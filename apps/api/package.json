@@ -1,0 +1,14 @@
+{
+  "name": "@harmony/api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node -e \"console.log('apps/api dev placeholder')\"",
+    "build": "node -e \"console.log('apps/api build placeholder')\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "sh -c 'mkdir -p reports && eslint . -f json -o reports/eslint-api.json'",
+    "test": "node -e \"console.log('apps/api test placeholder')\""
+  }
+}
+

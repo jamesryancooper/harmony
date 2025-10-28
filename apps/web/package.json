@@ -1,0 +1,14 @@
+{
+  "name": "@harmony/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node -e \"console.log('apps/web dev placeholder')\"",
+    "build": "node -e \"console.log('apps/web build placeholder')\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "sh -c 'mkdir -p reports && eslint . -f json -o reports/eslint-web.json'",
+    "test": "node -e \"console.log('apps/web test placeholder')\""
+  }
+}
+

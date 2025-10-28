@@ -14,9 +14,10 @@
       "@domain/*": ["packages/domain/*"],
       "@adapters/*": ["packages/adapters/*"],
       "@contracts/*": ["packages/contracts/*"],
-      "@ui-kit/*": ["packages/ui-kit/*"]
+      "@ui-kit/*": ["packages/ui-kit/*"],
+      "@config/*": ["packages/config/*"],
+      "@infra/*": ["infra/*"]
     }
   },
   "exclude": ["node_modules", "dist", "build"]
 }
-

@@ -8,6 +8,7 @@
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
+    "lint:root": "sh -c 'mkdir -p reports && eslint . -f json -o reports/eslint-root.json'",
     "test": "turbo run test",
     "contracts:check": "turbo run contracts:check",
     "deps:scan": "pnpm dlx osv-scanner --recursive --format sarif --output reports/osv.sarif || true",
@@ -15,9 +16,11 @@
     "secrets:scan": "pnpm dlx trufflehog filesystem --no-update --fail --path .",
     "preview:vercel": "turbo run preview:vercel"
   },
+  "engines": {
+    "node": "20.x"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
   ]
 }
-
