@@ -6,3 +6,13 @@ export class HealthAdapter implements HealthPort {
   }
 }
 
+export { default as createAIGateway } from './ai-gateway';
+export type {
+  AIGateway,
+  GenerateCompletionDTO,
+  CompletionResponseDTO,
+  GenerateEmbeddingDTO,
+  EmbeddingResponseDTO
+} from './ai-gateway';
+export { AIServiceError } from './ai-gateway';
+

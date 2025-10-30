@@ -64,6 +64,31 @@ jobs:
           base: packages/contracts/openapi-base.yaml
           revision: packages/contracts/openapi.yaml
 
+  python:
+    if: ${{ hashFiles('apps/ai-gateway/pyproject.toml') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@v3
+      - name: Install deps (uv sync)
+        working-directory: apps/ai-gateway
+        run: uv sync --all-extras
+      - name: Lint (ruff) + Format check (black)
+        working-directory: apps/ai-gateway
+        run: uv run ruff check . && uv run black --check .
+      - name: Typecheck (mypy)
+        working-directory: apps/ai-gateway
+        run: uv run mypy app
+      - name: Tests (pytest)
+        working-directory: apps/ai-gateway
+        run: uv run pytest -q
+      - name: Python license scan
+        working-directory: apps/ai-gateway
+        run: uv run pip-licenses --format=json --output-file reports/pip-licenses.json || true
+
   preview:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     needs: quality
