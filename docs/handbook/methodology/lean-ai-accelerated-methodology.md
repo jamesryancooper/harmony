@@ -1,4 +1,7 @@
-# Lean AI-Accelerated Methodology
+---
+title: Lean AI-Accelerated Methodology Overview
+description: Summary of the Harmony methodology combining BMAD, Cursor, Turborepo, Vercel, and compliance guardrails for fast delivery.
+---
 
 Harmony is a lean, **opinionated** methodology you can adopt tomorrow with two developers, optimized for **speed with safety** on your stated stack and hosting. It integrates **BMAD (Agentic agile with custom (SDD) spec‑first module) + Cursor + Turborepo + Vercel** end‑to‑end, while baking in **SRE, DevSecOps, OWASP ASVS, NIST SSDF, STRIDE, 12‑Factor, Monolith‑First, Hexagonal**.
 
@@ -99,7 +102,7 @@ flowchart LR
 4. **Cursor workflow**:
    - Paste Spec → generate **plan** and **checklist**; **pause**.
    - Ask Cursor to propose **diffs** *with* tests and contracts; **pause** again for a **human review** (security, correctness, licensing).
-   - Run **license checks** (Node `license-checker`, Python `pip-licenses`) and attach to PR.
+   - Record **license status** via GitHub **Dependency Review** + **SBOM (Syft)**. Optionally run Node `license-checker` or Python `pip-licenses` locally and attach notes to the PR.
    - Run **threat-model from spec** prompt to produce test cases (XSS/CSRF/SSRF/IDOR). Use **OWASP cheat sheets** for CSP/CSRF/SSRF while coding.
 
 ---
@@ -109,8 +112,8 @@ flowchart LR
 - **Trunk‑Based**: short‑lived branches (≤1 day). One small change per PR. Use **feature flags** for any risky behavior.
 - **Vercel Previews**: every PR gets a live URL for acceptance and e2e smoke. **Promote** a known‑good preview to production (instant rollback path).
 - **Environment naming & Production policy**: Use **PR Preview** (per PR), **Trunk Preview** (on `main`), and **Production** (manual promote only). In Vercel, disable **Auto Production Deployments** so Production is updated exclusively via `vercel promote <preview-url>`.
-- **Feature flags**: use **Vercel Flags** as the provider (server‑evaluated). The in‑repo `packages/config/flags.ts` reads flag values from the Vercel provider (registered at app startup) and falls back to env overrides (`HARMONY_FLAG_*`) for local/dev. Call `setFlagProvider(vercelFlagsProvider)` during application startup; otherwise, evaluation uses env (`HARMONY_FLAG_*`) and defaults. Clean up flags within 2 cycles.
-- **Environments & secrets**: use **Vercel envs** + CLI to manage; never commit secrets; rely on **GitHub secret scanning** + **Gitleaks** in CI.
+- **Feature flags**: use **Vercel Flags** as the provider (server‑evaluated). The in‑repo `packages/config/flags.ts` reads flag values from the Vercel provider (registered at app startup) and falls back to env overrides (`HARMONY_FLAG_*`) for local/dev. Call `setFlagProvider(vercelFlagsProvider)` during application startup — for this repo, register in `apps/api/src/server.ts` (API) and in the SSR entry when adding SSR surfaces. For **Astro SSG/static** pages, evaluate flags server‑side and inject values at build time or via Edge middleware; avoid using `process.env` in the browser. Otherwise, evaluation uses env (`HARMONY_FLAG_*`) and defaults. Clean up flags within 2 cycles.
+- **Environments & secrets**: use **Vercel envs** + CLI to manage; never commit secrets; rely on **GitHub secret scanning** + **TruffleHog** in CI.
 
 ---
 
@@ -137,16 +140,16 @@ flowchart TB
   M -->|all required checks| N[Merge Allowed]
 ```
 
-**Checklist (required to merge)**:
+**Checklist (required to merge unless marked optional/adopt incrementally)**:
 
-- [] **Lint/format**: ESLint (type-aware) + `typescript-eslint`, Ruff + Black.
-- [] **Type Check**: TypeScript (`tsc --noEmit` with strict), mypy (conditional).
-- [] **Tests**: unit (Vitest default; Jest only if needed; pytest for Python), **contract tests** (Pact), OpenAPI schema checks (**Schemathesis**), preview **e2e smoke** (Playwright).
+- [] **Lint/format**: ESLint (type-aware) + `typescript-eslint`; add Ruff/Black when Python is added (optional).
+- [] **Type Check**: TypeScript (`tsc --noEmit` with strict); add mypy when Python is added (optional).
+- [] **Tests**: unit. OpenAPI breaking-change check (**oasdiff**) enforced. Pact/Schemathesis and preview **e2e smoke** (Playwright) are recommended (optional).
 - [] **Static analysis**: **CodeQL** (GitHub code scanning) + **Semgrep** rules; fail on high‑sev.
-- [] **Dependencies**: **Dependabot alerts** + SCA (e.g., OWASP Dependency‑Check), **license** scan (`license-checker`, `pip-licenses`).
-- [] **Secret scan**: GitHub **secret scanning** + **Gitleaks**.
+- [] **Dependencies**: **Dependabot alerts** + SCA (e.g., OWASP Dependency‑Check); license policy via GitHub **Dependency Review**.
+- [] **Secret scan**: GitHub **secret scanning** + **TruffleHog**.
 - [] **SBOM**: **Syft** (SPDX by default) uploaded as artifact (e.g., `sbom/sbom.spdx.json`).
-- [] **Contracts & bundles**: OpenAPI/JSON‑Schema present; enforce **bundle size** budgets (`size-limit`).
+- [] **Contracts & bundles**: OpenAPI/JSON‑Schema present; enforce OpenAPI diff (**oasdiff**). **Bundle size** budgets are recommended; add CI enforcement later.
 - [] **Preview URL** comment: linked from Vercel integration; feature **flag off by default**.
 
 ---
@@ -157,7 +160,7 @@ flowchart TB
 - **Contract tests** at **ports** (API/UI) to freeze **Hexagonal** boundaries: Pact for consumer/provider; validate OpenAPI with Schemathesis; Prism mocks for dev.
 - **AI “golden” tests**: snapshot expected model outputs for critical prompts and guard with **JSON‑Schema**.
 - **Golden test stability**: prefer deterministic fixtures and schema-based assertions; allow bounded tolerances for token variance. Fail on schema or material output drift, not minor wording differences.
-- **E2E smoke** on every Preview (Playwright) for core flows (login, pay, CRUD).
+- **E2E smoke** on Preview (Playwright) for core flows (login, pay, CRUD) — recommended.
 - **Canary/flag validation checklist** before enabling flags for a % of users.
 
 ---
@@ -205,7 +208,7 @@ flowchart TB
 - **Caching**: at app (**React cache for Next.js surfaces**; for **Astro**, rely on SSG + CDN or adapter SSR caching), CDN (Vercel), and data (Upstash Redis) with **cache‑key discipline**.
 - **Queues/backpressure**: Default: **QStash** for serverless simplicity; alternative: **BullMQ + Upstash (Redis)** for heavier workloads or long‑running tasks; **Vercel Cron** for scheduled jobs.
 - **DB basics**: indexes on read paths, batched writes, pagination, idempotency keys, soft limits and rate limiting.
-- **Load test plan**: quick repeatables (k6/Artillery/autocannon) on Preview. Run against **PR Preview** for risky changes or **Trunk Preview** for broader regressions; minimum 2 minutes or ≥1,000 requests. Gate merges if p95 exceeds budget by >10%.
+- **Load test plan**: quick repeatables (k6/Artillery/autocannon) on Preview. Run against **PR Preview** for risky changes or **Trunk Preview** for broader regressions; minimum 2 minutes or ≥1,000 requests. Recommended policy: consider gating merges if p95 exceeds budget by >10%.
 
 ---
 
@@ -217,7 +220,7 @@ flowchart TB
 
 Framework strategy: **Next.js** is the default for SaaS/dynamic web apps; **Astro** is used for content‑first properties (blogs/docs/marketing). The current `apps/web` is Astro; additional Next.js apps will be added for dynamic surfaces as the project grows.
 
-- **Feature flags implementation**: flags are declared in `packages/config/flags.ts`. At app startup, register the **Vercel Flags provider** so `isFlagEnabled()` and `listFlags()` read from it by default, with local env (`HARMONY_FLAG_*`) as fallback for development. On **SSR** surfaces (Next.js, Astro adapters), flags are server‑evaluated by the provider. On **Astro SSG/static** pages, evaluate flags via Edge middleware/API or inject at build time—do not rely on `process.env` in the browser.
+- **Feature flags implementation**: flags are declared in `packages/config/flags.ts`. At app startup, register the **Vercel Flags provider** so `isFlagEnabled()` and `listFlags()` read from it by default, with local env (`HARMONY_FLAG_*`) as fallback for development. On **SSR** surfaces (Next.js, Astro adapters), flags are server‑evaluated by the provider. On **Astro SSG/static** pages, use `isFlagEnabled` only on the server; inject flag values at build time or fetch via Edge/API — do not rely on `process.env` in the browser.
 
 **Example layout & ownership (CODEOWNERS)**:
 Note: Illustrative example; `apps/app` (Next.js) may not exist yet. Add Next.js surfaces as needed.
@@ -273,7 +276,7 @@ Use **CODEOWNERS** to enforce review by area (e.g., `packages/domain` → both d
 
 - **GitHub Projects**: board columns above; templates for Spec/BMAD/bug; Insights for cycle time. Protect `main` with **required checks**.
 - **Actions matrix per package**: `turbo run lint test build --filter=...` using remote cache.
-- **Required checks**: all **CI gates** from §7.
+- **Required checks**: the gates configured in `infra/ci/pr.yml` (subset of §7); adopt additional gates incrementally.
 - **Vercel**: previews on every PR; **promote** for instant rollback; env & secret management; **feature flags** via Vercel Flags/Toolbar; **cron** for schedules.
 
 ---
@@ -365,7 +368,7 @@ Use **CODEOWNERS** to enforce review by area (e.g., `packages/domain` → both d
 3. Use **Cursor** to propose plan/diffs/tests with checkpoints.
 4. Open tiny PR → **Vercel Preview** → run e2e smoke → merge if gates pass.
 
-**Required CI checks**: lint/format; TS `--strict`; unit; typecheck; **contract tests**; **e2e smoke (Preview)**; **CodeQL + Semgrep**; **Dependabot/SCA + license**; **secret scanning + Gitleaks**; **SBOM**; **bundle/perf budgets**.
+**Required CI checks**: lint/format; TS `--strict`; unit; typecheck; **OpenAPI diff (oasdiff)**; **CodeQL + Semgrep**; **Dependabot/SCA + Dependency Review (license)**; **secret scanning + TruffleHog**; **SBOM**; Preview URL comment. Recommended: Pact/Schemathesis and **e2e smoke (Playwright)**; publish **bundle/perf budgets** (CI enforcement optional).
 
 **SLOs (starter)**: Availability 99.9%; p95 API ≤300 ms warm (≤600 ms incl. cold); p95 TTFB ≤400 ms; 5xx ≤0.5%. **Error budget** gates releases.
 
@@ -401,7 +404,7 @@ Use **CODEOWNERS** to enforce review by area (e.g., `packages/domain` → both d
 - **Hexagonal Architecture**.
 - **Kanban/WIP (Little’s Law)**.
 - **Turborepo** (caching/monorepos) + **Vercel** (previews, promote, envs, flags, cron).
-- **Static analysis & SCA**: CodeQL, Semgrep, Dependabot, OWASP Dependency‑Check; **SBOM**: Syft; **secret scanning**: GitHub + Gitleaks.
+- **Static analysis & SCA**: CodeQL, Semgrep, Dependabot, OWASP Dependency‑Check; **SBOM**: Syft; **secret scanning**: GitHub + TruffleHog.
 - **Observability**: Next.js/Astro (SSR) OTel + Node OTel + pino.
 
 ---

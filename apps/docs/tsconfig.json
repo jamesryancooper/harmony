@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "types": ["node", "astro/client"]
+  },
+  "include": [
+    "src",
+    "astro.config.ts",
+    "starlight.config.ts"
+  ]
+}
+

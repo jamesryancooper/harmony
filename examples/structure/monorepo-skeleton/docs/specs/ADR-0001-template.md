@@ -1,3 +1,8 @@
+---
+title: ADR Template (Monorepo Skeleton)
+description: Baseline ADR format bundled with the monorepo skeleton example.
+---
+
 # ADR-0001: <Title>
 
 - Status: Proposed

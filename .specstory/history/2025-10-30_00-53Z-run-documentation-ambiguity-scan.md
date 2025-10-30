@@ -270,551 +270,171 @@ Summary: 0 Critical, 6 Major, 4 Minor. Themes: CI/gating language overstates cur
 
 ---
 
-_**User (2025-10-29 19:04Z)**_
+_**User (2025-10-30 10:33Z)**_
 
-What would a good implementation/integration of Python be for this project? We will be building AI-heavy apps, and I'd assume an AI-related integration may make a good addition.
+Implement the suggested updates to correct the inconsistencies and ambiguities mentioned. Where there is a choice to be made, choose the options that cause the least friction and introduce the least complexity for a team of two developers while allowing them to maintain development **speed and safety**.
 
 ---
 
 _**Assistant (gpt-5-high)**_
 
-<think><details><summary>Thought Process</summary>**Considering Python integration**
+<think><details><summary>Thought Process</summary>**Implementing documentation updates**
 
-I’m focusing on how to integrate Python effectively into this project because they want to build AI-heavy apps. It seems logical to propose an AI-related integration. I’ll need to develop a plan for incorporating Python into the existing TypeScript-oriented Turborepo monorepo, which uses Node 22.x. Since they’re interested in ChatGPT-style LLM inference and Python microservices, I should also ensure the integration aligns with Clean Architecture and works with Next.js 15 and Astro for web development.
-**Proposing Python integration**
+I need to implement suggested updates to the lean-ai-accelerated-methodology.md to correct inconsistencies and ambiguities identified in the recent scan. It’s producing a list of 10 issues, and the user wants us to take care of these edits. The guidelines suggest creating a to-do list for these multi-step tasks. I’ll outline updates like CI Python support, contract tests language, Playwright updates, and more before opening the file to make edits.
+**Clarifying document line counts**
 
-The user prefers features from Next.js, but my memory notes that the project currently uses Astro. I can propose adding a Python package for machine learning, like 'packages/ai' or an 'apps/ai-service' using FastAPI for model serving. I also think I can integrate Turbo tasks through 'turbo.json' for Python tasks, while managing dependencies with tools like 'uv' or 'poetry'. The pipeline supports both TypeScript and Python, so I’ll suggest adopting 'uv' and include tools like 'Ruff', 'Black', and 'Mypy', while ensuring the folder structure follows kebab-case naming conventions.
-**Proposing architecture for AI integration**
+I reviewed the document and noticed it currently has 579 lines, while the additional data shows only 414 total lines. This discrepancy suggests that the document might have been trimmed. The git status points to deletions and modifications in other documents, not this one. It seems the additional data may be a stale snapshot. I need to re-read the file at /Users/jamesryancooper/Desktop/projects/harmony/docs/handbook/methodology/lean-ai-accelerated-methodology.md to confirm the line counts and specific sections to edit while preserving indentation. I'll also ensure to follow the CITING_CODE guidelines.
+**Implementing edits with user guidelines**
 
-I’m considering proposing interfaces and ports in `packages/domain` (TypeScript) and `packages/contracts` with OpenAPI. For the Python service, I can implement an adapter using JSON-typed DTOs. Maybe we could later consider a Pact contract as well. I’ll suggest adding observability with OpenTelemetry and logging with either structlog or standard JSON. The user needs LLM frameworks, so I think we should go for a minimal setup with FastAPI, Pydantic for schemas, and LiteLLM as a routing solution. This could all support an 'ai-gateway' service for completions and embeddings with proper security measures.
-**Planning Python integration and CI**
+I need to implement edits using the tool as expected. The user’s rules specify that I should wrap the entire result inside a single code box, which feels a bit at odds with our usual conversational style for updates. Earlier, we used code blocks, so it's not completely unfamiliar. For the current step, I need to actually modify the file rather than just show the changes. Then, I’ll provide a summary while adhering to the user’s preferences for formatting.
+**Navigating formatting conflicts**
 
-I’m considering introducing open-source license scanning for Python using tools like 'pip-licenses', 'licensecheck', or 'pip-audit'. I should expand the CI configuration in `infra/ci/pr.yml` to include a Python job when Python files are present. Maybe I can create a separate job called 'python-quality' that runs commands like 'ruff check' and 'pytest', while leveraging caching.
+I’m facing a conflict between the developer instruction, which states to use code blocks only for relevant sections, and the user's rules that require wrapping the entire result in a single code box. It seems the user's formatting instruction should take precedence since it's explicit. While I know I need to provide status updates and summaries, the user rules are clear on this format. So I’ll embed my status update within the required code box and ensure I follow the CITING CODE by not adding language tags.
+**Preparing for document edits**
 
-We might also generate a minimal code skeleton for the proposed Python service and match endpoints to the OpenAPI contract in `packages/contracts`. I’d include examples of necessary files for clarity.
-**Providing code proposal format**
-
-The user is in ask mode, so I can’t edit files, but I need to provide proposed code they can apply. I must follow their output rules, which require results in a single code box while escaping code fences with a backslash. This means inside the code box, I’ll split multiple file examples into separate escaped code blocks and include path comments, like `# apps/ai-service/app/main.py` for Python files.
-
-I also need to propose updates to existing CI configurations and suggest where to deploy the Python service, all while adhering to their coding standards.
-**Proposing Python service integration**
-
-Given that the pipeline supports TypeScript and Python, I suggest adding a Python service using FastAPI located in `apps/ai-service`. This service would implement various endpoints and include OpenTelemetry instrumentation.
-
-I’ll provide the necessary directory structure, configurations like `pyproject.toml`, and key files such as `main.py` for endpoints and `schemas.py` for DTOs. I'll also propose modifications to the CI configuration in `infra/ci/pr.yml`, all while adhering to the output rules of presenting everything in a single escaped code box.
-**Structuring code delivery**
-
-It’s clear that for existing files, I must include a file path comment after the initial backticks, while for new files, it’s optional but helpful for consistency. I need to ensure proper code style by commenting on complex logic and providing docstrings and error handling.
-
-For the `pyproject.toml`, I’ll specify required dependencies like FastAPI and OpenTelemetry. In `main.py`, I’ll create endpoints for health checks and LLM completions using Pydantic models. I will set up instrumentation in `otel.py` and ensure tests check functionality in `test_health.py`. Finally, I will structure my code in a nested format within a single code box for clarity.
-**Implementing CI and Code Structure**
-
-I need to ensure we add a new CI job in the `infra/ci/pr.yml` file and keep everything inside a single code block as required. The TypeScript snippet in `adapters/ai-gateway.ts` should use a default export for the main function, so I’ll define it accordingly with the `createAIGateway` function. 
-
-In `main.py`, I'll implement RESTful endpoints for completions and embeddings using `litellm`, ensuring proper configuration for OpenTelemetry instrumentation. Lastly, I’ll include a summary of the changes made at the end of my response, keeping it concise and within the code fence to meet the user's formatting requirements.</details></think>
+I’ll output everything inside a single code box, which may include code references. However, the aggregator environment might not require those since I’ll be summarizing changes instead. I’ll use apply_patch for code editing. My final message will likely include a commit message and status update all together. The developer guidelines indicate that I need a status update at the top of any message with tool calls, so I’ll follow that. I'll read the file to identify sections for minimal edits while preserving indentation.</details></think>
 
 ---
 
-```plaintext
-Proposal: Add a Python AI Gateway service (FastAPI + LiteLLM) under `apps/ai-service` for model-agnostic LLM/embeddings endpoints with OpenTelemetry and JSON logs. Integrate with the monorepo via a lightweight `package.json` for Turbo/PNPM orchestration, and extend CI to run Python gates conditionally. Provide a TypeScript adapter in `packages/adapters` to consume the gateway from apps.
-
-\```plaintext
-// Suggested repo additions (new files)
-apps/
-  ai-service/
-    app/
-      __init__.py
-      main.py
-      schemas.py
-      otel.py
-    tests/
-      test_health.py
-    pyproject.toml
-    README.md
-    package.json  # bridge to Turbo via PNPM scripts calling `uv`
-\```
-
-\```toml
-# apps/ai-service/pyproject.toml
-[project]
-name = "ai-service"
-version = "0.0.1"
-description = "Python AI Gateway for LLM and embeddings"
-requires-python = ">=3.11"
-dependencies = [
-  "fastapi>=0.115",
-  "uvicorn[standard]>=0.30",
-  "pydantic>=2.9",
-  "structlog>=24.1",
-  "httpx>=0.27",
-  "litellm>=1.40.0",
-  "opentelemetry-sdk>=1.26.0",
-  "opentelemetry-instrumentation-fastapi>=0.47b0",
-  "opentelemetry-exporter-otlp-proto-http>=1.26.0",
-  "opentelemetry-instrumentation-logging>=0.47b0",
-  "pip-licenses>=4.5.1"
-]
-
-[tool.uv]
-# No special config needed; `uv` will lock/install via this file.
-
-[tool.ruff]
-line-length = 100
-target-version = "py311"
-
-[tool.black]
-line-length = 100
-target-version = ["py311"]
-
-[tool.mypy]
-python_version = "3.11"
-strict = true
-warn_unused_ignores = true
-disallow_untyped_defs = true
-warn_return_any = true
-
-[tool.pytest.ini_options]
-addopts = "-q"
-asyncio_mode = "auto"
-\```
-
-\```python
-# apps/ai-service/app/schemas.py
-from __future__ import annotations
-
-from pydantic import BaseModel, Field
-from typing import Optional, List
-
-
-class CompletionRequest(BaseModel):
-    prompt: str = Field(..., description="User prompt")
-    model: Optional[str] = Field(default=None, description="LLM model identifier")
-    temperature: Optional[float] = Field(default=0.7, ge=0.0, le=2.0)
-    max_tokens: Optional[int] = Field(default=256, ge=1)
-
-
-class CompletionResponse(BaseModel):
-    output: str
-    model: str
-    promptTokens: int
-    completionTokens: int
-    totalTokens: int
-
-
-class EmbeddingRequest(BaseModel):
-    input: str = Field(..., description="Text to embed")
-    model: Optional[str] = Field(default=None, description="Embedding model identifier")
-
-
-class EmbeddingResponse(BaseModel):
-    embedding: List[float]
-    model: str
-\```
-
-\```python
-# apps/ai-service/app/otel.py
-from __future__ import annotations
-
-import os
-from typing import Optional
-
-from fastapi import FastAPI
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.logging import LoggingInstrumentation
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-
-
-def init_otel(app: FastAPI, service_name: str = "ai-service") -> Optional[callable]:
-    """
-    Initialize OpenTelemetry tracing and instrument FastAPI and logging.
-
-    Returns an optional shutdown callable for graceful teardown.
-    """
-    otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4318")
-    resource = Resource.create({"service.name": service_name})
-
-    provider = TracerProvider(resource=resource)
-    trace.set_tracer_provider(provider)
-
-    span_exporter = OTLPSpanExporter(endpoint=f"{otlp_endpoint}/v1/traces")
-    provider.add_span_processor(BatchSpanProcessor(span_exporter))
-
-    FastAPIInstrumentor.instrument_app(app)
-    LoggingInstrumentation(set_logging_format=True)
-
-    def _shutdown() -> None:
-        provider.shutdown()
-
-    return _shutdown
-\```
-
-\```python
-# apps/ai-service/app/main.py
-from __future__ import annotations
-
-import os
-import structlog
-from fastapi import FastAPI, HTTPException
-from litellm import acompletion, aembedding  # async LiteLLM APIs
-from app.schemas import (
-    CompletionRequest,
-    CompletionResponse,
-    EmbeddingRequest,
-    EmbeddingResponse,
-)
-from app.otel import init_otel
-
-logger = structlog.get_logger().bind(svc="ai-service")
-
-app = FastAPI(title="AI Gateway", version="0.0.1")
-_shutdown_otel = init_otel(app)
-
-
-@app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
-
-
-@app.post("/v1/llm/completions", response_model=CompletionResponse)
-async def create_completion(req: CompletionRequest) -> CompletionResponse:
-    """
-    Minimal model-agnostic completion endpoint using LiteLLM.
-    Provider API keys are read from env (e.g., OPENAI_API_KEY, ANTHROPIC_API_KEY).
-    """
-    model = req.model or os.getenv("LITELLM_MODEL", "gpt-4o-mini")
-    try:
-        resp = await acompletion(
-            model=model,
-            messages=[{"role": "user", "content": req.prompt}],
-            temperature=req.temperature or 0.7,
-            max_tokens=req.max_tokens or 256,
-        )
-        content = resp.choices[0].message["content"]
-        usage = resp.usage or {}
-        return CompletionResponse(
-            output=content,
-            model=resp.model or model,
-            promptTokens=int(usage.get("prompt_tokens", 0)),
-            completionTokens=int(usage.get("completion_tokens", 0)),
-            totalTokens=int(usage.get("total_tokens", 0)),
-        )
-    except Exception as e:
-        logger.exception("completion_error", err=str(e), model=model)
-        raise HTTPException(status_code=502, detail="Upstream LLM error") from e
-
-
-@app.post("/v1/embeddings", response_model=EmbeddingResponse)
-async def create_embedding(req: EmbeddingRequest) -> EmbeddingResponse:
-    """
-    Vendor-agnostic embeddings via LiteLLM.
-    """
-    model = req.model or os.getenv("LITELLM_EMBED_MODEL", "text-embedding-3-small")
-    try:
-        resp = await aembedding(model=model, input=req.input)
-        vec = resp.data[0]["embedding"]  # type: ignore[index]
-        return EmbeddingResponse(embedding=vec, model=model)
-    except Exception as e:
-        logger.exception("embedding_error", err=str(e), model=model)
-        raise HTTPException(status_code=502, detail="Upstream embeddings error") from e
-\```
-
-\```python
-# apps/ai-service/tests/test_health.py
-import pytest
-from httpx import AsyncClient
-from app.main import app
-
-
-@pytest.mark.asyncio
-async def test_health_ok():
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        r = await ac.get("/health")
-        assert r.status_code == 200
-        assert r.json() == {"status": "ok"}
-\```
-
-\```json
-// apps/ai-service/package.json
-{
-  "name": "@harmony/ai-service",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
-    "build": "uv sync",
-    "typecheck": "uv run mypy app",
-    "lint": "uv run ruff check . && uv run black --check .",
-    "format": "uv run black .",
-    "test": "uv run pytest -q",
-    "licenses": "uv run pip-licenses --format=json --with-urls --with-license-file --output-file reports/pip-licenses.json || true"
-  }
-}
-\```
-
-\```yaml
-# infra/ci/pr.yml (add a Python quality job and make preview depend on it)
-# 1) Add this new job:
-python:
-  if: ${{ hashFiles('apps/ai-service/pyproject.toml') != '' }}
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with: { python-version: "3.11" }
-    - uses: astral-sh/setup-uv@v3
-    - name: Install deps
-      working-directory: apps/ai-service
-      run: uv sync
-    - name: Lint (ruff) + Format check (black)
-      working-directory: apps/ai-service
-      run: uv run ruff check . && uv run black --check .
-    - name: Typecheck (mypy)
-      working-directory: apps/ai-service
-      run: uv run mypy app
-    - name: Tests (pytest)
-      working-directory: apps/ai-service
-      run: uv run pytest -q
-    - name: Python license scan
-      working-directory: apps/ai-service
-      run: uv run pip-licenses --format=json --output-file reports/pip-licenses.json || true
-
-# 2) Update the preview job `needs` to wait on Python too:
-# before:
-#   needs: quality
-# after:
-#   needs: [quality, python]
-\```
-
-\```ts
-// packages/adapters/src/ai-gateway.ts
-// ESM module: Node 22+ has global fetch.
-// Exposes a typed client for apps to call the Python AI Gateway.
-
-export interface GenerateCompletionDTO {
-  prompt: string;
-  model?: string;
-  temperature?: number;
-  maxTokens?: number;
-}
-
-export interface CompletionResponseDTO {
-  output: string;
-  model: string;
-  promptTokens: number;
-  completionTokens: number;
-  totalTokens: number;
-}
-
-export interface GenerateEmbeddingDTO {
-  input: string;
-  model?: string;
-}
-
-export interface EmbeddingResponseDTO {
-  embedding: number[];
-  model: string;
-}
-
-/**
- * Error class for AI Gateway failures.
- */
-export class AIServiceError extends Error {
-  constructor(message: string, public status?: number) {
-    super(message);
-    this.name = "AIServiceError";
-  }
-}
-
-/**
- * Contract for the AI Gateway client.
- */
-export interface AIGateway {
-  generateCompletion(
-    req: GenerateCompletionDTO,
-    signal?: AbortSignal
-  ): Promise<CompletionResponseDTO>;
-  generateEmbedding(
-    req: GenerateEmbeddingDTO,
-    signal?: AbortSignal
-  ): Promise<EmbeddingResponseDTO>;
-}
-
-const DEFAULT_AI_BASE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
-
-/**
- * Create a typed client to the Python AI Gateway.
- * Uses JSON over HTTP with simple retries handled by callers as needed.
- */
-export default function createAIGateway(baseUrl: string = DEFAULT_AI_BASE_URL): AIGateway {
-  async function handle<T>(res: Response): Promise<T> {
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new AIServiceError(text || `AI service error (${res.status})`, res.status);
-    }
-    return (await res.json()) as T;
-  }
-
-  return {
-    async generateCompletion(req, signal) {
-      const res = await fetch(new URL("/v1/llm/completions", baseUrl), {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(req),
-        signal
-      });
-      return handle<CompletionResponseDTO>(res);
-    },
-
-    async generateEmbedding(req, signal) {
-      const res = await fetch(new URL("/v1/embeddings", baseUrl), {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(req),
-        signal
-      });
-      return handle<EmbeddingResponseDTO>(res);
-    }
-  };
-}
-\```
-
-\```plaintext
-Env & ops notes:
-- Required env (Python service):
-  - `OTEL_EXPORTER_OTLP_ENDPOINT` (default `http://localhost:4318`)
-  - Provider keys as needed by LiteLLM (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`)
-  - `LITELLM_MODEL`, `LITELLM_EMBED_MODEL` (defaults in code)
-- Local dev:
-  - Start AI service: `cd apps/ai-service && uv run uvicorn app.main:app --reload --port 8000`
-  - Call from TS via `createAIGateway()` with `AI_SERVICE_URL=http://localhost:8000`
-- Security/limits (follow-ups):
-  - Add auth (e.g., HMAC or service token) and rate limiting (SlowAPI) before exposing publicly.
-  - Keep provider API keys only in the Python service env; do not forward to clients.
-- Observability:
-  - Python traces exported to the same OTLP endpoint as Node; HTTP spans correlate via W3C trace headers automatically when caller is instrumented.
-
-Impact:
-- Clean, decoupled AI boundary: TS apps call a stable HTTP contract; Python handles vendor complexity and evaluation.
-- CI alignment: Python gates run only when `apps/ai-service` exists, matching the doc’s intent for conditional Python support.
-\```
-```
+I’m going to update the methodology document to align it with the actual CI and repo setup, addressing the 10 noted issues. I’ll create a short todo list, then edit the file at each referenced section with minimal, precise wording changes.
 
 ---
 
-_**User (2025-10-30 01:30Z)**_
+Tool use: **todo_write**
 
-What type of AI service is this?
+## Todo List
 
----
-
-_**Assistant (gpt-5-high)**_
-
-<think><details><summary>Thought Process</summary>**Clarifying AI Service Type**
-
-I need to answer the user's question about the type of AI service. They’re referring to the proposed Python AI Gateway service. This service, built with FastAPI and LiteLLM, acts as a model-agnostic AI Gateway that abstracts underlying providers. It serves as a backend for AI operations, offering capabilities like LLM text generation and embeddings, with potential for extensions. The user requires a single code box for output and minimal formatting. I'll make sure to follow those guidelines!
-**Organizing Output with Code Box**
-
-I need to follow the user's request to use 'markdown_spec' with headings and bold bullet items. However, since they want everything in a single code box, I must escape the code block using backticks. They specified to place the entire result inside one code box and escape any example code blocks, but it doesn’t seem like there are actual code blocks, just text. I’ll ensure the output is formatted as plaintext with bullets while adhering to their rules, even if it creates some conflicts in formatting.
-**Summarizing AI Gateway Service**
-
-I need to provide a minimal answer about the AI Gateway service. It’s a model-agnostic REST microservice that uses FastAPI and LiteLLM, returning JSON. It has two endpoints for LLM completions and embeddings, meant for a TypeScript client. The service is stateless and secure with future HMAC tokens. I should cover what it is, what it isn’t, its current capabilities, and extensibility. I’ll also provide a concise bullet list, all wrapped in a single code box.
-**Creating Plaintext Code Block**
-
-I’m going to format the response in a plaintext code block with crisp bullet points. Here’s the outline:
-
-- Type: model-agnostic AI Gateway (REST microservice).
-- Purpose: uniform contract for completions and embeddings; vendor-agnostic via LiteLLM.
-- Tech: built on FastAPI, LiteLLM, OTEL, structlog; returns JSON.
-- Endpoints: POST /v1/llm/completions; POST /v1/embeddings.
-- Usage: Called by TypeScript adapter `createAIGateway`.
-- Not: Not a training service; not a vector database; not a job queue.
-- Additional Features: suitable for AI-heavy apps, can include reranking, moderation, schema validation, and caching.
-
-I’ll make sure it all fits within a single code block!</details></think>
+- [-] Reword CI Python support to TS-only with optional Python adoption
+- [ ] Clarify contract tests (Pact/Schemathesis) as incremental/optional; keep oasdiff
+- [ ] Clarify Playwright preview smoke as recommended unless added to CI
+- [ ] Align license scanning text with Dependency Review + SBOM; make license-checker optional
+- [ ] Replace Gitleaks mention with TruffleHog to match CI
+- [ ] Change bundle budget enforcement to recommended unless CI step added
+- [ ] Adjust 'Required checks' language to reflect actual pr.yml gates
+- [ ] Add explicit flag provider wiring points for API and Astro SSG
+- [ ] Clarify Astro SSG server-only flag evaluation and injection approach
+- [ ] Reframe load-test gating as recommended policy (no CI implementation)
 
 ---
 
-```plaintext
-- What it is: A model‑agnostic AI Gateway (REST microservice) that standardizes access to LLMs and embeddings behind a single HTTP API.
-- Purpose: Provide a uniform, vendor‑neutral contract for text completions and embeddings across providers (via LiteLLM), centralizing keys, quotas, and policies.
-- Tech stack: Python 3.11, FastAPI, LiteLLM, structlog (JSON logs), OpenTelemetry (OTLP), httpx; exported traces align with the repo’s OTEL setup.
-- Endpoints (JSON over HTTP):
-  - POST /v1/llm/completions → text generation (prompt, model, temperature, max_tokens)
-  - POST /v1/embeddings → dense vector embeddings (input, model)
-- Consumption: TypeScript apps call it through a typed HTTP client (e.g., `createAIGateway`) instead of talking to providers directly.
-- Characteristics: Stateless, provider‑agnostic, easy to extend (moderation, reranking, tool‑calling schema validation, caching, batch jobs).
-- What it isn’t: Not a training/finetuning pipeline, not a vector store, not a long‑running job/queue worker (those can be added later if needed).
-- Why this fits AI‑heavy apps: Centralizes observability, auth/rate‑limits, and cost controls; lets you swap/compose providers without changing app code.
-```
 
----
-
-_**User (2025-10-30 01:30Z)**_
-
-Please implement this AI service in the `apps/ai-gateway` directory.
-
----
-
-_**Assistant (gpt-5-high)**_
-
-<think><details><summary>Thought Process</summary>**Implementing AI service in the new directory**
-
-I need to implement the AI service in the `apps/ai-gateway` directory, as per the user's latest direction. I'll create a new directory and set up the Python service with FastAPI, LiteLLM, and OpenTelemetry, including tests and a `pyproject` file. I'll also need to update the CI configuration to reflect this change and ensure that Python jobs run correctly. Additionally, I’m considering adding a TypeScript adapter and updating exports accordingly.
-**Navigating developer instructions**
-
-The developer instructions want me to use todo_write for multi-step tasks, which includes creating directories, updating CI, and adding an adapter. I’ll need to keep track of tasks and their statuses. When implementing code, I can use apply_patch for new files and modifications to YAML. However, I must follow the user's Output Rules and ensure the results are formatted in a single code box while keeping content relevant. It seems there's some conflicting guidance here that I need to balance.
-**Resolving formatting conflicts**
-
-I’m noticing a conflict between the interface and the user’s requests. The user wants the AI service implemented in the `apps/ai-gateway` directory and expects a summary afterward. However, their Output Rules require code block formatting for outputs. The developer instructions advise against showing code unless explicitly requested, suggesting I use code editing tools instead. Since the user asked for implementation rather than code examples, I’ll focus on summarizing the changes without outputting full code. However, I have to think about how to incorporate the user’s formatting requests appropriately.
-**Implementing in agent mode**
-
-Now that I'm in agent mode, I need to implement the required changes. At the end, providing a summary is essential, but there’s some confusion regarding the user's rules. They specify that I should embed the entire result in a single code box, which conflicts with typical tool-run outputs. However, I can still place the summary inside a code block, complying with their request. I’ll ensure to include necessary status updates alongside the summary while avoiding overly lengthy code snippets.
-**Planning code edits**
-
-I need to ensure I preserve indentation characters and width in our code edits. So, let's make a todo list for our tasks:
-
-First, I'll scaffold the Python AI Gateway in `apps/ai-gateway`, creating necessary directories and files. Then, I’ll add a TypeScript adapter file in `packages/adapters/src/ai-gateway.ts` and make sure to export it in `index.ts`. Next, I’ll update the CI in `infra/ci/pr.yml` to include a Python job. Also, I may need to consider updates to `pnpm-workspace.yaml`, the `.gitignore`, and potential documentation adjustments. Finally, I’ll check the content of `index.ts`.</details></think>
-
----
-
-I'll scan the adapters index to wire the new `ai-gateway` export and then scaffold the Python service and CI job in one go.
 
 ---
 
 Tool use: **read_file**
 
-Read file: /Users/jamesryancooper/Desktop/projects/harmony/packages/adapters/src/index.ts
+Read file: /Users/jamesryancooper/Desktop/projects/harmony/docs/handbook/methodology/lean-ai-accelerated-methodology.md
 
 ---
 
-<think><details><summary>Thought Process</summary>**Updating project structure**
+<think><details><summary>Thought Process</summary>**Updating enforcement guidelines**
 
-I need to add an export for `createAIGateway`, and I might have to check the TS config in `packages/adapters/tsconfig.json` to ensure it's set up correctly with ES modules. I'll create the file `packages/adapters/src/ai-gateway.ts` with our previous content, using ESM TS. Additionally, I’ll update `packages/adapters/src/index.ts` to export from `./ai-gateway`. The user rules require both default and named exports, so I'll follow that. Then, I’ll create files in `apps/ai-gateway`, including a `pyproject.toml` with adjusted dependencies.
-**Simplifying CI configuration**
+I’m thinking we should update the list to reflect what’s actually enforced, like linting, type checking, unit tests, and possibly builds. I want to add things like CodeQL, Semgrep, Dependency Review, TruffleHog, and others. For clarity, I'll replace terms like "contract tests" with "OpenAPI diff" and rename "e2e smoke" to "recommended Playwright smoke". I’ll also refine the edits for license checks and wiring specifics to better guide our practices.
+**Refining server-side rendering guidelines**
 
-Since this service is straightforward, I can place tooling in the dependencies to streamline CI. Using optional dependencies with `[project.optional-dependencies] dev = [...]` lets us install extras when running `uv sync`. For clarity, it's better to categorize these as optional extras so that we can run `uv sync --all-extras` in CI. I'll also create the necessary files: `app/__init__.py`, `app/schemas.py`, `app/otel.py`, and `app/main.py` with previous code, plus `tests/test_health.py`. Lastly, the `package.json` ensures workspace inclusion with defined scripts for `turbo.json` tasks.
-**Configuring CI with GitHub Actions**
+I’m thinking about SSR surfaces and how for Astro SSG, we need to evaluate flags server-side, injecting them into pages either at build time or through Edge middleware. I'll avoid using process.env in the browser. Line 220 already mentions some details, so I'll ensure they stay consistent. 
 
-I realize that the Python tasks call `uv`, which might not be installed in local development, but it's okay since dev can still run `pnpm ...`. Adding a GitHub Actions job to run `uv` works well. I'll consider adding a `.python-version` for 3.11, although it might not be necessary. Now I need to update `infra/ci/pr.yml` to include a new job called `python`. I'll place this alongside the 'quality' and 'preview' jobs and set it as independent. 
+I want to replace Gitleaks with TruffleHog and clarify that we rely on GitHub secret scanning along with it. For the pipeline details, I’ll rephrase to make it clear that TypeScript is supported, and Python can be added later. I'll also adjust mentions in mermaid diagrams to clarify Python's optional status.
+**Updating the merge checklist**
 
-I should clarify how the `needs` dependency works, as jobs with dependencies will be skipped if those dependencies are skipped.
-**Refining job dependencies in CI**
+I think it'll be best to minimize changes, but we definitely need to adjust the "Checklist (required to merge)" so it reflects the difference between recommended and required items. Lines 142–149 need modifications. For linting, we’ll specify "ESLint (type-aware) + typescript-eslint," and when we add Python, we’ll include "add Ruff/Black." For type checks, it’ll be "TypeScript tsc --noEmit with strict," and I'll mention adding mypy for Python later. 
 
-I need to be careful here because if the Python job gets skipped on PRs without the ai-gateway, it could cause the preview job to be skipped too. It seems like I should use the `if` condition on the `needs` job. The best approach might be to keep the preview job dependent only on quality, while adding the Python job as independent with proper gating. I want the preview to run regardless, so for the Python job, I can use `if: always() && condition`. This might help ensure the preview still runs even if the Python job is skipped, but I'm not entirely sure. Alternatively, I could leave the `needs: quality` unchanged and just add the Python job to run independently without impacting the preview. However, their earlier suggestion was to update the preview's needs, which is worth considering.
-**Updating CI and project structure**
+I'll ensure "Dependencies" is clear, stating "Dependabot alerts + SCA," and separately noting the license policy and SBOM step without restructuring too much.
+**Refining the checklist and edits**
 
-The user hasn't made it explicit that the preview job should depend on Python; they just want to implement the AI service. So, I can update CI to add a Python job while leaving the preview unchanged for safety, or I can make its `needs` depend only on quality. I'll implement the Python job but not modify the preview's needs, to avoid any surprises. 
+I see there's already an SBOM bullet on line 148, so I’ll keep that. For the secret scan, I'll specify using GitHub and TruffleHog. The SBOM will remain unchanged. 
 
-I also need to include `apps/ai-gateway` in the PNPM workspace, ensuring that `package.json` reflects Node settings. Adding `.gitignore` for the Python virtual environment is a good idea, so I'll check if the root already ignores it. I’ll ensure proper code style with comments and type annotations. Finally, I need to run the necessary task updates using `functions.apply_patch` and `todo_write` to track progress. Let’s get started on this!</details></think>
+Under contracts and bundles, I'll note that "OpenAPI/JSON-Schema is present," and we’ll enforce the OpenAPI diff. I'll adjust the line about end-to-end smoke tests to say it's "recommended" during previews. Additionally, I’ll update the load test gating policy to suggest considering gating merges if p95 exceeds the budget by more than 10%. Lastly, I’ll add clarifications about server-only usage for flag checks on line 220.
+**Adjusting the patch and checklist**
+
+I’m planning changes to the "Required checks" section, specifying gates in infra/ci/pr.yml and suggesting additional gates can be added gradually. For the checklist, I’ll update it to include configured checks like linting, TypeScript strict mode, unit tests, and OpenAPI diffs, along with TruffleHog and others. 
+
+I'll replace Gitleaks with TruffleHog and ensure the pipeline mentions that Python is optional. For the mermaid diagram, I want to simplify it by keeping it generic without listing specific tools. Each step will be adjusted to reduce friction while ensuring clarity.</details></think>
 
 ---
 
-I'll create a small todo plan and start by scaffolding the Python AI Gateway under `apps/ai-gateway`. Then I'll add the TypeScript adapter and update CI to include the Python job.
+Tool use: **apply_patch**
+
+<details>
+        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/docs/handbook/methodology/lean-ai-accelerated-methodology.md</summary>
+      
+
+```diff
+*** Begin Patch
+*** Update File: /Users/jamesryancooper/Desktop/projects/harmony/docs/handbook/methodology/lean-ai-accelerated-methodology.md
+@@
+   - Ask Cursor to propose **diffs** *with* tests and contracts; **pause** again for a **human review** (security, correctness, licensing).
+-  - Run **license checks** (Node `license-checker`, Python `pip-licenses`) and attach to PR.
++  - Record **license status** via GitHub **Dependency Review** + **SBOM (Syft)**. Optionally run Node `license-checker` or Python `pip-licenses` locally and attach notes to the PR.
+   - Run **threat-model from spec** prompt to produce test cases (XSS/CSRF/SSRF/IDOR). Use **OWASP cheat sheets** for CSP/CSRF/SSRF while coding.
+@@
+ - **Environment naming & Production policy**: Use **PR Preview** (per PR), **Trunk Preview** (on `main`), and **Production** (manual promote only). In Vercel, disable **Auto Production Deployments** so Production is updated exclusively via `vercel promote <preview-url>`.
+-- **Feature flags**: use **Vercel Flags** as the provider (server‑evaluated). The in‑repo `packages/config/flags.ts` reads flag values from the Vercel provider (registered at app startup) and falls back to env overrides (`HARMONY_FLAG_*`) for local/dev. Call `setFlagProvider(vercelFlagsProvider)` during application startup; otherwise, evaluation uses env (`HARMONY_FLAG_*`) and defaults. Clean up flags within 2 cycles.
+-- **Environments & secrets**: use **Vercel envs** + CLI to manage; never commit secrets; rely on **GitHub secret scanning** + **Gitleaks** in CI.
++- **Feature flags**: use **Vercel Flags** as the provider (server‑evaluated). The in‑repo `packages/config/flags.ts` reads flag values from the Vercel provider (registered at app startup) and falls back to env overrides (`HARMONY_FLAG_*`) for local/dev. Call `setFlagProvider(vercelFlagsProvider)` during application startup — for this repo, register in `apps/api/src/server.ts` (API) and in the SSR entry when adding SSR surfaces. For **Astro SSG/static** pages, evaluate flags server‑side and inject values at build time or via Edge middleware; avoid using `process.env` in the browser. Otherwise, evaluation uses env (`HARMONY_FLAG_*`) and defaults. Clean up flags within 2 cycles.
++- **Environments & secrets**: use **Vercel envs** + CLI to manage; never commit secrets; rely on **GitHub secret scanning** + **TruffleHog** in CI.
+@@
+-## 7) CI/CD Quality Gates
+-
+-The pipeline supports **TypeScript and Python**. CI runs language-specific linters, type checks, and tests per package using Turbo filters. Python gates run conditionally—only when a package contains Python (detected by a `pyproject.toml` or `.py` files). TypeScript **`strict`** is enforced via tsconfig; the Type Check stage runs `tsc --noEmit` as a dedicated gate.
++## 7) CI/CD Quality Gates
++
++The pipeline currently supports **TypeScript**. Python gates are **optional** and can be added per-package if/when Python is introduced. TypeScript **`strict`** is enforced via tsconfig; the Type Check stage runs `tsc --noEmit` as a dedicated gate.
+@@
+-  B --> C[Lint/Format: ESLint (type-aware), Ruff/Black]
+-  C --> D["Unit Tests (Vitest default; pytest)"]
+-  D --> E[Type Check: TypeScript (tsc --noEmit with strict), mypy]
+-  E --> F[Contract Tests: OpenAPI/JSON-Schema + Pact]
+-  F --> G[E2E Smoke: Playwright vs Preview URL]
++  B --> C[Lint/Format: ESLint (type-aware) \[Python: optional\]]
++  C --> D[Unit Tests]
++  D --> E[Type Check: TypeScript (tsc --noEmit with strict) \[Python: optional\]]
++  E --> F[Contract Checks: OpenAPI diff (oasdiff); optional Pact/Schemathesis]
++  F --> G[E2E Smoke: Playwright vs Preview URL (optional)]
+@@
+-**Checklist (required to merge)**:
++**Checklist (required to merge unless marked optional/adopt incrementally)**:
+@@
+-- [] **Lint/format**: ESLint (type-aware) + `typescript-eslint`, Ruff + Black.
+-- [] **Type Check**: TypeScript (`tsc --noEmit` with strict), mypy (conditional).
+-- [] **Tests**: unit (Vitest default; Jest only if needed; pytest for Python), **contract tests** (Pact), OpenAPI schema checks (**Schemathesis**), preview **e2e smoke** (Playwright).
++- [] **Lint/format**: ESLint (type-aware) + `typescript-eslint`; add Ruff/Black when Python is added (optional).
++- [] **Type Check**: TypeScript (`tsc --noEmit` with strict); add mypy when Python is added (optional).
++- [] **Tests**: unit. OpenAPI breaking-change check (**oasdiff**) enforced. Pact/Schemathesis and preview **e2e smoke** (Playwright) are recommended (optional).
+@@
+-- [] **Dependencies**: **Dependabot alerts** + SCA (e.g., OWASP Dependency‑Check), **license** scan (`license-checker`, `pip-licenses`).
+-- [] **Secret scan**: GitHub **secret scanning** + **Gitleaks**.
++- [] **Dependencies**: **Dependabot alerts** + SCA (e.g., OWASP Dependency‑Check); license policy via GitHub **Dependency Review**.
++- [] **Secret scan**: GitHub **secret scanning** + **TruffleHog**.
+@@
+-- [] **SBOM**: **Syft** (SPDX by default) uploaded as artifact (e.g., `sbom/sbom.spdx.json`).
+-- [] **Contracts & bundles**: OpenAPI/JSON‑Schema present; enforce **bundle size** budgets (`size-limit`).
++- [] **SBOM**: **Syft** (SPDX by default) uploaded as artifact (e.g., `sbom/sbom.spdx.json`).
++- [] **Contracts & bundles**: OpenAPI/JSON‑Schema present; enforce OpenAPI diff (**oasdiff**). **Bundle size** budgets are recommended; add CI enforcement later.
+@@
+-- **E2E smoke** on every Preview (Playwright) for core flows (login, pay, CRUD).
++- **E2E smoke** on Preview (Playwright) for core flows (login, pay, CRUD) — recommended.
+@@
+-- **Load test plan**: quick repeatables (k6/Artillery/autocannon) on Preview. Run against **PR Preview** for risky changes or **Trunk Preview** for broader regressions; minimum 2 minutes or ≥1,000 requests. Gate merges if p95 exceeds budget by >10%.
++- **Load test plan**: quick repeatables (k6/Artillery/autocannon) on Preview. Run against **PR Preview** for risky changes or **Trunk Preview** for broader regressions; minimum 2 minutes or ≥1,000 requests. Recommended policy: consider gating merges if p95 exceeds budget by >10%.
+@@
+-- **Feature flags implementation**: flags are declared in `packages/config/flags.ts`. At app startup, register the **Vercel Flags provider** so `isFlagEnabled()` and `listFlags()` read from it by default, with local env (`HARMONY_FLAG_*`) as fallback for development. On **SSR** surfaces (Next.js, Astro adapters), flags are server‑evaluated by the provider. On **Astro SSG/static** pages, evaluate flags via Edge middleware/API or inject at build time—do not rely on `process.env` in the browser.
++- **Feature flags implementation**: flags are declared in `packages/config/flags.ts`. At app startup, register the **Vercel Flags provider** so `isFlagEnabled()` and `listFlags()` read from it by default, with local env (`HARMONY_FLAG_*`) as fallback for development. On **SSR** surfaces (Next.js, Astro adapters), flags are server‑evaluated by the provider. On **Astro SSG/static** pages, use `isFlagEnabled` only on the server; inject flag values at build time or fetch via Edge/API — do not rely on `process.env` in the browser.
+@@
+-- **Required checks**: all **CI gates** from §7.
++- **Required checks**: the gates configured in `infra/ci/pr.yml` (subset of §7); adopt additional gates incrementally.
+@@
+-**Required CI checks**: lint/format; TS `--strict`; unit; typecheck; **contract tests**; **e2e smoke (Preview)**; **CodeQL + Semgrep**; **Dependabot/SCA + license**; **secret scanning + Gitleaks**; **SBOM**; **bundle/perf budgets**.
++**Required CI checks**: lint/format; TS `--strict`; unit; typecheck; **OpenAPI diff (oasdiff)**; **CodeQL + Semgrep**; **Dependabot/SCA + Dependency Review (license)**; **secret scanning + TruffleHog**; **SBOM**; Preview URL comment. Recommended: Pact/Schemathesis and **e2e smoke (Playwright)**; publish **bundle/perf budgets** (CI enforcement optional).
+@@
+-- **Static analysis & SCA**: CodeQL, Semgrep, Dependabot, OWASP Dependency‑Check; **SBOM**: Syft; **secret scanning**: GitHub + Gitleaks.
++- **Static analysis & SCA**: CodeQL, Semgrep, Dependabot, OWASP Dependency‑Check; **SBOM**: Syft; **secret scanning**: GitHub + TruffleHog.
+*** End Patch
+```
+
+---
+
+
 
 ---
 
@@ -822,1016 +442,50 @@ Tool use: **todo_write**
 
 ## Todo List
 
-- [-] Scaffold Python AI Gateway under apps/ai-gateway (FastAPI, LiteLLM, OTEL, tests)
-- [ ] Add TypeScript client adapter packages/adapters/src/ai-gateway.ts and export
-- [ ] Extend CI: add conditional Python job for apps/ai-gateway with uv
-
----
-
-
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/pyproject.toml</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Add File: apps/ai-gateway/pyproject.toml
-+[project]
-+name = "ai-gateway"
-+version = "0.0.1"
-+description = "Python AI Gateway for LLM completions and embeddings"
-+requires-python = ">=3.11"
-+dependencies = [
-+  "fastapi>=0.115",
-+  "uvicorn[standard]>=0.30",
-+  "pydantic>=2.9",
-+  "structlog>=24.1",
-+  "httpx>=0.27",
-+  "litellm>=1.40.0",
-+  "opentelemetry-sdk>=1.26.0",
-+  "opentelemetry-instrumentation-fastapi>=0.47b0",
-+  "opentelemetry-exporter-otlp-proto-http>=1.26.0",
-+  "opentelemetry-instrumentation-logging>=0.47b0"
-+]
-+
-+[project.optional-dependencies]
-+dev = [
-+  "pytest>=8.3",
-+  "pytest-asyncio>=0.23",
-+  "mypy>=1.12",
-+  "ruff>=0.6",
-+  "black>=24.8",
-+  "pip-licenses>=4.5.1"
-+]
-+
-+[tool.ruff]
-+line-length = 100
-+target-version = "py311"
-+
-+[tool.black]
-+line-length = 100
-+target-version = ["py311"]
-+
-+[tool.mypy]
-+python_version = "3.11"
-+strict = true
-+warn_unused_ignores = true
-+disallow_untyped_defs = true
-+warn_return_any = true
-+
-+[tool.pytest.ini_options]
-+addopts = "-q"
-+asyncio_mode = "auto"
-*** End Patch
-PATCH
-```
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/app/__init__.py</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Add File: apps/ai-gateway/app/__init__.py
-+# Package marker for ai-gateway FastAPI app
-+
-*** End Patch
-PATCH
-```
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/app/schemas.py</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Add File: apps/ai-gateway/app/schemas.py
-+from __future__ import annotations
-+
-+from typing import List, Optional
-+
-+from pydantic import BaseModel, Field
-+
-+
-+class CompletionRequest(BaseModel):
-+    """Request schema for text completions."""
-+
-+    prompt: str = Field(..., description="User prompt for the LLM")
-+    model: Optional[str] = Field(default=None, description="LLM model identifier")
-+    temperature: Optional[float] = Field(default=0.7, ge=0.0, le=2.0)
-+    max_tokens: Optional[int] = Field(default=256, ge=1)
-+
-+
-+class CompletionResponse(BaseModel):
-+    """Response schema for text completions."""
-+
-+    output: str
-+    model: str
-+    promptTokens: int
-+    completionTokens: int
-+    totalTokens: int
-+
-+
-+class EmbeddingRequest(BaseModel):
-+    """Request schema for embeddings."""
-+
-+    input: str = Field(..., description="Text to embed")
-+    model: Optional[str] = Field(default=None, description="Embedding model identifier")
-+
-+
-+class EmbeddingResponse(BaseModel):
-+    """Response schema for embeddings."""
-+
-+    embedding: List[float]
-+    model: str
-+
-*** End Patch
-PATCH
-```
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/app/otel.py</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Add File: apps/ai-gateway/app/otel.py
-+from __future__ import annotations
-+
-+import os
-+from typing import Optional
-+
-+from fastapi import FastAPI
-+from opentelemetry import trace
-+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-+from opentelemetry.instrumentation.logging import LoggingInstrumentation
-+from opentelemetry.sdk.resources import Resource
-+from opentelemetry.sdk.trace import TracerProvider
-+from opentelemetry.sdk.trace.export import BatchSpanProcessor
-+
-+
-+def init_otel(app: FastAPI, service_name: str = "ai-gateway") -> Optional[callable]:
-+    """
-+    Initialize OpenTelemetry tracing and instrument FastAPI and logging.
-+
-+    Returns an optional shutdown callable for graceful teardown.
-+    """
-+    otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4318")
-+    resource = Resource.create({"service.name": service_name})
-+
-+    provider = TracerProvider(resource=resource)
-+    trace.set_tracer_provider(provider)
-+
-+    span_exporter = OTLPSpanExporter(endpoint=f"{otlp_endpoint}/v1/traces")
-+    provider.add_span_processor(BatchSpanProcessor(span_exporter))
-+
-+    FastAPIInstrumentor.instrument_app(app)
-+    LoggingInstrumentation(set_logging_format=True)
-+
-+    def _shutdown() -> None:
-+        provider.shutdown()
-+
-+    return _shutdown
-+
-*** End Patch
-PATCH
-```
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/app/main.py</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Add File: apps/ai-gateway/app/main.py
-+from __future__ import annotations
-+
-+import os
-+import structlog
-+from fastapi import FastAPI, HTTPException
-+from litellm import acompletion, aembedding
-+
-+from app.schemas import (
-+    CompletionRequest,
-+    CompletionResponse,
-+    EmbeddingRequest,
-+    EmbeddingResponse,
-+)
-+from app.otel import init_otel
-+
-+
-+logger = structlog.get_logger().bind(svc="ai-gateway")
-+
-+app = FastAPI(title="AI Gateway", version="0.0.1")
-+_shutdown_otel = init_otel(app)
-+
-+
-+@app.get("/health")
-+async def health() -> dict[str, str]:
-+    return {"status": "ok"}
-+
-+
-+@app.post("/v1/llm/completions", response_model=CompletionResponse)
-+async def create_completion(req: CompletionRequest) -> CompletionResponse:
-+    """
-+    Minimal model-agnostic completion endpoint using LiteLLM.
-+    Provider API keys are read from env (e.g., OPENAI_API_KEY, ANTHROPIC_API_KEY).
-+    """
-+    model = req.model or os.getenv("LITELLM_MODEL", "gpt-4o-mini")
-+    try:
-+        resp = await acompletion(
-+            model=model,
-+            messages=[{"role": "user", "content": req.prompt}],
-+            temperature=req.temperature or 0.7,
-+            max_tokens=req.max_tokens or 256,
-+        )
-+        content = resp.choices[0].message["content"]
-+        usage = resp.usage or {}
-+        return CompletionResponse(
-+            output=content,
-+            model=resp.model or model,
-+            promptTokens=int(usage.get("prompt_tokens", 0)),
-+            completionTokens=int(usage.get("completion_tokens", 0)),
-+            totalTokens=int(usage.get("total_tokens", 0)),
-+        )
-+    except Exception as e:  # noqa: BLE001
-+        logger.exception("completion_error", err=str(e), model=model)
-+        raise HTTPException(status_code=502, detail="Upstream LLM error") from e
-+
-+
-+@app.post("/v1/embeddings", response_model=EmbeddingResponse)
-+async def create_embedding(req: EmbeddingRequest) -> EmbeddingResponse:
-+    """Vendor-agnostic embeddings via LiteLLM."""
-+    model = req.model or os.getenv("LITELLM_EMBED_MODEL", "text-embedding-3-small")
-+    try:
-+        resp = await aembedding(model=model, input=req.input)
-+        vec = resp.data[0]["embedding"]  # type: ignore[index]
-+        return EmbeddingResponse(embedding=vec, model=model)
-+    except Exception as e:  # noqa: BLE001
-+        logger.exception("embedding_error", err=str(e), model=model)
-+        raise HTTPException(status_code=502, detail="Upstream embeddings error") from e
-+
-*** End Patch
-PATCH
-```
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/tests/test_health.py</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Add File: apps/ai-gateway/tests/test_health.py
-+import pytest
-+from httpx import AsyncClient
-+
-+from app.main import app
-+
-+
-+@pytest.mark.asyncio
-+async def test_health_ok():
-+    async with AsyncClient(app=app, base_url="http://test") as ac:
-+        r = await ac.get("/health")
-+        assert r.status_code == 200
-+        assert r.json() == {"status": "ok"}
-+
-*** End Patch
-PATCH
-```
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/package.json</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Add File: apps/ai-gateway/package.json
-+{
-+  "name": "@harmony/ai-gateway",
-+  "private": true,
-+  "version": "0.0.0",
-+  "type": "module",
-+  "scripts": {
-+    "dev": "uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
-+    "build": "uv sync --all-extras",
-+    "typecheck": "uv run mypy app",
-+    "lint": "uv run ruff check . && uv run black --check .",
-+    "format": "uv run black .",
-+    "test": "uv run pytest -q",
-+    "licenses": "uv run pip-licenses --format=json --with-urls --with-license-file --output-file reports/pip-licenses.json || true"
-+  }
-+}
-+
-*** End Patch
-PATCH
-```
-
----
-
-
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/packages/adapters/src/ai-gateway.ts</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Add File: packages/adapters/src/ai-gateway.ts
-+export interface GenerateCompletionDTO {
-+  prompt: string;
-+  model?: string;
-+  temperature?: number;
-+  maxTokens?: number;
-+}
-+
-+export interface CompletionResponseDTO {
-+  output: string;
-+  model: string;
-+  promptTokens: number;
-+  completionTokens: number;
-+  totalTokens: number;
-+}
-+
-+export interface GenerateEmbeddingDTO {
-+  input: string;
-+  model?: string;
-+}
-+
-+export interface EmbeddingResponseDTO {
-+  embedding: number[];
-+  model: string;
-+}
-+
-+/**
-+ * Error class for AI Gateway failures.
-+ */
-+export class AIServiceError extends Error {
-+  status?: number;
-+  constructor(message: string, status?: number) {
-+    super(message);
-+    this.name = 'AIServiceError';
-+    this.status = status;
-+  }
-+}
-+
-+/**
-+ * Contract for the AI Gateway client.
-+ */
-+export interface AIGateway {
-+  generateCompletion(
-+    req: GenerateCompletionDTO,
-+    signal?: AbortSignal
-+  ): Promise<CompletionResponseDTO>;
-+  generateEmbedding(
-+    req: GenerateEmbeddingDTO,
-+    signal?: AbortSignal
-+  ): Promise<EmbeddingResponseDTO>;
-+}
-+
-+const DEFAULT_AI_BASE_URL = (process.env.AI_SERVICE_URL as string) || 'http://localhost:8000';
-+
-+/**
-+ * Create a typed client to the Python AI Gateway.
-+ * Uses JSON over HTTP.
-+ */
-+export default function createAIGateway(baseUrl: string = DEFAULT_AI_BASE_URL): AIGateway {
-+  async function handle<T>(res: Response): Promise<T> {
-+    if (!res.ok) {
-+      const text = await res.text().catch(() => '');
-+      throw new AIServiceError(text || `AI service error (${res.status})`, res.status);
-+    }
-+    return (await res.json()) as T;
-+  }
-+
-+  function url(path: string): string {
-+    return new URL(path, baseUrl).toString();
-+  }
-+
-+  return {
-+    async generateCompletion(req, signal) {
-+      const res = await fetch(url('/v1/llm/completions'), {
-+        method: 'POST',
-+        headers: { 'content-type': 'application/json' },
-+        body: JSON.stringify(req),
-+        signal
-+      });
-+      return handle<CompletionResponseDTO>(res);
-+    },
-+
-+    async generateEmbedding(req, signal) {
-+      const res = await fetch(url('/v1/embeddings'), {
-+        method: 'POST',
-+        headers: { 'content-type': 'application/json' },
-+        body: JSON.stringify(req),
-+        signal
-+      });
-+      return handle<EmbeddingResponseDTO>(res);
-+    }
-+  };
-+}
-+
-*** End Patch
-PATCH
-```
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/packages/adapters/src/index.ts</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Update File: packages/adapters/src/index.ts
-@@
- import type { HealthPort } from '@domain/src/index';
- 
- export class HealthAdapter implements HealthPort {
-   async check(): Promise<boolean> {
-     return true; // placeholder implementation
-   }
- }
- 
-+export { default as createAIGateway } from './ai-gateway';
-+export type {
-+  AIGateway,
-+  GenerateCompletionDTO,
-+  CompletionResponseDTO,
-+  GenerateEmbeddingDTO,
-+  EmbeddingResponseDTO
-+} from './ai-gateway';
-+export { AIServiceError } from './ai-gateway';
-+
-*** End Patch
-```
-
----
-
-
-
----
-
-Tool use: **apply_patch**
-
-<details>
-        <summary>Apply patch for /Users/jamesryancooper/Desktop/projects/harmony/infra/ci/pr.yml</summary>
-      
-
-```diff
-<<'PATCH'
-*** Begin Patch
-*** Update File: infra/ci/pr.yml
-@@
- jobs:
-   quality:
-@@
-       - name: OpenAPI breaking-change check (oasdiff)
-         uses: oasdiff/oasdiff-action/diff@main
-         with:
-           base: packages/contracts/openapi-base.yaml
-           revision: packages/contracts/openapi.yaml
-+
-+  python:
-+    if: ${{ hashFiles('apps/ai-gateway/pyproject.toml') != '' }}
-+    runs-on: ubuntu-latest
-+    steps:
-+      - uses: actions/checkout@v4
-+      - uses: actions/setup-python@v5
-+        with:
-+          python-version: '3.11'
-+      - uses: astral-sh/setup-uv@v3
-+      - name: Install deps (uv sync)
-+        working-directory: apps/ai-gateway
-+        run: uv sync --all-extras
-+      - name: Lint (ruff) + Format check (black)
-+        working-directory: apps/ai-gateway
-+        run: uv run ruff check . && uv run black --check .
-+      - name: Typecheck (mypy)
-+        working-directory: apps/ai-gateway
-+        run: uv run mypy app
-+      - name: Tests (pytest)
-+        working-directory: apps/ai-gateway
-+        run: uv run pytest -q
-+      - name: Python license scan
-+        working-directory: apps/ai-gateway
-+        run: uv run pip-licenses --format=json --output-file reports/pip-licenses.json || true
-@@
-   preview:
--    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
--    needs: quality
-+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-+    needs: quality
-     runs-on: ubuntu-latest
-     steps:
-*** End Patch
-PATCH
-```
-
----
-
-<think><details><summary>Thought Process</summary>**Updating gitignore and todos**
-
-I'm thinking about using `.gitignore` for the `apps/ai-gateway` directory to exclude `.venv` and `.python` caches. I wonder if the root `.gitignore` already takes care of ignoring `__pycache__`. I haven't reviewed the repo's `.gitignore` content yet, but that’s optional. Next, I need to update my todos: I’ll mark the first as completed, then set the next to in progress, create the TS adapter, and so on until I finish with CI. Time to update!</details></think>
-
----
-
-Tool use: **todo_write**
-
-## Todo List
-
-- [x] Scaffold Python AI Gateway under apps/ai-gateway (FastAPI, LiteLLM, OTEL, tests)
-- [-] Add TypeScript client adapter packages/adapters/src/ai-gateway.ts and export
-- [ ] Extend CI: add conditional Python job for apps/ai-gateway with uv
-
----
-
-<think><details><summary>Thought Process</summary>**Managing task workflow**
-
-I need to mark the TS adapter as completed, and then shift my focus to the CI job that’s currently in progress. Once the previous patch has been applied successfully, I’ll also ensure to mark the CI process as completed. This step-by-step approach should help keep everything organized and on track, allowing for clear progress in the workflow. Let’s keep moving forward with this!</details></think>
-
----
-
-Tool use: **todo_write**
-
-## Todo List
-
-- [x] Scaffold Python AI Gateway under apps/ai-gateway (FastAPI, LiteLLM, OTEL, tests)
-- [x] Add TypeScript client adapter packages/adapters/src/ai-gateway.ts and export
-- [-] Extend CI: add conditional Python job for apps/ai-gateway with uv
-
----
-
-<think><details><summary>Thought Process</summary>**Finalizing CI job tasks**
-
-I’ve implemented the CI job and now I need to mark it as completed. After that, I should close the todos according to the completion specification. This means marking all the checks off the list and closing everything out properly. I want to make sure that everything is wrapped up neatly so there aren’t any loose ends left. It’s important to keep things organized and tidy!</details></think>
-
----
-
-Tool use: **todo_write**
-
-## Todo List
-
-- [x] Scaffold Python AI Gateway under apps/ai-gateway (FastAPI, LiteLLM, OTEL, tests)
-- [x] Add TypeScript client adapter packages/adapters/src/ai-gateway.ts and export
-- [x] Extend CI: add conditional Python job for apps/ai-gateway with uv
-
----
-
-<think><details><summary>Thought Process</summary>**Running lint checks**
-
-I need to run the read_lints tool since it's meant for local TypeScript linting. Since we've added a TS file, it's crucial to check for any linter errors. However, I see that the tool requires specific files or directories. I think I can run it for `packages/adapters/src/ai-gateway.ts` and `packages/adapters/src/index.ts`. It’s better to be safe and catch any issues early on. So, let’s go ahead and execute it!</details></think>
-
----
-
-Tool use: **read_lints**
-
-<details>
-          <summary>Read lints for 2 files</summary>
-      
-Lint paths:
-
-- `/Users/jamesryancooper/Desktop/projects/harmony/packages/adapters/src/ai-gateway.ts`
-- `/Users/jamesryancooper/Desktop/projects/harmony/packages/adapters/src/index.ts`
-
-Lint results
-
-
-**No lint errors found**
-</details>
-
----
-
-<think><details><summary>Thought Process</summary>**Assessing TypeScript config**
-
-I’m thinking about the TypeScript configuration. It seems that using `AbortSignal` and `fetch` might need some DOM APIs, especially since `fetch` is available in Node 22. The TypeScript config might need to include the DOM library. The base `tsconfig` potentially has `lib` unspecified because it’s in a Node ESM bundler environment. I should check `tsconfig.base.json` to see which libraries are included. Let’s open that up!</details></think>
-
----
-
-Tool use: **read_file**
-
-Read file: /Users/jamesryancooper/Desktop/projects/harmony/tsconfig.base.json
-
----
-
-
+- [x] Reword CI Python support to TS-only with optional Python adoption
+- [x] Clarify contract tests (Pact/Schemathesis) as incremental/optional; keep oasdiff
+- [x] Clarify Playwright preview smoke as recommended unless added to CI
+- [x] Align license scanning text with Dependency Review + SBOM; make license-checker optional
+- [x] Replace Gitleaks mention with TruffleHog to match CI
+- [x] Change bundle budget enforcement to recommended unless CI step added
+- [x] Adjust 'Required checks' language to reflect actual pr.yml gates
+- [x] Add explicit flag provider wiring points for API and Astro SSG
+- [x] Clarify Astro SSG server-only flag evaluation and injection approach
+- [x] Reframe load-test gating as recommended policy (no CI implementation)
 
 ---
 
 ```plaintext
-Status: I scaffolded the AI Gateway Python service in `apps/ai-gateway`, added a TypeScript client in `packages/adapters`, and extended CI with a conditional Python job. All related tasks are completed.
+Status: Implemented edits in `docs/handbook/methodology/lean-ai-accelerated-methodology.md` to align with current CI (`infra/ci/pr.yml`), flags, and tooling. All identified inconsistencies and ambiguities resolved with minimal, low-friction wording updates.
 
-What I implemented:
-- Python AI Gateway (FastAPI + LiteLLM + OpenTelemetry)
-  - New files under `apps/ai-gateway`:
-    - app/__init__.py
-    - app/main.py (FastAPI app with endpoints)
-    - app/schemas.py (Pydantic request/response models)
-    - app/otel.py (OTLP exporter; FastAPI/logging instrumentation)
-    - tests/test_health.py (basic health test)
-    - pyproject.toml (deps: FastAPI, LiteLLM, OTel; dev: pytest, mypy, ruff, black)
-    - package.json (PNPM bridge; scripts call uv)
-  - Endpoints:
-    - POST /v1/llm/completions → text generation (prompt, model?, temperature?, max_tokens?)
-    - POST /v1/embeddings → embeddings (input, model?)
-    - GET /health → status
-  - Env keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` (as needed by LiteLLM); `LITELLM_MODEL`, `LITELLM_EMBED_MODEL` (optional defaults); `OTEL_EXPORTER_OTLP_ENDPOINT` (defaults to `http://localhost:4318` [[memory:10493796]]).
+Changes applied (high-signal):
+- CI scope: Now states TypeScript-only by default; Python gates are optional.
+- Mermaid CI diagram: Generic, with Python and E2E marked optional; contract checks reflect `oasdiff` baseline.
+- Checklist: Required vs optional clarified. Enforced: ESLint, TS strict typecheck, unit tests, `oasdiff`, CodeQL, Semgrep, Dependency Review, TruffleHog, SBOM, Preview URL. Optional: Pact, Schemathesis, Playwright smoke, bundle budgets enforcement.
+- License scanning: Clarified to Dependency Review + SBOM; `license-checker`/`pip-licenses` optional.
+- Secrets scanning: Replaced “Gitleaks” with “TruffleHog” to match CI.
+- Flags wiring: Explicit guidance—call `setFlagProvider` in `apps/api/src/server.ts` and SSR entries; for Astro SSG, server-only evaluation and inject via build/Edge, never `process.env` in the browser.
+- Load tests: Gating reframed as recommended policy (not enforced in CI).
+- Tooling Map and Quick-Start: “Required checks” now reflect actual `infra/ci/pr.yml` gates and adopt-the-rest incrementally.
 
-- TypeScript client adapter for apps
-  - `packages/adapters/src/ai-gateway.ts` with:
-    - default `createAIGateway(baseUrl?)`
-    - DTOs and `AIServiceError`
-    - Uses Node 22 global fetch; base URL defaults to `AI_SERVICE_URL` or `http://localhost:8000`.
-  - Exported from `packages/adapters/src/index.ts`.
+Key edited excerpts (for quick review):
+- §5: License checks now “Dependency Review + SBOM,” with optional local tools.
+- §6: Feature flags wiring spelled out; secrets scanning uses TruffleHog.
+- §7: “Currently supports TypeScript”; Mermaid nodes made generic with optional markers; checklist adjusted to required vs optional and `oasdiff` baseline.
+- §8: Playwright E2E on Preview marked recommended.
+- §11: Load-test gating “recommended policy.”
+- §12: Astro SSG flags are server-only; inject at build or via Edge/API.
+- §14: Required checks text reflects actual CI.
+- Quick-Start: Required CI checks list updated; optional gates noted.
+- References: Secret scanning updated to GitHub + TruffleHog.
 
-- CI integration
-  - `infra/ci/pr.yml`: Added `python` job (conditional: runs only if `apps/ai-gateway/pyproject.toml` exists):
-    - Python 3.11, `uv` setup, `uv sync --all-extras`, ruff+black checks, mypy, pytest, and a `pip-licenses` JSON report.
-  - Preview job remains as-is (doesn’t block on Python job).
+No code or build changes required; only documentation edits were made to ensure speed and safety with minimal process friction for a 2-dev team.
 
-How to run locally:
-- Install uv (if not installed): see `astral-sh/setup-uv` docs or `pipx install uv`.
-- Start the gateway:
-  - With PNPM: `pnpm --filter @harmony/ai-gateway dev` [[memory:10493827]]
-  - Or directly: `cd apps/ai-gateway && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
-- Test the service: `cd apps/ai-gateway && uv run pytest -q`
-- Call from TypeScript:
-  - Set `AI_SERVICE_URL=http://localhost:8000`
-  - Import and use `createAIGateway` from `@adapters/src/ai-gateway` (now re-exported in `@adapters/src/index.ts`).
-
-Notes:
-- Observability: Python traces export to your OTLP endpoint; Node callers and the gateway will correlate via W3C trace headers automatically.
-- Security: Keys stay server-side in the Python service; add auth (HMAC/service token) and rate limits before exposing publicly.
-- Extensibility: Add moderation, reranking, caching, or tool-calling schemas as new endpoints without changing app-side contracts.
-
-Summary of changes:
-- Added `apps/ai-gateway` (FastAPI service with LiteLLM, OTEL, tests, PNPM bridge).
-- Added `packages/adapters/src/ai-gateway.ts` + exports in `packages/adapters/src/index.ts`.
-- Extended `infra/ci/pr.yml` with a conditional Python job (uv-based).
+Summary:
+- CI claims now match `infra/ci/pr.yml`.
+- Optional gates (Pact, Schemathesis, Playwright, size-limit, Python) are clearly marked for incremental adoption.
+- Flags and Astro guidance are explicit to prevent misuse of `process.env` on the client.
 ```
-
----
-
-_**User (2025-10-30 01:30Z)**_
-
-Can you update this @README.md as a README file for the ai-gateway app.
-
----
-
-_**Assistant (gpt-5-high)**_
-
-
-
----
-
-I'll open the existing README to tailor the content, then replace it with a comprehensive guide for running, configuring, and using the AI Gateway (endpoints, env vars, local dev, tests, OTel, security).
-
----
-
-Tool use: **read_file**
-
-Read file: /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/README.md
-
----
-
-<think><details><summary>Thought Process</summary>**Creating a README for Harmony AI Gateway**
-
-I need to replace the existing README summary with a comprehensive one for the app. The title will be "Harmony AI Gateway," and it'll serve as a model-agnostic gateway for LLM and embeddings using FastAPI, LiteLLM, and OTel.  
-
-I’ll include sections on features, prerequisites, local running options, API details (like endpoints for completions and embeddings), security recommendations, observability settings, testing commands, linting, CI processes, and a TypeScript client usage example.  
-
-I must also remove any references to "memory" citations from the current file.
-**Formatting the README with Markdown**
-
-I need to ensure that the README is formatted properly using Markdown, paying attention to code blocks and indentation. It’s essential to use code fences correctly, without escaping with backslashes.
-
-For instance, I’ll include an example of a .env file which has the following variables:
-
-```
-# AI Gateway env
-OPENAI_API_KEY=... 
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
-LITELLM_MODEL=gpt-4o-mini
-LITELLM_EMBED_MODEL=text-embedding-3-small
-```
-
-I’ll also need to provide curl and TypeScript usage examples. I should confirm paths and imports, specifically for `createAIGateway` from the proper modules in the project.
-**Reviewing repo configuration and deployment details**
-
-In the repo's tsconfig, the path alias '@adapters/*' points to 'packages/adapters/*'. For clarity, it might be better to show imports from '@adapters/src/ai-gateway' or directly from '@adapters/src' with named exports, since we’ve re-exported `createAIGateway` in index.ts.
-
-We should also consider adding a "Production deployment" section—perhaps mentioning running behind Vercel, even though it's a Python service. I’ll need to note that containerization or hosting will be essential, and keep details minimal.  
-
-Additionally, we'll need to mention the licensing scanning script in package.json and include "Makefile style commands." Don't forget about the default port 8000 and to update the preview job "needs" to entail Python, as the patch didn't reflect that change.
-**Adjusting README based on changes**
-
-The "attached_files" state indicates that the user accepted the changes to pr.yml, and they've approved our patch. Since the preview still depends only on quality, I think it’s fine to not mention that. Now, I'll implement apply_patch to modify the README file with the new content accordingly. This will help ensure everything is up-to-date and reflects the accepted changes properly!</details></think>
-
----
-
-I'll replace the existing placeholder README with a complete, app-focused README covering purpose, endpoints, configuration, local dev, tests, observability, security, CI, and TS client usage.
-
----
-
-The model made no changes to the file.
-
----
-
-<think><details><summary>Thought Process</summary>**Troubleshooting patch application**
-
-I’m encountering a context mismatch while applying a patch, which means the file might have changed since I last read it. The error is indicating that it couldn’t find the context for the existing content. I noticed the file from lines 1-52 when I read it. My patch attempted to replace everything but may need the exact context lines before and after. Instead, using the edit_file tool might simplify the process for content replacement.
-**Examining patching approaches**
-
-I need to consider how to apply a patch. While I can patch by specifying old and new content, it requires an exact match, which can be tricky. A simpler way would be to delete the whole file and start fresh with the new content. The patching tool mainly supports updates and uses plain text context, which can be error-prone. I also have the edit_file tool, which might be easier since it allows specifying precise lines of code to edit while handling unchanged code with markers.
-**Using edit_file for Markdown**
-
-Since the file is Markdown, I need to consider how comments are treated. The edit_file tool should be my fallback option if the apply_patch tool doesn't work, which seems to be the case here. I can replace the entire content by providing "instructions" and "code_edit" with just the new material. The tool expects "target_file" and doesn't require comments between unchanged code when replacing everything, so I can just enter the full content. I'll ensure to include newline endings while building the new README.
-**Clarifying Markdown headings**
-
-I need to use Markdown headings correctly, especially since the project's documentation prefers '##' over '#'. The user markdown spec suggests using '###' and '##', explicitly saying not to use '#'. It seems users appreciate organized messages with '###' and '##', so in my responses, I should stick to that preference. However, for the README file, using the standard Markdown format is fine, and a single heading like '# Harmony AI Gateway' is acceptable. It's important to keep in mind that the preference is more for messaging rather than the content of the repository docs.
-**Preparing the README**
-
-I need to focus on preparing the README, and they mentioned preserving the indentation style, although that seems less relevant for this task. I think including details like "Folder structure" or a "Project files list" would be helpful. I’ll go ahead and utilize the edit_file tool for this, as it should make updating the README easier. I want to ensure that I include all the necessary information in a clear and organized way!</details></think>
-
----
-
-Tool use: **edit_file**
-
-
-<details><summary>Edit file: /Users/jamesryancooper/Desktop/projects/harmony/apps/ai-gateway/README.md</summary>
-
-**Chunk 1**
-Lines added: 131, lines removed: 51
-
-```diff
-@@ -1,52 +1,132 @@
-- Implemented:
-- 
-- - Python AI Gateway (FastAPI + LiteLLM + OpenTelemetry)
--   - New files under `apps/ai-gateway`:
--     - app/__init__.py
--     - app/main.py (FastAPI app with endpoints)
--     - app/schemas.py (Pydantic request/response models)
--     - app/otel.py (OTLP exporter; FastAPI/logging instrumentation)
--     - tests/test_health.py (basic health test)
--     - pyproject.toml (deps: FastAPI, LiteLLM, OTel; dev: pytest, mypy, ruff, black)
--     - package.json (PNPM bridge; scripts call uv)
--   - Endpoints:
--     - POST /v1/llm/completions → text generation (prompt, model?, temperature?, max_tokens?)
--     - POST /v1/embeddings → embeddings (input, model?)
--     - GET /health → status
--   - Env keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` (as needed by LiteLLM); `LITELLM_MODEL`, `LITELLM_EMBED_MODEL` (optional defaults); `OTEL_EXPORTER_OTLP_ENDPOINT` (defaults to `http://localhost:4318` [[memory:10493796]]).
-- 
-- - TypeScript client adapter for apps
--   - `packages/adapters/src/ai-gateway.ts` with:
--     - default `createAIGateway(baseUrl?)`
--     - DTOs and `AIServiceError`
--     - Uses Node 22 global fetch; base URL defaults to `AI_SERVICE_URL` or `http://localhost:8000`.
--   - Exported from `packages/adapters/src/index.ts`.
-- 
-- - CI integration
--   - `infra/ci/pr.yml`: Added `python` job (conditional: runs only if `apps/ai-gateway/pyproject.toml` exists):
--     - Python 3.11, `uv` setup, `uv sync --all-extras`, ruff+black checks, mypy, pytest, and a `pip-licenses` JSON report.
--   - Preview job remains as-is (doesn’t block on Python job).
-- 
-- How to run locally:
-- 
-- - Install uv (if not installed): see `astral-sh/setup-uv` docs or `pipx install uv`.
-- - Start the gateway:
--   - With PNPM: `pnpm --filter @harmony/ai-gateway dev` [[memory:10493827]]
--   - Or directly: `cd apps/ai-gateway && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
-- - Test the service: `cd apps/ai-gateway && uv run pytest -q`
-- - Call from TypeScript:
--   - Set `AI_SERVICE_URL=http://localhost:8000`
--   - Import and use `createAIGateway` from `@adapters/src/ai-gateway` (now re-exported in `@adapters/src/index.ts`).
-- 
-- Notes:
-- 
-- - Observability: Python traces export to your OTLP endpoint; Node callers and the gateway will correlate via W3C trace headers automatically.
-- - Security: Keys stay server-side in the Python service; add auth (HMAC/service token) and rate limits before exposing publicly.
-- - Extensibility: Add moderation, reranking, caching, or tool-calling schemas as new endpoints without changing app-side contracts.
-- 
-- Summary of changes:
-- 
-- - Added `apps/ai-gateway` (FastAPI service with LiteLLM, OTEL, tests, PNPM bridge).
-- - Added `packages/adapters/src/ai-gateway.ts` + exports in `packages/adapters/src/index.ts`.
-- - Extended `infra/ci/pr.yml` with a conditional Python job (uv-based).
-+ # Harmony AI Gateway (Python)
-+ 
-+ Model-agnostic gateway for text completions and embeddings, built with FastAPI, LiteLLM, and OpenTelemetry. It centralizes provider keys, policies, and observability behind a single HTTP API that TypeScript apps consume via a small client adapter.
-+ 
-+ ## Features
-+ 
-+ - Vendor-neutral API for LLM completions and embeddings (LiteLLM under the hood)
-+ - JSON logs and OTLP traces for observability
-+ - Stateless service suitable for serverless/containers
-+ - TypeScript client in `packages/adapters` for easy consumption
-+ 
-+ ## Endpoints
-+ 
-+ - `GET /health` → service status
-+ - `POST /v1/llm/completions` → text generation
-+   - Request: `{ prompt: string, model?: string, temperature?: number, max_tokens?: number }`
-+   - Response: `{ output, model, promptTokens, completionTokens, totalTokens }`
-+ - `POST /v1/embeddings` → dense vector embeddings
-+   - Request: `{ input: string, model?: string }`
-+   - Response: `{ embedding: number[], model }`
-+ 
-+ ### API Examples
-+ 
-+ Completions:
-+ 
-+ ```bash
-+ curl -sS -X POST http://localhost:8000/v1/llm/completions \
-+   -H 'content-type: application/json' \
-+   -d '{"prompt":"Say hello","temperature":0.2,"max_tokens":64}'
-+ ```
-+ 
-+ Embeddings:
-+ 
-+ ```bash
-+ curl -sS -X POST http://localhost:8000/v1/embeddings \
-+   -H 'content-type: application/json' \
-+   -d '{"input":"The quick brown fox"}'
-+ ```
-+ 
-+ ## Quick Start (Local)
-+ 
-+ Prereqs:
-+ 
-+ - Python 3.11+
-+ - `uv` (fast Python package manager)
-+ - Provider API key(s) for your chosen LLM(s), e.g. `OPENAI_API_KEY`
-+ 
-+ Run the service:
-+ 
-+ ```bash
-+ # Using PNPM (monorepo friendly)
-+ pnpm --filter @harmony/ai-gateway dev
-+ 
-+ # Or directly
-+ cd apps/ai-gateway
-+ uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-+ ```
-+ 
-+ Smoke test:
-+ 
-+ ```bash
-+ curl -sS http://localhost:8000/health
-+ ```
-+ 
-+ ## Configuration
-+ 
-+ Environment variables:
-+ 
-+ - `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` (as needed by LiteLLM)
-+ - `LITELLM_MODEL` (default completion model, e.g. `gpt-4o-mini`)
-+ - `LITELLM_EMBED_MODEL` (default embed model, e.g. `text-embedding-3-small`)
-+ - `OTEL_EXPORTER_OTLP_ENDPOINT` (default `http://localhost:4318`)
-+ 
-+ Example `.env`:
-+ 
-+ ```bash
-+ OPENAI_API_KEY=sk-...
-+ OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
-+ LITELLM_MODEL=gpt-4o-mini
-+ LITELLM_EMBED_MODEL=text-embedding-3-small
-+ ```
-+ 
-+ ## TypeScript Client Usage
-+ 
-+ Use the adapter exported from `packages/adapters`:
-+ 
-+ ```ts
-+ import { createAIGateway } from '@adapters/src';
-+ 
-+ const ai = createAIGateway(process.env.AI_SERVICE_URL || 'http://localhost:8000');
-+ 
-+ const completion = await ai.generateCompletion({ prompt: 'Hello world', temperature: 0.2 });
-+ console.log(completion.output);
-+ 
-+ const embedding = await ai.generateEmbedding({ input: 'The quick brown fox' });
-+ console.log(embedding.embedding.length);
-+ ```
-+ 
-+ ## Development
-+ 
-+ Common commands (via PNPM scripts calling `uv`):
-+ 
-+ ```bash
-+ # Install deps (creates a .venv managed by uv)
-+ cd apps/ai-gateway && uv sync --all-extras
-+ 
-+ # Lint + format check
-+ pnpm --filter @harmony/ai-gateway lint
-+ 
-+ # Type check (mypy)
-+ pnpm --filter @harmony/ai-gateway typecheck
-+ 
-+ # Tests (pytest)
-+ pnpm --filter @harmony/ai-gateway test
-+ ```
-+ 
-+ ## Observability
-+ 
-+ - Traces exported to OTLP: set `OTEL_EXPORTER_OTLP_ENDPOINT` (default `http://localhost:4318`).
-+ - When the calling service (Node) is instrumented, W3C trace context propagates across HTTP.
-+ 
-+ ## Security & Hardening
-+ 
-+ - Keep provider API keys only in this service.
-+ - Before exposing publicly, add authentication (e.g., HMAC service token) and rate limiting.
-+ - Consider request/response schema enforcement and logging redaction for sensitive data.
-+ 
-+ ## CI
-+ 
-+ - The repo’s PR workflow includes a conditional Python job for this app: `uv sync`, ruff/black, mypy, pytest, and a license report.
-+ - See `infra/ci/pr.yml` for details.
-  
-```
-
-</details>
-
----
-
-<think><details><summary>Thought Process</summary>**Updating README status**
-
-I successfully updated the README. Since no linter checks are needed for Markdown, I'll provide a brief status update. The user requested the README to be formatted for the ai-gateway app, and I did that! They prefer minimal content, and their output rules specify to place results in a single code box. It seems like I should summarize this update briefly within the code box, mentioning where it was updated and any sections included.
-**Preparing README update**
-
-The developer instruction emphasizes avoiding heavy formatting, but I think a small code block with a bullet list could work since they require a code block. They've previously accepted changes to other files, so I feel confident just proceeding. I need to provide a status update at the top, saying something like, "I replaced the README with a complete guide..." followed by bullet points summarizing the contents. To follow their rules, I’ll place everything into a single code box labeled as plaintext.
-**Finalizing README update**
-
-I need to confirm the path and status to align with their rules. Since the instructions require a "status update" above tool calls, I’ll ensure to include that. I’ve updated the README earlier, so I realize I also need to provide a summary per the specifications. To avoid conflicts, I can include the summary within the code box while keeping it minimal. 
-
-In the code block, I’ll note: 
-
-- Status: Updated README for ai-gateway; replaced placeholder with full guide. 
-- Highlights: sections included. 
-- How to run: optional mention. 
-- Path: will keep this brief.</details></think>
-
----
-
-```plaintext
-Updated README for ai-gateway.
-
-- Path: apps/ai-gateway/README.md
-- What changed: Replaced placeholder with a complete app README covering:
-  - Overview and features
-  - Endpoints: GET /health, POST /v1/llm/completions, POST /v1/embeddings
-  - API examples (curl)
-  - Quick start (PNPM/uv run) and smoke test
-  - Configuration and example .env (OPENAI_API_KEY, LITELLM_MODEL, OTEL_EXPORTER_OTLP_ENDPOINT, etc.)
-  - TypeScript client usage (createAIGateway)
-  - Development commands (ruff/black, mypy, pytest)
-  - Observability (OTLP), Security notes, CI notes
-
-You can open the README for run commands and examples.
 
 ---
 

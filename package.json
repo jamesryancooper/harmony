@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "packageManager": "pnpm@10.20.0",
   "scripts": {
-    "dev": "turbo run dev --parallel",
+    "dev": "pnpm --filter @harmony/api dev",
+    "dev:all": "turbo run dev --parallel",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
@@ -17,7 +18,7 @@
     "preview:vercel": "turbo run preview:vercel"
   },
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "workspaces": [
     "apps/*",

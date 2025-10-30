@@ -1,4 +1,7 @@
-# Baseline Turborepo Monorepo
+---
+title: Baseline Turborepo Monorepo
+description: Overview of the Harmony reference monorepo structure, guardrails, and CI expectations.
+---
 
 This PR adds a ready‑to‑run Turborepo + Vercel baseline with CI/CD guardrails, Hexagonal boundaries, and contract checks.
 
@@ -136,7 +139,7 @@ jobs:
         with: { version: 9 }
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm turbo run typecheck lint test --cache-dir=.turbo
@@ -179,7 +182,7 @@ jobs:
       - uses: pnpm/action-setup@v3
         with: { version: 9 }
       - uses: actions/setup-node@v4
-        with: { node-version: '20', cache: 'pnpm' }
+        with: { node-version: '24', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile
       - name: Vercel pull env
         run: npx vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}

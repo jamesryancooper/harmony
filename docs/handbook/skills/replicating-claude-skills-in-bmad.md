@@ -1,4 +1,7 @@
-# Replicating Claude Skills in BMAD
+---
+title: Replicating Claude Skills in BMAD
+description: Strategy for reproducing Claude Assistant skills inside BMAD modules with Cursor integration.
+---
 
 **Claude Skills can be replicated in BMAD.**
 Claude Skills are “folders of instructions, scripts, and resources” (centered on a `SKILL.md` with YAML front-matter) that the model can **discover and invoke** when their descriptions match the user task, optionally with *allowed tool* permissions; they can be shared via git or plugins and organized as personal/project/plugin skills. ([Claude Docs][1])

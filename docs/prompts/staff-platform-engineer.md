@@ -1,4 +1,9 @@
-# Role: **Staff Platform Engineer (Monorepos & DX)**
+---
+title: Staff Platform Engineer Prompt
+description: Prompt describing the mission, methodology alignment, and deliverables for the staff platform engineer role.
+---
+
+## Role: **Staff Platform Engineer (Monorepos & DX)**
 
 ## Mission
 

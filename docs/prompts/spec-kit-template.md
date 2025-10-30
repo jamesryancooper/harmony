@@ -1,4 +1,7 @@
-# Spec Kit — One-Pager Template
+---
+title: Spec Kit One-Pager Template
+description: Prompt scaffold for generating Spec Kit one-pagers with harmony-specific guardrails.
+---
 
 - Title: 
 - Owner: 

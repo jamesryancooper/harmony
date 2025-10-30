@@ -1,0 +1,28 @@
+{
+  "name": "@harmony/docs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "preview:vercel": "astro preview --host 0.0.0.0 --port 4175",
+    "typecheck": "sh -c 'astro check && touch tsconfig.tsbuildinfo'",
+    "lint": "sh -c 'mkdir -p reports && eslint . -f json -o reports/eslint-docs.json'",
+    "test": "node -e \"console.log('apps/docs test placeholder')\""
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.36.1",
+    "astro": "^5.15.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "@astrojs/check": "^0.9.5",
+    "typescript": "^5.9.3"
+  }
+}
+

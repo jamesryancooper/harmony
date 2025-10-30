@@ -1,4 +1,7 @@
-# COE Monorepo (Turborepo + Vercel)
+---
+title: COE Monorepo Skeleton
+description: Snapshot of the Harmony center-of-excellence Turborepo skeleton, tooling, and setup steps.
+---
 
 What’s inside:
 

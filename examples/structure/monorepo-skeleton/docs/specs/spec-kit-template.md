@@ -1,3 +1,8 @@
+---
+title: Spec Kit Template (Monorepo Skeleton)
+description: Spec Kit one-pager template bundled with the monorepo skeleton example.
+---
+
 # Spec Kit — <Feature/Change>
 
 ## Problem

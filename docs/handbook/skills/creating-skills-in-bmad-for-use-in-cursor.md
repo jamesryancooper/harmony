@@ -1,4 +1,7 @@
-# Creating Skills in BMAD for Use in Cursor
+---
+title: Creating BMAD Skills for Cursor
+description: Mapping Claude-style skills into BMAD modules and Cursor workflows for discovery, invocation, and guardrails.
+---
 
 Short answer: **yes—working inside Cursor simplifies the plan**. You’ll keep the BMAD “Skills module + router + permissions” idea, but you can lean on Cursor’s built-ins for discovery, invocation, and guardrails:
 

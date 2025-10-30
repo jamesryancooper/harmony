@@ -1,4 +1,7 @@
-# Turborepo Structure
+---
+title: Turborepo Structure Guide
+description: Opinionated guidance for designing and evolving Harmony’s Turborepo layout, caching, CI/CD, and guardrails.
+---
 
 This guide provides a pragmatic Turborepo structure you can adopt with confidence. It distills patterns from real monorepos and the Vercel/Turbo docs, with file‑level references so you can copy what matters and skip what doesn’t.
 
@@ -238,7 +241,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
@@ -306,7 +309,7 @@ jobs:
       - uses: pnpm/action-setup@v4
         with: { version: 10 }
       - uses: actions/setup-node@v4
-        with: { node-version: '22', cache: 'pnpm' }
+        with: { node-version: '24', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile
 
       - name: Vercel pull env
