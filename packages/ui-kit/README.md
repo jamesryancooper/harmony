@@ -21,40 +21,21 @@ pnpm --filter @harmony/ui-kit test           # Vitest + RTL
 
 ## Tailwind v4 preset & CSS
 
-- Consumers should reuse the shared preset exported from `@harmony/config/tailwind-preset` and the
-  PostCSS preset from `@harmony/config/postcss-preset.mjs`.
-- Tailwind content globs **must** include this package so classes are not purged:
-
-```ts
-// Example: apps/ai-console/tailwind.config.ts
-import preset from '@harmony/config/tailwind-preset';
-
-const config = {
-  presets: [preset],
-  content: [
-    './app/**/*.{ts,tsx}',
-    '../../packages/ui-kit/src/**/*.{ts,tsx}'
-  ],
-  darkMode: ['class']
-};
-export default config;
-```
-
-- For surfaces that do **not** want Tailwind tooling (e.g., Astro pages with limited React islands),
-  import the prebuilt stylesheet instead:
-
-```ts
-// Astro component
-import '@harmony/ui-kit/dist/ui.css';
-```
+- Consumers that run Tailwind (e.g., Astro apps) should reuse the shared preset exported from
+  `@harmony/config/tailwind-preset` plus the PostCSS preset from `@harmony/config/postcss-preset.mjs`.
+- Tailwind content globs **must** include this package so classes are not purged.
+- The Next.js app currently imports the **prebuilt CSS bundle** (`@harmony/ui-kit/dist/ui.css`) instead
+  of running Tailwind, due to a known Turbopack ↔ Tailwind v4 / lightningcss issue. See "Tailwind in
+  consumers" below for options and guidance.
 
 ## Usage in Next.js (apps/ai-console)
 
-1. Ensure Tailwind and PostCSS configs mirror the example above.
-2. Import the global Tailwind entry in `app/layout.tsx`:
+The Next app keeps Turbopack enabled and **does not** run Tailwind v4 locally right now. Instead it
+imports the compiled design-system CSS:
 
 ```tsx
-import './globals.css';
+// app/layout.tsx
+import '@harmony/ui-kit/dist/ui.css';
 import { Button } from '@harmony/ui-kit';
 
 export default function Page() {
@@ -65,6 +46,9 @@ export default function Page() {
   );
 }
 ```
+
+If/when Turbopack gains first-class Tailwind v4 support, restore the shared PostCSS/Tailwind preset
+and switch the import back to a Tailwind entrypoint.
 
 ## Usage in Astro (apps/web, apps/docs)
 
@@ -101,6 +85,64 @@ import CtaButton from '../components/islands/cta-button.tsx';
 - Theme tokens (colors, radii) are defined in `src/styles/tailwind.css` using Tailwind v4 `@theme`.
 - Dark mode follows the `class` strategy (`.dark`). Consumers should toggle the class on `<html>` or
   `<body>` to align with their framework.
+
+## Tailwind in consumers (Next mitigation & options)
+
+- **Current mitigation (Next.js)**: Tailwind is compiled during the UI kit build, and the app imports
+  `@harmony/ui-kit/dist/ui.css`. This sidesteps the lightningcss native module issue in Turbopack and
+  keeps SSR/HMR happy.
+
+- **Option A – Tailwind inside the UI kit (default)**
+  - Author component styles with Tailwind utilities, compile them during the UI kit build, and ship
+    the resulting CSS. Example:
+
+    ```css
+    /* src/styles/components/button.css */
+    .btn { @apply inline-flex items-center justify-center font-semibold rounded-xl px-4 py-2; }
+    .btn--primary { @apply bg-[var(--harmony-brand)] text-white hover:opacity-90; }
+    .btn--ghost { @apply bg-transparent text-[var(--harmony-brand)] ring-1 ring-[color-mix(in srgb,var(--harmony-brand) 50%,transparent)]; }
+    ```
+
+    ```tsx
+    import clsx from 'clsx';
+
+    export function Button({ variant = 'primary', className, ...props }) {
+      return <button className={clsx('btn', `btn--${variant}`, className)} {...props} />;
+    }
+    ```
+
+    Consumers just import `@harmony/ui-kit/dist/ui.css`.
+
+- **Option B – Theme via CSS variables**
+  - Expose tokens from the kit and let apps override them without Tailwind:
+
+    ```css
+    :root { --harmony-brand: #3b82f6; }
+    .button--primary { background: var(--harmony-brand); }
+    ```
+
+    ```css
+    /* app/styles/app.css */
+    :root { --harmony-brand: #8b5cf6; }
+    ```
+
+- **Need Tailwind utilities in the app?** Keeping Turbopack and Tailwind together today is unstable.
+  Prefer CSS Modules or plain CSS for local tweaks:
+
+  ```css
+  /* components/CardShell.module.css */
+  .root { padding: 1.25rem; border-radius: 1rem; }
+  .title { font-weight: 700; }
+  ```
+
+  ```tsx
+  import s from './CardShell.module.css';
+  import { Card } from '@harmony/ui-kit';
+  ```
+
+Recommended path: keep Tailwind authoring inside the UI kit build (Option A), expose CSS variables
+(Option B), and use CSS Modules for app-specific layout tweaks until the Turbopack/Tailwind runtime
+story stabilizes.
 
 ## Scripts summary
 
