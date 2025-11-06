@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/{{feature-name}}.schema.json",
+  "title": "ExampleFeature",
+  "type": "object",
+  "required": [
+    "id",
+    "name"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Resource identifier"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "ex_123",
+      "name": "Example",
+      "createdAt": "2025-01-01T00:00:00Z",
+      "tags": [
+        "alpha",
+        "beta"
+      ]
+    }
+  ]
+}

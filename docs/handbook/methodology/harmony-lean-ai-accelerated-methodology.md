@@ -3,7 +3,7 @@ title: Lean AI-Accelerated Methodology Overview
 description: Summary of the Harmony methodology combining BMAD, Cursor, Turborepo, Vercel, and compliance guardrails for fast delivery.
 ---
 
-Harmony is a lean, **opinionated** methodology you can adopt tomorrow with two developers, optimized for **speed with safety** on your stated stack and hosting. It integrates **BMAD (Agentic agile with custom (SDD) spec‑first module) + Cursor + Turborepo + Vercel** end‑to‑end, while baking in **SRE, DevSecOps, OWASP ASVS, NIST SSDF, STRIDE, 12‑Factor, Monolith‑First, Hexagonal**.
+Harmony is a lean, **opinionated** methodology you can adopt tomorrow with two developers, optimized for **speed and quality with safety** on your stated stack and hosting. It integrates **BMAD (Agentic agile with custom (SDD) spec‑first module) + Cursor + Turborepo + Vercel** end‑to‑end, while baking in **SRE, DevSecOps, OWASP ASVS, NIST SSDF, STRIDE, 12‑Factor, Monolith‑First, Hexagonal**.
 
 > **Sources (select)**
 >
@@ -29,9 +29,13 @@ Harmony is a lean, **opinionated** methodology you can adopt tomorrow with two d
 
 ## 1) Executive Summary (≤2 pages)
 
-**Goal.** Ship small, safe, and frequent changes with **enterprise‑grade** security, reliability, and performance using **agent‑assisted** workflows. Humans own correctness, security, and licensing.
+**Goal.** Ship small, quality, safe, and frequent changes with **enterprise‑grade** security, reliability, and performance using **agent‑assisted** workflows. Humans own correctness, security, and licensing.
+
+**Guiding principle.** **Simplicity first**: prefer the smallest viable process, design, and tooling that satisfy the requirement. Add complexity only when SLOs, scale, or compliance clearly require it; avoid unnecessary dependencies.
 
 **Methodology**:
+
+- **Simplicity‑first**: choose the simplest process, design, and tooling that meets the requirement. Defer advanced patterns until justified by SLOs/scale/compliance. Default to no new dependency unless it materially reduces complexity.
 
 - **Spec‑first**: every meaningful change starts with a **Specification one‑pager** + **ADR** capturing problem, scope, API/UI contracts, SLIs/SLOs, **non‑functionals**, and a **micro‑threat model (STRIDE)** mapped to **OWASP ASVS** & **NIST SSDF** tasks.
 - **Agentic agile (BMAD)**: Convert the Spec to a **BMAD story** (context packets + agent plan + acceptance criteria). Use **Cursor** to generate plans/diffs/tests from the Spec, but enforce human checkpoints and license checks.
@@ -359,6 +363,8 @@ Use **CODEOWNERS** to enforce review by area (e.g., `packages/domain` → both d
 
 **Cadence & roles**: 1‑week cycle; rotate **Driver/Navigator**; async daily check‑ins.
 
+**Simplicity‑first**: Ship the smallest viable change that meets the requirement; avoid new dependencies unless they clearly reduce complexity or meet a non‑functional requirement.
+
 **Board & WIP**: Backlog → Ready (3) → In‑Dev (1 per dev) → In‑Review (2) → Preview (2) → Release → Done → Blocked.
 
 **Spec → BMAD → PR flow**:
@@ -411,6 +417,6 @@ Use **CODEOWNERS** to enforce review by area (e.g., `packages/domain` → both d
 
 ### Final notes
 
-- This method intentionally **minimizes ceremony**: few meetings, tiny PRs, clear gates, strong **Spec‑first + BMAD** with **Cursor** as a power tool and **humans as the safety system**.
+- This method intentionally **minimizes ceremony and complexity**: few meetings, tiny PRs, clear gates, strong **Spec‑first + BMAD** with **Cursor** as a power tool and **humans as the safety system**.
 - It **scales with your risk**: tighten gates when error budget burns, loosen when healthy.
 - It is **fully compatible** with your stack and hosting, and gives you **enterprise‑grade** security and reliability from day one.

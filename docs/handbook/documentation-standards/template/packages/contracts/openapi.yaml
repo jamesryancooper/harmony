@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: Harmony Contracts — {{feature-name}}
+  version: 0.1.0
+servers:
+  - url: https://api.example.com
+paths:
+  /v1/{{feature-name}}:
+    post:
+      summary: Create an example resource
+      operationId: createExample
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExampleFeature'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExampleFeature'
+        '400':
+          description: Bad Request
+components:
+  schemas:
+    ExampleFeature:
+      $ref: './schemas/{{feature-name}}.schema.json'
