@@ -3,7 +3,8 @@
 This folder contains the **source-of-truth** for component boundaries.
 
 - `openapi.yaml` — top-level API contract for endpoints under `/v1/{{feature-name}}`
-- `schemas/{{feature-name}}.schema.json` — payload schema used by requests/responses and events
+- `schemas/feature-name.schema.json` — payload schema used by requests/responses and events
+ - If your component emits on-disk artifacts (JSON/JSONL/manifests), define their schemas here as well and document `schema_version` in your Developer Guide.
 
 ## CI suggestions
 

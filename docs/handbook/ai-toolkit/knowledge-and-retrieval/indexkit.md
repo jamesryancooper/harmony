@@ -47,7 +47,7 @@ IndexKit creates deterministic indexes—both on-disk and in databases—that po
   - Tiny, CPU-only artifact suitable for small-footprint deployments
   - Enables document-level retrieval with stable IDs
   - Acts as a drop-in upgrade path to late-interaction embeddings
-- **Opinionated choices**
+- **Opinionated implementation choices**
   - RAGatouille-compatible schema (ColBERT-aligned contracts)
   - `numpy` / `scipy` for sparse weights
   - JSON/JSONL artifacts for portability
@@ -76,7 +76,7 @@ IndexKit creates deterministic indexes—both on-disk and in databases—that po
 - **Wins**
   - High-recall retrieval across dense, sparse, and structural signals
   - Reproducible, inspectable artifacts with incremental updates
-- **Opinionated choices**
+- **Opinionated implementation choices**
   - FAISS for dense vector search
   - `sentence-transformers` for embeddings
   - `rank-bm25` for keyword/BM25 scoring
@@ -95,7 +95,7 @@ IndexKit creates deterministic indexes—both on-disk and in databases—that po
   - Writes `hierarchical/**`: `tree_edges.jsonl`, `summaries.jsonl`, optional `summary_vectors.faiss`, and `snapshot/manifest.json`.
 - **Wins**
   - Substantial gains on long‑context/global questions by retrieving from summaries and leaves together.
-- **Opinionated choices**
+- **Opinionated implementation choices**
   - K‑means/HDBSCAN for clustering; `sentence-transformers` for summary embeddings; JSONL artifacts for transparency.
 
 ### `kg` — Knowledge Graph + Community Summaries
@@ -107,7 +107,7 @@ IndexKit creates deterministic indexes—both on-disk and in databases—that po
   - Writes `kg/**`: `entities.jsonl`, `edges.jsonl`, `communities.jsonl`, `community_summaries.jsonl`, `snapshot/manifest.json`.
 - **Wins**
   - Targets “global sensemaking” questions; complements local chunk retrieval with graph‑level evidence.
-- **Opinionated choices**
+- **Opinionated implementation choices**
   - Simple JSONL schemas for entities/edges; community detection metadata persisted for debuggability.
 
 ### `colbert` — Late‑Interaction (MaxSim) Retrieval
@@ -120,9 +120,9 @@ IndexKit creates deterministic indexes—both on-disk and in databases—that po
   - Writes `colbert/**` artifacts (RAGatouille/ColBERT layout) with model/tokenizer metadata and shard manifests.
 - **Wins**
   - Higher‑fidelity matching for nuanced queries; strong rerank without heavyweight cross‑encoders.
-- **Opinionated choices**
+- **Opinionated implementation choices**
   - RAGatouille/ColBERTv2 layout; tokenizer metadata captured for reproducibility; CPU/MPS acceptable for small corpora.
- - **Engines**
+- **Engines**
   - `engine`: `"vanilla" | "plaid" | "splate"` — PLAID keeps ColBERT quality with lower latency via centroid interaction/pruning; SPLATE provides a sparse late‑interaction variant (may require an ingest‑time adapter).
 
 ### `code` — Language‑Aware Code Indexing
@@ -135,7 +135,7 @@ IndexKit creates deterministic indexes—both on-disk and in databases—that po
   - Writes `code/**`: `symbols.jsonl`, `xref.jsonl`, `callgraph.jsonl`, and `files.jsonl` (optional previews).
 - **Wins**
   - Precise, navigable code retrieval and evidence for refactors/migrations; grounds DevKit/CodeModKit plans.
-- **Opinionated choices**
+- **Opinionated implementation choices**
   - Tree‑sitter where possible; deterministic JSONL artifacts; simple schema per language with shared core fields.
 
 ### `structured` — Tables / Knowledge Base
@@ -147,7 +147,7 @@ IndexKit creates deterministic indexes—both on-disk and in databases—that po
   - Writes `structured/**`: `tables.jsonl`, `schema.graph.json`, `fts.sqlite` (FTS5), optional `columns.faiss`.
 - **Wins**
   - High‑signal retrieval for facts/metrics; joins and key/foreign‑key awareness; complements text search.
-- **Opinionated choices**
+- **Opinionated implementation choices**
   - SQLite/FTS5 for local search; DuckDB acceptable; column embeddings optional; provenance preserved per row/table.
 
 ## Hybrid Signals
@@ -210,7 +210,7 @@ directly from the DB instead of local artifacts. See [QueryKit](./querykit.md) (
 
 ## Harmony Alignment
 
-IndexKit reinforces the Harmony methodology, as detailed in [harmony-lean-ai-accelerated-methodology.md](../../handbook/methodology/harmony-lean-ai-accelerated-methodology.md):
+IndexKit reinforces the Harmony methodology, as detailed in [harmony-lean-ai-accelerated-methodology.md](../../handbook/methodology/README.md):
 
 - **Spec-first, Contract-driven:** Schemas and artifact formats emphasize contract fidelity and drift detection.
 - **Auditability & Transparency:** Versionable artifacts and manifests meet Harmony's SRE, compliance, and ASVS guardrails.
@@ -541,10 +541,10 @@ psql "$PG_DSN" -c "SELECT id, ts_rank_cd(ts, plainto_tsquery('english','feature 
 - **ColBERT**
   - `colbert`: `{ model: "colbertv2", tokenizer: "bert-base-uncased", shards: 1, engine: "vanilla|plaid|splate" }`
   - `faiss`: `{ index_type: "IVFFlat", nlist, nprobe }` (if using ANN wrappers)
- - **Hierarchical**
-  - `hierarchical`: `{ use: ["leaf","summary"], fuse: "rrf|weighted", top_k: 50 }`
- - **KG**
-  - `kg`: `{ use: ["community_summaries","entities"], top_k: 50 }`
+- **Hierarchical**
+- `hierarchical`: `{ use: ["leaf","summary"], fuse: "rrf|weighted", top_k: 50 }`
+- **KG**
+- `kg`: `{ use: ["community_summaries","entities"], top_k: 50 }`
 - **Code**
   - `languages`: e.g., `["ts","js","py","go"]`
   - `parsers`: per‑language engine selection (e.g., tree‑sitter)
@@ -583,12 +583,15 @@ Additional checks by mode/signal
 ## Pilot Plan & Gates
 
 Objective
+
 - A/B new modes/signals against your baseline to quantify retrieval/answer gains, latency, and footprint.
 
 Dataset slice
+
 - Fix a snapshot of ~5–10% of the corpus; ensure the eval set includes long/global and local/pointed questions.
 
 Variants to build (besides baseline)
+
 - `hierarchical`: add summary‑tree artifacts; query multi‑level (probe summaries → descend to leaves).
 - `kg`: add entity KG + community summaries; enable a global question route.
 - `hybrid + sparse_learned`: add learned sparse postings alongside BM25/dense.
@@ -620,6 +623,7 @@ Minimal config deltas
 ```
 
 Acceptance gates (suggested)
+
 - Hierarchical: +5–10 pts Recall@20 on long/global; +3–5% absolute answer accuracy; ≤10% serve‑latency drift.
 - KG: +10% absolute answer accuracy on global/insight queries; citation correctness ≥ baseline.
 - Learned sparse: ≥ baseline Recall@20/MRR at BM25‑like latency (±10%); CPU‑friendly serving path validated.
@@ -627,6 +631,7 @@ Acceptance gates (suggested)
 - Unified hybrid (experimental): no regression >2% on Recall@20/MRR; document risks if serving complexity drops materially.
 
 Observability
+
 - Log `schema_version`, build `ts`, corpus hash, mode/signal knobs, and artifact sizes to ObservaKit for traceability.
 
 ## Link Graph Details

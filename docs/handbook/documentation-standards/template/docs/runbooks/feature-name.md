@@ -17,6 +17,12 @@
 - Command: `vercel promote <deployment-url>` (or your platform equivalent)
 - Fallback: disable `flag.{{feature-name}}`
 
+## Artifacts / Snapshots (if applicable)
+
+- Rebuild: run `<build command>` to create a fresh snapshot with manifest/checksums
+- Promote/Publish: push artifacts to serving backend (DB/edge) using `<publish command>`
+- Verify: check counts, schema_version, and integrity
+
 ## Common Issues
 
 - 4xx spikes → schema mismatch; validate requests against JSON Schema

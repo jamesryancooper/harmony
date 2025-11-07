@@ -4,6 +4,36 @@ A modular, local-first toolkit that lets a tiny team ship outsized results with 
 
 ---
 
+## The Problem with Multi-Agent Workflows
+
+In today’s software-development landscape, small teams are under pressure to deliver ever more features, faster, and with higher reliability. At the same time, the rise of multi-agent AI workflows brings enormous promise — but also significant, often unaddressed risks.
+
+- When multiple AI agents coordinate without strong structure, teams often encounter duplication of effort, circular loops or dead-locks in reasoning.
+- The lack of clear role definitions, shared memory/context, and orchestration leads to brittle systems that break under pressure.
+- Agents can complete tasks but still fail to resolve the correct intent, or produce technically plausible but contextually inappropriate results.
+- Without guardrails and observability, multi-agent systems magnify risks of misalignment, cascading errors, non-deterministic outcomes, and reduced trust in AI-powered workflows.
+- Complexity often dominates: tool proliferation, tangled interfaces, scattered data flows — resulting in slower development, harder debugging, and compromised speed or safety.
+
+### Delivering on the Promise of Multi-Agent Workflows And AI-Accelerated Development
+
+We envision a modular, local-first toolkit that empowers a tiny team to ship outsized results with AI. This vision rests on delivering **clear, predictable building blocks (kits)** that enforce structure where necessary, yet remain flexible elsewhere. Every element is aligned with the broader Harmony Framework — prioritising simplicity, safety-by-default, spec-first design, and rapid iteration. By transforming agentic workflows from fragile experiments into predictable, observable components, teams can scale AI-assisted development with confidence.
+
+---
+
+## The Purpose of the AI-Toolkit
+
+The **AI-Toolkit** exists to accelerate software development through AI-powered automation, enabling small teams to deliver high-quality, safe, and reliable software at speed. It does this by equipping AI agents with deterministic, **guard-railed tools** — called **kits** — that bring structure, visibility, and repeatability into what would otherwise be loosely-controlled workflows.
+
+Each kit embodies a single, crisp purpose, with clear inputs, outputs, and well-defined integration points. This ensures that AI agents operate in a **transparent, reproducible, and controlled** environment rather than drifting into undocumented or unpredictable behaviour. By guiding agents down **guarded paths**, the toolkit ensures safety, accuracy, quality, and speed — all while reducing cognitive and operational load for developers.
+
+In alignment with Harmony’s principles of **simplicity over complexity**, **spec-first rather than ceremony**, and **flow over fluff**, the AI-Toolkit is opinionated where it matters (interfaces, safety, structure) and flexible everywhere else. It favours minimal viable complexity — only introducing additional layers when required by SLOs, compliance, or scale.
+
+The AI-Toolkit addresses the core pitfalls encountered when implementing multiple AI agents within an automated workflow: ambiguous hand-offs, uncontrolled tool invocation, context fragmentation, cascading hallucinations or mis-reasoning, and difficulty in debugging or observing inter-agent interactions. By enforcing **deterministic tool boundaries**, **human checkpoints**, and **observability across all runs**, the toolkit transforms multi-agent complexity into measurable, predictable progress rather than uncontrolled autonomous behaviour.
+
+In short: the AI-Toolkit is the **practical backbone** of Harmony’s promise — a modular, local-first framework that lets a tiny team ship outsized results, without sacrificing simplicity, safety, or correctness. It turns multi-agent chaos into structured, safe, high-velocity development — **fast, safe, and aligned by design**.
+
+---
+
 ## How the kits are grouped
 
 - **Core Workflows:** Do the work (docs, code, stack, retrieval)
@@ -21,7 +51,7 @@ A modular, local-first toolkit that lets a tiny team ship outsized results with 
 
 ## Harmony Alignment (Lean AI-Accelerated Methodology)
 
-Harmony is a lean, opinionated delivery method for tiny teams to ship quickly and safely on their chosen stack. It pairs spec‑first, agentic agile development in an AI‑driven IDE with a monorepo workflow and TypeScript/Python services, and bakes in SRE and DevSecOps practices. Harmony aligns with OWASP ASVS, NIST SSDF, and STRIDE, and adopts architectural principles from 12‑Factor, Monolith‑First, and Hexagonal—so you can ship fast, ship safe, and ship with confidence.
+Harmony is a lean, opinionated delivery method for tiny teams to ship quickly and safely on their chosen stack. It pairs spec‑first, agentic agile development in an AI‑driven IDE with a monorepo workflow and TypeScript/Python services, and bakes in SRE and DevSecOps practices. Harmony aligns with OWASP ASVS, NIST SSDF, and STRIDE, and adopts architectural principles from 12‑Factor, Monolith‑First, and Hexagonal—so you can ship fast, ship safe, and ship with confidence. For the full methodology and lifecycle overview, see apps/docs/src/content/docs/handbook/methodology/README.md.
 
 This toolkit maps directly to Harmony. Use the kits as ready‑to‑run building blocks with AI‑driven quality, security, and reliability built in.
 
@@ -168,7 +198,7 @@ Harmony alignment notes are called out inline below in the relevant kits.
 - **AgentKit** calls **ToolKit** wrappers; leverages **CacheKit** for memoization.
 - **Dockit/DevKit/StackKit** call **QueryKit** for grounding; **QueryKit** reads **IndexKit** stores; **IndexKit** builds from **IngestKit**, which ingests from **SearchKit**.
 - **EvalKit**, **TestKit**, **PolicyKit**, and **ComplianceKit** gate outputs and **PatchKit** PRs; **HeadersKit** and **A11yKit** contribute checks.
-- **ReleaseKit** coordinates with **FlagKit** for progressive delivery and rollback; flags stored via Vercel Edge Config.
+- **ReleaseKit** coordinates with **FlagKit** for progressive delivery and rollback; flags via **Vercel Flags** (Edge Config).
 - **SearchKit** feeds **IngestKit** with external content.
 - **DiagramKit**, **BenchKit**, **DepKit**, **MigrationKit**, **i18nKit** hang off the main flows as needed.
 - **ScheduleKit** triggers **PlanKit → AgentKit**; **NotifyKit** informs humans; **ObservaKit** records everything; **GuardKit/VaultKit** keep it safe.

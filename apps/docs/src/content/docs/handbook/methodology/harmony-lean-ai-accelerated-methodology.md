@@ -3,7 +3,7 @@ title: Lean AI-Accelerated Methodology Overview
 description: Summary of the Harmony methodology combining BMAD, Cursor, Turborepo, Vercel, and compliance guardrails for fast delivery.
 ---
 
-Harmony is a lean, **opinionated** methodology you can adopt tomorrow with two developers, optimized for **speed and quality with safety** on your stated stack and hosting. It integrates **BMAD (Agentic agile with custom (SDD) spec‑first module) + Cursor + Turborepo + Vercel** end‑to‑end, while baking in **SRE, DevSecOps, OWASP ASVS, NIST SSDF, STRIDE, 12‑Factor, Monolith‑First, Hexagonal**.
+Harmony is a lean, **opinionated** methodology you can adopt tomorrow with two developers, optimized for **speed and quality with safety** on your stated stack and hosting. It integrates **BMAD (Agentic agile, paired with GitHub’s SpecKit for spec‑first) + Cursor + Turborepo + Vercel** end‑to‑end, while baking in **SRE, DevSecOps, OWASP ASVS, NIST SSDF, STRIDE, 12‑Factor, Monolith‑First, Hexagonal**.
 
 > **Sources (select)**
 >
@@ -24,6 +24,117 @@ Harmony is a lean, **opinionated** methodology you can adopt tomorrow with two d
 > - **Playwright/Pact/Schemathesis**
 > - **OWASP cheat sheets** (CSP/CSRF/SSRF)
 > - Citations are sprinkled where load‑bearing.
+
+### Taxonomy Legend (grouped)
+
+- Frameworks & standards
+  - **OWASP ASVS v5** — Standard: application security verification requirements and levels.
+  - **NIST SSDF (SP 800‑218)** — Framework: secure software development practices and activities.
+  - **OpenTelemetry (OTel)** — Standard: vendor‑neutral telemetry for traces/metrics/logs.
+- Methods & practices
+  - **Google SRE** — Discipline/guidance: SLIs/SLOs, error budgets, postmortems.
+  - **DORA metrics** — Metrics model: lead time, deploy frequency, change‑fail rate, MTTR.
+  - **Trunk‑Based Development** — Practice: small, frequent integration to a single trunk.
+  - **12‑Factor App** — Methodology/guidance: cloud‑native app design and ops.
+  - **Kanban/Little’s Law** — Method/principle: WIP limits; WIP = Throughput × Cycle Time.
+  - **Shape Up** — Product method: appetites/scopes instead of task backlogs.
+  - **STRIDE** — Threat‑modeling methodology: spoofing, tampering, repudiation, info disclosure, DoS, elevation.
+  - **Monolith‑First** — Strategy/principle: start with a modular monolith before services.
+- Architectural patterns
+  - **Hexagonal architecture** — Pattern: ports & adapters isolating domain from infrastructure.
+- Platforms & platform controls
+  - **Vercel** — Platform: previews, envs, promote/rollback, flags, cron.
+  - **GitHub** — Platform controls: branch protection, CODEOWNERS, secret scanning.
+- Build & repo tooling
+  - **Turborepo** — Tooling: monorepo builds with incremental/remote caching.
+- Security analysis tooling
+  - **CodeQL** — Tooling: semantic static analysis (GitHub code scanning).
+  - **Semgrep** — Tooling: rule‑based static analysis engine.
+- Testing & contract tools
+  - **Playwright** — Test framework: browser E2E automation.
+  - **Pact** — Test framework: consumer/provider contract testing.
+  - **Schemathesis** — Test tool: property‑based API testing from OpenAPI.
+- Specifications & schemas
+  - **OpenAPI** — Specification: machine‑readable HTTP API description.
+  - **JSON Schema** — Specification: JSON validation for data and APIs.
+- Guidance
+  - **OWASP cheat sheets (CSP/CSRF/SSRF)** — Guidance: concise best practices for common controls.
+
+---
+
+## Harmony’s Unifying Objective
+
+Harmony unifies speed, safety, and simplicity so a tiny team can ship high‑quality software quickly, safely, and predictably. Every framework and tool listed above reinforces one of Harmony’s three pillars and closes the loop from secure specification → agentic implementation → observable operations → postmortem learning.
+
+### The Three Pillars
+
+- Build safely — Security, compliance, correctness
+  - OWASP ASVS, NIST SSDF, STRIDE, CodeQL, Semgrep, OWASP Cheat Sheets
+- Ship simply — Flow, speed, operational simplicity
+  - Trunk‑Based Development, Monolith‑First, 12‑Factor, Kanban/Little’s Law, Shape Up
+- Operate observably — Reliability, measurement, and learning
+  - Google SRE, DORA, OpenTelemetry (OTel via ObservaKit), Vercel, GitHub, Turborepo
+
+Together these pillars create a self‑reinforcing system that makes changes small, deterministic, testable, and reversible.
+
+---
+
+## Where the AI‑Toolkit Fits
+
+The AI‑Toolkit provides the kit‑level building blocks that implement Harmony’s gates and flows. For a concise mapping from Harmony’s principles to specific kits, see “Harmony Alignment” in docs/handbook/ai-toolkit/README.md#harmony-alignment-lean-ai-accelerated-methodology. In practice, use FlagKit for feature gating and progressive delivery (Vercel Flags via Edge Config), ObservaKit for telemetry, EvalKit/PolicyKit/GuardKit for gates, and PatchKit for PRs.
+
+---
+
+## How They Interlock
+
+### 1) Security and Compliance (Defense‑in‑Depth)
+
+- OWASP ASVS and NIST SSDF establish baseline security and development controls; specs and CI gates map directly to them.
+- STRIDE injects threat modeling at design time (spec‑first), translating risks → mitigations → tests.
+- CodeQL, Semgrep, and OWASP cheat sheets operationalize controls as automated CI checks and developer guidance.
+- Outcome: security and compliance are built in, not bolted on after the fact.
+
+### 2) Speed and Flow (Lean Delivery)
+
+- Trunk‑Based Development, Kanban/Little’s Law, and Shape Up synchronize scope, WIP, and integration cadence.
+  - Shape Up defines appetites and trims scope.
+  - Kanban limits WIP to keep cycle times low.
+  - Trunk‑based flow yields tiny, frequent integrations.
+- Monolith‑First and 12‑Factor keep the architecture lean, reducing coordination and operational overhead.
+- Outcome: delivery is continuous, reversible, and predictable.
+
+### 3) Reliability and Observability (Continuous Feedback)
+
+- Google SRE introduces SLIs/SLOs and error budgets; DORA metrics measure speed versus stability to guide release decisions.
+- OpenTelemetry powers the observability stack (via ObservaKit) for traces, metrics, and structured logs.
+- Vercel and GitHub provide controlled deployment and governance surfaces that enforce reliability goals.
+- Outcome: reliability is measurable, and feedback loops are fast.
+
+### 4) Architecture and Maintainability
+
+- Hexagonal architecture, Turborepo, OpenAPI, and JSON Schema form Harmony’s structural backbone.
+  - Contracts/schemas define boundaries and expectations.
+  - Pact and Schemathesis ensure adapters remain compatible.
+  - Turborepo enforces modularity and fast iteration.
+- Outcome: systems are deterministic, testable, and easy to evolve—aligned with spec‑first and simplicity‑first rules.
+
+### 5) Testing and Quality Assurance
+
+- Playwright, Pact, and Schemathesis span the testing pyramid (E2E, contract, property‑based layers).
+- Combined with JSON Schema validations and EvalKit, they produce verifiable AI and code outputs.
+- Outcome: agent‑assisted changes are safe, observable, and reversible.
+
+---
+
+## Overall Harmony
+
+- Not random best practices: each fills a clear gap (security, flow, observability, architecture) with minimal overlap.
+- Mutual reinforcement: DORA depends on trunk flow; trunk flow depends on safe CI gates (ASVS, SSDF); SLOs depend on observability (OTel).
+- Shared philosophy: prioritize small, deterministic, testable, reversible changes—the core of Harmony.
+
+### Conclusion
+
+Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (ASVS, SSDF, STRIDE) define what “safe” means. Tools and platforms (Vercel, GitHub, OTel, Turborepo) ensure speed and safety coexist. This alignment makes Harmony lean, agent‑ready, and safe by default—so AI‑accelerated teams can move fast without breaking trust.
 
 ---
 
@@ -57,7 +168,7 @@ Harmony is a lean, **opinionated** methodology you can adopt tomorrow with two d
 
 ```mermaid
 flowchart LR
-  A["BMAD (SDD) Spec Module + ADR"] --> B[Shape & Scope Cuts]
+  A["SpecKit Spec + ADR"] --> B[Shape & Scope Cuts]
   B --> C["BMAD Story (context packets + agent plan + AC)"]
   C --> D["Dev in Cursor (human checkpoints)"]
   D --> E["PR -> Vercel Preview (feature-flagged)"]
@@ -100,7 +211,7 @@ flowchart LR
 
 ## 5) Spec‑First + BMAD (step‑by‑step)
 
-1. **Write the BMAD (SDD module) spec one‑pager** (template below): problem, constraints, **API/UI contracts (OpenAPI/JSON‑Schema)**, non‑functionals (perf, reliability, privacy), **ASVS** controls and **SSDF** tasks, **STRIDE** risks & tests.
+1. **Write the SpecKit spec one‑pager** (template below): problem, constraints, **API/UI contracts (OpenAPI/JSON‑Schema)**, non‑functionals (perf, reliability, privacy), **ASVS** controls and **SSDF** tasks, **STRIDE** risks & tests.
 2. **Shape**: Cut scope (“must”, “defer”). Pull useful parts of **Shape Up** (appetite, scopes).
 3. **Transform into BMAD story**: add **context packets** (domain, constraints, examples), the **agentic plan** (ordered steps Cursor can execute), clear acceptance criteria.
 4. **Cursor workflow**:
@@ -116,7 +227,7 @@ flowchart LR
 - **Trunk‑Based**: short‑lived branches (≤1 day). One small change per PR. Use **feature flags** for any risky behavior.
 - **Vercel Previews**: every PR gets a live URL for acceptance and e2e smoke. **Promote** a known‑good preview to production (instant rollback path).
 - **Environment naming & Production policy**: Use **PR Preview** (per PR), **Trunk Preview** (on `main`), and **Production** (manual promote only). In Vercel, disable **Auto Production Deployments** so Production is updated exclusively via `vercel promote <preview-url>`.
-- **Feature flags**: use **Vercel Flags** as the provider (server‑evaluated). The in‑repo `packages/config/flags.ts` reads flag values from the Vercel provider (registered at app startup) and falls back to env overrides (`HARMONY_FLAG_*`) for local/dev. Call `setFlagProvider(vercelFlagsProvider)` during application startup — for this repo, register in `apps/api/src/server.ts` (API) and in the SSR entry when adding SSR surfaces. For **Astro SSG/static** pages, evaluate flags server‑side and inject values at build time or via Edge middleware; avoid using `process.env` in the browser. Otherwise, evaluation uses env (`HARMONY_FLAG_*`) and defaults. Clean up flags within 2 cycles.
+- **Feature flags**: use **Vercel Flags** (Edge Config‑backed) as the provider (server‑evaluated). The in‑repo `packages/config/flags.ts` reads flag values from the Vercel provider (registered at app startup) and falls back to env overrides (`HARMONY_FLAG_*`) for local/dev. Call `setFlagProvider(vercelFlagsProvider)` during application startup — for this repo, register in `apps/api/src/server.ts` (API) and in the SSR entry when adding SSR surfaces. For **Astro SSG/static** pages, evaluate flags server‑side and inject values at build time or via Edge middleware; avoid using `process.env` in the browser. Otherwise, evaluation uses env (`HARMONY_FLAG_*`) and defaults. Clean up flags within 2 cycles.
 - **Environments & secrets**: use **Vercel envs** + CLI to manage; never commit secrets; rely on **GitHub secret scanning** + **TruffleHog** in CI.
 
 ---
@@ -224,7 +335,7 @@ flowchart TB
 
 Framework strategy: **Next.js** is the default for SaaS/dynamic web apps; **Astro** is used for content‑first properties (blogs/docs/marketing). The current `apps/web` is Astro; additional Next.js apps will be added for dynamic surfaces as the project grows.
 
-- **Feature flags implementation**: flags are declared in `packages/config/flags.ts`. At app startup, register the **Vercel Flags provider** so `isFlagEnabled()` and `listFlags()` read from it by default, with local env (`HARMONY_FLAG_*`) as fallback for development. On **SSR** surfaces (Next.js, Astro adapters), flags are server‑evaluated by the provider. On **Astro SSG/static** pages, use `isFlagEnabled` only on the server; inject flag values at build time or fetch via Edge/API — do not rely on `process.env` in the browser.
+- **Feature flags implementation**: flags are declared in `packages/config/flags.ts`. At app startup, register the **Vercel Flags provider** (Edge Config‑backed) so `isFlagEnabled()` and `listFlags()` read from it by default, with local env (`HARMONY_FLAG_*`) as fallback for development. On **SSR** surfaces (Next.js, Astro adapters), flags are server‑evaluated by the provider. On **Astro SSG/static** pages, use `isFlagEnabled` only on the server; inject flag values at build time or fetch via Edge/API — do not rely on `process.env` in the browser.
 
 **Example layout & ownership (CODEOWNERS)**:
 Note: Illustrative example; `apps/app` (Next.js) may not exist yet. Add Next.js surfaces as needed.

@@ -27,4 +27,4 @@ paths:
 components:
   schemas:
     ExampleFeature:
-      $ref: './schemas/{{feature-name}}.schema.json'
+      $ref: './schemas/feature-name.schema.json'

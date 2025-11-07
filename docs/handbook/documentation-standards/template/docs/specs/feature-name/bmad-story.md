@@ -5,13 +5,15 @@
 - Domain notes, glossary, examples (include sample payloads)
 - Constraints: compliance, latency budgets, limits
 - Links: [spec.md](./spec.md), ADRs, contracts, runbooks
+- Tech choices & rationale (link to ADR and Component Guide “Opinionated Implementation Choices”)
 
 ## Agent Plan (tiny diffs)
 
 1. **Contracts first**: author OpenAPI + JSON Schema; add stub handlers and contract tests.
 2. **Adapters & service**: implement adapters and domain service logic.
 3. **Routing/wiring**: expose `/v1/{{feature-name}}` routes; guard with `flag.{{feature-name}}`.
-4. **Preview smoke**: deploy PR preview and validate acceptance.
+4. **Artifacts** (if applicable): build reproducible snapshots/manifests; optionally publish to serving backends.
+5. **Preview smoke**: deploy PR preview and validate acceptance.
 
 ## Acceptance Criteria (Observable)
 
@@ -21,7 +23,7 @@
 ## Contracts (Source of Truth)
 
 - OpenAPI: `packages/contracts/openapi.yaml` (component `ExampleFeature`).
-- JSON Schema: `packages/contracts/schemas/{{feature-name}}.schema.json`.
+- JSON Schema: `packages/contracts/schemas/feature-name.schema.json`.
 - Optional Pact tests if there is a consumer/provider.
 
 ## Test Plan
@@ -30,11 +32,20 @@
 - Contract tests at boundaries (API/UI).
 - E2E smoke on preview for core flows.
 - Golden tests for AI output (if applicable) guarded by JSON Schema.
+ - Artifact validation: schema_version, integrity checksums, cardinality/dimension parity.
 
 ## Rollout & Observability
 
 - Flag: `flag.{{feature-name}}`; audience: internal → % ramp.
 - Monitors: SLOs, burn-rate, dashboards/traces.
+ - Reproducibility: log build/source hashes for artifacts.
+
+## Pilot Plan & Gates (optional)
+
+- Objective: quantify gains vs baseline in accuracy/recall/latency/cost.
+- Dataset slice: <e.g., 5–10% representative sample>.
+- Metrics: <Recall@k, MRR, citation correctness, p95 latency, cost>.
+- Acceptance gates: <threshold deltas, e.g., +5% recall with ≤10% latency increase>.
 
 ## Definition of Done (Gates)
 

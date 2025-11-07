@@ -4,6 +4,6 @@ Decide *what* to do and *how* to run it
 
 ## Kits
 
-- [SpecKit](./speckit.md)
-- [PlanKit](./plankit.md)
-- [AgentKit](./agentkit.md)
+- [SpecKit](./speckit/guide.md)
+- [PlanKit](./plankit/plankit.md)
+- [AgentKit](./agentkit/agentkit.md)

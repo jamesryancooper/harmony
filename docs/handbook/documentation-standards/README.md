@@ -17,6 +17,7 @@ Harmony is explicitly **spec-first**: every meaningful change starts with a **sp
 - **Problem & Outcome** (one paragraph)
 - **Scope**: Must / Defer
 - **Interfaces**: links to **OpenAPI + JSON-Schema** contracts
+- **I/O & Artifacts (if applicable)**: key inputs/outputs and any on-disk artifacts with `schema_version`
 - **Non-functionals**: SLIs/SLOs & perf budgets
 - **Risks (STRIDE) & mitigations** (bulleted)
 - **Architecture sketch**: ports & adapters / boundaries
@@ -55,6 +56,7 @@ Harmony prescribes converting the Spec into a **BMAD story** (context packets + 
 - **Context packets**: domain notes, examples, constraints
 - **Agent plan**: ordered steps/files to touch; smallest viable diffs
 - **Contracts**: link **OpenAPI/JSON-Schema** (+ Pact if used)
+- **Artifacts** (if applicable): build reproducible snapshots/manifests; optional publish step
 - **Acceptance criteria**: observable behaviors tied to contracts
 - **Test plan**: unit + contract (negative cases from STRIDE) + smoke on Preview
 - **Rollout**: feature flag name, initial audience, rollback plan
@@ -76,6 +78,8 @@ Harmony treats **contracts** as first-class and enforces **OpenAPI diff (oasdiff
 - **JSON-Schema**: one file per payload/event; examples + negative cases
 - **CI**: enable **oasdiff** + schema validation; add Pact if consumer/provider exists.
 
+If your component emits on-disk artifacts (JSON/JSONL/manifests), also define JSON Schemas for those artifacts, include a `schema_version`, and document them in the Component Guide.
+
 > **Repo hint:** keep these in `packages/contracts/` and link them from the Spec/BMAD.
 
 ---
@@ -90,12 +94,28 @@ Harmony favors **flow over ceremony**: central specs + contracts, while detailed
 
 **Ultra-lean template:**
 
-- **What it is / When to use**
-- **Interfaces & Contracts** (link to schemas/OpenAPI)
-- **Configuration** (minimal JSON/YAML examples)
-- **Outputs & Artifacts** (file formats/schemas)
-- **Operational notes** (limits, perf tips)
-- **Troubleshooting** (top errors, quick fixes)
+- **Quick Snapshot**: modes/variants • capabilities (e.g., signals) • inputs/outputs • artifacts • optional publish/serve
+- **What It Does**: primary responsibilities in brief
+- **Wins**: key benefits for users/teams
+- **Opinionated implementation choices**: libraries/engines/formats and rationale; link ADR for org‑wide/high‑impact choices
+- **Core Responsibilities**: what it owns and guarantees
+- **Ecosystem Integrations**: upstreams/downstreams in the AI toolkit
+- **Operating Modes / Usage Recipes**: when to choose which mode
+- **Signals/Capabilities (optional)**: feature toggles/signals and validation
+- **I/O & Contracts**: link OpenAPI/JSON‑Schema; summarize inputs/outputs
+- **Artifacts & Layout**: file formats, schema_version, and example tree
+- **Versioning & Compatibility**: artifact schema semver, breaking-change policy, down‑conversion notes
+- **Configuration & Tuning**: minimal and advanced knobs (JSON/YAML)
+- **Sizing & Capacity (optional)**: typical sizes, CPU/RAM guidance, perf tips
+- **Adapters (optional)**: in-memory/off-disk adapters and runtime knobs
+- **Publishing/Serving (optional)**: DB adapters or serving backends
+- **Validation & Health**: drift checks, parity checks, health probes
+- **Observability (optional)**: logs/metrics/traces to emit; ObservaKit/EvalKit hooks
+- **Harmony Alignment**: spec‑first, auditability, security, modular flow (link to ../methodology/README.md)
+- **Why Teams Choose `<component-name>`**: concise value proposition
+- **Minimal Interfaces**: copy‑paste config/function stubs
+- **Contracts & Schemas**: artifact schemas and `schema_version` notes
+- **Troubleshooting + Common Questions**: top issues and FAQs
 
 ---
 
@@ -112,8 +132,9 @@ Harmony’s reliability guardrails expect **SLOs, error-budget policy**, **previ
 - **SLOs & alerts** (burn-rate thresholds, dashboards)
 - **Validate** (preview smoke checklist for the feature)
 - **Rollback** (exact command: `vercel promote <deployment-url>`)
+- **Artifacts/Snapshots (if applicable)**: how to rebuild/promote or republish artifacts safely
 - **Run / Repair** (common issues & fixes; links to component guide)
-- **Postmortem** (blameless template link)  
+- **Postmortem** (blameless template link)
 
 ---
 
@@ -185,3 +206,27 @@ README.md
 4. Fill `bmad-story.md` with your small, ordered Agent Plan and acceptance criteria using the template as guidance.
 5. Use `docs/components/.../guide.md` as a guide for creating configuration, artifacts, and troubleshooting documentation.
 6. Hook up CI for `oasdiff` + schema validation; keep the feature behind `flag.<your-feature>` until rollout.
+
+---
+
+## Kit Docs Checklist
+
+When documenting kits in `docs/handbook/ai-toolkit`, include these data points where applicable:
+
+- Quick Snapshot: modes/variants, capabilities/signals, inputs/outputs, artifacts, optional publish/serve
+- Core Responsibilities and explicit non‑responsibilities (boundaries)
+- Ecosystem Integrations: which other kits consume/produce its artifacts
+- Operating Modes and selection guidance
+- I/O contract summary and links to OpenAPI/JSON‑Schema
+- Artifacts: schemas, `schema_version`, and example directory layout
+- Configuration & Tuning knobs with safe defaults
+- Opinionated implementation choices (with ADR links if consequential)
+- Validation & Health checks (drift, parity, integrity)
+- Versioning & Compatibility (schema semver, breaking changes)
+- Sizing & Capacity (typical sizes, resource guidance)
+- Observability (logs/metrics/traces; link to ObservaKit/EvalKit)
+- Publishing to databases/serving adapters (if relevant) with minimal DDL/examples
+- Harmony Alignment bullets mapping to spec‑first, auditability, security baselines, and modular CI/CD
+- Minimal Interfaces (functions/config shapes) and FAQs
+
+See `docs/handbook/ai-toolkit/knowledge-and-retrieval/indexkit.md` for a good exemplar that follows this pattern.
