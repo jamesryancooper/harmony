@@ -220,6 +220,7 @@ This catalog clarifies how the essential kits reinforce Harmony’s pillars and 
 | ObservaKit | quality_through_determinism | all | `kit.observakit.flush` + required attributes |
 | ComplianceKit | quality_through_determinism | verify·ship·learn | `kit.compliancekit.assemble` |
 | CacheKit | speed_with_safety, simplicity_over_complexity | implement | `kit.cachekit.hit`, `kit.cachekit.miss` |
+| ParseKit | simplicity_over_complexity, speed_with_safety | implement | `kit.parsekit.parse` |
 
 Notes:
 
@@ -245,6 +246,7 @@ This table standardizes each core kit’s purpose, lifecycle coverage, schemas, 
 | ObservaKit | Telemetry (traces/logs/metrics) | all | n/a | `runs/**` links + vendor traces | `kit.observakit.flush` | Never log secrets; redaction on by default |
 | ComplianceKit | Assemble evidence pack | verify·ship·learn | `packages/contracts/schemas/kits/compliancekit.inputs.v1.json` | Evidence pack manifest under `runs/**` | `kit.compliancekit.assemble` | Required for high‑risk changes |
 | CacheKit | Idempotency + memoization | implement | `packages/contracts/schemas/kits/cachekit.inputs.v1.json` | Cache hit/miss records | `kit.cachekit.hit`, `kit.cachekit.miss` | Pure ops must declare `--cache-key` |
+| ParseKit | Convert PDFs to Markdown (tables/figures) | implement | `packages/contracts/schemas/kits/parsekit.inputs.v1.json` | `docs_out/parsed/*.md`, `runs/**/parsekit-*.json` | `kit.parsekit.parse` | GuardKit redaction; dry‑run OK |
 
 Notes:
 
@@ -433,7 +435,7 @@ To align with Harmony governance, PolicyKit rules MUST be explicit and versioned
 ### 1) Daily Doc Refresh
 
 1. **ScheduleKit** triggers → **PlanKit** builds “Doc Refresh”.
-2. **AgentKit** runs: IngestKit → IndexKit → Dockit (PromptKit + QueryKit grounding).
+2. **AgentKit** runs: ParseKit → IngestKit → IndexKit → Dockit (PromptKit + QueryKit grounding).
 3. **EvalKit** verifies structure/links/grounding/security; **TestKit** runs code blocks/contracts.
 4. **PatchKit** opens PR; **NotifyKit** posts summary; **ObservaKit** stores traces.
 
@@ -588,6 +590,7 @@ PatchKit SHOULD generate (or validate) a minimal PR body conforming to Harmony�
   /datasetkit   /modelkit      /releasekit
   /migrationkit /flagkit       /uikit
   /i18nkit      /seedkit       /vaultkit
+  /parsekit
 /docs         (source)
 /docs_out     (proposed outputs)
 /ingest       (normalized sources)
@@ -1200,6 +1203,7 @@ Keep the toolkit lean and scalable for tiny teams:
 | IndexKit     | Build stores                | `indexes/*`                |
 | QueryKit     | Answers + evidence          | Citations, evidence pack   |
 | PromptKit    | Prompts                     | Templates                  |
+| ParseKit     | PDF parsing to Markdown     | Markdown files             |
 | TestKit      | Tests & contracts           | Reports, PR checks         |
 | EvalKit      | Verification                | Reports, PR checks         |
 | PolicyKit    | Guardrails                  | Policy YAML outcomes       |
@@ -1362,6 +1366,7 @@ To preserve local‑first operation and determinism without network access:
 - **PlanKit** calls **AgentKit** with a plan (from **SpecKit**), recording a run and opening a trace.
 - **AgentKit** calls **ToolKit** wrappers and leverages **CacheKit** for idempotency and memoization.
 - **Dockit/DevKit/StackKit** call **QueryKit** for grounding; **QueryKit** reads **IndexKit** stores; **IndexKit** builds from **IngestKit**, which ingests from **SearchKit**.
+- **ParseKit** converts raw PDFs into Markdown artifacts that feed **IngestKit** and downstream indexing/query workflows.
 - **EvalKit**, **TestKit**, **PolicyKit**, and **ComplianceKit** gate outputs and **PatchKit** PRs; **ComplianceKit** assembles evidence and links ObservaKit traces; **HeadersKit** and **A11yKit** contribute checks.
 - **ReleaseKit** coordinates with **FlagKit** for progressive delivery and rollback; flags via **Vercel Flags** (Edge Config).
 - **SearchKit** feeds **IngestKit** with external content.
