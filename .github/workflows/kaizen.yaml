@@ -1,0 +1,22 @@
+name: Kaizen Autopilot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 18 * * 1-5' # Weekdays 18:00 UTC (12:00 America/Chicago)
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  placeholder:
+    name: Kaizen placeholder
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Note
+        run: |
+          echo "Kaizen workflow placeholder. Replace with real steps (e.g., kaizen/agents and kaizen/evaluators) when ready."
+
