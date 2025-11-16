@@ -46,7 +46,7 @@ Each **node** represents a single actionable step in the flow:
 
 FlowKit uses a **typed state object** per flow. For the architecture assessment, this might include:
 
-- `workspace_root` and paths (for example, `docs/harmony/architecture`).
+- `workspace_root` (repo root used for resolving prompts/paths) and `architecture_docs_path` (for example, `docs/harmony/architecture`).
 - `inventory` (files, headings, terms, roles, invariants, links).
 - `terminology_map` and `decision_map`.
 - `issue_register`.
@@ -150,15 +150,27 @@ FlowKit’s implementation is intentionally minimal and composable.
 
 ### 3.1 Directory Layout (example)
 
-In code (Python side), a typical layout might look like:
+In code, FlowKit is split into:
+
+- **Kit contracts and TS interfaces** under `packages/kits/flowkit/` (TypeScript/Node side).
+- **Runtime implementations** (for example, LangGraph flows) under a non‑app host (for example, `agents/runner/runtime/`), which consume prompts and YAML and are driven via the FlowKit kit interface.
+
+In this repo, a typical Python-side layout for the Architecture Assessment flow looks like:
 
 ```text
-flows/
+agents/runner/runtime/
   __init__.py
+  pyproject.toml      # Python dependencies (langgraph, pydantic, pyyaml, markdown)
   architecture_assessment/
+    __init__.py
     state.py          # State model for ArchitectureAssessmentFlow
-    graph.py          # LangGraph graph construction
-    run.py            # Public entrypoint
+    graph.py          # LangGraph graph construction and node implementations
+    run.py            # Public entrypoint (CLI + helpers, canonical prompt validation)
+    parsing.py        # Markdown/frontmatter parsing utilities
+    analysis.py       # Terminology/decision map building, issue detection
+    __tests__/
+      test_parsing.py # Tests for parsing utilities
+      test_analysis.py # Tests for analysis utilities
   ...
 ```
 
@@ -171,30 +183,45 @@ On the prompts side, FlowKit expects:
 - Workflow manifest:
   - `packages/prompts/assessment/architecture/workflows/architecture-assessment.yaml`
 
-### 3.2 Graph Construction (conceptual)
+### 3.2 Graph Construction (implementation)
 
-At a high level, graph construction for the architecture assessment flow:
+The architecture assessment flow graph construction:
 
-1. Read the canonical prompt; get `meta.workflow.path`.
-2. Load the YAML workflow manifest (steps, prompt paths, meta).
-3. Create a state object with initial fields (paths, empty maps, empty issue register, etc.).
-4. For each step:
-   - Create a LangGraph node that:
-     - Loads the action prompt Markdown.
-     - Calls the model/tooling as defined by the FlowKit runtime.
-     - Updates the state.
-5. Wire nodes in order using `depends_on` / `meta.step_index`.
-6. Set stop conditions (for example, after `declare_no_update`).
+1. **Canonical prompt validation**: `run.py` validates the canonical prompt frontmatter, resolves `meta.workflow.path` relative to the repo (or `packages/prompts/`), ensures the manifest exists, and captures the declared `entrypoint`.
+2. **Manifest loading**: Loads the YAML workflow manifest (the resolved path from step 1) and passes both the path and entrypoint into the LangGraph builder.
+3. **State initialization**: Creates `ArchitectureAssessmentState` with `run_id`, `workspace_root` (repo root, defaults to `"."`), `architecture_docs_path` (defaults to `docs/harmony/architecture`), and empty collections for inventory, maps, issues, etc.
+4. **Node registration**: For each step in the manifest:
+   - Maps `meta.action` to a node function (e.g., `inventory` → `inventory_node`).
+   - Registers the node with LangGraph using the step's `id`.
+5. **Edge wiring**: Honors `depends_on` relationships from the manifest, or falls back to sequential ordering by `step_index`.
+6. **Execution**: The graph is compiled and invoked with the initial state, producing a final state with `alignment_report` or a no-update declaration.
+
+**Node implementations**:
+- `inventory_node`: Uses `parsing.py` utilities to walk `docs/harmony/architecture`, parse Markdown files, extract headings/terms/roles/processes/invariants/controls/links, and populate `state.inventory`.
+- `analyze_node`: Builds terminology and decision maps from the inventory using `analysis.py` utilities.
+- `map_node`: Normalizes terminology and decision representations (currently a pass-through; future enhancements can add semantic normalization).
+- `detect_issues_node`: Runs conflict, duplication, ambiguity, gap, and cross-link detection, populating `state.issue_register`.
+- `align_node`: Converts high/medium severity issues into alignment decisions with planned changes.
+- `edit_node`: Records what edits would be applied (read-only assessment; actual edits handled by downstream agents).
+- `validate_node`: Checks if alignment plan addresses issues, producing a validation summary.
+- `summarize_node`: Builds the `AlignmentReport` with executive summary, alignment score (0-100), key misalignments, normalized glossary, edits by file, and open questions.
+- `declare_no_update_node`: Checks if alignment score >= 90 and no high-severity issues remain; if so, emits the canonical no-update declaration.
 
 ### 3.3 State Models
 
-State models should:
+The `ArchitectureAssessmentState` model (implemented in `state.py`):
 
-- Be explicit and typed (pydantic or dataclasses).
-- Mirror the concepts in the canonical prompt:
-  - Inventory, terminology map, decision map, issue register, alignment plan, edits, validation summary, alignment report.
-- Include metadata:
-  - `run_id`, `flow_name`, `kit_name`, timestamps, etc., for ObservaKit.
+- **Explicit and typed**: Uses Pydantic v2 `BaseModel` with strict type annotations.
+- **Mirrors canonical prompt structure**:
+  - `inventory`: List of `FileInventoryItem` objects (path, title, frontmatter, headings, key_terms, roles, processes, invariants, controls, links).
+  - `terminology_map`: Dict mapping normalized terms to `TerminologyEntry` (definitions, files, notes).
+  - `decision_map`: List of `DecisionEntry` objects (id, description, files, status, notes).
+  - `issue_register`: List of `Issue` objects (id, type, severity, location, description, evidence).
+  - `alignment_plan`: List of `AlignmentDecision` objects (id, description, files, planned_changes, open_question_id).
+  - `edits_applied`: List of `EditRecord` objects (file_path, summary, evidence_locations).
+  - `validation_summary`: `ValidationSummary` (resolved_issue_ids, residual_issue_ids, notes).
+  - `alignment_report`: `AlignmentReport` (executive_summary, alignment_score, key_misalignments, normalized_glossary, edits_by_file, open_questions).
+- **Metadata**: Includes `run_id` (UUID), `workspace_root` (repo root for provenance), and `architecture_docs_path` (scope limiter) for ObservaKit correlation and enforcement.
 
 ---
 
@@ -248,7 +275,91 @@ To add a new Harmony‑aligned flow:
 
 ---
 
-## 5. When to Use FlowKit
+### 4.4 TypeScript FlowRunner Helper (Node ↔ Python Bridge)
+
+FlowKit includes a helper for calling the Python runtime from Node, so apps and tools (including Cursor commands) can orchestrate flows without re‑implementing the bridge.
+
+- `packages/kits/flowkit` exports:
+  - `createPythonModuleFlowRunner(options)` — builds a `FlowRunner` that shells out to `python -m <module> <canonicalPromptPath>` with `cwd` set to the workspace root. Includes enhanced error messages for spawn failures and non-zero exits, plus dependency-injection hooks for testing.
+  - `architectureAssessmentCliRunner` — a preconfigured runner that calls:
+    - `python -m agents.runner.runtime.architecture_assessment.run <canonicalPromptPath>`.
+
+**Error handling**: The TypeScript kit provides detailed error messages when the Python runtime fails, including hints about Python installation, canonical prompt existence, and dependency requirements.
+
+**Result metadata**: `FlowRunResult` includes optional `metadata` with `flowName`, `workflowManifestPath`, `canonicalPromptPath`, and `repoRoot` for ObservaKit correlation.
+
+Example (Node/TS):
+
+```ts
+import {
+  architectureAssessmentCliRunner,
+  type FlowConfig
+} from "@harmony/kits";
+
+const config: FlowConfig = {
+  flowName: "architecture_assessment",
+  canonicalPromptPath:
+    "packages/prompts/assessment/architecture/architecture-assessment.md",
+  workflowManifestPath:
+    "packages/prompts/assessment/architecture/workflows/architecture-assessment.yaml"
+  // workspaceRoot is optional; defaults to process.cwd()
+};
+
+const result = await architectureAssessmentCliRunner.run({ config });
+// result.result is parsed JSON (AlignmentReport) from the Python runtime.
+// result.runId is a UUID you can use for correlation/telemetry.
+// result.metadata includes flowName, canonicalPromptPath, workflowManifestPath, and repoRoot.
+```
+
+You can define your own runners for other flows by calling `createPythonModuleFlowRunner` with a different Python module (for example, another entrypoint under `agents/runner/runtime/*`).
+
+---
+
+## 5. Why This Layout (Pros and Cons)
+
+FlowKit’s split between `packages/kits/flowkit` (contracts) and `agents/runner/runtime` (runtime implementation) is deliberate.
+
+### 5.1 Pros (Why it’s the best fit)
+
+- **Architectural clarity**
+  - Matches the Harmony Architecture blueprint: kits live under `packages/kits` as control‑plane libraries; agentic execution lives under `agents/*`.
+  - Keeps FlowKit’s TypeScript contracts separate from any particular runtime or hosting choice.
+- **Clean dependency direction**
+  - Consumers (apps, agents, Kaizen jobs, CI) depend on FlowKit via `packages/kits/flowkit`.
+  - FlowKit’s TS contracts depend on nothing in `agents/*`; the Python runtime in `agents/runner/runtime` depends on prompts and the workflow manifest, not on app code.
+  - Avoids circular patterns like “kit imports its own runtime”, which would blur control‑plane boundaries.
+- **Reuse and composability**
+  - Any app (`apps/web`, `apps/api`, `apps/ai-console`, `apps/ai-gateway`) can call FlowKit via the TS kit, regardless of where the runtime is hosted.
+  - The runner under `agents/runner/runtime` can host multiple flows (architecture, methodology, comparison, etc.) without changing the FlowKit contract surface.
+- **Methodology alignment**
+  - Clean `Spec → Plan → Flow → Implement → Verify → Ship → Learn` chain:
+    - SpecKit validates specs.
+    - PlanKit produces BMAD plans.
+    - FlowKit instantiates flows (via `FlowRunner`), implemented in `agents/runner/runtime`.
+    - AgentKit, TestKit, PolicyKit, etc. are invoked from inside those flows.
+  - FlowKit is the **flow execution orchestrator**, not an app or a gateway.
+- **Future‑ready hosting**
+  - You can:
+    - Continue to run flows locally via CLI.
+    - Wrap `agents/runner/runtime` in a thin `apps/flowkit-runner` HTTP/CLI service later.
+  - None of those changes require you to move or redesign FlowKit’s TS contracts under `packages/kits/flowkit`.
+
+### 5.2 Cons (and why they’re acceptable)
+
+- **More structure to learn**
+  - Contributors must learn:
+    - Kits → `packages/kits/<kit>`.
+    - Runtimes → `agents/runner/runtime/*`.
+  - The docs call this out explicitly, and the pattern is consistent with other Harmony boundaries (e.g., domain vs adapters vs apps).
+- **Slight indirection**
+  - Using FlowKit from TS involves wiring a `FlowRunner` implementation that calls the Python runtime (CLI or HTTP).
+  - This is the cost of keeping control‑plane contracts stable while allowing runtime implementations to evolve independently. It buys testability, swap‑ability, and clearer separation of concerns.
+
+Overall, the pros—architectural clarity, reuse, clean layering, and tight alignment with the Methodology—outweigh the added indirection. This layout is the recommended and normative way to implement FlowKit in this repo.
+
+---
+
+## 6. When to Use FlowKit
 
 Use FlowKit when:
 

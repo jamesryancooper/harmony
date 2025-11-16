@@ -26,6 +26,23 @@ HSP aligns process and tooling end‑to‑end across all lifecycle stages (Spec 
 - “layer” refers to cross‑cutting governance/control‑plane concerns (e.g., Kaizen, quality gates, observability) that span slices, not runtime call layers.
 - See also: [slices vs layers](./slices-vs-layers.md) and [layers overview](./layers.md).
 
+### Planes: runtime vs knowledge
+
+At the repository root, Harmony distinguishes between **runtime planes** and **knowledge/logic planes**:
+
+- `apps/`: deployable applications and UIs (things you **run**).
+- `agents/`: agent runtimes and long‑running flows (things you **run** via FlowKit or CLIs).
+- `packages/`: reusable libraries and knowledge‑plane modules (things you **import**), including domain slices, kits, contracts, and prompt libraries such as `packages/prompts`.
+- `infra/`, `ci-pipeline/`: platform and pipeline automation.
+- `docs/`: specifications, ADRs, and other documentation.
+
+Rule of thumb:
+
+- Anything you **run** (HTTP servers, CLIs, flows, runners) lives in a runtime plane (`apps/*`, `agents/*`).
+- Anything you **import** across those planes (shared domain logic, kits, contracts, prompt suites) lives under `packages/*` (for example `packages/prompts` for the prompts knowledge plane).
+
+This keeps runtime concerns (processes and deployables) clearly separated from shared knowledge and logic (libraries and kits) and aligns the monorepo layout with the Harmony Structural Paradigm.
+
 ### Alignment Coverage (Stamp)
 
 - Lifecycle: Each stage is covered by at least one kit (e.g., SpecKit/PlanKit for Spec/Plan; AgentKit for Implement; EvalKit/TestKit for Verify; PatchKit for Ship; ObservaKit for Operate; Dockit for Learn).

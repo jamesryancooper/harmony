@@ -5,7 +5,7 @@ description: Lean, principle-driven development methodology integrating Spec‑F
 
 # Harmony Methodology
 
-Harmony is a lean, **opinionated**, AI-accelerated methodology you can adopt tomorrow with two developers, optimized for **speed and quality with safety** on your stated stack and hosting. It integrates **Spec‑First (via SpecKit `speckit` wrapping GitHub’s Spec Kit) + Agentic agile (via PlanKit `plankit` wrapping BMAD) + AI-driven IDE (Cursor) + Monorepo Workflow (Turborepo) + Deployment Platform (Vercel)** end‑to‑end, while baking in **SRE, DevSecOps, OWASP ASVS, NIST SSDF, STRIDE, 12‑Factor, Monolith‑First, Hexagonal**.
+Harmony is a lean, **opinionated**, AI-accelerated methodology you can adopt tomorrow with two developers, optimized for **speed and quality with safety** on your stated stack and hosting. It integrates **Spec‑First (via SpecKit `speckit` wrapping GitHub’s Spec Kit) + Agentic agile (via PlanKit `plankit` wrapping BMAD) + Flow orchestration (via FlowKit) + AI-driven IDE (Cursor) + Monorepo Workflow (Turborepo) + Deployment Platform (Vercel)** end‑to‑end, while baking in **SRE, DevSecOps, OWASP ASVS, NIST SSDF, STRIDE, 12‑Factor, Monolith‑First, Hexagonal**.
 
 ---
 
@@ -43,12 +43,51 @@ The AI‑Toolkit provides the kit‑level building blocks that implement Harmony
 
 ### Stage‑to‑Kit Map (operational)
 
-- Spec → Plan → Implement → Verify → Ship → Learn
+- Spec → Plan → Flow → Implement → Verify → Ship → Learn
   - Spec/Shape: SpecKit (`speckit`), PlanKit
+  - Flow orchestration: FlowKit (instantiates long‑running, stateful LangGraph flows from plans or canonical prompts)
   - Implement (agentic): AgentKit, DevKit, CodeModKit (as needed)
   - Verify/Govern: EvalKit (structure/hallucination), PolicyKit (ASVS/SSDF policy), GuardKit (redaction), TestKit (unit/contract/e2e), ComplianceKit (evidence)
   - Ship: PatchKit (PRs), Vercel Previews (promotion), ReleaseKit (changelog)
   - Observe/Learn: ObservaKit (OTel traces + logs), BenchKit (perf), Dockit (docs/ADR), ScheduleKit (jobs)
+
+#### LLMOps & ContextOps kit expectations
+
+To keep responsibilities crisp and repeatable:
+
+- **PromptKit (PromptOps, design-time)**
+  - Standardizes **prompt templates, variable schemas, variants, and fixtures**.
+  - Compiles templates (often from `packages/prompts/**`) into canonical prompts with `prompt_hash` and metadata used by ObservaKit/EvalKit/TestKit.
+  - Does **not** own retrieval, logging/metrics, dashboards, or evaluation logic.
+
+- **LLMOps (runtime monitoring, evaluation, governance)**
+  - **ObservaKit**: traces/logs/metrics (including LLM cost/latency) for all model calls.
+  - **EvalKit + DatasetKit**: evaluation suites and golden datasets for prompts/flows (e.g., hallucination, grounding, style), including per-template/variant scores.
+  - **PolicyKit**: fail-closed policy rules (determinism, redaction, safety thresholds) applied to LLM behavior.
+  - **CacheKit**: idempotency and memoization for pure/expensive LLM operations.
+  - **ModelKit / CostKit** (when adopted): model policy, routing, and cost budgets.
+  - **FlowKit / AgentKit / ToolKit**: orchestrate and execute agent flows that *use* prompts compiled by PromptKit.
+  - **UIkit**: provides human-friendly surfaces (playgrounds, dashboards, approver UIs) composed over these kits.
+
+- **ContextOps (RAG pipelines and context design)**
+  - **IngestKit → IndexKit → QueryKit (+ SearchKit)**: ingest, normalize, index, and retrieve content with provenance; define context quality and retrieval behavior.
+  - **PromptKit**: defines **context slots and schemas** in templates (e.g., how retrieved documents, policies, or prior runs are embedded in prompts) and validates those inputs before rendering.
+  - **ObservaKit + EvalKit + DatasetKit**: observe and evaluate retrieval behavior and answer grounding; PromptKit does not construct indexes or decide which documents to retrieve.
+
+This mirrors the mental model used in the AI‑Toolkit README and architecture docs: PromptKit is the **PromptOps kit at the template/contract layer**, while LLMOps and ContextOps concerns are implemented by a **composition of other kits** rather than being folded into PromptKit itself.
+
+In practice, FlowKit acts as the **flow execution orchestrator** between PlanKit and AgentKit:
+
+- SpecKit validates specs.
+- PlanKit turns specs into plans (BMAD).
+- FlowKit instantiates LangGraph flows from plans or canonical prompts.
+- AgentKit and other kits execute individual steps/tools referenced by the flow.
+
+Use FlowKit when workflows:
+
+- span multiple kits,
+- must be paused/resumed or inspected, or
+- require explicit, auditable state (maps, issue registers, reports).
 
 ### Deterministic Agent Loops & Provenance (AI‑Toolkit alignment)
 
@@ -63,6 +102,8 @@ The AI‑Toolkit provides the kit‑level building blocks that implement Harmony
 - License and provenance:
   - Run GitHub Dependency Review and include a license/provenance note in the PR.
   - Avoid adding new dependencies unless they materially reduce complexity; prefer permissive licenses (MIT/BSD/Apache).
+
+Prompt templates and variants used in these loops are standardized and compiled by **PromptKit** (template/variable/variant contracts and `prompt_hash`), while **IngestKit/IndexKit/QueryKit/SearchKit** own retrieval behavior for any context injected into those prompts and **ObservaKit/EvalKit/DatasetKit/PolicyKit/CacheKit/ModelKit/CostKit** own LLMOps concerns (telemetry, evaluation, governance, cost, and reliability). This keeps PromptKit focused on **PromptOps at the template/contract layer** and prevents LLMOps or ContextOps responsibilities from leaking into the prompt templating kit.
 
 ---
 

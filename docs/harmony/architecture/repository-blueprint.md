@@ -39,7 +39,7 @@ Organize by feature (vertical slice) in `packages/*`; enforce hexagonal (ports/a
 │
 │   # Centralized contract and control-plane libraries (optional but recommended)
 │   ├── contracts/            # Central JSON Schema/OpenAPI; re-export slice contracts
-│   └── kits/                 # Control-plane libs (observability, flags, policy, eval, test, patch)
+│   └── kits/                 # AI‑Toolkit control‑plane libs (FlowKit, PlanKit, PromptKit, EvalKit, TestKit, GuardKit, etc.)
 │
 ├── kaizen/                   # Kaizen/Autopilot layer (policies, evaluators, agents, reports)
 │   ├── policies/
@@ -83,6 +83,31 @@ Each feature in `packages/<feature>` is a bounded context that encapsulates its 
  - Optional: co-locate a brief spec (`docs/spec.md`) and slice-level JSON Schemas; re-export externally via `packages/contracts` for uniform CI contract testing.
 
 Hexagonal Architecture and dependency direction ensure deterministic, testable modules. The domain core is technology-agnostic and stable; adapters can change with minimal ripple.
+
+## Kits as Control-Plane Libraries: `packages/kits`
+
+Kits live in the **control plane** and are reused across the entire repo. They are implemented as libraries under `packages/kits/*` and expose stable contracts and APIs that apps, agents, Kaizen jobs, and CI gates can call.
+
+- **Primary placement (kits):**
+  - `packages/kits/<kit-name>/...`
+  - Source of truth for:
+    - Kit config and contracts (types, schemas, interfaces).
+    - Public APIs used by `apps/*`, `agents/*`, `kaizen/*`, and `ci-pipeline/*`.
+    - Any “local dev tool” commands that operate on the repo (for example, CLIs that help improve docs or code).
+- **Secondary placements (runtimes/adapters) are consumers of kits:**
+  - `apps/*` — thin HTTP/CLI adapters that call kits in `packages/kits/*`.
+  - `agents/*` — agent flows that use kits as tools during planner/builder/verifier work.
+  - `kaizen/*` — hygiene/improvement jobs that call kits for analysis and patch proposals.
+  - `ci-pipeline/*` — quality gates that import kit APIs (for example, EvalKit/FlowKit checks).
+
+For example:
+
+- **FlowKit** (planning & orchestration):
+  - Contracts and TypeScript interfaces live under `packages/kits/flowkit/`.
+  - Any Python LangGraph implementation is treated as a runtime for FlowKit (for example, under `agents/runner/runtime/`), not the kit itself.
+  - Apps such as `apps/web`, `apps/api`, `apps/ai-console`, and `apps/ai-gateway` can depend on FlowKit via the TS package, not the other way around.
+
+The general rule: **kits are libraries and contracts in `packages/kits`, with optional hosts in `apps/*`, `agents/*`, `kaizen/*`, and CI**. Runtimes (for example, LangGraph flows, external services) sit behind those kit contracts.
 
 Example flow (InventoryManagement):
 

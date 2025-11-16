@@ -179,12 +179,18 @@ Ingestion goals:
 - SearchKit (optional): fetch selected external documentation sources; use only when external knowledge materially improves outcomes.
 - IndexKit: build and update indexes over ingested content; ensure deterministic rebuilds and versioned snapshots.
 - QueryKit: evaluate queries against indexes with deterministic behavior and recorded evidence.
-- PromptKit (optional): manage prompt templates and parameters; may live inside AgentKit configuration when usage is light.
+- PromptKit (optional): cross-cutting **prompt template registry and compiler**. Defines template/variable/variant contracts and context slots (e.g., `{retrieved_docs}`) for prompts consumed by AgentKit/FlowKit/QueryKit, but does **not** own retrieval, indexing, or observability. Prompts may live in a shared library (for example `packages/prompts/**`) and are compiled by PromptKit into canonical prompts with `prompt_hash` and metadata.
 - Small‑team default: begin with IngestKit + IndexKit over first‑party sources; introduce SearchKit/PromptKit only as needs emerge.
- - GuardKit: apply redaction at ingest and emit boundaries (logs/traces) to prevent PII/PHI leakage in grounded answers and evidence packs; never substitute redaction for proper secret handling (see VaultKit).
- - ObservaKit: record retrieval operations (sources, doc ids, token counts) at low cardinality for auditability; include a query/run `trace_id` linking to PRs/builds when applicable.
- - EvalKit + DatasetKit: evaluate retrieval and answer quality against golden sets; require citations or entailment as configured.
- - FlagKit: gate the use of new sources or corpora and roll out gradually with monitoring.
+- GuardKit: apply redaction at ingest and emit boundaries (logs/traces) to prevent PII/PHI leakage in grounded answers and evidence packs; never substitute redaction for proper secret handling (see VaultKit).
+- ObservaKit: record retrieval operations (sources, doc ids, token counts) at low cardinality for auditability; include a query/run `trace_id` linking to PRs/builds when applicable.
+- EvalKit + DatasetKit: evaluate retrieval and answer quality against golden sets; require citations or entailment as configured.
+- FlagKit: gate the use of new sources or corpora and roll out gradually with monitoring.
+
+#### LLMOps vs PromptKit in the Knowledge Plane
+
+- **ContextOps (RAG)** in Harmony is the domain of **IngestKit, IndexKit, SearchKit, and QueryKit**: they ingest, normalize, index, and retrieve knowledge with provenance, and they expose deterministic retrieval behavior to agents and flows.
+- **PromptKit** sits at the **template boundary** only: it defines how retrieved context is shaped and inserted into prompts (slots and schemas) and compiles those prompts deterministically; it does not make retrieval decisions or manage indexes.
+- **LLMOps observability and evaluation** are the responsibility of **ObservaKit (telemetry), EvalKit (LLM evaluation), DatasetKit (goldens), PolicyKit (governance), CacheKit (idempotency/memoization), and ModelKit/CostKit (routing/cost)**. PromptKit supplies prompt-level metadata (`prompt_hash`, template id/version, variant) so these kits can correlate evaluations and runtime behavior back to specific templates.
 
 ## Linking Strategy
 
@@ -290,4 +296,4 @@ Example developer queries:
 4) Show traces that violated checkout P95<200ms in the last 24h.
 ```
 
-Reference: System traceability concepts are described by industry sources such as Edge Delta: https://edgedelta.com/company/blog/what-is-system-traceability.
+Reference: System traceability concepts are described by industry sources such as Edge Delta: <https://edgedelta.com/company/blog/what-is-system-traceability>.

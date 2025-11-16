@@ -18,18 +18,21 @@ HarmonyMonorepo
 ├─ apps/                     # Deployable applications and UIs (thin adapters)
 │  ├─ ai-console             # Next.js app (controllers, server actions)
 │  ├─ api                    # HTTP ports (OpenAPI), BFFs, webhooks
-│  ├─ ai-gateway (optional)  # Optional Python gateway behind a stable HTTP port
+│  ├─ ai-gateway (optional)  # Optional Python gateway behind a stable HTTP port (may call kits, does not own them)
 │  └─ web                    # Astro/docs/marketing
-├─ packages/                 # Reusable libraries organized by feature slices
+├─ packages/                 # Reusable libraries organized by feature slices and control-plane kits
 │  ├─ <feature>/             # Vertical feature slice (single workspace package)
 │  │  ├─ domain              # Pure domain/use-cases (functional core)
 │  │  ├─ adapters            # DB/HTTP/cache integrations (outbound adapters)
 │  │  ├─ api                 # Inbound API surface (interfaces/contracts)
 │  │  ├─ tests               # Unit/integration/contract tests for the slice
 │  │  └─ docs/spec.md        # Brief slice spec (scope, contracts, risks)
-│  └─ common/                # Cross-cutting helpers and canonical DTOs
+│  ├─ common/                # Cross-cutting helpers and canonical DTOs
 │     ├─ util                # Cross-cutting helpers (minimal)
 │     └─ models              # Canonical DTOs/value objects
+│  ├─ contracts              # Central JSON Schema/OpenAPI; re-export slice contracts
+│  ├─ kits                   # AI-Toolkit control-plane libs (FlowKit, PlanKit, PromptKit, EvalKit, TestKit, GuardKit, etc.)
+│  └─ prompts                # Prompt suites (knowledge-plane library) imported by kits and agents
 ├─ kaizen/                   # Kaizen/Autopilot layer (policies, evaluators, agents, reports)
 │  ├─ policies/
 │  ├─ evaluators/
@@ -53,12 +56,22 @@ HarmonyMonorepo
 └─ docs/
 ```
 
+At a high level:
+
+- Root planes like `apps/` and `agents/` contain **runtime entrypoints** (processes you run and deploy).
+- `packages/` contains **reusable, importable modules** (domain slices, kits, contracts, prompt libraries such as `packages/prompts`).
+
+Rule of thumb:
+
+- Anything you **run** (flows, runners, HTTP servers, CLIs) lives under the runtime planes (`apps/*`, `agents/*`).
+- Anything you **import** across those planes – including the prompts knowledge plane – lives under `packages/*` (for example `packages/prompts`).
+
 ## Apps (Deployables)
 
 - Purpose: Thin adapters at the system edge (web UI, HTTP/BFFs, CLIs). They orchestrate requests and delegate to feature modules in `packages/*`.
 - ai-console/web: Controllers, server actions, and pages should remain thin. Heavy logic belongs in `packages/<feature>/domain`.
 - api: Implements HTTP ports for features; references generated contracts in `packages/*` and returns DTOs.
-- ai-gateway (optional): If required for specialized AI/runtime workloads, implement as a separate process (e.g., Python) behind a stable HTTP contract so the modulith’s domain and ports remain unchanged.
+- ai-gateway (optional): If required for specialized AI/runtime workloads, implement as a separate process (e.g., Python) behind a stable HTTP contract so the modulith’s domain and ports remain unchanged. It may **call** AI‑Toolkit kits (for example, FlowKit, AgentKit), but it does not own those kits; kit contracts live under `packages/kits/*`.
 
 ### Framework Defaults and Runtime Guidance
 
@@ -78,6 +91,8 @@ HarmonyMonorepo
 - tests: Feature-specific unit, contract, and integration tests.
  - docs/spec.md: A concise slice spec including scope, acceptance checks, risk/flag plan, and contract references.
  - Boundary validation: Perform request/response validation at module boundaries using JSON Schema; reject invalid inputs explicitly and log with trace context. Guard risky or new flows behind feature flags with safe defaults.
+
+Prompt libraries (for example `packages/prompts`) are treated as **knowledge-plane packages**: they contain shared prompt suites used by multiple surfaces (kits, apps, agents) and are imported like any other library. They live under `packages/` because they are reusable assets, not long-running processes.
 
 ## Common
 
@@ -99,6 +114,8 @@ HarmonyMonorepo
 - **planner:** Strategic reasoning and backlog refinement logic.
 - **builder:** Code-generation or automation tasks responsible for implementing planned work.
 - **verifier:** Validation logic, QA harnesses, or autonomous reviewers that guard merge criteria.
+
+Agents under `agents/` are **runtime processes**, not shared libraries: they are invoked by FlowKit or other callers (for example, via CLI or a Python module entrypoint) and may themselves import kits and prompt libraries from `packages/*`. This keeps a clear distinction between things you **run** at the root plane (`apps/*`, `agents/*`) and things you **import** as reusable knowledge or logic (`packages/*`, including `packages/prompts`).
 
 ## CI Pipeline
 

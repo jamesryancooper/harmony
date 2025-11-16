@@ -1,14 +1,15 @@
 ---
 title: Harmony Lean AI-Accelerated Methodology Implementation Guide
-description: Detailed playbook for wiring Harmony’s Spec‑First (via SpecKit `speckit` wrapper for GitHub’s Spec Kit) + Agentic agile (via PlanKit `plankit` wrapper for BMAD) methodology, tooling, and governance into a Turborepo + Vercel stack.
+description: Detailed playbook for wiring Harmony’s Spec‑First (via SpecKit `speckit` wrapper for GitHub’s Spec Kit) + Agentic agile (via PlanKit `plankit` wrapper for BMAD) + Flow orchestration (via FlowKit) methodology, tooling, and governance into a Turborepo + Vercel stack.
 ---
 
 Below is a Harmony‑aligned implementation guide that shows exactly what you can wire up today, what needs a thin wrapper/kit, and what should stay in CI/Vercel. This guide aligns with the Harmony Methodology and the AI‑Toolkit. Our approach:
 
 - Wrap GitHub’s Spec Kit via our SpecKit (`speckit`) wrapper for Spec‑First flows and publishing.
 - Wrap BMAD via PlanKit (our `plankit` kit) for ADRs and planning/BMAD story generation.
+- Use FlowKit as the flow execution orchestrator between PlanKit and AgentKit, instantiating LangGraph flows from plans or canonical prompts.
 
-This removes duplication, keeps us on the official GitHub’s Spec Kit semantics, and isolates BMAD API churn behind PlanKit.
+This removes duplication, keeps us on the official GitHub’s Spec Kit semantics, and isolates BMAD API churn behind PlanKit while giving us a consistent, inspectable flow layer via FlowKit.
 
 > Terminology note: “SpecKit” refers to our AI‑Toolkit kit (code `speckit`) that wraps GitHub’s Spec Kit. Mentions of the upstream tool explicitly use “GitHub’s Spec Kit”.
 > **Sources** used for concrete behavior, commands, and integration details are cited inline where they matter most (Turborepo cache, Vercel previews/promote & flags, SLO/error budgets, OpenTelemetry for Next.js, OWASP ASVS & NIST SSDF, BMAD v6 alpha notes, plus AI‑Toolkit kit mappings). ([Turborepo][1])
@@ -21,18 +22,19 @@ This removes duplication, keeps us on the official GitHub’s Spec Kit semantics
 
 - SpecKit (`speckit`) wraps GitHub’s Spec Kit for `specify → clarify → plan → tasks → analyze` and publishing via Dockit. Artifacts live under `docs/specs/<feature>/…` (or GitHub’s Spec Kit defaults).
 - PlanKit (`plankit`) wraps BMAD to generate ADRs and a BMAD plan/story from the validated SpecKit outputs.
+- FlowKit orchestrates long‑running, stateful flows (via LangGraph) from those plans or from canonical prompts, coordinating downstream kits.
 
-This keeps Spec semantics authoritative (from GitHub’s Spec Kit) and makes BMAD usage stable behind a single kit boundary (PlanKit).
+This keeps Spec semantics authoritative (from GitHub’s Spec Kit), makes BMAD usage stable behind a single kit boundary (PlanKit), and gives us a standard way to turn plans/prompts into executable flows via FlowKit.
 
 **Why wrappers?**
 
 - **Upgrade safety.** BMAD v6 is active and evolving; encapsulating BMAD behind PlanKit shields calling sites from workflow/param churn. ([GitHub][3])
 - **Spec‑first integrity.** We rely on GitHub’s Spec Kit instead of re‑implementing it; SpecKit adds validation, structure, and publishing only.
-- **Harmony alignment.** Clean handoff: `SpecKit → PlanKit → AgentKit/TestKit/PolicyKit`, matching the Methodology and AI‑Toolkit READMEs.
+- **Harmony alignment.** Clean handoff: `SpecKit → PlanKit → FlowKit → AgentKit/TestKit/PolicyKit`, matching the Methodology and AI‑Toolkit READMEs.
 
 **Integration surface.**
 
-- **Kits:** `speckit` (SpecKit kit; wraps GitHub’s Spec Kit) and `plankit` (BMAD wrapper), located under `packages/kits/*`. Contracts live under `packages/contracts/**` (e.g., `/v1/speckit/*` operations).
+- **Kits:** `speckit` (SpecKit kit; wraps GitHub’s Spec Kit), `plankit` (BMAD wrapper), and `flowkit` (flow orchestration), located under `packages/kits/*`. Contracts live under `packages/contracts/**` (e.g., `/v1/speckit/*` operations).
 - **BMAD & agents:** Continue to use BMAD and BMB internally; PlanKit calls BMAD. If you need new personas, use BMB’s builder (`create-agent`). ([GitHub][2])
 - **Monorepo & CI/CD:** Turborepo for **pipelines/remote cache**, Vercel for **branch previews & guarded promote to production**, **feature flags** using Vercel Flags SDK + Edge Config (or your provider), and **OpenTelemetry** via `@vercel/otel`. ([Turborepo][1])
 

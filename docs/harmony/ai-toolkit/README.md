@@ -27,6 +27,39 @@ Choose the runtime that preserves determinism, safety, and performance while kee
   - Schedule non‑blocking side‑effects using Next.js `next/after` (or platform jobs) to keep user paths fast and reliable.
   - Long‑running work belongs in Node (or a worker) with ObservaKit spans covering the job lifecycle.
 
+---
+
+## Where Kits Live in the Monorepo
+
+Kits are **control‑plane libraries** that live under `packages/kits/*` and are reused across the entire repo.
+
+- **Primary placement (kits):**
+  - `packages/kits/<kit-name>/...`
+  - Source of truth for:
+    - Kit config and contracts (types, schemas, interfaces).
+    - Public APIs used by `apps/*`, `agents/*`, `kaizen/*`, and `ci-pipeline/*`.
+    - Any “local dev tool” commands that operate on the repo (for example, CLIs that help improve docs or code).
+- **Secondary placements (runtimes/adapters) are consumers of kits:**
+  - `apps/*` — thin HTTP/CLI adapters that call kits in `packages/kits/*`.
+  - `agents/*` — agent flows that use kits as tools during planner/builder/verifier work.
+  - `kaizen/*` — hygiene/improvement jobs that call kits for analysis and patch proposals.
+  - `ci-pipeline/*` — quality gates that import kit APIs (for example, EvalKit/FlowKit checks).
+
+For FlowKit specifically:
+
+- **TypeScript/Node interface:**
+  - `packages/kits/flowkit/` exposes types like `FlowConfig`, `FlowRunRequest`, and `FlowRunResult`, plus a small Node API/CLI to launch flows (for example, via a Python runner, HTTP, or subprocess).
+  - FlowKit integrates with other kits in TS (SpecKit, PlanKit, AgentKit) at the type level.
+- **Python LangGraph runtime:**
+  - Lives outside `apps/*` (for example, under `agents/runner/runtime/`) and is treated as a runtime implementation of FlowKit, not the kit itself.
+  - It consumes prompts and workflow YAML and exposes a small API/CLI that `packages/kits/flowkit` calls.
+- **Apps (web, api, ai-console, ai-gateway)** can depend on FlowKit via the TS package, not vice versa.
+
+This keeps the monorepo aligned with the Architecture blueprint:
+
+- Architecture: kits = control‑plane libraries under `packages/kits`.
+- Methodology: kits = concrete tools used to implement the Spec → Plan → Flow → Run lifecycle.
+
 ### Next.js 15+/16 & React 19 Integration (Guidance)
 
 - Server Actions (React 19):
@@ -247,11 +280,46 @@ This table standardizes each core kit’s purpose, lifecycle coverage, schemas, 
 | ComplianceKit | Assemble evidence pack | verify·ship·learn | `packages/contracts/schemas/kits/compliancekit.inputs.v1.json` | Evidence pack manifest under `runs/**` | `kit.compliancekit.assemble` | Required for high‑risk changes |
 | CacheKit | Idempotency + memoization | implement | `packages/contracts/schemas/kits/cachekit.inputs.v1.json` | Cache hit/miss records | `kit.cachekit.hit`, `kit.cachekit.miss` | Pure ops must declare `--cache-key` |
 | ParseKit | Convert PDFs to Markdown (tables/figures) | implement | `packages/contracts/schemas/kits/parsekit.inputs.v1.json` | `docs_out/parsed/*.md`, `runs/**/parsekit-*.json` | `kit.parsekit.parse` | GuardKit redaction; dry‑run OK |
+| PromptKit | Manage prompt templates, variables, variants, and fixtures | implement·verify | `packages/contracts/schemas/kits/promptkit.inputs.v1.json` | `prompts_out/**` compiled prompts, `prompt_tests/**` fixtures, `runs/**/promptkit-*.json` prompt metadata | `kit.promptkit.compile` | EvalKit/TestKit/PolicyKit gates on prompt drift and schema violations |
 
 Notes:
 
 - “Inputs Schema” and “Outputs/Artifacts” identify contract locations to keep interfaces crisp and consistent across kits.
 - If a kit spans multiple lifecycle stages, set `stage` on spans and record the stage in the run record.
+
+### LLMOps & ContextOps responsibilities (kit map)
+
+The following clarifies how kits participate in **LLMOps** (logging, evaluation, governance, cost, reliability) and **ContextOps** (RAG pipelines, context design), and how **PromptKit** fits into that picture:
+
+- **PromptKit (PromptOps, design-time)**
+  - Owns **prompt templates, variable schemas, variants, and fixtures**.
+  - Compiles templates (often from `packages/prompts/**`) into **canonical prompts** with `prompt_hash` and metadata.
+  - Produces **prompt test fixtures** consumed by EvalKit/TestKit and records prompt metadata in PromptKit run records.
+  - Does **not** own retrieval, logging/metrics, dashboards, or evaluation logic; it is a **compile-time/template contract kit**, not a full LLMOps platform.
+
+- **LLMOps responsibilities (runtime, evaluation, governance)**
+  - **ObservaKit**: central LLM observability (traces, logs, metrics, cost/latency) for all model calls, including those that use PromptKit-compiled prompts.
+  - **EvalKit**: runs structured evaluation suites over model outputs; can consume PromptKit fixtures to evaluate behavior per template/variant.
+  - **DatasetKit**: maintains golden datasets for prompts/flows; used by EvalKit to compare prompt variants and model choices.
+  - **PolicyKit**: applies policy rules to LLM behavior (e.g., determinism, redaction, safety thresholds) and blocks on violations.
+  - **CacheKit**: records cache hits/misses for pure LLM calls and RAG operations; pairs with deterministic `cacheKey` derivation.
+  - **ModelKit / CostKit** (when present): define model routing, allowed providers, and cost guardrails for LLM calls.
+  - **FlowKit / AgentKit / ToolKit**: orchestrate and execute flows that *use* prompts; they call PromptKit to obtain compiled prompts, then call providers under ObservaKit instrumentation.
+  - **UIkit**: provides dashboards and playground surfaces over the above (e.g., trying prompt variants, inspecting traces/evals).
+
+- **ContextOps responsibilities (RAG / context design)**
+  - **IngestKit**: ingests and normalizes documents into canonical forms with provenance.
+  - **IndexKit**: builds and updates indexes over ingested content.
+  - **SearchKit** (optional): fetches external documents when external knowledge materially improves outcomes.
+  - **QueryKit**: executes deterministic retrieval over indexes; emits evidence and usage metadata.
+  - **PromptKit**: defines **context slots and schemas** inside prompt templates (e.g., `{retrieved_docs}`, `{policy_snippets}`) and ensures context variables conform to schema before rendering.
+  - **ObservaKit + EvalKit + DatasetKit**: observe and evaluate retrieval quality and answer grounding; PromptKit does not manage indexes or retrieval strategy.
+
+In practice:
+
+- Treat **PromptKit** as your **PromptOps kit for templates/contracts/fixtures**.
+- Treat **ObservaKit, EvalKit, DatasetKit, PolicyKit, CacheKit, ModelKit/CostKit, FlowKit, AgentKit, ToolKit, and UIkit** as the primary **LLMOps and ContextOps surface area**.
+- Leave concrete prompt content and flow manifests in `packages/prompts/**` or slice-specific packages; PromptKit reads from those locations but does not own their domain semantics.
 
 ## Lifecycle Alignment Map (Harmony ⇄ Kits)
 
@@ -601,6 +669,8 @@ PatchKit SHOULD generate (or validate) a minimal PR body conforming to Harmony�
 /stack        (stack profiles)
 /datasets     (goldens for RAG/eval)
 ```
+
+In the Harmony monorepo, this conceptual `/prompts` node is realized as a workspace package (for example `packages/prompts`) rather than a separate root-level folder. Prompt suites are treated as **shared knowledge-plane libraries** that apps, kits, and agents import; by contrast, agent runtimes themselves live under the root `agents/` plane because they are long-running processes invoked via FlowKit or CLIs rather than importable libraries.
 
 ---
 
