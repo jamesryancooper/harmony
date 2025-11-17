@@ -1,6 +1,4 @@
-import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { resolve } from "node:path";
 
 export interface FlowConfig {
   /**
@@ -20,9 +18,14 @@ export interface FlowConfig {
   workspaceRoot?: string;
 
   /**
-   * Optional workflow manifest path to propagate in metadata.
+   * Workflow manifest path to propagate to the runtime.
    */
-  workflowManifestPath?: string;
+  workflowManifestPath: string;
+
+  /**
+   * Optional workflow entrypoint id (falls back to manifest order if omitted).
+   */
+  workflowEntrypoint?: string;
 }
 
 export interface FlowRunRequest {
@@ -60,6 +63,8 @@ export interface FlowRunResult {
     workflowManifestPath?: string;
     canonicalPromptPath?: string;
     repoRoot?: string;
+    runnerEndpoint?: string;
+    runtimeRunId?: string;
   };
 }
 
@@ -90,137 +95,85 @@ export const notImplementedFlowRunner: FlowRunner = {
   }
 };
 
-export interface PythonModuleFlowRunnerOptions {
+export interface HttpFlowRunnerOptions {
   /**
-   * Python module path to invoke via `python -m`.
-   * Example: "agents.runner.runtime.architecture_assessment.run".
+   * Base URL of the FlowKit runner service (e.g., http://127.0.0.1:8410).
    */
-  module: string;
+  baseUrl: string;
 
   /**
-   * Python command to use. Defaults to "python".
-   * Override via env (e.g., FLOWKIT_PYTHON_CMD) or caller options if needed.
+   * Optional fetch implementation (defaults to global fetch).
    */
-  pythonCommand?: string;
+  fetchImpl?: typeof fetch;
 }
 
-export interface PythonModuleFlowRunnerDependencies {
-  /**
-   * Override spawn implementation (used by tests).
-   */
-  spawn?: typeof spawn;
-}
+const ensureFetch = (override?: typeof fetch) => {
+  const impl = override ?? globalThis.fetch;
+  if (!impl) {
+    throw new Error(
+      "FlowKit HTTP runner requires a fetch implementation (Node 18+ or polyfill)."
+    );
+  }
+  return impl;
+};
 
-/**
- * Create a FlowRunner that shells out to a Python module using
- * `python -m <module> <canonicalPromptPath>`, with cwd set to
- * the configured workspace root (or process.cwd()).
- *
- * The Python module is expected to print either:
- * - JSON to stdout (which will be parsed), or
- * - plain text (which will be returned as a string).
- */
-export function createPythonModuleFlowRunner(
-  options: PythonModuleFlowRunnerOptions,
-  dependencies?: PythonModuleFlowRunnerDependencies
+export function createHttpFlowRunner(
+  options: HttpFlowRunnerOptions
 ): FlowRunner {
-  const pythonCmd =
-    options.pythonCommand || process.env.FLOWKIT_PYTHON_CMD || "python";
-  const spawnImpl = dependencies?.spawn || spawn;
+  const fetchImpl = ensureFetch(options.fetchImpl);
+  const baseUrl = options.baseUrl.replace(/\/$/, "");
 
   return {
     async run(request: FlowRunRequest): Promise<FlowRunResult> {
-      const { config } = request;
+      const { config, params } = request;
       const runId = randomUUID();
+      const payload = {
+        runId,
+        flowName: config.flowName,
+        canonicalPromptPath: config.canonicalPromptPath,
+        workflowManifestPath: config.workflowManifestPath,
+        workflowEntrypoint: config.workflowEntrypoint,
+        workspaceRoot: config.workspaceRoot,
+        params: params ?? {},
+      };
 
-      const cwd = config.workspaceRoot
-        ? resolve(config.workspaceRoot)
-        : process.cwd();
-
-      const args = [
-        "-m",
-        options.module,
-        config.canonicalPromptPath
-      ];
-
-      const stdout = await new Promise<string>((resolveStdout, reject) => {
-        const child = spawnImpl(pythonCmd, args, {
-          cwd,
-          stdio: ["ignore", "pipe", "pipe"]
-        });
-
-        let out = "";
-        let err = "";
-
-        child.stdout.setEncoding("utf8");
-        child.stdout.on("data", (chunk) => {
-          out += chunk;
-        });
-
-        child.stderr.setEncoding("utf8");
-        child.stderr.on("data", (chunk) => {
-          err += chunk;
-        });
-
-        child.on("error", (e) => {
-          reject(
-            new Error(
-              `Failed to start FlowKit Python runtime with '${pythonCmd}': ${e.message}\n\nEnsure:\n- Python is installed and accessible as '${pythonCmd}'\n- The canonical prompt exists at '${config.canonicalPromptPath}'\n- Required Python dependencies are installed`
-            )
-          );
-        });
-
-        child.on("close", (code) => {
-          if (code !== 0) {
-            const msg =
-              err ||
-              `Python process exited with code ${code}. Module: ${options.module}, Path: ${config.canonicalPromptPath}`;
-            reject(
-              new Error(
-                `FlowKit runtime failed: ${msg}\n\nEnsure:\n- Python is installed and accessible as '${pythonCmd}'\n- The canonical prompt exists at '${config.canonicalPromptPath}'\n- Required Python dependencies are installed`
-              )
-            );
-            return;
-          }
-          resolveStdout(out.trim());
-        });
+      const response = await fetchImpl(`${baseUrl}/flows/run`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
-      let parsed: unknown = stdout;
-      if (stdout) {
-        try {
-          parsed = JSON.parse(stdout);
-        } catch {
-          // keep raw string if not valid JSON
-          parsed = stdout;
-        }
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(
+          `FlowKit HTTP runner request failed (${response.status} ${response.statusText}): ${errorBody}`
+        );
       }
 
+      const data = await response.json();
+
       return {
-        result: parsed,
+        result: data.result,
+        artifacts: data.artifacts,
         runId,
         metadata: {
           flowName: config.flowName,
           workflowManifestPath: config.workflowManifestPath,
           canonicalPromptPath: config.canonicalPromptPath,
-          repoRoot: config.workspaceRoot || process.cwd()
+          repoRoot: config.workspaceRoot || process.cwd(),
+          runnerEndpoint: baseUrl,
+          runtimeRunId: data.runtimeRunId,
+          ...(data.metadata ?? {}),
         },
       };
-    }
+    },
   };
 }
 
-/**
- * Convenience FlowRunner for the Architecture Assessment flow.
- *
- * This uses the Python LangGraph runtime hosted at:
- *   agents/runner/runtime/architecture_assessment/run.py
- *
- * and invokes it as:
- *   python -m agents.runner.runtime.architecture_assessment.run <canonicalPromptPath>
- */
 export const architectureAssessmentCliRunner: FlowRunner =
-  createPythonModuleFlowRunner({
-    module: "agents.runner.runtime.architecture_assessment.run"
+  createHttpFlowRunner({
+    baseUrl: process.env.FLOWKIT_RUNNER_URL || "http://127.0.0.1:8410",
   });
 

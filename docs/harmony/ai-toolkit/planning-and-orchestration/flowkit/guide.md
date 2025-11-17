@@ -44,9 +44,10 @@ Each **node** represents a single actionable step in the flow:
 
 ### 1.3 State
 
-FlowKit uses a **typed state object** per flow. For the architecture assessment, this might include:
+FlowKit uses a **typed state object** per flow. For the architecture assessment, this includes:
 
-- `workspace_root` (repo root used for resolving prompts/paths) and `architecture_docs_path` (for example, `docs/harmony/architecture`).
+- `workspace_root` (repo root used for resolving prompts/paths) and `docs_path` (manifest-provided root such as `docs/harmony/architecture`).
+- Manifest-driven configuration (`expected_files`, `expected_cross_refs`, `thresholds`) that scopes inventory, cross-link checks, and scoring.
 - `inventory` (files, headings, terms, roles, invariants, links).
 - `terminology_map` and `decision_map`.
 - `issue_register`.
@@ -77,7 +78,7 @@ Each flow has a **canonical prompt** that acts as the human‑readable spec and 
 
 - `packages/prompts/assessment/architecture/architecture-assessment.md`
   - Contains: role, mission, scope, objectives, process, focus areas, expected output, quality rubric, constraints, stop instruction.
-  - Includes `meta.workflow.path` pointing to the YAML manifest and an `entrypoint`.
+  - Frontmatter is intentionally minimal (`title`, `description` only); `.flow.json` + the workflow manifest provide wiring and semantics.
 
 FlowKit does **not** re‑spec the workflow; it executes what the canonical prompt and manifest encode.
 
@@ -116,18 +117,23 @@ FlowKit uses LangGraph because:
 - **LLM‑centric:** designed for LLM agents and tools, matching Harmony’s AI‑Toolkit focus.
 - **Deterministic control:** you explicitly define nodes and edges; there is no “magic” orchestration.
 
-### 2.4 Why YAML + Frontmatter
+### 2.4 Why `.flow.json`, Manifests, and Minimal Frontmatter
 
-Instead of hard‑coding flows, FlowKit uses:
+Instead of hard‑coding flows, FlowKit uses clear layers:
 
-- **Markdown frontmatter** on canonical prompts:
-  - `meta.type`, `meta.mode`, `meta.subject`, `meta.subtype`, `meta.workflow.path`.
+- **`.flow.json` configs**:
+  - Register each flow (id, display name, description).
+  - Carry classification metadata (`type`, `subject`, `mode`, `subtype`) plus runtime wiring (runner URL, auto-start info).
+  - Point to the canonical prompt and workflow manifest paths.
 - **YAML workflow manifests**:
   - Define steps, ordering, prompt paths, and meta tags.
+  - Carry assessment semantics in an `assessment` block (`docs_path`, `expected_files`, `expected_cross_refs`, `thresholds`).
+- **Markdown frontmatter** on canonical prompts:
+  - Limited to `title` + `description`, keeping the human spec clean and leaving wiring/semantics to config.
 
 Benefits:
 
-- Developers can evolve workflows by editing Markdown/YAML, keeping behavior close to prompts.
+- Developers can evolve workflows by editing Markdown/YAML/JSON, keeping behavior close to prompts.
 - Tools (including Cursor and AI agents) can introspect flows without reading Python internals.
 
 ### 2.5 Determinism, Safety, and Alignment
@@ -161,7 +167,7 @@ In this repo, a typical Python-side layout for the Architecture Assessment flow 
 agents/runner/runtime/
   __init__.py
   pyproject.toml      # Python dependencies (langgraph, pydantic, pyyaml, markdown)
-  architecture_assessment/
+  assessment/
     __init__.py
     state.py          # State model for ArchitectureAssessmentFlow
     graph.py          # LangGraph graph construction and node implementations
@@ -187,14 +193,14 @@ On the prompts side, FlowKit expects:
 
 The architecture assessment flow graph construction:
 
-1. **Canonical prompt validation**: `run.py` validates the canonical prompt frontmatter, resolves `meta.workflow.path` relative to the repo (or `packages/prompts/`), ensures the manifest exists, and captures the declared `entrypoint`.
-2. **Manifest loading**: Loads the YAML workflow manifest (the resolved path from step 1) and passes both the path and entrypoint into the LangGraph builder.
-3. **State initialization**: Creates `ArchitectureAssessmentState` with `run_id`, `workspace_root` (repo root, defaults to `"."`), `architecture_docs_path` (defaults to `docs/harmony/architecture`), and empty collections for inventory, maps, issues, etc.
+1. **Canonical prompt validation**: `run.py` confirms the canonical prompt exists and has `title`/`description` frontmatter (no runtime wiring lives in the prompt).
+2. **Manifest loading**: The `.flow.json` supplies the manifest path; FlowKit loads it, extracting both the workflow steps and the `assessment` block (docs path, expected files/cross-links, thresholds).
+3. **State initialization**: Creates `AssessmentState` with `run_id`, `workspace_root`, manifest-derived `docs_path`, and config-driven expectations/thresholds plus empty collections for inventory, maps, issues, etc.
 4. **Node registration**: For each step in the manifest:
    - Maps `meta.action` to a node function (e.g., `inventory` → `inventory_node`).
    - Registers the node with LangGraph using the step's `id`.
 5. **Edge wiring**: Honors `depends_on` relationships from the manifest, or falls back to sequential ordering by `step_index`.
-6. **Execution**: The graph is compiled and invoked with the initial state, producing a final state with `alignment_report` or a no-update declaration.
+6. **Execution**: The graph is compiled and invoked with the initial state, producing a final state with `alignment_report` or a no-update declaration driven by manifest thresholds.
 
 **Node implementations**:
 - `inventory_node`: Uses `parsing.py` utilities to walk `docs/harmony/architecture`, parse Markdown files, extract headings/terms/roles/processes/invariants/controls/links, and populate `state.inventory`.
@@ -209,7 +215,7 @@ The architecture assessment flow graph construction:
 
 ### 3.3 State Models
 
-The `ArchitectureAssessmentState` model (implemented in `state.py`):
+The `AssessmentState` model (implemented in `state.py`):
 
 - **Explicit and typed**: Uses Pydantic v2 `BaseModel` with strict type annotations.
 - **Mirrors canonical prompt structure**:
@@ -221,7 +227,7 @@ The `ArchitectureAssessmentState` model (implemented in `state.py`):
   - `edits_applied`: List of `EditRecord` objects (file_path, summary, evidence_locations).
   - `validation_summary`: `ValidationSummary` (resolved_issue_ids, residual_issue_ids, notes).
   - `alignment_report`: `AlignmentReport` (executive_summary, alignment_score, key_misalignments, normalized_glossary, edits_by_file, open_questions).
-- **Metadata**: Includes `run_id` (UUID), `workspace_root` (repo root for provenance), and `architecture_docs_path` (scope limiter) for ObservaKit correlation and enforcement.
+- **Metadata**: Includes `run_id` (UUID), `workspace_root` (repo root for provenance), `docs_path`, and manifest-driven expectations for ObservaKit correlation and enforcement.
 
 ---
 
@@ -229,64 +235,110 @@ The `ArchitectureAssessmentState` model (implemented in `state.py`):
 
 ### 4.1 Running Flows from the CLI
 
-FlowKit should expose a small CLI (or Python module entrypoint), for example:
+FlowKit ships a Node-based CLI that reads a `.flow.json` config, validates it, and talks to the FlowKit HTTP runner service. From the repo root:
 
 ```bash
-python -m flows.architecture_assessment.run \
-  packages/prompts/assessment/architecture/architecture-assessment.md
+pnpm flowkit:run packages/prompts/assessment/architecture/architecture-assessment.flow.json
 ```
 
-The runner:
+> 💡 **Runtime prep:** Run `uv sync` inside `agents/runner/runtime` once to install the Python dependencies into `.venv`. The architecture assessment config sets `runtime.autoStart.pythonCommand` to `agents/runner/runtime/.venv/bin/python`, so FlowKit automatically spins up the LangGraph HTTP runner with that environment. Override the command per flow if you host runtimes elsewhere.
 
-- Reads the canonical prompt and workflow manifest.
-- Builds the LangGraph graph.
-- Executes nodes in order, updating state.
-- Emits a final alignment report and/or no‑update declaration.
+The CLI:
+
+- Ensures the path ends with `.flow.json` and exists.
+- Parses the config (flow id, canonical prompt, workflow manifest, runtime binding).
+- Instantiates the appropriate `FlowRunner` (an HTTP client that talks to the locally started runner or a remote endpoint).
+- Emits a structured `FlowRunResult` JSON payload (with `metadata`, `runId`, and optional `artifacts`) or fails fast with a descriptive error.
 
 ### 4.2 Running Flows via Cursor Custom Commands
 
-With Cursor’s custom commands and `run` tool:
+For conversational workflows, use a project-local Cursor command (this repo provides `.cursor/commands/run-flow.md`) that:
 
-- Define a `/run-architecture` command that:
-  - Uses the `run` tool to call the FlowKit CLI (as above) inside the repo.
-- Optionally define a generic `/run-flow` command that:
-  - Parses the file link from chat (for example, `[architecture-assessment.md](packages/prompts/assessment/architecture/architecture-assessment.md)`).
-  - Passes that path into the FlowKit CLI.
+- Requires a single `@Files` reference to a `.flow.json` file, e.g. `/run-flow @packages/prompts/assessment/architecture/architecture-assessment.flow.json`.
+- Echoes the flow id/display name back to the user before execution.
+- Invokes `pnpm flowkit:run <resolved-config-path>` via Cursor’s `run` tool and streams the CLI output into chat.
 
-This keeps developer ergonomics high while leveraging FlowKit’s orchestration.
+Because the user selects the config via `@Files`, they get immediate visual confirmation that they chose the right flow—no guessing canonical prompt paths or remembering flow ids.
 
-### 4.3 Defining New Flows
+### 4.3 `.flow.json` Reference
+
+Each flow owns a colocated config file that registers it with FlowKit tooling. Example (`packages/prompts/assessment/architecture/architecture-assessment.flow.json`):
+
+```json
+{
+  "id": "architecture_assessment",
+  "displayName": "Architecture Assessment",
+  "description": "Evaluate Harmony architecture docs and emit an alignment report with issues, plans, and no-update declarations.",
+  "type": "assessment",
+  "subject": "architecture",
+  "mode": "full",
+  "subtype": "alignment",
+  "canonicalPromptPath": "packages/prompts/assessment/architecture/architecture-assessment.md",
+  "workflowManifestPath": "packages/prompts/assessment/architecture/workflows/architecture-assessment.yaml",
+  "workflowEntrypoint": "architecture-inventory",
+  "runtime": {
+    "type": "http-service",
+    "url": "http://127.0.0.1:8410",
+    "autoStart": {
+      "pythonCommand": "agents/runner/runtime/.venv/bin/python",
+      "module": "agents.runner.runtime.server",
+      "host": "127.0.0.1",
+      "port": 8410,
+      "readyTimeoutSeconds": 60
+    },
+    "timeoutSeconds": 1800
+  },
+  "policyProfile": "architecture-assessment-default",
+  "requiredGates": ["policykit", "evalkit-basic"],
+  "observability": {
+    "spanPrefix": "harmony.flow.architecture_assessment"
+  }
+}
+```
+
+Key fields:
+
+- `id`, `displayName`, `description`: identity metadata surfaced in CLI and Cursor confirmations.
+- `type`, `subject`, `mode`, `subtype`: optional classification metadata for discovery/routing.
+- `canonicalPromptPath`, `workflowManifestPath`: existing FlowKit artifacts the runtime consumes.
+- `workflowEntrypoint`: node id that FlowKit should feed into the LangGraph builder.
+- `runtime`: execution binding (the HTTP runner service endpoint, plus auto-start metadata for local runs).
+- Optional Policy/Observability metadata for downstream gates and tracing.
+
+### 4.4 Defining New Flows
 
 To add a new Harmony‑aligned flow:
 
 1. **Write a canonical prompt**
    - Under `packages/prompts/**`, describing role, mission, scope, process, outputs, constraints, and stop instruction.
-   - Include `meta.workflow.path` in frontmatter.
+   - Keep frontmatter minimal (just `title` + `description`). Wiring, classification, and entrypoints live in config—not the prompt.
 2. **Create action prompts**
    - Under a scoped `actions/` directory (for example, `assessment/<subject>/actions/*.md`).
    - One prompt per action/node; wire them with `meta.type`, `meta.mode`, `meta.action`, `meta.subject`, `meta.step_index`.
 3. **Add a workflow manifest**
    - YAML under `workflows/` referencing each action prompt via `prompt_path`.
    - Include `canonical_prompt_path` and `steps` with `id`, `name`, `depends_on`, and `meta`.
-4. **Implement the FlowKit graph**
+4. **Create a `.flow.json` config**
+   - Co-locate `<flow-name>.flow.json` with the prompt and manifest.
+   - Populate identity, classification (`type`/`subject`/`mode`/`subtype`), canonical prompt path, workflow manifest path/entrypoint, and runtime fields so the CLI/Cursor command can discover the flow.
+5. **Implement the FlowKit graph**
    - Add a state model and graph builder around these prompts.
-5. **Register a Cursor command (optional)**
-   - Add a project‑local command that calls the FlowKit runner for your new flow.
+6. **Wire `/run-flow` (optional)**
+   - Reference the new `.flow.json` in `/run-flow` (or a bespoke command) if the flow should be launchable from Cursor chat.
 
 ---
 
-### 4.4 TypeScript FlowRunner Helper (Node ↔ Python Bridge)
+### 4.4 TypeScript FlowRunner Helper (Node ↔ HTTP Bridge)
 
-FlowKit includes a helper for calling the Python runtime from Node, so apps and tools (including Cursor commands) can orchestrate flows without re‑implementing the bridge.
+FlowKit includes a helper for calling the HTTP runner service from Node, so apps and tools (including Cursor commands) can orchestrate flows without re‑implementing the bridge.
 
 - `packages/kits/flowkit` exports:
-  - `createPythonModuleFlowRunner(options)` — builds a `FlowRunner` that shells out to `python -m <module> <canonicalPromptPath>` with `cwd` set to the workspace root. Includes enhanced error messages for spawn failures and non-zero exits, plus dependency-injection hooks for testing.
-  - `architectureAssessmentCliRunner` — a preconfigured runner that calls:
-    - `python -m agents.runner.runtime.architecture_assessment.run <canonicalPromptPath>`.
+  - `createHttpFlowRunner(options)` — builds a `FlowRunner` that POSTs to `<baseUrl>/flows/run`, injects `runId`, and surfaces metadata (runner endpoint, runtime run id, manifest path, etc.). Includes dependency-injection hooks for testing.
+  - `architectureAssessmentCliRunner` — a preconfigured runner that targets `process.env.FLOWKIT_RUNNER_URL ?? "http://127.0.0.1:8410"`.
 
-**Error handling**: The TypeScript kit provides detailed error messages when the Python runtime fails, including hints about Python installation, canonical prompt existence, and dependency requirements.
+**Error handling**: The TypeScript kit surfaces runner HTTP status codes and response bodies, plus hints about health/availability.
 
-**Result metadata**: `FlowRunResult` includes optional `metadata` with `flowName`, `workflowManifestPath`, `canonicalPromptPath`, and `repoRoot` for ObservaKit correlation.
+**Result metadata**: `FlowRunResult` includes optional `metadata` with `flowName`, `workflowManifestPath`, `canonicalPromptPath`, `repoRoot`, `runnerEndpoint`, and `runtimeRunId` for ObservaKit correlation.
 
 Example (Node/TS):
 
@@ -306,12 +358,12 @@ const config: FlowConfig = {
 };
 
 const result = await architectureAssessmentCliRunner.run({ config });
-// result.result is parsed JSON (AlignmentReport) from the Python runtime.
+// result.result is parsed JSON (AlignmentReport) from the HTTP runner service.
 // result.runId is a UUID you can use for correlation/telemetry.
-// result.metadata includes flowName, canonicalPromptPath, workflowManifestPath, and repoRoot.
+// result.metadata includes flowName, canonicalPromptPath, workflowManifestPath, repoRoot, runnerEndpoint, and runtimeRunId.
 ```
 
-You can define your own runners for other flows by calling `createPythonModuleFlowRunner` with a different Python module (for example, another entrypoint under `agents/runner/runtime/*`).
+You can define your own runners for other flows by calling `createHttpFlowRunner` with a different base URL (remote runner, edge deployment, etc.).
 
 ---
 

@@ -196,28 +196,28 @@ def extract_title_from_frontmatter(frontmatter: Dict[str, str]) -> Optional[str]
     return frontmatter.get("title")
 
 
-def inventory_architecture_docs(
-    workspace_root: str | Path, architecture_dir: str = "docs/harmony/architecture"
+def inventory_docs(
+    workspace_root: str | Path, docs_path: str = "docs/harmony/architecture"
 ) -> List[FileInventoryItem]:
     """
     Build an inventory of all Markdown files under docs/harmony/architecture.
 
     Args:
         workspace_root: Root of the repository.
-        architecture_dir: Relative path to architecture docs (default: docs/harmony/architecture).
+        docs_path: Relative path to the docs corpus (default: docs/harmony/architecture).
 
     Returns:
         List of FileInventoryItem objects, one per Markdown file found.
     """
     root_path = Path(workspace_root)
-    arch_path = root_path / architecture_dir
+    docs_root = root_path / docs_path
 
-    if not arch_path.exists():
+    if not docs_root.exists():
         return []
 
     inventory: List[FileInventoryItem] = []
 
-    for md_file in sorted(arch_path.rglob("*.md")):
+    for md_file in sorted(docs_root.rglob("*.md")):
         relative_path = str(md_file.relative_to(root_path))
         content = md_file.read_text(encoding="utf-8")
 

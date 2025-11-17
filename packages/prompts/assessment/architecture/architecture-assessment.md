@@ -1,14 +1,6 @@
 ---
 title: Harmony Architecture Assessment Prompt
 description: Guide for assessing and aligning all documents in docs/harmony/architecture so architectural decisions are consistent, clear, conflict-free, and complete.
-meta:
-  type: assessment
-  mode: full
-  subject: architecture
-  subtype: alignment
-  workflow:
-    path: assessment/architecture/workflows/architecture-assessment.yaml
-    entrypoint: architecture-inventory
 ---
 
 # Harmony Architecture Alignment

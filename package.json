@@ -15,7 +15,8 @@
     "deps:scan": "pnpm dlx osv-scanner --recursive --format sarif --output reports/osv.sarif || true",
     "sbom": "pnpm dlx @cyclonedx/cyclonedx-npm --output-file sbom/sbom.spdx.json",
     "secrets:scan": "pnpm dlx trufflehog filesystem --no-update --fail --path .",
-    "preview:vercel": "turbo run preview:vercel"
+    "preview:vercel": "turbo run preview:vercel",
+    "flowkit:run": "pnpm --filter @harmony/kits flowkit:run-config"
   },
   "engines": {
     "node": "24.x"

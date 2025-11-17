@@ -3,6 +3,8 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
+from typing_extensions import TypedDict
+
 from pydantic import BaseModel, Field
 
 
@@ -99,7 +101,7 @@ class AlignmentReport(BaseModel):
     open_questions: List[str] = Field(default_factory=list)
 
 
-class ArchitectureAssessmentState(BaseModel):
+class AssessmentState(BaseModel):
     """
     Shared state for the ArchitectureAssessmentFlow.
 
@@ -110,7 +112,7 @@ class ArchitectureAssessmentState(BaseModel):
 
     run_id: str
     workspace_root: str = "."  # Repo root (used for resolving relative paths)
-    architecture_docs_path: str = "docs/harmony/architecture"
+    docs_path: str = "docs/harmony/architecture"
 
     # Analysis artefacts
     inventory: List[FileInventoryItem] = Field(default_factory=list)
@@ -126,4 +128,36 @@ class ArchitectureAssessmentState(BaseModel):
     validation_summary: Optional[ValidationSummary] = None
     alignment_report: Optional[AlignmentReport] = None
 
+    # Assessment configuration (populated from manifest)
+    expected_files: List[str] = Field(default_factory=list)
+    expected_cross_refs: Dict[str, List[str]] = Field(default_factory=dict)
+    thresholds: Dict[str, Any] = Field(default_factory=dict)
 
+
+class AssessmentGraphState(TypedDict, total=False):
+    """
+    Data structure consumed by LangGraph nodes.
+
+    This mirrors AssessmentState but keeps fields optional so nodes can emit
+    incremental updates. Lists that accumulate data use reducer annotations so
+    LangGraph can merge contributions from multiple nodes when necessary.
+    """
+
+    run_id: str
+    workspace_root: str
+    docs_path: str
+
+    inventory: List[FileInventoryItem]
+    terminology_map: Dict[str, TerminologyEntry]
+    decision_map: List[DecisionEntry]
+    issue_register: List[Issue]
+
+    alignment_plan: List[AlignmentDecision]
+    edits_applied: List[EditRecord]
+
+    validation_summary: ValidationSummary
+    alignment_report: AlignmentReport
+
+    expected_files: List[str]
+    expected_cross_refs: Dict[str, List[str]]
+    thresholds: Dict[str, Any]

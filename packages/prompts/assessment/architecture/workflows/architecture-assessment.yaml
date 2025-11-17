@@ -11,6 +11,33 @@ defaults:
     temperature: 0.2
     max_tokens: 8000
 
+assessment:
+  docs_path: docs/harmony/architecture
+  expected_files:
+    - docs/harmony/architecture/overview.md
+    - docs/harmony/architecture/repository-blueprint.md
+    - docs/harmony/architecture/monorepo-layout.md
+    - docs/harmony/architecture/governance-model.md
+    - docs/harmony/architecture/runtime-policy.md
+    - docs/harmony/architecture/observability-requirements.md
+    - docs/harmony/architecture/knowledge-plane.md
+    - docs/harmony/architecture/kaizen-subsystem.md
+    - docs/harmony/architecture/tooling-integration.md
+    - docs/harmony/architecture/slices-vs-layers.md
+  expected_cross_refs:
+    docs/harmony/architecture/overview.md:
+      - docs/harmony/architecture/repository-blueprint.md
+      - docs/harmony/architecture/monorepo-layout.md
+      - docs/harmony/architecture/governance-model.md
+      - docs/harmony/architecture/runtime-policy.md
+      - docs/harmony/architecture/observability-requirements.md
+      - docs/harmony/architecture/knowledge-plane.md
+      - docs/harmony/architecture/kaizen-subsystem.md
+      - docs/harmony/architecture/tooling-integration.md
+      - docs/harmony/architecture/slices-vs-layers.md
+  thresholds:
+    min_alignment_score_for_no_update: 90
+
 steps:
   - id: architecture-inventory
     name: Architecture – Inventory

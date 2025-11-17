@@ -9,7 +9,7 @@ import pytest
 from ..parsing import (
     extract_headings,
     extract_key_terms,
-    inventory_architecture_docs,
+    inventory_docs,
     parse_frontmatter,
 )
 
@@ -51,7 +51,7 @@ The **Architecture Assessment** is important.
     assert "Architecture Assessment" in terms
 
 
-def test_inventory_architecture_docs(tmp_path: Path):
+def test_inventory_docs(tmp_path: Path):
     """Test inventory building."""
     # Create a temporary architecture directory structure
     arch_dir = tmp_path / "docs" / "harmony" / "architecture"
@@ -69,10 +69,29 @@ title: Test Architecture Doc
 """
     )
 
-    inventory = inventory_architecture_docs(tmp_path, "docs/harmony/architecture")
+    inventory = inventory_docs(tmp_path, "docs/harmony/architecture")
     assert len(inventory) == 1
     assert inventory[0].path == "docs/harmony/architecture/test.md"
     assert inventory[0].title == "Test Architecture Doc"
     assert "Test Document" in inventory[0].headings
     assert "Section One" in inventory[0].headings
+
+
+def test_inventory_docs_supports_custom_paths(tmp_path: Path):
+    """Verify docs_path parameter can target arbitrary directories."""
+    docs_dir = tmp_path / "assessments" / "architecture"
+    docs_dir.mkdir(parents=True)
+
+    sample = docs_dir / "custom.md"
+    sample.write_text(
+        """---
+title: Custom Doc
+---
+# Custom Doc
+"""
+    )
+
+    inventory = inventory_docs(tmp_path, "assessments/architecture")
+    assert len(inventory) == 1
+    assert inventory[0].path.endswith("assessments/architecture/custom.md")
 
