@@ -151,7 +151,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115.0" },
     { name = "langgraph", specifier = ">=0.2.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.12" },
-    { name = "pydantic", specifier = ">=2.9" },
+    { name = "pydantic", specifier = "==2.12.4" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.3" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23" },
     { name = "pyyaml", specifier = ">=6.0" },

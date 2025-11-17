@@ -1,22 +1,23 @@
-# FlowKit — LangGraph Flows for Harmony
+# FlowKit — Flows and the Shared LangGraph Runtime
 
-- **Purpose:** Provide a standard way to implement long‑running, multi‑step AI workflows (flows) as explicit LangGraph graphs wired to Harmony prompts, kits, and documents.
-- **Responsibilities:** model workflow state, orchestrate prompt/action execution, enforce ordering and stop conditions, surface telemetry, and coordinate hand‑offs to other kits (PlanKit, AgentKit, PromptKit, PolicyKit, ObservaKit, etc.).
+- **Purpose:** Provide a standard, runtime‑agnostic way to configure and run long‑running, multi‑step AI workflows (flows) using explicit graphs wired to Harmony prompts, kits, and documents.
+- **Responsibilities:** define flow contracts (`FlowConfig`, `FlowRunner`, `FlowRunResult`), call a runner over HTTP (`/flows/run`), model workflow state, orchestrate prompt/action execution, enforce ordering and stop conditions, surface telemetry, and coordinate hand‑offs to other kits (PlanKit, AgentKit, PromptKit, PolicyKit, ObservaKit, etc.).
 - **Harmony alignment:** turns Harmony’s architecture/methodology guidance into executable flows; ensures workflows remain deterministic, inspectable, and easy to validate against the architecture and methodology docs.
-- **Integrates with:** PlanKit (plans → flows), SpecKit (specs → flow inputs), AgentKit (task/tool execution), PromptKit (prompt assets), PolicyKit/GuardKit (gates), ObservaKit (traces/metrics/logs), TestKit/EvalKit (validation flows), Cursor custom commands (`run` tool) for local developer workflows.
-- **I/O:** inputs: canonical prompts (`packages/prompts/**`), workflow manifests (`*.yaml`), Harmony docs (for context); outputs: structured run state, reports (for example, alignment reports), and orchestrated edits applied by downstream kits/agents.
+- **Integrates with:** PlanKit (plans → flows), SpecKit (specs → flow inputs), AgentKit (plan‑driven agents that invoke flows), PromptKit (prompt assets), PolicyKit/GuardKit (gates), ObservaKit (traces/metrics/logs), TestKit/EvalKit (validation flows), Cursor custom commands (`run` tool) for local developer workflows.
+- **I/O:** inputs: canonical prompts (`packages/prompts/**`), workflow manifests (`*.yaml`), Harmony docs (for context); outputs: structured run state, reports (for example, alignment reports), and orchestrated edits proposed for downstream kits/agents.
 - **Wins:** repeatable, auditable workflows that directly reflect Harmony docs and AI‑Toolkit kits, with clear state and minimal hidden magic.
-- **Implementation choices (opinionated):**
-  - Python + [LangGraph](https://docs.langchain.com/oss/python/langgraph/overview) for graph orchestration and state handling.
+- **Runtime model:** FlowKit itself is **runtime‑agnostic**; it assumes “there is some runner that can execute flows” over HTTP. In this monorepo, that runner is the **shared LangGraph runtime** under `agents/runner/runtime/**`, which all flows and agents reuse.
+- **Implementation choices (opinionated in this repo):**
+  - Python + [LangGraph](https://docs.langchain.com/oss/python/langgraph/overview) for graph orchestration and state handling in the shared runtime.
   - Typed state models (pydantic or dataclasses) per flow for clarity and validation.
-  - YAML workflow manifests + prompt frontmatter as configuration, not code.
+  - YAML workflow manifests + prompt frontmatter + configuration, not code.
   - Cursor custom commands + `run` tool for low‑friction local execution.
 
 ---
 
 ## 1. Core Concepts
 
-FlowKit sits in **Planning & Orchestration** alongside SpecKit and PlanKit. It focuses on the *execution* of multi‑step work once a plan or canonical prompt exists.
+FlowKit sits in **Planning & Orchestration** alongside SpecKit and PlanKit. It focuses on the *execution* of multi‑step work once a plan or canonical prompt exists, and delegates actual graph execution to a separate runtime over HTTP.
 
 ### 1.1 Flow
 
@@ -95,18 +96,34 @@ FlowKit does **not** re‑spec the workflow; it executes what the canonical prom
   - Harmony Methodology (`docs/harmony/methodology`) — defines how work should flow (Spec‑First, Agentic Agile/BMAD, etc.).
   - Harmony AI‑Toolkit (`docs/harmony/ai-toolkit`) — provides the kits FlowKit calls during execution.
 
-### 2.2 FlowKit vs PlanKit vs AgentKit
+### 2.2 PlanKit vs AgentKit vs FlowKit vs the LangGraph runtime
 
-- **PlanKit**: decides *what* should happen and produces BMAD‑style plans (`plan.json`).
-- **FlowKit**: turns a plan or canonical prompt into a **LangGraph graph** and orchestrates the execution over time.
-- **AgentKit**: executes individual steps (tools/actions) within a flow.
+For full detail, see `docs/harmony/ai-toolkit/planning-and-orchestration/kit-roles.md`. At a glance:
+
+- **PlanKit**:
+  - Owns the **planning** stage between SpecKit and execution.
+  - Consumes SpecKit artifacts and methodology constraints.
+  - Produces BMAD‑style plans and a canonical `plan.json` plus ADR/checklist updates.
+- **AgentKit**:
+  - Runs **PlanKit plans** as durable, stateful agent graphs with retries/resume/HITL.
+  - Consumes `plan.json`, decides *which* flows to run and in what order, and maintains durable agent state.
+  - Uses FlowKit + the shared LangGraph runtime as its execution engine; it does **not** own its own runtime.
+- **FlowKit**:
+  - Defines the **flow contract** (`FlowConfig`, `FlowRunner`, `FlowRunResult`).
+  - Provides an HTTP runner client (`createHttpFlowRunner`) and CLI that POST to `<runtime>/flows/run`.
+  - Given a `FlowConfig`, turns “run this flow with these paths and params” into a single HTTP call to the runtime and returns a structured result.
+- **LangGraph runtime** (`agents/runner/runtime/**`):
+  - Implements concrete graphs for flows using LangGraph (`StateGraph`) and Pydantic state models.
+  - Exposes `/flows/run` and dispatches to flow‑specific graphs (for example `architecture_assessment`).
+  - Provides LangGraph Studio entrypoints via `langgraph.json` → `studio_entry.py`.
 
 One typical pipeline:
 
 1. SpecKit + Methodology produce/validate a spec.
-2. PlanKit turns spec + constraints into a plan.
-3. FlowKit instantiates a LangGraph flow from that plan (or a canonical prompt + YAML).
-4. AgentKit executes tools/actions invoked from nodes in the flow.
+2. PlanKit turns spec + constraints into a plan and `plan.json`.
+3. AgentKit reads `plan.json`, decides which flow(s) to run, and constructs FlowKit `FlowConfig` objects for each step.
+4. FlowKit calls the shared LangGraph runtime (`/flows/run`) for each requested flow.
+5. The LangGraph runtime executes the graph and returns structured state/results to FlowKit (and therefore to AgentKit or any other caller).
 
 ### 2.3 Why LangGraph
 
@@ -152,16 +169,19 @@ FlowKit is designed to:
 
 ## 3. Implementation Outline
 
-FlowKit’s implementation is intentionally minimal and composable.
+FlowKit’s implementation is intentionally minimal and composable: TypeScript contracts and clients live in `packages/kits/flowkit`, and runtime implementations live elsewhere (for example, the shared LangGraph runtime under `agents/runner/runtime/**`).
 
 ### 3.1 Directory Layout (example)
 
 In code, FlowKit is split into:
 
 - **Kit contracts and TS interfaces** under `packages/kits/flowkit/` (TypeScript/Node side).
-- **Runtime implementations** (for example, LangGraph flows) under a non‑app host (for example, `agents/runner/runtime/`), which consume prompts and YAML and are driven via the FlowKit kit interface.
+- **Runtime implementations** under a non‑app host (for example, `agents/runner/runtime/`), which:
+  - Consume prompts and workflow YAML from `packages/prompts/**`.
+  - Build and run LangGraph graphs for each flow.
+  - Expose a single `/flows/run` HTTP API for all flows.
 
-In this repo, a typical Python-side layout for the Architecture Assessment flow looks like:
+In this repo, the shared LangGraph runtime is organized like this (simplified):
 
 ```text
 agents/runner/runtime/
@@ -177,6 +197,9 @@ agents/runner/runtime/
     __tests__/
       test_parsing.py # Tests for parsing utilities
       test_analysis.py # Tests for analysis utilities
+  <other flows>/
+    ...               # Additional flow-specific state/graph/node modules
+  server.py           # HTTP runner exposing /flows/run for all flows
   ...
 ```
 
@@ -252,13 +275,15 @@ The CLI:
 
 ### 4.2 Running Flows via Cursor Custom Commands
 
-For conversational workflows, use a project-local Cursor command (this repo provides `.cursor/commands/run-flow.md`) that:
+For conversational workflows, use the project-local Cursor command defined in `.cursor/commands/run-flow.md`. The command now:
 
-- Requires a single `@Files` reference to a `.flow.json` file, e.g. `/run-flow @packages/prompts/assessment/architecture/architecture-assessment.flow.json`.
-- Echoes the flow id/display name back to the user before execution.
-- Invokes `pnpm flowkit:run <resolved-config-path>` via Cursor’s `run` tool and streams the CLI output into chat.
+- Enforces that **exactly one** `@Files` reference resolves to a `.flow.json` config, then parses that JSON to surface the flow id, display name, description, manifest path, entrypoint, and optional workspace root.
+- Announces the selected flow back to the user before execution and invokes `pnpm flowkit:run <resolved-config-path>` from the repo root, streaming CLI output directly into chat.
+- Never auto-launches LangGraph Studio; instead, every response includes two sections:
+  - **Flow result** — success/failure details, artifacts, and the config path that was run.
+  - **LangGraph Studio** — a ready-to-copy snippet that sets `FLOWKIT_STUDIO_WORKFLOW_MANIFEST`, `FLOWKIT_STUDIO_WORKFLOW_ENTRYPOINT`, and (when provided) `FLOWKIT_STUDIO_WORKSPACE_ROOT`, followed by `langgraph dev --config langgraph.json`. Because those values are pulled straight from the `.flow.json`, the snippet stays correct even as additional flows are added.
 
-Because the user selects the config via `@Files`, they get immediate visual confirmation that they chose the right flow—no guessing canonical prompt paths or remembering flow ids.
+This keeps `/run-flow` focused on executing flows while still giving developers one-click guidance for inspecting the same flow inside Studio.
 
 ### 4.3 `.flow.json` Reference
 
@@ -296,6 +321,59 @@ Each flow owns a colocated config file that registers it with FlowKit tooling. E
 }
 ```
 
+### 4.4 Visualizing Runs in LangGraph Studio
+
+LangGraph Studio can attach directly to the shared LangGraph runtime so you can explore every node, edge, and state mutation. This repo already includes:
+
+- A LangGraph‑ready entrypoint at `agents/runner/runtime/assessment/studio_entry.py` that exports the compiled `architecture_assessment` graph as `graph`.
+- A `langgraph.json` file in the repository root that registers the `architecture_assessment` graph (and any future graphs you add) for the LangGraph CLI.
+
+To launch Studio locally:
+
+1. Install the CLI (one time per workstation).
+2. Ensure the runtime dependencies are installed.
+3. From the repo root, run the LangGraph dev server:
+
+   ```bash
+   uv tool install "langgraph-cli[inmem]"
+   cd agents/runner/runtime
+   uv sync
+   LANGCHAIN_API_KEY=<optional-langsmith-key> langgraph dev --config langgraph.json
+   ```
+
+The CLI opens Studio in your browser and proxies to the local runtime. By default it uses:
+
+- `FLOWKIT_STUDIO_WORKSPACE_ROOT` (falls back to the repo root derived from `studio_entry.py`).
+- `FLOWKIT_STUDIO_WORKFLOW_MANIFEST` (defaults to `packages/prompts/assessment/architecture/workflows/architecture-assessment.yaml`).
+- `FLOWKIT_STUDIO_WORKFLOW_ENTRYPOINT` (defaults to the manifest’s first step).
+
+Override those environment variables before running `langgraph dev` if you want Studio to load a different manifest, workspace root, or entrypoint.
+
+The `/run-flow` command now prints those exact environment variables after every flow run so you can copy/paste them directly:
+
+```bash
+FLOWKIT_STUDIO_WORKFLOW_MANIFEST=<workflowManifestPath-from-config>
+FLOWKIT_STUDIO_WORKFLOW_ENTRYPOINT=<workflowEntrypoint-from-config>
+FLOWKIT_STUDIO_WORKSPACE_ROOT=<workspaceRoot-when-defined>
+langgraph dev --config langgraph.json
+```
+
+Because the snippet is generated from the selected `.flow.json`, it works for any registered flow and keeps Studio pointed at the same manifest the CLI just executed.
+
+**Multi-flow convention:** keep `.flow.json`, `langgraph.json`, and `studio_entry.py` in sync as you add new flows.
+
+- Add a `langgraph.json` entry (or equivalent module) for each flow you want visible in Studio, or rely on the env overrides above if you prefer not to register it yet.
+- Ensure the `.flow.json` fields (`workflowManifestPath`, `workflowEntrypoint`, optional `workspaceRoot`) remain the source of truth; `/run-flow` and Studio both read from the same values.
+- Document any non-default Studio entrypoints directly inside the flow config so the command—and your teammates—never need to guess.
+
+Once Studio is running you can:
+
+- Visualize the graphs defined in your workflow manifests (for example `inventory → analyze → … → declare_no_update` for architecture assessment).
+- Inspect node inputs/outputs and the shared state models (for example `AssessmentGraphState`).
+- Replay or branch from checkpoints generated by the runtime.
+
+Use Studio whenever you need to troubleshoot flow wiring, confirm manifest edits, or demo the orchestration story to other teams. For a conceptual overview of how Studio relates to FlowKit, AgentKit, PlanKit, and the shared runtime, see `kit-roles.md`.
+
 Key fields:
 
 - `id`, `displayName`, `description`: identity metadata surfaced in CLI and Cursor confirmations.
@@ -305,7 +383,7 @@ Key fields:
 - `runtime`: execution binding (the HTTP runner service endpoint, plus auto-start metadata for local runs).
 - Optional Policy/Observability metadata for downstream gates and tracing.
 
-### 4.4 Defining New Flows
+### 4.5 Defining New Flows
 
 To add a new Harmony‑aligned flow:
 
@@ -328,7 +406,7 @@ To add a new Harmony‑aligned flow:
 
 ---
 
-### 4.4 TypeScript FlowRunner Helper (Node ↔ HTTP Bridge)
+### 4.6 TypeScript FlowRunner Helper (Node ↔ HTTP Bridge)
 
 FlowKit includes a helper for calling the HTTP runner service from Node, so apps and tools (including Cursor commands) can orchestrate flows without re‑implementing the bridge.
 

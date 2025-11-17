@@ -24,13 +24,13 @@ This removes duplication, keeps us on the official GitHub’s Spec Kit semantics
 - PlanKit (`plankit`) wraps BMAD to generate ADRs and a BMAD plan/story from the validated SpecKit outputs.
 - FlowKit orchestrates long‑running, stateful flows (via LangGraph) from those plans or from canonical prompts, coordinating downstream kits.
 
-This keeps Spec semantics authoritative (from GitHub’s Spec Kit), makes BMAD usage stable behind a single kit boundary (PlanKit), and gives us a standard way to turn plans/prompts into executable flows via FlowKit.
+This keeps Spec semantics authoritative (from GitHub’s Spec Kit), makes BMAD usage stable behind a single kit boundary (PlanKit), and gives us a standard way to turn plans/prompts into executable flows via FlowKit and the shared LangGraph runtime under `agents/runner/runtime/**`, without every agent owning its own runtime.
 
 **Why wrappers?**
 
 - **Upgrade safety.** BMAD v6 is active and evolving; encapsulating BMAD behind PlanKit shields calling sites from workflow/param churn. ([GitHub][3])
 - **Spec‑first integrity.** We rely on GitHub’s Spec Kit instead of re‑implementing it; SpecKit adds validation, structure, and publishing only.
-- **Harmony alignment.** Clean handoff: `SpecKit → PlanKit → FlowKit → AgentKit/TestKit/PolicyKit`, matching the Methodology and AI‑Toolkit READMEs.
+- **Harmony alignment.** Clean handoff: `SpecKit → PlanKit → FlowKit → AgentKit/TestKit/PolicyKit`, matching the Methodology and AI‑Toolkit READMEs and the canonical kit roles described in `docs/harmony/ai-toolkit/planning-and-orchestration/kit-roles.md`.
 
 **Integration surface.**
 
@@ -890,7 +890,7 @@ Waivers are exceptional; scope/timebox (≤ 7 days) with navigator approval; dis
 - **Top 10 security/perf checks**: ASVS v5 auth/session, input validation, output encoding, TLS, secrets scan, dep scan & SBOM, OpenAPI lint+diff, contract tests, fuzz, bundle budget. ([GitHub][7])
 - **Incident hotline**: page on **error‑budget burn >2%/h**; follow runbook; file **blameless postmortem** same day. ([Google SRE][5])
 
-### Stop‑the‑line triggers (enforced)
+## Stop‑the‑line triggers (enforced)
 
 - Secret exposure or prohibited data in artifacts/logs → block/rollback; scrub artifacts and rotate credentials as needed.
 - License/provenance violations → block until resolved; document in PR.

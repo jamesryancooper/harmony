@@ -45,8 +45,8 @@ The AI‑Toolkit provides the kit‑level building blocks that implement Harmony
 
 - Spec → Plan → Flow → Implement → Verify → Ship → Learn
   - Spec/Shape: SpecKit (`speckit`), PlanKit
-  - Flow orchestration: FlowKit (instantiates long‑running, stateful LangGraph flows from plans or canonical prompts)
-  - Implement (agentic): AgentKit, DevKit, CodeModKit (as needed)
+  - Flow orchestration: FlowKit (defines `FlowConfig`/`FlowRunner`/`FlowRunResult` and calls the shared LangGraph runtime under `agents/runner/runtime/**` to instantiate long‑running, stateful flows from plans or canonical prompts)
+  - Implement (agentic): AgentKit (plan‑driven agents built on top of FlowKit and the shared runtime), DevKit, CodeModKit (as needed)
   - Verify/Govern: EvalKit (structure/hallucination), PolicyKit (ASVS/SSDF policy), GuardKit (redaction), TestKit (unit/contract/e2e), ComplianceKit (evidence)
   - Ship: PatchKit (PRs), Vercel Previews (promotion), ReleaseKit (changelog)
   - Observe/Learn: ObservaKit (OTel traces + logs), BenchKit (perf), Dockit (docs/ADR), ScheduleKit (jobs)
@@ -76,12 +76,12 @@ To keep responsibilities crisp and repeatable:
 
 This mirrors the mental model used in the AI‑Toolkit README and architecture docs: PromptKit is the **PromptOps kit at the template/contract layer**, while LLMOps and ContextOps concerns are implemented by a **composition of other kits** rather than being folded into PromptKit itself.
 
-In practice, FlowKit acts as the **flow execution orchestrator** between PlanKit and AgentKit:
+In practice, PlanKit, FlowKit, AgentKit, and the shared LangGraph runtime align as follows (see also `docs/harmony/ai-toolkit/planning-and-orchestration/kit-roles.md`):
 
 - SpecKit validates specs.
-- PlanKit turns specs into plans (BMAD).
-- FlowKit instantiates LangGraph flows from plans or canonical prompts.
-- AgentKit and other kits execute individual steps/tools referenced by the flow.
+- PlanKit turns specs into governed plans (`plan.json`).
+- FlowKit turns “run this flow with these prompts/manifests/paths” into HTTP calls to the shared LangGraph runtime.
+- AgentKit consumes `plan.json`, decides which flows to run via FlowKit, and uses the shared runtime’s checkpointing to maintain durable agent state.
 
 Use FlowKit when workflows:
 
@@ -589,7 +589,7 @@ Reference: Use the PatchKit PR Template (canonical) in `docs/harmony/ai-toolkit/
   - **Data classification & PII**: classify data touched by a change; ensure appropriate handling (encryption, redaction, access controls) and avoid logging sensitive content.
   - **Provenance & signed releases**: attest build artifacts (e.g., GitHub attestations/Sigstore cosign) and sign releases; link provenance in PRs that modify pipelines or release processes.
 
-#### Accessibility & Privacy Addendum
+### Accessibility & Privacy Addendum
 
 - Enable `eslint-plugin-jsx-a11y` for UI surfaces; treat critical a11y violations as policy/eval failures on reviewable surfaces.
 - Use semantic HTML and appropriate ARIA attributes; exercise basic keyboard/screen‑reader checks on critical flows (adopt incrementally).

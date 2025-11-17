@@ -5,9 +5,9 @@ description: Contracts, constraints, and provenance for Planner, Builder, and Ve
 
 # Agent Roles (Technical): Planner, Builder, Verifier
 
-Related docs: [MAPE-K modeling](./mape-k-loop-modeling.md), [kaizen subsystem](./kaizen-subsystem.md), [governance model](./governance-model.md), [knowledge plane](./knowledge-plane.md)
+Related docs: [MAPE-K modeling](./mape-k-loop-modeling.md), [kaizen subsystem](./kaizen-subsystem.md), [governance model](./governance-model.md), [knowledge plane](./knowledge-plane.md), [kit roles](../ai-toolkit/planning-and-orchestration/kit-roles.md)
 
-This document specifies the technical contracts, governance constraints, and provenance requirements for the three Harmony agents that drive continuous improvement within the MAPE-K loop: Planner, Builder, and Verifier.
+This document specifies the technical contracts, governance constraints, and provenance requirements for the three Harmony agents that drive continuous improvement within the MAPE-K loop: Planner, Builder, and Verifier. It should be read together with the AI-Toolkit planning and orchestration docs (`PlanKit`, `AgentKit`, `FlowKit`, and the shared LangGraph runtime) described in `../ai-toolkit/planning-and-orchestration/kit-roles.md`.
 
 ## Summary
 

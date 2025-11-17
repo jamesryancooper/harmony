@@ -7,7 +7,8 @@ from typing import Any, Dict, List
 
 import yaml
 
-from .graph import build_assessment_graph
+from .graph_factory import compile_assessment_graph
+from .paths import resolve_manifest_path, resolve_repo_path
 from .parsing import parse_frontmatter
 from .state import AssessmentGraphState, AssessmentState
 
@@ -37,21 +38,6 @@ def validate_canonical_prompt(canonical_prompt_path: str | Path) -> Dict[str, st
         )
 
     return {"title": str(title), "description": str(description)}
-
-
-def resolve_repo_path(candidate_path: str | Path, repo_root: str | Path) -> Path:
-    """Resolve a repo-relative path to an absolute Path."""
-    path_value = Path(candidate_path)
-    if path_value.is_absolute():
-        return path_value
-    return Path(repo_root) / path_value
-
-
-def resolve_manifest_path(
-    workflow_manifest_path: str | Path, repo_root: str | Path
-) -> Path:
-    """Resolve the workflow manifest path relative to the repository root."""
-    return resolve_repo_path(workflow_manifest_path, repo_root)
 
 
 def _load_assessment_config(manifest: Dict[str, Any]) -> Dict[str, Any]:
@@ -123,10 +109,10 @@ def run_assessment_from_canonical_prompt(
         "thresholds": assessment_config["thresholds"],
     }
 
-    graph = build_assessment_graph(
-        repo_root=repo_root,
-        workflow_manifest=str(manifest_path),
-        entrypoint=workflow_entrypoint,
+    graph = compile_assessment_graph(
+        workspace_root=root_path,
+        workflow_manifest_path=manifest_path,
+        workflow_entrypoint=workflow_entrypoint,
     )
     final_state = graph.invoke(initial_state)
     return AssessmentState.model_validate(final_state)

@@ -20,18 +20,18 @@ HSP is optimized for a small team (2 developers, scaling to ~6) to build and evo
 
 HSP aligns process and tooling end‑to‑end across all lifecycle stages (Spec → Plan → Implement → Verify → Ship → Operate → Learn) while upholding the four pillars above. The toolkit is designed to cover each stage with thin, predictable interfaces and fail‑closed governance.
 
-### Terminology: Slices vs Layers
+## Terminology: Slices vs Layers
 
 - Runtime code is organized by vertical feature slices with hexagonal (ports/adapters) boundaries. We do not use classic n‑tier layering for application calls.
 - “layer” refers to cross‑cutting governance/control‑plane concerns (e.g., Kaizen, quality gates, observability) that span slices, not runtime call layers.
 - See also: [slices vs layers](./slices-vs-layers.md) and [layers overview](./layers.md).
 
-### Planes: runtime vs knowledge
+## Planes: runtime vs knowledge
 
 At the repository root, Harmony distinguishes between **runtime planes** and **knowledge/logic planes**:
 
 - `apps/`: deployable applications and UIs (things you **run**).
-- `agents/`: agent runtimes and long‑running flows (things you **run** via FlowKit or CLIs).
+- `agents/`: agent runtimes, long‑running flows, and the shared LangGraph runtime (things you **run** via FlowKit or CLIs).
 - `packages/`: reusable libraries and knowledge‑plane modules (things you **import**), including domain slices, kits, contracts, and prompt libraries such as `packages/prompts`.
 - `infra/`, `ci-pipeline/`: platform and pipeline automation.
 - `docs/`: specifications, ADRs, and other documentation.
@@ -40,8 +40,9 @@ Rule of thumb:
 
 - Anything you **run** (HTTP servers, CLIs, flows, runners) lives in a runtime plane (`apps/*`, `agents/*`).
 - Anything you **import** across those planes (shared domain logic, kits, contracts, prompt suites) lives under `packages/*` (for example `packages/prompts` for the prompts knowledge plane).
+- The shared LangGraph **runtime implementation** that executes FlowKit flows and AgentKit agents lives under `agents/runner/runtime/**` and is treated as infrastructure behind the FlowKit and AgentKit kit boundaries.
 
-This keeps runtime concerns (processes and deployables) clearly separated from shared knowledge and logic (libraries and kits) and aligns the monorepo layout with the Harmony Structural Paradigm.
+This keeps runtime concerns (processes and deployables) clearly separated from shared knowledge and logic (libraries and kits) and aligns the monorepo layout with the Harmony Structural Paradigm. For more on how PlanKit, AgentKit, FlowKit, and the shared LangGraph runtime work together, see `docs/harmony/ai-toolkit/planning-and-orchestration/kit-roles.md`.
 
 ### Alignment Coverage (Stamp)
 

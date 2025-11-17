@@ -7,7 +7,7 @@ These appendices are referenced by **Core Comms Guide**, **Agent Layer Guide**, 
 ## A) Glossary
 
 - **Agent** — A thin policy that sequences kit operations where judgment is needed.
-- **AgentKit** — The orchestrator implementing agent policies, budgets, and telemetry.
+- **AgentKit** — The orchestrator implementing agent policies, budgets, and telemetry, built on top of FlowKit and the shared LangGraph runtime; it consumes PlanKit `plan.json` plans and drives flows via FlowKit.
 - **Artifact** — A durable file/object produced/consumed by kits (e.g., indexes, evidence packs).
 - **CloudEvents** — CNCF event envelope used on the event bus.
 - **Comms Stack** — Ports (typed calls), Artifacts (URIs/manifests), Events (CloudEvents).

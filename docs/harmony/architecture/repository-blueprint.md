@@ -53,10 +53,11 @@ Organize by feature (vertical slice) in `packages/*`; enforce hexagonal (ports/a
 │   ├── observability/        # Logging, metrics, tracing, instrumentation (OpenTelemetry)
 │   └── runtime/              # Feature flags, global policies, rollout rules (manual promote/rollback)
 │
-├── agents/                   # Agent system: planner, builder, verifier
-│   ├── planner/
-│   ├── builder/
-│   └── verifier/
+├── agents/                   # Agent system and shared flow runtime
+│   ├── planner/              # Planner agent runtime
+│   ├── builder/              # Builder agent runtime
+│   ├── verifier/             # Verifier agent runtime
+│   └── runner/runtime/       # Shared LangGraph runtime for FlowKit flows and AgentKit agents
 │
 ├── ci-pipeline/              # CI/CD workflows and policy gates
 │   ├── workflows/
@@ -80,7 +81,7 @@ Each feature in `packages/<feature>` is a bounded context that encapsulates its 
 - `domain/` is the inner hexagon; it never depends on `api/` or `adapters/`.
 - `api/` and `adapters/` act as adapters. They depend inward on `domain/`.
 - `tests/` co-locates unit, integration, and contract tests with the feature code.
- - Optional: co-locate a brief spec (`docs/spec.md`) and slice-level JSON Schemas; re-export externally via `packages/contracts` for uniform CI contract testing.
+- Optional: co-locate a brief spec (`docs/spec.md`) and slice-level JSON Schemas; re-export externally via `packages/contracts` for uniform CI contract testing.
 
 Hexagonal Architecture and dependency direction ensure deterministic, testable modules. The domain core is technology-agnostic and stable; adapters can change with minimal ripple.
 
@@ -126,9 +127,19 @@ Use `packages/common/*` only for genuinely cross-cutting utilities or shared pri
 - `observability/`: Centralizes logging, metrics, tracing, and instrumentation standards. Ensures consistent trace context propagation.
 - `runtime/`: Hosts feature flag definitions and rollout policies. Can include global middleware and rate limiting.
 
-## Agent System: `agents/`
+## Agent System and Shared Runtime: `agents/`
 
-Houses Planner, Builder, and Verifier agents. Keep agent logic and resources (prompts, rules) separate from product features to simplify governance and auditing. Shared agent utilities can live under `agents/common/` if needed.
+Houses Planner, Builder, and Verifier agents, plus the shared LangGraph runtime:
+
+- **planner/**: Planner agent runtime.
+- **builder/**: Builder agent runtime.
+- **verifier/**: Verifier agent runtime.
+- **runner/runtime/**: Shared LangGraph runtime that:
+  - Builds and executes graphs for FlowKit flows using prompts and workflow manifests.
+  - Exposes a single `/flows/run` HTTP API used by FlowKit (and therefore AgentKit and other callers).
+  - Provides LangGraph Studio entrypoints via `langgraph.json` → `studio_entry.py`.
+
+Keep agent logic and resources (prompts, rules) separate from product features to simplify governance and auditing. Shared agent utilities can live under `agents/common/` if needed. For conceptual roles and responsibilities of PlanKit, AgentKit, FlowKit, and the shared LangGraph runtime, see `docs/harmony/ai-toolkit/planning-and-orchestration/kit-roles.md`.
 
 ## CI/CD and Policy: `ci-pipeline/`
 

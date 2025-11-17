@@ -45,20 +45,23 @@ Kits are **control‑plane libraries** that live under `packages/kits/*` and are
   - `kaizen/*` — hygiene/improvement jobs that call kits for analysis and patch proposals.
   - `ci-pipeline/*` — quality gates that import kit APIs (for example, EvalKit/FlowKit checks).
 
-For FlowKit specifically:
+For FlowKit and AgentKit specifically:
 
-- **TypeScript/Node interface:**
+- **FlowKit (TypeScript/Node interface):**
   - `packages/kits/flowkit/` exposes types like `FlowConfig`, `FlowRunRequest`, and `FlowRunResult`, plus a small Node API/CLI to launch flows (for example, via a Python runner, HTTP, or subprocess).
   - FlowKit integrates with other kits in TS (SpecKit, PlanKit, AgentKit) at the type level.
-- **Python LangGraph runtime:**
-  - Lives outside `apps/*` (for example, under `agents/runner/runtime/`) and is treated as a runtime implementation of FlowKit, not the kit itself.
-  - It consumes prompts and workflow YAML and exposes a small API/CLI that `packages/kits/flowkit` calls.
-- **Apps (web, api, ai-console, ai-gateway)** can depend on FlowKit via the TS package, not vice versa.
+- **Shared Python LangGraph runtime:**
+  - Lives outside `apps/*` under `agents/runner/runtime/` and is treated as a shared runtime implementation behind FlowKit, not the kit itself.
+  - It consumes prompts and workflow YAML and exposes a small HTTP API/CLI (for example, `/flows/run`) that `packages/kits/flowkit` calls.
+- **AgentKit (plan‑driven agents on top of FlowKit):**
+  - Uses PlanKit `plan.json` plans, FlowKit `FlowConfig`/`FlowRunner` helpers, and the shared LangGraph runtime to run durable agent graphs with retries/resume/HITL.
+  - Does not implement its own separate runtime; it always reuses the shared runtime under `agents/runner/runtime/**`.
+- **Apps (web, api, ai-console, ai-gateway)** can depend on FlowKit and AgentKit via the TS packages, not vice versa.
 
 This keeps the monorepo aligned with the Architecture blueprint:
 
-- Architecture: kits = control‑plane libraries under `packages/kits`.
-- Methodology: kits = concrete tools used to implement the Spec → Plan → Flow → Run lifecycle.
+- Architecture: kits = control‑plane libraries under `packages/kits`; the LangGraph runtime is infrastructure under `agents/runner/runtime/**`.
+- Methodology: kits = concrete tools used to implement the Spec → Plan → Flow → Run lifecycle; see also `docs/harmony/ai-toolkit/planning-and-orchestration/kit-roles.md` for canonical roles.
 
 ### Next.js 15+/16 & React 19 Integration (Guidance)
 

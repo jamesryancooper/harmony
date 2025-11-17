@@ -46,7 +46,8 @@ HarmonyMonorepo
 ├─ agents/
 │  ├─ planner
 │  ├─ builder
-│  └─ verifier
+│  ├─ verifier
+│  └─ runner/runtime      # Shared LangGraph runtime for FlowKit flows and AgentKit agents
 ├─ ci-pipeline/
 │  ├─ workflows              # CI pipelines (build/test/scan)
 │  └─ gates                  # Policy/contract/coverage gates
@@ -60,6 +61,7 @@ At a high level:
 
 - Root planes like `apps/` and `agents/` contain **runtime entrypoints** (processes you run and deploy).
 - `packages/` contains **reusable, importable modules** (domain slices, kits, contracts, prompt libraries such as `packages/prompts`).
+- The **shared LangGraph runtime** under `agents/runner/runtime/**` hosts all concrete graphs for FlowKit flows and AgentKit agents and exposes a single `/flows/run` API.
 
 Rule of thumb:
 
@@ -89,8 +91,8 @@ Rule of thumb:
 - adapters: Integrations (DB, queues, external APIs) that implement ports; depend inward on domain abstractions.
 - api: Public interfaces/contracts for inbound calls (interfaces, OpenAPI/JSON Schema where applicable).
 - tests: Feature-specific unit, contract, and integration tests.
- - docs/spec.md: A concise slice spec including scope, acceptance checks, risk/flag plan, and contract references.
- - Boundary validation: Perform request/response validation at module boundaries using JSON Schema; reject invalid inputs explicitly and log with trace context. Guard risky or new flows behind feature flags with safe defaults.
+- docs/spec.md: A concise slice spec including scope, acceptance checks, risk/flag plan, and contract references.
+- Boundary validation: Perform request/response validation at module boundaries using JSON Schema; reject invalid inputs explicitly and log with trace context. Guard risky or new flows behind feature flags with safe defaults.
 
 Prompt libraries (for example `packages/prompts`) are treated as **knowledge-plane packages**: they contain shared prompt suites used by multiple surfaces (kits, apps, agents) and are imported like any other library. They live under `packages/` because they are reusable assets, not long-running processes.
 
@@ -114,8 +116,11 @@ Prompt libraries (for example `packages/prompts`) are treated as **knowledge-pla
 - **planner:** Strategic reasoning and backlog refinement logic.
 - **builder:** Code-generation or automation tasks responsible for implementing planned work.
 - **verifier:** Validation logic, QA harnesses, or autonomous reviewers that guard merge criteria.
+- **runner/runtime:** Shared LangGraph runtime that executes FlowKit flows over prompts/manifests and provides checkpointing and Studio entrypoints.
 
-Agents under `agents/` are **runtime processes**, not shared libraries: they are invoked by FlowKit or other callers (for example, via CLI or a Python module entrypoint) and may themselves import kits and prompt libraries from `packages/*`. This keeps a clear distinction between things you **run** at the root plane (`apps/*`, `agents/*`) and things you **import** as reusable knowledge or logic (`packages/*`, including `packages/prompts`).
+Agents under `agents/` are **runtime processes**, not shared libraries: they are invoked by FlowKit or other callers (for example, via CLI or a Python module entrypoint) and may themselves import kits and prompt libraries from `packages/*`. The `agents/runner/runtime` subtree is a special case: it is the **single shared LangGraph runtime** implementation used by all FlowKit flows and AgentKit agents in this monorepo. This keeps a clear distinction between things you **run** at the root plane (`apps/*`, `agents/*`) and things you **import** as reusable knowledge or logic (`packages/*`, including `packages/prompts`).
+
+See also `docs/harmony/ai-toolkit/planning-and-orchestration/kit-roles.md` for how PlanKit, AgentKit, FlowKit, and the LangGraph runtime map onto these physical locations.
 
 ## CI Pipeline
 
@@ -141,6 +146,7 @@ Guideline: keep the domain/runtime boundaries identical regardless of folderizat
 ## Optional: Cells for Tenancy/Scale
 
 When scale or isolation requirements arise (e.g., per‑tenant/region deployments), adopt cell‑style boundaries: replicate the same apps/* + packages/* slice per cell behind stable external contracts. Keep repository cohesion and shared policy/observability. See `docs/harmony/architecture/overview.md: Evolution Path` for guidance.
+
 ## Kaizen/Autopilot Layer
 
 - Purpose: Continuously propose small, reversible improvements to docs, tests, observability, and guardrails.

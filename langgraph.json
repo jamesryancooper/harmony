@@ -1,0 +1,11 @@
+{
+  "graphs": [
+    {
+      "name": "architecture_assessment",
+      "description": "FlowKit Architecture Assessment graph generated from config-driven manifests.",
+      "path": "agents.runner.runtime.assessment.studio_entry:graph"
+    }
+  ]
+}
+
+
