@@ -52,6 +52,18 @@ harmony ship
 | `check` | Run guardrail checks on AI output | `harmony check output.ts` |
 | `check --verify-imports` | Verify imports against package.json | `harmony check --verify-imports src/` |
 
+### Onboarding Commands
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `onboard` | Show onboarding status or start | `harmony onboard` |
+| `onboard start` | Begin guided onboarding | `harmony onboard start --name "Alice"` |
+| `onboard next` | Advance to next step | `harmony onboard next` |
+| `onboard fix` | Guided bug fix | `harmony onboard fix "Fix typo"` |
+| `onboard feature` | Guided feature | `harmony onboard feature "Add log"` |
+| `onboard skip` | Skip current step | `harmony onboard skip` |
+| `onboard reset` | Start fresh | `harmony onboard reset` |
+
 ## Risk Tiers
 
 AI automatically assigns risk tiers. You can override with `--tier`.
@@ -112,6 +124,52 @@ harmony check --file output.ts --tier T3
 # Check inline content
 harmony check "const x = eval(input)"
 ```
+
+### Onboard a new developer
+```bash
+# Start guided onboarding (~15-20 minutes)
+harmony onboard start
+harmony onboard start --name "Alice"
+
+# Follow the guided flow
+harmony onboard next          # Advance to next step
+harmony onboard fix "Fix typo in README"
+harmony onboard build
+harmony onboard approve
+
+# Control flow
+harmony onboard status        # Check progress
+harmony onboard skip          # Skip current step
+harmony onboard reset         # Start over
+```
+
+## Onboarding: How It Works
+
+The onboarding flow guides new developers through their first tasks:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  ONBOARDING FLOW (~15-20 minutes total)                      │
+├──────────────────────────────────────────────────────────────┤
+│  1. Welcome (2m)           - Mental model overview           │
+│  2. Environment Check (1m) - Verify setup                    │
+│  3. First Status (1m)      - Learn `harmony status`          │
+│  4. Guided Bug Fix (5m)    - Complete a T1 fix               │
+│  5. Guided Feature (8m)    - Add a small T1/T2 feature       │
+│  6. PR Review (3m)         - How to review AI work           │
+│  7. Ship (2m)              - Deploy with flags/rollback      │
+│  8. Complete! (1m)         - Summary and quick reference     │
+└──────────────────────────────────────────────────────────────┘
+```
+
+After onboarding, developers know:
+- ✓ How to start features and fixes
+- ✓ The T1/T2/T3 tier system
+- ✓ How to review AI summaries
+- ✓ How to ship with feature flags
+- ✓ How to rollback if needed
+
+Onboarding state is stored in `.harmony/onboarding.json` for progress tracking.
 
 ## How It Works
 
@@ -178,6 +236,7 @@ packages/harmony-cli/
     │   ├── state.ts          # Task persistence (.harmony/state.json)
     │   ├── workflow.ts       # Maps human commands to kit operations
     │   ├── guardrails.ts     # AI guardrail integration (GuardKit)
+    │   ├── onboarding.ts     # Onboarding state and workflows
     │   └── index.ts          # Orchestrator exports
     └── commands/
         ├── status.ts         # harmony status
@@ -190,6 +249,7 @@ packages/harmony-cli/
         ├── pause.ts          # harmony pause
         ├── rollback.ts       # harmony rollback
         ├── check.ts          # harmony check (guardrails)
+        ├── onboard.ts        # harmony onboard (guided onboarding)
         ├── help.ts           # harmony help
         └── index.ts          # Command exports
 ```
@@ -210,6 +270,7 @@ For faster typing, most commands have short aliases:
 | `pause` | `stop` |
 | `rollback` | `revert` |
 | `check` | `verify` |
+| `onboard` | `onboarding` |
 | `help` | `h`, `--help`, `-h` |
 
 ## Key Design Decisions
@@ -334,7 +395,9 @@ const ciHealth = await checkCIStatus();
 
 ## State Persistence
 
-The CLI persists task state in `.harmony/state.json`:
+The CLI persists state in the `.harmony/` directory:
+
+### Task State (`.harmony/state.json`)
 
 ```json
 {
@@ -357,6 +420,34 @@ The CLI persists task state in `.harmony/state.json`:
 }
 ```
 
+### Onboarding State (`.harmony/onboarding.json`)
+
+```json
+{
+  "version": 1,
+  "startedAt": "2025-01-01T00:00:00Z",
+  "currentStep": "guided_fix",
+  "userName": "Alice",
+  "isComplete": false,
+  "totalMinutesSpent": 5,
+  "steps": [
+    {
+      "id": "welcome",
+      "title": "Welcome to Harmony",
+      "status": "completed",
+      "startedAt": "2025-01-01T00:00:00Z",
+      "completedAt": "2025-01-01T00:02:00Z"
+    },
+    {
+      "id": "guided_fix",
+      "title": "Guided Bug Fix",
+      "status": "in_progress",
+      "taskId": "abc123-..."
+    }
+  ]
+}
+```
+
 Add `.harmony/` to your `.gitignore` to keep local state out of version control.
 
 ## Programmatic Usage
@@ -369,9 +460,12 @@ import {
   featureCommand,
   buildCommand,
   shipCommand,
+  onboardCommand,
   getSystemStatus,
   createTask,
   updateTask,
+  getOrCreateOnboarding,
+  loadOnboardingProgress,
 } from '@harmony/cli';
 
 // Check system status programmatically
@@ -382,6 +476,15 @@ console.log(status.activeTasks);
 const result = await featureCommand('Add dark mode', { tier: 'T2' });
 if (result.success) {
   console.log('Task created:', result.task?.id);
+}
+
+// Start onboarding programmatically
+const onboardResult = await onboardCommand('start', [], { name: 'Alice' });
+
+// Check onboarding progress
+const progress = loadOnboardingProgress('/path/to/workspace');
+if (progress) {
+  console.log(`Onboarding: ${progress.currentStep}`);
 }
 ```
 

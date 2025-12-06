@@ -35,6 +35,7 @@ Kits: The tools AI uses under the hood. You don't call them directly.
 
 | I want to...                | Command / Action                              |
 |-----------------------------|-----------------------------------------------|
+| **Get started (new dev)**   | `harmony onboard start`                       |
 | Start a new feature         | `harmony feature "description"`               |
 | Fix a bug                   | `harmony fix "#123"` or `harmony fix "desc"`  |
 | Check on AI progress        | `harmony status`                              |
@@ -68,6 +69,16 @@ AI auto-assigns a risk tier to every change. Higher tiers require more human att
 ---
 
 ## First Day Checklist
+
+**Option A: Guided Onboarding (Recommended)**
+
+```bash
+harmony onboard start
+```
+
+The AI will guide you through everything step-by-step. Takes about 15-20 minutes.
+
+**Option B: Self-Guided**
 
 - [ ] **Read this doc** (5 min) ✅ You're doing it now
 - [ ] **Read [DAILY-FLOW.md](./DAILY-FLOW.md)** (5 min) — How your day looks

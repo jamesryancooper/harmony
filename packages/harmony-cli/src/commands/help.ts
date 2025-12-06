@@ -14,6 +14,7 @@ import { explainHelp } from "./explain.js";
 import { retryHelp } from "./retry.js";
 import { pauseHelp } from "./pause.js";
 import { rollbackHelp } from "./rollback.js";
+import { onboardHelp } from "./onboard.js";
 
 const commands = [
   statusHelp,
@@ -25,6 +26,7 @@ const commands = [
   retryHelp,
   pauseHelp,
   rollbackHelp,
+  onboardHelp,
 ];
 
 export function helpCommand(commandName?: string): void {
@@ -80,6 +82,10 @@ export function helpCommand(commandName?: string): void {
   console.log(`  ${highlight("retry")}     ${muted("Retry with new guidance")}`);
   console.log(`  ${highlight("pause")}     ${muted("Pause a running task")}`);
   console.log(`  ${highlight("rollback")}  ${muted("Rollback production")}`);
+  console.log("");
+
+  console.log(bold("Onboarding:"));
+  console.log(`  ${highlight("onboard")}   ${muted("AI-guided onboarding for new developers")}`);
   console.log("");
 
   console.log(bold("Quick Start:"));

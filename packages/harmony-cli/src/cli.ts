@@ -33,6 +33,7 @@ import {
   retryCommand,
   pauseCommand,
   rollbackCommand,
+  onboardCommand,
   helpCommand,
 } from "./commands/index.js";
 import { error, bold, muted } from "./ui/index.js";
@@ -184,6 +185,13 @@ async function run(argv: string[] = process.argv): Promise<void> {
         await rollbackCommand({
           deploymentUrl: typeof options["deployment-url"] === "string" ? options["deployment-url"] : undefined,
           force: options.force === true,
+        });
+        break;
+
+      case "onboard":
+      case "onboarding":
+        await onboardCommand(args[0], args.slice(1), {
+          name: typeof options.name === "string" ? options.name : undefined,
         });
         break;
 

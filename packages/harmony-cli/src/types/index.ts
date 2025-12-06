@@ -240,3 +240,134 @@ export interface SystemStatus {
   };
 }
 
+// ============================================================================
+// Onboarding Types
+// ============================================================================
+
+/**
+ * Onboarding step types.
+ */
+export type OnboardingStepType =
+  | "welcome"
+  | "environment_check"
+  | "first_status"
+  | "guided_fix"
+  | "guided_feature"
+  | "review_pr"
+  | "ship"
+  | "complete";
+
+/**
+ * Status of an onboarding step.
+ */
+export type OnboardingStepStatus =
+  | "pending"
+  | "in_progress"
+  | "waiting_input"
+  | "completed"
+  | "skipped";
+
+/**
+ * An individual onboarding step.
+ */
+export interface OnboardingStep {
+  /** Step identifier */
+  id: OnboardingStepType;
+
+  /** Human-readable title */
+  title: string;
+
+  /** Description of what this step teaches */
+  description: string;
+
+  /** Current status */
+  status: OnboardingStepStatus;
+
+  /** When the step was started */
+  startedAt?: Date;
+
+  /** When the step was completed */
+  completedAt?: Date;
+
+  /** Associated task ID if this step created a task */
+  taskId?: string;
+
+  /** Guidance message to show during this step */
+  guidance?: string;
+
+  /** Estimated time in minutes */
+  estimatedMinutes: number;
+}
+
+/**
+ * Overall onboarding progress.
+ */
+export interface OnboardingProgress {
+  /** Version of the onboarding flow */
+  version: number;
+
+  /** When onboarding was started */
+  startedAt: Date;
+
+  /** When onboarding was completed (if finished) */
+  completedAt?: Date;
+
+  /** Current step being worked on */
+  currentStep: OnboardingStepType;
+
+  /** All steps and their status */
+  steps: OnboardingStep[];
+
+  /** Name of the person being onboarded (optional) */
+  userName?: string;
+
+  /** Whether onboarding was completed */
+  isComplete: boolean;
+
+  /** Total time spent (calculated from step times) */
+  totalMinutesSpent: number;
+}
+
+/**
+ * Onboarding candidate - a suitable task for onboarding exercises.
+ */
+export interface OnboardingCandidate {
+  /** Type of task */
+  type: "bug" | "feature";
+
+  /** Title/description */
+  title: string;
+
+  /** Why this is a good onboarding task */
+  reason: string;
+
+  /** Expected tier */
+  tier: RiskTier;
+
+  /** Estimated time */
+  estimatedMinutes: number;
+
+  /** Issue number if from issue tracker */
+  issueNumber?: string;
+}
+
+/**
+ * Result of an onboarding step.
+ */
+export interface OnboardingStepResult {
+  /** Whether the step succeeded */
+  success: boolean;
+
+  /** Human-readable message */
+  message: string;
+
+  /** The updated progress */
+  progress: OnboardingProgress;
+
+  /** Next action to take */
+  nextAction?: string;
+
+  /** Celebration message for completed steps */
+  celebration?: string;
+}
+
