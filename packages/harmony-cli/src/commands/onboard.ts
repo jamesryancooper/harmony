@@ -698,4 +698,3 @@ export const onboardHelp = {
     { name: "reset", description: "Reset onboarding to start fresh" },
   ],
 };
-
