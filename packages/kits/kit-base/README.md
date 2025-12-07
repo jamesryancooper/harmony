@@ -22,17 +22,34 @@ All kit metadata includes explicit version fields:
 
 ```json
 {
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.3.0",
   "methodologyVersion": "0.2.0",
   "name": "flowkit",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "dependencies": {
+    "requires": ["kit-base"],
+    "orchestrates": ["promptkit", "guardkit", "costkit"],
+    "integratesWith": []
+  }
 }
 ```
 
 | Field | Current | Description |
 |-------|---------|-------------|
-| `schemaVersion` | 1.2.0 | Kit metadata schema version |
+| `schemaVersion` | 1.3.0 | Kit metadata schema version |
 | `methodologyVersion` | 0.2.0 | Harmony methodology version |
+
+### Typed Dependencies (v1.3)
+
+Kit dependencies are categorized into three types with distinct semantics:
+
+| Type | Meaning | Circular Allowed |
+|------|---------|------------------|
+| `requires` | Runtime dependency; must be available | No |
+| `orchestrates` | This kit controls/coordinates another | No |
+| `integratesWith` | Optional integration partner | Yes |
+
+See [ARCHITECTURE.md](../ARCHITECTURE.md) for the Kit Granularity Policy and dependency rules.
 
 ### Enforcement Modes
 
@@ -201,7 +218,7 @@ process.exit(kitError.code);
 
 ## Run Records
 
-Run records capture the full context of every kit operation for reproducibility, governance, and observability.
+Run records capture the full context of every kit operation for reproducibility, governance, observability, and audit trails.
 
 ### Format
 
@@ -220,18 +237,20 @@ interface RunRecord {
   stage: LifecycleStage;   // spec|plan|implement|verify|ship|operate|learn
   risk: RiskLevel;         // trivial|low|medium|high
   hitl?: HITLInfo;         // HITL checkpoint state
-  determinism?: DeterminismInfo;  // prompt_hash, idempotencyKey
+  determinism?: DeterminismInfo;  // prompt_hash, idempotencyKey, inputsHash
+  outputs?: unknown;       // Serialized result for idempotency replay
   createdAt: string;       // ISO8601
   durationMs?: number;
 }
 ```
 
-### Usage
+### Writing Run Records
 
 ```typescript
 import {
   createRunRecord,
   writeRunRecord,
+  safeWriteRunRecord,
   generateRunId,
   getRunsDirectory,
 } from "@harmony/kit-base";
@@ -254,12 +273,156 @@ const record = createRunRecord({
   risk: "low",
   traceId: getCurrentTraceId() || randomUUID(),
   durationMs: 1250,
+  outputs: result, // Store for idempotency replay
 });
 
 // Write to disk
 const runsDir = getRunsDirectory(process.cwd());
 const path = writeRunRecord(record, runsDir);
 // => ./runs/flowkit/2025-12-07T10-30-00Z-flowkit-a1b2.json
+
+// Safe write (doesn't throw on failure)
+const { success, path, error } = safeWriteRunRecord(record, runsDir);
+```
+
+### Querying Run Records
+
+```typescript
+import {
+  readRunRecord,
+  listRunRecords,
+  getRunRecordStats,
+  findRunRecordByTraceId,
+  findRunRecordByIdempotencyKey,
+} from "@harmony/kit-base";
+
+// Read a single record
+const record = readRunRecord(runsDir, "2025-12-07T10-30-00Z-flowkit-a1b2");
+
+// List with filtering, sorting, and pagination
+const summaries = listRunRecords(runsDir, {
+  kit: "guardkit",
+  status: "success",
+  stage: "implement",
+  since: new Date("2025-01-01"),
+  limit: 100,
+  sortBy: "createdAt",
+  sortOrder: "desc",
+});
+
+// Get aggregate statistics
+const stats = getRunRecordStats(runsDir, { kit: "flowkit" });
+// => { totalRuns: 50, byKit: {...}, byStatus: {...}, avgDurationMs: 1250 }
+
+// Find by trace ID (for OTel correlation)
+const record = findRunRecordByTraceId(runsDir, traceId);
+
+// Find by idempotency key (for deduplication)
+const record = findRunRecordByIdempotencyKey(runsDir, "flowkit:run:abc123");
+```
+
+### Cleanup and Retention
+
+```typescript
+import {
+  cleanupRunRecords,
+  getRunRecordDiskUsage,
+  type RetentionPolicy,
+} from "@harmony/kit-base";
+
+// Define retention policy
+const policy: RetentionPolicy = {
+  maxAgeMs: 30 * 24 * 60 * 60 * 1000, // 30 days
+  maxCountPerKit: 1000,
+  keepFailures: true,      // Keep failures longer
+  failureMultiplier: 2,    // 2x retention for failures
+  keepHighRisk: true,      // Keep high-risk runs longer
+  highRiskMultiplier: 3,   // 3x retention for high risk
+};
+
+// Dry-run first
+const preview = cleanupRunRecords(runsDir, policy, true);
+console.log(`Would delete: ${preview.deletedCount} records`);
+
+// Execute cleanup
+const result = cleanupRunRecords(runsDir, policy, false);
+console.log(`Deleted: ${result.deletedCount}, Freed: ${result.freedBytes} bytes`);
+
+// Check disk usage
+const usage = getRunRecordDiskUsage(runsDir);
+// => { totalBytes: 1234567, byKit: {...}, totalFiles: 500 }
+```
+
+### Export Capabilities
+
+```typescript
+import {
+  exportRunRecords,
+  streamRunRecords,
+  toOtlpLogRecord,
+} from "@harmony/kit-base";
+
+// Export to file (JSON, NDJSON, or OTLP)
+const result = await exportRunRecords(runsDir, {
+  format: "ndjson",
+  destination: "file",
+  outputPath: "./backup.ndjson",
+  filter: { since: new Date("2025-01-01") },
+});
+
+// Export to OTel collector
+const result = await exportRunRecords(runsDir, {
+  format: "otlp",
+  destination: "otel-collector",
+  collectorUrl: "http://localhost:4318",
+});
+
+// Stream for large exports
+for await (const record of streamRunRecords(runsDir, { kit: "flowkit" })) {
+  await processRecord(record);
+}
+
+// Convert to OTLP log record format
+const otlpRecord = toOtlpLogRecord(record);
+```
+
+### kit-runs CLI
+
+A dedicated CLI for querying and managing run records:
+
+```bash
+# List run records
+kit-runs list --kit guardkit --status success --limit 20
+
+# Show a specific run record
+kit-runs show 2025-12-07T10-30-00Z-flowkit-a1b2
+
+# Get aggregate statistics
+kit-runs stats --since "7d ago"
+
+# Find by trace ID or idempotency key
+kit-runs find --trace abc123
+kit-runs find --idempotency-key flowkit:run:abc123
+
+# Cleanup old records
+kit-runs cleanup --max-age 30d --dry-run
+kit-runs cleanup --max-age 30d
+
+# Export records
+kit-runs export --export-format ndjson --output backup.ndjson
+kit-runs export --export-format otlp --collector-url http://localhost:4318
+
+# Check disk usage
+kit-runs usage
+```
+
+Each kit also includes a `runs` subcommand for kit-specific queries:
+
+```bash
+guardkit runs list --limit 20
+flowkit runs show <runId>
+promptkit runs stats
+costkit runs find --trace <traceId>
 ```
 
 ## Observability
@@ -558,7 +721,7 @@ if (result.warnings?.length) {
 
 ## Idempotency
 
-Key generation and conflict detection for deterministic operations.
+Key generation, conflict detection, and durable tracking for deterministic operations.
 
 ### Usage
 
@@ -594,12 +757,14 @@ const { result, cached, runId } = await withIdempotency(
 
 if (cached) {
   console.log("Operation already completed:", runId);
+  console.log("Cached result:", result); // Returns the original result
 }
 
 // Manual checking
 const existing = checkIdempotencyKey(key, "flowkit", "run", inputs);
 if (existing) {
   console.log("Already processed:", existing.runId);
+  console.log("Cached result:", existing.cachedResult);
 }
 
 // Direct manager access
@@ -608,6 +773,40 @@ const manager = new IdempotencyManager({
   completedTtlMs: 24 * 60 * 60 * 1000,  // 24 hours
 });
 ```
+
+### Storage Backends
+
+Idempotency supports pluggable storage backends:
+
+```typescript
+import {
+  createInMemoryIdempotencyManager,
+  createDurableIdempotencyManager,
+  useDurableIdempotency,
+  InMemoryIdempotencyStorage,
+  RunRecordIdempotencyStorage,
+} from "@harmony/kit-base";
+
+// In-memory storage (default, single process)
+const manager = createInMemoryIdempotencyManager();
+
+// Durable storage backed by run records (survives restarts)
+const manager = createDurableIdempotencyManager(runsDir);
+
+// Set durable storage as the default for all kits
+useDurableIdempotency(runsDir);
+
+// Custom storage backend
+const customStorage = new MyCustomStorage();
+const manager = new IdempotencyManager({
+  storage: customStorage,
+});
+```
+
+| Storage Backend | Durability | Use Case |
+|----------------|------------|----------|
+| `InMemoryIdempotencyStorage` | Process lifetime | Single-process, testing |
+| `RunRecordIdempotencyStorage` | Disk | Production, survives restarts |
 
 ### Key Derivation
 

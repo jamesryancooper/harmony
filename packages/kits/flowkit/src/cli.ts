@@ -17,6 +17,18 @@ import { setTimeout as delay } from "node:timers/promises";
 import {
   parseStandardFlags,
   getStandardFlagsHelp,
+  listRunRecords,
+  readRunRecord,
+  getRunRecordStats,
+  findRunRecordByTraceId,
+  findRunRecordByIdempotencyKey,
+  getRunsDirectory,
+  parseRunsCliArgs,
+  toListOptions,
+  formatRunRecordTable,
+  formatRunRecordDetail,
+  formatStats,
+  getRunsCliHelp,
   type StandardKitFlags,
 } from "@harmony/kit-base";
 
@@ -465,7 +477,13 @@ export const runCli = async (
     return null;
   }
 
-  const configPathArg = remaining[0];
+  // Check for "runs" subcommand
+  if (remaining[0] === "runs") {
+    return handleRunsCommand(remaining.slice(1), flags);
+  }
+
+  // Legacy: "run" subcommand is optional for backwards compatibility
+  const configPathArg = remaining[0] === "run" ? remaining[1] : remaining[0];
   if (!configPathArg) {
     throw new Error(
       `Missing required argument.\nUsage: pnpm flowkit:run <path/to/flow${FLOW_CONFIG_EXTENSION}> [options]\n\nRun with --help for more information.`
@@ -544,6 +562,96 @@ export const runCli = async (
   return output;
 };
 
+const KIT_NAME = "flowkit";
+const KIT_VERSION = "0.1.0";
+
+/**
+ * Handle "runs" subcommand for querying run records.
+ */
+async function handleRunsCommand(
+  args: string[],
+  flags: StandardKitFlags
+): Promise<Record<string, unknown>> {
+  const subcommand = args[0] || "list";
+  const subArg = args[1];
+  const runsDir = flags.runsDir || getRunsDirectory(process.cwd());
+  const format = flags.format || "table";
+
+  const runsArgs = parseRunsCliArgs([subcommand, ...(subArg ? [subArg] : []), "--kit", KIT_NAME]);
+
+  switch (subcommand) {
+    case "list": {
+      const listOptions = toListOptions({ ...runsArgs, kit: KIT_NAME });
+      const summaries = listRunRecords(runsDir, listOptions);
+      
+      if (format === "json") {
+        const output = { summaries, _kit: { name: KIT_NAME, version: KIT_VERSION } };
+        console.log(JSON.stringify(output, null, 2));
+        return output;
+      }
+      console.log(formatRunRecordTable(summaries));
+      return { count: summaries.length };
+    }
+
+    case "show": {
+      if (!subArg) {
+        throw new Error("Run ID required. Usage: flowkit runs show <runId>");
+      }
+      const record = readRunRecord(runsDir, subArg);
+      if (!record) {
+        throw new Error(`Run record not found: ${subArg}`);
+      }
+      if (format === "json") {
+        const output = { record, _kit: { name: KIT_NAME, version: KIT_VERSION } };
+        console.log(JSON.stringify(output, null, 2));
+        return output;
+      }
+      console.log(formatRunRecordDetail(record));
+      return { runId: record.runId };
+    }
+
+    case "stats": {
+      const stats = getRunRecordStats(runsDir, { kit: KIT_NAME, since: runsArgs.since });
+      if (format === "json") {
+        const output = { stats, _kit: { name: KIT_NAME, version: KIT_VERSION } };
+        console.log(JSON.stringify(output, null, 2));
+        return output;
+      }
+      console.log(formatStats(stats));
+      return { totalRuns: stats.totalRuns };
+    }
+
+    case "find": {
+      let record = null;
+      if (runsArgs.traceId) {
+        record = findRunRecordByTraceId(runsDir, runsArgs.traceId);
+      } else if (runsArgs.idempotencyKey) {
+        record = findRunRecordByIdempotencyKey(runsDir, runsArgs.idempotencyKey);
+      } else {
+        throw new Error("Use --trace or --idempotency-key to find records");
+      }
+      
+      if (!record) {
+        throw new Error("Run record not found");
+      }
+      if (format === "json") {
+        const output = { record, _kit: { name: KIT_NAME, version: KIT_VERSION } };
+        console.log(JSON.stringify(output, null, 2));
+        return output;
+      }
+      console.log(formatRunRecordDetail(record));
+      return { runId: record.runId };
+    }
+
+    case "help":
+      console.log(getRunsCliHelp(KIT_NAME));
+      return {};
+
+    default:
+      throw new Error(`Unknown runs subcommand: ${subcommand}. Use: list|show|stats|find|help`);
+  }
+}
+
 /**
  * Print usage information.
  */
@@ -553,9 +661,21 @@ FlowKit CLI v0.1.0 - Workflow orchestration for Harmony
 
 USAGE:
   flowkit run <path/to/flow.flow.json> [options]
+  flowkit runs <subcommand> [options]
 
-ARGUMENTS:
+COMMANDS:
+  run <flow.flow.json>  Run a flow from configuration
+  runs                  Query and manage run records
+
+RUN ARGUMENTS:
   <flow.flow.json>      Path to flow configuration file
+
+RUNS SUBCOMMANDS:
+  list                  List run records
+  show <runId>          Show details of a run record
+  stats                 Show aggregate statistics
+  find --trace <id>     Find by trace ID
+  help                  Show runs help
 
 ${getStandardFlagsHelp()}
 
@@ -574,8 +694,11 @@ EXAMPLES:
   # Run with risk tier and stage for telemetry
   flowkit run flows/architecture-assessment.flow.json --risk T2 --stage implement
 
-  # Verbose text output
-  flowkit run flows/architecture-assessment.flow.json --format text -v
+  # List recent run records
+  flowkit runs list --limit 20
+
+  # Show a specific run
+  flowkit runs show 2025-01-07T10-30-00Z-flowkit-a1b2
 `);
 }
 

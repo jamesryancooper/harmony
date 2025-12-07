@@ -20,16 +20,18 @@ Kits implement **Methodology-as-Code**: methodology constraints (pillars, lifecy
 
 | Component | Version | Description |
 |-----------|---------|-------------|
-| **Schema** | 1.2.0 | Kit metadata schema with versioning and enforcement |
+| **Schema** | 1.3.0 | Kit metadata schema with typed dependencies |
 | **Methodology** | 0.2.0 | Harmony methodology (5 pillars, 7 stages) |
 
 ### Key Features
 
 - **Version tracking** — All metadata includes `schemaVersion` and `methodologyVersion`
+- **Typed dependencies** — `requires`, `orchestrates`, `integratesWith` for clear kit relationships
 - **Enforcement modes** — `block`, `warn`, or `off` for graceful transitions
 - **Deprecation tracking** — Migration guidance for evolving schemas
 - **CI validation** — `pnpm --filter @harmony/kit-base validate:methodology`
 
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the Kit Granularity Policy and dependency rules.
 See [Methodology-as-Code Policy](../../docs/harmony/ai/methodology/methodology-as-code.md) for full documentation.
 
 ## Interface Hierarchy
@@ -66,6 +68,7 @@ packages/kits/
 ├── costkit/         # LLM cost management (estimation, tracking, budgeting)
 ├── package.json     # Workspace configuration
 ├── tsconfig.json    # Shared TypeScript config
+├── ARCHITECTURE.md  # Kit Granularity Policy and dependency rules
 └── README.md        # This file
 ```
 
@@ -84,7 +87,8 @@ packages/kits/
 | **PatchKit** | PR creation and code patches | 🔄 Planned | — |
 | **EvalKit** | AI output evaluation and quality scoring | 🔄 Planned | — |
 | **PolicyKit** | Policy enforcement and compliance | 🔄 Planned | — |
-| **ObservaKit** | Observability and telemetry | 🔄 Planned | — |
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the evaluation of planned kits and Kit Granularity Policy.
 
 ## Quick Start
 

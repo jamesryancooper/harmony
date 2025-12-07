@@ -55,10 +55,37 @@ export interface KitIdempotencyConfig {
 }
 
 /**
+ * Kit dependency declarations.
+ * See ARCHITECTURE.md for dependency type semantics.
+ */
+export interface KitDependencies {
+  /**
+   * Runtime dependencies that must be available.
+   * Circular requires are forbidden.
+   */
+  requires?: string[];
+
+  /**
+   * Kits this kit controls/coordinates.
+   * The orchestrated kit is unaware of the orchestrator.
+   */
+  orchestrates?: string[];
+
+  /**
+   * Optional integration partners.
+   * Bidirectional integratesWith is allowed.
+   */
+  integratesWith?: string[];
+}
+
+/**
  * Compatibility and versioning.
  */
 export interface KitCompatibilityConfig {
   contracts?: string[];
+  /**
+   * @deprecated Use `dependencies` instead. Will be removed in v2.0.0.
+   */
   kits?: string[];
   breakingChangePolicy?: string;
   deprecatedSince?: string;
@@ -74,7 +101,7 @@ export interface KitPolicyConfig {
 }
 
 /**
- * Complete kit metadata conforming to methodology v0.2.
+ * Complete kit metadata conforming to methodology v0.2 and schema v1.3.
  */
 export interface KitMetadata {
   /** Kit name (e.g., "flowkit") */
@@ -97,6 +124,12 @@ export interface KitMetadata {
 
   /** Path to outputs JSON schema */
   outputsSchema: string;
+
+  /**
+   * Kit dependency declarations.
+   * See ARCHITECTURE.md for dependency type semantics.
+   */
+  dependencies?: KitDependencies;
 
   /** Policy configuration */
   policy?: KitPolicyConfig;

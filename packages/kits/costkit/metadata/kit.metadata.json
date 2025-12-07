@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.3.0",
   "methodologyVersion": "0.2.0",
   "name": "costkit",
   "version": "0.1.0",
@@ -8,6 +8,11 @@
   "lifecycleStages": ["implement", "operate"],
   "inputsSchema": "schema/costkit.inputs.v1.json",
   "outputsSchema": "schema/costkit.outputs.v1.json",
+  "dependencies": {
+    "requires": ["kit-base"],
+    "orchestrates": [],
+    "integratesWith": ["flowkit", "promptkit"]
+  },
   "observability": {
     "serviceName": "harmony.kit.costkit",
     "requiredSpans": ["kit.costkit.estimate", "kit.costkit.record"],
@@ -38,9 +43,16 @@
   },
   "compatibility": {
     "minSchemaVersion": "1.1.0",
-    "maxSchemaVersion": "1.2.0",
+    "maxSchemaVersion": "1.3.0",
     "supportedMethodologyVersions": ["0.2.0"],
     "contracts": ["costkit.inputs.v1", "costkit.outputs.v1"],
-    "kits": ["flowkit", "promptkit"]
+    "deprecations": [
+      {
+        "field": "compatibility.kits",
+        "since": "1.3.0",
+        "removeAt": "2.0.0",
+        "migrationNote": "Use 'dependencies' object instead. See ARCHITECTURE.md for dependency type semantics."
+      }
+    ]
   }
 }

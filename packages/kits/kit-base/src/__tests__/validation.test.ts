@@ -340,11 +340,82 @@ describe("validation", () => {
 
   describe("version constants", () => {
     it("should export current schema version", () => {
-      expect(CURRENT_SCHEMA_VERSION).toBe("1.2.0");
+      expect(CURRENT_SCHEMA_VERSION).toBe("1.3.0");
     });
 
     it("should export current methodology version", () => {
       expect(CURRENT_METHODOLOGY_VERSION).toBe("0.2.0");
+    });
+  });
+
+  describe("DependenciesConfigSchema", () => {
+    it("should validate valid dependencies", () => {
+      const validMetadata = {
+        name: "testkit",
+        version: "0.1.0",
+        description: "Test kit",
+        pillars: ["speed_with_safety"],
+        lifecycleStages: ["implement"],
+        inputsSchema: "schema/test.inputs.json",
+        outputsSchema: "schema/test.outputs.json",
+        dependencies: {
+          requires: ["kit-base"],
+          orchestrates: ["promptkit", "guardkit"],
+          integratesWith: ["costkit"],
+        },
+        observability: {
+          serviceName: "harmony.kit.testkit",
+          requiredSpans: ["kit.testkit.run"],
+        },
+        determinism: {
+          ai: null,
+        },
+        safety: {
+          hitl: {},
+        },
+        idempotency: {
+          required: true,
+        },
+      };
+
+      const result = validateKitMetadataStrict(validMetadata);
+
+      expect(result.success).toBe(true);
+      expect(result.data?.dependencies?.requires).toEqual(["kit-base"]);
+      expect(result.data?.dependencies?.orchestrates).toEqual(["promptkit", "guardkit"]);
+      expect(result.data?.dependencies?.integratesWith).toEqual(["costkit"]);
+    });
+
+    it("should default empty arrays for dependencies", () => {
+      const validMetadata = {
+        name: "testkit",
+        version: "0.1.0",
+        pillars: ["speed_with_safety"],
+        lifecycleStages: ["implement"],
+        inputsSchema: "schema/test.inputs.json",
+        outputsSchema: "schema/test.outputs.json",
+        dependencies: {},
+        observability: {
+          serviceName: "harmony.kit.testkit",
+          requiredSpans: ["kit.testkit.run"],
+        },
+        determinism: {
+          ai: null,
+        },
+        safety: {
+          hitl: {},
+        },
+        idempotency: {
+          required: true,
+        },
+      };
+
+      const result = validateKitMetadataStrict(validMetadata);
+
+      expect(result.success).toBe(true);
+      expect(result.data?.dependencies?.requires).toEqual([]);
+      expect(result.data?.dependencies?.orchestrates).toEqual([]);
+      expect(result.data?.dependencies?.integratesWith).toEqual([]);
     });
   });
 });

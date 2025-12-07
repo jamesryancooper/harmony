@@ -3,13 +3,14 @@
  *
  * Provides foundational utilities that all kits depend on:
  * - Typed errors with standard exit codes
- * - Run record generation
+ * - Run record generation, querying, and management
  * - Observability bootstrap (OTel)
  * - Standard CLI flag parsing
  * - Kit metadata types and loading
  * - Zod-based validation utilities
  * - Idempotency key management
  * - CLI base utilities
+ * - Run records CLI utilities
  * - HTTP client utilities for kit runners
  */
 
@@ -42,4 +43,7 @@ export * from "./idempotency.js";
 
 // HTTP Client
 export * from "./http-client.js";
+
+// Run Records CLI Utilities
+export * from "./runs-cli-shared.js";
 

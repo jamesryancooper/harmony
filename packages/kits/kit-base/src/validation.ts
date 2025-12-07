@@ -16,7 +16,7 @@ import { InputValidationError } from "./errors.js";
 /**
  * Current kit metadata schema version.
  */
-export const CURRENT_SCHEMA_VERSION = "1.2.0";
+export const CURRENT_SCHEMA_VERSION = "1.3.0";
 
 /**
  * Current Harmony methodology version.
@@ -188,6 +188,28 @@ export const IdempotencyConfigSchema = z.object({
 });
 
 /**
+ * Kit dependencies configuration schema (v1.3).
+ * See ARCHITECTURE.md for dependency type semantics.
+ */
+export const DependenciesConfigSchema = z.object({
+  /**
+   * Runtime dependencies that must be available.
+   * Circular requires are forbidden.
+   */
+  requires: z.array(z.string()).default([]),
+  /**
+   * Kits this kit controls/coordinates.
+   * The orchestrated kit is unaware of the orchestrator.
+   */
+  orchestrates: z.array(z.string()).default([]),
+  /**
+   * Optional integration partners.
+   * Bidirectional integratesWith is allowed.
+   */
+  integratesWith: z.array(z.string()).default([]),
+});
+
+/**
  * Compatibility configuration schema (expanded for Methodology-as-Code).
  */
 export const CompatibilityConfigSchema = z.object({
@@ -199,7 +221,9 @@ export const CompatibilityConfigSchema = z.object({
   supportedMethodologyVersions: z.array(StrictSemverSchema).optional(),
   /** Contract versions this kit implements */
   contracts: z.array(z.string()).optional(),
-  /** Other kits this kit is compatible with */
+  /**
+   * @deprecated Use `dependencies` instead. Will be removed in v2.0.0.
+   */
   kits: z.array(z.string()).optional(),
   /** Policy for breaking changes */
   breakingChangePolicy: z.string().optional(),
@@ -215,7 +239,8 @@ export const DryRunConfigSchema = z.object({
 });
 
 /**
- * Complete kit metadata schema (v1.2 - with versioning and enforcement modes).
+ * Complete kit metadata schema (v1.3 - with typed dependencies).
+ * See ARCHITECTURE.md for Kit Granularity Policy.
  */
 export const KitMetadataSchema = z.object({
   /** Schema version this metadata conforms to */
@@ -236,6 +261,11 @@ export const KitMetadataSchema = z.object({
   inputsSchema: z.string(),
   /** Path to outputs JSON schema */
   outputsSchema: z.string(),
+  /**
+   * Kit dependency declarations (v1.3).
+   * See ARCHITECTURE.md for dependency type semantics.
+   */
+  dependencies: DependenciesConfigSchema.optional(),
   /** Policy configuration */
   policy: PolicyConfigSchema.optional(),
   /** Observability configuration */
@@ -394,6 +424,7 @@ export const BaseKitConfigSchema = z.object({
 export type EnforcementMode = z.infer<typeof EnforcementModeSchema>;
 export type Deprecation = z.infer<typeof DeprecationSchema>;
 export type PolicyConfig = z.infer<typeof PolicyConfigSchema>;
+export type DependenciesConfig = z.infer<typeof DependenciesConfigSchema>;
 export type ValidationObservabilityConfig = z.infer<
   typeof ObservabilityConfigSchema
 >;

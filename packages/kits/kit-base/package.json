@@ -5,6 +5,9 @@
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "kit-runs": "./dist/runs-cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -45,6 +48,10 @@
     "./http-client": {
       "types": "./dist/http-client.d.ts",
       "import": "./dist/http-client.js"
+    },
+    "./runs-cli-shared": {
+      "types": "./dist/runs-cli-shared.d.ts",
+      "import": "./dist/runs-cli-shared.js"
     }
   },
   "scripts": {

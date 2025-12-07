@@ -31,11 +31,26 @@
 import {
   parseStandardFlags,
   getStandardFlagsHelp,
+  listRunRecords,
+  readRunRecord,
+  getRunRecordStats,
+  findRunRecordByTraceId,
+  findRunRecordByIdempotencyKey,
+  getRunsDirectory,
+  parseRunsCliArgs,
+  toListOptions,
+  formatRunRecordTable,
+  formatRunRecordDetail,
+  formatStats,
+  getRunsCliHelp,
   type StandardKitFlags,
 } from "@harmony/kit-base";
 
 import { PromptKit } from "./index.js";
 import { shortHash } from "./hasher.js";
+
+const KIT_NAME = "promptkit";
+const KIT_VERSION = "0.1.0";
 
 interface CliOptions extends StandardKitFlags {
   variables?: string;
@@ -178,6 +193,10 @@ async function main(): Promise<void> {
       await cmdVariables(promptKit, promptId, options);
       break;
 
+    case "runs":
+      await cmdRuns(promptId, options);
+      break;
+
     default:
       console.error(`Unknown command: ${command}`);
       printUsage();
@@ -203,6 +222,14 @@ COMMANDS:
   variables <prompt-id> List expected variables for a prompt
   list                  List all available prompts
   info <prompt-id>      Show detailed prompt information
+  runs [subcommand]     Query and manage run records
+
+RUNS SUBCOMMANDS:
+  list                  List run records
+  show <runId>          Show details of a run record
+  stats                 Show aggregate statistics
+  find --trace <id>     Find by trace ID
+  help                  Show runs help
 
 PROMPT OPTIONS:
   --variables, --vars   JSON string of variables
@@ -567,6 +594,103 @@ async function cmdVariables(
     console.error(
       `Error: ${error instanceof Error ? error.message : String(error)}`
     );
+    process.exit(1);
+  }
+}
+
+/**
+ * Runs command - query and manage run records.
+ */
+async function cmdRuns(
+  subcommandArg: string | undefined,
+  options: CliOptions
+): Promise<void> {
+  const subcommand = subcommandArg || "list";
+  const runsDir = options.runsDir || getRunsDirectory(process.cwd());
+  const format = options.format || "table";
+
+  // Parse runs-specific args from process.argv
+  const argsStart = process.argv.findIndex(arg => arg === "runs");
+  const runsArgv = argsStart >= 0 ? process.argv.slice(argsStart + 1) : [];
+  const subArg = runsArgv.find(arg => !arg.startsWith("-") && arg !== subcommand);
+
+  const runsArgs = parseRunsCliArgs([subcommand, ...(subArg ? [subArg] : []), "--kit", KIT_NAME]);
+
+  try {
+    switch (subcommand) {
+      case "list": {
+        const listOptions = toListOptions({ ...runsArgs, kit: KIT_NAME });
+        const summaries = listRunRecords(runsDir, listOptions);
+        
+        if (format === "json") {
+          console.log(JSON.stringify({ summaries, _kit: { name: KIT_NAME, version: KIT_VERSION } }, null, 2));
+        } else {
+          console.log(formatRunRecordTable(summaries));
+        }
+        break;
+      }
+
+      case "show": {
+        if (!subArg) {
+          console.error("Error: Run ID required. Usage: promptkit runs show <runId>");
+          process.exit(1);
+        }
+        const record = readRunRecord(runsDir, subArg);
+        if (!record) {
+          console.error(`Run record not found: ${subArg}`);
+          process.exit(1);
+        }
+        if (format === "json") {
+          console.log(JSON.stringify({ record, _kit: { name: KIT_NAME, version: KIT_VERSION } }, null, 2));
+        } else {
+          console.log(formatRunRecordDetail(record));
+        }
+        break;
+      }
+
+      case "stats": {
+        const stats = getRunRecordStats(runsDir, { kit: KIT_NAME, since: runsArgs.since });
+        if (format === "json") {
+          console.log(JSON.stringify({ stats, _kit: { name: KIT_NAME, version: KIT_VERSION } }, null, 2));
+        } else {
+          console.log(formatStats(stats));
+        }
+        break;
+      }
+
+      case "find": {
+        let record = null;
+        if (runsArgs.traceId) {
+          record = findRunRecordByTraceId(runsDir, runsArgs.traceId);
+        } else if (runsArgs.idempotencyKey) {
+          record = findRunRecordByIdempotencyKey(runsDir, runsArgs.idempotencyKey);
+        } else {
+          console.error("Error: Use --trace or --idempotency-key to find records");
+          process.exit(1);
+        }
+        
+        if (!record) {
+          console.error("Run record not found");
+          process.exit(1);
+        }
+        if (format === "json") {
+          console.log(JSON.stringify({ record, _kit: { name: KIT_NAME, version: KIT_VERSION } }, null, 2));
+        } else {
+          console.log(formatRunRecordDetail(record));
+        }
+        break;
+      }
+
+      case "help":
+        console.log(getRunsCliHelp(KIT_NAME));
+        break;
+
+      default:
+        console.error(`Unknown runs subcommand: ${subcommand}. Use: list|show|stats|find|help`);
+        process.exit(1);
+    }
+  } catch (error) {
+    console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
     process.exit(1);
   }
 }

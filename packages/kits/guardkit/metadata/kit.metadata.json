@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.3.0",
   "methodologyVersion": "0.2.0",
   "name": "guardkit",
   "version": "0.1.0",
@@ -8,6 +8,11 @@
   "lifecycleStages": ["implement", "verify"],
   "inputsSchema": "schema/guardkit.inputs.v1.json",
   "outputsSchema": "schema/guardkit.outputs.v1.json",
+  "dependencies": {
+    "requires": ["kit-base"],
+    "orchestrates": [],
+    "integratesWith": ["promptkit", "flowkit"]
+  },
   "observability": {
     "serviceName": "harmony.kit.guardkit",
     "requiredSpans": ["kit.guardkit.check", "kit.guardkit.sanitize"],
@@ -38,9 +43,16 @@
   },
   "compatibility": {
     "minSchemaVersion": "1.1.0",
-    "maxSchemaVersion": "1.2.0",
+    "maxSchemaVersion": "1.3.0",
     "supportedMethodologyVersions": ["0.2.0"],
     "contracts": ["guardkit.inputs.v1", "guardkit.outputs.v1"],
-    "kits": ["promptkit", "flowkit"]
+    "deprecations": [
+      {
+        "field": "compatibility.kits",
+        "since": "1.3.0",
+        "removeAt": "2.0.0",
+        "migrationNote": "Use 'dependencies' object instead. See ARCHITECTURE.md for dependency type semantics."
+      }
+    ]
   }
 }

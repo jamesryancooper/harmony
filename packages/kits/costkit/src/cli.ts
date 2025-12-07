@@ -28,6 +28,18 @@ import {
   dryRunSuccess,
   failure,
   withKitMetadata,
+  listRunRecords,
+  readRunRecord,
+  getRunRecordStats,
+  findRunRecordByTraceId,
+  findRunRecordByIdempotencyKey,
+  getRunsDirectory,
+  parseRunsCliArgs,
+  toListOptions,
+  formatRunRecordTable,
+  formatRunRecordDetail,
+  formatStats,
+  getRunsCliHelp,
   type CliCommand,
   type KitCliConfig,
   type StandardKitFlags,
@@ -441,13 +453,124 @@ function formatCostSummary(summary: CostSummary): string {
 }
 
 /**
+ * Runs command - query and manage run records for this kit.
+ */
+const runsCommand: CliCommand<CostKitCliOptions> = {
+  name: "runs",
+  description: "Query and manage run records for CostKit",
+  args: [
+    { name: "subcommand", description: "Subcommand: list|show|stats|find", required: false },
+    { name: "arg", description: "Argument for subcommand (runId, traceId, etc.)", required: false },
+  ],
+  options: [
+    { name: "status", description: "Filter by status (success|failure)", type: "string" },
+    { name: "since", description: "Filter by date (ISO or '7d ago')", type: "string" },
+    { name: "limit", alias: "l", description: "Max records to return", type: "string" },
+    { name: "trace-id", description: "Find by trace ID", type: "string" },
+    { name: "idem-key", description: "Find by idempotency key", type: "string" },
+  ],
+  async handler(args, options) {
+    const subcommand = args[0] || "list";
+    const subArg = args[1];
+    const runsDir = options.runsDir || getRunsDirectory(process.cwd());
+    const format = options.format || "table";
+
+    // Note: We use different option names to avoid conflicts with standard kit flags
+    const traceId = (options as Record<string, unknown>)["traceId"] as string | undefined;
+    const idemKey = (options as Record<string, unknown>)["idemKey"] as string | undefined;
+    
+    const runsArgs = parseRunsCliArgs([
+      subcommand,
+      ...(subArg ? [subArg] : []),
+      "--kit", KIT_NAME,
+      ...(options.status ? ["--status", String(options.status)] : []),
+      ...(options.since ? ["--since", String(options.since)] : []),
+      ...(options.limit ? ["--limit", String(options.limit)] : []),
+      ...(traceId ? ["--trace", traceId] : []),
+      ...(idemKey ? ["--idempotency-key", idemKey] : []),
+    ]);
+
+    switch (subcommand) {
+      case "list": {
+        const listOptions = toListOptions({ ...runsArgs, kit: KIT_NAME });
+        const summaries = listRunRecords(runsDir, listOptions);
+        
+        if (format === "json") {
+          return success({ summaries }, "");
+        }
+        return success(
+          withKitMetadata({ count: summaries.length }, KIT_NAME, KIT_VERSION, options),
+          formatRunRecordTable(summaries)
+        );
+      }
+
+      case "show": {
+        if (!subArg) {
+          return failure("Run ID required. Usage: costkit runs show <runId>", 1);
+        }
+        const record = readRunRecord(runsDir, subArg);
+        if (!record) {
+          return failure(`Run record not found: ${subArg}`, 1);
+        }
+        if (format === "json") {
+          return success({ record }, "");
+        }
+        return success(
+          withKitMetadata({ runId: record.runId }, KIT_NAME, KIT_VERSION, options),
+          formatRunRecordDetail(record)
+        );
+      }
+
+      case "stats": {
+        const stats = getRunRecordStats(runsDir, { kit: KIT_NAME, since: runsArgs.since });
+        if (format === "json") {
+          return success({ stats }, "");
+        }
+        return success(
+          withKitMetadata({ totalRuns: stats.totalRuns }, KIT_NAME, KIT_VERSION, options),
+          formatStats(stats)
+        );
+      }
+
+      case "find": {
+        let record = null;
+        if (runsArgs.traceId) {
+          record = findRunRecordByTraceId(runsDir, runsArgs.traceId);
+        } else if (runsArgs.idempotencyKey) {
+          record = findRunRecordByIdempotencyKey(runsDir, runsArgs.idempotencyKey);
+        } else {
+          return failure("Use --trace or --idempotency-key to find records", 1);
+        }
+        
+        if (!record) {
+          return failure("Run record not found", 1);
+        }
+        if (format === "json") {
+          return success({ record }, "");
+        }
+        return success(
+          withKitMetadata({ runId: record.runId }, KIT_NAME, KIT_VERSION, options),
+          formatRunRecordDetail(record)
+        );
+      }
+
+      case "help":
+        return success({}, getRunsCliHelp(KIT_NAME));
+
+      default:
+        return failure(`Unknown runs subcommand: ${subcommand}. Use: list|show|stats|find|help`, 1);
+    }
+  },
+};
+
+/**
  * CostKit CLI configuration.
  */
 const cliConfig: KitCliConfig = {
   name: KIT_NAME,
   version: KIT_VERSION,
   description: "LLM cost management: estimation, tracking, budgeting, alerts",
-  commands: [estimateCommand, statusCommand, summaryCommand, recordCommand, alertsCommand],
+  commands: [estimateCommand, statusCommand, summaryCommand, recordCommand, alertsCommand, runsCommand],
   globalOptions: [
     { name: "policy-path", description: "Path to cost policy YAML", type: "string" },
     { name: "data-path", description: "Path to cost data file", type: "string" },
