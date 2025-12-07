@@ -558,4 +558,3 @@ export function clearUsageRecords(): void {
   usageRecords = [];
   persistRecords();
 }
-

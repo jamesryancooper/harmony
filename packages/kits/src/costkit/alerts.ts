@@ -455,4 +455,3 @@ export function getAlertSummary(): {
     byType: byType as Record<AlertType, number>,
   };
 }
-
