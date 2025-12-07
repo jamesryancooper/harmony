@@ -279,7 +279,7 @@ export interface PromptKitConfig {
   /** Default model to use when tier doesn't specify */
   defaultModel?: string;
 
-  /** Enable run record generation (default: false) */
+  /** Enable run record generation (default: true) */
   enableRunRecords?: boolean;
 
   /** Directory to write run records (default: ./runs) */

@@ -32,7 +32,8 @@
   },
   "dependencies": {
     "@harmony/kit-base": "workspace:*",
-    "@opentelemetry/api": "^1.9.0"
+    "@opentelemetry/api": "^1.9.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22.18.13",

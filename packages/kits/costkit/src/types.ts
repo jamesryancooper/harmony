@@ -465,7 +465,7 @@ export interface CostKitConfig {
   /** Require estimates before expensive operations (threshold in USD) */
   requireEstimateThreshold?: number;
 
-  /** Enable run record generation (default: false) */
+  /** Enable run record generation (default: true) */
   enableRunRecords?: boolean;
 
   /** Directory to write run records (default: ./runs) */

@@ -28,23 +28,14 @@
  * ```
  */
 
-import { PromptKit } from "./index";
-import { shortHash } from "./hasher";
+import {
+  parseStandardFlags,
+  getStandardFlagsHelp,
+  type StandardKitFlags,
+} from "@harmony/kit-base";
 
-/**
- * Standard flags supported by all kits (aligned with kit-base/cli-flags).
- */
-interface StandardKitFlags {
-  dryRun: boolean;
-  stage?: "spec" | "plan" | "implement" | "verify" | "ship" | "operate" | "learn";
-  risk?: "T1" | "T2" | "T3";
-  idempotencyKey?: string;
-  cacheKey?: string;
-  trace?: boolean;
-  traceParent?: string;
-  verbose?: boolean;
-  format?: "json" | "text";
-}
+import { PromptKit } from "./index.js";
+import { shortHash } from "./hasher.js";
 
 interface CliOptions extends StandardKitFlags {
   variables?: string;
@@ -55,15 +46,6 @@ interface CliOptions extends StandardKitFlags {
 }
 
 /**
- * Default flag values.
- */
-const DEFAULT_FLAGS: StandardKitFlags = {
-  dryRun: process.env.HARMONY_ENV !== "prod" && process.env.HARMONY_ENV !== "preview",
-  verbose: false,
-  format: "text",
-};
-
-/**
  * Parse command line arguments with standard flag support.
  */
 function parseArgs(args: string[]): {
@@ -71,17 +53,17 @@ function parseArgs(args: string[]): {
   promptId?: string;
   options: CliOptions;
 } {
-  const options: CliOptions = { ...DEFAULT_FLAGS };
+  // First parse standard flags using kit-base
+  const { flags: standardFlags, remaining } = parseStandardFlags(args);
+
+  // Parse prompt-kit specific options from remaining args
+  const options: CliOptions = { ...standardFlags };
   let command = "";
   let promptId: string | undefined;
+  const finalRemaining: string[] = [];
 
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-
-    // Stop parsing flags after --
-    if (arg === "--") {
-      break;
-    }
+  for (let i = 0; i < remaining.length; i++) {
+    const arg = remaining[i];
 
     if (arg.startsWith("--")) {
       const [rawKey, ...valueParts] = arg.slice(2).split("=");
@@ -89,24 +71,10 @@ function parseArgs(args: string[]): {
       const hasValue = valueParts.length > 0;
       const value = hasValue ? valueParts.join("=") : undefined;
 
-      // Handle boolean flags first (no value needed)
-      if (key === "verbose" || key === "v") {
-        options.verbose = true;
-        continue;
-      }
-      if (key === "dry-run" || key === "n") {
-        options.dryRun = value ? value === "true" : true;
-        continue;
-      }
-      if (key === "trace" || key === "t") {
-        options.trace = value ? value === "true" : true;
-        continue;
-      }
-
       // For value-based flags, consume value from = or next argument
       let flagValue = value;
-      if (!hasValue && i + 1 < args.length && !args[i + 1].startsWith("-")) {
-        flagValue = args[++i];
+      if (!hasValue && i + 1 < remaining.length && !remaining[i + 1].startsWith("-")) {
+        flagValue = remaining[++i];
       }
 
       switch (key) {
@@ -126,56 +94,25 @@ function parseArgs(args: string[]): {
         case "tier":
           options.tier = flagValue;
           break;
-        case "format":
-          options.format = flagValue as "json" | "text";
-          break;
-        // Standard kit flags
-        case "stage":
-          options.stage = flagValue as CliOptions["stage"];
-          break;
-        case "risk":
-          options.risk = flagValue?.toUpperCase() as CliOptions["risk"];
-          break;
-        case "idempotency-key":
-          options.idempotencyKey = flagValue;
-          break;
-        case "cache-key":
-          options.cacheKey = flagValue;
-          break;
-        case "trace-parent":
-          options.traceParent = flagValue;
-          break;
+        default:
+          // Unknown flag, pass through
+          finalRemaining.push(arg);
       }
     } else if (arg.startsWith("-")) {
       const key = arg.slice(1);
       switch (key) {
-        case "v":
-          options.verbose = true;
-          break;
         case "j":
           options.format = "json";
           break;
-        case "n":
-          options.dryRun = true;
-          break;
-        case "s":
-          if (i + 1 < args.length && !args[i + 1].startsWith("-")) {
-            options.stage = args[++i] as CliOptions["stage"];
-          }
-          break;
-        case "r":
-          if (i + 1 < args.length && !args[i + 1].startsWith("-")) {
-            options.risk = args[++i].toUpperCase() as CliOptions["risk"];
-          }
-          break;
-        case "t":
-          options.trace = true;
-          break;
+        default:
+          finalRemaining.push(arg);
       }
     } else if (!command) {
       command = arg;
     } else if (!promptId) {
       promptId = arg;
+    } else {
+      finalRemaining.push(arg);
     }
   }
 
@@ -253,7 +190,7 @@ async function main(): Promise<void> {
  */
 function printUsage(): void {
   console.log(`
-PromptKit CLI - Runtime prompt compiler for Harmony
+PromptKit CLI v0.1.0 - Runtime prompt compiler for Harmony
 
 USAGE:
   promptkit <command> [prompt-id] [options]
@@ -273,20 +210,9 @@ PROMPT OPTIONS:
   --max-tokens          Maximum tokens (truncates if exceeded)
   --model               Override model selection
   --tier                Risk tier (T1, T2, T3)
-
-STANDARD KIT FLAGS:
-  --dry-run, -n         Validate without side effects (default: true in local)
-  --stage, -s <stage>   Lifecycle stage: spec|plan|implement|verify|ship|operate|learn
-  --risk, -r <tier>     Risk tier: T1|T2|T3
-  --idempotency-key <key> Idempotency key for operations
-  --cache-key <key>     Cache key for pure operations
-  --trace, -t           Enable trace linking
-  --trace-parent <id>   Parent trace ID for correlation
-
-OUTPUT OPTIONS:
-  --format, -f <format> Output format: json, text (default: text)
-  -v, --verbose         Verbose output
   -j                    JSON output (shorthand for --format json)
+
+${getStandardFlagsHelp()}
 
 EXAMPLES:
   # Compile a prompt

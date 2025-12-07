@@ -7,6 +7,9 @@
  * - Observability bootstrap (OTel)
  * - Standard CLI flag parsing
  * - Kit metadata types and loading
+ * - Zod-based validation utilities
+ * - Idempotency key management
+ * - CLI base utilities
  */
 
 // Errors
@@ -21,9 +24,18 @@ export * from "./observability.js";
 // CLI Flags
 export * from "./cli-flags.js";
 
+// CLI Base
+export * from "./cli-base.js";
+
 // Metadata
 export * from "./metadata.js";
 
 // Types
 export * from "./types.js";
+
+// Validation
+export * from "./validation.js";
+
+// Idempotency
+export * from "./idempotency.js";
 

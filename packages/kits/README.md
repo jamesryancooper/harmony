@@ -159,22 +159,84 @@ if (!budgetCheck.allowed) {
 
 See [`costkit/README.md`](./costkit/README.md) for detailed documentation.
 
+## CLI Usage
+
+All kits provide consistent CLI interfaces with standard flags:
+
+```bash
+# FlowKit - run workflows
+flowkit run flows/my-workflow.flow.json --dry-run
+flowkit run flows/my-workflow.flow.json --risk T2 --stage implement
+
+# PromptKit - compile prompts
+promptkit compile spec-from-intent --vars '{"intent":"Add auth"}'
+promptkit list
+promptkit validate spec-from-intent --vars '{"intent":"Add auth"}'
+
+# GuardKit - check AI output
+guardkit check "AI generated content"
+guardkit sanitize "User input to sanitize"
+guardkit quick-check "Content to check"
+
+# CostKit - manage costs
+costkit estimate --workflow code-from-plan --tier T2
+costkit status --period monthly
+costkit summary
+```
+
+### Standard CLI Flags
+
+All kit CLIs support these standard flags:
+
+```
+--dry-run, -n              Validate without side effects (default: true in local)
+--stage, -s <stage>        Lifecycle stage: spec|plan|implement|verify|ship|operate|learn
+--risk, -r <tier>          Risk tier: T1|T2|T3
+--risk-level <level>       Risk level: trivial|low|medium|high
+--idempotency-key, -i <key> Idempotency key for mutating operations
+--cache-key, -c <key>      Cache key for pure/expensive operations
+--trace, -t                Enable trace linking
+--trace-parent <id>        Parent trace ID for correlation
+--verbose, -v              Enable verbose output
+--format, -f <format>      Output format: json|text (default: text)
+--enable-run-records       Enable run record generation (default: true)
+--runs-dir <dir>           Directory to write run records
+```
+
 ## Shared Infrastructure (kit-base)
 
 All kits share common infrastructure from `@harmony/kit-base`:
 
-- **Types**: Common types like `KitState`, `LifecycleStage`, `RiskTier`
-- **Errors**: Typed errors (`InputValidationError`, `PolicyViolationError`, etc.)
+- **Types**: Common types like `KitState`, `LifecycleStage`, `RiskTier`, `HarmonyPillar`
+- **Errors**: Typed errors (`InputValidationError`, `PolicyViolationError`, `IdempotencyConflictError`, etc.)
 - **Observability**: Tracing helpers (`createKitSpan`, `withKitSpan`, `emitStateTransition`)
-- **Run Records**: Standardized audit trail creation
-- **CLI Flags**: Standard flag parsing (`--dry-run`, `--stage`, `--risk`)
+- **Run Records**: Standardized audit trail creation (default: enabled)
+- **CLI Base**: Standard CLI scaffolding and flag parsing
+- **Validation**: Zod-based schema validation utilities
+- **Idempotency**: Key generation and conflict detection
 
 ```typescript
 import { 
+  // Errors
   InputValidationError,
   PolicyViolationError,
+  IdempotencyConflictError,
+  
+  // Observability
   createKitSpan,
+  withKitSpan,
+  
+  // CLI
   parseStandardFlags,
+  runKitCli,
+  
+  // Validation
+  validateWithSchema,
+  z,
+  
+  // Idempotency
+  deriveIdempotencyKey,
+  withIdempotency,
 } from '@harmony/kit-base';
 ```
 

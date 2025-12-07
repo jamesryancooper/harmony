@@ -134,7 +134,7 @@ export class PromptKit {
       catalogPath: config.catalogPath,
       enableTracing: config.enableTracing ?? false,
       defaultModel: config.defaultModel ?? "gpt-4o",
-      enableRunRecords: config.enableRunRecords ?? false,
+      enableRunRecords: config.enableRunRecords ?? true,
       runsDir: config.runsDir,
     };
 

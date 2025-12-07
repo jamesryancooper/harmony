@@ -15,118 +15,17 @@ import { pathToFileURL, URL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 
 import {
+  parseStandardFlags,
+  getStandardFlagsHelp,
+  type StandardKitFlags,
+} from "@harmony/kit-base";
+
+import {
   createHttpFlowRunner,
   type FlowConfig,
   type FlowRunResult,
   type FlowRunner
-} from "./index";
-
-/**
- * Standard flags supported by all kits (aligned with kit-base/cli-flags).
- */
-interface StandardKitFlags {
-  dryRun: boolean;
-  stage?: "spec" | "plan" | "implement" | "verify" | "ship" | "operate" | "learn";
-  risk?: "T1" | "T2" | "T3";
-  idempotencyKey?: string;
-  cacheKey?: string;
-  trace?: boolean;
-  traceParent?: string;
-  verbose?: boolean;
-  format?: "json" | "text";
-}
-
-/**
- * Default flag values.
- */
-const DEFAULT_KIT_FLAGS: StandardKitFlags = {
-  dryRun: process.env.HARMONY_ENV !== "prod" && process.env.HARMONY_ENV !== "preview",
-  verbose: false,
-  format: "json", // FlowKit defaults to JSON for machine consumption
-};
-
-/**
- * Parse standard kit flags from argv.
- */
-function parseStandardFlags(argv: string[]): {
-  flags: StandardKitFlags;
-  remaining: string[];
-} {
-  const flags: StandardKitFlags = { ...DEFAULT_KIT_FLAGS };
-  const remaining: string[] = [];
-
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
-
-    if (arg === "--") {
-      remaining.push(...argv.slice(i + 1));
-      break;
-    }
-
-    if (arg.startsWith("--")) {
-      const [rawKey, ...valueParts] = arg.slice(2).split("=");
-      const hasValue = valueParts.length > 0;
-      const value = hasValue ? valueParts.join("=") : undefined;
-
-      switch (rawKey) {
-        case "dry-run":
-          flags.dryRun = value ? value === "true" : true;
-          continue;
-        case "stage":
-          flags.stage = (value || argv[++i]) as StandardKitFlags["stage"];
-          continue;
-        case "risk":
-          flags.risk = (value || argv[++i])?.toUpperCase() as StandardKitFlags["risk"];
-          continue;
-        case "idempotency-key":
-          flags.idempotencyKey = value || argv[++i];
-          continue;
-        case "cache-key":
-          flags.cacheKey = value || argv[++i];
-          continue;
-        case "trace":
-          flags.trace = value ? value === "true" : true;
-          continue;
-        case "trace-parent":
-          flags.traceParent = value || argv[++i];
-          continue;
-        case "verbose":
-          flags.verbose = true;
-          continue;
-        case "format":
-          flags.format = (value || argv[++i]) as "json" | "text";
-          continue;
-      }
-    } else if (arg.startsWith("-")) {
-      const key = arg.slice(1);
-      switch (key) {
-        case "n":
-          flags.dryRun = true;
-          continue;
-        case "s":
-          if (i + 1 < argv.length && !argv[i + 1].startsWith("-")) {
-            flags.stage = argv[++i] as StandardKitFlags["stage"];
-          }
-          continue;
-        case "r":
-          if (i + 1 < argv.length && !argv[i + 1].startsWith("-")) {
-            flags.risk = argv[++i].toUpperCase() as StandardKitFlags["risk"];
-          }
-          continue;
-        case "t":
-          flags.trace = true;
-          continue;
-        case "v":
-          flags.verbose = true;
-          continue;
-      }
-    }
-
-    remaining.push(arg);
-  }
-
-  return { flags, remaining };
-}
+} from "./index.js";
 
 interface FlowConfigFile {
   /**
@@ -650,7 +549,7 @@ export const runCli = async (
  */
 function printUsage(): void {
   console.log(`
-FlowKit CLI - Workflow orchestration for Harmony
+FlowKit CLI v0.1.0 - Workflow orchestration for Harmony
 
 USAGE:
   flowkit run <path/to/flow.flow.json> [options]
@@ -658,18 +557,7 @@ USAGE:
 ARGUMENTS:
   <flow.flow.json>      Path to flow configuration file
 
-STANDARD KIT FLAGS:
-  --dry-run, -n         Validate config without executing (default: true in local)
-  --stage, -s <stage>   Lifecycle stage: spec|plan|implement|verify|ship|operate|learn
-  --risk, -r <tier>     Risk tier: T1|T2|T3
-  --idempotency-key <key> Idempotency key for operations
-  --cache-key <key>     Cache key for pure operations
-  --trace, -t           Enable trace linking
-  --trace-parent <id>   Parent trace ID for correlation
-
-OUTPUT OPTIONS:
-  --format <format>     Output format: json (default), text
-  --verbose, -v         Verbose output
+${getStandardFlagsHelp()}
 
 ENVIRONMENT:
   FLOWKIT_RUNNER_URL    Override flow runner URL

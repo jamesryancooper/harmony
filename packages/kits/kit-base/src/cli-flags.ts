@@ -45,6 +45,12 @@ export interface StandardKitFlags {
 
   /** Output format (json, text) */
   format?: "json" | "text";
+
+  /** Enable run record generation (default: true) */
+  enableRunRecords: boolean;
+
+  /** Directory to write run records */
+  runsDir?: string;
 }
 
 /**
@@ -54,6 +60,7 @@ export const DEFAULT_FLAGS: StandardKitFlags = {
   dryRun: process.env.HARMONY_ENV !== "prod" && process.env.HARMONY_ENV !== "preview",
   verbose: false,
   format: "text",
+  enableRunRecords: true,
 };
 
 /**
@@ -72,6 +79,8 @@ const FLAG_ALIASES: Record<string, keyof StandardKitFlags> = {
   "trace-parent": "traceParent",
   v: "verbose",
   f: "format",
+  "enable-run-records": "enableRunRecords",
+  "runs-dir": "runsDir",
 };
 
 /**
@@ -79,7 +88,7 @@ const FLAG_ALIASES: Record<string, keyof StandardKitFlags> = {
  */
 function parseValue(key: keyof StandardKitFlags, value: string | boolean): unknown {
   // Boolean flags
-  if (key === "dryRun" || key === "trace" || key === "verbose") {
+  if (key === "dryRun" || key === "trace" || key === "verbose" || key === "enableRunRecords") {
     if (typeof value === "boolean") return value;
     return value === "true" || value === "1" || value === "";
   }
@@ -225,14 +234,14 @@ export function parseStandardFlags(
  */
 function isStandardFlag(key: string): key is keyof StandardKitFlags {
   return key in DEFAULT_FLAGS ||
-    ["stage", "risk", "riskLevel", "idempotencyKey", "cacheKey", "traceParent"].includes(key);
+    ["stage", "risk", "riskLevel", "idempotencyKey", "cacheKey", "traceParent", "runsDir"].includes(key);
 }
 
 /**
  * Check if a flag is a boolean flag.
  */
 function isBooleanFlag(key: keyof StandardKitFlags): boolean {
-  return key === "dryRun" || key === "trace" || key === "verbose";
+  return key === "dryRun" || key === "trace" || key === "verbose" || key === "enableRunRecords";
 }
 
 /**
@@ -264,6 +273,8 @@ export function formatFlags(flags: StandardKitFlags): string {
   if (flags.traceParent) lines.push(`--trace-parent=${flags.traceParent}`);
   if (flags.verbose) lines.push("--verbose");
   if (flags.format && flags.format !== "text") lines.push(`--format=${flags.format}`);
+  if (!flags.enableRunRecords) lines.push("--enable-run-records=false");
+  if (flags.runsDir) lines.push(`--runs-dir=${flags.runsDir}`);
 
   return lines.join(" ");
 }
@@ -284,6 +295,8 @@ Standard Flags:
   --trace-parent <id>        Parent trace ID for correlation
   --verbose, -v              Enable verbose output
   --format, -f <format>      Output format: json|text (default: text)
+  --enable-run-records       Enable run record generation (default: true)
+  --runs-dir <dir>           Directory to write run records
 `.trim();
 }
 

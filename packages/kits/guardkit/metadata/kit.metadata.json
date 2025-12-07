@@ -13,15 +13,21 @@
   },
   "policy": {
     "rules": ["no-secrets", "no-pii", "no-injection"],
+    "rulesetVersion": "1.0.0",
     "failClosed": true
   },
   "determinism": {
-    "ai": null
+    "ai": null,
+    "artifactNaming": "guard-{checkId}"
   },
   "safety": {
     "hitl": {
       "requiredFor": ["high"]
     }
+  },
+  "idempotency": {
+    "required": false,
+    "idempotencyKeyFrom": ["contentHash", "checkType"]
   },
   "dryRun": {
     "supported": true

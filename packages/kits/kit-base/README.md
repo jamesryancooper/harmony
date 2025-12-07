@@ -3,9 +3,12 @@
 Shared infrastructure for Harmony Kits providing foundational utilities for:
 
 - **Typed Errors** — Semantic error classes with standard exit codes
-- **Run Records** — Structured audit logs for every kit operation
+- **Run Records** — Structured audit logs for every kit operation (default: enabled)
 - **Observability** — OpenTelemetry helpers for consistent tracing
 - **CLI Flags** — Standard flag parsing across all kit CLIs
+- **CLI Base** — Scaffolding for building consistent kit CLIs
+- **Validation** — Zod-based schema validation utilities
+- **Idempotency** — Key generation and conflict detection
 - **Metadata** — Kit metadata types and loading utilities
 
 ## Installation
@@ -238,6 +241,8 @@ Standard flags parsed consistently across all kit CLIs.
 | `--trace-parent` | — | string | — | Parent trace ID |
 | `--verbose` | `-v` | boolean | false | Verbose output |
 | `--format` | `-f` | enum | text | Output format (json/text) |
+| `--enable-run-records` | — | boolean | true | Enable run record generation |
+| `--runs-dir` | — | string | — | Directory to write run records |
 
 ### Usage
 
@@ -317,6 +322,187 @@ if (!validation.valid) {
   console.error(validation.errors);
 }
 ```
+
+## Validation
+
+Zod-based schema validation utilities for runtime type safety.
+
+### Usage
+
+```typescript
+import {
+  z,
+  validateWithSchema,
+  safeValidate,
+  createValidator,
+  BaseKitConfigSchema,
+  KitMetadataSchema,
+} from "@harmony/kit-base";
+
+// Create a schema
+const MyConfigSchema = z.object({
+  name: z.string(),
+  count: z.number().positive(),
+});
+
+// Validate with throwing
+const config = validateWithSchema(MyConfigSchema, input, "MyConfig");
+// Throws InputValidationError on failure
+
+// Safe validation (no throw)
+const result = safeValidate(MyConfigSchema, input);
+if (!result.success) {
+  console.error(result.errors);
+}
+
+// Create reusable validator
+const validateMyConfig = createValidator(MyConfigSchema, "MyConfig");
+const config = validateMyConfig(input);
+
+// Extend base kit config
+const ExtendedConfigSchema = BaseKitConfigSchema.merge(
+  z.object({
+    customOption: z.string(),
+  })
+);
+```
+
+### Built-in Schemas
+
+| Schema | Description |
+|--------|-------------|
+| `BaseKitConfigSchema` | Base config (enableRunRecords, runsDir, dryRun, idempotencyKey) |
+| `KitMetadataSchema` | Kit metadata (v1.1 - determinism, safety, idempotency required) |
+| `HarmonyPillarSchema` | Pillar enumeration |
+| `LifecycleStageSchema` | Lifecycle stage enumeration |
+| `RiskTierSchema` | Risk tier (T1/T2/T3) |
+| `RiskLevelSchema` | Risk level enumeration |
+
+## Idempotency
+
+Key generation and conflict detection for deterministic operations.
+
+### Usage
+
+```typescript
+import {
+  deriveIdempotencyKey,
+  hashInputs,
+  withIdempotency,
+  checkIdempotencyKey,
+  IdempotencyManager,
+} from "@harmony/kit-base";
+
+// Derive a stable idempotency key
+const key = deriveIdempotencyKey({
+  kitName: "flowkit",
+  operation: "run",
+  stableInputs: { flowName: "my-flow", config: "..." },
+  gitSha: "abc123",
+  stage: "implement",
+});
+// => "flowkit:run:a1b2c3d4e5f6g7h8"
+
+// Execute with idempotency protection
+const { result, cached, runId } = await withIdempotency(
+  key,
+  "flowkit",
+  "run",
+  inputs,
+  async () => {
+    return await executeOperation();
+  }
+);
+
+if (cached) {
+  console.log("Operation already completed:", runId);
+}
+
+// Manual checking
+const existing = checkIdempotencyKey(key, "flowkit", "run", inputs);
+if (existing) {
+  console.log("Already processed:", existing.runId);
+}
+
+// Direct manager access
+const manager = new IdempotencyManager({
+  pendingTtlMs: 60 * 60 * 1000,    // 1 hour
+  completedTtlMs: 24 * 60 * 60 * 1000,  // 24 hours
+});
+```
+
+### Key Derivation
+
+Keys are derived from:
+- Kit name
+- Operation name
+- Stable inputs (JSON stringified, keys sorted)
+- Git SHA (optional)
+- Lifecycle stage (optional)
+
+Format: `<kitName>:<operation>:<hash>`
+
+## CLI Base
+
+Scaffolding for building consistent kit CLIs.
+
+### Usage
+
+```typescript
+import {
+  runKitCli,
+  success,
+  dryRunSuccess,
+  failure,
+  withKitMetadata,
+  type CliCommand,
+  type KitCliConfig,
+} from "@harmony/kit-base";
+
+// Define commands
+const checkCommand: CliCommand = {
+  name: "check",
+  description: "Check content for issues",
+  args: [{ name: "content", description: "Content to check", required: true }],
+  options: [
+    { name: "threshold", alias: "t", description: "Block threshold", type: "string" },
+  ],
+  async handler(args, options) {
+    if (options.dryRun) {
+      return dryRunSuccess({ status: "dry-run" }, "Would check content");
+    }
+    
+    const result = await performCheck(args[0], options);
+    
+    return success(
+      withKitMetadata(result, "mykit", "0.1.0", options),
+      "Check completed"
+    );
+  },
+};
+
+// Configure CLI
+const config: KitCliConfig = {
+  name: "mykit",
+  version: "0.1.0",
+  description: "My custom kit",
+  commands: [checkCommand],
+};
+
+// Run CLI
+runKitCli(config).then((exitCode) => {
+  process.exitCode = exitCode;
+});
+```
+
+### Helper Functions
+
+| Function | Description |
+|----------|-------------|
+| `success(data?, message?)` | Create success result |
+| `dryRunSuccess(data?, message?)` | Create dry-run success result |
+| `failure(message, exitCode?)` | Create failure result |
+| `withKitMetadata(data, name, version, flags)` | Add `_kit` metadata block |
 
 ## Types
 

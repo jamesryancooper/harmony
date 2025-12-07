@@ -224,7 +224,7 @@ export class CostKit {
       enableEstimates: config.enableEstimates !== false,
       requireEstimateThreshold: config.requireEstimateThreshold ?? 0.10,
       alertHandler: config.alertHandler,
-      enableRunRecords: config.enableRunRecords ?? false,
+      enableRunRecords: config.enableRunRecords ?? true,
       runsDir: config.runsDir,
     } as Required<CostKitConfig>;
 

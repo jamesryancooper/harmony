@@ -11,6 +11,11 @@
     "requiredSpans": ["kit.promptkit.compile"],
     "logRedaction": true
   },
+  "policy": {
+    "rules": ["prompt-exists", "variables-valid", "within-context-window"],
+    "rulesetVersion": "1.0.0",
+    "failClosed": true
+  },
   "determinism": {
     "ai": {
       "promptHashAlgorithm": "sha256"
@@ -21,6 +26,10 @@
     "hitl": {
       "requiredFor": []
     }
+  },
+  "idempotency": {
+    "required": false,
+    "idempotencyKeyFrom": ["promptId", "variablesHash", "variantId"]
   },
   "dryRun": {
     "supported": true

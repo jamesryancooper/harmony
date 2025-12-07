@@ -1,10 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://harmony.local/schemas/kit-base/kit-metadata.v1.json",
+  "$id": "https://harmony.local/schemas/kit-base/kit-metadata.v1.1.json",
   "title": "KitMetadata",
-  "description": "Kit metadata conforming to Harmony methodology v0.2",
+  "description": "Kit metadata conforming to Harmony methodology v0.2. Schema v1.1 - determinism, safety, and idempotency are now required.",
   "type": "object",
-  "required": ["name", "version", "pillars", "lifecycleStages", "inputsSchema", "outputsSchema", "observability"],
+  "required": ["name", "version", "pillars", "lifecycleStages", "inputsSchema", "outputsSchema", "observability", "determinism", "safety", "idempotency"],
   "properties": {
     "name": {
       "type": "string",

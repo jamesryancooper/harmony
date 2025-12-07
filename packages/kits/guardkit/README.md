@@ -307,6 +307,49 @@ import {
 } from '@harmony/guardkit';
 ```
 
+## CLI Usage
+
+GuardKit provides a CLI for direct access to guardrail checks:
+
+```bash
+# Run full guardrail check on content
+guardkit check "AI generated content to check"
+guardkit check --file output.ts
+
+# Sanitize user input
+guardkit sanitize "User input with potential issues"
+
+# Fast preliminary check
+guardkit quick-check "Content to verify"
+
+# Dry-run mode (default in local)
+guardkit check --dry-run "Content"
+
+# JSON output
+guardkit check --format json "Content"
+
+# With risk tier and stage
+guardkit check --risk T3 --stage verify "Content"
+```
+
+### CLI Commands
+
+| Command | Description |
+|---------|-------------|
+| `check` | Run all guardrail checks on content |
+| `sanitize` | Sanitize content for safe use in prompts |
+| `quick-check` | Fast safety check (less thorough) |
+
+### CLI Options
+
+| Option | Description |
+|--------|-------------|
+| `--file, -F` | Read content from file |
+| `--project-root` | Project root for import verification |
+| `--threshold` | Block threshold: critical\|high\|medium\|low |
+
+Plus all [standard kit flags](#standard-flags).
+
 ## Integration with Harmony CLI
 
 GuardKit powers the `harmony check` command:

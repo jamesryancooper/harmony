@@ -28,7 +28,9 @@
   },
   "bin": {
     "promptkit": "./promptkit/dist/cli.js",
-    "flowkit": "./flowkit/dist/cli.js"
+    "flowkit": "./flowkit/dist/cli.js",
+    "guardkit": "./guardkit/dist/cli.js",
+    "costkit": "./costkit/dist/cli.js"
   },
   "scripts": {
     "build": "tsc -b",

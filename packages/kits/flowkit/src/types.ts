@@ -175,7 +175,7 @@ export interface HttpFlowRunnerOptions {
   headers?: Record<string, string>;
 
   /**
-   * Enable run record generation (default: false).
+   * Enable run record generation (default: true).
    */
   enableRunRecords?: boolean;
 

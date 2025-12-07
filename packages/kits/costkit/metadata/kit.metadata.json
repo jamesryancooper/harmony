@@ -13,6 +13,7 @@
   },
   "policy": {
     "rules": ["budget-check", "tier-compliance"],
+    "rulesetVersion": "1.0.0",
     "failClosed": false
   },
   "determinism": {
@@ -23,6 +24,10 @@
     "hitl": {
       "requiredFor": ["high"]
     }
+  },
+  "idempotency": {
+    "required": true,
+    "idempotencyKeyFrom": ["model", "inputTokens", "outputTokens", "workflowType", "timestamp"]
   },
   "dryRun": {
     "supported": true

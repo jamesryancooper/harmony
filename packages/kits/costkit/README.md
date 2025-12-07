@@ -294,6 +294,59 @@ alerts:
 | `getTierModels(tier, stage)` | Get models for a tier |
 | `getCheapestModel(options)` | Find cheapest model meeting requirements |
 
+## CLI Usage
+
+CostKit provides a CLI for direct cost management:
+
+```bash
+# Get cost estimate for a workflow
+costkit estimate --workflow code-from-plan --tier T2 --workflow-stage final
+
+# Check current budget status
+costkit status --period monthly
+
+# Get cost summary
+costkit summary --period monthly
+
+# Record usage (typically called by other kits)
+costkit record --model gpt-4o --input-tokens 5000 --output-tokens 3000
+
+# View unacknowledged alerts
+costkit alerts
+
+# Dry-run mode (default in local)
+costkit estimate --dry-run --workflow code-from-plan
+
+# JSON output
+costkit status --format json
+```
+
+### CLI Commands
+
+| Command | Description |
+|---------|-------------|
+| `estimate` | Get cost estimate for a workflow |
+| `status` | Check current budget status |
+| `summary` | Get cost summary for a period |
+| `record` | Record actual LLM usage |
+| `alerts` | Show unacknowledged alerts |
+
+### CLI Options
+
+| Option | Description |
+|--------|-------------|
+| `--workflow, -w` | Workflow type (e.g., code-from-plan) |
+| `--tier` | Risk tier: T1\|T2\|T3 |
+| `--workflow-stage` | Workflow stage: draft\|final |
+| `--period, -p` | Budget period: daily\|weekly\|monthly |
+| `--model, -m` | Model name (for record) |
+| `--input-tokens` | Number of input tokens |
+| `--output-tokens` | Number of output tokens |
+| `--policy-path` | Path to cost policy YAML |
+| `--data-path` | Path to cost data file |
+
+Plus all [standard kit flags](#standard-flags).
+
 ## Integration with Harmony CLI
 
 CostKit is integrated into the Harmony CLI:

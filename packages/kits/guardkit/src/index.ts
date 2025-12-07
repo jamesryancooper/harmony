@@ -130,7 +130,7 @@ export interface GuardKitConfig {
   /** Severity threshold for blocking (critical, high, medium, low) */
   blockThreshold?: Severity;
 
-  /** Enable run record generation (default: false) */
+  /** Enable run record generation (default: true) */
   enableRunRecords?: boolean;
 
   /** Directory to write run records (default: ./runs) */
@@ -151,7 +151,7 @@ const DEFAULT_CONFIG: Required<GuardKitConfig> = {
   checkPii: true,
   checkCodeSafety: true,
   blockThreshold: "high",
-  enableRunRecords: false,
+  enableRunRecords: true,
   runsDir: "",
 };
 
