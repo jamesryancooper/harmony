@@ -9,10 +9,27 @@ Modular building blocks for Harmony AI agents. Kits provide reusable functionali
 | Document | Purpose |
 |----------|---------|
 | **[README.md](./README.md)** | Quick start, usage examples, package overview |
-| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Architectural strengths, granularity policy, dependency rules |
+| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Comprehensive architecture documentation (see below) |
 | **[ROADMAP.md](./ROADMAP.md)** | Future considerations, planned enhancements, decision log |
 | **[kit-base/README.md](./kit-base/README.md)** | Shared infrastructure (errors, observability, validation) |
 | **[Methodology-as-Code](../../docs/harmony/ai/methodology/methodology-as-code.md)** | Schema versioning and evolution policy |
+
+### Architecture Documentation Contents
+
+For senior engineers and system architects, [ARCHITECTURE.md](./ARCHITECTURE.md) includes:
+
+| Section | What You'll Find |
+|---------|------------------|
+| [Design Pattern Alignment](./ARCHITECTURE.md#design-pattern-alignment) | How the Kit system aligns with hexagonal, modular monolith, contract-first patterns |
+| [Architectural Assessment](./ARCHITECTURE.md#architectural-assessment) | Evaluation of architecture fit for our goals and constraints |
+| [Architectural Strengths](./ARCHITECTURE.md#architectural-strengths) | Detailed documentation of key capabilities |
+| [Component Matrix](./ARCHITECTURE.md#component-and-responsibility-matrix) | Kit responsibilities, domains, and contracts |
+| [Request Flow](./ARCHITECTURE.md#request-flow-overview) | How requests move through kits |
+| [Source of Truth](./ARCHITECTURE.md#source-of-truth-table) | What lives in schemas, metadata, configs, code |
+| [RACI Matrix](./ARCHITECTURE.md#raci-matrix) | Responsibility assignments for kit operations |
+| [Risks and Anti-Patterns](./ARCHITECTURE.md#risks-and-anti-patterns) | Common pitfalls to avoid |
+| [New Kit Checklist](./ARCHITECTURE.md#new-kit-implementation-checklist) | Implementation checklist for new kits |
+| [Summary](./ARCHITECTURE.md#summary) | Architecture correctness, tradeoffs, next steps |
 
 ## Philosophy
 
