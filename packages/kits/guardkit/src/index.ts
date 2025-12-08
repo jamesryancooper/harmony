@@ -203,12 +203,17 @@ export class GuardKit {
     }});
     const idempotencyKey = options?.idempotencyKey ?? `${KIT_NAME}:check:${contentHash.slice(0, 16)}`;
 
+    // Compute inputsHash once for consistent idempotency tracking
+    // Both checkIdempotencyKey and startOperation must use the same inputsHash
+    const idempotencyInputs = { contentHash };
+    const inputsHash = hashInputs(idempotencyInputs);
+
     // Check for cached result (pure operation - no locking needed)
     const existing = checkIdempotencyKey<GuardrailResult>(
       idempotencyKey,
       KIT_NAME,
       "check",
-      { contentHash }
+      idempotencyInputs
     );
     if (existing?.state === "completed" && existing.cachedResult) {
       console.log(`[guardkit] Returning cached result for idempotency key ${idempotencyKey}`);
@@ -227,10 +232,10 @@ export class GuardKit {
       "idempotency.key": idempotencyKey,
     });
 
-    // Start idempotency tracking
+    // Start idempotency tracking with the same inputsHash used in checkIdempotencyKey
     const manager = getIdempotencyManager();
     const runId = randomUUID();
-    manager.startOperation(idempotencyKey, KIT_NAME, "check", contentHash, runId);
+    manager.startOperation(idempotencyKey, KIT_NAME, "check", inputsHash, runId);
 
     try {
       const checks: GuardrailCheckResult[] = [];

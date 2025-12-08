@@ -73,6 +73,9 @@ lcov.info
 # Logs directory
 logs/
 
+# Run records (centralized via HARMONY_RUNS_DIR)
+runs/
+
 # Package manager lockfiles (non-pnpm)
 package-lock.json
 yarn.lock

@@ -1,14 +1,235 @@
 # Kit Architecture
 
-This document defines the architectural principles, granularity policy, and dependency rules for the Harmony Kit ecosystem.
+This document defines the architectural principles, strengths, granularity policy, and dependency rules for the Harmony Kit ecosystem.
+
+**Status:** Production-ready architecture (Schema v1.3.0, Methodology v0.2.0)
+
+## Table of Contents
+
+- [Philosophy](#philosophy)
+- [Architectural Strengths](#architectural-strengths)
+- [Kit Granularity Policy](#kit-granularity-policy)
+- [Dependency Rules](#dependency-rules)
+- [Resolving Circular Concerns](#resolving-circular-concerns)
+- [kit-base vs. New Kit Threshold](#kit-base-vs-new-kit-threshold)
+- [Planned Kits Evaluation](#planned-kits-evaluation)
+- [Versioning](#versioning)
+- [Related Documentation](#related-documentation)
+
+---
 
 ## Philosophy
 
 **Kits are modular building blocks for AI agents.** Each kit encapsulates a single, well-scoped responsibility that AI agents orchestrate to accomplish tasks. Human developers rarely interact with kits directly — they orchestrate AI agents via the `harmony` CLI.
 
-```
+```text
 Human → harmony CLI → AI Agents → Kits → Results
 ```
+
+---
+
+## Architectural Strengths
+
+The Kit system architecture is **production-ready** and designed for AI-first consumption with human oversight. This section documents what developers can expect from the architecture.
+
+### 1. Methodology-as-Code
+
+Methodology constraints are encoded into machine-readable schemas, not just documentation.
+
+| What You Get | How It Works |
+|--------------|--------------|
+| **Typed contracts** | JSON schemas + Zod validation enforce structure at runtime |
+| **Version tracking** | All metadata includes `schemaVersion` and `methodologyVersion` |
+| **Safe evolution** | Enforcement modes (`block`, `warn`, `off`) enable graceful transitions |
+| **Deprecation windows** | N-1 version support with explicit migration notes |
+| **CI validation** | `pnpm --filter @harmony/kit-base validate:methodology` |
+
+**What to expect:** When methodology changes, schemas change. AI agents consume schemas directly; humans read documentation. Breaking changes follow semver with deprecation windows.
+
+See [Methodology-as-Code](../../docs/harmony/ai/methodology/methodology-as-code.md) for the full policy.
+
+### 2. Separation of Concerns
+
+Each kit has a single, well-scoped responsibility with clean boundaries.
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  kit-base (cross-cutting infrastructure)                         │
+│  - Types, Errors, Observability, CLI, Validation, Idempotency   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↑
+                              │ requires (all kits)
+                              │
+┌─────────────────────────────────────────────────────────────────┐
+│  Domain Kits (single responsibility each)                        │
+│                                                                   │
+│  FlowKit     → Workflow orchestration                            │
+│  GuardKit    → Safety gates (injection, secrets, hallucination)  │
+│  PromptKit   → Prompt compilation with determinism               │
+│  CostKit     → Budget management and cost tracking               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**What to expect:** Infrastructure code lives in `kit-base`. Domain logic lives in individual kits. You'll never find cost estimation in GuardKit or observability helpers spread across kits.
+
+### 3. Observable by Default
+
+Every kit operation produces observable artifacts for debugging and audit.
+
+| Artifact | Purpose | Default |
+|----------|---------|---------|
+| **OTel spans** | Distributed tracing with `kit.<name>.<action>` naming | Always |
+| **Run records** | JSON audit trail with inputs, outputs, timing | Enabled (`--enable-run-records`) |
+| **Typed errors** | Exit codes 1-8 with semantic meaning | Always |
+| **State events** | `state.enter`, `gate.pass`, `artifact.write` span events | Always |
+
+**What to expect:** You can trace any kit operation from invocation to completion. Run records provide replay capability. Error codes enable deterministic orchestrator decisions.
+
+```bash
+# Query run records
+kit-runs list --kit flowkit --status failure --limit 10
+kit-runs show <runId>
+kit-runs find --trace <traceId>
+kit-runs stats --since 2024-01-01
+```
+
+### 4. Pluggable Idempotency
+
+Operations can be made idempotent with automatic caching and replay.
+
+| Storage Backend | Use Case | Durability |
+|-----------------|----------|------------|
+| `InMemoryIdempotencyStorage` | Single process, testing | Lost on restart |
+| `RunRecordIdempotencyStorage` | Production, services | Survives restarts |
+| Custom implementation | Redis, database, etc. | External |
+
+**What to expect:** When you pass `--idempotency-key`, the system automatically uses durable storage. Repeated calls with the same key return cached results without re-execution.
+
+```typescript
+// Automatic idempotency protection
+const { result, cached, runId } = await withIdempotency(
+  key, kitName, operation, inputs,
+  async () => executeOperation()
+);
+
+if (cached) {
+  console.log('Returned cached result from:', runId);
+}
+```
+
+### 5. Triple Interface Pattern
+
+Every kit exposes three consistent interfaces for different consumers.
+
+| Interface | Primary Consumer | Characteristics |
+|-----------|------------------|-----------------|
+| **Programmatic API** | AI agents, services | Typed, fastest, full control |
+| **HTTP/RPC** | Python/cross-language | Protocol-based, distributed |
+| **CLI** | Humans, CI/CD | Text/JSON output, scriptable |
+
+**What to expect:** All interfaces share the same implementation and return equivalent data structures. Choose based on your consumer's needs, not capability differences.
+
+```typescript
+// Same result, different interfaces
+const api = new GuardKit(config);
+const http = createHttpGuardRunner({ baseUrl });
+const cli = 'guardkit check --format json';
+```
+
+### 6. Fail-Closed Governance
+
+The error taxonomy enables deterministic policy enforcement.
+
+| Exit Code | Error Class | Meaning | Orchestrator Action |
+|-----------|-------------|---------|---------------------|
+| 0 | — | Success | Continue |
+| 1 | `GenericKitError` | Unexpected failure | Retry or escalate |
+| 2 | `PolicyViolationError` | Policy gate blocked | Halt, require human |
+| 3 | `EvaluationFailureError` | Quality gate failed | Retry with different approach |
+| 4 | `GuardViolationError` | Safety issue detected | Block, redact, or sanitize |
+| 5 | `InputValidationError` | Schema validation failed | Fix inputs |
+| 6 | `UpstreamProviderError` | External service failure | Retry with backoff |
+| 7 | `IdempotencyConflictError` | Duplicate operation | Return cached result |
+| 8 | `CacheIntegrityError` | Cache corruption | Invalidate and retry |
+
+**What to expect:** Errors are not just messages — they're typed signals that orchestrators can handle deterministically. Exit code 2 always means "policy blocked this"; exit code 7 always means "already done".
+
+### 7. Run Record Query Capabilities
+
+Run records are first-class observable artifacts with full lifecycle management.
+
+**Centralized Storage (Recommended):**
+
+Set `HARMONY_RUNS_DIR` to aggregate all kit run records in one location:
+
+```bash
+# Via direnv (.envrc) or shell profile
+export HARMONY_RUNS_DIR=$PWD/runs
+
+# Records organized by kit: $HARMONY_RUNS_DIR/<kitName>/*.json
+```
+
+**Query Commands:**
+
+```bash
+# List and filter
+kit-runs list [--kit <name>] [--status success|failure] [--since <date>] [--limit N]
+
+# Inspect individual records
+kit-runs show <runId>
+
+# Find by correlation
+kit-runs find --trace <traceId>
+kit-runs find --idempotency-key <key>
+
+# Statistics and analytics
+kit-runs stats [--kit <name>] [--since <date>] [--until <date>]
+
+# Lifecycle management
+kit-runs cleanup --max-age 30d [--dry-run]
+kit-runs usage
+
+# Export for external systems
+kit-runs export --export-format json --output ./export.json
+kit-runs export --collector-url http://otel-collector:4318
+```
+
+**What to expect:** Run records support query, export, and cleanup. They integrate with OpenTelemetry Collector for centralized observability. Retention policies prevent unbounded growth. See [kit-base/README.md](./kit-base/README.md#run-records) for detailed configuration.
+
+### 8. Typed Dependencies
+
+Kit relationships are explicit and validated.
+
+```json
+{
+  "dependencies": {
+    "requires": ["kit-base"],
+    "orchestrates": ["promptkit", "guardkit"],
+    "integratesWith": ["costkit"]
+  }
+}
+```
+
+| Dependency Type | Meaning | Validation |
+|-----------------|---------|------------|
+| `requires` | Must be available at runtime | Circular forbidden |
+| `orchestrates` | This kit controls another | Unidirectional only |
+| `integratesWith` | Optional integration | Bidirectional OK |
+
+**What to expect:** The dependency graph is explicit and validated. Static analysis can detect circular dependencies before runtime. Documentation is auto-generated from metadata.
+
+### Summary: What Developers Can Expect
+
+| Concern | What You Get |
+|---------|--------------|
+| **Contracts** | Machine-readable schemas, runtime validation, version tracking |
+| **Observability** | OTel tracing, run records, typed errors with exit codes |
+| **Idempotency** | Pluggable storage, automatic replay, key derivation |
+| **Interfaces** | Programmatic API, HTTP, CLI — all consistent |
+| **Governance** | Fail-closed errors, policy enforcement, audit trails |
+| **Evolution** | Semantic versioning, deprecation windows, enforcement modes |
+
+---
 
 ## Kit Granularity Policy
 
@@ -59,7 +280,7 @@ Kit dependencies are categorized into three types with distinct semantics:
 | **orchestrates** | This kit controls/coordinates another | Parent → Child | FlowKit orchestrates GuardKit |
 | **integratesWith** | Optional integration; can work together | Bidirectional OK | CostKit integrates with PromptKit |
 
-### Dependency Rules
+### Enforcement Rules
 
 1. **All kits require kit-base** — This is implicit and one-way
 2. **Kits are orchestrated, not aware of orchestrators** — GuardKit doesn't know FlowKit exists
@@ -69,7 +290,7 @@ Kit dependencies are categorized into three types with distinct semantics:
 
 ### Current Kit Dependency Graph
 
-```
+```text
 kit-base (infrastructure)
     ↑ requires
     |
@@ -100,7 +321,7 @@ When two capabilities seem to need each other (e.g., PolicyKit evaluating EvalKi
 
 ### Example: PolicyKit and EvalKit
 
-```
+```text
 BAD:  PolicyKit ←── requires ──→ EvalKit  (circular!)
 
 GOOD: kit-base defines shared RuleResult schema
@@ -185,9 +406,32 @@ This architecture document aligns with:
 
 Changes to dependency types or granularity policy should bump the schema version.
 
+---
+
 ## Related Documentation
 
-- [Kit README](./README.md) — Package overview and quick start
-- [kit-base README](./kit-base/README.md) — Shared infrastructure documentation
-- [Methodology-as-Code](../../docs/harmony/ai/methodology/methodology-as-code.md) — Schema versioning policy
+| Document | Purpose |
+|----------|---------|
+| [README.md](./README.md) | Package overview and quick start |
+| [ROADMAP.md](./ROADMAP.md) | Future considerations, planned enhancements, decision log |
+| [kit-base/README.md](./kit-base/README.md) | Shared infrastructure documentation |
+| [Methodology-as-Code](../../docs/harmony/ai/methodology/methodology-as-code.md) | Schema versioning policy |
 
+---
+
+## Changelog
+
+### 2024-12 Centralized Run Records
+
+- Added `HARMONY_RUNS_DIR` environment variable for centralized run record storage
+- Documented direnv setup with `.envrc` example
+- Updated Run Record Query Capabilities with centralized storage guidance
+- Added `runs/` to `.gitignore`
+
+### 2024-12 Production-Ready Architecture
+
+- Added comprehensive [Architectural Strengths](#architectural-strengths) section
+- Created [ROADMAP.md](./ROADMAP.md) for future considerations
+- Documented Observable by Default, Pluggable Idempotency, Triple Interface Pattern
+- Added Run Record Query Capabilities documentation
+- Established decision log for architectural choices

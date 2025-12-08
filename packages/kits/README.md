@@ -2,6 +2,18 @@
 
 Modular building blocks for Harmony AI agents. Kits provide reusable functionality that AI agents orchestrate to accomplish tasks.
 
+**Status:** Production-ready architecture (Schema v1.3.0, Methodology v0.2.0)
+
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| **[README.md](./README.md)** | Quick start, usage examples, package overview |
+| **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Architectural strengths, granularity policy, dependency rules |
+| **[ROADMAP.md](./ROADMAP.md)** | Future considerations, planned enhancements, decision log |
+| **[kit-base/README.md](./kit-base/README.md)** | Shared infrastructure (errors, observability, validation) |
+| **[Methodology-as-Code](../../docs/harmony/ai/methodology/methodology-as-code.md)** | Schema versioning and evolution policy |
+
 ## Philosophy
 
 **Kits are designed primarily for AI/automated use via the programmatic API.**
@@ -11,6 +23,22 @@ Human developers orchestrate AI agents via the `harmony` CLI. AI agents use Kits
 ```
 Human → harmony CLI → AI Agents → Kits (Programmatic API) → Results
 ```
+
+## What You Get (Architectural Strengths)
+
+The Kit system is **production-ready** with the following guarantees:
+
+| Capability | What It Means |
+|------------|---------------|
+| **Methodology-as-Code** | Constraints encoded in schemas, not just docs; AI agents consume directly |
+| **Observable by Default** | OTel tracing, run records, typed errors for every operation |
+| **Pluggable Idempotency** | In-memory or durable storage; cached results for repeated calls |
+| **Triple Interface** | Programmatic API, HTTP, CLI — all consistent |
+| **Fail-Closed Governance** | Exit codes 0-8 with semantic meaning for orchestrator decisions |
+| **Typed Dependencies** | Explicit `requires`, `orchestrates`, `integratesWith` relationships |
+| **Version Evolution** | Deprecation windows, enforcement modes, CI validation |
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md#architectural-strengths) for detailed documentation of each strength.
 
 ## Methodology-as-Code
 
@@ -68,8 +96,9 @@ packages/kits/
 ├── costkit/         # LLM cost management (estimation, tracking, budgeting)
 ├── package.json     # Workspace configuration
 ├── tsconfig.json    # Shared TypeScript config
-├── ARCHITECTURE.md  # Kit Granularity Policy and dependency rules
-└── README.md        # This file
+├── README.md        # This file (quick start, usage)
+├── ARCHITECTURE.md  # Architectural strengths, granularity policy, dependencies
+└── ROADMAP.md       # Future considerations, planned enhancements, decisions
 ```
 
 ## Available Kits
@@ -315,7 +344,31 @@ Configuration is resolved differently depending on the interface:
 2. Environment variables
 3. Kit defaults
 
-See [`kit-base/README.md`](./kit-base/README.md) for detailed documentation on configuration precedence.
+### Environment Variables
+
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `HARMONY_RUNS_DIR` | Centralized run records directory | `/path/to/harmony/runs` |
+| `HARMONY_ENFORCEMENT_MODE` | Schema enforcement mode | `block`, `warn`, `off` |
+| `HARMONY_ENV` | Environment identifier | `development`, `production` |
+
+### Recommended Setup (direnv)
+
+Create a `.envrc` file in your project root for automatic environment loading:
+
+```bash
+# .envrc - Harmony environment configuration
+# Loaded automatically by direnv when entering this directory
+
+# Centralized run records directory for all kits
+export HARMONY_RUNS_DIR=$PWD/runs
+```
+
+Then run `direnv allow` to enable. The environment auto-loads when you `cd` into the project.
+
+> **Note:** The `.envrc` file is typically in `.gitignore` for local configuration. Install direnv via `brew install direnv` (macOS) or your package manager.
+
+See [`kit-base/README.md`](./kit-base/README.md) for detailed documentation on configuration and run records.
 
 ## Architecture Overview
 

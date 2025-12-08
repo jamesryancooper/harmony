@@ -220,6 +220,99 @@ process.exit(kitError.code);
 
 Run records capture the full context of every kit operation for reproducibility, governance, observability, and audit trails.
 
+### Configuration
+
+Run records are written to a runs directory with the following priority:
+
+| Priority | Source | Example |
+|----------|--------|---------|
+| 1 | `HARMONY_RUNS_DIR` env var | `export HARMONY_RUNS_DIR=/path/to/runs` |
+| 2 | `runsDir` config option | `new CostKit({ runsDir: './runs' })` |
+| 3 | `--runs-dir` CLI flag | `costkit estimate --runs-dir ./runs` |
+| 4 | Default | `./runs` relative to `process.cwd()` |
+
+**Centralized Runs (Recommended)**
+
+Set `HARMONY_RUNS_DIR` to aggregate run records from all kits in one location:
+
+```bash
+# All kits write to the same centralized location
+costkit estimate --workflow code-from-plan  # -> $HARMONY_RUNS_DIR/costkit/
+guardkit check "content"                    # -> $HARMONY_RUNS_DIR/guardkit/
+flowkit run workflow.json                   # -> $HARMONY_RUNS_DIR/flowkit/
+
+# Query across all kits
+kit-runs list
+kit-runs stats
+```
+
+**Setup Options**
+
+| Method | Best For | Setup |
+|--------|----------|-------|
+| **direnv (Recommended)** | Per-project, auto-loads | Create `.envrc`, run `direnv allow` |
+| Shell profile | Global, all projects | Add to `~/.zshrc` or `~/.bashrc` |
+| Inline | Quick testing | `HARMONY_RUNS_DIR=./runs costkit ...` |
+
+**Option 1: direnv (Recommended for Development)**
+
+Create a `.envrc` file in your project root:
+
+```bash
+# .envrc - Harmony environment configuration
+# Loaded automatically by direnv when entering this directory
+
+# Centralized run records directory for all kits
+export HARMONY_RUNS_DIR=$PWD/runs
+```
+
+Then allow it:
+
+```bash
+direnv allow
+```
+
+Now `HARMONY_RUNS_DIR` auto-loads whenever you `cd` into the project.
+
+> **Note:** Install direnv via `brew install direnv` (macOS) or your package manager. Add the hook to your shell profile per [direnv setup](https://direnv.net/docs/hook.html).
+
+**Option 2: Shell Profile**
+
+Add to `~/.zshrc` or `~/.bashrc`:
+
+```bash
+export HARMONY_RUNS_DIR=/path/to/harmony/runs
+```
+
+**Per-Kit Runs (Default)**
+
+Without `HARMONY_RUNS_DIR`, each kit writes to `./runs` relative to the current working directory. This creates isolated runs per package, which is fine for single-kit testing but makes cross-kit queries difficult.
+
+**Directory Structure**
+
+With centralized runs enabled, records are organized by kit:
+
+```
+$HARMONY_RUNS_DIR/
+├── costkit/
+│   └── 2025-12-08T11-12-39Z-costkit-528c.json
+├── guardkit/
+│   └── 2025-12-08T11-13-48Z-guardkit-65fc.json
+├── flowkit/
+│   └── 2025-12-08T14-00-00Z-flowkit-a1b2.json
+└── promptkit/
+    └── 2025-12-08T14-05-00Z-promptkit-c3d4.json
+```
+
+**Gitignore**
+
+Add `runs/` to your `.gitignore` — run records are typically not committed:
+
+```gitignore
+# Run records (centralized via HARMONY_RUNS_DIR)
+runs/
+```
+
 ### Format
 
 ```typescript

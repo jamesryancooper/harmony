@@ -187,12 +187,17 @@ export class PromptKit {
       },
     });
 
+    // Compute inputsHash once for consistent idempotency tracking
+    // Both checkIdempotencyKey and startOperation must use the same inputsHash
+    const idempotencyInputs = { promptId, variablesHash };
+    const inputsHash = hashInputs(idempotencyInputs);
+
     // Check for cached result (pure operation - no locking needed)
     const existing = checkIdempotencyKey<CompiledPrompt>(
       idempotencyKey,
       KIT_NAME,
       "compile",
-      { promptId, variablesHash }
+      idempotencyInputs
     );
     if (existing?.state === "completed" && existing.cachedResult) {
       console.log(`[promptkit] Returning cached result for idempotency key ${idempotencyKey}`);
@@ -209,10 +214,10 @@ export class PromptKit {
       "idempotency.key": idempotencyKey,
     });
 
-    // Start idempotency tracking
+    // Start idempotency tracking with the same inputsHash used in checkIdempotencyKey
     const manager = getIdempotencyManager();
     const runId = randomUUID();
-    manager.startOperation(idempotencyKey, KIT_NAME, "compile", variablesHash, runId);
+    manager.startOperation(idempotencyKey, KIT_NAME, "compile", inputsHash, runId);
 
     try {
     // Load the prompt

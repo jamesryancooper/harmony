@@ -335,6 +335,10 @@ export function createRunRecord(options: CreateRunRecordOptions): RunRecord {
  * Get the default runs directory for a workspace.
  */
 export function getRunsDirectory(workspaceRoot: string): string {
+  // Check for environment variable override
+  if (process.env.HARMONY_RUNS_DIR) {
+    return process.env.HARMONY_RUNS_DIR;
+  }
   return join(workspaceRoot, "runs");
 }
 

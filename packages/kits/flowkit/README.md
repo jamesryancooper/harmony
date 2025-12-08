@@ -76,9 +76,11 @@ interface HttpFlowRunnerOptions {
   timeoutMs?: number;        // Request timeout
   headers?: Record<string, string>;  // Custom headers
   enableRunRecords?: boolean;  // Enable run records (default: true)
-  runsDir?: string;          // Directory to write run records
+  runsDir?: string;          // Directory to write run records (default: $HARMONY_RUNS_DIR or ./runs)
 }
 ```
+
+> **Tip:** Set `HARMONY_RUNS_DIR` environment variable for centralized run records across all kits. See [kit-base/README.md](../kit-base/README.md#run-records) for setup.
 
 ### FlowRunResult
 

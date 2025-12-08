@@ -53,9 +53,15 @@ interface PromptKitConfig {
   /** Enable run record generation (default: true) */
   enableRunRecords?: boolean;
 
-  /** Directory to write run records */
+  /** Directory to write run records (default: $HARMONY_RUNS_DIR or ./runs) */
   runsDir?: string;
 }
+```
+
+> **Tip:** Set `HARMONY_RUNS_DIR` environment variable for centralized run records across all kits. See [kit-base/README.md](../kit-base/README.md#run-records) for setup.
+
+```typescript
+// Example with explicit runsDir (usually not needed with HARMONY_RUNS_DIR)
 ```
 
 ### Key Methods
