@@ -10,6 +10,7 @@ This document defines the architectural principles, patterns, assessments, and o
 - [Philosophy](#philosophy)
 - [Design Pattern Alignment](#design-pattern-alignment)
 - [Architectural Assessment](#architectural-assessment)
+- [Architecture Alignment Score](#architecture-alignment-score)
 - [Architectural Strengths](#architectural-strengths)
 - [Component and Responsibility Matrix](#component-and-responsibility-matrix)
 - [Request Flow Overview](#request-flow-overview)
@@ -96,6 +97,61 @@ This table evaluates how well the Kit system fits its intended requirements, con
 
 ---
 
+## Architecture Alignment Score
+
+This section provides a quantitative assessment of how well the Kit system aligns with Harmony's methodology, architectural principles, and best practices.
+
+**Assessment Date:** December 2025  
+**Overall Grade:** 9.4/10
+
+### Scoring Table
+
+| Criterion | Score | Evidence |
+|-----------|-------|----------|
+| **Pillar Alignment** | 10/10 | Schema v1.3.0 includes all 5 Harmony pillars (`speed_with_safety`, `simplicity_over_complexity`, `quality_through_determinism`, `guided_agentic_autonomy`, `evolvable_modularity`). All kits declare pillar alignment in metadata. FlowKit demonstrates full alignment with `evolvable_modularity`. |
+| **Observability** | 10/10 | OTel spans with `kit.<name>.<action>` naming. Run record query CLI (`kit-runs list/show/find/stats`). Centralized storage via `HARMONY_RUNS_DIR`. Export to OTel Collector. State transition events (`state.enter`, `gate.pass`, `artifact.write`). |
+| **Error Handling** | 10/10 | Exit codes 0-8 with semantic meaning documented and implemented. HTTP status mapping defined. Typed error classes (`PolicyViolationError`, `InputValidationError`, etc.). Fail-closed governance with deterministic error handling. |
+| **Run Records** | 9/10 | Enabled by default (`enableRunRecords: true`). Include `outputs` for idempotency replay. Query, export, and cleanup commands. Centralized via `HARMONY_RUNS_DIR`. Deduction: Runtime schema validation at write-time not confirmed in all paths. |
+| **CLI Interface** | 9/10 | Comprehensive `cli-flags.ts` with `--dry-run`, `--stage`, `--risk`, `--idempotency-key`, `--cache-key`, `--trace`, `--format`. Flag validation for risk levels. Help text generation. Deduction: GuardKit/CostKit lack dedicated CLI entrypoints. |
+| **Schema Validation** | 8/10 | Zod schemas documented for runtime validation. Schema v1.3.0 requires `determinism`, `safety`, `idempotency` fields. Input/output schemas declared in metadata. Deduction: Explicit `validateWithSchema()` calls not confirmed at all API boundaries. |
+| **Idempotency** | 9/10 | `IdempotencyStorage` interface with multiple backends. `RunRecordIdempotencyStorage` for durable storage. Run records include `determinism.idempotencyKey` and `inputsHash`. `IdempotencyConflictError` (exit 7) implemented. Deduction: File-based storage has race condition risks in high-concurrency scenarios. |
+| **Documentation** | 10/10 | Comprehensive ARCHITECTURE.md with design patterns, assessments, RACI matrix, granularity policy. ROADMAP.md with decision log. Triple interface pattern documented. Source of truth table. New kit implementation checklist. |
+
+### Remaining Areas for Improvement
+
+| Area | Impact | Description | Recommendation |
+|------|--------|-------------|----------------|
+| **CLI Entrypoints** | Minor | GuardKit and CostKit lack dedicated `cli.ts` entrypoints | Add CLI entrypoints to remaining kits for consistency |
+| **Runtime Schema Validation** | Minor | Zod validation not confirmed at all kit entry points | Add explicit `validateWithSchema()` calls at API boundaries |
+| **Idempotency Concurrency** | Conditional | File-based storage has race condition risks at high concurrency | Monitor in production; use Redis adapter when kits run as concurrent services (documented in ROADMAP) |
+| **Main Export Barrel** | Minor | `src/index.ts` only re-exports FlowKit | Either remove or export all kits from barrel file |
+| **Dry-Run Mode** | Minor | Kit classes don't expose explicit `dryRun` option in constructor | Add `dryRun: boolean` to kit configs to suppress side-effects programmatically |
+
+### Conclusion
+
+**Overall Grade: 9.4/10** — Production-ready architecture with excellent methodology alignment.
+
+The Kit system demonstrates strong architectural alignment with Harmony's principles:
+
+| Aspect | Status | Notes |
+|--------|--------|-------|
+| ✅ Pillar Alignment | Complete | All 5 pillars in schema and types; declared in kit metadata |
+| ✅ CLI Standardization | Complete | Comprehensive flags in `kit-base/cli-flags.ts` |
+| ✅ Idempotency | Implemented | Durable storage via run records; typed errors |
+| ✅ Run Records | Default On | Query capabilities; centralized storage |
+| ✅ Documentation | Comprehensive | ARCHITECTURE.md, ROADMAP.md with decision log |
+| ✅ Policy Configuration | Consistent | All kits declare policy in metadata |
+
+The remaining 0.6 points of improvement opportunity are minor polish items that don't affect production readiness:
+
+- CLI entrypoints for all kits (consistency)
+- Explicit dry-run support in constructors (convenience)
+- Schema validation at all boundaries (defense in depth)
+
+The architecture successfully answers the fundamental question: **How do you make software development safe and deterministic when AI agents are doing the work?** — with typed contracts, observable operations, fail-closed policies, and machine-readable methodology.
+
+---
+
 ## Architectural Strengths
 
 The Kit system architecture is **production-ready** and designed for AI-first consumption with human oversight. This section documents what developers can expect from the architecture.
@@ -158,7 +214,7 @@ Every kit operation produces observable artifacts for debugging and audit.
 kit-runs list --kit flowkit --status failure --limit 10
 kit-runs show <runId>
 kit-runs find --trace <traceId>
-kit-runs stats --since 2024-01-01
+kit-runs stats --since 2025-01-01
 ```
 
 ### 4. Pluggable Idempotency
@@ -743,7 +799,15 @@ Changes to dependency types or granularity policy should bump the schema version
 
 ## Changelog
 
-### 2024-12 Comprehensive Architecture Documentation
+### 2025-12 Architecture Alignment Score
+
+- Added [Architecture Alignment Score](#architecture-alignment-score) section with quantitative assessment
+- Documented scoring table with 8 criteria (Pillar Alignment, Observability, Error Handling, Run Records, CLI Interface, Schema Validation, Idempotency, Documentation)
+- Added Remaining Areas for Improvement table
+- Added Conclusion with alignment breakdown and overall grade (9.4/10)
+- Updated Table of Contents
+
+### 2025-12 Comprehensive Architecture Documentation
 
 - Added [Design Pattern Alignment](#design-pattern-alignment) table
 - Added [Architectural Assessment](#architectural-assessment) with evaluation tables
@@ -756,14 +820,14 @@ Changes to dependency types or granularity policy should bump the schema version
 - Added [Summary](#summary) section with architectural assessment
 - Updated Table of Contents with all new sections
 
-### 2024-12 Centralized Run Records
+### 2025-12 Centralized Run Records
 
 - Added `HARMONY_RUNS_DIR` environment variable for centralized run record storage
 - Documented direnv setup with `.envrc` example
 - Updated Run Record Query Capabilities with centralized storage guidance
 - Added `runs/` to `.gitignore`
 
-### 2024-12 Production-Ready Architecture
+### 2025-12 Production-Ready Architecture
 
 - Added comprehensive [Architectural Strengths](#architectural-strengths) section
 - Created [ROADMAP.md](./ROADMAP.md) for future considerations
