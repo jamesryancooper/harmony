@@ -19,7 +19,7 @@ import {
   statSync,
   unlinkSync,
 } from "node:fs";
-import { dirname, join, basename } from "node:path";
+import { dirname, join, basename, relative } from "node:path";
 import type {
   LifecycleStage,
   RiskLevel,
@@ -347,6 +347,20 @@ export function getRunRecordPath(runsDir: string, runId: string): string {
   const kitName = parts.length >= 3 ? parts[parts.length - 2] : "unknown";
 
   return join(runsDir, kitName, `${runId}.json`);
+}
+
+/**
+ * Compute the relative path of a run record file from the runs directory.
+ *
+ * @param runsDir - The base runs directory
+ * @param absolutePath - The absolute path to the run record file
+ * @returns The relative path from runsDir to the file
+ */
+export function getRelativeRunRecordPath(
+  runsDir: string,
+  absolutePath: string
+): string {
+  return relative(runsDir, absolutePath);
 }
 
 /**
@@ -1307,4 +1321,3 @@ export async function exportRunRecords(
   result.durationMs = Date.now() - startTime;
   return result;
 }
-

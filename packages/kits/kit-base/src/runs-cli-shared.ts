@@ -13,6 +13,7 @@ import type {
   ExportResult,
   ListRunRecordsOptions,
 } from "./run-record.js";
+import { getRelativeRunRecordPath } from "./run-record.js";
 import type { LifecycleStage, RiskLevel, RunStatus } from "./types.js";
 
 // ============================================================================
@@ -637,12 +638,15 @@ export function rebuildIdempotencyIndex(
     // Load the full run record to index it
     const record = readRunRecord(runsDir, summary.path);
     if (record && record.determinism?.idempotencyKey) {
-      indexManager.indexRunRecord(record, summary.path);
+      // Convert absolute path to relative path for storage
+      // This ensures the index remains valid if runsDir moves
+      const relativePath = getRelativeRunRecordPath(runsDir, summary.path);
+      indexManager.indexRunRecord(record, relativePath);
       indexed++;
 
       if (verbose) {
         console.log(
-          `Indexed: ${record.determinism.idempotencyKey} -> ${summary.path}`
+          `Indexed: ${record.determinism.idempotencyKey} -> ${relativePath}`
         );
       }
     } else {

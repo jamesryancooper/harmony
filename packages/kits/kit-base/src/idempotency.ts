@@ -546,6 +546,11 @@ export class IdempotencyManager {
 
   /**
    * Start tracking an operation with the given idempotency key.
+   *
+   * This method performs an atomic check-and-set to prevent race conditions
+   * where two concurrent calls could both start operations with the same key.
+   *
+   * @throws IdempotencyConflictError if a pending operation already exists
    */
   startOperation(
     key: string,
@@ -554,6 +559,27 @@ export class IdempotencyManager {
     inputsHash: string,
     runId?: string
   ): IdempotencyRecord<unknown> {
+    // Atomic check-and-set: verify no active operation exists before starting
+    // This prevents TOCTOU race conditions between checkIdempotency and startOperation
+    const existing = this.storage.get(key);
+    if (existing && existing.state === "pending") {
+      // Check if the pending operation is stale
+      const createdAt = new Date(existing.createdAt).getTime();
+      const isStale = Date.now() - createdAt > this.pendingTtlMs;
+
+      if (!isStale) {
+        // Active pending operation - conflict
+        throw new IdempotencyConflictError(
+          `Operation with idempotency key ${key} is already in progress`,
+          {
+            idempotencyKey: key,
+            conflictingRunId: existing.runId,
+          }
+        );
+      }
+      // Stale pending operation - allow overwrite
+    }
+
     const record: IdempotencyRecord<unknown> = {
       key,
       createdAt: new Date().toISOString(),
