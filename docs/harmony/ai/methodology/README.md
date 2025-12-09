@@ -13,29 +13,38 @@ Harmony is a lean, **opinionated**, AI-accelerated methodology you can adopt tom
 
 ## Harmony’s Unifying Objective
 
-Harmony unifies speed, safety, and simplicity so a tiny team can ship high‑quality software quickly, safely, and predictably. Every framework and tool listed above reinforces one of Harmony’s pillars and closes the loop from secure specification → agentic implementation → observable operations → postmortem learning.
+Harmony unifies speed, safety, and simplicity so a tiny team can ship high‑quality software quickly, safely, and predictably. Every framework and tool listed above reinforces one of Harmony's six pillars and closes the loop from validated specification → focused implementation → fast shipping → safe delivery → preserved knowledge → structured learning.
 
-### The Five Pillars
+### The Six Pillars
 
-1. **Speed with Safety** — Fast flow (trunk-based development, small PRs), automated quality/security gates, and frequent integration deliver quick results without sacrificing reliability.
-2. **Simplicity over Complexity** — Monolith-first and 12-Factor patterns keep architecture lean, Kanban and Shape Up focus work and limit scope, and spec-driven changes minimize dependencies and overhead.
-3. **Quality through Determinism** — Rigorous, measurable gates (OWASP ASVS, NIST SSDF, STRIDE threat modeling, SLOs/DORA metrics) plus contract and property-based tests ensure every change is observable, testable, and reversible.
-4. **Guided Agentic Autonomy** — AI systems autonomously self-build, self-heal, and self-tune within deterministic, observable, and reversible bounds—while humans retain ultimate authority, oversight, and accountability.
-5. **Evolvable Modularity** — Contract-driven, Hexagonal boundaries and a modular monolith keep capabilities loosely coupled and tech choices reversible, so databases, models, providers, and surfaces can be swapped, scaled, or retired as plug-and-play adapters instead of rewrites.
+Harmony's pillars are organized in three phases forming a complete feedback loop. For the complete pillar specifications, see [`../pillars/README.md`](../pillars/README.md).
 
-Together these pillars create a self‑reinforcing system that makes changes small, deterministic, testable, reversible, and evolvable.
+**PLAN Phase:**
+1. **[Direction through Validated Discovery](../pillars/direction.md)** — Build the right thing because every feature is validated before investment.
+2. **[Focus through Absorbed Complexity](../pillars/focus.md)** — Build features, not infrastructure — Harmony handles the rest.
+
+**SHIP Phase:**
+3. **[Velocity through Agentic Automation](../pillars/velocity.md)** — Ship fast because AI automation removes bottlenecks and multiplies output.
+4. **[Trust through Governed Determinism](../pillars/trust.md)** — Ship confidently because behavior is predictable, agents are bounded, security is enforced, and mistakes are reversible.
+
+**LEARN Phase:**
+5. **[Continuity through Institutional Memory](../pillars/continuity.md)** — Knowledge persists because decisions, traces, and context are captured durably.
+6. **[Insight through Structured Learning](../pillars/insight.md)** — Improve continuously because every outcome teaches us something.
+
+Together these pillars create a self‑reinforcing system: Direction ensures we build the right thing, Focus gives us bandwidth to build it, Velocity and Trust let us ship fast and safely, Continuity preserves what we learned, and Insight feeds back to Direction for the next cycle.
 
 > Terminology note: “SpecKit” refers to our AI‑Toolkit kit (code `speckit`) that wraps GitHub’s Spec Kit. Mentions of the upstream tool explicitly use “GitHub’s Spec Kit”.
 
 #### Pillars → Practices Map (at a glance)
 
-| Pillar | Primary Practices/Tools | Feedback loop it reinforces |
-| --- | --- | --- |
-| Speed with Safety | Trunk‑Based Development; Vercel Previews + `vercel promote`; Feature Flags (Vercel Flags); Tiny PRs | Frequent, reversible integration; instant rollback; safe, progressive rollout |
-| Simplicity over Complexity | Monolith‑First (Turborepo); 12‑Factor; Hexagonal boundaries; Spec‑First | Low coordination cost; crisp ports/adapters; scope control before code |
-| Quality through Determinism | Spec‑First + BMAD; OpenAPI/JSON‑Schema; PolicyKit/EvalKit/TestKit; ObservaKit | Typed contracts; fail‑closed governance; observable outcomes tied to traces |
-| Guided Agentic Autonomy | AgentKit; GuardKit; PolicyKit/EvalKit; PatchKit/NotifyKit (HITL); ObservaKit | Deterministic agent loops; HITL checkpoints; pinned AI config & golden tests; traces/provenance; fail‑closed governance |
-| Evolvable Modularity | Hexagonal ports/adapters; modular monolith in Turborepo; OpenAPI/JSON‑Schema contracts; Pact/Schemathesis; feature flags; kit‑level composition | Plug‑and‑play edges; reversible tech and vendor choices; safe adoption of new models/providers/platforms without rewrites |
+| Pillar | Phase | Primary Practices/Tools | Feedback loop it reinforces |
+| --- | --- | --- | --- |
+| Direction | PLAN | SpecKit; PlanKit (BMAD); Shape Up; Convivial Impact Assessment | Validated specs ensure effort is well-spent; no code without approved spec |
+| Focus | PLAN | kit-base; PromptKit; Turborepo; Hexagonal adapters | Absorbed complexity frees cognitive bandwidth; build features, not infrastructure |
+| Velocity | SHIP | AgentKit; FlowKit; CIKit; Trunk‑Based Development; Vercel Previews | AI automation removes bottlenecks; fast, frequent delivery within validated direction |
+| Trust | SHIP | PolicyKit; GuardKit; EvalKit; FlagKit; Pact; OpenAPI/JSON‑Schema | Typed contracts; bounded agents; rollback capability; fail‑closed governance |
+| Continuity | LEARN | Dockit; ObservaKit; ADR templates; RunbookKit; OnboardKit | ADRs, traces, decision logs preserve context; knowledge survives team changes |
+| Insight | LEARN | EvalKit; DatasetKit; postmortem templates; retro practices | Postmortems, evals, retros drive continuous improvement; Insight → Direction loop |
 
 ---
 

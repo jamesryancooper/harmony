@@ -13,21 +13,30 @@ Default to the smallest viable process, design, and tooling that enforces the pr
 
 ## Pillars Alignment
 
-This document codifies Harmony’s five pillars and how they translate into day‑to‑day decisions. For deeper operational mapping and examples across the lifecycle, see `docs/harmony/methodology/README.md`.
+This document codifies how Harmony's [six pillars](./pillars/README.md) translate into day‑to‑day decisions. The pillars are organized in three phases (PLAN → SHIP → LEARN) forming a complete feedback loop. For deeper operational mapping and examples across the lifecycle, see `docs/harmony/methodology/README.md`.
 
 ## Purpose
 
 - Provide a compact, quotable set of principles that guide design and delivery.
-- Connect day‑to‑day decisions to the five pillars and governance model.
+- Connect day‑to‑day decisions to the six pillars and governance model.
 - Keep choices simple, deterministic, testable, and reversible.
 
-## Pillars (non‑negotiable)
+## The Six Pillars (non‑negotiable)
 
-1) Speed with Safety — ship small, reversible changes behind flags; practice promote/rollback.
-2) Simplicity over Complexity — prefer a modular monolith with vertical slices and hexagonal boundaries.
-3) Quality through Determinism — contract‑first, typed boundaries, measurable gates, reproducible outcomes.
-4) Guided Agentic Autonomy — agents operate within deterministic, observable, reversible bounds with HITL.
-5) Evolvable Modularity — contract‑driven Hexagonal boundaries and a modular monolith keep capabilities loosely coupled and tech choices reversible, so edges (databases, models, providers, surfaces) can be swapped, scaled, or retired as plug‑and‑play adapters when new technologies arrive instead of forcing rewrites.
+### PLAN Phase
+
+1. **[Direction through Validated Discovery](./pillars/direction.md)** — Build the right thing because every feature is validated before investment. No code without a validated spec.
+2. **[Focus through Absorbed Complexity](./pillars/focus.md)** — Build features, not infrastructure — Harmony handles the rest. Use kits, respect boundaries.
+
+### SHIP Phase
+
+3. **[Velocity through Agentic Automation](./pillars/velocity.md)** — Ship fast because AI automation removes bottlenecks and multiplies output. Speed serves purpose, not metrics.
+4. **[Trust through Governed Determinism](./pillars/trust.md)** — Ship confidently because behavior is predictable, agents are bounded, security is enforced, and mistakes are reversible.
+
+### LEARN Phase
+
+5. **[Continuity through Institutional Memory](./pillars/continuity.md)** — Knowledge persists because decisions, traces, and context are captured durably. Write ADRs, document decisions.
+6. **[Insight through Structured Learning](./pillars/insight.md)** — Improve continuously because every outcome teaches us something. Run evals, conduct postmortems, update from feedback.
 
 ## Core Principles
 
@@ -77,6 +86,7 @@ This document codifies Harmony’s five pillars and how they translate into day�
 
 ## Related Docs
 
+- **Pillars documentation: `docs/harmony/ai/pillars/README.md`**
 - Methodology overview: `docs/harmony/methodology/README.md`
 - Architecture overview: `docs/harmony/architecture/overview.md`
 - Governance model: `docs/harmony/architecture/governance-model.md`
