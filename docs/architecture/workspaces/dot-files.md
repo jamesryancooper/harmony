@@ -76,17 +76,26 @@ Agents MUST NOT:
 ```text
 .scratch/
 ├── README.md       # Purpose, rules, publish workflow
+├── projects/       # Isolated research projects
+│   ├── registry.md
+│   ├── _template/
+│   └── <project-slug>/
 ├── ideas/          # Brainstorming, possibilities
-├── research/       # Collected findings, analysis
 ├── daily/          # Date-based notes (YYYY-MM-DD.md)
 ├── drafts/         # Work-in-progress documents
 └── clips/          # Snippets and fragments
 ```
 
+### Research Projects
+
+For structured, multi-session research, use `projects/`. Each project is a scaled-down workspace with its own goal, scope, memory, and continuity.
+
+See [Scratch Area](./scratch.md) for full documentation on research projects.
+
 ### When to Use
 
+- Conducting structured research (use `projects/`)
 - Exploring ideas before committing to a direction
-- Collecting research and analysis
 - Drafting content that isn't ready for agent consumption
 - Daily notes and stream-of-consciousness thinking
 
@@ -211,8 +220,8 @@ Agents MUST NOT:
 ### Scenario: Collaborative Research in Scratch
 
 ```text
-1. Human explores authentication options in .scratch/research.md
-2. Human: "Review .scratch/research.md and help organize findings"
+1. Human explores authentication options in .scratch/projects/auth-options/
+2. Human: "Review .scratch/projects/auth-options/findings.md and help organize"
 3. Agent reads specific file, proposes organization
 4. Human refines, makes decision
 5. Human promotes to context/decisions.md using promote workflow
@@ -239,6 +248,7 @@ Tools that scan, index, or retrieve content should respect these patterns during
 ## See Also
 
 - [README.md](./README.md) — Canonical workspace structure reference
+- [Scratch Area](./scratch.md) — Human-led thinking space with research projects
 - [Taxonomy](./taxonomy.md) — Command and workflow types
 - `.workspace/.scratch/README.md` — Scratchpad details and promotion workflow
 - `.workspace/.inbox/README.md` — Inbox lifecycle and triage

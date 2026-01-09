@@ -13,9 +13,9 @@ This document clarifies the distinctions between workspace artifact types: **com
 
 | Type | Location | Nature | When to Use |
 |------|----------|--------|-------------|
-| **Cursor Command** | `.cursor/commands/` | User entry point | IDE integration needed |
+| **Harness Entry Point** | `.<harness>/commands/` | Thin wrapper | Harness-specific invocation (Cursor, Claude Code, Codex) |
 | **Workspace Command** | `.workspace/commands/` | Deterministic procedure | Atomic, repeatable operation |
-| **Workspace Workflow** | `.workspace/workflows/` | Multi-step procedure | Complex, sequential operation |
+| **Workspace Workflow** | `.workspace/workflows/` | Multi-step procedure (source of truth) | Complex, sequential operation |
 | **Workspace Prompt** | `.workspace/prompts/` | Task template | Context-dependent, requires judgment |
 | **Assistant** | `.workspace/assistants/` | Focused specialist | Scoped, delegatable tasks |
 | **Mission** | `.workspace/missions/` | Sub-project | Isolated, time-bounded work |
@@ -45,26 +45,87 @@ This document clarifies the distinctions between workspace artifact types: **com
 
 | Term | Location | Triggered By | Scope |
 |------|----------|--------------|-------|
-| **Cursor Command** | `.cursor/commands/` | User typing `/command-name` in chat | Repository-wide |
-| **Workspace Command** | `.workspace/commands/` | Cursor command delegation or direct agent reference | Workspace-specific, atomic |
-| **Workspace Workflow** | `.workspace/workflows/` | Cursor command delegation or direct agent reference | Workspace-specific, multi-step |
+| **Harness Entry Point** | `.<harness>/commands/` | User typing `/command` in any AI harness | Repository-wide, harness-specific |
+| **Workspace Command** | `.workspace/commands/` | Harness delegation or direct agent reference | Workspace-specific, atomic |
+| **Workspace Workflow** | `.workspace/workflows/` | Harness delegation or direct agent reference | Workspace-specific, multi-step |
 | **Workspace Prompt** | `.workspace/prompts/` | Direct agent reference | Workspace-specific, template |
 | **FlowKit Flow** | `packages/workflows/` | `pnpm flowkit:run packages/workflows/<flowId>/config.flow.json` or `/run-flow @packages/workflows/<flowId>/config.flow.json` | Repository-wide |
 
+### Supported Harnesses
+
+| Harness | Entry Point Location | Integration |
+|---------|---------------------|-------------|
+| **Cursor** | `.cursor/commands/` | Slash commands, autocomplete |
+| **Claude Code** | `.claude/commands/` | Slash commands |
+| **Codex** | `.codex/commands/` | Commands |
+| **Future harness** | `.<harness>/commands/` | Harness-specific |
+
 ---
 
-## Cursor Commands
+## Harness Entry Points
 
-**Location:** `.cursor/commands/*.md`
+**Location:** `.<harness>/commands/*.md` (e.g., `.cursor/commands/`, `.claude/commands/`, `.codex/commands/`)
 
-Repo-wide entry points triggered by users typing `/command-name` in Cursor chat. These delegate to workspace commands or workflows.
+Thin wrappers that provide harness-specific invocation for workspace commands or workflows. The actual implementation logic lives in `.workspace/`.
+
+### Design Principle: Universal Harness-Agnostic Pattern
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Harness Entry Points (thin wrappers)                   │
+├─────────────────┬─────────────────┬─────────────────────┤
+│ .cursor/        │ .claude/        │ .codex/             │
+│ commands/       │ commands/       │ commands/           │
+│ research.md     │ research.md     │ research.md         │
+└────────┬────────┴────────┬────────┴──────────┬──────────┘
+         │                 │                   │
+         ▼                 ▼                   ▼
+┌─────────────────────────────────────────────────────────┐
+│  .workspace/workflows/scratch/create-research-project/  │
+│                                                         │
+│  Source of truth — same workflow for all harnesses      │
+└─────────────────────────────────────────────────────────┘
+```
 
 ### Characteristics
 
-- IDE integration (shows in command palette and autocomplete)
-- Repository-wide scope
-- User-initiated
-- Typically brief: usage syntax + reference to implementation
+- **Thin wrappers** — Only usage syntax and pointer to implementation
+- **Harness-specific integration** — Autocomplete, slash commands, etc.
+- **Repository-wide scope** — Available everywhere in the repo
+- **User-initiated** — Triggered by typing `/command` in chat
+- **No business logic** — All logic lives in `.workspace/workflows/` or `.workspace/commands/`
+
+### Entry Point Template
+
+```markdown
+# Command Name `/command-name`
+
+Brief description.
+
+See `.workspace/workflows/<category>/<name>/00-overview.md` for full description and steps.
+
+## Usage
+
+\`\`\`text
+/command-name <args>
+\`\`\`
+
+## Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `<arg>` | Yes | Description |
+
+## Implementation
+
+Execute the workflow in `.workspace/workflows/<category>/<name>/`.
+
+Start with `00-overview.md` and follow each step in sequence.
+
+## References
+
+- **Workflow:** `.workspace/workflows/<category>/<name>/`
+```
 
 ---
 
@@ -80,8 +141,9 @@ See [commands.md](./commands.md) for full details and examples.
 
 - Single-action, atomic operations
 - Workspace-specific scope
-- Can be triggered by Cursor commands or directly by agents
-- No IDE integration (unless wrapped by a Cursor command)
+- Can be triggered by harness entry points or directly by agents
+- No harness integration (unless wrapped by a harness entry point)
+- **Source of truth** for atomic operations
 
 ### Examples
 
@@ -95,16 +157,18 @@ See [commands.md](./commands.md) for full details and examples.
 
 **Location:** `.workspace/workflows/*.md` or `.workspace/workflows/<name>/`
 
-Multi-step procedures that operate on artifacts in the workspace's parent directory.
+Multi-step procedures that operate on artifacts in the workspace's parent directory. Workflows are the **source of truth** for complex operations.
 
-See [workflows.md](./workflows.md) for full details and examples.
+See [workflows.md](./workflows.md) for full details, including the Universal Harness-Agnostic Pattern.
 
 ### Characteristics
 
 - Multi-step procedures
 - Workspace-specific scope
-- Can be triggered by Cursor commands or referenced by agents
-- No IDE integration (unless wrapped by a Cursor command)
+- Can be triggered by any harness entry point or referenced directly by agents
+- No harness integration (unless wrapped by a harness entry point)
+- **Source of truth** for multi-step operations
+- **Portable** — Same workflow works across Cursor, Claude Code, Codex, etc.
 
 ### Examples
 
@@ -261,9 +325,9 @@ See `.workspace/catalog.md` for complete decision flowcharts and examples.
 
 ## File Locations Summary
 
-| Type | Location | Scope | IDE Integration |
-|------|----------|-------|-----------------|
-| Cursor Commands | `.cursor/commands/*.md` | Repository-wide | Yes |
+| Type | Location | Scope | Harness Integration |
+|------|----------|-------|---------------------|
+| Harness Entry Points | `.<harness>/commands/*.md` | Repository-wide | Yes (harness-specific) |
 | Workspace Commands | `.workspace/commands/*.md` | This workspace only | No (unless wrapped) |
 | Workspace Workflows | `.workspace/workflows/*.md` | This workspace only | No (unless wrapped) |
 | Prompts | `.workspace/prompts/*.md` | Task templates | No |
@@ -271,6 +335,15 @@ See `.workspace/catalog.md` for complete decision flowcharts and examples.
 | Missions | `.workspace/missions/<slug>/` | Sub-projects | No |
 | Checklists | `.workspace/checklists/*.md` | Quality gates | No |
 | FlowKit Flow assets | `packages/workflows/<flowId>/` | Repository-wide | No (but can be wrapped via `/run-flow`) |
+
+### Harness Entry Point Directories
+
+| Harness | Directory |
+|---------|-----------|
+| Cursor | `.cursor/commands/` |
+| Claude Code | `.claude/commands/` |
+| Codex | `.codex/commands/` |
+| Future harness | `.<harness>/commands/` |
 
 ---
 

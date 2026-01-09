@@ -9,16 +9,115 @@ Workspace workflows are **workspace-scoped multi-step procedures** defined in `.
 
 > **Not FlowKit flows:** `packages/workflows/<flowId>/` contains **FlowKit flow assets** (config + manifest + prompts) executed by FlowKit + the LangGraph runtime. `.workspace/workflows/**` contains **procedures** an agent follows. The seam is `/run-flow`, which delegates to `.workspace/workflows/flowkit/run-flow/*` and runs `@packages/workflows/<flowId>/config.flow.json`.
 
+---
+
+## Universal Harness-Agnostic Pattern
+
+Workspace workflows are designed to be **portable across all AI harnesses**—Cursor, Claude Code, Codex, or any future tool. The pattern separates concerns:
+
+```
+┌────────────────────────────────────────────────────────────┐
+│                     AI Harnesses                           │
+├──────────────┬──────────────┬──────────────┬──────────────┤
+│    Cursor    │  Claude Code │    Codex     │    Future    │
+│  /command    │  /command    │  /command    │   /command   │
+│              │              │              │              │
+│  .cursor/    │  .claude/    │  .codex/     │  .<harness>/ │
+│  commands/   │  commands/   │  commands/   │   commands/  │
+└──────┬───────┴──────┬───────┴──────┬───────┴──────┬───────┘
+       │              │              │              │
+       │              │              │              │
+       ▼              ▼              ▼              ▼
+┌────────────────────────────────────────────────────────────┐
+│              .workspace/workflows/<name>/                  │
+│                                                            │
+│   Universal workflow with portable steps that work         │
+│   regardless of which harness invokes them                 │
+└────────────────────────────────────────────────────────────┘
+```
+
+### Design Principles
+
+| Principle | Description |
+|-----------|-------------|
+| **Workflows are the source of truth** | All execution logic lives in `.workspace/workflows/` |
+| **Harness entry points are thin wrappers** | `.cursor/commands/`, `.claude/commands/`, etc. only provide syntax and delegation |
+| **No harness-specific logic in workflows** | Workflows should work identically regardless of invoking harness |
+| **Workspace is portable** | Copy a `.workspace/` to any repo, and it works with any harness |
+
+### Implementing the Pattern
+
+**1. Create the workflow (source of truth):**
+
+```text
+.workspace/workflows/<category>/<name>/
+├── 00-overview.md     # Purpose, prereqs, steps, references
+├── 01-step-one.md     # First step (if multi-step)
+├── 02-step-two.md     # Second step
+└── ...
+```
+
+**2. Create thin harness wrappers (entry points):**
+
+For Cursor:
+```text
+.cursor/commands/<name>.md
+```
+
+```markdown
+# Command Name `/command-name`
+
+Brief description.
+
+See `.workspace/workflows/<category>/<name>/00-overview.md` for full description and steps.
+
+## Usage
+
+\`\`\`text
+/command-name <args>
+\`\`\`
+
+## Implementation
+
+Execute the workflow in `.workspace/workflows/<category>/<name>/`.
+
+Start with `00-overview.md` and follow each step in sequence.
+
+## References
+
+- **Workflow:** `.workspace/workflows/<category>/<name>/`
+```
+
+For other harnesses, create equivalent wrappers in their respective directories (e.g., `.claude/commands/`, `.codex/commands/`).
+
+### Example: Research Project Workflow
+
+**Workflow (source of truth):**
+`.workspace/workflows/scratch/create-research-project/00-overview.md`
+
+**Cursor wrapper:**
+`.cursor/commands/research.md` → Points to workflow
+
+**Claude Code wrapper (if needed):**
+`.claude/commands/research.md` → Points to same workflow
+
+Both invoke the identical workflow, ensuring consistent behavior.
+
+---
+
 ## Invocation
 
-Workspace workflows can be invoked in two ways:
+Workspace workflows can be invoked in multiple ways:
 
 | Method | Trigger | Example |
 |--------|---------|---------|
 | **Direct** | Agent references the workflow | Agent reads `.workspace/workflows/publish-to-docs/00-overview.md` |
-| **Wrapped** | User types a Cursor slash command that delegates to the workflow | `/create-workspace` triggers `.workspace/workflows/workspace/create-workspace/` |
+| **Wrapped (Cursor)** | User types `/command` in Cursor | `/create-workspace` via `.cursor/commands/` |
+| **Wrapped (Claude Code)** | User types `/command` in Claude Code | `/create-workspace` via `.claude/commands/` |
+| **Wrapped (Codex)** | User invokes command in Codex | Via `.codex/commands/` |
+| **Wrapped (Any Harness)** | Harness-specific entry point | Via `.<harness>/commands/` |
 
-When a workspace workflow is wrapped by a Cursor command (in `.cursor/commands/`), it gains IDE integration—appearing in autocomplete when the user types `/`.
+When wrapped by a harness-specific command, the workflow gains that harness's integration features (e.g., autocomplete in Cursor, slash commands in Claude Code).
 
 ---
 
@@ -73,9 +172,9 @@ Each workflow subdirectory contains numbered step files for the agent to follow 
 
 | Layer | Location | Purpose |
 |-------|----------|---------|
-| **Entry point** | `.cursor/commands/*.md` | User-facing syntax, triggers `/command` in chat |
-| **Implementation** | `.workspace/workflows/workspace/<name>/` | Multi-step procedure the agent executes |
-| **Templates** | `.workspace/templates/workspace/` | Boilerplate for new workspaces |
+| **Entry points** | `.<harness>/commands/*.md` | Harness-specific wrappers (Cursor, Claude Code, Codex, etc.) |
+| **Implementation** | `.workspace/workflows/<category>/<name>/` | Multi-step procedure the agent executes (source of truth) |
+| **Templates** | `.workspace/templates/` | Boilerplate for scaffolding |
 
 ### Usage Examples
 
@@ -109,12 +208,12 @@ Or for a nested workspace:
 /evaluate-workspace @docs/my-feature/.workspace
 ```
 
-> **Note:** Workspace management uses the **Cursor Command → Workflow** pattern (no intermediate Workspace Commands). This is because workspace management is a repo-wide concern requiring IDE integration, not a workspace-specific atomic operation.
+> **Note:** Workspace management uses the **Harness Entry Point → Workflow** pattern. The workflow is the source of truth; harness-specific commands (`.cursor/commands/`, `.claude/commands/`, etc.) are thin wrappers that provide IDE integration.
 
 ---
 
 ## See Also
 
-- [Taxonomy](./taxonomy.md) — Cursor commands vs workspace commands vs workspace workflows
+- [Taxonomy](./taxonomy.md) — Harness entry points, workspace commands, workflows, and their relationships
 - [Workspace Commands](./commands.md) — Workspace-scoped atomic operations
 - [README.md](./README.md) — Canonical workspace structure reference

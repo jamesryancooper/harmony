@@ -15,14 +15,18 @@ See `.workspace/catalog.md#command-vs-prompt-decision` for the decision logic.
 
 ## Invocation
 
-Workspace commands can be invoked in two ways:
+Workspace commands can be invoked in multiple ways:
 
 | Method | Trigger | Example |
 |--------|---------|---------|
 | **Direct** | Agent references the command file | Agent reads `.workspace/commands/validate-frontmatter.md` |
-| **Wrapped** | User types a Cursor slash command that delegates to the workspace command | `/validate-frontmatter` triggers `.workspace/commands/validate-frontmatter.md` |
+| **Wrapped (Cursor)** | User types `/command` in Cursor | Via `.cursor/commands/` wrapper |
+| **Wrapped (Claude Code)** | User types `/command` in Claude Code | Via `.claude/commands/` wrapper |
+| **Wrapped (Any Harness)** | Harness-specific entry point | Via `.<harness>/commands/` wrapper |
 
-When a workspace command is wrapped by a Cursor command (in `.cursor/commands/`), it gains IDE integration—appearing in autocomplete when the user types `/`.
+When wrapped by a harness entry point, the command gains that harness's integration features.
+
+> **Universal Harness-Agnostic Pattern:** Workspace commands are the source of truth. Harness entry points (`.cursor/commands/`, `.claude/commands/`, etc.) are thin wrappers. See [workflows.md](./workflows.md) for the full pattern.
 
 ---
 
@@ -79,14 +83,16 @@ An agent working in the workspace can reference the command directly:
 
 ### Wrapped Invocation
 
-To enable `/validate-frontmatter` in Cursor chat, create a wrapper:
+To enable `/validate-frontmatter` in any harness, create a thin wrapper:
 
-**Location:** `.cursor/commands/validate-frontmatter.md`
+**Location:** `.<harness>/commands/validate-frontmatter.md` (e.g., `.cursor/commands/`, `.claude/commands/`)
 
 ```markdown
 # Validate Frontmatter `/validate-frontmatter`
 
 Validate YAML frontmatter in markdown files.
+
+See `.workspace/commands/validate-frontmatter.md` for full implementation.
 
 ## Usage
 
@@ -98,6 +104,8 @@ Validate YAML frontmatter in markdown files.
 
 Execute `.workspace/commands/validate-frontmatter.md` in the target directory's workspace.
 ```
+
+> **Note:** The same wrapper pattern works for any harness. Create equivalent files in `.cursor/commands/`, `.claude/commands/`, `.codex/commands/`, etc.
 
 ---
 

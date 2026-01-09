@@ -13,11 +13,11 @@ This directory is for **persistent thinking and research**—a space where human
 
 | Content Type | Examples |
 |--------------|----------|
-| **Daily notes** | `daily/2025-01-04.md` — stream-of-consciousness, meeting notes |
-| **Drafts** | `drafts/feature-proposal.md` — work-in-progress before promotion |
-| **Research** | `research/` — collected findings, links, analysis |
-| **Clips** | `clips/` — snippets, quotes, code fragments for reference |
+| **Research projects** | `projects/<slug>/` — isolated research with scope, memory, and continuity |
 | **Ideas** | `ideas/` — brainstorming, possibilities, "what if" explorations |
+| **Drafts** | `drafts/feature-proposal.md` — work-in-progress before promotion |
+| **Daily notes** | `daily/2025-01-04.md` — stream-of-consciousness, meeting notes |
+| **Clips** | `clips/` — snippets, quotes, code fragments for reference |
 
 ---
 
@@ -93,12 +93,67 @@ When insights in `.scratch/` mature into actionable knowledge, **promote them** 
 ```text
 .scratch/
 ├── README.md       ← You are here
+├── projects/       ← Isolated research projects (see below)
+│   ├── registry.md
+│   ├── _template/
+│   └── <project-slug>/
 ├── ideas/          ← Brainstorming and possibilities
-├── research/       ← Collected findings and analysis
 ├── daily/          ← Date-based notes (YYYY-MM-DD.md)
 ├── drafts/         ← Work-in-progress documents
 └── clips/          ← Snippets and fragments
 ```
+
+---
+
+## Research Projects
+
+For **structured, isolated research** with its own scope, memory, and continuity, use the `projects/` directory.
+
+### When to Use Projects
+
+| Scenario | Use Project? | Alternative |
+|----------|--------------|-------------|
+| Multi-session investigation | Yes | — |
+| Need isolated context/findings | Yes | — |
+| Will eventually promote findings | Yes | — |
+| Quick one-off exploration | No | Use `research/` or `ideas/` |
+| Daily notes or drafts | No | Use `daily/` or `drafts/` |
+
+### Project Structure
+
+Each project is a mini-workspace:
+
+```text
+projects/<slug>/
+├── project.md     # Goal, scope, questions, status
+├── log.md         # Progress log
+├── sources.md     # References (optional)
+├── findings.md    # Key findings (optional)
+└── notes/         # Free-form notes (optional)
+```
+
+### Creating a Project
+
+**Via command (any harness):**
+```text
+/research <slug>
+```
+
+**Manually:**
+1. Copy `projects/_template/` to `projects/<slug>/`
+2. Fill in `project.md` with goal, scope, and key questions
+3. Add entry to `projects/registry.md`
+
+See `.workspace/workflows/scratch/create-research-project/00-overview.md` for full workflow.
+
+### Project Lifecycle
+
+```
+Created → Active → Completed → Promoted
+                 ↘ Paused → Resumed
+```
+
+See `projects/registry.md` for the full workflow.
 
 ---
 

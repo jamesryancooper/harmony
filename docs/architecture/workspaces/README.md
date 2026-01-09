@@ -113,8 +113,11 @@ Agents struggle when they "arrive with no memory of what came before." A `.works
 │
 ├── .scratch/             # Human-led thinking/research (AGENTS: HUMAN-LED ONLY)
 │   ├── README.md         # Purpose, rules, publish workflow
+│   ├── projects/         # Isolated research projects
+│   │   ├── registry.md
+│   │   ├── _template/
+│   │   └── <project-slug>/
 │   ├── ideas/            # Brainstorming, possibilities
-│   ├── research/         # Collected findings, analysis
 │   ├── daily/            # Date-based notes (YYYY-MM-DD.md)
 │   ├── drafts/           # Work-in-progress documents
 │   └── clips/            # Snippets and fragments
@@ -183,7 +186,7 @@ Agents MUST NOT read, write, or reference content from `.humans/` or `.archive/`
 **Example: Valid collaboration**
 
 ```text
-Human: "Review .scratch/research.md and summarize the findings"
+Human: "Review .scratch/projects/auth-research/findings.md and summarize"
 Agent: [Reads the specific file, provides summary as directed]
 ```
 
@@ -341,9 +344,45 @@ The `.workspace` directory formalizes this for the age of AI agents, creating a 
 
 ---
 
-## Cursor Integration
+## Universal Harness-Agnostic Pattern
 
-### Workspace Rule
+Workspaces are designed to be **portable across all AI harnesses**—Cursor, Claude Code, Codex, or any future tool.
+
+### Design Principle
+
+```
+┌────────────────────────────────────────────────────────────┐
+│                     AI Harnesses                           │
+├──────────────┬──────────────┬──────────────┬──────────────┤
+│    Cursor    │  Claude Code │    Codex     │    Future    │
+│  /command    │  /command    │  /command    │   /command   │
+│              │              │              │              │
+│  .cursor/    │  .claude/    │  .codex/     │  .<harness>/ │
+│  commands/   │  commands/   │  commands/   │   commands/  │
+└──────┬───────┴──────┬───────┴──────┬───────┴──────┬───────┘
+       │              │              │              │
+       ▼              ▼              ▼              ▼
+┌────────────────────────────────────────────────────────────┐
+│              .workspace/workflows/<name>/                  │
+│                                                            │
+│   Source of truth — same workflow for all harnesses        │
+└────────────────────────────────────────────────────────────┘
+```
+
+| Principle | Description |
+|-----------|-------------|
+| **Workflows are the source of truth** | All execution logic lives in `.workspace/workflows/` |
+| **Harness entry points are thin wrappers** | `.<harness>/commands/` only provides syntax and delegation |
+| **No harness-specific logic in workflows** | Workflows work identically regardless of invoking harness |
+| **Workspace is portable** | Copy a `.workspace/` to any repo, and it works with any harness |
+
+See [workflows.md](./workflows.md) for the full implementation pattern.
+
+---
+
+## Harness Integration
+
+### Cursor
 
 The `.cursor/rules/workspace/RULE.md` provides context when editing `.workspace/` files. It:
 
@@ -352,9 +391,9 @@ The `.cursor/rules/workspace/RULE.md` provides context when editing `.workspace/
 - Provides key principles and token budget guidelines
 - Uses "Apply Intelligently" (not always-apply) to avoid unnecessary context in non-workspace sessions
 
-### Cursor Commands
+### Harness Entry Points
 
-Commands in `.cursor/commands/` wrap workspace workflows for IDE integration:
+Harness-specific commands wrap workspace workflows for integration:
 
 | Command | Delegates To | Purpose |
 |---------|--------------|---------|
@@ -362,9 +401,10 @@ Commands in `.cursor/commands/` wrap workspace workflows for IDE integration:
 | `/update-workspace` | `.workspace/workflows/workspace/update-workspace/` | Align with canonical definition |
 | `/evaluate-workspace` | `.workspace/workflows/workspace/evaluate-workspace/` | Assess token efficiency |
 | `/migrate-workspace` | `.workspace/workflows/workspace/migrate-workspace/` | Upgrade older workspace |
+| `/research` | `.workspace/workflows/scratch/create-research-project/` | Create research project |
 | `/bootstrap` | `.workspace/prompts/bootstrap-session.md` | Quick-start a session |
 
-When a user types `/command-name` in Cursor chat, the agent loads the corresponding workspace workflow or prompt.
+These commands live in `.<harness>/commands/` (e.g., `.cursor/commands/`, `.claude/commands/`) and are thin wrappers that point to the workflows.
 
 ---
 
@@ -380,15 +420,16 @@ See `.cursor/rules/workspace/RULE.md` for the authoritative token budget table t
 
 ### Core Concepts
 
-- [Taxonomy](./taxonomy.md) — Cursor commands vs workspace commands vs workspace workflows
+- [Taxonomy](./taxonomy.md) — Harness entry points, workspace commands, workflows, and their relationships
+- [Workspace Workflows](./workflows.md) — Multi-step procedures and the Universal Harness-Agnostic Pattern
+- [Workspace Commands](./commands.md) — Workspace-scoped atomic operations
 - [Assistants](./assistants.md) — Focused specialists for scoped tasks
 - [Missions](./missions.md) — Time-bounded sub-projects
-- [Workspace Commands](./commands.md) — Workspace-scoped atomic operations
-- [Workspace Workflows](./workflows.md) — Workspace-scoped multi-step procedures
 
 ### Directory Documentation
 
 - [Dot-Prefixed Directories](./dot-files.md) — `.humans/`, `.scratch/`, `.inbox/`, `.archive/` and autonomy rules
+- [Scratch Area](./scratch.md) — Human-led thinking space with research projects
 - [Prompts](./prompts.md) — Reusable task templates
 - [Templates](./templates.md) — Boilerplate for new content
 - [Examples](./examples.md) — Reference patterns
