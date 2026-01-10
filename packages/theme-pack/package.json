@@ -21,11 +21,6 @@
         "label": "Harmony Dark",
         "uiTheme": "vs-dark",
         "path": "./themes/harmony-dark.json"
-      },
-      {
-        "label": "Harmony Markdown Light",
-        "uiTheme": "vs",
-        "path": "./themes/harmony-markdown-light.json"
       }
     ]
   }

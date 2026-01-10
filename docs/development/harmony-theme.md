@@ -4,7 +4,6 @@ This repo includes a Cursor/VS Code theme extension at `packages/theme-pack/` th
 
 - **Harmony Dark**
 - **Harmony Light**
-- **Harmony Markdown Light** (paper-like light variant tuned for markdown readability)
 
 ## Recommended install (one command)
 
@@ -18,7 +17,7 @@ Then **fully quit Cursor** (Cmd+Q) and reopen it.
 
 Select the theme via:
 
-- Command Palette → **Preferences: Color Theme** → choose a Harmony theme (e.g. **Harmony Markdown Light**)
+- Command Palette → **Preferences: Color Theme** → choose a Harmony theme (e.g. **Harmony Light**)
 
 ## Uninstall
 
@@ -34,7 +33,6 @@ Edit the theme JSON files in the repo:
 
 - `packages/theme-pack/themes/harmony-dark.json`
 - `packages/theme-pack/themes/harmony-light.json`
-- `packages/theme-pack/themes/harmony-markdown-light.json`
 
 Inside each file:
 
@@ -48,6 +46,17 @@ node scripts/install-cursor-harmony-theme.js
 ```
 
 Then **fully quit Cursor** (Cmd+Q) and reopen it.
+
+## Terminal themes (iTerm2)
+
+The repo also includes iTerm2 color presets:
+
+- `packages/theme-pack/themes/Harmony Dark.itermcolors`
+- `packages/theme-pack/themes/Harmony Light.itermcolors`
+
+Import them in iTerm2 via:
+
+- Preferences → Profiles → Colors → Color Presets… → Import
 
 ## Adding additional color schemes (new theme variants)
 
@@ -117,4 +126,3 @@ If the themes don’t appear after restarting Cursor:
   - `~/.cursor/extensions/harmony.harmony-theme-1.0.0/`
 - Check `~/.cursor/extensions/.obsolete` and ensure it does **not** contain:
   - `harmony.harmony-theme-1.0.0`
-

@@ -6,7 +6,17 @@ A Cursor color theme extension featuring both light and dark variants.
 
 - **Harmony Dark**: Soothing dark theme for extended coding sessions
 - **Harmony Light**: Clean light theme with strong contrast
-- **Harmony Markdown Light**: Paper-like light variant tuned for markdown readability (headings, quotes, links, code blocks)
+
+## Terminal themes (iTerm2)
+
+This repo also includes iTerm2 color presets:
+
+- `packages/theme-pack/themes/Harmony Dark.itermcolors`
+- `packages/theme-pack/themes/Harmony Light.itermcolors`
+
+Import them in iTerm2 via:
+
+- Preferences → Profiles → Colors → Color Presets… → Import
 
 ## Install in Cursor (recommended)
 
@@ -18,7 +28,7 @@ node scripts/install-cursor-harmony-theme.js
 
 Then **fully quit Cursor** (Cmd+Q) and reopen it. Select the theme via:
 
-- Command Palette → **Preferences: Color Theme** → **Harmony Dark** / **Harmony Light** / **Harmony Markdown Light**
+- Command Palette → **Preferences: Color Theme** → **Harmony Dark** / **Harmony Light**
 
 ## Uninstall
 
@@ -49,4 +59,4 @@ If the themes don’t appear after restarting Cursor:
 ## Files
 
 - **Extension manifest**: `packages/theme-pack/package.json`
-- **Theme definitions**: `packages/theme-pack/themes/harmony-dark.json`, `packages/theme-pack/themes/harmony-light.json`, `packages/theme-pack/themes/harmony-markdown-light.json`
+- **Theme definitions**: `packages/theme-pack/themes/harmony-dark.json`, `packages/theme-pack/themes/harmony-light.json`
