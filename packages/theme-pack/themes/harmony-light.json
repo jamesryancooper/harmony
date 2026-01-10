@@ -1998,7 +1998,6 @@
 		},
 		{
 			"scope": [
-				"punctuation.definition.link",
 				"punctuation.definition.constant.markdown",
 				"punctuation.definition.constant.quarto"
 			],

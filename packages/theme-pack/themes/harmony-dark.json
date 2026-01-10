@@ -1402,6 +1402,7 @@
 		},
 		{
 			"scope": [
+				"punctuation.definition.link",
 				"markup.underline.link"
 			],
 			"settings": {
@@ -2015,7 +2016,6 @@
 		},
 		{
 			"scope": [
-				"punctuation.definition.link",
 				"punctuation.definition.constant.markdown",
 				"punctuation.definition.constant.quarto"
 			],
