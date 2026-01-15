@@ -71,6 +71,20 @@ A prioritized, trackable change manifest:
 - [ ] `context/decisions.md` — Add decision entry if applicable
 ```
 
+## Idempotency
+
+**Check:** Is change manifest already created?
+- [ ] Change manifest document exists
+- [ ] TodoWrite items populated
+- [ ] All audit files represented
+
+**If Already Complete:**
+- Load existing manifest
+- Verify it matches audit (no new files found)
+- Skip to next step if manifest is current
+
+**Marker:** `checkpoints/refactor/<refactor-id>/03-plan.complete`
+
 ## Proceed When
 
 - Every file from audit is represented in the manifest

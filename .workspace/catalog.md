@@ -47,6 +47,7 @@ Composable capabilities in `skills/`:
 | Skill | Commands | Description |
 |-------|----------|-------------|
 | [research-synthesizer](./skills/research-synthesizer/SKILL.md) | `/synthesize-research` | Synthesize scattered research notes into coherent findings |
+| [prompt-refiner](../.harmony/skills/prompt-refiner/SKILL.md) | `/refine-prompt` | Context-aware prompt refinement: analyze repo, inject references, decompose tasks, validate feasibility |
 
 **Invocation:** Use `/command` in chat or `use skill: skill-id` for explicit selection.
 
@@ -66,6 +67,9 @@ Atomic operations in `commands/`:
 |---------|--------|-------------|
 | [recover.md](./commands/recover.md) | human | Recovery procedures for common agent failure modes |
 | [validate-frontmatter.md](./commands/validate-frontmatter.md) | human | Validate YAML frontmatter in markdown files |
+| [create-workflow.md](../.harmony/commands/create-workflow.md) | human | Scaffold a new workflow with gap-aware structure |
+| [evaluate-workflow.md](../.harmony/commands/evaluate-workflow.md) | human | Assess a workflow against quality criteria |
+| [update-workflow.md](../.harmony/commands/update-workflow.md) | human | Modify an existing workflow to fix gaps |
 
 ---
 
@@ -94,6 +98,14 @@ Multi-step procedures in `workflows/`:
 |----------|--------|-------------|
 | [create-mission](./workflows/missions/create-mission/00-overview.md) | human | Scaffold a new mission from template |
 | [complete-mission](./workflows/missions/complete-mission/00-overview.md) | human | Archive a completed mission |
+
+### Workflow Management
+
+| Workflow | Access | Description |
+|----------|--------|-------------|
+| [create-workflow](../.harmony/workflows/workflows/create-workflow/00-overview.md) | human | Scaffold a new workflow with gap remediation features |
+| [evaluate-workflow](../.harmony/workflows/workflows/evaluate-workflow/00-overview.md) | human | Assess workflow quality and gap coverage |
+| [update-workflow](../.harmony/workflows/workflows/update-workflow/00-overview.md) | human | Add gap fixes to existing workflows |
 
 ### FlowKit (Repo-Wide Tool Integration)
 

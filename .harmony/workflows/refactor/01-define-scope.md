@@ -71,6 +71,20 @@ A scope definition block to reference in subsequent steps:
 **Exclusions:** node_modules, .git, dist
 ```
 
+## Idempotency
+
+**Check:** Is scope already defined for this refactor?
+- [ ] Scope definition block exists in working document
+- [ ] OLD and NEW patterns are specified
+- [ ] Search variations are listed
+
+**If Already Complete:**
+- Load existing scope definition
+- Ask user if modifications needed
+- Skip to next step if no changes
+
+**Marker:** `checkpoints/refactor/<refactor-id>/01-scope.complete`
+
 ## Proceed When
 
 - All variations are listed

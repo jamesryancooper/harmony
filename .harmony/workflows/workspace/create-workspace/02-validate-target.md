@@ -1,3 +1,8 @@
+---
+title: Validate Target
+description: Confirm target directory is valid for workspace creation.
+---
+
 # Step 2: Validate Target
 
 ## Actions
@@ -10,3 +15,14 @@
    - **No** → Suggest a README instead; workspace is overkill
    - **Yes** → Proceed to next step
 
+## Idempotency
+
+**Check:** Is target already validated?
+- [ ] Checkpoint file exists: `checkpoints/create-workspace/<target>/02-target.complete`
+- [ ] Target path stored in checkpoint
+
+**If Already Complete:**
+- Load cached target path
+- Skip to next step
+
+**Marker:** `checkpoints/create-workspace/<target>/02-target.complete`

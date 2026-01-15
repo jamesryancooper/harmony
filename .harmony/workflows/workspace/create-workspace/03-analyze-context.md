@@ -1,3 +1,8 @@
+---
+title: Analyze Context
+description: Detect directory type and existing patterns.
+---
+
 # Step 3: Analyze Directory Context
 
 ## List contents
@@ -31,3 +36,15 @@ ls -la <target>
 - Config files that matter
 - Build/run scripts
 
+## Idempotency
+
+**Check:** Is context analysis already complete?
+- [ ] Checkpoint file exists: `checkpoints/create-workspace/<target>/03-context.complete`
+- [ ] Directory type cached
+- [ ] Detected patterns cached
+
+**If Already Complete:**
+- Load cached analysis
+- Skip to next step
+
+**Marker:** `checkpoints/create-workspace/<target>/03-context.complete`

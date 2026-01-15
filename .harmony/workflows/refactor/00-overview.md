@@ -2,6 +2,12 @@
 title: Refactor
 description: Execute a verified refactor with exhaustive audit and mandatory verification.
 access: human
+version: "1.1.0"
+depends_on: []
+checkpoints:
+  enabled: true
+  storage: ".workspace/progress/checkpoints/"
+parallel_steps: []
 ---
 
 # Refactor: Overview
@@ -52,6 +58,13 @@ Files like `progress/log.md`, `decisions/*.md`, and similar historical records a
 - **Don't:** Modify existing entries to reflect new names/paths
 
 Historical accuracy is more important than current naming consistency in these files.
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2025-01-14 | Added gap remediation fields (version, depends_on, checkpoints, parallel_steps) |
+| 1.0.0 | 2025-01-05 | Initial version |
 
 ## References
 

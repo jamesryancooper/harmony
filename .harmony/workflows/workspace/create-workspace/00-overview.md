@@ -2,6 +2,15 @@
 title: Create Workspace
 description: Scaffold a new .workspace directory in a target location.
 access: human
+version: "1.2.0"
+depends_on: []
+checkpoints:
+  enabled: true
+  storage: ".workspace/progress/checkpoints/"
+parallel_steps:
+  - group: "validation"
+    steps: ["01-validate-prerequisites", "02-validate-target"]
+    join_at: "03-analyze-context"
 ---
 
 # Create Workspace: Overview
@@ -32,6 +41,14 @@ Parent directory where `.workspace/` will be created.
 5. [Copy templates](./05-copy-templates.md)
 6. [Customize](./06-customize.md)
 7. [Verify](./07-verify.md)
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.2.0 | 2025-01-14 | Added frontmatter and Idempotency sections to all step files |
+| 1.1.0 | 2025-01-14 | Added gap remediation fields |
+| 1.0.0 | 2025-01-05 | Initial version |
 
 ## References
 

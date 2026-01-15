@@ -2,6 +2,12 @@
 title: Evaluate Workspace
 description: Evaluate a .workspace directory for token efficiency and effectiveness.
 access: human
+version: "1.1.0"
+depends_on: []
+checkpoints:
+  enabled: true
+  storage: ".workspace/progress/checkpoints/"
+parallel_steps: []
 ---
 
 # Evaluate Workspace: Overview
@@ -29,6 +35,13 @@ Existing `.workspace/` directory.
 1. [Assess files](./01-assess-files.md)
 2. [Classify content](./02-classify-content.md)
 3. [Generate report](./03-generate-report.md)
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2025-01-14 | Added gap remediation fields |
+| 1.0.0 | 2025-01-05 | Initial version |
 
 ## References
 

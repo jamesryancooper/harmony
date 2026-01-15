@@ -1,3 +1,8 @@
+---
+title: Customize Templates
+description: Replace placeholders with context-specific values.
+---
+
 # Step 6: Customize Templates
 
 Replace placeholders based on analysis and user input. Wildcards (`*`) indicate repeatable items.
@@ -21,3 +26,14 @@ Replace placeholders based on analysis and user input. Wildcards (`*`) indicate 
 | Has code | "Document current state", "Identify priorities" |
 | Has docs | "Audit existing content", "Identify gaps" |
 
+## Idempotency
+
+**Check:** Are templates already customized?
+- [ ] No `{{placeholder}}` patterns remain in files
+- [ ] `scope.md` has target-specific content
+
+**If Already Complete:**
+- Verify no placeholders remain
+- Skip to next step
+
+**Marker:** `checkpoints/create-workspace/<target>/06-customize.complete`

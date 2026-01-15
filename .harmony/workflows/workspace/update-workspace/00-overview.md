@@ -2,6 +2,14 @@
 title: Update Workspace
 description: Align an existing .workspace directory with the canonical definition.
 access: human
+version: "1.1.0"
+depends_on:
+  - workflow: workspace/evaluate-workspace
+    condition: "optional but recommended to run first"
+checkpoints:
+  enabled: true
+  storage: ".workspace/progress/checkpoints/"
+parallel_steps: []
 ---
 
 # Update Workspace: Overview
@@ -31,6 +39,13 @@ Existing `.workspace/` directory.
 3. [Assess tokens](./03-assess-tokens.md)
 4. [Propose changes](./04-propose-changes.md)
 5. [Execute](./05-execute.md)
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2025-01-14 | Added gap remediation fields |
+| 1.0.0 | 2025-01-05 | Initial version |
 
 ## References
 

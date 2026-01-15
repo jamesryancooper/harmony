@@ -58,6 +58,17 @@ Report to user:
 - All steps completed successfully
 - User has clear next steps
 
+## Idempotency
+
+**Check:** Was success already reported?
+- [ ] Checkpoint file exists: `checkpoints/create-skill/<skill-id>/06-success.complete`
+
+**If Already Complete:**
+- Display cached success message
+- Workflow already finished
+
+**Marker:** `checkpoints/create-skill/<skill-id>/06-success.complete`
+
 ## Output
 
 - Skill creation complete

@@ -336,3 +336,146 @@ The `mutability` frontmatter property provides a machine-readable signal that ag
 **Blockers:**
 
 - None
+
+## 2026-01-14 (session 4)
+
+**Session focus:** Workflow meta-architecture and gap remediation
+
+**Completed:**
+
+- Reviewed workflow architecture against 8 quality dimensions (efficiency, scalability, performance, reliability, maintainability, adaptability, usability, robustness)
+- Identified 6 gaps: idempotency, cross-workflow dependencies, conditional branching, checkpoints, versioning, parallel steps
+- Created workflow meta-architecture system:
+  - `.harmony/workflows/_template/` (4 files) — Canonical templates with gap fix fields
+  - `.harmony/workflows/workflows/create-workflow/` (9 files) — Scaffold new workflows
+  - `.harmony/workflows/workflows/evaluate-workflow/` (6 files) — Assess workflow quality
+  - `.harmony/workflows/workflows/update-workflow/` (6 files) — Update existing workflows
+  - `.harmony/context/workflow-gaps.md` — Gap remediation guide
+  - `.harmony/context/workflow-quality.md` — Quality criteria and grading rubric
+- Created trigger commands with harness symlinks:
+  - `.harmony/commands/create-workflow.md` → `/create-workflow`
+  - `.harmony/commands/evaluate-workflow.md` → `/evaluate-workflow`
+  - `.harmony/commands/update-workflow.md` → `/update-workflow`
+  - Symlinks in `.cursor/commands/` and `.claude/commands/`
+- Applied gap fixes to existing workflows:
+  - `.harmony/workflows/refactor/` — Overview frontmatter + idempotency in steps 01, 06
+  - `.harmony/workflows/skills/create-skill/` — All 6 steps updated (v1.2.0)
+  - `.harmony/workflows/workspace/create-workspace/` — All 7 steps updated (v1.2.0)
+  - `.harmony/workflows/missions/complete-mission/` — Overview frontmatter
+  - `.harmony/workflows/workspace/update-workspace/` — Overview frontmatter
+- Updated `.workspace/catalog.md` with new workflows and commands
+- Created ADR-005: Workflow Meta-Architecture and Gap Remediation
+
+**Decisions made:**
+
+- D017: Workflow versioning — Semantic versioning in frontmatter
+- D018: Step idempotency — Required `## Idempotency` section in all step files
+- D019: Harness symlinks — Required for `access: human` commands
+- D020: Meta-workflows — `workflows/workflows/` directory for workflow management
+
+**Rationale:**
+
+The workflow architecture prioritizes reliability and maintainability, which is correct for AI agents making irreversible changes. The gap fixes address the identified weaknesses while preserving strengths. The meta-workflow system ensures new workflows automatically incorporate these improvements.
+
+**Next:**
+
+- Apply gap fixes to remaining workflows (evaluate-workspace, migrate-workspace, create-mission)
+- Test `/create-workflow` command end-to-end
+- Test `/evaluate-workflow` on existing workflows
+
+**Blockers:**
+
+- None
+
+## 2026-01-14 (session 6)
+
+**Session focus:** Document Harmony primitives in central reference
+
+**Completed:**
+
+- Explored differences between skills, commands, and workflows
+- Created `.harmony/context/primitives.md` documenting all 7 Harmony primitives:
+  - Skills — Composable capabilities with I/O contracts
+  - Commands — Lightweight entry points
+  - Workflows — Multi-step procedures with checkpoints
+  - Assistants — Persona-based specialists (`@mention` invocation)
+  - Checklists — Quality gates for verification
+  - Prompts — Task templates with structured I/O
+  - Templates — Scaffolding for new structures
+- Added decision matrix for choosing between primitives
+- Added conceptual groupings (by question answered, by lifecycle phase)
+- Added example scenarios for each primitive type
+- Renamed from `concepts.md` to `primitives.md` for precision
+- Created ADR-007: Primitives Documentation
+
+**Decisions made:**
+
+- D025: Primitives documentation — Central reference in `.harmony/context/primitives.md`
+- D026: Seven primitives — Skills, Commands, Workflows, Assistants, Checklists, Prompts, Templates
+
+**Rationale:**
+
+The seven primitives were documented across various files but lacked a central reference explaining when to use each and how they differ. The new document provides a single source of truth with decision criteria, reducing primitive misuse and accelerating onboarding.
+
+**Next:**
+
+- Update `.harmony/README.md` to reference `primitives.md`
+- Test primitives documentation with actual use cases
+
+**Blockers:**
+
+- None
+
+## 2026-01-14 (session 5)
+
+**Session focus:** Create prompt-refiner skill with context-aware refinement pipeline
+
+**Completed:**
+
+- Created `.harmony/skills/prompt-refiner/` with 10-phase pipeline (v2.1.1):
+  - Phase 1: Context Analysis — Scan repo, identify scope, load constraints
+  - Phase 2: Intent Extraction — Parse intent, expand scope, correct errors
+  - Phase 3: Persona Assignment — Assign role, expertise level, style
+  - Phase 4: Reference Injection — Add file paths, code references, patterns
+  - Phase 5: Negative Constraints — Define anti-patterns, forbidden approaches
+  - Phase 6: Decomposition — Break into ordered sub-tasks
+  - Phase 7: Validation — Check feasibility, identify risks
+  - Phase 8: Self-Critique — Review for completeness, fix gaps
+  - Phase 9: Intent Confirmation — Summarize and confirm with user
+  - Phase 10: Output — Save refined prompt, optionally execute
+- Created harness symlinks for cross-CLI access:
+  - `.claude/skills/prompt-refiner` → `../../.harmony/skills/prompt-refiner`
+  - `.cursor/skills/prompt-refiner` → `../../.harmony/skills/prompt-refiner`
+  - `.codex/skills/prompt-refiner` → `../../.harmony/skills/prompt-refiner`
+- Updated `.harmony/skills/registry.yml` with prompt-refiner entry
+- Updated `.workspace/catalog.md` with skill in catalog table
+- Created ADR-006: Prompt Refiner Skill
+- Updated `.workspace/context/decisions.md` with D021-D024
+
+**Decisions made:**
+
+- D021: Prompt refiner skill — 10-phase pipeline for prompt refinement
+- D022: Persona assignment — Explicit role/expertise in refined prompts
+- D023: Negative constraints — Anti-patterns and forbidden approaches section
+- D024: Intent confirmation — User confirms understanding before execution
+
+**Version history:**
+
+- v1.0.0: Initial skill with basic refinement
+- v2.0.0: Added context analysis, reference injection, decomposition, validation
+- v2.1.0: Added persona assignment, negative constraints, self-critique, intent confirmation
+- v2.1.1: Renamed `execute_after` to `--execute` flag
+
+**Rationale:**
+
+Prompt quality significantly impacts AI output quality. The 10-phase pipeline addresses common issues: vague intent, missing codebase context, contradictions, scope creep, and misunderstanding user intent. Key innovations include persona assignment (sets appropriate depth/style), negative constraints (prevents common mistakes), self-critique (catches gaps before finalization), and intent confirmation (reduces wasted effort from misunderstandings).
+
+**Next:**
+
+- Test `/refine-prompt` command on actual prompts
+- Consider adding more persona templates for common task types
+- Evaluate if pipeline can be shortened for simple tasks
+
+**Blockers:**
+
+- None

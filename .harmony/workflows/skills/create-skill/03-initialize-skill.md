@@ -45,6 +45,19 @@ Update `skills/<skill-id>/SKILL.md` frontmatter and content:
 - `explicit_call_patterns` has `use skill: <skill-id>`
 - Dates are set to current date
 
+## Idempotency
+
+**Check:** Is SKILL.md already initialized?
+- [ ] Frontmatter `id` field matches `<skill-id>`
+- [ ] `created_at` field has valid date
+- [ ] `commands` array contains `/<skill-id>`
+
+**If Already Complete:**
+- Verify initialization is correct
+- Skip to next step
+
+**Marker:** `checkpoints/create-skill/<skill-id>/03-initialize.complete`
+
 ## Output
 
 - Initialized `SKILL.md` ready for user customization

@@ -82,6 +82,19 @@ Record the completed refactor in continuity artifacts and formally close the ref
 - TodoWrite cleared
 - Explicit completion declaration
 
+## Idempotency
+
+**Check:** Is documentation already complete?
+- [ ] Progress log has entry for this refactor
+- [ ] TodoWrite items are cleared
+- [ ] Completion was declared
+
+**If Already Complete:**
+- Verify documentation entries exist
+- Skip if all documentation present
+
+**Marker:** `checkpoints/refactor/<refactor-id>/06-document.complete`
+
 ## Refactor Complete When
 
 - [ ] Verification (Step 5) passed

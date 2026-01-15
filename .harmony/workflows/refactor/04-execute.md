@@ -85,6 +85,23 @@ If you find a reference not in the manifest:
 - Continuity artifacts updated (append-only)
 - Any discovered items noted
 
+## Idempotency
+
+**Check:** Are changes partially or fully executed?
+- [ ] Check TodoWrite for completion status
+- [ ] Check if manifest items are marked done
+- [ ] Verify files reflect expected changes
+
+**If Partially Complete:**
+- Resume from first incomplete manifest item
+- Skip already-completed items
+
+**If Fully Complete:**
+- Verify all items marked done
+- Skip to verification step
+
+**Marker:** `checkpoints/refactor/<refactor-id>/04-execute.complete`
+
 ## Proceed When
 
 - Every manifest item is marked complete

@@ -36,6 +36,18 @@ description: Check skill ID format and uniqueness.
 - Invalid format: "Skill ID must be lowercase with hyphens (e.g., 'history-researcher')"
 - Already exists: "Skill '[id]' already exists in registry.yml"
 
+## Idempotency
+
+**Check:** Is validation already complete for this skill-id?
+- [ ] Checkpoint file exists: `checkpoints/create-skill/<skill-id>/01-validate.complete`
+- [ ] Validation passed previously
+
+**If Already Complete:**
+- Load cached validation result
+- Skip to next step
+
+**Marker:** `checkpoints/create-skill/<skill-id>/01-validate.complete`
+
 ## Output
 
 - Validated skill ID ready for use

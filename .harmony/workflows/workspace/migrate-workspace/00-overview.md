@@ -2,6 +2,12 @@
 title: Migrate Workspace
 description: Upgrade an older workspace to current conventions.
 access: human
+version: "1.1.0"
+depends_on: []
+checkpoints:
+  enabled: true
+  storage: ".workspace/progress/checkpoints/"
+parallel_steps: []
 ---
 
 # Migrate Workspace: Overview
@@ -31,6 +37,13 @@ Existing `.workspace/` directory using older conventions.
 2. [Structure migration](./02-structure-migration.md)
 3. [Content migration](./03-content-migration.md)
 4. [Validation](./04-validation.md)
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2025-01-14 | Added gap remediation fields |
+| 1.0.0 | 2025-01-05 | Initial version |
 
 ## References
 

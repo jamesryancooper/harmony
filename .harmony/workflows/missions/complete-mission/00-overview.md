@@ -2,6 +2,14 @@
 title: Complete Mission
 description: Archive a completed mission.
 access: human
+version: "1.1.0"
+depends_on:
+  - workflow: missions/create-mission
+    condition: "Mission must exist"
+checkpoints:
+  enabled: true
+  storage: ".workspace/progress/checkpoints/"
+parallel_steps: []
 ---
 
 # Complete Mission
@@ -45,6 +53,13 @@ missions/.archive/<slug>/
 | Flag | Description |
 |------|-------------|
 | `--cancelled` | Mark as cancelled instead of completed |
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2025-01-14 | Added gap remediation fields |
+| 1.0.0 | 2025-01-05 | Initial version |
 
 ## Related
 

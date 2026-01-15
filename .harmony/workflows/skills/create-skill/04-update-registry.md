@@ -44,6 +44,18 @@ skills:
 - `path` points to correct directory
 - `explicit_call_patterns` included
 
+## Idempotency
+
+**Check:** Is registry already updated?
+- [ ] Entry with `id: <skill-id>` exists in `registry.yml`
+- [ ] Entry has correct `path` value
+
+**If Already Complete:**
+- Verify entry is correct
+- Skip to next step
+
+**Marker:** `checkpoints/create-skill/<skill-id>/04-registry.complete`
+
 ## Output
 
 - Updated `registry.yml` with new skill entry

@@ -30,6 +30,19 @@ description: Copy skill template to new skill directory.
 - File `skills/<skill-id>/SKILL.md` exists
 - Subdirectories created (templates/, reference/, scripts/)
 
+## Idempotency
+
+**Check:** Is template already copied?
+- [ ] Directory `skills/<skill-id>/` exists
+- [ ] File `skills/<skill-id>/SKILL.md` exists
+- [ ] Symlinks exist in harness directories
+
+**If Already Complete:**
+- Verify directory structure is complete
+- Skip to next step if all files present
+
+**Marker:** `checkpoints/create-skill/<skill-id>/02-copy.complete`
+
 ## Output
 
 - New skill directory with template files

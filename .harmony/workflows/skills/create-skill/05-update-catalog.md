@@ -32,6 +32,18 @@ If the table only has the placeholder row ("*No skills defined yet*"), replace i
 - Link to `skill.md` is correct
 - Command matches registry
 
+## Idempotency
+
+**Check:** Is catalog already updated?
+- [ ] Skills table in `catalog.md` contains entry for `<skill-id>`
+- [ ] Entry has correct link and command
+
+**If Already Complete:**
+- Verify entry is correct
+- Skip to next step
+
+**Marker:** `checkpoints/create-skill/<skill-id>/05-catalog.complete`
+
 ## Output
 
 - Updated `catalog.md` with new skill entry

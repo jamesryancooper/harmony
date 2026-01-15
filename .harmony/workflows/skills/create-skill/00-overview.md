@@ -2,6 +2,12 @@
 title: Create Skill
 description: Scaffold a new skill from template with registry entry.
 access: human
+version: "1.2.0"
+depends_on: []
+checkpoints:
+  enabled: true
+  storage: ".workspace/progress/checkpoints/"
+parallel_steps: []
 ---
 
 # Create Skill
@@ -62,6 +68,14 @@ skills/<skill-id>/
 3. Write behavior steps
 4. Set safety policies
 5. Add acceptance criteria
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.2.0 | 2025-01-14 | Added Idempotency sections to all step files |
+| 1.1.0 | 2025-01-14 | Added gap remediation fields |
+| 1.0.0 | 2025-01-05 | Initial version |
 
 ## References
 

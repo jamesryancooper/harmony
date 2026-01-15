@@ -75,6 +75,20 @@ A complete audit manifest listing:
 - Which specific patterns matched
 - Physical files/directories to rename
 
+## Idempotency
+
+**Check:** Is audit already complete for this refactor?
+- [ ] Audit results document exists
+- [ ] All search variations have recorded results
+- [ ] Files list is consolidated
+
+**If Already Complete:**
+- Load existing audit results
+- Ask user if re-audit needed
+- Skip to next step if no re-audit
+
+**Marker:** `checkpoints/refactor/<refactor-id>/02-audit.complete`
+
 ## Proceed When
 
 - ALL search variations have been run

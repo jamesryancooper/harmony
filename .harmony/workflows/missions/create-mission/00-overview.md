@@ -2,6 +2,12 @@
 title: Create Mission
 description: Scaffold a new mission from template.
 access: human
+version: "1.1.0"
+depends_on: []
+checkpoints:
+  enabled: true
+  storage: ".workspace/progress/checkpoints/"
+parallel_steps: []
 ---
 
 # Create Mission
@@ -46,6 +52,13 @@ missions/<slug>/
 2. Assign an owner (agent role or @assistant)
 3. Add initial tasks to `tasks.json`
 4. Begin work on the mission
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.1.0 | 2025-01-14 | Added gap remediation fields |
+| 1.0.0 | 2025-01-05 | Initial version |
 
 ## Related
 
