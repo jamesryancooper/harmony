@@ -24,7 +24,7 @@
 # Note: Input/output paths are defined in .workspace/skills/registry.yml
 # to keep workspace-specific configuration separate from portable skill logic.
 #
-# Note: The pattern "use skill: <id>" is universal and does not need
+# Note: The pattern "use skill: {{id}}" is universal and does not need
 # per-skill configuration. Agents recognize this pattern automatically.
 
 schema_version: "1.2"
@@ -39,7 +39,7 @@ routing:
 # Extended skill metadata (keyed by id)
 skills:
   research-synthesizer:
-    version: "1.0.0"
+    version: "1.0.1"
     commands:
       - /synthesize-research
     parameters:

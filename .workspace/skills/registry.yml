@@ -13,7 +13,7 @@
 # For Tier 1 discovery (id, name, summary, triggers), see manifest.yml
 #
 # I/O Schema:
-#   path         - File path (supports <placeholders>)
+#   path         - File path (supports {{placeholders}})
 #   kind         - file | directory (default: file)
 #   format       - markdown | json | yaml | text | binary
 #   required     - true | false (for inputs, default: true)
@@ -101,9 +101,9 @@ pipelines:
   #     - research-synthesizer
   #     - html-reader-builder
   #   inputs:
-  #     - path: "projects/<project>/"
+  #     - path: "projects/{{project}}/"
   #       kind: directory
   #   outputs:
-  #     - path: "outputs/html/<project>.html"
+  #     - path: "outputs/html/{{project}}.html"
   #       kind: file
   #       format: html

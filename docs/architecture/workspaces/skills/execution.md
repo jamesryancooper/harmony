@@ -208,6 +208,27 @@ Placeholders use **double curly braces with snake_case** names:
 - `{{project_name}}` — Not `<project-name>` or `{{projectName}}`
 - `{{skill_id}}` — Not `<skill>` or `{{skillId}}`
 
+### Placeholder Usage Contexts
+
+The `{{snake_case}}` format is used consistently across **three contexts**:
+
+| Context | Purpose | Example |
+|---------|---------|---------|
+| **Path interpolation** | Runtime path resolution in registry | `outputs/{{category}}/{{timestamp}}-{{name}}.md` |
+| **Template fill-ins** | Skill authoring placeholders | `{{skill_name}}`, `{{Description}}` |
+| **Output format examples** | Document structure in documentation | `**Generated:** {{timestamp}}` |
+
+**Path interpolation:** Placeholders in `registry.yml` paths that are resolved at execution time. The agent substitutes actual values (e.g., `{{topic}}` becomes `api-design`).
+
+**Template fill-ins:** Placeholders in `_template/` files and reference file templates that skill authors replace with actual content when creating a new skill.
+
+**Output format examples:** Placeholders in documentation showing what generated output documents will contain. These appear in SKILL.md "Output Format" sections and io-contract.md output structure examples to indicate where dynamic content appears.
+
+**Why consistency matters:**
+- Single format to learn and recognize
+- Validation scripts can detect deprecated formats (`<placeholder>`, `[placeholder]`)
+- Clear visual distinction from literal text and markdown syntax
+
 ### Standard Placeholders
 
 | Placeholder | Resolution | Example |

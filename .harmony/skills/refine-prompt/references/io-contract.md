@@ -16,6 +16,7 @@
 Extended input/output documentation for the refine-prompt skill.
 
 > **Authoritative Sources:**
+>
 > - Tool permissions: `SKILL.md` frontmatter `allowed-tools`
 > - Parameters: `.harmony/skills/registry.yml`
 > - Output paths: `.workspace/skills/registry.yml`
@@ -37,53 +38,53 @@ The refined prompt follows this structure:
 ```markdown
 # Refined Prompt
 
-**Original:** [quoted original prompt]
-**Refined:** [timestamp]
-**Context Depth:** [minimal/standard/deep]
-**Status:** [confirmed/pending confirmation]
+**Original:** {{original_prompt}}
+**Refined:** {{timestamp}}
+**Context Depth:** {{minimal/standard/deep}}
+**Status:** {{confirmed/pending confirmation}}
 
 ---
 
 ## Execution Persona
-[Role, expertise level, perspective, style]
+{{Role, expertise level, perspective, style}}
 
 ## Repository Context
-[Tech stack, relevant modules, files in scope, patterns to follow]
+{{Tech stack, relevant modules, files in scope, patterns to follow}}
 
 ## Intent
-[Clear statement of what to accomplish]
+{{Clear statement of what to accomplish}}
 
 ## Requirements
-[Explicit numbered requirements]
+{{Explicit numbered requirements}}
 
 ## Assumptions Made
-[Listed assumptions with reasoning]
+{{Listed assumptions with reasoning}}
 
 ## Negative Constraints (What NOT To Do)
-[Anti-patterns, forbidden approaches, out of scope items]
+{{Anti-patterns, forbidden approaches, out of scope items}}
 
 ## Sub-Tasks
-[Decomposed tasks with dependencies]
+{{Decomposed tasks with dependencies}}
 
 ## Risks & Edge Cases
-[Identified risks and edge cases to handle]
+{{Identified risks and edge cases to handle}}
 
 ## Success Criteria
-[Measurable completion criteria]
+{{Measurable completion criteria}}
 
 ## Self-Critique Results
-[Completeness, ambiguity, feasibility, quality checks]
+{{Completeness, ambiguity, feasibility, quality checks}}
 
 ## Intent Confirmation
-[Summary, key decisions, user response]
+{{Summary, key decisions, user response}}
 
 ## Refined Prompt
-[The actual refined prompt text, self-contained]
+{{The actual refined prompt text, self-contained}}
 ```
 
 ## Dependencies
 
-Tool requirements are defined in `.harmony/skills/registry.yml` (single source of truth).
+Tool requirements are defined in SKILL.md `allowed-tools` frontmatter (single source of truth).
 
 No external dependencies required. Works with any codebase structure.
 

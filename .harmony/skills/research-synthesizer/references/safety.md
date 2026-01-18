@@ -14,6 +14,7 @@ description: Security boundaries and behavioral constraints for the research-syn
 Security boundaries and behavioral constraints for the research-synthesizer skill.
 
 > **Authoritative Sources:**
+>
 > - Tool permissions: `SKILL.md` frontmatter `allowed-tools`
 > - Output paths: `.workspace/skills/registry.yml`
 
@@ -49,6 +50,7 @@ The skill may only write to designated output locations:
 **Policy:** Never
 
 The skill must never:
+
 - Delete files
 - Overwrite source research notes
 - Modify files outside designated output paths

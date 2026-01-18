@@ -85,7 +85,7 @@ Acceptance criteria and quality checklist for the research-synthesizer skill.
 
 | Path Type | Pattern | Example |
 |-----------|---------|---------|
-| Synthesis output | `outputs/drafts/<topic>-synthesis.md` | `outputs/drafts/api-design-synthesis.md` |
+| Synthesis output | `outputs/drafts/{{topic}}-synthesis.md` | `outputs/drafts/api-design-synthesis.md` |
 | Run log | `logs/runs/{{timestamp}}-research-synthesizer.md` | `logs/runs/2025-01-12T10-31-00Z-research-synthesizer.md` |
 
 ## Error Conditions

@@ -11,6 +11,12 @@ metadata:
   created: "{{created_date}}"
   updated: "{{updated_date}}"
   # Note: version is defined in .harmony/skills/registry.yml, not here
+# Tool Permissions (Single Source of Truth)
+# Format: Space-delimited list. Add (path/glob) to scope writes.
+# Example: Read Glob Grep Write(outputs/*) Write(logs/*)
+#          └─ Read-only ─┘     └─ Scoped writes ────────┘
+# See: docs/architecture/workspaces/skills/specification.md#tool-permissions-single-source-of-truth
+# Tool reference: Read, Glob, Grep, Write(path/*), WebFetch, Shell, Task
 allowed-tools: Read Glob Grep Write(outputs/*) Write(logs/*)
 ---
 
@@ -28,7 +34,7 @@ Use this skill when:
 
 ## Quick Start
 
-```
+```markdown
 /{{skill_name}} "{{example_input}}"
 ```
 
@@ -68,15 +74,28 @@ Outputs are written to `outputs/{{output_category}}/` (results) and `logs/runs/`
 
 Reference files are **optional**. Choose the archetype that matches your skill's complexity:
 
-| Archetype | Structure | When to Use |
-|-----------|-----------|-------------|
-| **Utility** | SKILL.md only | Single-purpose skills with obvious I/O |
-| **Workflow** | SKILL.md + references/ | Multi-phase execution with defined steps |
-| **Domain** | Workflow + domain files | Specialized domains requiring terminology & auditability |
+| Archetype    | Structure               | When to Use                                              |
+|--------------|-------------------------|----------------------------------------------------------|
+| **Utility**  | SKILL.md only           | Single-purpose skills with obvious I/O                   |
+| **Workflow** | SKILL.md + references/  | Multi-phase execution with defined steps                 |
+| **Domain**   | Workflow + domain files | Specialized domains requiring terminology & auditability |
 
 See [Reference Artifacts](../../../docs/architecture/workspaces/skills/reference-artifacts.md) for the full archetype decision matrix.
 
-**This template includes Workflow archetype references:**
+### Utility Archetype (Simplest)
+
+For simple skills, delete the `references/` folder entirely and keep only SKILL.md. A Utility skill is appropriate when:
+
+- The skill has a single, obvious purpose
+- Input/output formats are self-explanatory
+- No complex multi-phase workflow
+- No domain-specific terminology needed
+
+**To convert to Utility archetype:** Delete `references/` directory. Everything needed fits in this SKILL.md file.
+
+### Workflow Archetype (This Template)
+
+This template includes Workflow archetype references:
 
 - [I/O contract](references/io-contract.md) - Inputs, outputs, dependencies, command-line usage
 - [Safety policies](references/safety.md) - Tool and file policies
@@ -84,8 +103,10 @@ See [Reference Artifacts](../../../docs/architecture/workspaces/skills/reference
 - [Behavior phases](references/behaviors.md) - Full phase-by-phase instructions
 - [Validation](references/validation.md) - Acceptance criteria
 
-**For Domain archetype, add:**
+### Domain Archetype (Most Complex)
+
+For Domain archetype, add:
 
 - `errors.md` - Error codes and recovery procedures
 - `glossary.md` - Domain-specific terminology
-- `<domain>.md` - Domain-specific reference material (e.g., `finance.md`, `security.md`)
+- `{{domain}}.md` - Domain-specific reference material (e.g., `finance.md`, `security.md`)

@@ -19,6 +19,38 @@ This invokes the workflow defined in `.harmony/workflows/skills/create-skill/`.
 
 ---
 
+## Choose Your Archetype First
+
+**Reference files are optional.** Before creating a skill, choose the appropriate archetype based on complexity:
+
+| Archetype | Structure | When to Use |
+|-----------|-----------|-------------|
+| **Utility** | `SKILL.md` only | Single-purpose skills with obvious I/O (e.g., `format-json`, `validate-schema`) |
+| **Workflow** | `SKILL.md` + `references/` | Multi-phase execution with defined steps (e.g., `refine-prompt`) |
+| **Domain** | Workflow + domain files | Specialized domains requiring terminology & auditability |
+
+### Utility Skills: The Simplest Option
+
+For simple, single-purpose skills, you can skip reference files entirely:
+
+```
+my-utility-skill/
+└── SKILL.md              # All instructions, examples, constraints in one file
+```
+
+**When to use Utility archetype:**
+
+- Skill does one thing well
+- Obvious inputs and outputs (1-2 inputs, 1 output)
+- All instructions fit comfortably in SKILL.md (<200 lines)
+- No complex edge cases or domain-specific terminology
+
+**You still need to:** Add entries to `manifest.yml` and `registry.yml` for discovery.
+
+See [Reference Artifacts](./reference-artifacts.md) for the full archetype decision matrix.
+
+---
+
 ## Workflow Steps
 
 | Step | File | Purpose |
@@ -59,7 +91,7 @@ A new skill directory following the agentskills.io spec:
 
 ## Post-Creation Steps
 
-After the workflow completes, you need to:
+After the workflow completes, customize based on your chosen archetype.
 
 ### 1. Edit `SKILL.md`
 
@@ -73,9 +105,11 @@ Add the skill's core content:
 - Boundaries and constraints
 - Escalation conditions
 
-### 2. Edit Reference Files
+### 2. Edit Reference Files (Workflow/Domain Only)
 
-Customize each reference file in `references/`:
+> **Utility archetype:** Skip this step. Keep all content in `SKILL.md` and delete the empty `references/` directory if created.
+
+For Workflow and Domain archetypes, customize each reference file in `references/`:
 
 | File | What to Add |
 |------|-------------|

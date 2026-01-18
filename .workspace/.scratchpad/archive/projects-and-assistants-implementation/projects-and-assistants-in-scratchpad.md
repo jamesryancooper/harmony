@@ -238,7 +238,7 @@ Add a small script that:
 
 - indexes `projects/**/CONTEXT/**` + `DECISIONS.md` + `MEMORY.md`
 - creates an embeddings index under `runtime/index/`
-- supports a command like: `scratchpad recall <project> "query"`
+- supports a command like: `scratchpad recall {{project}} "query"`
 
 This gives you “ask the project” recall without having to manually @mention a dozen files.
 

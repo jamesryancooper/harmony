@@ -158,11 +158,13 @@ flowchart TB
 
 ## Workspaces
 
-- [ ] Update pillar simplicity over complexity with mention of justified complexity.
 - [ ] Create a workspaceKit for creating and managing workspaces.
 - [ ] Determine where we implement the workspace resolution algorithm that was documented in @docs/architecture/workspaces/skills/architecture.md. In the @.harmony/skills/scripts directory?
 
+## Principles
 
+- [ ] Stop with diminishing returns.
+- [ ] Update simplicity over complexity with mention of justified complexity.
 
 ## Pillars
 

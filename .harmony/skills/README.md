@@ -56,11 +56,27 @@ Creating a new skill requires updating **4 files** across **2 locations**. Use t
 
 **Skill Archetypes** (choose based on complexity):
 
-| Archetype | Reference Files | When to Use |
-|-----------|-----------------|-------------|
-| **Utility** | None | Single-purpose, obvious I/O |
-| **Workflow** | io-contract, safety, examples, behaviors, validation | Multi-phase execution |
-| **Domain** | Workflow + errors, glossary, `<domain>.md` | Specialized domains |
+| Archetype     | Reference Files                                        | When to Use                 |
+|:------------- |:------------------------------------------------------ |:----------------------------|
+| **Utility**   | None                                                   | Single-purpose, obvious I/O |
+| **Workflow**  | io-contract, safety, examples, behaviors, validation   | Multi-phase execution       |
+| **Domain**    | Workflow + errors, glossary, `{{domain}}.md`           | Specialized domains         |
+
+**Archetype Selection Matrix:**
+
+| Question | Yes → | No → |
+|----------|-------|------|
+| Can you explain the skill in one sentence? | Consider Utility | Continue ↓ |
+| Does the skill have multiple distinct phases? | Continue ↓ | Utility |
+| Are there safety boundaries or escalation rules? | Continue ↓ | Utility |
+| Does the skill require domain-specific terminology? | Domain | Workflow |
+| Are there complex error recovery procedures? | Domain | Workflow |
+
+**Decision Examples:**
+
+- **Format JSON** → Utility (single-purpose, no phases, obvious I/O)
+- **Refine Prompt** → Workflow (10 phases, context analysis, safety boundaries)
+- **Financial Audit** → Domain (terminology glossary, compliance rules, audit trail requirements)
 
 The template includes **Workflow** archetype files. See [reference-artifacts.md](../../docs/architecture/workspaces/skills/reference-artifacts.md) for details.
 
@@ -130,10 +146,10 @@ use skill: research-synthesizer
 │   │  registry.yml ──────▶ Extended metadata (commands, parameters)      │   │
 │   │       │                      ~50 tokens/skill                       │   │
 │   │       ▼                                                             │   │
-│   │  <skill>/SKILL.md ──▶ Full instructions + allowed-tools             │   │
+│   │  {{skill}}/SKILL.md ──▶ Full instructions + allowed-tools           │   │
 │   │       │                      <5000 tokens                           │   │
 │   │       ▼                                                             │   │
-│   │  <skill>/references/ ▶ Detailed docs, examples, scripts             │   │
+│   │  {{skill}}/references/ ▶ Detailed docs, examples, scripts           │   │
 │   │                              On demand                              │   │
 │   └─────────────────────────────────────────────────────────────────────┘   │
 │                                    │                                        │
@@ -181,13 +197,13 @@ DATA FLOW:
 
 ## Single Source of Truth
 
-| Metadata | Source |
-|----------|--------|
-| `name`, `description` | SKILL.md frontmatter |
-| `allowed-tools` (tool permissions) | SKILL.md frontmatter (**authoritative**) |
-| `summary`, `triggers`, `tags` | `.harmony/skills/manifest.yml` |
-| `version`, `commands`, `parameters`, `depends_on` | `.harmony/skills/registry.yml` |
-| Input/output paths | `.workspace/skills/registry.yml` |
+| Metadata                                         | Source                                   |
+|--------------------------------------------------|------------------------------------------|
+| `name`, `description`                            | SKILL.md frontmatter                     |
+| `allowed-tools` (tool permissions)               | SKILL.md frontmatter (**authoritative**) |
+| `summary`, `triggers`, `tags`                    | `.harmony/skills/manifest.yml`           |
+| `version`, `commands`, `parameters`, `depends_on`| `.harmony/skills/registry.yml`           |
+| Input/output paths                               | `.workspace/skills/registry.yml`         |
 
 **Tool Permissions:** `allowed-tools` in SKILL.md is the single source of truth. The internal format is derived via the mapping function in `validate-skills.sh`. See [specification.md](../../docs/architecture/workspaces/skills/specification.md) for details.
 
@@ -224,9 +240,10 @@ Without tiktoken, word count approximation is used (±20% variance). CI environm
 
 Skills are exposed to different AI agents (Claude, Cursor, Codex) via symlinks from their respective skills directories to the shared `.harmony/skills/` definitions. This allows multiple agents to share the same canonical skill definitions.
 
-### Why Symlinks?
+### Why Symlinks
 
 Agent products discover skills in their own directories:
+
 - `.claude/skills/` — Claude Code
 - `.cursor/skills/` — Cursor
 - `.codex/skills/` — Codex
@@ -263,12 +280,12 @@ ln -s ../../.harmony/skills/refine-prompt .codex/skills/refine-prompt
 
 ### Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Symlinks not working | Ensure your filesystem supports symlinks (Windows may need admin) |
-| Agent can't find skill | Run `setup-harness-links.sh` to recreate links |
-| Wrong skill version | Delete the symlink and recreate it |
-| Permission denied | Check file permissions on `.harmony/skills/` |
+| Issue                 | Solution                                                         |
+|-----------------------|------------------------------------------------------------------|
+| Symlinks not working  | Ensure your filesystem supports symlinks (Windows may need admin)|
+| Agent can't find skill| Run `setup-harness-links.sh` to recreate links                   |
+| Wrong skill version   | Delete the symlink and recreate it                               |
+| Permission denied     | Check file permissions on `.harmony/skills/`                     |
 
 ### Verification
 
@@ -279,6 +296,58 @@ ls -la .claude/skills/
 ls -la .cursor/skills/
 ls -la .codex/skills/
 ```
+
+## Harmony Extensions
+
+Harmony extends the [agentskills.io specification](https://agentskills.io/specification) with additional fields for discovery, routing, and lifecycle management. The base spec requires only `name` and `description` in SKILL.md frontmatter.
+
+### Manifest Extensions (`.harmony/skills/manifest.yml`)
+
+| Field | Purpose | Example |
+|-------|---------|---------|
+| `display_name` | Human-readable title (Title Case) | `"Research Synthesizer"` |
+| `status` | Lifecycle state | `active`, `experimental`, `deprecated` |
+| `tags` | Filtering and grouping labels | `[research, synthesis]` |
+| `triggers` | Natural language phrases for intent matching | `["synthesize my research"]` |
+
+### Registry Extensions (`.harmony/skills/registry.yml`)
+
+| Field | Purpose | Example |
+|-------|---------|---------|
+| `version` | Semantic version string | `"1.0.0"` |
+| `commands` | Slash commands that invoke the skill | `[/synthesize-research]` |
+| `parameters` | Input parameters with types and defaults | See schema below |
+| `requires.context` | Context conditions for activation | `[{type: directory_exists, path: ".workspace/"}]` |
+| `depends_on` | Other skills this skill requires | `[]` |
+
+**Parameter Schema:**
+
+```yaml
+parameters:
+  - name: param_name        # Identifier
+    type: text              # text | boolean | file | folder
+    required: true          # true | false
+    default: "value"        # Default (if not required)
+    description: "..."      # Human-readable description
+```
+
+### Tool Permissions (SKILL.md `allowed-tools`)
+
+The `allowed-tools` field in SKILL.md frontmatter is the **single source of truth** for tool permissions. Harmony extends the agentskills.io format with path scoping:
+
+```yaml
+allowed-tools: Read Glob Grep Write(outputs/*) Write(logs/*)
+#              │    │    │    │                 │
+#              │    │    │    │                 └─ Scoped write (logs only)
+#              │    │    │    └─ Scoped write (outputs only)
+#              │    │    └─ Read-only tool
+#              │    └─ Read-only tool
+#              └─ Read-only tool
+```
+
+**Format:** Space-delimited list of tool names. Add `(path/glob)` suffix to scope write permissions.
+
+**Important:** Tool permissions are defined ONLY in SKILL.md. Do not duplicate in registry.yml or reference files.
 
 ## See Also
 

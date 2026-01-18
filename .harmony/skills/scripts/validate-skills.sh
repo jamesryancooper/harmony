@@ -6,9 +6,10 @@
 #   If no arguments, validates all skills
 #
 # Options:
-#   --strict     Treat trigger duplicates as errors (not warnings)
-#   --fix        Auto-fix issues where possible (scaffold missing entries)
-#   --help       Show this help message
+#   --strict              Treat trigger duplicates as errors (not warnings)
+#   --strict-display-name Treat display_name convention violations as errors
+#   --fix                 Auto-fix issues where possible (scaffold missing entries)
+#   --help                Show this help message
 #
 # Checks:
 #   1. Directory exists
@@ -33,6 +34,8 @@
 #   19. Cross-reference validation (all manifest skills have registry entries and vice versa)
 #   20. Reference file content validation (io-contract.md parameters match registry, examples use correct commands)
 #   21. Placeholder format validation ({{snake_case}} in workspace registry paths)
+#   22. Version staleness check (warns if version is 1.0.0 for mature skills)
+#   23. Line count validation (SKILL.md < 500 lines per agentskills.io spec)
 #
 # Tool Permission Model:
 #   - allowed-tools in SKILL.md frontmatter is the SINGLE SOURCE OF TRUTH
@@ -57,8 +60,10 @@ WORKSPACE_REGISTRY="$REPO_ROOT/.workspace/skills/registry.yml"
 
 # Configuration
 STRICT_MODE=false
+STRICT_DISPLAY_NAME=false
 FIX_MODE=false
 SKILL_MD_TOKEN_BUDGET=5000
+SKILL_MD_LINE_BUDGET=500
 MANIFEST_ENTRY_TOKEN_BUDGET=100
 
 # Colors for output
@@ -82,6 +87,10 @@ while [[ "$1" == --* ]]; do
             STRICT_MODE=true
             shift
             ;;
+        --strict-display-name)
+            STRICT_DISPLAY_NAME=true
+            shift
+            ;;
         --fix)
             FIX_MODE=true
             shift
@@ -98,12 +107,12 @@ done
 
 log_error() {
     echo -e "${RED}ERROR:${NC} $1"
-    ((errors++))
+    ((errors++)) || true
 }
 
 log_warning() {
     echo -e "${YELLOW}WARNING:${NC} $1"
-    ((warnings++))
+    ((warnings++)) || true
 }
 
 log_success() {
@@ -461,7 +470,7 @@ validate_skill_io_scope() {
             validation_result=$(validate_path_scope "$output_path" "$REPO_ROOT/.workspace/skills/")
             if [[ -n "$validation_result" ]]; then
                 log_error "Skill '$skill_id': $validation_result"
-                ((issues++))
+                ((issues++)) || true
             fi
         fi
     done < <(get_workspace_output_paths "$skill_id")
@@ -541,7 +550,7 @@ validate_skill_placeholders() {
                     validation_result=$(validate_placeholder_format "$placeholder" 2>&1)
                     if [[ $? -ne 0 ]]; then
                         log_warning "Path '$path': $validation_result"
-                        ((issues++))
+                        ((issues++)) || true
                     fi
                 fi
             done < <(extract_placeholders "$path")
@@ -675,7 +684,7 @@ validate_token_budgets() {
         if [[ $skill_tokens -gt $SKILL_MD_TOKEN_BUDGET ]]; then
             log_warning "SKILL.md exceeds token budget (~$skill_tokens > $SKILL_MD_TOKEN_BUDGET tokens)"
             log_info "  Consider moving detailed content to references/"
-            ((issues++))
+            ((issues++)) || true
         else
             log_success "SKILL.md within token budget (~$skill_tokens tokens)"
         fi
@@ -687,12 +696,51 @@ validate_token_budgets() {
     if [[ $manifest_tokens -gt $MANIFEST_ENTRY_TOKEN_BUDGET ]]; then
         log_warning "Manifest entry exceeds token budget (~$manifest_tokens > $MANIFEST_ENTRY_TOKEN_BUDGET tokens)"
         log_info "  Consider shortening summary or reducing triggers"
-        ((issues++))
+        ((issues++)) || true
     else
         log_success "Manifest entry within token budget (~$manifest_tokens tokens)"
     fi
 
     return $issues
+}
+
+# ============================================================================
+# Line Count Validation
+# ============================================================================
+# Validates that SKILL.md stays under 500 lines per agentskills.io spec.
+# Detailed content should be moved to references/ directory.
+
+# Count lines in SKILL.md (excluding empty lines at end)
+get_skill_line_count() {
+    local skill_dir="$1"
+    local skill_md="$skill_dir/SKILL.md"
+    if [[ -f "$skill_md" ]]; then
+        wc -l < "$skill_md" | tr -d ' '
+    else
+        echo 0
+    fi
+}
+
+# Validate line count for SKILL.md
+# Returns 0 if OK, 1 if over budget with message to stdout
+validate_line_count() {
+    local skill_dir="$1"
+    local skill_md="$skill_dir/SKILL.md"
+
+    if [[ ! -f "$skill_md" ]]; then
+        echo "SKILL.md not found"
+        return 1
+    fi
+
+    local line_count
+    line_count=$(get_skill_line_count "$skill_dir")
+
+    if [[ $line_count -gt $SKILL_MD_LINE_BUDGET ]]; then
+        echo "SKILL.md exceeds line budget ($line_count > $SKILL_MD_LINE_BUDGET lines)"
+        return 1
+    fi
+
+    return 0
 }
 
 # ============================================================================
@@ -757,9 +805,9 @@ check_description_summary_alignment() {
     local total_count=0
     for word in $sum_words; do
         if [[ ${#word} -gt 3 ]]; then  # Only check words > 3 chars
-            ((total_count++))
+            ((total_count++)) || true
             if ! echo "$desc_lower" | grep -q "$word"; then
-                ((missing_count++))
+                ((missing_count++)) || true
             fi
         fi
     done
@@ -801,7 +849,7 @@ check_manifest_registry_sync() {
             if [[ "$FIX_MODE" == "true" ]]; then
                 scaffold_registry_entry "$skill_id"
             fi
-            ((issues++))
+            ((issues++)) || true
         fi
     done
     
@@ -812,7 +860,7 @@ check_manifest_registry_sync() {
             if [[ "$FIX_MODE" == "true" ]]; then
                 scaffold_manifest_entry "$skill_id"
             fi
-            ((issues++))
+            ((issues++)) || true
         fi
     done
     
@@ -1142,7 +1190,7 @@ validate_reference_content() {
     param_result=$(validate_io_contract_parameters "$skill_id" "$skill_dir" 2>&1)
     if [[ $? -ne 0 ]]; then
         result="${result}${param_result}; "
-        ((issues++))
+        ((issues++)) || true
     fi
 
     # Check examples.md command usage
@@ -1150,12 +1198,72 @@ validate_reference_content() {
     cmd_result=$(validate_examples_commands "$skill_id" "$skill_dir" 2>&1)
     if [[ $? -ne 0 ]]; then
         result="${result}${cmd_result}; "
-        ((issues++))
+        ((issues++)) || true
     fi
 
     if [[ $issues -gt 0 ]]; then
         echo "${result%, }"
         return 1
+    fi
+
+    return 0
+}
+
+# ============================================================================
+# Version Staleness Check
+# ============================================================================
+# Warns when a skill has version "1.0.0" but appears mature (has reference files).
+# This is a reminder to consider version bumps for production skills.
+
+# Get version from registry for a skill
+get_registry_version() {
+    local skill_id="$1"
+    awk -v skill="$skill_id" '
+        $0 ~ "^  "skill":" {found=1; next}
+        found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
+        found && /version:/ {gsub(/.*version:[[:space:]]*/, ""); gsub(/["'"'"']/, ""); print; exit}
+    ' "$REGISTRY"
+}
+
+# Check if skill has reference files (indicates maturity beyond Utility archetype)
+has_reference_files() {
+    local skill_dir="$1"
+    [[ -d "$skill_dir/references" ]] && [[ -n "$(ls -A "$skill_dir/references" 2>/dev/null)" ]]
+}
+
+# Count reference files
+count_reference_files() {
+    local skill_dir="$1"
+    if [[ -d "$skill_dir/references" ]]; then
+        find "$skill_dir/references" -type f -name "*.md" | wc -l | tr -d ' '
+    else
+        echo 0
+    fi
+}
+
+# Validate version staleness
+# Returns 0 if OK, 1 if warning needed with message to stdout
+check_version_staleness() {
+    local skill_id="$1"
+    local skill_dir="$2"
+
+    local version
+    version=$(get_registry_version "$skill_id")
+
+    if [[ -z "$version" ]]; then
+        echo "No version found in registry"
+        return 1
+    fi
+
+    # Check if version is still at initial 1.0.0
+    if [[ "$version" == "1.0.0" ]]; then
+        # Check if skill appears mature (has reference files)
+        if has_reference_files "$skill_dir"; then
+            local ref_count
+            ref_count=$(count_reference_files "$skill_dir")
+            echo "Version is 1.0.0 but skill has $ref_count reference files (consider version bump if production-ready)"
+            return 1
+        fi
     fi
 
     return 0
@@ -1216,7 +1324,11 @@ validate_skill() {
     local display_name
     display_name=$(get_manifest_display_name "$skill_id")
     if [[ -z "$display_name" ]]; then
-        log_warning "Skill missing display_name in manifest.yml"
+        if [[ "$STRICT_DISPLAY_NAME" == "true" ]]; then
+            log_error "Skill missing display_name in manifest.yml"
+        else
+            log_warning "Skill missing display_name in manifest.yml"
+        fi
     else
         local display_name_result
         display_name_result=$(validate_display_name "$skill_id" "$display_name" 2>&1)
@@ -1225,7 +1337,11 @@ validate_skill() {
         if [[ $display_name_status -eq 0 ]]; then
             log_success "display_name is valid: $display_name"
         else
-            log_warning "display_name issue: $display_name_result"
+            if [[ "$STRICT_DISPLAY_NAME" == "true" ]]; then
+                log_error "display_name issue: $display_name_result"
+            else
+                log_warning "display_name issue: $display_name_result"
+            fi
             log_info "  Expected: $(id_to_title_case "$skill_id")"
         fi
     fi
@@ -1323,7 +1439,7 @@ validate_skill() {
                 validation_result=$(validate_path_scope "$output_path" "$REPO_ROOT/.workspace/skills/")
                 if [[ -n "$validation_result" ]]; then
                     log_error "Output path scope violation: $validation_result"
-                    ((scope_issues++))
+                    ((scope_issues++)) || true
                 fi
             fi
         done < <(get_workspace_output_paths "$skill_id")
@@ -1360,11 +1476,35 @@ validate_skill() {
     if [[ -f "$WORKSPACE_REGISTRY" ]]; then
         local placeholder_issues=0
         validate_skill_placeholders "$skill_id" || placeholder_issues=$?
-        check_deprecated_placeholder_formats "$skill_id" || ((placeholder_issues++))
+        check_deprecated_placeholder_formats "$skill_id" || ((placeholder_issues++)) || true
 
         if [[ $placeholder_issues -eq 0 ]]; then
             log_success "Placeholder formats valid ({{snake_case}})"
         fi
+    fi
+
+    # Check 20: Version staleness check
+    local version_result version_status=0
+    version_result=$(check_version_staleness "$skill_id" "$skill_dir" 2>&1) || version_status=$?
+
+    if [[ $version_status -eq 0 ]]; then
+        local current_version
+        current_version=$(get_registry_version "$skill_id")
+        log_success "Version OK: $current_version"
+    else
+        log_warning "Version review: $version_result"
+        log_info "  Update version in .harmony/skills/registry.yml when making changes"
+    fi
+
+    # Check 21: Line count validation (per agentskills.io spec)
+    local line_count
+    line_count=$(get_skill_line_count "$skill_dir")
+
+    if [[ $line_count -gt $SKILL_MD_LINE_BUDGET ]]; then
+        log_warning "SKILL.md exceeds line budget ($line_count > $SKILL_MD_LINE_BUDGET lines)"
+        log_info "  Per agentskills.io spec, move detailed content to references/"
+    else
+        log_success "SKILL.md within line budget ($line_count lines)"
     fi
 }
 
@@ -1403,6 +1543,14 @@ fi
 # Report fix mode
 if [[ "$FIX_MODE" == "true" ]]; then
     echo "Fix mode: ENABLED (will scaffold missing entries)"
+fi
+
+# Report strict modes
+if [[ "$STRICT_MODE" == "true" ]]; then
+    echo "Strict mode: ENABLED (trigger duplicates are errors)"
+fi
+if [[ "$STRICT_DISPLAY_NAME" == "true" ]]; then
+    echo "Strict display_name: ENABLED (naming violations are errors)"
 fi
 
 if [[ -n "$1" ]]; then

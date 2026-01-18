@@ -16,6 +16,7 @@
 Extended input/output documentation for the research-synthesizer skill.
 
 > **Authoritative Sources:**
+>
 > - Tool permissions: `SKILL.md` frontmatter `allowed-tools`
 > - Parameters: `.harmony/skills/registry.yml`
 > - Output paths: `.workspace/skills/registry.yml`
@@ -24,7 +25,7 @@ Extended input/output documentation for the research-synthesizer skill.
 
 The skill expects a folder containing markdown files with research notes:
 
-```
+```markdown
 sources/topic/
 ├── findings.md       # Research findings
 ├── notes.md          # Raw notes
@@ -47,45 +48,45 @@ If present, these files receive priority treatment:
 ### Synthesis Document Format
 
 ```markdown
-# Research Synthesis: [Topic]
+# Research Synthesis: {{topic}}
 
-**Generated:** [timestamp]
-**Source:** [input folder path]
+**Generated:** {{timestamp}}
+**Source:** {{input folder path}}
 
 ## Executive Summary
 
-[3-5 sentence overview of key findings]
+{{3-5 sentence overview of key findings}}
 
 ## Key Themes
 
-### Theme 1: [Name]
+### Theme 1: {{Name}}
 
-**Insight:** [Clear statement]
+**Insight:** {{Clear statement}}
 
 **Evidence:**
-- [Supporting point 1]
-- [Supporting point 2]
+- {{Supporting point 1}}
+- {{Supporting point 2}}
 
-**Confidence:** [High/Medium/Low]
+**Confidence:** {{High/Medium/Low}}
 
-### Theme 2: [Name]
+### Theme 2: {{Name}}
 ...
 
 ## Contradictions & Resolutions
 
 | Finding A | Finding B | Resolution |
 |-----------|-----------|------------|
-| [Claim] | [Conflicting claim] | [How resolved or "Unresolved"] |
+| {{Claim}} | {{Conflicting claim}} | {{How resolved or "Unresolved"}} |
 
 ## Open Questions
 
-1. [Question that remains unanswered]
-2. [Gap in research coverage]
+1. {{Question that remains unanswered}}
+2. {{Gap in research coverage}}
 
 ## Sources Reviewed
 
-- [File 1]
-- [File 2]
+- {{File 1}}
+- {{File 2}}
 ```
 
 ### Run Log Format

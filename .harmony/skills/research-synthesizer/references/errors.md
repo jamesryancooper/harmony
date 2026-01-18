@@ -136,6 +136,7 @@ Error conditions, recovery procedures, and troubleshooting for the research-synt
 **Cause:** Files exist but contain no substantive research content (e.g., only headers, empty sections, or boilerplate).
 
 **Solution:**
+
 1. Ensure files contain actual research notes with findings
 2. Check that content includes conclusions, observations, or data
 3. Verify files are not templates with placeholder text
@@ -147,6 +148,7 @@ Error conditions, recovery procedures, and troubleshooting for the research-synt
 **Cause:** Source materials contain genuinely conflicting information.
 
 **Solution:**
+
 1. Review the contradictions table in output
 2. Determine which source is authoritative
 3. Either:
@@ -160,6 +162,7 @@ Error conditions, recovery procedures, and troubleshooting for the research-synt
 **Cause:** Source materials span multiple topics without clear focus.
 
 **Solution:**
+
 1. Answer the clarifying question to provide focus
 2. Or, organize source files into topic-specific subfolders
 3. Run synthesis on each subfolder separately
@@ -171,6 +174,7 @@ Error conditions, recovery procedures, and troubleshooting for the research-synt
 **Cause:** Markdown file has syntax issues or unexpected encoding.
 
 **Solution:**
+
 1. Open the file and check for malformed markdown
 2. Verify file encoding is UTF-8
 3. Fix or remove problematic file

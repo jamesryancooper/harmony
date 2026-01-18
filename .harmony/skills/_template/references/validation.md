@@ -1,9 +1,9 @@
 ---
 acceptance_criteria:
-  - "[Criterion 1: what must be true for success]"
-  - "[Criterion 2]"
-  - "[Criterion 3]"
-  - "Output exists in outputs/[category]/"
+  - "{{Criterion 1: what must be true for success}}"
+  - "{{Criterion 2}}"
+  - "{{Criterion 3}}"
+  - "Output exists in outputs/{{category}}/"
   - "Run log captures input, context, and output"
 ---
 
@@ -15,10 +15,10 @@ Acceptance criteria and validation rules for the skill-name skill.
 
 A successful execution requires:
 
-- [ ] [Criterion 1]
-- [ ] [Criterion 2]
-- [ ] [Criterion 3]
-- [ ] Output exists in `outputs/[category]/`
+- [ ] {{Criterion 1}}
+- [ ] {{Criterion 2}}
+- [ ] {{Criterion 3}}
+- [ ] Output exists in `outputs/{{category}}/`
 - [ ] Run log captures input, context, and output
 
 ## Quality Checklist
@@ -46,19 +46,21 @@ A successful execution requires:
 ### Output Requirements
 
 All outputs must:
+
 - Be written to designated output paths
 - Include timestamp in filename
 - Follow the expected format
 
 ### Scope Limits
 
-- [Limit 1, e.g., Maximum items: 20]
-- If exceeded, [action to take]
+- {{Limit 1, e.g., Maximum items: 20}}
+- If exceeded, {{action to take}}
 
 ### Output Paths
 
 All outputs must be written to:
-- `outputs/[category]/{{timestamp}}-[name].md`
+
+- `outputs/{{category}}/{{timestamp}}-{{name}}.md`
 - `logs/runs/{{timestamp}}-skill-name.md`
 
 ### Timestamp Format

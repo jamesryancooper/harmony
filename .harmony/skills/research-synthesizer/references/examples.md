@@ -137,7 +137,7 @@ Consolidating research notes on REST vs. GraphQL API design.
 
 ### Source Files
 
-```
+```markdown
 sources/api-design/
 ├── rest-notes.md
 ├── graphql-notes.md
@@ -235,7 +235,7 @@ Handling a folder with minimal research content.
 
 ### Source Files
 
-```
+```markdown
 sources/quick-notes/
 └── notes.md  # Single file with brief notes
 ```

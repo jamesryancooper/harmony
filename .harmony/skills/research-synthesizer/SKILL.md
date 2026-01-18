@@ -12,7 +12,7 @@ metadata:
   author: Harmony Workspace
   created: "2025-01-12"
   updated: "2025-01-14"
-allowed-tools: Read Write(outputs/*) Write(logs/*)
+allowed-tools: Read Glob Write(outputs/*) Write(logs/*)
 ---
 
 # Research Synthesizer
@@ -30,7 +30,7 @@ Use this skill when:
 
 ## Quick Start
 
-```
+```markdown
 /synthesize-research sources/topic/
 ```
 
@@ -57,26 +57,26 @@ Outputs are written to `outputs/drafts/` (synthesis document) and `logs/runs/` (
 ## Output Format
 
 ```markdown
-# Research Synthesis: [Topic]
+# Research Synthesis: {{topic}}
 
-**Generated:** [timestamp]
-**Source:** [input folder path]
+**Generated:** {{timestamp}}
+**Source:** {{input folder path}}
 
 ## Executive Summary
 
-[3-5 sentence overview of key findings]
+{{3-5 sentence overview of key findings}}
 
 ## Key Themes
 
-### Theme 1: [Name]
+### Theme 1: {{Name}}
 
-**Insight:** [Clear statement]
+**Insight:** {{Clear statement}}
 
 **Evidence:**
-- [Supporting point 1]
-- [Supporting point 2]
+- {{Supporting point 1}}
+- {{Supporting point 2}}
 
-**Confidence:** [High/Medium/Low]
+**Confidence:** {{High/Medium/Low}}
 
 ## Contradictions & Resolutions
 
@@ -85,12 +85,12 @@ Outputs are written to `outputs/drafts/` (synthesis document) and `logs/runs/` (
 
 ## Open Questions
 
-1. [Question that remains unanswered]
+1. {{Question that remains unanswered}}
 
 ## Sources Reviewed
 
-- [File 1]
-- [File 2]
+- {{File 1}}
+- {{File 2}}
 ```
 
 ## Boundaries

@@ -14,6 +14,7 @@ description: Safety policies and constraints for the skill-name skill.
 Safety policies and constraints for the skill-name skill.
 
 > **Authoritative Sources:**
+>
 > - Tool permissions: `SKILL.md` frontmatter `allowed-tools`
 > - Output paths: `.workspace/skills/registry.yml`
 
@@ -31,24 +32,25 @@ Describe the tools this skill uses and their purposes in prose here. Reference t
 
 The skill may only write to designated output locations:
 
-| Tier | Path | Purpose |
-|------|------|---------|
-| **Tier 1** | `.workspace/skills/outputs/**` | Skill outputs |
-| **Tier 1** | `.workspace/skills/logs/**` | Execution logs |
+| Tier        | Path                             | Purpose        |
+|-------------|----------------------------------|----------------|
+| **Tier 1**  | `.workspace/skills/outputs/**`   | Skill outputs  |
+| **Tier 1**  | `.workspace/skills/logs/**`      | Execution logs |
 
 ### Scope Authority
 
-| Direction | Permission | Description |
-|-----------|------------|-------------|
-| **Down** | Allowed | Can write into descendant workspaces |
-| **Up** | Blocked | Cannot write into ancestor workspaces |
-| **Sideways** | Blocked | Cannot write into sibling workspaces |
+| Direction     | Permission | Description                           |
+|---------------|------------|---------------------------------------|
+| **Down**      | Allowed    | Can write into descendant workspaces  |
+| **Up**        | Blocked    | Cannot write into ancestor workspaces |
+| **Sideways**  | Blocked    | Cannot write into sibling workspaces  |
 
 ### Destructive Actions
 
 **Policy:** Never
 
 The skill must never:
+
 - Delete files
 - Overwrite source code
 - Modify files outside designated output paths
@@ -58,15 +60,15 @@ The skill must never:
 
 ### Must Always
 
-- [Boundary 1 - what the skill must always do]
-- [Boundary 2]
+- {{Boundary 1 - what the skill must always do}}
+- {{Boundary 2}}
 - Write only to designated output paths
 - State assumptions explicitly
 
 ### Must Never
 
-- [Boundary 1 - what the skill must never do]
-- [Boundary 2]
+- {{Boundary 1 - what the skill must never do}}
+- {{Boundary 2}}
 - Delete or modify source files
 - Access resources outside defined scope
 
@@ -74,11 +76,11 @@ The skill must never:
 
 The skill must escalate to the user when:
 
-| Condition | Action |
-|-----------|--------|
-| [Condition 1] | [Action to take] |
-| [Condition 2] | [Action to take] |
-| [Condition 3] | [Action to take] |
+| Condition         | Action              |
+|-------------------|---------------------|
+| {{Condition 1}}   | {{Action to take}}  |
+| {{Condition 2}}   | {{Action to take}}  |
+| {{Condition 3}}   | {{Action to take}}  |
 
 ## Input Validation
 
