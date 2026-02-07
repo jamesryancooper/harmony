@@ -13,11 +13,11 @@ Harmony uses a **two-layer inheritance model** for AI agent coordination:
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  .harmony/  (Shared Foundation - Portable)              │
-│  ├── skills/         Shared skill definitions           │
-│  ├── workflows/      Workspace management workflows     │
-│  ├── templates/      Workspace scaffolding              │
-│  ├── assistants/     Generic specialists (@reviewer)    │
-│  └── context/        Shared tools, compaction guides    │
+│  ├── capabilities/skills/       Shared skill definitions           │
+│  ├── orchestration/workflows/   Workspace management workflows     │
+│  ├── scaffolding/templates/     Workspace scaffolding              │
+│  ├── agency/assistants/         Generic specialists (@reviewer)    │
+│  └── cognition/context/         Shared tools, compaction guides    │
 └──────────────────────┬──────────────────────────────────┘
                        │ inherits from
                        ▼

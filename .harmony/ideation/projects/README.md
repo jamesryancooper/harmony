@@ -41,7 +41,7 @@ orchestration/missions/         Committed execution (ships deliverables)
 cognition/context/              Permanent workspace knowledge
 ```
 
-Most ideas die in `ideas/`. Some graduate to `brainstorm/`. Survivors become projects. Projects feed `context/` directly or spawn `missions/`.
+Most ideas die in `ideas/`. Some graduate to `brainstorm/`. Survivors become projects. Projects feed `cognition/context/` directly or spawn `orchestration/missions/`.
 
 ---
 
@@ -145,7 +145,7 @@ When a brainstorm graduates:
 When findings are ready:
 
 1. **Summarize findings** in `project.md` Findings Summary section
-2. **Publish to workspace** — update relevant `context/` files directly
+2. **Publish to workspace** — update relevant `cognition/context/` files directly
 3. **Spawn missions** if actionable work was identified
 4. **Move registry entry** from **Active** to **Completed**
 5. **Note outcomes** — what was published and where

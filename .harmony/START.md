@@ -140,7 +140,7 @@ cognition/context/              → Permanent knowledge
 | Domain terminology | `cognition/context/glossary.md` | Reference |
 | Lessons learned | `cognition/context/lessons.md` | Reference |
 
-**Publishing findings:** Project findings flow directly to `context/` files without a separate promotion step.
+**Publishing findings:** Project findings flow directly to `cognition/context/` files without a separate promotion step.
 
 ---
 

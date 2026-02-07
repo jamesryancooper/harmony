@@ -1,19 +1,19 @@
 # Update Workspace `/update-workspace`
 
-Align an existing `.workspace` directory with the canonical workspace definition.
+Align an existing `.harmony` directory with the canonical workspace definition.
 
 See `.harmony/orchestration/workflows/workspace/update-workspace/00-overview.md` for full description and steps.
 
 ## Usage
 
 ```text
-/update-workspace @path/to/.workspace
+/update-workspace @path/to/.harmony
 ```
 
 Or for the root workspace:
 
 ```text
-/update-workspace @.workspace
+/update-workspace @.harmony
 ```
 
 ## Implementation

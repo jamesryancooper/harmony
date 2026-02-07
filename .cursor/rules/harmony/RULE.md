@@ -33,11 +33,11 @@ All markdown files in `.harmony/` require YAML frontmatter. See the table below 
 | File Type | `title` | `description` | `access` |
 |-----------|---------|---------------|----------|
 | Root files (`START.md`, `scope.md`, etc.) | ✅ | ✅ | — |
-| Commands (`commands/*.md`) | ✅ | ✅ | ✅ |
-| Workflow overviews (`workflows/**/00-overview.md`) | ✅ | ✅ | ✅ |
-| Prompts (`prompts/*.md`) | ✅ | ✅ | ✅ |
+| Commands (`capabilities/commands/*.md`) | ✅ | ✅ | ✅ |
+| Workflow overviews (`orchestration/workflows/**/00-overview.md`) | ✅ | ✅ | ✅ |
+| Prompts (`scaffolding/prompts/*.md`) | ✅ | ✅ | ✅ |
 | Checklists (`quality/*.md`) | ✅ | ✅ | — |
-| Context files (`context/*.md`) | ✅ | ✅ | — |
+| Context files (`cognition/context/*.md`) | ✅ | ✅ | — |
 
 ### Field Specifications
 
@@ -134,7 +134,7 @@ For agent-facing content (everything without dot prefix):
 | Single file | ~300 | ~500 |
 | START.md (boot) | ~200 | ~300 |
 
-### Per-File Budgets (context/)
+### Per-File Budgets (cognition/context/)
 
 | File | Target | Max |
 |------|--------|-----|

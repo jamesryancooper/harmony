@@ -31,7 +31,7 @@ Key decisions that constrain or guide work in this workspace. For full rationale
 | D007 | Shared foundation | Single .harmony/ root organized by capability | Everything under .harmony/; organized by cognitive function | 2026-01-13 |
 | D008 | Consolidated scratchpad | `ideation/scratchpad/` with subdirectories | `inbox/`, `archive/`, `ideas/`, `brainstorm/` are subdirectories of `ideation/scratchpad/` | 2026-01-14 |
 | D009 | Human-led zone naming | `ideation/scratchpad/` over `.scratch/` | Explicit, self-documenting name preferred over shorter abbreviation | 2026-01-13 |
-| D010 | Projects location | Workspace level (`projects/`) | Projects live at workspace level, not in `ideation/scratchpad/`; direct artifact flow to `context/` | 2026-01-14 |
+| D010 | Projects location | Workspace level (`ideation/projects/`) | Projects live at workspace level, not in `ideation/scratchpad/`; direct artifact flow to `cognition/context/` | 2026-01-14 |
 | D011 | Brainstorm stage | Single-file exploration in `ideation/scratchpad/brainstorm/` | Filter stage between ideas and projects; most ideas die here | 2026-01-14 |
 | D012 | The Funnel | ideas → brainstorm → projects → missions → context | Clear pipeline from raw ideas to permanent knowledge | 2026-01-14 |
 | D013 | Refactor verification | Mandatory verification gate | Refactors cannot be declared complete until all audit searches return zero | 2026-01-14 |
