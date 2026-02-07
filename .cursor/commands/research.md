@@ -31,15 +31,15 @@ Create a new project in `.harmony/ideation/projects/`.
 Projects are part of a pipeline from ideas to executed work:
 
 ```
-.scratchpad/ideas/      → Quick captures (most die here)
+ideation/scratchpad/ideas/      → Quick captures (most die here)
         ↓
-.scratchpad/brainstorm/ → Structured exploration (filter stage)
+ideation/scratchpad/brainstorm/ → Structured exploration (filter stage)
         ↓
-projects/               → Committed research (produces artifacts)
+ideation/projects/              → Committed research (produces artifacts)
         ↓
-missions/               → Committed execution
+orchestration/missions/         → Committed execution
         ↓
-context/                → Permanent knowledge
+cognition/context/              → Permanent knowledge
 ```
 
 Use `/research` when you're ready to commit to a structured exploration that will produce workspace artifacts.
