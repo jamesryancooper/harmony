@@ -12,7 +12,7 @@ node_modules/
 dist/
 build/
 coverage/
-reports/
+/reports/
 sbom/
 .DS_Store
 *.tsbuildinfo

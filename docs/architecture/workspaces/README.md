@@ -148,6 +148,7 @@ Agents struggle when they "arrive with no memory of what came before." A `.harmo
 ├── continuity/              # Session-to-session continuity
 │   ├── log.md               # What's been done (append-only)
 │   ├── tasks.json           # Structured task list with goal
+│   ├── next.md              # Immediate actionable steps
 │   └── entities.json        # Entity state tracking (optional)
 │
 ├── quality/                 # Verification and quality gates
