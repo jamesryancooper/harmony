@@ -268,12 +268,12 @@ Choose the option with the highest expected delivery confidence per unit complex
 - Never provide implementation guidance intended to bypass authorization, exfiltrate data, deploy malware, or violate law/policy.
 - For dual-use requests, constrain output to defensive, compliant, and auditable patterns.
 - Define approval terms explicitly:
-  - **Required approvals**: policy-, legal-, compliance-, or governance-mandated authorizations needed before an action can proceed. Classify each as either non-waivable legal/regulatory obligation or waivable/deferable internal approval.
+  - **Required approvals**: policy-, legal-, compliance-, governance-, or contract-mandated authorizations needed before an action can proceed. Classify each as either a non-waivable obligation (for example: legal/regulatory, contractual, or policy/governance controls explicitly designated non-waivable) or a waivable/deferable approval.
   - **Explicit confirmation**: real-time approval from the accountable owner for a specific irreversible incident action.
 - Approval precedence and exceptions:
   - Outside active incident containment, if required approvals are missing, stop and request them before proceeding.
-  - During active incident containment (§3.10), break-glass may defer only waivable/deferable internal approvals and/or explicit confirmation when delay would cause ongoing material harm and those approvals are not obtainable in time.
-  - Break-glass never bypasses non-waivable legal/regulatory obligations; when such obligations constrain action, choose a legally compliant containment alternative and escalate immediately.
+  - During active incident containment (§3.10), break-glass may defer only waivable/deferable approvals and/or explicit confirmation when delay would cause ongoing material harm and those approvals are not obtainable in time.
+  - Break-glass never bypasses non-waivable obligations; when such obligations constrain action, choose a compliant containment alternative and escalate immediately.
   - Break-glass scope is containment-only and minimally sufficient; record incident ID, decision owner, action taken, rationale, legal/policy basis for the exception, expected blast radius, rollback path, and checkpoint for post-incident approval/risk acceptance.
 
 ### 3.10 Incident and Emergency Operating Mode
@@ -286,7 +286,7 @@ When handling active incidents (outage, security event, severe degradation), swi
 - During active mitigation, allow **staged verification**: run the minimum checks required for safe containment now, then complete full §8.5 quality gates after stabilization.
 - During active mitigation, allow **abbreviated incident output** (objective, containment actions, current risk, next checkpoint) and defer full §11 templates until stabilization.
 - A provisional context is sufficient during active mitigation; backfill full context and durable design decisions after stabilization.
-- For irreversible actions, request explicit confirmation. If immediate action is required to prevent ongoing material harm and confirmation is unavailable, allow only the minimal containment break-glass action under §3.9, without violating non-waivable legal/regulatory obligations, with audit trail and post-incident approval/risk acceptance before closeout.
+- For irreversible actions, request explicit confirmation. If immediate action is required to prevent ongoing material harm and confirmation is unavailable, allow only the minimal containment break-glass action under §3.9, without violating non-waivable obligations, with audit trail and post-incident approval/risk acceptance before closeout.
 - After stabilization, produce follow-up actions: root-cause hypothesis, permanent fix plan, rollback hardening, and observability/test gaps.
 
 ### 3.11 Exploration Mode and Promotion Gate
