@@ -37,7 +37,7 @@ Before applying detailed guidance, classify the project archetype:
 - Product backend/service
 - Web frontend
 - Mobile/native/desktop client
-- Data/ML pipeline or model-serving system
+- Data engineering and/or ML pipeline/model-serving system
 - Platform/infra/SRE system
 - Embedded/edge/systems software
 - Library/SDK/CLI/tooling
@@ -52,7 +52,7 @@ Then apply sections intentionally:
 | **§5** | Backend/server components | Applies to APIs/services and server-side boundaries. |
 | **§6.1-§6.11** | Web frontend only | Browser-specific guidance. |
 | **§6.12-§6.16** | Domain-specific profiles | Apply profile(s) matching the archetype. |
-| **§9** | Runtime-dependent profiles | Select profile(s) by delivery model (service, client, embedded, SDK/tooling, Data/ML) and custom-mapped runtimes. |
+| **§9** | Runtime-dependent profiles | Select profile(s) by delivery model (service, client, embedded, SDK/tooling, Data Engineering/ML) and custom-mapped runtimes. |
 
 For **Other/custom archetype** selections, map the system explicitly to the nearest runtime and delivery profiles before applying detailed guidance:
 
@@ -66,8 +66,9 @@ If multiple archetypes apply:
 - State 1-3 non-negotiable constraints per selected archetype as a keyed mapping (`<archetype>: [constraints...]`).
 - Optimize for the primary archetype while satisfying all declared non-negotiables for secondary archetypes.
 - If more than one secondary archetype applies, use a compact archetype-to-constraints matrix to keep tradeoffs explicit.
+- If declared non-negotiables are mutually incompatible, stop optimization and issue a **Constraint Conflict Record**: conflicting constraints, why they cannot all be satisfied, 2-3 viable resolution options, recommended option, and required decision owner/risk acceptance before proceeding.
 
-For non-trivial work, explicitly declare selected archetype(s), testing profile(s) (§8), observability/operations profile(s) (§9), and output mode (§11) once per task/turn, before or with the first substantial recommendation.
+For non-trivial work, explicitly declare selected archetype(s), testing profile(s) (§8), observability/operations profile(s) (§9), risk tier (§3.5.1), and output mode (§11) once per task/turn, before or with the first substantial recommendation. When backend/server components are in scope, also declare backend interaction model(s) from §5.0. If no runtime or delivery surface is in scope, use explicit `testing=n/a` and/or `operations=n/a` with a short reason.
 
 If context is incomplete (for example: incident triage, discovery spikes, or unclear brownfield systems), declare a **Provisional Context** using the §11 single- or multi-archetype format (with confidence and assumptions), then proceed with clearly conditional recommendations.
 
@@ -86,13 +87,13 @@ For every selected archetype (including those with shorter profile sections), ex
 - Testing strategy and quality gates
 - Observability, release, and support model
 
-For non-trivial work, operationalize parity with an explicit **Archetype Coverage Check** artifact (table or compact structured list) that maps each selected archetype to:
+For non-trivial work, operationalize parity with an explicit **Archetype Coverage Check** artifact, scaled by risk tier (§3.5.1), that maps each selected archetype to:
 
 - Key non-negotiables
 - Design/implementation choices that satisfy them
 - Residual risks and mitigations
 
-Do not finalize non-trivial recommendations until each selected archetype has explicit coverage across the six dimensions above.
+Do not finalize non-trivial recommendations until each selected archetype has explicit coverage across the six dimensions above, at depth proportional to the selected risk tier.
 
 Exception for active fast paths:
 
@@ -108,6 +109,13 @@ Resolve conflicts using this precedence order:
 4. Explicit user preferences about style/process/format where they do not conflict with items 1-3
 5. This file's defaults, templates, and heuristics
 6. Personal/tooling preferences
+
+Classify ambiguous instructions before applying precedence:
+
+- **Goals/constraints/acceptance criteria** describe required outcomes and externally imposed limits (what must be true).
+- Explicit user-mandated language/framework/runtime/tool selections are treated as goals/constraints by default, unless the user marks them as optional or preference-level.
+- **Preferences** describe requested implementation style, process, or format (how to do it), plus optional implementation choices not stated as mandatory.
+- If classification is ambiguous and materially affects architecture, risk, or rollout: ask one clarifying question. If immediate progress is required, provisionally treat it as a preference, proceed with repository standards, and call out the assumption.
 
 When a higher-precedence source overrides this file, adapt without friction and include a brief **Deviation Note** (`what changed`, `why`, `impact`) when the override materially affects architecture, risk, testing, rollout, or operational ownership.
 
@@ -209,6 +217,21 @@ Use this default threshold for **non-trivial**:
 - Changes auth/security/compliance behavior, or
 - Requires rollout/rollback coordination.
 
+### 3.5.1 Risk-Tiered Rigor (for non-trivial work)
+
+Use the lightest rigor that preserves safety, correctness, and reversibility:
+
+- **Tier A (low-impact non-trivial)**: reversible within one delivery window, limited blast radius, no new external/public contracts, no material compliance change. Use compact artifacts (concise Selected Context + compact Archetype Coverage Check list).
+- **Tier B (standard non-trivial)**: meaningful cross-module coordination, contract/surface evolution, or moderate operational risk. Use structured artifacts (context declaration + explicit archetype matrix/table + targeted rollout/verification plan).
+- **Tier C (high-impact/irreversible/regulatory)**: one-way-door decisions, material data-governance/compliance implications, or high blast radius. Require full-mode outputs, explicit options/tradeoffs, named ownership, and approval/risk acceptance checkpoints.
+- Assign tier by highest matched criterion; if criteria from multiple tiers apply, use the highest tier.
+- If tier is uncertain, escalate one tier and record the uncertainty as an assumption/risk.
+
+Precedence with §11 mode selection:
+
+- While active, incident fast-path (§3.10) and exploration fast-path (§3.11) override template depth requirements.
+- Outside active fast paths, risk tier sets minimum evidence depth; Tier C requires full-mode depth before stabilization completion, exploration promotion, or broad production/release rollout.
+
 ### 3.6 Communication Style
 
 - Be crisp, structured, concrete. Label: **assumptions**, **tradeoffs**, **risks**, **decisions**, **next steps**.
@@ -305,7 +328,7 @@ Adapt process rigor to risk and delivery surface, not organization size.
 - **Web frontend**: start with route/feature-based modular boundaries and choose rendering split (SSR/SSG/CSR/hybrid) by product needs (SEO, first paint, personalization, offline, operational constraints).
 - **Mobile/native/desktop clients**: start with feature/module boundaries that align with platform navigation/lifecycle and offline/upgrade constraints; keep service interfaces explicit and versioned, and split client surfaces only when release cadence, safety, or platform fragmentation demands it.
 - **Library/SDK/CLI/tooling**: start as a modular package with a stable public interface and clear internal boundaries.
-- **Data/ML systems**: start with explicit pipeline stages and contracts (ingest/transform/train/serve), then split runtime surfaces only where required.
+- **Data Engineering/ML systems**: start with explicit pipeline stages and contracts (ingest/transform/train/serve or ingest/transform/publish), then split runtime surfaces only where required.
 - **Platform/infra systems**: start with composable control-plane/data-plane boundaries and strong operational contracts.
 - **Embedded/edge systems**: start with a single deployable artifact where feasible; split components only when required by safety, timing, or resource isolation.
 
@@ -386,6 +409,23 @@ Apply this profile when systems process personal, financial, health, regulated, 
 
 ## 5) Backend Engineering Standards
 
+### 5.0 Backend Interaction Model Selection
+
+Before applying detailed backend guidance, declare the primary interaction model(s) in scope:
+
+- Request/response API
+- Async queue/task worker
+- Event/stream processor
+- Batch/scheduled job
+- Function/serverless/edge handler
+
+Apply profile guidance by model:
+
+- §5.1 is mandatory for request/response API surfaces.
+- §5.5 applies to async workers, streams, and batch/scheduler workloads.
+- §5.6 applies to function/serverless/edge workloads.
+- §5.2-§5.4 apply to all backend models, adapted to runtime constraints.
+
 ### 5.1 API Design
 
 - APIs are contracts: stable, explicit, versioned when breaking changes are unavoidable.
@@ -413,6 +453,21 @@ Apply this profile when systems process personal, financial, health, regulated, 
 - Eliminate N+1 queries. Intentional indexes based on query patterns.
 - Prefer linear-time algorithms. Mind big-O, memory, connection pooling.
 - Profile under realistic load.
+
+### 5.5 Async, Stream, and Batch Workloads
+
+- Define explicit input/output contracts (message/event/schema) with versioning and compatibility rules.
+- Enforce idempotency, deduplication, and replay safety for retried or reprocessed work.
+- Define retry, backoff, dead-letter, poison-message, and manual remediation paths.
+- For streams, define ordering, windowing, late/duplicate event policy, and checkpoint/recovery strategy.
+- For batch/scheduled jobs, define schedule guarantees, backfill policy, and partial-failure handling.
+
+### 5.6 Function, Serverless, and Edge Workloads
+
+- Treat handlers as stateless; externalize durable state and coordination.
+- Define timeout, memory, concurrency, and cold-start budgets aligned to SLOs.
+- Keep IAM/permissions narrow and deployment artifacts reproducible and auditable.
+- Define failure behavior for upstream/downstream dependency degradation, including fast-fail and fallback strategy.
 
 ---
 
@@ -514,13 +569,13 @@ Non-optional. At minimum:
 - Handle OS/version/device fragmentation with compatibility strategy and rollback plan.
 - Protect secrets and local data at rest/in transit using platform-provided secure storage primitives.
 
-### 6.13 Data/ML Profile
+### 6.13 Data Engineering and ML Profile
 
-- Ensure reproducibility: version datasets/features/models/configs and capture lineage.
-- Separate training, evaluation, and serving concerns with explicit interfaces.
-- Add data quality gates (schema, nulls, drift, freshness) before model or feature consumption.
-- Define objective metrics and rollback criteria before rollout.
-- Prefer deterministic, testable pipeline steps; isolate nondeterminism and document it.
+When this archetype is selected, declare one or both tracks explicitly:
+
+- **Data Engineering track** (non-ML data platforms/pipelines): version data contracts/schemas with compatibility guarantees; capture lineage/provenance across ingest/transform/publish; enforce data quality/freshness/completeness checks; define backfill/replay and partial-failure recovery strategy.
+- **ML track** (training/evaluation/serving): ensure reproducibility with versioned datasets/features/models/configs and lineage; separate training, evaluation, and serving concerns; add data/model quality gates (schema, nulls, drift, freshness); define objective metrics, rollout gates, and rollback criteria before rollout.
+- For both tracks: prefer deterministic, testable pipeline steps where feasible; isolate nondeterminism and document expected variance.
 
 ### 6.14 Platform/Infra/SRE Profile
 
@@ -590,7 +645,8 @@ Apply profile(s) based on runtime shape and delivery model.
 - **Service/distributed runtimes**: apply §8.1 and relevant parts of §8.4.
 - **Client/native/desktop/embedded runtimes**: apply §8.2 and relevant parts of §8.4.
 - **Library/SDK/CLI/tooling**: apply §8.3 and relevant parts of §8.4.
-- **Data/ML systems**: combine the runtime-matching profile (§8.1, §8.2, or §8.3) with data/model verification from §6.13 and rollout checks in §9.3.
+- **Data Engineering systems**: combine the runtime-matching profile (§8.1, §8.2, or §8.3) with data-contract/pipeline verification from §6.13 and operational checks in §9.3.
+- **ML systems**: combine the runtime-matching profile (§8.1, §8.2, or §8.3) with ML verification from §6.13 and ML rollout checks in §9.3.
 - For systems spanning multiple runtime/delivery surfaces in scope, apply each relevant testing profile and declare the selected profile list explicitly in §11.0 context lines.
 
 ### 8.1 Service and Distributed Runtime Profile
@@ -640,7 +696,8 @@ Apply profile(s) based on runtime shape and delivery model.
 - **Service/distributed runtimes**: apply §9.1 and the relevant parts of §9.3.
 - **Client/native/desktop/embedded runtimes**: apply §9.2 and the relevant parts of §9.3.
 - **Library/SDK/CLI/tooling**: apply §9.2; use §9.3 for release and support readiness.
-- **Data/ML systems**: apply §9.1 for online serving/control-plane services; apply §9.2 for offline/batch/artifact-heavy workflows; always apply Data/ML rollout and monitoring requirements in §9.3.
+- **Data Engineering systems**: apply §9.1 for online data/control-plane services; apply §9.2 for offline/batch/artifact-heavy workflows; apply data-engineering readiness requirements in §9.3.
+- **ML systems**: apply §9.1 for online serving/control-plane services; apply §9.2 for offline/batch/artifact-heavy workflows; apply ML rollout and monitoring requirements in §9.3.
 - For systems spanning multiple runtime/delivery surfaces in scope, apply each relevant operations profile and declare the selected profile list explicitly in §11.0 context lines.
 
 ### 9.1 Service and Distributed Runtime Profile
@@ -662,7 +719,8 @@ Apply profile(s) based on runtime shape and delivery model.
 
 - **Services/platforms**: safe deploys (flags, gradual rollout, canary), tested rollbacks, runbooks, dashboards, ownership and escalation.
 - **Libraries/SDK/CLI/tooling**: semantic versioning discipline, deprecation policy, compatibility matrix, migration guides, release notes.
-- **Data/ML systems**: dataset/model versioning, rollout gates, drift/quality monitoring, rollback to prior model/artifact.
+- **Data Engineering systems**: data contract/schema versioning, lineage/provenance coverage, freshness/completeness SLAs, and controlled backfill/replay/rollback of data artifacts.
+- **ML systems**: dataset/model versioning, rollout gates, drift/quality monitoring, rollback to prior model/artifact.
 - **Mobile/native/embedded**: staged rollouts, signed updates, health checks, and tested recovery/rollback paths.
 
 ---
@@ -691,24 +749,30 @@ Determine mode in this order:
 
 1. If active incident mode (§3.10) is in effect and critical system health/objectives are not yet stabilized, use the incident fast path (abbreviated incident output + staged verification) and defer full templates until stabilization.
 2. Else if the work is a time-boxed exploration spike focused on uncertainty reduction **and** can proceed without irreversible contract/data changes **and** with constrained blast radius plus reversible operational impact, use **Exploration mode** (non-production by default; controlled production experiments allowed with strict guardrails).
-3. Else if the primary requested deliverable is non-trivial technical documentation (for example: spec, design doc, runbook, implementation guide), use **Full mode (documentation)**.
+3. Else if the primary requested deliverable is non-trivial technical documentation (for example: spec, design doc, runbook, implementation guide) **and** either (a) risk tier is **B/C** or (b) the documentation establishes or changes architecture boundaries, public contracts, schema ownership/migrations, compliance controls, or cross-system rollout commitments, use **Full mode (documentation)**.
 4. Else if the request is non-trivial and changes architecture boundaries, public contracts, schema ownership/migrations, or cross-system rollout shape, use **Full mode (architecture)**.
-5. Else if the request is non-trivial **and** remains reversible/low-risk (§3.2) **and** does not introduce new architecture boundaries/contracts/schemas **and** does not require cross-system rollout coordination, use **Compact mode (non-trivial)**.
-6. Else if the request is non-trivial, use **Full mode (implementation)**.
-7. Otherwise, use **Lightweight mode** (default for short/low-risk requests).
+5. Else if the primary requested deliverable is non-trivial technical documentation **and** risk tier is **A** **and** the work remains reversible/low-risk with no new architecture boundaries/contracts/schemas/compliance-control commitments, use **Compact mode (non-trivial)** with documentation-focused content (`mode=compact`).
+6. Else if the request is non-trivial **and** remains reversible/low-risk (§3.2) **and** does not introduce new architecture boundaries/contracts/schemas **and** does not require cross-system rollout coordination, use **Compact mode (non-trivial)**.
+7. Else if the request is non-trivial, use **Full mode (implementation)**.
+8. Otherwise, use **Lightweight mode** (default for short/low-risk requests).
 
 - If both documentation and architecture triggers apply, choose by requested primary artifact: artifact-first deliverable -> **full-documentation**; decision/adoption recommendation -> **full-architecture**.
-- For non-trivial requests in any mode, include a short **Selected Context** line listing archetype(s), testing profile(s) (§8), observability/operations profile(s) (§9), and chosen mode.
-- Use this format: `Selected Context: archetype=<...>; testing=<§8.x[,§8.y...]>; operations=<§9.x[,§9.y...]>; mode=<incident|lightweight|exploration|compact|full-implementation|full-architecture|full-documentation>`.
-- For multi-archetype work, use: `Selected Context: archetypes=primary:<...>,secondary:[<...>]; non_negotiables={<archetype>:[...]}; testing=<§8.x[,§8.y...]>; operations=<§9.x[,§9.y...]>; mode=<...>`.
+- For non-trivial requests in any mode, include **Selected Context** fields: archetype(s), testing profile(s) (§8), observability/operations profile(s) (§9), risk tier (§3.5.1), **tier basis**, and mode. For multi-archetype work, include primary/secondary mapping plus non-negotiables.
+- Include `tier_basis=<...>` in both Selected and Provisional Context (short rationale for why the chosen tier applies).
+- Include backend model selection from §5.0 in Selected and Provisional Context as `backend_models=primary:<...>,secondary:[...]`; use `backend_models=n/a` when backend/server components are not in scope.
+- If no runtime or delivery surface is in scope, use explicit `testing=n/a` and/or `operations=n/a` with a short reason.
+- If risk tier and mode seem in tension, apply §3.5.1 precedence (active incident/exploration fast paths first; otherwise Tier C requires full-mode depth before broad rollout/promotion/closeout).
+- Default serialization format (recommended): `Selected Context: archetype=<...>; testing=<§8.x[,§8.y...]>; operations=<§9.x[,§9.y...]>; risk_tier=<A|B|C>; tier_basis=<...>; backend_models=<primary:<...>,secondary:[...]|n/a>; mode=<incident|lightweight|exploration|compact|full-implementation|full-architecture|full-documentation>`.
+- Default serialization format for multi-archetype work: `Selected Context: archetypes=primary:<...>,secondary:[<...>]; non_negotiables={<archetype>:[...]}; testing=<§8.x[,§8.y...]>; operations=<§9.x[,§9.y...]>; risk_tier=<A|B|C>; tier_basis=<...>; backend_models=<primary:<...>,secondary:[...]|n/a>; mode=<...>`.
 - For multi-archetype work with more than one secondary archetype, include a compact archetype-to-constraints matrix.
-- If context is incomplete (single archetype), use: `Provisional Context: archetype=<...>; testing=<§8.x[,§8.y...]>; operations=<§9.x[,§9.y...]>; mode=<...>; confidence=<low|medium|high>; assumptions=<...>`.
-- If context is incomplete (multi-archetype), use: `Provisional Context: archetypes=primary:<...>,secondary:[<...>]; non_negotiables={<archetype>:[...]}; testing=<§8.x[,§8.y...]>; operations=<§9.x[,§9.y...]>; mode=<...>; confidence=<low|medium|high>; assumptions=<...>`.
-- When only one testing or operations profile applies, use a single section reference.
+- If context is incomplete, include **Provisional Context** with the same fields plus confidence and assumptions.
+- Default provisional single-archetype format: `Provisional Context: archetype=<...>; testing=<§8.x[,§8.y...]>; operations=<§9.x[,§9.y...]>; risk_tier=<A|B|C>; tier_basis=<...>; backend_models=<primary:<...>,secondary:[...]|n/a>; mode=<...>; confidence=<low|medium|high>; assumptions=<...>`.
+- Default provisional multi-archetype format: `Provisional Context: archetypes=primary:<...>,secondary:[<...>]; non_negotiables={<archetype>:[...]}; testing=<§8.x[,§8.y...]>; operations=<§9.x[,§9.y...]>; risk_tier=<A|B|C>; tier_basis=<...>; backend_models=<primary:<...>,secondary:[...]|n/a>; mode=<...>; confidence=<low|medium|high>; assumptions=<...>`.
+- When only one testing or operations profile applies, use a single section reference. Use `n/a` for profiles that do not apply because no runtime/delivery surface is in scope.
 - During active incident containment (§3.10), a `Provisional Context` with `mode=incident` satisfies this context requirement until stabilization.
 - During active incident/exploration fast paths, when archetype coverage is intentionally partial, include: `Deferred Archetype Coverage: items=<...>; risk=<...>; owner=<...>; checkpoint=<...>`.
 - If selected/provisional context is missing or inconsistent with recommendation depth, correct it before finalizing.
-- If user/project templates require a different outward format, preserve the same context fields but map them into the required template.
+- Equivalent outward formats are acceptable (for example: sentence, table row, frontmatter, or ticket fields) as long as the same context fields are preserved and unambiguous.
 
 Exploration mode template (time-boxed, uncertainty-reduction):
 
