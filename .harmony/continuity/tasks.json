@@ -16,7 +16,7 @@
     },
     {
       "id": "create-context-commands",
-      "description": "Create context/ and commands/ with tools.md, compaction.md, recover.md",
+      "description": "Create cognition/context/ and capabilities/commands/ with tools.md, compaction.md, recover.md",
       "status": "completed",
       "completed_at": "2025-12-10"
     },
@@ -34,13 +34,13 @@
     },
     {
       "id": "create-prompts",
-      "description": "Create additional prompt templates in prompts/",
+      "description": "Create additional prompt templates in scaffolding/prompts/",
       "status": "completed",
       "completed_at": "2025-12-10"
     },
     {
       "id": "create-examples",
-      "description": "Add example content to examples/",
+      "description": "Add example content to scaffolding/examples/",
       "status": "completed",
       "completed_at": "2025-12-10"
     },

@@ -1,0 +1,155 @@
+# Workflow Registry — Tier 2 Extended Metadata
+#
+# Extended metadata for workflow routing: versions, commands, parameters, I/O.
+# Token budget: ~50 tokens per workflow entry.
+#
+# Load AFTER matching a workflow in manifest.yml.
+# Then load WORKFLOW.md when the workflow is activated.
+
+routing:
+  explicit_command_required: false
+  ambiguity_resolution: "ask"
+
+workflows:
+  # --- Fully specified (spec-compliant) ---
+
+  orchestrate-audit:
+    version: "1.0.0"
+    commands: ["/orchestrate-audit"]
+    parameters:
+      - name: manifest
+        type: file
+        required: true
+        description: "Migration manifest (inline YAML or file path)"
+      - name: strategy
+        type: text
+        required: false
+        default: "by-directory"
+        description: "Partition strategy: by-directory, by-type, by-concern, auto"
+      - name: concern_map
+        type: text
+        required: false
+        description: "Manual concern-to-glob mapping (required for by-concern strategy)"
+      - name: partition_count
+        type: text
+        required: false
+        description: "Number of partitions (for auto strategy)"
+    access: human
+    depends_on:
+      - skill: audit-migration
+        condition: "active in skill manifest"
+    io:
+      inputs:
+        - name: migration_manifest
+          path: "{{manifest}}"
+          kind: file
+          format: yaml
+          required: true
+          description: "Migration manifest with old/new mappings and scope"
+      outputs:
+        - name: consolidated_report
+          path: "../../output/reports/{{date}}-migration-audit-consolidated.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Consolidated audit report across all partitions"
+        - name: partition_reports
+          path: "../../output/reports/{{date}}-migration-audit-{{partition}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Individual partition audit reports"
+
+  # --- Skeleton entries (existing workflows, not yet fully migrated) ---
+
+  create-workspace:
+    version: "1.2.0"
+    commands: ["/create-workspace"]
+    access: human
+    depends_on: []
+
+  evaluate-workspace:
+    version: "1.1.0"
+    commands: ["/evaluate-workspace"]
+    access: human
+    depends_on: []
+
+  migrate-workspace:
+    version: "1.1.0"
+    commands: ["/migrate-workspace"]
+    access: human
+    depends_on: []
+
+  update-workspace:
+    version: "1.1.0"
+    commands: ["/update-workspace"]
+    access: human
+    depends_on:
+      - workflow: evaluate-workspace
+        condition: "optional but recommended to run first"
+
+  create-mission:
+    version: "1.1.0"
+    commands: ["/create-mission"]
+    access: human
+    depends_on: []
+
+  complete-mission:
+    version: "1.1.0"
+    commands: ["/complete-mission"]
+    access: human
+    depends_on:
+      - workflow: create-mission
+        condition: "Mission must exist"
+
+  create-skill:
+    version: "2.0.0"
+    commands: ["/create-skill"]
+    access: human
+    depends_on: []
+    deprecated: true
+    deprecated_by: ".harmony/capabilities/skills/create-skill/"
+
+  create-workflow:
+    version: "1.0.0"
+    commands: ["/create-workflow"]
+    access: human
+    depends_on: []
+
+  evaluate-workflow:
+    version: "1.0.0"
+    commands: ["/evaluate-workflow"]
+    access: human
+    depends_on: []
+
+  update-workflow:
+    version: "1.0.0"
+    commands: ["/update-workflow"]
+    access: human
+    depends_on:
+      - workflow: evaluate-workflow
+        condition: "optional but recommended to run first"
+
+  refactor:
+    version: "1.1.0"
+    commands: ["/refactor"]
+    access: human
+    depends_on: []
+
+  run-flow:
+    version: "1.0.0"
+    commands: ["/run-flow"]
+    access: human
+    depends_on: []
+
+  create-project:
+    version: "1.0.0"
+    commands: ["/create-project"]
+    access: human
+    depends_on: []
+
+  promote-from-scratchpad:
+    version: "1.0.0"
+    commands: ["/promote-from-scratchpad"]
+    access: human
+    depends_on: []

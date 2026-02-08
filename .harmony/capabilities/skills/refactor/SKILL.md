@@ -89,7 +89,7 @@ Outputs are written to:
 
 For detailed documentation:
 
-- [Behavior phases](references/behaviors.md) — Full phase-by-phase instructions
+- [Behavior phases](references/phases.md) — Full phase-by-phase instructions
 - [I/O contract](references/io-contract.md) — Inputs, outputs, dependencies
 - [Safety policies](references/safety.md) — Tool policies, boundaries
 - [Validation](references/validation.md) — Acceptance criteria, verification gate

@@ -170,7 +170,7 @@ The AI will guide you through everything step-by-step. Takes about 15-20 minutes
 2. **Want to understand risk?** → [RISK-TIERS.md](./RISK-TIERS.md)
 3. **Need to ship something?** → [SHIPPING.md](./SHIPPING.md)
 4. **Production is down?** → [INCIDENTS.md](./INCIDENTS.md)
-5. **Want the full details?** → [../ai/methodology/README.md](../ai/methodology/README.md) (AI-facing docs)
+5. **Want the full details?** → [methodology/README.md](methodology/README.md) (AI-facing docs)
 
 ---
 
@@ -182,10 +182,10 @@ The simple docs you're reading are the human-facing layer. For full details on m
 - **Kit CLIs**: [KITS.md](./KITS.md) — Quick reference for using kit CLIs directly
 - **Kit Technical Docs**: `/packages/kits/README.md` — Full kit documentation
 - **Prompt Library**: `packages/prompts/README.md` — Canonical prompts with schemas and validation
-- **Full Methodology**: [../ai/methodology/README.md](../ai/methodology/README.md)
-- **Architecture**: [../ai/architecture/overview.md](../ai/architecture/overview.md)
-- **Kit Documentation**: [../ai/kits/README.md](../ai/kits/README.md)
-- **Security Policies**: [../ai/methodology/security-baseline.md](../ai/methodology/security-baseline.md)
+- **Full Methodology**: [methodology/README.md](methodology/README.md)
+- **Architecture**: [architecture/overview.md](architecture/overview.md)
+- **Kit Documentation**: [kits/README.md](kits/README.md)
+- **Security Policies**: [methodology/security-baseline.md](methodology/security-baseline.md)
 
 These docs are detailed and comprehensive—designed for AI agents to consume. You don't need to read them unless you want to understand how things work under the hood.
 

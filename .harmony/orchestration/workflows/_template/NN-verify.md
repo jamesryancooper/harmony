@@ -1,4 +1,5 @@
 ---
+name: verify
 title: Verify Completion
 description: Validate workflow executed successfully.
 ---

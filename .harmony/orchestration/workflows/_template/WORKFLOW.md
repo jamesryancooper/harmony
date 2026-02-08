@@ -1,6 +1,17 @@
 ---
-title: "[Workflow Title]"
-description: "[Brief summary, max 160 characters.]"
+name: "[workflow-id]"
+description: "[Brief summary of what this workflow does and when to use it. Max 1024 characters.]"
+steps:
+  - id: "[step-id]"
+    file: 01-step-name.md
+    description: "[Brief step description]"
+  - id: "[step-id]"
+    file: 02-step-name.md
+    description: "[Brief step description]"
+  - id: verify
+    file: NN-verify.md
+    description: "Validate workflow executed successfully."
+# --- Harmony extensions (optional) ---
 access: human
 version: "1.0.0"
 depends_on: []
@@ -21,6 +32,7 @@ parallel_steps: []
 ```
 
 **Example:**
+
 ```text
 /[command] example-argument
 ```
@@ -50,6 +62,7 @@ N. [Verify](./NN-verify.md) - Validate workflow executed successfully
 ## Verification Gate
 
 [Workflow name] is NOT complete until:
+
 - [ ] [Completion criterion 1]
 - [ ] [Completion criterion 2]
 - [ ] Verification step passes
@@ -57,7 +70,7 @@ N. [Verify](./NN-verify.md) - Validate workflow executed successfully
 ## Version History
 
 | Version | Date | Changes |
-|---------|------|---------|
+| ------- | ---- | ------- |
 | 1.0.0 | YYYY-MM-DD | Initial version |
 
 ## References

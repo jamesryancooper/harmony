@@ -115,7 +115,7 @@ Outputs are written to `.harmony/output/drafts/` (synthesis document) and `logs/
 For detailed documentation:
 
 - [I/O contract](references/io-contract.md) - Inputs, outputs, dependencies, command-line usage
-- [Behavior phases](references/behaviors.md) - Full phase-by-phase instructions
+- [Behavior phases](references/phases.md) - Full phase-by-phase instructions
 - [Safety policies](references/safety.md) - Tool and file policies
 - [Examples](references/examples.md) - Full synthesis examples
 - [Validation](references/validation.md) - Acceptance criteria

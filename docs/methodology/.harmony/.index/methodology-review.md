@@ -9,11 +9,11 @@ date: 2025-11-20
 
 ## Goal
 
-Review `docs/handbooks/harmony/methodology/README.md` end-to-end, tighten structure and wording, and fix any conflicts, inconsistencies, ambiguities, or gaps while keeping it aligned with the rest of the Harmony handbooks.
+Review `docs/methodology/README.md` end-to-end, tighten structure and wording, and fix any conflicts, inconsistencies, ambiguities, or gaps while keeping it aligned with the rest of the Harmony handbooks.
 
 ## Scope
 
-- Focus on the full contents of `docs/handbooks/harmony/methodology/README.md`.
+- Focus on the full contents of `docs/methodology/README.md`.
 - Cross-check critical concepts and terminology against nearby handbooks (e.g. `principles.md`, `architecture/*`, `operating-model.md`, `glossary-and-conventions.md`) where needed for alignment.
 
 ## Steps

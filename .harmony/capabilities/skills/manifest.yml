@@ -102,3 +102,25 @@ skills:
       - executor
     capabilities:
       - self-validating
+
+  - id: audit-migration
+    display_name: Audit Migration
+    path: audit-migration/
+    summary: "Layered post-migration audit: grep sweeps, cross-reference validation, semantic read-through."
+    status: active
+    tags:
+      - audit
+      - migration
+      - verification
+      - quality
+    triggers:
+      - "audit the migration"
+      - "verify migration completeness"
+      - "check for stale references"
+      - "post-migration audit"
+      - "find stale paths"
+    skill_sets:
+      - executor
+      - guardian
+    capabilities:
+      - domain-specialized

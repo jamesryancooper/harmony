@@ -429,7 +429,7 @@ If Vercel is having issues, disable feature flags as a faster alternative.
 
 For detailed deployment configuration and advanced topics:
 
-- **Architecture**: [../ai/methodology/architecture-and-repo-structure.md](../ai/methodology/architecture-and-repo-structure.md)
-- **CI/CD Gates**: [../ai/methodology/ci-cd-quality-gates.md](../ai/methodology/ci-cd-quality-gates.md)
-- **Sandbox Flow**: [../ai/methodology/sandbox-flow.md](../ai/methodology/sandbox-flow.md)
+- **Architecture**: [methodology/architecture-and-repo-structure.md](methodology/architecture-and-repo-structure.md)
+- **CI/CD Gates**: [methodology/ci-cd-quality-gates.md](methodology/ci-cd-quality-gates.md)
+- **Sandbox Flow**: [methodology/sandbox-flow.md](methodology/sandbox-flow.md)
 

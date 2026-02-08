@@ -9,7 +9,7 @@ updated: 2025-11-20
 
 You are an expert **software architect, technical editor, and documentation maintainer** tasked with assessing and updating the **Harmony Architecture documentation** under:
 
-- `docs/handbooks/harmony/architecture/**`
+- `docs/architecture/**`
 
 for alignment with the **platform-centric, future-proof runtime model** defined in:
 
@@ -30,7 +30,7 @@ Your goals are to:
 
 You MUST work across all architecture documents in:
 
-- `docs/handbooks/harmony/architecture/**`
+- `docs/architecture/**`
 
 With special focus on (but not limited to):
 
@@ -47,7 +47,7 @@ With special focus on (but not limited to):
 - `resources.md`
 - `agent-roles.md`
 - `runtime-architecture.md` — the **canonical reference** for the platform runtime model and runtime-plane services.
-- Any other runtime-, flow-, or execution-related docs you discover under `docs/handbooks/harmony/architecture/**`.
+- Any other runtime-, flow-, or execution-related docs you discover under `docs/architecture/**`.
 
 ### Out of scope
 
@@ -66,7 +66,7 @@ Before making any assessment or edits, you MUST:
 1. Carefully read and internalize:
    - `@.archive/harmony-architecture-platform-centric-runtime-model.md`
 2. Review the current versions of:
-   - All in-scope architecture docs under `docs/handbooks/harmony/architecture/**`.
+   - All in-scope architecture docs under `docs/architecture/**`.
 
 Treat `@.archive/harmony-architecture-platform-centric-runtime-model.md` as **normative for all runtime-related concerns**.
 
@@ -243,7 +243,7 @@ You MUST follow this workflow for each assessment run.
 ### Phase 1: Discovery and inventory
 
 1. Enumerate all runtime-, flow-, or execution-related sections across:
-   - `docs/handbooks/harmony/architecture/**`.
+   - `docs/architecture/**`.
 2. For each document, build a short inventory that includes:
    - Where runtimes/flows are described.
    - Any references to:
@@ -350,7 +350,7 @@ After implementing per-document changes:
 When you complete an assessment and editing pass, your **final output MUST be the fully aligned architecture documentation**, plus a concise summary. Structure the output as follows:
 
 1. **Updated architecture documents (primary output)**
-   - For every document under `docs/handbooks/harmony/architecture/**` that you changed:
+   - For every document under `docs/architecture/**` that you changed:
      - Emit the **entire updated file content**, including YAML frontmatter.
      - Use one escaped code block per file (for example, `\```markdown` … `\```), and include the file path as a comment or heading at the top of each block.
      - Ensure all changes required to align with the platform runtime model are fully reflected in these file contents.
@@ -364,7 +364,7 @@ When you complete an assessment and editing pass, your **final output MUST be th
      - Any systemic issues discovered.
 
 3. **Per-document results**
-   - For each document in `docs/handbooks/harmony/architecture/**` that was in scope:
+   - For each document in `docs/architecture/**` that was in scope:
      - `Document`: `<path>`
      - `Status`: `Unchanged` | `Updated` | `Needs Human Review`
      - `Findings Summary`: 2–4 bullets describing key runtime-related findings.

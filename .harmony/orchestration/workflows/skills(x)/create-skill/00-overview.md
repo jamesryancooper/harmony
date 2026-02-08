@@ -139,7 +139,7 @@ This workflow creates skills that comply with [agentskills.io/specification](htt
 ## References
 
 - **Spec:** [agentskills.io/specification](https://agentskills.io/specification)
-- **Documentation:** `docs/architecture/workspaces/skills.md`
+- **Documentation:** `docs/architecture/workspaces/skills/README.md`
 - **Example:** `.harmony/capabilities/skills/refine-prompt/`
 - **Template:** `.harmony/capabilities/skills/_template/`
 - **Registry:** `.harmony/capabilities/skills/registry.yml`

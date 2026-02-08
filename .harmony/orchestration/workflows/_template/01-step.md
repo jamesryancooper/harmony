@@ -1,4 +1,5 @@
 ---
+name: "[step-id]"
 title: "[Step Title]"
 description: "[Brief description of this step.]"
 ---

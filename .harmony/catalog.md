@@ -75,7 +75,9 @@ Atomic operations in `capabilities/commands/`:
 
 ## Workflows
 
-Multi-step procedures in `orchestration/workflows/`:
+Multi-step procedures in `orchestration/workflows/`.
+
+**Discovery:** Read `orchestration/workflows/manifest.yml` for workflow index (Tier 1). After matching, read `orchestration/workflows/registry.yml` for extended metadata (Tier 2).
 
 ### Workspace Management
 
@@ -114,6 +116,18 @@ Multi-step procedures in `orchestration/workflows/`:
 | Workflow | Access | Description |
 |----------|--------|-------------|
 | [run-flow](./orchestration/workflows/flowkit/run-flow/00-overview.md) | human | Execute a FlowKit LangGraph flow from `@packages/workflows/<flowId>/config.flow.json` |
+
+### Audit
+
+| Workflow | Access | Description |
+| -------- | ------ | ----------- |
+| [orchestrate-audit](./orchestration/workflows/audit/orchestrate-audit/WORKFLOW.md) | human | Coordinate parallel audit-migration runs across codebase partitions |
+
+### Refactoring
+
+| Workflow | Access | Description |
+| -------- | ------ | ----------- |
+| [refactor](./orchestration/workflows/refactor(x)/00-overview.md) | human | Execute a verified refactor with exhaustive audit |
 
 ---
 

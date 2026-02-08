@@ -314,6 +314,6 @@ jobs:
 - [Auto-Tier Assignment](./auto-tier-assignment.md)
 - [Flow & WIP Policy](./flow-and-wip-policy.md)
 - [Spec Templates](./templates/README.md)
-- [Human-Facing Risk Tiers](../../human/RISK-TIERS.md)
+- [Human-Facing Risk Tiers](../RISK-TIERS.md)
 
-Reference: Use the PatchKit PR Template (canonical) in `docs/ai/kits/automation-and-delivery/patchkit/guide.md` to standardize PR bodies, determinism/provenance notes, and tier information.
+Reference: Use the PatchKit PR Template (canonical) in `docs/kits/automation-and-delivery/patchkit/guide.md` to standardize PR bodies, determinism/provenance notes, and tier information.

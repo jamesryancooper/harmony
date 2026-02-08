@@ -265,7 +265,7 @@ if (result.warnings?.length) {
    - Runtime TypeScript validation
    - Derived from JSON schemas
 
-3. **Methodology Documentation** (`docs/ai/methodology/`)
+3. **Methodology Documentation** (`docs/methodology/`)
    - Human-readable explanations
    - Must align with schemas
 

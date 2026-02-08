@@ -220,6 +220,83 @@ skills:
           determinism: variable
           description: "Top-level log index (cross-skill)"
 
+  audit-migration:
+    version: "1.1.0"
+    commands:
+      - /audit-migration
+    parameters:
+      - name: manifest
+        type: text
+        required: true
+        description: "Migration manifest (inline YAML or file path with old→new mappings)"
+      - name: scope
+        type: text
+        required: false
+        default: "."
+        description: "Directory to audit (default: current directory)"
+      - name: severity_threshold
+        type: text
+        required: false
+        default: "all"
+        description: "Minimum severity to report: critical, high, medium, low, all"
+      - name: structure_spec
+        type: file
+        required: false
+        description: "Path to documented directory structure for optional structure diff layer"
+      - name: template_dir
+        type: folder
+        required: false
+        description: "Path to template directory for optional template smoke test layer"
+      - name: partition
+        type: text
+        required: false
+        description: "Partition label for parallel orchestration (e.g., 'docs-architecture')"
+      - name: file_filter
+        type: text
+        required: false
+        description: "Glob pattern to narrow scope within scope directory (e.g., 'docs/architecture/**')"
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs:
+        - path: "configs/audit-migration/{{manifest_file}}"
+          kind: file
+          format: yaml
+          required: false
+          description: "Optional manifest file (alternative to inline YAML)"
+      outputs:
+        - name: audit_report
+          path: "../../output/reports/{{date}}-migration-audit.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Structured findings report with severity tiers and fix batches"
+        - name: partition_audit_report
+          path: "../../output/reports/{{date}}-migration-audit-{{partition}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Partition-scoped findings report (when partition parameter is set)"
+        - name: run_log
+          path: "logs/audit-migration/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for this audit run"
+        - name: log_index
+          path: "logs/audit-migration/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of all audit-migration runs with metadata"
+        - name: top_log_index
+          path: "logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
   create-skill:
     version: "1.0.0"
     commands:

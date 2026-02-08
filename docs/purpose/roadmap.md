@@ -43,7 +43,7 @@ Welcome to the implementation roadmap for Harmony's Convivial Purpose. The found
 | Purpose `README.md` | `purpose/README.md` | Not created |
 | `convivial_impact` schema | `packages/contracts/schemas/spec-frontmatter.schema.json` | Proposed in `convivial-purpose.md`, not implemented |
 | `convivial_guardrails.yaml` | `packages/kits/policykit/` or similar | Proposed in `convivial-purpose.md`, not implemented |
-| Spec template CIA section | `docs/ai/methodology/templates/spec-tier*.yaml` | Not added |
+| Spec template CIA section | `docs/methodology/templates/spec-tier*.yaml` | Not added |
 | PR review checklist | CI/PR templates | Not added |
 | Measurability dashboard | Observability infrastructure | Not implemented |
 
@@ -56,7 +56,7 @@ Welcome to the implementation roadmap for Harmony's Convivial Purpose. The found
 Create a `README.md` that provides an overview of the purpose documentation, connecting the RCDS framework to the Convivial Purpose synthesis:
 
 ```text
-docs/ai/purpose/
+docs/purpose/
 ├── README.md                          # Overview & 30-second summary (NEW)
 ├── convivial-purpose.md               # Synthesis & operationalization spec
 └── resonant-computing-design-stack.md # Foundational RCDS framework

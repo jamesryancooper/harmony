@@ -220,7 +220,7 @@ When human docs reference "engines," they mean these underlying Kits:
 
 ## See Also
 
-- [START-HERE.md](../human/START-HERE.md) — Entry point for human developers
-- [Full Methodology](../ai/methodology/README.md) — Complete AI-facing documentation
-- [Kit Documentation](../ai/kits/README.md) — Detailed Kit specifications
+- [START-HERE.md](./START-HERE.md) — Entry point for human developers
+- [Full Methodology](methodology/README.md) — Complete AI-facing documentation
+- [Kit Documentation](kits/README.md) — Detailed Kit specifications
 

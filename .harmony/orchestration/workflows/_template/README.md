@@ -6,7 +6,7 @@ This directory contains the canonical template for creating new workflows.
 
 | File | Purpose |
 |------|---------|
-| `00-overview.md` | Workflow entry point with enhanced frontmatter |
+| `WORKFLOW.md` | Workflow entry point with spec-compliant frontmatter |
 | `01-step.md` | Generic step template with idempotency section |
 | `NN-verify.md` | Mandatory verification gate template |
 
@@ -22,19 +22,25 @@ When creating a new workflow:
 
 ## Enhanced Frontmatter Schema
 
-The `00-overview.md` template includes gap-fix fields:
+The `WORKFLOW.md` template includes spec-compliant fields plus Harmony extensions:
 
 ```yaml
 ---
-title: "[Title]"
-description: "[Max 160 chars]"
+# Core spec fields (required)
+name: "[workflow-id]"
+description: "[What this workflow does and when to use it]"
+steps:
+  - id: "[step-id]"
+    file: 01-step-name.md
+    description: "[Brief step description]"
+# Harmony extensions (optional)
 access: human|agent
-version: "1.0.0"           # Semantic versioning
-depends_on: []              # Cross-workflow dependencies
+version: "1.0.0"
+depends_on: []
 checkpoints:
   enabled: true
   storage: ".harmony/continuity/checkpoints/"
-parallel_steps: []          # Steps safe to run in parallel
+parallel_steps: []
 ---
 ```
 

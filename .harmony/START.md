@@ -82,7 +82,7 @@ Assistants are focused specialists available via `@mention`:
 - `@refactor` / `@ref` — Code restructuring
 - `@docs` / `@doc` — Documentation
 
-See `assistants/registry.yml` for full list and `catalog.md` for details.
+See `agency/assistants/registry.yml` for full list and `catalog.md` for details.
 
 ## Visibility & Autonomy Rules
 

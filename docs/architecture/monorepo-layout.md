@@ -137,7 +137,7 @@ See also `docs/kits/planning-and-orchestration/kit-roles.md` for how PlanKit, Ag
 For guidance on how runtime-plane directories (`apps/*`, `agents/*`, `platform/runtimes/*-runtime/**`) map to container boundaries and sandbox environments, see:
 
 - `containerization-profile.md` — Containerization conventions and CI integration.
-- `docs/handbooks/harmony/methodology/sandbox-flow.md` — Canonical sandbox flow using previews, flags, CI gates, and observability.
+- `../methodology/sandbox-flow.md` — Canonical sandbox flow using previews, flags, CI gates, and observability.
 
 ## Documentation
 

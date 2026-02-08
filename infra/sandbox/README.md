@@ -6,7 +6,7 @@ The goals of these sandboxes are to:
 
 - Provide an **easy local and CI experience** for end‑to‑end testing.
 - Mirror production topology closely enough to exercise contracts, flags, and runtime behavior.
-- Integrate cleanly with the **Sandbox Flow** (`docs/handbooks/harmony/methodology/sandbox-flow.md`) and **Containerization Profile** (`docs/handbooks/harmony/architecture/containerization-profile.md`).
+- Integrate cleanly with the **Sandbox Flow** (`docs/methodology/sandbox-flow.md`) and **Containerization Profile** (`docs/architecture/containerization-profile.md`).
 
 > Note: The exact `docker compose` file names and contents may evolve. This README describes the intended patterns so teams can adjust or extend recipes while remaining aligned with Harmony.
 

@@ -31,6 +31,30 @@
 - Follow `deny-by-default` tool policy
 - Log every execution to `capabilities/skills/logs/`
 
+## Workflows
+
+Read `.harmony/orchestration/workflows/manifest.yml` for workflow discovery.
+
+### Quick Reference
+
+- **Manifest:** `.harmony/orchestration/workflows/manifest.yml` (Tier 1 discovery)
+- **Registry:** `.harmony/orchestration/workflows/registry.yml` (extended metadata + parameters)
+- **Workflow Definitions:** `.harmony/orchestration/workflows/<domain>/<workflow-id>/WORKFLOW.md`
+- **Catalog:** `.harmony/orchestration/workflows/workspace-README.md`
+
+### Progressive Disclosure
+
+1. Read `manifest.yml` for workflow index (id, name, summary, triggers)
+2. After matching, read `registry.yml` for extended metadata and parameters
+3. Load `WORKFLOW.md` when a workflow is activated
+4. Load step files (01-*.md, 02-*.md, ...) during execution
+
+### Invocation
+
+- Explicit command: `/orchestrate-audit manifest="..."`
+- Explicit call: `use workflow: orchestrate-audit`
+- Natural triggers: Match against `triggers` in manifest
+
 ## Foundation
 
 `.harmony/` is organized by capability:

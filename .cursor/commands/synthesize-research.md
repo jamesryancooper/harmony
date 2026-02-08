@@ -31,13 +31,13 @@ See `.harmony/capabilities/skills/synthesize-research/SKILL.md` for full details
    - Key themes with evidence
    - Contradictions and resolutions
    - Open questions
-4. Writes output to `.harmony/drafts/<topic>-synthesis.md`
+4. Writes output to `.harmony/output/drafts/<topic>-synthesis.md`
 5. Creates run log in `.harmony/capabilities/skills/logs/synthesize-research/`
 
 ## Output
 
 ```text
-.harmony/drafts/<topic>-synthesis.md
+.harmony/output/drafts/<topic>-synthesis.md
 ```
 
 ## References
@@ -45,4 +45,4 @@ See `.harmony/capabilities/skills/synthesize-research/SKILL.md` for full details
 - **Skill:** `.harmony/capabilities/skills/synthesize-research/SKILL.md`
 - **Shared Registry:** `.harmony/capabilities/skills/registry.yml`
 - **Local Registry:** `.harmony/capabilities/skills/registry.yml` (for input/output mappings)
-- **Documentation:** `docs/architecture/workspaces/skills.md`
+- **Documentation:** `docs/architecture/workspaces/skills/README.md`

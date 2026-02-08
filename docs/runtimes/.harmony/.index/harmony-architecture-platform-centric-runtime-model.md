@@ -9,7 +9,7 @@ updated: 2025-11-19
 
 You are an expert **software architect and technical writer** tasked with updating the **Harmony Architecture documentation** under:
 
-- `docs/handbooks/harmony/architecture/**`
+- `docs/architecture/**`
 
 to reflect a **platform-centric, future-proof runtime model**. Your goal is to introduce and normalize a **platform runtime service** abstraction that can be shared across apps, agents, and Kaizen agents, while preserving Harmony’s clean architecture principles.
 
@@ -21,7 +21,7 @@ to reflect a **platform-centric, future-proof runtime model**. Your goal is to i
 
 You will work across all architecture documents in:
 
-- `docs/handbooks/harmony/architecture/**`
+- `docs/architecture/**`
 
 Across these architecture docs, you must implement this runtime model consistently: any description of runtimes, “Runner”, LangGraph execution, or flow execution should be brought into alignment with the **platform runtime** model defined here and, where relevant, should reference the intended `platform/runtimes/flow-runtime/**` runtime layout described in this prompt as the target implementation path, rather than legacy or ad-hoc structures.
 

@@ -113,7 +113,7 @@ Continuity artifacts are files that preserve historical context across sessions.
 |------|---------|------|
 | `continuity/log.md` | Session history | Append new entries; never modify past entries |
 | `cognition/context/decisions.md` | Decision summary | Append new decisions; never update old references |
-| `decisions/*.md` | Full ADRs | Append addendums; never modify accepted content |
+| `cognition/decisions/*.md` | Full ADRs | Append addendums; never modify accepted content |
 
 ### Mutability Frontmatter
 
@@ -148,5 +148,5 @@ When renaming or moving paths, **do not** update historical references:
 ### See Also
 
 - **Decision:** D014 (Continuity artifact immutability)
-- **ADR:** [ADR-004](decisions/004-refactor-workflow.md)
+- **ADR:** [ADR-004](cognition/decisions/004-refactor-workflow.md)
 - **Workflow:** `.harmony/orchestration/workflows/refactor(x)/`

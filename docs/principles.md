@@ -86,7 +86,7 @@ This document codifies how Harmony's [six pillars](./pillars/README.md) translat
 
 ## Related Docs
 
-- **Pillars documentation: `docs/ai/pillars/README.md`**
+- **Pillars documentation: `pillars/README.md`**
 - Methodology overview: `docs/methodology/README.md`
 - Architecture overview: `docs/architecture/overview.md`
 - Governance model: `docs/architecture/governance-model.md`

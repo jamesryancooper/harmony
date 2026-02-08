@@ -92,7 +92,7 @@ The current `principles.md` is marked as "Draft stub (confirm team-specific thre
 Create `README.md` as the entry point for principles documentation:
 
 ```text
-docs/ai/principles/
+docs/principles/
 ├── README.md                    # Overview & navigation (NEW)
 ├── core/                        # Core principles detailed guides (P1)
 │   ├── README.md

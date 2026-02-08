@@ -439,5 +439,5 @@ harmony security fix pentest --severity high
 - [Run a data migration](./run-data-migration.md)
 - [Fix a bug](./fix-a-bug.md)
 - Back to [DAILY-FLOW.md](../DAILY-FLOW.md)
-- [Security Baseline](../ai/methodology/security-baseline.md) (full details)
+- [Security Baseline](../methodology/security-baseline.md) (full details)
 

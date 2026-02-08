@@ -29,8 +29,8 @@ See `.harmony/capabilities/skills/registry.yml` for skill definitions and mappin
 2. Load the skill definition from `.harmony/capabilities/skills/<skill-id>/SKILL.md`
 4. Validate inputs match skill requirements
 5. Execute the skill's behavior steps
-6. Write outputs to `.harmony/capabilities/skills/outputs/` (always local)
-7. Write run log to `.harmony/capabilities/skills/logs/runs/<timestamp>-<skill-id>.md`
+6. Write outputs to `.harmony/output/drafts/` (always local)
+7. Write run log to `.harmony/capabilities/skills/logs/<skill-id>/<run-id>.md`
 
 ## Progressive Disclosure
 
@@ -59,5 +59,5 @@ Skills can also be invoked via:
 ## References
 
 - **Registry:** `.harmony/capabilities/skills/registry.yml`
-- **Documentation:** `docs/architecture/workspaces/skills.md`
+- **Documentation:** `docs/architecture/workspaces/skills/README.md`
 - **Skills README:** `.harmony/capabilities/skills/README.md`

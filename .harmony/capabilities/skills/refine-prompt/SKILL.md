@@ -85,7 +85,7 @@ Outputs are written to `.harmony/scaffolding/prompts/` (refined prompt) and `log
 
 For detailed documentation:
 
-- [Behavior phases](references/behaviors.md) - Full phase-by-phase instructions
+- [Behavior phases](references/phases.md) - Full phase-by-phase instructions
 - [I/O contract](references/io-contract.md) - Inputs, outputs, dependencies, command-line usage
 - [Safety policies](references/safety.md) - Tool and file policies
 - [Examples](references/examples.md) - Full refinement examples

@@ -6,7 +6,7 @@
       "type": "directory",
       "status": "stable",
       "last_modified": "2025-12-18",
-      "notes": "Root workspace harness; structure finalized"
+      "notes": "Root workspace harness; capability-organized structure finalized"
     },
     "docs/architecture/workspaces/": {
       "type": "directory",

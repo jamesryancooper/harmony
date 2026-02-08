@@ -7,11 +7,11 @@ description: Harmony’s 12-Factor, monolith-first, Hexagonal architecture and T
 
 This document expands the architecture and repo structure sections from the Harmony Methodology. Use it as a high-level, practical guide to the Harmony Structural Paradigm (HSP) — the modular monolith layout, ports/adapters boundaries, and how feature flags and the thin control plane fit into the stack.
 
-The **normative source of truth** for architectural decisions lives under `docs/handbooks/harmony/architecture/**` (for example, `overview.md`, `monorepo-layout.md`, `repository-blueprint.md`, `nextjs-astro-vercel.md`, `runtime-architecture.md`, and `contracts-registry.md`). This Methodology page summarizes those decisions and links to them; it SHOULD NOT introduce conflicting rules.
+The **normative source of truth** for architectural decisions lives under `docs/architecture/` (for example, `overview.md`, `monorepo-layout.md`, `repository-blueprint.md`, `nextjs-astro-vercel.md`, `runtime-architecture.md`, and `contracts-registry.md`). This Methodology page summarizes those decisions and links to them; it SHOULD NOT introduce conflicting rules.
 
 ## Structural Basics
 
-- **Harmony Structural Paradigm (HSP)**: a modular monolith (“Hexa‑Modulith”) with vertical feature slices and a thin control plane (flags, contracts, observability, policy). See `docs/handbooks/harmony/architecture/overview.md`.
+- **Harmony Structural Paradigm (HSP)**: a modular monolith (“Hexa‑Modulith”) with vertical feature slices and a thin control plane (flags, contracts, observability, policy). See `docs/architecture/overview.md`.
 - **12‑Factor**: configs in env / runtime config, stateless processes where possible, logs as streams, disposability, clear build‑release‑run separation.
 - **Monolith‑First in Turborepo**: a single logical system in one workspace, organized as:
   - **Runtime planes** — things you **run**: `apps/*` (TypeScript apps and UIs), `agents/*` (Python control‑plane runtimes), and platform runtimes under `platform/runtimes/*-runtime/**` (for example, the LangGraph‑based flow runtime described in `runtime-architecture.md`).
@@ -24,7 +24,7 @@ The **normative source of truth** for architectural decisions lives under `docs/
 
 ## Framework Strategy (Next.js, Astro, Vercel, Python)
 
-Framework usage and defaults are defined in `docs/handbooks/harmony/architecture/nextjs-astro-vercel.md`. This repo applies that profile as follows:
+Framework usage and defaults are defined in `docs/architecture/nextjs-astro-vercel.md`. This repo applies that profile as follows:
 
 - **Next.js (App Router, React 19)**:
   - `apps/ai-console` is the canonical example: use Server Components and Server Actions as **thin controllers** that orchestrate flows and delegate to `packages/<feature>/domain` or to platform runtimes via contracts (for example, `runtime-flows` clients from `contracts/ts`).
@@ -116,6 +116,6 @@ This scaling policy is intentionally lightweight and SHOULD be read together wit
 - `architecture/overview.md` (Harmony Structural Paradigm objectives and evolution path).
 - `architecture/governance-model.md` (HITL gates, waiver policy, risk rubric).
 - `architecture/runtime-policy.md` (feature flags, rollback, runtime expectations).
-- `docs/handbooks/harmony/testing-strategy.md` (test pyramid, preview smoke, and contract test gates).
+- `docs/testing-strategy.md` (test pyramid, preview smoke, and contract test gates).
 
 Together, these documents keep solo developers and 2-person teams fast while preserving **Speed with Safety**, **Simplicity over Complexity**, and **Quality through Determinism**.

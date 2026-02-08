@@ -60,7 +60,7 @@ Rather than maintaining a single, monolithic set of agent instructions at the re
 
 1. **Scoped Context Reduces Noise**
 
-When an agent starts working in `docs/ai/methodology/`, it can immediately find relevant context in `.harmony/` without searching the entire repository. This is critical because:
+When an agent starts working in `docs/methodology/`, it can immediately find relevant context in `.harmony/` without searching the entire repository. This is critical because:
 
 - Agents have limited context windows
 - Irrelevant context dilutes attention

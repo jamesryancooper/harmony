@@ -173,7 +173,7 @@ If you want, I can drop **filled-in Markdown stubs** for all five into your repo
 
 ## Using the Starter Docs Stub Template
 
-Use the ready-to-rename docs stubs starter bundle with all five docs, contracts, and placeholders wired up. The template lives at `docs/handbook/documentation-standards/template`.
+Use the ready-to-rename docs stubs starter bundle with all five docs, contracts, and placeholders wired up. The template lives at `docs/documentation-standards/template`.
 
 ### What’s inside (template structure)
 
@@ -211,7 +211,7 @@ README.md
 
 ## Kit Docs Checklist
 
-When documenting kits in `docs/handbook/ai-toolkit`, include these data points where applicable:
+When documenting kits in `docs/kits`, include these data points where applicable:
 
 - Quick Snapshot: modes/variants, capabilities/signals, inputs/outputs, artifacts, optional publish/serve
 - Core Responsibilities and explicit non‑responsibilities (boundaries)
@@ -229,4 +229,4 @@ When documenting kits in `docs/handbook/ai-toolkit`, include these data points w
 - Harmony Alignment bullets mapping to spec‑first, auditability, security baselines, and modular CI/CD
 - Minimal Interfaces (functions/config shapes) and FAQs
 
-See `docs/handbook/ai-toolkit/knowledge-and-retrieval/indexkit/guide.md` for a good exemplar that follows this pattern.
+See `docs/kits/knowledge-and-retrieval/indexkit/guide.md` for a good exemplar that follows this pattern.

@@ -1,0 +1,194 @@
+# Workflow Manifest — Tier 1 Discovery
+#
+# Ultra-lightweight index for routing and intent matching.
+# Token budget: ~50 tokens per workflow entry.
+#
+# Load this FIRST for workflow discovery.
+# After matching, load registry.yml for extended metadata.
+# Then load WORKFLOW.md when a workflow is activated.
+
+workflows:
+  # --- Workspace Management ---
+
+  - id: create-workspace
+    display_name: Create Workspace
+    domain: workspace
+    path: workspace/create-workspace/
+    summary: Scaffold a new .harmony/ directory in a target location.
+    status: active
+    triggers:
+      - "create a workspace"
+      - "scaffold a harmony directory"
+      - "initialize workspace"
+
+  - id: evaluate-workspace
+    display_name: Evaluate Workspace
+    domain: workspace
+    path: workspace/evaluate-workspace/
+    summary: Evaluate a .harmony directory for token efficiency and effectiveness.
+    status: active
+    triggers:
+      - "evaluate workspace"
+      - "assess workspace quality"
+      - "check workspace health"
+
+  - id: migrate-workspace
+    display_name: Migrate Workspace
+    domain: workspace
+    path: workspace/migrate-workspace/
+    summary: Upgrade an older workspace to current conventions.
+    status: active
+    triggers:
+      - "migrate workspace"
+      - "upgrade workspace"
+      - "update workspace structure"
+
+  - id: update-workspace
+    display_name: Update Workspace
+    domain: workspace
+    path: workspace/update-workspace/
+    summary: Align an existing .harmony directory with the canonical definition.
+    status: active
+    triggers:
+      - "update workspace"
+      - "align workspace"
+      - "fix workspace gaps"
+
+  # --- Missions ---
+
+  - id: create-mission
+    display_name: Create Mission
+    domain: missions
+    path: missions/create-mission/
+    summary: Scaffold a new mission from template.
+    status: active
+    triggers:
+      - "create a mission"
+      - "start a new mission"
+      - "scaffold mission"
+
+  - id: complete-mission
+    display_name: Complete Mission
+    domain: missions
+    path: missions/complete-mission/
+    summary: Archive a completed mission.
+    status: active
+    triggers:
+      - "complete mission"
+      - "archive mission"
+      - "finish mission"
+
+  # --- Skills ---
+
+  - id: create-skill
+    display_name: Create Skill
+    domain: skills
+    path: skills(x)/create-skill/
+    summary: Scaffold a new skill from template with registry entry.
+    status: deprecated
+    triggers:
+      - "create a skill"
+      - "scaffold skill"
+
+  # --- Workflows ---
+
+  - id: create-workflow
+    display_name: Create Workflow
+    domain: workflows
+    path: workflows/create-workflow/
+    summary: Scaffold a new workflow with gap-aware structure and verification gates.
+    status: active
+    triggers:
+      - "create a workflow"
+      - "scaffold workflow"
+      - "new workflow"
+
+  - id: evaluate-workflow
+    display_name: Evaluate Workflow
+    domain: workflows
+    path: workflows/evaluate-workflow/
+    summary: Assess an existing workflow against quality criteria and gap coverage.
+    status: active
+    triggers:
+      - "evaluate workflow"
+      - "assess workflow quality"
+      - "grade workflow"
+
+  - id: update-workflow
+    display_name: Update Workflow
+    domain: workflows
+    path: workflows/update-workflow/
+    summary: Modify an existing workflow to add features or fix gaps.
+    status: active
+    triggers:
+      - "update workflow"
+      - "fix workflow gaps"
+      - "improve workflow"
+
+  # --- Refactoring ---
+
+  - id: refactor
+    display_name: Refactor
+    domain: refactor
+    path: refactor(x)/
+    summary: Execute a verified refactor with exhaustive audit and mandatory verification.
+    status: active
+    triggers:
+      - "refactor codebase"
+      - "rename across codebase"
+      - "verified refactor"
+
+  # --- Audit ---
+
+  - id: orchestrate-audit
+    display_name: Orchestrate Audit
+    domain: audit
+    path: audit/orchestrate-audit/
+    summary: Coordinate parallel audit-migration runs across codebase partitions.
+    status: active
+    triggers:
+      - "orchestrate an audit"
+      - "run a partitioned audit"
+      - "parallel audit"
+      - "coordinate audit partitions"
+
+  # --- FlowKit ---
+
+  - id: run-flow
+    display_name: Run FlowKit Flow
+    domain: flowkit
+    path: flowkit/run-flow/
+    summary: Execute a FlowKit LangGraph flow from its config file.
+    status: active
+    triggers:
+      - "run a flow"
+      - "execute flowkit"
+      - "run langgraph flow"
+
+  # --- Projects ---
+
+  - id: create-project
+    display_name: Create Project
+    domain: projects
+    path: projects/create-project.md
+    summary: Scaffold a new project in projects/.
+    status: active
+    format: single-file
+    triggers:
+      - "create a project"
+      - "new project"
+      - "scaffold project"
+
+  # --- Ideation ---
+
+  - id: promote-from-scratchpad
+    display_name: Promote from Scratchpad
+    domain: ideation
+    path: promote-from-scratchpad.md
+    summary: Publish distilled insights from scratchpad to agent-facing artifacts.
+    status: active
+    format: single-file
+    triggers:
+      - "promote from scratchpad"
+      - "publish scratchpad"
+      - "promote insights"
