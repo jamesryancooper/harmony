@@ -44,17 +44,39 @@ Each layer owns specific responsibilities with no overlap:
 
 ### Configuration
 
-**Config location:** `~/.config/ghostty/config` or `~/Library/Application Support/com.mitchellh.ghostty/config`
+**Config location:** `~/Library/Application Support/com.mitchellh.ghostty/config`
 
 **Theme location:** `~/.config/ghostty/themes/Harmony Dark`
 
 ### Features
 
 - Harmony Dark color scheme
-- Monospace Neon font at 18pt
+- Monospace Neon font at 20pt
 - Transparent titlebar (macOS native)
 - Shell integration with Zsh
 - No terminal splits (tmux handles this)
+- Auto-launches into tmux on open (via startup script)
+- `window-save-state = never` — always starts fresh via tmux session persistence
+
+### Tmux Auto-Launch
+
+Ghostty is configured to run a startup script instead of a bare shell:
+
+```
+command = ~/.config/tmux/sessions.sh
+```
+
+The script (`~/.config/tmux/sessions.sh`) creates four project sessions on startup and attaches to the default:
+
+```bash
+create_session "Harmony"          "~/Projects/harmony"
+create_session "CooperDrive"      "~/Projects/cooperdrive"
+create_session "JamesRyanCooper"  "~/Projects/jamesryancooper"
+create_session "Playmaker"        "~/Projects/playmaker"
+# Attaches to Harmony by default
+```
+
+Switch between sessions with `C-a S` (session chooser).
 
 ### Keybindings
 
@@ -157,6 +179,7 @@ Each layer owns specific responsibilities with no overlap:
 | `fzf` | — | Fuzzy finder, `Ctrl+R` for history |
 | `atuin` | — | Searchable shell history |
 | `delta` | `diff` | Better git diffs |
+| `difftastic` | — | Structural/syntax-aware diffs |
 | `tldr` | `man` | `tldr command` |
 | `jq` | — | JSON processor |
 | `yq` | — | YAML processor |
@@ -254,6 +277,19 @@ The prompt displays:
 
 All tmux commands start with the prefix unless noted otherwise.
 
+### Multi-Project Sessions
+
+On startup, four project sessions are automatically created by `~/.config/tmux/sessions.sh`:
+
+| Session | Working Directory |
+|---------|------------------|
+| `Harmony` | `~/Projects/harmony` |
+| `CooperDrive` | `~/Projects/cooperdrive` |
+| `JamesRyanCooper` | `~/Projects/jamesryancooper` |
+| `Playmaker` | `~/Projects/playmaker` |
+
+Switch between them with `C-a S` (session chooser) or `C-a f` (fzf fuzzy find).
+
 ### Plugins
 
 | Plugin | Description |
@@ -328,6 +364,23 @@ All tmux commands start with the prefix unless noted otherwise.
 ### Smart Pane Navigation
 
 `Ctrl+h/j/k/l` works seamlessly across tmux panes AND Neovim splits without needing the prefix. The config detects when Neovim is focused and passes the keys through.
+
+### Pane Border Labels
+
+Pane borders display an index and title label at the top of each pane:
+
+```
+ 1: claude ─────────────────────────────────
+```
+
+This is configured in `~/.tmux.conf`:
+
+```tmux
+set -g pane-border-status top
+set -g pane-border-format ' #{pane_index}: #{pane_title} '
+```
+
+Set a pane's title with: `printf '\033]2;my-label\033\\'`
 
 ### Session Persistence
 
@@ -650,6 +703,30 @@ Claude Code runs in a dedicated terminal split.
 - Can run terminal commands
 - Understands your codebase
 
+#### Agent Teams
+
+Agent Teams is enabled via `.claude/settings.json`:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+This allows Claude Code to spawn teammate agents into tmux splits for parallel work. Pane border labels (`pane-border-status`) show each agent's role at the top of its pane.
+
+**Manual swarm launcher:** `scripts/harmony-swarm.sh` creates a 4-pane tmux layout with lead, builder, reviewer, and verifier agents plus a logs tab:
+
+```
+┌─────────────────────┬─────────────────────┐
+│  Lead               │  Builder            │
+├─────────────────────┼─────────────────────┤
+│  Reviewer           │  Verifier           │
+└─────────────────────┴─────────────────────┘
+```
+
 ### Codex CLI (Terminal Agent)
 
 OpenAI Codex runs in a dedicated terminal split.
@@ -700,8 +777,12 @@ llm models default claude-sonnet-4-20250514  # Set default model
 
 ### Starting a Development Session
 
+Ghostty auto-launches into a tmux `Harmony` session in `~/Projects/harmony`. Three other project sessions (`CooperDrive`, `JamesRyanCooper`, `Playmaker`) are pre-created and accessible via `C-a S`.
+
+To manually start or attach:
+
 ```bash
-# Start or attach to dev session
+# Attach to existing or create new
 tdev
 
 # Or create a named session
@@ -748,6 +829,49 @@ tn myproject
 3. Or use: `ai-commit` for AI-suggested message
 4. Push from lazygit
 
+### Diffing & Reviewing Changes
+
+**Pretty diffs (delta):**
+```bash
+git diff       # Uses delta as pager automatically
+git show
+```
+
+**Structural diffs (difftastic):**
+```bash
+git difftool   # Syntax-aware, tree-based diffs
+difft fileA fileB  # One-off comparison
+```
+
+**In-editor diff:**
+```bash
+nvim -d fileA fileB
+```
+
+### File Management (Yazi)
+
+```bash
+y              # Launch yazi (shell cd's to last directory on exit)
+```
+
+In yazi: `O` to open-with (Cursor, nvim), `q` to quit.
+
+**Yazi config** (`~/.config/yazi/yazi.toml`):
+```toml
+[opener]
+edit_in_cursor = [
+  { run = 'cursor "$@"', orphan = true, desc = "Open in Cursor" }
+]
+edit_in_nvim = [
+  { run = 'nvim "$@"', block = true, desc = "Edit in nvim" }
+]
+
+[open]
+rules = [
+  { name = "*", use = [ "edit_in_cursor", "edit_in_nvim" ] },
+]
+```
+
 ### Debugging Errors
 
 ```bash
@@ -778,6 +902,11 @@ how "find all .py files modified in last 24 hours"
 - `<Leader>ac` — open Claude Code
 - Describe the task
 - Claude Code can edit files and run commands
+
+**For parallel agent work:**
+```bash
+scripts/harmony-swarm.sh   # 4-pane agent layout + logs tab
+```
 
 ---
 
@@ -815,6 +944,7 @@ C-a |        Split vertical
 C-a -        Split horizontal
 C-a z        Zoom pane
 C-a d        Detach
+C-a S        Session chooser
 
 # Neovim
 <Leader>ff   Find files
@@ -840,7 +970,7 @@ how "task"   Get command
 Ensure true color support:
 ```bash
 # Check terminal
-echo $TERM  # Should be xterm-256color or similar
+echo $TERM  # Should be xterm-256color or tmux-256color
 
 # Test colors
 curl -s https://raw.githubusercontent.com/gnachman/iTerm2/master/tests/24-bit-color.sh | bash
@@ -912,14 +1042,18 @@ exec zsh  # Reinstalls
 
 | Component | Config Location |
 |-----------|-----------------|
-| Ghostty | `~/.config/ghostty/config` |
+| Ghostty | `~/Library/Application Support/com.mitchellh.ghostty/config` |
 | Ghostty theme | `~/.config/ghostty/themes/Harmony Dark` |
+| Tmux | `~/.tmux.conf` |
+| Tmux sessions script | `~/.config/tmux/sessions.sh` |
 | Zsh | `~/.zshrc` |
 | Zsh prompt | `~/.zsh/prompt.zsh` |
-| Tmux | `~/.tmux.conf` |
 | Neovim | `~/.config/nvim/` |
 | Neovim plugins | `~/.config/nvim/lua/plugins/` |
 | Neovim theme | `~/.config/nvim/colors/harmony-dark.lua` |
+| Yazi | `~/.config/yazi/yazi.toml` |
+| Claude Code settings | `.claude/settings.json` |
+| Swarm launcher | `scripts/harmony-swarm.sh` |
 
 ---
 
@@ -934,4 +1068,4 @@ exec zsh  # Reinstalls
 
 ---
 
-*Last updated: January 2026*
+*Last updated: February 2026*

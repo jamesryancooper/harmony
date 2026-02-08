@@ -40,7 +40,7 @@ node scripts/install-cursor-harmony-theme.js --uninstall
 
 ## Customizing / adding more schemes
 
-See `docs/development/cursor-theme.md` for:
+See `docs/development/harmony-theme.md` for:
 
 - Updating theme colors (`"colors"` and `"tokenColors"`)
 - Adding additional theme variants (registering new JSON files in `package.json`)
