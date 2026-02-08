@@ -8,51 +8,51 @@
 # Then load WORKFLOW.md when a workflow is activated.
 
 workflows:
-  # --- Workspace Management ---
+  # --- Harness Management ---
 
-  - id: create-workspace
-    display_name: Create Workspace
-    domain: workspace
-    path: workspace/create-workspace/
+  - id: create-harness
+    display_name: Create Harness
+    domain: harness
+    path: harness/create-harness/
     summary: Scaffold a new .harmony/ directory in a target location.
     status: active
     triggers:
-      - "create a workspace"
+      - "create a harness"
       - "scaffold a harmony directory"
-      - "initialize workspace"
+      - "initialize harness"
 
-  - id: evaluate-workspace
-    display_name: Evaluate Workspace
-    domain: workspace
-    path: workspace/evaluate-workspace/
+  - id: evaluate-harness
+    display_name: Evaluate Harness
+    domain: harness
+    path: harness/evaluate-harness/
     summary: Evaluate a .harmony directory for token efficiency and effectiveness.
     status: active
     triggers:
-      - "evaluate workspace"
-      - "assess workspace quality"
-      - "check workspace health"
+      - "evaluate harness"
+      - "assess harness quality"
+      - "check harness health"
 
-  - id: migrate-workspace
-    display_name: Migrate Workspace
-    domain: workspace
-    path: workspace/migrate-workspace/
-    summary: Upgrade an older workspace to current conventions.
+  - id: migrate-harness
+    display_name: Migrate Harness
+    domain: harness
+    path: harness/migrate-harness/
+    summary: Upgrade an older harness to current conventions.
     status: active
     triggers:
-      - "migrate workspace"
-      - "upgrade workspace"
-      - "update workspace structure"
+      - "migrate harness"
+      - "upgrade harness"
+      - "update harness structure"
 
-  - id: update-workspace
-    display_name: Update Workspace
-    domain: workspace
-    path: workspace/update-workspace/
+  - id: update-harness
+    display_name: Update Harness
+    domain: harness
+    path: harness/update-harness/
     summary: Align an existing .harmony directory with the canonical definition.
     status: active
     triggers:
-      - "update workspace"
-      - "align workspace"
-      - "fix workspace gaps"
+      - "update harness"
+      - "align harness"
+      - "fix harness gaps"
 
   # --- Missions ---
 

@@ -156,9 +156,9 @@ Complete interface (Tier 2)
 Reference material (Tier 4)
 ```
 
-### Workspace Boot Sequence
+### Harness Boot Sequence
 
-The `.harmony/START.md` pattern implements progressive disclosure for workspace orientation:
+The `.harmony/START.md` pattern implements progressive disclosure for harness orientation:
 
 1. **Immediate context**: Scope, current state
 2. **Navigation**: Links to relevant files
@@ -188,7 +188,7 @@ Need examples? → Read references/ (on demand)
 
 - **Skill validation**: Manifests must include id, name, summary, triggers
 - **Token budgets**: SKILL.md files should target <5000 tokens
-- **Workspace linting**: START.md required for workspace directories
+- **Harness linting**: START.md required for harness directories
 
 ## Exceptions
 
@@ -200,6 +200,6 @@ Progressive disclosure may be skipped when:
 
 ## Related Documentation
 
-- [Workspace Architecture](../architecture/workspaces/README.md) — Progressive disclosure in workspace design
-- [Skills Specification](../architecture/workspaces/skills/specification.md) — Four-tier skill structure
+- [Harness Architecture](../architecture/harness/README.md) — Progressive disclosure in harness design
+- [Skills Specification](../architecture/harness/skills/specification.md) — Four-tier skill structure
 - [Focus Pillar](../pillars/focus.md) — The pillar this principle implements

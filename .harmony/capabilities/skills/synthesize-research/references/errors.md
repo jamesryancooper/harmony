@@ -60,10 +60,10 @@ errors:
     action: "Use timestamped filename to avoid collision"
 
   - code: "E030"
-    condition: "Workspace directory not found"
+    condition: "Harness directory not found"
     severity: fatal
-    message: "Workspace directory not found: .harmony/"
-    action: "Initialize workspace or run from correct directory"
+    message: "Harness directory not found: .harmony/"
+    action: "Initialize harness or run from correct directory"
 
   - code: "E040"
     condition: "Required tool not available"
@@ -114,7 +114,7 @@ Error conditions, recovery procedures, and troubleshooting for the synthesize-re
 | E012 | Fatal | No findings extractable | Add substantive content |
 | E020 | Fatal | Cannot write output | Check path/permissions |
 | E021 | Recoverable | Output file exists | Uses timestamped name |
-| E030 | Fatal | Workspace not found | Initialize workspace |
+| E030 | Fatal | Harness not found | Initialize harness |
 | E040 | Fatal | Required tool unavailable | Check allowed-tools |
 | E050 | Recoverable | Unclear research goal | Asks clarifying question |
 | E051 | Recoverable | Major contradictions | Flags for human review |
@@ -230,7 +230,7 @@ To avoid errors, ensure input files:
 
 ### Before Reporting a Bug
 
-- [ ] Verified workspace exists (`.harmony/` directory)
+- [ ] Verified harness exists (`.harmony/` directory)
 - [ ] Confirmed input folder path is correct
 - [ ] Checked folder contains `.md` files
 - [ ] Verified files have substantive content (not just headers)

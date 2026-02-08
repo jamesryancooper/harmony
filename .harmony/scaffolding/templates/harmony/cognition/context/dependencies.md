@@ -1,11 +1,11 @@
 ---
 title: Dependencies
-description: External systems and references this workspace interacts with.
+description: External systems and references this harness interacts with.
 ---
 
 # Dependencies
 
-External systems, APIs, or packages this workspace interacts with.
+External systems, APIs, or packages this harness interacts with.
 
 ## External APIs
 

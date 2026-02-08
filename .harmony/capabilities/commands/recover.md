@@ -35,4 +35,4 @@ access: human
 
 ## References
 
-- **Canonical:** `docs/architecture/workspaces/commands.md`
+- **Canonical:** `docs/architecture/harness/commands.md`

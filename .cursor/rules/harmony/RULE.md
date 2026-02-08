@@ -5,7 +5,7 @@ globs:
 alwaysApply: false
 ---
 
-# Workspace
+# Harness
 
 A `.harmony` directory is a **localized agent harness** that drives the creation of artifacts in its parent directory—code, docs, configs, or any deliverables.
 
@@ -15,12 +15,12 @@ A `.harmony` directory is a **localized agent harness** that drives the creation
 
 | Topic | Canonical Source |
 |-------|------------------|
-| **Workspace structure** | `docs/architecture/workspaces/README.md` |
-| **Artifact taxonomy** | `docs/architecture/workspaces/taxonomy.md` |
-| **Commands** | `docs/architecture/workspaces/commands.md` |
-| **Workflows** | `docs/architecture/workspaces/workflows.md` |
-| **Prompts** | `docs/architecture/workspaces/prompts.md` |
-| **Scripts** | `docs/architecture/workspaces/scripts.md` |
+| **Harness structure** | `docs/architecture/harness/README.md` |
+| **Artifact taxonomy** | `docs/architecture/harness/taxonomy.md` |
+| **Commands** | `docs/architecture/harness/commands.md` |
+| **Workflows** | `docs/architecture/harness/workflows.md` |
+| **Prompts** | `docs/architecture/harness/prompts.md` |
+| **Scripts** | `docs/architecture/harness/scripts.md` |
 
 ---
 
@@ -64,13 +64,13 @@ This rule provides context when working with `.harmony` files.
 
 **Decision guidance:** See `.harmony/catalog.md#decision-guidance`
 
-**This workspace's operations:** See `.harmony/catalog.md`
+**This harness's operations:** See `.harmony/catalog.md`
 
 ---
 
 ## Canonical Structure
 
-See `docs/architecture/workspaces/README.md` for the full structure reference, including:
+See `docs/architecture/harness/README.md` for the full structure reference, including:
 
 - Required files and directories
 - Agent-ignored (dot-prefixed) directories
@@ -80,9 +80,9 @@ See `docs/architecture/workspaces/README.md` for the full structure reference, i
 
 | Template | Path | Use For |
 |----------|------|---------|
-| Base workspace | `.harmony/scaffolding/templates/harmony/` | All workspaces inherit from this |
-| Docs workspace | `.harmony/scaffolding/templates/harmony-docs/` | Documentation areas |
-| Node.js/TS workspace | `.harmony/scaffolding/templates/harmony-node-ts/` | TypeScript packages |
+| Base harness | `.harmony/scaffolding/templates/harmony/` | All harnesses inherit from this |
+| Docs harness | `.harmony/scaffolding/templates/harmony-docs/` | Documentation areas |
+| Node.js/TS harness | `.harmony/scaffolding/templates/harmony-node-ts/` | TypeScript packages |
 | Cursor command | `.harmony/scaffolding/templates/cursor-command.md` | Cursor command wrappers (local) |
 | Document | `.harmony/scaffolding/templates/document.md` | General documents (local) |
 
@@ -118,7 +118,7 @@ For `ideation/scratchpad/` and `.inbox/`, agents MAY assist when ALL of these ar
 
 **During autonomous operation:** Treat `ideation/scratchpad/` and `.inbox/` as if they do not exist. No scanning, no retrieval, no "helpful" edits.
 
-See `docs/architecture/workspaces/dot-files.md` for full documentation.
+See `docs/architecture/harness/dot-files.md` for full documentation.
 
 ---
 
@@ -152,9 +152,9 @@ For agent-facing content (everything without dot prefix):
 
 ---
 
-## Context When Editing Workspace Files
+## Context When Editing Harness Files
 
-For operational instructions when editing workspace files, see the workspace's own `START.md` boot sequence, which covers:
+For operational instructions when editing harness files, see the harness's own `START.md` boot sequence, which covers:
 
 - Following conventions in `conventions.md`
 - Staying within scope defined in `scope.md`

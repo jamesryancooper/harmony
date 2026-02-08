@@ -14,7 +14,7 @@
 # If this file exceeds 100 lines AND domain-specific content (patterns, algorithms, rationale)
 # exceeds 30 lines, extract that content to a `<domain>.md` file.
 #
-# See: docs/architecture/workspaces/skills/reference-artifacts.md#domain-file-extraction-heuristics
+# See: docs/architecture/harness/skills/reference-artifacts.md#domain-file-extraction-heuristics
 #
 safety:
   tool_policy:
@@ -26,11 +26,11 @@ safety:
       - ".harmony/capabilities/skills/runs/**"      # Execution state (session recovery)
       - ".harmony/capabilities/skills/logs/**"      # Logs (always allowed)
       # Custom paths as defined in registry I/O mapping
-      # Must be within workspace's hierarchical scope
+      # Must be within harness's hierarchical scope
     scope_authority:               # Hierarchical scope rules
-      down: allowed                # Can write into descendant workspaces
-      up: blocked                  # Cannot write into ancestor workspaces
-      sideways: blocked            # Cannot write into sibling workspaces
+      down: allowed                # Can write into descendant harnesses
+      up: blocked                  # Cannot write into ancestor harnesses
+      sideways: blocked            # Cannot write into sibling harnesses
     destructive_actions: never     # Always 'never'
 ---
 
@@ -67,11 +67,11 @@ The skill may only write to designated output locations:
 
 ### Scope Authority
 
-| Direction     | Permission | Description                           |
-|---------------|------------|---------------------------------------|
-| **Down**      | Allowed    | Can write into descendant workspaces  |
-| **Up**        | Blocked    | Cannot write into ancestor workspaces |
-| **Sideways**  | Blocked    | Cannot write into sibling workspaces  |
+| Direction     | Permission | Description                          |
+|---------------|------------|--------------------------------------|
+| **Down**      | Allowed    | Can write into descendant harnesses  |
+| **Up**        | Blocked    | Cannot write into ancestor harnesses |
+| **Sideways**  | Blocked    | Cannot write into sibling harnesses  |
 
 ### Destructive Actions
 
@@ -82,7 +82,7 @@ The skill must never:
 - Delete files
 - Overwrite source code
 - Modify files outside designated output paths
-- Write to ancestor or sibling workspace paths
+- Write to ancestor or sibling harness paths
 
 ## Behavioral Boundaries
 

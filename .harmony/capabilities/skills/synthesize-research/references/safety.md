@@ -41,9 +41,9 @@ The skill may only write to designated output locations:
 
 | Direction | Permission | Description |
 |-----------|------------|-------------|
-| **Down** | Allowed | Can write into descendant workspaces |
-| **Up** | Blocked | Cannot write into ancestor workspaces |
-| **Sideways** | Blocked | Cannot write into sibling workspaces |
+| **Down** | Allowed | Can write into descendant harnesses |
+| **Up** | Blocked | Cannot write into ancestor harnesses |
+| **Sideways** | Blocked | Cannot write into sibling harnesses |
 
 ### Destructive Actions
 
@@ -54,7 +54,7 @@ The skill must never:
 - Delete files
 - Overwrite source research notes
 - Modify files outside designated output paths
-- Write to ancestor or sibling workspace paths
+- Write to ancestor or sibling harness paths
 
 ## Behavioral Boundaries
 

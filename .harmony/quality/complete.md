@@ -1,6 +1,6 @@
 ---
 title: Definition of Done
-description: Quality criteria and completion checklist for workspace tasks.
+description: Quality criteria and completion checklist for harness tasks.
 ---
 
 # Definition of Done

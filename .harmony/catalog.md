@@ -1,11 +1,11 @@
 ---
-title: Workspace Catalog
+title: Harness Catalog
 description: Index of available commands, workflows, and decision guidance.
 ---
 
-# Workspace Catalog
+# Harness Catalog
 
-Available operations and decision guidance in this workspace.
+Available operations and decision guidance in this harness.
 
 ---
 
@@ -79,14 +79,14 @@ Multi-step procedures in `orchestration/workflows/`.
 
 **Discovery:** Read `orchestration/workflows/manifest.yml` for workflow index (Tier 1). After matching, read `orchestration/workflows/registry.yml` for extended metadata (Tier 2).
 
-### Workspace Management
+### Harness Management
 
 | Workflow | Access | Description |
 |----------|--------|-------------|
-| [create-workspace](./orchestration/workflows/workspace/create-workspace/00-overview.md) | human | Scaffold a new `.harmony` directory |
-| [evaluate-workspace](./orchestration/workflows/workspace/evaluate-workspace/00-overview.md) | human | Evaluate token efficiency and effectiveness |
-| [migrate-workspace](./orchestration/workflows/workspace/migrate-workspace/00-overview.md) | human | Upgrade older workspace to current conventions |
-| [update-workspace](./orchestration/workflows/workspace/update-workspace/00-overview.md) | human | Align with canonical definition |
+| [create-harness](./orchestration/workflows/harness/create-harness/00-overview.md) | human | Scaffold a new `.harmony` directory |
+| [evaluate-harness](./orchestration/workflows/harness/evaluate-harness/00-overview.md) | human | Evaluate token efficiency and effectiveness |
+| [migrate-harness](./orchestration/workflows/harness/migrate-harness/00-overview.md) | human | Upgrade older harness to current conventions |
+| [update-harness](./orchestration/workflows/harness/update-harness/00-overview.md) | human | Align with canonical definition |
 
 ### Projects
 
@@ -111,7 +111,7 @@ Multi-step procedures in `orchestration/workflows/`.
 
 ### FlowKit (Repo-Wide Tool Integration)
 
-> **Note:** FlowKit workflows are **repo-wide tool integrations**, not workspace-management operations. They orchestrate the canonical FlowKit CLI (`pnpm flowkit:run`) and runtime (`agents/runner/runtime`) without duplicating implementation logic. The workflow steps describe *procedure*, not *semantics*—those live in `packages/kits/flowkit` and `agents/runner/runtime/`. Flow assets live in `packages/workflows/<flowId>/`.
+> **Note:** FlowKit workflows are **repo-wide tool integrations**, not harness-management operations. They orchestrate the canonical FlowKit CLI (`pnpm flowkit:run`) and runtime (`agents/runner/runtime`) without duplicating implementation logic. The workflow steps describe *procedure*, not *semantics*—those live in `packages/kits/flowkit` and `agents/runner/runtime/`. Flow assets live in `packages/workflows/<flowId>/`.
 
 | Workflow | Access | Description |
 |----------|--------|-------------|
@@ -137,15 +137,15 @@ Task templates in `scaffolding/prompts/`:
 
 | Prompt | Access | Description |
 |--------|--------|-------------|
-| [bootstrap-session.md](./scaffolding/prompts/bootstrap-session.md) | human | Quick-start a new agent session in a workspace. |
+| [bootstrap-session.md](./scaffolding/prompts/bootstrap-session.md) | human | Quick-start a new agent session in a harness. |
 
-> **Note:** Prompts are task templates that require context or judgment. Use `/evaluate-workspace` for health assessment.
+> **Note:** Prompts are task templates that require context or judgment. Use `/evaluate-harness` for health assessment.
 
 ---
 
 ## Decision Guidance
 
-This section contains the canonical decision logic for workspace operations. Other documentation references these sections.
+This section contains the canonical decision logic for harness operations. Other documentation references these sections.
 
 > **Note:** If you're creating a FlowKit flow (runnable via `pnpm flowkit:run` / `flowkit run` and backed by `config.flow.json` + `manifest.yaml`), put it in `packages/workflows/<flowId>/`. `.harmony/orchestration/workflows/**` is for procedural runbooks (including `/run-flow`), not flow assets.
 
@@ -196,27 +196,27 @@ Can the agent execute this without asking questions?
 | `audit-content.md` | Prompt | Criteria vary, judgment needed |
 | `improve-clarity.md` | Prompt | "Clarity" is subjective |
 
-### Workspace Modification Decision {#workspace-modification-decision}
+### Harness Modification Decision {#harness-modification-decision}
 
-When modifying an existing workspace:
+When modifying an existing harness:
 
 | Situation | Use | Why |
 |-----------|-----|-----|
-| Workspace missing required files | `/update-workspace` | Incremental alignment, adds missing pieces |
-| Workspace has minor structural gaps | `/update-workspace` | Non-destructive fixes |
-| Workspace uses old file structure (e.g., `agents/` dir) | `/migrate-workspace` | Major restructuring needed |
-| Major convention changes between versions | `/migrate-workspace` | Preserves content while transforming structure |
-| Read-only assessment, no changes | `/evaluate-workspace` | Produces report only |
-| New workspace needed | `/create-workspace` | Scaffolds from templates |
+| Harness missing required files | `/update-harness` | Incremental alignment, adds missing pieces |
+| Harness has minor structural gaps | `/update-harness` | Non-destructive fixes |
+| Harness uses old file structure (e.g., `agents/` dir) | `/migrate-harness` | Major restructuring needed |
+| Major convention changes between versions | `/migrate-harness` | Preserves content while transforming structure |
+| Read-only assessment, no changes | `/evaluate-harness` | Produces report only |
+| New harness needed | `/create-harness` | Scaffolds from templates |
 
 ```text
-Does the workspace exist?
-├── NO → /create-workspace
+Does the harness exist?
+├── NO → /create-harness
 └── YES → Is it structurally correct (current conventions)?
-    ├── NO → /migrate-workspace (structural transformation)
+    ├── NO → /migrate-harness (structural transformation)
     └── YES → Do you want to make changes?
-        ├── NO → /evaluate-workspace (read-only report)
-        └── YES → /update-workspace (incremental fixes)
+        ├── NO → /evaluate-harness (read-only report)
+        └── YES → /update-harness (incremental fixes)
 ```
 
 ### When to Create What
@@ -225,9 +225,9 @@ Does the workspace exist?
 |-----------|--------|
 | User types `/something` to start a simple action | Cursor Command only |
 | User types `/something` to start a complex procedure | Cursor Command + Workflow |
-| Agent follows a single deterministic operation | Workspace Command |
-| Agent follows a multi-step procedure | Workspace Workflow |
-| Agent needs a template for context-dependent work | Workspace Prompt |
+| Agent follows a single deterministic operation | Harness Command |
+| Agent follows a multi-step procedure | Harness Workflow |
+| Agent needs a template for context-dependent work | Harness Prompt |
 | Repository-wide action with IDE integration | Cursor Command |
 | Verification before completing work | Checklist |
 
@@ -300,12 +300,12 @@ Boilerplate in `scaffolding/templates/`:
 |----------|-------------|
 | [cursor-command.md](./scaffolding/templates/cursor-command.md) | Template for Cursor command wrappers |
 | [document.md](./scaffolding/templates/document.md) | Template for general documents |
-| [harmony/](./scaffolding/templates/harmony/) | Base .harmony/ template (all workspaces inherit from this) |
+| [harmony/](./scaffolding/templates/harmony/) | Base .harmony/ template (all harnesses inherit from this) |
 | [harmony-docs/](./scaffolding/templates/harmony-docs/) | Scoped template for documentation areas (extends base) |
 | [harmony-node-ts/](./scaffolding/templates/harmony-node-ts/) | Scoped template for Node.js/TypeScript packages (extends base) |
 
-Each workspace template contains:
-- `manifest.json` — Machine-readable structure for `/create-workspace`
+Each harness template contains:
+- `manifest.json` — Machine-readable structure for `/create-harness`
 - `MANIFEST.md` — Human-readable documentation (scoped templates only)
 
 ---

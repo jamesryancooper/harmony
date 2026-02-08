@@ -13,6 +13,6 @@
     "directories": [],
     "files": []
   },
-  "usage": "/create-workspace @path/to/package --template node-ts"
+  "usage": "/create-harness @path/to/package --template node-ts"
 }
 

@@ -1,1 +1,1 @@
-Explore implementing agent team definitions for the workspace.
+Explore implementing agent team definitions for the harness.

@@ -7,7 +7,7 @@
 # - Skill delegates specialized tasks to other agents
 # - Skill coordinates multiple agents working together
 #
-# See: docs/architecture/workspaces/skills/reference-artifacts.md#agentsmd
+# See: docs/architecture/harness/skills/reference-artifacts.md#agentsmd
 #
 agents:
   pattern: delegate                  # spawn | delegate | coordinate
@@ -117,7 +117,7 @@ Sub-agents spawned by skills must use one of these agent types:
 
 **Restrictions:**
 
-- Sub-agents inherit parent's workspace scope limits
+- Sub-agents inherit parent's harness scope limits
 - Sub-agents cannot write outside `.harmony/capabilities/skills/` unless parent has explicit permission
 - Sub-agents cannot spawn their own sub-agents (max depth = 1)
 - Sub-agents share the parent's token budget allocation

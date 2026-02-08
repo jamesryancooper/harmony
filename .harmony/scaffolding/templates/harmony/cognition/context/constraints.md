@@ -1,6 +1,6 @@
 ---
 title: Constraints
-description: Technical and business rules that limit workspace operations.
+description: Technical and business rules that limit harness operations.
 ---
 
 # Constraints

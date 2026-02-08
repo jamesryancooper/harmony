@@ -1,6 +1,6 @@
 # Templates
 
-Boilerplate files for creating new content within this workspace's domain.
+Boilerplate files for creating new content within this harness's domain.
 
-See `docs/architecture/workspaces/templates.md` for guidelines.
+See `docs/architecture/harness/templates.md` for guidelines.
 

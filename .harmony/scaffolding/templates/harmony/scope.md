@@ -1,6 +1,6 @@
 # Scope: {{TARGET_NAME}}
 
-## This Workspace Covers
+## This Harness Covers
 
 {{SCOPE_DESCRIPTION}}
 

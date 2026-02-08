@@ -50,7 +50,7 @@ skills:
       context:
         - type: directory_exists
           path: ".harmony/"
-          description: "Requires a workspace directory"
+          description: "Requires a harness directory"
     depends_on: []
 ```
 

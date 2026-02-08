@@ -6,7 +6,7 @@ This document explains the core building blocks in Harmony and when to use each.
 
 | Primitive | Purpose | Invocation | State |
 |-----------|---------|------------|-------|
-| **Agent** | Autonomous supervisor that orchestrates work | Assigned to workspace/mission | Persistent |
+| **Agent** | Autonomous supervisor that orchestrates work | Assigned to harness/mission | Persistent |
 | **Mission** | Durable multi-session orchestration | `/start-mission`, agent command | Persistent (state machine) |
 | **Skill** | Composable capability with I/O contract | `/command`, `use skill:`, triggers | Stateless |
 | **Assistant** | Specialist subagent for focused tasks | `@mention`, agent delegation | Stateless |
@@ -15,7 +15,7 @@ This document explains the core building blocks in Harmony and when to use each.
 | **Prompt** | Task template with structured I/O | Copy/paste or direct reference | Stateless |
 | **Template** | Scaffolding for new structures | Copied to target location | N/A |
 
-> **Note:** Workflows are deprecated and consolidated into Skills. See the workflows → skills migration in `docs/architecture/workspaces/skills/`.
+> **Note:** Workflows are deprecated and consolidated into Skills. See the workflows → skills migration in `docs/architecture/harness/skills/`.
 
 ---
 
@@ -238,7 +238,7 @@ See `.harmony/capabilities/skills/_template/SKILL.md`
 | Single-session procedures | **Skill** (phases in SKILL.md) |
 | Multi-session durable work | **Mission** (state machine) |
 | `refactor/` | `refactor` skill |
-| `create-workspace/` | `create-workspace` skill |
+| `create-harness/` | `create-harness` skill |
 
 **Why deprecated:**
 
@@ -247,7 +247,7 @@ See `.harmony/capabilities/skills/_template/SKILL.md`
 3. Missions handle durable, multi-session work that workflows couldn't
 4. Eliminates cognitive overhead of choosing between workflows and skills
 
-See `docs/architecture/workspaces/skills/` for migration guidance.
+See `docs/architecture/harness/skills/` for migration guidance.
 
 ---
 
@@ -414,18 +414,18 @@ access: human
 
 **Location:** `.harmony/scaffolding/templates/<template-name>/`
 
-**Purpose:** Scaffolding for creating new structures (workspaces, projects, etc.).
+**Purpose:** Scaffolding for creating new structures (harnesses, projects, etc.).
 
 ### Characteristics
 
 - Directory structure copied to target location
 - Contains placeholder files to be customized
-- Often used by workflows (e.g., `create-workspace` workflow)
+- Often used by workflows (e.g., `create-harness` workflow)
 - Not executed—just copied and modified
 
 ### When to Use
 
-- Creating new workspaces
+- Creating new harnesses
 - Bootstrapping project structures
 - Ensuring consistent initial structure
 - Providing starting-point files
@@ -440,7 +440,7 @@ access: human
 
 ```
 templates/
-├── workspace/           # Base template
+├── harness/             # Base template
 │   ├── START.md
 │   ├── scope.md
 │   ├── conventions.md
@@ -546,11 +546,11 @@ Verification gate with actionable criteria and failure mode prevention.
 
 Template with context, instructions, and expected output format.
 
-### "Create a new workspace for a subproject"
+### "Create a new harness for a subproject"
 
-→ **Template** (via `create-workspace` workflow)
+→ **Template** (via `create-harness` workflow)
 
-Scaffolding copied and customized for the new workspace.
+Scaffolding copied and customized for the new harness.
 
 ### "Chain prompt refinement → research synthesis"
 
@@ -564,13 +564,13 @@ Registry supports `pipelines` section for skill composition without manual orche
 
 | Primitive | Registry | Template | Documentation |
 |-----------|----------|----------|---------------|
-| Agents | `.harmony/agency/agents/registry.yml` | `.harmony/agency/agents/_template/` | `docs/architecture/workspaces/agents.md` |
-| Missions | `.harmony/orchestration/missions/registry.yml` | `.harmony/orchestration/missions/_template/` | `docs/architecture/workspaces/missions.md` |
-| Skills | `.harmony/capabilities/skills/registry.yml` | `.harmony/capabilities/skills/_template/` | `docs/architecture/workspaces/skills/` |
-| Assistants | `.harmony/agency/assistants/registry.yml` | `.harmony/agency/assistants/_template/` | `docs/architecture/workspaces/assistants.md` |
-| Commands | — | — | `docs/architecture/workspaces/commands.md` |
-| Checklists | — | — | `docs/architecture/workspaces/checklists.md` |
-| Prompts | — | — | `docs/architecture/workspaces/prompts.md` |
-| Templates | — | `.harmony/scaffolding/templates/` | `docs/architecture/workspaces/templates.md` |
+| Agents | `.harmony/agency/agents/registry.yml` | `.harmony/agency/agents/_template/` | `docs/architecture/harness/agents.md` |
+| Missions | `.harmony/orchestration/missions/registry.yml` | `.harmony/orchestration/missions/_template/` | `docs/architecture/harness/missions.md` |
+| Skills | `.harmony/capabilities/skills/registry.yml` | `.harmony/capabilities/skills/_template/` | `docs/architecture/harness/skills/` |
+| Assistants | `.harmony/agency/assistants/registry.yml` | `.harmony/agency/assistants/_template/` | `docs/architecture/harness/assistants.md` |
+| Commands | — | — | `docs/architecture/harness/commands.md` |
+| Checklists | — | — | `docs/architecture/harness/checklists.md` |
+| Prompts | — | — | `docs/architecture/harness/prompts.md` |
+| Templates | — | `.harmony/scaffolding/templates/` | `docs/architecture/harness/templates.md` |
 
 > **Note:** Workflows are deprecated. See Skills and Missions.

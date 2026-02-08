@@ -21,7 +21,7 @@ SKILLS_DIR="$(dirname "$SCRIPT_DIR")"
 HARMONY_DIR="$(dirname "$SKILLS_DIR")"
 REPO_ROOT="$(dirname "$HARMONY_DIR")"
 REGISTRY="$SKILLS_DIR/registry.yml"
-WORKSPACE_REGISTRY="$REPO_ROOT/.harmony/capabilities/skills/registry.yml"
+SKILLS_REGISTRY="$REPO_ROOT/.harmony/capabilities/skills/registry.yml"
 
 # Colors for output
 RED='\033[0;31m'

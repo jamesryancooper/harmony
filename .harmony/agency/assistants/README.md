@@ -37,7 +37,7 @@ Assistants serve agents by handling specialized work that benefits from domain f
 | **Autonomy** | High — reasons, plans, decides | Focused — executes assigned tasks |
 | **Lifecycle** | Persistent across sessions | Stateless (inherits context) |
 | **Scope** | Broad — orchestrates complex work | Narrow — scoped operations |
-| **Invocation** | Assigned to workspace/mission | `@mention` or delegation |
+| **Invocation** | Assigned to harness/mission | `@mention` or delegation |
 | **Delegation** | Delegates **to** assistants | Escalates **to** agents/humans |
 
 ## Invocation
@@ -72,4 +72,4 @@ See `registry.yml` for the @mention mapping configuration.
 
 - [Agents](../agents/README.md) — Supervisors that delegate to assistants
 - [Skills](../skills/README.md) — Capabilities that assistants use
-- `docs/architecture/workspaces/assistants.md` — Full assistant documentation
+- `docs/architecture/harness/assistants.md` — Full assistant documentation

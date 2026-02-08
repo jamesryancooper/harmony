@@ -15,7 +15,7 @@ Agents are **autonomous AI supervisors** that perceive their environment, reason
 | **Lifecycle** | Persistent across sessions | Stateless (inherits context) |
 | **Scope** | Broad — orchestrates complex work | Focused — scoped operations |
 | **State** | Maintains context and memory | No persistent state |
-| **Invocation** | Assigned to missions or workspaces | `@mention` or delegation |
+| **Invocation** | Assigned to missions or harnesses | `@mention` or delegation |
 | **Delegation** | Delegates to assistants | Escalates to agents/humans |
 | **Primary role** | Supervisor | Specialist |
 
@@ -24,7 +24,7 @@ Agents are **autonomous AI supervisors** that perceive their environment, reason
 │  AGENT (Supervisor)                                             │
 │  Planner, Builder, Verifier, Coordinator                        │
 │                                                                 │
-│  • Perceives workspace state                                    │
+│  • Perceives harness state                                      │
 │  • Reasons about goals and constraints                          │
 │  • Plans execution strategy                                     │
 │  • Delegates to assistants                                      │
@@ -46,7 +46,7 @@ Agents are **autonomous AI supervisors** that perceive their environment, reason
 
 | Name | Role | Scope |
 |------|------|-------|
-| planner | Strategic planning, goal decomposition | Workspace-wide |
+| planner | Strategic planning, goal decomposition | Harness-wide |
 | builder | Implementation, code generation | Task-specific |
 | verifier | Validation, testing, quality assurance | Task-specific |
 | coordinator | Cross-mission orchestration | Multi-mission |
@@ -59,7 +59,7 @@ Agents are **autonomous AI supervisors** that perceive their environment, reason
 
 Agents perceive their environment by:
 
-- Reading workspace state (`.harmony/continuity/`, `missions/`)
+- Reading harness state (`.harmony/continuity/`, `missions/`)
 - Analyzing codebase structure and patterns
 - Understanding current mission goals and constraints
 - Monitoring assistant outputs and task completion
@@ -69,7 +69,7 @@ Agents perceive their environment by:
 Agents reason about:
 
 - Goal decomposition (breaking complex goals into sub-goals)
-- Constraint satisfaction (respecting workspace conventions)
+- Constraint satisfaction (respecting harness conventions)
 - Risk assessment (identifying potential issues)
 - Priority ordering (what to do first)
 
@@ -116,7 +116,7 @@ Agents orchestrate by:
     └── agent.md           # Verifier agent spec
 
 .harmony/agency/agents/
-├── README.md              # Workspace-specific agents
+├── README.md              # Harness-specific agents
 └── registry.yml           # Extends shared registry
 ```
 
@@ -126,7 +126,7 @@ The `registry.yml` maps agent roles to definitions:
 
 ```yaml
 schema_version: "1.0"
-default: planner  # Default agent for workspace
+default: planner  # Default agent for harness
 
 agents:
   - name: planner
@@ -277,13 +277,13 @@ Agent commanding mission:
 
 | Location | Scope | Purpose |
 |----------|-------|---------|
-| `.harmony/agency/agents/` | Shared across workspaces | Portable agent definitions |
-| `.harmony/agency/agents/` | Workspace-specific | Override or extend shared agents |
+| `.harmony/agency/agents/` | Shared across harnesses | Portable agent definitions |
+| `.harmony/agency/agents/` | Harness-specific | Override or extend shared agents |
 
-Workspace agents can:
+Harness agents can:
 
 - Override shared agent behavior for project-specific needs
-- Add new agents specific to the workspace
+- Add new agents specific to the harness
 - Extend shared agents with additional capabilities
 
 ## See Also
@@ -291,4 +291,4 @@ Workspace agents can:
 - [Assistants](../assistants/README.md) — Focused specialists
 - [Skills](../skills/README.md) — Composable capabilities
 - [Missions](../../.harmony/orchestration/missions/README.md) — Durable orchestration
-- `docs/architecture/workspaces/agents.md` — Full agent documentation
+- `docs/architecture/harness/agents.md` — Full agent documentation

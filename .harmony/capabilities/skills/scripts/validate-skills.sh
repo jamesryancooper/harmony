@@ -24,16 +24,16 @@
 #   9. No duplicated parameter/tool tables in SKILL.md
 #   10. No duplicated parameter/tool tables in io-contract.md
 #   11. No duplicated tool tables in safety.md body
-#   12. No outputs in shared registry (should be in workspace registry)
-#   13. Skill has I/O mappings in workspace registry
+#   12. No outputs in shared registry (should be in skills registry)
+#   13. Skill has I/O mappings in skills registry
 #   14. allowed-tools in SKILL.md is present and valid (single source of truth)
 #   15. Trigger overlap detection (warns on duplicate/similar triggers)
-#   16. Workspace I/O path scope validation
+#   16. I/O path scope validation
 #   17. Token budget validation (SKILL.md < 5000 tokens, manifest entry < 100 tokens)
 #   18. Description/summary alignment (summary should be subset of description)
 #   19. Cross-reference validation (all manifest skills have registry entries and vice versa)
 #   20. Reference file content validation (io-contract.md parameters match registry, examples use correct commands)
-#   21. Placeholder format validation ({{snake_case}} in workspace registry paths)
+#   21. Placeholder format validation ({{snake_case}} in registry paths)
 #   22. Version staleness check (warns if version is 1.0.0 for mature skills)
 #   23. Line count validation (SKILL.md < 500 lines per agentskills.io spec)
 #   24. Reference file token budgets (io-contract, safety, examples, behaviors, validation)
@@ -49,7 +49,7 @@
 #   - stateful/resumable → checkpoints.md
 #   - self-validating → validation.md
 #   - safety-bounded → safety.md
-#   See: docs/architecture/workspaces/skills/capabilities.md
+#   See: docs/architecture/harness/skills/capabilities.md
 #
 # Tool Permission Model:
 #   - allowed-tools in SKILL.md frontmatter is the SINGLE SOURCE OF TRUTH
@@ -70,7 +70,7 @@ HARMONY_DIR="$(dirname "$SKILLS_DIR")"
 REPO_ROOT="$(dirname "$HARMONY_DIR")"
 MANIFEST="$SKILLS_DIR/manifest.yml"
 REGISTRY="$SKILLS_DIR/registry.yml"
-WORKSPACE_REGISTRY="$REPO_ROOT/.harmony/capabilities/skills/registry.yml"
+SKILLS_REGISTRY="$REPO_ROOT/.harmony/capabilities/skills/registry.yml"
 
 # Configuration
 STRICT_MODE=false
@@ -424,7 +424,7 @@ check_table_drift() {
     return 0  # No drift detected
 }
 
-# Check if shared registry has outputs for a skill (drift issue - outputs should be in workspace registry)
+# Check if shared registry has outputs for a skill (drift issue - outputs should be in skills registry)
 check_shared_registry_outputs() {
     local skill_id="$1"
     # Check if the skill section in shared registry has an outputs: key
@@ -435,26 +435,26 @@ check_shared_registry_outputs() {
     ' "$REGISTRY" | grep -q "found"
 }
 
-# Check if workspace registry has I/O mappings for a skill
-check_workspace_io_mappings() {
+# Check if skills registry has I/O mappings for a skill
+check_io_mappings() {
     local skill_id="$1"
-    if [[ ! -f "$WORKSPACE_REGISTRY" ]]; then
-        return 1  # No workspace registry
+    if [[ ! -f "$SKILLS_REGISTRY" ]]; then
+        return 1  # No skills registry
     fi
     # Check if skill_mappings section contains this skill
-    grep -q "^  $skill_id:" "$WORKSPACE_REGISTRY" 2>/dev/null
+    grep -q "^  $skill_id:" "$SKILLS_REGISTRY" 2>/dev/null
 }
 
 # ============================================================================
-# Workspace I/O Path Scope Validation
+# I/O Path Scope Validation
 # ============================================================================
-# Validates that output paths in workspace registry are within hierarchical scope.
-# Paths must not escape upward (../) to ancestor workspaces.
+# Validates that output paths in skills registry are within hierarchical scope.
+# Paths must not escape upward (../) to ancestor harnesses.
 
-# Get output paths for a skill from workspace registry
-get_workspace_output_paths() {
+# Get output paths for a skill from skills registry
+get_output_paths() {
     local skill_id="$1"
-    if [[ ! -f "$WORKSPACE_REGISTRY" ]]; then
+    if [[ ! -f "$SKILLS_REGISTRY" ]]; then
         return
     fi
     # Extract output paths from skill_mappings section
@@ -465,10 +465,10 @@ get_workspace_output_paths() {
         found && /outputs:/ {in_outputs=1; next}
         found && in_outputs && /^      - path:/ {gsub(/^      - path:[[:space:]]*["'"'"']?/, ""); gsub(/["'"'"']$/, ""); print}
         found && in_outputs && /^    [a-z]/ && !/^      / {exit}
-    ' "$WORKSPACE_REGISTRY"
+    ' "$SKILLS_REGISTRY"
 }
 
-# Validate that a path is within workspace scope
+# Validate that a path is within harness scope
 # Note: Paths starting with ../../ are allowed for deliverables that go to .harmony/output/{category}/
 validate_path_scope() {
     local path="$1"
@@ -483,16 +483,16 @@ validate_path_scope() {
     
     # Check for deeper path traversal attempts (more than two levels up)
     if [[ "$path" == */../../../* ]]; then
-        echo "Path escapes workspace scope: $path"
+        echo "Path escapes harness scope: $path"
         return 1
     fi
     
-    # Resolve the path and check it's within workspace
+    # Resolve the path and check it's within scope
     local resolved_path
     if [[ "$path" == /* ]]; then
-        # Absolute path - must start with workspace root
+        # Absolute path - must start with skills root
         if [[ "$path" != "$workspace_root"* ]]; then
-            echo "Absolute path outside workspace: $path"
+            echo "Absolute path outside harness scope: $path"
             return 1
         fi
     fi
@@ -514,7 +514,7 @@ validate_skill_io_scope() {
                 ((issues++)) || true
             fi
         fi
-    done < <(get_workspace_output_paths "$skill_id")
+    done < <(get_output_paths "$skill_id")
     
     return $issues
 }
@@ -522,7 +522,7 @@ validate_skill_io_scope() {
 # ============================================================================
 # Placeholder Format Validation
 # ============================================================================
-# Validates that path placeholders in workspace registry use correct format.
+# Validates that path placeholders in skills registry use correct format.
 # Valid format: {{snake_case}} (e.g., {{timestamp}}, {{project}}, {{topic}})
 # Invalid formats: <placeholder>, {placeholder}, {{ spaces }}
 
@@ -564,12 +564,12 @@ validate_placeholder_format() {
     return 1
 }
 
-# Validate all placeholders in workspace registry paths for a skill
+# Validate all placeholders in registry paths for a skill
 validate_skill_placeholders() {
     local skill_id="$1"
     local issues=0
 
-    if [[ ! -f "$WORKSPACE_REGISTRY" ]]; then
+    if [[ ! -f "$SKILLS_REGISTRY" ]]; then
         return 0
     fi
 
@@ -580,7 +580,7 @@ validate_skill_placeholders() {
         in_mappings && $0 ~ "^  "skill":" {found=1; next}
         found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
         found && /path:/ {gsub(/.*path:[[:space:]]*["'"'"']?/, ""); gsub(/["'"'"']$/, ""); print}
-    ' "$WORKSPACE_REGISTRY")
+    ' "$SKILLS_REGISTRY")
 
     while IFS= read -r path; do
         if [[ -n "$path" ]]; then
@@ -605,7 +605,7 @@ validate_skill_placeholders() {
 check_deprecated_placeholder_formats() {
     local skill_id="$1"
 
-    if [[ ! -f "$WORKSPACE_REGISTRY" ]]; then
+    if [[ ! -f "$SKILLS_REGISTRY" ]]; then
         return 0
     fi
 
@@ -616,7 +616,7 @@ check_deprecated_placeholder_formats() {
         found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
         found && /path:/ && /<[a-z_]+>/ {print; found_dep=1}
         END {exit !found_dep}
-    ' "$WORKSPACE_REGISTRY" 2>/dev/null; then
+    ' "$SKILLS_REGISTRY" 2>/dev/null; then
         log_warning "Deprecated <placeholder> format found (use {{placeholder}} instead)"
         return 1
     fi
@@ -628,7 +628,7 @@ check_deprecated_placeholder_formats() {
         found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
         found && /path:/ && /\{[a-z_]+\}/ && !/\{\{/ {print; found_dep=1}
         END {exit !found_dep}
-    ' "$WORKSPACE_REGISTRY" 2>/dev/null; then
+    ' "$SKILLS_REGISTRY" 2>/dev/null; then
         log_warning "Single-brace {placeholder} format found (use {{placeholder}} instead)"
         return 1
     fi
@@ -798,7 +798,7 @@ validate_reference_token_budgets() {
 #   - Enterprise Complex: ~12000 tokens (4-6 reference files)
 #   - Domain Expert: ~15000 tokens (5-8 reference files, domain knowledge extensive)
 #
-# See: docs/architecture/workspaces/skills/reference-artifacts.md#complexity-budget
+# See: docs/architecture/harness/skills/reference-artifacts.md#complexity-budget
 
 # Calculate aggregate token count for all reference files in a skill
 calculate_aggregate_reference_tokens() {
@@ -889,7 +889,7 @@ validate_aggregate_complexity() {
     elif [[ $aggregate_tokens -le $AGGREGATE_ENTERPRISE_BUDGET ]]; then
         log_warning "Aggregate reference tokens approaching complexity ceiling (~$aggregate_tokens > $AGGREGATE_STANDARD_BUDGET tokens)"
         log_info "  Consider: consolidate redundant content, extract shared domain knowledge"
-        log_info "  See: docs/architecture/workspaces/skills/reference-artifacts.md#reducing-complexity"
+        log_info "  See: docs/architecture/harness/skills/reference-artifacts.md#reducing-complexity"
     elif [[ $aggregate_tokens -le $AGGREGATE_DOMAIN_BUDGET ]]; then
         if [[ "$is_domain_skill" == "true" ]]; then
             log_success "Domain Expert skill within extended budget (~$aggregate_tokens tokens, $ref_count files)"
@@ -1159,11 +1159,11 @@ scaffold_manifest_entry() {
     echo "─────────────────────────────"
 }
 
-# Scaffold missing workspace I/O mapping
-scaffold_workspace_mapping() {
+# Scaffold missing I/O mapping
+scaffold_io_mapping() {
     local skill_id="$1"
     
-    log_info "  Scaffolding workspace I/O mapping for '$skill_id'..."
+    log_info "  Scaffolding I/O mapping for '$skill_id'..."
     
     local scaffold="
   ${skill_id}:
@@ -1187,7 +1187,7 @@ scaffold_workspace_mapping() {
         description: \"Execution log\""
     
     echo ""
-    echo "Add the following to ${WORKSPACE_REGISTRY} under skill_mappings:"
+    echo "Add the following to ${SKILLS_REGISTRY} under skill_mappings:"
     echo "─────────────────────────────"
     echo "$scaffold"
     echo "─────────────────────────────"
@@ -1656,7 +1656,7 @@ validate_capability_heuristics() {
         log_warning "Minimal skill may benefit from capability declarations:"
         echo -e "$suggestions"
         log_info "  Add skill_sets and capabilities to manifest.yml and SKILL.md"
-        log_info "  See: docs/architecture/workspaces/skills/capabilities.md"
+        log_info "  See: docs/architecture/harness/skills/capabilities.md"
         return 1
     fi
 
@@ -1923,29 +1923,29 @@ validate_skill() {
         log_success "No duplicated tables in safety.md"
     fi
     
-    # Check 12: No outputs in shared registry (should be in workspace registry only)
+    # Check 12: No outputs in shared registry (should be in skills registry only)
     if check_shared_registry_outputs "$skill_id"; then
         log_error "Outputs found in shared registry (should be in .harmony/capabilities/skills/registry.yml only)"
     else
         log_success "No outputs in shared registry"
     fi
     
-    # Check 13: Skill has I/O mappings in workspace registry
-    if [[ -f "$WORKSPACE_REGISTRY" ]]; then
-        if ! check_workspace_io_mappings "$skill_id"; then
-            log_warning "MISSING I/O MAPPINGS: Skill '$skill_id' has no workspace I/O configuration"
-            log_info "  Skills without workspace mappings will use default output paths only."
+    # Check 13: Skill has I/O mappings in skills registry
+    if [[ -f "$SKILLS_REGISTRY" ]]; then
+        if ! check_io_mappings "$skill_id"; then
+            log_warning "MISSING I/O MAPPINGS: Skill '$skill_id' has no I/O configuration"
+            log_info "  Skills without I/O mappings will use default output paths only."
             log_info "  To configure custom I/O paths, add an entry to:"
             log_info "    .harmony/capabilities/skills/registry.yml → skill_mappings.$skill_id"
-            log_info "  See docs/architecture/workspaces/skills/discovery.md#workspace-registry"
+            log_info "  See docs/architecture/harness/skills/discovery.md#shared-registry"
             if [[ "$FIX_MODE" == "true" ]]; then
-                scaffold_workspace_mapping "$skill_id"
+                scaffold_io_mapping "$skill_id"
             fi
         else
-            log_success "I/O mappings present in workspace registry"
+            log_success "I/O mappings present in skills registry"
         fi
     else
-        log_warning "Workspace registry not found: $WORKSPACE_REGISTRY"
+        log_warning "Skills registry not found: $SKILLS_REGISTRY"
     fi
     
     # Check 14: allowed-tools in SKILL.md is valid (single source of truth)
@@ -1959,11 +1959,11 @@ validate_skill() {
         log_success "allowed-tools is valid: $internal_tools"
     else
         log_error "Invalid allowed-tools: $tool_check_result"
-        log_info "  See docs/architecture/workspaces/skills/specification.md for allowed-tools format"
+        log_info "  See docs/architecture/harness/skills/specification.md for allowed-tools format"
     fi
     
-    # Check 15: Workspace I/O path scope validation
-    if [[ -f "$WORKSPACE_REGISTRY" ]]; then
+    # Check 15: I/O path scope validation
+    if [[ -f "$SKILLS_REGISTRY" ]]; then
         local scope_issues=0
         while IFS= read -r output_path; do
             if [[ -n "$output_path" ]]; then
@@ -1974,10 +1974,10 @@ validate_skill() {
                     ((scope_issues++)) || true
                 fi
             fi
-        done < <(get_workspace_output_paths "$skill_id")
+        done < <(get_output_paths "$skill_id")
         
         if [[ $scope_issues -eq 0 ]]; then
-            log_success "Output paths within workspace scope"
+            log_success "Output paths within harness scope"
         fi
     fi
     
@@ -2004,8 +2004,8 @@ validate_skill() {
         log_warning "Reference content may need review (see io-contract.md vs registry.yml)"
     fi
 
-    # Check 19: Placeholder format validation in workspace registry paths
-    if [[ -f "$WORKSPACE_REGISTRY" ]]; then
+    # Check 19: Placeholder format validation in registry paths
+    if [[ -f "$SKILLS_REGISTRY" ]]; then
         local placeholder_issues=0
         validate_skill_placeholders "$skill_id" || placeholder_issues=$?
         check_deprecated_placeholder_formats "$skill_id" || ((placeholder_issues++)) || true
@@ -2059,7 +2059,7 @@ echo "================================"
 echo "Skills directory: $SKILLS_DIR"
 echo "Manifest: $MANIFEST"
 echo "Shared registry: $REGISTRY"
-echo "Workspace registry: $WORKSPACE_REGISTRY"
+echo "Skills registry: $SKILLS_REGISTRY"
 
 if [[ ! -f "$MANIFEST" ]]; then
     log_error "Manifest file not found: $MANIFEST"
@@ -2071,8 +2071,8 @@ if [[ ! -f "$REGISTRY" ]]; then
     exit 1
 fi
 
-if [[ ! -f "$WORKSPACE_REGISTRY" ]]; then
-    log_warning "Workspace registry not found (I/O validation will be skipped)"
+if [[ ! -f "$SKILLS_REGISTRY" ]]; then
+    log_warning "Skills registry not found (I/O validation will be skipped)"
 fi
 
 # Report token counting method

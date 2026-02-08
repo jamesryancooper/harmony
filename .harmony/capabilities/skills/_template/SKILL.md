@@ -27,14 +27,14 @@ metadata:
 # Additional Capabilities (beyond skill set bundles):
 #   resumable, error-resilient, idempotent, cancellable, external-dependent
 #
-# See: docs/architecture/workspaces/skills/capabilities.md
+# See: docs/architecture/harness/skills/capabilities.md
 skill_sets: []
 capabilities: []
 # Tool Permissions (Single Source of Truth)
 # Format: Space-delimited list. Add (path/glob) to scope writes.
 # Example: Read Glob Grep Write(../prompts/*) Write(logs/*)
 #          └─ Read-only ─┘     └─ Scoped writes ────────┘
-# See: docs/architecture/workspaces/skills/specification.md#tool-permissions-single-source-of-truth
+# See: docs/architecture/harness/skills/specification.md#tool-permissions-single-source-of-truth
 # Tool reference: Read, Glob, Grep, Write(path/*), WebFetch, Shell, Task
 #
 # Output Types:
@@ -165,4 +165,4 @@ capabilities: [idempotent]
 2. Delete reference files you don't need (based on resolved capabilities)
 3. Update remaining reference files with skill-specific content
 
-See [Reference Artifacts](../../../../docs/architecture/workspaces/skills/reference-artifacts.md) for the complete capability-to-reference mapping.
+See [Reference Artifacts](../../../../docs/architecture/harness/skills/reference-artifacts.md) for the complete capability-to-reference mapping.

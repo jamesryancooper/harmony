@@ -53,5 +53,5 @@ A typical research flow might use these prompts in sequence:
 
 ## See Also
 
-- [Projects](../../../docs/architecture/workspaces/projects.md) — Full project documentation
-- [Scratchpad](../../../docs/architecture/workspaces/scratchpad.md) — Human-led thinking space and idea funnel
+- [Projects](../../../docs/architecture/harness/projects.md) — Full project documentation
+- [Scratchpad](../../../docs/architecture/harness/scratchpad.md) — Human-led thinking space and idea funnel

@@ -279,18 +279,18 @@ permissions:
 ### Hierarchical Scope Validation
 
 ```typescript
-// Workspace hierarchy determines write permissions
-function canWrite(workspace: Workspace, targetPath: string): boolean {
+// Harness hierarchy determines write permissions
+function canWrite(harness: Harness, targetPath: string): boolean {
   const target = resolve(targetPath);
-  const workspaceRoot = resolve(workspace.path);
-  
-  // Can write within own workspace
-  if (target.startsWith(workspaceRoot)) {
+  const harnessRoot = resolve(harness.path);
+
+  // Can write within own harness
+  if (target.startsWith(harnessRoot)) {
     return true;
   }
-  
-  // Can write to descendant workspaces
-  if (isDescendant(workspace, targetPath)) {
+
+  // Can write to descendant harnesses
+  if (isDescendant(harness, targetPath)) {
     return true;
   }
   
@@ -392,5 +392,5 @@ Prevention:
 
 - [Trust Pillar](../pillars/trust.md) — Bounded agents, enforced security
 - [HITL Checkpoints](./hitl-checkpoints.md) — Human approval for elevated actions
-- [Skills Specification](../architecture/workspaces/skills/specification.md) — Permission model details
+- [Skills Specification](../architecture/harness/skills/specification.md) — Permission model details
 - [Agentic Principles](../principles.md#agentic-principles) — Full agent governance model

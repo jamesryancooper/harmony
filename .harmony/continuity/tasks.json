@@ -9,8 +9,8 @@
       "completed_at": "2025-12-10"
     },
     {
-      "id": "evaluate-workspace",
-      "description": "Run evaluate-workspace.md and implement suggestions",
+      "id": "evaluate-harness",
+      "description": "Run evaluate-harness.md and implement suggestions",
       "status": "completed",
       "completed_at": "2025-12-10"
     },
@@ -28,7 +28,7 @@
     },
     {
       "id": "create-scaffolding",
-      "description": "Create workspace scaffolding system (workflow, templates, Cursor command)",
+      "description": "Create harness scaffolding system (workflow, templates, Cursor command)",
       "status": "completed",
       "completed_at": "2025-12-10"
     },
@@ -46,7 +46,7 @@
     },
     {
       "id": "test-scaffolding",
-      "description": "Test /create-workspace command on a target directory",
+      "description": "Test /create-harness command on a target directory",
       "status": "pending",
       "blocked_by": null,
       "note": "Deferred — will complete in future session"

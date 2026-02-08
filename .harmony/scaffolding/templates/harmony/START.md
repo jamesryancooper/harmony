@@ -1,6 +1,6 @@
 ---
 title: Start Here
-description: Boot sequence and orientation for this workspace
+description: Boot sequence and orientation for this harness
 ---
 
 # .harmony: Start Here
@@ -65,5 +65,5 @@ Subdirectories: `inbox/` (staging), `archive/` (deprecated).
 - Check `continuity/tasks.json` for blocked items
 - Check `cognition/context/lessons.md` for anti-patterns to avoid
 - Check `cognition/context/decisions.md` for relevant past decisions
-- Review parent workspace for patterns
+- Review parent harness for patterns
 - Document blocker in `continuity/log.md` and stop

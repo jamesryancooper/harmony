@@ -10,7 +10,7 @@ description: Style and formatting rules for the root .harmony harness.
 - Lowercase with hyphens: `my-prompt.md`
 - Commands: `{verb}-{noun}.md` (e.g., `validate-frontmatter.md`)
 - Prompts: `{action}-{target}.md` (e.g., `audit-content.md`)
-- Workflows: `{verb}-{noun}/` directory (e.g., `create-workspace/`)
+- Workflows: `{verb}-{noun}/` directory (e.g., `create-harness/`)
 
 ## Command vs Prompt Decision
 
@@ -77,9 +77,9 @@ See `[reference]` for full details.
 
 | Label | Use When |
 |-------|----------|
-| `Command:` | Delegating to a workspace command (atomic) |
-| `Workflow:` | Delegating to a workspace workflow (multi-step) |
-| `Prompt:` | Delegating to a workspace prompt (template) |
+| `Command:` | Delegating to a harness command (atomic) |
+| `Workflow:` | Delegating to a harness workflow (multi-step) |
+| `Prompt:` | Delegating to a harness prompt (template) |
 
 **Template:** `.harmony/scaffolding/templates/cursor-command.md`
 

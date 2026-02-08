@@ -1,8 +1,8 @@
-# Workspace Skills
+# Harness Skills
 
 Complex capabilities with defined I/O contracts and progressive disclosure.
 
-For full documentation, see [docs/architecture/workspaces/skills/](../../docs/architecture/workspaces/skills/README.md).
+For full documentation, see [docs/architecture/harness/skills/](../../docs/architecture/harness/skills/README.md).
 
 ---
 
@@ -44,7 +44,7 @@ Creating a new skill requires updating **4 files** across **2 locations**. Use t
 │       - requires.context: [{type, path, description}]                       │
 │       - depends_on: []                                                      │
 │                                                                             │
-│  4. WORKSPACE REGISTRY (.harmony/capabilities/skills/registry.yml)                     │
+│  4. HARNESS REGISTRY (.harmony/capabilities/skills/registry.yml)                      │
 │     □ Add I/O mapping under `skill_mappings:`:                              │
 │       - inputs: [{path, kind, required, description}]                       │
 │       - outputs: [{name, path, kind, format, determinism, description}]     │
@@ -68,7 +68,7 @@ Creating a new skill requires updating **4 files** across **2 locations**. Use t
 | `specialist` | domain-specialized | Requires domain expertise |
 | `guardian` | self-validating, safety-bounded | Has quality gates |
 
-> **Design Note:** Capabilities determine documentation needs. Each capability maps to specific reference files. See [capabilities.md](../../docs/architecture/workspaces/skills/capabilities.md) for the full mapping.
+> **Design Note:** Capabilities determine documentation needs. Each capability maps to specific reference files. See [capabilities.md](../../docs/architecture/harness/skills/capabilities.md) for the full mapping.
 
 **Capability Selection Guide:**
 
@@ -101,7 +101,7 @@ skill_sets: [executor]
 capabilities: [resumable]
 ```
 
-The template includes guidance for choosing capabilities. See [reference-artifacts.md](../../docs/architecture/workspaces/skills/reference-artifacts.md) for the complete capability-to-reference mapping.
+The template includes guidance for choosing capabilities. See [reference-artifacts.md](../../docs/architecture/harness/skills/reference-artifacts.md) for the complete capability-to-reference mapping.
 
 **Quick command to scaffold and validate:**
 
@@ -144,8 +144,8 @@ use skill: synthesize-research
 ├── _template/                      # Scaffolding for new skills
 └── <skill-id>/SKILL.md             # Core instructions (<500 lines)
 
-.harmony/capabilities/skills/                  # Workspace-specific configuration
-├── manifest.yml                    # Workspace-specific skills (extends shared)
+.harmony/capabilities/skills/                  # Harness-specific configuration
+├── manifest.yml                    # Harness-specific skills (extends shared)
 ├── registry.yml                    # I/O paths (single source of truth)
 ├── runs/                           # Execution state (checkpoints, manifests) for session recovery
 └── logs/                           # Execution logs
@@ -184,9 +184,9 @@ use skill: synthesize-research
 │                                    │ I/O paths defined in                   │
 │                                    ▼                                        │
 │   ┌─────────────────────────────────────────────────────────────────────┐   │
-│   │  TIER 2: WORKSPACE CONFIG (.harmony/capabilities/skills/)                      │   │
+│   │  TIER 2: HARNESS CONFIG (.harmony/capabilities/skills/)                        │   │
 │   │  ─────────────────────────────────────────────────────────────────  │   │
-│   │  Workspace-specific I/O — paths, outputs, logs                      │   │
+│   │  Harness-specific I/O — paths, outputs, logs                        │   │
 │   │                                                                     │   │
 │   │  registry.yml ──────▶ I/O mappings (inputs, outputs)                │   │
 │   │       │                                                             │   │
@@ -234,7 +234,7 @@ DATA FLOW:
 | `version`, `commands`, `parameters`, `depends_on`| `.harmony/capabilities/skills/registry.yml`           |
 | Input/output paths                               | `.harmony/capabilities/skills/registry.yml`         |
 
-**Tool Permissions:** `allowed-tools` in SKILL.md is the single source of truth. The internal format is derived via the mapping function in `validate-skills.sh`. See [specification.md](../../docs/architecture/workspaces/skills/specification.md) for details.
+**Tool Permissions:** `allowed-tools` in SKILL.md is the single source of truth. The internal format is derived via the mapping function in `validate-skills.sh`. See [specification.md](../../docs/architecture/harness/skills/specification.md) for details.
 
 **Validation:** Run `./scripts/validate-skills.sh` to verify skill consistency.
 
@@ -380,5 +380,5 @@ allowed-tools: Read Glob Grep Write(../prompts/*) Write(logs/*)
 
 ## See Also
 
-- [Full Documentation](../../docs/architecture/workspaces/skills/README.md) — Complete architecture and reference
+- [Full Documentation](../../docs/architecture/harness/skills/README.md) — Complete architecture and reference
 - [agentskills.io Specification](https://agentskills.io/specification) — Official spec

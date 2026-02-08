@@ -9,7 +9,7 @@ description: >
 license: MIT
 compatibility: Designed for Claude Code and similar AI coding assistants.
 metadata:
-  author: Harmony Workspace
+  author: Harmony Harness
   created: "2025-01-12"
   updated: "2026-01-23"
 skill_sets: [executor]

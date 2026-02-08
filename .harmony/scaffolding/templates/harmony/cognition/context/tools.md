@@ -1,6 +1,6 @@
 ---
 title: Available Tools
-description: Reference of available tools for agents working in this workspace
+description: Reference of available tools for agents working in this harness
 ---
 
 # Available Tools

@@ -9,7 +9,7 @@
 #   delegates_to - Assistants this agent delegates to
 
 schema_version: "1.0"
-default: planner  # Default agent for workspace
+default: planner  # Default agent for harness
 
 agents:
   - name: planner

@@ -238,7 +238,7 @@ Add entries to manifest and registry files.
        context:
          - type: directory_exists
            path: ".harmony/"
-           description: "Requires a workspace directory"
+           description: "Requires a harness directory"
      depends_on: []
    ```
 
@@ -280,7 +280,7 @@ phases:
 
 ## Phase 5: Update Catalog
 
-Add entry to workspace catalog.
+Add entry to harness catalog.
 
 ### Actions
 

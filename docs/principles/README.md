@@ -103,4 +103,4 @@ Patterns we explicitly avoid:
 - [Six Pillars](../pillars/README.md) — The structural framework principles implement
 - [Principles (full list)](../principles.md) — Complete principles reference
 - [Methodology](../methodology/README.md) — Operational procedures
-- [Workspace Architecture](../architecture/workspaces/README.md) — How principles manifest in workspace design
+- [Harness Architecture](../architecture/harness/README.md) — How principles manifest in harness design

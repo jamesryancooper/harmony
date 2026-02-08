@@ -62,30 +62,30 @@ workflows:
 
   # --- Skeleton entries (existing workflows, not yet fully migrated) ---
 
-  create-workspace:
+  create-harness:
     version: "1.2.0"
-    commands: ["/create-workspace"]
+    commands: ["/create-harness"]
     access: human
     depends_on: []
 
-  evaluate-workspace:
+  evaluate-harness:
     version: "1.1.0"
-    commands: ["/evaluate-workspace"]
+    commands: ["/evaluate-harness"]
     access: human
     depends_on: []
 
-  migrate-workspace:
+  migrate-harness:
     version: "1.1.0"
-    commands: ["/migrate-workspace"]
+    commands: ["/migrate-harness"]
     access: human
     depends_on: []
 
-  update-workspace:
+  update-harness:
     version: "1.1.0"
-    commands: ["/update-workspace"]
+    commands: ["/update-harness"]
     access: human
     depends_on:
-      - workflow: evaluate-workspace
+      - workflow: evaluate-harness
         condition: "optional but recommended to run first"
 
   create-mission:

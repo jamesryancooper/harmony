@@ -48,10 +48,10 @@ errors:
     action: "Check permissions; verify path is within allowed scope"
 
   - code: "E030"
-    condition: "Workspace directory not found"
+    condition: "Harness directory not found"
     severity: fatal
-    message: "Workspace directory not found: .harmony/"
-    action: "Initialize workspace or run from correct directory"
+    message: "Harness directory not found: .harmony/"
+    action: "Initialize harness or run from correct directory"
 
   - code: "E040"
     condition: "Required tool not available"
@@ -100,7 +100,7 @@ Error conditions, recovery procedures, and troubleshooting for the refine-prompt
 | E011 | Recoverable | Scope exceeds 20 files | Narrow scope or proceed with subset |
 | E012 | Recoverable | Cannot determine repo structure | Proceeds with minimal context |
 | E020 | Fatal | Cannot write output | Check path and permissions |
-| E030 | Fatal | Workspace not found | Initialize workspace |
+| E030 | Fatal | Harness not found | Initialize harness |
 | E040 | Fatal | Required tool unavailable | Check allowed-tools |
 | E050 | Cancelled | User rejected confirmation | Revise and retry |
 | E051 | Recoverable | Self-critique found issues | Address issues first |
@@ -185,7 +185,7 @@ When the skill cannot complete execution:
 
 ### Before Reporting a Bug
 
-- [ ] Verified workspace exists (`.harmony/` directory)
+- [ ] Verified harness exists (`.harmony/` directory)
 - [ ] Confirmed input is not empty
 - [ ] Checked input file path (if using file input)
 - [ ] Reviewed error code and tried suggested action

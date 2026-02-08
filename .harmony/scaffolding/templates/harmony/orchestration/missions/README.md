@@ -5,7 +5,7 @@ description: Time-bounded sub-projects with isolated progress tracking.
 
 # Missions
 
-Missions are **time-bounded sub-projects** within a workspace. They provide isolated progress tracking for parallel workstreams or large initiatives.
+Missions are **time-bounded sub-projects** within a harness. They provide isolated progress tracking for parallel workstreams or large initiatives.
 
 ## When to Create a Mission
 
@@ -14,7 +14,7 @@ Missions are **time-bounded sub-projects** within a workspace. They provide isol
 | Parallel workstreams | Yes | — |
 | Time-bounded initiative | Yes | — |
 | Delegatable unit of work | Yes | — |
-| Single task, one session | No | Use workspace `tasks.json` |
+| Single task, one session | No | Use harness `tasks.json` |
 | Different codebase area | No | Create nested `.harmony` |
 
 ## Active Missions

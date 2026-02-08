@@ -1,6 +1,6 @@
 ---
 title: Conventions
-description: Style and formatting rules for Node.js/TypeScript workspaces.
+description: Style and formatting rules for Node.js/TypeScript harnesses.
 ---
 
 # Conventions

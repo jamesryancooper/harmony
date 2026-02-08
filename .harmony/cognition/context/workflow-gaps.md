@@ -71,7 +71,7 @@ Add `depends_on` array to overview frontmatter:
 
 ```yaml
 depends_on:
-  - workflow: workspace/create-workspace
+  - workflow: harness/create-harness
     condition: "target .harmony/ must exist"
   - workflow: skills/create-skill
     condition: "optional, only if workflow uses skills"

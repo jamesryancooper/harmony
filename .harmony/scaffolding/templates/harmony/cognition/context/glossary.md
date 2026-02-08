@@ -1,11 +1,11 @@
 ---
 title: Glossary
-description: Domain-specific terminology for this workspace.
+description: Domain-specific terminology for this harness.
 ---
 
 # Glossary
 
-Terms used consistently throughout this workspace.
+Terms used consistently throughout this harness.
 
 | Term | Definition |
 |------|------------|

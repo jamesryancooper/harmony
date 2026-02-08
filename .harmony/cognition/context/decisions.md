@@ -1,12 +1,12 @@
 ---
 title: Decisions
-description: Agent-readable summary of key decisions affecting this workspace.
+description: Agent-readable summary of key decisions affecting this harness.
 mutability: append-only
 ---
 
 # Decisions
 
-Key decisions that constrain or guide work in this workspace. For full rationale, see `.harmony/cognition/decisions/`.
+Key decisions that constrain or guide work in this harness. For full rationale, see `.harmony/cognition/decisions/`.
 
 **ADRs:**
 - [ADR-001](../decisions/001-harmony-shared-foundation.md) — Shared `.harmony/` foundation (D007)
@@ -31,7 +31,7 @@ Key decisions that constrain or guide work in this workspace. For full rationale
 | D007 | Shared foundation | Single .harmony/ root organized by capability | Everything under .harmony/; organized by cognitive function | 2026-01-13 |
 | D008 | Consolidated scratchpad | `ideation/scratchpad/` with subdirectories | `inbox/`, `archive/`, `ideas/`, `brainstorm/` are subdirectories of `ideation/scratchpad/` | 2026-01-14 |
 | D009 | Human-led zone naming | `ideation/scratchpad/` over `.scratch/` | Explicit, self-documenting name preferred over shorter abbreviation | 2026-01-13 |
-| D010 | Projects location | Workspace level (`ideation/projects/`) | Projects live at workspace level, not in `ideation/scratchpad/`; direct artifact flow to `cognition/context/` | 2026-01-14 |
+| D010 | Projects location | Harness level (`ideation/projects/`) | Projects live at harness level, not in `ideation/scratchpad/`; direct artifact flow to `cognition/context/` | 2026-01-14 |
 | D011 | Brainstorm stage | Single-file exploration in `ideation/scratchpad/brainstorm/` | Filter stage between ideas and projects; most ideas die here | 2026-01-14 |
 | D012 | The Funnel | ideas → brainstorm → projects → missions → context | Clear pipeline from raw ideas to permanent knowledge | 2026-01-14 |
 | D013 | Refactor verification | Mandatory verification gate | Refactors cannot be declared complete until all audit searches return zero | 2026-01-14 |
@@ -51,7 +51,7 @@ Key decisions that constrain or guide work in this workspace. For full rationale
 | D027 | Skill naming convention | Verb-noun pattern (e.g., `refine-prompt`) | Skill names must use verb-noun for action-oriented clarity | 2026-01-15 |
 | D028 | Progressive disclosure | Three-tier: SKILL.md + references/ + assets/ | Keep SKILL.md under 500 lines; details in references/ | 2026-01-15 |
 | D029 | Reference file structure | behaviors.md, io-contract.md, safety.md, examples.md, validation.md | Standard files for all skills; machine-parseable YAML frontmatter | 2026-01-15 |
-| D030 | Hierarchical workspace authority | DOWN only, not UP or SIDEWAYS | Workspaces can write to descendants; cannot write to ancestors or siblings | 2026-01-15 |
+| D030 | Hierarchical harness authority | DOWN only, not UP or SIDEWAYS | Harnesses can write to descendants; cannot write to ancestors or siblings | 2026-01-15 |
 | D031 | Output permission tiers | Tier 1 (outputs/), Tier 2 (.harmony/**), Tier 3 (root/**) | Tier 1 always allowed; Tier 2/3 require declaration and scope validation | 2026-01-15 |
 | D032 | Documentation split | Monolithic skills.md → 10 focused documents | Each document under 300 lines; single responsibility | 2026-01-15 |
 | D033 | Four-tier progressive disclosure | manifest → registry → SKILL.md → references | Load in tiers; ~50 tokens at discovery, <5000 at activation | 2026-01-17 |

@@ -7,7 +7,7 @@ description: Boot sequence and orientation for the root .harmony harness.
 
 ## Inheritance
 
-This workspace extends `.harmony/` for shared infrastructure.
+This harness extends `.harmony/` for shared infrastructure.
 
 | Component | Local (Project-Specific) | Shared (in `.harmony/`) |
 |-----------|--------------------------|-------------------------|

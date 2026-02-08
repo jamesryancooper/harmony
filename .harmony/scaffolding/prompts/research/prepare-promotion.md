@@ -1,6 +1,6 @@
 ---
 title: Prepare Promotion
-description: Ready research findings for publication to agent-facing workspace locations.
+description: Ready research findings for publication to agent-facing harness locations.
 access: human
 ---
 
@@ -8,7 +8,7 @@ access: human
 
 ## Context
 
-Use this prompt when research is mature enough to publish findings to agent-facing workspace locations. Ensures findings are properly distilled and formatted for their destinations.
+Use this prompt when research is mature enough to publish findings to agent-facing harness locations. Ensures findings are properly distilled and formatted for their destinations.
 
 ## Inputs
 

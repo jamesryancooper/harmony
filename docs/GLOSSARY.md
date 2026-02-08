@@ -97,7 +97,7 @@ Work that cannot proceed due to a dependency or issue.
 
 ### Task Status Values
 
-Status values for `tasks.json` in workspace progress tracking:
+Status values for `tasks.json` in harness progress tracking:
 
 | Status | Meaning |
 |--------|---------|

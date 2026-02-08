@@ -1,7 +1,7 @@
 {
   "$schema": "../manifest.schema.json",
   "name": "harmony",
-  "description": "Base .harmony/ template for all workspaces.",
+  "description": "Base .harmony/ template for all harnesses.",
   "inherits": null,
   "files": {
     "required": [

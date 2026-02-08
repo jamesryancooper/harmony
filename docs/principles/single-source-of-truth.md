@@ -217,9 +217,9 @@ config/
 
 Runtime configuration merges: `base + environment`, not separate complete configs.
 
-### Workspace Source of Truth
+### Harness Source of Truth
 
-In Harmony workspaces, each type of knowledge has a designated home:
+In Harmony harnesses, each type of knowledge has a designated home:
 
 | Knowledge Type | Source Location | Derived Artifacts |
 |---------------|-----------------|-------------------|

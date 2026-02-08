@@ -1,11 +1,11 @@
 ---
 title: Dependencies
-description: External systems and references this workspace interacts with.
+description: External systems and references this harness interacts with.
 ---
 
 # Dependencies
 
-External systems, APIs, or packages this workspace interacts with.
+External systems, APIs, or packages this harness interacts with.
 
 ## External Documentation
 
@@ -18,12 +18,12 @@ External systems, APIs, or packages this workspace interacts with.
 
 | Reference | Purpose | Location |
 |-----------|---------|----------|
-| Canonical Workspace Docs | Authoritative workspace definition | `docs/architecture/workspaces/` |
-| Workspace Templates | Boilerplate for new workspaces | `.harmony/scaffolding/templates/harmony/` |
+| Canonical Harness Docs | Authoritative harness definition | `docs/architecture/harness/` |
+| Harness Templates | Boilerplate for new harnesses | `.harmony/scaffolding/templates/harmony/` |
 | Cursor Commands | IDE integration entry points | `.cursor/commands/` |
 | Cursor Rules | Agent context triggers | `.cursor/rules/` |
 
 ## Packages
 
-None required. This workspace is documentation-only.
+None required. This harness is documentation-only.
 

@@ -34,6 +34,6 @@
       "orchestration/workflows/are/workflow-document-set-improvement.md"
     ]
   },
-  "usage": "/create-workspace @path/to/docs --template docs"
+  "usage": "/create-harness @path/to/docs --template docs"
 }
 

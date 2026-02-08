@@ -1,11 +1,11 @@
 ---
 title: Scope
-description: Boundaries and responsibilities for documentation workspaces.
+description: Boundaries and responsibilities for documentation harnesses.
 ---
 
 # Scope: {{AREA_NAME}}
 
-## This Workspace Covers
+## This Harness Covers
 
 {{DESCRIPTION of the documentation area}}
 

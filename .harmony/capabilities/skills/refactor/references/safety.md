@@ -61,9 +61,9 @@ The skill:
 - **Does NOT** delete files (only rename/move)
 - **Does NOT** auto-commit changes (user controls git)
 
-## Workspace Continuity File Protection
+## Harness Continuity File Protection
 
-> **Terminology:** These are **workspace continuity files**—historical records that preserve project history. They are distinct from **skill execution state** (checkpoints, manifests in `runs/`) which enables session recovery. Workspace continuity files require append-only protection; execution state is freely writable by skills.
+> **Terminology:** These are **harness continuity files**—historical records that preserve project history. They are distinct from **skill execution state** (checkpoints, manifests in `runs/`) which enables session recovery. Harness continuity files require append-only protection; execution state is freely writable by skills.
 
 Files matching these patterns are **APPEND-ONLY** during refactors:
 

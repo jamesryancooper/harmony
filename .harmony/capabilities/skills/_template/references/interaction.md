@@ -7,7 +7,7 @@
 # - Skill has approval gates before proceeding
 # - Skill supports interactive refinement loops
 #
-# See: docs/architecture/workspaces/skills/reference-artifacts.md#interactionmd
+# See: docs/architecture/harness/skills/reference-artifacts.md#interactionmd
 #
 interaction:
   pattern: approval                  # approval | decision | iterative

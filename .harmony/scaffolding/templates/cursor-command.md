@@ -17,9 +17,9 @@ See `[reference to implementation]` for full details.
 
 ## Implementation
 
-[Brief description of what gets executed - either a workspace command or workflow.]
+[Brief description of what gets executed - either a harness command or workflow.]
 
 ## References
 
 - **Canonical:** `[path to canonical documentation]`
-- **[Command|Workflow]:** `[path to workspace command or workflow]`
+- **[Command|Workflow]:** `[path to harness command or workflow]`

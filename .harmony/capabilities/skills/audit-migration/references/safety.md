@@ -87,8 +87,8 @@ Even without user-defined exclusions, the skill always excludes:
 | `node_modules/` | Third-party code |
 | `.git/` | Version control internals |
 | `dist/`, `build/` | Build outputs |
-| `.history/` | Conversation history (not part of workspace) |
-| `.specstory/` | Spec history (not part of workspace) |
+| `.history/` | Conversation history (not part of harness) |
+| `.specstory/` | Spec history (not part of harness) |
 
 ### Append-Only File Handling
 

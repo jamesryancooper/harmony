@@ -1,6 +1,6 @@
-# Workspace Agents
+# Harness Agents
 
-This workspace inherits agent definitions from `.harmony/agency/agents/`.
+This harness inherits agent definitions from `.harmony/agency/agents/`.
 
 ## Inherited Agents
 
@@ -12,15 +12,15 @@ This workspace inherits agent definitions from `.harmony/agency/agents/`.
 
 See `.harmony/agency/agents/registry.yml` for the full list.
 
-## Workspace-Specific Agents
+## Harness-Specific Agents
 
 Add project-specific agents here to:
 
 - Override shared agent behavior for this project
-- Add agents specific to this workspace's domain
+- Add agents specific to this harness's domain
 - Extend shared agents with additional capabilities
 
-## Creating a Workspace Agent
+## Creating a Harness Agent
 
 1. Copy `.harmony/agency/agents/_template/` to `.harmony/agency/agents/<name>/`
 2. Update `agent.md` with role, capabilities, and delegation rules
@@ -38,7 +38,7 @@ AGENT (Supervisor)
 ASSISTANT (@reviewer, @refactor, @docs)
   │ uses skills
   ▼
-SKILL (refactor, synthesize, create-workspace)
+SKILL (refactor, synthesize, create-harness)
 ```
 
 See `.harmony/agency/agents/README.md` for full agent documentation.

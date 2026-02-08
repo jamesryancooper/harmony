@@ -1,11 +1,11 @@
 ---
-title: Workspace Catalog
-description: Index of available commands and workflows in this workspace.
+title: Harness Catalog
+description: Index of available commands and workflows in this harness.
 ---
 
-# Workspace Catalog
+# Harness Catalog
 
-Available operations in this workspace.
+Available operations in this harness.
 
 ## Commands
 
@@ -25,13 +25,13 @@ Multi-step procedures in `orchestration/workflows/`:
 
 ### Repo-Wide Workflows
 
-The root `.harmony` provides shared workflows available to all workspaces:
+The root `.harmony` provides shared workflows available to all harnesses:
 
 | Workflow | Access | Description |
 |----------|--------|-------------|
 | [run-flow](/.harmony/orchestration/workflows/flowkit/run-flow/00-overview.md) | human | Execute FlowKit LangGraph flows via `/run-flow @packages/workflows/<flowId>/config.flow.json` |
 
-> **Tip:** Use `/run-flow` from any workspace to run repo-wide FlowKit flows. See [FlowKit Guide](/docs/kits/planning-and-orchestration/flowkit/guide.md) for details.
+> **Tip:** Use `/run-flow` from any harness to run repo-wide FlowKit flows. See [FlowKit Guide](/docs/kits/planning-and-orchestration/flowkit/guide.md) for details.
 
 ## Prompts
 

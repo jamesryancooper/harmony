@@ -1,6 +1,6 @@
 ---
 title: Start Here
-description: Boot sequence and orientation for Node.js/TypeScript workspaces.
+description: Boot sequence and orientation for Node.js/TypeScript harnesses.
 ---
 
 # .harmony: Start Here

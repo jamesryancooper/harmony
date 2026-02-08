@@ -7,7 +7,7 @@
 # - Skill branches based on intermediate results
 # - Skill requires user choices at decision points
 #
-# See: docs/architecture/workspaces/skills/reference-artifacts.md#decisionsmd
+# See: docs/architecture/harness/skills/reference-artifacts.md#decisionsmd
 #
 decisions:
   - id: "{{decision_1_id}}"

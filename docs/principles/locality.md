@@ -11,9 +11,9 @@ status: Active
 
 ## What This Means
 
-Locality is an information architecture principle: knowledge, configuration, and guidance should be placed as close as possible to where they're used. Rather than centralizing everything in one location, distribute context to the domains, features, and workspaces where it applies.
+Locality is an information architecture principle: knowledge, configuration, and guidance should be placed as close as possible to where they're used. Rather than centralizing everything in one location, distribute context to the domains, features, and harnesses where it applies.
 
-This principle shapes Harmony's workspace architecture:
+This principle shapes Harmony's harness architecture:
 - Domain-specific `.harmony/` directories contain domain-specific guidance
 - Skills live near the code they operate on
 - Configuration inherits from parent to child, not scattered globally
@@ -33,7 +33,7 @@ The Focus pillar promises "cognitive bandwidth freed for what matters." Locality
 
 The Continuity pillar captures knowledge durably. Locality ensures this knowledge is:
 
-- **Discoverable**: Look in the workspace for that domain's knowledge
+- **Discoverable**: Look in the harness for that domain's knowledge
 - **Maintainable**: Domain experts own their domain's context
 - **Relevant**: Context doesn't become stale because it's used regularly
 
@@ -43,7 +43,7 @@ In agentic workflows, locality directly impacts performance:
 
 ```
 Global context (everything loaded): ~50,000 tokens
-Local context (workspace only):      ~2,000 tokens
+Local context (harness only):        ~2,000 tokens
 ```
 
 Agents working in a specific domain load ~2,000 tokens of relevant context instead of ~50,000 tokens of everything. This leaves room for actual work.
@@ -65,34 +65,34 @@ Harmony implements locality through a single `.harmony/` directory organized by 
 
 Portability is declared via `harmony.yml` metadata — it specifies which paths are reusable framework assets vs. project-specific state.
 
-### Hierarchical Workspace Model
+### Hierarchical Harness Model
 
-Workspaces can nest at any level of the repository:
+Harnesses can nest at any level of the repository:
 
 ```
 repo/
-├── .harmony/              # Root workspace
+├── .harmony/              # Root harness
 ├── packages/
 │   └── auth/
-│       └── .harmony/      # Auth-specific workspace
+│       └── .harmony/      # Auth-specific harness
 └── apps/
     └── web/
-        └── .harmony/      # Web app workspace
+        └── .harmony/      # Web app harness
 ```
 
 ### Scope Authority
 
-Locality includes boundaries. Workspaces follow strict scope rules:
+Locality includes boundaries. Harnesses follow strict scope rules:
 
 | Direction | Allowed | Example |
 |-----------|---------|---------|
-| Down (descendants) | ✅ Write | Root workspace can configure child workspaces |
+| Down (descendants) | ✅ Write | Root harness can configure child harnesses |
 | Up (ancestors) | ❌ Read only | Child cannot modify parent's context |
-| Sideways (siblings) | ❌ No access | `packages/auth/` cannot access `packages/billing/` workspace |
+| Sideways (siblings) | ❌ No access | `packages/auth/` cannot access `packages/billing/` harness |
 
 ### ✅ Do
 
-**Place domain-specific guidance in domain workspaces:**
+**Place domain-specific guidance in domain harnesses:**
 
 ```
 packages/billing/
@@ -120,14 +120,14 @@ packages/billing/
 - Additional: All money values use Decimal.js  # Domain-specific
 ```
 
-**Check for local workspace on directory entry:**
+**Check for local harness on directory entry:**
 
 ```markdown
 <!-- Agent behavior -->
 When entering a directory:
 1. Check if .harmony/ exists
 2. If yes, read START.md for orientation
-3. If no, use nearest ancestor workspace
+3. If no, use nearest ancestor harness
 ```
 
 **Scope context to reduce noise:**
@@ -157,17 +157,17 @@ skills:
 └── ...
 ```
 
-**Don't reach across workspace boundaries:**
+**Don't reach across harness boundaries:**
 
 ```typescript
-// Bad: Cross-workspace access
+// Bad: Cross-harness access
 import { billingContext } from '../../billing/.harmony/cognition/context';
 
 // Good: Request through proper channels or shared foundation
 import { sharedContext } from '../../../.harmony/cognition/context';
 ```
 
-**Don't duplicate shared content in every workspace:**
+**Don't duplicate shared content in every harness:**
 
 ```
 # Bad: Same content copied everywhere
@@ -181,9 +181,9 @@ packages/auth/.harmony/conventions.md      # "Extends shared, plus: ..."
 
 ## Implementation Patterns
 
-### Workspace Discovery
+### Harness Discovery
 
-Agents discover workspaces using nearest-ancestor resolution (like git finding `.git/`):
+Agents discover harnesses using nearest-ancestor resolution (like git finding `.git/`):
 
 ```
 Current: /repo/packages/auth/src/handlers/login.ts
@@ -211,7 +211,7 @@ sources:
 
 ### Progress Isolation
 
-Each workspace tracks its own progress:
+Each harness tracks its own progress:
 
 ```
 packages/auth/.harmony/continuity/
@@ -244,26 +244,26 @@ Missions inherit locality principles:
 | Principle | Relationship |
 |-----------|--------------|
 | Progressive Disclosure | Locality scopes what's disclosed; disclosure layers what's loaded |
-| Single Source of Truth | Local workspaces reference shared sources, not duplicate them |
+| Single Source of Truth | Local harnesses reference shared sources, not duplicate them |
 | Simplicity Over Complexity | Locality reduces complexity by scoping context |
 | Deny-by-Default | Scope boundaries enforce access control |
 
-## When to Create a Workspace
+## When to Create a Harness
 
 Use the decision heuristic:
 
 > *"Will an agent work here across multiple sessions?"*
 
-**Create a workspace when:**
+**Create a harness when:**
 - Domain has unique conventions or terminology
 - Multiple missions will operate in this area
 - Domain experts need to capture institutional knowledge
 - Different checklists or workflows apply
 
-**Don't create a workspace when:**
+**Don't create a harness when:**
 - One-off work in an area
 - No domain-specific guidance needed
-- Parent workspace context is sufficient
+- Parent harness context is sufficient
 
 ## Anti-Pattern: Global Soup
 
@@ -276,13 +276,13 @@ Signs of global soup:
 - "Which conventions apply here?" confusion
 
 Prevention:
-- Create domain workspaces for distinct areas
-- Keep workspaces focused (~2,000 tokens target)
+- Create domain harnesses for distinct areas
+- Keep harnesses focused (~2,000 tokens target)
 - Use inheritance instead of duplication
 
 ## Related Documentation
 
-- [Workspace Architecture](../architecture/workspaces/README.md) — Full workspace specification
+- [Harness Architecture](../architecture/harness/README.md) — Full harness specification
 - [Focus Pillar](../pillars/focus.md) — Cognitive bandwidth through locality
 - [Continuity Pillar](../pillars/continuity.md) — Durable, discoverable knowledge
-- [Skills Architecture](../architecture/workspaces/skills/architecture.md) — Locality in skill design
+- [Skills Architecture](../architecture/harness/skills/architecture.md) — Locality in skill design

@@ -1,6 +1,6 @@
 ---
 title: Start Here
-description: Boot sequence and orientation for documentation workspaces.
+description: Boot sequence and orientation for documentation harnesses.
 ---
 
 # .harmony: Start Here

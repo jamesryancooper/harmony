@@ -1,6 +1,6 @@
 # Create Skill `/create-skill`
 
-Scaffold a new workspace skill from template.
+Scaffold a new harness skill from template.
 
 See `.harmony/orchestration/workflows/skills(x)/create-skill/00-overview.md` for full description and steps.
 
@@ -45,4 +45,4 @@ Start with `00-overview.md` and follow each step in sequence:
 
 - **Workflow:** `.harmony/orchestration/workflows/skills(x)/create-skill/`
 - **Template:** `.harmony/capabilities/skills/_template/SKILL.md`
-- **Documentation:** `docs/architecture/workspaces/skills/README.md`
+- **Documentation:** `docs/architecture/harness/skills/README.md`

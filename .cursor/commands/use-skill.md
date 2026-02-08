@@ -1,6 +1,6 @@
 # Use Skill `/use-skill`
 
-Invoke a workspace skill with explicit selection.
+Invoke a harness skill with explicit selection.
 
 See `.harmony/capabilities/skills/registry.yml` for skill definitions and mappings.
 
@@ -59,5 +59,5 @@ Skills can also be invoked via:
 ## References
 
 - **Registry:** `.harmony/capabilities/skills/registry.yml`
-- **Documentation:** `docs/architecture/workspaces/skills/README.md`
+- **Documentation:** `docs/architecture/harness/skills/README.md`
 - **Skills README:** `.harmony/capabilities/skills/README.md`

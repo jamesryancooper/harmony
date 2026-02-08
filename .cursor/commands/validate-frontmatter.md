@@ -16,6 +16,6 @@ Execute `.harmony/capabilities/commands/validate-frontmatter.md` in the target d
 
 ## References
 
-- **Canonical:** `docs/architecture/workspaces/commands.md`
+- **Canonical:** `docs/architecture/harness/commands.md`
 - **Command:** `.harmony/capabilities/commands/validate-frontmatter.md`
 

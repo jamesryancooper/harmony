@@ -1,11 +1,11 @@
-# .harmony: Shared Workspace Foundation
+# .harmony: Shared Harness Foundation
 
 ## Purpose
 
-`.harmony/` provides **reusable infrastructure** for workspace harnesses across the repository:
+`.harmony/` provides **reusable infrastructure** for agent harnesses across the repository:
 
 - Generic assistants, workflows, commands, prompts
-- Workspace templates for scaffolding
+- Harness templates for scaffolding
 - Skills framework and base skills
 - Quality checklists and context references
 
@@ -56,11 +56,11 @@ When resolving a resource, agents check local first, then shared:
 ├── continuity/         <- Session log, tasks, entities
 │
 ├── orchestration/
-│   ├── workflows/      <- Multi-step procedures (workspace, missions, skills)
+│   ├── workflows/      <- Multi-step procedures (harness, missions, skills)
 │   └── missions/       <- Time-bounded sub-projects
 │
 ├── scaffolding/
-│   ├── templates/      <- Workspace scaffolding (harmony/, harmony-docs/, harmony-node-ts/)
+│   ├── templates/      <- Harness scaffolding (harmony/, harmony-docs/, harmony-node-ts/)
 │   ├── prompts/        <- Task templates
 │   └── examples/       <- Reference patterns
 │
@@ -76,8 +76,8 @@ When resolving a resource, agents check local first, then shared:
 ### In `.harmony/` (Shared)
 
 - Generic assistants (reviewer, refactor, docs)
-- Base templates for workspace creation
-- Workspace/mission management workflows
+- Base templates for harness creation
+- Harness/mission management workflows
 - Generic commands (recover, refactor, validate-frontmatter)
 - Tool usage and compaction guides
 - Base quality checklists
@@ -129,7 +129,7 @@ Harness command directories symlink to `.harmony/capabilities/commands/` for sha
 
 ## Adopting in Other Repos
 
-To use this workspace infrastructure in another repository:
+To use this harness infrastructure in another repository:
 
 ### Quick Start
 
@@ -137,7 +137,7 @@ To use this workspace infrastructure in another repository:
 # 1. Copy .harmony/ to your repo
 cp -r /path/to/harmony/.harmony /path/to/your-repo/
 
-# 2. Create a root workspace from template
+# 2. Create a root harness from template
 cp -r .harmony/scaffolding/templates/harmony .harmony
 
 # 3. Customize .harmony/scope.md and .harmony/conventions.md
@@ -147,9 +147,9 @@ cp -r .harmony/scaffolding/templates/harmony .harmony
 
 | Directory | Purpose |
 |-----------|---------|
-| `scaffolding/templates/` | Workspace scaffolding (base + variants) |
+| `scaffolding/templates/` | Harness scaffolding (base + variants) |
 | `agency/assistants/` | Generic specialists (reviewer, refactor, docs) |
-| `orchestration/workflows/` | Workspace management + mission lifecycle |
+| `orchestration/workflows/` | Harness management + mission lifecycle |
 | `capabilities/skills/` | Composable capabilities with defined I/O |
 | `capabilities/commands/` | Atomic operations |
 | `scaffolding/prompts/` | Task templates |
@@ -161,10 +161,10 @@ cp -r .harmony/scaffolding/templates/harmony .harmony
 1. Edit `.harmony/scope.md` to define your repo's boundaries
 2. Edit `.harmony/conventions.md` for your style rules
 3. Add repo-specific context to `.harmony/cognition/context/`
-4. Create domain workspaces as needed: `docs/.harmony/`, `packages/foo/.harmony/`
+4. Create domain harnesses as needed: `docs/.harmony/`, `packages/foo/.harmony/`
 
-For detailed documentation, see `docs/architecture/workspaces/shared-foundation.md`.
+For detailed documentation, see `docs/architecture/harness/shared-foundation.md`.
 
 ### When to Consider a Package
 
-If you have 5+ repositories using this pattern, frequent updates, or need semantic versioning, consider converting `.harmony/` to a published package. See `docs/architecture/workspaces/shared-foundation.md#when-to-consider-a-package` for guidance.
+If you have 5+ repositories using this pattern, frequent updates, or need semantic versioning, consider converting `.harmony/` to a published package. See `docs/architecture/harness/shared-foundation.md#when-to-consider-a-package` for guidance.

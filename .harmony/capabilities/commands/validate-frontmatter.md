@@ -25,7 +25,7 @@ Validate YAML frontmatter in all markdown files in the target directory.
 - `title` — Document title
 - `description` — Brief summary (max 160 characters)
 
-### Workspace Commands and Workflow Overviews
+### Harness Commands and Workflow Overviews
 
 Files in `.harmony/capabilities/commands/` and `.harmony/orchestration/workflows/**/00-overview.md` also require:
 
@@ -42,5 +42,5 @@ List of files with validation status:
 
 ## References
 
-- **Canonical:** `docs/architecture/workspaces/commands.md`
+- **Canonical:** `docs/architecture/harness/commands.md`
 

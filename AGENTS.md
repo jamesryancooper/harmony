@@ -40,7 +40,7 @@ Read `.harmony/orchestration/workflows/manifest.yml` for workflow discovery.
 - **Manifest:** `.harmony/orchestration/workflows/manifest.yml` (Tier 1 discovery)
 - **Registry:** `.harmony/orchestration/workflows/registry.yml` (extended metadata + parameters)
 - **Workflow Definitions:** `.harmony/orchestration/workflows/<domain>/<workflow-id>/WORKFLOW.md`
-- **Catalog:** `.harmony/orchestration/workflows/workspace-README.md`
+- **Catalog:** `.harmony/orchestration/workflows/harness-README.md`
 
 ### Progressive Disclosure
 
@@ -71,4 +71,4 @@ Read `.harmony/orchestration/workflows/manifest.yml` for workflow discovery.
 
 ## Entry Point
 
-For full workspace orientation, read `.harmony/START.md`.
+For full harness orientation, read `.harmony/START.md`.

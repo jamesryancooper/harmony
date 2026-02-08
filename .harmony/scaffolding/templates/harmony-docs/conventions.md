@@ -1,6 +1,6 @@
 ---
 title: Conventions
-description: Style and formatting rules for documentation workspaces.
+description: Style and formatting rules for documentation harnesses.
 ---
 
 # Conventions

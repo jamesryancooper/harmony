@@ -1,6 +1,6 @@
 # Bootstrap Session `/bootstrap`
 
-Quick-start a new agent session in a workspace.
+Quick-start a new agent session in a harness.
 
 See `.harmony/scaffolding/prompts/bootstrap-session.md` for full details.
 
@@ -22,6 +22,6 @@ Execute `.harmony/scaffolding/prompts/bootstrap-session.md` in the target direct
 
 ## References
 
-- **Canonical:** `docs/architecture/workspaces/prompts.md`
+- **Canonical:** `docs/architecture/harness/prompts.md`
 - **Prompt:** `.harmony/scaffolding/prompts/bootstrap-session.md`
 

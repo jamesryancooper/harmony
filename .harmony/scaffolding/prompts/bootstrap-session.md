@@ -1,6 +1,6 @@
 ---
 title: Bootstrap Session
-description: Quick-start a new agent session in a workspace.
+description: Quick-start a new agent session in a harness.
 access: human
 ---
 
@@ -12,10 +12,10 @@ Quick-start a new agent session in a `.harmony`-enabled directory.
 
 ## Instructions
 
-1. **Locate workspace**
+1. **Locate harness**
    - Check for `.harmony/` in current directory
    - If not found, check parent directories
-   - If none exists, suggest `/create-workspace`
+   - If none exists, suggest `/create-harness`
 
 2. **Execute boot sequence**
    Follow the boot sequence in `START.md`
@@ -32,7 +32,7 @@ Quick-start a new agent session in a `.harmony`-enabled directory.
 ```markdown
 ## Session Bootstrap
 
-**Workspace:** [path]
+**Harness:** [path]
 **Scope:** [1-line summary]
 **Last activity:** [date]
 

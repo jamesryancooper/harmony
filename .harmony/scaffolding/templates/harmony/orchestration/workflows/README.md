@@ -1,6 +1,6 @@
 # Workflows
 
-Multi-step procedures for this workspace. Create subdirectories with numbered step files:
+Multi-step procedures for this harness. Create subdirectories with numbered step files:
 
 ```text
 my-workflow/
@@ -10,5 +10,5 @@ my-workflow/
 └── 03-final-step.md
 ```
 
-See `docs/architecture/workspaces/workflows.md` for format and examples.
+See `docs/architecture/harness/workflows.md` for format and examples.
 

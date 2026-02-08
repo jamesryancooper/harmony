@@ -68,7 +68,7 @@ A new project directory ready for work:
 projects/<slug>/
 ├── project.md     # Ready for scope/questions definition
 ├── log.md         # Creation entry logged
-└── resources.md   # Workspace resource references
+└── resources.md   # Harness resource references
 ```
 
 ## The Funnel
@@ -96,6 +96,6 @@ context/                → Permanent knowledge
 
 ## Related
 
-- [Projects](../../../../docs/architecture/workspaces/projects.md) — Full documentation
+- [Projects](../../../../docs/architecture/harness/projects.md) — Full documentation
 - [Registry](../../../ideation/projects/registry.md) — Project tracking
 - [Brainstorm](../../../ideation/scratchpad/brainstorm/README.md) — Upstream exploration

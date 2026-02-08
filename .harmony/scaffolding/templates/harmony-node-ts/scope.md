@@ -1,11 +1,11 @@
 ---
 title: Scope
-description: Boundaries and responsibilities for Node.js/TypeScript workspaces.
+description: Boundaries and responsibilities for Node.js/TypeScript harnesses.
 ---
 
 # Scope: {{PACKAGE_NAME}}
 
-## This Workspace Covers
+## This Harness Covers
 
 {{DESCRIPTION of the package}}
 

@@ -5,11 +5,11 @@ description: Boundaries and responsibilities for the root .harmony/ harness.
 
 # Scope: Root .harmony/
 
-## This Workspace Covers
+## This Harness Covers
 
-The root `.harmony/` is the **repo-wide agent harness** — a functional workspace for repository-wide operations, decisions, and context.
+The root `.harmony/` is the **repo-wide agent harness** for repository-wide operations, decisions, and context.
 
-This workspace contains:
+This harness contains:
 
 - Repository-wide decisions, lessons, and constraints
 - Progress tracking for repo-level work
@@ -28,7 +28,7 @@ This workspace contains:
 
 ## Out of Scope
 
-- Domain-specific content (belongs in domain's own `.harmony/`)
+- Domain-specific content (belongs in domain's own `.harmony/` harness)
 - General project documentation (belongs in `/docs`)
 - Code implementation (belongs in `/packages`, `/apps`)
 - Human onboarding beyond `.harmony/` usage
@@ -38,9 +38,9 @@ This workspace contains:
 | Content Type | Location | Example |
 |--------------|----------|---------|
 | **Shared (in `.harmony/`)** | | |
-| Workspace templates | `.harmony/scaffolding/templates/` | `harmony/`, `harmony-docs/` |
+| Harness templates | `.harmony/scaffolding/templates/` | `harmony/`, `harmony-docs/` |
 | Generic assistants | `.harmony/agency/assistants/` | `reviewer/`, `refactor/`, `docs/` |
-| Workspace management workflows | `.harmony/orchestration/workflows/workspace/` | `create-workspace`, `migrate-workspace` |
+| Harness management workflows | `.harmony/orchestration/workflows/harness/` | `create-harness`, `migrate-harness` |
 | Mission management workflows | `.harmony/orchestration/workflows/missions/` | `create-mission`, `complete-mission` |
 | Generic skills | `.harmony/capabilities/skills/` | `synthesize-research/` |
 | **Repo-wide (in `.harmony/`)** | | |
@@ -51,7 +51,7 @@ This workspace contains:
 | Domain workflows | Domain's `.harmony/orchestration/workflows/` | `docs/api/.harmony/orchestration/workflows/` |
 | Domain conventions | Domain's `.harmony/conventions.md` | Package-specific style rules |
 | **Harness entry points** | | |
-| Cursor command wrappers | `.cursor/commands/` | `create-workspace.md`, `run-flow.md` |
+| Cursor command wrappers | `.cursor/commands/` | `create-harness.md`, `run-flow.md` |
 | Global Cursor commands | `~/.cursor/commands/` | Git utilities, personal workflows |
 
 ## Decision Authority
@@ -64,7 +64,7 @@ This workspace contains:
 
 **Escalate:**
 
-- Changes to the `.harmony/` pattern that affect other workspaces
+- Changes to the `.harmony/` pattern that affect other harnesses
 - New conventions that should apply project-wide
 
 ## Adjacent Areas
@@ -72,6 +72,6 @@ This workspace contains:
 | Area | Relationship |
 |------|--------------|
 | `.harmony/` | Shared foundation — templates, assistants, workflows, skills |
-| `.harmony/scaffolding/templates/` | Workspace scaffolding (base and scoped variants) |
+| `.harmony/scaffolding/templates/` | Harness scaffolding (base and scoped variants) |
 | `.cursor/` | IDE-specific agent configuration (complementary) |
-| `docs/architecture/workspaces/` | Canonical documentation for workspace pattern |
+| `docs/architecture/harness/` | Canonical documentation for harness pattern |

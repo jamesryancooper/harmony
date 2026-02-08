@@ -7,7 +7,7 @@ description: Scoped .harmony/ template for Node.js/TypeScript packages.
 
 A scoped `.harmony/` template for **Node.js/TypeScript packages** (libraries, components, CLI tools).
 
-> **Machine-readable manifest:** See `manifest.json` in this directory for the structured definition used by `/create-workspace`.
+> **Machine-readable manifest:** See `manifest.json` in this directory for the structured definition used by `/create-harness`.
 
 ## Inheritance
 
@@ -15,7 +15,7 @@ This template **extends** the base template at `.harmony/scaffolding/templates/h
 
 ### Resolution Order
 
-When creating a workspace using this template:
+When creating a harness using this template:
 
 1. Copy all files from `.harmony/scaffolding/templates/harmony/` (base)
 2. Overlay files from this directory (scope-specific overrides)
@@ -42,9 +42,9 @@ All other files come from `.harmony/scaffolding/templates/harmony/`:
 
 ## Usage
 
-This template is used by the `/create-workspace` workflow when creating a workspace for a Node.js/TypeScript package.
+This template is used by the `/create-harness` workflow when creating a harness for a Node.js/TypeScript package.
 
 ```text
-/create-workspace @packages/ui --template node-ts
+/create-harness @packages/ui --template node-ts
 ```
 

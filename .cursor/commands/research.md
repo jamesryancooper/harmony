@@ -42,11 +42,11 @@ orchestration/missions/         → Committed execution
 cognition/context/              → Permanent knowledge
 ```
 
-Use `/research` when you're ready to commit to a structured exploration that will produce workspace artifacts.
+Use `/research` when you're ready to commit to a structured exploration that will produce harness artifacts.
 
 ## References
 
 - **Registry:** `.harmony/ideation/projects/registry.md`
 - **Template:** `.harmony/ideation/projects/_template/`
-- **Documentation:** `docs/architecture/workspaces/projects.md`
+- **Documentation:** `docs/architecture/harness/projects.md`
 - **Brainstorm (upstream):** `.harmony/ideation/scratchpad/brainstorm/`

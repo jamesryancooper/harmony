@@ -132,13 +132,13 @@ flowchart LR
 | Layer | Canonical owner | Files (examples) |
 |---|---|---|
 | Cursor entrypoint | `.cursor/commands` | `.cursor/commands/run-flow.md` |
-| Workspace harness | `.harmony/orchestration/workflows` | `.harmony/orchestration/workflows/flowkit/run-flow/*` |
+| Harness | `.harmony/orchestration/workflows` | `.harmony/orchestration/workflows/flowkit/run-flow/*` |
 | Package semantics + CLI | `packages/kits/flowkit` | `packages/kits/flowkit/src/cli.ts`, `packages/kits/flowkit/src/index.ts` |
 | Flow assets | `packages/workflows` | `packages/workflows/<flowId>/config.flow.json`, `manifest.yaml`, `00-overview.md`, `NN-<step>.md` |
 | Runtime execution | `agents/runner/runtime` | `agents/runner/runtime/server.py`, `agents/runner/runtime/**/graph_factory.py` |
 | Studio wiring | repo root + runtime | `langgraph.json`, `agents/runner/runtime/**/studio_entry.py` |
 
-#### Workspace vs Package
+#### Harness vs Package
 
 - `.harmony/orchestration/workflows/flowkit/run-flow/*` documents the *procedure* for running `pnpm flowkit:run`.
 - The FlowKit CLI is the source of truth for `.flow.json` semantics and validation (`packages/kits/flowkit/src/cli.ts` → `validateFlowConfig`).
@@ -146,7 +146,7 @@ flowchart LR
 #### Locality vs Repo-Wide
 
 - The root `.harmony` is a **repo-wide harness** (see `.harmony/scope.md`), so FlowKit run procedures belong there.
-- Domain workspaces can add *references* for discoverability, but should **delegate** to the same canonical workflow rather than forking the logic.
+- Domain harnesses can add *references* for discoverability, but should **delegate** to the same canonical workflow rather than forking the logic.
 
 ### 2.1 Placement in Harmony
 
