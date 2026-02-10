@@ -263,12 +263,13 @@ VALIDATE_PATH(declared_path, harness_root):
 
 ```yaml
 # In docs/.harmony/capabilities/skills/registry.yml (scope: docs/**)
-skill_mappings:
+skills:
   generate-guide:
-    outputs:
-      - path: "../README.md"           # ✗ REJECTED: ancestor (repo)
-      - path: "../packages/kits/x.md"  # ✗ REJECTED: sibling path
-      - path: "guides/quickstart.md"   # ✓ Valid: within scope
+    io:
+      outputs:
+        - path: "../README.md"           # ✗ REJECTED: ancestor (repo)
+        - path: "../packages/kits/x.md"  # ✗ REJECTED: sibling path
+        - path: "guides/quickstart.md"   # ✓ Valid: within scope
 ```
 
 ---
@@ -278,9 +279,9 @@ skill_mappings:
 Symlinks expose shared skills to different agent hosts:
 
 ```bash
-.claude/skills/refine-prompt -> ../../.harmony/capabilities/skills/refine-prompt
-.cursor/skills/refine-prompt -> ../../.harmony/capabilities/skills/refine-prompt
-.codex/skills/refine-prompt  -> ../../.harmony/capabilities/skills/refine-prompt
+.claude/skills/refine-prompt -> ../../.harmony/capabilities/skills/synthesis/refine-prompt
+.cursor/skills/refine-prompt -> ../../.harmony/capabilities/skills/synthesis/refine-prompt
+.codex/skills/refine-prompt  -> ../../.harmony/capabilities/skills/synthesis/refine-prompt
 ```
 
 **Why symlinks?** Agent products discover skills in their own directories (`.claude/skills/`, `.cursor/skills/`, etc.). Symlinks allow multiple agents to share the same canonical skill definition while maintaining expected directory structures.
@@ -304,9 +305,9 @@ Symlinks expose shared skills to different agent hosts:
 mkdir -p .claude/skills .cursor/skills .codex/skills
 
 # Link a skill to all harnesses
-ln -s ../../.harmony/capabilities/skills/refine-prompt .claude/skills/refine-prompt
-ln -s ../../.harmony/capabilities/skills/refine-prompt .cursor/skills/refine-prompt
-ln -s ../../.harmony/capabilities/skills/refine-prompt .codex/skills/refine-prompt
+ln -s ../../.harmony/capabilities/skills/synthesis/refine-prompt .claude/skills/refine-prompt
+ln -s ../../.harmony/capabilities/skills/synthesis/refine-prompt .cursor/skills/refine-prompt
+ln -s ../../.harmony/capabilities/skills/synthesis/refine-prompt .codex/skills/refine-prompt
 ```
 
 ### Verification

@@ -27,13 +27,14 @@ Compact index for agent routing—contains only what's needed to match user inte
 
 ```yaml
 # Skills Manifest (Skill Discovery Index)
-schema_version: "1.2"
+schema_version: "2.0"
 default: null
 
 skills:
   - id: refine-prompt
     display_name: Refine Prompt
-    path: refine-prompt/
+    group: synthesis
+    path: synthesis/refine-prompt/
     summary: "Context-aware prompt refinement with persona assignment."
     status: active
     tags:
@@ -84,9 +85,10 @@ default: refine-prompt
 |-------|----------|-------------|
 | `id` | Yes | Unique skill identifier (matches directory name and SKILL.md `name`) |
 | `display_name` | Yes | Human-readable display name |
+| `group` | Yes | Skill group for directory organization |
 | `path` | Yes | Relative path to skill directory |
 | `summary` | Yes | One-line description for routing |
-| `status` | No | Lifecycle state: `active`, `deprecated`, `experimental` (default: `active`) |
+| `status` | No | Lifecycle state: `active`, `deprecated`, `experimental`, `draft` (default: `active`) |
 | `tags` | No | Freeform labels for filtering and grouping |
 | `triggers` | No | Natural language phrases for matching |
 | `skill_sets` | No | Capability bundles (executor, guardian, etc.) |
@@ -99,6 +101,7 @@ default: refine-prompt
 | `active` | Skill is ready for production use (default) |
 | `deprecated` | Skill is being phased out; agents may warn users |
 | `experimental` | Skill is in development; behavior may change |
+| `draft` | Skill is not ready for activation; used for in-progress definitions |
 
 ### Tags
 
@@ -155,7 +158,7 @@ Extended metadata loaded after a skill is matched—contains routing rules, comm
 
 ```yaml
 # Skills Registry (Extended Metadata)
-schema_version: "1.2"
+schema_version: "3.0"
 
 routing:
   explicit_command_required: false
@@ -200,7 +203,7 @@ skills:
 | `requires.context` | No | Context conditions for skill activation |
 | `depends_on` | No | Other skills this skill requires |
 
-> **Note:** Input/output paths are defined in `.harmony/capabilities/skills/registry.yml` under `skill_mappings`.
+> **Note:** Input/output paths are defined in `.harmony/capabilities/skills/registry.yml` under `skills.<id>.io`.
 
 > **Tool Permissions:** Tool permissions are **not** defined in registry.yml. They are defined in SKILL.md frontmatter via `allowed-tools` (single source of truth). The internal format is derived via the mapping function in `validate-skills.sh`.
 
@@ -230,37 +233,39 @@ requires:
 
 ---
 
-## Skill Mappings
+## Skill I/O Mappings
 
 I/O paths are defined in `registry.yml` under each skill's entry:
 
 ```yaml
-skill_mappings:
+skills:
   synthesize-research:
-    inputs:
-      - path: "resources/synthesize-research/"
-        kind: directory
-        required: true
-        description: "Research notes and source materials"
-    outputs:
-      - path: ".harmony/output/drafts/{{topic}}-synthesis.md"
-        kind: file
-        format: markdown
-        determinism: stable
-        description: "Synthesized research findings document"
+    io:
+      inputs:
+        - path: "resources/synthesize-research/"
+          kind: directory
+          required: true
+          description: "Research notes and source materials"
+      outputs:
+        - path: ".harmony/output/drafts/{{topic}}-synthesis.md"
+          kind: file
+          format: markdown
+          determinism: stable
+          description: "Synthesized research findings document"
 
   refine-prompt:
-    inputs:
-      - path: "resources/refine-prompt/prompts/"
-        kind: directory
-        required: false
-        description: "Optional prompt source folder"
-    outputs:
-      - path: ".harmony/scaffolding/prompts/{{timestamp}}-refined.md"
-        kind: file
-        format: markdown
-        determinism: stable
-        description: "Refined prompt output"
+    io:
+      inputs:
+        - path: "resources/refine-prompt/prompts/"
+          kind: directory
+          required: false
+          description: "Optional prompt source folder"
+      outputs:
+        - path: ".harmony/scaffolding/prompts/{{timestamp}}-refined.md"
+          kind: file
+          format: markdown
+          determinism: stable
+          description: "Refined prompt output"
 ```
 
 > **Note:** All `.harmony/capabilities/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. See [Design Conventions](./design-conventions.md#harness-skills-directory-structure) for details.
@@ -324,27 +329,30 @@ Operational artifacts use the categorical `{{category}}/{{skill-id}}/` pattern w
 Declare custom deliverable paths in the registry:
 
 ```yaml
-skill_mappings:
+skills:
   # Tier 2: Within .harmony/
   synthesize-research:
-    inputs:
-      - path: "projects/{{project}}/"
-        type: folder
-    outputs:
-      - path: "projects/{{project}}/synthesis.md"   # .harmony/ideation/projects/...
-        type: markdown
+    io:
+      inputs:
+        - path: "projects/{{project}}/"
+          type: folder
+      outputs:
+        - path: "projects/{{project}}/synthesis.md"   # .harmony/ideation/projects/...
+          type: markdown
 
   # Tier 3: Harness root
   generate-docs:
-    outputs:
-      - path: "docs/generated/{{name}}.md"          # {{harness_root}}/docs/...
-        type: markdown
+    io:
+      outputs:
+        - path: "docs/generated/{{name}}.md"          # {{harness_root}}/docs/...
+          type: markdown
 
   # Tier 3: Into descendant harness
   scaffold-kit:
-    outputs:
-      - path: "flowkit/README.md"                 # Descendant harness
-        type: markdown
+    io:
+      outputs:
+        - path: "flowkit/README.md"                 # Descendant harness
+          type: markdown
 ```
 
 ---
@@ -361,33 +369,36 @@ Output paths must fall within the harness's hierarchical scope:
 
 ```yaml
 # In repo/.harmony/capabilities/skills/registry.yml (scope: repo/**)
-skill_mappings:
+skills:
   scaffold-all:
-    outputs:
-      - path: "README.md"                         # ✓ Harness root
-      - path: "src/generated.ts"                  # ✓ Harness subdirectory
-      - path: "docs/guides/setup.md"              # ✓ Descendant harness (docs)
-      - path: "packages/kits/flowkit/README.md"   # ✓ Deep descendant harness
+    io:
+      outputs:
+        - path: "README.md"                         # ✓ Harness root
+        - path: "src/generated.ts"                  # ✓ Harness subdirectory
+        - path: "docs/guides/setup.md"              # ✓ Descendant harness (docs)
+        - path: "packages/kits/flowkit/README.md"   # ✓ Deep descendant harness
 ```
 
 #### Invalid Paths
 
 ```yaml
 # In docs/.harmony/capabilities/skills/registry.yml (scope: docs/**)
-skill_mappings:
+skills:
   generate-guide:
-    outputs:
-      - path: "guides/quickstart.md"              # ✓ Valid: within scope
-      - path: "../README.md"                      # ✗ REJECTED: ancestor (repo)
-      - path: "../packages/kits/README.md"        # ✗ REJECTED: sibling path
+    io:
+      outputs:
+        - path: "guides/quickstart.md"              # ✓ Valid: within scope
+        - path: "../README.md"                      # ✗ REJECTED: ancestor (repo)
+        - path: "../packages/kits/README.md"        # ✗ REJECTED: sibling path
 
 # In flowkit/.harmony/capabilities/skills/registry.yml (scope: flowkit/**)
-skill_mappings:
+skills:
   generate-types:
-    outputs:
-      - path: "src/types.ts"                      # ✓ Valid: within scope
-      - path: "../shared/types.ts"                # ✗ REJECTED: ancestor (kits)
-      - path: "../../README.md"                   # ✗ REJECTED: ancestor (repo)
+    io:
+      outputs:
+        - path: "src/types.ts"                      # ✓ Valid: within scope
+        - path: "../shared/types.ts"                # ✗ REJECTED: ancestor (kits)
+        - path: "../../README.md"                   # ✗ REJECTED: ancestor (repo)
 ```
 
 #### Validation Rules

@@ -15,7 +15,7 @@ Use the `/create-skill` command to create new skills that follow the agentskills
 /create-skill <skill-name>
 ```
 
-This invokes the `create-skill` skill defined in `.harmony/capabilities/skills/create-skill/`.
+This invokes the `create-skill` skill defined in `.harmony/capabilities/skills/meta/create-skill/`.
 
 ---
 
@@ -227,7 +227,8 @@ Add the skill to `.harmony/capabilities/skills/manifest.yml` for Tier 1 discover
 skills:
   - id: your-skill-name
     display_name: Your Skill Name
-    path: your-skill-name/
+    group: quality-gate
+    path: quality-gate/your-skill-name/
     summary: "One-line description of what the skill does."
     status: active
     tags:
@@ -263,19 +264,20 @@ skills:
 If the skill needs harness-specific I/O paths, add them to `.harmony/capabilities/skills/registry.yml`:
 
 ```yaml
-skill_mappings:
+skills:
   your-skill-name:
-    inputs:
-      - path: "resources/your-skill-name/input/"
-        kind: directory
-        required: true
-        description: "Source folder for skill input"
-    outputs:
-      - path: "../../your-category/{{name}}.md"
-        kind: file
-        format: markdown
-        determinism: stable
-        description: "Skill output document"
+    io:
+      inputs:
+        - path: "resources/your-skill-name/input/"
+          kind: directory
+          required: true
+          description: "Source folder for skill input"
+      outputs:
+        - path: "../../your-category/{{name}}.md"
+          kind: file
+          format: markdown
+          determinism: stable
+          description: "Skill output document"
 ```
 
 **Note:** All `.harmony/capabilities/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. See [Design Conventions](./design-conventions.md#harness-skills-directory-structure) for details.
@@ -291,9 +293,9 @@ Run the setup script or create symlinks manually:
 .harmony/capabilities/skills/scripts/setup-harness-links.sh
 
 # Or manually
-ln -s ../../.harmony/capabilities/skills/your-skill-name .claude/skills/your-skill-name
-ln -s ../../.harmony/capabilities/skills/your-skill-name .cursor/skills/your-skill-name
-ln -s ../../.harmony/capabilities/skills/your-skill-name .codex/skills/your-skill-name
+ln -s ../../.harmony/capabilities/skills/quality-gate/your-skill-name .claude/skills/your-skill-name
+ln -s ../../.harmony/capabilities/skills/quality-gate/your-skill-name .cursor/skills/your-skill-name
+ln -s ../../.harmony/capabilities/skills/quality-gate/your-skill-name .codex/skills/your-skill-name
 ```
 
 ### 7. Test

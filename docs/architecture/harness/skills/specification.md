@@ -328,7 +328,6 @@ Validate a skill manually:
 - [ ] `commands` includes at least one slash command
 - [ ] `allowed-tools` in SKILL.md lists all required tools (single source of truth)
 - [ ] All tools in `allowed-tools` are recognized (can be mapped to internal format)
-- [ ] No `outputs` in `.harmony/capabilities/skills/registry.yml` (I/O paths go in harness registry)
 - [ ] I/O mappings exist in `.harmony/capabilities/skills/registry.yml`
 
 #### Execution
