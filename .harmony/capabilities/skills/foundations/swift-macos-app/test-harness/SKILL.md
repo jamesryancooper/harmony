@@ -4,7 +4,7 @@ description: >
   Generate testing infrastructure for a Swift macOS app: XCTest suites,
   in-memory database fixtures, mock actors, CI workflow, and schema
   validation tests. Invoke with the project name and test categories.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

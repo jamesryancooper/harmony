@@ -4,7 +4,7 @@ description: >
   Generate docker-compose.local.yml for declared infrastructure dependencies
   and alembic setup for database migrations. Invoke with the project name and
   list of services needed (postgres, nats, redis, minio, temporal).
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

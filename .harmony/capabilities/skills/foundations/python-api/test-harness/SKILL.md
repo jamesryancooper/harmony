@@ -4,7 +4,7 @@ description: >
   Generate testing infrastructure aligned with the project's contracts and package
   structure: conftest fixtures, contract tests, unit test stubs, and integration
   test scaffolding. Invoke with the project name and list of infrastructure dependencies.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

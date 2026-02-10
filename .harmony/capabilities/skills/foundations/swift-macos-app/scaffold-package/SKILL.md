@@ -4,7 +4,7 @@ description: >
   Create an architecture-aligned Swift package structure with Package.swift,
   source targets, typed configuration, structured logging, and standard modules.
   Invoke with a project name, description, Swift version, platform, and dependencies.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

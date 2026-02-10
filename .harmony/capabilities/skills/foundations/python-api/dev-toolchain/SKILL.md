@@ -4,7 +4,7 @@ description: >
   Configure project development tooling: justfile task runner, pre-commit hooks,
   ruff/mypy settings in pyproject.toml, .gitignore, and .env.local.example.
   Invoke with the project name and infrastructure dependencies.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

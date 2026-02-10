@@ -4,7 +4,7 @@ description: >
   Generate a single-writer background daemon with actor isolation, intent
   queue, FSEvents file watcher, LaunchAgent plist, and signal handling.
   Invoke with the project name and watched paths.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

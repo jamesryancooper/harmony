@@ -4,7 +4,7 @@ description: >
   Generate AGENT.md, CONTRIBUTING.md, PR template, and CI workflow from actual
   project state. Reads existing files to produce accurate contributor documentation.
   Invoke after other foundation skills have established the project structure.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

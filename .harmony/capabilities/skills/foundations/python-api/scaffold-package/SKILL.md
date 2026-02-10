@@ -4,7 +4,7 @@ description: >
   Create an architecture-aligned Python package structure with typed config,
   structured logging, health endpoints, and standard sub-packages. Invoke with
   a project name, description, Python version, and infrastructure dependencies.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

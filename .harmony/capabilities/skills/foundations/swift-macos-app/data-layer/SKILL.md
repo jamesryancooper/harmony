@@ -4,7 +4,7 @@ description: >
   Generate a SQLite persistence layer using GRDB.swift with actor-based
   concurrency: database actor, schema migrations, record types, and query
   helpers. Invoke with entity names, fields, and relationship definitions.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

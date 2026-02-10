@@ -4,7 +4,7 @@ description: >
   Generate project documentation: CLAUDE.md for AI agents, CONTRIBUTING.md
   for developers, architecture overview, PR template, and CI config.
   Invoke with the project name — reads outputs from all other skills.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

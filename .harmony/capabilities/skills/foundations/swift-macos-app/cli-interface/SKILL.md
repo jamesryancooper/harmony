@@ -4,7 +4,7 @@ description: >
   Generate a command-line interface using swift-argument-parser with
   subcommands, typed options, shell completions, and help text. Invoke
   with the project name and list of commands/subcommands.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 

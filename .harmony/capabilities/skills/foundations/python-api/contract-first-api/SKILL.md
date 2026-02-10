@@ -4,7 +4,7 @@ description: >
   Generate a coherent contract set from a domain description: OpenAPI 3.1.0 spec,
   JSON Schema files, Pydantic ContractModel classes, contract tests, and JSON test
   fixtures. Invoke with a domain description and list of resources/endpoints.
-allowed-tools: Read, Grep, Glob, Bash, Write, Edit
+allowed-tools: Read Grep Glob Bash Write Edit
 disable-model-invocation: true
 ---
 
