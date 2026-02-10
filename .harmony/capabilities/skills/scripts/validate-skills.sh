@@ -288,12 +288,15 @@ get_skill_tools() {
 # | allowed-tools (SKILL.md)   | Internal Format           | Description              |
 # |----------------------------|---------------------------|--------------------------|
 # | Read                       | filesystem.read           | Read files               |
+# | Edit                       | filesystem.edit           | Edit files in-place      |
 # | Write(runs/*)              | filesystem.write.runs     | Write execution state (session recovery) |
 # | Write(logs/*)              | filesystem.write.logs     | Write to logs dir        |
 # | Write(../{category}/*)     | filesystem.write.deliverables | Write deliverables   |
+# | Write(...)                 | filesystem.write.scoped   | Write to explicit scoped path |
 # | Glob                       | filesystem.glob           | Pattern file discovery   |
 # | Grep                       | filesystem.grep           | Content search           |
 # | WebFetch                   | network.fetch             | HTTP requests (read)     |
+# | Bash / Bash(...)           | shell.execute             | Execute shell commands   |
 # | Shell                      | shell.execute             | Execute shell commands   |
 # | Task                       | agent.task                | Launch subagent tasks    |
 
@@ -303,12 +306,17 @@ map_allowed_to_internal() {
     local allowed="$1"
     case "$allowed" in
         Read)                    echo "filesystem.read" ;;
+        Edit)                    echo "filesystem.edit" ;;
+        Write)                   echo "filesystem.write" ;;
         Write\(runs/\*\))        echo "filesystem.write.runs" ;;
         Write\(logs/\*\))        echo "filesystem.write.logs" ;;
         Write\(../*\))           echo "filesystem.write.deliverables" ;;
+        Write\(*\))              echo "filesystem.write.scoped" ;;
         Glob)                    echo "filesystem.glob" ;;
         Grep)                    echo "filesystem.grep" ;;
         WebFetch)                echo "network.fetch" ;;
+        Bash)                    echo "shell.execute" ;;
+        Bash\(*\))               echo "shell.execute" ;;
         Shell)                   echo "shell.execute" ;;
         Task)                    echo "agent.task" ;;
         *)                       echo "" ;;  # Unknown mapping
@@ -320,17 +328,16 @@ map_allowed_to_internal() {
 # Returns space-separated list of internal tool names
 get_internal_tools_from_skill() {
     local skill_dir="$1"
-    local allowed_tools
-    allowed_tools=$(get_skill_allowed_tools "$skill_dir")
     
     local internal_tools=""
-    for allowed in $allowed_tools; do
+    while IFS= read -r allowed; do
+        [[ -z "$allowed" ]] && continue
         local mapped
         mapped=$(map_allowed_to_internal "$allowed")
         if [[ -n "$mapped" ]]; then
             internal_tools="$internal_tools $mapped"
         fi
-    done
+    done < <(get_skill_allowed_tools "$skill_dir")
     echo "$internal_tools" | xargs  # Trim whitespace
 }
 
@@ -338,22 +345,23 @@ get_internal_tools_from_skill() {
 # Returns 0 if valid, 1 if invalid with error message
 validate_allowed_tools_format() {
     local skill_dir="$1"
-    local allowed_tools
-    allowed_tools=$(get_skill_allowed_tools "$skill_dir")
-    
-    if [[ -z "$allowed_tools" ]]; then
-        echo "allowed-tools not found in SKILL.md frontmatter"
-        return 1
-    fi
+    local has_tools=false
     
     local invalid=""
-    for allowed in $allowed_tools; do
+    while IFS= read -r allowed; do
+        [[ -z "$allowed" ]] && continue
+        has_tools=true
         local mapped
         mapped=$(map_allowed_to_internal "$allowed")
         if [[ -z "$mapped" ]]; then
             invalid="${invalid}${allowed}, "
         fi
-    done
+    done < <(get_skill_allowed_tools "$skill_dir")
+
+    if [[ "$has_tools" != "true" ]]; then
+        echo "allowed-tools not found in SKILL.md frontmatter"
+        return 1
+    fi
     
     if [[ -n "$invalid" ]]; then
         echo "Unknown tools: ${invalid%, }"
@@ -368,13 +376,64 @@ map_allowed_to_registry() {
     map_allowed_to_internal "$1"
 }
 
+# Split allowed-tools value by spaces outside parentheses.
+# Example:
+#   "Read Bash(vercel *) Write(logs/*)"
+# becomes tokens:
+#   Read
+#   Bash(vercel *)
+#   Write(logs/*)
+split_allowed_tools() {
+    local raw="$1"
+    local token=""
+    local depth=0
+    local ch
+    local i
+
+    for ((i=0; i<${#raw}; i++)); do
+        ch="${raw:i:1}"
+
+        case "$ch" in
+            "(")
+                ((depth++))
+                token+="$ch"
+                ;;
+            ")")
+                if [[ $depth -gt 0 ]]; then
+                    ((depth--))
+                fi
+                token+="$ch"
+                ;;
+            " " | $'\t')
+                if [[ $depth -eq 0 ]]; then
+                    if [[ -n "$token" ]]; then
+                        echo "$token"
+                        token=""
+                    fi
+                else
+                    token+="$ch"
+                fi
+                ;;
+            *)
+                token+="$ch"
+                ;;
+        esac
+    done
+
+    if [[ -n "$token" ]]; then
+        echo "$token"
+    fi
+}
+
 # Get allowed-tools from SKILL.md frontmatter
 get_skill_allowed_tools() {
     local skill_dir="$1"
     local skill_md="$skill_dir/SKILL.md"
     if [[ -f "$skill_md" ]]; then
-        # Extract allowed-tools line and split by space
-        grep -E "^allowed-tools:" "$skill_md" | head -1 | sed 's/allowed-tools:[[:space:]]*//' | tr ' ' '\n'
+        # Extract allowed-tools line and split by spaces outside parentheses.
+        local raw
+        raw=$(grep -E "^allowed-tools:" "$skill_md" | head -1 | sed 's/allowed-tools:[[:space:]]*//')
+        split_allowed_tools "$raw"
     fi
 }
 

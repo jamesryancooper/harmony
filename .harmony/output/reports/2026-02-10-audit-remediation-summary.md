@@ -3,17 +3,20 @@
 Date: 2026-02-10
 
 ## Scope
+
 Implemented Phases 1-7 from the verified skills system audit remediation plan, with validator checkpoints after each phase and phase-by-phase commits.
 
 ## Per-Phase Changes
 
 ### Phase 1 - Allowed-tools delimiter normalization
+
 - Files modified: 12 `SKILL.md` files (foundation sub-skills).
 - Fix count: 12 delimiter corrections (`comma-delimited` -> `space-delimited`).
 - Validation checkpoint: path-resolution failure still present (known pre-existing blocker before Phase 3).
 - Commit: `ad830dd`
 
 ### Phase 2 - Group membership reconciliation + family parents
+
 - Files modified: 9.
 - Fixes:
   - Updated `capabilities.yml` group members to real manifest IDs.
@@ -24,6 +27,7 @@ Implemented Phases 1-7 from the verified skills system audit remediation plan, w
 - Commit: `4d80a06`
 
 ### Phase 3 - Validator grouped path handling
+
 - Files modified: 1 (`validate-skills.sh`).
 - Fixes:
   - Added `get_skill_path()` resolving manifest `path` as source of truth.
@@ -35,6 +39,7 @@ Implemented Phases 1-7 from the verified skills system audit remediation plan, w
 - Commit: `0a23c68`
 
 ### Phase 4 - Executor capability reference completion
+
 - Files modified: 24 (new reference files).
 - Fixes:
   - Added missing `decisions.md` and `checkpoints.md` across all manifested executor skills.
@@ -44,6 +49,7 @@ Implemented Phases 1-7 from the verified skills system audit remediation plan, w
 - Commit: `5dd8c6e`
 
 ### Phase 5 - Documentation drift remediation
+
 - Files modified: 5 docs files under `docs/architecture/harness/skills/`.
 - Fixes:
   - Replaced flat paths with grouped paths (`quality-gate/`, `synthesis/`, `meta/`).
@@ -56,6 +62,7 @@ Implemented Phases 1-7 from the verified skills system audit remediation plan, w
 - Commit: `345ef00`
 
 ### Phase 6 - Capability taxonomy expansion
+
 - Files modified: 7.
 - Fixes:
   - Added capabilities: `long-running`, `scheduled`, `external-output`.
@@ -75,6 +82,7 @@ Implemented Phases 1-7 from the verified skills system audit remediation plan, w
 - Commit: `330d118`
 
 ### Phase 7 - Final cross-check closure + reporting
+
 - Files modified: specialist glossary additions + this report.
 - Fixes:
   - Added missing `glossary.md` files so every resolved capability now has required references across manifested skills.
@@ -83,14 +91,17 @@ Implemented Phases 1-7 from the verified skills system audit remediation plan, w
 ## Issues Encountered and Resolutions
 
 1. Shell loop edit issue in Phase 1 (zsh word splitting)
+
 - Issue: bulk edit loop treated all paths as one token.
 - Resolution: switched to `while IFS= read -r` file iteration.
 
 2. Validator runtime inconsistency between direct execution and `bash script`
+
 - Issue: shebang used `/bin/bash` (3.2), which did not behave consistently with Homebrew Bash (5.x) for this script.
 - Resolution: changed shebang to `#!/usr/bin/env bash` and verified full-manifest scan (`21` skills validated).
 
 3. Capability-reference completeness gap after adding specialist family parents
+
 - Issue: specialist skills required `glossary.md` via `domain-specialized` capability.
 - Resolution: added missing glossary references for all manifested specialist skills.
 
@@ -106,23 +117,26 @@ Implemented Phases 1-7 from the verified skills system audit remediation plan, w
 ## Validator Before/After Comparison
 
 ### Before (baseline, pre-remediation)
+
 - Command: `.harmony/capabilities/skills/scripts/validate-skills.sh`
 - Result: `EXIT 1`
 - Behavior: terminated immediately with grouped-path directory resolution failure:
   - `Directory not found: .../.harmony/capabilities/skills/synthesize-research`
 
 ### After (final remediation state)
+
 - Command: `.harmony/capabilities/skills/scripts/validate-skills.sh`
-- Result: `EXIT 6`
+- Result: `EXIT 0`
 - Behavior:
   - Full manifest scan runs (`21` skills validated).
   - Grouped-path resolution issue is fixed.
-  - Remaining errors are non-path related (allowed-tools token mapping mismatches in six skills).
-  - Summary: `Errors: 6`, `Warnings: 67`.
+  - `allowed-tools` parsing/mapping issues are fixed for scoped tokens and generic forms.
+  - Summary: `Warnings: 113`.
 
 ## Remaining Known Gaps
 
 ### Explicitly Deferred (per D7)
+
 - New parameter types: `number`, `enum`, `list`, `object`, `secret`
 - New I/O kinds: `api`, `database`, `stream`
 - Trigger patterns: regex/intent matching
@@ -130,4 +144,5 @@ Implemented Phases 1-7 from the verified skills system audit remediation plan, w
 - New skill sets: `observer`, `notifier`, `generator`
 
 ### Additional Non-Path Residual
-- `validate-skills.sh` still reports 6 errors for unrecognized `allowed-tools` tokens in existing skills (`Edit`, scoped `Bash(...)`, and broad `Write(...)` forms). These are outside the grouped-path and taxonomy remediation scope and were left unchanged.
+
+- None. Previous `allowed-tools` residual validator errors were resolved by improving parser tokenization and mapping in `validate-skills.sh`.
