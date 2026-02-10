@@ -1,9 +1,12 @@
 ---
-name: react-native-foundation
+name: react-native
 description: >
   Foundation skill set for React Native and Expo applications. Provides context
   about the available skills, their purpose, and when to suggest them.
 user-invocable: false
+skill_sets: [specialist]
+capabilities: []
+allowed-tools: Read Grep Glob
 ---
 
 # React Native Foundation

@@ -1,9 +1,12 @@
 ---
-name: react-foundation
+name: react
 description: >
   Foundation skill set for React and Next.js applications. Provides context about
   the available skills, their purpose, and when to suggest them.
 user-invocable: false
+skill_sets: [specialist]
+capabilities: []
+allowed-tools: Read Grep Glob
 ---
 
 # React Foundation

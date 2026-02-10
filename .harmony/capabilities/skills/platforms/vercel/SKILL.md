@@ -1,9 +1,12 @@
 ---
-name: vercel-foundation
+name: vercel
 description: >
   Platform skill set for Vercel deployments. Provides context about
   the available skills, platform requirements, and deployment workflow.
 user-invocable: false
+skill_sets: [specialist]
+capabilities: []
+allowed-tools: Read Grep Glob
 ---
 
 # Vercel Platform

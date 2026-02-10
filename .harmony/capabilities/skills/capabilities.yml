@@ -80,12 +80,12 @@ skill_group_definitions:
   foundations:
     description: Stack-specific project scaffolding skill families
     path: foundations/
-    members: [python-api-foundation, swift-macos-app-foundation, react-foundation, react-native-foundation, postgres-foundation]
+    members: [python-api, swift-macos-app, react, react-native, postgres, react-composition-patterns, react-best-practices, react-native-best-practices, postgres-best-practices]
 
   platforms:
     description: Deployment platform integrations and operations
     path: platforms/
-    members: [vercel-foundation]
+    members: [vercel, vercel-deploy]
 
 # ============================================================================
 # VALID CAPABILITIES

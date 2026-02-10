@@ -348,6 +348,61 @@ skills:
           determinism: variable
           description: "Top-level log index (cross-skill)"
 
+  python-api:
+    version: "1.0.0"
+    commands: []
+    parameters: []
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs: []
+
+  swift-macos-app:
+    version: "1.0.0"
+    commands: []
+    parameters: []
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs: []
+
+  react:
+    version: "1.0.0"
+    commands: []
+    parameters: []
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs: []
+
+  react-native:
+    version: "1.0.0"
+    commands: []
+    parameters: []
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs: []
+
+  postgres:
+    version: "1.0.0"
+    commands: []
+    parameters: []
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs: []
+
   react-composition-patterns:
     version: "1.0.0"
     commands:
@@ -452,6 +507,17 @@ skills:
           format: yaml
           determinism: variable
           description: "Top-level log index (cross-skill)"
+
+  vercel:
+    version: "1.0.0"
+    commands: []
+    parameters: []
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs: []
 
   vercel-deploy:
     version: "1.0.0"

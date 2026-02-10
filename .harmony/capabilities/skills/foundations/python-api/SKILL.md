@@ -1,9 +1,12 @@
 ---
-name: python-api-foundation
+name: python-api
 description: >
   Foundation skill set for Python API services. Provides context about
   the available skills, their dependencies, and the recommended workflow.
 user-invocable: false
+skill_sets: [specialist]
+capabilities: []
+allowed-tools: Read Grep Glob
 ---
 
 # Python API Foundation

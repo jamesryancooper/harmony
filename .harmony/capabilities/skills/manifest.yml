@@ -157,6 +157,101 @@ skills:
     capabilities:
       - external-dependent
 
+  - id: python-api
+    display_name: Python Api
+    group: foundations
+    path: foundations/python-api/
+    summary: "Foundation skill set for Python API services."
+    status: active
+    tags:
+      - foundation
+      - python
+      - api
+      - fastapi
+    triggers:
+      - "python api foundation"
+      - "set up python api stack"
+      - "python api workflow"
+    skill_sets:
+      - specialist
+    capabilities: []
+
+  - id: swift-macos-app
+    display_name: Swift Macos App
+    group: foundations
+    path: foundations/swift-macos-app/
+    summary: "Foundation skill set for Swift macOS applications."
+    status: active
+    tags:
+      - foundation
+      - swift
+      - macos
+      - app
+    triggers:
+      - "swift macos foundation"
+      - "set up swift macos app"
+      - "swift app workflow"
+    skill_sets:
+      - specialist
+    capabilities: []
+
+  - id: react
+    display_name: React
+    group: foundations
+    path: foundations/react/
+    summary: "Foundation skill set for React and Next.js applications."
+    status: active
+    tags:
+      - foundation
+      - react
+      - nextjs
+      - frontend
+    triggers:
+      - "react foundation"
+      - "nextjs foundation"
+      - "react workflow guidance"
+    skill_sets:
+      - specialist
+    capabilities: []
+
+  - id: react-native
+    display_name: React Native
+    group: foundations
+    path: foundations/react-native/
+    summary: "Foundation skill set for React Native and Expo applications."
+    status: active
+    tags:
+      - foundation
+      - react-native
+      - expo
+      - mobile
+    triggers:
+      - "react native foundation"
+      - "expo foundation"
+      - "react native workflow guidance"
+    skill_sets:
+      - specialist
+    capabilities: []
+
+  - id: postgres
+    display_name: Postgres
+    group: foundations
+    path: foundations/postgres/
+    summary: "Foundation skill set for PostgreSQL application and schema guidance."
+    status: active
+    tags:
+      - foundation
+      - postgres
+      - database
+      - sql
+    triggers:
+      - "postgres foundation"
+      - "postgres workflow guidance"
+      - "database foundation skill"
+    skill_sets:
+      - specialist
+    capabilities: []
+
   - id: react-composition-patterns
     display_name: React Composition Patterns
     group: foundations
@@ -235,6 +330,25 @@ skills:
       - "ship to production"
     skill_sets:
       - executor
+    capabilities: []
+
+  - id: vercel
+    display_name: Vercel
+    group: platforms
+    path: platforms/vercel/
+    summary: "Platform skill set for Vercel deployments."
+    status: active
+    tags:
+      - platform
+      - vercel
+      - deployment
+      - hosting
+    triggers:
+      - "vercel platform guidance"
+      - "vercel foundation"
+      - "deploy workflow for vercel"
+    skill_sets:
+      - specialist
     capabilities: []
 
   - id: resolve-pr-comments
