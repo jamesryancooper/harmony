@@ -85,12 +85,12 @@ Files scanned with no violations:
 
 ### Execution Log
 
-- **Path:** `.harmony/capabilities/skills/logs/audit-ui/{run_id}.md`
+- **Path:** `.harmony/capabilities/skills/_state/logs/audit-ui/{run_id}.md`
 - **Format:** Markdown
 - **Determinism:** Unique
 
 ### Log Index
 
-- **Path:** `.harmony/capabilities/skills/logs/audit-ui/index.yml`
+- **Path:** `.harmony/capabilities/skills/_state/logs/audit-ui/index.yml`
 - **Format:** YAML
 - **Determinism:** Variable (appended each run)

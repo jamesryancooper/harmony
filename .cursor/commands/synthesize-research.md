@@ -12,8 +12,8 @@ See `.harmony/capabilities/skills/synthesize-research/SKILL.md` for full details
 
 **Examples:**
 ```text
-/synthesize-research resources/synthesize-research/projects/auth-patterns/
-/synthesize-research resources/synthesize-research/api-design/
+/synthesize-research _state/resources/synthesize-research/projects/auth-patterns/
+/synthesize-research _state/resources/synthesize-research/api-design/
 ```
 
 ## Parameters
@@ -32,7 +32,7 @@ See `.harmony/capabilities/skills/synthesize-research/SKILL.md` for full details
    - Contradictions and resolutions
    - Open questions
 4. Writes output to `.harmony/output/drafts/<topic>-synthesis.md`
-5. Creates run log in `.harmony/capabilities/skills/logs/synthesize-research/`
+5. Creates run log in `.harmony/capabilities/skills/_state/logs/synthesize-research/`
 
 ## Output
 

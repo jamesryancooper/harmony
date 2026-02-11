@@ -78,7 +78,7 @@ metadata:
   author: Harmony Framework
   created: "2025-01-14"
   updated: "2025-01-15"
-allowed-tools: Read Glob Grep Write(../prompts/*) Write(logs/*)
+allowed-tools: Read Glob Grep Write(../prompts/*) Write(_state/logs/*)
 ---
 ```
 
@@ -121,7 +121,7 @@ The Markdown body follows the frontmatter and contains skill instructions. Per t
 
 ## Output Location
 - **Deliverables:** `.harmony/{{category}}/{{timestamp}}-{{name}}.md`
-- **Run logs:** `logs/{{skill-id}}/{{run-id}}.md`
+- **Run logs:** `_state/logs/{{skill-id}}/{{run-id}}.md`
 
 ## Boundaries
 - [Constraints]

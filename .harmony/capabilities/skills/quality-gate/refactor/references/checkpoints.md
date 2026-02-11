@@ -1,7 +1,7 @@
 ---
 checkpoints:
   strategy: phase
-  storage: ".harmony/capabilities/skills/runs/refactor/{{run-id}}/"
+  storage: ".harmony/capabilities/skills/_state/runs/refactor/{{run-id}}/"
   retention: session
 
   schema:
@@ -31,6 +31,6 @@ This skill is explicitly resumable. Checkpoints preserve audit manifests and exe
 
 Resume contract:
 
-- State is stored in `.harmony/capabilities/skills/runs/refactor/{{run-id}}/`.
+- State is stored in `.harmony/capabilities/skills/_state/runs/refactor/{{run-id}}/`.
 - Resume starts at the first incomplete phase with full audit context.
 - Verification attempt count is retained for escalation logic.

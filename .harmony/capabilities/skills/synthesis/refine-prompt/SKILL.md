@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor, collaborator]
 capabilities: []
-allowed-tools: Read Glob Grep Write(../../scaffolding/prompts/*) Write(logs/*)
+allowed-tools: Read Glob Grep Write(../../scaffolding/prompts/*) Write(_state/logs/*)
 ---
 
 # Refine Prompt
@@ -60,7 +60,7 @@ This skill accepts one required parameter (`raw_prompt`) and three optional para
 
 Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single source of truth).
 
-Outputs are written to `.harmony/scaffolding/prompts/` (refined prompt) and `logs/refine-prompt/` (execution log).
+Outputs are written to `.harmony/scaffolding/prompts/` (refined prompt) and `_state/logs/refine-prompt/` (execution log).
 
 ## Boundaries
 

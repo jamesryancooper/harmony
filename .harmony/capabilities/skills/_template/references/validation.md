@@ -63,7 +63,7 @@ All outputs must:
 All outputs must be written to:
 
 - `.harmony/output/{{category}}/{{timestamp}}-{{name}}.md` (deliverable)
-- `logs/{{skill-id}}/{{run-id}}.md` (execution log)
+- `_state/logs/{{skill-id}}/{{run-id}}.md` (execution log)
 
 ### Timestamp Format
 

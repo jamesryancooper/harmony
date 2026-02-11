@@ -150,7 +150,7 @@ Without an explicit flag, the harness is determined automatically:
 | **Registry loading** | Loads the active harness's `.harmony/capabilities/skills/registry.yml`                         |
 | **Output paths**     | Validates paths against harness's hierarchical scope                                |
 | **Write permissions**| Can write down (descendants), not up (ancestors), or sideways (siblings)              |
-| **Run logs**         | Written to active harness's `.harmony/capabilities/skills/logs/{{skill-id}}/{{run-id}}.md`     |
+| **Run logs**         | Written to active harness's `.harmony/capabilities/skills/_state/logs/{{skill-id}}/{{run-id}}.md`     |
 
 See [Harness Resolution](./harness-resolution.md) for the complete resolution algorithm.
 

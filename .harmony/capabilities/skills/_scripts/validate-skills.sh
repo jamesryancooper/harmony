@@ -463,8 +463,8 @@ get_skill_tools() {
 # |----------------------------|---------------------------|--------------------------|
 # | Read                       | filesystem.read           | Read files               |
 # | Edit                       | filesystem.edit           | Edit files in-place      |
-# | Write(runs/*)              | filesystem.write.runs     | Write execution state (session recovery) |
-# | Write(logs/*)              | filesystem.write.logs     | Write to logs dir        |
+# | Write(_state/runs/*)              | filesystem.write.runs     | Write execution state (session recovery) |
+# | Write(_state/logs/*)              | filesystem.write.logs     | Write to logs dir        |
 # | Write(../{category}/*)     | filesystem.write.deliverables | Write deliverables   |
 # | Write(...)                 | filesystem.write.scoped   | Write to explicit scoped path |
 # | Glob                       | filesystem.glob           | Pattern file discovery   |
@@ -482,8 +482,8 @@ map_allowed_to_internal() {
         Read)                    echo "filesystem.read" ;;
         Edit)                    echo "filesystem.edit" ;;
         Write)                   echo "filesystem.write" ;;
-        Write\(runs/\*\))        echo "filesystem.write.runs" ;;
-        Write\(logs/\*\))        echo "filesystem.write.logs" ;;
+        Write\(_state/runs/\*\))        echo "filesystem.write.runs" ;;
+        Write\(_state/logs/\*\))        echo "filesystem.write.logs" ;;
         Write\(../*\))           echo "filesystem.write.deliverables" ;;
         Write\(*\))              echo "filesystem.write.scoped" ;;
         Glob)                    echo "filesystem.glob" ;;
@@ -552,11 +552,11 @@ map_allowed_to_registry() {
 
 # Split allowed-tools value by spaces outside parentheses.
 # Example:
-#   "Read Bash(vercel *) Write(logs/*)"
+#   "Read Bash(vercel *) Write(_state/logs/*)"
 # becomes tokens:
 #   Read
 #   Bash(vercel *)
-#   Write(logs/*)
+#   Write(_state/logs/*)
 split_allowed_tools() {
     local raw="$1"
     local token=""
@@ -1535,7 +1535,7 @@ scaffold_io_mapping() {
     local scaffold="
     io:
       inputs:
-        - path: \"resources/${skill_id}/{{category}}/\"
+        - path: \"_state/resources/${skill_id}/{{category}}/\"
           kind: directory
           required: false
           description: \"Optional input source folder\"
@@ -1547,7 +1547,7 @@ scaffold_io_mapping() {
           determinism: stable
           description: \"Skill output document\"
         - name: run_log
-          path: \"logs/${skill_id}/{{run_id}}.md\"
+          path: \"_state/logs/${skill_id}/{{run_id}}.md\"
           kind: file
           format: markdown
           determinism: unique
@@ -2592,7 +2592,7 @@ else
     echo "─────────────────────────────"
 
     # Skip known infrastructure directories and manifest-defined groups.
-    infra_dirs="_template scripts archive configs logs resources runs"
+    infra_dirs="_template _scripts archive _state"
     group_dirs=""
     group_dirs=$(awk '/group:/{gsub(/.*group:[[:space:]]*/, ""); gsub(/[[:space:]]*$/, ""); print}' "$MANIFEST" | sort -u)
 

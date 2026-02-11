@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor]
 capabilities: [domain-specialized]
-allowed-tools: Read Glob Write(../../output/drafts/*) Write(logs/*)
+allowed-tools: Read Glob Write(../../output/drafts/*) Write(_state/logs/*)
 ---
 
 # Synthesize Research
@@ -33,7 +33,7 @@ Use this skill when:
 ## Quick Start
 
 ```markdown
-/synthesize-research resources/synthesize-research/topic/
+/synthesize-research _state/resources/synthesize-research/topic/
 ```
 
 ## Core Workflow
@@ -54,7 +54,7 @@ This skill accepts one required parameter: a folder path containing research not
 
 Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single source of truth).
 
-Outputs are written to `.harmony/output/drafts/` (synthesis document) and `logs/synthesize-research/` (execution log).
+Outputs are written to `.harmony/output/drafts/` (synthesis document) and `_state/logs/synthesize-research/` (execution log).
 
 ## Output Format
 

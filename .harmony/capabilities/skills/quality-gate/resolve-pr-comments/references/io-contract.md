@@ -32,11 +32,11 @@ Written to `.harmony/output/reports/YYYY-MM-DD-pr-comments-resolved.md`.
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/logs/resolve-pr-comments/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_state/logs/resolve-pr-comments/{{run_id}}.md`.
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/logs/resolve-pr-comments/index.yml`.
+Written to `.harmony/capabilities/skills/_state/logs/resolve-pr-comments/index.yml`.
 
 ## Dependencies
 
@@ -50,7 +50,7 @@ This skill requires:
 - **Edit** — Apply fixes to source files
 - **Bash(gh)** — GitHub CLI for fetching PR data and comments
 - **Write(../../output/reports/*)** — Write resolution report
-- **Write(logs/*)** — Write execution logs
+- **Write(_state/logs/*)** — Write execution logs
 
 ## External Dependencies
 

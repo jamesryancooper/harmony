@@ -50,7 +50,7 @@ Creating a new skill requires updating **4 files** across **2 locations**. Use t
 │       - outputs: [{name, path, kind, format, determinism, description}]     │
 │                                                                             │
 │  5. VALIDATE                                                                │
-│     □ Run: ./scripts/validate-skills.sh <skill-id>                          │
+│     □ Run: ./_scripts/validate-skills.sh <skill-id>                          │
 │     □ Fix any errors or warnings                                            │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -114,10 +114,10 @@ cp -r .harmony/capabilities/skills/_template .harmony/capabilities/skills/<skill
 
 # Edit files (use your editor)
 # Then validate
-.harmony/capabilities/skills/scripts/validate-skills.sh <skill-id>
+.harmony/capabilities/skills/_scripts/validate-skills.sh <skill-id>
 
 # Use --fix to see scaffolding suggestions for missing entries
-.harmony/capabilities/skills/scripts/validate-skills.sh <skill-id> --fix
+.harmony/capabilities/skills/_scripts/validate-skills.sh <skill-id> --fix
 ```
 
 ---
@@ -127,7 +127,7 @@ cp -r .harmony/capabilities/skills/_template .harmony/capabilities/skills/<skill
 **Invoke a skill:**
 
 ```text
-/synthesize-research resources/synthesize-research/topic/
+/synthesize-research _state/resources/synthesize-research/topic/
 ```
 
 **Or explicit call pattern:**
@@ -147,11 +147,11 @@ use skill: synthesize-research
 ├── registry.yml                    # Extended metadata and I/O paths (single source of truth)
 ├── _template/                      # Scaffolding for new skills
 ├── <group>/<skill-id>/SKILL.md     # Core instructions (<500 lines)
-├── runs/                           # Execution state (checkpoints) for session recovery
-├── configs/                        # Per-skill configuration overrides
-├── resources/                      # Per-skill input materials
-├── logs/                           # Execution logs
-└── scripts/                        # Validation and maintenance scripts
+├── _state/runs/                           # Execution state (checkpoints) for session recovery
+├── _state/configs/                        # Per-skill configuration overrides
+├── _state/resources/                      # Per-skill input materials
+├── _state/logs/                           # Execution logs
+└── _scripts/                       # Validation and maintenance scripts
 
 .harmony/output/                    # Deliverables (final products)
 ├── prompts/                        # Refined prompts
@@ -193,8 +193,8 @@ use skill: synthesize-research
 │   │                                                                     │   │
 │   │  registry.yml ──────▶ I/O mappings (inputs, outputs)                │   │
 │   │       │                                                             │   │
-│   │       ├──▶ runs/       Execution state (session recovery)            │   │
-│   │       └──▶ logs/       Execution audit logs                         │   │
+│   │       ├──▶ _state/runs/       Execution state (session recovery)            │   │
+│   │       └──▶ _state/logs/       Execution audit logs                         │   │
 │   └─────────────────────────────────────────────────────────────────────┘   │
 │                                    │                                        │
 │                                    │ exposed via symlinks                   │
@@ -223,7 +223,7 @@ DATA FLOW:
   Read SKILL.md ─────────────▶ Load full instructions + tool permissions
          │
          ▼
-  Execute skill ─────────────▶ Write deliverables + runs/, log to logs/
+  Execute skill ─────────────▶ Write deliverables + _state/runs/, log to _state/logs/
 ```
 
 ## Single Source of Truth
@@ -239,7 +239,7 @@ DATA FLOW:
 
 **Tool Permissions:** `allowed-tools` in SKILL.md is the single source of truth. The internal format is derived via the mapping function in `validate-skills.sh`. See [specification.md](../../docs/architecture/harness/skills/specification.md) for details.
 
-**Validation:** Run `./scripts/validate-skills.sh` to verify skill consistency.
+**Validation:** Run `./_scripts/validate-skills.sh` to verify skill consistency.
 
 **Token Validation:** For accurate token budget validation, install tiktoken:
 
@@ -257,15 +257,15 @@ Without tiktoken, word count approximation is used (±20% variance). CI environm
 4. Add entry to `manifest.yml` (id, display_name, path, summary, triggers)
 5. Add entry to `.harmony/capabilities/skills/registry.yml` under `skills.<id>` (version, commands, parameters)
 6. Add I/O mapping to `.harmony/capabilities/skills/registry.yml` under `skills.<id>.io` (inputs, outputs)
-7. Run `./scripts/validate-skills.sh {{skill_id}}` to verify consistency
+7. Run `./_scripts/validate-skills.sh {{skill_id}}` to verify consistency
 
 **Validation Options:**
 
 ```bash
-./scripts/validate-skills.sh              # Validate all skills
-./scripts/validate-skills.sh my-skill     # Validate specific skill
-./scripts/validate-skills.sh --fix        # Scaffold missing entries
-./scripts/validate-skills.sh --strict     # Treat trigger duplicates as errors
+./_scripts/validate-skills.sh              # Validate all skills
+./_scripts/validate-skills.sh my-skill     # Validate specific skill
+./_scripts/validate-skills.sh --fix        # Scaffold missing entries
+./_scripts/validate-skills.sh --strict     # Treat trigger duplicates as errors
 ```
 
 ## Skill Classes
@@ -297,7 +297,7 @@ Symlinks allow all agents to share the same skill definition without duplication
 **Automatic setup (recommended):**
 
 ```bash
-./scripts/setup-harness-links.sh
+./_scripts/setup-harness-links.sh
 ```
 
 This creates symlinks for all skills in `.harmony/capabilities/skills/` to each agent's skills directory.
@@ -317,7 +317,7 @@ ln -s ../../.harmony/capabilities/skills/refine-prompt .codex/skills/refine-prom
 **Link a single skill:**
 
 ```bash
-./scripts/setup-harness-links.sh refine-prompt
+./_scripts/setup-harness-links.sh refine-prompt
 ```
 
 ### Troubleshooting
@@ -378,7 +378,7 @@ parameters:
 The `allowed-tools` field in SKILL.md frontmatter is the **single source of truth** for tool permissions. Harmony extends the agentskills.io format with path scoping:
 
 ```yaml
-allowed-tools: Read Glob Grep Write(../prompts/*) Write(logs/*)
+allowed-tools: Read Glob Grep Write(../prompts/*) Write(_state/logs/*)
 #              │    │    │    │                    │
 #              │    │    │    │                    └─ Scoped write (logs only)
 #              │    │    │    └─ Scoped write (deliverables destination)

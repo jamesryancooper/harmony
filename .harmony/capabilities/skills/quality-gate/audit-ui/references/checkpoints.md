@@ -1,7 +1,7 @@
 ---
 checkpoints:
   strategy: phase
-  storage: ".harmony/capabilities/skills/runs/audit-ui/{{run-id}}/"
+  storage: ".harmony/capabilities/skills/_state/runs/audit-ui/{{run-id}}/"
   retention: session
 
   schema:
@@ -31,6 +31,6 @@ State is preserved for deterministic reporting and restart safety.
 
 Resume contract:
 
-- Checkpoints are stored in `.harmony/capabilities/skills/runs/audit-ui/{{run-id}}/`.
+- Checkpoints are stored in `.harmony/capabilities/skills/_state/runs/audit-ui/{{run-id}}/`.
 - Resume validates that the same ruleset URL and target scope are still in effect.
 - If not, the run restarts from discovery to avoid mixed baselines.

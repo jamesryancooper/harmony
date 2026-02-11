@@ -111,7 +111,7 @@ The audit revealed distinct classes of staleness, each caught by different layer
 | Direct old→new name references | Grep Sweep | `.workspace/context/` instead of `.harmony/cognition/context/` |
 | Broken cross-references | Cross-Reference Audit | `catalog.md` linking to `skills.md` when it became `skills/README.md` |
 | Conceptual staleness | Semantic Read-Through | "Two-tier architecture" description when model changed to "progressive disclosure" |
-| Incomplete on-disk renames | Cross-Reference Audit | `resources/research-synthesizer/` not renamed to `resources/synthesize-research/` |
+| Incomplete on-disk renames | Cross-Reference Audit | `_state/resources/research-synthesizer/` not renamed to `_state/resources/synthesize-research/` |
 | Secondary migration debris | Grep Sweep | `docs/handbooks/` references from a separate docs reorganization |
 
 ### Fix Batches Generated

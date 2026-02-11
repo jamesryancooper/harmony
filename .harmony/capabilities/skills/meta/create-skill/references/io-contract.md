@@ -44,7 +44,7 @@ Input/output specifications for the create-skill skill.
 ### Continuity Artifacts
 
 ```
-.harmony/capabilities/skills/runs/create-skill/{{run-id}}/
+.harmony/capabilities/skills/_state/runs/create-skill/{{run-id}}/
 ├── checkpoint.yml     # Execution state (source of truth for resume)
 └── summary.md         # Creation summary
 ```
@@ -62,7 +62,7 @@ Where `{{run-id}}` = `{{timestamp}}-{{skill-name}}` (e.g., `2026-01-20-analyze-c
 ### Log Structure
 
 ```
-.harmony/capabilities/skills/logs/
+.harmony/capabilities/skills/_state/logs/
 ├── index.yml                          # Top-level index (update with new run)
 └── create-skill/
     ├── index.yml                      # Skill-level index (all skills created)
@@ -123,10 +123,10 @@ parameters:
 
 ## Log Index Schemas
 
-### Top-Level Index (`logs/index.yml`)
+### Top-Level Index (`_state/logs/index.yml`)
 
 ```yaml
-# logs/index.yml - Cross-skill chronological index (~50-100 tokens)
+# _state/logs/index.yml - Cross-skill chronological index (~50-100 tokens)
 updated: "2026-01-20T14:30:00Z"
 
 recent_runs:
@@ -143,10 +143,10 @@ summary:
     refactor: 2
 ```
 
-### Skill-Level Index (`logs/create-skill/index.yml`)
+### Skill-Level Index (`_state/logs/create-skill/index.yml`)
 
 ```yaml
-# logs/create-skill/index.yml - All create-skill runs
+# _state/logs/create-skill/index.yml - All create-skill runs
 skill: create-skill
 updated: "2026-01-20T14:30:00Z"
 
@@ -174,8 +174,8 @@ Tool requirements defined in SKILL.md `allowed-tools`:
 | `Glob` | Find existing skills for uniqueness check |
 | `Grep` | Search for existing skill entries |
 | `Write(.harmony/capabilities/skills/*)` | Create skill directory and files |
-| `Write(runs/*)` | Write execution state (session recovery) |
-| `Write(logs/*)` | Write execution log |
+| `Write(_state/runs/*)` | Write execution state (session recovery) |
+| `Write(_state/logs/*)` | Write execution log |
 | `Bash(mkdir)` | Create directories |
 | `Bash(ln)` | Create symlinks |
 | `Bash(cp)` | Copy template files |

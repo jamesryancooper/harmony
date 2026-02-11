@@ -1,7 +1,7 @@
 ---
 checkpoints:
   strategy: phase
-  storage: ".harmony/capabilities/skills/runs/triage-ci-failure/{{run-id}}/"
+  storage: ".harmony/capabilities/skills/_state/runs/triage-ci-failure/{{run-id}}/"
   retention: session
 
   schema:
@@ -31,6 +31,6 @@ Checkpointing prevents re-triaging large CI logs after interruption.
 
 Resume contract:
 
-- State is saved in `.harmony/capabilities/skills/runs/triage-ci-failure/{{run-id}}/`.
+- State is saved in `.harmony/capabilities/skills/_state/runs/triage-ci-failure/{{run-id}}/`.
 - Resume re-verifies CI job identity to avoid applying stale fixes.
 - Verification results are appended to checkpoint state before final report.

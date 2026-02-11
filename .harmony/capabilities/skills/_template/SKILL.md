@@ -38,15 +38,15 @@ skill_sets: []
 capabilities: []
 # Tool Permissions (Single Source of Truth)
 # Format: Space-delimited list. Add (path/glob) to scope writes.
-# Example: Read Glob Grep Write(../prompts/*) Write(logs/*)
+# Example: Read Glob Grep Write(../prompts/*) Write(_state/logs/*)
 #          └─ Read-only ─┘     └─ Scoped writes ────────┘
 # See: docs/architecture/harness/skills/specification.md#tool-permissions-single-source-of-truth
 # Tool reference: Read, Glob, Grep, Write(path/*), WebFetch, Shell, Task
 #
 # Output Types:
 #   - Deliverables: Write(../{{category}}/*) - e.g., Write(../prompts/*), Write(../drafts/*)
-#   - Continuity Artifacts: Write(runs/*) - for stateful/resumable skills
-allowed-tools: Read Glob Grep Write(../{{category}}/*) Write(logs/*)
+#   - Continuity Artifacts: Write(_state/runs/*) - for stateful/resumable skills
+allowed-tools: Read Glob Grep Write(../{{category}}/*) Write(_state/logs/*)
 ---
 
 # {{skill_display_name}}
@@ -87,10 +87,10 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 All operational categories in `.harmony/capabilities/skills/` follow the `{{category}}/{{skill-id}}/` pattern:
 
 - **Deliverables:** `.harmony/output/{{category}}/` (e.g., `.harmony/scaffolding/prompts/`, `.harmony/output/drafts/`)
-- **Configs:** `.harmony/capabilities/skills/configs/{{skill-id}}/` (per-skill configuration overrides)
-- **Resources:** `.harmony/capabilities/skills/resources/{{skill-id}}/` (per-skill input materials)
-- **Continuity Artifacts:** `.harmony/capabilities/skills/runs/{{skill-id}}/{{run-id}}/` (for stateful/resumable skills)
-- **Execution Logs:** `.harmony/capabilities/skills/logs/{{skill-id}}/{{run-id}}.md`
+- **Configs:** `.harmony/capabilities/skills/_state/configs/{{skill-id}}/` (per-skill configuration overrides)
+- **Resources:** `.harmony/capabilities/skills/_state/resources/{{skill-id}}/` (per-skill input materials)
+- **Continuity Artifacts:** `.harmony/capabilities/skills/_state/runs/{{skill-id}}/{{run-id}}/` (for stateful/resumable skills)
+- **Execution Logs:** `.harmony/capabilities/skills/_state/logs/{{skill-id}}/{{run-id}}.md`
 
 ## Boundaries
 

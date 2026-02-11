@@ -268,7 +268,7 @@ skills:
   your-skill-name:
     io:
       inputs:
-        - path: "resources/your-skill-name/input/"
+        - path: "_state/resources/your-skill-name/input/"
           kind: directory
           required: true
           description: "Source folder for skill input"
@@ -290,7 +290,7 @@ Run the setup script or create symlinks manually:
 
 ```bash
 # Using setup script
-.harmony/capabilities/skills/scripts/setup-harness-links.sh
+.harmony/capabilities/skills/_scripts/setup-harness-links.sh
 
 # Or manually
 ln -s ../../.harmony/capabilities/skills/quality-gate/your-skill-name .claude/skills/your-skill-name
@@ -308,7 +308,7 @@ Run the skill with a test input:
 
 Verify:
 - [ ] Output created in expected location
-- [ ] Run log created in `logs/{{skill-id}}/{{run-id}}.md`
+- [ ] Run log created in `_state/logs/{{skill-id}}/{{run-id}}.md`
 - [ ] Output format matches specification
 - [ ] All phases executed correctly
 

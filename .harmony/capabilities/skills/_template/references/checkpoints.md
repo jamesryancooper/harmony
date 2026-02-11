@@ -11,7 +11,7 @@
 #
 checkpoints:
   strategy: phase                    # phase | step | time-based
-  storage: ".harmony/capabilities/skills/runs/{{skill-id}}/{{run-id}}/"
+  storage: ".harmony/capabilities/skills/_state/runs/{{skill-id}}/{{run-id}}/"
   retention: session                 # session | permanent
 
   schema:
@@ -116,8 +116,8 @@ Files produced during execution (not just final output):
 
 | Output | Path | Purpose |
 |--------|------|---------|
-| Phase 1 checkpoint | `runs/{{run-id}}/phase1.json` | {{purpose}} |
-| Phase 2 checkpoint | `runs/{{run-id}}/phase2.json` | {{purpose}} |
+| Phase 1 checkpoint | `_state/runs/{{run-id}}/phase1.json` | {{purpose}} |
+| Phase 2 checkpoint | `_state/runs/{{run-id}}/phase2.json` | {{purpose}} |
 
 ---
 
@@ -134,7 +134,7 @@ Execution is interrupted during Phase 4 (Execute) after completing 7 of 13 file 
 ### Checkpoint State at Interruption
 
 ```yaml
-# .harmony/capabilities/skills/runs/refactor/2026-01-22-scratch-to-scratchpad/checkpoint.yml
+# .harmony/capabilities/skills/_state/runs/refactor/2026-01-22-scratch-to-scratchpad/checkpoint.yml
 skill: refactor
 version: "1.0.0"
 status: in_progress
@@ -185,7 +185,7 @@ When user invokes `/refactor .scratch/ → .scratchpad/` again:
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  1. DETECT CHECKPOINT                                           │
-│     Look for: runs/refactor/*scratch-to-scratchpad*/checkpoint  │
+│     Look for: _state/runs/refactor/*scratch-to-scratchpad*/checkpoint  │
 │     Found: 2026-01-22-scratch-to-scratchpad/checkpoint.yml      │
 │                                                                  │
 │  2. READ CHECKPOINT (~50 tokens)                                │
@@ -238,7 +238,7 @@ When user invokes `/refactor .scratch/ → .scratchpad/` again:
 # In your skill's behaviors.md, add resumption logic:
 resumption:
   detection:
-    pattern: "runs/{{skill-id}}/*{{scope-slug}}*/checkpoint.yml"
+    pattern: "_state/runs/{{skill-id}}/*{{scope-slug}}*/checkpoint.yml"
     load_tokens: 50  # Keep checkpoint small for fast detection
 
   decision_matrix:

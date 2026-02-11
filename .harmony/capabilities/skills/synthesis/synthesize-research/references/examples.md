@@ -1,11 +1,11 @@
 ---
 examples:
-  - input: "resources/synthesize-research/projects/auth-patterns/"
-    invocation: "/synthesize-research resources/synthesize-research/projects/auth-patterns/"
+  - input: "_state/resources/synthesize-research/projects/auth-patterns/"
+    invocation: "/synthesize-research _state/resources/synthesize-research/projects/auth-patterns/"
     output: ".harmony/output/drafts/auth-patterns-synthesis.md"
     description: "Synthesize authentication pattern research"
-  - input: "resources/synthesize-research/api-design/"
-    invocation: "/synthesize-research resources/synthesize-research/api-design/"
+  - input: "_state/resources/synthesize-research/api-design/"
+    invocation: "/synthesize-research _state/resources/synthesize-research/api-design/"
     output: ".harmony/output/drafts/api-design-synthesis.md"
     description: "Consolidate API design research notes"
 ---
@@ -132,13 +132,13 @@ Consolidating research notes on REST vs. GraphQL API design.
 ### Input
 
 ```bash
-/synthesize-research resources/synthesize-research/api-design/
+/synthesize-research _state/resources/synthesize-research/api-design/
 ```
 
 ### Source Files
 
 ```markdown
-resources/synthesize-research/api-design/
+_state/resources/synthesize-research/api-design/
 ├── rest-notes.md
 ├── graphql-notes.md
 ├── performance-findings.md
@@ -153,7 +153,7 @@ resources/synthesize-research/api-design/
 # Research Synthesis: api-design
 
 **Generated:** 2025-01-14T14:22:00Z
-**Source:** resources/synthesize-research/api-design/
+**Source:** _state/resources/synthesize-research/api-design/
 
 ## Executive Summary
 
@@ -230,13 +230,13 @@ Handling a folder with minimal research content.
 ### Input
 
 ```bash
-/synthesize-research resources/synthesize-research/quick-notes/
+/synthesize-research _state/resources/synthesize-research/quick-notes/
 ```
 
 ### Source Files
 
 ```markdown
-resources/synthesize-research/quick-notes/
+_state/resources/synthesize-research/quick-notes/
 └── notes.md  # Single file with brief notes
 ```
 
@@ -248,7 +248,7 @@ resources/synthesize-research/quick-notes/
 # Research Synthesis: quick-notes
 
 **Generated:** 2025-01-15T09:00:00Z
-**Source:** resources/synthesize-research/quick-notes/
+**Source:** _state/resources/synthesize-research/quick-notes/
 
 ## Executive Summary
 

@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor, guardian]
 capabilities: [resumable]
-allowed-tools: Read Glob Grep Edit Write(runs/*) Write(logs/*) Bash(mv) Bash(mkdir)
+allowed-tools: Read Glob Grep Edit Write(_state/runs/*) Write(_state/logs/*) Bash(mv) Bash(mkdir)
 ---
 
 # Refactor
@@ -56,8 +56,8 @@ This skill accepts one required parameter (`scope`) and optional parameters for 
 Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single source of truth).
 
 Outputs are written to:
-- `runs/refactor/{{refactor-id}}/` — Execution state (checkpoint, manifests, reports) for session recovery
-- `logs/refactor/` — Execution logs with index
+- `_state/runs/refactor/{{refactor-id}}/` — Execution state (checkpoint, manifests, reports) for session recovery
+- `_state/logs/refactor/` — Execution logs with index
 
 ## Verification Gate
 

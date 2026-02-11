@@ -53,4 +53,4 @@ description: Acceptance criteria for the spec-to-implementation skill.
 4. Each milestone delivers a testable increment
 5. Assumptions are listed explicitly
 6. Plan was presented for human review
-7. Log exists at `logs/spec-to-implementation/{{run_id}}.md`
+7. Log exists at `_state/logs/spec-to-implementation/{{run_id}}.md`

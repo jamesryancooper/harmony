@@ -28,7 +28,7 @@ metadata:
   version: "0.1.0"
   created: "[current date YYYY-MM-DD]"
   updated: "[current date YYYY-MM-DD]"
-allowed-tools: Read Glob Grep Write(outputs/*) Write(logs/*)
+allowed-tools: Read Glob Grep Write(outputs/*) Write(_state/logs/*)
 ---
 ```
 
@@ -38,7 +38,7 @@ Replace placeholders:
 - `# [Skill Name]` -> `# [Human-Readable Name - TODO]`
 - `/skill-name` -> `/<skill-name>`
 - `skill-name skill` -> `<skill-name> skill`
-- All `logs/runs/<timestamp>-skill-name.md` -> `logs/runs/<timestamp>-<skill-name>.md`
+- All `_state/logs/skill-name/<run-id>.md` -> `_state/logs/<skill-name>/<run-id>.md`
 
 ### Update Reference Files
 

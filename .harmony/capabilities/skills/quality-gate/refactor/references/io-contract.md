@@ -32,10 +32,10 @@ Extended input/output documentation for the refactor skill.
 
 ## Output Structure
 
-All execution state artifacts are written to `.harmony/capabilities/skills/runs/refactor/{{refactor-id}}/` for session recovery:
+All execution state artifacts are written to `.harmony/capabilities/skills/_state/runs/refactor/{{refactor-id}}/` for session recovery:
 
 ```
-runs/refactor/{{refactor-id}}/
+_state/runs/refactor/{{refactor-id}}/
 ├── checkpoint.yml        # Execution state (source of truth for resume)
 ├── scope.md              # Phase 1: Scope definition
 ├── audit-manifest.md     # Phase 2: Audit results
@@ -102,10 +102,10 @@ parameters:
 
 ## Log Structure
 
-Logs are written to `.harmony/capabilities/skills/logs/refactor/`:
+Logs are written to `.harmony/capabilities/skills/_state/logs/refactor/`:
 
 ```
-logs/refactor/
+_state/logs/refactor/
 ├── index.yml                    # Skill-level index with metadata
 └── {{refactor-id}}.md             # Individual run log
 ```
@@ -113,7 +113,7 @@ logs/refactor/
 ### Log Index Schema
 
 ```yaml
-# logs/refactor/index.yml
+# _state/logs/refactor/index.yml
 skill: refactor
 updated: "2026-01-20T10:15:00Z"
 
@@ -170,7 +170,7 @@ Dry-run output:
 - 1 directory to rename
 
 **Change Manifest:**
-See runs/refactor/{{id}}/change-manifest.md
+See _state/runs/refactor/{{id}}/change-manifest.md
 
 **Next steps:**
 - Review the change manifest
@@ -185,8 +185,8 @@ Tool requirements are defined in SKILL.md `allowed-tools` frontmatter:
 - **Glob** — Pattern matching for file discovery
 - **Grep** — Content search for pattern matching
 - **Edit** — Modify source files to replace references
-- **Write(runs/*)** — Write execution state (session recovery)
-- **Write(logs/*)** — Write execution logs
+- **Write(_state/runs/*)** — Write execution state (session recovery)
+- **Write(_state/logs/*)** — Write execution logs
 - **Bash(mv)** — Rename/move files and directories
 - **Bash(mkdir)** — Create output directories
 

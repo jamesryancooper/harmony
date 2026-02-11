@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor, coordinator]
 capabilities: [human-collaborative]
-allowed-tools: Read Glob Grep Write(../../output/plans/*) Write(logs/*)
+allowed-tools: Read Glob Grep Write(../../output/plans/*) Write(_state/logs/*)
 ---
 
 # Spec to Implementation
@@ -87,7 +87,7 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 Outputs are written to:
 
 - `.harmony/output/plans/YYYY-MM-DD-{{feature}}-implementation-plan.md` — Implementation plan
-- `logs/spec-to-implementation/` — Execution logs with index
+- `_state/logs/spec-to-implementation/` — Execution logs with index
 
 ## Boundaries
 

@@ -144,11 +144,11 @@ The report header includes additional metadata:
 
 The execution log filename similarly includes the partition:
 
-Written to `.harmony/capabilities/skills/logs/audit-migration/{{run_id}}-{partition}.md`.
+Written to `.harmony/capabilities/skills/_state/logs/audit-migration/{{run_id}}-{partition}.md`.
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/logs/audit-migration/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_state/logs/audit-migration/{{run_id}}.md`.
 
 ```markdown
 # Audit Migration Run Log
@@ -178,7 +178,7 @@ Written to `.harmony/capabilities/skills/logs/audit-migration/{{run_id}}.md`.
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/logs/audit-migration/index.yml`:
+Written to `.harmony/capabilities/skills/_state/logs/audit-migration/index.yml`:
 
 ```yaml
 skill: audit-migration
@@ -208,7 +208,7 @@ This skill requires:
 - **Glob** — Find key operational files and verify path existence
 - **Grep** — Pattern-based search for stale references
 - **Write(../../output/reports/*)** — Write audit report
-- **Write(logs/*)** — Write execution logs
+- **Write(_state/logs/*)** — Write execution logs
 
 No external dependencies required.
 

@@ -145,19 +145,19 @@ Every new skill implementation must record an alignment decision:
 ### Validate All Skills
 
 ```bash
-.harmony/capabilities/skills/scripts/validate-skills.sh
+.harmony/capabilities/skills/_scripts/validate-skills.sh
 ```
 
 ### Validate Specific Skill
 
 ```bash
-.harmony/capabilities/skills/scripts/validate-skills.sh my-skill
+.harmony/capabilities/skills/_scripts/validate-skills.sh my-skill
 ```
 
 ### Strict Mode (Treat Warnings as Errors)
 
 ```bash
-.harmony/capabilities/skills/scripts/validate-skills.sh --strict
+.harmony/capabilities/skills/_scripts/validate-skills.sh --strict
 ```
 
 ---

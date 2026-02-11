@@ -30,7 +30,7 @@ See `.harmony/capabilities/skills/registry.yml` for skill definitions and mappin
 4. Validate inputs match skill requirements
 5. Execute the skill's behavior steps
 6. Write outputs to `.harmony/output/drafts/` (always local)
-7. Write run log to `.harmony/capabilities/skills/logs/<skill-id>/<run-id>.md`
+7. Write run log to `.harmony/capabilities/skills/_state/logs/<skill-id>/<run-id>.md`
 
 ## Progressive Disclosure
 

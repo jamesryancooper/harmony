@@ -114,7 +114,7 @@ Assign severity based on the violation's impact category:
 
 ### Log Structure
 
-Write execution log to `logs/audit-ui/{run_id}.md`:
+Write execution log to `_state/logs/audit-ui/{run_id}.md`:
 
 ```markdown
 # audit-ui — {run_id}
@@ -129,4 +129,4 @@ Write execution log to `logs/audit-ui/{run_id}.md`:
 - **Status:** complete | failed | partial
 ```
 
-Update `logs/audit-ui/index.yml` and `logs/index.yml` with the new entry.
+Update `_state/logs/audit-ui/index.yml` and `_state/logs/index.yml` with the new entry.

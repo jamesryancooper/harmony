@@ -26,7 +26,7 @@ Extended input/output documentation for the synthesize-research skill.
 The skill expects a folder containing markdown files with research notes:
 
 ```markdown
-resources/synthesize-research/topic/
+_state/resources/synthesize-research/topic/
 ├── findings.md       # Research findings
 ├── notes.md          # Raw notes
 ├── log.md            # Research log (optional)
@@ -102,7 +102,7 @@ status: success  # success | partial | failed
 started_at: 2025-01-12T10:31:00Z
 ended_at: 2025-01-12T10:44:12Z
 inputs:
-  - resources/synthesize-research/api-design/
+  - _state/resources/synthesize-research/api-design/
 outputs:
   - .harmony/output/drafts/api-design-synthesis.md
 tools_used:
@@ -133,23 +133,23 @@ No external dependencies required. Works with any folder containing markdown fil
 ### Basic Invocation
 
 ```bash
-/synthesize-research resources/synthesize-research/topic/
+/synthesize-research _state/resources/synthesize-research/topic/
 ```
 
 ### With Project Folder
 
 ```bash
-/synthesize-research resources/synthesize-research/projects/auth-patterns/
+/synthesize-research _state/resources/synthesize-research/projects/auth-patterns/
 ```
 
 ### Examples
 
 ```bash
 # Synthesize API design research
-/synthesize-research resources/synthesize-research/api-design/
+/synthesize-research _state/resources/synthesize-research/api-design/
 
 # Synthesize project research
-/synthesize-research resources/synthesize-research/projects/caching-strategy/
+/synthesize-research _state/resources/synthesize-research/projects/caching-strategy/
 
 # Using explicit skill call
 use skill: synthesize-research

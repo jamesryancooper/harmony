@@ -23,8 +23,8 @@ safety:
   file_policy:
     write_scope:                   # Paths where writing is allowed
       - ".harmony/output/{{category}}/**"     # Deliverables (final destination)
-      - ".harmony/capabilities/skills/runs/**"      # Execution state (session recovery)
-      - ".harmony/capabilities/skills/logs/**"      # Logs (always allowed)
+      - ".harmony/capabilities/skills/_state/runs/**"      # Execution state (session recovery)
+      - ".harmony/capabilities/skills/_state/logs/**"      # Logs (always allowed)
       # Custom paths as defined in registry I/O mapping
       # Must be within harness's hierarchical scope
     scope_authority:               # Hierarchical scope rules
@@ -62,8 +62,8 @@ The skill may only write to designated output locations:
 | Tier        | Path                                      | Purpose              |
 |-------------|-------------------------------------------|----------------------|
 | **Tier 1**  | `.harmony/output/{{category}}/**`              | Deliverables         |
-| **Tier 1**  | `.harmony/capabilities/skills/runs/{{skill-id}}/**`  | Execution state (session recovery) |
-| **Tier 1**  | `.harmony/capabilities/skills/logs/**`               | Execution logs       |
+| **Tier 1**  | `.harmony/capabilities/skills/_state/runs/{{skill-id}}/**`  | Execution state (session recovery) |
+| **Tier 1**  | `.harmony/capabilities/skills/_state/logs/**`               | Execution logs       |
 
 ### Scope Authority
 

@@ -35,11 +35,11 @@ Written to `.harmony/output/reports/YYYY-MM-DD-ci-triage.md`.
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/logs/triage-ci-failure/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_state/logs/triage-ci-failure/{{run_id}}.md`.
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/logs/triage-ci-failure/index.yml`.
+Written to `.harmony/capabilities/skills/_state/logs/triage-ci-failure/index.yml`.
 
 ## Dependencies
 
@@ -52,7 +52,7 @@ This skill requires:
 - **Bash(gh)** — GitHub CLI for fetching CI logs
 - **Bash(npm/npx)** — Run local verification checks
 - **Write(../../output/reports/*)** — Write triage report
-- **Write(logs/*)** — Write execution logs
+- **Write(_state/logs/*)** — Write execution logs
 
 ## External Dependencies
 

@@ -20,8 +20,8 @@ Allowed tools defined in SKILL.md `allowed-tools`:
 - `Glob` — Pattern matching for file discovery
 - `Grep` — Content search for uniqueness checks
 - `Write(.harmony/capabilities/skills/*)` — Create new skill directory and files
-- `Write(runs/*)` — Write execution state (checkpoint and summary) for session recovery
-- `Write(logs/*)` — Write execution logs
+- `Write(_state/runs/*)` — Write execution state (checkpoint and summary) for session recovery
+- `Write(_state/logs/*)` — Write execution logs
 - `Bash(mkdir)` — Create directories
 - `Bash(ln)` — Create symlinks
 - `Bash(cp)` — Copy template files
@@ -38,9 +38,9 @@ The skill may write to:
 | `.harmony/capabilities/skills/manifest.yml` | Append entry | Register skill |
 | `.harmony/capabilities/skills/registry.yml` | Append entry | Add metadata |
 | `.harmony/catalog.md` | Append row | Add to catalog table |
-| `.harmony/capabilities/skills/runs/create-skill/` | Create files | Execution state (session recovery) |
-| `.harmony/capabilities/skills/logs/create-skill/` | Create/update files | Run logs and indexes |
-| `.harmony/capabilities/skills/logs/index.yml` | Update | Top-level log index |
+| `.harmony/capabilities/skills/_state/runs/create-skill/` | Create files | Execution state (session recovery) |
+| `.harmony/capabilities/skills/_state/logs/create-skill/` | Create/update files | Run logs and indexes |
+| `.harmony/capabilities/skills/_state/logs/index.yml` | Update | Top-level log index |
 
 ### Protected Paths
 
@@ -146,8 +146,8 @@ If rollback needed after completion:
 
 6. (Optional) Delete execution state and logs:
    ```bash
-   rm -rf .harmony/capabilities/skills/runs/create-skill/{{run-id}}/
-   rm .harmony/capabilities/skills/logs/create-skill/{{run-id}}.md
+   rm -rf .harmony/capabilities/skills/_state/runs/create-skill/{{run-id}}/
+   rm .harmony/capabilities/skills/_state/logs/create-skill/{{run-id}}.md
    ```
 
 ## Input Validation

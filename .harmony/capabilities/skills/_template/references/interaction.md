@@ -24,7 +24,7 @@ interaction:
       signal:
         method: checkpoint           # checkpoint | block | poll
         state_persistence:
-          location: "runs/{{run-id}}/pending_interaction.json"
+          location: "_state/runs/{{run-id}}/pending_interaction.json"
           ttl: null                  # null = persist until resolved
         resume_trigger: user_response
 
@@ -37,13 +37,13 @@ interaction:
       signal:
         method: checkpoint
         state_persistence:
-          location: "runs/{{run-id}}/pending_interaction.json"
+          location: "_state/runs/{{run-id}}/pending_interaction.json"
           ttl: 86400000              # 24 hours in ms
 
   # State persistence during pause
   state_persistence:
     strategy: checkpoint             # checkpoint | memory | hybrid
-    location: "runs/{{skill-id}}/{{run-id}}/"
+    location: "_state/runs/{{skill-id}}/{{run-id}}/"
     artifacts:
       - name: "execution_state"
         file: "state.json"
@@ -164,9 +164,9 @@ When paused, the skill preserves all context needed for seamless resume:
 
 | Artifact | Location | Purpose |
 |----------|----------|---------|
-| `execution_state.json` | `runs/{{run-id}}/state.json` | Full checkpoint: phase, intermediate results, decisions |
-| `pending_interaction.json` | `runs/{{run-id}}/pending_interaction.json` | Current question, options, context for UI |
-| `user_response.json` | `runs/{{run-id}}/user_response.json` | User's answer (written by runtime, read on resume) |
+| `execution_state.json` | `_state/runs/{{run-id}}/state.json` | Full checkpoint: phase, intermediate results, decisions |
+| `pending_interaction.json` | `_state/runs/{{run-id}}/pending_interaction.json` | Current question, options, context for UI |
+| `user_response.json` | `_state/runs/{{run-id}}/user_response.json` | User's answer (written by runtime, read on resume) |
 
 **State Schema:**
 
@@ -227,7 +227,7 @@ When paused, the skill preserves all context needed for seamless resume:
 
 When resuming after a pause:
 
-1. **Locate checkpoint:** Find `runs/{{run-id}}/state.json`
+1. **Locate checkpoint:** Find `_state/runs/{{run-id}}/state.json`
 2. **Validate state:** Confirm `status === "waiting_for_input"`
 3. **Check for response:** Look for `user_response.json`
 4. **Validate response:** Ensure `interaction_id` matches pending interaction

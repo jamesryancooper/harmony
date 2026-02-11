@@ -58,7 +58,7 @@ behavior:
       steps:
         - "Structure refined prompt with all context"
         - "Save to .harmony/scaffolding/prompts/{{timestamp}}-refined.md"
-        - "Log execution to logs/runs/"
+        - "Log execution to _state/logs/refine-prompt/"
         - "Optionally execute the refined prompt"
   goals:
     - "Ground the prompt in actual codebase context"
@@ -305,7 +305,7 @@ Produce the final refined prompt:
 
 2. **Save artifacts**
    - Write to `.harmony/scaffolding/prompts/{{timestamp}}-refined.md`
-   - Log to `logs/runs/{{timestamp}}-refine-prompt.md`
+   - Log to `_state/logs/refine-prompt/{{timestamp}}-refine-prompt.md`
 
 3. **Execute (optional)**
    - If `--execute`, run the refined prompt

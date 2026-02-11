@@ -79,7 +79,7 @@ This skill explicitly does **NOT** have:
 
 ### Write Scope
 
-- `.harmony/capabilities/skills/logs/vercel-deploy/` — Execution logs only
+- `.harmony/capabilities/skills/_state/logs/vercel-deploy/` — Execution logs only
 
 ### Source Code Modifications
 

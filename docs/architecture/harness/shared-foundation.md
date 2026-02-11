@@ -88,7 +88,7 @@ portable:
   - capabilities/skills/registry.yml
   - capabilities/skills/capabilities.yml
   - capabilities/skills/_template/
-  - capabilities/skills/scripts/
+  - capabilities/skills/_scripts/
   - capabilities/skills/*/SKILL.md
   - capabilities/skills/*/references/
   - capabilities/commands/

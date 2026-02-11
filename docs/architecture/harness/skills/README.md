@@ -65,7 +65,7 @@ repo/                          ← Root harness
 - Harnesses can write **down** into descendant harnesses
 - Harnesses cannot write **up** into ancestors or **sideways** into siblings
 - Deliverables go to `.harmony/{{category}}/` (final destination)
-- Execution state goes to `.harmony/capabilities/skills/runs/{{skill-id}}/{{run-id}}/`
+- Execution state goes to `.harmony/capabilities/skills/_state/runs/{{skill-id}}/{{run-id}}/`
 
 See [Architecture](./architecture.md) for the complete model.
 
@@ -137,9 +137,9 @@ See [Creation](./creation.md) for the full workflow.
 | `.harmony/capabilities/skills/<skill-id>/SKILL.md` | Full skill definition (Tier 3) |
 | `.harmony/capabilities/skills/<skill-id>/references/` | Phase details, safety, validation (Tier 4) |
 | `.harmony/capabilities/skills/_template/` | Scaffolding for new skills |
-| `.harmony/capabilities/skills/scripts/validate-skills.sh` | Capability validation script |
-| `.harmony/capabilities/skills/runs/{{skill-id}}/` | Execution state (checkpoints) |
-| `.harmony/capabilities/skills/logs/{{skill-id}}/` | Skill-specific logs |
+| `.harmony/capabilities/skills/_scripts/validate-skills.sh` | Capability validation script |
+| `.harmony/capabilities/skills/_state/runs/{{skill-id}}/` | Execution state (checkpoints) |
+| `.harmony/capabilities/skills/_state/logs/{{skill-id}}/` | Skill-specific logs |
 | `.harmony/{{category}}/` | Deliverables (prompts, drafts, etc.) |
 
 ---

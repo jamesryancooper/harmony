@@ -32,11 +32,11 @@ Written to `.harmony/output/plans/YYYY-MM-DD-{{feature}}-implementation-plan.md`
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/logs/spec-to-implementation/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_state/logs/spec-to-implementation/{{run_id}}.md`.
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/logs/spec-to-implementation/index.yml`.
+Written to `.harmony/capabilities/skills/_state/logs/spec-to-implementation/index.yml`.
 
 ## Dependencies
 
@@ -46,6 +46,6 @@ This skill requires:
 - **Glob** — Find relevant modules and files
 - **Grep** — Search for existing patterns and integrations
 - **Write(../../output/plans/*)** — Write implementation plan
-- **Write(logs/*)** — Write execution logs
+- **Write(_state/logs/*)** — Write execution logs
 
 No external dependencies required. This is a read-only analysis skill.

@@ -16,7 +16,7 @@ behavior:
       steps:
         - "Structure output with all context"
         - "Save to .harmony/output/{{category}}/{{timestamp}}-{{name}}.md"
-        - "Log execution to logs/{{skill-id}}/{{run-id}}.md"
+        - "Log execution to _state/logs/{{skill-id}}/{{run-id}}.md"
   goals:
     - "{{Primary goal}}"
     - "{{Secondary goal}}"
@@ -65,7 +65,7 @@ Produce the final output:
 
 2. **Save artifacts**
    - Write deliverable to `.harmony/output/{{category}}/{{timestamp}}-{{name}}.md`
-   - Log to `logs/{{skill-id}}/{{run-id}}.md`
+   - Log to `_state/logs/{{skill-id}}/{{run-id}}.md`
 
 ## Phase Transitions
 

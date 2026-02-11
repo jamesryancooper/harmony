@@ -356,7 +356,7 @@ capabilities: []
 
 ```bash
 # Validate capability-to-reference matching
-.harmony/capabilities/skills/scripts/validate-skills.sh my-skill
+.harmony/capabilities/skills/_scripts/validate-skills.sh my-skill
 ```
 
 Validation warns if:

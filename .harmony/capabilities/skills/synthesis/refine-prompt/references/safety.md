@@ -32,7 +32,7 @@ This skill requires read access to codebase files, glob for pattern matching, gr
 The skill may only write to:
 
 - `.harmony/scaffolding/prompts/**` — Refined prompts (deliverables)
-- `.harmony/capabilities/skills/logs/**` — Execution logs
+- `.harmony/capabilities/skills/_state/logs/**` — Execution logs
 
 ### Destructive Actions
 

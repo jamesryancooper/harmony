@@ -29,7 +29,7 @@ A skill creation is valid when:
 - [ ] Symlinks exist in `.claude/`, `.cursor/`, `.codex/`
 - [ ] Symlinks resolve to correct target
 - [ ] Alignment decision recorded in checkpoint (`aligned` or `extension-proposed`)
-- [ ] Run log exists at `logs/create-skill/{{run-id}}.md`
+- [ ] Run log exists at `_state/logs/create-skill/{{run-id}}.md`
 - [ ] Log indexes updated (both top-level and skill-level)
 
 ## Name Validation Rules
@@ -112,10 +112,10 @@ Expected: `../../.harmony/capabilities/skills/{{skill-name}}`
 
 ```bash
 # Check run log exists
-ls .harmony/capabilities/skills/logs/create-skill/{{run-id}}.md
+ls .harmony/capabilities/skills/_state/logs/create-skill/{{run-id}}.md
 
 # Check indexes updated
-grep "{{skill-name}}" .harmony/capabilities/skills/logs/create-skill/index.yml
+grep "{{skill-name}}" .harmony/capabilities/skills/_state/logs/create-skill/index.yml
 ```
 
 ## Validation Script

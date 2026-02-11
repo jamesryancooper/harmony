@@ -303,7 +303,7 @@ Verify that paths referenced in key operational files actually resolve on disk.
    | ------------------- | ----------------- | -------------------------------------------- |
    | Backtick paths      | `` `path/to/file` `` | `` `cognition/context/decisions.md` ``    |
    | Markdown links      | `[text](path)`    | `[decisions](cognition/decisions/)`          |
-   | YAML path values    | `path: "value"`   | `path: "resources/synthesize-research/"`     |
+   | YAML path values    | `path: "value"`   | `path: "_state/resources/synthesize-research/"`     |
    | Relative references | `./path` or `../path` | `../capabilities/commands/`              |
 
 3. **Resolve each path relative to its containing file:**
@@ -591,7 +591,7 @@ Consolidate all findings into a structured, actionable report with coverage proo
 
 7. **Write execution log:**
 
-   Log to `logs/audit-migration/{{run_id}}.md`:
+   Log to `_state/logs/audit-migration/{{run_id}}.md`:
 
    ```markdown
    # Audit Migration Run Log
@@ -624,7 +624,7 @@ Consolidate all findings into a structured, actionable report with coverage proo
    - .harmony/output/reports/YYYY-MM-DD-migration-audit.md
    ```
 
-8. **Update log index** (`logs/audit-migration/index.yml`)
+8. **Update log index** (`_state/logs/audit-migration/index.yml`)
 
 ### Partition-Mode Report Variant (when `partition` parameter is set)
 

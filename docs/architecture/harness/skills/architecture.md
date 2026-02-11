@@ -76,10 +76,10 @@ Each harness's scope includes its parent directory and **all descendants**, incl
 │  │   ├── SKILL.md              Core instructions (<500 lines)   │
 │  │   └── references/           Progressive disclosure content   │
 │  ├── synthesize-research/                                      │
-│  ├── configs/                  Per-skill configuration          │
-│  ├── resources/                Per-skill input resources        │
-│  ├── runs/                     Execution state (checkpoints)    │
-│  └── logs/                     Execution logs with indexes      │
+│  ├── _state/configs/                  Per-skill configuration          │
+│  ├── _state/resources/                Per-skill input resources        │
+│  ├── _state/runs/                     Execution state (checkpoints)    │
+│  └── _state/logs/                     Execution logs with indexes      │
 └─────────────────────────────────────────────────────────────────┘
                                  │
                                  │ exposed via symlinks
@@ -178,16 +178,16 @@ All operational categories follow the `{{category}}/{{skill-id}}/` pattern withi
 
 | Content | Purpose |
 |---------|---------|
-| `configs/{{skill-id}}/` | Per-skill configuration overrides |
-| `resources/{{skill-id}}/` | Per-skill input resources (notes, docs, data) |
-| `runs/{{skill-id}}/{{run-id}}/` | Execution state (checkpoints, manifests) |
-| `logs/index.yml` | Cross-skill chronological index |
-| `logs/{{skill-id}}/index.yml` | Skill-level run metadata |
-| `logs/{{skill-id}}/{{run-id}}.md` | Execution audit logs |
+| `_state/configs/{{skill-id}}/` | Per-skill configuration overrides |
+| `_state/resources/{{skill-id}}/` | Per-skill input resources (notes, docs, data) |
+| `_state/runs/{{skill-id}}/{{run-id}}/` | Execution state (checkpoints, manifests) |
+| `_state/logs/index.yml` | Cross-skill chronological index |
+| `_state/logs/{{skill-id}}/index.yml` | Skill-level run metadata |
+| `_state/logs/{{skill-id}}/{{run-id}}.md` | Execution audit logs |
 
-> **Bounded top-level:** The top level has fixed entries regardless of skill count: `manifest.yml`, `registry.yml`, `capabilities.yml`, `configs/`, `resources/`, `runs/`, `logs/`.
+> **Bounded top-level:** The top level has fixed entries regardless of skill count: `manifest.yml`, `registry.yml`, `capabilities.yml`, `_state/configs/`, `_state/resources/`, `_state/runs/`, `_state/logs/`.
 
-> **Terminology Note:** The `runs/` directory stores **execution state** for session recovery (checkpoints, manifests). This is distinct from **harness continuity files** (`continuity/log.md`, ADRs, decisions) which preserve project history. See [Design Conventions](./design-conventions.md#continuity-artifact-detection) for continuity file handling.
+> **Terminology Note:** The `_state/runs/` directory stores **execution state** for session recovery (checkpoints, manifests). This is distinct from **harness continuity files** (`continuity/log.md`, ADRs, decisions) which preserve project history. See [Design Conventions](./design-conventions.md#continuity-artifact-detection) for continuity file handling.
 
 ### Output Paths
 
@@ -196,10 +196,10 @@ Output paths are declared in `registry.yml` under each skill's `io:` section and
 | Path Type | Example | Purpose |
 |-----------|---------|---------|
 | **Deliverables** | `.harmony/{{category}}/{{file}}` | Final products (prompts, drafts) |
-| **Configs** | `configs/{{skill-id}}/` | Per-skill configuration |
-| **Resources** | `resources/{{skill-id}}/` | Per-skill input materials |
-| **Execution state** | `runs/{{skill-id}}/{{run-id}}/` | Checkpoints, manifests |
-| **Logs** | `logs/{{skill-id}}/{{run-id}}.md` | Execution audit |
+| **Configs** | `_state/configs/{{skill-id}}/` | Per-skill configuration |
+| **Resources** | `_state/resources/{{skill-id}}/` | Per-skill input materials |
+| **Execution state** | `_state/runs/{{skill-id}}/{{run-id}}/` | Checkpoints, manifests |
+| **Logs** | `_state/logs/{{skill-id}}/{{run-id}}.md` | Execution audit |
 | **Descendant harness** | `flowkit/docs/api.md` | Must be declared, scope-validated |
 
 **Scope validation:** Paths are checked to ensure they fall within the harness's hierarchical scope (can write down, not up or sideways).
@@ -230,12 +230,12 @@ Operational artifacts use the categorical `{{category}}/{{skill-id}}/` pattern w
 
 | Category | Path Pattern | Purpose |
 |----------|--------------|---------|
-| `configs/` | `configs/{{skill-id}}/` | Per-skill configuration overrides |
-| `resources/` | `resources/{{skill-id}}/` | Per-skill input materials |
-| `runs/` | `runs/{{skill-id}}/{{run-id}}/` | Execution state (checkpoints, manifests) |
-| `logs/` | `logs/{{skill-id}}/{{run-id}}.md` | Execution history |
+| `_state/configs/` | `_state/configs/{{skill-id}}/` | Per-skill configuration overrides |
+| `_state/resources/` | `_state/resources/{{skill-id}}/` | Per-skill input materials |
+| `_state/runs/` | `_state/runs/{{skill-id}}/{{run-id}}/` | Execution state (checkpoints, manifests) |
+| `_state/logs/` | `_state/logs/{{skill-id}}/{{run-id}}.md` | Execution history |
 
-**Correlation pattern:** `logs/{{skill-id}}/{{run-id}}.md` pairs with `runs/{{skill-id}}/{{run-id}}/` for easy correlation.
+**Correlation pattern:** `_state/logs/{{skill-id}}/{{run-id}}.md` pairs with `_state/runs/{{skill-id}}/{{run-id}}/` for easy correlation.
 
 ---
 
@@ -292,10 +292,10 @@ Symlinks expose shared skills to different agent hosts:
 
 ```bash
 # Create symlinks for all skills
-.harmony/capabilities/skills/scripts/setup-harness-links.sh
+.harmony/capabilities/skills/_scripts/setup-harness-links.sh
 
 # Create symlinks for a specific skill
-.harmony/capabilities/skills/scripts/setup-harness-links.sh refine-prompt
+.harmony/capabilities/skills/_scripts/setup-harness-links.sh refine-prompt
 ```
 
 **Manual:**
@@ -414,7 +414,7 @@ Skills in `.harmony/capabilities/skills/` can be:
 Every skill execution produces:
 
 - Output artifacts (default or custom paths within scope)
-- Run logs in `logs/{{skill-id}}/{{run-id}}.md`
+- Run logs in `_state/logs/{{skill-id}}/{{run-id}}.md`
 - Timestamped entries for traceability
 
 ---

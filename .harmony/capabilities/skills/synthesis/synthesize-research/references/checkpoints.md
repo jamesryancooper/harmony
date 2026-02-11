@@ -1,7 +1,7 @@
 ---
 checkpoints:
   strategy: phase
-  storage: ".harmony/capabilities/skills/runs/synthesize-research/{{run-id}}/"
+  storage: ".harmony/capabilities/skills/_state/runs/synthesize-research/{{run-id}}/"
   retention: session
 
   schema:
@@ -31,6 +31,6 @@ The run preserves source inventory, extracted findings, and theme drafts so synt
 
 Resume contract:
 
-- Checkpoint files are stored under `.harmony/capabilities/skills/runs/synthesize-research/{{run-id}}/`.
+- Checkpoint files are stored under `.harmony/capabilities/skills/_state/runs/synthesize-research/{{run-id}}/`.
 - Resume always revalidates source file count before continuing.
 - If files changed materially, the run restarts to avoid stale conclusions.

@@ -15,7 +15,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [specialist]
 capabilities: []
-allowed-tools: Read Glob Grep Write(logs/*)
+allowed-tools: Read Glob Grep Write(_state/logs/*)
 ---
 
 # Postgres Best Practices

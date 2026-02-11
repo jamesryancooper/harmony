@@ -33,7 +33,7 @@ description: >
   Execute verified codebase refactor with exhaustive audit.
 skill_sets: [executor, guardian]
 capabilities: [resumable]
-allowed-tools: Read Glob Grep Write(runs/*) Write(logs/*)
+allowed-tools: Read Glob Grep Write(_state/runs/*) Write(_state/logs/*)
 ---
 ```
 

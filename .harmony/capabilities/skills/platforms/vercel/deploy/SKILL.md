@@ -12,7 +12,7 @@ metadata:
   updated: "2026-02-09"
 skill_sets: [executor]
 capabilities: [external-output]
-allowed-tools: Read Glob Bash(vercel *) Bash(npm pack*) Write(logs/*)
+allowed-tools: Read Glob Bash(vercel *) Bash(npm pack*) Write(_state/logs/*)
 ---
 
 # Vercel Deploy
@@ -59,7 +59,7 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 
 Outputs are written to:
 
-- `logs/vercel-deploy/` — Execution logs with deployment URLs and status
+- `_state/logs/vercel-deploy/` — Execution logs with deployment URLs and status
 
 The deployment URL is reported directly to the user (not written to a file).
 

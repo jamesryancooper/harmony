@@ -26,11 +26,11 @@ Created at `{output_dir}/{name}/` with full project structure.
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/logs/build-mcp-server/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_state/logs/build-mcp-server/{{run_id}}.md`.
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/logs/build-mcp-server/index.yml`.
+Written to `.harmony/capabilities/skills/_state/logs/build-mcp-server/index.yml`.
 
 ## Dependencies
 
@@ -42,4 +42,4 @@ This skill requires:
 - **Edit** — Modify generated files during implementation
 - **Write** — Create new project files
 - **Bash** — Run npm install, TypeScript compilation, validation
-- **Write(logs/*)** — Write execution logs
+- **Write(_state/logs/*)** — Write execution logs

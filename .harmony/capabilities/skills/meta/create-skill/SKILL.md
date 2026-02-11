@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor]
 capabilities: [self-validating]
-allowed-tools: Read Glob Grep Write(.harmony/capabilities/skills/*) Write(runs/*) Write(logs/*) Bash(mkdir) Bash(ln) Bash(cp)
+allowed-tools: Read Glob Grep Write(.harmony/capabilities/skills/*) Write(_state/runs/*) Write(_state/logs/*) Bash(mkdir) Bash(ln) Bash(cp)
 ---
 
 # Create Skill
@@ -71,8 +71,8 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 
 Outputs are written to:
 - `.harmony/capabilities/skills/<group>/{{skill-name}}/` — The new skill directory (deliverable)
-- `runs/create-skill/{{run-id}}/` — Execution state (checkpoint and summary) for session recovery
-- `logs/create-skill/` — Execution logs with index
+- `_state/runs/create-skill/{{run-id}}/` — Execution state (checkpoint and summary) for session recovery
+- `_state/logs/create-skill/` — Execution logs with index
 
 ## Naming Convention
 

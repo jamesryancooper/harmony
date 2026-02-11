@@ -35,7 +35,7 @@ The skill may only write to designated output locations:
 | Tier | Path | Purpose |
 |------|------|---------|
 | **Tier 1** | `.harmony/output/drafts/**` | Synthesis documents (deliverables) |
-| **Tier 1** | `.harmony/capabilities/skills/logs/**` | Execution logs |
+| **Tier 1** | `.harmony/capabilities/skills/_state/logs/**` | Execution logs |
 
 ### Scope Authority
 
@@ -64,7 +64,7 @@ The skill must never:
 - Preserve the nuance of original research
 - State assumptions explicitly
 - Mark uncertain findings with appropriate confidence level
-- Write only to .harmony/output/drafts/ and logs/ directories
+- Write only to .harmony/output/drafts/ and _state/logs/ directories
 
 ### Must Never
 

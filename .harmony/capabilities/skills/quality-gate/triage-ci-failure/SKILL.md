@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor]
 capabilities: [external-dependent]
-allowed-tools: Read Glob Grep Edit Bash(gh) Bash(npm) Bash(npx) Write(../../output/reports/*) Write(logs/*)
+allowed-tools: Read Glob Grep Edit Bash(gh) Bash(npm) Bash(npx) Write(../../output/reports/*) Write(_state/logs/*)
 ---
 
 # Triage CI Failure
@@ -83,7 +83,7 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 Outputs are written to:
 
 - `.harmony/output/reports/YYYY-MM-DD-ci-triage.md` — Triage report
-- `logs/triage-ci-failure/` — Execution logs with index
+- `_state/logs/triage-ci-failure/` — Execution logs with index
 
 ## Boundaries
 

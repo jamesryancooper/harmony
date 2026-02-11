@@ -202,7 +202,7 @@ Replace placeholders with actual values.
    - `{{skill_name}}` → `{{skill-name}}`
    - `{{skill_display_name}}` → `{{Skill Name}}` (title case)
    - `/skill-name` → `/{{skill-name}}`
-   - `logs/runs/<timestamp>-skill-name.md` → `logs/create-skill/<run-id>.md`
+   - `_state/logs/skill-name/<run-id>.md` → `_state/logs/<skill-name>/<run-id>.md`
 
 3. **Update Reference Files**
 
@@ -365,7 +365,7 @@ Communicate completion and next steps.
 
 3. **Write Run Log**
 
-   Write execution log to `logs/create-skill/{{run-id}}.md`:
+   Write execution log to `_state/logs/create-skill/{{run-id}}.md`:
 
    ```markdown
    # Run Log: create-skill
@@ -399,8 +399,8 @@ Communicate completion and next steps.
 
 4. **Update Log Indexes**
 
-   - Add entry to `logs/index.yml` (top-level)
-   - Add entry to `logs/create-skill/index.yml` (skill-level)
+   - Add entry to `_state/logs/index.yml` (top-level)
+   - Add entry to `_state/logs/create-skill/index.yml` (skill-level)
 
 ### Checkpoint Update
 
@@ -419,7 +419,7 @@ phases:
 
 On invocation, check for existing checkpoint:
 
-1. Look for `runs/create-skill/*{{skill-name}}*/checkpoint.yml`
+1. Look for `_state/runs/create-skill/*{{skill-name}}*/checkpoint.yml`
 2. If found with `status: completed`:
    - "Skill '{{skill-name}}' already exists. Create a different skill?"
 3. If found with `status: in_progress`:

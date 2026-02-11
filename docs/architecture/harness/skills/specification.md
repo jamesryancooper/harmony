@@ -63,7 +63,7 @@ allowed-tools in SKILL.md → SINGLE SOURCE OF TRUTH
 The `allowed-tools` field in SKILL.md frontmatter uses space-delimited tool names:
 
 ```yaml
-allowed-tools: Read Glob Grep Write(../prompts/*) Write(logs/*)
+allowed-tools: Read Glob Grep Write(../prompts/*) Write(_state/logs/*)
 ```
 
 ### Tool Reference
@@ -71,9 +71,9 @@ allowed-tools: Read Glob Grep Write(../prompts/*) Write(logs/*)
 | `allowed-tools` | Internal Format | Description |
 |-----------------|-----------------|-------------|
 | `Read` | `filesystem.read` | Read files |
-| `Write(runs/*)` | `filesystem.write.runs` | Write execution state |
+| `Write(_state/runs/*)` | `filesystem.write.runs` | Write execution state |
 | `Write(../{{category}}/*)` | `filesystem.write.deliverables` | Write deliverables to final destination |
-| `Write(logs/*)` | `filesystem.write.logs` | Write to logs directory |
+| `Write(_state/logs/*)` | `filesystem.write.logs` | Write to logs directory |
 | `Glob` | `filesystem.glob` | Pattern matching for file discovery |
 | `Grep` | `filesystem.grep` | Content search |
 | `WebFetch` | `network.fetch` | HTTP requests (read-only) |
@@ -92,8 +92,8 @@ map_allowed_to_internal() {
     local allowed="$1"
     case "$allowed" in
         Read)                    echo "filesystem.read" ;;
-        Write\(runs/\*\))        echo "filesystem.write.runs" ;;
-        Write\(logs/\*\))        echo "filesystem.write.logs" ;;
+        Write\(_state/runs/\*\))        echo "filesystem.write.runs" ;;
+        Write\(_state/logs/\*\))        echo "filesystem.write.logs" ;;
         Write\(../*\))           echo "filesystem.write.deliverables" ;;
         Glob)                    echo "filesystem.glob" ;;
         Grep)                    echo "filesystem.grep" ;;
@@ -117,7 +117,7 @@ get_internal_tools_from_skill() {
 Run the validation script to verify `allowed-tools` is present and valid:
 
 ```bash
-.harmony/capabilities/skills/scripts/validate-skills.sh
+.harmony/capabilities/skills/_scripts/validate-skills.sh
 ```
 
 The script checks that:
@@ -189,7 +189,7 @@ See [Architecture](./architecture.md) for details.
 
 **Tool Permissions:** `allowed-tools` in SKILL.md is the single source of truth. The internal format is derived on-demand using the mapping function in `validate-skills.sh`. See [Tool Permissions](#tool-permissions-single-source-of-truth) above.
 
-**Validation:** Run `.harmony/capabilities/skills/scripts/validate-skills.sh` to detect issues.
+**Validation:** Run `.harmony/capabilities/skills/_scripts/validate-skills.sh` to detect issues.
 
 See [Discovery](./discovery.md) for details.
 
@@ -280,16 +280,16 @@ The Harmony validation script provides additional checks:
 
 ```bash
 # Validate all skills
-.harmony/capabilities/skills/scripts/validate-skills.sh
+.harmony/capabilities/skills/_scripts/validate-skills.sh
 
 # Validate specific skill
-.harmony/capabilities/skills/scripts/validate-skills.sh my-skill
+.harmony/capabilities/skills/_scripts/validate-skills.sh my-skill
 
 # Auto-scaffold missing entries
-.harmony/capabilities/skills/scripts/validate-skills.sh --fix
+.harmony/capabilities/skills/_scripts/validate-skills.sh --fix
 
 # Strict mode (treat trigger duplicates as errors)
-.harmony/capabilities/skills/scripts/validate-skills.sh --strict
+.harmony/capabilities/skills/_scripts/validate-skills.sh --strict
 ```
 
 **Token Validation:** For accurate token budget validation, install tiktoken:
@@ -344,8 +344,8 @@ Validate a skill manually:
 
 #### Execution
 
-- [ ] Skill produces output in designated location (deliverables to `.harmony/{{category}}/`, execution state to `runs/{{skill-id}}/`)
-- [ ] Skill creates run log in `logs/{{skill-id}}/{{run-id}}.md`
+- [ ] Skill produces output in designated location (deliverables to `.harmony/{{category}}/`, execution state to `_state/runs/{{skill-id}}/`)
+- [ ] Skill creates run log in `_state/logs/{{skill-id}}/{{run-id}}.md`
 - [ ] Output matches format defined in `.harmony/capabilities/skills/registry.yml`
 - [ ] All acceptance criteria are met
 

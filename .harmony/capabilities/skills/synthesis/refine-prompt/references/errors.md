@@ -3,7 +3,7 @@
 # Documents error conditions, recovery procedures, and troubleshooting.
 #
 # Error codes follow the standard format defined in:
-# .harmony/capabilities/skills/logs/FORMAT.md
+# .harmony/capabilities/skills/_state/logs/FORMAT.md
 errors:
   - code: "E001"
     condition: "Empty or whitespace-only prompt input"
@@ -203,6 +203,6 @@ When the skill cannot complete execution:
 
 ## See Also
 
-- [Run Log Format](../../../.harmony/capabilities/skills/logs/FORMAT.md) — Structured logging specification
+- [Run Log Format](../../../.harmony/capabilities/skills/_state/logs/FORMAT.md) — Structured logging specification
 - [Safety Reference](./safety.md) — Behavioral boundaries
 - [Validation Reference](./validation.md) — Acceptance criteria

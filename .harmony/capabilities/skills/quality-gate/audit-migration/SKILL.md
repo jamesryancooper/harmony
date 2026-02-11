@@ -16,7 +16,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor, guardian]
 capabilities: [domain-specialized]
-allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(logs/*)
+allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_state/logs/*)
 ---
 
 # Audit Migration
@@ -101,7 +101,7 @@ Outputs are written to:
 
 - `.harmony/output/reports/YYYY-MM-DD-migration-audit.md` — Findings report (unified mode)
 - `.harmony/output/reports/YYYY-MM-DD-migration-audit-{partition}.md` — Findings report (partition mode)
-- `logs/audit-migration/` — Execution logs with index
+- `_state/logs/audit-migration/` — Execution logs with index
 
 ## Severity Classification
 

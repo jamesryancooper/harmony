@@ -10,7 +10,7 @@
 - **Capabilities Schema:** `.harmony/capabilities/skills/capabilities.yml` (skill sets, valid capabilities, refs)
 - **Registry:** `.harmony/capabilities/skills/registry.yml` (extended metadata + I/O mappings)
 - **Skill Definitions:** `.harmony/capabilities/skills/<skill-id>/SKILL.md`
-- **Logs:** `.harmony/capabilities/skills/logs/` (execution logs)
+- **Logs:** `.harmony/capabilities/skills/_state/logs/` (execution logs)
 
 ### Progressive Disclosure
 
@@ -29,7 +29,7 @@
 ### Safety
 
 - Follow `deny-by-default` tool policy
-- Log every execution to `capabilities/skills/logs/`
+- Log every execution to `capabilities/skills/_state/logs/`
 
 ## Workflows
 

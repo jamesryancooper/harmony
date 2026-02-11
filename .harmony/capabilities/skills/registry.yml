@@ -39,10 +39,10 @@
 # Directory Structure:
 # All operational categories follow the {category}/{skill-id}/ pattern:
 #
-#   configs/{skill-id}/       - Per-skill configuration overrides
-#   resources/{skill-id}/     - Per-skill input resources (notes, docs, data)
-#   runs/{skill-id}/{run-id}/ - Execution state (checkpoints, manifests) for recovery
-#   logs/{skill-id}/{run-id}.md - Execution logs
+#   _state/configs/{skill-id}/       - Per-skill configuration overrides
+#   _state/resources/{skill-id}/     - Per-skill input resources (notes, docs, data)
+#   _state/runs/{skill-id}/{run-id}/ - Execution state (checkpoints, manifests) for recovery
+#   _state/logs/{skill-id}/{run-id}.md - Execution logs
 #
 # Note: The pattern "use skill: {{id}}" is universal and does not need
 # per-skill configuration. Agents recognize this pattern automatically.
@@ -72,11 +72,11 @@ skills:
     depends_on: []
     io:
       inputs:
-        - path: "resources/synthesize-research/projects/{{project}}/"
+        - path: "_state/resources/synthesize-research/projects/{{project}}/"
           kind: directory
           required: true
           description: "Project folder containing research notes"
-        - path: "resources/synthesize-research/{{topic}}/"
+        - path: "_state/resources/synthesize-research/{{topic}}/"
           kind: directory
           required: false
           description: "Additional source materials by topic"
@@ -88,19 +88,19 @@ skills:
           determinism: stable
           description: "Consolidated findings document with themes and evidence"
         - name: run_log
-          path: "logs/synthesize-research/{{run_id}}.md"
+          path: "_state/logs/synthesize-research/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log capturing inputs, outputs, and processing notes"
         - name: log_index
-          path: "logs/synthesize-research/index.yml"
+          path: "_state/logs/synthesize-research/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all synthesize-research runs with metadata"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -135,7 +135,7 @@ skills:
     depends_on: []
     io:
       inputs:
-        - path: "resources/refine-prompt/prompts/"
+        - path: "_state/resources/refine-prompt/prompts/"
           kind: directory
           required: false
           description: "Optional folder containing prompt source files"
@@ -147,19 +147,19 @@ skills:
           determinism: stable
           description: "The refined, improved prompt ready for execution"
         - name: run_log
-          path: "logs/refine-prompt/{{run_id}}.md"
+          path: "_state/logs/refine-prompt/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log with input, context analyzed, and output summary"
         - name: log_index
-          path: "logs/refine-prompt/index.yml"
+          path: "_state/logs/refine-prompt/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all refine-prompt runs with metadata"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -196,25 +196,25 @@ skills:
       inputs: []
       outputs:
         - name: refactor_artifacts
-          path: "runs/refactor/{{refactor_id}}/"
+          path: "_state/runs/refactor/{{refactor_id}}/"
           kind: directory
           format: markdown
           determinism: unique
           description: "Refactor execution state (checkpoint, manifests, reports) for recovery"
         - name: run_log
-          path: "logs/refactor/{{refactor_id}}.md"
+          path: "_state/logs/refactor/{{refactor_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this refactor run"
         - name: log_index
-          path: "logs/refactor/index.yml"
+          path: "_state/logs/refactor/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all refactor runs with metadata"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -260,7 +260,7 @@ skills:
     depends_on: []
     io:
       inputs:
-        - path: "configs/audit-migration/{{manifest_file}}"
+        - path: "_state/configs/audit-migration/{{manifest_file}}"
           kind: file
           format: yaml
           required: false
@@ -279,19 +279,19 @@ skills:
           determinism: unique
           description: "Partition-scoped findings report (when partition parameter is set)"
         - name: run_log
-          path: "logs/audit-migration/{{run_id}}.md"
+          path: "_state/logs/audit-migration/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this audit run"
         - name: log_index
-          path: "logs/audit-migration/index.yml"
+          path: "_state/logs/audit-migration/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all audit-migration runs with metadata"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -330,19 +330,19 @@ skills:
           determinism: variable
           description: "UI audit findings with file:line violations and rule references"
         - name: run_log
-          path: "logs/audit-ui/{{run_id}}.md"
+          path: "_state/logs/audit-ui/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this UI audit run"
         - name: log_index
-          path: "logs/audit-ui/index.yml"
+          path: "_state/logs/audit-ui/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all audit-ui runs with metadata"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -387,19 +387,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/python-scaffold-package/{{run_id}}.md"
+          path: "_state/logs/python-scaffold-package/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/python-scaffold-package/index.yml"
+          path: "_state/logs/python-scaffold-package/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all python-scaffold-package runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -423,19 +423,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/python-contract-first-api/{{run_id}}.md"
+          path: "_state/logs/python-contract-first-api/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/python-contract-first-api/index.yml"
+          path: "_state/logs/python-contract-first-api/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all python-contract-first-api runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -459,19 +459,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/python-test-harness/{{run_id}}.md"
+          path: "_state/logs/python-test-harness/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/python-test-harness/index.yml"
+          path: "_state/logs/python-test-harness/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all python-test-harness runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -495,19 +495,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/python-dev-toolchain/{{run_id}}.md"
+          path: "_state/logs/python-dev-toolchain/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/python-dev-toolchain/index.yml"
+          path: "_state/logs/python-dev-toolchain/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all python-dev-toolchain runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -531,19 +531,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/python-infra-manifest/{{run_id}}.md"
+          path: "_state/logs/python-infra-manifest/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/python-infra-manifest/index.yml"
+          path: "_state/logs/python-infra-manifest/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all python-infra-manifest runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -566,19 +566,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/python-contributor-guide/{{run_id}}.md"
+          path: "_state/logs/python-contributor-guide/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/python-contributor-guide/index.yml"
+          path: "_state/logs/python-contributor-guide/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all python-contributor-guide runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -601,19 +601,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/swift-scaffold-package/{{run_id}}.md"
+          path: "_state/logs/swift-scaffold-package/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/swift-scaffold-package/index.yml"
+          path: "_state/logs/swift-scaffold-package/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all swift-scaffold-package runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -637,19 +637,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/swift-data-layer/{{run_id}}.md"
+          path: "_state/logs/swift-data-layer/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/swift-data-layer/index.yml"
+          path: "_state/logs/swift-data-layer/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all swift-data-layer runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -673,19 +673,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/swift-cli-interface/{{run_id}}.md"
+          path: "_state/logs/swift-cli-interface/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/swift-cli-interface/index.yml"
+          path: "_state/logs/swift-cli-interface/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all swift-cli-interface runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -709,19 +709,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/swift-daemon-service/{{run_id}}.md"
+          path: "_state/logs/swift-daemon-service/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/swift-daemon-service/index.yml"
+          path: "_state/logs/swift-daemon-service/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all swift-daemon-service runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -745,19 +745,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/swift-test-harness/{{run_id}}.md"
+          path: "_state/logs/swift-test-harness/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/swift-test-harness/index.yml"
+          path: "_state/logs/swift-test-harness/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all swift-test-harness runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -780,19 +780,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/swift-contributor-guide/{{run_id}}.md"
+          path: "_state/logs/swift-contributor-guide/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log"
         - name: log_index
-          path: "logs/swift-contributor-guide/index.yml"
+          path: "_state/logs/swift-contributor-guide/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all swift-contributor-guide runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -848,19 +848,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/react-composition-patterns/{{run_id}}.md"
+          path: "_state/logs/react-composition-patterns/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this pattern review"
         - name: log_index
-          path: "logs/react-composition-patterns/index.yml"
+          path: "_state/logs/react-composition-patterns/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -883,19 +883,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/react-best-practices/{{run_id}}.md"
+          path: "_state/logs/react-best-practices/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this review"
         - name: log_index
-          path: "logs/react-best-practices/index.yml"
+          path: "_state/logs/react-best-practices/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -918,19 +918,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/react-native-best-practices/{{run_id}}.md"
+          path: "_state/logs/react-native-best-practices/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this review"
         - name: log_index
-          path: "logs/react-native-best-practices/index.yml"
+          path: "_state/logs/react-native-best-practices/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -972,19 +972,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/vercel-deploy/{{run_id}}.md"
+          path: "_state/logs/vercel-deploy/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log capturing deployment URL and status"
         - name: log_index
-          path: "logs/vercel-deploy/index.yml"
+          path: "_state/logs/vercel-deploy/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all deploy runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -1029,19 +1029,19 @@ skills:
           determinism: unique
           description: "Deployment status report with readiness assessment and follow-ups"
         - name: run_log
-          path: "logs/deploy-status/{{run_id}}.md"
+          path: "_state/logs/deploy-status/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for deployment status checks"
         - name: log_index
-          path: "logs/deploy-status/index.yml"
+          path: "_state/logs/deploy-status/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of deploy-status runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -1086,25 +1086,25 @@ skills:
           determinism: stable
           description: "The created skill directory (deliverable)"
         - name: scaffold_artifacts
-          path: "runs/create-skill/{{run_id}}/"
+          path: "_state/runs/create-skill/{{run_id}}/"
           kind: directory
           format: yaml
           determinism: unique
           description: "Execution state (checkpoint and summary) for session recovery"
         - name: run_log
-          path: "logs/create-skill/{{run_id}}.md"
+          path: "_state/logs/create-skill/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this skill creation"
         - name: skill_log_index
-          path: "logs/create-skill/index.yml"
+          path: "_state/logs/create-skill/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all create-skill runs with metadata"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -1144,19 +1144,19 @@ skills:
           determinism: unique
           description: "Structured resolution report with per-comment status"
         - name: run_log
-          path: "logs/resolve-pr-comments/{{run_id}}.md"
+          path: "_state/logs/resolve-pr-comments/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this resolution run"
         - name: log_index
-          path: "logs/resolve-pr-comments/index.yml"
+          path: "_state/logs/resolve-pr-comments/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all resolve-pr-comments runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -1199,19 +1199,19 @@ skills:
           determinism: unique
           description: "CI triage report with diagnosis and fix details"
         - name: run_log
-          path: "logs/triage-ci-failure/{{run_id}}.md"
+          path: "_state/logs/triage-ci-failure/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this triage run"
         - name: log_index
-          path: "logs/triage-ci-failure/index.yml"
+          path: "_state/logs/triage-ci-failure/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all triage-ci-failure runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -1234,19 +1234,19 @@ skills:
       inputs: []
       outputs:
         - name: run_log
-          path: "logs/postgres-best-practices/{{run_id}}.md"
+          path: "_state/logs/postgres-best-practices/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this review"
         - name: log_index
-          path: "logs/postgres-best-practices/index.yml"
+          path: "_state/logs/postgres-best-practices/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -1284,19 +1284,19 @@ skills:
           determinism: stable
           description: "Staged implementation plan with task decomposition"
         - name: run_log
-          path: "logs/spec-to-implementation/{{run_id}}.md"
+          path: "_state/logs/spec-to-implementation/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this planning run"
         - name: log_index
-          path: "logs/spec-to-implementation/index.yml"
+          path: "_state/logs/spec-to-implementation/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all spec-to-implementation runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -1342,19 +1342,19 @@ skills:
           determinism: stable
           description: "The created MCP server project directory"
         - name: run_log
-          path: "logs/build-mcp-server/{{run_id}}.md"
+          path: "_state/logs/build-mcp-server/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this build"
         - name: log_index
-          path: "logs/build-mcp-server/index.yml"
+          path: "_state/logs/build-mcp-server/index.yml"
           kind: file
           format: yaml
           determinism: variable
           description: "Index of all build-mcp-server runs"
         - name: top_log_index
-          path: "logs/index.yml"
+          path: "_state/logs/index.yml"
           kind: file
           format: yaml
           determinism: variable
@@ -1369,10 +1369,10 @@ pipelines:
     steps:
       - synthesize-research
     inputs:
-      - path: "resources/synthesize-research/projects/{{project}}/"
+      - path: "_state/resources/synthesize-research/projects/{{project}}/"
         kind: directory
     outputs:
       - path: "../../output/drafts/{{project}}-synthesis.md"
         kind: file
         format: markdown
-    invocation: "/synthesize-research resources/synthesize-research/projects/{{project}}/"
+    invocation: "/synthesize-research _state/resources/synthesize-research/projects/{{project}}/"

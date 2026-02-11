@@ -235,7 +235,7 @@ capabilities: [resumable]
 ### 7. Run Validation
 
 ```bash
-.harmony/capabilities/skills/scripts/validate-skills.sh my-skill
+.harmony/capabilities/skills/_scripts/validate-skills.sh my-skill
 ```
 
 Fix any warnings about missing or extra reference files.

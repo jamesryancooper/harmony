@@ -242,7 +242,7 @@ skills:
   synthesize-research:
     io:
       inputs:
-        - path: "resources/synthesize-research/"
+        - path: "_state/resources/synthesize-research/"
           kind: directory
           required: true
           description: "Research notes and source materials"
@@ -256,7 +256,7 @@ skills:
   refine-prompt:
     io:
       inputs:
-        - path: "resources/refine-prompt/prompts/"
+        - path: "_state/resources/refine-prompt/prompts/"
           kind: directory
           required: false
           description: "Optional prompt source folder"
@@ -319,10 +319,10 @@ Operational artifacts use the categorical `{{category}}/{{skill-id}}/` pattern w
 
 | Category | Path Pattern | Purpose |
 |----------|--------------|---------|
-| `configs/` | `configs/{{skill-id}}/` | Per-skill configuration overrides |
-| `resources/` | `resources/{{skill-id}}/` | Per-skill input materials |
-| `runs/` | `runs/{{skill-id}}/{{run-id}}/` | Execution state (checkpoints, manifests) |
-| `logs/` | `logs/{{skill-id}}/{{run-id}}.md` | Execution history |
+| `_state/configs/` | `_state/configs/{{skill-id}}/` | Per-skill configuration overrides |
+| `_state/resources/` | `_state/resources/{{skill-id}}/` | Per-skill input materials |
+| `_state/runs/` | `_state/runs/{{skill-id}}/{{run-id}}/` | Execution state (checkpoints, manifests) |
+| `_state/logs/` | `_state/logs/{{skill-id}}/{{run-id}}.md` | Execution history |
 
 #### Custom Paths (Tier 2 & 3)
 

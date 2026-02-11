@@ -19,7 +19,7 @@ SKILLS_DIR="$PROJECT_ROOT/.harmony/capabilities/skills"
 HARNESSES=(".claude/skills" ".cursor/skills" ".codex/skills")
 
 # Directories to exclude from skill discovery
-EXCLUDE_DIRS=("_template" "outputs" "logs" "sources" "scripts")
+EXCLUDE_DIRS=("_template" "outputs" "_state" "sources" "_scripts")
 
 # Function to check if directory should be excluded
 is_excluded() {

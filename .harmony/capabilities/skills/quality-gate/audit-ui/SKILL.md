@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor, guardian]
 capabilities: [external-dependent]
-allowed-tools: Read Glob Grep WebFetch Write(../../output/reports/*) Write(logs/*)
+allowed-tools: Read Glob Grep WebFetch Write(../../output/reports/*) Write(_state/logs/*)
 ---
 
 # Audit UI
@@ -72,7 +72,7 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 Outputs are written to:
 
 - `.harmony/output/reports/YYYY-MM-DD-ui-audit.md` — Findings report
-- `logs/audit-ui/` — Execution logs with index
+- `_state/logs/audit-ui/` — Execution logs with index
 
 ## Severity Classification
 

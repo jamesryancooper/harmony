@@ -176,7 +176,7 @@ states:
 - Full `SKILL.md` specification with inputs, outputs, dependencies
 - Invoked via `/command`, `use skill: <id>`, or natural language triggers
 - Stateless and portable (symlinked to harness directories)
-- Writes only to `.harmony/capabilities/skills/outputs/**` and `logs/**`
+- Writes only to `.harmony/capabilities/skills/outputs/**` and `_state/logs/**`
 - Can be chained into pipelines via registry
 
 ### When to Use

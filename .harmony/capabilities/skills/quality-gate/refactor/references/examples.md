@@ -240,7 +240,7 @@ Phase 4-6 are SKIPPED.
 - 3 directories to rename
 
 **Change Manifest:**
-See runs/refactor/2026-01-20-move-utils/change-manifest.md
+See _state/runs/refactor/2026-01-20-move-utils/change-manifest.md
 
 **Physical changes planned:**
 - Rename `src/utils/` → `lib/utils/`
@@ -248,7 +248,7 @@ See runs/refactor/2026-01-20-move-utils/change-manifest.md
 - Update 45 import statements
 
 **Next steps:**
-- Review the change manifest at runs/refactor/2026-01-20-move-utils/
+- Review the change manifest at _state/runs/refactor/2026-01-20-move-utils/
 - If satisfied, run: `/refactor "utils/ → lib/utils/"` (without --dry_run)
 ```
 

@@ -11,7 +11,7 @@ This document covers what happens when a skill runs, including run logging, safe
 
 ## Run Logging
 
-> **Note:** For skills with the `phased` capability, see [Design Conventions](./design-conventions.md) for the recommended log structure using `logs/{{skill-id}}/` with multi-level indexes.
+> **Note:** For skills with the `phased` capability, see [Design Conventions](./design-conventions.md) for the recommended log structure using `_state/logs/{{skill-id}}/` with multi-level indexes.
 
 Every skill execution produces a log. The log location follows this pattern:
 
@@ -93,12 +93,12 @@ Skills may only write to paths defined in their registry I/O mappings, validated
 
 | Category | Path Pattern | Read/Write |
 |----------|--------------|------------|
-| `configs/` | `configs/{{skill-id}}/` | Read (skills), Write (user/setup) |
-| `resources/` | `resources/{{skill-id}}/` | Read (skills), Write (user) |
-| `runs/` | `runs/{{skill-id}}/{{run-id}}/` | Read/Write (skills) |
-| `logs/` | `logs/{{skill-id}}/{{run-id}}.md` | Read/Write (skills) |
+| `_state/configs/` | `_state/configs/{{skill-id}}/` | Read (skills), Write (user/setup) |
+| `_state/resources/` | `_state/resources/{{skill-id}}/` | Read (skills), Write (user) |
+| `_state/runs/` | `_state/runs/{{skill-id}}/{{run-id}}/` | Read/Write (skills) |
+| `_state/logs/` | `_state/logs/{{skill-id}}/{{run-id}}.md` | Read/Write (skills) |
 
-> **Note:** All `.harmony/capabilities/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. Skills typically read from `configs/` and `resources/`, and write to `runs/` and `logs/`.
+> **Note:** All `.harmony/capabilities/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. Skills typically read from `_state/configs/` and `_state/resources/`, and write to `_state/runs/` and `_state/logs/`.
 
 ### Hierarchical Scope Enforcement
 
@@ -177,11 +177,11 @@ All operational categories follow the `{{category}}/{{skill-id}}/` pattern:
 
 | Category | Path Pattern | Read/Write |
 |----------|--------------|------------|
-| Configs | `configs/{{skill-id}}/` | Read (skills), Write (user/setup) |
-| Resources | `resources/{{skill-id}}/` | Read (skills), Write (user) |
-| Checkpoints | `runs/{{skill-id}}/{{run-id}}/checkpoint.yml` | Read/Write (skills) |
-| Manifests | `runs/{{skill-id}}/{{run-id}}/*.md` | Read/Write (skills) |
-| Logs | `logs/{{skill-id}}/{{run-id}}.md` | Read/Write (skills) |
+| Configs | `_state/configs/{{skill-id}}/` | Read (skills), Write (user/setup) |
+| Resources | `_state/resources/{{skill-id}}/` | Read (skills), Write (user) |
+| Checkpoints | `_state/runs/{{skill-id}}/{{run-id}}/checkpoint.yml` | Read/Write (skills) |
+| Manifests | `_state/runs/{{skill-id}}/{{run-id}}/*.md` | Read/Write (skills) |
+| Logs | `_state/logs/{{skill-id}}/{{run-id}}.md` | Read/Write (skills) |
 
 **Tier 2 & 3 — Custom Paths (must declare, scope-validated):**
 
@@ -297,7 +297,7 @@ outputs:
 **Invocation:**
 
 ```bash
-/synthesize-research resources/synthesize-research/api-design/
+/synthesize-research _state/resources/synthesize-research/api-design/
 ```
 
 **Resolution:**
@@ -369,7 +369,7 @@ When creating a new skill, replace all `{{placeholder}}` values with actual cont
 │  5. WRITE OUTPUT (scope-validated)                              │
 │     ├── Re-validate path is within hierarchical scope           │
 │     ├── Save to declared output path                            │
-│     └── Log to logs/{{skill-id}}/{{run-id}}.md                  │
+│     └── Log to _state/logs/{{skill-id}}/{{run-id}}.md                  │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```

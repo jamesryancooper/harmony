@@ -36,7 +36,7 @@ Parameter definitions are in `registry.yml` (single source of truth). Summary:
 
 Output definitions are in `.harmony/capabilities/skills/registry.yml` (single source of truth).
 
-> **Note:** All `.harmony/capabilities/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern: `configs/`, `resources/`, `runs/`, `logs/`.
+> **Note:** All `.harmony/capabilities/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern: `_state/configs/`, `_state/resources/`, `_state/runs/`, `_state/logs/`.
 
 Summary:
 
@@ -48,7 +48,7 @@ Summary:
 
 ### Run Log
 
-- **Path:** `logs/{{skill-id}}/{{run-id}}.md`
+- **Path:** `_state/logs/{{skill-id}}/{{run-id}}.md`
 - **Format:** YAML frontmatter + Markdown
 - **Content:** Execution log with input, context, and output summary
 
@@ -109,7 +109,7 @@ Tool requirements are defined in SKILL.md `allowed-tools` frontmatter (single so
 |-------------------|---------------|
 | `Read`            | {{Purpose}}   |
 | `Write(../{{category}}/*)`| Write deliverables to final destination |
-| `Write(logs/*)`   | Write execution logs |
+| `Write(_state/logs/*)`   | Write execution logs |
 | `Glob`            | {{Purpose}}   |
 | `Grep`            | {{Purpose}}   |
 
