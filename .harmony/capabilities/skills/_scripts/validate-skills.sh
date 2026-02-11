@@ -6,7 +6,7 @@
 #   If no arguments, validates all skills
 #
 # Options:
-#   --strict              Treat trigger duplicates as errors (not warnings)
+#   --strict              Enable strict contract checks and treat trigger duplicates as errors
 #   --strict-display-name Treat display_name convention violations as errors
 #   --fix                 Auto-fix issues where possible (scaffold missing entries)
 #   --help                Show this help message
@@ -90,6 +90,9 @@ VALIDATION_TOKEN_BUDGET=1500
 # Valid skill sets and capabilities
 VALID_SKILL_SETS=("executor" "coordinator" "delegator" "collaborator" "integrator" "specialist" "guardian")
 VALID_CAPABILITIES=("phased" "branching" "parallel" "task-coordinating" "agent-delegating" "human-collaborative" "stateful" "resumable" "long-running" "scheduled" "self-validating" "error-resilient" "composable" "contract-driven" "domain-specialized" "safety-bounded" "idempotent" "cancellable" "external-dependent" "external-output")
+VALID_MANIFEST_STATUSES=("active" "deprecated" "experimental" "draft")
+VALID_PARAMETER_TYPES=("text" "boolean" "file" "folder")
+VALID_OUTPUT_DETERMINISM=("stable" "variable" "unique")
 
 # Aggregate complexity budgets (soft warning thresholds)
 # These are soft limits that trigger warnings, not errors
@@ -157,6 +160,19 @@ log_info() {
     echo "  $1"
 }
 
+# Returns 0 when the first argument exists in the remaining arguments.
+contains() {
+    local value="$1"
+    shift
+    local item
+    for item in "$@"; do
+        if [[ "$item" == "$value" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 # Extract skill IDs from manifest
 get_manifest_skills() {
     grep -E "^\s*- id:" "$MANIFEST" | sed 's/.*id:\s*//' | tr -d '"' | tr -d "'" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
@@ -191,6 +207,108 @@ get_manifest_status() {
             exit
         }
     ' "$MANIFEST"
+}
+
+# Validate manifest status values in strict mode
+validate_manifest_status_value() {
+    local skill_id="$1"
+    local status
+    status=$(get_manifest_status "$skill_id")
+
+    if [[ -z "$status" ]]; then
+        log_error "Strict mode: missing status for skill '$skill_id' in manifest.yml"
+        return 1
+    fi
+
+    if ! contains "$status" "${VALID_MANIFEST_STATUSES[@]}"; then
+        log_error "Strict mode: invalid status '$status' for skill '$skill_id' (expected: active|deprecated|experimental|draft)"
+        return 1
+    fi
+
+    log_success "Strict mode: manifest status is valid ($status)"
+    return 0
+}
+
+# Extract parameter.type values from registry for a skill
+get_registry_parameter_types() {
+    local skill_id="$1"
+    awk -v skill="$skill_id" '
+        /^skills:/ {in_skills=1; next}
+        in_skills && $0 ~ "^  "skill":" {found=1; next}
+        found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
+        found && /parameters:/ {in_params=1; next}
+        found && in_params && /^    [a-z]/ && !/^      / {exit}
+        found && in_params && /^        type:/ {
+            gsub(/^        type:[[:space:]]*/, "")
+            gsub(/["'"'"']/, "")
+            print
+        }
+    ' "$REGISTRY"
+}
+
+# Validate parameter.type values in strict mode
+validate_registry_parameter_types() {
+    local skill_id="$1"
+    local issues=0
+    local invalid_types=()
+    local param_type
+
+    while IFS= read -r param_type; do
+        [[ -z "$param_type" ]] && continue
+        if ! contains "$param_type" "${VALID_PARAMETER_TYPES[@]}"; then
+            invalid_types+=("$param_type")
+            ((issues++)) || true
+        fi
+    done < <(get_registry_parameter_types "$skill_id")
+
+    if [[ $issues -gt 0 ]]; then
+        log_error "Strict mode: invalid parameter type(s) for '$skill_id': ${invalid_types[*]} (expected: text|boolean|file|folder)"
+        return 1
+    fi
+
+    log_success "Strict mode: registry parameter types are valid"
+    return 0
+}
+
+# Extract io.outputs[].determinism values from registry for a skill
+get_registry_output_determinism_values() {
+    local skill_id="$1"
+    awk -v skill="$skill_id" '
+        /^skills:/ {in_skills=1; next}
+        in_skills && $0 ~ "^  "skill":" {found=1; next}
+        found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
+        found && /outputs:/ {in_outputs=1; next}
+        found && in_outputs && /^    [a-z]/ && !/^      / {exit}
+        found && in_outputs && /determinism:/ {
+            gsub(/.*determinism:[[:space:]]*/, "")
+            gsub(/["'"'"']/, "")
+            print
+        }
+    ' "$REGISTRY"
+}
+
+# Validate io.outputs[].determinism values in strict mode
+validate_registry_output_determinism() {
+    local skill_id="$1"
+    local issues=0
+    local invalid_values=()
+    local determinism
+
+    while IFS= read -r determinism; do
+        [[ -z "$determinism" ]] && continue
+        if ! contains "$determinism" "${VALID_OUTPUT_DETERMINISM[@]}"; then
+            invalid_values+=("$determinism")
+            ((issues++)) || true
+        fi
+    done < <(get_registry_output_determinism_values "$skill_id")
+
+    if [[ $issues -gt 0 ]]; then
+        log_error "Strict mode: invalid output determinism value(s) for '$skill_id': ${invalid_values[*]} (expected: stable|variable|unique)"
+        return 1
+    fi
+
+    log_success "Strict mode: output determinism values are valid"
+    return 0
 }
 
 # Get manifest path for a skill (authoritative for grouped directories)
@@ -2306,6 +2424,9 @@ validate_skill() {
         log_error "Skill not found in manifest.yml"
     else
         log_success "Listed in manifest.yml"
+        if [[ "$STRICT_MODE" == "true" ]]; then
+            validate_manifest_status_value "$skill_id" || true
+        fi
     fi
     
     # Check 5: Skill is in registry
@@ -2313,6 +2434,10 @@ validate_skill() {
         log_error "Skill not found in registry.yml"
     else
         log_success "Listed in registry.yml"
+        if [[ "$STRICT_MODE" == "true" ]]; then
+            validate_registry_parameter_types "$skill_id" || true
+            validate_registry_output_determinism "$skill_id" || true
+        fi
     fi
     
     # Check 5b: display_name is present and follows Title Case convention
@@ -2424,8 +2549,11 @@ validate_skill() {
         # Active skills must scope Bash permissions explicitly.
         local manifest_status
         manifest_status=$(get_manifest_status "$skill_id")
-        if [[ "$manifest_status" == "active" ]] && get_skill_allowed_tools "$skill_dir" | grep -qx "Bash"; then
+        if [[ "$manifest_status" == "active" ]] && grep -qx "Bash" < <(get_skill_allowed_tools "$skill_dir"); then
             log_error "Unscoped Bash permission found in active skill. Use Bash(<command>) scopes."
+        fi
+        if [[ "$manifest_status" == "active" ]] && grep -qx "Write" < <(get_skill_allowed_tools "$skill_dir"); then
+            log_error "Unscoped Write permission found in active skill. Use Write(<path>/*) scopes."
         fi
     else
         log_error "Invalid allowed-tools: $tool_check_result"
