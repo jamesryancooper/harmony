@@ -4,8 +4,8 @@ description: >
   Generate a command-line interface using swift-argument-parser with
   subcommands, typed options, shell completions, and help text. Invoke
   with the project name and list of commands/subcommands.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir)
 ---
@@ -124,3 +124,18 @@ enum ExitCode: Int32 {
 - **Depends on**: `/scaffold-package` (for Package.swift and module structure)
 - **Optionally depends on**: `/data-layer` (for database commands), `/daemon-service` (for watch commands)
 - **Feeds into**: `/contributor-guide` (for CLI usage documentation)
+
+## When to Use
+
+- Creating a Swift ArgumentParser command surface with subcommands and typed options
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

@@ -5,7 +5,7 @@ description: Cross-cutting design decisions and patterns for skill implementatio
 
 # Skills Design Conventions
 
-This document defines cross-cutting design decisions that apply to all skills, particularly **complex archetype** skills that manage execution state and produce audit logs.
+This document defines cross-cutting design decisions that apply to all skills, particularly **phased executor** skills that manage execution state and produce audit logs.
 
 > **Why this document exists:** Design decisions were originally scattered across multiple files. This consolidates authoritative patterns for log structure, checkpoints, progressive disclosure, and correlations—ensuring consistency across all skills.
 
@@ -179,7 +179,7 @@ scopes_completed:
 | Index | Requirement | Rationale |
 |-------|-------------|-----------|
 | `_state/logs/index.yml` | **Required** | All skills update this; enables cross-skill queries |
-| `_state/logs/{{skill-id}}/index.yml` | **Recommended for complex archetypes** | Rich metadata for complex skills; optional for atomic skills |
+| `_state/logs/{{skill-id}}/index.yml` | **Recommended for phased executor skills** | Rich metadata for phased skills; optional for minimal skills |
 
 ### Key Benefits
 
@@ -337,7 +337,7 @@ Examples:
 
 ## Scope Limits
 
-**Decision:** Complex archetype skills escalate to missions when scope exceeds thresholds.
+**Decision:** Phased executor skills escalate to missions when scope exceeds thresholds.
 
 ### Thresholds
 

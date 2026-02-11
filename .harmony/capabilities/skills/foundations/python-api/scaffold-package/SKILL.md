@@ -4,8 +4,8 @@ description: >
   Create an architecture-aligned Python package structure with typed config,
   structured logging, health endpoints, and standard sub-packages. Invoke with
   a project name, description, Python version, and infrastructure dependencies.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir) Bash(uv)
 ---
@@ -156,3 +156,18 @@ Follow the conventions in [references/init-exports.md](references/init-exports.m
 
 - **Run first** in the foundation workflow.
 - Feeds into: `/contract-first-api`, `/test-harness`, `/dev-toolchain`, `/infra-manifest`, `/contributor-guide`.
+
+## When to Use
+
+- Starting a new Python API package scaffold with typed config and logging conventions
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

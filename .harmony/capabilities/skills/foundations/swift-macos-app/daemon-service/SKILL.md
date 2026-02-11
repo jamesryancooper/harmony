@@ -4,8 +4,8 @@ description: >
   Generate a single-writer background daemon with actor isolation, intent
   queue, FSEvents file watcher, LaunchAgent plist, and signal handling.
   Invoke with the project name and watched paths.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir)
 ---
@@ -146,3 +146,18 @@ Update `Sources/{PROJECT_NAME}/Config/Configuration.swift`:
 - **Depends on**: `/scaffold-package` (for Package.swift and module structure)
 - **Optionally depends on**: `/data-layer` (for database persistence)
 - **Feeds into**: `/test-harness` (for daemon integration tests), `/cli-interface` (for watch command)
+
+## When to Use
+
+- Generating LaunchAgent daemon scaffolding with intent queue and file-watcher integration
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

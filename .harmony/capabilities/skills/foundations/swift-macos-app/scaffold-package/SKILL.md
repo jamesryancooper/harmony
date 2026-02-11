@@ -4,8 +4,8 @@ description: >
   Create an architecture-aligned Swift package structure with Package.swift,
   source targets, typed configuration, structured logging, and standard modules.
   Invoke with a project name, description, Swift version, platform, and dependencies.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir) Bash(swift)
 ---
@@ -147,3 +147,18 @@ Define foundational domain types:
 
 - **Run first** in the foundation workflow.
 - Feeds into: `/data-layer`, `/daemon-service`, `/cli-interface`, `/test-harness`, `/contributor-guide`.
+
+## When to Use
+
+- Starting a new Swift macOS package scaffold with modules, config, and logging conventions
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

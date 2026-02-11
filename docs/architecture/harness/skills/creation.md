@@ -169,11 +169,11 @@ A new skill directory following the agentskills.io spec:
 
 ## Post-Creation Steps
 
-After creation completes, customize based on your chosen archetype.
+After creation completes, customize based on your declared skill_sets and capabilities.
 
 ### 1. Edit `SKILL.md`
 
-**For Atomic skills,** add:
+**For minimal skills,** add:
 
 - Description of what the skill does
 - When to use it (trigger conditions)
@@ -181,7 +181,7 @@ After creation completes, customize based on your chosen archetype.
 - Output format specification
 - Inline success criteria (e.g., "Success: output is valid JSON")
 
-**For Complex skills,** add:
+**For phased skills,** add:
 
 - Description of what the skill does
 - When to use it (trigger conditions)
@@ -193,9 +193,9 @@ After creation completes, customize based on your chosen archetype.
 
 ### 2. Edit Reference Files
 
-Reference file requirements depend on your chosen archetype:
+Reference file requirements depend on your declared skill_sets and capabilities:
 
-**Atomic archetype:** Reference files are optional. Add them only when they reduce agent confusion:
+**Minimal skills (no phased execution):** Reference files are optional. Add them only when they reduce agent confusion:
 
 | File | When to Add |
 |------|-------------|
@@ -205,7 +205,7 @@ Reference file requirements depend on your chosen archetype:
 
 If no reference files are needed, delete the empty `references/` directory if created.
 
-**Complex archetype:** Customize all five core reference files in `references/`:
+**Phased skill:** Customize all five core reference files in `references/`:
 
 | File | What to Add |
 |------|-------------|

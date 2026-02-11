@@ -5,6 +5,8 @@ description: Confirm skill creation and provide next steps.
 
 # Step 6: Report Success
 
+> **Deprecated workflow step:** Use the `create-skill` skill for authoritative success reporting.
+
 ## Input
 
 - Completed steps 1-5

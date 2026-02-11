@@ -31,7 +31,7 @@ Refactor the skills architecture to align with agentskills.io spec and implement
 |----|----------|--------|
 | D027 | Skill naming convention | Verb-noun pattern (e.g., `refine-prompt`, `synthesize-research`) |
 | D028 | Progressive disclosure | Three-tier model: SKILL.md (core) + references/ (details) + assets/ (resources) |
-| D029 | Reference file structure | Standard files: behaviors.md, io-contract.md, safety.md, examples.md, validation.md |
+| D029 | Reference file structure | Standard files: phases.md, io-contract.md, safety.md, examples.md, validation.md |
 | D030 | Hierarchical workspace authority | Workspaces can write DOWN (descendants), not UP (ancestors) or SIDEWAYS (siblings) |
 | D031 | Output permission tiers | Tier 1 (default outputs/), Tier 2 (.workspace/**), Tier 3 (workspace root/**) |
 | D032 | Documentation split | Monolithic skills.md split into 10 focused documents |
@@ -52,7 +52,7 @@ The verb-noun pattern follows agentskills.io convention and reads more naturally
 .harmony/capabilities/skills/<skill-name>/
 ├── SKILL.md              # Core instructions (<500 lines, ~5000 tokens)
 ├── references/           # Detailed documentation
-│   ├── behaviors.md      # Phase-by-phase execution
+│   ├── phases.md      # Phase-by-phase execution
 │   ├── io-contract.md    # Inputs, outputs, parameters
 │   ├── safety.md         # Tool/file policies, constraints
 │   ├── examples.md       # Worked examples

@@ -4,8 +4,8 @@ description: >
   Generate testing infrastructure for a Swift macOS app: XCTest suites,
   in-memory database fixtures, mock actors, CI workflow, and schema
   validation tests. Invoke with the project name and test categories.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir) Bash(swift)
 ---
@@ -171,3 +171,18 @@ jobs:
 
 - **Depends on**: `/scaffold-package` (package structure), `/data-layer` (record types), `/daemon-service` (actors)
 - **Feeds into**: `/contributor-guide` (for test documentation and CI config)
+
+## When to Use
+
+- Building XCTest and fixture scaffolding for Swift macOS modules and persistence layers
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

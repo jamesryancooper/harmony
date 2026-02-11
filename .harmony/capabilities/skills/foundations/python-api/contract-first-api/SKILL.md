@@ -4,8 +4,8 @@ description: >
   Generate a coherent contract set from a domain description: OpenAPI 3.1.0 spec,
   JSON Schema files, Pydantic ContractModel classes, contract tests, and JSON test
   fixtures. Invoke with a domain description and list of _state/resources/endpoints.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir)
 ---
@@ -130,3 +130,18 @@ for new path segments in the OpenAPI spec.
 
 - **Depends on**: `/scaffold-package` (for `models/base.py` and package structure)
 - **Feeds into**: `/test-harness` (for test infrastructure)
+
+## When to Use
+
+- Defining or regenerating OpenAPI, JSON Schema, and contract models from domain requirements
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

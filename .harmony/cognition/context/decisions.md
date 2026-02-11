@@ -50,7 +50,7 @@ Key decisions that constrain or guide work in this harness. For full rationale, 
 | D026 | Seven primitives | Skills, Commands, Workflows, Assistants, Checklists, Prompts, Templates | These are the canonical building blocks; new primitives require ADR | 2026-01-14 |
 | D027 | Skill naming convention | Verb-noun pattern (e.g., `refine-prompt`) | Skill names must use verb-noun for action-oriented clarity | 2026-01-15 |
 | D028 | Progressive disclosure | Three-tier: SKILL.md + references/ + assets/ | Keep SKILL.md under 500 lines; details in references/ | 2026-01-15 |
-| D029 | Reference file structure | behaviors.md, io-contract.md, safety.md, examples.md, validation.md | Standard files for all skills; machine-parseable YAML frontmatter | 2026-01-15 |
+| D029 | Reference file structure | phases.md, io-contract.md, safety.md, examples.md, validation.md | Standard files for all skills; machine-parseable YAML frontmatter | 2026-01-15 |
 | D030 | Hierarchical harness authority | DOWN only, not UP or SIDEWAYS | Harnesses can write to descendants; cannot write to ancestors or siblings | 2026-01-15 |
 | D031 | Output permission tiers | Tier 1 (outputs/), Tier 2 (.harmony/**), Tier 3 (root/**) | Tier 1 always allowed; Tier 2/3 require declaration and scope validation | 2026-01-15 |
 | D032 | Documentation split | Monolithic skills.md → 10 focused documents | Each document under 300 lines; single responsibility | 2026-01-15 |

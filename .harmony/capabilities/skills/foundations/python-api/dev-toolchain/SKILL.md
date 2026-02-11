@@ -4,8 +4,8 @@ description: >
   Configure project development tooling: justfile task runner, pre-commit hooks,
   ruff/mypy settings in pyproject.toml, .gitignore, and .env.local.example.
   Invoke with the project name and infrastructure dependencies.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir) Bash(just) Bash(pre-commit)
 ---
@@ -126,3 +126,18 @@ See [references/env-local-example.md](references/env-local-example.md) for the c
 - **Depends on**: `/scaffold-package` (pyproject.toml, settings)
 - **Complements**: `/test-harness` (pytest config), `/contract-first-api`
   (validate-schemas targets)
+
+## When to Use
+
+- Bootstrapping local developer tooling (just, linting, type checks, pre-commit) for a Python API
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

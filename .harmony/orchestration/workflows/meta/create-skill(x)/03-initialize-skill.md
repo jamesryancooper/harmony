@@ -5,6 +5,8 @@ description: Update SKILL.md and reference files with skill name and initial val
 
 # Step 3: Initialize Skill
 
+> **Deprecated workflow step:** Use the `create-skill` skill for current placeholder conventions and references.
+
 ## Input
 
 - `skill-name` from Step 1

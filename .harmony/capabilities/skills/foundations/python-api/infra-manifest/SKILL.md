@@ -4,8 +4,8 @@ description: >
   Generate docker-compose.local.yml for declared infrastructure dependencies
   and alembic setup for database migrations. Invoke with the project name and
   list of services needed (postgres, nats, redis, minio, temporal).
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir) Bash(docker) Bash(alembic)
 ---
@@ -95,3 +95,18 @@ Rules:
 - **Depends on**: `/scaffold-package` (project name)
 - **Complements**: `/dev-toolchain` (justfile docker targets reference this compose file)
 - **Feeds into**: `/test-harness` (integration test fixtures use these connection strings)
+
+## When to Use
+
+- Generating local infrastructure manifests (compose + migrations) for declared backend dependencies
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

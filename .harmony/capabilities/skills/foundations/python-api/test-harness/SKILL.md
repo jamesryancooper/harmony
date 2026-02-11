@@ -4,8 +4,8 @@ description: >
   Generate testing infrastructure aligned with project contracts and package
   structure: conftest fixtures, contract tests, unit test stubs, and integration
   test scaffolding. Invoke with the project name and list of infrastructure dependencies.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir) Bash(uv)
 ---
@@ -148,3 +148,18 @@ For each JSON schema without existing fixtures, generate:
 
 - **Depends on**: `/scaffold-package` (package structure), `/contract-first-api` (contracts)
 - **Feeds into**: `/dev-toolchain` (pytest config in pyproject.toml)
+
+## When to Use
+
+- Building pytest unit, contract, and integration scaffolding aligned with existing contracts
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

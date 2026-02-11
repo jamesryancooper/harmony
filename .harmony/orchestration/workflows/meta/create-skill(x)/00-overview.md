@@ -12,8 +12,10 @@ deprecated: true
 deprecated_by: ".harmony/capabilities/skills/meta/create-skill/"
 ---
 
-> **DEPRECATED:** This workflow has been migrated to `.harmony/capabilities/skills/meta/create-skill/`.
-> Use `/create-skill` instead.
+> **DEPRECATED:** This workflow is superseded by the `create-skill` skill.
+> Use `use skill: create-skill` or `/create-skill` instead.
+> This workflow is retained as historical reference only.
+> Active paths, reference file names, and directory structures below may be stale.
 
 # Create Skill
 

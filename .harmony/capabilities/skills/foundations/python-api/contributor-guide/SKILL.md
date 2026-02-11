@@ -4,8 +4,8 @@ description: >
   Generate AGENT.md, CONTRIBUTING.md, PR template, and CI workflow from actual
   project state. Reads existing files to produce accurate contributor documentation.
   Invoke after other foundation skills have established the project structure.
-skill_sets: [executor]
-capabilities: []
+skill_sets: [specialist]
+capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
 allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir)
 ---
@@ -127,3 +127,18 @@ Use the template in [references/ci-workflow-pattern.yml](references/ci-workflow-
 
 - **Depends on**: all other skills (reads their outputs)
 - **Run last** in the foundation workflow
+
+## When to Use
+
+- Generating contributor-facing docs and CI templates from current Python project state
+- Need repeatable scaffolding that follows Harmony foundation conventions
+
+## Boundaries
+
+- Does not perform in-place migrations of existing implementations
+- Does not install runtime dependencies outside generated project files
+
+## When to Escalate
+
+- Project requires a non-standard directory topology or naming scheme
+- Existing code must be migrated or reconciled instead of scaffolded from templates

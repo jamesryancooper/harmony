@@ -205,8 +205,9 @@ skills:
       - "create python api project structure"
       - "python pyproject setup"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: python-contract-first-api
     display_name: Python Contract First Api
@@ -224,8 +225,9 @@ skills:
       - "contract first api setup"
       - "openapi pydantic models"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: python-test-harness
     display_name: Python Test Harness
@@ -243,8 +245,9 @@ skills:
       - "generate pytest fixtures"
       - "python test scaffolding"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: python-dev-toolchain
     display_name: Python Dev Toolchain
@@ -262,8 +265,9 @@ skills:
       - "configure python linting"
       - "python pre-commit setup"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: python-infra-manifest
     display_name: Python Infra Manifest
@@ -281,8 +285,9 @@ skills:
       - "docker compose for python api"
       - "alembic migration setup"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: python-contributor-guide
     display_name: Python Contributor Guide
@@ -300,8 +305,9 @@ skills:
       - "python contributing guide"
       - "python ci workflow setup"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: swift-scaffold-package
     display_name: Swift Scaffold Package
@@ -319,8 +325,9 @@ skills:
       - "create swift macos project"
       - "swift package setup"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: swift-data-layer
     display_name: Swift Data Layer
@@ -338,8 +345,9 @@ skills:
       - "grdb database actor"
       - "swift sqlite persistence"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: swift-cli-interface
     display_name: Swift Cli Interface
@@ -357,8 +365,9 @@ skills:
       - "argument parser commands"
       - "swift command line interface"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: swift-daemon-service
     display_name: Swift Daemon Service
@@ -376,8 +385,9 @@ skills:
       - "launchagent daemon setup"
       - "swift background service"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: swift-test-harness
     display_name: Swift Test Harness
@@ -395,8 +405,9 @@ skills:
       - "xctest scaffolding"
       - "swift test fixtures"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: swift-contributor-guide
     display_name: Swift Contributor Guide
@@ -414,8 +425,9 @@ skills:
       - "swift contributing guide"
       - "swift ci workflow setup"
     skill_sets:
-      - executor
-    capabilities: []
+      - specialist
+    capabilities:
+      - phased
 
   - id: react
     display_name: React

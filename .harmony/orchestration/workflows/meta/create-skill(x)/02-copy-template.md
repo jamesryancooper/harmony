@@ -5,6 +5,8 @@ description: Copy skill template to new skill directory with spec-compliant stru
 
 # Step 2: Copy Template
 
+> **Deprecated workflow step:** Use the `create-skill` skill for current paths and file naming.
+
 ## Input
 
 - Validated `skill-name` from Step 1

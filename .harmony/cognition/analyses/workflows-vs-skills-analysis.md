@@ -187,7 +187,7 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 
 ```yaml
 # In .harmony/capabilities/skills/registry.yml
-skill_mappings:
+skills:
   refactor-skill:
     outputs:
       - path: "outputs/refactors/{{timestamp}}-process-report.md"
@@ -515,10 +515,10 @@ A refactor is NOT complete until Phase 5 (Verify) passes with zero remaining ref
 
 | File | Change Type | Description |
 |------|-------------|-------------|
-| `docs/architecture/workspaces/skills/comparison.md` | Update | Remove "workflows" from comparison table; note consolidation |
+| `docs/architecture/harness/skills/comparison.md` | Update | Remove "workflows" from comparison table; note consolidation |
 | `docs/architecture/workspaces/workflows.md` | Deprecate | Add deprecation notice, point to skills |
-| `docs/architecture/workspaces/skills/README.md` | Update | Add "workflow skills" archetype section |
-| `docs/architecture/workspaces/skills/archetypes.md` | Create | Document different skill archetypes (transform, workflow, etc.) |
+| `docs/architecture/harness/skills/README.md` | Update | Add "workflow skills" archetype section |
+| `docs/architecture/harness/skills/archetypes.md` | Create | Document different skill archetypes (transform, workflow, etc.) |
 | `.harmony/capabilities/skills/manifest.yml` | Update | Add new skills as they're migrated |
 | `.harmony/capabilities/skills/registry.yml` | Update | Add new skill metadata |
 | `CLAUDE.md` | Update | Remove workflow references, simplify skill discovery |
@@ -554,10 +554,10 @@ The key insight is that skills are not just "composable I/O operations" - they a
 
 - `.harmony/capabilities/skills/manifest.yml` - Current skill definitions
 - `.harmony/capabilities/skills/registry.yml` - Extended skill metadata
-- `.harmony/capabilities/skills/refine-prompt/SKILL.md` - Example multi-phase skill
-- `.harmony/capabilities/skills/refine-prompt/references/behaviors.md` - Detailed phase documentation
+- `.harmony/capabilities/skills/synthesis/refine-prompt/SKILL.md` - Example multi-phase skill
+- `.harmony/capabilities/skills/synthesis/refine-prompt/references/phases.md` - Detailed phase documentation
 - `.harmony/orchestration/workflows/refactor/` - Example workflow (candidate for migration)
-- `docs/architecture/workspaces/skills/` - Skills documentation
+- `docs/architecture/harness/skills/` - Skills documentation
 - `docs/architecture/workspaces/workflows.md` - Workflows documentation
 
 ---
@@ -866,7 +866,7 @@ Is your task...
 
 | File | Change |
 |------|--------|
-| `docs/architecture/workspaces/skills/comparison.md` | Add missions comparison |
+| `docs/architecture/harness/skills/comparison.md` | Add missions comparison |
 | `docs/architecture/workspaces/workflows.md` | Deprecation notice → point to skills |
 | `docs/architecture/workspaces/missions.md` | **Create** - Mission primitive docs |
 | `docs/architecture/workspaces/missions/schema.md` | **Create** - mission.yml schema |
@@ -901,14 +901,14 @@ The analysis establishes a clear separation:
 
 | Layer | Format | Execution Model |
 |-------|--------|-----------------|
-| **Skills** | Prose instructions (SKILL.md + behaviors.md) | Agent-interpreted, single-session |
+| **Skills** | Prose instructions (SKILL.md + phases.md) | Agent-interpreted, single-session |
 | **Missions** | YAML state machine (mission.yml) | Runtime-orchestrated, durable, multi-session |
 
 Adding a `workflow.yml` to skills would blur this boundary and create the same cognitive load problem the analysis warned against.
 
 ### What Already Exists Works
 
-The `refine-prompt` skill demonstrates the pattern. Look at `behaviors.md`:
+The `refine-prompt` skill demonstrates the pattern. Look at `phases.md`:
 
 ```yaml
 ---
@@ -965,7 +965,7 @@ Then it's a **Mission**, not a skill. The analysis says:
 Use the existing pattern:
 
 ```yaml
-# references/behaviors.md frontmatter
+# references/phases.md frontmatter
 ---
 behavior:
   phases:
