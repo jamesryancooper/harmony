@@ -134,7 +134,7 @@ The `create-skill` skill executes these phases:
 | Phase | Purpose |
 |-------|---------|
 | **Validate Name** | Check format (kebab-case), action-oriented naming, uniqueness |
-| **Copy Template** | Copy `_template/` to `.harmony/capabilities/skills/<skill-name>/` |
+| **Copy Template** | Copy `_template/` to `.harmony/capabilities/skills/<group>/<skill-name>/` |
 | **Initialize** | Update placeholders with skill name, display name, description |
 | **Update Manifest** | Add entry to `manifest.yml` (Tier 1 discovery) |
 | **Update Registry** | Add entry to `registry.yml` (extended metadata) |
@@ -148,10 +148,10 @@ The `create-skill` skill executes these phases:
 A new skill directory following the agentskills.io spec:
 
 ```markdown
-.harmony/capabilities/skills/<skill-name>/
+.harmony/capabilities/skills/<group>/<skill-name>/
 ├── SKILL.md              # Core definition (<500 lines)
 ├── references/           # Progressive disclosure
-│   ├── behaviors.md
+│   ├── phases.md
 │   ├── io-contract.md
 │   ├── safety.md
 │   ├── examples.md
@@ -160,9 +160,9 @@ A new skill directory following the agentskills.io spec:
 └── assets/               # Static resources (optional)
 
 # Plus symlinks in harness folders:
-.claude/skills/<skill-name> -> ../../.harmony/capabilities/skills/<skill-name>
-.cursor/skills/<skill-name> -> ../../.harmony/capabilities/skills/<skill-name>
-.codex/skills/<skill-name> -> ../../.harmony/capabilities/skills/<skill-name>
+.claude/skills/<skill-name> -> ../../.harmony/capabilities/skills/<group>/<skill-name>
+.cursor/skills/<skill-name> -> ../../.harmony/capabilities/skills/<group>/<skill-name>
+.codex/skills/<skill-name> -> ../../.harmony/capabilities/skills/<group>/<skill-name>
 ```
 
 ---
@@ -212,7 +212,7 @@ If no reference files are needed, delete the empty `references/` directory if cr
 | `io-contract.md` | Input names, types, output paths, command-line usage |
 | `safety.md` | Tool permissions, behavioral boundaries |
 | `examples.md` | 2-4 worked examples with full output |
-| `behaviors.md` | Phase-by-phase execution details |
+| `phases.md` | Phase-by-phase execution details |
 | `validation.md` | Acceptance criteria specific to this skill |
 
 See [Reference Artifacts](./reference-artifacts.md) for detailed guidance on each file.

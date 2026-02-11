@@ -31,6 +31,15 @@ The `context_depth` parameter controls how deeply the skill analyzes the reposit
 | `standard` | Scan relevant directories, identify key files, patterns |
 | `deep` | Full codebase analysis, dependency graph, cross-module patterns |
 
+## Parameter Summary
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `raw_prompt` | text | Yes | - | Raw prompt text to refine (inline or file path) |
+| `execute` | boolean | No | `false` | Execute the refined prompt after generation |
+| `context_depth` | text | No | `standard` | Repository analysis depth (`minimal`, `standard`, `deep`) |
+| `skip_confirmation` | boolean | No | `false` | Skip the intent confirmation step |
+
 ## Output Format
 
 The refined prompt follows this structure:

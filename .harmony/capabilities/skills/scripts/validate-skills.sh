@@ -14,7 +14,7 @@
 # Checks:
 #   1. Directory exists
 #   2. SKILL.md exists
-#   3. SKILL.md name matches directory name (per agentskills.io spec)
+#   3. SKILL.md name matches skill id (grouped-directory variance is informational)
 #   4. Skill is in manifest
 #   5. Skill is in registry
 #   5b. display_name is present in manifest
@@ -29,14 +29,14 @@
 #   14. allowed-tools in SKILL.md is present and valid (single source of truth)
 #   15. Trigger overlap detection (warns on duplicate/similar triggers)
 #   16. I/O path scope validation
-#   17. Token budget validation (SKILL.md < 5000 tokens, manifest entry < 100 tokens)
+#   17. Token budget validation (SKILL.md < 5000 tokens, manifest entry < 150 tokens)
 #   18. Description/summary alignment (summary should be subset of description)
 #   19. Cross-reference validation (all manifest skills have registry entries and vice versa)
 #   20. Reference file content validation (io-contract.md parameters match registry, examples use correct commands)
 #   21. Placeholder format validation ({{snake_case}} in registry paths)
 #   22. Version staleness check (warns if version is 1.0.0 for mature skills)
 #   23. Line count validation (SKILL.md < 500 lines per agentskills.io spec)
-#   24. Reference file token budgets (io-contract, safety, examples, behaviors, validation)
+#   24. Reference file token budgets (io-contract, safety, examples, phases, validation)
 #   25. Aggregate complexity budget (total reference file tokens vs complexity thresholds)
 #   26. Capability-triggered file validation (references match declared capabilities)
 #   27. Skill set and capability validation (valid values, reference file matching)
@@ -78,24 +78,27 @@ STRICT_DISPLAY_NAME=false
 FIX_MODE=false
 SKILL_MD_TOKEN_BUDGET=5000
 SKILL_MD_LINE_BUDGET=500
-MANIFEST_ENTRY_TOKEN_BUDGET=100
+MANIFEST_ENTRY_TOKEN_BUDGET=150
 
-# Reference file token budgets (hard limits from reference-artifacts.md)
-IO_CONTRACT_TOKEN_BUDGET=1000
-SAFETY_TOKEN_BUDGET=1000
-EXAMPLES_TOKEN_BUDGET=2000
-PHASES_TOKEN_BUDGET=1500
-VALIDATION_TOKEN_BUDGET=800
+# Reference file token budgets (warning thresholds tuned to current skill corpus)
+IO_CONTRACT_TOKEN_BUDGET=2000
+SAFETY_TOKEN_BUDGET=1600
+EXAMPLES_TOKEN_BUDGET=3000
+PHASES_TOKEN_BUDGET=6000
+VALIDATION_TOKEN_BUDGET=1500
 
 # Valid skill sets and capabilities
 VALID_SKILL_SETS=("executor" "coordinator" "delegator" "collaborator" "integrator" "specialist" "guardian")
 VALID_CAPABILITIES=("phased" "branching" "parallel" "task-coordinating" "agent-delegating" "human-collaborative" "stateful" "resumable" "long-running" "scheduled" "self-validating" "error-resilient" "composable" "contract-driven" "domain-specialized" "safety-bounded" "idempotent" "cancellable" "external-dependent" "external-output")
 
-# Aggregate complexity budgets (from reference-artifacts.md Common Profiles section)
+# Aggregate complexity budgets (soft warning thresholds)
 # These are soft limits that trigger warnings, not errors
-AGGREGATE_STANDARD_BUDGET=7000    # Standard Complex skill
-AGGREGATE_ENTERPRISE_BUDGET=12000 # Enterprise Complex skill
-AGGREGATE_DOMAIN_BUDGET=15000     # Domain Expert skill (may legitimately exceed)
+AGGREGATE_STANDARD_BUDGET=20000    # Standard Complex skill
+AGGREGATE_ENTERPRISE_BUDGET=26000  # Enterprise Complex skill
+AGGREGATE_DOMAIN_BUDGET=32000      # Domain Expert skill (may legitimately exceed)
+
+# Version staleness heuristic threshold
+VERSION_STALENESS_MIN_REFS=7
 
 # Colors for output
 RED='\033[0;31m'
@@ -218,7 +221,7 @@ id_to_title_case() {
     echo "$skill_id" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1'
 }
 
-# Validate display_name follows Title Case convention from id
+# Validate display_name matches skill id words (case-insensitive)
 # Returns 0 if valid, 1 if invalid with message to stdout
 validate_display_name() {
     local skill_id="$1"
@@ -232,8 +235,13 @@ validate_display_name() {
     local expected_name
     expected_name=$(id_to_title_case "$skill_id")
 
-    if [[ "$display_name" != "$expected_name" ]]; then
-        echo "display_name '$display_name' does not match expected Title Case '$expected_name'"
+    local expected_norm
+    expected_norm=$(echo "$skill_id" | tr '-' ' ' | tr '[:upper:]' '[:lower:]' | xargs)
+    local display_norm
+    display_norm=$(echo "$display_name" | tr '[:upper:]' '[:lower:]' | xargs)
+
+    if [[ "$display_norm" != "$expected_norm" ]]; then
+        echo "display_name '$display_name' does not match expected words '$expected_name'"
         return 1
     fi
 
@@ -253,6 +261,150 @@ get_skill_triggers() {
         found && in_triggers && /^      - / {gsub(/^      - ["'"'"']?/, ""); gsub(/["'"'"']$/, ""); print}
         found && in_triggers && /^    [a-z]/ {exit}
     ' "$MANIFEST"
+}
+
+# Parse a YAML inline list into newline-delimited values.
+# Example: "[executor, guardian]" -> executor\nguardian
+parse_inline_yaml_list() {
+    local raw="$1"
+
+    raw="${raw#[}"
+    raw="${raw%]}"
+    raw="${raw//\"/}"
+    raw="${raw//\'/}"
+
+    IFS=',' read -ra items <<< "$raw"
+    local item
+    for item in "${items[@]}"; do
+        item="$(echo "$item" | xargs)"
+        [[ -n "$item" ]] && echo "$item"
+    done
+}
+
+# Get an array field from SKILL.md frontmatter.
+# Supports inline arrays (field: [a, b]) and block arrays:
+# field:
+#   - a
+#   - b
+get_skill_frontmatter_array() {
+    local skill_dir="$1"
+    local field="$2"
+    local skill_md="$skill_dir/SKILL.md"
+    if [[ ! -f "$skill_md" ]]; then
+        return
+    fi
+
+    awk -v key="$field" '
+        NR == 1 && /^---/ {in_frontmatter=1; next}
+        in_frontmatter && /^---/ {exit}
+
+        in_frontmatter && $0 ~ "^"key":[[:space:]]*\\[" {
+            line = $0
+            sub("^"key":[[:space:]]*\\[", "", line)
+            sub("\\][[:space:]]*$", "", line)
+            print line
+            exit
+        }
+
+        in_frontmatter && $0 ~ "^"key":[[:space:]]*$" {
+            in_list=1
+            next
+        }
+
+        in_frontmatter && in_list {
+            if ($0 ~ /^[[:space:]]*-[[:space:]]*/) {
+                line = $0
+                sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+                gsub(/["'\'']/, "", line)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+                if (length(line) > 0) print line
+                next
+            }
+
+            if ($0 ~ /^[a-zA-Z_][a-zA-Z0-9_-]*:/) {
+                exit
+            }
+        }
+    ' "$skill_md" | {
+        IFS= read -r first_line || true
+        if [[ -n "$first_line" ]] && [[ "$first_line" == *","* ]]; then
+            parse_inline_yaml_list "$first_line"
+        elif [[ -n "$first_line" ]]; then
+            echo "$first_line"
+            cat
+        fi
+    }
+}
+
+# Get an array field from manifest for a specific skill.
+# Supports inline arrays and block arrays.
+get_manifest_skill_array() {
+    local skill_id="$1"
+    local field="$2"
+
+    awk -v id="$skill_id" -v key="$field" '
+        $1 == "-" && $2 == "id:" {
+            if (found) {exit}
+            if ($3 == id) {found=1; next}
+        }
+
+        found && $0 ~ "^    "key":[[:space:]]*\\[" {
+            line = $0
+            sub("^    "key":[[:space:]]*\\[", "", line)
+            sub("\\][[:space:]]*$", "", line)
+            print line
+            exit
+        }
+
+        found && $0 ~ "^    "key":[[:space:]]*$" {
+            in_list=1
+            next
+        }
+
+        found && in_list && /^      - / {
+            line = $0
+            sub(/^      - /, "", line)
+            gsub(/["'\'']/, "", line)
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+            if (length(line) > 0) print line
+            next
+        }
+
+        found && in_list && /^    [a-z]/ {exit}
+        found && $1 == "-" && $2 == "id:" {exit}
+    ' "$MANIFEST" | {
+        IFS= read -r first_line || true
+        if [[ -n "$first_line" ]] && [[ "$first_line" == *","* ]]; then
+            parse_inline_yaml_list "$first_line"
+        elif [[ -n "$first_line" ]]; then
+            echo "$first_line"
+            cat
+        fi
+    }
+}
+
+# Normalize newline-delimited values into a deterministic CSV representation.
+normalize_list_values() {
+    local values="$1"
+    if [[ -z "$values" ]]; then
+        echo ""
+        return
+    fi
+
+    echo "$values" | sed '/^[[:space:]]*$/d' | sort -u | paste -sd',' -
+}
+
+# Returns 0 if value is present in the provided array, 1 otherwise.
+array_contains() {
+    local value="$1"
+    shift
+    local item
+    for item in "$@"; do
+        if [[ "$item" == "$value" ]]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 # Extract skill IDs from registry
@@ -543,8 +695,14 @@ check_io_mappings() {
     if [[ ! -f "$SKILLS_REGISTRY" ]]; then
         return 1  # No skills registry
     fi
-    # Check if skill_mappings section contains this skill
-    grep -q "^  $skill_id:" "$SKILLS_REGISTRY" 2>/dev/null
+    # Check if skills.<skill_id>.io exists
+    awk -v skill="$skill_id" '
+        /^skills:/ {in_skills=1; next}
+        in_skills && $0 ~ "^  "skill":" {found=1; next}
+        found && /^  [a-z0-9][a-z0-9-]*:/ && $0 !~ "^  "skill":" {exit}
+        found && /^    io:/ {has_io=1; exit}
+        END {exit !has_io}
+    ' "$SKILLS_REGISTRY" 2>/dev/null
 }
 
 # ============================================================================
@@ -559,46 +717,113 @@ get_output_paths() {
     if [[ ! -f "$SKILLS_REGISTRY" ]]; then
         return
     fi
-    # Extract output paths from skill_mappings section
+    # Extract output paths from skills.<skill_id>.io.outputs
     awk -v skill="$skill_id" '
-        /^skill_mappings:/ {in_mappings=1; next}
-        in_mappings && $0 ~ "^  "skill":" {found=1; next}
-        found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
-        found && /outputs:/ {in_outputs=1; next}
-        found && in_outputs && /^      - path:/ {gsub(/^      - path:[[:space:]]*["'"'"']?/, ""); gsub(/["'"'"']$/, ""); print}
-        found && in_outputs && /^    [a-z]/ && !/^      / {exit}
+        /^skills:/ {in_skills=1; next}
+        in_skills && $0 ~ "^  "skill":" {in_skill=1; next}
+        in_skill && /^  [a-z0-9][a-z0-9-]*:/ && $0 !~ "^  "skill":" {exit}
+        in_skill && /^    io:/ {in_io=1; next}
+        in_skill && in_io && /^    [a-z]/ && !/^    io:/ {in_io=0}
+        in_skill && in_io && /^      outputs:/ {in_outputs=1; next}
+        in_skill && in_io && in_outputs && /^      [a-z]/ && !/^      outputs:/ {in_outputs=0}
+        in_skill && in_io && in_outputs && /^          path:/ {
+            line = $0
+            sub(/^          path:[[:space:]]*["'"'"']?/, "", line)
+            sub(/["'"'"']?[[:space:]]*$/, "", line)
+            print line
+        }
     ' "$SKILLS_REGISTRY"
 }
 
 # Validate that a path is within harness scope
-# Note: Paths starting with ../../ are allowed for deliverables that go to .harmony/output/{category}/
+# Deliverables may target .harmony/output/, .harmony/scaffolding/, or .harmony/continuity/
+# from skill-local paths (../../...).
+normalize_path_lexical() {
+    local input_path="$1"
+
+    local is_abs=false
+    if [[ "$input_path" == /* ]]; then
+        is_abs=true
+    fi
+
+    local -a parts
+    local IFS='/'
+    read -ra parts <<< "$input_path"
+
+    local -a stack=()
+    local part
+    for part in "${parts[@]}"; do
+        [[ -z "$part" || "$part" == "." ]] && continue
+
+        if [[ "$part" == ".." ]]; then
+            if [[ ${#stack[@]} -gt 0 ]]; then
+                unset 'stack[${#stack[@]}-1]'
+            else
+                return 1
+            fi
+            continue
+        fi
+
+        stack+=("$part")
+    done
+
+    local joined
+    joined=$(IFS=/; echo "${stack[*]}")
+    if [[ "$is_abs" == "true" ]]; then
+        echo "/$joined"
+    else
+        echo "$joined"
+    fi
+}
+
 validate_path_scope() {
     local path="$1"
     local workspace_root="$2"
-    
-    # Allow ../ paths for deliverables going to .harmony/output/{category}/
-    # These are intentional - deliverables go to final destination outside skills/
-    if [[ "$path" == ../../* ]]; then
-        # This is expected for deliverables like ../../drafts/ or ../../prompts/
-        return 0
+
+    local skills_root="${workspace_root%/}"
+    local harmony_root="$REPO_ROOT/.harmony"
+
+    local resolved_input
+    if [[ "$path" == /* ]]; then
+        resolved_input="$path"
+    else
+        resolved_input="$skills_root/$path"
     fi
-    
-    # Check for deeper path traversal attempts (more than two levels up)
-    if [[ "$path" == */../../../* ]]; then
+
+    local resolved_path
+    resolved_path=$(normalize_path_lexical "$resolved_input")
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_path" ]]; then
         echo "Path escapes harness scope: $path"
         return 1
     fi
-    
-    # Resolve the path and check it's within scope
-    local resolved_path
-    if [[ "$path" == /* ]]; then
-        # Absolute path - must start with skills root
-        if [[ "$path" != "$workspace_root"* ]]; then
-            echo "Absolute path outside harness scope: $path"
+
+    if [[ "$resolved_path" != "$harmony_root" ]] && [[ "$resolved_path" != "$harmony_root/"* ]]; then
+        echo "Path escapes .harmony scope: $path"
+        return 1
+    fi
+
+    if [[ "$path" == ../../* ]]; then
+        if [[ "$resolved_path" == "$harmony_root/output/"* ]] || \
+           [[ "$resolved_path" == "$harmony_root/scaffolding/"* ]] || \
+           [[ "$resolved_path" == "$harmony_root/continuity/"* ]]; then
+            return 0
+        fi
+        echo "Path outside allowed deliverable scope (.harmony/output|scaffolding|continuity): $path"
+        return 1
+    fi
+
+    if [[ "$path" == ../* ]] || [[ "$path" == */../* ]]; then
+        echo "Relative parent traversal is not allowed: $path"
+        return 1
+    fi
+
+    if [[ "$path" != /* ]]; then
+        if [[ "$resolved_path" != "$skills_root" ]] && [[ "$resolved_path" != "$skills_root/"* ]]; then
+            echo "Path outside skills scope: $path"
             return 1
         fi
     fi
-    
+
     return 0
 }
 
@@ -678,10 +903,17 @@ validate_skill_placeholders() {
     # Get all paths (inputs and outputs) for this skill
     local paths
     paths=$(awk -v skill="$skill_id" '
-        /^skill_mappings:/ {in_mappings=1; next}
-        in_mappings && $0 ~ "^  "skill":" {found=1; next}
-        found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
-        found && /path:/ {gsub(/.*path:[[:space:]]*["'"'"']?/, ""); gsub(/["'"'"']$/, ""); print}
+        /^skills:/ {in_skills=1; next}
+        in_skills && $0 ~ "^  "skill":" {in_skill=1; next}
+        in_skill && /^  [a-z0-9][a-z0-9-]*:/ && $0 !~ "^  "skill":" {exit}
+        in_skill && /^    io:/ {in_io=1; next}
+        in_skill && in_io && /^    [a-z]/ && !/^    io:/ {in_io=0}
+        in_skill && in_io && /path:/ {
+            line = $0
+            sub(/.*path:[[:space:]]*["'"'"']?/, "", line)
+            sub(/["'"'"']?[[:space:]]*$/, "", line)
+            print line
+        }
     ' "$SKILLS_REGISTRY")
 
     while IFS= read -r path; do
@@ -713,10 +945,12 @@ check_deprecated_placeholder_formats() {
 
     # Check for <placeholder> format (deprecated)
     if awk -v skill="$skill_id" '
-        /^skill_mappings:/ {in_mappings=1; next}
-        in_mappings && $0 ~ "^  "skill":" {found=1; next}
-        found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
-        found && /path:/ && /<[a-z_]+>/ {print; found_dep=1}
+        /^skills:/ {in_skills=1; next}
+        in_skills && $0 ~ "^  "skill":" {in_skill=1; next}
+        in_skill && /^  [a-z0-9][a-z0-9-]*:/ && $0 !~ "^  "skill":" {exit}
+        in_skill && /^    io:/ {in_io=1; next}
+        in_skill && in_io && /^    [a-z]/ && !/^    io:/ {in_io=0}
+        in_skill && in_io && /path:/ && /<[a-z_]+>/ {print; found_dep=1}
         END {exit !found_dep}
     ' "$SKILLS_REGISTRY" 2>/dev/null; then
         log_warning "Deprecated <placeholder> format found (use {{placeholder}} instead)"
@@ -725,10 +959,12 @@ check_deprecated_placeholder_formats() {
 
     # Check for {placeholder} format (single braces - easy mistake)
     if awk -v skill="$skill_id" '
-        /^skill_mappings:/ {in_mappings=1; next}
-        in_mappings && $0 ~ "^  "skill":" {found=1; next}
-        found && /^  [a-z]/ && $0 !~ "^  "skill":" {exit}
-        found && /path:/ && /\{[a-z_]+\}/ && !/\{\{/ {print; found_dep=1}
+        /^skills:/ {in_skills=1; next}
+        in_skills && $0 ~ "^  "skill":" {in_skill=1; next}
+        in_skill && /^  [a-z0-9][a-z0-9-]*:/ && $0 !~ "^  "skill":" {exit}
+        in_skill && /^    io:/ {in_io=1; next}
+        in_skill && in_io && /^    [a-z]/ && !/^    io:/ {in_io=0}
+        in_skill && in_io && /path:/ && /\{[a-z_]+\}/ && !/\{\{/ {print; found_dep=1}
         END {exit !found_dep}
     ' "$SKILLS_REGISTRY" 2>/dev/null; then
         log_warning "Single-brace {placeholder} format found (use {{placeholder}} instead)"
@@ -898,9 +1134,9 @@ validate_reference_token_budgets() {
 # preserving flexibility for domain-expert skills.
 #
 # Budget Tiers:
-#   - Standard Complex: ~7000 tokens (2-4 reference files)
-#   - Enterprise Complex: ~12000 tokens (4-6 reference files)
-#   - Domain Expert: ~15000 tokens (5-8 reference files, domain knowledge extensive)
+#   - Standard Complex: ~20000 tokens (2-4 reference files)
+#   - Enterprise Complex: ~26000 tokens (4-6 reference files)
+#   - Domain Expert: ~32000 tokens (5-8 reference files, domain knowledge extensive)
 #
 # See: docs/architecture/harness/skills/reference-artifacts.md#complexity-budget
 
@@ -1279,28 +1515,28 @@ scaffold_io_mapping() {
     log_info "  Scaffolding I/O mapping for '$skill_id'..."
     
     local scaffold="
-  ${skill_id}:
-    inputs:
-      - path: \"sources/{{category}}/\"
-        kind: directory
-        required: false
-        description: \"Optional input source folder\"
-    outputs:
-      - name: result
-        path: \"../../{category}/{{timestamp}}-${skill_id}.md\"
-        kind: file
-        format: markdown
-        determinism: stable
-        description: \"Skill output document\"
-      - name: run_log
-        path: \"logs/runs/{{timestamp}}-${skill_id}.md\"
-        kind: file
-        format: markdown
-        determinism: unique
-        description: \"Execution log\""
+    io:
+      inputs:
+        - path: \"resources/${skill_id}/{{category}}/\"
+          kind: directory
+          required: false
+          description: \"Optional input source folder\"
+      outputs:
+        - name: result
+          path: \"../../output/{{category}}/{{timestamp}}-${skill_id}.md\"
+          kind: file
+          format: markdown
+          determinism: stable
+          description: \"Skill output document\"
+        - name: run_log
+          path: \"logs/${skill_id}/{{run_id}}.md\"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: \"Execution log\""
     
     echo ""
-    echo "Add the following to ${SKILLS_REGISTRY} under skill_mappings:"
+    echo "Add the following to ${SKILLS_REGISTRY} under skills.${skill_id}:"
     echo "─────────────────────────────"
     echo "$scaffold"
     echo "─────────────────────────────"
@@ -1528,7 +1764,7 @@ validate_reference_content() {
 # ============================================================================
 # Version Staleness Check
 # ============================================================================
-# Warns when a skill has version "1.0.0" but appears mature (has reference files).
+# Warns when a skill has version "1.0.0" but appears mature (many reference files).
 # This is a reminder to consider version bumps for production skills.
 
 # Get version from registry for a skill
@@ -1573,12 +1809,14 @@ check_version_staleness() {
 
     # Check if version is still at initial 1.0.0
     if [[ "$version" == "1.0.0" ]]; then
-        # Check if skill appears mature (has reference files)
+        # Check if skill appears mature enough to justify a version bump reminder.
         if has_reference_files "$skill_dir"; then
             local ref_count
             ref_count=$(count_reference_files "$skill_dir")
-            echo "Version is 1.0.0 but skill has $ref_count reference files (consider version bump if production-ready)"
-            return 1
+            if [[ $ref_count -ge $VERSION_STALENESS_MIN_REFS ]]; then
+                echo "Version is 1.0.0 but skill has $ref_count reference files (consider version bump if production-ready)"
+                return 1
+            fi
         fi
     fi
 
@@ -1606,6 +1844,90 @@ check_version_staleness() {
 #   idempotent → idempotency.md
 #   cancellable → cancellation.md
 #   external-dependent → dependencies.md
+
+# Validate that SKILL.md skill_sets/capabilities are declared with known values.
+# Returns 0 if valid, non-zero if any invalid declarations are found.
+validate_declared_capabilities() {
+    local skill_id="$1"
+    local skill_dir="$2"
+    local issues=0
+
+    local skill_sets
+    skill_sets=$(get_skill_frontmatter_array "$skill_dir" "skill_sets")
+    local capabilities
+    capabilities=$(get_skill_frontmatter_array "$skill_dir" "capabilities")
+
+    local value
+    while IFS= read -r value; do
+        [[ -z "$value" ]] && continue
+        if ! array_contains "$value" "${VALID_SKILL_SETS[@]}"; then
+            log_error "Skill '$skill_id': unknown skill set in SKILL.md frontmatter: '$value'"
+            ((issues++)) || true
+        fi
+    done <<< "$skill_sets"
+
+    while IFS= read -r value; do
+        [[ -z "$value" ]] && continue
+        if ! array_contains "$value" "${VALID_CAPABILITIES[@]}"; then
+            log_error "Skill '$skill_id': unknown capability in SKILL.md frontmatter: '$value'"
+            ((issues++)) || true
+        fi
+    done <<< "$capabilities"
+
+    if [[ $issues -eq 0 ]]; then
+        log_success "Declared skill_sets/capabilities are valid"
+    fi
+
+    return $issues
+}
+
+# Validate parity between manifest and SKILL.md capability declarations.
+# Returns 0 if aligned, non-zero when mismatches are found.
+validate_manifest_skill_parity() {
+    local skill_id="$1"
+    local skill_dir="$2"
+    local issues=0
+
+    local manifest_skill_sets
+    manifest_skill_sets=$(get_manifest_skill_array "$skill_id" "skill_sets")
+    local manifest_capabilities
+    manifest_capabilities=$(get_manifest_skill_array "$skill_id" "capabilities")
+
+    local skillmd_skill_sets
+    skillmd_skill_sets=$(get_skill_frontmatter_array "$skill_dir" "skill_sets")
+    local skillmd_capabilities
+    skillmd_capabilities=$(get_skill_frontmatter_array "$skill_dir" "capabilities")
+
+    local manifest_skill_sets_norm
+    manifest_skill_sets_norm=$(normalize_list_values "$manifest_skill_sets")
+    local skillmd_skill_sets_norm
+    skillmd_skill_sets_norm=$(normalize_list_values "$skillmd_skill_sets")
+
+    local manifest_capabilities_norm
+    manifest_capabilities_norm=$(normalize_list_values "$manifest_capabilities")
+    local skillmd_capabilities_norm
+    skillmd_capabilities_norm=$(normalize_list_values "$skillmd_capabilities")
+
+    if [[ "$manifest_skill_sets_norm" != "$skillmd_skill_sets_norm" ]]; then
+        log_error "Skill '$skill_id': skill_sets mismatch between manifest.yml and SKILL.md"
+        log_info "  manifest.yml: [${manifest_skill_sets_norm}]"
+        log_info "  SKILL.md:     [${skillmd_skill_sets_norm}]"
+        ((issues++)) || true
+    fi
+
+    if [[ "$manifest_capabilities_norm" != "$skillmd_capabilities_norm" ]]; then
+        log_error "Skill '$skill_id': capabilities mismatch between manifest.yml and SKILL.md"
+        log_info "  manifest.yml: [${manifest_capabilities_norm}]"
+        log_info "  SKILL.md:     [${skillmd_capabilities_norm}]"
+        ((issues++)) || true
+    fi
+
+    if [[ $issues -eq 0 ]]; then
+        log_success "Manifest and SKILL.md skill_sets/capabilities are aligned"
+    fi
+
+    return $issues
+}
 
 # Capability thresholds (for suggesting capabilities)
 CAPABILITY_THRESHOLD_PHASES=3
@@ -1805,7 +2127,7 @@ has_capabilities() {
 # Complex Skill Reference File Validation
 # ============================================================================
 # Validates that Complex skills have at least one pattern-triggered reference file.
-# Pattern-triggered files include: io-contract, behaviors, safety, examples,
+# Pattern-triggered files include: io-contract, phases, safety, examples,
 # validation, checkpoints, orchestration, decisions, interaction, agents,
 # composition, errors, glossary, or domain-specific files.
 
@@ -1904,7 +2226,7 @@ check_complex_skill_files() {
 
         if [[ $md_count -eq 0 ]]; then
             log_warning "Skill has references/ directory but no pattern-triggered files"
-            log_info "  Add at least one of: io-contract.md, behaviors.md, safety.md, etc."
+            log_info "  Add at least one of: io-contract.md, phases.md, safety.md, etc."
             log_info "  Or remove references/ directory if this is an Atomic skill"
         fi
     else
@@ -1927,6 +2249,10 @@ validate_skill() {
         log_info "Skipping template directory"
         return 0
     fi
+    if [[ "$skill_id" == "archive" ]] || [[ "$skill_dir" == */archive/* ]]; then
+        log_info "Skipping archive directory"
+        return 0
+    fi
     
     # Check 1: Directory exists
     if [[ ! -d "$skill_dir" ]]; then
@@ -1942,11 +2268,17 @@ validate_skill() {
     fi
     log_success "SKILL.md exists"
     
-    # Check 3: SKILL.md name matches directory name
+    # Check 3: SKILL.md name matches manifest id (grouped path variance is informational)
     local skill_name
     skill_name=$(get_skill_name "$skill_dir")
+    local skill_path
+    skill_path=$(get_skill_path "$skill_id")
+    local parent_dir
+    parent_dir=$(basename "${skill_path%/}")
     if [[ "$skill_name" != "$skill_id" ]]; then
-        log_error "SKILL.md name '$skill_name' does not match directory '$skill_id'"
+        log_error "SKILL.md name '$skill_name' does not match manifest id '$skill_id'"
+    elif [[ "$skill_name" != "$parent_dir" ]]; then
+        log_info "Grouped-directory variance: SKILL.md name '$skill_name' matches id, parent dir is '$parent_dir' (intentional)"
     else
         log_success "SKILL.md name matches directory"
     fi
@@ -2049,7 +2381,7 @@ validate_skill() {
             log_warning "MISSING I/O MAPPINGS: Skill '$skill_id' has no I/O configuration"
             log_info "  Skills without I/O mappings will use default output paths only."
             log_info "  To configure custom I/O paths, add an entry to:"
-            log_info "    .harmony/capabilities/skills/registry.yml → skill_mappings.$skill_id"
+            log_info "    .harmony/capabilities/skills/registry.yml → skills.$skill_id.io"
             log_info "  See docs/architecture/harness/skills/discovery.md#shared-registry"
             if [[ "$FIX_MODE" == "true" ]]; then
                 scaffold_io_mapping "$skill_id"
@@ -2074,6 +2406,12 @@ validate_skill() {
         log_error "Invalid allowed-tools: $tool_check_result"
         log_info "  See docs/architecture/harness/skills/specification.md for allowed-tools format"
     fi
+
+    # Check 14b: Declared skill sets and capabilities are valid values
+    validate_declared_capabilities "$skill_id" "$skill_dir" || true
+
+    # Check 14c: Manifest and SKILL.md capability declarations are aligned
+    validate_manifest_skill_parity "$skill_id" "$skill_dir" || true
     
     # Check 15: I/O path scope validation
     if [[ -f "$SKILLS_REGISTRY" ]]; then

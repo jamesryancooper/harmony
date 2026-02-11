@@ -166,7 +166,7 @@ skills:
           description: "Top-level log index (cross-skill)"
 
   refactor:
-    version: "1.0.0"
+    version: "1.0.1"
     commands:
       - /refactor
     parameters:
@@ -298,7 +298,7 @@ skills:
           description: "Top-level log index (cross-skill)"
 
   audit-ui:
-    version: "1.0.0"
+    version: "1.0.1"
     commands:
       - /audit-ui
     parameters:
@@ -620,7 +620,7 @@ skills:
           description: "Top-level log index (cross-skill)"
 
   create-skill:
-    version: "1.0.0"
+    version: "1.0.1"
     commands:
       - /create-skill
     parameters:
@@ -652,7 +652,7 @@ skills:
       inputs: []
       outputs:
         - name: skill_directory
-          path: "{{skill_name}}/"
+          path: "{{group}}/{{skill_name}}/"
           kind: directory
           description: "The created skill directory (deliverable)"
         - name: scaffold_artifacts
@@ -681,7 +681,7 @@ skills:
           description: "Top-level log index (cross-skill)"
 
   resolve-pr-comments:
-    version: "1.0.0"
+    version: "1.0.1"
     commands:
       - /resolve-pr-comments
     parameters:
@@ -733,7 +733,7 @@ skills:
           description: "Top-level log index (cross-skill)"
 
   triage-ci-failure:
-    version: "1.0.0"
+    version: "1.0.1"
     commands:
       - /triage-ci-failure
     parameters:
@@ -823,7 +823,7 @@ skills:
           description: "Top-level log index (cross-skill)"
 
   spec-to-implementation:
-    version: "1.0.0"
+    version: "1.0.1"
     commands:
       - /spec-to-implementation
     parameters:
@@ -873,7 +873,7 @@ skills:
           description: "Top-level log index (cross-skill)"
 
   build-mcp-server:
-    version: "1.0.0"
+    version: "1.0.1"
     commands:
       - /build-mcp-server
     parameters:

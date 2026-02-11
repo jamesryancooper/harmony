@@ -345,7 +345,7 @@ Traditional systems categorize by execution type: "Validator," "Transformer," "P
 
 ### Benefits
 
-1. **Granular control.** 17 capabilities vs 2 archetypes—declare exactly what you need.
+1. **Granular control.** 20 capabilities vs 2 archetypes—declare exactly what you need.
 
 2. **Clear documentation requirements.** Each capability maps to specific reference files.
 

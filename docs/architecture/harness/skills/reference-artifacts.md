@@ -367,7 +367,7 @@ Validation warns if:
 
 ## See Also
 
-- [Capabilities](./capabilities.md) — All 17 capabilities defined
+- [Capabilities](./capabilities.md) — All 20 capabilities defined
 - [Skill Sets](./skill-sets.md) — Pre-defined capability bundles
 - [Declaration](./declaration.md) — How to declare capabilities
 - [Validation](./validation.md) — Validation rules

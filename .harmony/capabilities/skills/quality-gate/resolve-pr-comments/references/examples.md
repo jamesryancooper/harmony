@@ -5,6 +5,8 @@ description: Resolution examples for the resolve-pr-comments skill.
 
 # Examples Reference
 
+Use command: `/resolve-pr-comments`.
+
 ## Example 1: Simple Style Fix
 
 **Comment:** "@reviewer: This should use camelCase per our conventions"

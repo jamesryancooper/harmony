@@ -5,6 +5,8 @@ description: Triage examples for the triage-ci-failure skill.
 
 # Examples Reference
 
+Use command: `/triage-ci-failure`.
+
 ## Example 1: Test Failure
 
 **CI Log:**

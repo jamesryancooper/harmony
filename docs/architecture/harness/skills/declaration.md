@@ -10,7 +10,7 @@ Skills declare their capabilities using `skill_sets` and `capabilities` fields. 
 skills:
   - id: refactor
     display_name: Refactor
-    path: refactor/
+    path: quality-gate/refactor/
     summary: "Execute verified codebase refactor with exhaustive audit."
     status: active
     tags: [refactor, codebase, verification]

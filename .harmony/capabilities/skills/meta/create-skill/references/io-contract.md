@@ -21,17 +21,18 @@ Input/output specifications for the create-skill skill.
 |-----------|------|----------|---------|-------------|
 | `skill_name` | text | Yes | - | Skill identifier (kebab-case, 1-64 chars) |
 | `description` | text | No | - | Initial description for SKILL.md |
-| `archetype` | text | No | `complex` | Skill archetype: `atomic` or `complex` |
+| `skill_sets` | text | No | `""` | Comma-separated skill sets (executor, coordinator, delegator, collaborator, integrator, specialist, guardian) |
+| `capabilities` | text | No | `""` | Comma-separated additional capabilities beyond skill set bundles |
 
 ## Output Structure
 
 ### Created Skill Directory
 
 ```
-.harmony/capabilities/skills/{{skill-name}}/
+.harmony/capabilities/skills/<group>/{{skill-name}}/
 ├── SKILL.md
 ├── references/
-│   ├── behaviors.md
+│   ├── phases.md
 │   ├── io-contract.md
 │   ├── safety.md
 │   ├── examples.md
@@ -53,9 +54,9 @@ Where `{{run-id}}` = `{{timestamp}}-{{skill-name}}` (e.g., `2026-01-20-analyze-c
 ### Symlinks
 
 ```
-.claude/skills/{{skill-name}} -> ../../.harmony/capabilities/skills/{{skill-name}}
-.cursor/skills/{{skill-name}} -> ../../.harmony/capabilities/skills/{{skill-name}}
-.codex/skills/{{skill-name}} -> ../../.harmony/capabilities/skills/{{skill-name}}
+.claude/skills/{{skill-name}} -> ../../.harmony/capabilities/skills/<group>/{{skill-name}}
+.cursor/skills/{{skill-name}} -> ../../.harmony/capabilities/skills/<group>/{{skill-name}}
+.codex/skills/{{skill-name}} -> ../../.harmony/capabilities/skills/<group>/{{skill-name}}
 ```
 
 ### Log Structure
@@ -90,7 +91,7 @@ phases:
     completed_at: "2026-01-20T14:00:05Z"
     files_created:
       - SKILL.md
-      - references/behaviors.md
+      - references/phases.md
       - references/io-contract.md
       - references/safety.md
       - references/examples.md
@@ -116,7 +117,8 @@ resume:
 parameters:
   skill_name: "{{skill-name}}"
   description: null
-  archetype: "complex"
+  skill_sets: ""
+  capabilities: ""
 ```
 
 ## Log Index Schemas
@@ -192,10 +194,10 @@ Tool requirements defined in SKILL.md `allowed-tools`:
 /create-skill "analyze-codebase" --description="Analyze codebase structure and patterns"
 ```
 
-### Specify Archetype
+### Specify Skill Sets and Capabilities
 
 ```
-/create-skill "format-json" --archetype=atomic
+/create-skill "format-json" --skill_sets=executor --capabilities=self-validating
 ```
 
 ### Resume Interrupted

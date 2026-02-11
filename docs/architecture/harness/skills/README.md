@@ -89,7 +89,7 @@ Per the [agentskills.io specification](https://agentskills.io/what-are-skills), 
 | Document | Description |
 |----------|-------------|
 | [Architecture](./architecture.md) | Hierarchical harness model, scope authority, progressive disclosure |
-| [Capabilities](./capabilities.md) | All 17 capabilities with reference file mapping |
+| [Capabilities](./capabilities.md) | All 20 capabilities with reference file mapping |
 | [Skill Sets](./skill-sets.md) | Pre-defined capability bundles and common combinations |
 | [Declaration](./declaration.md) | How to declare capabilities, resolution rules |
 | [Validation](./validation.md) | Validation rules for capabilities and references |

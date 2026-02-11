@@ -114,7 +114,7 @@ See [Capabilities](./capabilities.md) and [Skill Sets](./skill-sets.md) for the 
 
 ## See Also
 
-- [Capabilities](./capabilities.md) — All 17 capabilities defined
+- [Capabilities](./capabilities.md) — All 20 capabilities defined
 - [Skill Sets](./skill-sets.md) — Pre-defined capability bundles
 - [Specification](./specification.md) — Spec compliance and validation
 - [Architecture](./architecture.md) — Skills architecture

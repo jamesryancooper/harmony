@@ -21,6 +21,9 @@ valid_capabilities:
   # State
   - stateful
   - resumable
+  # Temporal
+  - long-running
+  - scheduled
   # Quality
   - self-validating
   - error-resilient
@@ -34,6 +37,8 @@ valid_capabilities:
   - idempotent
   - cancellable
   - external-dependent
+  # Output
+  - external-output
 ```
 
 **Error:** Unknown capability declared
@@ -77,6 +82,8 @@ Resolved capabilities should have corresponding reference files:
 | `human-collaborative` | `interaction.md` |
 | `stateful` | `checkpoints.md` |
 | `resumable` | `checkpoints.md` |
+| `long-running` | `execution-model.md` |
+| `scheduled` | `schedule.md` |
 | `self-validating` | `validation.md` |
 | `error-resilient` | `errors.md` |
 | `composable` | `composition.md` |
@@ -86,6 +93,7 @@ Resolved capabilities should have corresponding reference files:
 | `idempotent` | `idempotency.md` |
 | `cancellable` | `cancellation.md` |
 | `external-dependent` | `dependencies.md` |
+| `external-output` | `external-outputs.md` |
 
 **Warning:** Capability declared but reference missing
 

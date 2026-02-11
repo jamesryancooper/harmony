@@ -5,6 +5,8 @@ description: Implementation plan examples for the spec-to-implementation skill.
 
 # Examples Reference
 
+Use command: `/spec-to-implementation`.
+
 ## Example 1: Authentication Feature
 
 **Spec:** "Add email/password authentication with password reset"

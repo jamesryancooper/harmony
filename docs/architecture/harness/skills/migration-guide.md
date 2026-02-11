@@ -47,12 +47,12 @@ Map the complex archetype to skill sets based on the skill's behavior:
 
 ## File Migrations
 
-### behaviors.md → phases.md
+### legacy phases file rename
 
-Rename `references/behaviors.md` to `references/phases.md`:
+Rename the legacy phase reference file to `references/phases.md`:
 
 ```bash
-mv .harmony/capabilities/skills/my-skill/references/behaviors.md \
+mv .harmony/capabilities/skills/my-skill/references/<legacy-phases-file> \
    .harmony/capabilities/skills/my-skill/references/phases.md
 ```
 
@@ -199,12 +199,12 @@ Check for capabilities not covered by skill sets:
 | Can be cancelled mid-execution | `cancellable` |
 | Requires external services | `external-dependent` |
 
-### 4. Rename behaviors.md
+### 4. Rename legacy phase reference
 
-If the skill has `behaviors.md`, rename to `phases.md`:
+If the skill has the legacy phase reference file, rename it to `phases.md`:
 
 ```bash
-mv references/behaviors.md references/phases.md
+mv references/<legacy-phases-file> references/phases.md
 ```
 
 ### 5. Update Reference File Headers

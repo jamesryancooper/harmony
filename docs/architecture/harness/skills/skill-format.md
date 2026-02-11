@@ -150,7 +150,7 @@ A complete skill directory:
 │   ├── io-contract.md    # Inputs, outputs, dependencies, command-line usage
 │   ├── safety.md         # Tool and file policies
 │   ├── examples.md       # Full worked examples
-│   ├── behaviors.md      # Phase-by-phase execution
+│   ├── phases.md         # Phase-by-phase execution
 │   └── validation.md     # Acceptance criteria
 ├── scripts/              # Optional: executable code
 └── assets/               # Optional: static resources

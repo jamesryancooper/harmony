@@ -20,8 +20,20 @@ This implementation follows [agentskills.io/specification](https://agentskills.i
 | Capability declaration: `skill_sets`, `capabilities` | ✓ In `SKILL.md` and `manifest.yml` |
 | Directory structure: `references/`, `scripts/`, `assets/` | ✓ Per spec |
 | `SKILL.md` < 500 lines | ✓ Details in `references/` |
-| Name matches directory | ✓ Enforced by `create-skill` skill |
+| Name matches skill `id` | ✓ Enforced; grouped directory variance documented below |
 | Progressive disclosure | ✓ Four-tier model |
+
+---
+
+## Naming Policy
+
+Harmony uses globally unique skill IDs and grouped directories:
+
+- Skill identity is the `id` (for example, `react-best-practices`).
+- Filesystem layout may nest by domain (for example, `foundations/react/best-practices/`).
+- Validation requires `SKILL.md` `name` to match the skill `id`; parent-directory mismatch is treated as an intentional grouped-directory variance when the manifest path is grouped.
+
+This intentionally deviates from the strict agentskills.io parent-directory match rule while preserving unique, stable IDs for routing and cross-artifact alignment.
 
 ---
 
@@ -235,7 +247,7 @@ id_to_title_case() {
 | File               | Archetype                                 | Purpose                        |
 |--------------------|-------------------------------------------|--------------------------------|
 | `io-contract.md`   | Complex (when: non-trivial I/O)           | Inputs, outputs, CLI usage     |
-| `behaviors.md`     | Complex (when: distinct phases)           | Phase-by-phase execution       |
+| `phases.md`        | Complex (when: distinct phases)           | Phase-by-phase execution       |
 | `safety.md`        | Complex (when: tool/file policies)        | Tool and file policies         |
 | `examples.md`      | Atomic (optional), Complex (when needed)  | Worked examples                |
 | `validation.md`    | Complex (when: quality gates)             | Acceptance criteria            |
@@ -313,7 +325,7 @@ Validate a skill manually:
 - [ ] `io-contract.md` defines inputs, outputs, and command-line usage
 - [ ] `safety.md` defines tool and file policies
 - [ ] `examples.md` has at least one worked example
-- [ ] `behaviors.md` documents execution phases
+- [ ] `phases.md` documents execution phases
 - [ ] `validation.md` defines acceptance criteria
 
 #### Manifest and Registry

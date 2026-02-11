@@ -1,200 +1,175 @@
-# Skills System Post-Remediation: 4-Tier Completion Plan
+# Skills System Follow-Up Remediation Plan
+
+Date: 2026-02-10
 
 ## Context
 
-The skills system audit (2026-02-10) identified critical issues that were remediated across 7 phases. The remediation summary reports EXIT 6 with 6 errors and 67 warnings. However, deep code analysis reveals:
+The follow-up architectural audit (`.harmony/output/reports/2026-02-10-skills-follow-up-architectural-audit.md`) identified 13 cross-artifact alignment issues (A1-A13), validator coverage gaps, and documentation drift. All findings have been independently verified against source files. This plan addresses the audit's Critical and Important action items in dependency order, with validator improvements first (so subsequent changes can be validated), then data fixes, then docs.
 
-1. **The validator itself has bugs** producing false positives — the `REPO_ROOT` path calculation is wrong (off by one `dirname` level), causing `SKILLS_REGISTRY` to resolve to a doubled `.harmony/.harmony/...` path. This breaks 11+ validation checks and generates cascading warnings.
-2. **Orphaned directory detection** flags valid group directories (`foundations/`, `platforms/`, etc.) as orphaned because it only checks top-level dirs against manifest `id:` fields.
-3. **The allowed-tools mapping is actually correct** — `split_allowed_tools()` (line 386) properly handles parenthesized tokens with spaces, and all token types have case branches. The 6 errors reported in the remediation summary likely stem from the REPO_ROOT cascade, not from allowed-tools mapping.
+## Phase 1: Fix vercel-deploy capability regression (A1)
 
-Fixing the validator first is critical because it's the feedback loop for all subsequent work.
+**Why first:** This is a data-level regression introduced during the taxonomy expansion. Trivial fix, blocks nothing, but should be resolved immediately.
 
----
+**Files:**
 
-## Tier 1: Fix the Validator (unblocks everything)
+- `.harmony/capabilities/skills/platforms/vercel/deploy/SKILL.md` — line 14
 
-### 1A. Fix `REPO_ROOT` path calculation
+**Changes:**
 
-**File:** `.harmony/capabilities/skills/scripts/validate-skills.sh`
-**Lines:** 67-73
+- Change `capabilities: []` to `capabilities: [external-output]` in SKILL.md frontmatter to match manifest.yml line 328.
 
-**Current (broken):**
-```bash
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS_DIR="$(dirname "$SCRIPT_DIR")"
-HARMONY_DIR="$(dirname "$SKILLS_DIR")"        # ← .harmony/capabilities (mislabeled)
-REPO_ROOT="$(dirname "$HARMONY_DIR")"          # ← .harmony (wrong, should be project root)
-```
+## Phase 2: Validator schema migration — `skill_mappings` to `skills.<id>.io` (A6, A7)
 
-**Fix:** Add proper intermediate variables matching the actual directory hierarchy:
-```
-{repo_root}/.harmony/capabilities/skills/scripts/  ← SCRIPT_DIR
-{repo_root}/.harmony/capabilities/skills/           ← SKILLS_DIR
-{repo_root}/.harmony/capabilities/                  ← (intermediate)
-{repo_root}/.harmony/                               ← HARMONY_DIR (actual .harmony dir)
-{repo_root}/                                        ← REPO_ROOT
-```
+**Why:** The validator's path-scope and placeholder checks parse a `skill_mappings:` YAML key that no longer exists in the registry (the current schema uses `skills.<id>:` with nested `io:`). This means those checks are no-ops. Fixing the parser unblocks accurate validation for all subsequent phases.
 
-**Change to:**
-```bash
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SKILLS_DIR="$(dirname "$SCRIPT_DIR")"
-HARMONY_DIR="$(dirname "$(dirname "$SKILLS_DIR")")"   # .harmony/
-REPO_ROOT="$(dirname "$HARMONY_DIR")"                  # project root
-```
+**Files:**
 
-This automatically fixes `SKILLS_REGISTRY` on line 73 since it derives from `REPO_ROOT`.
+- `.harmony/capabilities/skills/scripts/validate-skills.sh`
 
-**Impact:** Fixes 11+ downstream checks that depend on SKILLS_REGISTRY (I/O mapping validation, path scope validation, placeholder format checks, etc.).
+**Changes:**
 
-### 1B. Fix orphaned directory detection
+1. **`get_output_paths()` (lines 557-571):** Replace awk pattern that searches for `skill_mappings:` with one that searches under `skills:` → `<skill_id>:` → `io:` → `outputs:` → `path:`.
 
-**File:** `.harmony/capabilities/skills/scripts/validate-skills.sh`
-**Lines:** 2218-2231
+2. **`validate_skill_placeholders()` (lines 670-701):** Same awk pattern fix — search under `skills.<id>.io` instead of `skill_mappings.<id>`.
 
-**Current:** Iterates top-level `$SKILLS_DIR/*/` directories, skips only `_template` and `scripts`, flags everything else not matching a manifest `id:`.
+3. **`check_deprecated_placeholder_formats()` (lines 707-738):** Same awk pattern fix.
 
-**Problem:** Group directories (`foundations/`, `platforms/`, `quality-gate/`, `synthesis/`, `meta/`) and infrastructure directories (`archive/`, `configs/`, `logs/`, `resources/`, `runs/`) are falsely flagged.
+4. **User-facing message at line 2052:** Change `skill_mappings.$skill_id` to `skills.$skill_id.io` in the guidance string.
 
-**Fix:** Build a skip list from known infrastructure dirs + group names extracted from the manifest:
+5. **`scaffold_io_mapping()` (lines 1276-1307):** Update scaffold template to emit `skills.<id>:` structure with nested `io:` instead of `skill_mappings:` format. Update the guidance message on line 1303.
 
-```bash
-# Known infrastructure directories
-local infra_dirs="_template scripts archive configs logs resources runs"
+## Phase 3: Add hard capability/skill-set validation to validator (A9)
 
-# Extract unique group names from manifest
-local group_dirs
-group_dirs=$(awk '/group:/{gsub(/.*group: */, ""); gsub(/[[:space:]]*$/, ""); print}' "$MANIFEST" | sort -u)
+**Why:** The validator declares checks 26 and 27 in its header but only implements soft heuristics. The `VALID_CAPABILITIES` and `VALID_SKILL_SETS` arrays are defined (lines 91-92) but never used for rejection. This means invalid capability names pass silently.
 
-for dir in "$SKILLS_DIR"/*/; do
-    dir_name=$(basename "$dir")
-    if echo "$infra_dirs" | grep -qw "$dir_name"; then continue; fi
-    if echo "$group_dirs" | grep -qw "$dir_name"; then continue; fi
-    if ! grep -q "id: $dir_name" "$MANIFEST"; then
-        log_warning "Directory '$dir_name' exists but not listed in manifest"
-    fi
-done
-```
+**Files:**
 
-### 1C. Run validator and establish clean baseline
+- `.harmony/capabilities/skills/scripts/validate-skills.sh`
 
-After fixes, run the validator and record the new error/warning counts. The expected outcome:
-- REPO_ROOT-related warnings eliminated (~21 "Skills registry not found" warnings gone)
-- Orphaned directory false positives eliminated (~5-10 warnings gone)
-- Remaining issues are genuine and actionable
+**Changes:**
 
-**Verification:** `bash .harmony/capabilities/skills/scripts/validate-skills.sh 2>&1 | tail -10`
+1. Add a new function `validate_declared_capabilities()` that:
+   - Extracts `skill_sets` and `capabilities` from SKILL.md frontmatter (already parsed elsewhere)
+   - Checks each against `VALID_SKILL_SETS` and `VALID_CAPABILITIES` arrays
+   - Logs errors for unknown values
 
----
+2. Add a new function `validate_manifest_skill_parity()` that:
+   - Compares manifest `skill_sets`/`capabilities` against SKILL.md frontmatter values
+   - Logs errors on mismatch (would have caught A1)
 
-## Tier 2: Address Legitimate Warnings
+3. Wire both into `validate_skill()` (after existing check 14, around line 2076).
 
-*Execute after Tier 1 establishes a clean baseline.*
+## Phase 4: Fix path-scope validation permissiveness (A8)
 
-### 2A. Triage remaining warnings by category
+**Why:** The `../../*` auto-allow at line 581 lets any path with that prefix pass without checking the destination. A path like `../../../../../../etc/passwd` would pass.
 
-Run validator, categorize output into:
-- Token budget warnings (manifest entries, reference files, aggregate complexity)
-- Description/summary alignment warnings
-- Duplicate trigger warnings (if any remain)
-- Table drift warnings (duplicated parameter/tool tables in SKILL.md)
-- Version staleness warnings
-- Any genuine allowed-tools errors
+**Files:**
 
-### 2B. Fix description/summary alignment
+- `.harmony/capabilities/skills/scripts/validate-skills.sh`
 
-**Priority: react-best-practices rule count discrepancy.**
+**Changes:**
 
-The manifest says "57 React/Next.js performance rules" but the SKILL.md description says "40+ rules." Verify the actual count by reading the skill content, then align both to the correct number.
+- In `validate_path_scope()` (lines 575-603), replace the blanket `../../*` allow with a check that the resolved destination starts with the `.harmony/` prefix. Allow `../../output/`, `../../scaffolding/`, and `../../continuity/` as known safe destinations. Reject paths that escape the `.harmony/` tree.
 
-Other skills with minor wording drift (audit-migration, spec-to-implementation, build-mcp-server) — update manifest summaries to better reflect SKILL.md descriptions where the description is more precise.
+## Phase 5: Reconcile create-skill contracts (A2, A3)
 
-### 2C. Optimize manifest token budgets
+**Why:** The create-skill SKILL.md, io-contract.md, and registry.yml are mutually inconsistent about parameters and output paths.
 
-The validator's `MANIFEST_ENTRY_TOKEN_BUDGET` is 100 tokens (line 81). The manifest header comments aspire to ~50 tokens/entry. Three skills significantly exceed 100 tokens:
-- `triage-ci-failure` (~70+ tokens, 6 triggers)
-- `audit-migration` (~68 tokens, 5 triggers)
-- `audit-ui` (~64 tokens, 6 triggers)
+**Files:**
 
-**Fix:** Trim triggers for these skills to 3-4 per skill, removing semantic duplicates:
-- `triage-ci-failure`: Keep "triage CI failure", "fix CI", "debug build failure" — drop "CI is failing", "fix the build", "tests are failing in CI"
-- `audit-ui`: Keep "audit the UI", "check UI guidelines", "review accessibility" — drop "review interface design", "web design audit", "check design compliance"
+- `.harmony/capabilities/skills/meta/create-skill/SKILL.md` — lines 66, 73
+- `.harmony/capabilities/skills/meta/create-skill/references/io-contract.md` — lines 24, 31-38, 56-58, 34 (`behaviors.md`), 93 (`behaviors.md`)
+- `.harmony/capabilities/skills/registry.yml` — lines 635-644, 655
 
-### 2D. Address duplicate triggers (if any remain)
+**Changes:**
 
-The current manifest appears to have no exact duplicate triggers between vercel and vercel-deploy (remediation resolved this). Validate by running the trigger overlap check and confirming zero duplicates.
+1. **SKILL.md line 66:** Change "archetype" to "skill_sets and capabilities" to match registry parameters.
 
-### 2E. Review build-mcp-server broad permissions
+2. **SKILL.md line 73:** Change `{{skill-name}}/` to `<group>/{{skill-name}}/` to reflect grouped layout.
 
-`build-mcp-server` uses unscoped `Write` and `Bash` in allowed-tools. If this is intentional (it scaffolds files across the project), add a comment. If not, scope to specific paths.
+3. **io-contract.md parameter table (line 24):** Replace `archetype` row with `skill_sets` and `capabilities` rows matching registry.yml definitions.
 
----
+4. **io-contract.md output structure (lines 31-38):** Update path from `.harmony/capabilities/skills/{{skill-name}}/` to `.harmony/capabilities/skills/<group>/{{skill-name}}/`. Replace `behaviors.md` with `phases.md` in the directory tree.
 
-## Tier 3: End-to-End Stretch Skill Validation
+5. **io-contract.md symlink targets (lines 56-58):** Update symlink paths to use grouped format.
 
-*Execute after Tier 2 resolves all warnings/errors.*
+6. **io-contract.md checkpoint schema (line 93):** Replace `behaviors.md` with `phases.md` in `files_created`.
 
-### 3A. Create a new skill that exercises new capabilities
+7. **io-contract.md checkpoint parameters (line 119):** Replace `archetype: "complex"` with `skill_sets` and `capabilities` fields.
 
-Use `/create-skill` to scaffold a skill that declares `external-output` or `long-running` capability (the newly added capabilities from Phase 6 of the remediation).
+8. **registry.yml line 655:** Change `path: "{{skill_name}}/"` to `path: "<group>/{{skill_name}}/"` or use a `{{group}}` placeholder.
 
-**Suggested skill:** A simple `deploy-status` skill that checks deployment status (exercises `external-output` + `external-dependent`).
+## Phase 6: Codify grouped-directory naming policy (A4, A5)
 
-### 3B. Validate the full pipeline
+**Why:** 5 nested skills fail the strict agentskills.io parent-directory naming rule. Rather than restructuring directories, this should be explicitly documented and the validator should acknowledge the variance.
 
-1. Scaffold creates correct directory structure with grouped path
-2. Manifest entry is added with correct group/path
-3. Registry entry is added
-4. Capability resolution produces correct reference files (including new `external-outputs.md`)
-5. Validator passes with EXIT 0 for this skill
-6. Reference files contain meaningful, customized content (not just template placeholders)
+**Files:**
 
-### 3C. Remove or mark as draft after validation
+- `.harmony/capabilities/skills/scripts/validate-skills.sh` — check 3 (line 1946-1952)
+- `docs/architecture/harness/skills/specification.md` (add policy note)
 
-If the stretch skill isn't needed long-term, either delete it or set `status: draft` to keep it as a reference implementation without routing to it.
+**Changes:**
 
----
+1. **Validator check 3:** When the SKILL.md `name` matches the manifest `id` but not the parent directory, and the skill has a grouped `path` in manifest, downgrade from ERROR to INFO with a note that this is an intentional grouped-directory variance. The check should still ERROR if name doesn't match manifest `id`.
 
-## Tier 4: Track Deferred Items
+2. **specification.md:** Add a "Naming Policy" section documenting that Harmony uses globally-unique skill IDs (e.g., `react-best-practices`) nested under domain directories (e.g., `foundations/react/best-practices/`), which is an intentional deviation from the strict agentskills.io parent-directory match rule.
 
-*No implementation — documentation only.*
+3. **Template/archive exclusion:** Add a skip condition in the validator for `_template` and `archive/` directories so they don't appear in compliance reports as failures.
 
-### 4A. Create a deferred-items tracking file
+## Phase 7: Documentation drift fixes (A10, A11, A12, A13)
 
-Create `.harmony/output/reports/2026-02-10-deferred-items.md` listing:
+**Why:** Multiple docs files contain stale capability counts, missing capability entries, wrong reference filenames, and flat path examples.
 
-1. **Parameter types**: `number`, `enum`, `list`, `object`, `secret` — add when a skill needs non-text input
-2. **I/O kinds**: `api`, `database`, `stream` — add when a skill produces non-file outputs beyond URLs
-3. **Trigger patterns**: regex/intent matching — add when catalog exceeds ~50 skills and NL triggers lose precision
-4. **Dependency model**: optional deps, version constraints, cycle detection — add when cross-skill dependencies become common
-5. **New skill sets**: `observer`, `notifier`, `generator` — add when concrete skills need patterns not covered by existing 7 sets
-6. **New capabilities**: `adaptive`, `feedback-aware`, `multimodal-input`, `multimodal-output`, `streaming-output`, `secret-handling`, `security-scanning` — add when concrete skills need them
+**Files and changes:**
 
-Each item should include:
-- What it is
-- Why it was deferred (no concrete skill needs it yet)
-- What would trigger its addition (a specific skill requirement)
+### A10 — Update capability count from 17 to 20
 
----
+- `docs/architecture/harness/skills/README.md` line 92
+- `docs/architecture/harness/skills/architecture.md` line 348
+- `docs/architecture/harness/skills/comparison.md` line 117
 
-## Files Modified
+### A11 — Add missing capability mappings
 
-| Tier | File | Change |
-|------|------|--------|
-| 1A | `validate-skills.sh:67-73` | Fix REPO_ROOT/HARMONY_DIR path calculation |
-| 1B | `validate-skills.sh:2218-2231` | Skip group + infra dirs in orphan check |
-| 2B | Multiple SKILL.md + manifest.yml | Align descriptions/summaries |
-| 2C | `manifest.yml` | Trim triggers for 3 high-token skills |
-| 3A | New skill directory + manifest + registry | Stretch skill scaffold |
-| 4A | `.harmony/output/reports/` | New deferred-items tracking file |
+- `docs/architecture/harness/skills/capabilities.md` — Add Temporal and Output categories with `long-running`, `scheduled`, `external-output` entries including their reference file mappings. Add to the YAML mapping block (lines 79-97).
 
-## Verification
+### A12 — Replace `behaviors.md` with `phases.md`
 
-After each tier:
-- **Tier 1:** Run `validate-skills.sh` — expect significant error/warning reduction. Target: 0 errors from validator bugs.
-- **Tier 2:** Run `validate-skills.sh` — target: 0 errors, minimal warnings (only informational).
-- **Tier 3:** Run `validate-skills.sh <new-skill-id>` — target: EXIT 0 for the new skill.
-- **Tier 4:** No validation needed — documentation only.
+- `docs/architecture/harness/skills/specification.md` lines 238, 316
+- `docs/architecture/harness/skills/creation.md` lines 154-158, 215
+- `docs/architecture/harness/skills/skill-format.md` line 153
 
-Final target: `validate-skills.sh` exits 0 with zero errors and only intentional informational warnings.
+### A13 — Replace flat-path examples with grouped paths
+
+- `docs/architecture/harness/skills/declaration.md` line 13: `path: refactor/` → `path: quality-gate/refactor/`
+- `docs/architecture/harness/skills/creation.md` line 151: `.harmony/capabilities/skills/<skill-name>/` → `.harmony/capabilities/skills/<group>/<skill-name>/`
+
+### A11 supplement — Update validation.md capability list
+
+- `docs/architecture/harness/skills/validation.md` lines 12-37: Add `long-running`, `scheduled`, `external-output` to the valid_capabilities list and add their reference mappings to the table at lines 70-88.
+
+## Phase 8: Run validator and verify
+
+**Verification steps:**
+
+1. Run `bash .harmony/capabilities/skills/scripts/validate-skills.sh` — should exit 0 with reduced warnings (target: < 72).
+2. Verify `vercel-deploy` passes capability parity check (Phase 1 + Phase 3 combined).
+3. Grep for `skill_mappings` in validator — should return 0 matches (Phase 2).
+4. Grep for `behaviors.md` in docs/ — should return 0 matches (Phase 7).
+5. Grep for `"17 capabilities"` in docs/ — should return 0 matches (Phase 7).
+6. Verify `create-skill` SKILL.md, io-contract.md, and registry.yml all reference consistent parameter names and grouped paths (Phase 5).
+7. Manual spot-check: validator should warn/error on an invalid capability name if injected into a test SKILL.md (Phase 3).
+
+## Summary
+
+| Phase | Priority | Scope | Files Modified |
+|-------|----------|-------|----------------|
+| 1 | Critical | Fix regression | 1 |
+| 2 | Critical | Validator schema fix | 1 |
+| 3 | Critical | Validator enforcement | 1 |
+| 4 | Critical | Validator security | 1 |
+| 5 | Critical | Contract reconciliation | 3 |
+| 6 | Important | Naming policy | 2 |
+| 7 | Important | Docs alignment | 8 |
+| 8 | Verification | Validation run | 0 |
+
+Total files modified: ~14 (some overlap in validator across phases 2-4).

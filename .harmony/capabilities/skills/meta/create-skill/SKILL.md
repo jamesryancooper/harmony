@@ -63,14 +63,14 @@ If `extension-proposed`, do not proceed with ad hoc schema changes. Escalate wit
 
 Parameters are defined in `.harmony/capabilities/skills/registry.yml` (single source of truth).
 
-This skill accepts one required parameter (`skill_name`) and optional parameters for description and archetype.
+This skill accepts one required parameter (`skill_name`) and optional parameters for description, skill_sets, and capabilities.
 
 ## Output Location
 
 Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single source of truth).
 
 Outputs are written to:
-- `.harmony/capabilities/skills/{{skill-name}}/` — The new skill directory (deliverable)
+- `.harmony/capabilities/skills/<group>/{{skill-name}}/` — The new skill directory (deliverable)
 - `runs/create-skill/{{run-id}}/` — Execution state (checkpoint and summary) for session recovery
 - `logs/create-skill/` — Execution logs with index
 

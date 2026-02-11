@@ -33,6 +33,15 @@ Capabilities for managing state across execution.
 | `stateful` | Persists state across phases | `checkpoints.md` |
 | `resumable` | Can checkpoint and resume | `checkpoints.md` |
 
+### Temporal Capabilities
+
+Capabilities for time-oriented execution constraints.
+
+| Capability | Description | Reference File |
+|------------|-------------|----------------|
+| `long-running` | Execution spans extended time (minutes to hours) | `execution-model.md` |
+| `scheduled` | Triggered on a schedule/timer | `schedule.md` |
+
 ### Quality Capabilities
 
 Capabilities for ensuring quality and handling errors.
@@ -70,6 +79,14 @@ Capabilities for robust execution.
 | `cancellable` | Can be stopped mid-execution | `cancellation.md` |
 | `external-dependent` | Requires external services (e.g., live ruleset fetch via WebFetch). See [Live Ruleset Pattern](design-conventions.md#live-ruleset-pattern-external-dependent) for the full design convention. | `dependencies.md` |
 
+### Output Capabilities
+
+Capabilities for non-file execution outputs.
+
+| Capability | Description | Reference File |
+|------------|-------------|----------------|
+| `external-output` | Produces non-file outputs (URLs, API responses) | `external-outputs.md` |
+
 ---
 
 ## Capability-to-Reference Mapping
@@ -85,6 +102,8 @@ agent-delegating: [agents.md]
 human-collaborative: [interaction.md]
 stateful: [checkpoints.md]
 resumable: [checkpoints.md]
+long-running: [execution-model.md]
+scheduled: [schedule.md]
 self-validating: [validation.md]
 error-resilient: [errors.md]
 composable: [composition.md]
@@ -94,6 +113,7 @@ safety-bounded: [safety.md]
 idempotent: [idempotency.md]
 cancellable: [cancellation.md]
 external-dependent: [dependencies.md]
+external-output: [external-outputs.md]
 ```
 
 ---
