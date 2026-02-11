@@ -108,6 +108,5 @@ if (!validation.valid) {
 
 - [Risk Tiers Overview](../risk-tiers.md)
 - [Auto-Tier Assignment](../auto-tier-assignment.md)
-- [Spec-First BMAD](../spec-first-bmad.md)
+- [Spec-First Planning](../spec-first-planning.md)
 - [Human-Facing Risk Tiers](../../RISK-TIERS.md)
-

@@ -1,11 +1,13 @@
 ---
-title: Spec-First + BMAD Workflow
-description: How to run Harmony's spec-first + BMAD loop end-to-end, including tiered spec templates, the BMAD story pattern, and AI-assisted workflow.
+title: Spec-First Planning Workflow
+description: How to run Harmony's spec-first planning loop end-to-end, including tiered spec templates, the feature story pattern, and AI-assisted workflow.
 ---
 
-# Spec-First + BMAD (Step-by-Step)
+# Spec-First Planning (Step-by-Step)
 
-This guide details Harmony's spec-first + BMAD loop and AI-assisted workflow. It expands the methodology overview with concrete steps, templates, and prompts. For the high-level lifecycle diagram and context, see the main Harmony Methodology overview.
+This guide details Harmony's spec-first planning loop and AI-assisted workflow. It expands the methodology overview with concrete steps, templates, and prompts. For the high-level lifecycle diagram and context, see the main Harmony Methodology overview.
+
+PlanKit exposes a planning kernel and feature story interface at the methodology level; its BMAD adapter is an internal implementation detail.
 
 ---
 
@@ -15,7 +17,7 @@ Harmony uses a **three-tier risk classification** to right-size specs and review
 
 | Tier | Risk Level | Spec Template | Human Time |
 |------|------------|---------------|------------|
-| **T1** | Trivial | BMAD-lite | 2-3 min |
+| **T1** | Trivial | Minimal | 2-3 min |
 | **T2** | Standard | Standard | 15-20 min |
 | **T3** | Elevated | Full | 30-60 min |
 
@@ -38,7 +40,7 @@ Harmony uses a **three-tier risk classification** to right-size specs and review
 
 ---
 
-## Spec‑First + BMAD Workflow
+## Spec-First Planning Workflow
 
 ### Step 1: Initiate Change
 
@@ -56,7 +58,7 @@ AI automatically:
 
 ### Step 2: AI Generates Spec (All Tiers)
 
-**T1 (Trivial):** AI generates BMAD-lite spec in ~30 seconds
+**T1 (Trivial):** AI generates a minimal spec in ~30 seconds
 - Intent, files, risk assessment, verification plan
 
 **T2 (Standard):** AI generates standard spec in ~2 minutes
@@ -154,9 +156,9 @@ For T3, AI also handles:
 - Navigator security review
 - Post-promotion watch
 
-### Cursor/IDE Integration
+### AI IDE Integration
 
-When using Cursor or similar AI-powered IDE:
+When using an AI IDE:
 
 ```
 1. Paste spec summary → AI generates plan and checklist
@@ -176,7 +178,7 @@ When using Cursor or similar AI-powered IDE:
 
 ## Spec Templates by Tier
 
-### T1: BMAD-Lite Template
+### T1: Minimal Template
 
 Use for: Typos, doc updates, tiny fixes, test additions
 

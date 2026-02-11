@@ -1001,6 +1001,6 @@ tier_bump_down:
 3. Observability requirements scale with tier
 
 See also:
-- [spec-first-bmad.md](./spec-first-bmad.md)
+- [spec-first-planning.md](./spec-first-planning.md)
 - [ci-cd-quality-gates.md](./ci-cd-quality-gates.md)
 - [flow-and-wip-policy.md](./flow-and-wip-policy.md)

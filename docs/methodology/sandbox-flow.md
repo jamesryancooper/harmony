@@ -10,7 +10,7 @@ This document defines the **canonical Sandbox Flow** for Harmony. It explains ho
 It is a focused, narrative view that stitches together the lifecycle and tooling described in:
 
 - Methodology:
-  - `implementation-guide.md` (A→J lifecycle and AI-Toolkit kits).
+  - `implementation-guide.md` (A→J lifecycle and Harmony's kit layer).
   - `ci-cd-quality-gates.md` (pipeline and gates).
   - `performance-and-scalability.md` (perf budgets and load testing).
   - `reliability-and-ops.md` (SLOs, error budgets, incidents, and rollback policy).
@@ -89,10 +89,10 @@ This section maps the lifecycle stages from the Implementation Guide to the sand
     - Additional runtime sandboxes (e.g., dedicated staging flows).
   - Mark any **required sandbox checks** (load tests, contract tests, a11y) for this work.
 
-### C — Plan & Acceptance Criteria (PlanKit → BMAD)
+### C — Plan & Acceptance Criteria (PlanKit planning kernel)
 
 - **Outputs**:
-  - ADR(s), BMAD plan/story, implementation notes such as `docs/implementation/<feature>.md`.
+  - ADR(s), feature story/context packet, implementation notes such as `docs/implementation/<feature>.md`.
 - **Sandbox angle**:
   - Make sandbox requirements explicit:
     - “Feature is dark‑launched behind `<flag-name>` in preview.”
@@ -102,7 +102,7 @@ This section maps the lifecycle stages from the Implementation Guide to the sand
     - Flag behavior (defaults OFF, safe fallback).
     - Observability (spans/logs/metrics present and visible in preview).
 
-### D — Dev in Cursor (Guided Implementation)
+### D — Dev in AI IDE (Guided Implementation)
 
 - **Work**:
   - Implement code changes in slices (`packages/<feature>`), apps (`apps/*`), agents (`agents/*`), and runtimes, guided by SpecKit and PlanKit.

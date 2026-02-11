@@ -1,6 +1,6 @@
 ---
 title: Harmony Methodology and Principles — Synthesized Summary
-description: Concise, agent-focused summary of Harmony’s lean AI-accelerated methodology, pillars, and system guarantees.
+description: Concise, agent-focused summary of Harmony’s AI-native, human-governed methodology, pillars, and system guarantees.
 ---
 
 ## Purpose of This Summary
@@ -65,7 +65,7 @@ description: Concise, agent-focused summary of Harmony’s lean AI-accelerated m
 Agents and their ecosystems must uphold the following guarantees from the methodology:
 
 - **Spec‑first changes**:
-  - Every material change starts from a SpecKit one‑pager + ADR and BMAD story.
+  - Every material change starts from a spec one‑pager + ADR and feature story.
   - Specs include threat modeling (STRIDE), non‑functional requirements, and acceptance criteria.
 - **No silent apply**:
   - Agents never push directly to protected branches, merge PRs, or change production flags.
@@ -120,6 +120,4 @@ Harmony’s lifecycle, mapped to agent responsibilities:
 - When in doubt:
   - Prefer **smaller, spec‑referenced changes** with explicit tests and rollback.
   - Escalate ambiguity or conflict to humans and record open questions in the Knowledge Plane.
-
-
 

@@ -210,7 +210,7 @@ directly from the DB instead of local artifacts. See [QueryKit](../querykit/guid
 
 ## Harmony Alignment
 
-IndexKit reinforces the Harmony methodology, as detailed in [harmony-lean-ai-accelerated-methodology.md](../../harmony/methodology/README.md):
+IndexKit reinforces the Harmony methodology, as detailed in [the methodology overview](../../../methodology/README.md):
 
 - **Spec-first, Contract-driven:** Schemas and artifact formats emphasize contract fidelity and drift detection.
 - **Auditability & Transparency:** Versionable artifacts and manifests meet Harmony's SRE, compliance, and ASVS guardrails.

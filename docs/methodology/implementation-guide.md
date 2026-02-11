@@ -1,12 +1,12 @@
 ---
-title: Harmony Lean AI-Accelerated Methodology Implementation Guide
-description: Detailed playbook for wiring Harmony’s Spec‑First (via SpecKit `speckit` wrapper for GitHub’s Spec Kit) + Agentic agile (via PlanKit `plankit` wrapper for BMAD) + Flow orchestration (via FlowKit) methodology, tooling, and governance into a Turborepo + Vercel stack.
+title: Harmony AI-Native, Human-Governed Methodology Implementation Guide
+description: Detailed playbook for wiring Harmony’s Spec‑First (via SpecKit `speckit` wrapper for GitHub’s Spec Kit) + context-efficient planning (via PlanKit `plankit` wrapper for BMAD) + Flow orchestration (via FlowKit) methodology, tooling, and governance into a Turborepo + Vercel stack.
 ---
 
-Below is a Harmony‑aligned implementation guide that shows exactly what you can wire up today, what needs a thin wrapper/kit, and what should stay in CI/Vercel. This guide aligns with the Harmony Methodology and the AI‑Toolkit. Our approach:
+Below is a Harmony‑aligned implementation guide that shows exactly what you can wire up today, what needs a thin wrapper/kit, and what should stay in CI/Vercel. This guide aligns with the Harmony Methodology and Harmony's kit layer. Our approach:
 
 - Wrap GitHub’s Spec Kit via our SpecKit (`speckit`) wrapper for Spec‑First flows and publishing.
-- Wrap BMAD via PlanKit (our `plankit` kit) for ADRs and planning/BMAD story generation.
+- Wrap BMAD via PlanKit (our `plankit` kit) for ADRs and planning/feature story generation.
 - Use FlowKit as the flow execution orchestrator between PlanKit and AgentKit, instantiating LangGraph flows from plans or canonical prompts.
 
 This removes duplication, keeps us on the official GitHub’s Spec Kit semantics, and isolates BMAD API churn behind PlanKit while giving us a consistent, inspectable flow layer via FlowKit.
@@ -78,7 +78,7 @@ This keeps Spec semantics authoritative (from GitHub’s Spec Kit), makes BMAD u
 flowchart LR
   A[Spec (GitHub’s Spec Kit via SpecKit) + ADR stub] --> B[Shape & Scope Cuts]
   B --> C[PlanKit (BMAD plan + ADR)]
-  C --> D[Dev in Cursor (human checkpoints)]
+  C --> D[Dev in AI IDE (human checkpoints)]
   D --> E[PR -> Vercel Preview (feature-flagged; ObservaKit trace linked)]
   E --> F[CI Gates: lint/type/test/scan/contract/SBOM]
   F -->|all green| G[Merge to Trunk]
@@ -126,11 +126,11 @@ flowchart LR
 - **Human**: Verify ACs & security/perf AC embedded; confirm AI determinism plan (pinned provider/model/version, temperature ≤ 0.3, prompt hash, golden tests).
 - **Gate**: **P‑1** (PlanKit/BMAD alignment: ADR/plan ↔ spec/plan tie‑out).
 
-### D — Dev in Cursor (guided, HITL)
+### D — Dev in AI IDE (guided, HITL)
 
-- **BMAD mgmt**: **Custom BMAD** *policy files* + **Cursor rules**.
-- **Artifacts**: `.cursorrules` seeds prompts with SpecKit + gates; Cursor **Commands** for “spec‑to‑code”, “threat‑model”, “generate tests”. ([Cursor][15])
-- **Command**: Cursor custom command triggers SpecKit/PlanKit flows; or run `speckit …` / `plankit …` directly.
+- **Planning mgmt**: PlanKit planning policies + AI IDE rules.
+- **Artifacts**: `.cursorrules` seeds prompts with SpecKit + gates; AI IDE **Commands** for “spec‑to‑code”, “threat‑model”, “generate tests”. ([Cursor][15])
+- **Command**: AI IDE custom command triggers SpecKit/PlanKit flows; or run `speckit …` / `plankit …` directly.
 - **Human**: Approve agent plans & diffs; license‑safe suggestion check (ORT or license‑checker); record AI provenance (provider/model/version/params, prompt hash) and attach ObservaKit `trace_id` to PR. ([OSS Review Toolkit][16])
 - **Determinism**: Follow AI‑Toolkit Deterministic Operation Policy — pin AI config, add golden tests guarded by JSON‑Schema, avoid new deps unless they materially reduce complexity.
 - **Agentic execution boundary (no‑silent‑apply)**: Use **AgentKit** (with **ToolKit** wrappers) to produce proposed diffs, tests, and artifacts under `runs/**`. Local/dev runs default to `--dry-run`; mutating operations MUST use idempotency keys; GuardKit redacts at write/log boundaries. Required spans: `kit.agentkit.execute`, `kit.toolkit.call.*`. Run records include `run.id`, `stage=implement`, and determinism fields (`prompt_hash`, `idempotencyKey`). See “Alignment addenda (AI‑Toolkit v0.2)” for observability/run‑record details. AgentKit orchestration can be implemented atop frameworks like LangGraph while remaining runtime‑agnostic; keep orchestration choices hidden behind the kit boundary and preserve the no‑silent‑apply constraint.
@@ -786,7 +786,7 @@ flowchart TD
 1. `speckit init --feature oauth-billing --out docs/specs/oauth-billing` → creates `spec.md` (auth flows), `risk.md` (STRIDE on OAuth callback/CSRF), `security.md` (ASVS auth/session controls), optional `data-model.md`, `quickstart.md`. ([GitHub][7])
 2. `speckit validate --path docs/specs/oauth-billing` → structure/required fields validated.
 3. `plankit plan --spec docs/specs/oauth-billing/spec.md --out plan.json` → ADR + BMAD plan/story; define contracts: `/api/auth/callback` schema, `/billing/webhook` Pact.
-4. Dev in Cursor: use `.cursorrules` snippets “spec‑to‑code”, generate adapters & tests; human approves diffs. ([Cursor][23])
+4. Dev in AI IDE: use `.cursorrules` snippets “spec‑to‑code”, generate adapters & tests; human approves diffs. ([Cursor][23])
 6. Open PR → Vercel preview; Playwright smoke (`/login` happy path); Spectral lint; Schemathesis runs against `openapi.yaml`; SBOM & scans pass. ([Vercel][13])
 7. Merge → `vercel promote` when flag‑on canary looks good; instant rollback if error budget spikes. ([Vercel][17])
 

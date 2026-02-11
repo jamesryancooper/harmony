@@ -9,7 +9,7 @@ This document centralizes Harmony’s tooling and metrics guidance. Use it along
 
 ## Tooling Map (GitHub/Vercel/Turborepo)
 
-- **GitHub Projects**: board columns above; templates for Spec/BMAD/bug; Insights for cycle time. Protect `main` with **required checks**.
+- **GitHub Projects**: board columns above; templates for Spec/Story/bug; Insights for cycle time. Protect `main` with **required checks**.
 - **Actions matrix per package**: `turbo run lint test build --filter=...` using remote cache.
 - **Required checks**: the gates configured in `infra/ci/pr.yml` (subset of CI/CD Quality Gates); adopt additional gates incrementally.
 - **Vercel**: previews on every PR; **promote** for instant rollback; env & secret management; **feature flags** via Vercel Flags/Toolbar; **cron** for schedules.

@@ -123,7 +123,7 @@ In today’s software-development landscape, small teams are under pressure to d
 - Without guardrails and observability, multi-agent systems magnify risks of misalignment, cascading errors, non-deterministic outcomes, and reduced trust in AI-powered workflows.
 - Complexity often dominates: tool proliferation, tangled interfaces, scattered data flows — resulting in slower development, harder debugging, and compromised speed or safety.
 
-### Delivering on the Promise of Multi-Agent Workflows And AI-Accelerated Development
+### Delivering on the Promise of Multi-Agent Workflows and AI-Native Development
 
 We envision a modular, local-first toolkit that empowers a tiny team to ship outsized results with AI. This vision rests on delivering **clear, predictable building blocks (kits)** that enforce structure where necessary, yet remain flexible elsewhere. Every element is aligned with the broader Harmony Framework — prioritising simplicity, safety-by-default, spec-first design, and rapid iteration. By transforming agentic workflows from fragile experiments into predictable, observable components, teams can scale AI-assisted development with confidence.
 
@@ -181,9 +181,9 @@ These invariants apply to every kit and workflow so the Toolkit operates as a co
 - Simplicity‑first ergonomics
   - Prefer platform features (Vercel envs/cron/flags) over new deps. Monolith‑first with clear ports/adapters. One small change per PR. Consistent CLI flags across all kits.
 
-## Harmony Alignment (Lean AI-Accelerated Methodology)
+## Harmony Alignment
 
-Harmony is a lean, opinionated delivery method for tiny teams to ship quickly and safely on their chosen stack. It pairs spec‑first, agentic agile development in an AI‑driven IDE with a monorepo workflow and TypeScript/Python services, and bakes in SRE and DevSecOps practices. Harmony aligns with OWASP ASVS, NIST SSDF, and STRIDE, and adopts architectural principles from 12‑Factor, Monolith‑First, and Hexagonal—so you can ship fast, ship safe, and ship with confidence. For the full methodology and lifecycle overview, see docs/methodology/README.md.
+Harmony is an AI-native, human-governed methodology for solo builders — lean in ceremony and rich in capability. It pairs spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered human governance while staying stack-, host-, and environment-agnostic. Harmony aligns with OWASP ASVS, NIST SSDF, and STRIDE, and adopts architectural principles from 12‑Factor, Monolith‑First, and Hexagonal—so you can ship fast, ship safe, and ship with confidence. For the full methodology and lifecycle overview, see docs/methodology/README.md.
 
 This toolkit maps directly to Harmony. Use the kits as ready‑to‑run building blocks with AI‑driven quality, security, and reliability built in.
 

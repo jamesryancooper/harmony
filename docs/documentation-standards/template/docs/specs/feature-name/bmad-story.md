@@ -1,4 +1,4 @@
-# {{feature-name}} — BMAD Story (Execution Plan)
+# {{feature-name}} — Feature Story (Execution Plan)
 
 ## Context Packets
 
@@ -52,10 +52,10 @@
 - Lint, typecheck, unit, **contract diff**, static analysis, dependencies & license, secret scan, SBOM, perf/bundle budgets are green.
 - Preview smoke passes; docs updated; feature remains behind flag until rollout conditions are met.
 
-## Notes for Cursor (optional prompt)
+## Notes for AI IDE (optional prompt)
 
 ```plaintext
-Given the Spec and BMAD Story above, propose a minimal file-by-file diff with tests and contracts.
+Given the Spec and Feature Story above, propose a minimal file-by-file diff with tests and contracts.
 Highlight security/privacy/licensing concerns. Avoid new deps unless justified.
 Propose negative tests from STRIDE and summarize risks + rollback plan.
 ```

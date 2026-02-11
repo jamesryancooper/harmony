@@ -1,10 +1,10 @@
-# speckit — BMAD Story (Execution Plan)
+# speckit — Feature Story (Execution Plan)
 
 ## Context Packets
 
-- Purpose: standardize spec‑first authoring via a thin wrapper over GitHub SpecKit, aligned to Harmony’s methodology (spec → ADR → BMAD → tiny PRs behind flags → previews → gates).
+- Purpose: standardize spec‑first authoring via a thin wrapper over GitHub SpecKit, aligned to Harmony’s methodology (spec → ADR → plan → tiny PRs behind flags → previews → gates).
 - Constraints: simplicity‑first; contracts as source of truth; internal rollout behind `flag.speckit`; budgets: validate p95 ≤ 300ms, availability 99.9% when HTTP is enabled; no secrets in specs/logs.
-- Adjacent kits: PlanKit (owns ADR/BMAD), Dockit (publish), DiagramKit (render), TestKit/PolicyKit/ComplianceKit (gates), ObservaKit (traces/logs), FlagKit (rollout).
+- Adjacent kits: PlanKit (owns ADR/planning), Dockit (publish), DiagramKit (render), TestKit/PolicyKit/ComplianceKit (gates), ObservaKit (traces/logs), FlagKit (rollout).
 - Links: [spec.md](./spec.md), [ADR-0001](./adr-0001.md), component guide: ../../handbook/ai-toolkit/planning-and-orchestration/speckit/guide.md, runbook: ../../handbook/ai-toolkit/planning-and-orchestration/speckit/runbook.md
 - Contracts: `packages/contracts/openapi.yaml`; schemas: `packages/contracts/schemas/spec-frontmatter.schema.json`.
 - Tech choices & rationale: see ADR; contracts enforced in CI via oasdiff + JSON Schema; tiny HTTP/MCP surface only.
@@ -57,11 +57,10 @@
 ## Definition of Done (Gates)
 
 - Lint, typecheck, unit, contract diff, static analysis, dependencies/license, secret scan, SBOM, and perf/bundle budgets are green.
-- Preview smoke passes; docs updated (spec/ADR/BMAD/guide/runbook); feature remains behind flag until rollout criteria met.
+- Preview smoke passes; docs updated (spec/ADR/plan/guide/runbook); feature remains behind flag until rollout criteria met.
 
-## Notes for Cursor (optional prompt)
+## Notes for AI IDE (optional prompt)
 
 ```plaintext
-Given the Spec, ADR, and BMAD Story above, propose a minimal file-by-file diff to implement the thin SpecKit wrapper with tests and contracts. Highlight security/privacy/licensing concerns. Avoid new deps unless justified. Propose negative tests from STRIDE and summarize risks + rollback plan.
+Given the Spec, ADR, and Feature Story above, propose a minimal file-by-file diff to implement the thin SpecKit wrapper with tests and contracts. Highlight security/privacy/licensing concerns. Avoid new deps unless justified. Propose negative tests from STRIDE and summarize risks + rollback plan.
 ```
-

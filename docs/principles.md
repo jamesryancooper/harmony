@@ -53,7 +53,7 @@ This document codifies how Harmony's [six pillars](./pillars/README.md) translat
 - Ownership & boundaries: CODEOWNERS per slice; enforce import/architecture rules in CI.
 - Learn continuously: blameless postmortems; Kaizen proposes tiny, evidence‑based improvements.
 
-## Agentic Principles (AI‑Toolkit alignment)
+## Agentic Principles (kit-layer alignment)
 
 - No silent apply: standard loop is Plan → Diff → Explain → Test; humans approve material changes.
 - Determinism & provenance: pin provider/model/version; low temperature; record prompt hashes and parameters; capture run/trace IDs.

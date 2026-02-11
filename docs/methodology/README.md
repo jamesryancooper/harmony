@@ -52,24 +52,26 @@ Together these pillars create a self‑reinforcing system: Direction ensures we 
 | LEARN | [Continuity](../pillars/continuity.md) | "How do we remember?" | ADRs, traces, ObservaKit |
 | LEARN | [Insight](../pillars/insight.md) | "How do we improve?" | Postmortems, EvalKit |
 
-> Terminology note: “SpecKit” refers to our AI‑Toolkit kit (code `speckit`) that wraps GitHub’s Spec Kit. Mentions of the upstream tool explicitly use “GitHub’s Spec Kit”.
+> Terminology note: “SpecKit” (`speckit`) wraps GitHub’s Spec Kit. Mentions of the upstream tool use “GitHub’s Spec Kit” explicitly. PlanKit implements its planning kernel via BMAD; this adapter is transparent to methodology consumers.
 
 #### Pillars → Practices Map (at a glance)
 
 | Pillar | Phase | Primary Practices/Tools | Feedback loop it reinforces |
 | --- | --- | --- | --- |
-| Direction | PLAN | SpecKit; PlanKit (BMAD); Shape Up; Convivial Impact Assessment | Validated specs ensure effort is well-spent; no code without approved spec |
+| Direction | PLAN | SpecKit; PlanKit (planning kernel); Shape Up; Convivial Impact Assessment | Validated specs ensure effort is well-spent; no code without approved spec |
 | Focus | PLAN | kit-base; PromptKit; Turborepo; Hexagonal adapters | Absorbed complexity frees cognitive bandwidth; build features, not infrastructure |
 | Velocity | SHIP | AgentKit; FlowKit; CIKit; Trunk‑Based Development; Vercel Previews | AI automation removes bottlenecks; fast, frequent delivery within validated direction |
 | Trust | SHIP | PolicyKit; GuardKit; EvalKit; FlagKit; Pact; OpenAPI/JSON‑Schema | Typed contracts; bounded agents; rollback capability; fail‑closed governance |
 | Continuity | LEARN | Dockit; ObservaKit; ADR templates; RunbookKit; OnboardKit | ADRs, traces, decision logs preserve context; knowledge survives time and handoffs |
 | Insight | LEARN | EvalKit; DatasetKit; postmortem templates; retro practices | Postmortems, evals, retros drive continuous improvement; Insight → Direction loop |
 
+> **Reference implementation.** Specific platforms above (Turborepo, Vercel) reflect Harmony's reference stack. Substitute your own build system and deployment platform. Harmony's principles and gates are stack-, host-, and environment-agnostic.
+
 ---
 
-## Where the AI‑Toolkit Fits
+## Kit Architecture and Stage Mapping
 
-The AI‑Toolkit provides the kit‑level building blocks that implement Harmony’s gates and flows. For a concise mapping from Harmony’s principles to specific kits, see “Harmony Alignment” in docs/kits/README.md#harmony-alignment-lean-ai-accelerated-methodology. In practice, use FlagKit for feature gating and progressive delivery (Vercel Flags via Edge Config), ObservaKit for telemetry, EvalKit/PolicyKit/GuardKit for gates, and PatchKit for PRs.
+Harmony's kit layer provides the building blocks that implement Harmony’s gates and flows. For a concise mapping from Harmony’s principles to specific kits, see “Harmony Alignment” in docs/kits/README.md#harmony-alignment. In practice, use FlagKit for feature gating and progressive delivery, ObservaKit for telemetry, EvalKit/PolicyKit/GuardKit for gates, and PatchKit for PRs.
 
 ### Stage‑to‑Kit Map (operational)
 
@@ -104,7 +106,7 @@ To keep responsibilities crisp and repeatable:
   - **PromptKit**: defines **context slots and schemas** in templates (e.g., how retrieved documents, policies, or prior runs are embedded in prompts) and validates those inputs before rendering.
   - **ObservaKit + EvalKit + DatasetKit**: observe and evaluate retrieval behavior and answer grounding; PromptKit does not construct indexes or decide which documents to retrieve.
 
-This mirrors the mental model used in the AI‑Toolkit README and architecture docs: PromptKit is the **PromptOps kit at the template/contract layer**, while LLMOps and ContextOps concerns are implemented by a **composition of other kits** rather than being folded into PromptKit itself.
+This mirrors the mental model used in docs/kits/README.md and the kit architecture docs: PromptKit is the **PromptOps kit at the template/contract layer**, while LLMOps and ContextOps concerns are implemented by a **composition of other kits** rather than being folded into PromptKit itself.
 
 In practice, PlanKit, FlowKit, AgentKit, and the shared LangGraph runtime align as follows (see also `docs/kits/planning-and-orchestration/kit-roles.md`):
 
@@ -119,7 +121,7 @@ Use FlowKit when workflows:
 - must be paused/resumed or inspected, or
 - require explicit, auditable state (maps, issue registers, reports).
 
-### Deterministic Agent Loops & Provenance (AI‑Toolkit alignment)
+### Deterministic Agent Loops & Provenance (kit-layer alignment)
 
 - Standard agent loop: Plan → Diff → Explain → Test (no direct apply). Each step produces an artifact (plan, proposed edits, risk/explain notes, tests) that is reviewable.
 - Pin and record AI configuration whenever agents are used for code or content:
@@ -153,7 +155,7 @@ Harmony operates as a closed loop with a few non‑negotiable, compounding habit
 - Small batches by policy: Trunk‑based, tiny PRs, explicit WIP limits, and preview smoke keep cycle time short and outcomes reversible.
 - Waiver discipline: Gate waivers are exceptional and rare; Navigator approval (with a security checklist for High‑risk) is required with an explicit scope/timebox (≤ 7 days or until merge) and a PR‑linked justification. Waivers are disallowed for secrets/PII exposure, missing observability on changed flows, missing rollback/flag, and sustained SLO burn‑rate violations. Waivers auto‑expire at merge and must include a follow‑up issue for any residual risk or work.
 
-These guarantees align 1:1 with the AI‑Toolkit’s invariants (determinism, typed contracts, idempotency, observability, and fail‑closed policy), ensuring the methodology is self‑reinforcing instead of fragile.
+These guarantees align 1:1 with Harmony’s kit-layer invariants (determinism, typed contracts, idempotency, observability, and fail‑closed policy), ensuring the methodology is self‑reinforcing instead of fragile.
 
 ---
 
@@ -161,7 +163,7 @@ These guarantees align 1:1 with the AI‑Toolkit’s invariants (determinism, ty
 
 Use these companion documents when you need deeper operational detail:
 
-- `spec-first-bmad.md` — Spec-first + BMAD workflow, templates, and Cursor workflow.
+- `spec-first-planning.md` — Spec-first planning workflow, templates, and AI IDE integration.
 - `flow-and-wip-policy.md` — Board columns, WIP limits, Definitions of Ready/Done/Safe/Small, and risk rubric.
 - `ci-cd-quality-gates.md` — CI/CD pipeline, required checks, and waiver policy.
 - `security-baseline.md` — OWASP ASVS/NIST SSDF alignment, STRIDE per feature, and defenses.
@@ -170,7 +172,7 @@ Use these companion documents when you need deeper operational detail:
 - `architecture-and-repo-structure.md` — 12-Factor modulith, Hexagonal boundaries, and feature flags.
 - `tooling-and-metrics.md` — GitHub/Vercel/Turborepo tooling map and improvement metrics.
 - `adoption-plan-30-60-90.md` — 30/60/90 adoption plan and quick-start cadence.
- - `sandbox-flow.md` — Canonical end-to-end sandbox flow using previews, flags, CI gates, and observability before production rollout.
+- `sandbox-flow.md` — Canonical end-to-end sandbox flow using previews, flags, CI gates, and observability before production rollout.
 
 ---
 
@@ -183,7 +185,7 @@ Here’s an explanation of each framework, method, and tool in the **Harmony Met
 | Item                       | Role                                       | Why it aligns with Harmony                                                                                                                                                                                                                   |
 | -------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **OWASP ASVS v5**          | Application Security Verification Standard | Provides clear, testable security requirements (auth, input validation, crypto, logging) that integrate directly into Harmony’s **spec-first + CI gates** (CodeQL, Semgrep, SBOM). Maps 1-to-1 with Harmony’s “security by default” policy.  |
-| **NIST SSDF (SP 800-218)** | Secure Software Development Framework      | Defines secure development activities (planning, coding, reviewing, releasing) that Harmony automates and embeds into each lifecycle stage. The SSDF “plan-protect-produce-respond” phases align with Harmony’s BMAD → CI → Postmortem loop. |
+| **NIST SSDF (SP 800-218)** | Secure Software Development Framework      | Defines secure development activities (planning, coding, reviewing, releasing) that Harmony automates and embeds into each lifecycle stage. The SSDF “plan-protect-produce-respond” phases align with Harmony’s Spec → CI → Postmortem loop. |
 | **OpenTelemetry (OTel)**   | Observability Standard                     | Harmony mandates OTel for **structured logs, traces, and metrics**, ensuring reliable AI observability and root cause analysis (tied to **ObservaKit** and **BenchKit**).                                                                    |
 
 ### Methods & Practices
@@ -192,18 +194,20 @@ Here’s an explanation of each framework, method, and tool in the **Harmony Met
 | --------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Google SRE**              | Reliability Engineering discipline | Introduces SLIs, SLOs, and **error budgets**, the backbone of Harmony’s reliability guardrails and postmortems.                                    |
 | **DORA Metrics**            | DevOps performance metrics         | Harmony explicitly targets DORA’s four keys—lead time, deploy frequency, MTTR, and change-fail rate—to measure improvement in automation and flow. |
-| **Trunk-Based Development** | Integration practice               | Core to Harmony’s “flow over ceremony”: small, frequent PRs to a single trunk with instant **Vercel previews** and feature flags for safe rollout. |
-| **12-Factor App**           | Cloud-native design principles     | Ensures stateless, portable, and disposable services—Harmony’s **Turborepo monolith-first stack** adheres to this for simplicity and speed.        |
+| **Trunk-Based Development** | Integration practice               | Core to Harmony’s “flow over ceremony”: small, frequent PRs to a single trunk with instant **preview deploys** and feature flags for safe rollout. |
+| **12-Factor App**           | Cloud-native design principles     | Ensures stateless, portable, and disposable services—Harmony’s **monolith-first stack** (e.g., Turborepo) adheres to this for simplicity and speed.        |
 | **Kanban / Little’s Law**   | Flow optimization principle        | Harmony’s WIP limits (Ready=3, In‑Dev=1, In‑Review=1, Preview=1) derive directly from Little’s Law to maximize throughput and reduce cycle time.                   |
-| **Shape Up**                | Product shaping method             | Used to size “appetites” and cut scope before development—Harmony’s BMAD step #2 (“Shape”) implements this to define crisp, buildable features.    |
+| **Shape Up**                | Product shaping method             | Used to size “appetites” and cut scope before development—Harmony’s shaping step implements this to define crisp, buildable features.    |
 | **STRIDE**                  | Threat-modeling methodology        | Harmony mandates STRIDE per feature in the spec phase, linking threats → mitigations → tests, enforced by **PolicyKit** and **GuardKit**.          |
-| **Monolith-First**          | Architectural strategy             | Harmony advocates a **modular monolith** in **Turborepo** before microservices—maximizing speed and minimizing ops overhead for solo developers.       |
+| **Monolith-First**          | Architectural strategy             | Harmony advocates a **modular monolith** (e.g., in Turborepo) before microservices—maximizing speed and minimizing ops overhead for solo developers.       |
 
 ### Architectural Patterns
 
 | Item                       | Role                           | Why it aligns with Harmony                                                                                                                                                      |
 | -------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Hexagonal Architecture** | Domain-driven ports & adapters | Core pattern of Harmony: keeps business logic isolated from infrastructure. Enables testability, AI-generated adapters, and contract testing via **Pact** and **Schemathesis**. |
+
+> **Reference implementation.** The platforms below are used in Harmony's reference stack. Substitute equivalents as appropriate.
 
 ### Platforms & Platform Controls
 
@@ -216,7 +220,7 @@ Here’s an explanation of each framework, method, and tool in the **Harmony Met
 
 | Item          | Role                | Why it aligns with Harmony                                                                                                                              |
 | ------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Turborepo** | Monorepo build tool | Central to Harmony’s **modular monolith** design: enables incremental builds, shared caching, and parallel CI pipelines for both Python and TypeScript. |
+| **Turborepo** | Monorepo build tool | Supports Harmony’s **modular monolith** design: enables incremental builds, shared caching, and parallel CI pipelines for both Python and TypeScript. |
 
 ### Security Analysis Tooling
 
@@ -244,7 +248,7 @@ Here’s an explanation of each framework, method, and tool in the **Harmony Met
 
 | Item                                   | Role                       | Why it aligns with Harmony                                                                                                                         |
 | -------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **OWASP Cheat Sheets (CSP/CSRF/SSRF)** | Targeted security guidance | Harmony integrates these directly into the **Spec → Threat Model → Tests** flow; Cursor prompts even reference them by name during implementation. |
+| **OWASP Cheat Sheets (CSP/CSRF/SSRF)** | Targeted security guidance | Harmony integrates these directly into the **Spec → Threat Model → Tests** flow; AI IDE prompts reference them by name during implementation. |
 
 ---
 
@@ -289,7 +293,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - Combined with JSON Schema validations and EvalKit, they produce verifiable AI and code outputs.
 - Outcome: agent‑assisted changes are safe, observable, and reversible.
 
-### 6) Guided Agentic Autonomy (Deterministic Agent Loops & HITL)
+### 6) Guided Agentic Autonomy (Deterministic Agent Loops & Risk-Tiered Governance)
 
 - Deterministic, reviewable agent loops: Plan → Diff → Explain → Test; no silent apply.
 - Pinned AI configuration and low‑variance defaults; golden tests guarded by JSON‑Schema prevent drift.
@@ -347,7 +351,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
   - Verify license/provenance and secret hygiene; check OpenAPI/JSON‑Schema diff where applicable.
   - Confirm observability for changed flows (trace + structured logs) and attach a representative trace or trace_id in the PR.
 - Required human‑in‑the‑loop checkpoints
-  1. Before implementation: SpecKit one‑pager + micro‑STRIDE + acceptance criteria approved by Navigator.
+  1. Before implementation: spec one-pager + micro-STRIDE + acceptance criteria approved by Navigator.
   2. Before merge: PR review using the risk rubric (below) with license/provenance note and OpenAPI diff.
   3. Before promotion: Feature behind a flag, Preview e2e smoke green, rollback noted, owner on‑call.
   4. After promote: 30‑minute watch window; check SLO burn‑rate and key SLIs; document in PR thread.
@@ -376,13 +380,13 @@ The lifecycle maps to Harmony's three pillar phases: **PLAN → SHIP → LEARN**
 ```mermaid
 flowchart LR
   subgraph PLAN ["PLAN Phase (Direction + Focus)"]
-    A["Spec (SpecKit) + ADR"] --> B[Shape & Scope Cuts]
-    B --> C["BMAD Story (context + plan + AC)"]
+    A["Spec + ADR"] --> B[Shape & Scope Cuts]
+    B --> C["Feature Story (context + plan + AC)"]
   end
   
   subgraph SHIP ["SHIP Phase (Velocity + Trust)"]
-    C --> D["Dev in Cursor (human checkpoints)"]
-    D --> E["PR -> Vercel Preview (flagged)"]
+    C --> D["Dev in AI IDE (risk-tiered checkpoints)"]
+    D --> E["PR -> Preview Deploy (flagged)"]
     E --> F[CI Gates]
     F -->|all green| G[Merge to Trunk]
     G --> H["Promote to Prod (guarded)"]
@@ -444,13 +448,15 @@ Harmony uses a lightweight Kanban flow with strict WIP limits and explicit Defin
 
 See `flow-and-wip-policy.md` for the full board policy, WIP limits, definitions, debt/risk classifiers, and change-type gates.
 
-## Spec‑First + BMAD (step‑by‑step)
+## Spec-First Planning (step-by-step)
 
-Harmony is explicitly spec-first: every meaningful change starts with a SpecKit one‑pager and BMAD story, then runs through a Cursor-assisted loop of Plan → Diff → Explain → Test with human checkpoints.
+Harmony is explicitly spec-first: every meaningful change starts with a spec one-pager and feature story (structured context + agent plan + acceptance criteria), then runs through an AI-assisted loop of Plan → Diff → Explain → Test with risk-tiered human checkpoints.
 
-See `spec-first-bmad.md` for the full SpecKit one-pager template, BMAD story pattern, and Cursor workflow.
+See `spec-first-planning.md` for the full spec one-pager template, feature story pattern, and AI IDE integration guide.
 
 ---
+
+> **Reference implementation.** The branching and release details below use Vercel as the deployment platform. The principles (preview-per-PR, guarded promotion, instant rollback, server-evaluated feature flags) are platform-agnostic.
 
 ## Branching & Release Model
 
@@ -531,15 +537,15 @@ See `performance-and-scalability.md` for perf budget guidance, caching/queue rec
 
 ## Architecture & Repository Structure
 
-Harmony uses a 12-Factor, monolith-first modular monolith in Turborepo with Hexagonal boundaries and feature flags as a first-class concern.
+Harmony uses a 12-Factor, monolith-first modular monolith with Hexagonal boundaries and feature flags as a first-class concern.
 
 See `architecture-and-repo-structure.md` for the detailed layout, feature flag implementation, and scaling policy from solo → 2 developers.
 
 ---
 
-## Cursor‑Native Playbook (ready prompts)
+## AI IDE Prompt Library
 
-> Use these **verbatim** in Cursor. Keep prompts (suggested filenames) under `/docs/prompts/`. Paste into PRs as evidence.
+> Use these prompts verbatim in your AI IDE or terminal agent. Keep prompts (suggested filenames) under `/docs/prompts/`. Paste into PRs as evidence.
 
 - **Spec‑to‑code**:
   *“Given the spec below, propose a minimal design and file‑by‑file diff (TypeScript/Python). Include contract types, tests, and a step‑by‑step plan. Flag any security, privacy, or licensing concerns. Do NOT add new deps without justification.”*
@@ -564,11 +570,13 @@ See `architecture-and-repo-structure.md` for the detailed layout, feature flag i
 
 ---
 
-## Tooling Map (GitHub/Vercel/Turborepo)
+## Tooling Map
 
 See `tooling-and-metrics.md` for a dedicated deep-dive into tooling and metrics.
 
-- **GitHub Projects**: board columns above; templates for Spec/BMAD/bug; Insights for cycle time. Protect `main` with **required checks**.
+> **Reference implementation.** The tooling below reflects Harmony's reference stack. Substitute your own equivalents as needed.
+
+- **GitHub Projects**: board columns above; templates for Spec/Story/bug; Insights for cycle time. Protect `main` with **required checks**.
 - **Actions matrix per package**: `turbo run lint test build --filter=...` using remote cache.
 - **Required checks**: the gates configured in `infra/ci/pr.yml` (subset of §7); adopt additional gates incrementally.
 - **Vercel**: previews on every PR; **promote** for instant rollback; env & secret management; **feature flags** via Vercel Flags/Toolbar; **cron** for schedules.
@@ -612,7 +620,7 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 - Non‑functionals: p95 auth callback ≤ 600 ms; availability ≥ 99.9%.
 - Security: ASVS V2 (authentication), V3 (session), V4 (access control), V10 (errors/logging). **STRIDE**: spoofing (OAuth state), tampering (webhook sig), info disclosure (PII), DoS (webhook storms), elevation (role mapping). Mitigations: state+nonce, Stripe signature verify, PII minimization, rate limit, RBAC checks.
 
-**BMAD story → Cursor**:
+**Feature story → AI IDE**:
 
 - Context packets: OAuth sequence, Stripe events (`checkout.session.completed`, `invoice.paid`).
 - Agent plan: add adapters (`adapters/oauth-google.ts`, `adapters/stripe.ts`), domain services (`AuthService`, `BillingService`), routes, tests (unit + Pact for webhook), e2e smoke on Preview.
@@ -627,7 +635,7 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 
 ---
 
-## Cursor Prompt Snippets Library
+## Prompt Snippets Library
 
 ```plaintext
 /docs/prompts/spec-to-code.md
@@ -647,11 +655,11 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 
 **Feature flags cleanup cadence**: tag flags by owner & expiry; automate weekly report; remove within 2 cycles.
 
-**AI license‑safety tips**: prefer permissive deps; add **license scan gates**; Cursor diff review must include license notes (`license-checker`, `pip-licenses`).
+**AI license‑safety tips**: prefer permissive deps; add **license scan gates**; AI IDE diff review must include license notes (`license-checker`, `pip-licenses`).
 
 **Day‑in‑the‑life (Solo)**:
 
-- **Mon**: Spec/BMAD → small PR #1.
+- **Mon**: Spec/Plan → small PR #1.
 - **Tue**: Tests/contracts; PR #2.
 - **Wed**: Feature + flags; preview smoke.
 - **Thu**: Security scans & perf budgets; PR #3.
@@ -667,12 +675,12 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 
 **Board & WIP**: Backlog → Ready (3) → In‑Dev (1) → In‑Review (1) → Preview (1) → Release → Done → Blocked.
 
-**Spec → BMAD → PR flow**:
+**Spec → Plan → PR flow**:
 
-1. Write **BMAD spec one‑pager** + **ADR**.
-2. Convert to **BMAD story**.
-3. Use **Cursor** to propose plan/diffs/tests with checkpoints.
-4. Open tiny PR → **Vercel Preview** → run e2e smoke → merge if gates pass.
+1. Write **spec one-pager** + **ADR**.
+2. Convert to **feature story** (context + plan + AC).
+3. Use **AI IDE** to propose plan/diffs/tests with risk-tiered checkpoints.
+4. Open tiny PR → **preview deploy** → run e2e smoke → merge if gates pass.
 
 **Required CI checks**: lint/format; TS `--strict`; unit; typecheck; **OpenAPI diff (oasdiff)**; **CodeQL + Semgrep**; **Dependabot/SCA + Dependency Review (license)**; **secret scanning + TruffleHog**; **SBOM**; Preview URL comment; **Observability for changed flows** (trace/logs + trace_id in PR). Recommended: Pact/Schemathesis and **e2e smoke (Playwright or `scripts/smoke-check.sh`)**; publish **bundle/perf budgets** (CI enforcement optional).
 
@@ -707,7 +715,7 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 - **Static analysis & SCA**: CodeQL; Semgrep; Dependabot; OWASP Dependency‑Check; SBOM: Syft; Secret scanning: GitHub, TruffleHog
 - **Testing & contract**: Playwright; Pact; Schemathesis
 - **Observability**: OpenTelemetry (Next.js/Astro SSR + Node); pino
-- **Delivery platform**: Turborepo (caching/monorepo); Vercel (previews, envs, promote/rollback, feature flags, cron)
+- **Delivery platform (reference implementation)**: Turborepo (caching/monorepo); Vercel (previews, envs, promote/rollback, feature flags, cron)
 - **OWASP cheat sheets**: CSP, CSRF, SSRF
 
 ---

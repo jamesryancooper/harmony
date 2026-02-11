@@ -20,12 +20,12 @@ This document is a focused onboarding and adoption guide for Harmony. Use it whe
 - **Simplicity‑first**: Ship the smallest viable change that meets the requirement; avoid new dependencies unless they clearly reduce complexity or meet a non‑functional requirement.
 - **Board & WIP**: Backlog → Ready (3) → In‑Dev (1) → In‑Review (1) → Preview (1) → Release → Done → Blocked.
 
-### Spec → BMAD → PR Flow
+### Spec → Plan → PR Flow
 
-1. Write **BMAD spec one‑pager** + **ADR**.
-2. Convert to **BMAD story**.
-3. Use **Cursor** to propose plan/diffs/tests with checkpoints.
-4. Open tiny PR → **Vercel Preview** → run e2e smoke → merge if gates pass.
+1. Write **spec one-pager** + **ADR**.
+2. Convert to **feature story** (context + plan + AC).
+3. Use **AI IDE** to propose plan/diffs/tests with checkpoints.
+4. Open tiny PR → **preview deploy** → run e2e smoke → merge if gates pass.
 
 ### Required CI Checks (Summary)
 
@@ -57,7 +57,7 @@ This document is a focused onboarding and adoption guide for Harmony. Use it whe
 
 ### Day-in-the-Life (Solo)
 
-- **Mon**: Spec/BMAD → small PR #1.
+- **Mon**: Spec/Plan → small PR #1.
 - **Tue**: Tests/contracts; PR #2.
 - **Wed**: Feature + flags; preview smoke.
 - **Thu**: Security scans & perf budgets; PR #3.

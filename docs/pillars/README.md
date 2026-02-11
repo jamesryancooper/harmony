@@ -206,7 +206,7 @@ Velocity scored lowest on convivial alignment because speed alone can enable shi
 | Kit | Pillar | Maturity | Notes |
 |-----|--------|----------|-------|
 | SpecKit | Direction | `[Production]` | Spec-first validation |
-| PlanKit (BMAD) | Direction | `[Production]` | Shaping and appetite management |
+| PlanKit (planning kernel) | Direction | `[Production]` | Shaping and appetite management |
 | kit-base | Focus | `[Production]` | Foundation for all kits |
 | PromptKit | Focus | `[Production]` | AI prompt orchestration |
 | AgentKit | Velocity | `[Production]` | AI agents for autonomous tasks |

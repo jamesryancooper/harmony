@@ -43,13 +43,13 @@ Harmony expects ADRs alongside the spec; they close the loop during “Learn” 
 
 ---
 
-## 2) BMAD Story (execution plan) + Contracts — *the development guide*
+## 2) Feature Story (execution plan) + Contracts — *the development guide*
 
 **Purpose**
 Turn the Spec into a small, concrete plan with acceptance criteria and tests—optimized for tiny, safe PRs behind flags.
 
 **Why this fits**
-Harmony prescribes converting the Spec into a **BMAD story** (context packets + agent plan + acceptance criteria) and shipping via tiny PRs, previews, feature flags, and **CI gates**.  
+Harmony prescribes converting the Spec into a **feature story** (context packets + agent plan + acceptance criteria) and shipping via tiny PRs, previews, feature flags, and **CI gates**.  
 
 **Ultra-lean template (2–3 pages max):**
 
@@ -80,7 +80,7 @@ Harmony treats **contracts** as first-class and enforces **OpenAPI diff (oasdiff
 
 If your component emits on-disk artifacts (JSON/JSONL/manifests), also define JSON Schemas for those artifacts, include a `schema_version`, and document them in the Component Guide.
 
-> **Repo hint:** keep these in `packages/contracts/` and link them from the Spec/BMAD.
+> **Repo hint:** keep these in `packages/contracts/` and link them from the Spec/Plan flow.
 
 ---
 
@@ -143,7 +143,7 @@ Harmony’s reliability guardrails expect **SLOs, error-budget policy**, **previ
 1. **Start with the Spec One-Pager**
    Write the spec + ADR, including contracts, non-functionals, and **STRIDE** with tests you’ll add. Keep scope tight (Must/Defer).
 
-2. **Transform into the BMAD Story**
+2. **Transform into the Feature Story**
    Add context packets, the agent plan (tiny diffs), acceptance criteria, and link the **contracts**. Keep PRs tiny, always behind a **feature flag**.
 
 3. **Lean on Contracts as truth**

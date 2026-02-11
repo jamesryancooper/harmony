@@ -54,7 +54,7 @@ Before beginning, document the evaluation context:
 
 ## Context
 
-You are a senior methodology architect conducting a comprehensive assessment of Harmony's methodology. The methodology has been designed for **tiny teams (1-3 developers)** and claims to be **lean and AI-accelerated**. Your task is to **assess, explore, refine, and evaluate** the methodology for:
+You are a senior methodology architect conducting a comprehensive assessment of Harmony's methodology. The methodology has been designed for **tiny teams (1-3 developers)** and claims to be **AI-native, human-governed**. Your task is to **assess, explore, refine, and evaluate** the methodology for:
 
 1. **Pillar alignment** — Does every methodology element serve one or more pillars?
 2. **Operational clarity** — Can tiny teams apply the methodology day-to-day?
@@ -140,7 +140,7 @@ The methodology spans these documents:
 |----------|-----------|---------|
 | **Core** | `README.md` | Main overview and unifying narrative |
 | **Flow** | `flow-and-wip-policy.md`, `risk-tiers.md`, `auto-tier-assignment.md` | Work management and risk classification |
-| **Practices** | `spec-first-bmad.md`, `ci-cd-quality-gates.md`, `sandbox-flow.md` | Development workflows |
+| **Practices** | `spec-first-planning.md`, `ci-cd-quality-gates.md`, `sandbox-flow.md` | Development workflows |
 | **Standards** | `security-baseline.md`, `reliability-and-ops.md`, `performance-and-scalability.md` | Non-functional requirements |
 | **Structure** | `architecture-and-repo-structure.md`, `tooling-and-metrics.md` | Technical architecture |
 | **Governance** | `methodology-as-code.md` | Schema-first methodology encoding and enforcement |
@@ -308,15 +308,15 @@ Complete the assessment template for each of the following methodology elements.
 
 ---
 
-### Element 4: Spec-First & BMAD Workflow
+### Element 4: Spec-First Planning Workflow
 
-**Purpose:** Defines the spec-first discipline, BMAD story pattern, and Cursor-assisted development loop.
+**Purpose:** Defines the spec-first discipline, feature story pattern, and AI-assisted development loop.
 
 **Assessment Questions:**
 
 1. Is "every material change" clearly defined?
 2. Are the spec templates (tier1/tier2/tier3) appropriately scoped?
-3. Is the BMAD → Cursor workflow practical?
+3. Is the feature story → AI IDE workflow practical?
 4. How does spec-first work for urgent fixes?
 5. Is the Plan → Diff → Explain → Test loop clear?
 
@@ -677,7 +677,7 @@ Evaluate the methodology elements as a system.
 |------|-----------|-----------|-----------|-----------|----------------------|
 | Risk levels | T1/T2/T3 | Trivial/Standard/Elevated | Low/Medium/High | | |
 | Validation gates | Gate | Check | Guard | | |
-| Specification | Spec | One-pager | BMAD story | | |
+| Specification | Spec | One-pager | Feature story | | |
 | Safety | Safe | Safety | Trust | | |
 | Work item | Card | Ticket | Issue | | |
 
@@ -693,7 +693,7 @@ Evaluate the methodology elements as a system.
 | Risk tier gates | risk-tiers | ci-cd-quality-gates | | | |
 | SLO definitions | README | reliability-and-ops | | | |
 | Feature flag guidance | README | architecture | | | |
-| STRIDE guidance | security-baseline | spec-first-bmad | | | |
+| STRIDE guidance | security-baseline | spec-first-planning | | | |
 
 ---
 
@@ -713,7 +713,7 @@ Evaluate the methodology elements as a system.
 
 | Referenced Document | Exists? | Complete? | Notes |
 |--------------------|---------|-----------|-------|
-| `spec-first-bmad.md` | | | |
+| `spec-first-planning.md` | | | |
 | `ci-cd-quality-gates.md` | | | |
 | `security-baseline.md` | | | |
 | `reliability-and-ops.md` | | | |
@@ -753,7 +753,7 @@ The Six Pillars reference specific kits as their implementation mechanisms. Veri
 | Kit | Pillar | Expected in Methodology | Actually Referenced? | Integration Quality |
 |-----|--------|------------------------|---------------------|---------------------|
 | SpecKit | Direction | Spec-First, Risk Tiers | | |
-| PlanKit (BMAD) | Direction | Spec-First | | |
+| PlanKit (planning kernel) | Direction | Spec-First | | |
 | kit-base | Focus | Architecture | | |
 | PromptKit | Focus | Architecture, AI sections | | |
 | AgentKit | Velocity | Core, CI/CD | | |
@@ -827,7 +827,7 @@ Teams adopting Harmony likely have experience with other methodologies. Evaluate
 
 | Differentiator | Claimed? | Substantiated? | Evidence |
 |----------------|----------|----------------|----------|
-| AI-accelerated (not just AI-assisted) | | | |
+| AI-native, human-governed (not just AI-assisted) | | | |
 | Lean for tiny teams (1-3 devs) | | | |
 | Spec-first with tiered rigor | | | |
 | Convivial Purpose integration | | | |
@@ -855,7 +855,7 @@ Teams adopting Harmony likely have experience with other methodologies. Evaluate
 | README.md | | min | Yes / Too long / Too short |
 | flow-and-wip-policy.md | | min | |
 | risk-tiers.md | | min | |
-| spec-first-bmad.md | | min | |
+| spec-first-planning.md | | min | |
 | implementation-guide.md | | min | |
 | Other critical docs: | | min | |
 
@@ -951,8 +951,8 @@ The Implementation Guide defines a detailed A→J lifecycle that is more granula
 |-------|---------------|-------------|------------------|----------------|
 | A — Spec | PLAN | | | |
 | B — Shape & Scope | PLAN | | | |
-| C — Plan (BMAD) | PLAN | | | |
-| D — Dev in Cursor | SHIP | | | |
+| C — Plan (feature story) | PLAN | | | |
+| D — Dev in AI IDE | SHIP | | | |
 | E — PR → Preview | SHIP | | | |
 | F — CI Gates | SHIP | | | |
 | G — Merge | SHIP | | | |
@@ -1793,7 +1793,7 @@ These are inherent tensions between pillars that the methodology must balance:
 | GitHub | | | High / Medium / Low |
 | Turborepo | | | High / Medium / Low |
 | OpenTelemetry backend | | | High / Medium / Low |
-| Cursor IDE | | | High / Medium / Low |
+| AI IDE | | | High / Medium / Low |
 | Pact Broker | | | High / Medium / Low |
 
 **Questions:**
@@ -1818,7 +1818,7 @@ These are inherent tensions between pillars that the methodology must balance:
 | Observability backend | | | |
 | Pact Broker hosting | | | |
 | AI/LLM tokens | | | |
-| Cursor subscription | | | |
+| AI IDE subscription | | | |
 
 **Minimum Viable Budget:** $___ /month for 2-dev team
 

@@ -5,7 +5,7 @@ For full guidance on how these stubs fit together and how to use them, see the D
 This bundle contains **ready-to-rename** stubs for the Harmony workflow:
 
 - `Spec One-Pager` + lightweight `ADR`
-- `BMAD Story` (execution plan) + **Contracts** (OpenAPI + JSON Schema)
+- `Feature Story` (execution plan) + **Contracts** (OpenAPI + JSON Schema)
 - `Component/Developer Guide`
 - `Operations Runbook`
 

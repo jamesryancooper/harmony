@@ -12,7 +12,7 @@ This glossary defines key terms used throughout Harmony documentation.
 ## Core Concepts
 
 ### Harmony
-The methodology itself—a lean, AI-accelerated approach where human developers orchestrate AI agents to build enterprise-quality software.
+The methodology itself—an AI-native, human-governed approach where developers orchestrate AI agents to build enterprise-quality software.
 
 ### Spec (Specification)
 A structured document describing what you want to build. Includes problem statement, solution approach, contracts, and acceptance criteria. AI generates specs from your descriptions; you review and approve.
@@ -55,8 +55,8 @@ A tool module that AI agents use internally. Examples: SpecKit, PlanKit, TestKit
 
 ## Development Flow
 
-### BMAD
-"Brief Method for Agile Development" — a structured approach to breaking down work. AI uses this internally when generating plans.
+### Feature Story
+A structured planning artifact containing context, an agent plan, and acceptance criteria derived from an approved spec.
 
 ### ADR (Architecture Decision Record)
 A document recording an important technical decision, its context, and consequences. AI generates these for significant changes.
@@ -223,4 +223,3 @@ When human docs reference "engines," they mean these underlying Kits:
 - [START-HERE.md](./START-HERE.md) — Entry point for human developers
 - [Full Methodology](methodology/README.md) — Complete AI-facing documentation
 - [Kit Documentation](kits/README.md) — Detailed Kit specifications
-
