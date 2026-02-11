@@ -9,12 +9,31 @@ description: Canonical reference for the domain-organized agent harness pattern.
 
 | Term | Meaning |
 |------|---------|
+| Harmony Framework | The overall methodology, architecture, principles, and reusable system design that can be applied across many repositories and teams |
+| Harmony Universal Localized Harness | The concrete `.harmony/` implementation inside a specific repository or subdirectory that applies the framework locally |
+| Root harness | The primary `.harmony/` at repo root that owns repo-wide harness policy and shared defaults |
+| Descendant harness | A localized `.harmony/` in any subdirectory, scoped to that subtree |
 | Harness | The `.harmony/` support structure |
 | Domain | A top-level directory organizing related concerns (e.g., `cognition/`, `orchestration/`) |
 | Portable infrastructure | Reusable framework assets declared in `harmony.yml` |
 | Boot sequence | Steps to orient and begin work |
 | Cold start | First session without prior context |
 | Token budget | Maximum tokens for agent-facing content |
+
+## Harmony Universal Localized Harness vs Harmony Framework
+
+The terms are related but operate at different levels:
+
+| Dimension | Harmony Framework | Harmony Universal Localized Harness |
+|-----------|-------------------|-------------------------------------|
+| **Level** | System-level paradigm | Repository/workspace-level implementation |
+| **Scope** | Cross-project, reusable model | Local to one repo or nested area |
+| **What it includes** | Principles, architecture, governance, and reusable patterns | Concrete `.harmony/` files: workflows, skills, continuity, quality gates, context |
+| **Portability role** | Defines what should be portable in general | Uses `harmony.yml` to declare exactly which local paths are portable |
+| **State model** | Conceptual + reusable standards | Operational + stateful (project decisions, continuity, mission artifacts) |
+| **Purpose** | Provide a consistent way to build with Harmony | Execute Harmony in a specific codebase with local context |
+
+**Short rule:** The **Framework** is the "system design"; the **Universal Localized Harness** is that design instantiated in a specific repository so humans and agents can run it.
 
 ## Agency Subsystem Docs
 
@@ -29,7 +48,11 @@ For the finalized agency model, see:
 
 ## Single-Root Architecture
 
-Everything lives under a single `.harmony/` directory, organized by **domain**:
+Within a given harness scope, everything lives under one `.harmony/` directory, organized by **domain**.
+
+At repository level, this is the root harness (`/<repo>/.harmony/`). Additional descendant harnesses can exist in subdirectories for localized work.
+
+Canonical root-harness structure:
 
 ```
 .harmony/
@@ -51,7 +74,7 @@ Everything lives under a single `.harmony/` directory, organized by **domain**:
 | **Portable** | Declared in `harmony.yml` | Framework assets that travel across repos (agents, skills, templates, checklists) |
 | **Project-specific** | Everything else | Local state: continuity, missions, decisions, project context |
 
-**Portability:** The `harmony.yml` manifest at the root of `.harmony/` declares which paths are portable. Running `harmony init` copies those paths to bootstrap a new repo. Project-specific state (continuity logs, missions, decisions) stays with the originating repo. See [harmony.yml](#harmonyyml-portability-metadata) for details.
+**Portability:** The root harness `harmony.yml` manifest declares which paths are portable. Running `harmony init` copies those paths to bootstrap a new repo. Project-specific state (continuity logs, missions, decisions) stays with the originating repo. See [harmony.yml](#harmonyyml-portability-metadata) for details.
 
 ---
 
@@ -204,12 +227,19 @@ Agents struggle when they "arrive with no memory of what came before." A `.harmo
 
 ### Structure Categorization
 
-| Category | Items | Description |
-|----------|-------|-------------|
-| **Required** | `START.md`, `scope.md`, `conventions.md`, `catalog.md`, `continuity/`, `quality/complete.md`, `scaffolding/prompts/`, `orchestration/workflows/`, `capabilities/commands/`, `cognition/context/` | MUST exist in every harness |
-| **Recommended** | `quality/session-exit.md` | SHOULD exist for session continuity |
-| **Standard** | `scaffolding/templates/`, `scaffolding/examples/`, `agency/agents/`, `agency/assistants/`, `agency/teams/`, `orchestration/missions/`, `ideation/projects/` | Create as needed for the harness's use case |
-| **Human-led** | `ideation/projects/`, `ideation/scratchpad/` | Require explicit human direction for agent access |
+The full tree above is the **canonical superset**. In practice, harness profiles differ:
+
+| Profile | Baseline | Notes |
+|---------|----------|-------|
+| **Root harness (repo-wide)** | `harmony.yml`, `START.md`, `scope.md`, `conventions.md`, `catalog.md`, `continuity/`, `quality/`, `scaffolding/prompts/`, `orchestration/workflows/`, `capabilities/commands/`, `cognition/context/` | Root is the primary coordination harness and is expected to carry full governance/state coverage |
+| **Descendant harness (localized)** | `START.md`, `scope.md`, plus at least one active subsystem (`cognition/`, `capabilities/`, `orchestration/`, `continuity/`, or `quality/`) | Descendants are intentionally minimal. They include only subsystems needed for that subtree |
+
+| Subsystem | Root Harness | Descendant Harness |
+|-----------|--------------|--------------------|
+| `conventions.md`, `catalog.md` | Recommended baseline | Optional (add when local rules or local command discovery diverges) |
+| `continuity/` | Recommended baseline | Optional (add for multi-session localized work) |
+| `quality/` | Recommended baseline | Optional (add when local completion gates are needed) |
+| `agency/`, `scaffolding/`, `ideation/`, `output/` | Common at root | Optional and usually omitted unless clearly local-useful |
 
 ---
 
@@ -561,7 +591,9 @@ The `.harmony` directory formalizes this for the age of AI agents, creating a **
 
 ## Nested Harnesses
 
-Nested harnesses use the same `.harmony/` convention. A subdirectory can have its own `.harmony/` that provides area-specific context, while inheriting portable infrastructure from the root-level `.harmony/`.
+Nested harnesses use the same `.harmony/` convention. A descendant `.harmony/` can live in **any directory** in the repository where localized context is beneficial.
+
+A subdirectory harness provides area-specific context while inheriting defaults from the root harness.
 
 ```
 repo-root/
@@ -580,6 +612,24 @@ repo-root/
 ```
 
 Agents encountering a nested `.harmony/` should use it as their primary harness for that area. The root `.harmony/` provides fallback infrastructure for anything not overridden locally.
+
+---
+
+## Root vs Descendant Harness Contract
+
+The root harness and descendant harnesses are complementary, not competing:
+
+| Dimension | Root Harness (`/<repo>/.harmony/`) | Descendant Harness (`/<repo>/<path>/.harmony/`) |
+|-----------|------------------------------------|--------------------------------------------------|
+| Primary purpose | Repo-wide governance and shared defaults | Localized context for one subtree |
+| Activation | Used when no nearer descendant exists | Used when it is the nearest `.harmony/` ancestor |
+| Scope | Whole repository | The descendant directory and its descendants |
+| Subsystem expectation | Broad coverage across capabilities and governance | Minimal, task-driven subset only |
+| Fallback behavior | Provides defaults to descendants | Overrides root guidance where explicitly defined |
+
+**Nearest-harness rule:** When both root and descendant harnesses exist, agents resolve to the nearest `.harmony/` ancestor of the current work path; root content is fallback when the descendant does not define a local override.
+
+**Migration note:** Legacy `.workspace/` guidance for localized workspaces now maps directly to descendant `.harmony/` harnesses with the same locality model.
 
 ---
 
@@ -602,7 +652,7 @@ Harnesses are designed to be **portable across all AI harnesses**---Cursor, Clau
        |              |              |              |
        v              v              v              v
 +------------------------------------------------------------+
-|                  SINGLE .harmony/ ROOT                      |
+|               PRIMARY .harmony/ ROOT (repo-level)           |
 +------------------------------------------------------------+
 |  .harmony/                                                  |
 |  +-- harmony.yml           (portability metadata)           |
@@ -615,7 +665,7 @@ Harnesses are designed to be **portable across all AI harnesses**---Cursor, Clau
 
 | Principle | Description |
 |-----------|-------------|
-| **Single root in `.harmony/`** | All harness infrastructure lives under one directory, organized by domain |
+| **Single root per harness scope** | Each harness uses one `.harmony/` root in its scope; repositories may contain root + descendant harnesses |
 | **`harmony.yml` declares portability** | Metadata specifies which paths are framework assets vs. project-specific |
 | **Harness entry points are thin wrappers** | `.<harness>/commands/` only provides syntax and delegation |
 | **No harness-specific logic in workflows** | Workflows work identically regardless of invoking harness |

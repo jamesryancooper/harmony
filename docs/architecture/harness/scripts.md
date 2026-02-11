@@ -5,7 +5,7 @@ description: Shell scripts for harness health checks and automation.
 
 # Harness Scripts
 
-Scripts are **shell utilities** stored at the `.harmony/` root level. They provide automation for harness maintenance tasks that are better suited to shell execution than agent procedures.
+Scripts are **shell utilities** stored at the primary (repo-root) `.harmony/` level. They provide automation for harness maintenance tasks that are better suited to shell execution than agent procedures.
 
 ## Location
 
@@ -18,13 +18,14 @@ Scripts are **shell utilities** stored at the `.harmony/` root level. They provi
 
 ## `init.sh`
 
-The primary harness script. Verifies that required files and directories exist.
+The primary root-harness script. Verifies that root-profile files and directories exist.
 
 ### Purpose
 
 - Validate harness structure integrity
 - Report missing required components
 - Identify available standard directories
+- Validate the repo-root harness profile (not minimal descendant profiles)
 
 ### Usage
 
@@ -62,6 +63,8 @@ Standard directories:
 | `0` | All required files/directories present |
 | `1` | One or more required items missing |
 
+Descendant harnesses may intentionally omit many root-profile directories. Use `init.sh` as a root harness check, not as a strict descendant harness validator.
+
 ---
 
 ## When to Use Scripts vs Workflows
@@ -92,4 +95,3 @@ Scripts are for **quick validation**. Workflows are for **agent-driven procedure
 
 - [README.md](./README.md) — Canonical harness structure
 - [Checklists](./checklists.md) — Quality gates (agent-facing alternative to validation scripts)
-

@@ -1,13 +1,15 @@
 ---
 title: ".harmony/ Architecture"
-description: The single-root, capability-organized harness that drives all Harmony projects.
+description: Capability-organized harness architecture with a repo root harness and optional localized descendant harnesses.
 ---
 
 # `.harmony/` Architecture
 
 ## Purpose
 
-`.harmony/` is the **single root directory** for all harness infrastructure. It organizes resources by **capability category** rather than by reusability layer, eliminating the need for separate "shared" and "local" directories. A root manifest (`harmony.yml`) declares which paths are portable to other repositories and which are project-specific state.
+For any harness scope, `.harmony/` is the **single root directory** for that scope's harness infrastructure. Repositories can have a primary root harness at repo root plus optional descendant harnesses in subdirectories for localized work.
+
+The structure is organized by **capability category** rather than by reusability layer, eliminating the old separate "shared" and "local" directory model. A root manifest (`harmony.yml`) declares which paths are portable to other repositories and which are project-specific state.
 
 The key insight: **organize by what things do, not by where they came from**.
 
@@ -65,6 +67,32 @@ The key insight: **organize by what things do, not by where they came from**.
     ├── drafts/              #   Work-in-progress documents
     └── artifacts/           #   Other generated outputs
 ```
+
+The tree above is the canonical superset profile. Descendant harnesses may include only the subsystems needed for their local scope.
+
+---
+
+## Root and Descendant Harnesses
+
+Descendant `.harmony/` directories can be created in any subtree that benefits from localized context.
+
+| Dimension | Root Harness | Descendant Harness |
+| --------- | ------------ | ------------------ |
+| Typical path | `/<repo>/.harmony/` | `/<repo>/<subpath>/.harmony/` |
+| Purpose | Repo-wide policy, defaults, and shared assets | Localized guidance for one subtree |
+| Scope | Entire repository | Local subtree (its directory + descendants) |
+| Subsystems | Usually broad/full profile | Minimal profile (only needed subsystems) |
+| Resolution | Fallback/default source | Nearest harness takes precedence |
+
+### Minimal Descendant Profile
+
+A descendant harness does not need every subsystem. Baseline:
+
+- `START.md`
+- `scope.md`
+- At least one active subsystem (`cognition/`, `capabilities/`, `orchestration/`, `continuity/`, or `quality/`)
+
+Add only what the local area needs (for example `continuity/` for multi-session work, `quality/` for local gates, `conventions.md` for local style deltas).
 
 ---
 

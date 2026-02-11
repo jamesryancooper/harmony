@@ -7,6 +7,11 @@ description: Quality gates stored in .harmony/quality/ including definition of d
 
 The `quality/` directory contains **quality gates** that agents verify before completing work.
 
+Applicability by harness type:
+
+- Root harness: `quality/` is strongly recommended and typically present.
+- Descendant harness: `quality/` is optional; include it when local completion gates are needed.
+
 ## Location
 
 ```text
@@ -19,9 +24,12 @@ The `quality/` directory contains **quality gates** that agents verify before co
 
 ---
 
-## `complete.md` (Required)
+## `complete.md` (Required When `quality/` Exists)
 
-Every harness MUST have a `quality/complete.md` that defines completion criteria.
+If a harness includes the `quality/` subsystem, it MUST define `quality/complete.md` with completion criteria.
+
+- Root harness: should always include this file.
+- Descendant harness: include this file only when the descendant defines local quality gates.
 
 ### Structure
 

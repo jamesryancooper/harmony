@@ -88,6 +88,15 @@ Scoped templates **extend** the base `harmony/` template:
 | `harmony-docs/` | `harmony/` | Docs conventions, ARE workflows |
 | `harmony-node-ts/` | `harmony/` | TypeScript/React conventions |
 
+### Root vs Descendant Usage
+
+| Harness Type | Template Guidance |
+|--------------|-------------------|
+| **Root harness** | Use the base `harmony/` profile as-is (full governance/state coverage) |
+| **Descendant harness** | Start from a template, then prune unused subsystems to keep local harnesses minimal |
+
+The scaffold intentionally starts comprehensive; localized descendant harnesses may omit subsystems that are not needed in that subtree.
+
 ### Resolution Order
 
 When creating a harness with a scoped template:
