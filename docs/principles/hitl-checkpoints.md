@@ -1,23 +1,23 @@
 ---
 title: Human-in-the-Loop Checkpoints
-description: Agents propose, humans approve. Material changes require human review before taking effect.
+description: AI drives within principled bounds while humans govern direction, safety boundaries, and material decisions through risk-tiered checkpoints.
 pillar: Trust, Direction
 status: Active
 ---
 
 # Human-in-the-Loop Checkpoints
 
-> Agents propose, humans approve. Material changes require human review before taking effect.
+> AI drives within principled bounds; humans govern direction, safety boundaries, and material decisions.
 
 ## What This Means
 
-Human-in-the-Loop (HITL) is a governance principle: AI agents can analyze, plan, draft, and suggest, but humans make final decisions on material changes. This creates a collaborative model where:
+Human-in-the-Loop (HITL) is a governance principle for AI-native delivery: agents execute most routine planning, implementation, and verification autonomously inside explicit policy and risk boundaries, while humans govern direction and approve material decisions. This creates a collaborative model where:
 
-- Agents handle the cognitive heavy lifting
-- Humans provide judgment, context, and approval
-- Neither operates entirely autonomously on consequential decisions
+- Agents execute within approved boundaries and produce reviewable artifacts
+- Humans set direction, define boundaries, and arbitrate material risk
+- Oversight intensity is calibrated to risk tier, not applied uniformly at every step
 
-The standard loop is: **Plan → Diff → Explain → Test → Human Approval → Apply**
+The standard loop is: **Intent → Boundaries → Plan/Diff/Test → Risk-Tiered Human Checkpoint → Apply**
 
 ## Why It Matters
 
@@ -50,26 +50,24 @@ Not all agent actions require the same level of oversight:
 | Hard checkpoint | Must approve | File edits, commits, deploys |
 | Prohibited | Cannot do | Delete files, push to main |
 
-HITL checkpoints typically apply to "hard checkpoint" actions.
+HITL checkpoints are triggered by action class and risk tier. Low-risk work can run with notify or soft checkpoints, while hard checkpoints are reserved for material changes.
 
 ## In Practice
 
 ### The Standard Agent Loop
 
 ```
-1. PLAN    Agent analyzes task, proposes approach
+1. DIRECT  Human sets intent, constraints, and risk context
               ↓
-2. DIFF    Agent shows exactly what will change
+2. EXECUTE Agent runs plan/diff/test loops within bounds
               ↓
-3. EXPLAIN Agent explains why these changes
+3. SIGNAL  Agent surfaces evidence, risk classification, and deltas
               ↓
-4. TEST    Agent runs tests, shows results
+4. CHECK   Human review is required only when risk tier requires it
               ↓
-5. REVIEW  Human reviews plan, diff, explanation, tests
+5. APPLY   Agent applies approved changes through governed paths
               ↓
-6. APPROVE Human approves or requests changes
-              ↓
-7. APPLY   Agent applies approved changes
+6. VERIFY  Agent and human verify outcomes and feed learning forward
 ```
 
 ### ✅ Do

@@ -30,27 +30,30 @@ Convivial Purpose (WHY)
 | [Reversibility](./reversibility.md) | Every change should be undoable | Trust, Velocity |
 | [Deny by Default](./deny-by-default.md) | No permissions until explicitly granted | Trust |
 | [Determinism](./determinism.md) | Same inputs produce same outputs | Trust, Insight |
-| [HITL Checkpoints](./hitl-checkpoints.md) | Agents propose, humans approve | Trust, Direction |
+| [HITL Checkpoints](./hitl-checkpoints.md) | AI drives within bounds; humans govern material decisions | Trust, Direction |
 
 ## Relationship to Pillars
 
 Each principle implements one or more of the [Six Pillars](../pillars/README.md):
 
 ### PLAN Phase Principles
+
 - **Progressive Disclosure** → Focus (absorbed complexity)
 - **Simplicity Over Complexity** → Focus (cognitive bandwidth)
 - **Locality** → Focus (scoped context reduces noise)
-- **HITL Checkpoints** → Direction (validated decisions)
+- **HITL Checkpoints** → Direction (risk-tiered governance keeps work aligned)
 
 ### SHIP Phase Principles
+
 - **Single Source of Truth** → Trust (predictable behavior)
 - **Simplicity Over Complexity** → Velocity (fewer moving parts)
 - **Reversibility** → Trust (recoverable mistakes) + Velocity (ship fast, roll back safely)
 - **Deny by Default** → Trust (bounded agents, enforced security)
 - **Determinism** → Trust (predictable, reproducible behavior)
-- **HITL Checkpoints** → Trust (human oversight on material changes)
+- **HITL Checkpoints** → Trust (risk-tiered oversight on material changes)
 
 ### LEARN Phase Principles
+
 - **Single Source of Truth** → Continuity (durable knowledge)
 - **Progressive Disclosure** → Insight (efficient learning)
 - **Locality** → Continuity (discoverable, domain-specific knowledge)
@@ -59,16 +62,19 @@ Each principle implements one or more of the [Six Pillars](../pillars/README.md)
 ## How to Use Principles
 
 ### In Design Documents
+
 Reference principles when justifying decisions:
 
 > *"We chose a monolith over microservices per [Simplicity Over Complexity](./simplicity-over-complexity.md) — we don't yet have evidence that we need distributed coordination."*
 
 ### In Code Reviews
+
 Cite principles when requesting changes:
 
 > *"This duplicates the schema definition. Per [Single Source of Truth](./single-source-of-truth.md), we should generate types from the OpenAPI spec."*
 
 ### In Architecture Decisions
+
 Use principles as evaluation criteria:
 
 | Option | Progressive Disclosure | Simplicity | Single Source |
@@ -79,7 +85,9 @@ Use principles as evaluation criteria:
 ## Principle Categories
 
 ### Core Principles
+
 Foundational principles that apply to all engineering decisions. See [`principles.md`](../principles.md) for the complete list including:
+
 - Monolith-first modulith
 - Contract-first
 - Small diffs, trunk-based
@@ -87,13 +95,17 @@ Foundational principles that apply to all engineering decisions. See [`principle
 - Reversibility
 
 ### Agentic Principles
+
 Principles specific to AI-assisted development:
+
 - No silent apply
 - Determinism & provenance
-- HITL checkpoints
+- HITL checkpoints (risk-tiered oversight)
 
 ### Anti-Principles
+
 Patterns we explicitly avoid:
+
 - Early microservices
 - Long-lived branches
 - Flaky tests

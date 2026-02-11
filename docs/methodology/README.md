@@ -1,11 +1,19 @@
 ---
-title: Lean AI-Accelerated Methodology Overview
-description: Lean, principle-driven development methodology integrating Spec‑First, agentic workflows, opinionated guardrails, and automated quality gates—enabling safe, high-velocity shipping for solo developers using modern AI and monorepo tools.
+title: AI-Native, Human-Governed Methodology Overview
+description: Principled, AI-native methodology for solo builders — lean in ceremony, rich in capability — with spec-led intent capture, context-efficient planning, autonomous execution loops, and risk-tiered human governance.
 ---
 
 # Harmony Methodology
 
-Harmony is a lean, **opinionated**, AI-accelerated methodology you can adopt tomorrow as a solo developer, optimized for **speed and quality with safety** on your stated stack and hosting. It integrates **Spec‑First (via SpecKit `speckit` wrapping GitHub’s Spec Kit) + Agentic agile (via PlanKit `plankit` wrapping BMAD) + Flow orchestration (via FlowKit) + AI-driven IDE (Cursor) + Monorepo Workflow (Turborepo) + Deployment Platform (Vercel)** end‑to‑end, while baking in **SRE, DevSecOps, OWASP ASVS, NIST SSDF, STRIDE, 12‑Factor, Monolith‑First, Hexagonal**.
+Harmony is an AI-native, human-governed development methodology for solo builders.
+
+Harmony empowers solo developers across experience levels to ship high-quality software with speed, safety, and confidence. It combines spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered human checkpoints within a principled, progressively adoptable framework.
+
+Harmony is lean in ceremony and rich in capability: context-efficient artifacts, progressive disclosure, and fast feedback loops — without imposing vendor lock-in or stack prescription.
+
+Harmony is stack-, host-, and environment-agnostic, adapting to your chosen IDE, terminal, harness, repository structure, and deployment platform. Start with the defaults; deepen as your project demands.
+
+Work is organized as a closed loop across **PLAN** (Direction, Focus), **SHIP** (Velocity, Trust), and **LEARN** (Continuity, Insight). Defaults are principled and guardrails are opinionated: contract-first design, small-batch trunk flow, reversible delivery, observability, and secure-by-default controls informed by established standards.
 
 ---
 
@@ -13,7 +21,7 @@ Harmony is a lean, **opinionated**, AI-accelerated methodology you can adopt tom
 
 ## Harmony’s Unifying Objective
 
-Harmony unifies speed, safety, and simplicity so a solo developer can ship high‑quality software quickly, safely, and predictably. Every framework and tool listed above reinforces one of Harmony's six pillars and closes the loop from validated specification → focused implementation → fast shipping → safe delivery → preserved knowledge → structured learning.
+Harmony unifies speed, safety, and simplicity so a solo builder can ship high-quality software quickly, safely, and predictably. AI agents drive planning, implementation, and verification autonomously within principled bounds, while humans govern direction, define safety boundaries, and exercise risk-tiered oversight. Every principle, guardrail, and artifact reinforces one or more of Harmony's six pillars and closes the loop from validated intent → focused implementation → fast shipping → safe delivery → preserved knowledge → structured learning.
 
 ### The Six Pillars
 
@@ -168,7 +176,7 @@ Use these companion documents when you need deeper operational detail:
 
 ## Harmony's Components
 
-Here’s an explanation of each framework, method, and tool in the **Harmony Methodology** — and *why* it aligns with the **Harmony Methodology** for Lean AI-Accelerated development. Together, these ensure that every change — human or AI-generated — is **traceable, testable, and reversible**, fulfilling Harmony’s “lean AI-accelerated” promise.
+Here’s an explanation of each framework, method, and tool in the **Harmony Methodology** — and *why* it aligns with Harmony’s AI-native, human-governed delivery model. Together, these ensure that every change — human or AI-generated — is **traceable, testable, and reversible**, fulfilling Harmony’s promise of fast, safe, high-confidence shipping.
 
 ### Frameworks & Standards
 
@@ -242,7 +250,7 @@ Here’s an explanation of each framework, method, and tool in the **Harmony Met
 
 ## How Harmony’s Components Reinforce Each Other
 
-Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (ASVS, SSDF, STRIDE) define what “safe” means. Tools and platforms (Vercel, GitHub, OTel, Turborepo) ensure speed and safety coexist. This alignment makes Harmony lean, agent‑ready, and safe by default—so AI‑accelerated solo developers can move fast without breaking trust.
+Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (ASVS, SSDF, STRIDE) define what “safe” means. Tools and platforms (Vercel, GitHub, OTel, Turborepo) ensure speed and safety coexist. This alignment makes Harmony AI-native, principled, and safe by default — so solo builders can move fast without breaking trust.
 
 ### 1) Security and Compliance (Defense‑in‑Depth)
 
@@ -286,7 +294,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - Deterministic, reviewable agent loops: Plan → Diff → Explain → Test; no silent apply.
 - Pinned AI configuration and low‑variance defaults; golden tests guarded by JSON‑Schema prevent drift.
 - Observability and provenance: OTel traces/logs on runs; PRs include representative `trace_id` and Eval/Policy outcomes.
-- Fail‑closed governance: HITL checkpoints enforced; agents cannot approve PRs or push to protected branches; humans retain ultimate authority, oversight, and accountability.
+- Fail-closed governance: risk-tiered HITL checkpoints enforced; agents cannot approve PRs or push to protected branches; humans retain ultimate authority, oversight, and accountability.
 - Outcome: AI systems autonomously self‑build, self‑heal, and self‑tune within deterministic, observable, and reversible bounds.
 
 ### In Short
@@ -299,7 +307,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 
 ## Harmony in Practice
 
-**Goal.** Ship small, quality, safe, and frequent changes with **enterprise‑grade** security, reliability, and performance using **agent‑assisted** workflows. Humans own correctness, security, and licensing.
+**Goal.** Ship small, quality, safe, and frequent changes with **enterprise‑grade** security, reliability, and performance using **AI-native** workflows with **risk-tiered human governance**. Humans own direction, safety boundaries, and material risk decisions.
 
 **Guiding principle.** **Simplicity first**: prefer the smallest viable process, design, and tooling that satisfy the requirement. Add complexity only when SLOs, scale, or compliance clearly require it; avoid unnecessary dependencies.
 
@@ -307,7 +315,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 
 - **Simplicity‑first**: choose the simplest process, design, and tooling that meets the requirement. Defer advanced patterns until justified by SLOs/scale/compliance. Default to no new dependency unless it materially reduces complexity.
 - **Spec‑first**: every meaningful change starts with a **Specification one‑pager** + **ADR** capturing problem, scope, API/UI contracts, SLIs/SLOs, **non‑functionals**, and a **micro‑threat model (STRIDE)** mapped to **OWASP ASVS** & **NIST SSDF** tasks.
-- **Agentic agile (BMAD)**: Convert the Spec to a **BMAD story** (context packets + agent plan + acceptance criteria). Use **Cursor** to generate plans/diffs/tests from the Spec, but enforce human checkpoints and license checks.
+- **Context-efficient planning**: Convert the Spec to a context packet (structured intent + agent plan + acceptance criteria). AI agents generate plans/diffs/tests from the Spec within governed bounds; risk-tiered checkpoints enforce human oversight on material changes.
 - **Flow over ceremony**: **Trunk‑Based Development** (+ short‑lived branches), tiny PRs, gated **Vercel Preview** per PR, **feature‑flagged** releases with guarded manual promote to prod; rollbacks are instant by promoting a prior preview.
 - **Reliability guardrails**: Define **SLIs/SLOs**, manage via **error budgets**, alert on budget burn, run blameless postmortems with action items.
 - **Security by default**: **OWASP ASVS** controls + **NIST SSDF** activities embedded in **CI/CD** quality gates: static analysis (**CodeQL/Semgrep**), dependency & **license** scan, **secret scanning**, SBOM, and contract tests.
@@ -326,7 +334,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
   - Owner (you): accountable for risk, waivers, and promotion decisions.
   - Driver (usually you): owns implementation and rollout plan (often the Owner).
   - Navigator (you, separate pass): owns review, security/license checks, and rollout readiness.
-  - Agents (Cursor + AI‑Toolkit): propose plans/diffs/tests; never approve risk or production changes.
+  - Agents (AI IDE/terminal/harness): drive planning, implementation, and verification within governed bounds; never approve risk or production changes.
 - Two‑pass rule: High‑risk changes require a Driver pass and a distinct Navigator pass (ideally time-separated) from spec to promotion; with 2 devs, Navigator is the other person.
 
 - Non‑negotiables (AI)
@@ -706,6 +714,6 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 
 ### Final notes
 
-- This method intentionally **minimizes ceremony and complexity**: few meetings, tiny PRs, clear gates, strong **Spec‑first + BMAD** with **Cursor** as a power tool and **humans as the safety system**.
+- This method intentionally **minimizes ceremony and maximizes capability**: few meetings, tiny PRs, clear gates, strong **spec-led intent capture** with **AI-native execution loops** and **risk-tiered human governance**.
 - It **scales with your risk**: tighten gates when error budget burns, loosen when healthy.
-- It is **fully compatible** with your stack and hosting, and gives you **enterprise‑grade** security and reliability from day one.
+- It is **stack-, host-, and environment-agnostic**, adapting to your project's needs while providing **enterprise‑grade** security and reliability from day one.
