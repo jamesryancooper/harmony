@@ -16,6 +16,8 @@ This harness extends `.harmony/` for shared infrastructure.
 | Workflows | `.harmony/orchestration/workflows/` | `.harmony/orchestration/workflows/` |
 | Skills | `.harmony/capabilities/skills/` | `.harmony/capabilities/skills/` |
 | Commands | `.harmony/capabilities/commands/` | `.harmony/capabilities/commands/` |
+| Tools | `.harmony/capabilities/tools/` | `.harmony/capabilities/tools/` |
+| Services | `.harmony/capabilities/services/` | `.harmony/capabilities/services/` |
 | Prompts | `.harmony/scaffolding/prompts/` | `.harmony/scaffolding/prompts/` |
 | Context | `.harmony/cognition/context/` | `.harmony/cognition/context/` |
 | Checklists | `.harmony/quality/` | `.harmony/quality/` |
@@ -41,7 +43,9 @@ This harness extends `.harmony/` for shared infrastructure.
 │
 ├── capabilities/
 │   ├── skills/         ← Composable capabilities
-│   └── commands/       ← Atomic operations
+│   ├── commands/       ← Atomic operations
+│   ├── tools/          ← Tool packs and custom tools
+│   └── services/       ← Typed domain capabilities
 │
 ├── cognition/
 │   └── context/        ← Decisions, lessons, glossary

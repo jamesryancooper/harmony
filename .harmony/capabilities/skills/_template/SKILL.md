@@ -40,6 +40,7 @@ capabilities: []
 # Format: Space-delimited list. Add (path/glob) to scope writes.
 # Example: Read Glob Grep Write(../prompts/*) Write(_state/logs/*)
 #          └─ Read-only ─┘     └─ Scoped writes ────────┘
+# Pack reference example: pack:read-only Write(_state/logs/*)
 # See: docs/architecture/harness/skills/specification.md#tool-permissions-single-source-of-truth
 # Tool reference: Read, Glob, Grep, Write(path/*), WebFetch, Shell, Task
 #
@@ -47,6 +48,9 @@ capabilities: []
 #   - Deliverables: Write(../{{category}}/*) - e.g., Write(../prompts/*), Write(../drafts/*)
 #   - Continuity Artifacts: Write(_state/runs/*) - for stateful/resumable skills
 allowed-tools: Read Glob Grep Write(../{{category}}/*) Write(_state/logs/*)
+# Allowed service IDs (optional, space-delimited):
+# Example: guard cost
+allowed-services:
 ---
 
 # {{skill_display_name}}

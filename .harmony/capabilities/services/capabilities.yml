@@ -1,0 +1,32 @@
+schema_version: "1.0"
+
+service_categories:
+  - guard
+  - prompt
+  - cost
+  - flow
+
+valid_interface_types:
+  - shell
+  - mcp
+  - library
+
+valid_statuses:
+  - active
+  - deprecated
+  - experimental
+  - draft
+
+valid_dependency_types:
+  - requires
+  - orchestrates
+  - integratesWith
+
+base_conventions:
+  error_codes: conventions/error-codes.md
+  run_records: conventions/run-records.md
+  observability: conventions/observability.md
+  idempotency: conventions/idempotency.md
+
+policy:
+  valid_enforcement_modes: [block, warn, off]

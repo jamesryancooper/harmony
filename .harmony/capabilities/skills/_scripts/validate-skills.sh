@@ -27,19 +27,20 @@
 #   12. No outputs in shared registry (should be in skills registry)
 #   13. Skill has I/O mappings in skills registry
 #   14. allowed-tools in SKILL.md is present and valid (single source of truth)
-#   15. Trigger overlap detection (warns on duplicate/similar triggers)
-#   16. I/O path scope validation
-#   17. Token budget validation (SKILL.md < 5000 tokens, manifest entry < 150 tokens)
-#   18. Description/summary alignment (summary should be subset of description)
-#   19. Cross-reference validation (all manifest skills have registry entries and vice versa)
-#   20. Reference file content validation (io-contract.md parameters match registry, examples use correct commands)
-#   21. Placeholder format validation ({{snake_case}} in registry paths)
-#   22. Version staleness check (warns if version is 1.0.0 for mature skills)
-#   23. Line count validation (SKILL.md < 500 lines per agentskills.io spec)
-#   24. Reference file token budgets (io-contract, safety, examples, phases, validation)
-#   25. Aggregate complexity budget (total reference file tokens vs complexity thresholds)
-#   26. Capability-triggered file validation (references match declared capabilities)
-#   27. Skill set and capability validation (valid values, reference file matching)
+#   15. allowed-services in SKILL.md resolves to services manifest entries
+#   16. Trigger overlap detection (warns on duplicate/similar triggers)
+#   17. I/O path scope validation
+#   18. Token budget validation (SKILL.md < 5000 tokens, manifest entry < 150 tokens)
+#   19. Description/summary alignment (summary should be subset of description)
+#   20. Cross-reference validation (all manifest skills have registry entries and vice versa)
+#   21. Reference file content validation (io-contract.md parameters match registry, examples use correct commands)
+#   22. Placeholder format validation ({{snake_case}} in registry paths)
+#   23. Version staleness check (warns if version is 1.0.0 for mature skills)
+#   24. Line count validation (SKILL.md < 500 lines per agentskills.io spec)
+#   25. Reference file token budgets (io-contract, safety, examples, phases, validation)
+#   26. Aggregate complexity budget (total reference file tokens vs complexity thresholds)
+#   27. Capability-triggered file validation (references match declared capabilities)
+#   28. Skill set and capability validation (valid values, reference file matching)
 #
 # Capability Model:
 #   Skills declare skill_sets (bundles) and capabilities in manifest.yml and SKILL.md.
@@ -71,6 +72,8 @@ REPO_ROOT="$(dirname "$HARMONY_DIR")"
 MANIFEST="$SKILLS_DIR/manifest.yml"
 REGISTRY="$SKILLS_DIR/registry.yml"
 SKILLS_REGISTRY="$REPO_ROOT/.harmony/capabilities/skills/registry.yml"
+TOOLS_MANIFEST="$REPO_ROOT/.harmony/capabilities/tools/manifest.yml"
+SERVICES_MANIFEST="$REPO_ROOT/.harmony/capabilities/services/manifest.yml"
 
 # Configuration
 STRICT_MODE=false
@@ -588,6 +591,7 @@ get_skill_tools() {
 # | Glob                       | filesystem.glob           | Pattern file discovery   |
 # | Grep                       | filesystem.grep           | Content search           |
 # | WebFetch                   | network.fetch             | HTTP requests (read)     |
+# | WebSearch                  | network.search            | HTTP search              |
 # | Bash / Bash(...)           | shell.execute             | Execute shell commands   |
 # | Shell                      | shell.execute             | Execute shell commands   |
 # | Task                       | agent.task                | Launch subagent tasks    |
@@ -607,12 +611,71 @@ map_allowed_to_internal() {
         Glob)                    echo "filesystem.glob" ;;
         Grep)                    echo "filesystem.grep" ;;
         WebFetch)                echo "network.fetch" ;;
+        WebSearch)               echo "network.search" ;;
         Bash)                    echo "shell.execute" ;;
         Bash\(*\))               echo "shell.execute" ;;
         Shell)                   echo "shell.execute" ;;
         Task)                    echo "agent.task" ;;
         *)                       echo "" ;;  # Unknown mapping
     esac
+}
+
+# Extract tool pack IDs from tools manifest.
+get_tool_pack_ids() {
+    if [[ ! -f "$TOOLS_MANIFEST" ]]; then
+        return
+    fi
+
+    awk '
+        /^packs:/ {in_packs=1; next}
+        /^tools:/ {in_packs=0}
+        in_packs && /^[[:space:]]*- id:/ {
+            id=$3
+            gsub(/["'\'' ]/, "", id)
+            print id
+        }
+    ' "$TOOLS_MANIFEST"
+}
+
+# Extract tools in a specific tool pack.
+get_tool_pack_tools() {
+    local pack_id="$1"
+    if [[ ! -f "$TOOLS_MANIFEST" ]]; then
+        return
+    fi
+
+    awk -v target="$pack_id" '
+        /^packs:/ {in_packs=1; next}
+        /^tools:/ {if (found) exit; in_packs=0}
+        in_packs && /^[[:space:]]*- id:/ {
+            id=$3
+            gsub(/["'\'' ]/, "", id)
+            found=(id==target)
+            next
+        }
+        found && /tools:[[:space:]]*\[/ {
+            line=$0
+            sub(/.*tools:[[:space:]]*\[/, "", line)
+            sub(/\].*/, "", line)
+            gsub(/["'\'']/, "", line)
+
+            n=split(line, arr, ",")
+            for (i=1; i<=n; i++) {
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", arr[i])
+                if (arr[i] != "") print arr[i]
+            }
+            exit
+        }
+    ' "$TOOLS_MANIFEST"
+}
+
+# Returns 0 when the provided pack id exists, 1 otherwise.
+tool_pack_exists() {
+    local pack_id="$1"
+    if [[ ! -f "$TOOLS_MANIFEST" ]]; then
+        return 1
+    fi
+    grep -q "^[[:space:]]*- id:[[:space:]]*${pack_id}[[:space:]]*$" "$TOOLS_MANIFEST"
 }
 
 # Convert all allowed-tools from SKILL.md to internal format
@@ -624,13 +687,26 @@ get_internal_tools_from_skill() {
     local internal_tools=""
     while IFS= read -r allowed; do
         [[ -z "$allowed" ]] && continue
+        if [[ "$allowed" == pack:* ]]; then
+            local pack_id="${allowed#pack:}"
+            while IFS= read -r expanded; do
+                [[ -z "$expanded" ]] && continue
+                local mapped_pack
+                mapped_pack=$(map_allowed_to_internal "$expanded")
+                if [[ -n "$mapped_pack" ]]; then
+                    internal_tools="$internal_tools $mapped_pack"
+                fi
+            done < <(get_tool_pack_tools "$pack_id")
+            continue
+        fi
+
         local mapped
         mapped=$(map_allowed_to_internal "$allowed")
         if [[ -n "$mapped" ]]; then
             internal_tools="$internal_tools $mapped"
         fi
     done < <(get_skill_allowed_tools "$skill_dir")
-    echo "$internal_tools" | xargs  # Trim whitespace
+    echo "$internal_tools" | tr ' ' '\n' | sed '/^[[:space:]]*$/d' | sort -u | xargs
 }
 
 # Validate allowed-tools format
@@ -643,6 +719,36 @@ validate_allowed_tools_format() {
     while IFS= read -r allowed; do
         [[ -z "$allowed" ]] && continue
         has_tools=true
+
+        if [[ "$allowed" == pack:* ]]; then
+            local pack_id="${allowed#pack:}"
+            if [[ ! -f "$TOOLS_MANIFEST" ]]; then
+                invalid="${invalid}${allowed} (tools manifest missing), "
+                continue
+            fi
+
+            if ! tool_pack_exists "$pack_id"; then
+                invalid="${invalid}${allowed} (unknown pack), "
+                continue
+            fi
+
+            local has_pack_members=false
+            while IFS= read -r expanded; do
+                [[ -z "$expanded" ]] && continue
+                has_pack_members=true
+                local expanded_mapped
+                expanded_mapped=$(map_allowed_to_internal "$expanded")
+                if [[ -z "$expanded_mapped" ]]; then
+                    invalid="${invalid}${allowed}->${expanded} (unknown tool), "
+                fi
+            done < <(get_tool_pack_tools "$pack_id")
+
+            if [[ "$has_pack_members" != "true" ]]; then
+                invalid="${invalid}${allowed} (empty pack), "
+            fi
+            continue
+        fi
+
         local mapped
         mapped=$(map_allowed_to_internal "$allowed")
         if [[ -z "$mapped" ]]; then
@@ -727,6 +833,95 @@ get_skill_allowed_tools() {
         raw=$(grep -E "^allowed-tools:" "$skill_md" | head -1 | sed 's/allowed-tools:[[:space:]]*//')
         split_allowed_tools "$raw"
     fi
+}
+
+# Split allowed-services value by spaces.
+split_allowed_services() {
+    local raw="$1"
+    local item
+    for item in $raw; do
+        [[ -n "$item" ]] && echo "$item"
+    done
+}
+
+# Get allowed-services from SKILL.md frontmatter.
+get_skill_allowed_services() {
+    local skill_dir="$1"
+    local skill_md="$skill_dir/SKILL.md"
+    if [[ -f "$skill_md" ]]; then
+        local raw
+        raw=$(grep -E "^allowed-services:" "$skill_md" | head -1 | sed 's/allowed-services:[[:space:]]*//')
+        if [[ -z "$raw" ]]; then
+            return
+        fi
+
+        if [[ "$raw" == \[*\] ]]; then
+            parse_inline_yaml_list "$raw"
+        else
+            split_allowed_services "$raw"
+        fi
+    fi
+}
+
+# Extract service IDs from services manifest.
+get_service_ids() {
+    if [[ ! -f "$SERVICES_MANIFEST" ]]; then
+        return
+    fi
+
+    awk '
+        /^services:/ {in_services=1; next}
+        in_services && /^[[:space:]]*- id:/ {
+            id=$3
+            gsub(/["'\'' ]/, "", id)
+            print id
+        }
+    ' "$SERVICES_MANIFEST"
+}
+
+# Validate allowed-services in SKILL.md.
+# Returns 0 when absent or valid, 1 when invalid.
+validate_allowed_services() {
+    local skill_id="$1"
+    local skill_dir="$2"
+    local skill_md="$skill_dir/SKILL.md"
+
+    if [[ ! -f "$skill_md" ]]; then
+        echo "SKILL.md not found"
+        return 1
+    fi
+
+    if ! grep -q "^allowed-services:" "$skill_md"; then
+        return 0
+    fi
+
+    if [[ ! -f "$SERVICES_MANIFEST" ]]; then
+        echo "allowed-services declared but services manifest is missing"
+        return 1
+    fi
+
+    local service_ids
+    mapfile -t service_ids < <(get_service_ids)
+    if [[ ${#service_ids[@]} -eq 0 ]]; then
+        echo "services manifest contains no service ids"
+        return 1
+    fi
+
+    local invalid=""
+    local allowed_service
+    while IFS= read -r allowed_service; do
+        [[ -z "$allowed_service" ]] && continue
+        if ! contains "$allowed_service" "${service_ids[@]}"; then
+            invalid="${invalid}${allowed_service}, "
+        fi
+    done < <(get_skill_allowed_services "$skill_dir")
+
+    if [[ -n "$invalid" ]]; then
+        echo "Unknown services: ${invalid%, }"
+        return 1
+    fi
+
+    return 0
 }
 
 # Validate allowed-tools in SKILL.md
@@ -2560,13 +2755,31 @@ validate_skill() {
         log_info "  See docs/architecture/harness/skills/specification.md for allowed-tools format"
     fi
 
-    # Check 14b: Declared skill sets and capabilities are valid values
+    # Check 15: allowed-services in SKILL.md resolves to services manifest entries
+    local services_check_result
+    services_check_result=$(validate_allowed_services "$skill_id" "$skill_dir" 2>&1)
+    local services_check_status=$?
+
+    if [[ $services_check_status -eq 0 ]]; then
+        local allowed_services
+        allowed_services=$(get_skill_allowed_services "$skill_dir" | tr '\n' ' ' | xargs)
+        if [[ -n "$allowed_services" ]]; then
+            log_success "allowed-services is valid: $allowed_services"
+        else
+            log_success "allowed-services not declared"
+        fi
+    else
+        log_error "Invalid allowed-services: $services_check_result"
+        log_info "  See .harmony/capabilities/services/manifest.yml for valid service ids"
+    fi
+
+    # Check 15b: Declared skill sets and capabilities are valid values
     validate_declared_capabilities "$skill_id" "$skill_dir" || true
 
-    # Check 14c: Manifest and SKILL.md capability declarations are aligned
+    # Check 15c: Manifest and SKILL.md capability declarations are aligned
     validate_manifest_skill_parity "$skill_id" "$skill_dir" || true
     
-    # Check 15: I/O path scope validation
+    # Check 16: I/O path scope validation
     if [[ -f "$SKILLS_REGISTRY" ]]; then
         local scope_issues=0
         while IFS= read -r output_path; do
@@ -2585,10 +2798,10 @@ validate_skill() {
         fi
     fi
     
-    # Check 16: Token budget validation
+    # Check 17: Token budget validation
     validate_token_budgets "$skill_id" "$skill_dir" || true
 
-    # Check 17: Description/summary alignment
+    # Check 18: Description/summary alignment
     local alignment_status=0
     check_description_summary_alignment "$skill_id" "$skill_dir" >/dev/null 2>&1 || alignment_status=$?
 

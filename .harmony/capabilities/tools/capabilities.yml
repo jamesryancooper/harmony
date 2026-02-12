@@ -1,0 +1,27 @@
+schema_version: "1.0"
+
+built_in_tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - WebFetch
+  - WebSearch
+  - Shell
+  - Bash
+  - Task
+
+valid_interface_types:
+  - shell
+  - mcp
+
+pack_rules:
+  supports_pack_reference_prefix: "pack:"
+  expansion_mode: union
+  duplicate_handling: dedupe
+  backward_compatible_inline_tools: true
+
+custom_tool_requirements:
+  required_manifest_fields: [id, display_name, path, summary, status, interface_type]
+  required_registry_fields: [version, interface_type, status, entrypoint, input_schema, output_schema]

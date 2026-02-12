@@ -1,0 +1,16 @@
+schema_version: "1.0"
+
+tools: {}
+# Example:
+# tools:
+#   regex-check:
+#     version: "1.0.0"
+#     interface_type: shell
+#     status: active
+#     entrypoint: custom/regex-check/run.sh
+#     input_schema: custom/regex-check/schema/input.schema.json
+#     output_schema: custom/regex-check/schema/output.schema.json
+#     dependencies:
+#       runtime: [bash]
+#       commands: []
+#     timeout_ms: 30000

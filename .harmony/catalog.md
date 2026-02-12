@@ -90,6 +90,49 @@ Atomic operations in `capabilities/commands/`:
 
 ---
 
+## Tools
+
+Invocation-driven atomic tool capability in `capabilities/tools/`.
+
+### Packs
+
+| Pack ID | Purpose | Included Tools |
+|---|---|---|
+| `read-only` | Read-only file access | `Read`, `Glob`, `Grep` |
+| `file-ops` | File read/write ops | `Read`, `Write`, `Glob`, `Grep` |
+| `full-edit` | Full edit toolkit | `Read`, `Write`, `Edit`, `Glob`, `Grep` |
+| `web-access` | Web fetch/search | `WebFetch`, `WebSearch` |
+| `shell-safe` | Scoped shell utilities | `Bash(mkdir)`, `Bash(cp)`, `Bash(mv)`, `Bash(ln)` |
+| `ci-integration` | CI and GitHub operations | `Bash(gh)`, `Bash(npm)`, `Bash(npx)` |
+
+### Usage Example
+
+```yaml
+allowed-tools: pack:read-only Write(_state/logs/*)
+```
+
+---
+
+## Services
+
+Invocation-driven composite capabilities with typed I/O contracts in `capabilities/services/`.
+
+| Service | Interface | Category | Description |
+|---|---|---|---|
+| [guard](./capabilities/services/guard/SERVICE.md) | `shell` | guard | Content safety checks and sanitization |
+| [prompt](./capabilities/services/prompt/SERVICE.md) | `library` | prompt | Prompt rendering/token contracts |
+| [cost](./capabilities/services/cost/SERVICE.md) | `shell` | cost | Budget estimation and usage tracking |
+| [flow](./capabilities/services/flow/SERVICE.md) | `mcp` | flow | LangGraph-compatible flow execution |
+
+### Usage Example
+
+```yaml
+allowed-tools: pack:read-only Write(_state/logs/*)
+allowed-services: guard cost
+```
+
+---
+
 ## Workflows
 
 Multi-step procedures in `orchestration/workflows/`.
@@ -161,6 +204,27 @@ This section contains the canonical decision logic for harness operations. Other
 
 > **Note:** If you're creating a FlowKit flow (runnable via `pnpm flowkit:run` / `flowkit run` and backed by `config.flow.json` + `manifest.yaml`), put it in `packages/workflows/<flowId>/`. `.harmony/orchestration/workflows/**` is for procedural runbooks (including `/run-flow`), not flow assets.
 
+### Which Subsystem? {#which-subsystem}
+
+```text
+Is this instruction-driven (agent reads and follows)?
+├── YES
+│   ├── Atomic? → Command
+│   └── Composite? → Skill
+└── NO (invocation-driven; agent calls it)
+    ├── Atomic? → Tool
+    └── Composite with typed contract? → Service
+```
+
+### What interface_type for a service? {#service-interface-type-decision}
+
+```text
+Can logic run as POSIX shell?
+├── YES, pure computation/file ops → shell
+├── NO, needs runtime library → library
+└── NO, communicates over network → mcp
+```
+
 ### Artifact Type Decision {#artifact-type-decision}
 
 When creating a new artifact, use this flowchart:
@@ -168,18 +232,15 @@ When creating a new artifact, use this flowchart:
 ```text
 Is this triggered by a user typing /something in Cursor chat?
 ├── YES → Create a Cursor Command (.cursor/commands/)
-│   └── Is the procedure complex (3+ steps)?
-│       ├── YES → Also create a Workflow (.harmony/orchestration/workflows/)
-│       └── NO → Is it a single atomic action?
-│           ├── YES → Also create a Command (.harmony/capabilities/commands/)
-│           └── NO → Procedure fits in Cursor command file
-└── NO → Is this something an agent uses?
-    ├── YES → Does it require context/judgment?
-    │   ├── YES → Create a Prompt (.harmony/scaffolding/prompts/)
-    │   └── NO → Is it atomic (single action)?
-    │       ├── YES → Create a Command (.harmony/capabilities/commands/)
-    │       └── NO → Create a Workflow (.harmony/orchestration/workflows/)
-    └── NO → Maybe it's a Checklist (quality gate)
+│   └── If execution is non-trivial, delegate to Workflow/Skill/Service
+└── NO → Is this instruction-driven (agent reads and follows)?
+    ├── YES
+    │   ├── Requires context/judgment template? → Prompt
+    │   ├── Atomic deterministic action? → Command
+    │   └── Composite reusable procedure? → Skill or Workflow
+    └── NO (invocation-driven)
+        ├── Atomic call/result unit? → Tool
+        └── Composite typed domain capability? → Service
 ```
 
 ### Command vs Prompt Decision {#command-vs-prompt-decision}
@@ -240,6 +301,8 @@ Does the harness exist?
 | Agent follows a single deterministic operation | Harness Command |
 | Agent follows a multi-step procedure | Harness Workflow |
 | Agent needs a template for context-dependent work | Harness Prompt |
+| Agent invokes an atomic callable operation | Harness Tool |
+| Agent invokes composite typed domain capability | Harness Service |
 | Repository-wide action with IDE integration | Cursor Command |
 | Verification before completing work | Checklist |
 

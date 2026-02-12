@@ -1,0 +1,110 @@
+schema_version: "1.0"
+
+services:
+  guard:
+    version: "0.1.0"
+    commands: [check, sanitize]
+    parameters:
+      - name: content
+        type: text
+        required: true
+        description: "Content to inspect or sanitize."
+    dependencies:
+      requires: []
+      orchestrates: []
+      integratesWith: [prompt, flow]
+    contracts:
+      input: guard/schema/input.schema.json
+      output: guard/schema/output.schema.json
+    observability:
+      service_name: harmony.service.guard
+      required_spans: [service.guard.check, service.guard.sanitize]
+    policy:
+      enforcement: block
+      fail_closed: true
+    idempotency:
+      required: false
+      key_from: [contentHash, checkType]
+    impl:
+      entrypoint: guard/impl/guard.sh
+
+  prompt:
+    version: "0.1.0"
+    commands: [compile]
+    parameters:
+      - name: promptId
+        type: text
+        required: true
+        description: "Prompt identifier to compile."
+    dependencies:
+      requires: []
+      orchestrates: []
+      integratesWith: [guard, flow]
+    contracts:
+      input: prompt/schema/input.schema.json
+      output: prompt/schema/output.schema.json
+    observability:
+      service_name: harmony.service.prompt
+      required_spans: [service.prompt.compile]
+    policy:
+      enforcement: block
+      fail_closed: true
+    idempotency:
+      required: false
+      key_from: [promptId, variablesHash, variantId]
+    impl:
+      entrypoint: prompt/impl/LIBRARY.md
+
+  cost:
+    version: "0.1.0"
+    commands: [estimate, record]
+    parameters:
+      - name: operation
+        type: text
+        required: true
+        description: "Operation mode: estimate or record."
+    dependencies:
+      requires: []
+      orchestrates: []
+      integratesWith: [flow, prompt]
+    contracts:
+      input: cost/schema/input.schema.json
+      output: cost/schema/output.schema.json
+    observability:
+      service_name: harmony.service.cost
+      required_spans: [service.cost.estimate, service.cost.record]
+    policy:
+      enforcement: block
+      fail_closed: false
+    idempotency:
+      required: true
+      key_from: [model, inputTokens, outputTokens, workflowType]
+    impl:
+      entrypoint: cost/impl/cost.sh
+
+  flow:
+    version: "0.1.0"
+    commands: [run]
+    parameters:
+      - name: config
+        type: object
+        required: true
+        description: "Flow execution config."
+    dependencies:
+      requires: []
+      orchestrates: [prompt, guard, cost]
+      integratesWith: []
+    contracts:
+      input: flow/schema/input.schema.json
+      output: flow/schema/output.schema.json
+    observability:
+      service_name: harmony.service.flow
+      required_spans: [service.flow.run]
+    policy:
+      enforcement: block
+      fail_closed: true
+    idempotency:
+      required: true
+      key_from: [flowName, canonicalPromptPath, workflowManifestPath]
+    impl:
+      entrypoint: flow/impl/flow-client.sh
