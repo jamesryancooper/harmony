@@ -211,7 +211,7 @@ README.md
 
 ## Kit Docs Checklist
 
-When documenting kits in `docs/kits`, include these data points where applicable:
+When documenting kits in `docs/services`, include these data points where applicable:
 
 - Quick Snapshot: modes/variants, capabilities/signals, inputs/outputs, artifacts, optional publish/serve
 - Core Responsibilities and explicit non‑responsibilities (boundaries)
@@ -229,4 +229,4 @@ When documenting kits in `docs/kits`, include these data points where applicable
 - Harmony Alignment bullets mapping to spec‑first, auditability, security baselines, and modular CI/CD
 - Minimal Interfaces (functions/config shapes) and FAQs
 
-See `docs/kits/knowledge-and-retrieval/indexkit/guide.md` for a good exemplar that follows this pattern.
+See `docs/services/knowledge-and-retrieval/indexkit/guide.md` for a good exemplar that follows this pattern.

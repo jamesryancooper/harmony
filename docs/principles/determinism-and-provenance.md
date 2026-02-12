@@ -90,7 +90,7 @@ Exploratory local prompts may skip full records, but production-impacting output
 ## Related Documentation
 
 - `docs/methodology/README.md`
-- `docs/kits/README.md`
+- `docs/services/README.md`
 - `docs/pillars/trust.md`
 - `docs/pillars/insight.md`
 - `docs/pillars/continuity.md`

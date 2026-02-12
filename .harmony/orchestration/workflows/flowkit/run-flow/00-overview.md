@@ -36,5 +36,5 @@ A `.flow.json` configuration file provided via `@` reference.
 
 ## References
 
-- **Canonical:** `docs/kits/planning-and-orchestration/flowkit/guide.md`
+- **Canonical:** `docs/services/planning/flow/guide.md`
 

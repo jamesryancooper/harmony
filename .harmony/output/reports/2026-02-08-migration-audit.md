@@ -82,7 +82,7 @@ These should all use `docs/architecture/harness/` (singular — the actual direc
 | 31 | `"Create workspace scaffolding system"` | `"Create harness scaffolding system"` |
 | 49 | `"Test /create-workspace command"` | `"Test /create-harness command"` |
 
-**G6. `docs/kits/planning-and-orchestration/flowkit/guide.md` — 2 occurrences** [MEDIUM]
+**G6. `docs/services/planning/flow/guide.md` — 2 occurrences** [MEDIUM]
 
 | Line | Content | Should Be |
 |------|---------|-----------|
@@ -140,7 +140,7 @@ The entire script uses "workspace" as its conceptual model for what is now calle
 
 Variable `WORKSPACE_REGISTRY="$REPO_ROOT/.harmony/capabilities/skills/registry.yml"` — should be renamed to `HARNESS_REGISTRY` or just `REGISTRY`.
 
-**S4. `docs/kits/planning-and-orchestration/flowkit/guide.md:149`** [MEDIUM]
+**S4. `docs/services/planning/flow/guide.md:149`** [MEDIUM]
 
 "Domain workspaces can add *references*" — should be "Domain harnesses can add *references*".
 
@@ -193,7 +193,7 @@ Variable `WORKSPACE_REGISTRY="$REPO_ROOT/.harmony/capabilities/skills/registry.y
 
 ### Batch 6: Medium — Documentation (1 file)
 
-**`docs/kits/planning-and-orchestration/flowkit/guide.md`** — Replace "Workspace harness" → "Harness", "Workspace vs Package" → "Harness vs Package", "Domain workspaces" → "Domain harnesses".
+**`docs/services/planning/flow/guide.md`** — Replace "Workspace harness" → "Harness", "Workspace vs Package" → "Harness vs Package", "Domain workspaces" → "Domain harnesses".
 
 ### Batch 7: Low — ADR notation (1 file)
 

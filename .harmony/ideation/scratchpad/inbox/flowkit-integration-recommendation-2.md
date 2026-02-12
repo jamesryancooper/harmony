@@ -62,7 +62,7 @@ flowchart LR
 - **Evidence these are assumed to exist**:
 - Runtime defaults: [`agents/runner/runtime/assessment/graph_factory.py`](agents/runner/runtime/assessment/graph_factory.py) and [`agents/runner/runtime/glossary/graph_factory.py`](agents/runner/runtime/glossary/graph_factory.py).
 - Runtime tests: [`agents/runner/runtime/__tests__/test_server.py`](agents/runner/runtime/__tests__/test_server.py) and flow tests under `agents/runner/runtime/**/__tests__/`.
-- Canonical doc examples: [`docs/kits/planning-and-orchestration/flowkit/guide.md`](docs/kits/planning-and-orchestration/flowkit/guide.md).
+- Canonical doc examples: [`docs/services/planning/flow/guide.md`](docs/services/planning/flow/guide.md).
 
 ## Responsibility Matrix (single owner per responsibility)
 
@@ -86,7 +86,7 @@ flowchart LR
 
 | Studio wiring | Runtime + repo root | [`langgraph.json`](langgraph.json), `studio_entry.py` files | Env var naming is inconsistent across flows today. |
 
-| Docs (conceptual + usage) | `docs/` | [`docs/kits/planning-and-orchestration/flowkit/guide.md`](docs/kits/planning-and-orchestration/flowkit/guide.md) | Examples currently reference missing assets (drift). |
+| Docs (conceptual + usage) | `docs/` | [`docs/services/planning/flow/guide.md`](docs/services/planning/flow/guide.md) | Examples currently reference missing assets (drift). |
 
 ## Conflicts / Gaps / Drift (evidence-backed)
 
@@ -141,7 +141,7 @@ Choose **Option 1 (Layered integration)**.
 
 ### Phase 2 — Unify Studio UX
 
-- Standardize Studio env vars to one naming scheme (recommend: `FLOWKIT_STUDIO_*` for all flows) and document it in [`docs/kits/planning-and-orchestration/flowkit/guide.md`](docs/kits/planning-and-orchestration/flowkit/guide.md).
+- Standardize Studio env vars to one naming scheme (recommend: `FLOWKIT_STUDIO_*` for all flows) and document it in [`docs/services/planning/flow/guide.md`](docs/services/planning/flow/guide.md).
 
 ### Phase 3 — Contracts-first hardening
 

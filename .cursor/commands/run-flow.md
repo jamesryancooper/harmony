@@ -20,5 +20,5 @@ Start with `00-overview.md`, then follow each step in sequence.
 
 ## References
 
-- **Canonical:** `docs/kits/planning-and-orchestration/flowkit/guide.md`
+- **Canonical:** `docs/services/planning/flow/guide.md`
 - **Workflow:** `.harmony/orchestration/workflows/flowkit/run-flow/`

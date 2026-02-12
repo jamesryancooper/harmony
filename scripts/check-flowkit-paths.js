@@ -68,7 +68,7 @@ const CRITICAL_PATHS = [
   ".cursor/commands/run-flow.md",
 
   // Docs
-  "docs/kits/planning-and-orchestration/flowkit/guide.md",
+  "docs/services/planning/flow/guide.md",
 
   // OpenAPI contract
   "packages/contracts/openapi.yaml",

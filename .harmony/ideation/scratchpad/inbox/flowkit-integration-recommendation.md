@@ -75,7 +75,7 @@
 | **Package Implementation** | `packages/kits/flowkit/src/*` | Canonical code |
 | **Runtime Execution** | `agents/runner/runtime/**` | Graph execution |
 | **Contracts/Schemas** | `packages/kits/flowkit/schema/*` | API contract |
-| **Docs** | `docs/kits/planning-and-orchestration/flowkit/*` | Canonical reference |
+| **Docs** | `docs/services/planning/flow/*` | Canonical reference |
 
 ---
 
@@ -318,7 +318,7 @@ The current four-layer architecture is **correct and should be maintained** with
 
 | Action | Owner | Files Affected |
 |--------|-------|----------------|
-| Update guide.md with actual config paths | FlowKit maintainer | `docs/kits/planning-and-orchestration/flowkit/guide.md` |
+| Update guide.md with actual config paths | FlowKit maintainer | `docs/services/planning/flow/guide.md` |
 | Add "How to add a new flow" section | FlowKit maintainer | Same |
 | Consider template distribution | Workspace maintainer | `.workspace/templates/` |
 
@@ -433,7 +433,7 @@ From `langgraph.json`:
 
 **Docs Layer:**
 
-- `docs/kits/planning-and-orchestration/flowkit/guide.md` — Canonical guide (507 lines)
+- `docs/services/planning/flow/guide.md` — Canonical guide (507 lines)
 - `packages/kits/flowkit/README.md` — Package README (281 lines)
 
 ---

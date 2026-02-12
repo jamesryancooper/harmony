@@ -114,7 +114,7 @@ The root `.workspace` provides shared workflows available to all workspaces:
 |----------|--------|-------------|
 | [run-flow](/.workspace/workflows/flowkit/run-flow/00-overview.md) | human | Execute FlowKit LangGraph flows via `/run-flow @<config>.flow.json` |
 
-> **Tip:** Use `/run-flow` from any workspace to run repo-wide FlowKit flows. See [FlowKit Guide](/docs/kits/planning-and-orchestration/flowkit/guide.md) for details.
+> **Tip:** Use `/run-flow` from any workspace to run repo-wide FlowKit flows. See [FlowKit Guide](/docs/services/planning/flow/guide.md) for details.
 ```
 
 ---

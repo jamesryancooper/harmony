@@ -23,7 +23,7 @@ However, the expanded audit uncovered **three additional classes of staleness** 
 
 ## Agent A — docs/ non-architecture (146 files)
 
-**Directories audited:** `docs/kits/`, `docs/methodology/`, `docs/engines/`, `docs/pillars/`, `docs/principles/`, `docs/documentation-standards/`, `docs/development/`, `docs/specs/`, `docs/TASKS/`, `docs/purpose/`, `docs/runtimes/`, `docs/practices/`
+**Directories audited:** `docs/services/`, `docs/methodology/`, `docs/engines/`, `docs/pillars/`, `docs/principles/`, `docs/documentation-standards/`, `docs/development/`, `docs/specs/`, `docs/TASKS/`, `docs/purpose/`, `docs/runtimes/`, `docs/practices/`
 
 **Result:** 132 files clean, 14 files with findings (23 total)
 
@@ -49,7 +49,7 @@ However, the expanded audit uncovered **three additional classes of staleness** 
 | File | Lines | Current Path | Should Be |
 |------|-------|-------------|-----------|
 | `docs/documentation-standards/README.md` | 176 | `docs/handbook/documentation-standards/template` | `docs/documentation-standards/template` |
-| `docs/documentation-standards/README.md` | 214, 232 | `docs/handbook/ai-toolkit/...` | `docs/kits/...` |
+| `docs/documentation-standards/README.md` | 214, 232 | `docs/handbook/ai-toolkit/...` | `docs/services/...` |
 | `docs/documentation-standards/template/README.md` | 3, 24 | `docs/handbook/.../README.md` | `docs/.../README.md` |
 | `docs/documentation-standards/template/docs/.../guide.md` | 142 | `docs/handbook/methodology/README.md` | `docs/methodology/README.md` |
 
@@ -58,7 +58,7 @@ However, the expanded audit uncovered **three additional classes of staleness** 
 | File | Lines | Current Path | Should Be |
 |------|-------|-------------|-----------|
 | `docs/methodology/methodology-as-code.md` | 268 | `docs/ai/methodology/` | `docs/methodology/` |
-| `docs/methodology/ci-cd-quality-gates.md` | 319 | `docs/ai/kits/...` | `docs/kits/...` |
+| `docs/methodology/ci-cd-quality-gates.md` | 319 | `docs/ai/kits/...` | `docs/services/...` |
 | `docs/principles/roadmap.md` | 95 | `docs/ai/principles/` | `docs/principles/` |
 | `docs/purpose/roadmap.md` | 46, 59 | `docs/ai/methodology/`, `docs/ai/purpose/` | `docs/methodology/`, `docs/purpose/` |
 | `docs/TASKS/handle-security-issue.md` | 442 | `../ai/methodology/security-baseline.md` | `../methodology/security-baseline.md` |
@@ -238,7 +238,7 @@ All 11 workflows have consistent step files matching their overviews. Mission wo
 | CI/CD (`.github/`, `infra/`) | 3 | All clean |
 | Root config | 5 | All clean |
 | Template scaffolding (52 files) | 52 | All clean (prior audit) |
-| `docs/kits/` (58 files) | 58 | All clean |
+| `docs/services/` (58 files) | 58 | All clean |
 | `docs/engines/` (15 files) | 15 | All clean |
 | `docs/pillars/` (15 files) | 15 | All clean |
 | `docs/development/` (4 files) | 4 | All clean |
