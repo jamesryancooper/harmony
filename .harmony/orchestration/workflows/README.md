@@ -7,7 +7,7 @@ All workflows live in `.harmony/orchestration/workflows/`, organized by group.
 ## Workflow Groups
 
 - `meta/` — Harness management (create, evaluate, migrate, update) and meta-workflows (create, evaluate, update workflow/skill)
-- `quality-gate/` — Codebase integrity (refactor, orchestrate-audit)
+- `quality-gate/` — Codebase integrity and release gates (refactor, orchestrate-audit, pre-release-audit, documentation-quality-gate)
 - `foundations/` — Stack-specific project scaffolding (python-api, swift-macos-app)
 - `missions/` — Mission lifecycle (create, complete)
 - `flowkit/` — FlowKit LangGraph integration

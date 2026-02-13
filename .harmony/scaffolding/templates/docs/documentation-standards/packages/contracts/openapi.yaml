@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: Harmony Contracts — {{feature-name}}
+  title: Documentation Standards Example Contract - {{feature-name}}
   version: 0.1.0
 servers:
   - url: https://api.example.com

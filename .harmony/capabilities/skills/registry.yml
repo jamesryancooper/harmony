@@ -355,6 +355,61 @@ skills:
           determinism: variable
           description: "Top-level log index (cross-skill)"
 
+  audit-documentation-standards:
+    version: "1.0.0"
+    commands:
+      - /audit-documentation-standards
+    parameters:
+      - name: docs_root
+        type: folder
+        required: true
+        description: "Root documentation directory to audit (for example docs)"
+      - name: template_root
+        type: folder
+        required: false
+        default: ".harmony/scaffolding/templates/docs/documentation-standards"
+        description: "Canonical documentation template root"
+      - name: policy_doc
+        type: file
+        required: false
+        default: ".harmony/cognition/principles/documentation-is-code.md"
+        description: "Canonical docs-as-code policy document"
+      - name: severity_threshold
+        type: text
+        required: false
+        default: "all"
+        description: "Minimum severity to report: critical, high, medium, low, all"
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs:
+        - name: docs_standards_audit_report
+          path: "../../output/reports/{{date}}-documentation-standards-audit.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Structured docs standards findings report with severity tiers and fix batches"
+        - name: run_log
+          path: "_state/logs/audit-documentation-standards/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for this audit run"
+        - name: log_index
+          path: "_state/logs/audit-documentation-standards/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of all audit-documentation-standards runs with metadata"
+        - name: top_log_index
+          path: "_state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
   audit-ui:
     version: "1.0.1"
     commands:

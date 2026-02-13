@@ -152,6 +152,29 @@ skills:
       - domain-specialized
       - self-validating
 
+  - id: audit-documentation-standards
+    display_name: Audit Documentation Standards
+    group: quality-gate
+    path: quality-gate/audit-documentation-standards/
+    summary: "Bounded docs-as-code audit against Harmony policy and template standards."
+    status: active
+    tags:
+      - audit
+      - documentation
+      - quality
+      - standards
+    triggers:
+      - "audit documentation standards"
+      - "run docs quality gate"
+      - "documentation compliance audit"
+      - "run audit-documentation-standards"
+    skill_sets:
+      - executor
+      - guardian
+    capabilities:
+      - domain-specialized
+      - self-validating
+
   - id: audit-ui
     display_name: Audit UI
     group: quality-gate

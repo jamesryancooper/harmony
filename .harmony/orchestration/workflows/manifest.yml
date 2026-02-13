@@ -157,6 +157,19 @@ workflows:
       - "release readiness check"
       - "full audit before release"
 
+  - id: documentation-quality-gate
+    display_name: Documentation Quality Gate
+    group: quality-gate
+    domain: audit
+    path: quality-gate/documentation-quality-gate/
+    summary: Run docs-as-code standards enforcement and emit a release gate recommendation.
+    status: active
+    triggers:
+      - "documentation quality gate"
+      - "run docs quality gate workflow"
+      - "audit docs for release"
+      - "enforce documentation standards"
+
   # --- foundations: Stack-specific project scaffolding ---
 
   - id: python-api-foundation
@@ -353,7 +366,7 @@ workflow_group_definitions:
   quality-gate:
     description: Verify and enforce codebase integrity
     path: quality-gate/
-    members: [orchestrate-audit, pre-release-audit, refactor]
+    members: [documentation-quality-gate, orchestrate-audit, pre-release-audit, refactor]
 
   foundations:
     description: Stack-specific project scaffolding orchestration
