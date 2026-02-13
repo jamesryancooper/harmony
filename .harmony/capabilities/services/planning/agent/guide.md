@@ -34,7 +34,7 @@ In practice:
   - Decides which Flow flow(s) to run for each step (and with what config).
   - Calls Flow's HTTP runner for each requested flow, using the shared runtime.
   - Uses LangGraph checkpointing to persist and resume agent state across runs.
-  - Emits run records and Observe spans (`kit.agentkit.execute`, etc.) with links back to `plan.json` and flow executions.
+  - Emits run records and Observe spans (`service.agent.execute`, etc.) with links back to `plan.json` and flow executions.
 
 For a full conceptual overview of how Plan, Agent, Flow, and the shared runtime fit together, see `.harmony/capabilities/services/planning/service-roles.md`.
 

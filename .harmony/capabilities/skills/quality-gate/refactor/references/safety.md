@@ -5,7 +5,7 @@ description: Safety policies and constraints for the refactor skill.
 #   - Tool permissions: SKILL.md frontmatter `allowed-tools`
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Edit Write(_state/runs/*) Write(_state/logs/*) Bash(mv) Bash(mkdir)
+# Current allowed-tools: Read Glob Grep Edit Write(_ops/state/runs/*) Write(_ops/state/logs/*) Bash(mv) Bash(mkdir)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -40,8 +40,8 @@ This skill requires:
 
 The skill may only write to:
 
-- `.harmony/capabilities/skills/_state/runs/refactor/**` — Execution state (session recovery)
-- `.harmony/capabilities/skills/_state/logs/refactor/**` — Execution logs
+- `.harmony/capabilities/skills/_ops/state/runs/refactor/**` — Execution state (session recovery)
+- `.harmony/capabilities/skills/_ops/state/logs/refactor/**` — Execution logs
 
 ### Source Code Modifications
 
@@ -65,7 +65,7 @@ The skill:
 
 ## Harness Continuity File Protection
 
-> **Terminology:** These are **harness continuity files**—historical records that preserve project history. They are distinct from **skill execution state** (checkpoints, manifests in `_state/runs/`) which enables session recovery. Harness continuity files require append-only protection; execution state is freely writable by skills.
+> **Terminology:** These are **harness continuity files**—historical records that preserve project history. They are distinct from **skill execution state** (checkpoints, manifests in `_ops/state/runs/`) which enables session recovery. Harness continuity files require append-only protection; execution state is freely writable by skills.
 
 Files matching these patterns are **APPEND-ONLY** during refactors:
 
@@ -143,7 +143,7 @@ The skill does NOT run git commands for commits. It:
 
 1. Makes file changes
 2. Generates suggested commit message
-3. Saves to `_state/runs/refactor/{{id}}/commit-message.txt`
+3. Saves to `_ops/state/runs/refactor/{{id}}/commit-message.txt`
 4. Informs user: "Changes are unstaged. Suggested commit saved."
 
 **User responsibilities:**

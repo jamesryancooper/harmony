@@ -7,7 +7,7 @@
 #   - Parameters: .harmony/capabilities/skills/registry.yml
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(../../scaffolding/prompts/*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Grep Write(../../scaffolding/prompts/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.

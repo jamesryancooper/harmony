@@ -7,7 +7,7 @@
 #   - Parameters: .harmony/capabilities/skills/registry.yml
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Edit Bash(gh) Write(../../output/reports/*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Grep Edit Bash(gh) Write(../../output/reports/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -39,11 +39,11 @@ Written to `.harmony/output/reports/YYYY-MM-DD-pr-comments-resolved.md`.
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/_state/logs/resolve-pr-comments/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_ops/state/logs/resolve-pr-comments/{{run_id}}.md`.
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/_state/logs/resolve-pr-comments/index.yml`.
+Written to `.harmony/capabilities/skills/_ops/state/logs/resolve-pr-comments/index.yml`.
 
 ## Dependencies
 
@@ -57,7 +57,7 @@ This skill requires:
 - **Edit** — Apply fixes to source files
 - **Bash(gh)** — GitHub CLI for fetching PR data and comments
 - **Write(../../output/reports/*)** — Write resolution report
-- **Write(_state/logs/*)** — Write execution logs
+- **Write(_ops/state/logs/*)** — Write execution logs
 
 ## External Dependencies
 

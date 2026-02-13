@@ -1,7 +1,5 @@
 # Guard Patterns
 
-Migrated from `packages/kits/guardkit/src/patterns.ts`.
-
 ## Injection Pattern IDs
 
 - `ignore_instructions`

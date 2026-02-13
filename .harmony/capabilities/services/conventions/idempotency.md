@@ -2,7 +2,6 @@
 title: Service Idempotency
 scope: harness
 applies_to: services
-migrated_from: packages/kits/kit-base/src/idempotency.ts
 ---
 
 # Service Idempotency
@@ -17,7 +16,7 @@ Default derived key format:
 
 Hash input factors:
 
-- service/kit name
+- service name
 - operation name
 - stable inputs (canonical JSON with sorted keys)
 - optional git SHA

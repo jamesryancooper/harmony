@@ -28,6 +28,6 @@ Expected parameters:
 ## Outputs
 
 - `.harmony/output/reports/YYYY-MM-DD-documentation-standards-audit.md`
-- `_state/logs/audit-documentation-standards/{{run_id}}.md`
-- `_state/logs/audit-documentation-standards/index.yml`
-- `_state/logs/index.yml`
+- `_ops/state/logs/audit-documentation-standards/{{run_id}}.md`
+- `_ops/state/logs/audit-documentation-standards/index.yml`
+- `_ops/state/logs/index.yml`

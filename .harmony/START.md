@@ -37,21 +37,21 @@ This harness extends `.harmony/` for shared infrastructure.
 │
 ├── agency/
 │   ├── manifest.yml    ← Actor registry discovery
-│   ├── architecture/   ← Agency subsystem specification
+│   ├── _meta/architecture/   ← Agency subsystem specification
 │   ├── practices/      ← Collaboration and delivery practices
 │   ├── agents/         ← Autonomous supervisors
 │   ├── assistants/     ← Focused specialists (@mention invocation)
 │   └── teams/          ← Reusable multi-actor compositions
 │
 ├── capabilities/
-│   ├── architecture/   ← Capabilities subsystem specification
+│   ├── _meta/architecture/   ← Capabilities subsystem specification
 │   ├── skills/         ← Composable capabilities
 │   ├── commands/       ← Atomic operations
 │   ├── tools/          ← Tool packs and custom tools
 │   └── services/       ← Typed domain capabilities
 │
 ├── cognition/
-│   ├── architecture/   ← Cross-cutting harness and methodology architecture
+│   ├── _meta/architecture/   ← Cross-cutting harness and methodology architecture
 │   ├── principles/     ← Canonical principles, pillars, and purpose
 │   ├── methodology/    ← AI-native development methodology
 │   ├── context/        ← Shared reference material and repo context
@@ -59,30 +59,45 @@ This harness extends `.harmony/` for shared infrastructure.
 │   └── analyses/       ← Analytical working artifacts
 │
 ├── continuity/         ← log.md, tasks.json, entities.json, next.md
-│   └── architecture/   ← Continuity subsystem specification
+│   └── _meta/architecture/   ← Continuity subsystem specification
 │
 ├── orchestration/
-│   ├── architecture/   ← Orchestration subsystem specification
+│   ├── _meta/architecture/   ← Orchestration subsystem specification
 │   ├── workflows/      ← Multi-step procedures
 │   └── missions/       ← Time-bounded sub-projects
 │
 ├── scaffolding/
-│   ├── architecture/   ← Scaffolding subsystem specification
+│   ├── _meta/architecture/   ← Scaffolding subsystem specification
 │   ├── patterns/       ← Reusable design/policy patterns
 │   ├── templates/      ← Boilerplate for new content
 │   ├── prompts/        ← Task templates
 │   └── examples/       ← Reference patterns
 │
 ├── quality/            ← complete.md, session-exit.md + standards
-│   └── architecture/   ← Quality subsystem specification
+│   └── _meta/architecture/   ← Quality subsystem specification
 │
 ├── ideation/           ← Human-led zone (IGNORE)
-│   ├── architecture/   ← Ideation subsystem specification
+│   ├── _meta/architecture/   ← Ideation subsystem specification
 │   ├── scratchpad/     ← Temporary staging (inbox/, archive/, etc.)
 │   └── projects/       ← Committed research
 │
 └── output/             ← Reports, drafts, artifacts
 ```
+
+## Naming Convention
+
+Use plain directory names for structural units (domains, subsystems, components). Use underscore-prefixed namespaces for non-structural support material:
+
+- `_meta/` — docs-as-code governance and architecture reference modules.
+- `_ops/` — operational assets such as scripts and mutable state.
+- `_scaffold/` — templates and scaffolding material.
+
+Within these namespaces, standard subpaths are:
+
+- `_meta/architecture/`
+- `_ops/scripts/`
+- `_ops/state/`
+- `_scaffold/template/`
 
 ## Boot Sequence
 

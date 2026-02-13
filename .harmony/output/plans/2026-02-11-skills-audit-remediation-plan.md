@@ -22,7 +22,7 @@ The exhaustive audit produced 14 findings: 3 critical, 8 important, 2 minor, 1 i
 
 **Why first:** The validator currently fails unscoped `Bash` (line 2428) but silently passes unscoped `Write`. Fixing the validator first ensures Phase 2's `Write` scoping changes can be validated mechanically.
 
-**File:** `.harmony/capabilities/skills/_scripts/validate-skills.sh`
+**File:** `.harmony/capabilities/skills/_ops/scripts/validate-skills.sh`
 
 **Changes:**
 
@@ -34,7 +34,7 @@ The exhaustive audit produced 14 findings: 3 critical, 8 important, 2 minor, 1 i
    fi
    ```
 
-   The `grep -qx "Write"` pattern matches only the bare token `Write` (exact line match), not `Write(_state/logs/*)` or other scoped variants, because `get_skill_allowed_tools` emits one token per line.
+   The `grep -qx "Write"` pattern matches only the bare token `Write` (exact line match), not `Write(_ops/state/logs/*)` or other scoped variants, because `get_skill_allowed_tools` emits one token per line.
 
 2. Add missing contract checks gated behind `--strict` mode (addresses D3-001 coverage gaps). These are additive checks that don't affect normal mode:
 
@@ -48,7 +48,7 @@ The exhaustive audit produced 14 findings: 3 critical, 8 important, 2 minor, 1 i
 
 ```bash
 # Should report errors for 13 skills with bare Write
-.harmony/capabilities/skills/_scripts/validate-skills.sh 2>&1 | grep -c "Unscoped Write"
+.harmony/capabilities/skills/_ops/scripts/validate-skills.sh 2>&1 | grep -c "Unscoped Write"
 # Expected: 13
 ```
 
@@ -66,7 +66,7 @@ The exhaustive audit produced 14 findings: 3 critical, 8 important, 2 minor, 1 i
 
 ### Foundation child skills with scaffolding Write
 
-These skills intentionally write to user project directories. The appropriate scope is `Write(<project-root>/**)` — but since skills execute within a harness context, the correct pattern is to scope writes to the harness root using `Write(../../../**)` (3 levels up from `_scripts/` to repo root) or use the semantic equivalent per the existing convention.
+These skills intentionally write to user project directories. The appropriate scope is `Write(<project-root>/**)` — but since skills execute within a harness context, the correct pattern is to scope writes to the harness root using `Write(../../../**)` (3 levels up from `_ops/scripts/` to repo root) or use the semantic equivalent per the existing convention.
 
 However, examining the existing comment in these files ("Write is intentionally unscoped: scaffolds into user project directories"), the correct remediation is to use a broad but explicit scope that covers the harness root. The pattern used by `create-skill` is instructive: `Write(.harmony/capabilities/skills/*)`. For scaffolding skills that write into the user's project tree, scope to the harness root:
 
@@ -74,7 +74,7 @@ However, examining the existing comment in these files ("Write is intentionally 
 
 | File | Current `allowed-tools` | New `allowed-tools` |
 |------|------------------------|---------------------|
-| `foundations/python-api/scaffold-package/SKILL.md:10` | `Read Grep Glob Edit Write Bash(mkdir) Bash(uv)` | `Read Grep Glob Edit Write(<project>/**) Write(_state/logs/*) Bash(mkdir) Bash(uv)` |
+| `foundations/python-api/scaffold-package/SKILL.md:10` | `Read Grep Glob Edit Write Bash(mkdir) Bash(uv)` | `Read Grep Glob Edit Write(<project>/**) Write(_ops/state/logs/*) Bash(mkdir) Bash(uv)` |
 | `foundations/python-api/contract-first-api/SKILL.md:10` | same pattern | same fix pattern |
 | `foundations/python-api/test-harness/SKILL.md:10` | same pattern | same fix pattern |
 | `foundations/python-api/dev-toolchain/SKILL.md:10` | same pattern | same fix pattern |
@@ -85,7 +85,7 @@ However, examining the existing comment in these files ("Write is intentionally 
 
 | File | Current `allowed-tools` | New `allowed-tools` |
 |------|------------------------|---------------------|
-| `foundations/swift-macos-app/scaffold-package/SKILL.md:10` | `Read Grep Glob Edit Write Bash(mkdir) Bash(swift)` | `Read Grep Glob Edit Write(<project>/**) Write(_state/logs/*) Bash(mkdir) Bash(swift)` |
+| `foundations/swift-macos-app/scaffold-package/SKILL.md:10` | `Read Grep Glob Edit Write Bash(mkdir) Bash(swift)` | `Read Grep Glob Edit Write(<project>/**) Write(_ops/state/logs/*) Bash(mkdir) Bash(swift)` |
 | `foundations/swift-macos-app/data-layer/SKILL.md:10` | same pattern | same fix pattern |
 | `foundations/swift-macos-app/cli-interface/SKILL.md:10` | same pattern | same fix pattern |
 | `foundations/swift-macos-app/daemon-service/SKILL.md:10` | same pattern | same fix pattern |
@@ -96,7 +96,7 @@ However, examining the existing comment in these files ("Write is intentionally 
 
 | File | Current `allowed-tools` | New `allowed-tools` |
 |------|------------------------|---------------------|
-| `meta/build-mcp-server/SKILL.md:18` | `Read Glob Grep Edit Write Bash(npm) Bash(npx) Bash(mkdir) Bash(cp) Bash(node) Write(_state/logs/*)` | `Read Glob Grep Edit Write(<project>/**) Bash(npm) Bash(npx) Bash(mkdir) Bash(cp) Bash(node) Write(_state/logs/*)` |
+| `meta/build-mcp-server/SKILL.md:18` | `Read Glob Grep Edit Write Bash(npm) Bash(npx) Bash(mkdir) Bash(cp) Bash(node) Write(_ops/state/logs/*)` | `Read Glob Grep Edit Write(<project>/**) Bash(npm) Bash(npx) Bash(mkdir) Bash(cp) Bash(node) Write(_ops/state/logs/*)` |
 
 > **Decision needed:** The `<project>` token is a placeholder for "the project root relative to the skill directory." The exact glob depends on how the harness resolves write scopes at execution time. If the validator's `Write(*)` case (line 488) already maps to `filesystem.write.scoped`, then `Write(**/*)` may suffice. Review the path-scope validator to confirm. If the existing scope mechanism cannot express "user's project root," introduce a `Write(<harness-root>/**)` convention and document it in `specification.md`.
 
@@ -104,7 +104,7 @@ However, examining the existing comment in these files ("Write is intentionally 
 
 ```bash
 # Should report 0 unscoped Write errors
-.harmony/capabilities/skills/_scripts/validate-skills.sh 2>&1 | grep -c "Unscoped Write"
+.harmony/capabilities/skills/_ops/scripts/validate-skills.sh 2>&1 | grep -c "Unscoped Write"
 # Expected: 0
 ```
 
@@ -118,11 +118,11 @@ However, examining the existing comment in these files ("Write is intentionally 
 
 **Why now:** Critical infrastructure — broken symlinks affect all host adapters.
 
-**File:** `.harmony/capabilities/skills/_scripts/setup-harness-links.sh`
+**File:** `.harmony/capabilities/skills/_ops/scripts/setup-harness-links.sh`
 
 **Root cause analysis:**
 
-1. **Line 13:** `PROJECT_ROOT` is computed as 3 levels up from `_scripts/` (`../../..`), but `_scripts/` is at `.harmony/capabilities/skills/_scripts/`, so 3 levels up gives `.harmony/` — not the repo root. The correct depth is **4 levels up** (or better: derive from manifest location).
+1. **Line 13:** `PROJECT_ROOT` is computed as 3 levels up from `_ops/scripts/` (`../../..`), but `_ops/scripts/` is at `.harmony/capabilities/skills/_ops/scripts/`, so 3 levels up gives `.harmony/` — not the repo root. The correct depth is **4 levels up** (or better: derive from manifest location).
 2. **Lines 97-113:** `discover_skills()` iterates only top-level directories under `SKILLS_DIR`, which finds group directories (`foundations/`, `meta/`, etc.) but not the actual skills nested inside them.
 3. **Lines 36-44:** `find_skill_location()` checks `$SKILLS_DIR/$skill_id` — flat path only.
 4. **Line 58:** Symlink target is `../../.harmony/capabilities/skills/$skill_id` — flat path, doesn't work for grouped skills.
@@ -226,7 +226,7 @@ However, examining the existing comment in these files ("Write is intentionally 
 
 ```bash
 # Run script
-bash .harmony/capabilities/skills/_scripts/setup-harness-links.sh
+bash .harmony/capabilities/skills/_ops/scripts/setup-harness-links.sh
 
 # Verify no broken symlinks
 find .claude/skills .cursor/skills .codex/skills -type l ! -exec test -e {} \; -print
@@ -245,7 +245,7 @@ ls -la .claude/skills/create-skill
 
 **Findings addressed:** [I]-D7-002
 
-**File:** `.harmony/capabilities/skills/_scripts/generate-reference-headers.sh`
+**File:** `.harmony/capabilities/skills/_ops/scripts/generate-reference-headers.sh`
 
 **Root cause:** Line 191 constructs `skill_dir="$SKILLS_DIR/$skill_id"` — a flat path that doesn't account for grouped directory structure. The `get_manifest_skills()` function (line 236) extracts skill IDs, but the `process_skill()` function needs the manifest `path` instead.
 
@@ -292,11 +292,11 @@ ls -la .claude/skills/create-skill
 
 ```bash
 # Should process all manifest skills without "Skill directory not found" errors
-bash .harmony/capabilities/skills/_scripts/generate-reference-headers.sh 2>&1 | grep -c "ERROR"
+bash .harmony/capabilities/skills/_ops/scripts/generate-reference-headers.sh 2>&1 | grep -c "ERROR"
 # Expected: 0
 
 # Single-skill mode should work for a grouped skill
-bash .harmony/capabilities/skills/_scripts/generate-reference-headers.sh create-skill
+bash .harmony/capabilities/skills/_ops/scripts/generate-reference-headers.sh create-skill
 # Expected: "Processing: create-skill" with no errors
 ```
 
@@ -310,21 +310,21 @@ bash .harmony/capabilities/skills/_scripts/generate-reference-headers.sh create-
 
 ### 5a: Update `FORMAT.md` paths
 
-**File:** `.harmony/capabilities/skills/_state/logs/FORMAT.md`
+**File:** `.harmony/capabilities/skills/_ops/state/logs/FORMAT.md`
 
 **Changes:**
 
-1. **Line 20:** Change `skills/logs/runs/{{timestamp}}-{{skill_id}}.md` → `skills/_state/logs/{{skill_id}}/{{timestamp}}-{{skill_id}}.md`
+1. **Line 20:** Change `skills/logs/runs/{{timestamp}}-{{skill_id}}.md` → `skills/_ops/state/logs/{{skill_id}}/{{timestamp}}-{{skill_id}}.md`
 
 2. **Line 25:** Change `runs/20250116-143052-refine-prompt.md` → `refine-prompt/20250116-143052-refine-prompt.md`
 
-3. **Lines 183-191:** Update `find` command examples from `skills/logs/runs` → `skills/_state/logs`
+3. **Lines 183-191:** Update `find` command examples from `skills/logs/runs` → `skills/_ops/state/logs`
 
 4. **Lines 335-337 (See Also):** Update links from `workspaces/skills/` → `harness/skills/`
 
 ### 5b: Rebuild top-level log index
 
-**File:** `.harmony/capabilities/skills/_state/logs/index.yml`
+**File:** `.harmony/capabilities/skills/_ops/state/logs/index.yml`
 
 **Changes:**
 
@@ -353,9 +353,9 @@ summary:
 
 **Files to create** (matching the existing `audit-migration/index.yml` pattern):
 
-- `.harmony/capabilities/skills/_state/logs/refactor/index.yml`
-- `.harmony/capabilities/skills/_state/logs/refine-prompt/index.yml`
-- `.harmony/capabilities/skills/_state/logs/synthesize-research/index.yml`
+- `.harmony/capabilities/skills/_ops/state/logs/refactor/index.yml`
+- `.harmony/capabilities/skills/_ops/state/logs/refine-prompt/index.yml`
+- `.harmony/capabilities/skills/_ops/state/logs/synthesize-research/index.yml`
 
 Each with:
 
@@ -438,7 +438,7 @@ Update the workflow manifest entry (if present) to set `status: deprecated`.
 | `.harmony/cognition/analyses/workflows-vs-skills-analysis.md:558` | `references/behaviors.md` → `references/phases.md` | Update reference filename |
 | `.harmony/cognition/analyses/workflows-vs-skills-analysis.md:559` | `skills/refine-prompt/` → `skills/synthesis/refine-prompt/` | Update to grouped path |
 | `.harmony/cognition/context/decisions.md:53` (D029) | `behaviors.md` → `phases.md` | Update canonical reference file name |
-| `.harmony/cognition/decisions/001-harmony-shared-foundation.md:59` | `skills/logs/` → `skills/_state/logs/` | Update path convention |
+| `.harmony/cognition/decisions/001-harmony-shared-foundation.md:59` | `skills/logs/` → `skills/_ops/state/logs/` | Update path convention |
 
 ### 6c: Update creation/design docs archetype language
 
@@ -523,7 +523,7 @@ Tailor the specific content to each skill's domain (python packaging, swift data
 
 ```bash
 # Run validator — should pass with 0 errors
-bash .harmony/capabilities/skills/_scripts/validate-skills.sh
+bash .harmony/capabilities/skills/_ops/scripts/validate-skills.sh
 
 # Verify no stale behaviors.md references in active docs
 grep -rn 'behaviors\.md' docs/architecture/harness/skills/ .harmony/cognition/ .harmony/orchestration/
@@ -571,7 +571,7 @@ This is informational — the existing `ambiguity_resolution: "ask"` mode handle
 
 ```bash
 # Validate all skills pass with --strict (includes trigger overlap checks)
-bash .harmony/capabilities/skills/_scripts/validate-skills.sh --strict
+bash .harmony/capabilities/skills/_ops/scripts/validate-skills.sh --strict
 
 # Verify rules.md files are within budget
 for f in $(find .harmony/capabilities/skills/foundations -name "rules.md"); do

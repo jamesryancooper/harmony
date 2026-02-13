@@ -48,8 +48,8 @@ In `.harmony/capabilities/skills/registry.yml`, a Composite Skill SHOULD:
 2. Declare explicit parameters and output artifacts.
 3. List required child skills in `depends_on`.
 4. Expose deterministic output policy in `io.outputs[].determinism`.
-5. Record execution artifacts in `_state/runs/<skill-id>/<run-id>/` and
-   `_state/logs/<skill-id>/<run-id>.md`.
+5. Record execution artifacts in `_ops/state/runs/<skill-id>/<run-id>/` and
+   `_ops/state/logs/<skill-id>/<run-id>.md`.
 
 ## Execution Semantics
 

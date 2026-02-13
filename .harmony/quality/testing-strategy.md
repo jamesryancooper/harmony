@@ -61,12 +61,12 @@ See `.harmony/cognition/methodology/README.md` for Harmony’s five pillars.
 
 ## Related Docs
 
-- Governance gates: `.harmony/cognition/architecture/governance-model.md`
-- Monorepo layout (tests): `.harmony/cognition/architecture/monorepo-layout.md`
-- Tooling integration: `.harmony/cognition/architecture/tooling-integration.md`
+- Governance gates: `.harmony/cognition/_meta/architecture/governance-model.md`
+- Monorepo layout (tests): `.harmony/cognition/_meta/architecture/monorepo-layout.md`
+- Tooling integration: `.harmony/cognition/_meta/architecture/tooling-integration.md`
 - Methodology overview: `.harmony/cognition/methodology/README.md`
 - Implementation guide: `.harmony/cognition/methodology/implementation-guide.md`
 - Layers model: `.harmony/cognition/methodology/layers.md`
 - Improve layer: `.harmony/cognition/methodology/improve-layer.md`
-- Architecture overview: `.harmony/cognition/architecture/overview.md`
-- Observability requirements: `.harmony/cognition/architecture/observability-requirements.md`
+- Architecture overview: `.harmony/cognition/_meta/architecture/overview.md`
+- Observability requirements: `.harmony/cognition/_meta/architecture/observability-requirements.md`

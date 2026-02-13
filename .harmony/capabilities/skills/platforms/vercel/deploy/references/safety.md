@@ -5,7 +5,7 @@ description: Safety policies and constraints for the deploy skill.
 #   - Tool permissions: SKILL.md frontmatter `allowed-tools`
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Bash(vercel *) Bash(npm pack*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Bash(vercel *) Bash(npm pack*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -84,7 +84,7 @@ This skill explicitly does **NOT** have:
 
 ### Write Scope
 
-- `.harmony/capabilities/skills/_state/logs/vercel-deploy/` — Execution logs only
+- `.harmony/capabilities/skills/_ops/state/logs/vercel-deploy/` — Execution logs only
 
 ### Source Code Modifications
 

@@ -85,5 +85,5 @@ No exceptions for secret exposure or unredacted PII/PHI. Temporary exceptions fo
 
 - `.harmony/cognition/methodology/security-baseline.md`
 - `.harmony/cognition/methodology/README.md`
-- `.harmony/cognition/architecture/governance-model.md`
+- `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/principles/pillars/trust.md`

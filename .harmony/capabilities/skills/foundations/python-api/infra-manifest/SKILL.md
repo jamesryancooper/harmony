@@ -7,7 +7,7 @@ description: >
 skill_sets: [specialist]
 capabilities: [phased]
 # Write scopes are explicit: workspace scaffolding plus skill log output.
-allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_state/logs/*) Bash(mkdir) Bash(docker) Bash(alembic)
+allowed-tools: Read Grep Glob Edit Write(../../../**) Write(_ops/state/logs/*) Bash(mkdir) Bash(docker) Bash(alembic)
 ---
 
 # Infrastructure Manifest

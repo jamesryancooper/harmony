@@ -96,7 +96,7 @@ Use multiple services earlier only when one of these is true:
 ## Related Documentation
 
 - `.harmony/cognition/methodology/README.md`
-- `.harmony/cognition/architecture/runtime-architecture.md`
-- `.harmony/cognition/architecture/repository-blueprint.md`
+- `.harmony/cognition/_meta/architecture/runtime-architecture.md`
+- `.harmony/cognition/_meta/architecture/repository-blueprint.md`
 - `.harmony/cognition/principles/pillars/focus.md`
 - `.harmony/cognition/principles/pillars/velocity.md`

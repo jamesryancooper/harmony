@@ -1,0 +1,78 @@
+version: "1.0.0"
+rules:
+  - id: prompt.schema.input
+    description: Input schema must exist.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/input.schema.json
+    target:
+      kind: file
+      selector: schema/input.schema.json
+    action:
+      mode: block
+      code: INPUT_SCHEMA_MISSING
+      message: Missing prompt input schema.
+
+  - id: prompt.schema.output
+    description: Output schema must exist.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/output.schema.json
+    target:
+      kind: file
+      selector: schema/output.schema.json
+    action:
+      mode: block
+      code: OUTPUT_SCHEMA_MISSING
+      message: Missing prompt output schema.
+
+  - id: prompt.impl.entrypoint
+    description: Prompt shell entrypoint must exist.
+    category: structural
+    severity: high
+    condition:
+      type: file_exists
+      path: impl/prompt.sh
+    target:
+      kind: file
+      selector: impl/prompt.sh
+    action:
+      mode: block
+      code: IMPL_MISSING
+      message: Prompt implementation entrypoint missing.
+
+  - id: prompt.semantic.required-fields
+    description: Prompt output must include required schema fields.
+    category: semantic
+    severity: high
+    condition:
+      type: output_has_keys
+      keys: [promptId, content, messages]
+    target:
+      kind: output
+      selector: $.promptId
+    action:
+      mode: block
+      code: OUTPUT_INVALID
+      message: Prompt output missing required fields.
+
+  - id: prompt.policy.fail_closed
+    description: Prompt policy remains fail-closed.
+    category: policy
+    severity: critical
+    condition:
+      type: frontmatter_equals
+      path: SERVICE.md
+      key: policy.fail_closed
+      value: true
+    target:
+      kind: file
+      selector: SERVICE.md
+    action:
+      mode: block
+      code: POLICY_NOT_FAIL_CLOSED
+      message: Prompt service must stay fail-closed.

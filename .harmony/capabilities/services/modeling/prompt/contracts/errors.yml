@@ -1,0 +1,12 @@
+version: "1.0.0"
+errors:
+  - code: InputValidationError
+    category: structural
+    exit_code: 5
+    retryable: false
+    operator_action: "Fix prompt request payload to satisfy schema/input.schema.json."
+  - code: UpstreamProviderError
+    category: dependency
+    exit_code: 6
+    retryable: false
+    operator_action: "Install required runtime dependencies (jq)."

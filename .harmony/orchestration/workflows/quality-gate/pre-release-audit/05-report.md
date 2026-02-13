@@ -109,7 +109,7 @@ Produce a single consolidated report that combines all audit findings, presents 
 
 2. **Write execution log:**
 
-   Log to `_state/logs/` or workflow checkpoint directory.
+   Log to `_ops/state/logs/` or workflow checkpoint directory.
 
 ## Idempotency
 

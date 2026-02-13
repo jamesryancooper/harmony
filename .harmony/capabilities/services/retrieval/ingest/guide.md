@@ -67,7 +67,7 @@ Minimal config stub (MinHash and SimHash)
       "bits": 64,
       "hamming": 3
     },
-    "redaction": { "guardkit_profile": "default" }
+    "redaction": { "guard_profile": "default" }
   }
 }
 ```

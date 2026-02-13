@@ -552,7 +552,7 @@ The current diagram shows two separate blocks both pointing to `.harmony/capabil
 ├── manifest.yml                    # Tier 1 discovery index
 ├── capabilities.yml                # Capability schema & skill set definitions
 ├── registry.yml                    # Extended metadata, I/O paths (single source of truth)
-├── _template/                      # Scaffolding for new skills
+├── _scaffold/template/                      # Scaffolding for new skills
 ├── <group>/<skill-id>/SKILL.md     # Core instructions (<500 lines)
 ├── runs/                           # Execution state (checkpoints) for session recovery
 ├── configs/                        # Per-skill configuration overrides

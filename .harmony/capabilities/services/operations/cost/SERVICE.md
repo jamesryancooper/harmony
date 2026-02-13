@@ -8,9 +8,16 @@ version: "0.1.0"
 metadata:
   author: "harmony"
   created: "2026-02-12"
-  updated: "2026-02-12"
+  updated: "2026-02-13"
 input_schema: schema/input.schema.json
 output_schema: schema/output.schema.json
+rules: rules/
+fixtures: fixtures/
+contracts:
+  invariants: contracts/invariants.md
+  errors: contracts/errors.yml
+compatibility_profile: compatibility.yml
+generation_manifest: impl/generated.manifest.json
 stateful: true
 deterministic: false
 dependencies:
@@ -32,7 +39,7 @@ impl:
   timeout_ms: 30000
   health_check: null
 dry_run: true
-allowed-tools: Read Write(../../_state/runs/*) Glob Grep
+allowed-tools: Read Write(../../_ops/state/runs/*) Glob Grep
 ---
 
 # Cost Service

@@ -150,7 +150,7 @@ For rapid workflow evaluation:
 
 - Target directory already exists -> STOP, use /update-workflow instead
 - Invalid ID format -> STOP, ID must be kebab-case (e.g., my-workflow)
-- Template not found -> STOP, verify .harmony/orchestration/workflows/_template/ exists
+- Template not found -> STOP, verify .harmony/orchestration/workflows/_scaffold/template/ exists
 ```
 
 ### Issue: Steps not actionable

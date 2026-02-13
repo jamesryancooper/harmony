@@ -1,19 +1,19 @@
-# Plan: Consolidate operational directories under `_state/`
+# Plan: Consolidate operational directories under `_ops/state/`
 
 ## Context
 
-The skills directory at `.harmony/capabilities/skills/` mixes operational directories (`configs/`, `resources/`, `runs/`, `logs/`) with skill group directories (`foundations/`, `meta/`, `platforms/`, etc.) at the same level. There is no visual or structural distinction between them. Moving the four operational directories under a `_state/` parent creates a clear separation of mutable runtime data from skill definitions, improves top-level legibility, and simplifies gitignore/cleanup operations.
+The skills directory at `.harmony/capabilities/skills/` mixes operational directories (`configs/`, `resources/`, `runs/`, `logs/`) with skill group directories (`foundations/`, `meta/`, `platforms/`, etc.) at the same level. There is no visual or structural distinction between them. Moving the four operational directories under a `_ops/state/` parent creates a clear separation of mutable runtime data from skill definitions, improves top-level legibility, and simplifies gitignore/cleanup operations.
 
 ## Target structure
 
 ```
 .harmony/capabilities/skills/
-├── _state/                  # Mutable operational data
+├── _ops/state/                  # Mutable operational data
 │   ├── configs/{skill-id}/
 │   ├── resources/{skill-id}/
 │   ├── runs/{skill-id}/{run-id}/
 │   └── logs/{skill-id}/{run-id}.md
-├── _template/               # Scaffolding
+├── _scaffold/template/               # Scaffolding
 ├── foundations/              # Skill groups
 ├── meta/
 ├── platforms/
@@ -38,48 +38,48 @@ The skills directory at `.harmony/capabilities/skills/` mixes operational direct
 
 ```
 mkdir .harmony/capabilities/skills/_state
-git mv .harmony/capabilities/skills/configs   .harmony/capabilities/skills/_state/configs
-git mv .harmony/capabilities/skills/resources .harmony/capabilities/skills/_state/resources
-git mv .harmony/capabilities/skills/runs      .harmony/capabilities/skills/_state/runs
-git mv .harmony/capabilities/skills/logs      .harmony/capabilities/skills/_state/logs
+git mv .harmony/capabilities/skills/configs   .harmony/capabilities/skills/_ops/state/configs
+git mv .harmony/capabilities/skills/resources .harmony/capabilities/skills/_ops/state/resources
+git mv .harmony/capabilities/skills/runs      .harmony/capabilities/skills/_ops/state/runs
+git mv .harmony/capabilities/skills/logs      .harmony/capabilities/skills/_ops/state/logs
 ```
 
 ### Step 2: Update `registry.yml`
 
 **File:** `.harmony/capabilities/skills/registry.yml`
 
-- Update comment block (lines 40-46): prefix all four directory patterns with `_state/`
+- Update comment block (lines 40-46): prefix all four directory patterns with `_ops/state/`
 - Global replace all I/O `path:` values:
-  - `"logs/` → `"_state/logs/` (~75 occurrences across every skill entry)
-  - `"resources/` → `"_state/resources/` (3 occurrences: synthesize-research, refine-prompt)
-  - `"runs/` → `"_state/runs/` (2 occurrences: refactor, create-skill)
-  - `"configs/` → `"_state/configs/` (1 occurrence: audit-migration)
-- Update pipeline section (lines 1372-1378): prefix `resources/` paths with `_state/`
+  - `"logs/` → `"_ops/state/logs/` (~75 occurrences across every skill entry)
+  - `"resources/` → `"_ops/state/resources/` (3 occurrences: synthesize-research, refine-prompt)
+  - `"runs/` → `"_ops/state/runs/` (2 occurrences: refactor, create-skill)
+  - `"configs/` → `"_ops/state/configs/` (1 occurrence: audit-migration)
+- Update pipeline section (lines 1372-1378): prefix `resources/` paths with `_ops/state/`
 
 ### Step 3: Update validation and setup scripts
 
 **File:** `.harmony/capabilities/skills/scripts/validate-skills.sh`
-- Line 466-467: Update comments `Write(runs/*)` → `Write(_state/runs/*)`, `Write(logs/*)` → `Write(_state/logs/*)`
-- Line 485: `Write\(runs/\*\))` → `Write\(_state/runs/\*\))`
-- Line 486: `Write\(logs/\*\))` → `Write\(_state/logs/\*\))`
+- Line 466-467: Update comments `Write(runs/*)` → `Write(_ops/state/runs/*)`, `Write(logs/*)` → `Write(_ops/state/logs/*)`
+- Line 485: `Write\(runs/\*\))` → `Write\(_ops/state/runs/\*\))`
+- Line 486: `Write\(logs/\*\))` → `Write\(_ops/state/logs/\*\))`
 - Line 555, 559: Update comment examples
 - Line 2595: `infra_dirs` — replace `configs logs resources runs` with `_state`
-- Lines 1538, 1550: Update scaffold template paths to `_state/resources/` and `_state/logs/`
+- Lines 1538, 1550: Update scaffold template paths to `_ops/state/resources/` and `_ops/state/logs/`
 
 **File:** `.harmony/capabilities/skills/scripts/setup-harness-links.sh`
 - Line 22: Replace `"logs"` with `"_state"` in `EXCLUDE_DIRS`
 
 ### Step 4: Update `allowed-tools` in all SKILL.md files
 
-Global find-and-replace within `.harmony/capabilities/skills/**/SKILL.md` (excluding `archive/` and `_template/`):
-- `Write(logs/*)` → `Write(_state/logs/*)` (19 SKILL.md files)
-- `Write(runs/*)` → `Write(_state/runs/*)` (2 files: refactor, create-skill)
+Global find-and-replace within `.harmony/capabilities/skills/**/SKILL.md` (excluding `archive/` and `_scaffold/template/`):
+- `Write(logs/*)` → `Write(_ops/state/logs/*)` (19 SKILL.md files)
+- `Write(runs/*)` → `Write(_ops/state/runs/*)` (2 files: refactor, create-skill)
 
 ### Step 5: Update template files
 
-**`.harmony/capabilities/skills/_template/SKILL.md`** — Lines 41, 48, 49, 87-93: update all `logs/`, `runs/`, `configs/`, `resources/` path references
+**`.harmony/capabilities/skills/_scaffold/template/SKILL.md`** — Lines 41, 48, 49, 87-93: update all `logs/`, `runs/`, `configs/`, `resources/` path references
 
-**`.harmony/capabilities/skills/_template/references/`** — 7 reference files with path updates:
+**`.harmony/capabilities/skills/_scaffold/template/references/`** — 7 reference files with path updates:
 - `io-contract.md` (lines 39, 51, 68, 112)
 - `checkpoints.md` (lines 14, 119-120, 137, 188, 241)
 - `interaction.md` (lines 27, 40, 46, 167-169, 230)
@@ -90,21 +90,21 @@ Global find-and-replace within `.harmony/capabilities/skills/**/SKILL.md` (exclu
 
 ### Step 6: Update individual skill reference files
 
-Grep for `Write(logs/*)`, `Write(runs/*)`, and bare `logs/`/`runs/` path references in `**/references/*.md` across all non-archived skills. Update each occurrence with the `_state/` prefix.
+Grep for `Write(logs/*)`, `Write(runs/*)`, and bare `logs/`/`runs/` path references in `**/references/*.md` across all non-archived skills. Update each occurrence with the `_ops/state/` prefix.
 
 ### Step 7: Update `CLAUDE.md`
 
-- Line 13: `.harmony/capabilities/skills/logs/` → `.harmony/capabilities/skills/_state/logs/`
-- Line 32: `capabilities/skills/logs/` → `capabilities/skills/_state/logs/`
+- Line 13: `.harmony/capabilities/skills/logs/` → `.harmony/capabilities/skills/_ops/state/logs/`
+- Line 32: `capabilities/skills/logs/` → `capabilities/skills/_ops/state/logs/`
 
 ### Step 8: Update skills README
 
 **File:** `.harmony/capabilities/skills/README.md`
-- Line 130: invocation example with `resources/` → `_state/resources/`
-- Lines 144-160: directory structure diagram — nest `configs/`, `resources/`, `runs/`, `logs/` under `_state/`
+- Line 130: invocation example with `resources/` → `_ops/state/resources/`
+- Lines 144-160: directory structure diagram — nest `configs/`, `resources/`, `runs/`, `logs/` under `_ops/state/`
 - Lines 196-197: architecture diagram references
 - Line 226: execution flow text
-- Line 381: `Write(logs/*)` → `Write(_state/logs/*)`
+- Line 381: `Write(logs/*)` → `Write(_ops/state/logs/*)`
 
 ### Step 9: Update architecture docs
 
@@ -137,4 +137,4 @@ All files under `docs/architecture/harness/skills/`:
      -E 'path: "(configs|resources|runs|logs)/' \
      .harmony/capabilities/skills/ docs/architecture/harness/skills/ CLAUDE.md
    ```
-3. Verify physical structure: `ls .harmony/capabilities/skills/_state/` shows 4 directories; old locations are gone
+3. Verify physical structure: `ls .harmony/capabilities/skills/_ops/state/` shows 4 directories; old locations are gone

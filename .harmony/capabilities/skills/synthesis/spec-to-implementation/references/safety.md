@@ -5,7 +5,7 @@ description: Safety policies and constraints for the spec-to-implementation skil
 #   - Tool permissions: SKILL.md frontmatter `allowed-tools`
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(../../output/plans/*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Grep Write(../../output/plans/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.

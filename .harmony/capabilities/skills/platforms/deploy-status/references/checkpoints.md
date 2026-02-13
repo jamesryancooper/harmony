@@ -1,7 +1,7 @@
 ---
 checkpoints:
   strategy: phase
-  storage: ".harmony/capabilities/skills/_state/runs/deploy-status/{{run_id}}/"
+  storage: ".harmony/capabilities/skills/_ops/state/runs/deploy-status/{{run_id}}/"
   retention: session
 
   schema:

@@ -4,7 +4,7 @@ services:
   - id: guard
     display_name: Guard
     path: governance/guard/
-    summary: "Content protection: injection, hallucination, secrets/PII detection."
+    summary: "Harness-native content safety checks for injection, hallucination, secrets, and PII."
     status: active
     interface_type: shell
     tags: [safety, regex, detection]
@@ -14,9 +14,9 @@ services:
   - id: prompt
     display_name: Prompt
     path: modeling/prompt/
-    summary: "Template rendering, token counting, variant selection."
+    summary: "Harness-native prompt compilation and hashing service."
     status: active
-    interface_type: library
+    interface_type: shell
     tags: [prompt, template, tokens]
     category: prompt
     stateful: false
@@ -24,7 +24,7 @@ services:
   - id: cost
     display_name: Cost
     path: operations/cost/
-    summary: "Budget tracking, cost estimation, usage monitoring."
+    summary: "Harness-native budget estimation and usage recording service."
     status: active
     interface_type: shell
     tags: [budget, cost, tracking]
@@ -34,7 +34,7 @@ services:
   - id: flow
     display_name: Flow
     path: planning/flow/
-    summary: "HTTP client to LangGraph server for workflow orchestration."
+    summary: "Harness-native flow execution orchestrator for HTTP runner endpoints."
     status: active
     interface_type: mcp
     tags: [workflow, orchestration, langgraph]

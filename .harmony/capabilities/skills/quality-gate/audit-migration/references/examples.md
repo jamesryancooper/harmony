@@ -111,7 +111,7 @@ The audit revealed distinct classes of staleness, each caught by different layer
 | Direct old→new name references | Grep Sweep | `.workspace/context/` instead of `.harmony/cognition/context/` |
 | Broken cross-references | Cross-Reference Audit | `catalog.md` linking to `skills.md` when it became `skills/README.md` |
 | Conceptual staleness | Semantic Read-Through | "Two-tier architecture" description when model changed to "progressive disclosure" |
-| Incomplete on-disk renames | Cross-Reference Audit | `_state/resources/research-synthesizer/` not renamed to `_state/resources/synthesize-research/` |
+| Incomplete on-disk renames | Cross-Reference Audit | `_ops/state/resources/research-synthesizer/` not renamed to `_ops/state/resources/synthesize-research/` |
 | Secondary migration debris | Grep Sweep | `docs/handbooks/` references from a separate docs reorganization |
 
 ### Fix Batches Generated
@@ -156,7 +156,7 @@ migration:
 ### Invocation with Structure Diff
 
 ```
-/audit-migration manifest="..." structure_spec=".harmony/capabilities/architecture/README.md"
+/audit-migration manifest="..." structure_spec=".harmony/capabilities/_meta/architecture/README.md"
 ```
 
 ### Structure Diff Output
@@ -172,5 +172,5 @@ migration:
 - skills/runs/ (exists, not in spec)
 
 ### Mismatches:
-- skills/_template/references/behaviors.md (spec says phases.md)
+- skills/_scaffold/template/references/behaviors.md (spec says phases.md)
 ```

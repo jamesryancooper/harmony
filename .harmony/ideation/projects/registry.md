@@ -38,12 +38,12 @@ This registry tracks active, paused, and completed projects.
 ```
 
 **From brainstorm:**
-1. When a brainstorm graduates, copy `_template/` to `projects/<slug>/`
+1. When a brainstorm graduates, copy `_scaffold/template/` to `projects/<slug>/`
 2. Transfer context from the brainstorm file
 3. Add entry to **Active** table above
 
 **Manually:**
-1. Copy `_template/` to `projects/<slug>/`
+1. Copy `_scaffold/template/` to `projects/<slug>/`
 2. Fill in `project.md` with goal, scope, and key questions
 3. Add entry to **Active** table above
 4. Begin research, logging progress in `log.md`

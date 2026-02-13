@@ -3,7 +3,7 @@
 # Documents error conditions, recovery procedures, and troubleshooting.
 #
 # Error codes follow the standard format defined in:
-# .harmony/capabilities/skills/_state/logs/FORMAT.md
+# .harmony/capabilities/skills/_ops/state/logs/FORMAT.md
 errors:
   - code: "E001"
     condition: "Input folder path is empty or not provided"
@@ -248,6 +248,6 @@ To avoid errors, ensure input files:
 
 ## See Also
 
-- [Run Log Format](../../../_state/logs/FORMAT.md) — Structured logging specification
+- [Run Log Format](../../../_ops/state/logs/FORMAT.md) — Structured logging specification
 - [Safety Reference](./safety.md) — Behavioral boundaries
 - [Validation Reference](./validation.md) — Acceptance criteria

@@ -23,7 +23,7 @@ See `registry.yml` for current missions.
 
 ## Creating a New Mission
 
-1. Copy `_template/` to `missions/<slug>/`
+1. Copy `_scaffold/template/` to `missions/<slug>/`
 2. Update `mission.md` with goal, scope, success criteria
 3. Register in `registry.yml`
 

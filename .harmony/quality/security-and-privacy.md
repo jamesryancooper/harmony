@@ -56,9 +56,9 @@ See `.harmony/cognition/methodology/README.md` for Harmony’s five pillars.
 
 ## Related Docs
 
-- Governance model: `.harmony/cognition/architecture/governance-model.md`
-- Runtime policy: `.harmony/cognition/architecture/runtime-policy.md`
-- Observability requirements: `.harmony/cognition/architecture/observability-requirements.md`
+- Governance model: `.harmony/cognition/_meta/architecture/governance-model.md`
+- Runtime policy: `.harmony/cognition/_meta/architecture/runtime-policy.md`
+- Observability requirements: `.harmony/cognition/_meta/architecture/observability-requirements.md`
 - Knowledge Plane: `.harmony/cognition/knowledge-plane/knowledge-plane.md`
 - Methodology overview: `.harmony/cognition/methodology/README.md`
 - Implementation guide: `.harmony/cognition/methodology/implementation-guide.md`

@@ -149,5 +149,5 @@ Focus serves Convivial Purpose: convivial tools must be understandable. Absorbed
 - [Velocity through Agentic Automation](./velocity.md) — Enabled by Focus
 - [Pillars Overview](./README.md) — All six pillars
 - [Kit Documentation](../kits/README.md) — Tools that absorb complexity
-- [Architecture Overview](../architecture/overview.md) — Hexagonal boundaries
+- [Architecture Overview](../_meta/architecture/overview.md) — Hexagonal boundaries
 - [Convivial Purpose](../purpose/convivial-purpose.md) — The "why" this pillar serves

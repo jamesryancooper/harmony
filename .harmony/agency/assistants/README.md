@@ -59,7 +59,7 @@ Agent: "I need a code review for the authentication changes."
 
 ## Creating a New Assistant
 
-1. Copy `_template/` to a new directory: `assistants/<name>/`
+1. Copy `_scaffold/template/` to a new directory: `assistants/<name>/`
 2. Update `assistant.md` with mission, rules, and output format
 3. Register in `registry.yml`
 4. Define escalation rules (when to escalate to agents or humans)
@@ -72,4 +72,4 @@ See `registry.yml` for the alias and escalation mapping configuration.
 
 - [Agents](../agents/README.md) — Supervisors that delegate to assistants
 - [Skills](../../capabilities/skills/README.md) — Capabilities that assistants use
-- `.harmony/agency/architecture/assistants.md` — Full assistant documentation
+- `.harmony/agency/_meta/architecture/assistants.md` — Full assistant documentation

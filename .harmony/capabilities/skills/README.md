@@ -2,7 +2,7 @@
 
 Complex capabilities with defined I/O contracts and progressive disclosure.
 
-For full documentation, see [.harmony/capabilities/architecture/](/.harmony/capabilities/architecture/README.md).
+For full documentation, see [.harmony/capabilities/_meta/architecture/](/.harmony/capabilities/_meta/architecture/README.md).
 For reusable skill composition, see [Composite Skills](./composite-skills.md).
 
 ---
@@ -17,7 +17,7 @@ Creating a new skill requires updating **4 files** across **2 locations**. Use t
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  1. SKILL DEFINITION (/.harmony/capabilities/skills/<skill-id>/)                          │
-│     □ Copy _template/ to <skill-id>/                                        │
+│     □ Copy _scaffold/template/ to <skill-id>/                                        │
 │     □ Edit SKILL.md:                                                        │
 │       - Set `name:` to match directory name (kebab-case)                    │
 │       - Write `description:` (1-1024 chars, include keywords)               │
@@ -51,7 +51,7 @@ Creating a new skill requires updating **4 files** across **2 locations**. Use t
 │       - outputs: [{name, path, kind, format, determinism, description}]     │
 │                                                                             │
 │  5. VALIDATE                                                                │
-│     □ Run: ./_scripts/validate-skills.sh <skill-id>                          │
+│     □ Run: ./_ops/scripts/validate-skills.sh <skill-id>                          │
 │     □ Fix any errors or warnings                                            │
 │                                                                             │
 │  6. (OPTIONAL) COMPOSITE SKILL PROFILE                                     │
@@ -63,7 +63,7 @@ Creating a new skill requires updating **4 files** across **2 locations**. Use t
 ```
 
 Before implementing any new skill, apply the alignment-first gate in
-`.harmony/capabilities/architecture/alignment-policy.md`.
+`.harmony/capabilities/_meta/architecture/alignment-policy.md`.
 
 **Skill Sets** (choose capability bundles):
 
@@ -77,7 +77,7 @@ Before implementing any new skill, apply the alignment-first gate in
 | `specialist` | domain-specialized | Requires domain expertise |
 | `guardian` | self-validating, safety-bounded | Has quality gates |
 
-> **Design Note:** Capabilities determine documentation needs. Each capability maps to specific reference files. See [capabilities.md](/.harmony/capabilities/architecture/capabilities.md) for the full mapping.
+> **Design Note:** Capabilities determine documentation needs. Each capability maps to specific reference files. See [capabilities.md](/.harmony/capabilities/_meta/architecture/capabilities.md) for the full mapping.
 
 ## Composite Skills
 
@@ -129,7 +129,7 @@ skill_sets: [executor]
 capabilities: [resumable]
 ```
 
-The template includes guidance for choosing capabilities. See [reference-artifacts.md](/.harmony/capabilities/architecture/reference-artifacts.md) for the complete capability-to-reference mapping.
+The template includes guidance for choosing capabilities. See [reference-artifacts.md](/.harmony/capabilities/_meta/architecture/reference-artifacts.md) for the complete capability-to-reference mapping.
 
 **Quick command to scaffold and validate:**
 
@@ -139,10 +139,10 @@ cp -r .harmony/capabilities/skills/_template .harmony/capabilities/skills/<skill
 
 # Edit files (use your editor)
 # Then validate
-.harmony/capabilities/skills/_scripts/validate-skills.sh <skill-id>
+.harmony/capabilities/skills/_ops/scripts/validate-skills.sh <skill-id>
 
 # Use --fix to see scaffolding suggestions for missing entries
-.harmony/capabilities/skills/_scripts/validate-skills.sh <skill-id> --fix
+.harmony/capabilities/skills/_ops/scripts/validate-skills.sh <skill-id> --fix
 ```
 
 ---
@@ -152,7 +152,7 @@ cp -r .harmony/capabilities/skills/_template .harmony/capabilities/skills/<skill
 **Invoke a skill:**
 
 ```text
-/synthesize-research _state/resources/synthesize-research/topic/
+/synthesize-research _ops/state/resources/synthesize-research/topic/
 ```
 
 **Or explicit call pattern:**
@@ -171,13 +171,13 @@ use skill: synthesize-research
 ├── capabilities.yml                # Capability schema & skill set definitions
 ├── registry.yml                    # Extended metadata and I/O paths (single source of truth)
 ├── composite-skills.md             # Canonical composition model for skills
-├── _template/                      # Scaffolding for new skills
+├── _scaffold/template/                      # Scaffolding for new skills
 ├── <group>/<skill-id>/SKILL.md     # Core instructions (<500 lines)
-├── _state/runs/                           # Execution state (checkpoints) for session recovery
-├── _state/configs/                        # Per-skill configuration overrides
-├── _state/resources/                      # Per-skill input materials
-├── _state/logs/                           # Execution logs
-└── _scripts/                       # Validation and maintenance scripts
+├── _ops/state/runs/                           # Execution state (checkpoints) for session recovery
+├── _ops/state/configs/                        # Per-skill configuration overrides
+├── _ops/state/resources/                      # Per-skill input materials
+├── _ops/state/logs/                           # Execution logs
+└── _ops/scripts/                       # Validation and maintenance scripts
 
 .harmony/output/                    # Deliverables (final products)
 ├── prompts/                        # Refined prompts
@@ -219,8 +219,8 @@ use skill: synthesize-research
 │   │                                                                     │   │
 │   │  registry.yml ──────▶ I/O mappings (inputs, outputs)                │   │
 │   │       │                                                             │   │
-│   │       ├──▶ _state/runs/       Execution state (session recovery)            │   │
-│   │       └──▶ _state/logs/       Execution audit logs                         │   │
+│   │       ├──▶ _ops/state/runs/       Execution state (session recovery)            │   │
+│   │       └──▶ _ops/state/logs/       Execution audit logs                         │   │
 │   └─────────────────────────────────────────────────────────────────────┘   │
 │                                    │                                        │
 │                                    │ exposed via symlinks                   │
@@ -249,7 +249,7 @@ DATA FLOW:
   Read SKILL.md ─────────────▶ Load full instructions + tool permissions
          │
          ▼
-  Execute skill ─────────────▶ Write deliverables + _state/runs/, log to _state/logs/
+  Execute skill ─────────────▶ Write deliverables + _ops/state/runs/, log to _ops/state/logs/
 ```
 
 ## Single Source of Truth
@@ -263,9 +263,9 @@ DATA FLOW:
 | `version`, `commands`, `parameters`, `depends_on`| `.harmony/capabilities/skills/registry.yml`           |
 | Input/output paths                               | `.harmony/capabilities/skills/registry.yml`         |
 
-**Tool Permissions:** `allowed-tools` in SKILL.md is the single source of truth. The internal format is derived via the mapping function in `validate-skills.sh`. See [specification.md](/.harmony/capabilities/architecture/specification.md) for details.
+**Tool Permissions:** `allowed-tools` in SKILL.md is the single source of truth. The internal format is derived via the mapping function in `validate-skills.sh`. See [specification.md](/.harmony/capabilities/_meta/architecture/specification.md) for details.
 
-**Validation:** Run `./_scripts/validate-skills.sh` to verify skill consistency.
+**Validation:** Run `./_ops/scripts/validate-skills.sh` to verify skill consistency.
 
 **Token Validation:** For accurate token budget validation, install tiktoken:
 
@@ -277,21 +277,21 @@ Without tiktoken, word count approximation is used (±20% variance). CI environm
 
 ## Creating a Skill
 
-1. Copy `_template/` to `{{group}}/{{skill_id}}/`
+1. Copy `_scaffold/template/` to `{{group}}/{{skill_id}}/`
 2. Update `SKILL.md` frontmatter (`name` must match directory, set `allowed-tools`)
 3. Replace all `{{placeholder}}` values with actual content
 4. Add entry to `manifest.yml` (id, display_name, path, summary, triggers)
 5. Add entry to `.harmony/capabilities/skills/registry.yml` under `skills.<id>` (version, commands, parameters)
 6. Add I/O mapping to `.harmony/capabilities/skills/registry.yml` under `skills.<id>.io` (inputs, outputs)
-7. Run `./_scripts/validate-skills.sh {{skill_id}}` to verify consistency
+7. Run `./_ops/scripts/validate-skills.sh {{skill_id}}` to verify consistency
 
 **Validation Options:**
 
 ```bash
-./_scripts/validate-skills.sh              # Validate all skills
-./_scripts/validate-skills.sh my-skill     # Validate specific skill
-./_scripts/validate-skills.sh --fix        # Scaffold missing entries
-./_scripts/validate-skills.sh --strict     # Treat trigger duplicates as errors
+./_ops/scripts/validate-skills.sh              # Validate all skills
+./_ops/scripts/validate-skills.sh my-skill     # Validate specific skill
+./_ops/scripts/validate-skills.sh --fix        # Scaffold missing entries
+./_ops/scripts/validate-skills.sh --strict     # Treat trigger duplicates as errors
 ```
 
 ## Skill Classes
@@ -323,7 +323,7 @@ Symlinks allow all agents to share the same skill definition without duplication
 **Automatic setup (recommended):**
 
 ```bash
-./_scripts/setup-harness-links.sh
+./_ops/scripts/setup-harness-links.sh
 ```
 
 This creates symlinks for all skills in `.harmony/capabilities/skills/` to each agent's skills directory.
@@ -343,7 +343,7 @@ ln -s ../../.harmony/capabilities/skills/refine-prompt .codex/skills/refine-prom
 **Link a single skill:**
 
 ```bash
-./_scripts/setup-harness-links.sh refine-prompt
+./_ops/scripts/setup-harness-links.sh refine-prompt
 ```
 
 ### Troubleshooting
@@ -404,7 +404,7 @@ parameters:
 The `allowed-tools` field in SKILL.md frontmatter is the **single source of truth** for tool permissions. Harmony extends the agentskills.io format with path scoping:
 
 ```yaml
-allowed-tools: Read Glob Grep Write(../prompts/*) Write(_state/logs/*)
+allowed-tools: Read Glob Grep Write(../prompts/*) Write(_ops/state/logs/*)
 #              │    │    │    │                    │
 #              │    │    │    │                    └─ Scoped write (logs only)
 #              │    │    │    └─ Scoped write (deliverables destination)
@@ -452,7 +452,7 @@ updates, at the cost of requiring network access.
 
 **Template for `dependencies.md`:**
 
-The `_template/references/dependencies.md` provides the scaffold. Key sections:
+The `_scaffold/template/references/dependencies.md` provides the scaffold. Key sections:
 
 1. **Dependencies table** — service, URL, purpose, required (yes/no)
 2. **Configuration** — how to override the default URL via parameters
@@ -478,5 +478,5 @@ WebFetch ruleset URL
 
 ## See Also
 
-- [Full Documentation](/.harmony/capabilities/architecture/README.md) — Complete architecture and reference
+- [Full Documentation](/.harmony/capabilities/_meta/architecture/README.md) — Complete architecture and reference
 - [agentskills.io Specification](https://agentskills.io/specification) — Official spec

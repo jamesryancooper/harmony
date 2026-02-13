@@ -78,8 +78,8 @@ Boundary exceptions require explicit owner approval and a follow-up task to rest
 
 ## Related Documentation
 
-- `.harmony/cognition/architecture/repository-blueprint.md`
-- `.harmony/cognition/architecture/governance-model.md`
+- `.harmony/cognition/_meta/architecture/repository-blueprint.md`
+- `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/principles/pillars/focus.md`
 - `.harmony/cognition/principles/pillars/continuity.md`
 - `.harmony/cognition/principles/pillars/trust.md`

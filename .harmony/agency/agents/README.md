@@ -24,6 +24,6 @@ Use `registry.yml` for actor routing metadata and `agent.md` for behavioral cont
 ```text
 agents/
 ├── registry.yml
-├── _template/agent.md
+├── _scaffold/template/agent.md
 └── <id>/agent.md
 ```

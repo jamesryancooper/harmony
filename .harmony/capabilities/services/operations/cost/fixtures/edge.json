@@ -1,0 +1,19 @@
+{
+  "id": "cost-edge-record-failure",
+  "description": "Record operation captures failed run metadata.",
+  "request": {
+    "operation": "record",
+    "model": "gpt-4o-mini",
+    "inputTokens": 5100,
+    "outputTokens": 4200,
+    "workflowType": "code-from-plan",
+    "tier": "T2",
+    "durationMs": 12000,
+    "success": false,
+    "error": "provider timeout"
+  },
+  "expect": {
+    "hasKeys": ["usageId", "actualCostUsd", "durationMs", "success"],
+    "success": false
+  }
+}

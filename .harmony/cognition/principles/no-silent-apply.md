@@ -80,6 +80,6 @@ Low-risk read-only automation (analysis, reporting, lint suggestions) can run wi
 ## Related Documentation
 
 - `.harmony/cognition/methodology/README.md`
-- `.harmony/cognition/architecture/governance-model.md`
+- `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/principles/pillars/trust.md`
 - `.harmony/cognition/principles/pillars/direction.md`

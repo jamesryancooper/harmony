@@ -16,6 +16,12 @@ services:
     contracts:
       input: governance/guard/schema/input.schema.json
       output: governance/guard/schema/output.schema.json
+      rules: governance/guard/rules/rules.yml
+      fixtures: governance/guard/fixtures/
+      invariants: governance/guard/contracts/invariants.md
+      errors: governance/guard/contracts/errors.yml
+      compatibility: governance/guard/compatibility.yml
+      generation_manifest: governance/guard/impl/generated.manifest.json
     observability:
       service_name: harmony.service.guard
       required_spans: [service.guard.check, service.guard.sanitize]
@@ -43,6 +49,12 @@ services:
     contracts:
       input: modeling/prompt/schema/input.schema.json
       output: modeling/prompt/schema/output.schema.json
+      rules: modeling/prompt/rules/rules.yml
+      fixtures: modeling/prompt/fixtures/
+      invariants: modeling/prompt/contracts/invariants.md
+      errors: modeling/prompt/contracts/errors.yml
+      compatibility: modeling/prompt/compatibility.yml
+      generation_manifest: modeling/prompt/impl/generated.manifest.json
     observability:
       service_name: harmony.service.prompt
       required_spans: [service.prompt.compile]
@@ -53,7 +65,7 @@ services:
       required: false
       key_from: [promptId, variablesHash, variantId]
     impl:
-      entrypoint: modeling/prompt/impl/LIBRARY.md
+      entrypoint: modeling/prompt/impl/prompt.sh
 
   cost:
     version: "0.1.0"
@@ -70,6 +82,12 @@ services:
     contracts:
       input: operations/cost/schema/input.schema.json
       output: operations/cost/schema/output.schema.json
+      rules: operations/cost/rules/rules.yml
+      fixtures: operations/cost/fixtures/
+      invariants: operations/cost/contracts/invariants.md
+      errors: operations/cost/contracts/errors.yml
+      compatibility: operations/cost/compatibility.yml
+      generation_manifest: operations/cost/impl/generated.manifest.json
     observability:
       service_name: harmony.service.cost
       required_spans: [service.cost.estimate, service.cost.record]
@@ -97,6 +115,12 @@ services:
     contracts:
       input: planning/flow/schema/input.schema.json
       output: planning/flow/schema/output.schema.json
+      rules: planning/flow/rules/rules.yml
+      fixtures: planning/flow/fixtures/
+      invariants: planning/flow/contracts/invariants.md
+      errors: planning/flow/contracts/errors.yml
+      compatibility: planning/flow/compatibility.yml
+      generation_manifest: planning/flow/impl/generated.manifest.json
     observability:
       service_name: harmony.service.flow
       required_spans: [service.flow.run]

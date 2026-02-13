@@ -5,7 +5,7 @@ description: Unified, queryable engineering knowledge linking specs, contracts, 
 
 # Knowledge Plane: Linking Specifications, Contracts, Tests, Traces, and SBOM
 
-Related docs: [Content Plane](/.harmony/cognition/architecture/content-plane/README.md), [Continuity Plane](/.harmony/continuity/architecture/continuity-plane.md), [Three Planes Integration](/.harmony/continuity/architecture/three-planes-integration.md), [monorepo polyglot (normative)](../architecture/monorepo-polyglot.md), [runtime architecture](/.harmony/cognition/architecture/runtime-architecture.md), [tooling integration](../architecture/tooling-integration.md), [observability requirements](../architecture/observability-requirements.md), [governance model](../architecture/governance-model.md), [contracts registry](../architecture/contracts-registry.md)
+Related docs: [Content Plane](/.harmony/cognition/_meta/architecture/content-plane/README.md), [Continuity Plane](/.harmony/continuity/_meta/architecture/continuity-plane.md), [Three Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md), [monorepo polyglot (normative)](../_meta/architecture/monorepo-polyglot.md), [runtime architecture](/.harmony/cognition/_meta/architecture/runtime-architecture.md), [tooling integration](../_meta/architecture/tooling-integration.md), [observability requirements](../_meta/architecture/observability-requirements.md), [governance model](../_meta/architecture/governance-model.md), [contracts registry](../_meta/architecture/contracts-registry.md)
 
 The Knowledge Plane is the unified, queryable body of **system knowledge**—specifications, contracts, code artifacts, tests, build outputs, runtime telemetry, and compliance. It provides traceability from requirements to runtime signals so that both developers and AI agents can reason about **what the system is** and **how it behaves**.
 
@@ -76,7 +76,7 @@ The Knowledge Plane **indexes** (but doesn't own):
 - ADR impacts via `ADR AFFECTS CodeModule` edges
 - Decision references for traceability queries
 
-See [Three Planes Integration](/.harmony/continuity/architecture/three-planes-integration.md) for complete boundary definitions.
+See [Three Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md) for complete boundary definitions.
 
 ---
 
@@ -103,7 +103,7 @@ The Knowledge Plane indexes and links **system knowledge** across these domains:
 
 ### What Knowledge Plane Does NOT Own
 
-The following belong to the **Continuity Plane** (see [Continuity Plane](/.harmony/continuity/architecture/continuity-plane.md)):
+The following belong to the **Continuity Plane** (see [Continuity Plane](/.harmony/continuity/_meta/architecture/continuity-plane.md)):
 
 - Decision records (ADRs, CDRs) — their rationale and alternatives
 - Session handoffs — context transfer between agents/humans
@@ -195,7 +195,7 @@ Represent relationships in a knowledge graph (e.g., Neo4j/RDF) or equivalent ind
 
 ### Cross-Plane Edges (Indexed from Continuity Plane)
 
-These edges link to nodes **owned by the Continuity Plane** (see [Three Planes Integration](/.harmony/continuity/architecture/three-planes-integration.md)):
+These edges link to nodes **owned by the Continuity Plane** (see [Three Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md)):
 
 | Edge | From (Continuity) | To (Knowledge) | Meaning |
 |------|-------------------|----------------|---------|
@@ -427,7 +427,7 @@ Traceability matrix (conceptual) links Spec → Design → Code → Tests → Ru
 
 - Keep the retrieval pipeline minimal by default for small teams. Start with essential ingestion and indexing only; introduce additional components on demand.
 - Defer optional capabilities like broad external search until product needs justify them. Favor a simple Ingest → Index → Query path first; add Search (external) only if the app must integrate external knowledge sources.
-- Manage prompts close to agent configurations initially; a dedicated prompt‑templating layer (cross‑cutting; see `.harmony/cognition/architecture/slices-vs-layers.md`) can be added later if prompt complexity or reuse demands it.
+- Manage prompts close to agent configurations initially; a dedicated prompt‑templating layer (cross‑cutting; see `.harmony/cognition/_meta/architecture/slices-vs-layers.md`) can be added later if prompt complexity or reuse demands it.
 - Preserve determinism: record document versions, index parameters, and query options to ensure repeatable planning and verification.
 
 ## Appendix

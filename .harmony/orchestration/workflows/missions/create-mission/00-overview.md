@@ -28,7 +28,7 @@ Scaffold a new mission with isolated progress tracking.
 ## Steps
 
 1. **Validate slug** — Check format and uniqueness
-2. **Copy template** — Copy `missions/_template/` to `missions/<slug>/`
+2. **Copy template** — Copy `missions/_scaffold/template/` to `missions/<slug>/`
 3. **Initialize mission.md** — Update with slug, start date, placeholder goal
 4. **Initialize tasks.json** — Set mission name
 5. **Initialize log.md** — Add creation entry with date

@@ -2,7 +2,6 @@
 title: Service Error Codes
 scope: harness
 applies_to: services
-migrated_from: packages/kits/kit-base/src/errors.ts
 ---
 
 # Service Error Codes

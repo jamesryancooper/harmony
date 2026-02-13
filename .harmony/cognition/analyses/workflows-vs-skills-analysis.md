@@ -19,8 +19,8 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 
 | Skill ID | Purpose | Has I/O Contract | Has Logging | Triggers |
 |----------|---------|------------------|-------------|----------|
-| `refine-prompt` | Transform rough prompts into clear, actionable instructions with codebase context | Yes (outputs/prompts/, _state/logs/refine-prompt/) | Yes | "refine my prompt", "improve this prompt", "expand this prompt" |
-| `synthesize-research` | Synthesize scattered research notes into coherent findings documents | Yes (outputs/drafts/, _state/logs/synthesize-research/) | Yes | "synthesize my research", "consolidate findings", "summarize research notes" |
+| `refine-prompt` | Transform rough prompts into clear, actionable instructions with codebase context | Yes (outputs/prompts/, _ops/state/logs/refine-prompt/) | Yes | "refine my prompt", "improve this prompt", "expand this prompt" |
+| `synthesize-research` | Synthesize scattered research notes into coherent findings documents | Yes (outputs/drafts/, _ops/state/logs/synthesize-research/) | Yes | "synthesize my research", "consolidate findings", "summarize research notes" |
 
 **Observations:**
 
@@ -34,7 +34,7 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 
 | Path | Files Present | Apparent Purpose | Maturity |
 |------|---------------|------------------|----------|
-| `.harmony/orchestration/workflows/_template/` | 00-overview.md, 01-step.md, NN-verify.md, README.md | Scaffolding template | Draft |
+| `.harmony/orchestration/workflows/_scaffold/template/` | 00-overview.md, 01-step.md, NN-verify.md, README.md | Scaffolding template | Draft |
 | `.harmony/orchestration/workflows/workspace/create-workspace/` | 00-overview.md + 6 step files | Scaffold new .harmony directory | Draft/Functional |
 | `.harmony/orchestration/workflows/workspace/update-workspace/` | 00-overview.md + 5 step files | Align workspace with canonical definition | Draft/Functional |
 | `.harmony/orchestration/workflows/workspace/evaluate-workspace/` | 00-overview.md + 3 step files | Assess token efficiency | Draft/Functional |
@@ -68,7 +68,7 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 |------------|-------------------------|------------------|
 | **I/O Contract** | Typed paths in registry.yml, explicit output locations | Required |
 | **Composability** | Pipeline-friendly design, defined inputs/outputs enable chaining | Core philosophy |
-| **Auditability** | Required run logs in `_state/logs/<skill-id>/` | Required |
+| **Auditability** | Required run logs in `_ops/state/logs/<skill-id>/` | Required |
 | **Invocation** | `/command`, natural triggers, `use skill: {{id}}` | Supported |
 | **Progressive Disclosure** | 4-tier model (manifest → registry → SKILL.md → references) | Required |
 | **Portability** | Harness-agnostic via symlinks to `.claude/`, `.cursor/`, `.codex/` | Supported |
@@ -180,7 +180,7 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 **Analysis:**
 
 - Skills are output-focused, but nothing prevents the output from being process documentation
-- The run log (`_state/logs/<skill-id>/`) already captures execution trace
+- The run log (`_ops/state/logs/<skill-id>/`) already captures execution trace
 - A skill could explicitly output a "process report" as its primary artifact
 
 **How it works in practice:**
@@ -466,7 +466,7 @@ Is your task...
 | **Migrate to Skills** | refactor/, create-workspace, update-workspace, evaluate-workspace, create-skill | Create SKILL.md with phases |
 | **Deprecate (meta)** | create-workflow, update-workflow, evaluate-workflow | No longer needed post-consolidation |
 | **Deprecate (specialized)** | promote-from-scratchpad, missions/* | Evaluate individual utility; may not need formal primitive |
-| **Keep as templates only** | _template/ | Reference for SKILL.md structure |
+| **Keep as templates only** | _scaffold/template/ | Reference for SKILL.md structure |
 
 ### 6.4 Skill Archetype: "Workflow Skills"
 
@@ -476,7 +476,7 @@ For skills that implement procedural workflows, adopt this pattern:
 ---
 name: refactor
 description: Execute a verified codebase refactor with exhaustive audit and mandatory verification.
-allowed-tools: Read Glob Grep Edit Write(outputs/*) Write(_state/logs/*)
+allowed-tools: Read Glob Grep Edit Write(outputs/*) Write(_ops/state/logs/*)
 metadata:
   archetype: workflow
   checkpoints: true
@@ -503,7 +503,7 @@ A refactor is NOT complete until Phase 5 (Verify) passes with zero remaining ref
 1. **Create `refactor` skill** - Migrate `.harmony/orchestration/workflows/refactor/` to `.harmony/capabilities/skills/refactor/`
 2. **Create `create-workspace` skill** - Migrate workspace scaffolding workflow
 3. **Update `create-skill` workflow** to be a skill itself (meta but consistent)
-4. **Deprecate `.harmony/orchestration/workflows/`** - Move templates to `.harmony/capabilities/skills/_template/`
+4. **Deprecate `.harmony/orchestration/workflows/`** - Move templates to `.harmony/capabilities/skills/_scaffold/template/`
 5. **Update documentation** - Revise comparison.md to reflect consolidation
 6. **Add skill archetype guidance** - Document "workflow skills" pattern in skills docs
 
@@ -515,10 +515,10 @@ A refactor is NOT complete until Phase 5 (Verify) passes with zero remaining ref
 
 | File | Change Type | Description |
 |------|-------------|-------------|
-| `.harmony/capabilities/architecture/comparison.md` | Update | Remove "workflows" from comparison table; note consolidation |
+| `.harmony/capabilities/_meta/architecture/comparison.md` | Update | Remove "workflows" from comparison table; note consolidation |
 | `docs/architecture/workspaces/workflows.md` | Deprecate | Add deprecation notice, point to skills |
-| `.harmony/capabilities/architecture/README.md` | Update | Add "workflow skills" archetype section |
-| `.harmony/capabilities/architecture/archetypes.md` | Create | Document different skill archetypes (transform, workflow, etc.) |
+| `.harmony/capabilities/_meta/architecture/README.md` | Update | Add "workflow skills" archetype section |
+| `.harmony/capabilities/_meta/architecture/archetypes.md` | Create | Document different skill archetypes (transform, workflow, etc.) |
 | `.harmony/capabilities/skills/manifest.yml` | Update | Add new skills as they're migrated |
 | `.harmony/capabilities/skills/registry.yml` | Update | Add new skill metadata |
 | `CLAUDE.md` | Update | Remove workflow references, simplify skill discovery |
@@ -557,7 +557,7 @@ The key insight is that skills are not just "composable I/O operations" - they a
 - `.harmony/capabilities/skills/synthesis/refine-prompt/SKILL.md` - Example multi-phase skill
 - `.harmony/capabilities/skills/synthesis/refine-prompt/references/phases.md` - Detailed phase documentation
 - `.harmony/orchestration/workflows/refactor/` - Example workflow (candidate for migration)
-- `.harmony/capabilities/architecture/` - Skills documentation
+- `.harmony/capabilities/_meta/architecture/` - Skills documentation
 - `docs/architecture/workspaces/workflows.md` - Workflows documentation
 
 ---
@@ -708,7 +708,7 @@ These become unnecessary after consolidation:
 | `.harmony/orchestration/workflows/workflows/create-workflow/` | No longer creating workflows |
 | `.harmony/orchestration/workflows/workflows/update-workflow/` | No longer maintaining workflows |
 | `.harmony/orchestration/workflows/workflows/evaluate-workflow/` | No longer evaluating workflows |
-| `.harmony/orchestration/workflows/_template/` | Move to `.harmony/capabilities/skills/_template/` |
+| `.harmony/orchestration/workflows/_scaffold/template/` | Move to `.harmony/capabilities/skills/_scaffold/template/` |
 
 ### Phase 3: Evolve Missions into Durable Orchestration
 
@@ -866,12 +866,12 @@ Is your task...
 
 | File | Change |
 |------|--------|
-| `.harmony/capabilities/architecture/comparison.md` | Add missions comparison |
+| `.harmony/capabilities/_meta/architecture/comparison.md` | Add missions comparison |
 | `docs/architecture/workspaces/workflows.md` | Deprecation notice → point to skills |
 | `docs/architecture/workspaces/missions.md` | **Create** - Mission primitive docs |
 | `docs/architecture/workspaces/missions/schema.md` | **Create** - mission.yml schema |
 | `docs/architecture/workspaces/missions/flowkit-integration.md` | **Create** - FlowKit integration |
-| `.harmony/orchestration/missions/_template/` | **Create** - Mission template |
+| `.harmony/orchestration/missions/_scaffold/template/` | **Create** - Mission template |
 | `CLAUDE.md` | Update with two-layer model |
 
 ---

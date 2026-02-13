@@ -4,7 +4,7 @@ Date: 2026-02-10
 
 ## Context
 
-The skills subsystem has undergone significant structural changes since the last audit cycle: a `_state/` directory consolidation, remediation of 13 cross-artifact alignment issues (A1-A13), validator hardening, capability taxonomy expansion, and documentation updates. Many of these changes are staged but uncommitted. This plan defines an exhaustive audit across 8 dimensions that covers the full subsystem — structure, schemas, validator, documentation, specification compliance, content quality, operational infrastructure, and cross-system integration — producing a graded findings report with actionable remediations.
+The skills subsystem has undergone significant structural changes since the last audit cycle: a `_ops/state/` directory consolidation, remediation of 13 cross-artifact alignment issues (A1-A13), validator hardening, capability taxonomy expansion, and documentation updates. Many of these changes are staged but uncommitted. This plan defines an exhaustive audit across 8 dimensions that covers the full subsystem — structure, schemas, validator, documentation, specification compliance, content quality, operational infrastructure, and cross-system integration — producing a graded findings report with actionable remediations.
 
 ## Prior Work
 
@@ -13,7 +13,7 @@ The skills subsystem has undergone significant structural changes since the last
 | `2026-02-10-skills-subsystem-audit-plan.md` | Executed | Defined 14-dimension audit framework; this plan supersedes it with post-remediation scope |
 | `2026-02-10-skills-audit-remediation-plan.md` | Executed | 7-phase remediation; validator passed after |
 | `2026-02-10-skills-post-remediation-plan.md` | Partially executed | Phases 1-5 address A1-A13; some items may remain open |
-| `2026-02-10-skills-state-directory-consolidation.md` | In-flight | `_state/` migration staged in git; needs verification |
+| `2026-02-10-skills-state-directory-consolidation.md` | In-flight | `_ops/state/` migration staged in git; needs verification |
 
 This audit treats all prior work as "claimed done" and independently verifies it.
 
@@ -21,7 +21,7 @@ This audit treats all prior work as "claimed done" and independently verifies it
 
 **In scope:**
 
-- `.harmony/capabilities/skills/` — all files: manifest.yml, capabilities.yml, registry.yml, README.md, every SKILL.md, every `references/` file, `_state/`, `_template/`, `_scripts/`
+- `.harmony/capabilities/skills/` — all files: manifest.yml, capabilities.yml, registry.yml, README.md, every SKILL.md, every `references/` file, `_ops/state/`, `_scaffold/template/`, `_ops/scripts/`
 - `docs/architecture/harness/skills/` — all 10 architecture documents
 - `CLAUDE.md` and `AGENTS.md` — skills-related instructions
 - `.cursor/commands/` — skill invocation commands
@@ -99,7 +99,7 @@ Spot-check that each of the 13 previously identified issues is resolved:
 | A2 | create-skill parameter inconsistency | SKILL.md, io-contract.md, registry.yml agree on parameter names |
 | A3 | create-skill output path inconsistency | All three files use grouped path format |
 | A4 | 5 nested skills fail parent-directory naming | Documented as intentional divergence in specification.md |
-| A5 | Template/archive placeholder compliance | Validator skips `_template/` and `archive/` |
+| A5 | Template/archive placeholder compliance | Validator skips `_scaffold/template/` and `archive/` |
 | A6 | Validator parses deprecated `skill_mappings` | Validator uses `skills.<id>.io` |
 | A7 | Same as A6 for placeholder checks | Same fix applied |
 | A8 | Path-scope validation too permissive | `../../*` escape blocked |
@@ -113,9 +113,9 @@ Spot-check that each of the 13 previously identified issues is resolved:
 
 ---
 
-## Dimension 2: `_state/` Directory Migration Completeness
+## Dimension 2: `_ops/state/` Directory Migration Completeness
 
-**Goal:** The consolidation of `configs/`, `resources/`, `runs/`, `logs/` under `_state/` is complete with zero stale references anywhere in the tree.
+**Goal:** The consolidation of `configs/`, `resources/`, `runs/`, `logs/` under `_ops/state/` is complete with zero stale references anywhere in the tree.
 
 **Why critical:** This migration touches 100+ files. A single stale path breaks skill execution silently.
 
@@ -123,9 +123,9 @@ Spot-check that each of the 13 previously identified issues is resolved:
 
 #### 2.1 Physical structure verification
 
-1. Confirm `_state/` directory exists with exactly 4 subdirectories: `configs/`, `resources/`, `runs/`, `logs/`
+1. Confirm `_ops/state/` directory exists with exactly 4 subdirectories: `configs/`, `resources/`, `runs/`, `logs/`
 2. Confirm old top-level directories (`configs/`, `resources/`, `runs/`, `logs/` at `.harmony/capabilities/skills/`) no longer exist
-3. Confirm per-skill subdirectories exist inside `_state/` for each skill that needs them
+3. Confirm per-skill subdirectories exist inside `_ops/state/` for each skill that needs them
 
 #### 2.2 Stale path sweep
 
@@ -150,23 +150,23 @@ Grep the entire project for old-style paths. Each pattern must return 0 matches 
 
 Verify the new paths are correctly formed:
 
-1. Registry.yml I/O paths use `_state/logs/`, `_state/resources/`, etc.
-2. SKILL.md `allowed-tools` Write scopes use `_state/logs/*`, `_state/runs/*`
-3. Template SKILL.md uses `_state/` prefix in examples and allowed-tools
-4. Template reference files use `_state/` prefix in path examples
+1. Registry.yml I/O paths use `_ops/state/logs/`, `_ops/state/resources/`, etc.
+2. SKILL.md `allowed-tools` Write scopes use `_ops/state/logs/*`, `_ops/state/runs/*`
+3. Template SKILL.md uses `_ops/state/` prefix in examples and allowed-tools
+4. Template reference files use `_ops/state/` prefix in path examples
 
 #### 2.4 Script updates
 
-1. `validate-skills.sh`: References to `logs/`, `runs/`, `configs/`, `resources/` updated to `_state/` equivalents
+1. `validate-skills.sh`: References to `logs/`, `runs/`, `configs/`, `resources/` updated to `_ops/state/` equivalents
 2. `setup-harness-links.sh`: Exclude list updated (`_state` instead of individual directories)
 3. Both scripts execute without error after migration
 
 #### 2.5 Cross-system reference updates
 
-1. CLAUDE.md log path references use `_state/logs/`
-2. Workflow files (`.harmony/orchestration/`) use `_state/` paths
-3. Cursor commands (`.cursor/commands/`) use `_state/` paths
-4. Cognition files (`.harmony/cognition/`) use `_state/` paths
+1. CLAUDE.md log path references use `_ops/state/logs/`
+2. Workflow files (`.harmony/orchestration/`) use `_ops/state/` paths
+3. Cursor commands (`.cursor/commands/`) use `_ops/state/` paths
+4. Cognition files (`.harmony/cognition/`) use `_ops/state/` paths
 
 **Tools:** Bash (`ls`), Grep (stale path patterns across entire project), Read (registry.yml, SKILL.md samples, scripts)
 
@@ -212,7 +212,7 @@ Read the validator source and catalogue every named check (27+ claimed). For eac
 
 1. Confirm nested skills like `foundations/react/best-practices` pass directory-exists checks
 2. Confirm the name-vs-parent-directory check handles grouped paths correctly (INFO not ERROR when name matches manifest ID but not parent directory)
-3. Confirm `_template/` and `archive/` are excluded from compliance checks
+3. Confirm `_scaffold/template/` and `archive/` are excluded from compliance checks
 
 #### 3.6 Token budget accuracy
 
@@ -276,8 +276,8 @@ Map architecture doc contracts against validator checks. Identify contracts that
 #### 4.3 Path examples
 
 1. Grep docs for flat-path skill directory examples (e.g., `skills/refactor/`, `skills/<skill-name>/`) — should use grouped format (`skills/<group>/<skill-name>/`)
-2. Grep docs for old operational directory paths (`skills/logs/`, `skills/configs/`, `skills/runs/`, `skills/resources/`) — should use `_state/` prefix
-3. Verify directory tree diagrams in `architecture.md`, `design-conventions.md`, `README.md` show `_state/` structure
+2. Grep docs for old operational directory paths (`skills/logs/`, `skills/configs/`, `skills/runs/`, `skills/resources/`) — should use `_ops/state/` prefix
+3. Verify directory tree diagrams in `architecture.md`, `design-conventions.md`, `README.md` show `_ops/state/` structure
 
 #### 4.4 Deprecated terminology
 
@@ -444,7 +444,7 @@ For each skill in the `foundations/` group:
 
 #### 7.1 Log format compliance
 
-1. Read `_state/logs/FORMAT.md` for the log specification
+1. Read `_ops/state/logs/FORMAT.md` for the log specification
 2. Read each existing log file (e.g., `audit-migration/2026-02-08-workspace-to-harness.md`)
 3. Verify YAML frontmatter contains required fields: `run_id`, `skill_id`, `version`, `status`, `started_at`, `completed_at`
 4. Verify `status` is one of: `success`, `partial`, `failed`, `cancelled`
@@ -452,22 +452,22 @@ For each skill in the `foundations/` group:
 
 #### 7.2 Log index consistency
 
-1. Read `_state/logs/index.yml` — every entry references a log file that exists on disk
+1. Read `_ops/state/logs/index.yml` — every entry references a log file that exists on disk
 2. Every log file on disk is referenced in the appropriate index
-3. Per-skill `index.yml` files (e.g., `_state/logs/audit-migration/index.yml`) are consistent with their directory contents
+3. Per-skill `index.yml` files (e.g., `_ops/state/logs/audit-migration/index.yml`) are consistent with their directory contents
 4. No orphaned log files (present on disk but missing from index)
 
 #### 7.3 Run directory cleanliness
 
-1. List all directories under `_state/runs/`
+1. List all directories under `_ops/state/runs/`
 2. For each directory, check if there are any checkpoint files or just `.gitkeep`
 3. Any checkpoint files should reference a valid skill ID that exists in manifest.yml
 4. Flag stale checkpoints (no corresponding recent log entry suggesting active execution)
 
 #### 7.4 Config and resource directory cleanliness
 
-1. Every subdirectory under `_state/configs/` matches a skill ID in manifest.yml
-2. Every subdirectory under `_state/resources/` matches a skill ID in manifest.yml
+1. Every subdirectory under `_ops/state/configs/` matches a skill ID in manifest.yml
+2. Every subdirectory under `_ops/state/resources/` matches a skill ID in manifest.yml
 3. No orphaned directories for skills that no longer exist
 
 #### 7.5 Script execution verification
@@ -476,7 +476,7 @@ For each skill in the `foundations/` group:
 2. Run `setup-harness-links.sh` — exits 0, symlinks created/updated correctly
 3. Verify `generate-reference-headers.sh` runs without error (if applicable)
 
-**Tools:** Read (FORMAT.md, log files, index files), Glob (`_state/**/*`), Bash (run scripts)
+**Tools:** Read (FORMAT.md, log files, index files), Glob (`_ops/state/**/*`), Bash (run scripts)
 
 ---
 
@@ -489,7 +489,7 @@ For each skill in the `foundations/` group:
 #### 8.1 CLAUDE.md accuracy
 
 1. Progressive disclosure sequence matches reality (manifest → capabilities → registry → SKILL.md → references)
-2. File paths are correct (especially `_state/logs/` for the log directory)
+2. File paths are correct (especially `_ops/state/logs/` for the log directory)
 3. Safety instruction ("deny-by-default") matches execution.md
 4. Quick reference paths all resolve to existing files
 
@@ -502,17 +502,17 @@ For each skill in the `foundations/` group:
 
 For each workflow file that references skills paths:
 
-1. `.harmony/orchestration/workflows/meta/create-skill(x)/03-initialize-skill.md` — paths use `_state/` prefix, references grouped directory structure
-2. `.harmony/orchestration/workflows/quality-gate/orchestrate-audit/06-report.md` — paths use `_state/` prefix
+1. `.harmony/orchestration/workflows/meta/create-skill(x)/03-initialize-skill.md` — paths use `_ops/state/` prefix, references grouped directory structure
+2. `.harmony/orchestration/workflows/quality-gate/orchestrate-audit/06-report.md` — paths use `_ops/state/` prefix
 
 #### 8.4 Cursor command accuracy
 
 1. `.cursor/commands/use-skill.md` — invocation pattern matches current invocation.md
-2. `.cursor/commands/synthesize-research.md` — resource and log paths use `_state/` prefix
+2. `.cursor/commands/synthesize-research.md` — resource and log paths use `_ops/state/` prefix
 
 #### 8.5 Cognition file accuracy
 
-1. `.harmony/cognition/analyses/workflows-vs-skills-analysis.md` — skill path references use `_state/` prefix and grouped format
+1. `.harmony/cognition/analyses/workflows-vs-skills-analysis.md` — skill path references use `_ops/state/` prefix and grouped format
 2. `.harmony/cognition/context/primitives.md` — skills subsystem description matches current architecture
 
 #### 8.6 Host adapter symlinks
@@ -520,7 +520,7 @@ For each workflow file that references skills paths:
 1. Run `setup-harness-links.sh` and verify symlinks are created for `.claude/skills`, `.cursor/skills`, `.codex/skills`
 2. Each symlink resolves to the correct skill directory
 3. Nested/grouped skills are properly linked
-4. `_state/`, `_template/`, and `_scripts/` are excluded from symlinks
+4. `_ops/state/`, `_scaffold/template/`, and `_ops/scripts/` are excluded from symlinks
 
 **Tools:** Read (CLAUDE.md, AGENTS.md, workflow files, cursor commands, cognition files), Grep (path patterns), Bash (symlink verification)
 

@@ -13,7 +13,7 @@ metadata:
   updated: "2026-02-13"
 skill_sets: [executor, guardian]
 capabilities: [domain-specialized, self-validating]
-allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_state/logs/*)
+allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_ops/state/logs/*)
 ---
 
 # Audit Documentation Standards
@@ -69,7 +69,7 @@ source of truth).
 Outputs are written to:
 
 - `.harmony/output/reports/YYYY-MM-DD-documentation-standards-audit.md`
-- `_state/logs/audit-documentation-standards/`
+- `_ops/state/logs/audit-documentation-standards/`
 
 ## Severity Classification
 

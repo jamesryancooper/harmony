@@ -32,7 +32,7 @@ Scaffold a new project with isolated scope, memory, and continuity.
    - If invalid → STOP, report error with valid format
 
 2. **Copy template**
-   - Copy `projects/_template/` to `projects/<slug>/`
+   - Copy `projects/_scaffold/template/` to `projects/<slug>/`
 
 3. **Initialize project.md**
    - Replace `[topic]` with the slug (human-readable form)
@@ -96,6 +96,6 @@ context/                → Permanent knowledge
 
 ## Related
 
-- [Projects](/.harmony/ideation/architecture/projects.md) — Full documentation
+- [Projects](/.harmony/ideation/_meta/architecture/projects.md) — Full documentation
 - [Registry](../../../ideation/projects/registry.md) — Project tracking
 - [Brainstorm](../../../ideation/scratchpad/brainstorm/README.md) — Upstream exploration

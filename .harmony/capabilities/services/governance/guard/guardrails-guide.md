@@ -293,15 +293,13 @@ When in doubt: **Ask the AI to explain**, or **regenerate with stricter constrai
 
 For developers who want to understand the implementation:
 
-| Component | Package | Description |
-|-----------|---------|-------------|
-| GuardKit | `@harmony/guardkit` | Core guardrail implementation |
-| Hallucination Detection | `@harmony/prompts` | Prompt output validation |
-| Quality Monitoring | `@harmony/prompts` | Golden test monitoring |
-| CLI Integration | `@harmony/harmony-cli` | `check` command implementation |
+| Component | Location | Description |
+|-----------|----------|-------------|
+| Guard Service Contract | `.harmony/capabilities/services/governance/guard/SERVICE.md` | Canonical service metadata and policy |
+| Guard Runtime | `.harmony/capabilities/services/governance/guard/impl/guard.sh` | Shell implementation for check/sanitize |
+| Guard Rules | `.harmony/capabilities/services/governance/guard/rules/rules.yml` | Declarative enforcement rules |
+| Guard Fixtures | `.harmony/capabilities/services/governance/guard/fixtures/` | Positive/negative/edge behavior anchors |
 
-See:
-- [`packages/kits/src/guardkit/README.md`](/packages/kits/src/guardkit/README.md) - GuardKit API
-- [`packages/prompts/README.md`](/packages/prompts/README.md) - Hallucination & monitoring APIs
-- [`packages/harmony-cli/README.md`](/packages/harmony-cli/README.md) - CLI commands
-
+See also:
+- `.harmony/capabilities/services/governance/guard/guide.md`
+- `.harmony/capabilities/services/governance/guard/references/patterns.md`

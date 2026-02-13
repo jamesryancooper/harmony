@@ -8,9 +8,16 @@ version: "0.1.0"
 metadata:
   author: "harmony"
   created: "2026-02-12"
-  updated: "2026-02-12"
+  updated: "2026-02-13"
 input_schema: schema/input.schema.json
 output_schema: schema/output.schema.json
+rules: rules/
+fixtures: fixtures/
+contracts:
+  invariants: contracts/invariants.md
+  errors: contracts/errors.yml
+compatibility_profile: compatibility.yml
+generation_manifest: impl/generated.manifest.json
 stateful: false
 deterministic: false
 dependencies:

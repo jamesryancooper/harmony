@@ -1,0 +1,20 @@
+{
+  "id": "guard-edge-custom-pattern",
+  "description": "Custom pattern matching appends custom check results.",
+  "request": {
+    "content": "this output includes forbidden marker",
+    "options": {
+      "customPatterns": [
+        {
+          "name": "forbidden-marker",
+          "pattern": "forbidden",
+          "severity": "high"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "passed": false,
+    "containsCheckPrefix": "custom:forbidden-marker"
+  }
+}

@@ -120,7 +120,7 @@ Created → Exploring → Verdict
 When a brainstorm graduates:
 
 1. Create project directory: `projects/<slug>/`
-2. Copy `_template/` files into it
+2. Copy `_scaffold/template/` files into it
 3. Transfer relevant context from brainstorm
 4. Update brainstorm status to `graduated`
 5. Add entry to `projects/registry.md`

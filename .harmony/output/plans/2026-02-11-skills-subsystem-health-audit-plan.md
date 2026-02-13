@@ -21,7 +21,7 @@ This audit independently re-verifies subsystem health regardless of prior remedi
 
 **In scope:**
 
-- `.harmony/capabilities/skills/` — manifest.yml, registry.yml, capabilities.yml, README.md, all SKILL.md files, `references/`, `_state/`, `_template/`, `_scripts/`
+- `.harmony/capabilities/skills/` — manifest.yml, registry.yml, capabilities.yml, README.md, all SKILL.md files, `references/`, `_ops/state/`, `_scaffold/template/`, `_ops/scripts/`
 - `docs/architecture/harness/skills/` — all architecture documents
 - `.claude/skills/`, `.cursor/skills/`, `.codex/skills/` — harness symlinks
 - `CLAUDE.md`, `AGENTS.md` — skills-related instructions
@@ -107,7 +107,7 @@ Registry key without manifest entry = orphaned registry entry.
 
 #### 2.3 Reverse: disk → manifest
 
-Glob all directories under `.harmony/capabilities/skills/` that contain a `SKILL.md`, excluding `_template/`, `_state/`, `_scripts/`, and `archive/`. For each:
+Glob all directories under `.harmony/capabilities/skills/` that contain a `SKILL.md`, excluding `_scaffold/template/`, `_ops/state/`, `_ops/scripts/`, and `archive/`. For each:
 1. Verify a manifest.yml entry exists whose `path` resolves to that directory
 
 Skill directory without manifest entry = unindexed skill.
@@ -128,7 +128,7 @@ Glob all directories under `.harmony/capabilities/skills/{group}/` that do NOT c
 
 For every skill in registry.yml, for each path in `io.inputs` and `io.outputs`:
 1. If `path` is a literal path (not a parameter placeholder like `$source`), verify the parent directory exists
-2. If `path` references a `_state/` subdirectory, verify that subdirectory exists
+2. If `path` references a `_ops/state/` subdirectory, verify that subdirectory exists
 
 #### 3.2 SKILL.md `references/` section links
 
@@ -141,7 +141,7 @@ Missing reference file = stale cross-reference.
 #### 3.3 Capability-to-reference mapping in capabilities.yml
 
 Read capabilities.yml `capability_refs`. For each capability → file list mapping:
-1. Verify each listed filename exists in `_template/references/`
+1. Verify each listed filename exists in `_scaffold/template/references/`
 2. For each active skill declaring that capability, verify the corresponding reference file exists in the skill's `references/` directory
 
 #### 3.4 Registry `depends_on` resolution
@@ -333,32 +333,32 @@ For skills with `status: draft` or `deprecated`:
 
 ## Lens 8: Template Drift
 
-**Goal:** The scaffold template (`_template/`) reflects what existing active skills actually look like.
+**Goal:** The scaffold template (`_scaffold/template/`) reflects what existing active skills actually look like.
 
 ### Checks
 
 #### 8.1 SKILL.md structural comparison
 
-1. Parse `_template/SKILL.md` to extract its section headings (## and ### level)
+1. Parse `_scaffold/template/SKILL.md` to extract its section headings (## and ### level)
 2. For a representative sample of 5 active skills (one from each group), parse their SKILL.md section headings
 3. Flag headings present in template but absent from active skills (template bloat) and headings present in active skills but absent from template (template gap)
 
 #### 8.2 Frontmatter field comparison
 
-1. Extract frontmatter keys from `_template/SKILL.md`
+1. Extract frontmatter keys from `_scaffold/template/SKILL.md`
 2. Extract frontmatter keys from all active SKILL.md files
 3. Flag keys in template not used by any skill (dead placeholders) and keys used by skills but absent from template (undocumented fields)
 
 #### 8.3 Reference file coverage
 
-1. List all files in `_template/references/`
+1. List all files in `_scaffold/template/references/`
 2. For each active skill, list files in its `references/` directory
 3. Flag template reference files that no active skill uses (dead templates)
 4. Flag reference files used by active skills that have no template counterpart (undocumented references)
 
 #### 8.4 Placeholder format consistency
 
-1. Scan `_template/SKILL.md` for placeholder patterns (e.g., `{{skill_name}}`, `{{skill_description}}`)
+1. Scan `_scaffold/template/SKILL.md` for placeholder patterns (e.g., `{{skill_name}}`, `{{skill_description}}`)
 2. Verify `create-skill` SKILL.md documents all placeholders used in the template
 3. Flag placeholders in template that aren't documented in `create-skill`
 
@@ -366,30 +366,30 @@ For skills with `status: draft` or `deprecated`:
 
 ## Lens 9: Log / State Coherence
 
-**Goal:** The `_state/` directory structure matches what docs and the FORMAT.md specification say it should contain.
+**Goal:** The `_ops/state/` directory structure matches what docs and the FORMAT.md specification say it should contain.
 
 ### Checks
 
-#### 9.1 _state/ directory structure
+#### 9.1 _ops/state/ directory structure
 
 Verify these subdirectories exist as documented:
-- `_state/configs/`
-- `_state/resources/`
-- `_state/logs/`
-- `_state/runs/`
+- `_ops/state/configs/`
+- `_ops/state/resources/`
+- `_ops/state/logs/`
+- `_ops/state/runs/`
 
-Flag any unexpected subdirectories or files at the `_state/` root level.
+Flag any unexpected subdirectories or files at the `_ops/state/` root level.
 
 #### 9.2 Log subdirectory parity
 
-1. List all subdirectories in `_state/logs/`
+1. List all subdirectories in `_ops/state/logs/`
 2. For each, verify a corresponding manifest skill entry exists
 3. Flag log directories for non-existent skills (orphaned logs)
 4. (Informational) flag active skills with no log directory (never executed)
 
 #### 9.3 Log format compliance
 
-For each log file in `_state/logs/*/`:
+For each log file in `_ops/state/logs/*/`:
 1. If YAML-frontmatter format, verify required frontmatter fields per FORMAT.md:
    - `run.id`, `run.skill_id`, `run.timestamp`
    - `status.outcome` (one of: success | partial | failed | cancelled)
@@ -397,7 +397,7 @@ For each log file in `_state/logs/*/`:
 
 #### 9.4 Runs / configs / resources parity
 
-1. List subdirectories in `_state/runs/`, `_state/configs/`, `_state/resources/`
+1. List subdirectories in `_ops/state/runs/`, `_ops/state/configs/`, `_ops/state/resources/`
 2. For each, verify a corresponding manifest skill entry exists
 3. Flag orphaned subdirectories (skill was removed but state wasn't cleaned up)
 
@@ -424,7 +424,7 @@ Lenses are independent and can run in any order. However, for efficient context 
 4. **Lens 3 (Stale Cross-Refs)** — builds on disk presence checks from Lens 2
 5. **Lens 7 (Trigger/Invocation Gaps)** — uses manifest data already parsed
 6. **Lens 8 (Template Drift)** — independent, reads template + sample skills
-7. **Lens 9 (Log/State Coherence)** — independent, reads _state/ tree
+7. **Lens 9 (Log/State Coherence)** — independent, reads _ops/state/ tree
 8. **Lens 5 (Broken Internal Links)** — expensive link crawl, run late
 9. **Lens 4 (Doc-to-Source Misalignment)** — reads architecture docs, run last
 

@@ -8,9 +8,16 @@ version: "0.1.0"
 metadata:
   author: "harmony"
   created: "2026-02-12"
-  updated: "2026-02-12"
+  updated: "2026-02-13"
 input_schema: schema/input.schema.json
 output_schema: schema/output.schema.json
+rules: rules/
+fixtures: fixtures/
+contracts:
+  invariants: contracts/invariants.md
+  errors: contracts/errors.yml
+compatibility_profile: compatibility.yml
+generation_manifest: impl/generated.manifest.json
 stateful: false
 deterministic: true
 dependencies:
@@ -37,11 +44,9 @@ allowed-tools: Read Glob Grep
 
 # Guard Service
 
-Portable shell implementation of GuardKit checks. Input is JSON via stdin and output is JSON to stdout.
+Portable shell implementation of content safety checks.
 
 ## Actions
 
 - `check`: detect risky content patterns.
 - `sanitize`: emit redacted content when patterns are detected.
-
-Both actions are represented in the single output contract and can be composed by callers.

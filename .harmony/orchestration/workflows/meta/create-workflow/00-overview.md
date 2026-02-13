@@ -41,7 +41,7 @@ Scaffold a new workflow directory with numbered step files, incorporating all ga
 
 - Workflow ID must be lowercase with hyphens (e.g., `code-review`)
 - No existing workflow with the same ID in target location
-- Template directory exists at `.harmony/orchestration/workflows/_template/`
+- Template directory exists at `.harmony/orchestration/workflows/_scaffold/template/`
 
 ## Failure Conditions
 
@@ -89,7 +89,7 @@ Create Workflow is NOT complete until:
 
 ## References
 
-- **Template:** `.harmony/orchestration/workflows/_template/`
+- **Template:** `.harmony/orchestration/workflows/_scaffold/template/`
 - **Gap fixes guide:** `.harmony/cognition/context/workflow-gaps.md`
 - **Quality criteria:** `.harmony/cognition/context/workflow-quality.md`
 - **Existing examples:** `.harmony/orchestration/workflows/quality-gate/refactor(x)/`, `.harmony/orchestration/workflows/meta/create-skill(x)/`

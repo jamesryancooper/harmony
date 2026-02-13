@@ -51,7 +51,7 @@ Read `.harmony/capabilities/skills/manifest.yml` for skill discovery.
 ### Safety
 
 - Follow `deny-by-default` tool policy
-- Log every execution to `capabilities/skills/_state/logs/`
+- Log every execution to `capabilities/skills/_ops/state/logs/`
 
 ## Workflows
 

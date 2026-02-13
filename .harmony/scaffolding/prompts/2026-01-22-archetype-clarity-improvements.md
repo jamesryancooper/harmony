@@ -138,7 +138,7 @@ Workflow skills require formal validation in `validation.md`:
 - Quality checklist for final output
 - Error conditions and expected handling
 
-See [validation.md template](./../../../.harmony/capabilities/skills/_template/references/validation.md) for the standard format.
+See [validation.md template](./../../../.harmony/capabilities/skills/_scaffold/template/references/validation.md) for the standard format.
 ```
 
 ---
@@ -194,7 +194,7 @@ See [Reference Artifacts](./reference-artifacts.md#validation-expectations-by-ar
 
 ---
 
-### File: `.harmony/capabilities/skills/_template/SKILL.md`
+### File: `.harmony/capabilities/skills/_scaffold/template/SKILL.md`
 
 **Location:** After the "Workflow Archetype" section (end of References section)
 
@@ -267,7 +267,7 @@ After implementation, verify:
 - [ ] Validation expectations section exists in `reference-artifacts.md`
 - [ ] `creation.md` mentions validation expectations per archetype
 - [ ] `.harmony/capabilities/skills/README.md` selection matrix uses new phrasing
-- [ ] `_template/SKILL.md` includes validation guidance
+- [ ] `_scaffold/template/SKILL.md` includes validation guidance
 
 ---
 

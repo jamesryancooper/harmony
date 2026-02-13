@@ -38,7 +38,7 @@ Created → Active → Completed → Archived
 Use the workflow: `/create-mission <slug>`
 
 Or manually:
-1. Copy `_template/` to a new directory: `missions/<slug>/`
+1. Copy `_scaffold/template/` to a new directory: `missions/<slug>/`
 2. Update `mission.md` with goal, scope, success criteria
 3. Register in `registry.yml`
 

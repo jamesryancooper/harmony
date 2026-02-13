@@ -79,7 +79,7 @@ All file paths referenced in the refined prompt must:
 
 All outputs must be written to:
 - `.harmony/scaffolding/prompts/{{timestamp}}-refined.md` (deliverable)
-- `_state/logs/refine-prompt/{{run_id}}.md` (execution log)
+- `_ops/state/logs/refine-prompt/{{run_id}}.md` (execution log)
 
 ### Timestamp Format
 

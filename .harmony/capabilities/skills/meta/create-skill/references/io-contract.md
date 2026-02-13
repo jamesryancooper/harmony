@@ -7,7 +7,7 @@
 #   - Parameters: .harmony/capabilities/skills/registry.yml
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(/.harmony/capabilities/skills/*) Write(_state/runs/*) Write(_state/logs/*) Bash(mkdir) Bash(ln) Bash(cp)
+# Current allowed-tools: Read Glob Grep Write(/.harmony/capabilities/skills/*) Write(_ops/state/runs/*) Write(_ops/state/logs/*) Bash(mkdir) Bash(ln) Bash(cp)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -51,7 +51,7 @@ Input/output specifications for the create-skill skill.
 ### Continuity Artifacts
 
 ```
-.harmony/capabilities/skills/_state/runs/create-skill/{{run_id}}/
+.harmony/capabilities/skills/_ops/state/runs/create-skill/{{run_id}}/
 ├── checkpoint.yml     # Execution state (source of truth for resume)
 └── summary.md         # Creation summary
 ```
@@ -69,7 +69,7 @@ Where `{{run_id}}` = `{{timestamp}}-{{skill_name}}` (e.g., `2026-01-20-analyze-c
 ### Log Structure
 
 ```
-.harmony/capabilities/skills/_state/logs/
+.harmony/capabilities/skills/_ops/state/logs/
 ├── index.yml                          # Top-level index (update with new run)
 └── create-skill/
     ├── index.yml                      # Skill-level index (all skills created)
@@ -130,10 +130,10 @@ parameters:
 
 ## Log Index Schemas
 
-### Top-Level Index (`_state/logs/index.yml`)
+### Top-Level Index (`_ops/state/logs/index.yml`)
 
 ```yaml
-# _state/logs/index.yml - Cross-skill chronological index (~50-100 tokens)
+# _ops/state/logs/index.yml - Cross-skill chronological index (~50-100 tokens)
 updated: "2026-01-20T14:30:00Z"
 
 recent_runs:
@@ -150,10 +150,10 @@ summary:
     refactor: 2
 ```
 
-### Skill-Level Index (`_state/logs/create-skill/index.yml`)
+### Skill-Level Index (`_ops/state/logs/create-skill/index.yml`)
 
 ```yaml
-# _state/logs/create-skill/index.yml - All create-skill runs
+# _ops/state/logs/create-skill/index.yml - All create-skill runs
 skill: create-skill
 updated: "2026-01-20T14:30:00Z"
 
@@ -181,8 +181,8 @@ Tool requirements defined in SKILL.md `allowed-tools`:
 | `Glob` | Find existing skills for uniqueness check |
 | `Grep` | Search for existing skill entries |
 | `Write(/.harmony/capabilities/skills/*)` | Create skill directory and files |
-| `Write(_state/runs/*)` | Write execution state (session recovery) |
-| `Write(_state/logs/*)` | Write execution log |
+| `Write(_ops/state/runs/*)` | Write execution state (session recovery) |
+| `Write(_ops/state/logs/*)` | Write execution log |
 | `Bash(mkdir)` | Create directories |
 | `Bash(ln)` | Create symlinks |
 | `Bash(cp)` | Copy template files |

@@ -184,5 +184,5 @@ related_specs: [spec references]
 - [Trust through Governed Determinism](./trust.md) — Enabled by Continuity
 - [Pillars Overview](./README.md) — All six pillars
 - [ADR Policy](../adr-policy.md) — ADR guidelines
-- [Architecture: Observability Requirements](../architecture/observability-requirements.md) — Trace requirements
+- [Architecture: Observability Requirements](../_meta/architecture/observability-requirements.md) — Trace requirements
 - [Convivial Purpose](../purpose/convivial-purpose.md) — The "why" this pillar serves

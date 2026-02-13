@@ -143,7 +143,7 @@ Add new convention references to `base_conventions`:
 
 - `rich_contracts`, `declarative_rules`, `fixtures`, `validation_tiers`, `implementation_generation`
 
-**9. `.harmony/capabilities/services/_template/SERVICE.md`**
+**9. `.harmony/capabilities/services/_scaffold/template/SERVICE.md`**
 
 Extend frontmatter with new fields:
 
@@ -201,7 +201,7 @@ Phase 3 (references Phases 1-2):
 
 - `.harmony/capabilities/services/conventions/run-records.md` — pattern for convention format
 - `.harmony/capabilities/services/conventions/error-codes.md` — pattern for convention format
-- `.harmony/capabilities/services/_template/SERVICE.md` — template to update
+- `.harmony/capabilities/services/_scaffold/template/SERVICE.md` — template to update
 - `.harmony/capabilities/services/capabilities.yml` — registry to update
 - `.harmony/capabilities/services/README.md` — contents table to update
 - `docs/architecture/agent-architecture.md` — existing agent model to extend
@@ -216,7 +216,7 @@ After all files are created:
 1. All new docs follow YAML frontmatter pattern matching existing conventions
 2. All cross-references between documents are valid paths
 3. `capabilities.yml` lists all new convention files
-4. `_template/SERVICE.md` includes rules, fixtures, compatibility profile, and generation manifest fields
+4. `_scaffold/template/SERVICE.md` includes rules, fixtures, compatibility profile, and generation manifest fields
 5. Services README reflects new conventions in contents table and dependency-boundary language
 6. `validation-tiers.md` defines Tier 1 deterministic validator inputs/outputs/exit codes
 7. `implementation-generation.md` defines required pinned metadata fields in generated manifests
@@ -242,7 +242,7 @@ After all files are created:
 ### Phase 3
 
 - [x] `.harmony/capabilities/services/capabilities.yml`
-- [x] `.harmony/capabilities/services/_template/SERVICE.md`
+- [x] `.harmony/capabilities/services/_scaffold/template/SERVICE.md`
 - [x] `.harmony/capabilities/services/README.md`
 - [x] `docs/architecture/agent-architecture.md`
 - [x] `docs/principles.md`

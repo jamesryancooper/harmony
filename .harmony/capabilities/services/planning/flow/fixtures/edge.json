@@ -1,0 +1,18 @@
+{
+  "id": "flow-edge-live-run",
+  "description": "Live run includes params and runtime metadata passthrough.",
+  "request": {
+    "config": {
+      "flowName": "architecture_assessment",
+      "canonicalPromptPath": "packages/workflows/architecture_assessment/00-overview.md",
+      "workflowManifestPath": "packages/workflows/architecture_assessment/manifest.yaml",
+      "workflowEntrypoint": "architecture-inventory"
+    },
+    "params": {
+      "targetPath": "src"
+    }
+  },
+  "expect": {
+    "hasMetadataFields": ["flowName", "workflowManifestPath", "runnerEndpoint"]
+  }
+}

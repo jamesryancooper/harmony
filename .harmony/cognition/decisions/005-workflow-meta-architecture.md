@@ -68,7 +68,7 @@ Created `.harmony/orchestration/workflows/workflows/` containing:
 
 ### 4. Supporting Infrastructure
 
-- `.harmony/orchestration/workflows/_template/` — Canonical templates with gap fix fields
+- `.harmony/orchestration/workflows/_scaffold/template/` — Canonical templates with gap fix fields
 - `.harmony/cognition/context/workflow-gaps.md` — Gap remediation guide
 - `.harmony/cognition/context/workflow-quality.md` — Quality criteria and grading rubric
 - `.harmony/capabilities/commands/` — Trigger commands (`create-workflow`, `evaluate-workflow`, `update-workflow`)

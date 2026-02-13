@@ -93,7 +93,7 @@ Skip full schema formalization only for short-lived exploratory spikes that neve
 ## Related Documentation
 
 - `.harmony/scaffolding/patterns/api-design-guidelines.md`
-- `.harmony/cognition/architecture/governance-model.md`
+- `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/methodology/README.md`
 - `.harmony/cognition/principles/pillars/direction.md`
 - `.harmony/cognition/principles/pillars/trust.md`

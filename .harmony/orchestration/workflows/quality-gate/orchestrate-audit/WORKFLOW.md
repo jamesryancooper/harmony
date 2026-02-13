@@ -114,4 +114,4 @@ Orchestrate Audit is NOT complete until:
 
 - **Skill:** `.harmony/capabilities/skills/quality-gate/audit-migration/SKILL.md`
 - **Registry:** `.harmony/capabilities/skills/registry.yml`
-- **Workflow template:** `.harmony/orchestration/workflows/_template/`
+- **Workflow template:** `.harmony/orchestration/workflows/_scaffold/template/`

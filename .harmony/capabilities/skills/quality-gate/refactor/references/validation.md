@@ -170,7 +170,7 @@ The skill must STOP and report failure when:
 ### Log Index Update
 
 After completion:
-- `_state/logs/refactors/index.yml` must be updated
+- `_ops/state/logs/refactors/index.yml` must be updated
 - New run entry added to `runs` array
 - `scopes_completed` updated
 

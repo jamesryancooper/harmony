@@ -29,7 +29,7 @@ metadata:
   author: "[TODO: Author Name]"
   created: "[current date YYYY-MM-DD]"
   updated: "[current date YYYY-MM-DD]"
-allowed-tools: Read Glob Grep Write(../{{category}}/*) Write(_state/logs/*)
+allowed-tools: Read Glob Grep Write(../{{category}}/*) Write(_ops/state/logs/*)
 ---
 ```
 
@@ -39,7 +39,7 @@ Replace placeholders:
 - `# [Skill Name]` -> `# [Human-Readable Name - TODO]`
 - `/skill-name` -> `/<skill-name>`
 - `skill-name skill` -> `<skill-name> skill`
-- All `_state/logs/skill-name/<run-id>.md` -> `_state/logs/<skill-name>/<run-id>.md`
+- All `_ops/state/logs/skill-name/<run-id>.md` -> `_ops/state/logs/<skill-name>/<run-id>.md`
 
 ### Update Reference Files
 

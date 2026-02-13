@@ -17,14 +17,14 @@ description: Copy skill template to new skill directory with spec-compliant stru
 1. Create directory: .harmony/capabilities/skills/<group>/<skill-name>/
 
 2. Copy core file:
-   - .harmony/capabilities/skills/_template/SKILL.md -> .harmony/capabilities/skills/<group>/<skill-name>/SKILL.md
+   - .harmony/capabilities/skills/_scaffold/template/SKILL.md -> .harmony/capabilities/skills/<group>/<skill-name>/SKILL.md
 
 3. Create and copy reference files:
-   - .harmony/capabilities/skills/_template/references/phases.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/phases.md
-   - .harmony/capabilities/skills/_template/references/io-contract.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/io-contract.md
-   - .harmony/capabilities/skills/_template/references/safety.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/safety.md
-   - .harmony/capabilities/skills/_template/references/examples.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/examples.md
-   - .harmony/capabilities/skills/_template/references/validation.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/validation.md
+   - .harmony/capabilities/skills/_scaffold/template/references/phases.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/phases.md
+   - .harmony/capabilities/skills/_scaffold/template/references/io-contract.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/io-contract.md
+   - .harmony/capabilities/skills/_scaffold/template/references/safety.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/safety.md
+   - .harmony/capabilities/skills/_scaffold/template/references/examples.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/examples.md
+   - .harmony/capabilities/skills/_scaffold/template/references/validation.md -> .harmony/capabilities/skills/<group>/<skill-name>/references/validation.md
 
 4. Create empty directories:
    - .harmony/capabilities/skills/<group>/<skill-name>/scripts/

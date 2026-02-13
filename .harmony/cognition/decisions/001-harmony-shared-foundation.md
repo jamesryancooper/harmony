@@ -44,7 +44,7 @@ Introduce a **two-layer architecture** with a shared `.harmony/` foundation:
 | `context/` | tools.md, compaction.md |
 | `checklists/` | complete.md, session-exit.md |
 | `prompts/` | bootstrap-session, research/ |
-| `skills/` | framework, _template/, synthesize-research |
+| `skills/` | framework, _scaffold/template/, synthesize-research |
 | `examples/` | create-workspace-flow.md |
 
 ## Components Remaining in `.workspace/`
@@ -56,7 +56,7 @@ Introduce a **two-layer architecture** with a shared `.harmony/` foundation:
 | `missions/` | Time-bounded sub-projects (always local) |
 | `context/decisions.md`, `lessons.md`, `glossary.md`, `constraints.md` | Domain-specific knowledge |
 | `workflows/flowkit/`, `workflows/scratchpad/` | Domain-specific workflows |
-| `skills/outputs/`, `skills/_state/logs/` | Execution artifacts (always local) |
+| `skills/outputs/`, `skills/_ops/state/logs/` | Execution artifacts (always local) |
 | Stub READMEs | Override points + discoverability |
 
 ## Skills Registry Split

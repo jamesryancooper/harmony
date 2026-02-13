@@ -86,7 +86,7 @@ Acceptance criteria and quality checklist for the synthesize-research skill.
 | Path Type | Pattern | Example |
 |-----------|---------|---------|
 | Synthesis output | `.harmony/output/drafts/{{topic}}-synthesis.md` | `.harmony/output/drafts/api-design-synthesis.md` |
-| Run log | `_state/logs/synthesize-research/{{run_id}}.md` | `_state/logs/synthesize-research/2025-01-12-api-design.md` |
+| Run log | `_ops/state/logs/synthesize-research/{{run_id}}.md` | `_ops/state/logs/synthesize-research/2025-01-12-api-design.md` |
 
 ## Error Conditions
 

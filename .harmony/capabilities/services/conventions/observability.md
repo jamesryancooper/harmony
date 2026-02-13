@@ -2,12 +2,11 @@
 title: Service Observability
 scope: harness
 applies_to: services
-migrated_from: packages/kits/kit-base/src/observability.ts
 ---
 
 # Service Observability
 
-Services inherit kit observability primitives with a service-oriented naming convention.
+Services use shared observability primitives with a service-oriented naming convention.
 
 ## Span Naming
 
@@ -21,7 +20,7 @@ Examples:
 - `service.cost.estimate`
 - `service.flow.run`
 
-This replaces the kit-era `kit.{kitName}.{action}` naming while preserving event and attribute semantics.
+This standard preserves event and attribute semantics while using service-native naming.
 
 ## Required Attributes
 

@@ -42,5 +42,5 @@ List of files with validation status:
 
 ## References
 
-- **Canonical:** `.harmony/capabilities/architecture/commands.md`
+- **Canonical:** `.harmony/capabilities/_meta/architecture/commands.md`
 

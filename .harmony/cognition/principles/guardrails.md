@@ -78,5 +78,5 @@ Temporary waivers require explicit owner, reason, scope, and expiry (`<= 7 days`
 ## Related Documentation
 
 - `.harmony/cognition/methodology/README.md`
-- `.harmony/cognition/architecture/governance-model.md`
+- `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/principles/pillars/trust.md`

@@ -15,7 +15,7 @@ metadata:
 skill_sets: [executor]
 capabilities: [self-validating]
 # Write scopes are explicit: workspace writes plus skill log output. Bash scoped to npm/npx/mkdir/cp/node.
-allowed-tools: Read Glob Grep Edit Write(../../../**) Bash(npm) Bash(npx) Bash(mkdir) Bash(cp) Bash(node) Write(_state/logs/*)
+allowed-tools: Read Glob Grep Edit Write(../../../**) Bash(npm) Bash(npx) Bash(mkdir) Bash(cp) Bash(node) Write(_ops/state/logs/*)
 ---
 
 # Build MCP Server
@@ -89,7 +89,7 @@ This skill accepts a server name and either a list of tools or a service descrip
 
 ## Output Location
 
-The MCP server is created in the project directory specified by the user. Execution logs are written to `_state/logs/build-mcp-server/`.
+The MCP server is created in the project directory specified by the user. Execution logs are written to `_ops/state/logs/build-mcp-server/`.
 
 ## Boundaries
 

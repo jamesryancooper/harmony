@@ -1,0 +1,78 @@
+version: "1.0.0"
+rules:
+  - id: guard.schema.input
+    description: Input schema must exist and parse.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/input.schema.json
+    target:
+      kind: file
+      selector: schema/input.schema.json
+    action:
+      mode: block
+      code: INPUT_SCHEMA_MISSING
+      message: Missing input schema.
+
+  - id: guard.schema.output
+    description: Output schema must exist and parse.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/output.schema.json
+    target:
+      kind: file
+      selector: schema/output.schema.json
+    action:
+      mode: block
+      code: OUTPUT_SCHEMA_MISSING
+      message: Missing output schema.
+
+  - id: guard.impl.entrypoint
+    description: Shell entrypoint must be present and executable.
+    category: structural
+    severity: high
+    condition:
+      type: file_exists
+      path: impl/guard.sh
+    target:
+      kind: file
+      selector: impl/guard.sh
+    action:
+      mode: block
+      code: IMPL_MISSING
+      message: Guard implementation entrypoint missing.
+
+  - id: guard.semantic.summary
+    description: Guard output must include summary counters.
+    category: semantic
+    severity: high
+    condition:
+      type: output_has_keys
+      keys: [passed, checks, summary]
+    target:
+      kind: output
+      selector: $.summary
+    action:
+      mode: block
+      code: SUMMARY_INVALID
+      message: Output missing required summary fields.
+
+  - id: guard.policy.fail_closed
+    description: Guard policy must remain fail-closed.
+    category: policy
+    severity: critical
+    condition:
+      type: frontmatter_equals
+      path: SERVICE.md
+      key: policy.fail_closed
+      value: true
+    target:
+      kind: file
+      selector: SERVICE.md
+    action:
+      mode: block
+      code: POLICY_NOT_FAIL_CLOSED
+      message: Guard service must stay fail-closed.

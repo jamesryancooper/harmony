@@ -155,4 +155,4 @@ Swift macOS App Foundation is NOT complete until:
 
 - **Foundation skill:** `.harmony/capabilities/skills/foundations/swift-macos-app/SKILL.md`
 - **Child skills:** `.harmony/capabilities/skills/foundations/swift-macos-app/*/SKILL.md`
-- **Workflow template:** `.harmony/orchestration/workflows/_template/`
+- **Workflow template:** `.harmony/orchestration/workflows/_scaffold/template/`

@@ -5,7 +5,7 @@ description: Safety policies and constraints for the audit-subsystem-health skil
 #   - Tool permissions: SKILL.md frontmatter `allowed-tools`
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -53,7 +53,7 @@ The skill reads files within the subsystem directory and optionally the companio
 The skill may only write to:
 
 - `.harmony/output/reports/` — Audit report deliverable
-- `.harmony/capabilities/skills/_state/logs/audit-subsystem-health/` — Execution logs
+- `.harmony/capabilities/skills/_ops/state/logs/audit-subsystem-health/` — Execution logs
 
 ### Source Code Modifications
 

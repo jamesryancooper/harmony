@@ -34,7 +34,7 @@ quality. Patterns go in scaffolding. Workflows go in orchestration.
 
 ## Destination Map
 
-### `.harmony/cognition/architecture/` (NEW)
+### `.harmony/cognition/_meta/architecture/` (NEW)
 
 Harness and methodology architecture docs. Cross-cutting structural reasoning.
 
@@ -78,8 +78,8 @@ Harness and methodology architecture docs. Cross-cutting structural reasoning.
 
 > **Note:** Remaining `harness/` files are distributed by subsystem below.
 > `content-plane/` stays in `docs/` (project-specific). `continuity-plane/`
-> is rewritten then moves to `.harmony/continuity/architecture/`.
-> `scratchpad.md` and `projects.md` move to `.harmony/ideation/architecture/`.
+> is rewritten then moves to `.harmony/continuity/_meta/architecture/`.
+> `scratchpad.md` and `projects.md` move to `.harmony/ideation/_meta/architecture/`.
 > `decisions/` moves to `.harmony/cognition/decisions/`.
 
 ### `.harmony/cognition/decisions/` (EXISTS — additions)
@@ -90,7 +90,7 @@ Architecture decision records.
 
 - `adr-flowkit-integration.md` — FlowKit integration model ADR
 
-### `.harmony/agency/architecture/` (NEW)
+### `.harmony/agency/_meta/architecture/` (NEW)
 
 Agency subsystem specification and design docs.
 
@@ -103,7 +103,7 @@ Agency subsystem specification and design docs.
 
 - `README.md`, `architecture.md`, `specification.md`, `finalization-plan.md`
 
-### `.harmony/capabilities/architecture/` (NEW)
+### `.harmony/capabilities/_meta/architecture/` (NEW)
 
 Capabilities subsystem specification and design docs.
 
@@ -119,7 +119,7 @@ Capabilities subsystem specification and design docs.
   invocation.md, migration-guide.md, reference-artifacts.md, skill-format.md,
   skill-sets.md, specification.md, validation.md
 
-### `.harmony/orchestration/architecture/` (NEW)
+### `.harmony/orchestration/_meta/architecture/` (NEW)
 
 Orchestration subsystem specification and design docs.
 
@@ -132,7 +132,7 @@ Orchestration subsystem specification and design docs.
 
 - `specification.md` — detailed workflow specification
 
-### `.harmony/continuity/architecture/` (NEW)
+### `.harmony/continuity/_meta/architecture/` (NEW)
 
 Continuity subsystem specification and design docs.
 
@@ -145,9 +145,9 @@ Continuity subsystem specification and design docs.
 - Rewrite `README.md`, `continuity-plane.md`, and `three-planes-integration.md`
   to align with `.harmony/continuity/` (`log.md`, `tasks.json`,
   `entities.json`, `next.md`) and remove legacy `.continuity/` paths.
-- Move rewritten files into `.harmony/continuity/architecture/`.
+- Move rewritten files into `.harmony/continuity/_meta/architecture/`.
 
-### `.harmony/ideation/architecture/` (NEW)
+### `.harmony/ideation/_meta/architecture/` (NEW)
 
 Ideation subsystem specification and design docs.
 
@@ -156,7 +156,7 @@ Ideation subsystem specification and design docs.
 - `scratchpad.md` — human-led ideation/scratchpad model
 - `projects.md` — human-led ideation/projects model
 
-### `.harmony/scaffolding/architecture/` (NEW)
+### `.harmony/scaffolding/_meta/architecture/` (NEW)
 
 Scaffolding subsystem specification and design docs.
 
@@ -167,7 +167,7 @@ Scaffolding subsystem specification and design docs.
 - `prompts.md` — prompts specification
 - `scripts.md` — scripts specification
 
-### `.harmony/quality/architecture/` (NEW)
+### `.harmony/quality/_meta/architecture/` (NEW)
 
 Quality subsystem specification and design docs.
 
@@ -457,8 +457,8 @@ Core architecture flat files and cross-cutting harness meta-docs into cognition.
 
 **Creates:**
 
-- `.harmony/cognition/architecture/` (20 core architecture files + 12 cross-cutting harness meta-docs)
-- `.harmony/cognition/architecture/knowledge-plane/` (1 file)
+- `.harmony/cognition/_meta/architecture/` (20 core architecture files + 12 cross-cutting harness meta-docs)
+- `.harmony/cognition/_meta/architecture/knowledge-plane/` (1 file)
 
 **Adds to existing:**
 
@@ -475,14 +475,14 @@ Split from Wave 2 to isolate the heaviest cross-referencing.
 
 **Creates:**
 
-- `.harmony/agency/architecture/` (6 files — agents, assistants, agency spec)
-- `.harmony/capabilities/architecture/` (19 files — commands, skills spec)
-- `.harmony/orchestration/architecture/` (3 files — missions, workflows spec)
-- `.harmony/continuity/architecture/` (4 files — progress + rewritten continuity-plane specs)
-- `.harmony/ideation/architecture/` (2 files — scratchpad, projects spec)
-- `.harmony/scaffolding/architecture/` (4 files — templates, examples, prompts,
+- `.harmony/agency/_meta/architecture/` (6 files — agents, assistants, agency spec)
+- `.harmony/capabilities/_meta/architecture/` (19 files — commands, skills spec)
+- `.harmony/orchestration/_meta/architecture/` (3 files — missions, workflows spec)
+- `.harmony/continuity/_meta/architecture/` (4 files — progress + rewritten continuity-plane specs)
+- `.harmony/ideation/_meta/architecture/` (2 files — scratchpad, projects spec)
+- `.harmony/scaffolding/_meta/architecture/` (4 files — templates, examples, prompts,
   scripts spec)
-- `.harmony/quality/architecture/` (1 file — checklists spec)
+- `.harmony/quality/_meta/architecture/` (1 file — checklists spec)
 
 **Moves:** ~39 files
 **Cross-ref updates:** Moderate. Update internal `harness/` cross-references to
@@ -540,19 +540,19 @@ Move core service guides into the harness capabilities layer.
 Each new directory needs a `README.md` for orientation, plus one canonical
 principles file:
 
-- `.harmony/cognition/architecture/README.md`
+- `.harmony/cognition/_meta/architecture/README.md`
 - `.harmony/cognition/principles/principles.md` (canonical consolidated principles file)
 - `.harmony/cognition/principles/pillars/README.md` (from `docs/pillars/README.md`)
 - `.harmony/cognition/principles/purpose/README.md`
 - `.harmony/cognition/methodology/README.md` (from `docs/methodology/README.md`)
-- `.harmony/agency/architecture/README.md` (from `docs/architecture/harness/agency/README.md`)
+- `.harmony/agency/_meta/architecture/README.md` (from `docs/architecture/harness/agency/README.md`)
 - `.harmony/agency/practices/README.md` (from `docs/practices/README.md`)
-- `.harmony/capabilities/architecture/README.md`
-- `.harmony/orchestration/architecture/README.md`
-- `.harmony/continuity/architecture/README.md`
-- `.harmony/ideation/architecture/README.md`
-- `.harmony/scaffolding/architecture/README.md`
-- `.harmony/quality/architecture/README.md`
+- `.harmony/capabilities/_meta/architecture/README.md`
+- `.harmony/orchestration/_meta/architecture/README.md`
+- `.harmony/continuity/_meta/architecture/README.md`
+- `.harmony/ideation/_meta/architecture/README.md`
+- `.harmony/scaffolding/_meta/architecture/README.md`
+- `.harmony/quality/_meta/architecture/README.md`
 - `.harmony/orchestration/workflows/tasks/README.md`
 - `.harmony/scaffolding/patterns/README.md`
 

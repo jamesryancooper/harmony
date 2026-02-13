@@ -26,7 +26,7 @@ Create the workflow directory structure and populate with template files.
 2. **Copy template files:**
    ```text
    For each file in template:
-     Copy .harmony/orchestration/workflows/_template/<file> to <target-path>/<file>
+     Copy .harmony/orchestration/workflows/_scaffold/template/<file> to <target-path>/<file>
    ```
 
 3. **Rename step files:**
@@ -85,7 +85,7 @@ Create the workflow directory structure and populate with template files.
 ## Error Messages
 
 - Cannot create directory: "Failed to create directory '<path>'. Check permissions."
-- Template not found: "Template file '<file>' not found in .harmony/orchestration/workflows/_template/"
+- Template not found: "Template file '<file>' not found in .harmony/orchestration/workflows/_scaffold/template/"
 - Write failed: "Failed to write '<file>'. Check disk space and permissions."
 
 ## Output

@@ -214,7 +214,7 @@ mutability: append-only
 - Elevated `projects/` from `.scratchpad/projects/` to `.harmony/ideation/projects/`
   - Created `README.md` with comprehensive documentation
   - Created `registry.md` for project tracking
-  - Created `_template/` with project templates
+  - Created `_scaffold/template/` with project templates
   - Created `.harmony/orchestration/workflows/projects/create-project.md`
 - Introduced `.scratchpad/brainstorm/` as filter stage between ideas and projects
   - Created `README.md` with template for single-file explorations
@@ -346,7 +346,7 @@ The `mutability` frontmatter property provides a machine-readable signal that ag
 - Reviewed workflow architecture against 8 quality dimensions (efficiency, scalability, performance, reliability, maintainability, adaptability, usability, robustness)
 - Identified 6 gaps: idempotency, cross-workflow dependencies, conditional branching, checkpoints, versioning, parallel steps
 - Created workflow meta-architecture system:
-  - `.harmony/orchestration/workflows/_template/` (4 files) — Canonical templates with gap fix fields
+  - `.harmony/orchestration/workflows/_scaffold/template/` (4 files) — Canonical templates with gap fix fields
   - `.harmony/orchestration/workflows/workflows/create-workflow/` (9 files) — Scaffold new workflows
   - `.harmony/orchestration/workflows/workflows/evaluate-workflow/` (6 files) — Assess workflow quality
   - `.harmony/orchestration/workflows/workflows/update-workflow/` (6 files) — Update existing workflows

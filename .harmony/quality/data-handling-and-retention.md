@@ -47,6 +47,6 @@ See `.harmony/cognition/methodology/README.md` for Harmony’s five pillars.
 - Implementation guide: `.harmony/cognition/methodology/implementation-guide.md`
 - Layers model: `.harmony/cognition/methodology/layers.md`
 - Improve layer: `.harmony/cognition/methodology/improve-layer.md`
-- Architecture overview: `.harmony/cognition/architecture/overview.md`
-- Runtime policy: `.harmony/cognition/architecture/runtime-policy.md`
-- Governance model: `.harmony/cognition/architecture/governance-model.md`
+- Architecture overview: `.harmony/cognition/_meta/architecture/overview.md`
+- Runtime policy: `.harmony/cognition/_meta/architecture/runtime-policy.md`
+- Governance model: `.harmony/cognition/_meta/architecture/governance-model.md`

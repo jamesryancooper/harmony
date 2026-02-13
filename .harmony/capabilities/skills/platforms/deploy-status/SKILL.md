@@ -12,7 +12,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor]
 capabilities: [external-dependent, external-output]
-allowed-tools: Read Glob Bash(vercel *) WebFetch Write(../../output/reports/*) Write(_state/logs/*)
+allowed-tools: Read Glob Bash(vercel *) WebFetch Write(../../output/reports/*) Write(_ops/state/logs/*)
 ---
 
 # Deploy Status
@@ -58,7 +58,7 @@ This skill accepts optional project/deployment targets plus environment and URL-
 Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single source of truth).
 
 - `.harmony/output/reports/` - Deployment readiness report
-- `.harmony/capabilities/skills/_state/logs/deploy-status/` - Execution logs and run index
+- `.harmony/capabilities/skills/_ops/state/logs/deploy-status/` - Execution logs and run index
 
 External outputs (deployment URL and status state) are documented in `references/external-outputs.md`.
 

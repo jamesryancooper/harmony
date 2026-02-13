@@ -1,0 +1,79 @@
+version: "1.0.0"
+rules:
+  - id: cost.schema.input
+    description: Input schema must exist.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/input.schema.json
+    target:
+      kind: file
+      selector: schema/input.schema.json
+    action:
+      mode: block
+      code: INPUT_SCHEMA_MISSING
+      message: Missing cost input schema.
+
+  - id: cost.schema.output
+    description: Output schema must exist.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/output.schema.json
+    target:
+      kind: file
+      selector: schema/output.schema.json
+    action:
+      mode: block
+      code: OUTPUT_SCHEMA_MISSING
+      message: Missing cost output schema.
+
+  - id: cost.impl.entrypoint
+    description: Shell entrypoint must exist.
+    category: structural
+    severity: high
+    condition:
+      type: file_exists
+      path: impl/cost.sh
+    target:
+      kind: file
+      selector: impl/cost.sh
+    action:
+      mode: block
+      code: IMPL_MISSING
+      message: Cost implementation entrypoint missing.
+
+  - id: cost.semantic.operation
+    description: Input operation must be estimate or record.
+    category: semantic
+    severity: high
+    condition:
+      type: input_enum
+      path: operation
+      allowed: [estimate, record]
+    target:
+      kind: input
+      selector: $.operation
+    action:
+      mode: block
+      code: OPERATION_UNSUPPORTED
+      message: Unsupported cost operation.
+
+  - id: cost.policy.mode
+    description: Cost policy remains non-fail-closed by design.
+    category: policy
+    severity: medium
+    condition:
+      type: frontmatter_equals
+      path: SERVICE.md
+      key: policy.fail_closed
+      value: false
+    target:
+      kind: file
+      selector: SERVICE.md
+    action:
+      mode: block
+      code: POLICY_MISMATCH
+      message: Cost fail_closed policy must remain false.

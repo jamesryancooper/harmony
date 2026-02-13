@@ -104,7 +104,7 @@ These defaults are normative unless a documented waiver applies:
 
 - `.harmony/cognition/principles/pillars/README.md`
 - `.harmony/cognition/methodology/README.md`
-- `.harmony/cognition/architecture/governance-model.md`
-- `.harmony/cognition/architecture/observability-requirements.md`
-- `.harmony/cognition/architecture/runtime-policy.md`
+- `.harmony/cognition/_meta/architecture/governance-model.md`
+- `.harmony/cognition/_meta/architecture/observability-requirements.md`
+- `.harmony/cognition/_meta/architecture/runtime-policy.md`
 - `.harmony/cognition/knowledge-plane/knowledge-plane.md`

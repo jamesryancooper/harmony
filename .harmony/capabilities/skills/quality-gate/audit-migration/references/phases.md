@@ -167,7 +167,7 @@ When `partition` is provided, additional configuration steps apply after scope e
 
    ```text
    1. Start with full scope manifest (N files)
-   2. Apply file_filter glob pattern (e.g., ".harmony/cognition/architecture/**")
+   2. Apply file_filter glob pattern (e.g., ".harmony/cognition/_meta/architecture/**")
    3. Keep only files matching the filter
    4. Record: "Partition '{partition}': M files (filtered from N total)"
    ```
@@ -303,14 +303,14 @@ Verify that paths referenced in key operational files actually resolve on disk.
    | ------------------- | ----------------- | -------------------------------------------- |
    | Backtick paths      | `` `path/to/file` `` | `` `cognition/context/decisions.md` ``    |
    | Markdown links      | `[text](path)`    | `[decisions](cognition/decisions/)`          |
-   | YAML path values    | `path: "value"`   | `path: "_state/resources/synthesize-research/"`     |
+   | YAML path values    | `path: "value"`   | `path: "_ops/state/resources/synthesize-research/"`     |
    | Relative references | `./path` or `../path` | `../capabilities/commands/`              |
 
 3. **Resolve each path relative to its containing file:**
 
    For a reference in `.harmony/START.md`:
    - `cognition/context/decisions.md` → `.harmony/cognition/context/decisions.md`
-   - `../.harmony/cognition/architecture/` → `.harmony/cognition/architecture/`
+   - `../.harmony/cognition/_meta/architecture/` → `.harmony/cognition/_meta/architecture/`
 
 4. **Check whether each path exists:**
 
@@ -591,7 +591,7 @@ Consolidate all findings into a structured, actionable report with coverage proo
 
 7. **Write execution log:**
 
-   Log to `_state/logs/audit-migration/{{run_id}}.md`:
+   Log to `_ops/state/logs/audit-migration/{{run_id}}.md`:
 
    ```markdown
    # Audit Migration Run Log
@@ -624,7 +624,7 @@ Consolidate all findings into a structured, actionable report with coverage proo
    - .harmony/output/reports/YYYY-MM-DD-migration-audit.md
    ```
 
-8. **Update log index** (`_state/logs/audit-migration/index.yml`)
+8. **Update log index** (`_ops/state/logs/audit-migration/index.yml`)
 
 ### Partition-Mode Report Variant (when `partition` parameter is set)
 

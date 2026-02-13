@@ -7,7 +7,7 @@
 #   - Parameters: .harmony/capabilities/skills/registry.yml
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -33,7 +33,7 @@ Extended input/output documentation for the audit-migration skill.
 | `structure_spec` | file | No | — | Path to documented directory structure for structure diff layer |
 | `template_dir` | folder | No | — | Path to template directory for template smoke test layer |
 | `partition` | text | No | — | Partition label for parallel orchestration (e.g., "docs-architecture") |
-| `file_filter` | text | No | — | Glob pattern to narrow scope within `scope` directory (e.g., ".harmony/cognition/architecture/**") |
+| `file_filter` | text | No | — | Glob pattern to narrow scope within `scope` directory (e.g., ".harmony/cognition/_meta/architecture/**") |
 
 ## Migration Manifest Schema
 
@@ -139,18 +139,18 @@ The report header includes additional metadata:
 
 ```markdown
 **Partition:** docs-architecture
-**File Filter:** .harmony/cognition/architecture/**
+**File Filter:** .harmony/cognition/_meta/architecture/**
 **Partition Mode:** Yes
 **Partition Coverage:** 45 files (of 280 total in scope)
 ```
 
 The execution log filename similarly includes the partition:
 
-Written to `.harmony/capabilities/skills/_state/logs/audit-migration/{{run_id}}-{partition}.md`.
+Written to `.harmony/capabilities/skills/_ops/state/logs/audit-migration/{{run_id}}-{partition}.md`.
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/_state/logs/audit-migration/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_ops/state/logs/audit-migration/{{run_id}}.md`.
 
 ```markdown
 # Audit Migration Run Log
@@ -180,7 +180,7 @@ Written to `.harmony/capabilities/skills/_state/logs/audit-migration/{{run_id}}.
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/_state/logs/audit-migration/index.yml`:
+Written to `.harmony/capabilities/skills/_ops/state/logs/audit-migration/index.yml`:
 
 ```yaml
 skill: audit-migration
@@ -210,7 +210,7 @@ This skill requires:
 - **Glob** — Find key operational files and verify path existence
 - **Grep** — Pattern-based search for stale references
 - **Write(../../output/reports/*)** — Write audit report
-- **Write(_state/logs/*)** — Write execution logs
+- **Write(_ops/state/logs/*)** — Write execution logs
 
 No external dependencies required.
 
@@ -238,7 +238,7 @@ No external dependencies required.
 /audit-migration manifest="..." scope="docs/"
 
 # Enable structure diff layer
-/audit-migration manifest="..." structure_spec=".harmony/cognition/architecture/README.md"
+/audit-migration manifest="..." structure_spec=".harmony/cognition/_meta/architecture/README.md"
 
 # Enable template smoke test layer
 /audit-migration manifest="..." template_dir=".harmony/scaffolding/templates/"
@@ -247,8 +247,8 @@ No external dependencies required.
 ### With Partition (for parallel orchestration)
 
 ```text
-# Audit only .harmony/cognition/architecture/ files
-/audit-migration manifest="..." partition="docs-architecture" file_filter=".harmony/cognition/architecture/**"
+# Audit only .harmony/cognition/_meta/architecture/ files
+/audit-migration manifest="..." partition="docs-architecture" file_filter=".harmony/cognition/_meta/architecture/**"
 
 # Audit only agency files
 /audit-migration manifest="..." partition="agency-files" file_filter=".harmony/agency/**"

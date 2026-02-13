@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor, guardian]
 capabilities: [external-dependent]
-allowed-tools: Read Glob Grep Edit Bash(gh) Write(../../output/reports/*) Write(_state/logs/*)
+allowed-tools: Read Glob Grep Edit Bash(gh) Write(../../output/reports/*) Write(_ops/state/logs/*)
 ---
 
 # Resolve PR Comments
@@ -86,7 +86,7 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 Outputs are written to:
 
 - `.harmony/output/reports/YYYY-MM-DD-pr-comments-resolved.md` — Resolution report
-- `_state/logs/resolve-pr-comments/` — Execution logs with index
+- `_ops/state/logs/resolve-pr-comments/` — Execution logs with index
 
 ## Boundaries
 

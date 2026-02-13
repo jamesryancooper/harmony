@@ -8,7 +8,7 @@ An exhaustive, bounded audit of the `.harmony/capabilities/skills/` subsystem ac
 
 ## Scope
 
-**In scope:** All files under `.harmony/capabilities/skills/`, including manifest.yml, capabilities.yml, registry.yml, all SKILL.md files, all reference files, logs/, runs/, configs/, resources/, scripts/, and _template/.
+**In scope:** All files under `.harmony/capabilities/skills/`, including manifest.yml, capabilities.yml, registry.yml, all SKILL.md files, all reference files, logs/, runs/, configs/, resources/, scripts/, and _scaffold/template/.
 
 **Out of scope:** Workflow subsystem, command subsystem, agent definitions, host adapter behavior, runtime execution correctness (the audit checks structure and documentation, not whether skills produce correct output when invoked).
 
@@ -203,17 +203,17 @@ Run `validate-skills.sh` first to capture mechanical checks, then perform manual
 
 ## Dimension 14: Template Completeness
 
-**Goal:** The `_template/` directory provides complete, accurate scaffolding for new skills.
+**Goal:** The `_scaffold/template/` directory provides complete, accurate scaffolding for new skills.
 
 **Checks:**
 
-1. **Reference coverage:** `_template/references/` contains a template for every reference file type that any capability can require (cross-reference with capabilities.yml capability-to-reference mapping). Currently 20 templates — verify none are missing
-2. **SKILL.md template:** `_template/SKILL.md` includes all required frontmatter fields and body sections
+1. **Reference coverage:** `_scaffold/template/references/` contains a template for every reference file type that any capability can require (cross-reference with capabilities.yml capability-to-reference mapping). Currently 20 templates — verify none are missing
+2. **SKILL.md template:** `_scaffold/template/SKILL.md` includes all required frontmatter fields and body sections
 3. **Placeholder format:** All placeholders use `{{snake_case}}` convention consistently
 4. **Template-to-live drift:** Compare template SKILL.md structure against a recently created skill to verify the template hasn't drifted from actual practice
-5. **Scaffolding directories:** `_template/scripts/` and `_template/assets/` exist (even if empty) so `create-skill` can copy them
+5. **Scaffolding directories:** `_scaffold/template/scripts/` and `_scaffold/template/assets/` exist (even if empty) so `create-skill` can copy them
 
-**Tools:** Read (_template/SKILL.md, _template/references/*), Glob (_template/), Read (capabilities.yml for reference mapping)
+**Tools:** Read (_scaffold/template/SKILL.md, _scaffold/template/references/*), Glob (_scaffold/template/), Read (capabilities.yml for reference mapping)
 
 ---
 

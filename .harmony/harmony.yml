@@ -21,8 +21,8 @@ portable:
   - capabilities/skills/manifest.yml
   - capabilities/skills/registry.yml
   - capabilities/skills/capabilities.yml
-  - capabilities/skills/_template/
-  - capabilities/skills/_scripts/
+  - capabilities/skills/_scaffold/template/
+  - capabilities/skills/_ops/scripts/
   - capabilities/skills/**/SKILL.md
   - capabilities/skills/**/references/
   - capabilities/commands/

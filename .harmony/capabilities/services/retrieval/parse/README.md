@@ -32,11 +32,11 @@ Convert PDFs into clean, reviewable Markdown using Docling, with an optional tin
 
 | Field                | Value                                                                                                                 |
 |----------------------|-----------------------------------------------------------------------------------------------------------------------|
-| Service name         | `parsekit`                                                                                                            |
+| Service name         | `parse`                                                                                                            |
 | Stage                | `implement`                                                                                                           |
-| Required span        | `kit.parsekit.parse`                                                                                                  |
-| Artifacts            | `docs_out/parsed/*.md`, `runs/**/parsekit-*.json`                                                                     |
-| Contracts (normative)| `packages/contracts/schemas/kits/parsekit.inputs.v1.json`, `packages/contracts/schemas/kits/parsekit.outputs.v1.json` |
+| Required span        | `service.parse.run`                                                                                                  |
+| Artifacts            | `docs_out/parsed/*.md`, `runs/**/parse-*.json`                                                                     |
+| Contracts (normative)| `.harmony/capabilities/services/retrieval/parse/schema/input.schema.json`, `.harmony/capabilities/services/retrieval/parse/schema/output.schema.json` |
 
 ## Why Docling
 
@@ -62,15 +62,15 @@ References:
 Directory layout:
 
 ```plaintext
-/kits/parsekit/
+/services/parse/
 ├── package.json
 ├── pyproject.toml
 ├── src/
-│   └── parsekit/
+│   └── parse/
 │       └── cli.py
 ├── schema/
-│   ├── parsekit.inputs.v1.json
-│   └── parsekit.outputs.v1.json
+│   ├── parse.inputs.v1.json
+│   └── parse.outputs.v1.json
 └── runs/              # gitignored artifacts
 ```
 
@@ -78,10 +78,10 @@ Directory layout:
 
 ```json
 {
-  "name": "parsekit",
+  "name": "parse",
   "private": true,
   "scripts": {
-    "kit:run": "python -m parsekit.cli",
+    "service:run": "python -m parse.cli",
     "lint": "echo \"n/a\"",
     "typecheck": "echo \"n/a\"",
     "test": "pytest -q || true"
@@ -93,13 +93,13 @@ Directory layout:
 
 ```toml
 [project]
-name = "parsekit"
+name = "parse"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = ["docling>=2.60", "pydantic>=2", "typer>=0.12", "rich>=13"]
 
 [project.scripts]
-parsekit = "parsekit.cli:app"
+parse = "parse.cli:app"
 ```
 
 Turbo pipeline (excerpt):
@@ -107,7 +107,7 @@ Turbo pipeline (excerpt):
 ```json
 {
   "pipeline": {
-    "kit:run": { "cache": false },
+    "service:run": { "cache": false },
     "lint": { "outputs": [] },
     "typecheck": { "outputs": [] },
     "test": { "outputs": ["runs/test/**"] }
@@ -122,16 +122,16 @@ The CLI is intentionally minimal and deterministic. It converts a single file or
 Example invocation (local):
 
 ```bash
-cd kits/parsekit
+cd .harmony/capabilities/services/retrieval/parse
 # install Python deps (pip or uv)
 pip install -e .
 # or: uv pip install -e .
 
 # help
-pnpm turbo run kit:run --filter=parsekit -- --help
+pnpm turbo run service:run --filter=parse -- --help
 
 # parse a set of PDFs into Markdown
-pnpm turbo run kit:run --filter=parsekit -- "docs/**/*.pdf" --out "docs_out/parsed"
+pnpm turbo run service:run --filter=parse -- "docs/**/*.pdf" --out "docs_out/parsed"
 ```
 
 ### CLI behavior
@@ -142,22 +142,22 @@ pnpm turbo run kit:run --filter=parsekit -- "docs/**/*.pdf" --out "docs_out/pars
   - `--include-assets`: export figures to `assets/` where supported (default: true).
 - Outputs:
   - Markdown files: `docs_out/parsed/<stem>.md`
-  - Run record: `docs_out/parsed/<timestamp>-parsekit.json`
+  - Run record: `docs_out/parsed/<timestamp>-parse.json`
   - One‑line JSON summary to stdout (for agents/CI parsing)
 
 ## Contracts (Schemas)
 
 Normative schema locations (create as the service matures):
 
-- Inputs: `packages/contracts/schemas/kits/parsekit.inputs.v1.json`
-- Outputs: `packages/contracts/schemas/kits/parsekit.outputs.v1.json`
+- Inputs: `.harmony/capabilities/services/retrieval/parse/schema/input.schema.json`
+- Outputs: `.harmony/capabilities/services/retrieval/parse/schema/output.schema.json`
 
 Minimum output keys to include in the run record:
 
 ```json
 {
-  "runId": "2025-11-07T12-00-01Z-parsekit-9f2c",
-  "kit": { "name": "parsekit", "version": "0.1.0" },
+  "runId": "2025-11-07T12-00-01Z-parse-9f2c",
+  "service": { "name": "parse", "version": "0.1.0" },
   "artifacts": [
     { "path": "docs_out/parsed/example.md", "type": "markdown" }
   ],
@@ -174,8 +174,8 @@ Minimum output keys to include in the run record:
   - Stable inputs produce stable outputs; avoid time‑dependent content in files.
   - Print a one‑line JSON summary to stdout (`{"status":"success","summary":"..."}`).
 - Observability:
-  - Emit a parent lifecycle span `kit.parsekit.parse` (when integrated with Observe).
-  - Include attributes: `kit.name`, `kit.version`, `run.id`, `stage`.
+  - Emit a parent lifecycle span `service.parse.run` (when integrated with Observe).
+  - Include attributes: `service.name`, `service.version`, `run.id`, `stage`.
 - Governance:
   - Apply Guard redaction rules at write/log boundaries; never serialize secrets/PII.
   - Fail‑closed posture in CI when schema validation or policy checks fail.
@@ -202,7 +202,7 @@ Note: MarkItDown targets LLM‑readable Markdown rather than high‑fidelity typ
 
 ## CI Recommendations
 
-- Add a lightweight `kit:run` job for preview branches to refresh parsed docs.
+- Add a lightweight `service:run` job for preview branches to refresh parsed docs.
 - Store artifacts under `docs_out/parsed` and link run records in PRs (Patch).
 - For medium/high‑risk changes, include Eval/Policy gates that verify schema presence and redaction compliance.
 

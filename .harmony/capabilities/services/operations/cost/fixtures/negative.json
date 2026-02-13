@@ -1,0 +1,12 @@
+{
+  "id": "cost-negative-missing-operation",
+  "description": "Missing operation fails input validation.",
+  "request": {
+    "workflowType": "code-from-plan",
+    "tier": "T2"
+  },
+  "expect": {
+    "errorCode": "InputValidationError",
+    "exitCode": 5
+  }
+}

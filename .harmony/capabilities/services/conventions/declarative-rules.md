@@ -10,7 +10,7 @@ Declarative rules replace imperative script logic as the authoritative expressio
 
 Related docs:
 
-- `.harmony/cognition/architecture/agent-as-runtime.md`
+- `.harmony/cognition/_meta/architecture/agent-as-runtime.md`
 - `conventions/rich-contracts.md`
 - `conventions/validation-tiers.md`
 

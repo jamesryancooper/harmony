@@ -19,7 +19,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor, guardian]
 capabilities: [domain-specialized, self-validating]
-allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_state/logs/*)
+allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_ops/state/logs/*)
 ---
 
 # Audit Subsystem Health
@@ -51,7 +51,7 @@ With a schema reference:
 With companion docs:
 
 ```
-/audit-subsystem-health subsystem=".harmony/capabilities/skills" docs=".harmony/cognition/architecture/skills"
+/audit-subsystem-health subsystem=".harmony/capabilities/skills" docs=".harmony/cognition/_meta/architecture/skills"
 ```
 
 ## Core Workflow
@@ -90,7 +90,7 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 Outputs are written to:
 
 - `.harmony/output/reports/YYYY-MM-DD-subsystem-health-audit.md` — Findings report
-- `_state/logs/audit-subsystem-health/` — Execution logs with index
+- `_ops/state/logs/audit-subsystem-health/` — Execution logs with index
 
 ## Severity Classification
 

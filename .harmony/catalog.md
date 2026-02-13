@@ -108,7 +108,7 @@ Invocation-driven atomic tool capability in `capabilities/tools/`.
 ### Usage Example
 
 ```yaml
-allowed-tools: pack:read-only Write(_state/logs/*)
+allowed-tools: pack:read-only Write(_ops/state/logs/*)
 ```
 
 ---
@@ -127,7 +127,7 @@ Invocation-driven composite capabilities with typed I/O contracts in `capabiliti
 ### Usage Example
 
 ```yaml
-allowed-tools: pack:read-only Write(_state/logs/*)
+allowed-tools: pack:read-only Write(_ops/state/logs/*)
 allowed-services: guard cost
 ```
 

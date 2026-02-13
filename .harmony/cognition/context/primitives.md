@@ -16,7 +16,7 @@ This document explains the core building blocks in Harmony and when to use each.
 | **Prompt** | Task template with structured I/O | Copy/paste or direct reference | Stateless |
 | **Template** | Scaffolding for new structures | Copied to target location | N/A |
 
-> **Note:** Workflows are deprecated and consolidated into Skills. See the workflows → skills migration in `.harmony/capabilities/architecture/`.
+> **Note:** Workflows are deprecated and consolidated into Skills. See the workflows → skills migration in `.harmony/capabilities/_meta/architecture/`.
 
 ---
 
@@ -175,7 +175,7 @@ states:
 - Full `SKILL.md` specification with inputs, outputs, dependencies
 - Invoked via `/command`, `use skill: <id>`, or natural language triggers
 - Stateless and portable (symlinked to harness directories)
-- Writes only to `.harmony/capabilities/skills/outputs/**` and `_state/logs/**`
+- Writes only to `.harmony/capabilities/skills/outputs/**` and `_ops/state/logs/**`
 - Can be chained into pipelines via registry
 
 ### When to Use
@@ -192,7 +192,7 @@ states:
 
 ### Template
 
-See `.harmony/capabilities/skills/_template/SKILL.md`
+See `.harmony/capabilities/skills/_scaffold/template/SKILL.md`
 
 ---
 
@@ -246,7 +246,7 @@ See `.harmony/capabilities/skills/_template/SKILL.md`
 3. Missions handle durable, multi-session work that workflows couldn't
 4. Eliminates cognitive overhead of choosing between workflows and skills
 
-See `.harmony/capabilities/architecture/` for migration guidance.
+See `.harmony/capabilities/_meta/architecture/` for migration guidance.
 
 ---
 
@@ -563,14 +563,14 @@ Registry supports `pipelines` section for skill composition without manual orche
 
 | Primitive | Registry | Template | Documentation |
 |-----------|----------|----------|---------------|
-| Agents | `.harmony/agency/agents/registry.yml` | `.harmony/agency/agents/_template/` | `.harmony/agency/architecture/README.md` |
-| Teams | `.harmony/agency/teams/registry.yml` | `.harmony/agency/teams/_template/` | `.harmony/agency/architecture/architecture.md` |
-| Missions | `.harmony/orchestration/missions/registry.yml` | `.harmony/orchestration/missions/_template/` | `.harmony/orchestration/architecture/missions.md` |
-| Skills | `.harmony/capabilities/skills/registry.yml` | `.harmony/capabilities/skills/_template/` | `.harmony/capabilities/architecture/` |
-| Assistants | `.harmony/agency/assistants/registry.yml` | `.harmony/agency/assistants/_template/` | `.harmony/agency/architecture/README.md` |
-| Commands | — | — | `.harmony/capabilities/architecture/commands.md` |
-| Checklists | — | — | `.harmony/quality/architecture/checklists.md` |
-| Prompts | — | — | `.harmony/scaffolding/architecture/prompts.md` |
-| Templates | — | `.harmony/scaffolding/templates/` | `.harmony/scaffolding/architecture/templates.md` |
+| Agents | `.harmony/agency/agents/registry.yml` | `.harmony/agency/agents/_scaffold/template/` | `.harmony/agency/_meta/architecture/README.md` |
+| Teams | `.harmony/agency/teams/registry.yml` | `.harmony/agency/teams/_scaffold/template/` | `.harmony/agency/_meta/architecture/architecture.md` |
+| Missions | `.harmony/orchestration/missions/registry.yml` | `.harmony/orchestration/missions/_scaffold/template/` | `.harmony/orchestration/_meta/architecture/missions.md` |
+| Skills | `.harmony/capabilities/skills/registry.yml` | `.harmony/capabilities/skills/_scaffold/template/` | `.harmony/capabilities/_meta/architecture/` |
+| Assistants | `.harmony/agency/assistants/registry.yml` | `.harmony/agency/assistants/_scaffold/template/` | `.harmony/agency/_meta/architecture/README.md` |
+| Commands | — | — | `.harmony/capabilities/_meta/architecture/commands.md` |
+| Checklists | — | — | `.harmony/quality/_meta/architecture/checklists.md` |
+| Prompts | — | — | `.harmony/scaffolding/_meta/architecture/prompts.md` |
+| Templates | — | `.harmony/scaffolding/templates/` | `.harmony/scaffolding/_meta/architecture/templates.md` |
 
 > **Note:** Workflows are deprecated. See Skills and Missions.

@@ -44,11 +44,11 @@ See `.harmony/cognition/methodology/README.md` for Harmony’s five pillars.
 
 ## Related Docs
 
-- Knowledge Plane: `.harmony/cognition/architecture/knowledge-plane/knowledge-plane.md`
-- Governance model: `.harmony/cognition/architecture/governance-model.md`
+- Knowledge Plane: `.harmony/cognition/_meta/architecture/knowledge-plane/knowledge-plane.md`
+- Governance model: `.harmony/cognition/_meta/architecture/governance-model.md`
 - Methodology overview: `.harmony/cognition/methodology/README.md`
 - Implementation guide: `.harmony/cognition/methodology/implementation-guide.md`
 - Layers model: `.harmony/cognition/methodology/layers.md`
 - Improve layer: `.harmony/cognition/methodology/improve-layer.md`
-- Architecture overview: `.harmony/cognition/architecture/overview.md`
-- Repository blueprint: `.harmony/cognition/architecture/repository-blueprint.md`
+- Architecture overview: `.harmony/cognition/_meta/architecture/overview.md`
+- Repository blueprint: `.harmony/cognition/_meta/architecture/repository-blueprint.md`

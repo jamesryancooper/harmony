@@ -1,7 +1,7 @@
 ---
 checkpoints:
   strategy: phase
-  storage: ".harmony/capabilities/skills/_state/runs/spec-to-implementation/{{run-id}}/"
+  storage: ".harmony/capabilities/skills/_ops/state/runs/spec-to-implementation/{{run-id}}/"
   retention: session
 
   schema:
@@ -31,6 +31,6 @@ Checkpoints retain requirement extraction and task graph context across interrup
 
 Resume contract:
 
-- State is stored in `.harmony/capabilities/skills/_state/runs/spec-to-implementation/{{run-id}}/`.
+- State is stored in `.harmony/capabilities/skills/_ops/state/runs/spec-to-implementation/{{run-id}}/`.
 - Resume preserves assumption logs so review context is not lost.
 - Any material spec update invalidates prior decomposition checkpoints.

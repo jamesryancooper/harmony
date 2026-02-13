@@ -1,7 +1,7 @@
 ---
 checkpoints:
   strategy: phase
-  storage: ".harmony/capabilities/skills/_state/runs/resolve-pr-comments/{{run-id}}/"
+  storage: ".harmony/capabilities/skills/_ops/state/runs/resolve-pr-comments/{{run-id}}/"
   retention: session
 
   schema:
@@ -31,6 +31,6 @@ State is preserved to keep comment-to-fix traceability stable across interruptio
 
 Resume contract:
 
-- Checkpoints are stored in `.harmony/capabilities/skills/_state/runs/resolve-pr-comments/{{run-id}}/`.
+- Checkpoints are stored in `.harmony/capabilities/skills/_ops/state/runs/resolve-pr-comments/{{run-id}}/`.
 - Resume revalidates PR head SHA before applying additional fixes.
 - Deferred comments remain explicitly tracked in checkpoint state.

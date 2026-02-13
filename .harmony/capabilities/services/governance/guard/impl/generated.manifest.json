@@ -1,0 +1,12 @@
+{
+  "contract_version": "0.1.0",
+  "contract_hash": "sha256:247ccf5dc0453dea71f45d1a97a8f791ddf29d95",
+  "fixture_set_hash": "sha256:7e019b3744f2b56c992d675bbad95e803c60424e",
+  "rule_set_hash": "sha256:756fdee54910b1af125a3b2dd2d9e29de9650ab5",
+  "agent_id": "architect",
+  "agent_version": "2026-02-13",
+  "model_id": "gpt-5-codex",
+  "prompt_hash": "sha256:faf246d2e9b9946811907f9f3e1c82b94de4e493",
+  "tool_surface_version": "1",
+  "generated_at": "2026-02-13T00:00:00Z"
+}

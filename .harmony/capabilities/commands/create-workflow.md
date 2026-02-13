@@ -58,13 +58,13 @@ New workflow directory with:
 ## Key Features
 
 - **Gap-Aware:** All generated workflows include gap remediation features
-- **Template-Based:** Uses `.harmony/orchestration/workflows/_template/` for consistency
+- **Template-Based:** Uses `.harmony/orchestration/workflows/_scaffold/template/` for consistency
 - **Guided:** Prompts for requirements if not provided
 - **Verified:** Final step validates structure and content
 
 ## References
 
 - **Workflow:** `.harmony/orchestration/workflows/meta/create-workflow/`
-- **Template:** `.harmony/orchestration/workflows/_template/`
+- **Template:** `.harmony/orchestration/workflows/_scaffold/template/`
 - **Gap Guide:** `.harmony/cognition/context/workflow-gaps.md`
 - **Quality Criteria:** `.harmony/cognition/context/workflow-quality.md`

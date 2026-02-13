@@ -2,6 +2,10 @@
 
 Domain capabilities with typed contracts for invocation-driven composite behavior.
 
+## Independence Requirement
+
+Production services in this harness are self-contained and must not require or reference external kit implementations.
+
 ## Contents
 
 | File/Dir | Purpose |
@@ -15,13 +19,11 @@ Domain capabilities with typed contracts for invocation-driven composite behavio
 | `conventions/fixtures.md` | Fixture format and semantic anchoring requirements |
 | `conventions/validation-tiers.md` | Tier 1 deterministic and Tier 2 semantic validation contract |
 | `conventions/implementation-generation.md` | Contract-derived implementation generation workflow |
-| `_template/` | Service scaffold template |
-| `_scripts/validate-services.sh` | Structural and contract validator |
-| `_state/` | Service logs and run state |
+| `_scaffold/template/` | Service scaffold template |
+| `_ops/scripts/validate-services.sh` | Structural and contract validator |
+| `_ops/scripts/validate-service-independence.sh` | Independence validator (forbidden external package references) |
+| `_ops/state/` | Service logs and run state |
 | `composite-services.md` | Canonical definition of harness-only composite service composition |
-| `docs-services-migration.md` | Coverage summary for mirrored `docs/services` migration |
-| `platform-overview.md` | Integrated platform overview formerly documented at `docs/services/README.md` |
-| `architecture/`, `authoring/`, `delivery/`, `governance/`, `interfaces/`, `modeling/`, `operations/`, `planning/`, `quality/`, `retrieval/` | Migrated domain-grouped service documentation stubs |
 
 ## Interface Types
 

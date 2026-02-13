@@ -33,7 +33,7 @@ Move `projects/` from `.scratchpad/projects/` to `.harmony/ideation/projects/`:
 ├── projects/           # Human-led explorations (produces artifacts)
 │   ├── README.md
 │   ├── registry.md
-│   ├── _template/
+│   ├── _scaffold/template/
 │   └── <project-slug>/
 ├── missions/           # Agent-accessible execution
 └── .scratchpad/        # Ephemeral content and idea funnel
@@ -118,7 +118,7 @@ Brainstorms are lightweight exploration, not committed research:
 
 - `.harmony/ideation/projects/README.md` — Projects overview with funnel
 - `.harmony/ideation/projects/registry.md` — Project tracking
-- `.harmony/ideation/projects/_template/*` — Project templates
+- `.harmony/ideation/projects/_scaffold/template/*` — Project templates
 - `.harmony/ideation/scratchpad/brainstorm/README.md` — Brainstorm template
 - `.harmony/orchestration/workflows/projects/create-project.md` — Project creation workflow
 

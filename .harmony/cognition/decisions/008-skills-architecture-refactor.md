@@ -105,5 +105,5 @@ repo/                              ← Root workspace (scope: repo/**)
 
 - [agentskills.io/specification](https://agentskills.io/specification) - Format specification
 - `docs/architecture/workspaces/skills/` - Split documentation
-- `.harmony/capabilities/skills/_template/` - Updated skill template
+- `.harmony/capabilities/skills/_scaffold/template/` - Updated skill template
 - `.harmony/orchestration/workflows/skills/create-skill/` - Updated workflow (v2.0.0)

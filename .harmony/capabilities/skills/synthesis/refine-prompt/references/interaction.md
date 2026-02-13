@@ -19,7 +19,7 @@ interaction:
 
   state_persistence:
     strategy: checkpoint
-    location: ".harmony/capabilities/skills/_state/runs/refine-prompt/{{run-id}}/"
+    location: ".harmony/capabilities/skills/_ops/state/runs/refine-prompt/{{run-id}}/"
 
   fallback:
     on_timeout: abort

@@ -2,7 +2,6 @@
 title: Service Run Records
 scope: harness
 applies_to: services
-migrated_from: packages/kits/kit-base/src/run-record.ts
 ---
 
 # Service Run Records
@@ -11,14 +10,9 @@ Run records are canonical execution artifacts for reproducibility, auditability,
 
 ## Canonical Record Shape
 
-Base implementation source:
-
-- `packages/kits/kit-base/src/run-record.ts`
-- `packages/kits/kit-base/schema/run-record.v1.json`
-
 Core fields:
 
-- Identity: `runId`, `kit/service name`, `version`
+- Identity: `runId`, `service name`, `version`
 - Inputs: sanitized `inputs` (sensitive keys redacted)
 - Outcome: `status`, `summary`, `durationMs`
 - Methodology: `stage`, `risk`, optional `hitl`

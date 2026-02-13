@@ -90,7 +90,7 @@ Low-risk internal scripts may use reduced telemetry, but production paths and sh
 ## Related Documentation
 
 - `.harmony/cognition/methodology/README.md`
-- `.harmony/cognition/architecture/observability-requirements.md`
+- `.harmony/cognition/_meta/architecture/observability-requirements.md`
 - `.harmony/cognition/principles/pillars/continuity.md`
 - `.harmony/cognition/principles/pillars/trust.md`
 - `.harmony/cognition/principles/pillars/insight.md`

@@ -14,7 +14,7 @@ metadata:
   updated: "2026-02-10"
 skill_sets: [executor]
 capabilities: [self-validating]
-allowed-tools: Read Glob Grep Write(/.harmony/capabilities/skills/*) Write(_state/runs/*) Write(_state/logs/*) Bash(mkdir) Bash(ln) Bash(cp)
+allowed-tools: Read Glob Grep Write(/.harmony/capabilities/skills/*) Write(_ops/state/runs/*) Write(_ops/state/logs/*) Bash(mkdir) Bash(ln) Bash(cp)
 ---
 
 # Create Skill
@@ -39,7 +39,7 @@ Use this skill when:
 ## Core Workflow
 
 1. **Validate** — Check name format, verify uniqueness, and run alignment-first gate
-2. **Copy Template** — Create directory structure from `_template/`, create symlinks
+2. **Copy Template** — Create directory structure from `_scaffold/template/`, create symlinks
 3. **Initialize** — Replace placeholders with skill name and dates
 4. **Update Registry** — Add entries to manifest.yml and registry.yml
 5. **Update Catalog** — Add row to catalog.md skills table
@@ -71,8 +71,8 @@ Output paths are defined in `.harmony/capabilities/skills/registry.yml` (single 
 
 Outputs are written to:
 - `.harmony/capabilities/skills/<group>/{{skill_name}}/` — The new skill directory (deliverable)
-- `_state/runs/create-skill/{{run_id}}/` — Execution state (checkpoint and summary) for session recovery
-- `_state/logs/create-skill/` — Execution logs with index
+- `_ops/state/runs/create-skill/{{run_id}}/` — Execution state (checkpoint and summary) for session recovery
+- `_ops/state/logs/create-skill/` — Execution logs with index
 
 ## Naming Convention
 
@@ -83,7 +83,7 @@ Outputs are written to:
 | verb-noun | `refine-prompt`, `build-mcp-server` | `prompt-refiner`, `report-generator` |
 | verb-object | `audit-migration`, `resolve-pr-comments` | `codebase-analyzer`, `payment-processor` |
 
-**Verb vocabulary:** See [Verb Vocabulary](/.harmony/capabilities/architecture/design-conventions.md#verb-vocabulary) for the full list with semantic definitions, boundaries, and retired verbs.
+**Verb vocabulary:** See [Verb Vocabulary](/.harmony/capabilities/_meta/architecture/design-conventions.md#verb-vocabulary) for the full list with semantic definitions, boundaries, and retired verbs.
 
 **Key distinctions:**
 - `create` (scaffold from template) vs `build` (end-to-end construction)

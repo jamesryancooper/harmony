@@ -5,7 +5,7 @@
 #   - Parameters: .harmony/capabilities/skills/registry.yml
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Grep Write(../../output/reports/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -82,7 +82,7 @@ Written to `.harmony/output/reports/YYYY-MM-DD-subsystem-health-audit.md`.
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/_state/logs/audit-subsystem-health/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_ops/state/logs/audit-subsystem-health/{{run_id}}.md`.
 
 ```markdown
 # Audit Subsystem Health Run Log
@@ -117,7 +117,7 @@ Written to `.harmony/capabilities/skills/_state/logs/audit-subsystem-health/{{ru
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/_state/logs/audit-subsystem-health/index.yml`:
+Written to `.harmony/capabilities/skills/_ops/state/logs/audit-subsystem-health/index.yml`:
 
 ```yaml
 skill: audit-subsystem-health
@@ -147,7 +147,7 @@ This skill requires:
 - **Glob** — Find definition files and verify path existence
 - **Grep** — Pattern-based search for cross-references and trigger analysis
 - **Write(../../output/reports/*)** — Write audit report
-- **Write(_state/logs/*)** — Write execution logs
+- **Write(_ops/state/logs/*)** — Write execution logs
 
 No external dependencies required.
 
@@ -168,7 +168,7 @@ No external dependencies required.
 ### With Companion Docs
 
 ```text
-/audit-subsystem-health subsystem=".harmony/capabilities/skills" docs=".harmony/cognition/architecture/skills"
+/audit-subsystem-health subsystem=".harmony/capabilities/skills" docs=".harmony/cognition/_meta/architecture/skills"
 ```
 
 ### With Options

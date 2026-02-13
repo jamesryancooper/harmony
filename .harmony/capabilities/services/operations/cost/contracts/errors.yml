@@ -1,0 +1,12 @@
+version: "1.0.0"
+errors:
+  - code: InputValidationError
+    category: structural
+    exit_code: 5
+    retryable: false
+    operator_action: "Provide required fields for estimate or record operations."
+  - code: UpstreamProviderError
+    category: dependency
+    exit_code: 6
+    retryable: false
+    operator_action: "Install jq or fix shell runtime dependencies."

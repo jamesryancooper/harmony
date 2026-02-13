@@ -78,4 +78,4 @@ This harness contains:
 | `.harmony/` | Shared foundation — actors, templates, workflows, skills |
 | `.harmony/scaffolding/templates/` | Harness scaffolding (base and scoped variants) |
 | `.cursor/` | IDE-specific agent configuration (complementary) |
-| `.harmony/cognition/architecture/` | Canonical documentation for harness pattern |
+| `.harmony/cognition/_meta/architecture/` | Canonical documentation for harness pattern |

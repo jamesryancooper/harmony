@@ -166,7 +166,7 @@ Use this skill when:
 ## Core Workflow
 
 1. **Validate Name** — Check format (kebab-case), convention (verb-noun), uniqueness
-2. **Copy Template** — Copy `_template/` to `skills/<name>/`
+2. **Copy Template** — Copy `_scaffold/template/` to `skills/<name>/`
 3. **Initialize Skill** — Update SKILL.md frontmatter and placeholders
 4. **Update Registry** — Add entry to manifest.yml and registry.yml
 5. **Update Catalog** — Add row to catalog.md (if exists)
@@ -238,7 +238,7 @@ Use action-oriented names (verb-noun pattern):
 
 | Type | Path | Description |
 |------|------|-------------|
-| Template | `.harmony/skills/_template/` | Source template directory |
+| Template | `.harmony/skills/_scaffold/template/` | Source template directory |
 | Manifest | `.harmony/skills/manifest.yml` | For uniqueness check and registration |
 | Registry | `.harmony/skills/registry.yml` | For uniqueness check and registration |
 
@@ -283,7 +283,7 @@ create-skill:
   requires:
     context:
       - type: directory_exists
-        path: ".harmony/skills/_template/"
+        path: ".harmony/skills/_scaffold/template/"
         description: "Requires skill template directory"
   depends_on: []
 ```
@@ -442,12 +442,12 @@ If name doesn't start with a verb, warn but continue.
 **Objective:** Create skill directory with template files.
 
 ### Files to Copy
-- `_template/SKILL.md` → `<skill-name>/SKILL.md`
-- `_template/references/behaviors.md` → `<skill-name>/references/behaviors.md`
-- `_template/references/io-contract.md` → `<skill-name>/references/io-contract.md`
-- `_template/references/safety.md` → `<skill-name>/references/safety.md`
-- `_template/references/examples.md` → `<skill-name>/references/examples.md`
-- `_template/references/validation.md` → `<skill-name>/references/validation.md`
+- `_scaffold/template/SKILL.md` → `<skill-name>/SKILL.md`
+- `_scaffold/template/references/behaviors.md` → `<skill-name>/references/behaviors.md`
+- `_scaffold/template/references/io-contract.md` → `<skill-name>/references/io-contract.md`
+- `_scaffold/template/references/safety.md` → `<skill-name>/references/safety.md`
+- `_scaffold/template/references/examples.md` → `<skill-name>/references/examples.md`
+- `_scaffold/template/references/validation.md` → `<skill-name>/references/validation.md`
 
 ### Directories to Create
 - `<skill-name>/scripts/`

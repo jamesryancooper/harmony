@@ -25,7 +25,7 @@ Agents may delegate subtasks to assistants when specialized focus is needed.
 
 ## Creating a New Assistant
 
-1. Copy `_template/` to a new directory: `assistants/<name>/`
+1. Copy `_scaffold/template/` to a new directory: `assistants/<name>/`
 2. Update `assistant.md` with mission, rules, and output format
 3. Register in `registry.yml`
 

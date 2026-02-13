@@ -11,7 +11,7 @@ Use this guide together with:
 
 - `.harmony/capabilities/services/planning/README.md`
 - `.harmony/capabilities/services/planning/{spec,plan,agent,flow}/guide.md`
-- `.harmony/cognition/architecture/{overview,monorepo-layout,repository-blueprint,agent-roles}.md`
+- `.harmony/cognition/_meta/architecture/{overview,monorepo-layout,repository-blueprint,agent-roles}.md`
 - `.harmony/cognition/knowledge-plane/knowledge-plane.md`
 
 When any earlier docs conflict with this page, **this page wins**.
@@ -23,7 +23,7 @@ When any earlier docs conflict with this page, **this page wins**.
 ### 1.1 Flow (TypeScript service)
 
 - Flow is the **flow orchestration service**.
-- In TypeScript (`packages/kits/flowkit/src/**`), it defines:
+- In the harness runtime (`.harmony/capabilities/services/planning/flow/**` + runtime clients), it defines:
   - `FlowConfig`, `FlowRunner`, `FlowRunResult` (generic flow contracts).
   - `createHttpFlowRunner` and a CLI that:
     - Reads `*.flow.json` configs.
@@ -80,7 +80,7 @@ In Harmony:
   - Example: "Architecture Assessment Flow".
 - Flow provides the **contracts and runner client**:
   - `FlowConfig`, `FlowRunner`, `FlowRunResult`.
-  - HTTP runner (`createHttpFlowRunner`) and CLI (`flowkit:run`).
+  - HTTP runner (`createHttpFlowRunner`) and CLI (`service:run` pattern).
 - The LangGraph runtime under `agents/runner/runtime/**` provides the **concrete implementation**:
   - A `StateGraph` per flow.
   - Nodes that implement the steps from the manifest.
@@ -198,7 +198,7 @@ To keep responsibilities clean:
 
 - Keep the **shared runtime** (LangGraph + HTTP server) in `agents/runner/runtime`.
 - Agent logic is split as follows:
-  - The **core agent logic** (state machines, plan execution, hooks, etc.) lives in the Agent service and related services under `packages/kits` as configurations and orchestrators that always call Flow.
+  - The **core agent logic** (state machines, plan execution, hooks, etc.) lives in the Agent service and related harness service contracts/orchestrators that always call Flow.
   - The **`agents/` directory** is reserved for small, **deployable agent or flow-oriented services/processes** that embody particular agent behaviors in production (review, assess, triage, etc.), all of which **reuse** the same shared LangGraph runtime in `agents/runner/runtime`.
 
 Services under `agents/<agent-name>/<agent-behavior-name>/` should remain **thin hosts** that:
@@ -289,7 +289,7 @@ This section is the canonical summary of responsibilities; other docs (AI Servic
   - Output: BMAD-style plans and stories plus a canonical `plan.json` (and ADR/checklist updates) that downstream services can consume.
 - Wrap **BMAD** as a Harmony-native service (`plan`) so that:
   - BMAD workflow/parameter churn is encapsulated behind a single, versioned service boundary.
-  - Callers rely on stable contracts under `packages/contracts/schemas/kits/plankit.inputs.v1.json`.
+  - Callers rely on stable contracts under `.harmony/capabilities/services/planning/plan/schema/input.schema.json`.
 - Coordinate with **Policy/Compliance/Observe** at plan time:
   - Ensure the right policy ruleset is selected and that risky plans can be gated or rejected before execution.
   - Emit required spans (for example `service.plan.plan`) and link plans to traces/run records for later evidence packs.
@@ -319,7 +319,7 @@ For **development of a new capability**:
 
 For **running a flow directly (Flow)**:
 
-1. Developer runs `pnpm flowkit:run path/to/flow.flow.json`.
+1. Developer runs a Flow service command (for example `pnpm run-flow path/to/flow.flow.json`).
 2. Flow CLI:
    - Starts/contacts `agents.runner.runtime.server`.
    - Calls `/flows/run` with `flowName`, prompt path, manifest path, etc.

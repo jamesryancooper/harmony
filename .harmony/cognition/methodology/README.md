@@ -17,7 +17,7 @@ Work is organized as a closed loop across **PLAN** (Direction, Focus), **SHIP** 
 
 ---
 
-> Terminology: Slices vs Layers — see `.harmony/cognition/architecture/slices-vs-layers.md`.
+> Terminology: Slices vs Layers — see `.harmony/cognition/_meta/architecture/slices-vs-layers.md`.
 
 ## Harmony’s Unifying Objective
 

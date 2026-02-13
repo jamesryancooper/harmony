@@ -79,11 +79,11 @@ migrated_from: packages/kits/kit-base/src/{{source}}
 ├── manifest.yml            # Packs + custom tools discovery
 ├── registry.yml            # Extended metadata for custom tools
 ├── capabilities.yml        # Built-in tools list, valid interface types, pack rules
-├── _template/
+├── _scaffold/template/
 │   └── TOOL.md
-├── _scripts/
+├── _ops/scripts/
 │   └── validate-tools.sh
-└── _state/
+└── _ops/state/
     └── logs/
 ```
 
@@ -142,10 +142,10 @@ tools: []
 
 ```yaml
 # New pack reference (additive — existing format still works):
-allowed-tools: pack:read-only Write(../../output/reports/*) Write(_state/logs/*)
+allowed-tools: pack:read-only Write(../../output/reports/*) Write(_ops/state/logs/*)
 
 # Multiple packs + inline tools:
-allowed-tools: pack:file-ops pack:ci-integration WebFetch Write(_state/logs/*)
+allowed-tools: pack:file-ops pack:ci-integration WebFetch Write(_ops/state/logs/*)
 ```
 
 Resolution: `pack:X` expands to the tools listed in the pack definition, unioned
@@ -183,8 +183,8 @@ Defines built-in tools reference, valid interface types, pack composition rules.
 - `.harmony/capabilities/tools/manifest.yml`
 - `.harmony/capabilities/tools/registry.yml`
 - `.harmony/capabilities/tools/capabilities.yml`
-- `.harmony/capabilities/tools/_template/TOOL.md`
-- `.harmony/capabilities/tools/_scripts/validate-tools.sh`
+- `.harmony/capabilities/tools/_scaffold/template/TOOL.md`
+- `.harmony/capabilities/tools/_ops/scripts/validate-tools.sh`
 
 ---
 
@@ -203,7 +203,7 @@ Defines built-in tools reference, valid interface types, pack composition rules.
 │   ├── run-records.md
 │   ├── observability.md
 │   └── idempotency.md
-├── _template/
+├── _scaffold/template/
 │   ├── SERVICE.md
 │   ├── impl/
 │   │   └── .gitkeep
@@ -213,9 +213,9 @@ Defines built-in tools reference, valid interface types, pack composition rules.
 │   └── references/
 │       ├── examples.md
 │       └── errors.md
-├── _scripts/
+├── _ops/scripts/
 │   └── validate-services.sh
-└── _state/
+└── _ops/state/
     ├── logs/
     └── runs/
 ```
@@ -325,7 +325,7 @@ New field parallel to `allowed-tools`:
 
 ```yaml
 # In SKILL.md frontmatter:
-allowed-tools: pack:read-only Write(_state/logs/*)
+allowed-tools: pack:read-only Write(_ops/state/logs/*)
 allowed-services: guard cost
 ```
 
@@ -337,13 +337,13 @@ I/O via contracts). Validated against `services/manifest.yml`.
 - `.harmony/capabilities/services/manifest.yml`
 - `.harmony/capabilities/services/registry.yml`
 - `.harmony/capabilities/services/capabilities.yml`
-- `.harmony/capabilities/services/_template/SERVICE.md`
-- `.harmony/capabilities/services/_template/impl/.gitkeep`
-- `.harmony/capabilities/services/_template/schema/input.schema.json`
-- `.harmony/capabilities/services/_template/schema/output.schema.json`
-- `.harmony/capabilities/services/_template/references/examples.md`
-- `.harmony/capabilities/services/_template/references/errors.md`
-- `.harmony/capabilities/services/_scripts/validate-services.sh`
+- `.harmony/capabilities/services/_scaffold/template/SERVICE.md`
+- `.harmony/capabilities/services/_scaffold/template/impl/.gitkeep`
+- `.harmony/capabilities/services/_scaffold/template/schema/input.schema.json`
+- `.harmony/capabilities/services/_scaffold/template/schema/output.schema.json`
+- `.harmony/capabilities/services/_scaffold/template/references/examples.md`
+- `.harmony/capabilities/services/_scaffold/template/references/errors.md`
+- `.harmony/capabilities/services/_ops/scripts/validate-services.sh`
 
 ---
 
@@ -417,10 +417,10 @@ table. Add the 2x2 classification diagram. Update interaction model descriptions
 and `## Services` section (service table, usage example). Update the Artifact Type
 Decision flowchart to include tools and services paths.
 
-**`.harmony/capabilities/skills/_template/SKILL.md`** — Add `allowed-services`
+**`.harmony/capabilities/skills/_scaffold/template/SKILL.md`** — Add `allowed-services`
 field to frontmatter template.
 
-**`.harmony/capabilities/skills/_scripts/validate-skills.sh`** — Add validation
+**`.harmony/capabilities/skills/_ops/scripts/validate-skills.sh`** — Add validation
 for `pack:` prefix resolution in `allowed-tools` and `allowed-services` values
 against `services/manifest.yml`.
 
@@ -448,8 +448,8 @@ Can logic run as POSIX shell?
 ### Files to modify
 - `.harmony/capabilities/README.md`
 - `.harmony/catalog.md`
-- `.harmony/capabilities/skills/_template/SKILL.md`
-- `.harmony/capabilities/skills/_scripts/validate-skills.sh`
+- `.harmony/capabilities/skills/_scaffold/template/SKILL.md`
+- `.harmony/capabilities/skills/_ops/scripts/validate-skills.sh`
 - `.harmony/START.md`
 
 ---

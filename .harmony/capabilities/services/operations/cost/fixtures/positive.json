@@ -1,0 +1,16 @@
+{
+  "id": "cost-positive-estimate",
+  "description": "Estimate returns deterministic pricing shape.",
+  "request": {
+    "operation": "estimate",
+    "workflowType": "code-from-plan",
+    "tier": "T2",
+    "model": "gpt-4o-mini",
+    "inputTokens": 5000,
+    "outputTokens": 4000
+  },
+  "expect": {
+    "hasKeys": ["estimateId", "estimatedCostUsd", "tokens", "workflowType", "tier"],
+    "estimatedCostUsdMin": 0
+  }
+}

@@ -52,5 +52,5 @@ Parent directory where `.harmony/` will be created.
 
 ## References
 
-- **Canonical:** `.harmony/cognition/architecture/README.md`
+- **Canonical:** `.harmony/cognition/_meta/architecture/README.md`
 - **Templates:** `.harmony/scaffolding/templates/harmony/`

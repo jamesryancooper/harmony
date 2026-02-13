@@ -39,6 +39,6 @@ Read `registry.yml` for routing metadata and each `team.md` for behavior contrac
 ```text
 teams/
 ├── registry.yml
-├── _template/team.md
+├── _scaffold/template/team.md
 └── <id>/team.md
 ```

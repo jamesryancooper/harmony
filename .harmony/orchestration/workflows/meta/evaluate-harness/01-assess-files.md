@@ -1,6 +1,6 @@
 # Step 1: Assess Files
 
-Read the target `.harmony` files. Compare structure against `.harmony/cognition/architecture/README.md` canonical definition.
+Read the target `.harmony` files. Compare structure against `.harmony/cognition/_meta/architecture/README.md` canonical definition.
 
 ## Structure Check
 

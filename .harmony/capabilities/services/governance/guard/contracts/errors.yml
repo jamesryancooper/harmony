@@ -1,0 +1,17 @@
+version: "1.0.0"
+errors:
+  - code: InputValidationError
+    category: structural
+    exit_code: 5
+    retryable: false
+    operator_action: "Fix input payload to match schema/input.schema.json."
+  - code: UpstreamProviderError
+    category: dependency
+    exit_code: 6
+    retryable: false
+    operator_action: "Install required shell dependency (jq) or fix runtime wiring."
+  - code: GuardViolationError
+    category: semantic
+    exit_code: 4
+    retryable: true
+    operator_action: "Review failed checks and sanitize or block content."

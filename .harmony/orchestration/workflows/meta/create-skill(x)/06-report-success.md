@@ -100,7 +100,7 @@ This skill follows [agentskills.io/specification](https://agentskills.io/specifi
 
 - **Spec:** [agentskills.io/specification](https://agentskills.io/specification)
 - **Example skill:** `.harmony/capabilities/skills/synthesis/refine-prompt/`
-- **Template:** `.harmony/capabilities/skills/_template/`
+- **Template:** `.harmony/capabilities/skills/_scaffold/template/`
 ```
 
 ## Verification

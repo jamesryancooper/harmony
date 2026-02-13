@@ -51,7 +51,7 @@ Most ideas die in `ideas/`. Some graduate to `brainstorm/`. Survivors become pro
 projects/
 ├── README.md           # You are here
 ├── registry.md         # Index of all projects by status
-├── _template/          # Template for new projects
+├── _scaffold/template/          # Template for new projects
 │   ├── project.md
 │   ├── log.md
 │   └── resources.md
@@ -115,14 +115,14 @@ Created → Active → Completed → Archived
 ### From Brainstorm
 
 When a brainstorm graduates:
-1. Copy `_template/` to `projects/<slug>/`
+1. Copy `_scaffold/template/` to `projects/<slug>/`
 2. Transfer context from brainstorm file
 3. Add entry to `registry.md` under **Active**
 4. Archive or delete the brainstorm file
 
 ### Manually
 
-1. Copy `_template/` to `projects/<slug>/`
+1. Copy `_scaffold/template/` to `projects/<slug>/`
 2. Fill in `project.md` with goal, scope, and key questions
 3. Add entry to `registry.md` under **Active**
 4. Begin research, logging progress in `log.md`

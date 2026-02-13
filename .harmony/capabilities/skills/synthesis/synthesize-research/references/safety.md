@@ -5,7 +5,7 @@ description: Safety policies and constraints for the synthesize-research skill.
 #   - Tool permissions: SKILL.md frontmatter `allowed-tools`
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Write(../../output/drafts/*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Write(../../output/drafts/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -37,7 +37,7 @@ The skill may only write to designated output locations:
 | Tier | Path | Purpose |
 |------|------|---------|
 | **Tier 1** | `.harmony/output/drafts/**` | Synthesis documents (deliverables) |
-| **Tier 1** | `.harmony/capabilities/skills/_state/logs/**` | Execution logs |
+| **Tier 1** | `.harmony/capabilities/skills/_ops/state/logs/**` | Execution logs |
 
 ### Scope Authority
 
@@ -66,7 +66,7 @@ The skill must never:
 - Preserve the nuance of original research
 - State assumptions explicitly
 - Mark uncertain findings with appropriate confidence level
-- Write only to .harmony/output/drafts/ and _state/logs/ directories
+- Write only to .harmony/output/drafts/ and _ops/state/logs/ directories
 
 ### Must Never
 

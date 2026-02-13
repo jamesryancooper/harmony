@@ -6,7 +6,7 @@
 {
   "promptId": "workflow/implement",
   "variables": {
-    "target": "packages/kits"
+    "target": ".harmony/capabilities/services"
   },
   "options": {
     "variant": "default",

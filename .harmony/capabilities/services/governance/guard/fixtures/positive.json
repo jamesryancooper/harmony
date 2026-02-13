@@ -1,0 +1,11 @@
+{
+  "id": "guard-positive-safe-content",
+  "description": "Benign content passes all enabled checks.",
+  "request": {
+    "content": "Document architecture decisions and keep references updated."
+  },
+  "expect": {
+    "passed": true,
+    "failedChecks": 0
+  }
+}

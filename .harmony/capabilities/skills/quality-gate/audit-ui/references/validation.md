@@ -39,9 +39,9 @@ A UI audit execution is valid when ALL of these conditions are met:
 
 ### Logging
 
-- [ ] Execution log was written to `_state/logs/audit-ui/{run_id}.md`
-- [ ] Log index was updated at `_state/logs/audit-ui/index.yml`
-- [ ] Top-level log index was updated at `_state/logs/index.yml`
+- [ ] Execution log was written to `_ops/state/logs/audit-ui/{run_id}.md`
+- [ ] Log index was updated at `_ops/state/logs/audit-ui/index.yml`
+- [ ] Top-level log index was updated at `_ops/state/logs/index.yml`
 
 ## Validation Failures
 

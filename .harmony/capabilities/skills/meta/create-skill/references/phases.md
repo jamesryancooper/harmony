@@ -11,8 +11,8 @@ behavior:
     - name: "Copy Template"
       steps:
         - "Create directory .harmony/capabilities/skills/<group>/{{skill_name}}/"
-        - "Copy SKILL.md from _template/"
-        - "Copy references/ directory from _template/"
+        - "Copy SKILL.md from _scaffold/template/"
+        - "Copy references/ directory from _scaffold/template/"
         - "Create empty scripts/ and assets/ directories"
         - "Create symlinks in harness folders"
     - name: "Initialize Skill"
@@ -134,15 +134,15 @@ Create the skill directory structure from template.
 
 2. **Copy Core Files**
 
-   - `.harmony/capabilities/skills/_template/SKILL.md` → `.harmony/capabilities/skills/<group>/{{skill_name}}/SKILL.md`
+   - `.harmony/capabilities/skills/_scaffold/template/SKILL.md` → `.harmony/capabilities/skills/<group>/{{skill_name}}/SKILL.md`
 
 3. **Copy Reference Files**
 
-   - `_template/references/phases.md` → `<group>/{{skill_name}}/references/phases.md`
-   - `_template/references/io-contract.md` → `<group>/{{skill_name}}/references/io-contract.md`
-   - `_template/references/safety.md` → `<group>/{{skill_name}}/references/safety.md`
-   - `_template/references/examples.md` → `<group>/{{skill_name}}/references/examples.md`
-   - `_template/references/validation.md` → `<group>/{{skill_name}}/references/validation.md`
+   - `_scaffold/template/references/phases.md` → `<group>/{{skill_name}}/references/phases.md`
+   - `_scaffold/template/references/io-contract.md` → `<group>/{{skill_name}}/references/io-contract.md`
+   - `_scaffold/template/references/safety.md` → `<group>/{{skill_name}}/references/safety.md`
+   - `_scaffold/template/references/examples.md` → `<group>/{{skill_name}}/references/examples.md`
+   - `_scaffold/template/references/validation.md` → `<group>/{{skill_name}}/references/validation.md`
 
 4. **Create Symlinks in Harness Folders**
 
@@ -202,7 +202,7 @@ Replace placeholders with actual values.
    - `{{skill_name}}` → `{{skill_name}}`
    - `{{skill_display_name}}` → `{{Skill Name}}` (title case)
    - `/skill-name` → `/{{skill_name}}`
-   - `_state/logs/skill-name/<run-id>.md` → `_state/logs/<skill-name>/<run-id>.md`
+   - `_ops/state/logs/skill-name/<run-id>.md` → `_ops/state/logs/<skill-name>/<run-id>.md`
 
 3. **Update Reference Files**
 
@@ -365,7 +365,7 @@ Communicate completion and next steps.
 
 3. **Write Run Log**
 
-   Write execution log to `_state/logs/create-skill/{{run_id}}.md`:
+   Write execution log to `_ops/state/logs/create-skill/{{run_id}}.md`:
 
    ```markdown
    # Run Log: create-skill
@@ -399,8 +399,8 @@ Communicate completion and next steps.
 
 4. **Update Log Indexes**
 
-   - Add entry to `_state/logs/index.yml` (top-level)
-   - Add entry to `_state/logs/create-skill/index.yml` (skill-level)
+   - Add entry to `_ops/state/logs/index.yml` (top-level)
+   - Add entry to `_ops/state/logs/create-skill/index.yml` (skill-level)
 
 ### Checkpoint Update
 
@@ -419,7 +419,7 @@ phases:
 
 On invocation, check for existing checkpoint:
 
-1. Look for `_state/runs/create-skill/*{{skill_name}}*/checkpoint.yml`
+1. Look for `_ops/state/runs/create-skill/*{{skill_name}}*/checkpoint.yml`
 2. If found with `status: completed`:
    - "Skill '{{skill_name}}' already exists. Create a different skill?"
 3. If found with `status: in_progress`:

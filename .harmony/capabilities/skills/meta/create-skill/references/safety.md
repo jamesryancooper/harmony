@@ -5,7 +5,7 @@ description: Safety policies and constraints for the create-skill skill.
 #   - Tool permissions: SKILL.md frontmatter `allowed-tools`
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(/.harmony/capabilities/skills/*) Write(_state/runs/*) Write(_state/logs/*) Bash(mkdir) Bash(ln) Bash(cp)
+# Current allowed-tools: Read Glob Grep Write(/.harmony/capabilities/skills/*) Write(_ops/state/runs/*) Write(_ops/state/logs/*) Bash(mkdir) Bash(ln) Bash(cp)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -28,8 +28,8 @@ Allowed tools defined in SKILL.md `allowed-tools`:
 - `Glob` — Pattern matching for file discovery
 - `Grep` — Content search for uniqueness checks
 - `Write(/.harmony/capabilities/skills/*)` — Create new skill directory and files
-- `Write(_state/runs/*)` — Write execution state (checkpoint and summary) for session recovery
-- `Write(_state/logs/*)` — Write execution logs
+- `Write(_ops/state/runs/*)` — Write execution state (checkpoint and summary) for session recovery
+- `Write(_ops/state/logs/*)` — Write execution logs
 - `Bash(mkdir)` — Create directories
 - `Bash(ln)` — Create symlinks
 - `Bash(cp)` — Copy template files
@@ -46,9 +46,9 @@ The skill may write to:
 | `.harmony/capabilities/skills/manifest.yml` | Append entry | Register skill |
 | `.harmony/capabilities/skills/registry.yml` | Append entry | Add metadata |
 | `.harmony/catalog.md` | Append row | Add to catalog table |
-| `.harmony/capabilities/skills/_state/runs/create-skill/` | Create files | Execution state (session recovery) |
-| `.harmony/capabilities/skills/_state/logs/create-skill/` | Create/update files | Run logs and indexes |
-| `.harmony/capabilities/skills/_state/logs/index.yml` | Update | Top-level log index |
+| `.harmony/capabilities/skills/_ops/state/runs/create-skill/` | Create files | Execution state (session recovery) |
+| `.harmony/capabilities/skills/_ops/state/logs/create-skill/` | Create/update files | Run logs and indexes |
+| `.harmony/capabilities/skills/_ops/state/logs/index.yml` | Update | Top-level log index |
 
 ### Protected Paths
 
@@ -56,7 +56,7 @@ The skill must NOT:
 
 - Modify existing skill directories (only create new ones)
 - Overwrite existing skills without explicit user confirmation
-- Modify or delete the `_template/` directory
+- Modify or delete the `_scaffold/template/` directory
 - Write outside designated paths
 - Modify registry entries for other skills
 
@@ -154,8 +154,8 @@ If rollback needed after completion:
 
 6. (Optional) Delete execution state and logs:
    ```bash
-   rm -rf .harmony/capabilities/skills/_state/runs/create-skill/{{run_id}}/
-   rm .harmony/capabilities/skills/_state/logs/create-skill/{{run_id}}.md
+   rm -rf .harmony/capabilities/skills/_ops/state/runs/create-skill/{{run_id}}/
+   rm .harmony/capabilities/skills/_ops/state/logs/create-skill/{{run_id}}.md
    ```
 
 ## Input Validation

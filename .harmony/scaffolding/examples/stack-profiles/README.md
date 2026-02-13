@@ -5,7 +5,7 @@ Harmony in concrete environments.
 
 - These files are **non-normative**.
 - Canonical, stack-agnostic architecture policy lives under:
-  `.harmony/cognition/architecture/`.
+  `.harmony/cognition/_meta/architecture/`.
 - Use these profiles as implementation references and adaptation guides.
 
 Current examples:

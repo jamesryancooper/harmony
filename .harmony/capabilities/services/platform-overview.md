@@ -2,7 +2,7 @@
 
 A modular, local-first platform that lets a tiny team ship outsized results with AI. It's opinionated where it matters (interfaces, safety, structure) and flexible everywhere else. Everything is a **service** with a crisp purpose, clear inputs/outputs, and predictable integration points.
 
-> Terminology note: "Spec" refers to our AI Services Platform service (code `speckit`) that wraps GitHub's Spec Kit. Mentions of the upstream tool explicitly use "GitHub's Spec Kit".
+> Terminology note: "Spec" refers to our AI Services Platform service (code `spec`) that wraps GitHub's Spec Kit. Mentions of the upstream tool explicitly use "GitHub's Spec Kit".
 
 ---
 
@@ -18,7 +18,7 @@ Choose the runtime that preserves determinism, safety, and performance while kee
   - Constraints: avoid heavy dependencies; keep attribute cardinality low; prefer short synchronous spans.
 - Telemetry
   - Edge → OTLP HTTP is supported; fall back to buffered export when offline per Observe offline mode.
-  - Always include `run.id`, `kit.name`, `kit.version`, `stage` to correlate across runtimes.
+  - Always include `run.id`, `service.name`, `service.version`, `stage` to correlate across runtimes.
 - Caching & Next.js 15+/16
   - Defaults: Next.js 15+/16 sets `no-store` for `fetch` and GET Route Handlers. Services MUST opt‑in explicitly to caching (`force-static`, `default-cache`, or headers) and pair with stable `cacheKey` derivation.
   - Do not leak TTLs into outputs or filenames; TTL only influences validity, never content. Record `determinism.cacheKey` and, when applicable, `cache.ttl` in the run record.
@@ -31,28 +31,28 @@ Choose the runtime that preserves determinism, safety, and performance while kee
 
 ## Where Services Live in the Monorepo
 
-Services are **control‑plane libraries** that live under `packages/kits/*` and are reused across the entire repo.
+Services are **control‑plane capabilities** that live under `.harmony/capabilities/services/*` and are reused across the entire repo.
 
 - **Primary placement (services):**
-  - `packages/kits/<kit-name>/...`
+  - `.harmony/capabilities/services/<domain>/<service-id>/...`
   - Source of truth for:
     - Service config and contracts (types, schemas, interfaces).
     - Public APIs used by `apps/*`, `agents/*`, `kaizen/*`, and `ci-pipeline/*`.
     - Any "local dev tool" commands that operate on the repo (for example, CLIs that help improve docs or code).
 - **Secondary placements (runtimes/adapters) are consumers of services:**
-  - `apps/*` — thin HTTP/CLI adapters that call services in `packages/kits/*`.
+  - `apps/*` — thin HTTP/CLI adapters that call services in `.harmony/capabilities/services/*`.
   - `agents/*` — agent flows that use services as tools during planner/builder/verifier work.
   - `kaizen/*` — hygiene/improvement jobs that call services for analysis and patch proposals.
   - `ci-pipeline/*` — quality gates that import service APIs (for example, Eval/Flow checks).
 
 For Flow and Agent specifically:
 
-- **Flow (TypeScript/Node interface):**
-  - `packages/kits/flowkit/` exposes types like `FlowConfig`, `FlowRunRequest`, and `FlowRunResult`, plus a small Node API/CLI to launch flows (for example, via a Python runner, HTTP, or subprocess).
+- **Flow (service contract interface):**
+  - `.harmony/capabilities/services/planning/flow/` exposes typed input/output contracts and runtime semantics to launch flows (for example, via a Python runner, HTTP, or subprocess).
   - Flow integrates with other services in TS (Spec, Plan, Agent) at the type level.
 - **Shared Python LangGraph runtime:**
   - Lives outside `apps/*` under `agents/runner/runtime/` and is treated as a shared runtime implementation behind Flow, not the service itself.
-  - It consumes prompts and workflow YAML and exposes a small HTTP API/CLI (for example, `/flows/run`) that `packages/kits/flowkit` calls.
+  - It consumes prompts and workflow YAML and exposes a small HTTP API/CLI (for example, `/flows/run`) that the Flow service calls.
 - **Agent (plan‑driven agents on top of Flow):**
   - Uses Plan `plan.json` plans, Flow `FlowConfig`/`FlowRunner` helpers, and the shared LangGraph runtime to run durable agent graphs with retries/resume/HITL.
   - Does not implement its own separate runtime; it always reuses the shared runtime under `agents/runner/runtime/**`.
@@ -60,14 +60,14 @@ For Flow and Agent specifically:
 
 This keeps the monorepo aligned with the Architecture blueprint:
 
-- Architecture: services = control‑plane libraries under `packages/kits`; the LangGraph runtime is infrastructure under `agents/runner/runtime/**`.
+- Architecture: services = control‑plane capabilities under `.harmony/capabilities/services`; the LangGraph runtime is infrastructure under `agents/runner/runtime/**`.
 - Methodology: services = concrete tools used to implement the Spec → Plan → Flow → Run lifecycle; see also `.harmony/capabilities/services/planning/service-roles.md` for canonical roles.
 
 ### Next.js 15+/16 & React 19 Integration (Guidance)
 
 - Server Actions (React 19):
   - Use for deterministic, typed mutations invoked from UI surfaces. Keep business logic in services and call Server Actions as thin controllers.
-  - Emit `kit.<kit>.execute` spans inside the action; propagate `run.id` via headers or form data; print one‑line JSON result to logs.
+  - Emit `service.<service>.execute` spans inside the action; propagate `run.id` via headers or form data; print one‑line JSON result to logs.
   - Prefer `useActionState` for form state; pair with optimistic UI using `useOptimistic` only for clearly idempotent updates.
 - Partial Prerendering (PPR) and Streaming:
   - Opt pages/layouts into PPR selectively. Keep dynamic islands behind `Suspense` with clear span boundaries around data fetches.
@@ -169,7 +169,7 @@ These invariants apply to every service and workflow so the Platform operates as
 - Determinism by default
   - Pin AI provider/model/version/params; compute and record a stable `prompt_hash`. Use idempotency keys for mutating ops and cache keys for pure/expensive ops. Use content‑addressed artifact naming under `runs/`.
 - Observability everywhere
-  - Emit OTel traces/logs with required resource attributes; keep attributes low‑cardinality; include `trace_id` in PRs. Support offline buffering and an explicit `kit.observakit.flush`.
+  - Emit OTel traces/logs with required resource attributes; keep attributes low‑cardinality; include `trace_id` in PRs. Support offline buffering and an explicit `service.observe.flush`.
 - Governance and typed failures
   - Policies are fail‑closed; violations block progression. Use typed errors with actionable summaries; assemble evidence with Compliance.
 - Safety and secret hygiene
@@ -247,20 +247,20 @@ This catalog clarifies how the essential services reinforce Harmony's pillars an
 
 | Service | Pillars | Lifecycle | Required Spans (minimum) |
 | --- | --- | --- | --- |
-| Spec | simplicity_over_complexity, quality_through_determinism | spec | `kit.speckit.specify` |
-| Plan | speed_with_safety, quality_through_determinism | plan | `kit.plankit.plan` |
-| Agent | speed_with_safety, guided_agentic_autonomy | implement | `kit.agentkit.execute` |
-| Tool | speed_with_safety, simplicity_over_complexity | implement | `kit.toolkit.call.<action>` |
-| Eval | quality_through_determinism | verify | `kit.evalkit.verify` |
-| Policy | quality_through_determinism | spec·plan·verify·ship | `kit.policykit.check` |
-| Test | quality_through_determinism | verify | `kit.testkit.run` |
-| Patch | speed_with_safety | ship | `kit.patchkit.open_pr` |
-| Release | speed_with_safety | ship | `kit.releasekit.tag` |
-| Flag | speed_with_safety | ship·operate | `kit.flagkit.evaluate`, `kit.flagkit.toggle` |
-| Observe | quality_through_determinism | all | `kit.observakit.flush` + required attributes |
-| Compliance | quality_through_determinism | verify·ship·learn | `kit.compliancekit.assemble` |
-| Cache | speed_with_safety, simplicity_over_complexity | implement | `kit.cachekit.hit`, `kit.cachekit.miss` |
-| Parse | simplicity_over_complexity, speed_with_safety | implement | `kit.parsekit.parse` |
+| Spec | simplicity_over_complexity, quality_through_determinism | spec | `service.spec.specify` |
+| Plan | speed_with_safety, quality_through_determinism | plan | `service.plan.plan` |
+| Agent | speed_with_safety, guided_agentic_autonomy | implement | `service.agent.execute` |
+| Tool | speed_with_safety, simplicity_over_complexity | implement | `service.tool.call.<action>` |
+| Eval | quality_through_determinism | verify | `service.eval.verify` |
+| Policy | quality_through_determinism | spec·plan·verify·ship | `service.policy.check` |
+| Test | quality_through_determinism | verify | `service.test.run` |
+| Patch | speed_with_safety | ship | `service.patch.open_pr` |
+| Release | speed_with_safety | ship | `service.release.tag` |
+| Flag | speed_with_safety | ship·operate | `service.flag.evaluate`, `service.flag.toggle` |
+| Observe | quality_through_determinism | all | `service.observe.flush` + required attributes |
+| Compliance | quality_through_determinism | verify·ship·learn | `service.compliance.assemble` |
+| Cache | speed_with_safety, simplicity_over_complexity | implement | `service.cache.hit`, `service.cache.miss` |
+| Parse | simplicity_over_complexity, speed_with_safety | implement | `service.parse.run` |
 
 Notes:
 
@@ -273,21 +273,21 @@ This table standardizes each core service's purpose, lifecycle coverage, schemas
 
 | Service | Purpose | Stage(s) | Inputs Schema (normative) | Outputs/Artifacts (normative) | Required Spans | Gates (default) |
 | --- | --- | --- | --- | --- | --- | --- |
-| Spec | Produce spec one‑pager + ADR | spec | `packages/contracts/schemas/kits/speckit.inputs.v1.json` | `docs/specs/*.md`, `docs/specs/adr-*.md` | `kit.speckit.specify` | Policy preflight (ASVS/SSDF), Observe trace open |
-| Plan | Produce plan (BMAD) from spec | plan | `packages/contracts/schemas/kits/plankit.inputs.v1.json` | `plan.json` | `kit.plankit.plan` | Policy ruleset selected; dry‑run OK |
-| Agent | Execute plan (produce artifacts only) | implement | `packages/contracts/schemas/kits/agentkit.inputs.v1.json` | Proposed diffs, tests, notes under `runs/**` | `kit.agentkit.execute` | Guard redaction; idempotency required on mutating ops |
-| Tool | Deterministic action wrappers (Git/HTTP/Shell) | implement | `packages/contracts/schemas/kits/toolkit.inputs.v1.json` | Structured logs, proposed changes | `kit.toolkit.call.<action>` | Guard + Cache; fail closed on secret/redaction errors |
-| Eval | Verify structure/grounding/style | verify | `packages/contracts/schemas/kits/evalkit.inputs.v1.json` | `runs/eval/*.json` | `kit.evalkit.verify` | Thresholds enforced; fail‑closed on miss |
-| Policy | Evaluate policy rulesets (ASVS/SSDF/STRIDE) | spec·plan·verify·ship | `packages/contracts/schemas/kits/policykit.inputs.v1.json` | `runs/policy/*.json` | `kit.policykit.check` | Fail‑closed by default (`policy.failClosed = true`) |
-| Test | Contract/unit/e2e invoker | verify | `packages/contracts/schemas/kits/testkit.inputs.v1.json` | `runs/test/*.json` | `kit.testkit.run` | OpenAPI diff fail‑closed; contract tests required on changed surfaces |
-| Patch | Open PR + changelog | ship | `packages/contracts/schemas/kits/patchkit.inputs.v1.json` | PR number, preview URL | `kit.patchkit.open_pr` | Feature flag OFF by default; preview smoke recommended |
-| Release | Tag and release | ship | `packages/contracts/schemas/kits/releasekit.inputs.v1.json` | Tag, changelog | `kit.releasekit.tag` | Requires green policy/eval gates |
-| Flag | Server‑side flag evaluation/toggles | ship·operate | `packages/contracts/schemas/kits/flagkit.inputs.v1.json` | Flag states/rollout plan | `kit.flagkit.evaluate`, `kit.flagkit.toggle` | Progressive delivery; rollback path ready |
-| Observe | Telemetry (traces/logs/metrics) | all | n/a | `runs/**` links + vendor traces | `kit.observakit.flush` | Never log secrets; redaction on by default |
-| Compliance | Assemble evidence pack | verify·ship·learn | `packages/contracts/schemas/kits/compliancekit.inputs.v1.json` | Evidence pack manifest under `runs/**` | `kit.compliancekit.assemble` | Required for high‑risk changes |
-| Cache | Idempotency + memoization | implement | `packages/contracts/schemas/kits/cachekit.inputs.v1.json` | Cache hit/miss records | `kit.cachekit.hit`, `kit.cachekit.miss` | Pure ops must declare `--cache-key` |
-| Parse | Convert PDFs to Markdown (tables/figures) | implement | `packages/contracts/schemas/kits/parsekit.inputs.v1.json` | `docs_out/parsed/*.md`, `runs/**/parsekit-*.json` | `kit.parsekit.parse` | Guard redaction; dry‑run OK |
-| Prompt | Manage prompt templates, variables, variants, and fixtures | implement·verify | `packages/contracts/schemas/kits/promptkit.inputs.v1.json` | `prompts_out/**` compiled prompts, `prompt_tests/**` fixtures, `runs/**/promptkit-*.json` prompt metadata | `kit.promptkit.compile` | Eval/Test/Policy gates on prompt drift and schema violations |
+| Spec | Produce spec one‑pager + ADR | spec | `.harmony/capabilities/services/planning/spec/schema/input.schema.json` | `docs/specs/*.md`, `docs/specs/adr-*.md` | `service.spec.specify` | Policy preflight (ASVS/SSDF), Observe trace open |
+| Plan | Produce plan (BMAD) from spec | plan | `.harmony/capabilities/services/planning/plan/schema/input.schema.json` | `plan.json` | `service.plan.plan` | Policy ruleset selected; dry‑run OK |
+| Agent | Execute plan (produce artifacts only) | implement | `.harmony/capabilities/services/planning/agent/schema/input.schema.json` | Proposed diffs, tests, notes under `runs/**` | `service.agent.execute` | Guard redaction; idempotency required on mutating ops |
+| Tool | Deterministic action wrappers (Git/HTTP/Shell) | implement | `.harmony/capabilities/services/operations/tool/schema/input.schema.json` | Structured logs, proposed changes | `service.tool.call.<action>` | Guard + Cache; fail closed on secret/redaction errors |
+| Eval | Verify structure/grounding/style | verify | `.harmony/capabilities/services/quality/eval/schema/input.schema.json` | `runs/eval/*.json` | `service.eval.verify` | Thresholds enforced; fail‑closed on miss |
+| Policy | Evaluate policy rulesets (ASVS/SSDF/STRIDE) | spec·plan·verify·ship | `.harmony/capabilities/services/governance/policy/schema/input.schema.json` | `runs/policy/*.json` | `service.policy.check` | Fail‑closed by default (`policy.failClosed = true`) |
+| Test | Contract/unit/e2e invoker | verify | `.harmony/capabilities/services/quality/test/schema/input.schema.json` | `runs/test/*.json` | `service.test.run` | OpenAPI diff fail‑closed; contract tests required on changed surfaces |
+| Patch | Open PR + changelog | ship | `.harmony/capabilities/services/delivery/patch/schema/input.schema.json` | PR number, preview URL | `service.patch.open_pr` | Feature flag OFF by default; preview smoke recommended |
+| Release | Tag and release | ship | `.harmony/capabilities/services/delivery/release/schema/input.schema.json` | Tag, changelog | `service.release.tag` | Requires green policy/eval gates |
+| Flag | Server‑side flag evaluation/toggles | ship·operate | `.harmony/capabilities/services/delivery/flag/schema/input.schema.json` | Flag states/rollout plan | `service.flag.evaluate`, `service.flag.toggle` | Progressive delivery; rollback path ready |
+| Observe | Telemetry (traces/logs/metrics) | all | n/a | `runs/**` links + vendor traces | `service.observe.flush` | Never log secrets; redaction on by default |
+| Compliance | Assemble evidence pack | verify·ship·learn | `.harmony/capabilities/services/governance/compliance/schema/input.schema.json` | Evidence pack manifest under `runs/**` | `service.compliance.assemble` | Required for high‑risk changes |
+| Cache | Idempotency + memoization | implement | `.harmony/capabilities/services/operations/cache/schema/input.schema.json` | Cache hit/miss records | `service.cache.hit`, `service.cache.miss` | Pure ops must declare `--cache-key` |
+| Parse | Convert PDFs to Markdown (tables/figures) | implement | `.harmony/capabilities/services/retrieval/parse/schema/input.schema.json` | `docs_out/parsed/*.md`, `runs/**/parse-*.json` | `service.parse.run` | Guard redaction; dry‑run OK |
+| Prompt | Manage prompt templates, variables, variants, and fixtures | implement·verify | `.harmony/capabilities/services/modeling/prompt/schema/input.schema.json` | `prompts_out/**` compiled prompts, `prompt_tests/**` fixtures, `runs/**/prompt-*.json` prompt metadata | `service.prompt.compile` | Eval/Test/Policy gates on prompt drift and schema violations |
 
 Notes:
 
@@ -365,37 +365,37 @@ This contract makes the end‑to‑end flow deterministic, observable, and gover
    - Services: Spec → Plan
    - Inputs: approved Spec one‑pager + ADR; micro‑STRIDE
    - Artifacts: `docs/specs/*.md`, `plan.json`
-   - Required spans: `kit.speckit.specify`, `kit.plankit.plan`
+   - Required spans: `service.spec.specify`, `service.plan.plan`
    - Gate: Policy preflight (ASVS/SSDF), Observe trace opened
 
 2. Implement (Agentic)
    - Services: Agent → Tool (+ Cache) producing proposed diffs only
    - Artifacts: proposed diffs, tests, notes; no direct apply
-   - Required spans: `kit.agentkit.execute`, `kit.toolkit.call.*`
+   - Required spans: `service.agent.execute`, `service.tool.call.*`
    - Gates: Guard redaction; idempotency keys attached to mutating ops
 
 3. Verify (Quality & Security)
    - Services: Eval, Test, Policy, Compliance
    - Artifacts: eval reports, test results, policy outcomes, evidence pack links
-   - Required spans: `kit.evalkit.verify`, `kit.policykit.check`
+   - Required spans: `service.eval.verify`, `service.policy.check`
    - Gates: fail‑closed on threshold/policy violations
 
 4. Ship
    - Services: Patch → Release (optional) + Flag
    - Artifacts: PR, CHANGELOG, rollout/rollback plan
-   - Required spans: `kit.patchkit.open_pr`, `kit.releasekit.tag` (optional)
+   - Required spans: `service.patch.open_pr`, `service.release.tag` (optional)
    - Gates: Preview smoke (recommended), feature off by default
 
 5. Operate → Learn
    - Services: Observe, Bench → Doc (+ Schedule for cadence)
    - Artifacts: traces/logs/metrics, perf deltas, ADR/postmortem updates
-   - Required spans: `kit.observakit.flush`, domain spans around changed flows
+   - Required spans: `service.observe.flush`, domain spans around changed flows
 
 Required run record additions for this flow (see schema v0.2 below): `stage`, `risk`, `hitl.checkpoint`, `prompt_hash` (if AI used), `idempotencyKey`, `cacheKey`, `policy.ruleset` and outcome.
 
 ### Service Lifecycle State Machine (standard v0.2)
 
-Define consistent states and transitions across all services to improve determinism, observability, and governance. These states are orthogonal to Harmony stages and are represented in spans as attributes (`kit.state`) and as span events for transitions.
+Define consistent states and transitions across all services to improve determinism, observability, and governance. These states are orthogonal to Harmony stages and are represented in spans as attributes (`service.state`) and as span events for transitions.
 
 - States (string enum): `idle` → `planning` → `executing` → `verifying` → `completed` | `failed`
 - Transitions (event names emitted on the active lifecycle span):
@@ -408,10 +408,10 @@ Define consistent states and transitions across all services to improve determin
 
 Recommended spans per state:
 
-- `planning` → `kit.<kit>.plan` (e.g., `kit.plankit.plan`)
-- `executing` → `kit.<kit>.execute` or `kit.toolkit.call.<action>`
-- `verifying` → `kit.evalkit.verify`, `kit.policykit.check`, `kit.testkit.run`
-- Terminal states: add `kit.state` attribute to the parent lifecycle span and include `status` in the run record
+- `planning` → `service.<service>.plan` (e.g., `service.plan.plan`)
+- `executing` → `service.<service>.execute` or `service.tool.call.<action>`
+- `verifying` → `service.eval.verify`, `service.policy.check`, `service.test.run`
+- Terminal states: add `service.state` attribute to the parent lifecycle span and include `status` in the run record
 
 Mermaid state sketch:
 
@@ -651,21 +651,21 @@ Patch SHOULD generate (or validate) a minimal PR body conforming to Harmony's go
 ## Minimal, Small-Team Setup (Directory Layout)
 
 ```plaintext
-/kits
-  /dockit       /devkit        /stackkit
-  /plankit      /agentkit      /toolkit
-  /speckit      /testkit       /searchkit
-  /ingestkit    /indexkit      /querykit
-  /promptkit    /evalkit       /observakit
-  /guardkit     /policykit     /cachekit
-  /compliancekit /a11ykit      /headerskit
-  /notifykit    /schedulekit   /costkit
-  /codemodkit   /scaffoldkit   /playbookkit
-  /diagramkit   /depkit        /benchkit
-  /datasetkit   /modelkit      /releasekit
-  /migrationkit /flagkit       /uikit
-  /i18nkit      /seedkit       /vaultkit
-  /parsekit
+/services
+  /doc          /dev           /stack
+  /plan         /agent         /tool
+  /spec         /test          /search
+  /ingest       /index         /query
+  /prompt       /eval          /observe
+  /guard        /policy        /cache
+  /compliance   /a11y          /headers
+  /notify       /schedule      /cost
+  /codemod      /scaffold      /playbook
+  /diagram      /dep           /bench
+  /dataset      /model         /release
+  /migration    /flag          /ui
+  /i18n         /seed          /vault
+  /parse
 /docs         (source)
 /docs_out     (proposed outputs)
 /ingest       (normalized sources)
@@ -688,7 +688,7 @@ Standardize the on‑disk layout and commands for each service to keep developer
 ### Service directory skeleton (normative)
 
 ```plaintext
-/kits/<kit-name>/
+/.harmony/capabilities/services/<domain>/<service-id>/
   README.md
   package.json
   tsconfig.json
@@ -698,10 +698,10 @@ Standardize the on‑disk layout and commands for each service to keep developer
     observability.ts   # Observe bootstrap (exports tracer/logger)
     errors.ts          # typed error classes (maps to standard exit codes)
   schema/
-    <kit>.inputs.v1.json
-    <kit>.outputs.v1.json
+    input.schema.json
+    output.schema.json
   metadata/
-    kit.metadata.json  # conforms to KitMetadata v0.2
+    service.metadata.json  # conforms to ServiceMetadata v0.2
   runs/                # local artifacts during dev (gitignored)
   __tests__/           # unit + contract tests (Eval/Test/Policy fixtures)
 ```
@@ -717,7 +717,7 @@ Add or align pipelines in `turbo.json` so all services expose the same verbs:
     "lint": { "outputs": [] },
     "typecheck": { "outputs": [] },
     "test": { "dependsOn": ["build"], "outputs": ["runs/test/**"] },
-    "kit:run": { "cache": false }
+    "service:run": { "cache": false }
   }
 }
 ```
@@ -731,7 +731,7 @@ Recommended `package.json` scripts per service:
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "kit:run": "node dist/cli.js --dry-run --stage implement"
+    "service:run": "node dist/cli.js --dry-run --stage implement"
   }
 }
 ```
@@ -772,7 +772,7 @@ Run interfaces are standardized to maximize determinism and ease orchestration. 
   - `--policy.ruleset <id>` `--policy.version <semver|date>` `--policy.fail-closed`.
   - `--trace` `--trace-parent <trace_id>`: link runs to upstream traces.
 - Standard envs
-  - `OTEL_EXPORTER_OTLP_ENDPOINT` (default `http://localhost:4318`) and `OTEL_SERVICE_NAME` (auto: `harmony.kit.<kit>`).
+  - `OTEL_EXPORTER_OTLP_ENDPOINT` (default `http://localhost:4318`) and `OTEL_SERVICE_NAME` (auto: `harmony.service.<service>`).
   - `HARMONY_ENV` (`local|preview|prod`) mapped to `deployment.environment`.
   - Provider-specific envs are read only through **Vault**; secrets must never be logged or serialized to run records.
 
@@ -785,18 +785,18 @@ All services MUST print a one-line JSON summary to stdout on success/failure, ma
 - Idempotency key derived for mutating ops; cache key declared for pure/expensive ops.
 - Policy ruleset selected and recorded; fail‑closed behavior exercised locally (`--dry-run`).
 - Observability present: lifecycle/action spans with required attributes; structured logs with `trace_id`/`span_id`.
-- Artifacts written to `runs/{timestamp}-{kit}-{runId}/` with low‑cardinality names; `artifact.write` span events emitted.
+- Artifacts written to `runs/{timestamp}-{service}-{runId}/` with low‑cardinality names; `artifact.write` span events emitted.
 - Typed errors used with exit codes (0–8); one‑line JSON summary printed on failure with actionable message.
 - Secrets/PII never serialized; Guard redaction on by default; Vault for secret reads.
-- Contracts updated in `packages/contracts`; barrel exports refreshed; diffs linked in PR.
+- Contracts updated in the service-local schema path (`.harmony/capabilities/services/<domain>/<service>/schema`); registry references refreshed; diffs linked in PR.
 - HITL checkpoints encoded when risk ≥ medium; PR body includes risk rubric, flags, rollback, trace URL.
 
-Reference run record (stored under `/runs/<timestamp>-<kit>-<runId>.json`):
+Reference run record (stored under `/runs/<timestamp>-<service>-<runId>.json`):
 
 ```json
 {
-  "runId": "2025-11-07T12-00-01Z-plankit-9f2c",
-  "kit": { "name": "plankit", "version": "0.2.0" },
+  "runId": "2025-11-07T12-00-01Z-plan-9f2c",
+  "service": { "name": "plan", "version": "0.2.0" },
   "inputs": { "goal": "Doc Refresh", "scope": ["/docs"] },
   "ai": {
     "provider": "openai",
@@ -814,7 +814,7 @@ Reference run record (stored under `/runs/<timestamp>-<kit>-<runId>.json`):
   "eval": { "suite": "basic-docs", "score": 0.94, "threshold": 0.9 },
   "telemetry": {
     "trace_id": "f3a0b1c2d3e4f5a6",
-    "spans": ["kit.plankit.plan", "kit.agentkit.execute"]
+    "spans": ["service.plan.plan", "service.agent.execute"]
   },
   "summary": "Planned and executed doc refresh; eval passed; PR #123 opened.",
   "status": "success"
@@ -826,12 +826,12 @@ Reference run record (stored under `/runs/<timestamp>-<kit>-<runId>.json`):
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "KitRunRecord",
+  "title": "ServiceRunRecord",
   "type": "object",
-  "required": ["runId", "kit", "inputs", "status", "summary", "telemetry"],
+  "required": ["runId", "service", "inputs", "status", "summary", "telemetry"],
   "properties": {
     "runId": { "type": "string" },
-    "kit": {
+    "service": {
       "type": "object",
       "required": ["name", "version"],
       "properties": {
@@ -945,7 +945,7 @@ Define service‑level metadata to make responsibilities, governance, and observ
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "KitMetadata",
+  "title": "ServiceMetadata",
   "type": "object",
   "required": [
     "name",
@@ -1036,7 +1036,7 @@ Define service‑level metadata to make responsibilities, governance, and observ
       "type": "object",
       "properties": {
         "contracts": { "type": "array", "items": { "type": "string" } },
-        "kits": { "type": "array", "items": { "type": "string" } },
+        "services": { "type": "array", "items": { "type": "string" } },
         "breakingChangePolicy": { "type": "string" },
         "deprecatedSince": { "type": "string" }
       }
@@ -1050,27 +1050,27 @@ Example metadata:
 
 ```json
 {
-  "name": "plankit",
+  "name": "plan",
   "version": "0.2.0",
   "pillars": ["speed_with_safety", "quality_through_determinism"],
   "lifecycleStages": ["plan", "implement"],
-  "inputsSchema": "schema/plankit.inputs.json",
-  "outputsSchema": "schema/plankit.outputs.json",
+  "inputsSchema": "schema/plan.inputs.json",
+  "outputsSchema": "schema/plan.outputs.json",
   "policy": { "rules": ["ASVS-2.1.1", "SSDF-PO.1"], "rulesetVersion": "2025-11-01", "failClosed": true },
   "observability": {
-    "serviceName": "harmony.kit.plankit",
-    "requiredSpans": ["kit.plankit.plan"],
+    "serviceName": "harmony.service.plan",
+    "requiredSpans": ["service.plan.plan"],
     "logRedaction": true
   },
   "determinism": {
     "ai": { "provider": "openai", "model": "gpt-4.1", "temperatureMax": 0.3, "supportsSeed": true, "promptHashAlgorithm": "sha256" },
-    "artifactNaming": "runs/{timestamp}-{kit}-{runId}/"
+    "artifactNaming": "runs/{timestamp}-{service}-{runId}/"
   },
   "safety": { "hitl": { "requiredFor": ["medium", "high"] } },
   "idempotency": { "required": true, "idempotencyKeyFrom": ["inputs.goal", "git.sha"] },
   "compatibility": {
-    "contracts": ["plankit.inputs.v1", "plankit.outputs.v1"],
-    "kits": ["agentkit@>=0.2.0"],
+    "contracts": ["plan.inputs.v1", "plan.outputs.v1"],
+    "services": ["agent@>=0.2.0"],
     "breakingChangePolicy": "semver-major-only"
   },
   "dryRun": { "supported": true }
@@ -1084,12 +1084,12 @@ Extends the minimal schema with lifecycle metadata, HITL checkpoints, and determ
 ```json
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "KitRunRecordV0_2",
+  "title": "ServiceRunRecordV0_2",
   "type": "object",
-  "required": ["runId", "kit", "inputs", "status", "summary", "telemetry", "stage", "risk"],
+  "required": ["runId", "service", "inputs", "status", "summary", "telemetry", "stage", "risk"],
   "properties": {
     "runId": { "type": "string" },
-    "kit": { "$ref": "#/definitions/KitRef" },
+    "service": { "$ref": "#/definitions/ServiceRef" },
     "inputs": { "type": "object" },
     "ai": { "type": "object" },
     "artifacts": { "type": "array" },
@@ -1118,7 +1118,7 @@ Extends the minimal schema with lifecycle metadata, HITL checkpoints, and determ
     }
   },
   "definitions": {
-    "KitRef": {
+    "ServiceRef": {
       "type": "object",
       "required": ["name", "version"],
       "properties": {
@@ -1133,18 +1133,18 @@ Extends the minimal schema with lifecycle metadata, HITL checkpoints, and determ
 #### Run ID Format (recommended)
 
 - Use a stable, low‑cardinality identifier to correlate artifacts, spans, and PRs without leaking sensitive data:
-  - `runId = <ISO8601-UTC-with-dashes>Z-<kitName>-<short-stable-id>`
-  - Example: `2025-11-07T12-00-01Z-plankit-9f2c`
+  - `runId = <ISO8601-UTC-with-dashes>Z-<serviceName>-<short-stable-id>`
+  - Example: `2025-11-07T12-00-01Z-plan-9f2c`
 - The short ID should be derived from stable inputs (e.g., git SHA fragment + inputs hash), not timestamps alone. Do not include PII or secrets in `runId`.
 
 ## Contracts Registry & Schema Conventions (Harmonized)
 
 Centralize all service contracts in a single registry to keep interfaces deterministic and discoverable.
 
-- Location: `packages/contracts`
-  - OpenAPI: `packages/contracts/openapi.yaml` (aggregate) and service‑specific files as needed.
-  - JSON Schemas (services): `packages/contracts/schemas/kits/`
-    - Naming: `<kit>.inputs.v<MAJOR>.json` and `<kit>.outputs.v<MAJOR>.json` (e.g., `plankit.inputs.v1.json`).
+- Location: `.harmony/capabilities/services`
+  - OpenAPI: service-specific files as needed in each service folder.
+  - JSON Schemas (services): `.harmony/capabilities/services/<domain>/<service>/schema/`
+    - Naming: `input.schema.json` and `output.schema.json`.
     - Draft: JSON Schema 2020‑12.
 - Versioning:
   - Breaking contract changes → bump MAJOR and provide migration notes; backward‑compatible additions → bump MINOR.
@@ -1153,13 +1153,13 @@ Centralize all service contracts in a single registry to keep interfaces determi
   - OpenAPI diffs are required (oasdiff) for API‑touching changes.
   - JSON‑Schema changes SHOULD include a schema diff summary and updated tests/goldens.
   - Patch PRs MUST link the contract diffs when a service interface changes.
-- Barrel exports: update `packages/contracts/src/index.ts` (or equivalent) to re‑export new/updated schemas for programmatic consumers.
+- Registry exports: update `.harmony/capabilities/services/registry.yml` (or service-local docs) to expose new or updated contracts to consumers.
 
 This registry is the single source of truth for inter‑service interfaces and aligns with Harmony's spec‑first, contract‑driven flow.
 
 Interoperability promise:
 
-- Services depend only on normative contracts in `packages/contracts` and respect semantic versioning boundaries. Breaking changes require a MAJOR bump with migration notes; MINOR additions must be backward-compatible. Cross‑service integration tests (via Test/Pact/Schemathesis where applicable) verify forward/backward compatibility. Use service metadata `compatibility` and `deprecatedSince` fields to signal support windows and orchestrate safe upgrades.
+- Services depend only on normative contracts in `.harmony/capabilities/services/**/schema` and respect semantic versioning boundaries. Breaking changes require a MAJOR bump with migration notes; MINOR additions must be backward-compatible. Cross‑service integration tests (via Test/Pact/Schemathesis where applicable) verify forward/backward compatibility. Use service metadata `compatibility` and `deprecatedSince` fields to signal support windows and orchestrate safe upgrades.
 
 ## Deterministic Operation Policy (Agents & Tools)
 
@@ -1185,7 +1185,7 @@ These defaults make outputs reproducible and reviewable:
   - Canonicalize by JSON‑stringifying with sorted keys; omit secrets or replace with stable placeholders.
   - `inputs_without_secrets` MUST exclude tokens/keys and any user data classified as sensitive; replace with stable placeholders (e.g., `<REDACTED:EMAIL>`), and record the redaction strategy in the run record `determinism.prompt_hash` notes when needed.
 - Artifact and directory naming:
-  - Directory: `runs/{timestamp}-{kit}-{runId}/`
+  - Directory: `runs/{timestamp}-{service}-{runId}/`
   - Files: include `{stage}-{artifactKind}-{stableName}.{ext}`; avoid high‑cardinality filenames.
 - Idempotency keys:
   - Derive from stable inputs + git SHA + stage (e.g., `sha256(plan.inputs + git.sha + stage)`), persisted in `determinism.idempotencyKey`.
@@ -1238,7 +1238,7 @@ Keep the platform lean and scalable for tiny teams:
 
 ### Service Versioning & Release Policy
 
-- Services follow Semantic Versioning (`MAJOR.MINOR.PATCH`). The `kit.version` in run records must reflect the released version.
+- Services follow Semantic Versioning (`MAJOR.MINOR.PATCH`). The `service.version` in run records must reflect the released version.
 - Backward‑compatible changes to inputs/outputs increment MINOR; breaking contract changes increment MAJOR and must include migration notes and updated schemas.
 - Each service maintains `schema/` for inputs/outputs and a `CHANGELOG.md` summarizing notable changes and required actions.
 - PRs that modify a service must update its version, schemas, and documentation, and include OpenAPI/JSON‑Schema diffs where contracts are affected.
@@ -1247,7 +1247,7 @@ Keep the platform lean and scalable for tiny teams:
 #### Deprecation & Compatibility
 
 - Declare deprecations in service metadata (`compatibility.deprecatedSince`) and document support windows. Provide an upgrade path and migration notes for every MAJOR bump.
-- Use `compatibility.contracts` and `compatibility.kits` to state interoperable versions; CI should verify matrices for critical cross‑service pairs (e.g., Plan ↔ Agent).
+- Use `compatibility.contracts` and `compatibility.services` to state interoperable versions; CI should verify matrices for critical cross‑service pairs (e.g., Plan ↔ Agent).
 - Avoid churn: prefer additive MINOR changes; batch breaking changes behind a single MAJOR with clear migration steps.
 
 ---
@@ -1313,10 +1313,10 @@ Keep the platform lean and scalable for tiny teams:
 
 Standardize instrumentation across all services:
 
-- **Service identity**: `service.name = "harmony.kit.<kitName>"`; `service.version` from git SHA or package version; `deployment.environment` set (e.g., `local`, `preview`, `prod`).
-- **Span names**: `kit.<kit>.<action>` (e.g., `kit.evalkit.verify`, `kit.patchkit.open_pr`).
+- **Service identity**: `service.name = "harmony.service.<serviceName>"`; `service.version` from git SHA or package version; `deployment.environment` set (e.g., `local`, `preview`, `prod`).
+- **Span names**: `service.<service>.<action>` (e.g., `service.eval.verify`, `service.patch.open_pr`).
 - **Required span attributes**:
-  - `kit.name`, `kit.version`, `run.id`, `git.sha`, `repo`, `branch`
+  - `service.name`, `service.version`, `run.id`, `git.sha`, `repo`, `branch`
   - If AI used: `ai.provider`, `ai.model`, `ai.version`, `ai.temperature`, `ai.top_p`, `ai.seed`
   - Policy/Eval: `policy.ruleset`, `policy.result`, `eval.suite`, `eval.score`, `eval.threshold`
 - **Structured logs**: include `trace_id`, `span_id`, severity, and summary; default redaction via Guard; never log PII/PHI.
@@ -1338,14 +1338,14 @@ Implementation notes:
 All services MUST set these OpenTelemetry Resource attributes and log fields to enable consistent correlation, DORA, and governance:
 
 - Resource (set once per process):
-  - `service.name = "harmony.kit.<kitName>"`
+  - `service.name = "harmony.service.<serviceName>"`
   - `service.version = <semver|git-sha>`
   - `deployment.environment = <local|preview|prod>`
-  - `telemetry.distro.name = "observakit"` (optional), `telemetry.distro.version`
+  - `telemetry.distro.name = "observe"` (optional), `telemetry.distro.version`
   - `harmony.repo`, `harmony.branch`
 
 - Span attributes (on lifecycle/action spans):
-  - `run.id`, `kit.name`, `kit.version`, `stage`, `git.sha`, `repo`, `branch`
+  - `run.id`, `service.name`, `service.version`, `stage`, `git.sha`, `repo`, `branch`
   - If AI used: `ai.provider`, `ai.model`, `ai.version`, `ai.temperature`, `ai.top_p`, `ai.seed`, `prompt_hash`
   - Policy/Eval/Test: `policy.ruleset`, `policy.result`, `eval.suite`, `eval.score`, `eval.threshold`
 
@@ -1357,8 +1357,8 @@ All services MUST set these OpenTelemetry Resource attributes and log fields to 
   "msg": "artifact written",
   "trace_id": "<id>",
   "span_id": "<id>",
-  "kit": {"name": "plankit", "version": "0.2.0"},
-  "run": {"id": "2025-11-07T12-00-01Z-plankit-9f2c"},
+  "service": {"name": "plan", "version": "0.2.0"},
+  "run": {"id": "2025-11-07T12-00-01Z-plan-9f2c"},
   "artifact": {"path": "runs/…/verify-report.json", "type": "report"}
 }
 ```
@@ -1373,13 +1373,13 @@ Sampling policy:
 
 Canonical spans (minimum):
 
-- `kit.speckit.specify` → `kit.plankit.plan` → `kit.agentkit.execute` → `kit.toolkit.call.<action>` →
-  `kit.evalkit.verify` → `kit.policykit.check` → `kit.patchkit.open_pr` → (`kit.releasekit.tag`)
+- `service.spec.specify` → `service.plan.plan` → `service.agent.execute` → `service.tool.call.<action>` →
+  `service.eval.verify` → `service.policy.check` → `service.patch.open_pr` → (`service.release.tag`)
 
 Guardrails:
 
 - Keep attribute cardinality bounded; prefer enums/IDs over free‑text.
-- Always include `run.id`, `kit.name`, `kit.version`, `stage`, `git.sha`, `repo`, `branch`.
+- Always include `run.id`, `service.name`, `service.version`, `stage`, `git.sha`, `repo`, `branch`.
 - Log errors with a typed `error.type` and `error.message` (no secrets/PII); attach `trace_id`.
 - Derive `prompt_hash` once per run (if AI used); attach it as an attribute to the parent span only.
 - Sampling: head‑based for low‑traffic; tail‑based for long traces; never drop error spans.
@@ -1400,9 +1400,9 @@ Emit low-cardinality span events on the active lifecycle span to improve explain
 To preserve local‑first operation and determinism without network access:
 
 - When `--dry-run` is true or `OTEL_EXPORTER_OTLP_ENDPOINT` is unreachable, Observe SHOULD buffer telemetry to disk and defer export.
-- Buffer file (NDJSON): `runs/{timestamp}-{kit}-{runId}/otel-buffer.ndjson` containing spans and logs with `trace_id`/`span_id`.
+- Buffer file (NDJSON): `runs/{timestamp}-{service}-{runId}/otel-buffer.ndjson` containing spans and logs with `trace_id`/`span_id`.
 - Flushing rules:
-  - Auto‑flush on `kit.observakit.flush` span end (best‑effort).
+  - Auto‑flush on `service.observe.flush` span end (best‑effort).
   - Manual flush allowed via a CLI mode or a service‑provided utility that replays buffered spans to the configured OTLP endpoint.
 - Redaction still applies to buffered logs; never include secrets/PII.
 - Include a buffered‑export summary event on the parent lifecycle span (when later flushed) to keep provenance intact.
@@ -1424,7 +1424,7 @@ To preserve local‑first operation and determinism without network access:
 ### Common Failure Modes & Fixes (operational)
 
 - Missing spans/logs:
-  - Ensure each service calls its `observability` bootstrap and sets required resource attributes; verify `kit.<kit>.<action>` spans appear with `run.id`.
+  - Ensure each service calls its `observability` bootstrap and sets required resource attributes; verify `service.<service>.<action>` spans appear with `run.id`.
 - Policy blocks with "missing evidence":
   - Attach links to Eval/Test outputs and run records; ensure `policy.checked[]` IDs are present in the run record and span attributes.
 - Idempotency conflicts (exit 7):
@@ -1463,14 +1463,14 @@ Keep domain logic isolated from infrastructure and UI, and freeze boundaries wit
 
 - Ports (interfaces) live in `packages/domain` and describe capabilities (e.g., `UserRepository`, `PaymentService`).
 - Adapters live in `packages/adapters` and implement ports (e.g., `DatabaseUserRepository`, `HttpPaymentService`).
-- Contracts live in `packages/contracts` (OpenAPI + JSON‑Schema); service schemas under `packages/contracts/schemas/kits`.
+- Contracts live alongside services under `.harmony/capabilities/services/<domain>/<service>/schema` (OpenAPI + JSON‑Schema where applicable).
 - Naming (alignment with Harmony):
   - Interfaces: `PascalCase` (e.g., `UserRepository`).
   - Implementations: descriptive prefix/suffix (e.g., `DatabaseUserRepository`, `InMemoryUserRepository`).
   - DTOs: `PascalCase` with `DTO` suffix and context (e.g., `CreateUserDTO`).
 - Tests:
   - Pact for adapter contracts (consumer/provider), Schemathesis for OpenAPI (property‑based), unit tests for domain logic.
-  - Place adapter contract tests adjacent to adapters; export shared contracts via `packages/contracts`.
+  - Place adapter contract tests adjacent to adapters; keep service contract references under `.harmony/capabilities/services/**/schema`.
 - CI gates:
   - Contract diffs (oasdiff) fail‑closed on breaking changes; service schema diffs accompany PRs that touch inter‑service interfaces.
 

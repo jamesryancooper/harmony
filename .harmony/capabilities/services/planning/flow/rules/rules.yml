@@ -1,0 +1,78 @@
+version: "1.0.0"
+rules:
+  - id: flow.schema.input
+    description: Input schema must exist.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/input.schema.json
+    target:
+      kind: file
+      selector: schema/input.schema.json
+    action:
+      mode: block
+      code: INPUT_SCHEMA_MISSING
+      message: Missing flow input schema.
+
+  - id: flow.schema.output
+    description: Output schema must exist.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/output.schema.json
+    target:
+      kind: file
+      selector: schema/output.schema.json
+    action:
+      mode: block
+      code: OUTPUT_SCHEMA_MISSING
+      message: Missing flow output schema.
+
+  - id: flow.impl.entrypoint
+    description: Flow shell client entrypoint must exist.
+    category: structural
+    severity: high
+    condition:
+      type: file_exists
+      path: impl/flow-client.sh
+    target:
+      kind: file
+      selector: impl/flow-client.sh
+    action:
+      mode: block
+      code: IMPL_MISSING
+      message: Flow client implementation missing.
+
+  - id: flow.semantic.result
+    description: Flow output must include result and runId.
+    category: semantic
+    severity: high
+    condition:
+      type: output_has_keys
+      keys: [result, runId, metadata]
+    target:
+      kind: output
+      selector: $.runId
+    action:
+      mode: block
+      code: FLOW_OUTPUT_INVALID
+      message: Flow output missing required keys.
+
+  - id: flow.policy.fail_closed
+    description: Flow service remains fail-closed.
+    category: policy
+    severity: critical
+    condition:
+      type: frontmatter_equals
+      path: SERVICE.md
+      key: policy.fail_closed
+      value: true
+    target:
+      kind: file
+      selector: SERVICE.md
+    action:
+      mode: block
+      code: POLICY_NOT_FAIL_CLOSED
+      message: Flow service must stay fail-closed.

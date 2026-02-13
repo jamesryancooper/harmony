@@ -126,8 +126,8 @@ After skill execution, verify:
 4. Report includes coverage proof section (files confirmed clean)
 5. Report includes idempotency metadata (manifest hash, file count, timestamp)
 6. Each layer completed fully before the next began (lens isolation)
-7. Log exists at `_state/logs/audit-migration/{{run_id}}.md`
-8. Log index updated at `_state/logs/audit-migration/index.yml`
+7. Log exists at `_ops/state/logs/audit-migration/{{run_id}}.md`
+8. Log index updated at `_ops/state/logs/audit-migration/index.yml`
 9. No source files were modified (read-only guarantee)
 10. If partition mode: report filename includes partition name
 11. If partition mode: report metadata includes partition, file_filter, partition_mode

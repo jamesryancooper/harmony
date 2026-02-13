@@ -7,7 +7,7 @@
 #   - Parameters: .harmony/capabilities/skills/registry.yml
 #   - Output paths: .harmony/capabilities/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(../../output/plans/*) Write(_state/logs/*)
+# Current allowed-tools: Read Glob Grep Write(../../output/plans/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -39,11 +39,11 @@ Written to `.harmony/output/plans/YYYY-MM-DD-{{feature}}-implementation-plan.md`
 
 ### Execution Log
 
-Written to `.harmony/capabilities/skills/_state/logs/spec-to-implementation/{{run_id}}.md`.
+Written to `.harmony/capabilities/skills/_ops/state/logs/spec-to-implementation/{{run_id}}.md`.
 
 ### Log Index
 
-Written to `.harmony/capabilities/skills/_state/logs/spec-to-implementation/index.yml`.
+Written to `.harmony/capabilities/skills/_ops/state/logs/spec-to-implementation/index.yml`.
 
 ## Dependencies
 
@@ -53,6 +53,6 @@ This skill requires:
 - **Glob** — Find relevant modules and files
 - **Grep** — Search for existing patterns and integrations
 - **Write(../../output/plans/*)** — Write implementation plan
-- **Write(_state/logs/*)** — Write execution logs
+- **Write(_ops/state/logs/*)** — Write execution logs
 
 No external dependencies required. This is a read-only analysis skill.
