@@ -9,6 +9,21 @@ Teams define reusable collaboration topologies across agents and assistants.
 
 A team is a composition artifact, not a separate runtime actor class.
 
+## Composition Boundaries
+
+Teams coordinate actor handoffs. They complement, but do not replace:
+
+- **Composite Skills** (`.harmony/capabilities/skills/composite-skills.md`):
+  reusable capability bundles.
+- **Workflows** (`.harmony/orchestration/workflows/`):
+  ordered procedural execution plans.
+
+In practice:
+
+- Teams decide **who** does the work and how escalations happen.
+- Workflows decide **when/what sequence** steps run.
+- Composite Skills decide **what reusable capability bundle** is invoked.
+
 ## Use Cases
 
 - Repeated cross-role execution patterns

@@ -7,7 +7,7 @@ date: 2025-11-21
 
 # Repo layout for new engineers
 
-Related docs: [monorepo layout](./monorepo-layout.md), [repository blueprint](./repository-blueprint.md), [layers](./layers.md), [migration playbook](./migration-playbook.md)
+Related docs: [monorepo layout](./monorepo-layout.md), [repository blueprint](./repository-blueprint.md), [layers](./layers.md), [migration playbook](./migration-playbook.md), [composite services](../../capabilities/services/composite-services.md)
 
 This repo follows a simple rule:
 
@@ -28,7 +28,7 @@ These directories contain **processes and services** that actually run in an env
 - They are intentionally **thin**:
   - Handle transport (HTTP, CLI args, etc.)
   - Instantiate agents via **factories** from `packages/agents`
-  - Delegate real work to **Engines** and **Kits**
+  - Delegate real work to **Composite Services** and **Kits**
 
 Think: “UI and edge APIs live here.”
 
@@ -59,7 +59,7 @@ Think: “Execution substrate: given a flow to run, it runs it—safely and obse
 
 ---
 
-## 2. Things you import (libraries, abstractions, definitions)
+## 2. Things you import (libraries, abstractions, and harness definitions)
 
 These directories contain **shared logic** and **definitions**. They are never run directly; they are imported by the runtime roots above.
 
@@ -72,23 +72,20 @@ Everything under `packages/` is **import-only**. The main categories:
 - Small, focused libraries that provide **one capability well**:
   - Planning, flows, prompts, evals, policies, context/RAG, caching, observability, etc.
 - Stateless or deterministic by design where possible.
-- Called by Engines, agents, and sometimes apps.
+- Called by services, agents, and sometimes apps.
 
 Think: “Sharp tools / primitives.”
 
-#### `packages/engines/`
+#### `.harmony/capabilities/services/`
 
-- Higher-level **subsystems built from kits**:
-  - `plan-engine/` – planning as a capability
-  - `work-engine/` – executing plan steps via flows/tools
-  - `context-engine/` – RAG/ContextOps
-  - `governance-engine/`, `release-engine/`, `kaizen-engine/`, etc.
-- Each Engine:
-  - Composes multiple Kits
-  - Encapsulates policies, evals, budgets, and observability for its domain
-  - Exposes a small, stable API for “do X” (e.g. `generatePlan`, `executeStep`, `getContext`)
+- Harness-level **composite capability definitions**:
+  - domain-grouped services under `planning/`, `retrieval/`, `governance/`, `delivery/`, etc.
+- Each Composite Service:
+  - Composes one or more services through typed contracts.
+  - Encapsulates policy, observability, and idempotency requirements.
+  - Defines capability boundaries without creating a new runtime root.
 
-Think: “Subsystems like ‘Planning’ or ‘RAG’, not just helper functions.”
+Think: “Capability composition contracts in the harness.”
 
 #### `packages/agents/`
 
@@ -98,7 +95,7 @@ Defines **what an agent is** in a reusable TypeScript form:
 packages/agents/
   src/
     specs/        # agent input/output contracts, roles, capabilities
-    definitions/  # what flows/engines/kits an agent uses
+    definitions/  # what flows/services/kits an agent uses
     governance/   # risk classes, budgets, eval & policy hooks
     factories/    # TS agent factories for apps/console/etc.
 ```
@@ -106,13 +103,13 @@ packages/agents/
 - **`specs/`**
   - Types and contracts: what the agent accepts, returns, and is allowed to do.
 - **`definitions/`**
-  - Logical wiring: which flows, Engines, and Kits implement the agent’s behavior.
+  - Logical wiring: which flows, services, and kits implement the agent’s behavior.
 - **`governance/`**
   - Risk levels, budgets, policies, eval suites, observability hooks.
 - **`factories/`**
   - **Factory functions** used by `apps/*` (and other TS entrypoints) to instantiate concrete agents:
     - e.g. `createConsoleAssistant(config)`, `createKaizenReviewer(config)`
-  - Factories wire specs + definitions + governance together with Engines, Kits, and platform runtime clients.
+  - Factories wire specs + definitions + governance together with services, kits, and platform runtime clients.
   - Import-only: these are **not** runtime roots.
 
 Think: “All the reusable agent smarts live here; apps and services just call the factories.”
@@ -142,9 +139,9 @@ Think: “Single source of truth for service boundaries between TypeScript and P
 - Everything related to **continuous improvement**:
   - Kaizen policies and playbooks
   - Kaizen evaluators and codemods
-  - Kaizen agents (often consuming Engines + Kits)
+  - Kaizen agents (often consuming composite services + kits)
 - Typically combines:
-  - `packages/engines/kaizen-engine`
+  - quality-gate and improvement workflows in `.harmony/orchestration/workflows/**`
   - `packages/agents` factories
   - Runtime roots in `apps/*` or `agents/*` to actually run Kaizen work
 
@@ -157,7 +154,7 @@ For a TypeScript app:
 ```text
 User → apps/ai-console
      → packages/agents (factory builds a console agent)
-     → packages/engines (PlanEngine, WorkEngine, ContextEngine, ...)
+     → .harmony/capabilities/services (composite service contracts)
      → packages/kits (PlanKit, FlowKit, EvalKit, ...)
      → contracts/ts client
      → platform/runtimes/flow-runtime/** (executes flows)
@@ -172,7 +169,7 @@ Scheduler/Event → agents/planner (Python process)
                 → flows, tools, DBs, etc.
 ```
 
-In both cases, **only** `apps/*`, `agents/*`, and `platform/runtimes/*-runtime/**` are actual processes. Everything else in `packages/*` and `contracts/*` is imported.
+In both cases, **only** `apps/*`, `agents/*`, and `platform/runtimes/*-runtime/**` are actual processes. Everything else in `packages/*` and `contracts/*` is imported, with composition definitions in `.harmony/capabilities/services/**`.
 
 ---
 

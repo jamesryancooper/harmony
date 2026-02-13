@@ -21,6 +21,23 @@ Use this team for non-trivial changes that require architecture, implementation,
 2. `architect` delegates bounded subtasks to assistants.
 3. `auditor` performs material-risk verification before completion.
 
+## Workflow Alignment
+
+- **Default workflow:** none
+- **Optional workflows:** `pre-release-audit`, `documentation-quality-gate`,
+  `orchestrate-audit`
+- **Routing guidance:**
+  - Use `pre-release-audit` before risky promotions.
+  - Use `documentation-quality-gate` when docs-as-code artifacts are in scope.
+  - Use `orchestrate-audit` for partitioned migration audits.
+
+## Composite Skill Alignment
+
+- **Preferred composite skills:** none currently registered
+- **Policy stance:** If a composite skill is introduced, it must be
+  fail-closed, self-validating, and declared in skills registry with explicit
+  `depends_on`.
+
 ## Escalation Rules
 
 Escalate to human when:

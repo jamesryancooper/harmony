@@ -3,6 +3,7 @@
 Complex capabilities with defined I/O contracts and progressive disclosure.
 
 For full documentation, see [.harmony/capabilities/architecture/](/.harmony/capabilities/architecture/README.md).
+For reusable skill composition, see [Composite Skills](./composite-skills.md).
 
 ---
 
@@ -53,6 +54,11 @@ Creating a new skill requires updating **4 files** across **2 locations**. Use t
 │     □ Run: ./_scripts/validate-skills.sh <skill-id>                          │
 │     □ Fix any errors or warnings                                            │
 │                                                                             │
+│  6. (OPTIONAL) COMPOSITE SKILL PROFILE                                     │
+│     □ If this skill bundles child skills, read composite-skills.md          │
+│     □ Set skill_sets to include integrator (+ coordinator recommended)      │
+│     □ Declare child skills in registry.yml depends_on                        │
+│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -72,6 +78,25 @@ Before implementing any new skill, apply the alignment-first gate in
 | `guardian` | self-validating, safety-bounded | Has quality gates |
 
 > **Design Note:** Capabilities determine documentation needs. Each capability maps to specific reference files. See [capabilities.md](/.harmony/capabilities/architecture/capabilities.md) for the full mapping.
+
+## Composite Skills
+
+Composite Skills are reusable harness-level capability bundles that orchestrate
+multiple skills behind one skill contract.
+
+- Canonical definition: [composite-skills.md](./composite-skills.md)
+- Use when:
+  - You need a stable, reusable slash command over multiple child skills.
+  - You need consistent merged outputs from a known bundle.
+- Prefer a workflow instead when:
+  - You need a one-off or highly procedural runbook with rich step narration.
+
+Recommended profile for Composite Skills:
+
+- `skill_sets`: `integrator` (required), `coordinator` (recommended)
+- `capabilities`: add only what execution requires (`parallel`, `resumable`,
+  `self-validating`, etc.)
+- `registry.yml`: use explicit `depends_on` child-skill declarations.
 
 **Capability Selection Guide:**
 
@@ -145,6 +170,7 @@ use skill: synthesize-research
 ├── manifest.yml                    # Tier 1 discovery index
 ├── capabilities.yml                # Capability schema & skill set definitions
 ├── registry.yml                    # Extended metadata and I/O paths (single source of truth)
+├── composite-skills.md             # Canonical composition model for skills
 ├── _template/                      # Scaffolding for new skills
 ├── <group>/<skill-id>/SKILL.md     # Core instructions (<500 lines)
 ├── _state/runs/                           # Execution state (checkpoints) for session recovery

@@ -217,19 +217,34 @@ A specific AI model version locked for consistency. Prevents unexpected behavior
 
 ---
 
-## Engines (Human-Friendly Kit Names)
+## Composite Service
 
-When human docs reference "engines," they mean these underlying Kits:
+A harness-only composition concept that defines higher-level capabilities by
+orchestrating multiple services under `.harmony/capabilities/services/`.
+Composite Services are declarative contracts and orchestration metadata, not a
+runtime package layer.
 
-| Engine | Kit | What It Does |
-|--------|-----|--------------|
-| Spec Engine | SpecKit | Validates and structures feature specs |
-| Plan Engine | PlanKit | Generates implementation plans |
-| Test Engine | TestKit | Generates and runs tests |
-| Security Engine | GuardKit, PolicyKit | Security checks and policy enforcement |
-| Observability Engine | ObservaKit | Tracing, logging, metrics |
-| Eval Engine | EvalKit | Evaluates AI outputs for quality |
-| Flow Engine | FlowKit | Orchestrates multi-step workflows |
+Legacy "engine" wording in historical notes maps to Composite Services:
+
+| Legacy Term | Composite Service Mapping |
+|--------|---------|
+| Spec Engine | `planning/spec` |
+| Plan Engine | `planning/plan` |
+| Work Engine | `planning/agent` + `planning/flow` + `operations/tool` |
+| Context Engine | `retrieval/*` |
+| Governance Engine | `governance/*` + `quality/*` |
+| Release Engine | `delivery/*` |
+| Kaizen Engine | quality-gate and improvement workflows across service domains |
+
+---
+
+## Composite Skill
+
+A harness-only composition concept that defines reusable capability bundles in
+`.harmony/capabilities/skills/`.
+
+Composite Skills orchestrate multiple skills under a stable skill contract.
+They differ from workflows (procedural sequences) and teams (actor handoffs).
 
 ---
 

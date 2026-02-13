@@ -24,6 +24,11 @@ metadata:
 #   specialist   - Requires domain expertise (→ domain-specialized)
 #   guardian     - Enforces quality/safety (→ self-validating, safety-bounded)
 #
+# Composite Skill profile (recommended):
+#   skill_sets: [integrator, coordinator]
+#   capabilities: [resumable, self-validating]  # as needed
+#   See: .harmony/capabilities/skills/composite-skills.md
+#
 # Additional Capabilities (beyond skill set bundles):
 #   resumable, error-resilient, idempotent, cancellable, external-dependent,
 #   long-running, scheduled, external-output

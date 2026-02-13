@@ -21,6 +21,18 @@ description: "[One-line purpose for this team composition]"
 2. [assistant execution step]
 3. [verification/escalation step]
 
+## Workflow Alignment
+
+- **Default workflow (if any):** [workflow-id or none]
+- **Optional workflows:** [workflow-id, ...]
+- **When to use each:** [short routing notes]
+
+## Composite Skill Alignment
+
+- **Preferred composite skills:** [skill-id, ...]
+- **Optional composite skills:** [skill-id, ...]
+- **Policy constraints:** [which bundles are disallowed for this team]
+
 ## Escalation Rules
 
 - [when to escalate to human]

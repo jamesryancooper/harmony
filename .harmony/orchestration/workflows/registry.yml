@@ -5,6 +5,11 @@
 #
 # Load AFTER matching a workflow in manifest.yml.
 # Then load WORKFLOW.md when the workflow is activated.
+#
+# Composition note:
+# - Workflows are procedural orchestrations.
+# - Composite Skills are reusable capability bundles.
+# - `depends_on.skill` may reference atomic or composite skills.
 
 routing:
   explicit_command_required: false
