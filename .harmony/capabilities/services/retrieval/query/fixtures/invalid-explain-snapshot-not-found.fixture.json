@@ -1,0 +1,49 @@
+{
+  "input": {
+    "command": "explain",
+    "query": "Explain ranking behavior for rollout docs.",
+    "index": {
+      "snapshot": "indexes/does-not-exist"
+    },
+    "strategy": {
+      "use": ["keyword", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "top_k": 5
+    }
+  },
+  "expected_output": {
+    "run": {
+      "run_id": "run-explain-invalid-001",
+      "service_version": "0.1.0",
+      "snapshot_id": "indexes/does-not-exist"
+    },
+    "status": "error",
+    "candidates": [],
+    "citations": [],
+    "evidence": [],
+    "diagnostics": {
+      "strategy": {
+        "use": ["keyword", "graph"],
+        "fuse": "rrf",
+        "top_k": 5
+      },
+      "timings": {
+        "total_ms": 1
+      },
+      "deterministic_stages": [],
+      "warnings": ["Snapshot path does not exist."]
+    },
+    "error": {
+      "code": "SnapshotNotFoundError",
+      "message": "Snapshot could not be resolved."
+    }
+  },
+  "metadata": {
+    "id": "invalid-explain-snapshot-not-found",
+    "type": "negative",
+    "behavior_family": "explain",
+    "description": "Explain fails with typed error when snapshot is missing.",
+    "expected_result": "fail"
+  }
+}

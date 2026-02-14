@@ -1,0 +1,20 @@
+id: local-faiss
+provider: FAISS
+adapter_version: "0.1.0"
+adapter_schema_version: "1.0.0"
+interop_contract_version: "1.0.0"
+status: draft
+mode: external
+supports:
+  keyword: supported
+  semantic: supported
+  graph: unsupported
+  route_hierarchical: unsupported
+  route_graph_global: unsupported
+degradation_policy:
+  unsupported_critical: fail-closed
+  evidence_required: true
+artifacts:
+  mapping: mapping.md
+  compatibility: compatibility.yml
+  capabilities_fixture: fixtures/capabilities.json

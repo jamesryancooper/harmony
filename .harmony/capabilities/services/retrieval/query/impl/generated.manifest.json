@@ -1,0 +1,23 @@
+{
+  "service": "query",
+  "version": "0.1.0",
+  "status": "phase4-implemented",
+  "generated": false,
+  "scripts": [
+    "query.sh",
+    "fusion.sh",
+    "cite.sh",
+    "make-test-snapshot.sh",
+    "run-fixtures.sh",
+    "evaluate-baseline.sh",
+    "evaluate-routes.sh",
+    "validate-adapters.sh",
+    "signals/keyword.sh",
+    "signals/graph.sh",
+    "signals/semantic.sh",
+    "routes/hierarchical.sh",
+    "routes/graph-global.sh",
+    "routes/memory-clues.sh"
+  ],
+  "notes": "Phase 4 route/memory runtime, adapter-contract validation, fixture runner, and evaluation tooling implemented with bash + jq."
+}

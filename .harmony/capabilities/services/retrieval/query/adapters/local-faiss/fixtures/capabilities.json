@@ -1,0 +1,13 @@
+{
+  "interop_contract_version": "1.0.0",
+  "mode": "adapter",
+  "adapter_id": "local-faiss",
+  "generated_at": "2026-02-14T00:00:00Z",
+  "capabilities": {
+    "keyword": { "state": "supported", "via": "adapter", "evidence_required": true },
+    "semantic": { "state": "supported", "via": "adapter", "evidence_required": true },
+    "graph": { "state": "unsupported", "via": "adapter", "evidence_required": true },
+    "route_hierarchical": { "state": "unsupported", "via": "adapter", "evidence_required": true },
+    "route_graph_global": { "state": "unsupported", "via": "adapter", "evidence_required": true }
+  }
+}

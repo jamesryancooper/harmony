@@ -1,0 +1,111 @@
+version: "1.0.0"
+rules:
+  - id: query.schema.input
+    description: Input schema must exist and parse.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/input.schema.json
+    target:
+      kind: file
+      selector: schema/input.schema.json
+    action:
+      mode: block
+      code: INPUT_SCHEMA_MISSING
+      message: Missing input schema.
+
+  - id: query.schema.output
+    description: Output schema must exist and parse.
+    category: structural
+    severity: critical
+    condition:
+      type: file_exists
+      path: schema/output.schema.json
+    target:
+      kind: file
+      selector: schema/output.schema.json
+    action:
+      mode: block
+      code: OUTPUT_SCHEMA_MISSING
+      message: Missing output schema.
+
+  - id: query.contract.rich-components
+    description: Rich-contract artifacts must all exist.
+    category: structural
+    severity: critical
+    condition:
+      type: files_exist
+      paths:
+        - contracts/invariants.md
+        - contracts/errors.yml
+        - compatibility.yml
+        - fixtures/valid-retrieve-basic.fixture.json
+        - fixtures/invalid-retrieve-required-signal-artifact-missing.fixture.json
+        - fixtures/edge-retrieve-optional-graph-degraded.fixture.json
+        - fixtures/valid-ask-basic.fixture.json
+        - fixtures/invalid-ask-semantic-unavailable.fixture.json
+        - fixtures/edge-ask-min-evidence-bounds.fixture.json
+        - fixtures/valid-explain-basic.fixture.json
+        - fixtures/invalid-explain-snapshot-not-found.fixture.json
+        - fixtures/edge-explain-weighted-missing-weights.fixture.json
+        - fixtures/valid-retrieve-hierarchical-route.fixture.json
+        - fixtures/valid-retrieve-graph-global-route.fixture.json
+        - fixtures/edge-retrieve-memory-clues-enabled.fixture.json
+        - fixtures/invalid-retrieve-route-requires-graph.fixture.json
+        - fixtures/invalid-retrieve-route-artifact-missing.fixture.json
+    target:
+      kind: directory
+      selector: .
+    action:
+      mode: block
+      code: CONTRACT_INCOMPLETE
+      message: Query service is missing required rich-contract artifacts.
+
+  - id: query.policy.fail-closed
+    description: Query policy must remain fail-closed.
+    category: policy
+    severity: critical
+    condition:
+      type: frontmatter_equals
+      path: SERVICE.md
+      key: policy.fail_closed
+      value: true
+    target:
+      kind: file
+      selector: SERVICE.md
+    action:
+      mode: block
+      code: POLICY_NOT_FAIL_CLOSED
+      message: Query service must stay fail-closed.
+
+  - id: query.output.required-fields
+    description: Query output must include retrieval, citation, and evidence fields.
+    category: semantic
+    severity: high
+    condition:
+      type: output_has_keys
+      keys: [run, status, candidates, citations, evidence, diagnostics]
+    target:
+      kind: output
+      selector: $
+    action:
+      mode: block
+      code: OUTPUT_SHAPE_INVALID
+      message: Output missing required retrieval and evidence fields.
+
+  - id: query.input.adapter-free-core
+    description: Core input contract must not include adapter or provider wiring keys.
+    category: policy
+    severity: critical
+    condition:
+      type: schema_disallow_keys
+      path: schema/input.schema.json
+      keys: [adapters, rerankers, retriever, provider, model]
+    target:
+      kind: file
+      selector: schema/input.schema.json
+    action:
+      mode: block
+      code: ADAPTER_KEYS_FORBIDDEN
+      message: Adapter/provider fields are not allowed in query core input schema.

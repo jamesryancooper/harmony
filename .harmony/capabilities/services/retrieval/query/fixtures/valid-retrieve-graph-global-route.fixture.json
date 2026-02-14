@@ -1,0 +1,52 @@
+{
+  "input": {
+    "command": "retrieve",
+    "query": "narrative accountability posture",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "route": "graph_global",
+      "top_k": 6
+    },
+    "evidence": {
+      "max_excerpts": 3,
+      "max_chars_per_excerpt": 220
+    }
+  },
+  "expected_output": {
+    "status": "success",
+    "candidates": [
+      {
+        "chunk_id": "doc:migration#c:0001"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:migration#c:0001"
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:migration#c:0001"
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "route": "graph_global"
+      },
+      "route_applied": true,
+      "deterministic_stages": ["keyword", "graph", "fusion", "citation"]
+    }
+  },
+  "metadata": {
+    "id": "valid-retrieve-graph-global-route",
+    "type": "positive",
+    "behavior_family": "retrieve",
+    "description": "Graph-global route boosts global-summary candidates into final ranking.",
+    "expected_result": "pass"
+  }
+}

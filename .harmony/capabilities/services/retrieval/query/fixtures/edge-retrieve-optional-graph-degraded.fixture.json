@@ -1,0 +1,74 @@
+{
+  "input": {
+    "command": "retrieve",
+    "query": "rollout ownership decisions",
+    "index": {
+      "snapshot": "indexes/test-snapshot-no-graph"
+    },
+    "strategy": {
+      "use": ["keyword", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "top_k": 5
+    }
+  },
+  "expected_output": {
+    "run": {
+      "run_id": "run-retrieve-edge-001",
+      "service_version": "0.1.0",
+      "snapshot_id": "indexes/test-snapshot-no-graph"
+    },
+    "status": "partial",
+    "candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "doc:owners#c:0002",
+        "doc_id": "doc:owners",
+        "score": 0.88,
+        "signals": {
+          "keyword": 0.88
+        },
+        "source_locator": "docs/ownership.md:27"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:owners#c:0002",
+        "locator": "docs/ownership.md:27",
+        "confidence": 0.86
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:owners#c:0002",
+        "locator": "docs/ownership.md:27",
+        "excerpt": "Ownership decisions require escalation to platform leads."
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "use": ["keyword", "graph"],
+        "fuse": "rrf",
+        "top_k": 5
+      },
+      "timings": {
+        "total_ms": 10,
+        "signal_ms": {
+          "keyword": 5,
+          "fusion": 2,
+          "citation": 3
+        }
+      },
+      "deterministic_stages": ["keyword", "fusion", "citation"],
+      "degraded_signals": ["graph"],
+      "warnings": ["Optional graph artifact missing; continuing with keyword-only retrieval."]
+    }
+  },
+  "metadata": {
+    "id": "edge-retrieve-optional-graph-degraded",
+    "type": "edge",
+    "behavior_family": "retrieve",
+    "description": "Retrieve degrades to partial when optional graph signal is unavailable.",
+    "expected_result": "pass"
+  }
+}

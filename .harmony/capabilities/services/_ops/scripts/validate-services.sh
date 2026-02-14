@@ -177,6 +177,21 @@ main() {
     [[ -f "$service_dir/schema/output.schema.json" ]] || log_error "Missing output schema for '$service_id'"
     [[ -d "$service_dir/impl" ]] || log_error "Missing impl directory for '$service_id'"
     [[ -d "$service_dir/references" ]] || log_error "Missing references directory for '$service_id'"
+    if [[ "$service_id" == "query" && -d "$service_dir/adapters" ]]; then
+      local adapter_validator="$service_dir/impl/validate-adapters.sh"
+      if [[ ! -f "$adapter_validator" ]]; then
+        log_error "Missing adapter validator for '$service_id': $adapter_validator"
+      else
+        local adapter_validation_output
+        adapter_validation_output="$(bash "$adapter_validator" 2>&1 || true)"
+        if grep -q "Adapter validation passed" <<<"$adapter_validation_output"; then
+          log_success "Adapter contracts validated for '$service_id'"
+        else
+          log_error "Adapter validation failed for '$service_id'"
+          echo "$adapter_validation_output"
+        fi
+      fi
+    fi
 
     if [[ -n "$interface_type" ]]; then
       has_value "$interface_type" "${valid_interfaces[@]}" || log_error "Invalid interface_type '$interface_type' for '$service_id'"

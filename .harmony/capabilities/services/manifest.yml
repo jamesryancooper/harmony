@@ -50,3 +50,13 @@ services:
     tags: [interop, native-first, governance]
     category: agent-platform
     stateful: false
+
+  - id: query
+    display_name: Query
+    path: retrieval/query/
+    summary: "Hybrid retrieval and answering with chunk-level citations and evidence packs."
+    status: active
+    interface_type: shell
+    tags: [retrieval, hybrid, citations, evidence]
+    category: retrieval
+    stateful: false

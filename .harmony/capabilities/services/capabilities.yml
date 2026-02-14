@@ -6,6 +6,7 @@ service_categories:
   - cost
   - flow
   - agent-platform
+  - retrieval
 
 valid_interface_types:
   - shell

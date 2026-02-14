@@ -1,0 +1,77 @@
+{
+  "input": {
+    "command": "ask",
+    "query": "Who approves rollout?",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "top_k": 1
+    },
+    "evidence": {
+      "max_excerpts": 1,
+      "max_chars_per_excerpt": 32
+    }
+  },
+  "expected_output": {
+    "run": {
+      "run_id": "run-ask-edge-001",
+      "service_version": "0.1.0",
+      "snapshot_id": "indexes/test-snapshot"
+    },
+    "status": "success",
+    "answer": "Platform owner approves staged rollout.",
+    "candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "doc:owners#c:0001",
+        "doc_id": "doc:owners",
+        "score": 0.92,
+        "signals": {
+          "keyword": 0.92
+        },
+        "source_locator": "docs/ownership.md:15"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:owners#c:0001",
+        "locator": "docs/ownership.md:15",
+        "confidence": 0.89
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:owners#c:0001",
+        "locator": "docs/ownership.md:15",
+        "excerpt": "Owner approves staged rollout."
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "use": ["keyword"],
+        "fuse": "rrf",
+        "top_k": 1
+      },
+      "timings": {
+        "total_ms": 9,
+        "signal_ms": {
+          "keyword": 4,
+          "fusion": 2,
+          "citation": 3
+        }
+      },
+      "deterministic_stages": ["keyword", "fusion", "citation"]
+    }
+  },
+  "metadata": {
+    "id": "edge-ask-min-evidence-bounds",
+    "type": "edge",
+    "behavior_family": "ask",
+    "description": "Ask respects minimum evidence bounds while returning grounded output.",
+    "expected_result": "pass"
+  }
+}

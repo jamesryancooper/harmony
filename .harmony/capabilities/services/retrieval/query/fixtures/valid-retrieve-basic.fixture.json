@@ -1,0 +1,78 @@
+{
+  "input": {
+    "command": "retrieve",
+    "query": "feature flag rollout gates",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "top_k": 5
+    },
+    "evidence": {
+      "max_excerpts": 3,
+      "max_chars_per_excerpt": 240
+    }
+  },
+  "expected_output": {
+    "run": {
+      "run_id": "run-retrieve-valid-001",
+      "service_version": "0.1.0",
+      "snapshot_id": "indexes/test-snapshot"
+    },
+    "status": "success",
+    "candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "doc:flags#c:0001",
+        "doc_id": "doc:flags",
+        "score": 1.23,
+        "signals": {
+          "keyword": 1.1,
+          "graph": 0.4
+        },
+        "source_locator": "docs/flags.md:42"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:flags#c:0001",
+        "locator": "docs/flags.md:42",
+        "confidence": 0.93
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:flags#c:0001",
+        "locator": "docs/flags.md:42",
+        "excerpt": "Rollout gates require owner approval and staged exposure."
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "use": ["keyword", "graph"],
+        "fuse": "rrf",
+        "top_k": 5
+      },
+      "timings": {
+        "total_ms": 12,
+        "signal_ms": {
+          "keyword": 4,
+          "graph": 3,
+          "fusion": 2,
+          "citation": 3
+        }
+      },
+      "deterministic_stages": ["keyword", "graph", "fusion", "citation"]
+    }
+  },
+  "metadata": {
+    "id": "valid-retrieve-basic",
+    "type": "positive",
+    "behavior_family": "retrieve",
+    "description": "Retrieve returns ranked candidates with citations and evidence.",
+    "expected_result": "pass"
+  }
+}

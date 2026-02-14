@@ -1,0 +1,49 @@
+{
+  "input": {
+    "command": "retrieve",
+    "query": "flag owner escalation path",
+    "index": {
+      "snapshot": "indexes/test-snapshot-missing-keyword"
+    },
+    "strategy": {
+      "use": ["keyword"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "top_k": 5
+    }
+  },
+  "expected_output": {
+    "run": {
+      "run_id": "run-retrieve-invalid-001",
+      "service_version": "0.1.0",
+      "snapshot_id": "indexes/test-snapshot-missing-keyword"
+    },
+    "status": "error",
+    "candidates": [],
+    "citations": [],
+    "evidence": [],
+    "diagnostics": {
+      "strategy": {
+        "use": ["keyword"],
+        "fuse": "rrf",
+        "top_k": 5
+      },
+      "timings": {
+        "total_ms": 2
+      },
+      "deterministic_stages": [],
+      "warnings": ["Required keyword artifact is missing."]
+    },
+    "error": {
+      "code": "MissingSignalArtifactError",
+      "message": "Required keyword artifact not found for snapshot."
+    }
+  },
+  "metadata": {
+    "id": "invalid-retrieve-required-signal-artifact-missing",
+    "type": "negative",
+    "behavior_family": "retrieve",
+    "description": "Retrieve fails closed when required keyword artifact is missing.",
+    "expected_result": "fail"
+  }
+}

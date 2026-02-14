@@ -53,6 +53,27 @@ commands:
     access: human
     argument_hint: "[--mode all|services-core|platform-core|adapters|conformance|degradation]"
 
+  - id: query-ask
+    display_name: Query Ask
+    path: query-ask.md
+    summary: Run query service in ask mode and return grounded answer output.
+    access: human
+    argument_hint: "--file <path-to-query-json>"
+
+  - id: query-retrieve
+    display_name: Query Retrieve
+    path: query-retrieve.md
+    summary: Run query service in retrieve mode and return ranked candidates.
+    access: human
+    argument_hint: "--file <path-to-query-json>"
+
+  - id: query-explain
+    display_name: Query Explain
+    path: query-explain.md
+    summary: Run query service in explain mode and return ranking rationale.
+    access: human
+    argument_hint: "--file <path-to-query-json>"
+
   - id: create-workflow
     display_name: Create Workflow
     path: create-workflow.md

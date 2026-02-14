@@ -1,0 +1,76 @@
+{
+  "input": {
+    "command": "explain",
+    "query": "Why is doc:flags#c:0001 ranked first?",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "top_k": 5
+    }
+  },
+  "expected_output": {
+    "run": {
+      "run_id": "run-explain-valid-001",
+      "service_version": "0.1.0",
+      "snapshot_id": "indexes/test-snapshot"
+    },
+    "status": "success",
+    "candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "doc:flags#c:0001",
+        "doc_id": "doc:flags",
+        "score": 1.17,
+        "signals": {
+          "keyword": 0.9,
+          "graph": 0.27
+        },
+        "source_locator": "docs/flags.md:42"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:flags#c:0001",
+        "locator": "docs/flags.md:42",
+        "confidence": 0.9,
+        "claim": "Highest rank due to direct keyword overlap and graph proximity."
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:flags#c:0001",
+        "locator": "docs/flags.md:42",
+        "excerpt": "Rollout gates require owner approval before staged enablement."
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "use": ["keyword", "graph"],
+        "fuse": "rrf",
+        "top_k": 5
+      },
+      "timings": {
+        "total_ms": 11,
+        "signal_ms": {
+          "keyword": 4,
+          "graph": 2,
+          "fusion": 2,
+          "citation": 3
+        }
+      },
+      "deterministic_stages": ["keyword", "graph", "fusion", "citation"],
+      "warnings": []
+    }
+  },
+  "metadata": {
+    "id": "valid-explain-basic",
+    "type": "positive",
+    "behavior_family": "explain",
+    "description": "Explain returns score rationale artifacts without answer synthesis.",
+    "expected_result": "pass"
+  }
+}

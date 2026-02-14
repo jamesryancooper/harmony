@@ -1,0 +1,35 @@
+{
+  "input": {
+    "command": "retrieve",
+    "query": "governance posture escalation pathways",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "route": "hierarchical",
+      "top_k": 5
+    }
+  },
+  "expected_output": {
+    "status": "error",
+    "error": {
+      "code": "InputValidationError"
+    },
+    "diagnostics": {
+      "strategy": {
+        "route": "hierarchical"
+      },
+      "route_applied": false
+    }
+  },
+  "metadata": {
+    "id": "invalid-retrieve-route-requires-graph",
+    "type": "negative",
+    "behavior_family": "retrieve",
+    "description": "Advanced routes are invalid unless graph signal is enabled.",
+    "expected_result": "pass"
+  }
+}

@@ -1,0 +1,12 @@
+schema_version: "1.0"
+
+adapters:
+  - id: local-faiss
+    provider: FAISS
+    path: local-faiss/
+    status: draft
+    adapter_version: "0.1.0"
+    adapter_schema_version: "1.0.0"
+    interop_contract_version: "1.0.0"
+    aliases: [faiss]
+    capabilities_profile: local-faiss/fixtures/capabilities.json

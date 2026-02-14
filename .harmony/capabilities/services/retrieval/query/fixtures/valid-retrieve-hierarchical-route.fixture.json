@@ -1,0 +1,52 @@
+{
+  "input": {
+    "command": "retrieve",
+    "query": "governance posture escalation pathways",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "route": "hierarchical",
+      "top_k": 6
+    },
+    "evidence": {
+      "max_excerpts": 3,
+      "max_chars_per_excerpt": 220
+    }
+  },
+  "expected_output": {
+    "status": "success",
+    "candidates": [
+      {
+        "chunk_id": "doc:owners#c:0002"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:owners#c:0002"
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:owners#c:0002"
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "route": "hierarchical"
+      },
+      "route_applied": true,
+      "deterministic_stages": ["keyword", "graph", "fusion", "citation"]
+    }
+  },
+  "metadata": {
+    "id": "valid-retrieve-hierarchical-route",
+    "type": "positive",
+    "behavior_family": "retrieve",
+    "description": "Hierarchical route produces ranked candidates and citations.",
+    "expected_result": "pass"
+  }
+}

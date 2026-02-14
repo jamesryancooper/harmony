@@ -1,0 +1,47 @@
+version: "1.0.0"
+errors:
+  - code: InputValidationError
+    category: structural
+    exit_code: 5
+    retryable: false
+    operator_action: "Fix request payload to match schema/input.schema.json."
+  - code: UnsupportedCommandError
+    category: structural
+    exit_code: 5
+    retryable: false
+    operator_action: "Use one of ask, retrieve, or explain."
+  - code: UnsupportedSignalError
+    category: structural
+    exit_code: 5
+    retryable: false
+    operator_action: "Use only keyword, semantic, and graph signals."
+  - code: SnapshotNotFoundError
+    category: dependency
+    exit_code: 6
+    retryable: false
+    operator_action: "Provide a valid index snapshot path."
+  - code: MissingSignalArtifactError
+    category: dependency
+    exit_code: 6
+    retryable: false
+    operator_action: "Add missing artifacts for enabled required signals."
+  - code: SemanticScoringUnavailableError
+    category: dependency
+    exit_code: 6
+    retryable: true
+    operator_action: "Retry with semantic disabled or restore semantic scoring capability."
+  - code: CitationAssemblyError
+    category: semantic
+    exit_code: 4
+    retryable: true
+    operator_action: "Inspect chunk metadata and locator joins for malformed records."
+  - code: NativeInvariantViolation
+    category: policy
+    exit_code: 4
+    retryable: false
+    operator_action: "Remove non-native contract fields and restore core service invariants."
+  - code: ProviderTermLeakError
+    category: policy
+    exit_code: 4
+    retryable: false
+    operator_action: "Move provider-specific terms to adapter-only paths."

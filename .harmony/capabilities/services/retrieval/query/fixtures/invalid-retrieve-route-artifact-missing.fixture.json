@@ -1,0 +1,35 @@
+{
+  "input": {
+    "command": "retrieve",
+    "query": "authority gates and staged release controls",
+    "index": {
+      "snapshot": "indexes/test-snapshot-no-graph"
+    },
+    "strategy": {
+      "use": ["keyword", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "route": "graph_global",
+      "top_k": 5
+    }
+  },
+  "expected_output": {
+    "status": "error",
+    "error": {
+      "code": "MissingSignalArtifactError"
+    },
+    "diagnostics": {
+      "strategy": {
+        "route": "graph_global"
+      },
+      "route_applied": false
+    }
+  },
+  "metadata": {
+    "id": "invalid-retrieve-route-artifact-missing",
+    "type": "negative",
+    "behavior_family": "retrieve",
+    "description": "Advanced route requests fail closed when route-required artifacts are missing.",
+    "expected_result": "pass"
+  }
+}

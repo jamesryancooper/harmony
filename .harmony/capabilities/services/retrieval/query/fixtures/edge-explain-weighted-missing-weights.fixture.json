@@ -1,0 +1,75 @@
+{
+  "input": {
+    "command": "explain",
+    "query": "Explain weighted fusion for rollout policy query.",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "weighted",
+      "top_k": 5
+    }
+  },
+  "expected_output": {
+    "run": {
+      "run_id": "run-explain-edge-001",
+      "service_version": "0.1.0",
+      "snapshot_id": "indexes/test-snapshot"
+    },
+    "status": "partial",
+    "candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "doc:flags#c:0001",
+        "doc_id": "doc:flags",
+        "score": 0.97,
+        "signals": {
+          "keyword": 0.83,
+          "graph": 0.14
+        },
+        "source_locator": "docs/flags.md:42"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:flags#c:0001",
+        "locator": "docs/flags.md:42",
+        "confidence": 0.88
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:flags#c:0001",
+        "locator": "docs/flags.md:42",
+        "excerpt": "Weighted fusion defaults to equal weights when none are provided."
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "use": ["keyword", "graph"],
+        "fuse": "weighted",
+        "top_k": 5
+      },
+      "timings": {
+        "total_ms": 12,
+        "signal_ms": {
+          "keyword": 4,
+          "graph": 2,
+          "fusion": 3,
+          "citation": 3
+        }
+      },
+      "deterministic_stages": ["keyword", "graph", "fusion", "citation"],
+      "warnings": ["weights not provided for weighted fusion; using equal defaults."]
+    }
+  },
+  "metadata": {
+    "id": "edge-explain-weighted-missing-weights",
+    "type": "edge",
+    "behavior_family": "explain",
+    "description": "Explain reports weighted-fusion defaults when weights are omitted.",
+    "expected_result": "pass"
+  }
+}

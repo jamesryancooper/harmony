@@ -1,0 +1,57 @@
+{
+  "input": {
+    "command": "retrieve",
+    "query": "rollout gates migration policy",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "route": "flat",
+      "top_k": 5
+    },
+    "memory": {
+      "enabled": true,
+      "max_clues": 3
+    },
+    "evidence": {
+      "max_excerpts": 3,
+      "max_chars_per_excerpt": 220
+    }
+  },
+  "expected_output": {
+    "status": "success",
+    "candidates": [
+      {
+        "chunk_id": "doc:migration#c:0001"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:migration#c:0001"
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:migration#c:0001"
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "route": "flat"
+      },
+      "route_applied": true,
+      "deterministic_stages": ["keyword", "fusion", "citation"],
+      "memory_clues": ["rollout", "gates", "migration"]
+    }
+  },
+  "metadata": {
+    "id": "edge-retrieve-memory-clues-enabled",
+    "type": "edge",
+    "behavior_family": "retrieve",
+    "description": "Memory clue extraction augments retrieval query with deterministic clue terms.",
+    "expected_result": "pass"
+  }
+}

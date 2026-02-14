@@ -165,3 +165,44 @@ services:
       key_from: [sessionId, policyId, budgetSnapshotHash]
     impl:
       entrypoint: interfaces/agent-platform/impl/context-budget.sh
+
+  query:
+    version: "0.1.0"
+    commands: [ask, retrieve, explain]
+    parameters:
+      - name: command
+        type: text
+        required: true
+        description: "Operation mode: ask, retrieve, or explain."
+      - name: query
+        type: text
+        required: true
+        description: "Natural-language query text."
+      - name: index.snapshot
+        type: text
+        required: true
+        description: "Snapshot path or ID containing keyword/graph/chunk artifacts."
+    dependencies:
+      requires: []
+      orchestrates: []
+      integratesWith: [index]
+    contracts:
+      input: retrieval/query/schema/input.schema.json
+      output: retrieval/query/schema/output.schema.json
+      rules: retrieval/query/rules/rules.yml
+      fixtures: retrieval/query/fixtures/
+      invariants: retrieval/query/contracts/invariants.md
+      errors: retrieval/query/contracts/errors.yml
+      compatibility: retrieval/query/compatibility.yml
+      generation_manifest: retrieval/query/impl/generated.manifest.json
+    observability:
+      service_name: harmony.service.query
+      required_spans: [service.query.ask, service.query.retrieve, service.query.explain]
+    policy:
+      enforcement: block
+      fail_closed: true
+    idempotency:
+      required: false
+      key_from: [queryHash, snapshotId, strategyHash]
+    impl:
+      entrypoint: retrieval/query/impl/query.sh

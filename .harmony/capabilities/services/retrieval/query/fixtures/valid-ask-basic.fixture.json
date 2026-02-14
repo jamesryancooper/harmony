@@ -1,0 +1,81 @@
+{
+  "input": {
+    "command": "ask",
+    "query": "Where are rollout gates defined?",
+    "index": {
+      "snapshot": "indexes/test-snapshot"
+    },
+    "strategy": {
+      "use": ["keyword", "semantic", "graph"],
+      "required_signals": ["keyword"],
+      "fuse": "rrf",
+      "top_k": 8
+    },
+    "evidence": {
+      "max_excerpts": 4,
+      "max_chars_per_excerpt": 320
+    }
+  },
+  "expected_output": {
+    "run": {
+      "run_id": "run-ask-valid-001",
+      "service_version": "0.1.0",
+      "snapshot_id": "indexes/test-snapshot"
+    },
+    "status": "success",
+    "answer": "Rollout gates are defined in docs/flags.md and require owner approval before staged exposure.",
+    "candidates": [
+      {
+        "rank": 1,
+        "chunk_id": "doc:flags#c:0001",
+        "doc_id": "doc:flags",
+        "score": 1.45,
+        "signals": {
+          "keyword": 1.0,
+          "semantic": 0.85,
+          "graph": 0.35
+        },
+        "source_locator": "docs/flags.md:42"
+      }
+    ],
+    "citations": [
+      {
+        "chunk_id": "doc:flags#c:0001",
+        "locator": "docs/flags.md:42",
+        "confidence": 0.95
+      }
+    ],
+    "evidence": [
+      {
+        "chunk_id": "doc:flags#c:0001",
+        "locator": "docs/flags.md:42",
+        "excerpt": "Owner approval is mandatory before enabling staged rollout."
+      }
+    ],
+    "diagnostics": {
+      "strategy": {
+        "use": ["keyword", "semantic", "graph"],
+        "fuse": "rrf",
+        "top_k": 8
+      },
+      "timings": {
+        "total_ms": 38,
+        "signal_ms": {
+          "keyword": 5,
+          "semantic": 24,
+          "graph": 4,
+          "fusion": 2,
+          "citation": 3
+        }
+      },
+      "deterministic_stages": ["keyword", "graph", "fusion", "citation"]
+    }
+  },
+  "metadata": {
+    "id": "valid-ask-basic",
+    "type": "positive",
+    "behavior_family": "ask",
+    "description": "Ask produces an answer with citations and evidence.",
+    "expected_result": "pass"
+  }
+}
