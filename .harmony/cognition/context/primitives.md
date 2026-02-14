@@ -230,6 +230,7 @@ See `.harmony/capabilities/skills/_scaffold/template/SKILL.md`
 
 ### Examples
 
+- `/init` → generate project-level bootstrap files from `.harmony` templates (optional `--with-boot-files`)
 - `/refactor` → delegates to `.harmony/orchestration/workflows/refactor/`
 - `/recover` → error recovery procedures
 - `/validate-frontmatter` → check markdown metadata

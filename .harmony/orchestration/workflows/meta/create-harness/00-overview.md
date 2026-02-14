@@ -42,6 +42,8 @@ Parent directory where `.harmony/` will be created.
 6. [Customize](./06-customize.md)
 7. [Verify](./07-verify.md)
 
+After workflow completion, run `/init` in the target repo root to generate project-level bootstrap files (`AGENTS.md`, `CLAUDE.md` alias). Add `--with-boot-files` when BOOT compatibility files are required.
+
 ## Version History
 
 | Version | Date | Changes |

@@ -113,6 +113,7 @@ Execute `.harmony/capabilities/commands/validate-frontmatter.md` in the target d
 
 | Command | Purpose | Why It's a Command (Not a Prompt) |
 |---------|---------|-----------------------------------|
+| `init.md` | Initialize project bootstrap files | Deterministic generation from templates + manifest values |
 | `validate-frontmatter.md` | Check YAML frontmatter | Deterministic validation rules |
 | `recover.md` | Recovery procedures | Fixed steps for known error types |
 | `format-for-publication.md` | Apply formatting | Consistent rules, no judgment |

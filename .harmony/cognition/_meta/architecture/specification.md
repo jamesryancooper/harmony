@@ -146,6 +146,26 @@ Expands in:
 - [Documentation is Code](/.harmony/cognition/principles/documentation-is-code.md)
 - [Contract-first](/.harmony/cognition/principles/contract-first.md)
 
+### HARMONY-SPEC-011: Project Bootstrap Initialization
+
+After a harness is introduced into a repository, project-level bootstrap artifacts MUST be initialized via `/init` (or script equivalent) using scaffolding templates.
+
+Minimum bootstrap outputs:
+
+- `AGENTS.md` rendered from `.harmony/scaffolding/templates/AGENTS.md`
+- `CLAUDE.md` alias to `AGENTS.md` when safe and non-destructive
+
+Optional compatibility outputs (when explicitly requested):
+
+- `BOOT.md` rendered from `.harmony/scaffolding/templates/BOOT.md`
+- `BOOTSTRAP.md` rendered from `.harmony/scaffolding/templates/BOOTSTRAP.md`
+
+Expands in:
+
+- [Init Command](/.harmony/capabilities/commands/init.md)
+- [Init Script](/.harmony/scaffolding/_ops/scripts/init-project.sh)
+- [Templates Architecture](/.harmony/scaffolding/_meta/architecture/templates.md)
+
 ### HARMONY-SPEC-101: Agency Contract Boundary
 
 `/.harmony/agency/**` MUST define actor taxonomy, invocation model, and delegation boundaries as an explicit contract.

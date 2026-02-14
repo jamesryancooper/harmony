@@ -94,6 +94,7 @@ Atomic operations in `capabilities/commands/`:
 
 | Command | Access | Description |
 |---------|--------|-------------|
+| [init.md](./capabilities/commands/init.md) | human | Initialize project-level bootstrap files (`AGENTS.md`, `CLAUDE.md` alias, optional `BOOT*.md`) |
 | [recover.md](./capabilities/commands/recover.md) | human | Recovery procedures for common agent failure modes |
 | [validate-frontmatter.md](./capabilities/commands/validate-frontmatter.md) | human | Validate YAML frontmatter in markdown files |
 | [create-workflow.md](./capabilities/commands/create-workflow.md) | human | Scaffold a new workflow with gap-aware structure |
@@ -385,6 +386,9 @@ Boilerplate in `scaffolding/templates/`:
 
 | Template | Description |
 |----------|-------------|
+| [AGENTS.md](./scaffolding/templates/AGENTS.md) | Template for project-level `AGENTS.md` bootstrap |
+| [BOOT.md](./scaffolding/templates/BOOT.md) | Optional recurring startup checklist template |
+| [BOOTSTRAP.md](./scaffolding/templates/BOOTSTRAP.md) | Optional one-time bootstrap checklist template |
 | [cursor-command.md](./scaffolding/templates/cursor-command.md) | Template for Cursor command wrappers |
 | [document.md](./scaffolding/templates/document.md) | Template for general documents |
 | [harmony/](./scaffolding/templates/harmony/) | Base .harmony/ template (all harnesses inherit from this) |
@@ -401,9 +405,10 @@ Each harness template contains:
 
 | Script | Description |
 |--------|-------------|
+| [scaffolding/_ops/scripts/init-project.sh](./scaffolding/_ops/scripts/init-project.sh) | Project bootstrap generator for `AGENTS.md`, `CLAUDE.md` alias, and optional `BOOT*.md` files |
 | [init.sh](./init.sh) | Health check: verifies required files/directories exist |
 
-**Usage:** Run `./init.sh` from the `.harmony/` directory to verify structure integrity.
+**Usage:** Run `.harmony/scaffolding/_ops/scripts/init-project.sh` from repo root (or use `/init`) for project bootstrap. Add `--with-boot-files` to generate `BOOT.md` and `BOOTSTRAP.md`. Run `.harmony/init.sh` from `.harmony/` for harness health checks.
 
 ---
 

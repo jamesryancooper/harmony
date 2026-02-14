@@ -21,6 +21,7 @@
       ],
       "standard": [
         "scaffolding/templates",
+        "scaffolding/_ops/scripts",
         "scaffolding/examples",
         "agency/agents",
         "agency/assistants",
@@ -61,6 +62,10 @@
     "cognition/context/compaction.md": "Token compaction strategies",
     "cognition/context/tools.md": "Available tools reference",
     "scaffolding/templates/README.md": "Placeholder for templates",
+    "scaffolding/templates/AGENTS.md": "Template for project-level AGENTS.md bootstrap file",
+    "scaffolding/templates/BOOT.md": "Template for recurring startup checklist compatibility",
+    "scaffolding/templates/BOOTSTRAP.md": "Template for one-time bootstrap checklist compatibility",
+    "scaffolding/_ops/scripts/init-project.sh": "Initialize project-level bootstrap files from .harmony templates",
     "scaffolding/examples/README.md": "Placeholder for examples",
     "agency/assistants/registry.yml": "Assistant @mention mappings",
     "agency/assistants/README.md": "How to use and create assistants",

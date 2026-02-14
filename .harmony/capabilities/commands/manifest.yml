@@ -13,6 +13,13 @@
 schema_version: "1.0"
 
 commands:
+  - id: init
+    display_name: Initialize Project
+    path: init.md
+    summary: Generate project-level bootstrap files from .harmony templates.
+    access: human
+    argument_hint: "[@project-root] [--force] [--no-claude-alias] [--with-boot-files]"
+
   - id: recover
     display_name: Recover from Errors
     path: recover.md

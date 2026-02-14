@@ -20,6 +20,9 @@ Templates, prompts, and examples for generating new content.
 
 | Template | Inherits | Purpose |
 |----------|----------|---------|
+| `AGENTS.md` | — | Project-level agent bootstrap template rendered by `/init` |
+| `BOOT.md` | — | Optional recurring startup checklist template (`/init --with-boot-files`) |
+| `BOOTSTRAP.md` | — | Optional one-time bootstrap checklist template (`/init --with-boot-files`) |
 | `harmony/` | — | Base harness template |
 | `harmony-docs/` | `harmony/` | Documentation area harness |
 | `harmony-node-ts/` | `harmony/` | Node.js / TypeScript harness |

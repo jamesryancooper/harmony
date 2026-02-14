@@ -144,7 +144,7 @@ Harness command directories symlink to `.harmony/capabilities/commands/` for sha
 
 **Note:** Codex CLI does not support project-level custom commands. Codex users have two options:
 1. Manually copy commands from `.harmony/capabilities/commands/` to `~/.codex/prompts/`
-2. Invoke the workflow directly: "Execute `.harmony/orchestration/workflows/quality-gate/refactor(x)/00-overview.md`"
+2. Run script implementations directly (for example: `.harmony/scaffolding/_ops/scripts/init-project.sh`)
 
 ## Adopting in Other Repos
 
@@ -156,11 +156,16 @@ To use this harness infrastructure in another repository:
 # 1. Copy .harmony/ to your repo
 cp -r /path/to/harmony/.harmony /path/to/your-repo/
 
-# 2. Create a root harness from template
-cp -r .harmony/scaffolding/templates/harmony .harmony
+# 2. Initialize project-level bootstrap files (AGENTS.md + CLAUDE.md alias)
+.harmony/scaffolding/_ops/scripts/init-project.sh
+
+# Optional: also generate BOOT compatibility files
+.harmony/scaffolding/_ops/scripts/init-project.sh --with-boot-files
 
 # 3. Customize .harmony/scope.md and .harmony/conventions.md
 ```
+
+If your tool supports harness commands, run `/init` instead of invoking the script directly. Use `/init --with-boot-files` when `BOOT.md` and `BOOTSTRAP.md` compatibility files are needed.
 
 ### What's Included
 

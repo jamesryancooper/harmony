@@ -11,6 +11,9 @@ Templates are **boilerplate files** stored in `.harmony/scaffolding/templates/`.
 
 ```text
 .harmony/scaffolding/templates/
+├── BOOT.md                 # Optional recurring startup checklist template
+├── BOOTSTRAP.md            # Optional one-time bootstrap checklist template
+├── AGENTS.md               # Template for project-level AGENTS.md bootstrap
 ├── cursor-command.md       # Template for Cursor commands
 ├── document.md             # Template for new documents
 ├── harmony/                # Base .harmony/ template
@@ -25,6 +28,11 @@ Templates are **boilerplate files** stored in `.harmony/scaffolding/templates/`.
 │   ├── continuity/
 │   ├── quality/
 │   ├── scaffolding/templates/
+│   │   ├── AGENTS.md       # Included AGENTS bootstrap template
+│   │   ├── BOOT.md         # Included optional BOOT template
+│   │   └── BOOTSTRAP.md    # Included optional BOOTSTRAP template
+│   ├── scaffolding/_ops/scripts/
+│   │   └── init-project.sh # Project bootstrap generator
 │   └── scaffolding/examples/
 ├── harmony-docs/           # Scoped template for documentation areas
 │   ├── MANIFEST.md         # Inheritance metadata
@@ -114,6 +122,8 @@ See each template's `MANIFEST.md` for human-readable details or `manifest.json` 
 | Situation | Use Templates |
 |-----------|---------------|
 | Creating new harnesses | ✅ Yes |
+| Initializing project-level agent bootstrap files | ✅ Yes (`templates/AGENTS.md` via `/init`) |
+| Initializing optional BOOT compatibility files | ✅ Optional (`templates/BOOT.md`, `templates/BOOTSTRAP.md` via `/init --with-boot-files`) |
 | Adding new documents of a standard type | ✅ Yes |
 | One-off content creation | ❌ No (write directly) |
 | Content with no standard structure | ❌ No |
