@@ -359,7 +359,7 @@ std::fs::write(&service_json, serde_json::to_vec_pretty(&v)?)?;
 
 ```bash
 # scaffold a new service
-.harmony/runtime/run service new agent-platform kv --summary "Local key/value storage"
+.harmony/runtime/run service new interfaces kv
 
 # implement ops + update schemas
 # edit service.json ops/schemas + rust/src/lib.rs

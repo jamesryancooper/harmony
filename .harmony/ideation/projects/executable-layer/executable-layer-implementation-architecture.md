@@ -20,8 +20,8 @@ Below is the **implementation architecture** for a portable, stack-agnostic, OS-
     run                 # POSIX sh launcher
     run.cmd             # Windows launcher
     bin/
-      harmony-darwin-arm64
-      harmony-darwin-x64
+      harmony-macos-arm64
+      harmony-macos-x64
       harmony-linux-arm64
       harmony-linux-x64
       harmony-windows-x64.exe
@@ -33,13 +33,14 @@ Below is the **implementation architecture** for a portable, stack-agnostic, OS-
     services/
       manifest.yml       # discovery tier 1 (lightweight index)
       registry.yml       # discovery tier 2 (extended metadata)
-      agent-platform/
+      interfaces/
         kv/
           service.wasm
           service.json
-        policy/
-          service.wasm
-          service.json
+        agent-platform/
+          policy/
+            service.wasm
+            service.json
       retrieval/
         search/
           service.wasm

@@ -61,8 +61,24 @@ Status: **Implemented with a known limitation**.
 
 ## Service tier metadata YAML
 
-- Example `manifest.yml` and `registry.yml` are present under `.harmony/capabilities/services/`.
-- The runtime loader does **not** require or enforce these files.
+- Runtime tier files are now implemented at:
+  - `.harmony/capabilities/services/manifest.runtime.yml`
+  - `.harmony/capabilities/services/registry.runtime.yml`
+- `harmony validate` enforces:
+  - `format_version` values (`services-manifest-v1`, `services-registry-v1`)
+  - ID consistency between Tier 1 and Tier 2
+  - `runtime.path` safety/shape checks
+  - alignment with discovered `service.json` entries
 
-Status: **Deferred for runtime enforcement** (treated as harness metadata in v1).
+Status: **Implemented (validation-time enforcement)**.
 
+## Cross-platform prebuilt binaries
+
+- Prebuilt runtime execution currently ships:
+  - `.harmony/runtime/bin/harmony-macos-arm64`
+- `.harmony/runtime/bin/harmony-macos-x64`
+- Linux/Windows prebuilt artifacts are not checked in from this environment.
+- Linux cross-build failed due missing cross C toolchain (`x86_64-linux-gnu-gcc`) for transitive native dependencies.
+- Launchers still support source fallback (`cargo run`) when a platform binary is absent.
+
+Status: **Partially implemented**.

@@ -138,7 +138,7 @@ world harmony-service {
       size: u64,
       modified-ms: option<u64>,
     }
-    stat: func(path: string) -> option<stat>;
+    get-stat: func(path: string) -> option<stat>;
   }
 
   /// Generic op dispatcher.

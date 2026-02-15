@@ -233,7 +233,7 @@ format_version: services-manifest-v1
 services:
   - id: interfaces/kv
     name: kv
-    category: agent-platform
+    category: interfaces
     summary: Local key/value storage.
     triggers:
       - "state"

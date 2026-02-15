@@ -12,4 +12,5 @@ pub mod policy;
 pub mod registry;
 pub mod root;
 pub mod schema;
+pub mod tiers;
 pub mod trace;

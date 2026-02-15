@@ -77,6 +77,8 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/capabilities/commands/manifest.yml"
   require_file "$HARMONY_DIR/capabilities/skills/manifest.yml"
   require_file "$HARMONY_DIR/capabilities/services/manifest.yml"
+  require_file "$HARMONY_DIR/capabilities/services/manifest.runtime.yml"
+  require_file "$HARMONY_DIR/capabilities/services/registry.runtime.yml"
   require_file "$HARMONY_DIR/capabilities/tools/manifest.yml"
 
   require_file "$HARMONY_DIR/orchestration/workflows/manifest.yml"

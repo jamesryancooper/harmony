@@ -12,6 +12,8 @@ Production services in this harness are self-contained and must not require or r
 |---|---|
 | `manifest.yml` | Service discovery index |
 | `registry.yml` | Extended service metadata |
+| `manifest.runtime.yml` | Executable runtime Tier 1 discovery index (`services-manifest-v1`) |
+| `registry.runtime.yml` | Executable runtime Tier 2 metadata (`services-registry-v1`) |
 | `capabilities.yml` | Service capability schema and constraints |
 | `conventions/` | Harness-wide cross-cutting contracts (errors, run records, observability, idempotency, rich contracts, declarative rules, fixtures, validation tiers, implementation generation) |
 | `conventions/rich-contracts.md` | Rich contract completeness and compatibility profile requirements |
@@ -44,4 +46,5 @@ Skills may whitelist services with:
 allowed-services: guard cost
 ```
 
-Service IDs resolve against `services/manifest.yml`.
+Service IDs resolve against `services/manifest.yml` for the harness-native catalog.
+Executable-runtime IDs resolve against `services/manifest.runtime.yml`.

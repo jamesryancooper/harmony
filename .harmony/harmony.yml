@@ -28,6 +28,8 @@ portable:
   - capabilities/commands/
   - capabilities/services/manifest.yml
   - capabilities/services/registry.yml
+  - capabilities/services/manifest.runtime.yml
+  - capabilities/services/registry.runtime.yml
   - capabilities/services/interfaces/kv/
   - orchestration/workflows/
   - runtime/
