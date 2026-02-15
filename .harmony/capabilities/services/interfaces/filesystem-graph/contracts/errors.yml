@@ -1,0 +1,16 @@
+errors:
+  - code: ERR_FILESYSTEM_GRAPH_INPUT_INVALID
+    message: Input payload failed validation.
+    category: validation
+  - code: ERR_FILESYSTEM_GRAPH_PATH_INVALID
+    message: Path is invalid or outside allowed workspace scope.
+    category: policy
+  - code: ERR_FILESYSTEM_GRAPH_NOT_FOUND
+    message: Requested file, node, or snapshot was not found.
+    category: not-found
+  - code: ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID
+    message: Snapshot artifacts are missing or malformed.
+    category: integrity
+  - code: ERR_FILESYSTEM_GRAPH_OPERATION_UNSUPPORTED
+    message: Operation is not supported by the service contract.
+    category: validation

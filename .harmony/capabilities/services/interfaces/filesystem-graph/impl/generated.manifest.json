@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-02-15T00:00:00Z",
+  "service": "filesystem-graph",
+  "scripts": [
+    "impl/filesystem-graph.sh",
+    "impl/snapshot-build.sh",
+    "impl/snapshot-diff.sh"
+  ],
+  "notes": "Generated manifest placeholder for contract-first phase execution."
+}

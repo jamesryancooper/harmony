@@ -1,0 +1,13 @@
+rules:
+  - id: native-first-required
+    description: Core behavior must run with no external adapter.
+    severity: critical
+  - id: files-source-of-truth
+    description: Filesystem remains canonical source; graph is derived.
+    severity: critical
+  - id: fail-closed-invalid-snapshot
+    description: Missing or invalid snapshot state must block graph operations.
+    severity: critical
+  - id: provenance-required
+    description: Graph results must include snapshot and source references.
+    severity: high

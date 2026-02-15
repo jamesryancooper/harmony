@@ -60,3 +60,13 @@ services:
     tags: [retrieval, hybrid, citations, evidence]
     category: retrieval
     stateful: false
+
+  - id: filesystem-graph
+    display_name: Filesystem Graph
+    path: interfaces/filesystem-graph/
+    summary: "Filesystem operations, deterministic snapshots, derived graph traversal, and progressive discovery."
+    status: active
+    interface_type: shell
+    tags: [filesystem, graph, discovery, snapshots, provenance]
+    category: interfaces
+    stateful: true

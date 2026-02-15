@@ -206,3 +206,67 @@ services:
       key_from: [queryHash, snapshotId, strategyHash]
     impl:
       entrypoint: retrieval/query/impl/query.sh
+
+  filesystem-graph:
+    version: "0.1.0"
+    commands:
+      [
+        fs.list,
+        fs.read,
+        fs.stat,
+        fs.search,
+        snapshot.build,
+        snapshot.diff,
+        snapshot.get-current,
+        kg.get-node,
+        kg.neighbors,
+        kg.traverse,
+        kg.resolve-to-file,
+        discover.start,
+        discover.expand,
+        discover.explain,
+        discover.resolve
+      ]
+    parameters:
+      - name: command
+        type: text
+        required: true
+        description: "Filesystem-graph operation command."
+      - name: snapshot_id
+        type: text
+        required: false
+        description: "Optional snapshot id (defaults to active snapshot pointer)."
+      - name: payload
+        type: object
+        required: true
+        description: "Operation payload."
+    dependencies:
+      requires: []
+      orchestrates: []
+      integratesWith: [query, agent-platform]
+    contracts:
+      input: interfaces/filesystem-graph/schema/input.schema.json
+      output: interfaces/filesystem-graph/schema/output.schema.json
+      rules: interfaces/filesystem-graph/rules/rules.yml
+      fixtures: interfaces/filesystem-graph/fixtures/
+      invariants: interfaces/filesystem-graph/contracts/invariants.md
+      errors: interfaces/filesystem-graph/contracts/errors.yml
+      compatibility: interfaces/filesystem-graph/compatibility.yml
+      generation_manifest: interfaces/filesystem-graph/impl/generated.manifest.json
+    observability:
+      service_name: harmony.service.filesystem-graph
+      required_spans:
+        [
+          service.filesystem-graph.fs,
+          service.filesystem-graph.snapshot,
+          service.filesystem-graph.kg,
+          service.filesystem-graph.discover
+        ]
+    policy:
+      enforcement: block
+      fail_closed: true
+    idempotency:
+      required: true
+      key_from: [command, snapshotId, payloadHash]
+    impl:
+      entrypoint: interfaces/filesystem-graph/impl/filesystem-graph.sh
