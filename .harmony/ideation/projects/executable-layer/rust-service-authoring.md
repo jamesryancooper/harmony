@@ -365,7 +365,7 @@ std::fs::write(&service_json, serde_json::to_vec_pretty(&v)?)?;
 # edit service.json ops/schemas + rust/src/lib.rs
 
 # build artifact + compute integrity hash
-.harmony/runtime/run service build agent-platform/kv
+.harmony/runtime/run service build interfaces/kv
 
 # validate all services
 .harmony/runtime/run validate

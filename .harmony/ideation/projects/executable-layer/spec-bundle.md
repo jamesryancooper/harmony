@@ -39,7 +39,7 @@ These files are intended to live under `.harmony/spec/` (or wherever you prefer)
   "format_version": "service-manifest-v1",
   "name": "kv",
   "version": "1.0.0",
-  "category": "agent-platform",
+  "category": "interfaces",
   "abi": "wasi-component@0.2",
   "entry": "service.wasm",
 
@@ -231,7 +231,7 @@ Create `.harmony/capabilities/services/manifest.yml`:
 ```yaml
 format_version: services-manifest-v1
 services:
-  - id: agent-platform/kv
+  - id: interfaces/kv
     name: kv
     category: agent-platform
     summary: Local key/value storage.
@@ -241,7 +241,7 @@ services:
       - "kv"
     runtime:
       type: wasm
-      path: agent-platform/kv/service.json
+      path: interfaces/kv/service.json
 
   - id: agent-platform/policy
     name: policy
@@ -273,7 +273,7 @@ Create `.harmony/capabilities/services/registry.yml`:
 ```yaml
 format_version: services-registry-v1
 services:
-  agent-platform/kv:
+  interfaces/kv:
     owner: agency/platform
     risk_tier: low
     approvals:
@@ -350,7 +350,7 @@ All subsequent messages MUST include `id` for request/response/event correlation
   "method": "tool.invoke",
   "params": {
     "service": "kv",
-    "category": "agent-platform",
+    "category": "interfaces",
     "op": "get",
     "input": { "key": "x" }
   },

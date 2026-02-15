@@ -50,7 +50,7 @@ Build the following, in this order:
 9. **CLI commands**: `info`, `services list`, `tool`, `validate`, `serve-stdio`, `service new`, `service build`
 10. **Bootstrap scripts**: `run` (POSIX sh) and `run.cmd` (Windows) at `.harmony/runtime/`
 11. **JSON Schema file** at `.harmony/spec/service-manifest-v1.schema.json`
-12. **Reference KV service** at `.harmony/capabilities/services/agent-platform/kv/` — fully buildable with `cargo component build`
+12. **Reference KV service** at `.harmony/capabilities/services/interfaces/kv/` — fully buildable with `cargo component build`
 
 ### What NOT to do
 

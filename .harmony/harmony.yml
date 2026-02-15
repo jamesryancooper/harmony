@@ -26,7 +26,12 @@ portable:
   - capabilities/skills/**/SKILL.md
   - capabilities/skills/**/references/
   - capabilities/commands/
+  - capabilities/services/manifest.yml
+  - capabilities/services/registry.yml
+  - capabilities/services/interfaces/kv/
   - orchestration/workflows/
+  - runtime/
+  - spec/
   - quality/
   - scaffolding/
   - cognition/context/primitives.md
