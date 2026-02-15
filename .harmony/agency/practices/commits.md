@@ -8,12 +8,24 @@
 
 ## Enforcement
 
-- Local: `.husky/commit-msg` runs commitlint on every commit message.
-- Run `pnpm install` after pulling changes so Husky installs local hooks.
-- CI: `.github/workflows/commit-and-branch-standards.yml` validates commit
-  messages for all commits in a pull request and checks branch naming.
-- Branch protection on `main`: require both `Commit and Branch Standards` and
-  `PR Quality Standards` checks before merge.
+This practice is tool-agnostic. Repositories can enforce it using any local
+and CI mechanism (native Git hooks, hook frameworks, custom scripts, or
+pipeline checks).
+
+For a message to pass enforcement, it must satisfy this contract:
+
+- Header format: `<type>(<scope>): <summary>`
+- Allowed types: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`,
+  `ci`, `revert`
+- `type` must be lowercase
+- `scope` is required and must be lowercase
+- `summary` is required, lowercase, and must not end with `.`
+- Header max length: 72 characters
+- Body line max length: 72 characters
+- Footer line max length: 72 characters
+
+Implementation detail: if a repository includes auto-normalization before
+linting, review the final message text before confirming the commit.
 
 ---
 
@@ -50,6 +62,7 @@ If a change truly spans multiple scopes, it is usually multiple commits.
 - Imperative mood: "add validation", not "added validation" or "adds
   validation"
 - Lowercase, no period at the end
+- Non-empty
 - Max 72 characters
 - Describes the outcome, not the activity
 - If you need "and" in the subject, split into multiple commits
@@ -79,7 +92,8 @@ A commit does one thing. Ask: "Can I describe this commit without using
 ### 2. Every Commit Passes CI
 
 Never commit code that breaks the build, even if the next commit fixes it.
-Verify before committing: lint passes, types check, tests pass.
+Verify before committing: required quality checks for your stack pass
+(lint/static analysis/tests/build validation).
 
 ### 3. Commit the Intent, Not the Journey
 
@@ -89,10 +103,9 @@ Final history should read as a clean narrative of deliberate changes.
 ### 4. Never Commit
 
 - Secrets, credentials, API keys, `.env` files
-- Generated files (`node_modules`, `dist`, build artifacts, lockfile changes
-  you did not intend)
-- IDE/editor configuration (`.idea`, `.vscode`, unless project-shared)
-- OS files (`.DS_Store`, `Thumbs.db`)
+- Generated/vendor artifacts unless intentionally versioned for the project
+- Local IDE/editor settings unless explicitly shared by team convention
+- Local operating-system metadata files
 - Large binaries or media without explicit need
 
 Enforce with `.gitignore` and review staged files before every commit.
@@ -145,7 +158,7 @@ rules. No behavior change, verified by existing test suite.
 ```
 
 ```text
-chore(deps): bump express from 4.18.2 to 4.21.0
+chore(deps): bump gateway framework from 4.18.2 to 4.21.0
 
 Security patch for CVE-2024-XXXX (request smuggling via malformed
 Transfer-Encoding headers). No breaking changes per changelog.
@@ -177,7 +190,8 @@ WIP - will fix later
 <type>/<ticket-id>-<short-description>
 ```
 
-- Lowercase, hyphen-separated
+- Keep `type` and short description lowercase and hyphen-separated
+- Preserve ticket casing only when your tracker requires it
 - Ticket ID when one exists
 - Short but descriptive enough to identify without opening the ticket
 
@@ -188,5 +202,5 @@ feat/AUTH-42-email-verification
 fix/API-108-rate-limit-bypass
 refactor/CORE-15-extract-payment-module
 chore/CI-7-parallel-test-runners
-docs/README-onboarding-update
+docs/readme-onboarding-update
 ```

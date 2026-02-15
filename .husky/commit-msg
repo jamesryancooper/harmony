@@ -1,2 +1,5 @@
 #!/usr/bin/env sh
+set -e
+
+node scripts/normalize-commit-msg.js "$1"
 pnpm exec commitlint --edit "$1"
