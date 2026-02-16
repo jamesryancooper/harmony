@@ -39,6 +39,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-component
+        run: |
+          cargo install --locked cargo-component
+
       - name: Download SLO history artifacts
         env:
           GH_TOKEN: ${{ github.token }}
