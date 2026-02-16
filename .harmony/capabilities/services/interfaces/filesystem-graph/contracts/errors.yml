@@ -8,9 +8,15 @@ errors:
   - code: ERR_FILESYSTEM_GRAPH_NOT_FOUND
     message: Requested file, node, or snapshot was not found.
     category: not-found
+  - code: ERR_FILESYSTEM_GRAPH_LIMIT_EXCEEDED
+    message: Operation exceeded configured safety limits (time, files, or bytes).
+    category: resource
   - code: ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID
     message: Snapshot artifacts are missing or malformed.
     category: integrity
   - code: ERR_FILESYSTEM_GRAPH_OPERATION_UNSUPPORTED
     message: Operation is not supported by the service contract.
     category: validation
+  - code: ERR_FILESYSTEM_GRAPH_INTERNAL
+    message: Internal execution failure.
+    category: internal

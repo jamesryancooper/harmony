@@ -7,6 +7,8 @@
 5. Discovery operations return bounded, explicit frontier expansions.
 6. Graph entities returned to callers are resolvable to file path or source locator.
 7. Provider-specific terms are disallowed in core filesystem-graph files.
-8. Runtime metrics are emitted per operation with latency and status fields.
+8. Runtime metrics are emitted per operation with latency, status, scanned file counts, and bytes-read fields.
 9. Per-operation latency and error budgets are enforced by CI SLO gates.
 10. Automated SLO tuning can tighten budgets from CI history but must not loosen them.
+11. Snapshot/discovery operations must enforce bounded file/byte/time limits and fail closed on limit exceedance.
+12. Corrupt snapshot artifacts must fail with actionable remediation guidance.

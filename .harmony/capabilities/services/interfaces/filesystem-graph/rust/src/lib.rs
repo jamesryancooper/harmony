@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 use std::path::{Component, Path};
 
@@ -15,6 +16,10 @@ const RUNTIME_STATE_ROOT: &str = ".harmony/runtime/_ops/state";
 const SERVICES_BUILD_STATE_ROOT: &str = ".harmony/capabilities/services/_ops/state/build";
 const HASH_CACHE_FILE: &str = "hash-cache.jsonl";
 const SEARCH_INDEX_FILE: &str = "search-index.jsonl";
+const DEFAULT_SNAPSHOT_MAX_FILES: u64 = 200_000;
+const DEFAULT_SNAPSHOT_MAX_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
+const DEFAULT_SNAPSHOT_MAX_OP_MS: u64 = 90_000;
+const DEFAULT_DISCOVER_MAX_OP_MS: u64 = 5_000;
 
 #[derive(Debug)]
 struct ServiceError {
@@ -74,10 +79,34 @@ struct SnapshotData {
     search_index: Vec<SearchIndexRecord>,
 }
 
+#[derive(Debug, Default, Clone, Copy)]
+struct OpCounters {
+    scanned_files: u64,
+    bytes_read: u64,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct SnapshotLimits {
+    max_files: u64,
+    max_total_bytes: u64,
+    deadline_ms: u64,
+}
+
+#[derive(Debug, Default, Clone, Copy)]
+struct SnapshotProgress {
+    files_scanned: u64,
+    total_size: u64,
+}
+
+thread_local! {
+    static OP_COUNTERS: RefCell<OpCounters> = RefCell::new(OpCounters::default());
+}
+
 impl bindings::Guest for Service {
     fn invoke(op: String, input_json: String) -> String {
         let started_ms = monotonic_now_ms();
         let input_bytes = input_json.len() as u64;
+        reset_op_counters();
 
         let (out, status, error_code) = match serde_json::from_str::<Value>(&input_json) {
             Ok(v) if v.is_object() => match handle_op(&op, &v) {
@@ -92,7 +121,11 @@ impl bindings::Guest for Service {
                         Some("ERR_FILESYSTEM_GRAPH_INTERNAL".to_string()),
                     ),
                 },
-                Err(e) => (error_json(e.code, &e.message), "error", Some(e.code.to_string())),
+                Err(e) => (
+                    error_json(e.code, &e.message),
+                    "error",
+                    Some(e.code.to_string()),
+                ),
             },
             Ok(_) => (
                 error_json(
@@ -111,6 +144,7 @@ impl bindings::Guest for Service {
                 Some("ERR_FILESYSTEM_GRAPH_INPUT_INVALID".to_string()),
             ),
         };
+        let counters = snapshot_op_counters();
 
         emit_runtime_metric(
             &op,
@@ -120,6 +154,8 @@ impl bindings::Guest for Service {
             monotonic_now_ms(),
             input_bytes,
             out.len() as u64,
+            counters.scanned_files,
+            counters.bytes_read,
         );
 
         out
@@ -134,10 +170,16 @@ fn emit_runtime_metric(
     ended_ms: u64,
     input_bytes: u64,
     output_bytes: u64,
+    scanned_files: u64,
+    bytes_read: u64,
 ) {
     let duration_ms = ended_ms.saturating_sub(started_ms);
     let slo_ms = op_latency_budget_ms(op);
-    let slo_status = if duration_ms <= slo_ms { "ok" } else { "violation" };
+    let slo_status = if duration_ms <= slo_ms {
+        "ok"
+    } else {
+        "violation"
+    };
     let level = if status != "ok" {
         "error"
     } else if slo_status == "violation" {
@@ -158,6 +200,8 @@ fn emit_runtime_metric(
         "slo_status": slo_status,
         "input_bytes": input_bytes,
         "output_bytes": output_bytes,
+        "scanned_files": scanned_files,
+        "bytes_read": bytes_read,
         "ended_at": epoch_ms_to_rfc3339(ended_ms)
     });
 
@@ -183,6 +227,34 @@ fn op_latency_budget_ms(op: &str) -> u64 {
         "discover.resolve" => 260,
         _ => 2_000,
     }
+}
+
+fn reset_op_counters() {
+    OP_COUNTERS.with(|c| *c.borrow_mut() = OpCounters::default());
+}
+
+fn snapshot_op_counters() -> OpCounters {
+    OP_COUNTERS.with(|c| *c.borrow())
+}
+
+fn add_bytes_read(n: u64) {
+    OP_COUNTERS.with(|c| {
+        let mut counters = c.borrow_mut();
+        counters.bytes_read = counters.bytes_read.saturating_add(n);
+    });
+}
+
+fn mark_files_scanned(n: u64) {
+    OP_COUNTERS.with(|c| {
+        let mut counters = c.borrow_mut();
+        counters.scanned_files = counters.scanned_files.saturating_add(n);
+    });
+}
+
+fn read_bytes(path: &str) -> Vec<u8> {
+    let bytes = bindings::fs::read(path);
+    add_bytes_read(bytes.len() as u64);
+    bytes
 }
 
 fn handle_op(op: &str, input: &Value) -> Result<Value, ServiceError> {
@@ -270,7 +342,8 @@ fn op_fs_read(input: &Value) -> Result<Value, ServiceError> {
         }
     }
 
-    let bytes = bindings::fs::read(&path);
+    mark_files_scanned(1);
+    let bytes = read_bytes(&path);
     let cut = bytes.len().min(max_bytes);
     let content = String::from_utf8_lossy(&bytes[..cut]).to_string();
 
@@ -286,8 +359,12 @@ fn op_fs_read(input: &Value) -> Result<Value, ServiceError> {
 fn op_fs_stat(input: &Value) -> Result<Value, ServiceError> {
     let path = norm_rel_required(get_str(input, "path")?)?;
 
-    let stat = fs_get_stat(&path)
-        .ok_or_else(|| err("ERR_FILESYSTEM_GRAPH_NOT_FOUND", format!("Path not found: {path}")))?;
+    let stat = fs_get_stat(&path).ok_or_else(|| {
+        err(
+            "ERR_FILESYSTEM_GRAPH_NOT_FOUND",
+            format!("Path not found: {path}"),
+        )
+    })?;
 
     let kind = match stat.kind {
         bindings::fs::NodeKind::File => "file",
@@ -314,13 +391,19 @@ fn op_fs_search(input: &Value) -> Result<Value, ServiceError> {
     let path = norm_rel_or_default(get_str(input, "path")?, ".")?;
     let limit = get_u64_or(input, "limit", 50) as usize;
 
-    let stat = fs_get_stat(&path)
-        .ok_or_else(|| err("ERR_FILESYSTEM_GRAPH_NOT_FOUND", format!("Path not found: {path}")))?;
+    let stat = fs_get_stat(&path).ok_or_else(|| {
+        err(
+            "ERR_FILESYSTEM_GRAPH_NOT_FOUND",
+            format!("Path not found: {path}"),
+        )
+    })?;
 
     let mut files = Vec::new();
     match stat.kind {
         bindings::fs::NodeKind::File => files.push(path.clone()),
-        bindings::fs::NodeKind::Dir => collect_files_recursive(&path, DEFAULT_STATE_DIR, &mut files)?,
+        bindings::fs::NodeKind::Dir => {
+            collect_files_recursive(&path, DEFAULT_STATE_DIR, &mut files)?
+        }
     }
 
     let mut hits = Vec::new();
@@ -340,6 +423,30 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
     let root = norm_rel_or_default(get_str(input, "root")?, ".")?;
     let state_dir = norm_rel_or_default(get_str(input, "state_dir")?, DEFAULT_STATE_DIR)?;
     let set_current = get_bool_or(input, "set_current", true);
+    let max_files = get_u64_or(input, "max_files", DEFAULT_SNAPSHOT_MAX_FILES);
+    let max_total_bytes = get_u64_or(input, "max_total_bytes", DEFAULT_SNAPSHOT_MAX_TOTAL_BYTES);
+    let max_op_ms = get_u64_or(input, "max_op_ms", DEFAULT_SNAPSHOT_MAX_OP_MS);
+
+    if max_files == 0 {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "max_files must be >= 1.",
+        ));
+    }
+
+    if max_total_bytes == 0 {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "max_total_bytes must be >= 1.",
+        ));
+    }
+
+    if max_op_ms == 0 {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "max_op_ms must be >= 1.",
+        ));
+    }
 
     match fs_get_stat(&root) {
         Some(stat) => {
@@ -369,6 +476,12 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
     let mut files = Vec::new();
     let mut dirs = BTreeSet::new();
     let mut edges: BTreeSet<(String, String, String)> = BTreeSet::new();
+    let mut progress = SnapshotProgress::default();
+    let limits = SnapshotLimits {
+        max_files,
+        max_total_bytes,
+        deadline_ms: monotonic_now_ms().saturating_add(max_op_ms),
+    };
 
     collect_snapshot_data(
         &root,
@@ -378,6 +491,8 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
         &mut files,
         &mut dirs,
         &mut edges,
+        &limits,
+        &mut progress,
     )?;
 
     if files.is_empty() {
@@ -615,7 +730,12 @@ fn op_kg_get_node(input: &Value) -> Result<Value, ServiceError> {
         .nodes
         .iter()
         .find(|n| n.node_id == node_id)
-        .ok_or_else(|| err("ERR_FILESYSTEM_GRAPH_NOT_FOUND", format!("Node not found: {node_id}")))?;
+        .ok_or_else(|| {
+            err(
+                "ERR_FILESYSTEM_GRAPH_NOT_FOUND",
+                format!("Node not found: {node_id}"),
+            )
+        })?;
 
     Ok(json!({"node": node}))
 }
@@ -674,12 +794,16 @@ fn op_kg_traverse(input: &Value) -> Result<Value, ServiceError> {
     let snapshot = load_snapshot(input)?;
     let start = get_str(input, "start_node_id")?
         .filter(|s| !s.is_empty())
-        .ok_or_else(|| err("ERR_FILESYSTEM_GRAPH_INPUT_INVALID", "start_node_id is required."))?;
+        .ok_or_else(|| {
+            err(
+                "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+                "start_node_id is required.",
+            )
+        })?;
     let depth = get_u64_or(input, "depth", 2) as usize;
     let edge_type_filter = get_str(input, "edge_type")?.unwrap_or_default();
 
-    let (visited, traversed) =
-        traverse_edges(&start, depth, &edge_type_filter, &snapshot.edges);
+    let (visited, traversed) = traverse_edges(&start, depth, &edge_type_filter, &snapshot.edges);
 
     let nodes: Vec<NodeRecord> = snapshot
         .nodes
@@ -723,6 +847,14 @@ fn op_discover_start(input: &Value) -> Result<Value, ServiceError> {
     let query_lower = query.to_lowercase();
     let query_terms = tokenize_terms(&query);
     let content_scan_limit = get_u64_or(input, "content_scan_limit", 200) as usize;
+    let max_op_ms = get_u64_or(input, "max_op_ms", DEFAULT_DISCOVER_MAX_OP_MS);
+    if max_op_ms == 0 {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "max_op_ms must be >= 1.",
+        ));
+    }
+    let deadline_ms = monotonic_now_ms().saturating_add(max_op_ms);
 
     let mut candidates: BTreeMap<String, (f64, String, String)> = BTreeMap::new();
 
@@ -746,10 +878,17 @@ fn op_discover_start(input: &Value) -> Result<Value, ServiceError> {
 
     let mut scanned = 0usize;
     for file in &snapshot.files {
+        if monotonic_now_ms() > deadline_ms {
+            return Err(err(
+                "ERR_FILESYSTEM_GRAPH_LIMIT_EXCEEDED",
+                format!("discover.start exceeded max_op_ms limit ({max_op_ms} ms)."),
+            ));
+        }
         if candidates.len() >= limit.saturating_mul(2) || scanned >= content_scan_limit {
             break;
         }
         scanned += 1;
+        mark_files_scanned(1);
 
         if !fs_exists(&file.path) {
             continue;
@@ -760,12 +899,14 @@ fn op_discover_start(input: &Value) -> Result<Value, ServiceError> {
             continue;
         }
 
-        let bytes = bindings::fs::read(&file.path);
+        let bytes = read_bytes(&file.path);
         let text = String::from_utf8_lossy(&bytes).to_lowercase();
         if text.contains(&query_lower) {
-            let entry = candidates
-                .entry(key)
-                .or_insert((0.7, file.path.clone(), "content-match".to_string()));
+            let entry = candidates.entry(key).or_insert((
+                0.7,
+                file.path.clone(),
+                "content-match".to_string(),
+            ));
             if entry.0 < 0.7 {
                 *entry = (0.7, file.path.clone(), "content-match".to_string());
             }
@@ -812,13 +953,19 @@ fn op_discover_expand(input: &Value) -> Result<Value, ServiceError> {
     let snapshot = load_snapshot(input)?;
     let limit = get_u64_or(input, "limit", 100) as usize;
 
-    let ids_value = input
-        .get("node_ids")
-        .ok_or_else(|| err("ERR_FILESYSTEM_GRAPH_INPUT_INVALID", "node_ids is required."))?;
+    let ids_value = input.get("node_ids").ok_or_else(|| {
+        err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "node_ids is required.",
+        )
+    })?;
 
-    let ids_arr = ids_value
-        .as_array()
-        .ok_or_else(|| err("ERR_FILESYSTEM_GRAPH_INPUT_INVALID", "node_ids must be an array."))?;
+    let ids_arr = ids_value.as_array().ok_or_else(|| {
+        err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "node_ids must be an array.",
+        )
+    })?;
 
     if ids_arr.is_empty() {
         return Err(err(
@@ -942,7 +1089,12 @@ fn op_resolve(input: &Value) -> Result<Value, ServiceError> {
         .nodes
         .iter()
         .find(|n| n.node_id == node_id)
-        .ok_or_else(|| err("ERR_FILESYSTEM_GRAPH_NOT_FOUND", format!("Node not found: {node_id}")))?;
+        .ok_or_else(|| {
+            err(
+                "ERR_FILESYSTEM_GRAPH_NOT_FOUND",
+                format!("Node not found: {node_id}"),
+            )
+        })?;
 
     if node.node_type != "file" && node.node_type != "dir" {
         return Err(err(
@@ -970,7 +1122,16 @@ fn collect_snapshot_data(
     files: &mut Vec<FileRecord>,
     dirs: &mut BTreeSet<String>,
     edges: &mut BTreeSet<(String, String, String)>,
+    limits: &SnapshotLimits,
+    progress: &mut SnapshotProgress,
 ) -> Result<(), ServiceError> {
+    if monotonic_now_ms() > limits.deadline_ms {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_LIMIT_EXCEEDED",
+            "snapshot.build exceeded max_op_ms limit.",
+        ));
+    }
+
     dirs.insert(dir.to_string());
 
     let mut entries = fs_list_dir_paths(dir);
@@ -1001,21 +1162,53 @@ fn collect_snapshot_data(
                     files,
                     dirs,
                     edges,
+                    limits,
+                    progress,
                 )?;
             }
             bindings::fs::NodeKind::File => {
                 let modified_epoch = stat.modified_ms.unwrap_or(0) / 1000;
                 let size_bytes = stat.size;
+                progress.files_scanned = progress.files_scanned.saturating_add(1);
+                progress.total_size = progress.total_size.saturating_add(size_bytes);
+                mark_files_scanned(1);
+
+                if progress.files_scanned > limits.max_files {
+                    return Err(err(
+                        "ERR_FILESYSTEM_GRAPH_LIMIT_EXCEEDED",
+                        format!(
+                            "snapshot.build exceeded max_files limit ({} > {}).",
+                            progress.files_scanned, limits.max_files
+                        ),
+                    ));
+                }
+
+                if progress.total_size > limits.max_total_bytes {
+                    return Err(err(
+                        "ERR_FILESYSTEM_GRAPH_LIMIT_EXCEEDED",
+                        format!(
+                            "snapshot.build exceeded max_total_bytes limit ({} > {}).",
+                            progress.total_size, limits.max_total_bytes
+                        ),
+                    ));
+                }
+
+                if monotonic_now_ms() > limits.deadline_ms {
+                    return Err(err(
+                        "ERR_FILESYSTEM_GRAPH_LIMIT_EXCEEDED",
+                        "snapshot.build exceeded max_op_ms limit.",
+                    ));
+                }
 
                 let sha = if let Some(cached) = cache_by_path.get(&child) {
                     if cached.size_bytes == size_bytes && cached.modified_epoch == modified_epoch {
                         cached.sha256.clone()
                     } else {
-                        let bytes = bindings::fs::read(&child);
+                        let bytes = read_bytes(&child);
                         sha256_hex(&bytes)
                     }
                 } else {
-                    let bytes = bindings::fs::read(&child);
+                    let bytes = read_bytes(&child);
                     sha256_hex(&bytes)
                 };
 
@@ -1048,7 +1241,11 @@ fn collect_snapshot_data(
     Ok(())
 }
 
-fn collect_files_recursive(dir: &str, state_dir: &str, out: &mut Vec<String>) -> Result<(), ServiceError> {
+fn collect_files_recursive(
+    dir: &str,
+    state_dir: &str,
+    out: &mut Vec<String>,
+) -> Result<(), ServiceError> {
     let mut entries = fs_list_dir_paths(dir);
     entries.sort();
 
@@ -1079,7 +1276,8 @@ fn search_file(path: &str, pattern_lower: &str, hits: &mut Vec<Value>, limit: us
         return;
     }
 
-    let bytes = bindings::fs::read(path);
+    mark_files_scanned(1);
+    let bytes = read_bytes(path);
     let text = String::from_utf8_lossy(&bytes);
 
     for (idx, line) in text.lines().enumerate() {
@@ -1126,12 +1324,13 @@ fn load_snapshot(input: &Value) -> Result<SnapshotData, ServiceError> {
     let nodes_path = join_path(&snapshot_dir, "nodes.jsonl");
     let edges_path = join_path(&snapshot_dir, "edges.jsonl");
     let index_path = join_path(&snapshot_dir, SEARCH_INDEX_FILE);
+    let remediation = snapshot_rebuild_hint(&state_dir);
 
     for p in [&manifest_path, &files_path, &nodes_path, &edges_path] {
         if !fs_exists(p) {
             return Err(err(
                 "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
-                format!("Missing snapshot artifact: {p}"),
+                format!("Missing snapshot artifact: {p}. {remediation}"),
             ));
         }
     }
@@ -1140,15 +1339,35 @@ fn load_snapshot(input: &Value) -> Result<SnapshotData, ServiceError> {
     let manifest = serde_json::from_str::<Value>(&manifest_text).map_err(|e| {
         err(
             "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
-            format!("Invalid manifest JSON: {e}"),
+            format!("Invalid manifest JSON: {e}. {remediation}"),
         )
     })?;
 
-    let files = parse_jsonl::<FileRecord>(&read_text_file(&files_path)?)?;
-    let nodes = parse_jsonl::<NodeRecord>(&read_text_file(&nodes_path)?)?;
-    let edges = parse_jsonl::<EdgeRecord>(&read_text_file(&edges_path)?)?;
+    let files = parse_jsonl::<FileRecord>(&read_text_file(&files_path)?).map_err(|e| {
+        err(
+            "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
+            format!("{}. {remediation}", e.message),
+        )
+    })?;
+    let nodes = parse_jsonl::<NodeRecord>(&read_text_file(&nodes_path)?).map_err(|e| {
+        err(
+            "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
+            format!("{}. {remediation}", e.message),
+        )
+    })?;
+    let edges = parse_jsonl::<EdgeRecord>(&read_text_file(&edges_path)?).map_err(|e| {
+        err(
+            "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
+            format!("{}. {remediation}", e.message),
+        )
+    })?;
     let search_index = if fs_exists(&index_path) {
-        parse_jsonl::<SearchIndexRecord>(&read_text_file(&index_path)?)?
+        parse_jsonl::<SearchIndexRecord>(&read_text_file(&index_path)?).map_err(|e| {
+            err(
+                "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
+                format!("{}. {remediation}", e.message),
+            )
+        })?
     } else {
         build_search_index(&files)
     };
@@ -1216,10 +1435,7 @@ fn traverse_edges(
     depth: usize,
     edge_type_filter: &str,
     edges: &[EdgeRecord],
-) -> (
-    BTreeSet<String>,
-    BTreeSet<(String, String, String)>,
-) {
+) -> (BTreeSet<String>, BTreeSet<(String, String, String)>) {
     let mut queue: VecDeque<(String, usize)> = VecDeque::new();
     let mut visited: BTreeSet<String> = BTreeSet::new();
     let mut traversed: BTreeSet<(String, String, String)> = BTreeSet::new();
@@ -1262,7 +1478,10 @@ fn load_hash_cache(path: &str) -> Result<BTreeMap<String, HashCacheRecord>, Serv
     Ok(out)
 }
 
-fn write_hash_cache(path: &str, records: &BTreeMap<String, HashCacheRecord>) -> Result<(), ServiceError> {
+fn write_hash_cache(
+    path: &str,
+    records: &BTreeMap<String, HashCacheRecord>,
+) -> Result<(), ServiceError> {
     let mut lines = Vec::with_capacity(records.len());
     for record in records.values() {
         lines.push(serde_json::to_string(record).map_err(|e| {
@@ -1308,6 +1527,12 @@ fn parse_jsonl<T: for<'de> Deserialize<'de>>(text: &str) -> Result<Vec<T>, Servi
         out.push(item);
     }
     Ok(out)
+}
+
+fn snapshot_rebuild_hint(state_dir: &str) -> String {
+    format!(
+        "Rebuild snapshot artifacts: invoke snapshot.build with {{\"root\":\".\",\"state_dir\":\"{state_dir}\",\"set_current\":true}}."
+    )
 }
 
 fn resolve_snapshot_ref(state_dir: &str, value: &str) -> Result<(String, String), ServiceError> {
@@ -1365,7 +1590,7 @@ fn read_text_file(path: &str) -> Result<String, ServiceError> {
         ));
     }
 
-    let bytes = bindings::fs::read(path);
+    let bytes = read_bytes(path);
     String::from_utf8(bytes).map_err(|e| {
         err(
             "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
@@ -1375,14 +1600,14 @@ fn read_text_file(path: &str) -> Result<String, ServiceError> {
 }
 
 fn get_str(input: &Value, key: &str) -> Result<Option<String>, ServiceError> {
-    let obj = input
-        .as_object()
-        .ok_or_else(|| err("ERR_FILESYSTEM_GRAPH_INPUT_INVALID", "Input must be object."))?;
+    let obj = input.as_object().ok_or_else(|| {
+        err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "Input must be object.",
+        )
+    })?;
 
-    Ok(obj
-        .get(key)
-        .and_then(Value::as_str)
-        .map(|s| s.to_string()))
+    Ok(obj.get(key).and_then(Value::as_str).map(|s| s.to_string()))
 }
 
 fn get_u64_or(input: &Value, key: &str, default: u64) -> u64 {
@@ -1587,7 +1812,8 @@ fn should_skip(path: &str, state_dir: &str) -> bool {
         return false;
     }
 
-    if normalized == RUNTIME_STATE_ROOT || normalized.starts_with(&format!("{RUNTIME_STATE_ROOT}/")) {
+    if normalized == RUNTIME_STATE_ROOT || normalized.starts_with(&format!("{RUNTIME_STATE_ROOT}/"))
+    {
         return true;
     }
 
@@ -1611,13 +1837,7 @@ fn sha256_hex(bytes: &[u8]) -> String {
 
 fn sha256_digest(input: &[u8]) -> [u8; 32] {
     const H0: [u32; 8] = [
-        0x6a09e667,
-        0xbb67ae85,
-        0x3c6ef372,
-        0xa54ff53a,
-        0x510e527f,
-        0x9b05688c,
-        0x1f83d9ab,
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
         0x5be0cd19,
     ];
 
@@ -1803,6 +2023,8 @@ fn error_json(code: &str, message: &str) -> String {
 mod tests {
     use super::*;
     use std::collections::{BTreeMap, BTreeSet, VecDeque};
+    use std::fs;
+    use std::path::PathBuf;
 
     #[derive(Clone)]
     struct TestRng {
@@ -1817,10 +2039,7 @@ mod tests {
         }
 
         fn next_u32(&mut self) -> u32 {
-            self.state = self
-                .state
-                .wrapping_mul(6364136223846793005)
-                .wrapping_add(1);
+            self.state = self.state.wrapping_mul(6364136223846793005).wrapping_add(1);
             (self.state >> 32) as u32
         }
 
@@ -1899,11 +2118,7 @@ mod tests {
 
         let (visited_all, traversed_all) = traverse_edges("n1", 2, "", &edges);
         assert!(visited_all.contains("n3"));
-        assert!(traversed_all.contains(&(
-            "n1".to_string(),
-            "n4".to_string(),
-            "REF".to_string()
-        )));
+        assert!(traversed_all.contains(&("n1".to_string(), "n4".to_string(), "REF".to_string())));
 
         let (visited_contains, traversed_contains) = traverse_edges("n1", 2, "CONTAINS", &edges);
         assert!(visited_contains.contains("n3"));
@@ -1917,15 +2132,27 @@ mod tests {
 
     #[test]
     fn should_skip_runtime_state_paths() {
-        assert!(should_skip(".harmony/runtime/_ops/state/traces/x.ndjson", DEFAULT_STATE_DIR));
-        assert!(should_skip(".harmony/runtime/_ops/state/build/x", DEFAULT_STATE_DIR));
-        assert!(should_skip(".harmony/runtime/_ops/state/snapshots/snap-abc", DEFAULT_STATE_DIR));
+        assert!(should_skip(
+            ".harmony/runtime/_ops/state/traces/x.ndjson",
+            DEFAULT_STATE_DIR
+        ));
+        assert!(should_skip(
+            ".harmony/runtime/_ops/state/build/x",
+            DEFAULT_STATE_DIR
+        ));
+        assert!(should_skip(
+            ".harmony/runtime/_ops/state/snapshots/snap-abc",
+            DEFAULT_STATE_DIR
+        ));
         assert!(should_skip(
             ".harmony/capabilities/services/_ops/state/build/target/debug/file.o",
             DEFAULT_STATE_DIR
         ));
         assert!(should_skip(".git/config", DEFAULT_STATE_DIR));
-        assert!(!should_skip(".harmony/cognition/context/index.yml", DEFAULT_STATE_DIR));
+        assert!(!should_skip(
+            ".harmony/cognition/context/index.yml",
+            DEFAULT_STATE_DIR
+        ));
     }
 
     #[test]
@@ -1956,7 +2183,9 @@ mod tests {
 
                 if in_head {
                     let sha = if in_base && rng.next_bool() {
-                        base.get(path).cloned().unwrap_or_else(|| format!("{:08x}", rng.next_u32()))
+                        base.get(path)
+                            .cloned()
+                            .unwrap_or_else(|| format!("{:08x}", rng.next_u32()))
                     } else {
                         format!("{:08x}", rng.next_u32())
                     };
@@ -2010,10 +2239,7 @@ mod tests {
             depth: usize,
             edge_type_filter: &str,
             edges: &[EdgeRecord],
-        ) -> (
-            BTreeSet<String>,
-            BTreeSet<(String, String, String)>,
-        ) {
+        ) -> (BTreeSet<String>, BTreeSet<(String, String, String)>) {
             let mut queue: VecDeque<(String, usize)> = VecDeque::new();
             let mut visited = BTreeSet::new();
             let mut traversed = BTreeSet::new();
@@ -2083,7 +2309,8 @@ mod tests {
 
     #[test]
     fn tokenize_terms_fuzz_preserves_token_constraints() {
-        let alphabet = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_/.:()[]{} \t\n";
+        let alphabet =
+            b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_/.:()[]{} \t\n";
         let mut rng = TestRng::new(42);
 
         for _ in 0..256 {
@@ -2097,7 +2324,9 @@ mod tests {
             let terms = tokenize_terms(&sample);
             for term in terms {
                 assert!(term.len() >= 2);
-                assert!(term.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()));
+                assert!(term
+                    .chars()
+                    .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()));
             }
         }
     }
@@ -2141,6 +2370,127 @@ mod tests {
         for op in ops {
             assert!(op_latency_budget_ms(op) > 0);
         }
+    }
+
+    fn service_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..")
+    }
+
+    fn declared_error_codes() -> BTreeSet<String> {
+        let errors_yml = service_root().join("contracts").join("errors.yml");
+        let content = fs::read_to_string(errors_yml).expect("read contracts/errors.yml");
+        let mut out = BTreeSet::new();
+
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if !trimmed.starts_with("- code:") && !trimmed.starts_with("code:") {
+                continue;
+            }
+            if let Some(code) = trimmed.split_whitespace().nth(2) {
+                out.insert(code.to_string());
+            } else if let Some(code) = trimmed.split_whitespace().nth(1) {
+                out.insert(code.to_string());
+            }
+        }
+
+        out
+    }
+
+    fn runtime_error_codes_from_source() -> BTreeSet<String> {
+        let mut out = BTreeSet::new();
+        for token in
+            include_str!("lib.rs").split(|c: char| !(c.is_ascii_alphanumeric() || c == '_'))
+        {
+            if token.starts_with("ERR_FILESYSTEM_GRAPH_") && token != "ERR_FILESYSTEM_GRAPH_" {
+                out.insert(token.to_string());
+            }
+        }
+        out
+    }
+
+    fn has_error_envelope(schema: &Value) -> bool {
+        let branches = schema
+            .get("anyOf")
+            .or_else(|| schema.get("oneOf"))
+            .and_then(Value::as_array);
+
+        let Some(branches) = branches else {
+            return false;
+        };
+
+        branches.iter().any(|branch| {
+            let Some(props) = branch.get("properties").and_then(Value::as_object) else {
+                return false;
+            };
+
+            let Some(required) = branch.get("required").and_then(Value::as_array) else {
+                return false;
+            };
+            let has_required = |field: &str| required.iter().any(|v| v.as_str() == Some(field));
+
+            let ok_false = props
+                .get("ok")
+                .and_then(|v| v.get("const"))
+                .and_then(Value::as_bool)
+                == Some(false);
+
+            let contract_version_present = props.contains_key("filesystem_graph_contract_version");
+
+            let error_has_code_message = props
+                .get("error")
+                .and_then(|v| v.get("properties"))
+                .and_then(Value::as_object)
+                .map(|error_props| {
+                    error_props.contains_key("code") && error_props.contains_key("message")
+                })
+                .unwrap_or(false);
+
+            ok_false
+                && contract_version_present
+                && error_has_code_message
+                && has_required("ok")
+                && has_required("filesystem_graph_contract_version")
+                && has_required("error")
+        })
+    }
+
+    #[test]
+    fn documented_errors_cover_runtime_errors() {
+        let declared = declared_error_codes();
+        let used = runtime_error_codes_from_source();
+        let missing: Vec<String> = used
+            .into_iter()
+            .filter(|code| !declared.contains(code))
+            .collect();
+
+        assert!(
+            missing.is_empty(),
+            "contracts/errors.yml is missing runtime error codes: {missing:?}"
+        );
+    }
+
+    #[test]
+    fn every_op_output_schema_includes_error_envelope() {
+        let service_json = service_root().join("service.json");
+        let payload = fs::read_to_string(service_json).expect("read service.json");
+        let manifest: Value = serde_json::from_str(&payload).expect("parse service.json");
+        let ops = manifest
+            .get("ops")
+            .and_then(Value::as_object)
+            .expect("ops object in service.json");
+
+        let mut missing = Vec::new();
+        for (op, decl) in ops {
+            let output_schema = decl.get("output_schema");
+            if output_schema.is_none() || !has_error_envelope(output_schema.unwrap()) {
+                missing.push(op.clone());
+            }
+        }
+
+        assert!(
+            missing.is_empty(),
+            "ops missing standard error envelope in output_schema: {missing:?}"
+        );
     }
 }
 

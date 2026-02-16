@@ -37,6 +37,7 @@ required_files=(
   "$SERVICE_DIR/fixtures/benchmark-profile.tsv"
   "$HARMONY_DIR/capabilities/services/_ops/scripts/build-filesystem-graph-benchmark-fixture.sh"
   "$HARMONY_DIR/capabilities/services/_ops/scripts/download-filesystem-graph-slo-history.sh"
+  "$HARMONY_DIR/capabilities/services/_ops/scripts/test-filesystem-graph-integration.sh"
   "$HARMONY_DIR/capabilities/services/_ops/scripts/test-filesystem-graph-slo.sh"
   "$HARMONY_DIR/capabilities/services/_ops/scripts/tune-filesystem-graph-slo-budgets.sh"
 )
@@ -102,6 +103,12 @@ fi
 # Determinism and runtime-state exclusion regression check.
 if ! bash "$HARMONY_DIR/capabilities/services/_ops/scripts/test-filesystem-graph-determinism.sh" >/dev/null 2>&1; then
   echo "ERROR: filesystem-graph determinism regression"
+  errors=$((errors + 1))
+fi
+
+# Runtime integration regression check.
+if ! bash "$HARMONY_DIR/capabilities/services/_ops/scripts/test-filesystem-graph-integration.sh" >/dev/null 2>&1; then
+  echo "ERROR: filesystem-graph integration regression"
   errors=$((errors + 1))
 fi
 

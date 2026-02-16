@@ -26,6 +26,8 @@ knowledge-graph traversal, and progressive discovery.
 
 - Determinism regression:
   - `.harmony/capabilities/services/_ops/scripts/test-filesystem-graph-determinism.sh`
+- Runtime integration regression:
+  - `.harmony/capabilities/services/_ops/scripts/test-filesystem-graph-integration.sh`
 - Benchmark fixture generation:
   - `.harmony/capabilities/services/_ops/scripts/build-filesystem-graph-benchmark-fixture.sh`
 - Latency/error SLO gate:
@@ -34,3 +36,9 @@ knowledge-graph traversal, and progressive discovery.
   - `.harmony/capabilities/services/_ops/scripts/download-filesystem-graph-slo-history.sh`
   - `.harmony/capabilities/services/_ops/scripts/tune-filesystem-graph-slo-budgets.sh`
   - `.github/workflows/filesystem-graph-slo-tune.yml`
+
+## Safety Limits
+
+- `snapshot.build` enforces default caps for `max_files`, `max_total_bytes`, and `max_op_ms`.
+- `discover.start` enforces bounded `content_scan_limit` and `max_op_ms`.
+- Corrupt snapshot artifacts fail with actionable rebuild remediation guidance.
