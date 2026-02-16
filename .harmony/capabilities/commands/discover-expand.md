@@ -2,21 +2,14 @@
 title: Discover Expand
 description: Expand progressive discovery frontier by traversing graph neighbors.
 access: human
-argument-hint: "--file <path-to-request-json>"
+argument-hint: "--node-ids '<json-array>' [--limit <n>]"
 ---
 
 # Discover Expand `/discover-expand`
 
 Run `discover.expand` through the filesystem-graph service.
 
-Request JSON must include:
-
-```json
-{
-  "command": "discover.expand",
-  "payload": {
-    "node_ids": ["file:.harmony/START.md"],
-    "limit": 100
-  }
-}
+```bash
+.harmony/runtime/run tool interfaces/filesystem-graph discover.expand --json \
+  '{"node_ids":["file:.harmony/START.md"],"limit":100}'
 ```

@@ -20,8 +20,6 @@ Build deterministic snapshot artifacts for filesystem-graph operations.
 ## Implementation
 
 ```bash
-bash .harmony/capabilities/services/interfaces/filesystem-graph/impl/snapshot-build.sh \
-  [--root <path>] \
-  [--state-dir <path>] \
-  [--set-current true|false]
+.harmony/runtime/run tool interfaces/filesystem-graph snapshot.build --json \
+  '{"root":".","state_dir":".harmony/runtime/_ops/state/snapshots","set_current":true}'
 ```

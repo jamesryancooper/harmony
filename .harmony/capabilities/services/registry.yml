@@ -269,4 +269,4 @@ services:
       required: true
       key_from: [command, snapshotId, payloadHash]
     impl:
-      entrypoint: interfaces/filesystem-graph/impl/filesystem-graph.sh
+      entrypoint: runtime/run tool interfaces/filesystem-graph

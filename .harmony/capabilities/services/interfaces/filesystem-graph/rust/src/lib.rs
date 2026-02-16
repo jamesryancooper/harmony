@@ -11,6 +11,9 @@ pub struct Service;
 
 const CONTRACT_VERSION: &str = "1.0.0";
 const DEFAULT_STATE_DIR: &str = ".harmony/runtime/_ops/state/snapshots";
+const RUNTIME_STATE_ROOT: &str = ".harmony/runtime/_ops/state";
+const HASH_CACHE_FILE: &str = "hash-cache.jsonl";
+const SEARCH_INDEX_FILE: &str = "search-index.jsonl";
 
 #[derive(Debug)]
 struct ServiceError {
@@ -44,6 +47,22 @@ struct EdgeRecord {
     edge_type: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct HashCacheRecord {
+    path: String,
+    size_bytes: u64,
+    modified_epoch: u64,
+    sha256: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct SearchIndexRecord {
+    node_id: String,
+    path: String,
+    path_lc: String,
+    terms: Vec<String>,
+}
+
 #[derive(Debug, Clone)]
 struct SnapshotData {
     snapshot_id: String,
@@ -51,6 +70,7 @@ struct SnapshotData {
     files: Vec<FileRecord>,
     nodes: Vec<NodeRecord>,
     edges: Vec<EdgeRecord>,
+    search_index: Vec<SearchIndexRecord>,
 }
 
 impl bindings::Guest for Service {
@@ -256,13 +276,27 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
         }
     }
 
-    bindings::fs::mkdirp(&state_dir);
+    if !fs_exists(&state_dir) {
+        bindings::fs::mkdirp(&state_dir);
+    }
+
+    let cache_path = join_path(&state_dir, HASH_CACHE_FILE);
+    let cache_by_path = load_hash_cache(&cache_path)?;
+    let mut cache_next: BTreeMap<String, HashCacheRecord> = BTreeMap::new();
 
     let mut files = Vec::new();
     let mut dirs = BTreeSet::new();
     let mut edges: BTreeSet<(String, String, String)> = BTreeSet::new();
 
-    collect_snapshot_data(&root, &state_dir, &mut files, &mut dirs, &mut edges)?;
+    collect_snapshot_data(
+        &root,
+        &state_dir,
+        &cache_by_path,
+        &mut cache_next,
+        &mut files,
+        &mut dirs,
+        &mut edges,
+    )?;
 
     if files.is_empty() {
         return Err(err(
@@ -293,7 +327,9 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
     let snapshot_id = format!("snap-{}", &input_fingerprint[..16]);
     let snapshot_dir = join_path(&state_dir, &snapshot_id);
 
-    bindings::fs::mkdirp(&snapshot_dir);
+    if !fs_exists(&snapshot_dir) {
+        bindings::fs::mkdirp(&snapshot_dir);
+    }
 
     let mut node_lines = Vec::new();
     for dir_path in &dirs {
@@ -344,6 +380,24 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
     write_jsonl_file(&join_path(&snapshot_dir, "files.jsonl"), &file_lines)?;
     write_jsonl_file(&join_path(&snapshot_dir, "nodes.jsonl"), &node_lines)?;
     write_jsonl_file(&join_path(&snapshot_dir, "edges.jsonl"), &edge_lines)?;
+
+    let search_index = build_search_index(&files);
+    let search_index_lines: Vec<String> = search_index
+        .iter()
+        .map(|r| {
+            serde_json::to_string(r).map_err(|e| {
+                err(
+                    "ERR_FILESYSTEM_GRAPH_INTERNAL",
+                    format!("Failed to serialize search index record: {e}"),
+                )
+            })
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    write_jsonl_file(
+        &join_path(&snapshot_dir, SEARCH_INDEX_FILE),
+        &search_index_lines,
+    )?;
+    write_hash_cache(&cache_path, &cache_next)?;
 
     let manifest = json!({
         "snapshot_id": snapshot_id,
@@ -439,44 +493,7 @@ fn op_snapshot_diff(input: &Value) -> Result<Value, ServiceError> {
     let base_files = parse_files_map(&join_path(&base_dir, "files.jsonl"))?;
     let head_files = parse_files_map(&join_path(&head_dir, "files.jsonl"))?;
 
-    let mut added = Vec::new();
-    let mut removed = Vec::new();
-    let mut changed = Vec::new();
-
-    for (path, sha) in &head_files {
-        match base_files.get(path) {
-            None => added.push(json!({"path": path, "sha256": sha})),
-            Some(base_sha) if base_sha != sha => {
-                changed.push(json!({"path": path, "base_sha256": base_sha, "head_sha256": sha}))
-            }
-            _ => {}
-        }
-    }
-
-    for (path, sha) in &base_files {
-        if !head_files.contains_key(path) {
-            removed.push(json!({"path": path, "sha256": sha}));
-        }
-    }
-
-    added.sort_by(|a, b| {
-        a["path"]
-            .as_str()
-            .unwrap_or("")
-            .cmp(b["path"].as_str().unwrap_or(""))
-    });
-    removed.sort_by(|a, b| {
-        a["path"]
-            .as_str()
-            .unwrap_or("")
-            .cmp(b["path"].as_str().unwrap_or(""))
-    });
-    changed.sort_by(|a, b| {
-        a["path"]
-            .as_str()
-            .unwrap_or("")
-            .cmp(b["path"].as_str().unwrap_or(""))
-    });
+    let (added, removed, changed) = compute_snapshot_diff(&base_files, &head_files);
 
     Ok(json!({
         "ok": true,
@@ -579,32 +596,8 @@ fn op_kg_traverse(input: &Value) -> Result<Value, ServiceError> {
     let depth = get_u64_or(input, "depth", 2) as usize;
     let edge_type_filter = get_str(input, "edge_type")?.unwrap_or_default();
 
-    let mut queue: VecDeque<(String, usize)> = VecDeque::new();
-    let mut visited: BTreeSet<String> = BTreeSet::new();
-    let mut traversed: BTreeSet<(String, String, String)> = BTreeSet::new();
-
-    queue.push_back((start.clone(), 0));
-    visited.insert(start.clone());
-
-    while let Some((current, d)) = queue.pop_front() {
-        if d >= depth {
-            continue;
-        }
-
-        for edge in &snapshot.edges {
-            if edge.src != current {
-                continue;
-            }
-            if !edge_type_filter.is_empty() && edge.edge_type != edge_type_filter {
-                continue;
-            }
-
-            traversed.insert((edge.src.clone(), edge.dst.clone(), edge.edge_type.clone()));
-            if visited.insert(edge.dst.clone()) {
-                queue.push_back((edge.dst.clone(), d + 1));
-            }
-        }
-    }
+    let (visited, traversed) =
+        traverse_edges(&start, depth, &edge_type_filter, &snapshot.edges);
 
     let nodes: Vec<NodeRecord> = snapshot
         .nodes
@@ -646,31 +639,48 @@ fn op_discover_start(input: &Value) -> Result<Value, ServiceError> {
 
     let limit = get_u64_or(input, "limit", 20) as usize;
     let query_lower = query.to_lowercase();
+    let query_terms = tokenize_terms(&query);
+    let content_scan_limit = get_u64_or(input, "content_scan_limit", 200) as usize;
 
     let mut candidates: BTreeMap<String, (f64, String, String)> = BTreeMap::new();
 
-    for file in &snapshot.files {
-        if file.path.to_lowercase().contains(&query_lower) {
+    for rec in &snapshot.search_index {
+        if rec.path_lc.contains(&query_lower) {
             candidates.insert(
-                format!("file:{}", file.path),
-                (1.0, file.path.clone(), "path-match".to_string()),
+                rec.node_id.clone(),
+                (1.0, rec.path.clone(), "path-match".to_string()),
             );
+            continue;
+        }
+
+        if !query_terms.is_empty() && rec.terms.iter().any(|t| query_terms.contains(t)) {
+            candidates.entry(rec.node_id.clone()).or_insert((
+                0.85,
+                rec.path.clone(),
+                "index-term-match".to_string(),
+            ));
         }
     }
 
+    let mut scanned = 0usize;
     for file in &snapshot.files {
-        if candidates.len() >= limit.saturating_mul(2) {
+        if candidates.len() >= limit.saturating_mul(2) || scanned >= content_scan_limit {
             break;
         }
+        scanned += 1;
 
         if !fs_exists(&file.path) {
+            continue;
+        }
+
+        let key = format!("file:{}", file.path);
+        if candidates.contains_key(&key) {
             continue;
         }
 
         let bytes = bindings::fs::read(&file.path);
         let text = String::from_utf8_lossy(&bytes).to_lowercase();
         if text.contains(&query_lower) {
-            let key = format!("file:{}", file.path);
             let entry = candidates
                 .entry(key)
                 .or_insert((0.7, file.path.clone(), "content-match".to_string()));
@@ -873,6 +883,8 @@ fn op_resolve(input: &Value) -> Result<Value, ServiceError> {
 fn collect_snapshot_data(
     dir: &str,
     state_dir: &str,
+    cache_by_path: &BTreeMap<String, HashCacheRecord>,
+    cache_next: &mut BTreeMap<String, HashCacheRecord>,
     files: &mut Vec<FileRecord>,
     dirs: &mut BTreeSet<String>,
     edges: &mut BTreeSet<(String, String, String)>,
@@ -899,17 +911,46 @@ fn collect_snapshot_data(
                     format!("dir:{child}"),
                     "CONTAINS".to_string(),
                 ));
-                collect_snapshot_data(&child, state_dir, files, dirs, edges)?;
+                collect_snapshot_data(
+                    &child,
+                    state_dir,
+                    cache_by_path,
+                    cache_next,
+                    files,
+                    dirs,
+                    edges,
+                )?;
             }
             bindings::fs::NodeKind::File => {
-                let bytes = bindings::fs::read(&child);
-                let sha = sha256_hex(&bytes);
                 let modified_epoch = stat.modified_ms.unwrap_or(0) / 1000;
+                let size_bytes = stat.size;
+
+                let sha = if let Some(cached) = cache_by_path.get(&child) {
+                    if cached.size_bytes == size_bytes && cached.modified_epoch == modified_epoch {
+                        cached.sha256.clone()
+                    } else {
+                        let bytes = bindings::fs::read(&child);
+                        sha256_hex(&bytes)
+                    }
+                } else {
+                    let bytes = bindings::fs::read(&child);
+                    sha256_hex(&bytes)
+                };
+
+                cache_next.insert(
+                    child.clone(),
+                    HashCacheRecord {
+                        path: child.clone(),
+                        size_bytes,
+                        modified_epoch,
+                        sha256: sha.clone(),
+                    },
+                );
 
                 files.push(FileRecord {
                     path: child.clone(),
                     sha256: sha,
-                    size_bytes: stat.size.max(bytes.len() as u64),
+                    size_bytes,
                     modified_epoch,
                 });
 
@@ -1002,6 +1043,7 @@ fn load_snapshot(input: &Value) -> Result<SnapshotData, ServiceError> {
     let files_path = join_path(&snapshot_dir, "files.jsonl");
     let nodes_path = join_path(&snapshot_dir, "nodes.jsonl");
     let edges_path = join_path(&snapshot_dir, "edges.jsonl");
+    let index_path = join_path(&snapshot_dir, SEARCH_INDEX_FILE);
 
     for p in [&manifest_path, &files_path, &nodes_path, &edges_path] {
         if !fs_exists(p) {
@@ -1023,6 +1065,11 @@ fn load_snapshot(input: &Value) -> Result<SnapshotData, ServiceError> {
     let files = parse_jsonl::<FileRecord>(&read_text_file(&files_path)?)?;
     let nodes = parse_jsonl::<NodeRecord>(&read_text_file(&nodes_path)?)?;
     let edges = parse_jsonl::<EdgeRecord>(&read_text_file(&edges_path)?)?;
+    let search_index = if fs_exists(&index_path) {
+        parse_jsonl::<SearchIndexRecord>(&read_text_file(&index_path)?)?
+    } else {
+        build_search_index(&files)
+    };
 
     Ok(SnapshotData {
         snapshot_id,
@@ -1030,6 +1077,7 @@ fn load_snapshot(input: &Value) -> Result<SnapshotData, ServiceError> {
         files,
         nodes,
         edges,
+        search_index,
     })
 }
 
@@ -1040,6 +1088,124 @@ fn parse_files_map(path: &str) -> Result<BTreeMap<String, String>, ServiceError>
         map.insert(f.path, f.sha256);
     }
     Ok(map)
+}
+
+fn compute_snapshot_diff(
+    base_files: &BTreeMap<String, String>,
+    head_files: &BTreeMap<String, String>,
+) -> (Vec<Value>, Vec<Value>, Vec<Value>) {
+    let mut added = Vec::new();
+    let mut removed = Vec::new();
+    let mut changed = Vec::new();
+
+    for (path, sha) in head_files {
+        match base_files.get(path) {
+            None => added.push(json!({"path": path, "sha256": sha})),
+            Some(base_sha) if base_sha != sha => {
+                changed.push(json!({"path": path, "base_sha256": base_sha, "head_sha256": sha}))
+            }
+            _ => {}
+        }
+    }
+
+    for (path, sha) in base_files {
+        if !head_files.contains_key(path) {
+            removed.push(json!({"path": path, "sha256": sha}));
+        }
+    }
+
+    let sort_by_path = |values: &mut Vec<Value>| {
+        values.sort_by(|a, b| {
+            a["path"]
+                .as_str()
+                .unwrap_or("")
+                .cmp(b["path"].as_str().unwrap_or(""))
+        });
+    };
+    sort_by_path(&mut added);
+    sort_by_path(&mut removed);
+    sort_by_path(&mut changed);
+
+    (added, removed, changed)
+}
+
+fn traverse_edges(
+    start: &str,
+    depth: usize,
+    edge_type_filter: &str,
+    edges: &[EdgeRecord],
+) -> (
+    BTreeSet<String>,
+    BTreeSet<(String, String, String)>,
+) {
+    let mut queue: VecDeque<(String, usize)> = VecDeque::new();
+    let mut visited: BTreeSet<String> = BTreeSet::new();
+    let mut traversed: BTreeSet<(String, String, String)> = BTreeSet::new();
+
+    queue.push_back((start.to_string(), 0));
+    visited.insert(start.to_string());
+
+    while let Some((current, d)) = queue.pop_front() {
+        if d >= depth {
+            continue;
+        }
+
+        for edge in edges {
+            if edge.src != current {
+                continue;
+            }
+            if !edge_type_filter.is_empty() && edge.edge_type != edge_type_filter {
+                continue;
+            }
+
+            traversed.insert((edge.src.clone(), edge.dst.clone(), edge.edge_type.clone()));
+            if visited.insert(edge.dst.clone()) {
+                queue.push_back((edge.dst.clone(), d + 1));
+            }
+        }
+    }
+
+    (visited, traversed)
+}
+
+fn load_hash_cache(path: &str) -> Result<BTreeMap<String, HashCacheRecord>, ServiceError> {
+    if !fs_exists(path) {
+        return Ok(BTreeMap::new());
+    }
+    let records = parse_jsonl::<HashCacheRecord>(&read_text_file(path)?)?;
+    let mut out = BTreeMap::new();
+    for record in records {
+        out.insert(record.path.clone(), record);
+    }
+    Ok(out)
+}
+
+fn write_hash_cache(path: &str, records: &BTreeMap<String, HashCacheRecord>) -> Result<(), ServiceError> {
+    let mut lines = Vec::with_capacity(records.len());
+    for record in records.values() {
+        lines.push(serde_json::to_string(record).map_err(|e| {
+            err(
+                "ERR_FILESYSTEM_GRAPH_INTERNAL",
+                format!("Failed to serialize hash cache record: {e}"),
+            )
+        })?);
+    }
+    write_jsonl_file(path, &lines)
+}
+
+fn build_search_index(files: &[FileRecord]) -> Vec<SearchIndexRecord> {
+    let mut out = Vec::with_capacity(files.len());
+    for file in files {
+        let mut terms: Vec<String> = tokenize_terms(&file.path).into_iter().collect();
+        terms.sort();
+        out.push(SearchIndexRecord {
+            node_id: format!("file:{}", file.path),
+            path: file.path.clone(),
+            path_lc: file.path.to_lowercase(),
+            terms,
+        });
+    }
+    out
 }
 
 fn parse_jsonl<T: for<'de> Deserialize<'de>>(text: &str) -> Result<Vec<T>, ServiceError> {
@@ -1101,7 +1267,9 @@ fn write_jsonl_file(path: &str, lines: &[String]) -> Result<(), ServiceError> {
 
 fn write_text_file(path: &str, content: &str) -> Result<(), ServiceError> {
     if let Some(parent) = parent_path(path) {
-        bindings::fs::mkdirp(&parent);
+        if parent != "." && !fs_exists(&parent) {
+            bindings::fs::mkdirp(&parent);
+        }
     }
     bindings::fs::write(path, content.as_bytes());
     Ok(())
@@ -1243,6 +1411,28 @@ fn basename(path: &str) -> String {
     path.rsplit('/').next().unwrap_or(path).to_string()
 }
 
+fn tokenize_terms(text: &str) -> BTreeSet<String> {
+    let mut out = BTreeSet::new();
+    let mut cur = String::new();
+
+    for ch in text.chars() {
+        if ch.is_ascii_alphanumeric() {
+            cur.push(ch.to_ascii_lowercase());
+        } else if !cur.is_empty() {
+            if cur.len() >= 2 {
+                out.insert(cur.clone());
+            }
+            cur.clear();
+        }
+    }
+
+    if !cur.is_empty() && cur.len() >= 2 {
+        out.insert(cur);
+    }
+
+    out
+}
+
 fn fs_exists(path: &str) -> bool {
     if path == "." {
         true
@@ -1306,6 +1496,14 @@ fn is_immediate_child(parent: &str, child: &str) -> bool {
 }
 
 fn should_skip(path: &str, state_dir: &str) -> bool {
+    if path == "." || path.is_empty() {
+        return false;
+    }
+
+    if path == RUNTIME_STATE_ROOT || path.starts_with(&format!("{RUNTIME_STATE_ROOT}/")) {
+        return true;
+    }
+
     path == ".git"
         || path.starts_with(".git/")
         || path == state_dir
@@ -1481,6 +1679,107 @@ fn error_json(code: &str, message: &str) -> String {
         "filesystem_graph_contract_version": CONTRACT_VERSION
     })
     .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn normalize_relative_path_accepts_clean_paths() {
+        assert_eq!(normalize_relative_path(".").unwrap(), ".");
+        assert_eq!(normalize_relative_path("a/b/c").unwrap(), "a/b/c");
+        assert_eq!(normalize_relative_path("./a//b").unwrap(), "a/b");
+    }
+
+    #[test]
+    fn normalize_relative_path_rejects_escape_and_absolute() {
+        assert!(normalize_relative_path("../x").is_err());
+        assert!(normalize_relative_path("/abs/path").is_err());
+    }
+
+    #[test]
+    fn sha256_matches_known_vector() {
+        assert_eq!(
+            sha256_hex(b"abc"),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+    }
+
+    #[test]
+    fn snapshot_diff_detects_added_removed_changed() {
+        let mut base = BTreeMap::new();
+        base.insert("a.txt".to_string(), "111".to_string());
+        base.insert("b.txt".to_string(), "222".to_string());
+
+        let mut head = BTreeMap::new();
+        head.insert("a.txt".to_string(), "999".to_string());
+        head.insert("c.txt".to_string(), "333".to_string());
+
+        let (added, removed, changed) = compute_snapshot_diff(&base, &head);
+        assert_eq!(added.len(), 1);
+        assert_eq!(removed.len(), 1);
+        assert_eq!(changed.len(), 1);
+        assert_eq!(added[0]["path"].as_str(), Some("c.txt"));
+        assert_eq!(removed[0]["path"].as_str(), Some("b.txt"));
+        assert_eq!(changed[0]["path"].as_str(), Some("a.txt"));
+    }
+
+    #[test]
+    fn traverse_edges_honors_depth_and_filter() {
+        let edges = vec![
+            EdgeRecord {
+                src: "n1".to_string(),
+                dst: "n2".to_string(),
+                edge_type: "CONTAINS".to_string(),
+            },
+            EdgeRecord {
+                src: "n2".to_string(),
+                dst: "n3".to_string(),
+                edge_type: "CONTAINS".to_string(),
+            },
+            EdgeRecord {
+                src: "n1".to_string(),
+                dst: "n4".to_string(),
+                edge_type: "REF".to_string(),
+            },
+        ];
+
+        let (visited_all, traversed_all) = traverse_edges("n1", 2, "", &edges);
+        assert!(visited_all.contains("n3"));
+        assert!(traversed_all.contains(&(
+            "n1".to_string(),
+            "n4".to_string(),
+            "REF".to_string()
+        )));
+
+        let (visited_contains, traversed_contains) = traverse_edges("n1", 2, "CONTAINS", &edges);
+        assert!(visited_contains.contains("n3"));
+        assert!(!visited_contains.contains("n4"));
+        assert!(!traversed_contains.contains(&(
+            "n1".to_string(),
+            "n4".to_string(),
+            "REF".to_string()
+        )));
+    }
+
+    #[test]
+    fn should_skip_runtime_state_paths() {
+        assert!(should_skip(".harmony/runtime/_ops/state/traces/x.ndjson", DEFAULT_STATE_DIR));
+        assert!(should_skip(".harmony/runtime/_ops/state/build/x", DEFAULT_STATE_DIR));
+        assert!(should_skip(".harmony/runtime/_ops/state/snapshots/snap-abc", DEFAULT_STATE_DIR));
+        assert!(should_skip(".git/config", DEFAULT_STATE_DIR));
+        assert!(!should_skip(".harmony/cognition/context/index.yml", DEFAULT_STATE_DIR));
+    }
+
+    #[test]
+    fn tokenize_terms_extracts_lowercase_tokens() {
+        let terms = tokenize_terms("A/B-C_file.md");
+        assert!(terms.contains("file"));
+        assert!(terms.contains("md"));
+        assert!(!terms.contains("a"));
+        assert!(!terms.contains("b"));
+    }
 }
 
 bindings::export!(Service with_types_in bindings);

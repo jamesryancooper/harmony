@@ -3,7 +3,7 @@ name: filesystem-graph
 description: >
   Native-first service for filesystem operations, deterministic snapshots,
   graph traversal, and progressive discovery.
-interface_type: shell
+interface_type: library
 version: "0.1.0"
 metadata:
   author: "harmony"
@@ -19,7 +19,7 @@ contracts:
 compatibility_profile: compatibility.yml
 generation_manifest: impl/generated.manifest.json
 stateful: true
-deterministic: false
+deterministic: true
 dependencies:
   requires: []
   orchestrates: []
@@ -42,11 +42,11 @@ idempotency:
   required: true
   key_from: [command, snapshotId, payloadHash]
 impl:
-  entrypoint: "impl/filesystem-graph.sh"
+  entrypoint: "runtime/run tool interfaces/filesystem-graph"
   timeout_ms: 60000
   health_check: null
 dry_run: true
-allowed-tools: Read Glob Grep Bash
+allowed-tools: Read Glob
 ---
 
 # Filesystem Graph Service

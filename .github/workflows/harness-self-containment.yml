@@ -35,6 +35,11 @@ jobs:
           chmod +x .harmony/capabilities/services/_ops/scripts/validate-service-independence.sh
           .harmony/capabilities/services/_ops/scripts/validate-service-independence.sh
 
+      - name: Validate filesystem-graph runtime wiring
+        run: |
+          chmod +x .harmony/capabilities/services/_ops/scripts/validate-filesystem-graph.sh
+          .harmony/capabilities/services/_ops/scripts/validate-filesystem-graph.sh
+
       - name: Report validation failure
         if: failure()
         run: |

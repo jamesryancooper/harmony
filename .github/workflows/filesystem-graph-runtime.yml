@@ -1,0 +1,66 @@
+name: filesystem-graph-runtime
+
+on:
+  push:
+    paths:
+      - '.harmony/capabilities/services/interfaces/filesystem-graph/**'
+      - '.harmony/capabilities/services/manifest.runtime.yml'
+      - '.harmony/capabilities/services/registry.runtime.yml'
+      - '.harmony/runtime/**'
+      - '.harmony/capabilities/services/_ops/scripts/validate-filesystem-graph.sh'
+      - '.harmony/capabilities/services/_ops/scripts/test-filesystem-graph-determinism.sh'
+      - '.github/workflows/filesystem-graph-runtime.yml'
+  pull_request:
+    paths:
+      - '.harmony/capabilities/services/interfaces/filesystem-graph/**'
+      - '.harmony/capabilities/services/manifest.runtime.yml'
+      - '.harmony/capabilities/services/registry.runtime.yml'
+      - '.harmony/runtime/**'
+      - '.harmony/capabilities/services/_ops/scripts/validate-filesystem-graph.sh'
+      - '.harmony/capabilities/services/_ops/scripts/test-filesystem-graph-determinism.sh'
+      - '.github/workflows/filesystem-graph-runtime.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: validate-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-component
+        run: |
+          cargo install --locked cargo-component
+
+      - name: Build filesystem-graph wasm from source
+        run: |
+          .harmony/runtime/run service build interfaces/filesystem-graph
+
+      - name: Unit tests (filesystem-graph Rust crate)
+        working-directory: .harmony/capabilities/services/interfaces/filesystem-graph/rust
+        run: |
+          cargo test --quiet
+
+      - name: Validate runtime registry and wasm package
+        run: |
+          .harmony/runtime/run validate
+
+      - name: Validate filesystem-graph service
+        run: |
+          chmod +x .harmony/capabilities/services/_ops/scripts/validate-filesystem-graph.sh
+          .harmony/capabilities/services/_ops/scripts/validate-filesystem-graph.sh
+
+      - name: Determinism regression
+        run: |
+          chmod +x .harmony/capabilities/services/_ops/scripts/test-filesystem-graph-determinism.sh
+          .harmony/capabilities/services/_ops/scripts/test-filesystem-graph-determinism.sh

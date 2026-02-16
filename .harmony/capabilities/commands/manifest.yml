@@ -79,7 +79,7 @@ commands:
     path: filesystem-graph.md
     summary: Invoke filesystem-graph service operations via JSON input.
     access: human
-    argument_hint: "--file <path-to-request-json>"
+    argument_hint: "--op <operation> --json '<payload-json>'"
 
   - id: snapshot-build
     display_name: Snapshot Build
@@ -100,28 +100,28 @@ commands:
     path: discover-start.md
     summary: Start progressive discovery for a query using the active snapshot.
     access: human
-    argument_hint: "--file <path-to-request-json>"
+    argument_hint: "--query <text> [--limit <n>]"
 
   - id: discover-expand
     display_name: Discover Expand
     path: discover-expand.md
     summary: Expand progressive discovery frontier by traversing graph neighbors.
     access: human
-    argument_hint: "--file <path-to-request-json>"
+    argument_hint: "--node-ids '<json-array>' [--limit <n>]"
 
   - id: discover-explain
     display_name: Discover Explain
     path: discover-explain.md
     summary: Explain candidate relevance and provenance for progressive discovery.
     access: human
-    argument_hint: "--file <path-to-request-json>"
+    argument_hint: "--query <text> --candidate-node-ids '<json-array>'"
 
   - id: discover-resolve
     display_name: Discover Resolve
     path: discover-resolve.md
     summary: Resolve a discovered node back to file path.
     access: human
-    argument_hint: "--file <path-to-request-json>"
+    argument_hint: "--node-id <node-id>"
 
   - id: create-workflow
     display_name: Create Workflow

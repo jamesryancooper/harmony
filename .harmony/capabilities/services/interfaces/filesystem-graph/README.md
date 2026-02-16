@@ -17,6 +17,6 @@ knowledge-graph traversal, and progressive discovery.
 - `rules/rules.yml` - policy and contract checks.
 - `contracts/invariants.md` - non-negotiable invariants.
 - `contracts/errors.yml` - typed error semantics.
-- `impl/filesystem-graph.sh` - operation dispatcher.
-- `impl/snapshot-build.sh` - deterministic snapshot builder.
-- `impl/snapshot-diff.sh` - snapshot comparison utility.
+- `service.json` / `service.wasm` - runtime-native service package.
+- `rust/` - Rust/WASM implementation.
+- `impl/generated.manifest.json` - implementation generation metadata.
