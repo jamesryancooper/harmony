@@ -14,7 +14,7 @@
   "entry": "service.wasm",
   "format_version": "service-manifest-v1",
   "integrity": {
-    "wasm_sha256": "92001ef3eeb9b881da6ac80356b16836697c4173eb3585936f675dc0da5c418f"
+    "wasm_sha256": "49abd011790caab74662609fd90d64529ac425c0b89b735a39ff7e7285a8adf8"
   },
   "limits": {
     "max_concurrency": 1,
@@ -406,6 +406,11 @@
           },
           "limit": {
             "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "max_content_bytes_per_file": {
+            "maximum": 1048576,
             "minimum": 1,
             "type": "integer"
           },
@@ -1390,6 +1395,21 @@
       "input_schema": {
         "additionalProperties": false,
         "properties": {
+          "gc_max_age_hours": {
+            "maximum": 87600,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "gc_max_snapshots": {
+            "maximum": 100000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "gc_max_state_bytes": {
+            "maximum": 1099511627776,
+            "minimum": 0,
+            "type": "integer"
+          },
           "max_files": {
             "maximum": 1000000,
             "minimum": 1,
@@ -1444,6 +1464,57 @@
                   "files",
                   "nodes",
                   "edges"
+                ],
+                "type": "object"
+              },
+              "gc": {
+                "additionalProperties": false,
+                "properties": {
+                  "deleted_bytes": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "deleted_snapshots": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "remaining_bytes": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "remaining_snapshots": {
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "deleted_snapshots",
+                  "deleted_bytes",
+                  "remaining_snapshots",
+                  "remaining_bytes"
+                ],
+                "type": "object"
+              },
+              "limits": {
+                "additionalProperties": false,
+                "properties": {
+                  "max_files": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_op_ms": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "max_total_bytes": {
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "max_files",
+                  "max_total_bytes",
+                  "max_op_ms"
                 ],
                 "type": "object"
               },

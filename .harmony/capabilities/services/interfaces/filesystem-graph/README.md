@@ -40,10 +40,13 @@ knowledge-graph traversal, and progressive discovery.
 ## Safety Limits
 
 - `snapshot.build` enforces default caps for `max_files`, `max_total_bytes`, and `max_op_ms`.
+- `snapshot.build` applies retention GC controls (`gc_max_snapshots`, `gc_max_age_hours`, `gc_max_state_bytes`).
 - `discover.start` enforces bounded `content_scan_limit` and `max_op_ms`.
+- `discover.start` enforces `max_content_bytes_per_file` and binary-file skipping during content fallback scan.
 - Corrupt snapshot artifacts fail with actionable rebuild remediation guidance.
 
 ## Failure Alerting
 
-- Runtime and SLO tuning workflow failures upsert a GitHub issue with run metadata.
+- Runtime and SLO tuning workflow failures upsert a GitHub issue with run metadata and cooldown-based de-duplication.
+- Recovery runs automatically annotate and close open alert issues.
 - Optional Slack delivery is enabled when repository secret `FILESYSTEM_GRAPH_SLO_ALERT_WEBHOOK` is configured.

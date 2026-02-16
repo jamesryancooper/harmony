@@ -8,6 +8,7 @@
 4. Return typed errors for validation and policy failures.
 5. Block operations on invalid or missing required snapshot artifacts with actionable rebuild remediation guidance.
 6. Enforce bounded snapshot/discovery limits for files scanned, bytes processed, and operation time.
+7. Enforce snapshot retention policies via deterministic GC without deleting active snapshots.
 
 ## Operation Families
 
@@ -29,3 +30,4 @@ All operations must emit output conforming to:
 - Service emits structured `filesystem_graph.metric` log events per op.
 - Events include op name, status, duration, byte sizes, scanned file counts, and SLO status.
 - CI validates SLO budgets in `contracts/slo-budgets.tsv`.
+- CI validates cross-OS snapshot determinism for fixture builds.

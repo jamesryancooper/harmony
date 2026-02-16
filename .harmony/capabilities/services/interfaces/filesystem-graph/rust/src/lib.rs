@@ -16,10 +16,16 @@ const RUNTIME_STATE_ROOT: &str = ".harmony/runtime/_ops/state";
 const SERVICES_BUILD_STATE_ROOT: &str = ".harmony/capabilities/services/_ops/state/build";
 const HASH_CACHE_FILE: &str = "hash-cache.jsonl";
 const SEARCH_INDEX_FILE: &str = "search-index.jsonl";
+const SNAPSHOT_READY_MARKER: &str = ".ready";
+const SNAPSHOT_BUILDING_MARKER: &str = ".building";
 const DEFAULT_SNAPSHOT_MAX_FILES: u64 = 200_000;
 const DEFAULT_SNAPSHOT_MAX_TOTAL_BYTES: u64 = 512 * 1024 * 1024;
 const DEFAULT_SNAPSHOT_MAX_OP_MS: u64 = 90_000;
+const DEFAULT_SNAPSHOT_GC_MAX_SNAPSHOTS: u64 = 128;
+const DEFAULT_SNAPSHOT_GC_MAX_AGE_HOURS: u64 = 24 * 30;
+const DEFAULT_SNAPSHOT_GC_MAX_STATE_BYTES: u64 = 4 * 1024 * 1024 * 1024;
 const DEFAULT_DISCOVER_MAX_OP_MS: u64 = 5_000;
+const DEFAULT_DISCOVER_MAX_CONTENT_BYTES_PER_FILE: u64 = 64 * 1024;
 
 #[derive(Debug)]
 struct ServiceError {
@@ -32,7 +38,8 @@ struct FileRecord {
     path: String,
     sha256: String,
     size_bytes: u64,
-    modified_epoch: u64,
+    #[serde(default, alias = "modified_epoch")]
+    modified_ms: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -57,7 +64,8 @@ struct EdgeRecord {
 struct HashCacheRecord {
     path: String,
     size_bytes: u64,
-    modified_epoch: u64,
+    #[serde(default, alias = "modified_epoch")]
+    modified_ms: u64,
     sha256: String,
 }
 
@@ -96,6 +104,22 @@ struct SnapshotLimits {
 struct SnapshotProgress {
     files_scanned: u64,
     total_size: u64,
+}
+
+#[derive(Debug, Clone)]
+struct SnapshotDirInfo {
+    id: String,
+    path: String,
+    modified_ms: u64,
+    size_bytes: u64,
+}
+
+#[derive(Debug, Default, Clone, Copy, Serialize)]
+struct SnapshotGcStats {
+    deleted_snapshots: u64,
+    deleted_bytes: u64,
+    remaining_snapshots: u64,
+    remaining_bytes: u64,
 }
 
 thread_local! {
@@ -426,6 +450,13 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
     let max_files = get_u64_or(input, "max_files", DEFAULT_SNAPSHOT_MAX_FILES);
     let max_total_bytes = get_u64_or(input, "max_total_bytes", DEFAULT_SNAPSHOT_MAX_TOTAL_BYTES);
     let max_op_ms = get_u64_or(input, "max_op_ms", DEFAULT_SNAPSHOT_MAX_OP_MS);
+    let gc_max_snapshots = get_u64_or(input, "gc_max_snapshots", DEFAULT_SNAPSHOT_GC_MAX_SNAPSHOTS);
+    let gc_max_age_hours = get_u64_or(input, "gc_max_age_hours", DEFAULT_SNAPSHOT_GC_MAX_AGE_HOURS);
+    let gc_max_state_bytes = get_u64_or(
+        input,
+        "gc_max_state_bytes",
+        DEFAULT_SNAPSHOT_GC_MAX_STATE_BYTES,
+    );
 
     if max_files == 0 {
         return Err(err(
@@ -445,6 +476,13 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
         return Err(err(
             "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
             "max_op_ms must be >= 1.",
+        ));
+    }
+
+    if gc_max_snapshots == 0 {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "gc_max_snapshots must be >= 1.",
         ));
     }
 
@@ -513,20 +551,25 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
                 format!("Failed to serialize file record: {e}"),
             )
         })?);
-        seed_lines.push(format!(
-            "{}\t{}\t{}\t{}",
-            f.path, f.sha256, f.size_bytes, f.modified_epoch
-        ));
+        seed_lines.push(format!("{}\t{}\t{}", f.path, f.sha256, f.size_bytes));
     }
     seed_lines.sort();
 
     let input_fingerprint = sha256_hex(seed_lines.join("\n").as_bytes());
     let snapshot_id = format!("snap-{}", &input_fingerprint[..16]);
     let snapshot_dir = join_path(&state_dir, &snapshot_id);
+    let ready_marker = join_path(&snapshot_dir, SNAPSHOT_READY_MARKER);
+    let building_marker = join_path(&snapshot_dir, SNAPSHOT_BUILDING_MARKER);
 
-    if !fs_exists(&snapshot_dir) {
-        bindings::fs::mkdirp(&snapshot_dir);
+    if fs_exists(&snapshot_dir) {
+        // Best-effort cleanup for stale or prior artifacts before writing a fresh deterministic snapshot.
+        bindings::fs::remove_dir_recursive(&snapshot_dir);
     }
+    bindings::fs::mkdirp(&snapshot_dir);
+    write_text_file(
+        &building_marker,
+        &format!("started_at={}", epoch_ms_to_rfc3339(monotonic_now_ms())),
+    )?;
 
     let mut node_lines = Vec::new();
     for dir_path in &dirs {
@@ -617,10 +660,35 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
             )
         })?,
     )?;
+    write_text_file(
+        &ready_marker,
+        &format!("ready_at={}", epoch_ms_to_rfc3339(monotonic_now_ms())),
+    )?;
+    if fs_exists(&building_marker) {
+        bindings::fs::remove_file(&building_marker);
+    }
 
     if set_current {
         write_text_file(&join_path(&state_dir, "current"), &snapshot_id)?;
     }
+
+    let mut gc_keep_ids = BTreeSet::new();
+    gc_keep_ids.insert(snapshot_id.clone());
+    let current_path = join_path(&state_dir, "current");
+    if fs_exists(&current_path) {
+        let current = read_text_file(&current_path).unwrap_or_default();
+        let current = current.trim();
+        if !current.is_empty() {
+            gc_keep_ids.insert(current.to_string());
+        }
+    }
+    let gc = run_snapshot_gc(
+        &state_dir,
+        &gc_keep_ids,
+        gc_max_snapshots,
+        gc_max_age_hours,
+        gc_max_state_bytes,
+    )?;
 
     Ok(json!({
         "ok": true,
@@ -632,7 +700,13 @@ fn op_snapshot_build(input: &Value) -> Result<Value, ServiceError> {
             "nodes": node_lines.len(),
             "edges": edge_lines.len()
         },
-        "set_current": set_current
+        "set_current": set_current,
+        "limits": {
+            "max_files": max_files,
+            "max_total_bytes": max_total_bytes,
+            "max_op_ms": max_op_ms
+        },
+        "gc": gc
     }))
 }
 
@@ -657,6 +731,18 @@ fn op_snapshot_get_current(input: &Value) -> Result<Value, ServiceError> {
 
     let snapshot_dir = join_path(&state_dir, &snapshot_id);
     let manifest_path = join_path(&snapshot_dir, "manifest.json");
+    let ready_marker = join_path(&snapshot_dir, SNAPSHOT_READY_MARKER);
+    let building_marker = join_path(&snapshot_dir, SNAPSHOT_BUILDING_MARKER);
+
+    if fs_exists(&building_marker) && !fs_exists(&ready_marker) {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
+            format!(
+                "Active snapshot is incomplete: {snapshot_id}. {}",
+                snapshot_rebuild_hint(&state_dir)
+            ),
+        ));
+    }
 
     let manifest = if fs_exists(&manifest_path) {
         let manifest_text = read_text_file(&manifest_path)?;
@@ -848,10 +934,21 @@ fn op_discover_start(input: &Value) -> Result<Value, ServiceError> {
     let query_terms = tokenize_terms(&query);
     let content_scan_limit = get_u64_or(input, "content_scan_limit", 200) as usize;
     let max_op_ms = get_u64_or(input, "max_op_ms", DEFAULT_DISCOVER_MAX_OP_MS);
+    let max_content_bytes_per_file = get_u64_or(
+        input,
+        "max_content_bytes_per_file",
+        DEFAULT_DISCOVER_MAX_CONTENT_BYTES_PER_FILE,
+    );
     if max_op_ms == 0 {
         return Err(err(
             "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
             "max_op_ms must be >= 1.",
+        ));
+    }
+    if max_content_bytes_per_file == 0 {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_INPUT_INVALID",
+            "max_content_bytes_per_file must be >= 1.",
         ));
     }
     let deadline_ms = monotonic_now_ms().saturating_add(max_op_ms);
@@ -899,7 +996,17 @@ fn op_discover_start(input: &Value) -> Result<Value, ServiceError> {
             continue;
         }
 
+        if is_probably_binary_path(&file.path) {
+            continue;
+        }
+        if file.size_bytes > max_content_bytes_per_file {
+            continue;
+        }
+
         let bytes = read_bytes(&file.path);
+        if looks_binary_content(&bytes) {
+            continue;
+        }
         let text = String::from_utf8_lossy(&bytes).to_lowercase();
         if text.contains(&query_lower) {
             let entry = candidates.entry(key).or_insert((
@@ -1167,7 +1274,7 @@ fn collect_snapshot_data(
                 )?;
             }
             bindings::fs::NodeKind::File => {
-                let modified_epoch = stat.modified_ms.unwrap_or(0) / 1000;
+                let modified_ms = stat.modified_ms.unwrap_or(0);
                 let size_bytes = stat.size;
                 progress.files_scanned = progress.files_scanned.saturating_add(1);
                 progress.total_size = progress.total_size.saturating_add(size_bytes);
@@ -1201,7 +1308,7 @@ fn collect_snapshot_data(
                 }
 
                 let sha = if let Some(cached) = cache_by_path.get(&child) {
-                    if cached.size_bytes == size_bytes && cached.modified_epoch == modified_epoch {
+                    if cached.size_bytes == size_bytes && cached.modified_ms == modified_ms {
                         cached.sha256.clone()
                     } else {
                         let bytes = read_bytes(&child);
@@ -1217,7 +1324,7 @@ fn collect_snapshot_data(
                     HashCacheRecord {
                         path: child.clone(),
                         size_bytes,
-                        modified_epoch,
+                        modified_ms,
                         sha256: sha.clone(),
                     },
                 );
@@ -1226,7 +1333,7 @@ fn collect_snapshot_data(
                     path: child.clone(),
                     sha256: sha,
                     size_bytes,
-                    modified_epoch,
+                    modified_ms,
                 });
 
                 edges.insert((
@@ -1324,7 +1431,18 @@ fn load_snapshot(input: &Value) -> Result<SnapshotData, ServiceError> {
     let nodes_path = join_path(&snapshot_dir, "nodes.jsonl");
     let edges_path = join_path(&snapshot_dir, "edges.jsonl");
     let index_path = join_path(&snapshot_dir, SEARCH_INDEX_FILE);
+    let ready_marker = join_path(&snapshot_dir, SNAPSHOT_READY_MARKER);
+    let building_marker = join_path(&snapshot_dir, SNAPSHOT_BUILDING_MARKER);
     let remediation = snapshot_rebuild_hint(&state_dir);
+
+    if fs_exists(&building_marker) && !fs_exists(&ready_marker) {
+        return Err(err(
+            "ERR_FILESYSTEM_GRAPH_SNAPSHOT_INVALID",
+            format!(
+                "Snapshot appears incomplete (building marker present): {snapshot_dir}. {remediation}"
+            ),
+        ));
+    }
 
     for p in [&manifest_path, &files_path, &nodes_path, &edges_path] {
         if !fs_exists(p) {
@@ -1535,6 +1653,185 @@ fn snapshot_rebuild_hint(state_dir: &str) -> String {
     )
 }
 
+fn run_snapshot_gc(
+    state_dir: &str,
+    keep_ids: &BTreeSet<String>,
+    max_snapshots: u64,
+    max_age_hours: u64,
+    max_state_bytes: u64,
+) -> Result<SnapshotGcStats, ServiceError> {
+    let mut snapshots = list_snapshot_dirs(state_dir)?;
+    if snapshots.is_empty() {
+        return Ok(SnapshotGcStats::default());
+    }
+
+    snapshots.sort_by(|a, b| {
+        b.modified_ms
+            .cmp(&a.modified_ms)
+            .then_with(|| a.id.cmp(&b.id))
+    });
+
+    let now_ms = monotonic_now_ms();
+    let mut delete = vec![false; snapshots.len()];
+    let age_limit_ms = max_age_hours.saturating_mul(3_600_000);
+
+    if age_limit_ms > 0 {
+        for (idx, snap) in snapshots.iter().enumerate() {
+            if keep_ids.contains(&snap.id) {
+                continue;
+            }
+            if now_ms.saturating_sub(snap.modified_ms) > age_limit_ms {
+                delete[idx] = true;
+            }
+        }
+    }
+
+    let mut retained_count = snapshots
+        .iter()
+        .enumerate()
+        .filter(|(idx, _)| !delete[*idx])
+        .count() as u64;
+
+    if retained_count > max_snapshots {
+        let mut oldest_first: Vec<usize> = (0..snapshots.len()).collect();
+        oldest_first.sort_by(|a, b| {
+            snapshots[*a]
+                .modified_ms
+                .cmp(&snapshots[*b].modified_ms)
+                .then_with(|| snapshots[*a].id.cmp(&snapshots[*b].id))
+        });
+
+        for idx in oldest_first {
+            if retained_count <= max_snapshots {
+                break;
+            }
+            if delete[idx] || keep_ids.contains(&snapshots[idx].id) {
+                continue;
+            }
+            delete[idx] = true;
+            retained_count = retained_count.saturating_sub(1);
+        }
+    }
+
+    if max_state_bytes > 0 {
+        let mut retained_bytes: u64 = snapshots
+            .iter()
+            .enumerate()
+            .filter(|(idx, _)| !delete[*idx])
+            .map(|(_, snap)| snap.size_bytes)
+            .sum();
+
+        if retained_bytes > max_state_bytes {
+            let mut oldest_first: Vec<usize> = (0..snapshots.len()).collect();
+            oldest_first.sort_by(|a, b| {
+                snapshots[*a]
+                    .modified_ms
+                    .cmp(&snapshots[*b].modified_ms)
+                    .then_with(|| snapshots[*a].id.cmp(&snapshots[*b].id))
+            });
+
+            for idx in oldest_first {
+                if retained_bytes <= max_state_bytes {
+                    break;
+                }
+                if delete[idx] || keep_ids.contains(&snapshots[idx].id) {
+                    continue;
+                }
+                delete[idx] = true;
+                retained_bytes = retained_bytes.saturating_sub(snapshots[idx].size_bytes);
+            }
+        }
+    }
+
+    let mut stats = SnapshotGcStats::default();
+    for (idx, snap) in snapshots.iter().enumerate() {
+        if !delete[idx] {
+            continue;
+        }
+        if fs_exists(&snap.path) {
+            bindings::fs::remove_dir_recursive(&snap.path);
+        }
+        stats.deleted_snapshots = stats.deleted_snapshots.saturating_add(1);
+        stats.deleted_bytes = stats.deleted_bytes.saturating_add(snap.size_bytes);
+    }
+
+    for (idx, snap) in snapshots.iter().enumerate() {
+        if delete[idx] {
+            continue;
+        }
+        stats.remaining_snapshots = stats.remaining_snapshots.saturating_add(1);
+        stats.remaining_bytes = stats.remaining_bytes.saturating_add(snap.size_bytes);
+    }
+
+    Ok(stats)
+}
+
+fn list_snapshot_dirs(state_dir: &str) -> Result<Vec<SnapshotDirInfo>, ServiceError> {
+    if !fs_exists(state_dir) {
+        return Ok(Vec::new());
+    }
+
+    let mut out = Vec::new();
+    let mut entries = fs_list_dir_paths(state_dir);
+    entries.sort();
+
+    for child in entries {
+        let Some(stat) = fs_get_stat(&child) else {
+            continue;
+        };
+        if !matches!(stat.kind, bindings::fs::NodeKind::Dir) {
+            continue;
+        }
+
+        let id = basename(&child);
+        if !id.starts_with("snap-") {
+            continue;
+        }
+
+        let manifest_path = join_path(&child, "manifest.json");
+        let modified_ms = fs_get_stat(&manifest_path)
+            .and_then(|s| s.modified_ms)
+            .or(stat.modified_ms)
+            .unwrap_or(0);
+        let size_bytes = snapshot_dir_size_bytes(&child)?;
+
+        out.push(SnapshotDirInfo {
+            id,
+            path: child,
+            modified_ms,
+            size_bytes,
+        });
+    }
+
+    Ok(out)
+}
+
+fn snapshot_dir_size_bytes(dir: &str) -> Result<u64, ServiceError> {
+    let mut total = 0u64;
+    collect_dir_size_recursive(dir, &mut total)?;
+    Ok(total)
+}
+
+fn collect_dir_size_recursive(path: &str, total: &mut u64) -> Result<(), ServiceError> {
+    let mut entries = fs_list_dir_paths(path);
+    entries.sort();
+
+    for child in entries {
+        let Some(stat) = fs_get_stat(&child) else {
+            continue;
+        };
+
+        match stat.kind {
+            bindings::fs::NodeKind::File => {
+                *total = total.saturating_add(stat.size);
+            }
+            bindings::fs::NodeKind::Dir => collect_dir_size_recursive(&child, total)?,
+        }
+    }
+
+    Ok(())
+}
+
 fn resolve_snapshot_ref(state_dir: &str, value: &str) -> Result<(String, String), ServiceError> {
     let normalized = norm_rel_required(Some(value.to_string()))?;
 
@@ -1738,6 +2035,52 @@ fn tokenize_terms(text: &str) -> BTreeSet<String> {
     }
 
     out
+}
+
+fn is_probably_binary_path(path: &str) -> bool {
+    let ext = path
+        .rsplit('.')
+        .next()
+        .map(|v| v.to_ascii_lowercase())
+        .unwrap_or_default();
+
+    matches!(
+        ext.as_str(),
+        "png"
+            | "jpg"
+            | "jpeg"
+            | "gif"
+            | "bmp"
+            | "webp"
+            | "ico"
+            | "pdf"
+            | "zip"
+            | "gz"
+            | "tar"
+            | "tgz"
+            | "7z"
+            | "rar"
+            | "jar"
+            | "war"
+            | "class"
+            | "wasm"
+            | "o"
+            | "a"
+            | "so"
+            | "dylib"
+            | "dll"
+            | "exe"
+            | "bin"
+            | "mp3"
+            | "mp4"
+            | "mov"
+            | "avi"
+    )
+}
+
+fn looks_binary_content(bytes: &[u8]) -> bool {
+    let sample_len = bytes.len().min(1024);
+    bytes[..sample_len].iter().any(|b| *b == 0)
 }
 
 fn fs_exists(path: &str) -> bool {
