@@ -41,7 +41,11 @@
     },
     "capabilities_required": {
       "type": "array",
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Capability id such as log.write, storage.local, fs.read, fs.write, clock.read, or net.http."
+      },
       "uniqueItems": true
     },
     "ops": {

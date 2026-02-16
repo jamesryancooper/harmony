@@ -174,6 +174,8 @@ pub fn service_build(harmony_dir: &Path, category: &str, name: &str) -> anyhow::
         .arg("component")
         .arg("build")
         .arg("--release")
+        // The Harmony harness is expected to support offline execution.
+        .arg("--offline")
         .env("CARGO_TARGET_DIR", &build_target_dir)
         .current_dir(&rust_dir)
         .status()
