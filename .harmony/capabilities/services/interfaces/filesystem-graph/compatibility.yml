@@ -1,8 +1,0 @@
-version: "1.0.0"
-compatibility:
-  required_tools: [read, glob]
-  optional_tools: [grep, rg]
-  minimum_behavior:
-    deterministic_snapshot_ids: true
-    fail_closed_policy: true
-    progressive_discovery: true

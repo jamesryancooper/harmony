@@ -39,10 +39,10 @@ description: Quality criteria and completion checklist for harness tasks.
 - [ ] `validate-service-independence.sh --mode degradation` passes
 - [ ] Native commands (`context-budget`, `validate-session-policy`) run without adapters
 
-### For Filesystem Graph Changes
+### For Filesystem Interface Changes
 
 - [ ] Files remain source-of-truth; graph is derived from snapshots
-- [ ] `validate-filesystem-graph.sh` passes
+- [ ] `validate-filesystem-interfaces.sh` passes
 - [ ] Snapshot build emits deterministic `snap-*` IDs for identical inputs
 - [ ] Progressive discovery commands (`discover-start`, `discover-expand`, `discover-resolve`) execute with an active snapshot
 

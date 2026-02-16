@@ -1,6 +1,6 @@
 ---
 title: Snapshot Diff
-description: Compare two filesystem-graph snapshots.
+description: Compare two filesystem-snapshot artifacts.
 access: human
 argument-hint: "--base <snapshot-id|path> --head <snapshot-id|path> [--state-dir <path>]"
 ---
@@ -18,6 +18,6 @@ Compare two snapshots and emit added/removed/changed paths.
 ## Implementation
 
 ```bash
-.harmony/runtime/run tool interfaces/filesystem-graph snapshot.diff --json \
+.harmony/runtime/run tool interfaces/filesystem-snapshot snapshot.diff --json \
   '{"base":"snap-aaaa","head":"snap-bbbb","state_dir":".harmony/runtime/_ops/state/snapshots"}'
 ```

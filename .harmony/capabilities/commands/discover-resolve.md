@@ -7,9 +7,9 @@ argument-hint: "--node-id <node-id>"
 
 # Discover Resolve `/discover-resolve`
 
-Run `discover.resolve` through the filesystem-graph service.
+Run `discover.resolve` through the filesystem-discovery query plane.
 
 ```bash
-.harmony/runtime/run tool interfaces/filesystem-graph discover.resolve --json \
+.harmony/runtime/run tool interfaces/filesystem-discovery discover.resolve --json \
   '{"node_id":"file:.harmony/START.md"}'
 ```

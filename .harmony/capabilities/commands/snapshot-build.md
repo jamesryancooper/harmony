@@ -1,13 +1,13 @@
 ---
 title: Snapshot Build
-description: Build deterministic filesystem-graph snapshot artifacts.
+description: Build deterministic snapshot artifacts via filesystem-snapshot.
 access: human
 argument-hint: "[--root <path>] [--state-dir <path>] [--set-current true|false]"
 ---
 
 # Snapshot Build `/snapshot-build`
 
-Build deterministic snapshot artifacts for filesystem-graph operations.
+Build deterministic snapshot artifacts via the filesystem-snapshot writer plane.
 
 ## Usage
 
@@ -20,6 +20,6 @@ Build deterministic snapshot artifacts for filesystem-graph operations.
 ## Implementation
 
 ```bash
-.harmony/runtime/run tool interfaces/filesystem-graph snapshot.build --json \
+.harmony/runtime/run tool interfaces/filesystem-snapshot snapshot.build --json \
   '{"root":".","state_dir":".harmony/runtime/_ops/state/snapshots","set_current":true}'
 ```
