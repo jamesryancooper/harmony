@@ -33,6 +33,12 @@ case "$OS" in
     ;;
 esac
 
+case "${1:-}" in
+  ""|studio|-h|--help|help)
+    BIN=""
+    ;;
+esac
+
 if [ -n "${BIN:-}" ] && [ -x "$BIN" ]; then
   if [ "${HARMONY_RUNTIME_PREFER_SOURCE:-0}" != "1" ]; then
     exec "$BIN" "$@"
