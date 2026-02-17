@@ -309,12 +309,6 @@ workflows:
     access: human
     depends_on: []
 
-  run-flow:
-    version: "1.0.0"
-    commands: ["/run-flow"]
-    access: human
-    depends_on: []
-
   create-project:
     version: "1.0.0"
     commands: ["/create-project"]

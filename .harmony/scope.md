@@ -15,7 +15,7 @@ This harness contains:
 - Repository-wide principles, methodology, and architecture guidance
 - Progress tracking for repo-level work
 - Mission tracking for time-bounded sub-projects
-- Domain-specific workflows (e.g., FlowKit integration)
+- Domain-specific workflows
 
 **Note:** All content is organized by capability within `.harmony/`. See `.harmony/README.md` for the full structure.
 
@@ -24,7 +24,7 @@ This harness contains:
 - Repository-wide context (decisions, lessons, glossary, constraints)
 - Repository-wide architecture, principles, and methodology docs
 - Repo-level progress tracking and session continuity
-- Repository-wide workflows (e.g., FlowKit execution)
+- Repository-wide workflows
 - Managing missions (time-bounded sub-projects)
 - Repo-specific conventions and style rules
 
@@ -48,14 +48,14 @@ This harness contains:
 | Mission management workflows | `.harmony/orchestration/workflows/missions/` | `create-mission`, `complete-mission` |
 | Generic skills | `.harmony/capabilities/skills/` | `synthesize-research/` |
 | **Repo-wide (in `.harmony/`)** | | |
-| Repository-wide tool workflows | `.harmony/orchestration/workflows/<tool>/` | `flowkit/run-flow` |
+| Repository-wide tool workflows | `.harmony/orchestration/workflows/<tool>/` | _None currently_ |
 | Repo-level missions | `.harmony/orchestration/missions/` | `auth-overhaul/`, `billing-v2/` |
 | Repo-wide context | `.harmony/cognition/context/` | `decisions.md`, `lessons.md` |
 | **Domain-specific** | | |
 | Domain workflows | Domain's `.harmony/orchestration/workflows/` | `docs/api/.harmony/orchestration/workflows/` |
 | Domain conventions | Domain's `.harmony/conventions.md` | Package-specific style rules |
 | **Harness entry points** | | |
-| Cursor command wrappers | `.cursor/commands/` | `create-harness.md`, `run-flow.md` |
+| Cursor command wrappers | `.cursor/commands/` | `create-harness.md`, `evaluate-harness.md` |
 | Global Cursor commands | `~/.cursor/commands/` | Git utilities, personal workflows |
 
 ## Decision Authority

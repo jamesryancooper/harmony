@@ -5,7 +5,7 @@ description: Classification of commands, workflows, prompts, and their relations
 
 # Harness Artifact Taxonomy
 
-This document clarifies the distinctions between harness artifact types: **commands**, **workflows**, **prompts**, and their relationship to **Cursor commands**. It also calls out **FlowKit flow assets** because they can look similar to harness workflows but are owned and executed differently.
+This document clarifies the distinctions between harness artifact types: **commands**, **workflows**, **prompts**, and their relationship to **Cursor commands**.
 
 ---
 
@@ -20,7 +20,6 @@ This document clarifies the distinctions between harness artifact types: **comma
 | **Harness Skill** | `.harmony/capabilities/skills/` | Composable capability | Defined I/O, pipelines, auditability |
 | **Assistant** | `.harmony/agency/assistants/` | Focused specialist | Scoped, delegatable tasks |
 | **Mission** | `.harmony/orchestration/missions/` | Sub-project | Isolated, time-bounded work |
-| **FlowKit Flow (repo-wide)** | `<flow-assets>/` | Runnable flow assets | Needs FlowKit runtime/CI/Studio execution |
 
 ---
 
@@ -50,7 +49,6 @@ This document clarifies the distinctions between harness artifact types: **comma
 | **Harness Command** | `.harmony/capabilities/commands/` | Harness delegation or direct agent reference | Harness-specific, atomic |
 | **Harness Workflow** | `.harmony/orchestration/workflows/` | Harness delegation or direct agent reference | Harness-specific, multi-step |
 | **Harness Prompt** | `.harmony/scaffolding/prompts/` | Direct agent reference | Harness-specific, template |
-| **FlowKit Flow** | `<flow-assets>/` | `flowkit run <path-to-config.flow.json>` or `/run-flow @path/to/config.flow.json` | Repository-wide |
 
 ### Supported Harnesses
 
@@ -317,40 +315,6 @@ See [skills.md](../../../capabilities/skills/README.md) for full details.
 
 ---
 
-## FlowKit Flows (Repo-Wide)
-
-**Location:** `<flow-assets>/<flowId>/`
-
-FlowKit flows are **executable flow assets** run by FlowKit (CLI + LangGraph runtime), not harness workflows run by agents.
-
-### Characteristics
-
-- **Machine-wired execution** — flow graphs and semantics are defined by `config.flow.json` + `manifest.yaml`.
-- **Repo-wide scope** — used by the FlowKit CLI, CI automation, and LangGraph Studio.
-- **Different metadata model** — canonical prompt frontmatter stays minimal; wiring and classification live in config/manifest.
-
-### Choosing Between `.harmony/orchestration/workflows/**` and `<flow-assets>/**`
-
-Use this guide when you're deciding *where* a multi-step workflow belongs:
-
-| Dimension | `.harmony/orchestration/workflows/**` (Harness Workflow) | `<flow-assets>/**` (FlowKit Flow Assets) |
-|---|---|---|
-| Primary purpose | Human/agent **procedure** (“follow these steps”) | Runnable **execution contract** (config + manifest + prompts) |
-| How it runs | An agent reads Markdown and follows steps | FlowKit CLI + runtime execute a manifest-defined graph |
-| Entry points | Direct agent reference; optional `/…` wrapper via `.cursor/commands/*` | `flowkit run <path-to-config.flow.json>`; `/run-flow @path/to/config.flow.json`; automation or CI calling the runner |
-| Strengths | Low ceremony; high readability; great for IDE UX and runbooks | Deterministic ordering; structured state/output; easier automation/CI/Studio; clearer “semantics” ownership |
-| Weaknesses | Harder to automate reliably; “determinism” depends on agent compliance; limited structured observability | More setup/maintenance; more concepts (config/manifest/runtime); overkill for simple runbooks |
-| Best for | Harness management, procedural checklists, thin tool wrappers | Long-running / repeatable flows, evaluators/assessments, any workflow you want to run from multiple surfaces |
-
-**Rule of thumb**
-
-- If it must be runnable/auditable as a system (CLI/CI/runtime/Studio) → `<flow-assets>/<flowId>/`
-- If it’s primarily guidance/UX (“how we do this here”, optionally wrapped as a Cursor command) → `.harmony/orchestration/workflows/**`
-
-See `.harmony/capabilities/services/execution/flow/guide.md` for the ownership map and entrypoints.
-
----
-
 ## Decision Guidance
 
 All decision flowcharts and tables are maintained in `.harmony/catalog.md#decision-guidance` as the single source of truth. This includes:
@@ -374,7 +338,6 @@ See `.harmony/catalog.md` for complete decision flowcharts and examples.
 | Assistants | `.harmony/agency/assistants/<name>/` | Focused specialists | Via @mention |
 | Missions | `.harmony/orchestration/missions/<slug>/` | Sub-projects | No |
 | Checklists | `.harmony/quality/*.md` | Quality gates | No |
-| FlowKit Flow assets | `<flow-assets>/<flowId>/` | Repository-wide | No (but can be wrapped via `/run-flow`) |
 
 ### Harness Entry Point Directories
 

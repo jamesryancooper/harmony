@@ -1,24 +1,6 @@
 # Archive
 .archive/
 
-# SpecStory
-.specstory/**
-
-# Node/Turbo/Vercel
-node_modules/
-.turbo/
-.next/
-.vercel/
-dist/
-build/
-coverage/
-/reports/
-sbom/
-.DS_Store
-*.tsbuildinfo
-*.log
-
-
 # Environment files
 .env
 .env.*
@@ -29,52 +11,22 @@ sbom/
 .vscode/
 .idea/
 
-# Framework and tool caches
-.astro/
-.cache/
-.vitest/
-
-# Test artifacts
-junit.xml
-test-results/
-playwright-report/
-
-# Package manager logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
 # Temporary files
 tmp/
 temp/
 *.pid
 *.pid.lock
 
-
-# Additional build outputs
-out/
-storybook-static/
-
-# Cypress artifacts
-cypress/screenshots/
-cypress/videos/
-cypress/downloads/
-
-# ESLint/Stylelint caches
-.eslintcache
-.stylelintcache
-
-# Coverage extras
-nyc_output/
-coverage-final.json
-lcov.info
-
 # Logs directory
 logs/
+*.log
 
-# Run records (centralized via HARMONY_RUNS_DIR)
+# Runtime and service run records
 runs/
+
+
+# Additional local outputs
+out/
 
 # Harmony runtime state (local/cache/traces)
 .harmony/runtime/_ops/state/
@@ -82,19 +34,8 @@ runs/
 !.harmony/runtime/_ops/state/
 !.harmony/runtime/_ops/state/.gitkeep
 
-# Legacy runtime state location (deprecated)
-.harmony/state/
-.harmony/state/**
-
-# Package manager lockfiles (non-pnpm)
-package-lock.json
-yarn.lock
-
-# Yarn PnP
-.pnp.*
-.pnp.cjs
-
 # OS-specific files
+.DS_Store
 Thumbs.db
 Desktop.ini
 Icon?
@@ -103,31 +44,6 @@ Icon?
 
 # Archives from packaging
 *.tgz
-
-# Python / virtualenv (ai-gateway)
-.venv/
-venv/
-.python-version
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.mypy_cache/
-.pytest_cache/
-.ruff_cache/
-.tox/
-.nox/
-.hypothesis/
-.pyre/
-.ipynb_checkpoints/
-.coverage
-.coverage.*
-coverage.xml
-pip-wheel-metadata/
-*.egg-info/
-.eggs/
-*.egg
-*.whl
 
 # direnv / envrc
 .direnv/
@@ -145,7 +61,7 @@ pip-wheel-metadata/
 .harmony/capabilities/services/_ops/state/build/
 .harmony/capabilities/services/_ops/state/build/**
 
-# Legacy Rust build artifact locations (deprecated)
+# Direct cargo build artifact locations
 .harmony/runtime/crates/target/
 .harmony/capabilities/services/**/rust/target/
 

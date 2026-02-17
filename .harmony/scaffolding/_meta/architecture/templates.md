@@ -147,7 +147,7 @@ Templates are typically used by workflows (e.g., `/create-harness` copies from `
 
 ```text
 /create-harness @docs/api-reference --template docs
-/create-harness @packages/ui --template node-ts
+/create-harness @domains/ui --template docs
 ```
 
 ### Manual Usage

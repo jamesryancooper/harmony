@@ -79,7 +79,7 @@ Use visuals to reduce ambiguity and improve comprehension, not for decoration.
 
 ## Repository Naming Conventions
 
-- Packages and slices: `packages/<slice-name>/...` (kebab-case).
+- Scoped components and slices: `<scope>/<slice-name>/...` (kebab-case).
 - Feature flags: `feature.<slice>.<capability>` (default OFF, fail-closed).
 - Kill switches: `kill.<area>.<toggle>`.
 - Environment variables: `SCREAMING_SNAKE_CASE`.

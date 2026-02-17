@@ -34,7 +34,6 @@ Teams may standardize which workflows and composite skills are used.
 - `quality-gate/` — Codebase integrity and release gates (refactor, orchestrate-audit, pre-release-audit, documentation-quality-gate)
 - `foundations/` — Stack-specific project scaffolding (python-api, swift-macos-app)
 - `missions/` — Mission lifecycle (create, complete)
-- `flowkit/` — FlowKit LangGraph integration
 - `projects/` — Project creation
 - `ideation/` — Scratchpad content promotion
 - `tasks/` — Guided operational playbooks (single-file workflows)

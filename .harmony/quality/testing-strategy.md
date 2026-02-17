@@ -35,7 +35,7 @@ See `.harmony/cognition/methodology/README.md` for Harmony’s five pillars.
 - Unit (majority): deterministic, in‑memory; property‑based where valuable.
 - Integration: adapters to DB/HTTP/queues with emulators/containers.
 - Contract: Pact (consumer/provider) and Schemathesis (fuzz/negative) for OpenAPI/JSON Schema.
-- E2E/Smoke: thin happy‑path checks; preview environments mandatory for `apps/*`.
+- E2E/Smoke: thin happy‑path checks; preview environments mandatory for user-facing runtimes.
 
 ## Gates and Minimums
 
@@ -56,8 +56,8 @@ See `.harmony/cognition/methodology/README.md` for Harmony’s five pillars.
 
 ## Ownership
 
-- Slices own their unit/integration/contract tests under `packages/<slice>/tests/`.
-- Cross‑cutting E2E lives beside the owning app under `apps/*/tests/`.
+- Slices own their unit/integration/contract tests under their local scope (for example `<scope>/<slice>/tests/`).
+- Cross‑cutting E2E lives beside the owning runtime under `<runtime-root>/tests/`.
 
 ## Related Docs
 

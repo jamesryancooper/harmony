@@ -721,7 +721,6 @@ Harness-specific commands wrap workflows for integration. All workflows live in 
 | `/bootstrap` | `.harmony/scaffolding/prompts/bootstrap-session.md` |
 | `/synthesize-research` | `.harmony/capabilities/skills/synthesize-research/` |
 | `/research` | `.harmony/orchestration/workflows/projects/create-project.md` |
-| `/run-flow` | `.harmony/orchestration/workflows/flowkit/run-flow/` |
 
 These commands live in `.<harness>/commands/` (e.g., `.cursor/commands/`, `.claude/commands/`) and are thin wrappers that delegate to `.harmony/` paths.
 

@@ -230,21 +230,6 @@ workflows:
       - "archive mission"
       - "finish mission"
 
-  # --- flowkit: FlowKit flow execution ---
-
-  - id: run-flow
-    display_name: Run FlowKit Flow
-    group: flowkit
-    domain: flowkit
-    path: flowkit/run-flow/
-    execution_profile: external-dependent
-    summary: Execute a FlowKit LangGraph flow from its config file.
-    status: active
-    triggers:
-      - "run a flow"
-      - "execute flowkit"
-      - "run langgraph flow"
-
   # --- projects: Project scaffolding ---
 
   - id: create-project
@@ -381,11 +366,6 @@ workflow_group_definitions:
     description: Mission lifecycle management
     path: missions/
     members: [create-mission, complete-mission]
-
-  flowkit:
-    description: FlowKit flow execution
-    path: flowkit/
-    members: [run-flow]
 
   projects:
     description: Project scaffolding
