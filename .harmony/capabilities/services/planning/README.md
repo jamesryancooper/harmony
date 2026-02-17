@@ -1,43 +1,52 @@
 # Planning
 
-Decide *what* to do and *how* to run it.
+Decide *what* to do.
 
-This domain covers the path from **validated specs** to **executable flows and agents**:
+## Native-First Portability Policy (Normative)
+
+The Planning domain is stack-agnostic and OS-agnostic by default.
+Core service behavior must run within Harmony harness constraints without requiring Python.
+
+Policy rules:
+
+1. `spec`, `plan`, and `playbook` are core Planning services and must have native harness execution paths.
+2. Planning outputs (especially `plan.json`) are portable inputs for downstream execution services.
+3. Core Planning contracts must not embed provider- or runtime-specific terms.
+4. Python is never a required runtime dependency in Planning core paths.
+
+This domain covers the path from **validated specs** to a governed **canonical plan**:
 
 - **Spec**: turn product/architecture intent into validated specs.
-- **Plan**: turn specs into governed, BMAD-style plans and `plan.json`.
-- **Agent**: run plans as durable, stateful agent graphs with HITL checkpoints.
-- **Flow**: define and run flows over prompts/manifests via a shared runtime.
 - **Playbook**: plan templates for common workflows (consumed by the Plan service).
+- **Plan**: turn specs and playbooks into governed BMAD-style plans and `plan.json`.
 
-For a detailed description of how these services and the shared LangGraph runtime fit together, see:
+Execution responsibilities are defined in:
 
-- `./service-roles.md` — canonical roles of Plan, Agent, Flow, and the LangGraph runtime.
+- `../execution/README.md`
+- `../execution/service-roles.md`
 
 ## Services
 
 - [Spec](./spec/guide.md)
 - [Plan](./plan/guide.md)
-- [Agent](./agent/guide.md)
-- [Flow](./flow/guide.md)
 - [Playbook](./playbook/guide.md)
+- [Critic](./critic/guide.md)
+- [Replan](./replan/guide.md)
+- [Scheduler](./scheduler/guide.md)
+- [Capability Bind](./capability-bind/guide.md)
+- [Contingency](./contingency/guide.md)
 
-### End-to-end pipeline (Spec → Plan → Flows & Agents → Runtime)
+### End-to-end pipeline (Spec → Plan → Execution)
 
 At a high level:
 
 1. **Spec** validates specs and constraints for a capability.
-2. **Plan** consumes those specs and emits:
+2. **Playbook** expands reusable planning templates into plan-ready structures.
+3. **Plan** consumes validated specs/playbooks and emits:
    - A canonical `plan.json` describing BMAD-style steps and dependencies.
    - ADR/checklist updates for governance.
-3. **Agent** loads `plan.json` and:
-   - Decides which Flow flow(s) to run for each step.
-   - Manages retries/resume, long-term run identity, and HITL checkpoints.
-4. **Flow**:
-   - Defines `FlowConfig`/`FlowRunner`/`FlowRunResult`.
-   - Calls the shared LangGraph runtime's `/flows/run` endpoint for each configured flow.
-5. The **LangGraph runtime** under `agents/runner/runtime/**`:
-   - Builds and executes LangGraph graphs for each flow based on prompts and workflow manifests.
-   - Exposes Studio entrypoints via `langgraph.json` so you can debug the same graphs Agent and Flow use.
+4. **Execution domain services** consume `plan.json`:
+   - **Agent** orchestrates plan execution, retries/resume, and HITL checkpoints.
+   - **Flow** executes flow manifests through native runtime by default, with optional adapter forwarding.
 
-This keeps **planning**, **agents**, **flows**, and the **runtime** cleanly separated but tightly integrated.
+This keeps **planning** (intent and sequencing) cleanly separated from **execution** (runtime and durable run control).

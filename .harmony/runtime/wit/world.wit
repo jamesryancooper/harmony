@@ -52,6 +52,30 @@ world harmony-service {
     get-stat: func(path: string) -> option<stat>;
   }
 
+  /// Host HTTP client (capability-gated by the kernel).
+  import http: interface {
+    record header {
+      name: string,
+      value: string,
+    }
+
+    record request {
+      method: string,
+      url: string,
+      headers: list<header>,
+      body: list<u8>,
+      timeout-ms: option<u64>,
+    }
+
+    record response {
+      status: u16,
+      headers: list<header>,
+      body: list<u8>,
+    }
+
+    send: func(req: request) -> response;
+  }
+
   /// Generic op dispatcher.
   /// `input-json` and return value are UTF-8 JSON strings.
   export invoke: func(op: string, input-json: string) -> string;

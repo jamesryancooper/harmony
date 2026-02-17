@@ -5,6 +5,11 @@ service_categories:
   - prompt
   - cost
   - flow
+  - spec
+  - plan
+  - playbook
+  - planning
+  - agent
   - agent-platform
   - interfaces
   - retrieval

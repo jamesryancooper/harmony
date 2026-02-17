@@ -47,3 +47,14 @@ services:
     runtime:
       type: wasm
       path: interfaces/kv/service.json
+  - id: execution/flow
+    name: flow
+    category: execution
+    summary: Native-first flow execution with optional external HTTP adapter.
+    triggers:
+      - workflow
+      - orchestration
+      - flow
+    runtime:
+      type: wasm
+      path: execution/flow/service.json
