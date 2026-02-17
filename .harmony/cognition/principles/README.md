@@ -6,7 +6,7 @@ description: Canonical principles index and thresholds that translate Harmony pi
 # Harmony Principles
 
 Status: Active (Production)
-Last updated: 2026-02-13
+Last updated: 2026-02-17
 
 Principles are Harmony's operational translation layer between philosophy and execution.
 
@@ -37,6 +37,7 @@ For small teams, default to the smallest viable process, design, and tooling tha
 | Foundational | Single Source of Truth | Keep each core fact/contract authoritative in one place. | Continuity, Trust | [Guide](./single-source-of-truth.md) |
 | Foundational | Locality | Keep context and ownership near the work surface. | Focus, Continuity | [Guide](./locality.md) |
 | Foundational | Deny by Default | Deny dangerous actions unless explicitly permitted. | Trust | [Guide](./deny-by-default.md) |
+| Foundational | Portability and Independence | Keep core behavior self-contained, tech-agnostic, and OS-agnostic by default. | Velocity, Trust, Continuity | [Guide](./portability-and-independence.md) |
 | Core | Monolith-first Modulith | Start modular monolith-first; split only with measured evidence. | Focus, Velocity | [Guide](./monolith-first-modulith.md) |
 | Core | Contract-first | Define and govern API/data contracts before implementation. | Direction, Trust | [Guide](./contract-first.md) |
 | Core | Small Diffs, Trunk-based | Merge small, single-purpose changes continuously. | Velocity, Trust | [Guide](./small-diffs-trunk-based.md) |
@@ -99,6 +100,7 @@ These defaults are normative unless a documented waiver applies:
 | Supply-chain provenance and attestation | Determinism and Provenance; Security and Privacy Baseline | Covered |
 | Small-batch policy | Small Diffs, Trunk-based; Reversibility | Covered |
 | Waiver discipline (time-boxed exceptions) | Guardrails; HITL Checkpoints | Covered |
+| Self-contained, stack/host/environment-agnostic operation | Portability and Independence | Covered |
 
 ## Related Docs
 

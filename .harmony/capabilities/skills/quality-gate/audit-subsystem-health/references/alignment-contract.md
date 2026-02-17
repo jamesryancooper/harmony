@@ -24,6 +24,7 @@ Changes in any of the following paths must trigger an alignment check:
 - `.harmony/harmony.yml`
 - `.harmony/catalog.md`
 - `.harmony/cognition/_meta/architecture/`
+- `.harmony/cognition/principles/`
 - `.harmony/*/_meta/architecture/`
 - `.harmony/orchestration/workflows/quality-gate/pre-release-audit/`
 - `.harmony/quality/_ops/scripts/validate-harness-structure.sh`

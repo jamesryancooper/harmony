@@ -1,6 +1,6 @@
 # Pull Request Template Pattern
 
-Place this file at `.github/pull_request_template.md`.
+Place this file at `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ---
 

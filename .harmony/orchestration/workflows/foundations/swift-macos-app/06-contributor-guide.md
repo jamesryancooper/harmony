@@ -36,7 +36,7 @@ reflects the true state of the project.
    - `CLAUDE.md` with accurate module layout and build commands
    - `CONTRIBUTING.md` with development setup and PR process
    - `Docs/architecture/overview.md` with system diagram
-   - `.github/pull_request_template.md`
+   - `.github/PULL_REQUEST_TEMPLATE.md`
    - `.gitignore` with Swift-appropriate patterns
 
 4. **Cross-validate documentation:**
@@ -70,7 +70,7 @@ reflects the true state of the project.
 - `CLAUDE.md` — AI agent orientation
 - `CONTRIBUTING.md` — developer onboarding
 - `Docs/architecture/overview.md` — architecture reference
-- `.github/pull_request_template.md` — PR template
+- `.github/PULL_REQUEST_TEMPLATE.md` — PR template
 - `.gitignore` — standard ignores
 
 ## Proceed When

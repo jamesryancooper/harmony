@@ -25,19 +25,19 @@ Examples:
 2. `fix/{{TICKET_PREFIX}}-77-retry-status-race`
 3. `docs/{{TICKET_PREFIX}}-15-openapi-skeleton`
 
-If no ticket exists, use `NOJIRA`:
+If no ticket exists, omit the ticket segment:
 
-- `docs/NOJIRA-update-glossary`
+- `docs/update-glossary`
 
 ## 3. Commit Message Format
 
 Use Conventional Commits:
 
-`<type>(<scope>): <short summary>`
+`<type>(<scope>): <summary>`
 
 Types:
 
-- `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`, `ci`
+- `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`, `ci`, `revert`
 
 Examples:
 
@@ -64,7 +64,7 @@ Before opening a PR:
 4. Update docs/contracts/tests for behavior changes.
 5. Keep PRs reviewable; split if broad or mixed concerns.
 
-PR template is provided in `.github/pull_request_template.md`.
+PR template is provided in `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ## 6. Code Review Conventions
 

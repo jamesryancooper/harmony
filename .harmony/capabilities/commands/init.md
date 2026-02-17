@@ -45,14 +45,16 @@ Behavior:
 1. Render `AGENTS.md` from `.harmony/scaffolding/templates/AGENTS.md`.
 2. Use `.harmony/agency/manifest.yml` `default_agent` for contract paths.
 3. Optionally render `BOOT.md` and `BOOTSTRAP.md` for BOOT compatibility.
-4. Optionally generate adapter bootstrap config at `.harmony/capabilities/services/interfaces/agent-platform/adapters/enabled.yml` (opt-in only).
-5. Create `CLAUDE.md -> AGENTS.md` symlink when safe.
-6. Preserve existing files unless `--force` is supplied.
+4. Render root `alignment-check` shim from `.harmony/scaffolding/templates/alignment-check`.
+5. Optionally generate adapter bootstrap config at `.harmony/capabilities/services/interfaces/agent-platform/adapters/enabled.yml` (opt-in only).
+6. Create `CLAUDE.md -> AGENTS.md` symlink when safe.
+7. Preserve existing files unless `--force` is supplied.
 
 ## Output
 
 - `AGENTS.md` (generated or skipped)
 - `BOOT.md` and `BOOTSTRAP.md` (optional; generated or skipped)
+- `alignment-check` shim (generated or skipped)
 - `.harmony/capabilities/services/interfaces/agent-platform/adapters/enabled.yml` (optional; generated or skipped)
 - `CLAUDE.md` symlink to `AGENTS.md` (created, verified, or skipped)
 - Summary of actions/warnings
@@ -60,5 +62,5 @@ Behavior:
 ## References
 
 - **Script:** `.harmony/scaffolding/_ops/scripts/init-project.sh`
-- **Templates:** `.harmony/scaffolding/templates/AGENTS.md`, `.harmony/scaffolding/templates/BOOT.md`, `.harmony/scaffolding/templates/BOOTSTRAP.md`
+- **Templates:** `.harmony/scaffolding/templates/AGENTS.md`, `.harmony/scaffolding/templates/BOOT.md`, `.harmony/scaffolding/templates/BOOTSTRAP.md`, `.harmony/scaffolding/templates/alignment-check`
 - **Canonical:** `.harmony/README.md#adopting-in-other-repos`

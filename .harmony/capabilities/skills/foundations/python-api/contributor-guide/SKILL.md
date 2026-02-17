@@ -21,7 +21,7 @@ module layout, tooling config, contracts, and infrastructure.
 
 - **Project name**
 - **Team name** or contact (for author attribution)
-- **Ticket prefix** (e.g., "ASC", "PROJ") or "NOJIRA" as default
+- **Ticket prefix** (e.g., "ASC", "PROJ") if your team requires ticket IDs
 - **Optional**: custom branch naming convention, additional review priorities
 
 Example: `myapp "Platform Team" ASC`
@@ -89,7 +89,8 @@ Use the structure in [references/contributing-md-pattern.md](references/contribu
 Sections:
 - **Scope**: Contract-first approach description.
 - **Branch Naming**: `<type>/<ticket-id>-<short-description>` with examples
-  using the provided ticket prefix.
+  using the provided ticket prefix when tickets are required. If no ticket
+  is used, omit the ticket segment.
 - **Commit Message Format**: Conventional Commits with types.
 - **Local Workflow**: Numbered list of `just` commands discovered from justfile.
 - **Pull Request Expectations**: One concern per PR, What/Why/How, reference ticket.
@@ -98,7 +99,7 @@ Sections:
 - **Definition of Ready to Merge**: CI passes, approvals present, no
   unresolved blocking comments, docs updated.
 
-### Step 3: `.github/pull_request_template.md`
+### Step 3: `.github/PULL_REQUEST_TEMPLATE.md`
 
 Use the template in [references/pr-template-pattern.md](references/pr-template-pattern.md).
 

@@ -154,6 +154,7 @@ Minimum bootstrap outputs:
 
 - `AGENTS.md` rendered from `.harmony/scaffolding/templates/AGENTS.md`
 - `CLAUDE.md` alias to `AGENTS.md` when safe and non-destructive
+- `alignment-check` shim rendered from `.harmony/scaffolding/templates/alignment-check`
 
 Optional compatibility outputs (when explicitly requested):
 
@@ -165,6 +166,22 @@ Expands in:
 - [Init Command](/.harmony/capabilities/commands/init.md)
 - [Init Script](/.harmony/scaffolding/_ops/scripts/init-project.sh)
 - [Templates Architecture](/.harmony/scaffolding/_meta/architecture/templates.md)
+
+### HARMONY-SPEC-012: Portability and Independence Defaults
+
+Harmony core behavior MUST remain:
+
+- self-contained (required harness contracts and assets live within `.harmony/`),
+- tech/runtime-agnostic (core semantics do not require a specific provider, framework, or runtime),
+- OS-agnostic (core contract semantics hold across operating systems).
+
+Provider/runtime/OS-specific implementation details MAY exist only as optional adapters or implementation paths and MUST NOT redefine core contract behavior.
+
+Expands in:
+
+- [Portability and Independence Principle](/.harmony/cognition/principles/portability-and-independence.md)
+- [Harmony Methodology](/.harmony/cognition/methodology/README.md)
+- [Services README](/.harmony/capabilities/services/README.md)
 
 ### HARMONY-SPEC-101: Agency Contract Boundary
 

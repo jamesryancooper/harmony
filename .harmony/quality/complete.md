@@ -50,7 +50,12 @@ description: Quality criteria and completion checklist for harness tasks.
 
 - [ ] `bash .harmony/quality/_ops/scripts/validate-harness-structure.sh` passes
 - [ ] `bash .harmony/quality/_ops/scripts/validate-audit-subsystem-health-alignment.sh` passes
+- [ ] `bash .harmony/quality/_ops/scripts/alignment-check.sh --profile harness` passes
 - [ ] `pre-release-audit` workflow executed (or explicit rationale recorded for not running it)
+
+### For Commit/PR Standards Changes
+
+- [ ] `bash .harmony/quality/_ops/scripts/alignment-check.sh --profile commit-pr` passes
 
 ## Common Failure Modes
 

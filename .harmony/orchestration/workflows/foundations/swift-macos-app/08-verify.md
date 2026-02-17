@@ -51,7 +51,7 @@ description: Validate the Swift macOS app foundation workflow executed successfu
 - [ ] `CLAUDE.md` exists with accurate module layout
 - [ ] `CONTRIBUTING.md` exists with accurate workflow
 - [ ] `Docs/architecture/overview.md` exists
-- [ ] `.github/pull_request_template.md` exists
+- [ ] `.github/PULL_REQUEST_TEMPLATE.md` exists
 - [ ] `.gitignore` exists
 
 ### Smoke Test (step 7)

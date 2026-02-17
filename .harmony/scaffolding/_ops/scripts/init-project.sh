@@ -65,11 +65,13 @@ REPO_ROOT="$(cd -- "$REPO_ROOT" && pwd)"
 TEMPLATE_FILE="$HARMONY_DIR/scaffolding/templates/AGENTS.md"
 BOOT_TEMPLATE_FILE="$HARMONY_DIR/scaffolding/templates/BOOT.md"
 BOOTSTRAP_TEMPLATE_FILE="$HARMONY_DIR/scaffolding/templates/BOOTSTRAP.md"
+ALIGNMENT_CHECK_TEMPLATE_FILE="$HARMONY_DIR/scaffolding/templates/alignment-check"
 AGENCY_MANIFEST="$HARMONY_DIR/agency/manifest.yml"
 AGENTS_OUT="$REPO_ROOT/AGENTS.md"
 CLAUDE_OUT="$REPO_ROOT/CLAUDE.md"
 BOOT_OUT="$REPO_ROOT/BOOT.md"
 BOOTSTRAP_OUT="$REPO_ROOT/BOOTSTRAP.md"
+ALIGNMENT_CHECK_OUT="$REPO_ROOT/alignment-check"
 ADAPTER_REGISTRY="$REPO_ROOT/.harmony/capabilities/services/interfaces/agent-platform/adapters/registry.yml"
 ADAPTER_ENABLED_OUT="$REPO_ROOT/.harmony/capabilities/services/interfaces/agent-platform/adapters/enabled.yml"
 
@@ -175,6 +177,36 @@ write_boot_files() {
 
   write_from_template "$BOOT_TEMPLATE_FILE" "$BOOT_OUT" "BOOT.md"
   write_from_template "$BOOTSTRAP_TEMPLATE_FILE" "$BOOTSTRAP_OUT" "BOOTSTRAP.md"
+}
+
+write_alignment_check_shim() {
+  if [[ ! -f "$ALIGNMENT_CHECK_TEMPLATE_FILE" ]]; then
+    echo "[WARN] Missing alignment-check template: $ALIGNMENT_CHECK_TEMPLATE_FILE"
+    return
+  fi
+
+  if [[ -f "$ALIGNMENT_CHECK_OUT" && "$FORCE" -ne 1 ]]; then
+    echo "[SKIP] alignment-check shim already exists: $ALIGNMENT_CHECK_OUT"
+    return
+  fi
+
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    if [[ -f "$ALIGNMENT_CHECK_OUT" ]]; then
+      echo "[DRY] Would overwrite alignment-check shim from template: $ALIGNMENT_CHECK_OUT"
+    else
+      echo "[DRY] Would create alignment-check shim from template: $ALIGNMENT_CHECK_OUT"
+    fi
+    return
+  fi
+
+  cat "$ALIGNMENT_CHECK_TEMPLATE_FILE" > "$ALIGNMENT_CHECK_OUT"
+  chmod +x "$ALIGNMENT_CHECK_OUT"
+
+  if [[ "$FORCE" -eq 1 ]]; then
+    echo "[OK] alignment-check shim overwritten from template: $ALIGNMENT_CHECK_OUT"
+  else
+    echo "[OK] alignment-check shim created from template: $ALIGNMENT_CHECK_OUT"
+  fi
 }
 
 write_agent_platform_adapter_bootstrap() {
@@ -310,6 +342,7 @@ echo ""
 
 write_agents
 write_boot_files
+write_alignment_check_shim
 write_agent_platform_adapter_bootstrap
 write_claude_alias
 

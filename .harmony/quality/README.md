@@ -12,8 +12,10 @@ Quality gates and completion criteria.
 | `testing-strategy.md` | Testing strategy and quality approach | When designing or validating tests |
 | `security-and-privacy.md` | Security and privacy baseline policy | When handling sensitive data or controls |
 | `data-handling-and-retention.md` | Data handling and retention standards | When designing data lifecycle behavior |
+| `_ops/scripts/alignment-check.sh` | Profile-based alignment runner across harness aspects | When you want one repeatable alignment command |
 | `_ops/scripts/validate-harness-structure.sh` | Structural namespace and discovery contract validation | Before release or architecture-sensitive merges |
 | `_ops/scripts/validate-audit-subsystem-health-alignment.sh` | Drift guardrail between `.harmony` architecture and `audit-subsystem-health` | When `.harmony` architecture surfaces change |
+| `_ops/scripts/validate-commit-pr-alignment.sh` | Drift guardrail for commit/PR standards policy, template, and workflow alignment | When commit/PR governance artifacts change |
 
 ## Contract
 

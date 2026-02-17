@@ -4,6 +4,18 @@
 
 ---
 
+## Quick Path
+
+Use this progressive path to get only the depth you need:
+
+1. **Fast reminder:** use `.github/PULL_REQUEST_TEMPLATE.md`
+2. **Human policy details:** this file (`pull-request-standards.md`)
+3. **Machine-enforced headings/checklist:** `.github/workflows/pr-quality.yml`
+4. **Related commit/branch contract:** `commits.md` and
+   `standards/commit-pr-standards.json`
+
+---
+
 ## Principles
 
 1. **One concern per PR.** A PR does one thing well. Feature + refactor + config change = three PRs. If the description needs multiple paragraphs covering unrelated topics, split it.

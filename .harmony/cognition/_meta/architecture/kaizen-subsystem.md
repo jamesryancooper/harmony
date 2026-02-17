@@ -92,7 +92,7 @@ The loop executes on cadence or trigger and iterates over small, isolated change
 
 4) Execution as Dry‑Run (Builder)
 
-- Create branch: `kaizen-<YYYYMMDD>-<topic>`.
+- Create branch: `chore/kaizen-<yyyymmdd>-<topic>`.
 - Implement the change; open a PR labeled "Kaizen-AI proposed" and link plan context.
 
 5) Automated Validation (Verifier + CI)
@@ -185,8 +185,8 @@ Implementation note: workflow wiring lives in `tooling-integration.md` (Kaizen W
 
 ## Branching and PR Conventions
 
-- Branch naming: `kaizen-<YYYYMMDD>-<topic>`.
-- PR title example: `chore: bump json-lib to 2.3.2 (Kaizen AI)`.
+- Branch naming: `chore/kaizen-<yyyymmdd>-<topic>`.
+- PR title example: `chore(kaizen): bump json-lib to 2.3.2`.
 - Labels: `Kaizen-AI proposed`; link to plan/risk context in the PR body.
 - One PR per improvement; avoid batching unless trivial and orthogonal.
 

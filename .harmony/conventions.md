@@ -73,6 +73,8 @@ Use visuals to reduce ambiguity and improve comprehension, not for decoration.
 
 - Follow `.harmony/agency/practices/commits.md` for commit message format, branch naming,
   and commit discipline.
+- Enforcement values are defined in
+  `.harmony/agency/practices/standards/commit-pr-standards.json`.
 - Use Conventional Commits with explicit scope:
   `<type>(<scope>): <summary>`.
 - Keep commit summaries outcome-focused and <=72 characters.

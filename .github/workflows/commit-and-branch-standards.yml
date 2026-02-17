@@ -11,89 +11,170 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   validate-branch-name:
     name: Validate branch naming
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-
-      - name: Validate head branch
+      - name: Validate head branch from standards source
+        uses: actions/github-script@v7
         env:
           BRANCH_NAME: ${{ github.head_ref }}
-        run: |
-          set -euo pipefail
-          allowed_types='feat fix refactor perf test docs chore ci revert'
-          type_pattern='feat|fix|refactor|perf|test|docs|chore|ci|revert'
-          pattern="^(${type_pattern})/([A-Za-z0-9]+-[0-9]+-)?[a-z0-9]+(-[a-z0-9]+)*$"
+        with:
+          script: |
+            const baseSha = context.payload.pull_request?.base?.sha;
+            if (!baseSha) {
+              core.setFailed("Unable to determine PR base SHA for branch validation.");
+              return;
+            }
 
-          if ! [[ "${BRANCH_NAME}" =~ ${pattern} ]]; then
-            echo "Invalid branch name: ${BRANCH_NAME}"
-            echo "Expected: <type>/<ticket-id>-<short-description>"
-            echo "Short description must be lowercase and hyphen-separated"
-            echo "Allowed types: ${allowed_types}"
-            exit 1
-          fi
+            const path = ".harmony/agency/practices/standards/commit-pr-standards.json";
+            const standardsResponse = await github.rest.repos.getContent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path,
+              ref: baseSha
+            });
+
+            if (Array.isArray(standardsResponse.data) || !("content" in standardsResponse.data)) {
+              core.setFailed(`Expected file content at ${path} but found a non-file response.`);
+              return;
+            }
+
+            const standards = JSON.parse(
+              Buffer.from(
+                standardsResponse.data.content,
+                standardsResponse.data.encoding || "base64"
+              ).toString("utf8")
+            );
+
+            const branch = standards.branch;
+            const branchName = process.env.BRANCH_NAME || "";
+            const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const typePattern = branch.allowed_types.map(escapeRegExp).join("|");
+            const fullPattern = new RegExp(
+              `^(?<type>${typePattern})/(?:(?<ticket>${branch.ticket_pattern})-)?(?<slug>${branch.slug_pattern})$`
+            );
+
+            if (!fullPattern.test(branchName)) {
+              core.setFailed(
+                [
+                  `Invalid branch name: ${branchName}`,
+                  `Expected: ${branch.default_format}`,
+                  "Short description must be lowercase and hyphen-separated.",
+                  `Allowed types: ${branch.allowed_types.join(", ")}`
+                ].join("\n")
+              );
+              return;
+            }
+
+            core.info(`Branch name passes standards: ${branchName}`);
 
   validate-commit-messages:
     name: Validate commit messages
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Lint commit messages in PR from standards source
+        uses: actions/github-script@v7
         with:
-          fetch-depth: 0
+          script: |
+            const baseSha = context.payload.pull_request?.base?.sha;
+            const prNumber = context.payload.pull_request?.number;
+            if (!baseSha || !prNumber) {
+              core.setFailed("Unable to determine PR base SHA/number for commit validation.");
+              return;
+            }
 
-      - name: Lint commit messages in PR
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
+            const standardsPath = ".harmony/agency/practices/standards/commit-pr-standards.json";
+            const standardsResponse = await github.rest.repos.getContent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: standardsPath,
+              ref: baseSha
+            });
 
-          type_pattern='feat|fix|refactor|perf|test|docs|chore|ci|revert'
-          header_pattern="^(${type_pattern})\\(([a-z0-9][a-z0-9-]*)\\): (.+)$"
+            if (Array.isArray(standardsResponse.data) || !("content" in standardsResponse.data)) {
+              core.setFailed(`Expected file content at ${standardsPath} but found a non-file response.`);
+              return;
+            }
 
-          commits="$(git rev-list --no-merges "${BASE_SHA}..${HEAD_SHA}")"
-          if [ -z "${commits}" ]; then
-            echo "No commits to validate in range ${BASE_SHA}..${HEAD_SHA}."
-            exit 0
-          fi
+            const standards = JSON.parse(
+              Buffer.from(
+                standardsResponse.data.content,
+                standardsResponse.data.encoding || "base64"
+              ).toString("utf8")
+            );
 
-          failures=0
-          for sha in ${commits}; do
-            header="$(git log -n1 --format=%s "${sha}")"
-            echo "Validating ${sha}: ${header}"
+            const commitRules = standards.commit;
+            const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const typePattern = commitRules.allowed_types.map(escapeRegExp).join("|");
+            const headerPattern = new RegExp(
+              `^(?<type>${typePattern})\\((?<scope>${commitRules.scope_pattern})\\): (?<summary>.+)$`
+            );
 
-            if [ "${#header}" -gt 72 ]; then
-              echo "::error::${sha} header exceeds 72 characters."
-              failures=$((failures + 1))
-              continue
-            fi
+            const commits = await github.paginate(github.rest.pulls.listCommits, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 100
+            });
 
-            if ! [[ "${header}" =~ ${header_pattern} ]]; then
-              echo "::error::${sha} header must match <type>(<scope>): <summary>."
-              failures=$((failures + 1))
-              continue
-            fi
+            const nonMergeCommits = commits.filter((item) => (item.parents || []).length <= 1);
+            if (!nonMergeCommits.length) {
+              core.info(`No non-merge commits to validate for PR #${prNumber}.`);
+              return;
+            }
 
-            summary="${BASH_REMATCH[3]}"
-            if [[ "${summary}" =~ [A-Z] ]]; then
-              echo "::error::${sha} summary must be lowercase."
-              failures=$((failures + 1))
-            fi
+            const failures = [];
+            for (const item of nonMergeCommits) {
+              const sha = item.sha;
+              const message = (item.commit?.message || "").replace(/\r\n/g, "\n");
+              const lines = message.split("\n");
+              const header = lines[0] || "";
+              core.info(`Validating ${sha}: ${header}`);
 
-            if [[ "${summary}" == *"." ]]; then
-              echo "::error::${sha} summary must not end with a period."
-              failures=$((failures + 1))
-            fi
-          done
+              if (header.length > commitRules.header_max_length) {
+                failures.push(`${sha} header exceeds ${commitRules.header_max_length} characters.`);
+                continue;
+              }
 
-          if [ "${failures}" -ne 0 ]; then
-            echo "::error::Commit message validation failed with ${failures} issue(s)."
-            exit 1
-          fi
+              const match = header.match(headerPattern);
+              if (!match || !match.groups) {
+                failures.push(`${sha} header must match ${commitRules.header_format}.`);
+                continue;
+              }
+
+              const summary = match.groups.summary || "";
+              if (commitRules.summary_must_be_lowercase && summary !== summary.toLowerCase()) {
+                failures.push(`${sha} summary must be lowercase.`);
+              }
+
+              if (commitRules.summary_must_not_end_with_period && summary.endsWith(".")) {
+                failures.push(`${sha} summary must not end with a period.`);
+              }
+
+              for (const line of lines.slice(1)) {
+                if (!line.trim()) {
+                  continue;
+                }
+                if (line.length > commitRules.body_max_line_length) {
+                  failures.push(
+                    `${sha} body/footer line exceeds ${commitRules.body_max_line_length} characters.`
+                  );
+                }
+              }
+            }
+
+            if (failures.length) {
+              core.setFailed(
+                [
+                  `Commit message validation failed with ${failures.length} issue(s).`,
+                  ...failures.map((issue) => `- ${issue}`)
+                ].join("\n")
+              );
+              return;
+            }
+
+            core.info("All commit messages pass standards.");

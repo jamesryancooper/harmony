@@ -6,3 +6,4 @@
 - [Operating Model](operating-model.md)
 - [Commits - Convention and Discipline](commits.md)
 - [Pull Requests - Convention and Quality Standards](pull-request-standards.md)
+- [Commit and PR Standards (Machine Contract)](standards/commit-pr-standards.json)

@@ -13,6 +13,13 @@
 schema_version: "1.0"
 
 commands:
+  - id: alignment-check
+    display_name: Alignment Check
+    path: alignment-check.md
+    summary: Run profile-based harness alignment validations through a single command.
+    access: human
+    argument_hint: "--profile <aspect>[,<aspect>...] [--dry-run] [--list-profiles]"
+
   - id: init
     display_name: Initialize Project
     path: init.md

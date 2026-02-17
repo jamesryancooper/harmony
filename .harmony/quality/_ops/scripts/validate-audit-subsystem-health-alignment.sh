@@ -175,6 +175,7 @@ check_drift_alignment() {
   local watched_regexes=(
     '^\.harmony/(START\.md|README\.md|harmony\.yml|catalog\.md)$'
     '^\.harmony/cognition/_meta/architecture/'
+    '^\.harmony/cognition/principles/'
     '^\.harmony/[^/]+/_meta/architecture/'
     '^\.harmony/orchestration/workflows/quality-gate/pre-release-audit/'
     '^\.harmony/quality/(complete\.md|session-exit\.md)$'

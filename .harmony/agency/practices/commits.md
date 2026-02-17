@@ -6,6 +6,18 @@
 
 ---
 
+## Quick Path
+
+Use this progressive path to get only the depth you need:
+
+1. **Fast reminder:** `<type>(<scope>): <summary>` and
+   `<type>/<ticket-id>-<short-description>`
+2. **Human policy details:** this file (`commits.md`)
+3. **Machine-enforced values:** `standards/commit-pr-standards.json`
+4. **Runtime enforcement:** `.github/workflows/commit-and-branch-standards.yml`
+
+---
+
 ## Enforcement
 
 This practice is tool-agnostic. Repositories can enforce it using any local
@@ -18,11 +30,14 @@ Canonical enforcement in this repository:
   `.github/workflows/commit-and-branch-standards.yml`
 - Main-branch safety checks:
   `.github/workflows/main-push-safety.yml`
+- Machine-readable enforcement contract:
+  `.harmony/agency/practices/standards/commit-pr-standards.json`
 
 If you want local pre-commit enforcement, mirror the same contract in your
 editor or local Git hooks.
 
-For a message to pass enforcement, it must satisfy this contract:
+For a message to pass enforcement, it must satisfy this contract
+(values are sourced from `commit-pr-standards.json`):
 
 - Header format: `<type>(<scope>): <summary>`
 - Allowed types: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`,
@@ -42,7 +57,7 @@ linting, review the final message text before confirming the commit.
 ## Format: Conventional Commits
 
 ```text
-<type>(<scope>): <short summary>
+<type>(<scope>): <summary>
 
 <optional body - why, not what>
 

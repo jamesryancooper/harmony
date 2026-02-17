@@ -56,7 +56,13 @@ Complete before ending a session, context reset, or handoff.
 
 - [ ] Run `bash .harmony/quality/_ops/scripts/validate-harness-structure.sh`
 - [ ] Run `bash .harmony/quality/_ops/scripts/validate-audit-subsystem-health-alignment.sh`
+- [ ] Run `bash .harmony/quality/_ops/scripts/alignment-check.sh --profile harness`
 - [ ] If validator reports drift, update `audit-subsystem-health` skill artifacts before exit
+
+### If commit/PR governance artifacts changed
+
+- [ ] Run `bash .harmony/quality/_ops/scripts/alignment-check.sh --profile commit-pr`
+- [ ] If validator reports drift, update standards/template/workflow files to restore alignment
 
 ### If something failed
 

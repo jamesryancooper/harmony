@@ -34,13 +34,13 @@ discovers and documents the actual project state.
    arguments, use sensible defaults:
 
    - Team name: project name
-   - Ticket prefix: `NOJIRA`
+   - Ticket prefix: optional (omit ticket segment when no ticket ID is used)
 
 3. **Validate outputs:**
 
    - `AGENT.md` exists with Module Layout and Coding Conventions sections
    - `CONTRIBUTING.md` exists with Local Workflow section
-   - `.github/pull_request_template.md` exists
+   - `.github/PULL_REQUEST_TEMPLATE.md` exists
    - `.github/workflows/ci.yml` exists
 
 4. **Spot-check accuracy:**
@@ -73,7 +73,7 @@ discovers and documents the actual project state.
 
 - `AGENT.md` — AI agent orientation document
 - `CONTRIBUTING.md` — human contributor guide
-- `.github/pull_request_template.md` — PR template
+- `.github/PULL_REQUEST_TEMPLATE.md` — PR template
 - `.github/workflows/ci.yml` — CI pipeline
 
 ## Proceed When

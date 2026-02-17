@@ -624,12 +624,13 @@ Add this to `are-session-log.md` at the END of every session:
 
 ## Commit Message Format
 
-Use consistent commit messages:
+Use Conventional Commits with explicit scope (`<type>(<scope>): <summary>`).
+For ARE Loop work, use `docs(are)` unless another type is more accurate.
 
-- `ARE Loop: Initialize tracking for <scope> (<concept>)`
-- `ARE Loop: Complete set analysis`
-- `ARE Loop: Complete <Phase> for <doc> (Cycle <n>)`
-- `ARE Loop: <doc> Cycle <n> complete - <decision>`
+- `docs(are): initialize tracking for <scope> (<concept>)`
+- `docs(are): complete set analysis`
+- `docs(are): complete <phase> for <doc> (cycle <n>)`
+- `docs(are): finalize <doc> cycle <n> as <decision>`
 
 ---
 
@@ -640,7 +641,7 @@ If you must stop mid-task:
 1. **Save partial progress**: Write what you've done to a partial artifact
 2. **Update progress**: Set status to "in_progress" (not completed)
 3. **Document state**: In session log, note exactly where you stopped
-4. **Commit**: "ARE Loop: WIP - <doc> <phase> (partial)"
+4. **Commit**: `docs(are): record wip for <doc> <phase> (partial)`
 
 Next session will see "in_progress" and can resume.
 

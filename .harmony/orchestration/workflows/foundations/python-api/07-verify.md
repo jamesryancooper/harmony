@@ -52,7 +52,7 @@ description: Validate the Python API foundation workflow executed successfully.
 
 - [ ] `AGENT.md` exists with accurate module layout
 - [ ] `CONTRIBUTING.md` exists with accurate workflow
-- [ ] `.github/pull_request_template.md` exists
+- [ ] `.github/PULL_REQUEST_TEMPLATE.md` exists
 - [ ] `.github/workflows/ci.yml` exists
 
 ### Smoke Test (step 6)

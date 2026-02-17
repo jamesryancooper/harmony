@@ -71,33 +71,50 @@ Generate `Docs/architecture/overview.md` with:
 
 ### Step 4: PR template
 
-Create `.github/pull_request_template.md`:
+Create `.github/PULL_REQUEST_TEMPLATE.md`:
 
 ```markdown
-## Summary
+Policy reference: `.harmony/agency/practices/pull-request-standards.md`
+Reminder: Run `@codex review`.
 
-<!-- Brief description of changes -->
+## What
 
-## Type of Change
+<!-- One or two sentences describing what this PR changes. -->
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Refactoring
-- [ ] Documentation
-- [ ] CI/CD
+## Why
+
+<!-- The problem this solves and why it matters. Include ticket/issue links. -->
+
+## How
+
+<!-- Approach summary, including non-obvious design choices and alternatives rejected. -->
+
+## Tradeoffs
+
+<!-- Known compromises, remaining risks, and any follow-up tickets. -->
 
 ## Testing
 
+<!-- How this was verified (automated and manual), including edge cases covered. -->
 - [ ] `swift test` passes
 - [ ] New tests added for changed code
 - [ ] Integration tests pass (if applicable)
 
+## Rollout
+
+<!-- Release strategy or `n/a`. -->
+
 ## Checklist
 
-- [ ] Code follows project conventions
+- [ ] Requirements met; edge cases handled
+- [ ] Security reviewed (authz, input validation, secrets)
+- [ ] Tests added or updated
+- [ ] Observability updated (logs, metrics, traces) if needed
+- [ ] Conventions followed; no drift introduced
+- [ ] Non-obvious decisions documented (comments, ADR)
+- [ ] All review conversations resolved
 - [ ] No new warnings from `swift build`
-- [ ] Documentation updated (if applicable)
-- [ ] CLAUDE.md updated (if architecture changed)
+- [ ] `CLAUDE.md` updated (if architecture changed)
 ```
 
 ### Step 5: README.md (if missing)

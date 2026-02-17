@@ -1,0 +1,59 @@
+name: Alignment Check
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Alignment profile to run
+        required: true
+        default: all
+        type: choice
+        options:
+          - commit-pr
+          - harness
+          - agency
+          - workflows
+          - skills
+          - services
+          - all
+      dry_run:
+        description: Print planned checks without executing validators
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alignment-check-${{ github.ref }}-${{ github.event.inputs.profile || 'all' }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    name: Run alignment profile
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PROFILE: ${{ github.event.inputs.profile || 'all' }}
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show selected input
+        run: |
+          echo "profile=${PROFILE}"
+          echo "dry_run=${DRY_RUN}"
+
+      - name: Run alignment-check
+        run: |
+          chmod +x .harmony/quality/_ops/scripts/alignment-check.sh
+          chmod +x .harmony/quality/_ops/scripts/validate-commit-pr-alignment.sh
+
+          args=(--profile "$PROFILE")
+          if [[ "$DRY_RUN" == "true" ]]; then
+            args+=(--dry-run)
+          fi
+
+          bash .harmony/quality/_ops/scripts/alignment-check.sh "${args[@]}"
