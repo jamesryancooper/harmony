@@ -41,12 +41,13 @@ jobs:
           const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
           const typePattern = allowedTypes.map(escapeRegex).join("|");
           const pattern = new RegExp(
-            `^(?:${typePattern})\\/(?:[A-Za-z0-9]+-[0-9]+-)?[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$`
+            `^(?:${typePattern})\\/(?:[A-Za-z0-9]+-[0-9]+-)?[a-z0-9]+(?:-[a-z0-9]+)*$`
           );
 
           if (!pattern.test(branchName)) {
             console.error(`Invalid branch name: ${branchName}`);
             console.error("Expected: <type>/<ticket-id>-<short-description>");
+            console.error("Short description must be lowercase and hyphen-separated");
             console.error(`Allowed types: ${allowedTypes.join(", ")}`);
             process.exit(1);
           }
