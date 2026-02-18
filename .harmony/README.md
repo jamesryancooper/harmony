@@ -38,6 +38,17 @@ software delivery by:
 - Requiring quality gates before handoff or completion
 - Enabling portability so the same operating model can be copied to new repos
 
+### Quality Governance Engine (QGE)
+
+Harmony quality weighting, scoring, and policy deviation enforcement is run by
+the **Quality Governance Engine (QGE)**.
+
+QGE is implemented as an **authoritative local engine**: policy and
+measurement files live in-repo, resolution and gate logic run locally or in CI,
+and generated evidence artifacts are written back to the repo workspace. This
+keeps governance deterministic, auditable, portable, and independent of an
+external service.
+
 ### How Harmony Works
 
 Harmony is organized by function:

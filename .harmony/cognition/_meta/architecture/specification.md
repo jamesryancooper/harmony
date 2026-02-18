@@ -222,6 +222,8 @@ Expands in:
 ### HARMONY-SPEC-601: Quality Contract Boundary
 
 `/.harmony/quality/**` MUST preserve completion and exit contracts as enforceable quality gates.
+The Quality Governance Engine (QGE) is the authoritative local engine for
+weighted quality policy resolution, scoring, and gating in this boundary.
 
 Expands in:
 

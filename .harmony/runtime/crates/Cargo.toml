@@ -5,6 +5,7 @@ members = [
   "wasm_host",
   "kernel",
   "studio",
+  "quality_tools",
 ]
 
 [workspace.package]

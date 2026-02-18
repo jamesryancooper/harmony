@@ -64,6 +64,13 @@ Complete before ending a session, context reset, or handoff.
 - [ ] Run `bash .harmony/quality/_ops/scripts/alignment-check.sh --profile commit-pr`
 - [ ] If validator reports drift, update standards/template/workflow files to restore alignment
 
+### If quality weight artifacts changed
+
+- [ ] Run `bash .harmony/quality/_ops/scripts/compute-quality-score.sh --weights .harmony/quality/weights/weights.yml --scores .harmony/quality/scores/scores.yml`
+- [ ] Run `bash .harmony/quality/_ops/scripts/quality-gate.sh --scorecard <generated-scorecard.yml> --weights .harmony/quality/weights/weights.yml --scores .harmony/quality/scores/scores.yml`
+- [ ] Verify `.harmony/output/quality/effective/<context>.md` and `.harmony/output/quality/results/<context>.md` were generated
+- [ ] Attach scorecard path and gate outcome in `continuity/log.md`
+
 ### If something failed
 
 - [ ] Add to `cognition/context/lessons.md`

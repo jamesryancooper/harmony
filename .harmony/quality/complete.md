@@ -57,6 +57,12 @@ description: Quality criteria and completion checklist for harness tasks.
 
 - [ ] `bash .harmony/quality/_ops/scripts/alignment-check.sh --profile commit-pr` passes
 
+### For Quality Weight Governance Changes
+
+- [ ] `bash .harmony/quality/_ops/scripts/compute-quality-score.sh --weights .harmony/quality/weights/weights.yml --scores .harmony/quality/scores/scores.yml` runs successfully
+- [ ] `bash .harmony/quality/_ops/scripts/quality-gate.sh --scorecard <generated-scorecard.yml> --weights .harmony/quality/weights/weights.yml --scores .harmony/quality/scores/scores.yml` passes (or warning rationale is recorded)
+- [ ] Resolver generated `.harmony/output/quality/effective/<context>.md` and `.harmony/output/quality/results/<context>.md`
+
 ## Common Failure Modes
 
 | Failure | Prevention |

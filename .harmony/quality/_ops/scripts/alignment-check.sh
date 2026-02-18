@@ -34,6 +34,7 @@ Profiles:
   workflows   Workflow manifest/registry/path contract checks
   skills      Skill contract and drift checks (strict mode)
   services    Services contract and interop boundary checks
+  weights     Weighted quality score and gate checks
   all         Run all profiles above in sequence
 PROFILES
 }
@@ -106,6 +107,35 @@ run_services() {
     bash "$HARMONY_DIR/capabilities/services/_ops/scripts/validate-filesystem-interfaces.sh"
 }
 
+run_weights() {
+  local out_dir="$HARMONY_DIR/output/.tmp/quality-weight-alignment"
+  run_step \
+    "Compute weighted quality scorecard" \
+    bash "$HARMONY_DIR/quality/_ops/scripts/compute-quality-score.sh" \
+      --weights "$HARMONY_DIR/quality/weights/weights.yml" \
+      --scores "$HARMONY_DIR/quality/scores/scores.yml" \
+      --charter "$HARMONY_DIR/quality/CHARTER.md" \
+      --context "$HARMONY_DIR/quality/weights/inputs/context.yml" \
+      --profile ci-reliability \
+      --run-mode ci \
+      --maturity beta \
+      --repo harmony \
+      --out-dir "$out_dir"
+
+  run_step \
+    "Run weighted quality gate" \
+    bash "$HARMONY_DIR/quality/_ops/scripts/quality-gate.sh" \
+      --scorecard "$out_dir/scorecard.yml" \
+      --weights "$HARMONY_DIR/quality/weights/weights.yml" \
+      --scores "$HARMONY_DIR/quality/scores/scores.yml" \
+      --charter "$HARMONY_DIR/quality/CHARTER.md" \
+      --baseline-weights "$HARMONY_DIR/quality/weights/weights.yml" \
+      --baseline-scores "$HARMONY_DIR/quality/scores/scores.yml" \
+      --baseline-charter "$HARMONY_DIR/quality/CHARTER.md" \
+      --mode ci \
+      --summary-out "$out_dir/gate-summary.md"
+}
+
 run_profile() {
   local profile="$1"
   case "$profile" in
@@ -115,6 +145,7 @@ run_profile() {
     workflows) run_workflows ;;
     skills) run_skills ;;
     services) run_services ;;
+    weights) run_weights ;;
     all)
       run_commit_pr
       run_harness
@@ -122,6 +153,7 @@ run_profile() {
       run_workflows
       run_skills
       run_services
+      run_weights
       ;;
     *)
       echo "[ERROR] unknown profile: $profile" >&2

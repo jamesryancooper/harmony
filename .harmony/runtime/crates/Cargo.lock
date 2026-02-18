@@ -2425,6 +2425,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "harmony_quality_tools"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "hex",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "sha2",
+]
+
+[[package]]
 name = "harmony_studio"
 version = "0.1.0"
 dependencies = [
