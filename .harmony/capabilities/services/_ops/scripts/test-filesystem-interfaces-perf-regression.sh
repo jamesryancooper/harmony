@@ -16,6 +16,23 @@ raw_out_path=""
 summary_out_path=""
 report_path=""
 emit_report="1"
+HAS_RG=false
+
+if command -v rg >/dev/null 2>&1; then
+  HAS_RG=true
+fi
+
+payload_has_regex() {
+  local payload="$1"
+  local pattern="$2"
+
+  if [[ "$HAS_RG" == "true" ]]; then
+    rg -q "$pattern" <<<"$payload"
+    return $?
+  fi
+
+  printf '%s\n' "$payload" | grep -Eq -- "$pattern"
+}
 
 usage() {
   cat <<USAGE
@@ -141,7 +158,7 @@ build_snapshot() {
     return 1
   }
 
-  if ! rg -q '"ok"[[:space:]]*:[[:space:]]*true' <<<"$out"; then
+  if ! payload_has_regex "$out" '"ok"[[:space:]]*:[[:space:]]*true'; then
     echo "ERROR: snapshot.build returned failure payload while preparing perf fixture state"
     echo "$out"
     return 1
@@ -166,7 +183,7 @@ run_timed_sample() {
 
   start_ms="$(now_ms)"
   if raw_out="$(invoke_op "$op" "$payload" 2>&1)"; then
-    if rg -q '"ok"[[:space:]]*:[[:space:]]*false' <<<"$raw_out"; then
+    if payload_has_regex "$raw_out" '"ok"[[:space:]]*:[[:space:]]*false'; then
       status="error"
       error_code="$(extract_json_string_field "$raw_out" "code")"
       [[ -z "$error_code" ]] && error_code="ERR_UNKNOWN"

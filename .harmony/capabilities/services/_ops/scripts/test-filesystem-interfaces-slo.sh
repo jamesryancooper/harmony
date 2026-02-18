@@ -16,6 +16,23 @@ report_path=""
 raw_out_path=""
 summary_out_path=""
 emit_report="1"
+HAS_RG=false
+
+if command -v rg >/dev/null 2>&1; then
+  HAS_RG=true
+fi
+
+payload_has_regex() {
+  local payload="$1"
+  local pattern="$2"
+
+  if [[ "$HAS_RG" == "true" ]]; then
+    rg -q "$pattern" <<<"$payload"
+    return $?
+  fi
+
+  printf '%s\n' "$payload" | grep -Eq -- "$pattern"
+}
 
 usage() {
   cat <<USAGE
@@ -153,7 +170,7 @@ target_module_node="dir:$fixture_root/module-00"
 
 bootstrap_payload="$(printf '{"root":"%s","state_dir":"%s","set_current":true}' "$fixture_root" "$state_dir")"
 bootstrap_out="$("$RUNTIME_RUN" tool interfaces/filesystem-snapshot snapshot.build --json "$bootstrap_payload" 2>&1)"
-if ! rg -q '"ok"[[:space:]]*:[[:space:]]*true' <<<"$bootstrap_out"; then
+if ! payload_has_regex "$bootstrap_out" '"ok"[[:space:]]*:[[:space:]]*true'; then
   echo "ERROR: bootstrap snapshot.build failed"
   echo "$bootstrap_out"
   exit 1
@@ -265,7 +282,7 @@ while IFS=$'\t' read -r op budget_samples budget_p95_ms max_error_rate; do
 
     start_ms="$(now_ms)"
     if raw_out="$("$RUNTIME_RUN" tool "$service" "$op" --json "$payload" 2>&1)"; then
-      if rg -q '"ok"[[:space:]]*:[[:space:]]*false' <<<"$raw_out"; then
+      if payload_has_regex "$raw_out" '"ok"[[:space:]]*:[[:space:]]*false'; then
         status="error"
         error_code="$(extract_json_string_field "$raw_out" "code")"
         [[ -z "$error_code" ]] && error_code="ERR_UNKNOWN"

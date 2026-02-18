@@ -18,6 +18,35 @@ RUNTIME_RUN="$HARMONY_DIR/runtime/run"
 errors=0
 validate_slo="${FILESYSTEM_INTERFACES_VALIDATE_SLO:-0}"
 validate_perf="${FILESYSTEM_INTERFACES_VALIDATE_PERF:-0}"
+HAS_RG=false
+
+if command -v rg >/dev/null 2>&1; then
+  HAS_RG=true
+fi
+
+has_file_match() {
+  local pattern="$1"
+  shift
+
+  if [[ "$HAS_RG" == "true" ]]; then
+    rg -n "$pattern" "$@" >/dev/null 2>&1
+    return $?
+  fi
+
+  grep -nE -- "$pattern" "$@" >/dev/null 2>&1
+}
+
+has_payload_match() {
+  local pattern="$1"
+  local payload="$2"
+
+  if [[ "$HAS_RG" == "true" ]]; then
+    rg -q "$pattern" <<<"$payload"
+    return $?
+  fi
+
+  printf '%s\n' "$payload" | grep -Eq -- "$pattern"
+}
 
 check_file() {
   local f="$1"
@@ -67,37 +96,37 @@ for f in "${required_files[@]}"; do
 done
 
 for service_id in filesystem-snapshot filesystem-discovery filesystem-watch; do
-  if ! rg -n "id: ${service_id}" "$SERVICES_MANIFEST" >/dev/null 2>&1; then
+  if ! has_file_match "id: ${service_id}" "$SERVICES_MANIFEST"; then
     echo "ERROR: services manifest missing ${service_id} entry"
     errors=$((errors + 1))
   fi
 done
 
 for service_key in filesystem-snapshot filesystem-discovery filesystem-watch; do
-  if ! rg -n "^  ${service_key}:" "$SERVICES_REGISTRY" >/dev/null 2>&1; then
+  if ! has_file_match "^  ${service_key}:" "$SERVICES_REGISTRY"; then
     echo "ERROR: services registry missing ${service_key} entry"
     errors=$((errors + 1))
   fi
 done
 
 for cmd_id in snapshot-build snapshot-diff discover-start discover-expand discover-explain discover-resolve watch-poll; do
-  if ! rg -n "id: ${cmd_id}" "$COMMANDS_MANIFEST" >/dev/null 2>&1; then
+  if ! has_file_match "id: ${cmd_id}" "$COMMANDS_MANIFEST"; then
     echo "ERROR: commands manifest missing ${cmd_id} command"
     errors=$((errors + 1))
   fi
 done
 
-if ! rg -n "entrypoint:[[:space:]]+runtime/run tool interfaces/filesystem-snapshot" "$SERVICES_REGISTRY" >/dev/null 2>&1; then
+if ! has_file_match "entrypoint:[[:space:]]+runtime/run tool interfaces/filesystem-snapshot" "$SERVICES_REGISTRY"; then
   echo "ERROR: services registry entrypoint is not runtime-direct for filesystem-snapshot"
   errors=$((errors + 1))
 fi
 
-if ! rg -n "entrypoint:[[:space:]]+runtime/run tool interfaces/filesystem-discovery" "$SERVICES_REGISTRY" >/dev/null 2>&1; then
+if ! has_file_match "entrypoint:[[:space:]]+runtime/run tool interfaces/filesystem-discovery" "$SERVICES_REGISTRY"; then
   echo "ERROR: services registry entrypoint is not runtime-direct for filesystem-discovery"
   errors=$((errors + 1))
 fi
 
-if ! rg -n "entrypoint:[[:space:]]+runtime/run tool interfaces/filesystem-watch" "$SERVICES_REGISTRY" >/dev/null 2>&1; then
+if ! has_file_match "entrypoint:[[:space:]]+runtime/run tool interfaces/filesystem-watch" "$SERVICES_REGISTRY"; then
   echo "ERROR: services registry entrypoint is not runtime-direct for filesystem-watch"
   errors=$((errors + 1))
 fi
@@ -115,39 +144,39 @@ runtime_command_docs=(
 for mapped in "${runtime_command_docs[@]}"; do
   cmd_doc="${mapped%%|*}"
   runtime_service="${mapped##*|}"
-  if ! rg -n "runtime/run tool ${runtime_service}" "$cmd_doc" >/dev/null 2>&1; then
+  if ! has_file_match "runtime/run tool ${runtime_service}" "$cmd_doc"; then
     echo "ERROR: command doc is not runtime-direct for ${runtime_service}: $cmd_doc"
     errors=$((errors + 1))
   fi
-  if rg -n "impl/(filesystem-interfaces|snapshot-build|snapshot-diff)\\.sh" "$cmd_doc" >/dev/null 2>&1; then
+  if has_file_match "impl/(filesystem-interfaces|snapshot-build|snapshot-diff)\\.sh" "$cmd_doc"; then
     echo "ERROR: command doc still references legacy shell wrapper: $cmd_doc"
     errors=$((errors + 1))
   fi
 done
 
-if ! rg -n "id: filesystem-interfaces-interop" "$CONTEXT_INDEX" >/dev/null 2>&1; then
+if ! has_file_match "id: filesystem-interfaces-interop" "$CONTEXT_INDEX"; then
   echo "ERROR: context index missing filesystem-interfaces-interop entry"
   errors=$((errors + 1))
 fi
 
 # Smoke test snapshot build + current pointer via writer-plane service.
 SMOKE_OUT="$("$RUNTIME_RUN" tool interfaces/filesystem-snapshot snapshot.build --json '{"root":".","set_current":true}')"
-if ! rg -q '"ok"[[:space:]]*:[[:space:]]*true' <<<"$SMOKE_OUT" || \
-   ! rg -q '"snapshot_id"[[:space:]]*:[[:space:]]*"snap-[^"]+"' <<<"$SMOKE_OUT"; then
+if ! has_payload_match '"ok"[[:space:]]*:[[:space:]]*true' "$SMOKE_OUT" || \
+   ! has_payload_match '"snapshot_id"[[:space:]]*:[[:space:]]*"snap-[^"]+"' "$SMOKE_OUT"; then
   echo "ERROR: snapshot-build smoke test failed"
   errors=$((errors + 1))
 fi
 
 # Smoke test discovery query-plane service invocation.
 DISCOVER_OUT="$("$RUNTIME_RUN" tool interfaces/filesystem-discovery discover.start --json '{"query":"harmony","limit":5}')"
-if ! rg -q '"frontier_node_ids"[[:space:]]*:' <<<"$DISCOVER_OUT"; then
+if ! has_payload_match '"frontier_node_ids"[[:space:]]*:' "$DISCOVER_OUT"; then
   echo "ERROR: discover-start smoke test failed"
   errors=$((errors + 1))
 fi
 
 # Smoke test watch polling service invocation.
 WATCH_OUT="$("$RUNTIME_RUN" tool interfaces/filesystem-watch watch.poll --json '{"root":".","state_key":"filesystem-watch:validate","max_events":25,"max_files":50000}')"
-if ! rg -q '"cursor"[[:space:]]*:[[:space:]]*"watch-[a-f0-9]{16}"' <<<"$WATCH_OUT"; then
+if ! has_payload_match '"cursor"[[:space:]]*:[[:space:]]*"watch-[a-f0-9]{16}"' "$WATCH_OUT"; then
   echo "ERROR: watch-poll smoke test failed"
   errors=$((errors + 1))
 fi

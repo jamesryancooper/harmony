@@ -7,6 +7,23 @@ HARMONY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 REPO_ROOT="$(cd "$HARMONY_DIR/.." && pwd)"
 RUNTIME_RUN="$HARMONY_DIR/runtime/run"
 STATE_DIR=".harmony/runtime/_ops/state/snapshots"
+HAS_RG=false
+
+if command -v rg >/dev/null 2>&1; then
+  HAS_RG=true
+fi
+
+payload_has_regex() {
+  local payload="$1"
+  local pattern="$2"
+
+  if [[ "$HAS_RG" == "true" ]]; then
+    rg -q "$pattern" <<<"$payload"
+    return $?
+  fi
+
+  printf '%s\n' "$payload" | grep -Eq -- "$pattern"
+}
 
 if [[ ! -x "$RUNTIME_RUN" ]]; then
   echo "ERROR: runtime launcher not found: $RUNTIME_RUN"
@@ -23,7 +40,7 @@ assert_contains() {
   local payload="$1"
   local pattern="$2"
   local message="$3"
-  if ! rg -q "$pattern" <<<"$payload"; then
+  if ! payload_has_regex "$payload" "$pattern"; then
     echo "ERROR: $message"
     echo "$payload"
     exit 1

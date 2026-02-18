@@ -7,6 +7,47 @@ HARMONY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 REPO_ROOT="$(cd "$HARMONY_DIR/.." && pwd)"
 RUNTIME_RUN="$HARMONY_DIR/runtime/run"
 STATE_DIR=".harmony/runtime/_ops/state/snapshots"
+HAS_RG=false
+
+if command -v rg >/dev/null 2>&1; then
+  HAS_RG=true
+fi
+
+has_payload_match() {
+  local pattern="$1"
+  local payload="$2"
+
+  if [[ "$HAS_RG" == "true" ]]; then
+    rg -q "$pattern" <<<"$payload"
+    return $?
+  fi
+
+  printf '%s\n' "$payload" | grep -Eq -- "$pattern"
+}
+
+has_file_match() {
+  local pattern="$1"
+  local file="$2"
+
+  if [[ "$HAS_RG" == "true" ]]; then
+    rg -n "$pattern" "$file" >/dev/null 2>&1
+    return $?
+  fi
+
+  grep -nE -- "$pattern" "$file" >/dev/null 2>&1
+}
+
+print_file_matches() {
+  local pattern="$1"
+  local file="$2"
+
+  if [[ "$HAS_RG" == "true" ]]; then
+    rg -n "$pattern" "$file" || true
+    return 0
+  fi
+
+  grep -nE -- "$pattern" "$file" || true
+}
 
 if [[ ! -x "$RUNTIME_RUN" ]]; then
   echo "ERROR: runtime launcher not found: $RUNTIME_RUN"
@@ -28,7 +69,7 @@ OUT1="$(build_snapshot)" || {
   echo "$OUT1"
   exit 1
 }
-if ! rg -q '"ok"[[:space:]]*:[[:space:]]*true' <<<"$OUT1"; then
+if ! has_payload_match '"ok"[[:space:]]*:[[:space:]]*true' "$OUT1"; then
   echo "ERROR: first snapshot build returned failure payload"
   echo "$OUT1"
   exit 1
@@ -40,7 +81,7 @@ OUT2="$(build_snapshot)" || {
   echo "$OUT2"
   exit 1
 }
-if ! rg -q '"ok"[[:space:]]*:[[:space:]]*true' <<<"$OUT2"; then
+if ! has_payload_match '"ok"[[:space:]]*:[[:space:]]*true' "$OUT2"; then
   echo "ERROR: second snapshot build returned failure payload"
   echo "$OUT2"
   exit 1
@@ -67,9 +108,9 @@ if [[ ! -f "$FILES_JSONL" ]]; then
   exit 1
 fi
 
-if rg -n "\"path\":\"\\.harmony/runtime/_ops/state/" "$FILES_JSONL" >/dev/null 2>&1; then
+if has_file_match "\"path\":\"\\.harmony/runtime/_ops/state/" "$FILES_JSONL"; then
   echo "ERROR: runtime state paths leaked into snapshot artifact"
-  rg -n "\"path\":\"\\.harmony/runtime/_ops/state/" "$FILES_JSONL" || true
+  print_file_matches "\"path\":\"\\.harmony/runtime/_ops/state/" "$FILES_JSONL"
   exit 1
 fi
 
