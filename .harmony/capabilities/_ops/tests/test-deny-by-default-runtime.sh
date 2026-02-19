@@ -269,6 +269,23 @@ run_acp_gate_tests() {
     "
 
   assert_success \
+    "acp digest mirrors receipt metadata" \
+    bash -euo pipefail -c "
+      receipt='.harmony/continuity/runs/$receipt_run_id/receipt.latest.json'
+      digest='.harmony/continuity/runs/$receipt_run_id/digest.latest.md'
+      [[ -f \"\$receipt\" ]]
+      [[ -f \"\$digest\" ]]
+      op_class=\"\$(jq -r '.operation.class // \"\"' \"\$receipt\")\"
+      decision=\"\$(jq -r '.decision // \"\"' \"\$receipt\")\"
+      [[ -n \"\$op_class\" ]]
+      [[ -n \"\$decision\" ]]
+      grep -F -- \"- Operation Class: \" \"\$digest\" >/dev/null
+      grep -F -- \"- Decision: \" \"\$digest\" >/dev/null
+      grep -F -- \"\$op_class\" \"\$digest\" >/dev/null
+      grep -F -- \"\$decision\" \"\$digest\" >/dev/null
+    "
+
+  assert_success \
     "acp receipts append decision log" \
     bash -euo pipefail -c "
       [[ -s '.harmony/capabilities/_ops/state/logs/acp-decisions.jsonl' ]]

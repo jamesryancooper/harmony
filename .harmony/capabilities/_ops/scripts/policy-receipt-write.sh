@@ -40,19 +40,30 @@ read_policy_paths() {
 render_digest() {
   local receipt_path="$1"
   local output_path="$2"
+  local run_id timestamp decision effective_acp operation_class phase reason_codes rollback_handle recovery_window
+
+  run_id="$(jq -r '.run_id // ""' "$receipt_path")"
+  timestamp="$(jq -r '.timestamp // ""' "$receipt_path")"
+  decision="$(jq -r '.decision // ""' "$receipt_path")"
+  effective_acp="$(jq -r '.effective_acp // ""' "$receipt_path")"
+  operation_class="$(jq -r '.operation.class // ""' "$receipt_path")"
+  phase="$(jq -r '.phase // ""' "$receipt_path")"
+  reason_codes="$(jq -r '(.reason_codes // []) | join(",")' "$receipt_path")"
+  rollback_handle="$(jq -r '.rollback_handle // ""' "$receipt_path")"
+  recovery_window="$(jq -r '.recovery_window // ""' "$receipt_path")"
 
   {
     echo "# ACP Decision Digest"
     echo
-    echo "- Run ID: \`$(jq -r '.run_id' "$receipt_path")\`"
-    echo "- Timestamp: \`$(jq -r '.timestamp' "$receipt_path")\`"
-    echo "- Decision: \`$(jq -r '.decision' "$receipt_path")\`"
-    echo "- Effective ACP: \`$(jq -r '.effective_acp' "$receipt_path")\`"
-    echo "- Operation Class: \`$(jq -r '.operation.class // \"\"' "$receipt_path")\`"
-    echo "- Phase: \`$(jq -r '.phase' "$receipt_path")\`"
-    echo "- Reason Codes: \`$(jq -r '.reason_codes | join(\",\")' "$receipt_path")\`"
-    echo "- Rollback Handle: \`$(jq -r '.rollback_handle // \"\"' "$receipt_path")\`"
-    echo "- Recovery Window: \`$(jq -r '.recovery_window // \"\"' "$receipt_path")\`"
+    echo "- Run ID: \`$run_id\`"
+    echo "- Timestamp: \`$timestamp\`"
+    echo "- Decision: \`$decision\`"
+    echo "- Effective ACP: \`$effective_acp\`"
+    echo "- Operation Class: \`$operation_class\`"
+    echo "- Phase: \`$phase\`"
+    echo "- Reason Codes: \`$reason_codes\`"
+    echo "- Rollback Handle: \`$rollback_handle\`"
+    echo "- Recovery Window: \`$recovery_window\`"
   } > "$output_path"
 }
 
