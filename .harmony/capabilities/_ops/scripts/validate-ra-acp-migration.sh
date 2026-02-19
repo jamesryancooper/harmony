@@ -102,12 +102,15 @@ check_receipt_writer_append_only() {
 check_active_surface_legacy_terms() {
   local hits sample
 
-  hits="$(rg -n -i --hidden \
-    --glob '!.harmony/output/**' \
-    --glob '!.harmony/ideation/**' \
-    --glob '!.harmony/capabilities/_ops/scripts/validate-ra-acp-migration.sh' \
-    'human checkpoint|human approval|\bHITL\b|hitl-checkpoints' \
-    "$REPO_ROOT/.harmony" || true)"
+  hits="$(
+    cd "$REPO_ROOT" && rg -n -i --hidden \
+      --glob '!.harmony/output/**' \
+      --glob '!.harmony/ideation/**' \
+      --glob '!.harmony/capabilities/_ops/tests/**' \
+      --glob '!.harmony/capabilities/_ops/scripts/validate-ra-acp-migration.sh' \
+      'human checkpoint|human approval|\bHITL\b|hitl-checkpoints' \
+      ".harmony" || true
+  )"
 
   if [[ -n "$hits" ]]; then
     sample="$(printf '%s\n' "$hits" | head -n 10 | tr '\n' '; ')"
