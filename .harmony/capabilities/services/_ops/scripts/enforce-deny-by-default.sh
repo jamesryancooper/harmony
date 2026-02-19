@@ -143,9 +143,9 @@ harmony_acp_gate_enforce() {
   local harmony_root="$2"
   local policy_file="$3"
 
-  local phase operation_class run_id profile actor_id actor_type break_glass
+  local phase operation_class run_id profile actor_id actor_type break_glass keep_tmp
   local target_json evidence_json attestations_json counters_json budgets_json signals_json reversibility_json
-  local request_builder acp_eval receipt_writer tmp_dir request_file decision_file decision_output rc
+  local request_builder acp_eval receipt_writer tmp_dir request_file decision_file decision_output rc request_rc
 
   phase="${HARMONY_OPERATION_PHASE:-stage}"
   if ! harmony_acp_should_gate_phase "$phase"; then
@@ -163,6 +163,7 @@ harmony_acp_gate_enforce() {
   actor_id="${HARMONY_AGENT_ID:-agent-local}"
   actor_type="${HARMONY_ACTOR_TYPE:-agent}"
   break_glass="${HARMONY_BREAK_GLASS:-false}"
+  keep_tmp="${HARMONY_ACP_KEEP_TMP:-false}"
 
   target_json="${HARMONY_ACP_TARGET_JSON:-{}}"
   if [[ "$target_json" == "{}" && -n "${HARMONY_TARGET_BRANCH:-}" ]]; then
@@ -214,6 +215,7 @@ harmony_acp_gate_enforce() {
   request_file="$tmp_dir/${run_id}-${service_id}-request.json"
   decision_file="$tmp_dir/${run_id}-${service_id}-decision.json"
 
+  request_rc=0
   "$request_builder" \
     --output "$request_file" \
     --run-id "$run_id" \
@@ -233,7 +235,12 @@ harmony_acp_gate_enforce() {
     --evidence-hash "${HARMONY_EVIDENCE_HASH:-}" \
     --intent "${HARMONY_ACP_INTENT:-runtime-service-enforcement}" \
     --boundaries "${HARMONY_ACP_BOUNDARIES:-service policy envelope}" \
-    $( [[ "$break_glass" == "true" ]] && echo "--break-glass" ) >/dev/null
+    $( [[ "$break_glass" == "true" ]] && echo "--break-glass" ) >/dev/null || request_rc=$?
+
+  if [[ "$request_rc" -ne 0 ]]; then
+    echo "[acp] request envelope generation failed; failing closed" >&2
+    return 13
+  fi
 
   rc=0
   decision_output="$("$acp_eval" enforce --policy "$policy_file" --request "$request_file" 2>&1)" || rc=$?
@@ -249,6 +256,11 @@ harmony_acp_gate_enforce() {
   fi
 
   harmony_acp_emit_receipt "$receipt_writer" "$policy_file" "$request_file" "$decision_file"
+
+  if [[ "$keep_tmp" != "true" ]]; then
+    rm -f "$request_file" "$decision_file" >/dev/null 2>&1 || true
+    rmdir "$tmp_dir" >/dev/null 2>&1 || true
+  fi
 
   case "$rc" in
     0)

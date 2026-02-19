@@ -261,6 +261,15 @@ run_acp_gate_tests() {
     "
 
   assert_success \
+    "acp guard temp files are cleaned by default" \
+    bash -euo pipefail -c "
+      request_file='.harmony/capabilities/_ops/state/.tmp/acp/$receipt_run_id-guard-request.json'
+      decision_file='.harmony/capabilities/_ops/state/.tmp/acp/$receipt_run_id-guard-decision.json'
+      [[ ! -e \"\$request_file\" ]]
+      [[ ! -e \"\$decision_file\" ]]
+    "
+
+  assert_success \
     "acp receipt validates against policy contract" \
     bash -euo pipefail -c "
       receipt='.harmony/continuity/runs/$receipt_run_id/receipt.latest.json'
