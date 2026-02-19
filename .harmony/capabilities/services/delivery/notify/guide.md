@@ -1,4 +1,4 @@
-# Notify — Human-in-the-Loop Handoffs
+# Notify — ACP Escalation Handoffs
 
 - **Purpose:** Summaries, approvals, alerts (Slack/Email/PR comments).
 - **Responsibilities:** compact diffs, "Approve/Apply" buttons.

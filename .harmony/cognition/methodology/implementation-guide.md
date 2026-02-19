@@ -78,7 +78,7 @@ This keeps Spec semantics authoritative (from GitHub’s Spec Kit), makes BMAD u
 flowchart LR
   A[Spec (GitHub’s Spec Kit via SpecKit) + ADR stub] --> B[Shape & Scope Cuts]
   B --> C[PlanKit (BMAD plan + ADR)]
-  C --> D[Dev in AI IDE (human checkpoints)]
+  C --> D[Dev in AI IDE (ACP checkpoints)]
   D --> E[PR -> Vercel Preview (feature-flagged; ObservaKit trace linked)]
   E --> F[CI Gates: lint/type/test/scan/contract/SBOM]
   F -->|all green| G[Merge to Trunk]
@@ -105,7 +105,7 @@ flowchart LR
   - In: intent/idea (issue), constraints.
   - Out: `docs/specs/<feature>/spec.md` and related GitHub’s Spec Kit docs; ADR is created in the next stage by PlanKit. (ASVS/SSDF per OWASP/NIST.) ([GitHub][7])
 - **Commands & hooks**: `speckit init …` to author; `speckit validate …` to ensure structure; `speckit render …` to publish. See `.harmony/capabilities/services/_meta/docs/platform-overview.md` (SpecKit + PlanKit sections) and `.harmony/capabilities/services/planning/spec/guide.md` for wrapper details and contracts.
-- **Human checkpoint**: Driver & Navigator confirm problem, scope, non‑functionals (two passes if solo).
+- **ACP checkpoint**: Driver & Navigator confirm problem, scope, non‑functionals (two passes if solo).
 - **Integrations**: Open an ObservaKit trace at spec start and persist the `trace_id` for downstream linkage.
 - **Gate**: **S‑1** passes when SpecKit validation succeeds and required fields are present.
 
@@ -126,7 +126,7 @@ flowchart LR
 - **Human**: Verify ACs & security/perf AC embedded; confirm AI determinism plan (pinned provider/model/version, temperature ≤ 0.3, prompt hash, golden tests).
 - **Gate**: **P‑1** (PlanKit/BMAD alignment: ADR/plan ↔ spec/plan tie‑out).
 
-### D — Dev in AI IDE (guided, HITL)
+### D — Dev in AI IDE (guided, ACP)
 
 - **Planning mgmt**: PlanKit planning policies + AI IDE rules.
 - **Artifacts**: `.cursorrules` seeds prompts with SpecKit + gates; AI IDE **Commands** for “spec‑to‑code”, “threat‑model”, “generate tests”. ([Cursor][15])
@@ -368,7 +368,7 @@ See `.harmony/capabilities/services/_meta/docs/platform-overview.md` (SpecKit + 
   - `speckit.inputs.v1.json`, `speckit.outputs.v1.json`
   - `plankit.inputs.v1.json`, `plankit.outputs.v1.json`
 - Add kit metadata files under each kit, conforming to AI‑Toolkit KitMetadata v0.2:
-  - `packages/kits/<kit>/metadata/kit.metadata.json` declaring `pillars`, `lifecycleStages`, `inputsSchema`, `outputsSchema`, required spans, determinism/HITL/idempotency.
+  - `packages/kits/<kit>/metadata/kit.metadata.json` declaring `pillars`, `lifecycleStages`, `inputsSchema`, `outputsSchema`, required spans, determinism/ACP/idempotency.
 - Update `packages/contracts/src/index.ts` (barrel) to re‑export schemas for programmatic consumers; include schema diffs in PRs when interfaces change.
 - Validate kit run records against the AI‑Toolkit run‑record schema (v0.2). Runs MUST include: `runId`, `kit`, `stage`, `risk`, `telemetry.trace_id`, determinism (`prompt_hash`, `idempotencyKey`, optional `cacheKey`), `status`, and `summary`.
 - Enforce OpenAPI diffs (oasdiff) for API changes and JSON‑Schema diffs for kit contracts as CI gates.
@@ -794,9 +794,9 @@ flowchart TD
 
 ## Alignment addenda (AI‑Toolkit v0.2)
 
-### Risk & HITL policy (Harmony default)
+### Risk & ACP policy (Harmony default)
 
-| Risk | Required gates | HITL | Flags & rollback |
+| Risk | Required gates | ACP | Flags & rollback |
 | --- | --- | --- | --- |
 | Trivial | Lint, typecheck | Optional Navigator pass | Not required |
 | Low | + Unit/contract; Policy/Eval pass | Navigator pass | Optional flag; rollback note |
@@ -832,14 +832,16 @@ Waivers are exceptional; scope/timebox (≤ 7 days) with Navigator approval (rev
 - Evidence linking: record `policy.checked[]` IDs (e.g., `ASVS-2.1.1`) and `policy.result` in run records and span attributes.  
 - PatchKit SHOULD render a ruleset summary in PR bodies and require navigator acknowledgement for deviations.
 
-### HITL states & semantics (operational)
+### ACP states & semantics (operational)
 
-- States: `planned` → `requested` → `approved` | `rejected` | `waived`.  
+- Decisions: `ALLOW` | `STAGE_ONLY` | `DENY` | `ESCALATE`.  
 - Required fields in run records/telemetry:  
-  - `hitl.checkpoint` (`pre-implement`, `pre-merge`, `pre-promote`, `post-promote`)  
-  - `hitl.approver` (handle/email), `hitl.approvedAt` (ISO8601)  
-  - For waivers: `hitl.justification` and PR comment/link  
-- Emit span events: `hitl.requested`, `hitl.approved`, `hitl.rejected`, `hitl.waived` on the parent lifecycle span to preserve auditability.
+  - `acp.phase` (`stage`, `promote`, `finalize`)  
+  - `acp.level` (for example `ACP-1`, `ACP-2`)  
+  - `acp.decision` and `acp.reason_codes[]`  
+  - `acp.attestations[]` for ACP-2+ operations  
+  - For waivers: `acp.justification` and PR comment/link  
+- Emit span events: `acp.requested`, `acp.allow`, `acp.stage_only`, `acp.deny`, `acp.escalate` on the parent lifecycle span to preserve auditability.
 
 ### Kit exit codes & HTTP mapping (standard v0.2)
 
@@ -852,7 +854,7 @@ Waivers are exceptional; scope/timebox (≤ 7 days) with Navigator approval (rev
 
 ### Kit metadata & contracts registry (harmonized)
 
-- Kits MUST include metadata (`metadata/kit.metadata.json`) conforming to AI‑Toolkit KitMetadata v0.2, declaring `pillars`, `lifecycleStages`, `inputsSchema`, `outputsSchema`, required spans, determinism, safety (HITL), and idempotency.  
+- Kits MUST include metadata (`metadata/kit.metadata.json`) conforming to AI‑Toolkit KitMetadata v0.2, declaring `pillars`, `lifecycleStages`, `inputsSchema`, `outputsSchema`, required spans, determinism, safety (ACP), and idempotency.  
 - Contracts live under `packages/contracts` with kit JSON‑Schemas at `packages/contracts/schemas/kits/<kit>.{inputs|outputs}.v<MAJOR>.json`.  
 - Observe semantic versioning: breaking contract changes bump MAJOR and include migration notes; additive changes bump MINOR.  
 - Update `packages/contracts/src/index.ts` (barrel) when schemas change; PatchKit PRs MUST link schema diffs when interfaces are touched.

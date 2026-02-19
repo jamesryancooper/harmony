@@ -37,7 +37,7 @@ Harmony remains fully operational with zero adapters installed.
 | Memory and compaction semantics | Memory classes, retention, flush-before-compaction policy | Provider memory APIs and persistence backend |
 | Multi-agent routing | Routing precedence and delegation rules | Session spawning/transport implementation |
 | Presence contract | Heartbeat field requirements and evidence shape | Runtime signal emission |
-| Governance controls | HITL checkpoints, no-silent-apply, deny-by-default, fail-closed policy | Provider approval plumbing |
+| Governance controls | ACP checkpoints, no-silent-apply, deny-by-default, fail-closed policy | Provider approval plumbing |
 
 ## Canonical Semantics
 
@@ -88,7 +88,7 @@ Flush sequence:
 On flush failure:
 
 - Compaction is blocked by default.
-- Continue only with explicit HITL waiver and waiver evidence.
+- Continue only with explicit ACP waiver and waiver evidence.
 
 ### Routing Precedence
 

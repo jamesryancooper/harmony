@@ -74,7 +74,7 @@ if branch_age_days > 1:
 
 - `Reversibility` depends on small rollback units.
 - `Flags by Default` enables shipping incomplete work safely.
-- `HITL Checkpoints` stay lightweight when diffs are small.
+- `Autonomous Control Points` stay lightweight when diffs are small and reversible.
 
 ## Anti-Pattern: Big-bang PR
 

@@ -13,7 +13,7 @@ This document specifies the technical contracts, governance constraints, and pro
 
 - Agents: Planner (Analyze/Plan), Builder (Implement), Verifier (Validate).
 - Contracts: explicit, decision-grade outputs with traceable rationale.
-- Governance: risk thresholds, policy compliance, HITL gates, fail-closed defaults.
+- Governance: risk thresholds, policy compliance, ACP gates, fail-closed defaults.
 - Provenance: end-to-end audit trail across plans, code changes, and verifications.
 
 ## Audience and Scope
@@ -57,7 +57,7 @@ Quality requirements:
 ### Planner Agent Governance & Constraints
 
 - Policy Compliance: validate planned actions against policy knowledge (security, secrets, banned APIs, quality bars).
-- Risk Thresholds: require human approval for medium/high-risk or sensitive changes (HITL at planning).
+- Risk Thresholds: require ACP approval for medium/high-risk or sensitive changes (ACP at planning).
 - Explainability: provide rationale and evidence; opaque recommendations are rejected.
 - Scope Respect: do not plan architectural/infrastructure changes outside remit unless explicitly allowed.
 - Escalation: when ambiguous or beyond scope, request human decision rather than guessing.
@@ -128,9 +128,9 @@ Quality requirements:
 
 ### Verifier Agent Governance & Constraints
 
-- Strict by Default: fail-closed behavior; waivers require explicit human approval with justification.
+- Strict by Default: fail-closed behavior; waivers require explicit ACP approval with justification.
 - Independence: run in isolated environment; inputs are team-maintained standards that Builder cannot alter ad hoc.
-- HITL Gate: failing checks route to Builder for fixes or to humans for adjudication when tests are disputed.
+- ACP Gate: failing checks route to Builder for fixes or to humans for adjudication when tests are disputed.
 - Knowledge Updates: persist verification artifacts, coverage history, and waiver records.
 - No Partial Pass: either meets bars or fails; no dynamic threshold adjustments without policy updates.
 - Tooling Governance: checks are configured by the team; Verifier does not suppress configured rules.
@@ -145,10 +145,10 @@ Quality requirements:
 
 ## Cross-Agent Governance and Collaboration
 
-- Planner: enforces risk thresholds and routes high-impact plans to humans (HITL at planning).
-- Builder: implements via PRs behind CI + human review (HITL at pre-merge).
+- Planner: enforces risk thresholds and routes high-impact plans to humans (ACP at planning).
+- Builder: implements via PRs behind CI + human review (ACP at pre-merge).
 - Verifier: gates merges with strict validation; humans may override via recorded waivers.
-- Thin Control Plane (TS kits + CI gates): provides the shared guardrails (flags, policy checks, contract tests, observability baselines) that all agents must respect; violations fail‑closed and are surfaced for HITL decisions.
+- Thin Control Plane (TS kits + CI gates): provides the shared guardrails (flags, policy checks, contract tests, observability baselines) that all agents must respect; violations fail‑closed and are surfaced for ACP decisions.
 
 ### Physical Mapping in the Polyglot Monorepo
 

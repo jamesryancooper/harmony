@@ -1,13 +1,13 @@
 ---
 title: MAPE-K Loop Modeling
-description: Application of the MAPE-K model with HITL checkpoints to drive safe, continuous improvement via Planner/Builder/Verifier agents.
+description: Application of the MAPE-K model with ACP checkpoints to drive safe, continuous improvement via Planner/Builder/Verifier agents.
 ---
 
 # MAPE-K Loop Modeling (Technical)
 
 Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [agent roles](./agent-roles.md), [kaizen subsystem](./kaizen-subsystem.md), [knowledge plane](../../knowledge-plane/knowledge-plane.md), [contracts registry](./contracts-registry.md), [python runtime workspace example](/.harmony/scaffolding/examples/stack-profiles/python-runtime-workspace.md)
 
-This document specifies how Harmony applies the MAPE-K model with Human-in-the-Loop (HITL) checkpoints to continuously improve the system while maintaining safety and alignment with governance policies.
+This document specifies how Harmony applies the MAPE-K model with ACP checkpoints to continuously improve the system while maintaining safety and alignment with governance policies.
 
 ## Summary
 
@@ -15,7 +15,7 @@ This document specifies how Harmony applies the MAPE-K model with Human-in-the-L
 - Managed Element: the Harmony SaaS monorepo/application.
 - Managing Element: AI agents plus human operators.
 - Core agents: Planner Agent, Builder Agent, Verifier Agent.
-- HITL checkpoints: plan approval and pre-merge review.
+- ACP checkpoints: plan approval and pre-merge review.
 - Operation modes: continuous kaizen loop and event-driven loop.
 
 ## Audience and Scope
@@ -135,15 +135,15 @@ Triggers start the loop outside the schedule:
 - CI pipeline failure on main → analyze regression and plan fix or revert.
 - Production anomaly (e.g., spike in errors) → analyze recent changes/logs and plan mitigation (e.g., feature-flag rollback).
 
-## Human-in-the-Loop Checkpoints
+## Autonomous Control Points
 
-HITL ensures safety, prioritization, and policy alignment. We apply three oversight points:
+ACP ensures safety, prioritization, and policy alignment. We apply three oversight points:
 
 - Plan approval: humans (e.g., tech lead/product owner) review proposed plans, rationale, and risk before execution.
 - Pre-merge review: humans review PR diffs and test results even when automated checks pass, especially early to build trust; very low-risk changes may be streamlined over time.
 - Analyze assistance: humans can annotate signals or provide hypotheses to guide analysis when uncertainty is high.
 
-This aligns with the “Autonomic Threshold” concept [arxiv.org](https://arxiv.org/html/2506.22185#:~:text=management,39%20%2C%20%2035): routine, low-risk adjustments may proceed autonomously; higher-risk work requires explicit human confirmation. Risk scoring and required approvals are enforced via the Governance and Risk model.
+This aligns with the “Autonomic Threshold” concept [arxiv.org](https://arxiv.org/html/2506.22185#:~:text=management,39%20%2C%20%2035): routine, low-risk adjustments may proceed autonomously; higher-risk work requires explicit policy gating and escalation. Risk scoring and ACP requirements are enforced via the Governance and Risk model.
 The Thin Control Plane provides the concrete guardrails (flags, policy checks, contract tests, and observability baselines) that agents must satisfy to advance between phases.
 
 ## Inputs and Outputs by Phase

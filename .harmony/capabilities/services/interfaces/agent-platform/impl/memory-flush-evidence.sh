@@ -147,7 +147,7 @@ description: Evidence record for flush-before-compaction policy evaluation.
 - Flush required (>=90% or explicit compaction): ${flush_required}
 - Flush execution state: ${flush_state}
 - Compaction decision: ${decision}
-- HITL waiver id: ${waiver_id:-none}
+- ACP waiver id: ${waiver_id:-none}
 
 ## Flush Sequence Evidence
 

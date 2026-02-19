@@ -1,9 +1,11 @@
 use clap::{Args, Parser, Subcommand};
 use policy_engine::{
-    doctor, evaluate_enforce, evaluate_grant, evaluate_preflight, DoctorRequest, EnforceRequest,
-    GrantEvalRequest, PreflightRequest, ScopeKind,
+    doctor, evaluate_acp_enforce, evaluate_acp_preflight, evaluate_enforce, evaluate_grant,
+    evaluate_preflight, validate_receipt, AcpDecisionKind, AcpRequest, DoctorRequest,
+    EnforceRequest, GrantEvalRequest, PreflightRequest, ReceiptValidateRequest, ScopeKind,
 };
 use serde::Serialize;
+use std::fs;
 use std::path::PathBuf;
 
 const DEFAULT_POLICY_PATH: &str = ".harmony/capabilities/_ops/policy/deny-by-default.v2.yml";
@@ -23,8 +25,20 @@ struct Cli {
 enum Commands {
     Preflight(PreflightArgs),
     Enforce(EnforceArgs),
+    AcpPreflight(AcpArgs),
+    AcpEnforce(AcpArgs),
+    ReceiptValidate(ReceiptValidateArgs),
     GrantEval(GrantEvalArgs),
     Doctor(DoctorArgs),
+}
+
+#[derive(Args, Debug)]
+struct AcpArgs {
+    #[arg(long, default_value = DEFAULT_POLICY_PATH)]
+    policy: PathBuf,
+
+    #[arg(long)]
+    request: PathBuf,
 }
 
 #[derive(Args, Debug)]
@@ -129,6 +143,15 @@ struct DoctorArgs {
     reason_codes: PathBuf,
 }
 
+#[derive(Args, Debug)]
+struct ReceiptValidateArgs {
+    #[arg(long, default_value = DEFAULT_POLICY_PATH)]
+    policy: PathBuf,
+
+    #[arg(long)]
+    receipt: PathBuf,
+}
+
 #[derive(Debug, Serialize)]
 struct RuntimeErrorPayload {
     allow: bool,
@@ -148,6 +171,9 @@ fn main() {
     match cli.command {
         Commands::Preflight(args) => run_preflight(args),
         Commands::Enforce(args) => run_enforce(args),
+        Commands::AcpPreflight(args) => run_acp_preflight(args),
+        Commands::AcpEnforce(args) => run_acp_enforce(args),
+        Commands::ReceiptValidate(args) => run_receipt_validate(args),
         Commands::GrantEval(args) => run_grant_eval(args),
         Commands::Doctor(args) => run_doctor(args),
     }
@@ -242,6 +268,57 @@ fn run_grant_eval(args: GrantEvalArgs) {
     }
 }
 
+fn run_acp_preflight(args: AcpArgs) {
+    let request = match load_acp_request(&args.request) {
+        Ok(value) => value,
+        Err(err) => {
+            emit_runtime_error(&err.to_string());
+            std::process::exit(2);
+        }
+    };
+
+    match evaluate_acp_preflight(&args.policy, &request) {
+        Ok(decision) => {
+            emit_json(&decision);
+            if matches!(
+                decision.decision,
+                AcpDecisionKind::Allow | AcpDecisionKind::StageOnly
+            ) {
+                std::process::exit(0);
+            }
+            std::process::exit(13);
+        }
+        Err(err) => {
+            emit_runtime_error(&err.to_string());
+            std::process::exit(2);
+        }
+    }
+}
+
+fn run_acp_enforce(args: AcpArgs) {
+    let request = match load_acp_request(&args.request) {
+        Ok(value) => value,
+        Err(err) => {
+            emit_runtime_error(&err.to_string());
+            std::process::exit(2);
+        }
+    };
+
+    match evaluate_acp_enforce(&args.policy, &request) {
+        Ok(decision) => {
+            emit_json(&decision);
+            if matches!(decision.decision, AcpDecisionKind::Allow) {
+                std::process::exit(0);
+            }
+            std::process::exit(13);
+        }
+        Err(err) => {
+            emit_runtime_error(&err.to_string());
+            std::process::exit(2);
+        }
+    }
+}
+
 fn run_doctor(args: DoctorArgs) {
     let request = DoctorRequest {
         policy_path: args.policy,
@@ -250,6 +327,27 @@ fn run_doctor(args: DoctorArgs) {
     };
 
     match doctor(&request) {
+        Ok(report) => {
+            emit_json(&report);
+            if report.valid {
+                std::process::exit(0);
+            }
+            std::process::exit(1);
+        }
+        Err(err) => {
+            emit_runtime_error(&err.to_string());
+            std::process::exit(2);
+        }
+    }
+}
+
+fn run_receipt_validate(args: ReceiptValidateArgs) {
+    let request = ReceiptValidateRequest {
+        policy_path: args.policy,
+        receipt_path: args.receipt,
+    };
+
+    match validate_receipt(&request) {
         Ok(report) => {
             emit_json(&report);
             if report.valid {
@@ -280,7 +378,9 @@ fn parse_scope_kind(value: &str) -> Result<ScopeKind, String> {
     match value.to_lowercase().as_str() {
         "service" => Ok(ScopeKind::Service),
         "skill" => Ok(ScopeKind::Skill),
-        _ => Err(format!("invalid --kind value '{value}' (expected service|skill)")),
+        _ => Err(format!(
+            "invalid --kind value '{value}' (expected service|skill)"
+        )),
     }
 }
 
@@ -301,11 +401,16 @@ fn env_or_string(explicit: Option<String>, key: &str, fallback: &str) -> String 
 }
 
 fn env_or_optional(explicit: Option<String>, key: &str) -> Option<String> {
-    if explicit.as_deref().is_some_and(|value| !value.trim().is_empty()) {
+    if explicit
+        .as_deref()
+        .is_some_and(|value| !value.trim().is_empty())
+    {
         return explicit;
     }
 
-    std::env::var(key).ok().filter(|value| !value.trim().is_empty())
+    std::env::var(key)
+        .ok()
+        .filter(|value| !value.trim().is_empty())
 }
 
 fn emit_json<T: Serialize>(value: &T) {
@@ -329,4 +434,11 @@ fn emit_runtime_error(message: &str) {
         },
     };
     emit_json(&payload);
+}
+
+fn load_acp_request(path: &PathBuf) -> Result<AcpRequest, String> {
+    let content = fs::read_to_string(path)
+        .map_err(|err| format!("failed to read ACP request {}: {err}", path.display()))?;
+    serde_json::from_str::<AcpRequest>(&content)
+        .map_err(|err| format!("failed to parse ACP request {}: {err}", path.display()))
 }

@@ -17,7 +17,7 @@ Every change in Harmony is classified into one of three risk tiers:
 
 | Tier | Name | Human Time | AI Rigor | Approval Flow |
 |------|------|------------|----------|---------------|
-| **T1** | Trivial | 2-3 min | Standard gates | Auto-mergeable with human approval |
+| **T1** | Trivial | 2-3 min | Standard gates | Auto-mergeable with ACP approval |
 | **T2** | Standard | 15-20 min | Standard + threat analysis + preview | Single human review pass |
 | **T3** | Elevated | 30-60 min | Full analysis + staged approval | Navigator pass + security sign-off |
 
@@ -737,7 +737,7 @@ slo_implications:
     - name: "<SLI>"
       definition: "<definition>"
 
-# Human Approval Checkpoints
+# ACP approval Checkpoints
 approval_checkpoints:
   spec_approval:
     required: true
@@ -878,7 +878,7 @@ approval_checkpoints:
 **Rollback**: <immediate + full method>
 **Watch window**: 30 minutes
 
-### Human Checkpoints
+### ACP checkpoints
 - [ ] Spec approved by owner
 - [ ] Spec approved by navigator
 - [ ] PR approved by owner

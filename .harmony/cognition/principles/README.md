@@ -54,7 +54,7 @@ For small teams, default to the smallest viable process, design, and tooling tha
 | Agentic | Determinism and Provenance | Persist model/prompt/run metadata for reproducibility and auditability. | Trust, Insight, Continuity | [Guide](./determinism-and-provenance.md) |
 | Agentic | Idempotency | Make mutating operations safe under retries and partial failures. | Trust, Velocity | [Guide](./idempotency.md) |
 | Agentic | Guardrails | Apply policy/eval/security gates fail-closed across agent loops. | Trust | [Guide](./guardrails.md) |
-| Agentic | HITL Checkpoints | Use risk-tiered human checkpoints at consequential decisions. | Direction, Trust | [Guide](./hitl-checkpoints.md) |
+| Agentic | Autonomous Control Points | Use policy-gated ACPs for consequential promotions with stage-only fallback and receipts. | Direction, Trust | [Guide](./autonomous-control-points.md) |
 
 ## Concrete Threshold Defaults
 
@@ -89,8 +89,8 @@ These defaults are normative unless a documented waiver applies:
 
 | Methodology guarantee | Backing principles | Status |
 |---|---|---|
-| Spec-first changes (one-pager + ADR + micro-STRIDE) | Contract-first; Documentation is Code; HITL Checkpoints | Covered |
-| No silent apply (Plan -> Diff -> Explain -> Test) | No Silent Apply; HITL Checkpoints; Guardrails | Covered |
+| Spec-first changes (one-pager + ADR + micro-STRIDE) | Contract-first; Documentation is Code; Autonomous Control Points | Covered |
+| No silent apply (Plan -> Diff -> Explain -> Test) | No Silent Apply; Autonomous Control Points; Guardrails | Covered |
 | Deterministic AI config + drift controls | Governed Determinism; Determinism and Provenance | Covered |
 | Observability required (`trace_id` evidence) | Observability as a Contract | Covered |
 | Idempotency + rollback + flags | Idempotency; Reversibility; Flags by Default | Covered |
@@ -99,7 +99,7 @@ These defaults are normative unless a documented waiver applies:
 | Cost and efficiency guardrails | Learn Continuously; Guardrails; Small Diffs, Trunk-based | Covered |
 | Supply-chain provenance and attestation | Determinism and Provenance; Security and Privacy Baseline | Covered |
 | Small-batch policy | Small Diffs, Trunk-based; Reversibility | Covered |
-| Waiver discipline (time-boxed exceptions) | Guardrails; HITL Checkpoints | Covered |
+| Waiver discipline (time-boxed exceptions) | Guardrails; Autonomous Control Points | Covered |
 | Self-contained, stack/host/environment-agnostic operation | Portability and Independence | Covered |
 
 ## Related Docs

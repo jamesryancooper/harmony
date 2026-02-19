@@ -105,7 +105,7 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 
 | Use Case | Potential Challenge | Can Skills Adapt? |
 |----------|---------------------|-------------------|
-| Human approval gates mid-execution | Not native to spec | **Yes** - See Phase 3.1 |
+| ACP approval gates mid-execution | Not native to spec | **Yes** - See Phase 3.1 |
 | Dynamic branching at runtime | Linear phase model assumed | **Yes** - See Phase 3.2 |
 | Process documentation as primary output | Output-focused design | **Yes** - See Phase 3.3 |
 | Multi-session long-running tasks | Single-session focus | **Yes** - See Phase 3.4 |
@@ -116,9 +116,9 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 
 ## Phase 3: Skills Limitation Deep-Dive
 
-### 3.1 Human Checkpoint Support
+### 3.1 ACP checkpoint Support
 
-**The Question:** Can skills support mandatory human approval gates mid-execution?
+**The Question:** Can skills support mandatory ACP approval gates mid-execution?
 
 **Analysis:**
 
@@ -134,13 +134,13 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 
 1. Summarize understanding
 2. Present key decisions
-3. **Ask user: "Is this what you intended?"** ← Human checkpoint
+3. **Ask user: "Is this what you intended?"** ← ACP checkpoint
 4. Incorporate feedback if provided
 ```
 
 **Evidence:** `refine-prompt` already implements this with the `skip_confirmation` parameter.
 
-**Verdict:** **Skills CAN handle this.** Human checkpoints are implemented via user prompts within phases. No spec violation required.
+**Verdict:** **Skills CAN handle this.** ACP checkpoints are implemented via user prompts within phases. No spec violation required.
 
 ---
 
@@ -282,7 +282,7 @@ skills:
 
 | Capability | Skills Handle It | Extension Feasible | Justifies New Primitive |
 |------------|------------------|-------------------|------------------------|
-| Human checkpoints | **Yes** | N/A | **No** |
+| ACP checkpoints | **Yes** | N/A | **No** |
 | Dynamic branching | **Yes** | N/A | **No** |
 | Process documentation | **Yes** | N/A | **No** |
 | Multi-session tasks | Partially | Yes (checkpoint patterns) | **No** |
@@ -310,7 +310,7 @@ skills:
 
 ### 4.2 Capability Gap Analysis
 
-**Capability 1: Human Checkpoint Orchestration**
+**Capability 1: ACP checkpoint Orchestration**
 
 - Skills handle this via user prompts within phases
 - `refine-prompt` demonstrates with `skip_confirmation` parameter
@@ -344,7 +344,7 @@ skills:
 
 | Capability | Real Use Cases | Frequency | Skills Workaround | Workaround Quality |
 |------------|----------------|-----------|-------------------|-------------------|
-| Human checkpoints | Code review approval, deploy gates | Common | User prompts in phases | Adequate |
+| ACP checkpoints | Code review approval, deploy gates | Common | User prompts in phases | Adequate |
 | Dynamic branching | Error recovery, conditional features | Common | Conditional phase instructions | Adequate |
 | Process documentation | Refactor audits, migration reports | Occasional | Output as process report | Adequate |
 | Multi-session tasks | Large migrations, phased rollouts | Rare | Checkpoint patterns | Adequate (needs standardization) |
@@ -383,7 +383,7 @@ Is your task...
 ├── Has defined I/O and needs auditability? → Skill
 ├── Pure scaffolding with no data transform? → Workflow?
 ├── Multi-phase procedure? → Both could work
-├── Needs human checkpoints? → Both could work
+├── Needs ACP checkpoints? → Both could work
 ├── Needs verification loops? → Both could work
 └── Unclear? → Confusion
 ```
@@ -546,7 +546,7 @@ The analysis demonstrates that **workflow archetype skills adequately serve all 
 
 **The recommendation is to consolidate to skills**, migrating valuable workflow content to skill definitions and deprecating the workflows primitive. This reduces cognitive load, eliminates system overlap, and leverages the production-ready skills infrastructure.
 
-The key insight is that skills are not just "composable I/O operations" - they are capable of encoding complex, multi-phase procedures with human checkpoints, verification gates, and conditional branching. The `refine-prompt` skill with its 10 phases proves this conclusively.
+The key insight is that skills are not just "composable I/O operations" - they are capable of encoding complex, multi-phase procedures with ACP checkpoints, verification gates, and conditional branching. The `refine-prompt` skill with its 10 phases proves this conclusively.
 
 ---
 
@@ -579,7 +579,7 @@ The original analysis evaluated single-session procedural tasks. Additional requ
 |-------------|-------------------|---------------------|
 | Multi-phase procedures (single session) | **Yes** | No |
 | Simple branching (if/else) | **Yes** | No |
-| Human checkpoints (within session) | **Yes** | No |
+| ACP checkpoints (within session) | **Yes** | No |
 | **Durable execution (survives restarts)** | No | **Yes** |
 | **Complex decision trees (>5 branch points)** | Awkward | **Yes** |
 | **Multi-session by design (days/weeks)** | No | **Yes** |
@@ -598,7 +598,7 @@ The original analysis evaluated single-session procedural tasks. Additional requ
 │  • Survives Claude Code restarts                               │
 │  • Complex decision trees (YAML/JSON state machine)            │
 │  • Multi-session by design (days/weeks)                        │
-│  • First-class human approval gates                            │
+│  • First-class ACP approval gates                            │
 │  • Interfaces with FlowKit runtime                              │
 │                                                                 │
 │  Location: .harmony/orchestration/missions/                      │
@@ -882,7 +882,7 @@ The analysis establishes a **two-layer architecture**:
 
 1. **Skills** (agentskills.io) — Single-session, composable capabilities with I/O contracts and audit logging. Migrate current workflow content here.
 
-2. **Missions** (FlowKit-native) — Durable, multi-session orchestration with complex branching, formal state machines, and first-class human checkpoints. Evolve the draft missions concept into this primitive.
+2. **Missions** (FlowKit-native) — Durable, multi-session orchestration with complex branching, formal state machines, and first-class ACP checkpoints. Evolve the draft missions concept into this primitive.
 
 This architecture provides clear separation of concerns:
 

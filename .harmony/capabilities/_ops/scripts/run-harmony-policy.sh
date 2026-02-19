@@ -10,10 +10,29 @@ RUNTIME_CRATES_DIR="$REPO_ROOT/.harmony/runtime/crates"
 DEFAULT_BIN="$RUNTIME_CRATES_DIR/../_ops/state/build/runtime-crates-target/debug/harmony-policy"
 ROLLOUT_STATE_FILE="$CAPABILITIES_DIR/_ops/state/rollout-mode.state"
 
+binary_is_stale() {
+  local bin="$1"
+  if [[ ! -x "$bin" ]]; then
+    return 0
+  fi
+
+  local src_root="$RUNTIME_CRATES_DIR/policy_engine"
+  if find \
+    "$src_root/src" \
+    "$src_root/tests" \
+    "$src_root/Cargo.toml" \
+    "$RUNTIME_CRATES_DIR/Cargo.toml" \
+    -type f -newer "$bin" -print -quit 2>/dev/null | grep -q .; then
+    return 0
+  fi
+
+  return 1
+}
+
 ensure_harmony_policy_bin() {
   local candidate="${HARMONY_POLICY_BIN:-$DEFAULT_BIN}"
 
-  if [[ -x "$candidate" ]]; then
+  if [[ -x "$candidate" ]] && ! binary_is_stale "$candidate"; then
     echo "$candidate"
     return 0
   fi

@@ -1,6 +1,6 @@
 ---
 title: Kaizen Subsystem
-description: Cross-cutting, fail-closed agentic improvement loop that proposes small, reversible changes under HITL governance.
+description: Cross-cutting, fail-closed agentic improvement loop that proposes small, reversible changes under ACP governance.
 ---
 
 # Kaizen Subsystem (Technical)
@@ -15,7 +15,7 @@ This document specifies the Kaizen subsystem: an agentic, fail-closed improvemen
 - Mode: fail‑closed with dry‑run PRs; no merge without validation + approval.
 - Agents: Planner, Builder, Verifier; backed by the Knowledge Plane and CI/CD.
 - Triggers: scheduled cadence and event-driven (e.g., CVEs, CI failures).
-- HITL: plan approval (risk‑gated) and pre‑merge code review.
+- ACP: plan approval (risk‑gated) and pre‑merge code review.
 - Outputs: branch + PR per improvement, verification artifacts, post‑merge outcomes logged.
 
 ## Audience and Scope
@@ -68,7 +68,7 @@ Complementing the Planner/Builder/Verifier loop, the subsystem uses a simple pip
 - Sensors: CI outcomes (TS + Python tasks), DORA/SRE signals, preview smoke results, OpenTelemetry traces/logs, and platform runtime run metadata (for example, flow/run records for Kaizen and governance flows).
 - Evaluators/Policy: codified rules from required checks, the risk rubric, and change‑type gates; outputs include reports/artifacts consumed by planners and attached to PRs.
 - Planners: small tasks drawn from retrospectives and stop‑the‑line triggers, producing decision‑grade plans.
-- Actuators: PR‑opening bots using our prompts/scripts (e.g., docs lint, span scaffolding, contract drift diffs), always behind HITL + branch protection. Contract drift work operates over the root `contracts/` registry (OpenAPI/JSON Schema, TS/Py clients) so that proposed changes consider both TypeScript and Python consumers. Weekly summaries are published under `kaizen/reports/`.
+- Actuators: PR‑opening bots using our prompts/scripts (e.g., docs lint, span scaffolding, contract drift diffs), always behind ACP + branch protection. Contract drift work operates over the root `contracts/` registry (OpenAPI/JSON Schema, TS/Py clients) so that proposed changes consider both TypeScript and Python consumers. Weekly summaries are published under `kaizen/reports/`.
 
 ## Workflow (Dry‑Run Improvement Loop)
 
@@ -85,9 +85,9 @@ The loop executes on cadence or trigger and iterates over small, isolated change
 - Prioritizes and selects one item (or a trivially orthogonal bundle).
 - Assigns risk aligned to governance thresholds; prepares validation criteria.
 
-3) Plan Approval (HITL)
+3) Plan Approval (ACP)
 
-- If risk ≥ threshold, await human approval; low‑risk routine maintenance may auto‑proceed per policy.
+- If risk ≥ threshold, await ACP approval; low‑risk routine maintenance may auto‑proceed per policy.
 - Early maturity: prefer quick human review of all plans to build trust.
 
 4) Execution as Dry‑Run (Builder)
@@ -100,7 +100,7 @@ The loop executes on cadence or trigger and iterates over small, isolated change
 - Run unit/integration tests, linting/static analysis, and other required checks.
 - If failures occur, loop on fixes within the PR when tractable; otherwise hold for human input.
 
-6) Review & Decision (HITL)
+6) Review & Decision (ACP)
 
 - Human reviewer validates intent, quality, and alignment even when CI is green.
 - Approve when satisfied; request changes or close otherwise.
@@ -122,11 +122,11 @@ The loop executes on cadence or trigger and iterates over small, isolated change
 flowchart LR
   T[Trigger (schedule/event)] --> P[Plan]
   P -->|risk < threshold| B[Build (branch + PR)]
-  P -->|risk ≥ threshold| A[HITL Plan Approval]
+  P -->|risk ≥ threshold| A[ACP Plan Approval]
   A -->|approved| B
   A -->|rejected| X[Fail-closed: no change]
   B --> V[Verifier + CI]
-  V -->|checks pass| R[HITL Review]
+  V -->|checks pass| R[ACP Review]
   V -->|checks fail| F[Fix or Hold]
   F -->|fixed| V
   F -->|blocked| X
@@ -142,7 +142,7 @@ flowchart LR
 Default posture is "no change" unless evidence and approval support merge.
 
 - Any test or verification failure prevents merge; PR remains open for fixes or is closed.
-- If planning or building reveals unexpected complexity, halt and flag HITL.
+- If planning or building reveals unexpected complexity, halt and flag ACP.
 - Human reviewers can reject or request changes even on all‑green runs.
 - Post‑merge monitoring may trigger revert/rollback if adverse effects are detected.
 
@@ -150,12 +150,12 @@ This guarantees safety even when an AI misjudges an improvement: the process blo
 
 Guardrails (practical defaults):
 
-- Map actions to the risk rubric: Trivial/Low may auto‑proceed within the loop; Medium/High require explicit HITL plan approval and review.
+- Map actions to the risk rubric: Trivial/Low may auto‑proceed within the loop; Medium/High require explicit ACP plan approval and review.
 - Non‑negotiables: no direct pushes, no bot approvals on protected branches, pinned/approved AI configs, and evidence artifacts for every PR.
 
 ## Risk Model & Guardrails
 
-Map change types to tracks and preconditions. Higher risk always elevates to HITL.
+Map change types to tracks and preconditions. Higher risk always elevates to ACP.
 
 | Change type | Track | Preconditions (examples) |
 |---|---|---|
@@ -196,7 +196,7 @@ Autopilot vs Copilot categories (applies to PR intent, not approvals):
 
 - Autopilot (eligible to proceed within normal review): docs hygiene (lint/links/titles), stale‑flags cleanup diffs, preview smoke wiring for top routes.
   (see `scripts/smoke-check.sh`)
-- Copilot (must open PRs with evidence; human approval required): observability scaffolding (missing spans/logs on changed paths with a sample trace outline), contract drift fixes using OpenAPI/JSON‑Schema + `oasdiff`, perf budget nudges (bundle/caching deltas), and targeted threat‑model test stubs (e.g., STRIDE‑driven checks).
+- Copilot (must open PRs with evidence; ACP approval required): observability scaffolding (missing spans/logs on changed paths with a sample trace outline), contract drift fixes using OpenAPI/JSON‑Schema + `oasdiff`, perf budget nudges (bundle/caching deltas), and targeted threat‑model test stubs (e.g., STRIDE‑driven checks).
 
 ## Validation and Quality Gates
 
@@ -206,11 +206,11 @@ Autopilot vs Copilot categories (applies to PR intent, not approvals):
 
 Reports: a weekly Kaizen digest is generated under `kaizen/reports/YYYY‑WW.md` (hygiene score, span coverage, perf/cost deltas, merged Kaizen PRs).
 
-## Human‑in‑the‑Loop (HITL)
+## ACP Gates
 
 - Plan approval when risk ≥ threshold; can be streamlined for low‑risk maintenance.
 - Pre‑merge code review for semantic correctness and intent alignment.
-- Early operation favors more HITL to build trust; automation can expand over time.
+- Early operation favors more ACP to build trust; automation can expand over time.
 
 Change freezes/incidents: operate in suggest‑only mode (issues over PRs); resume PRs when unfreezed.
 
@@ -318,7 +318,7 @@ This complements existing CI and prompts while keeping ownership clear.
 
 ### Merging Policy and Non‑Negotiables
 
-- Autopilot PRs still require at least one human approval; bots never approve or push to protected branches.
+- Autopilot PRs still require at least one ACP approval; bots never approve or push to protected branches.
 - AI configuration is pinned and versioned; every PR carries evidence artifacts and PR↔build↔trace correlation for provenance.
 
 ## Triggers & Schedules

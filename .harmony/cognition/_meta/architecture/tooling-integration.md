@@ -146,7 +146,7 @@ flowchart LR
 - `otel_scaffold`: missing span/log coverage suggestions for recently changed paths.
 - `contracts_drift`: `oasdiff` or equivalent contract drift reports.
 
-Notes: These checks are evidence producers; they do not bypass HITL. Bots may open PRs but never approve protected branches.
+Notes: These checks are evidence producers; they do not bypass ACP. Bots may open PRs but never approve protected branches.
 
 ### Toolkit Integration Matrix (excerpt)
 
@@ -328,7 +328,7 @@ jobs:
 
 ## Kaizen Workflow (Docs/Flags Hygiene)
 
-Purpose: run safe, incremental Kaizen tasks on a schedule and on‑demand. Jobs open PRs with evidence and respect branch protections and HITL review.
+Purpose: run safe, incremental Kaizen tasks on a schedule and on‑demand. Jobs open PRs with evidence and respect branch protections and ACP review.
 
 Example (GitHub Actions skeleton):
 
@@ -383,7 +383,7 @@ jobs:
 Notes:
 
 - Autopilot tasks: docs/links/titles normalization; stale‑flag diffs with owners/expiry; preview smoke wiring for top routes.
-- Copilot tasks (PRs require human approval): observability scaffolding PRs for missing spans/logs (with sample trace outlines), contract drift fixes using `oasdiff` on OpenAPI/JSON‑Schema; perf budget nudges with budget delta evidence; targeted threat‑model test stubs (STRIDE‑driven). Contracts and observability jobs above attach artifacts (e.g., `kaizen/reports/oasdiff.md`, trace coverage report) to PRs.
+- Copilot tasks (PRs require ACP approval): observability scaffolding PRs for missing spans/logs (with sample trace outlines), contract drift fixes using `oasdiff` on OpenAPI/JSON‑Schema; perf budget nudges with budget delta evidence; targeted threat‑model test stubs (STRIDE‑driven). Contracts and observability jobs above attach artifacts (e.g., `kaizen/reports/oasdiff.md`, trace coverage report) to PRs.
 - Non‑negotiables: no bot approvals or direct pushes; AI configs pinned; artifacts produced for review. All PRs carry PR↔build↔trace correlation per Knowledge Plane schema.
 
 ```json

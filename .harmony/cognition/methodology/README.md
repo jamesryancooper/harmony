@@ -7,7 +7,7 @@ description: Principled, AI-native methodology for solo builders — lean in cer
 
 Harmony is an AI-native, human-governed development methodology for solo builders.
 
-Harmony empowers solo developers across experience levels to ship high-quality software with speed, safety, and confidence. It combines spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered human checkpoints within a principled, progressively adoptable framework.
+Harmony empowers solo developers across experience levels to ship high-quality software with speed, safety, and confidence. It combines spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered ACP governance within a principled, progressively adoptable framework.
 
 Harmony is lean in ceremony and rich in capability: context-efficient artifacts, progressive disclosure, and fast feedback loops — without imposing vendor lock-in or stack prescription.
 
@@ -298,7 +298,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - Deterministic, reviewable agent loops: Plan → Diff → Explain → Test; no silent apply.
 - Pinned AI configuration and low‑variance defaults; golden tests guarded by JSON‑Schema prevent drift.
 - Observability and provenance: OTel traces/logs on runs; PRs include representative `trace_id` and Eval/Policy outcomes.
-- Fail-closed governance: risk-tiered HITL checkpoints enforced; agents cannot approve PRs or push to protected branches; humans retain ultimate authority, oversight, and accountability.
+- Fail-closed governance: risk-tiered ACP checkpoints enforced; agents cannot approve PRs or push to protected branches; humans retain ultimate authority, oversight, and accountability.
 - Outcome: AI systems autonomously self‑build, self‑heal, and self‑tune within deterministic, observable, and reversible bounds.
 
 ### In Short
@@ -332,7 +332,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - **MTTR**: minutes–hours via instant rollback (promote a known‑good preview) and clear runbooks.
 - **SLO attainment**: measurable improvement by alerting on **burn‑rate** and holding code until budget recovers.
 
-### Human–AI Roles & HITL Checkpoints
+### Human-AI Roles & ACP Checkpoints
 
 - Roles
   - Owner (you): accountable for risk, waivers, and promotion decisions.
@@ -350,7 +350,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
   - Classify PR risk (Trivial/Low/Medium/High) and confirm rollback/flag plan.
   - Verify license/provenance and secret hygiene; check OpenAPI/JSON‑Schema diff where applicable.
   - Confirm observability for changed flows (trace + structured logs) and attach a representative trace or trace_id in the PR.
-- Required human‑in‑the‑loop checkpoints
+- Required ACP checkpoints (with human-on-the-loop oversight)
   1. Before implementation: spec one-pager + micro-STRIDE + acceptance criteria approved by Navigator.
   2. Before merge: PR review using the risk rubric (below) with license/provenance note and OpenAPI diff.
   3. Before promotion: Feature behind a flag, Preview e2e smoke green, rollback noted, owner on‑call.
@@ -363,7 +363,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - Decision log
   - Dockit auto‑prompts an ADR summary on merge; link PR, preview URL, post‑deploy notes, and (when agents were used) AI provider/model/version + parameters and ObservaKit/EvalKit run links.
 
-### HITL Waivers & Exceptions (minimal rules)
+### ACP Waivers & Exceptions (minimal rules)
 
 - Waivers are exceptional and rare—prefer scope cuts, flags, and staged rollouts.
 - Who can waive: Navigator (High‑risk requires Navigator security checklist). Agents cannot waive.
@@ -450,7 +450,7 @@ See `flow-and-wip-policy.md` for the full board policy, WIP limits, definitions,
 
 ## Spec-First Planning (step-by-step)
 
-Harmony is explicitly spec-first: every meaningful change starts with a spec one-pager and feature story (structured context + agent plan + acceptance criteria), then runs through an AI-assisted loop of Plan → Diff → Explain → Test with risk-tiered human checkpoints.
+Harmony is explicitly spec-first: every meaningful change starts with a spec one-pager and feature story (structured context + agent plan + acceptance criteria), then runs through an AI-assisted loop of Plan → Diff → Explain → Test with risk-tiered ACP gates.
 
 See `spec-first-planning.md` for the full spec one-pager template, feature story pattern, and AI IDE integration guide.
 

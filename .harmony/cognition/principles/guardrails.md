@@ -64,7 +64,7 @@ if engineer_says_ok:
 ## Relationship to Other Principles
 
 - `Deny by Default` is the permission model foundation.
-- `HITL Checkpoints` governs where human authorization is required.
+- `Autonomous Control Points` governs stage/promote/finalize authorization through policy.
 - `Security and Privacy Baseline` defines non-waivable controls.
 
 ## Anti-Pattern: Governance Theater

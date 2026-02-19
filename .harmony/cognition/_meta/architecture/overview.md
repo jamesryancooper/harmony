@@ -1,6 +1,6 @@
 ---
 title: Harmony Structural Paradigm (HSP) Overview
-description: Modular-monolith architecture with vertical slices, deterministic quality gates, and a guided MAPE‑K autonomic loop with human‑in‑the‑loop governance for a small, fast team.
+description: Modular-monolith architecture with vertical slices, deterministic quality gates, and a guided MAPE‑K autonomic loop with ACP-governed autonomy for a small, fast team.
 ---
 
 # Harmony Structural Paradigm (HSP)
@@ -77,7 +77,7 @@ This keeps runtime concerns (processes and deployables) clearly separated from s
 
 ### Self‑Improvement (Kaizen/Autopilot) Layer
 
-An in‑repo Kaizen layer runs beside normal development to propose tiny, reversible improvements. It detects opportunities (metrics, gates, traces, docs hygiene), evaluates them against written policy (ASVS/SSDF, risk rubric, change‑type gates), and opens PRs with evidence. Autopilot is limited to Trivial/Low‑risk hygiene (e.g., docs, stale‑flags, span/log scaffolding); Copilot PRs for Medium/High‑risk or behavioral changes always require human approval. Non‑negotiables apply: no direct pushes, no bot approvals, pinned AI configs, and full provenance. See `.harmony/cognition/_meta/architecture/kaizen-subsystem.md` for technical design and operations, and `.harmony/cognition/_meta/architecture/tooling-integration.md` for the workflow wiring.
+An in‑repo Kaizen layer runs beside normal development to propose tiny, reversible improvements. It detects opportunities (metrics, gates, traces, docs hygiene), evaluates them against written policy (ASVS/SSDF, risk rubric, change‑type gates), and opens PRs with evidence. Autopilot is limited to Trivial/Low‑risk hygiene (e.g., docs, stale‑flags, span/log scaffolding); Copilot PRs for Medium/High‑risk or behavioral changes always require ACP approval. Non‑negotiables apply: no direct pushes, no bot approvals, pinned AI configs, and full provenance. See `.harmony/cognition/_meta/architecture/kaizen-subsystem.md` for technical design and operations, and `.harmony/cognition/_meta/architecture/tooling-integration.md` for the workflow wiring.
 
 #### Cross‑Cutting Nature
 
@@ -126,7 +126,7 @@ Quick Rubric (Does it fit Autopilot?)
 ### Guided Agentic Autonomy
 
 - Introduce an autonomic improvement loop with AI agents that Plan, Build, and Verify changes under strict governance.
-- Keep humans in control of high‑impact decisions via human‑in‑the‑loop (HITL) checkpoints.
+- Keep humans on the loop for high‑impact decisions via ACP checkpoints and escalation digests.
 - Require provenance and transparency: log agent actions and rationales; require approvals for potentially risky actions.
 - Favor fail‑closed behavior: unapproved or failing changes never reach production.
 - Establish a thin control plane (flags, policies, contracts, observability) so agents operate within guardrails and achieve deterministic outcomes.
@@ -189,7 +189,7 @@ MAPE‑K: Monitor → Analyze → Plan → Execute, backed by a shared Knowledge
 
 ## Governance and Safety
 
-- HITL checkpoints for merges, production promotion, and other high‑risk actions.
+- ACP checkpoints for merges, production promotion, and other high‑risk actions.
 - Full provenance of agent actions and approvals.
 - Feature flags to decouple release from deploy; default to safe rollouts and instant rollback.
 - CI policy gates enforce security and quality controls (e.g., alignment with ASVS/SSDF), contract compliance, and observability baselines.
@@ -213,7 +213,7 @@ MAPE‑K: Monitor → Analyze → Plan → Execute, backed by a shared Knowledge
 - Repository structure blueprint (`repo_structure.json`).
 - Detailed MAPE‑K loop design and guardrails.
 - Knowledge Plane data model and workflows.
-- Agent roles, HITL governance model, and risk controls.
+- Agent roles, ACP governance model, and risk controls.
 - Continuous improvement (Kaizen) subsystem.
 - Operational policies and failure‑mode analysis.
 - Scoring rubric and risk analysis supporting HSP adoption.

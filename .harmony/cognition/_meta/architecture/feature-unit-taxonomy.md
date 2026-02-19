@@ -31,7 +31,7 @@ Related docs: [overview](./overview.md), [migration playbook](./migration-playbo
   - Test reports validating amounts/tax; audit logs with trace IDs.
 - Flags & Risk
   - High risk; ship behind flags; two‑person review for high‑risk per Governance Model.
-  - HITL: navigator/finance/security review at spec and pre‑merge.
+  - ACP: navigator/finance/security review at spec and pre‑merge.
 
 ### OAuth Login & User Authentication (High Risk)
 
@@ -59,7 +59,7 @@ Related docs: [overview](./overview.md), [migration playbook](./migration-playbo
 - Artifacts
   - RBAC policies (code/YAML), OpenAPI security requirements, test reports, compliance evidence.
 - Flags & Risk
-  - Medium to High depending on surface; feature‑flag new roles/paths; HITL on high‑risk changes.
+  - Medium to High depending on surface; feature‑flag new roles/paths; ACP on high‑risk changes.
 
 ---
 

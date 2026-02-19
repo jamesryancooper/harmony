@@ -16,8 +16,8 @@ Operational review identified uneven enforcement across execution lanes:
 3. Active artifacts still contain broad write scopes and unscoped command
    permissions that increase blast radius.
 
-Harmony also needs policy behavior that supports both human-in-the-loop and
-fully agentic execution while preserving fail-closed behavior.
+Harmony also needs policy behavior that supports both ACP-gated and fully
+agentic execution while preserving fail-closed behavior.
 
 ## Decision
 
@@ -40,7 +40,7 @@ rules:
    routine local changes without weakening repository safety defaults.
 7. Agent-only operation is supported via policy gates (risk tiers,
    separation-of-duties checks, and fail-closed rollback/kill-switch controls)
-   rather than human approval prompts.
+   rather than ACP approval prompts.
 
 ## Rationale
 

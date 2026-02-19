@@ -33,7 +33,7 @@ lifecycle, derived graph traversal, progressive discovery workflows, and optiona
 | Graph semantics | Node/edge schema, traversal contracts, provenance | Alternative graph traversal engines |
 | Discovery semantics | Progressive disclosure contract and deterministic boundaries | Provider-specific ranking augmentation |
 | Watch semantics | OS-agnostic bounded polling hints + cursor state contracts | Platform-native watch accelerators (optional) |
-| Governance semantics | HITL and no-silent-apply for writes, fail-closed policy | Platform-specific approval plumbing |
+| Governance semantics | ACP and no-silent-apply for writes, fail-closed policy | Platform-specific approval plumbing |
 
 ## Canonical Semantics
 

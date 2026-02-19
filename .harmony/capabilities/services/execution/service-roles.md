@@ -55,7 +55,7 @@ The following rules are normative and supersede legacy runtime assumptions:
 
 - Agent is the **agent service**.
 - Responsibilities:
-  - **Run Plan plans** as durable, stateful agent graphs (with retries, resume, checkpoints, human-in-the-loop).
+  - **Run Plan plans** as durable, stateful agent graphs (with retries, resume, checkpoints, and ACP gates).
   - Delegate runtime gates to Policy/Eval/Test/Compliance.
   - Produce artifacts and keep a durable state store (SQLite by default) via LangGraph checkpointers.
 - Agent uses Flow's execution interfaces:
@@ -98,7 +98,7 @@ An **agent** is a higher-level actor that:
 
 - Consumes a plan from Plan (`plan.json`).
 - Decides which flows to invoke when, with what parameters and context.
-- Handles retries, resume, long-term run identity, and human-in-the-loop checkpoints.
+- Handles retries, resume, long-term run identity, and ACP checkpoints.
 
 Agent:
 
@@ -212,7 +212,7 @@ To keep responsibilities clean:
 - An **agent** (Agent) is a higher-level actor that:
   - Consumes a plan from Plan (`plan.json`).
   - Decides which flows to invoke when, with what parameters and context.
-  - Handles retries, resume, long-term run identity, and human-in-the-loop checkpoints.
+  - Handles retries, resume, long-term run identity, and ACP checkpoints.
 
 ### 4.2 Where agents live physically
 
@@ -270,7 +270,7 @@ This section is the canonical summary of responsibilities; other docs (AI Servic
 
 - Plan plans or agent-level logic.
 - Checkpointing semantics (it just sends a single run request).
-- Human-in-the-loop control.
+- ACP control.
 
 ### 5.2 LangGraph runtime responsibilities (`agents/runner/runtime/**`)
 
@@ -297,7 +297,7 @@ This section is the canonical summary of responsibilities; other docs (AI Servic
   - Configure and rely on LangGraph checkpointing (for example, SQLite) so long-running agent runs can pause/resume and survive restarts.
 - Handle:
   - **Retries/resume** using LangGraph checkpointing (via the runtime).
-  - **Human-in-the-loop** pauses and edits (HITL checkpoints) based on Plan/Policy guidance.
+  - **ACP gate** pauses and escalations based on Plan/Policy guidance.
   - **No-silent-apply**: produce proposed diffs, tests, and notes only; delegate actual apply to Patch/Release or humans.
   - **Determinism and safety**: integrate Guard, Policy, Eval, Compliance, and Cache for redaction, policy gates, evaluation, evidence packs, and idempotency on mutating operations.
   - **Observability**: emit Observe spans and structured run records (for example `service.agent.execute`, `run.id`, `stage=implement`, `plan.id`, `prompt_hash` where applicable).
@@ -355,7 +355,7 @@ For **running a plan as an agent (Agent)**:
    - For each step or sub-flow:
      - Calls Flow execution interface.
    - Uses configured checkpointing to maintain resilient state across runs.
-   - Pauses for human approval or edits when required; then resumes.
+   - Pauses for ACP stage-only remediation or edits when required; then resumes.
 3. LangGraph Studio can be used at any time to inspect the underlying graphs that Agent is driving.
 
 ---

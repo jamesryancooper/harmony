@@ -9,7 +9,7 @@ Status: Active (schema v1.2.0, methodology v0.2.0)
 
 ## Overview
 
-Harmony uses a **Methodology-as-Code** approach: methodology constraints (pillars, lifecycle stages, HITL requirements, policy rules) are encoded directly into JSON schemas and runtime validation. This enables AI agents to consume methodology as machine-readable contracts while humans read documentation.
+Harmony uses a **Methodology-as-Code** approach: methodology constraints (pillars, lifecycle stages, ACP requirements, policy rules) are encoded directly into JSON schemas and runtime validation. This enables AI agents to consume methodology as machine-readable contracts while humans read documentation.
 
 **Guiding principle:** Schemas are the source of truth. Documentation is derived from or validated against schemas.
 

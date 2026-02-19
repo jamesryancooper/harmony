@@ -71,10 +71,10 @@ defaults:
     autonomy:
       score: 4
       target_score: 5
-      acceptance_criteria: "Autonomous execution remains effective for low/medium-risk work while material side effects require explicit human approval."
+      acceptance_criteria: "Autonomous execution remains effective for low/medium-risk work while material side effects require ACP policy gates and receipts."
       evidence:
         - .harmony/cognition/principles/no-silent-apply.md
-        - .harmony/cognition/principles/hitl-checkpoints.md
+        - .harmony/cognition/principles/autonomous-control-points.md
         - .harmony/cognition/principles/deny-by-default.md
     security:
       score: 5
@@ -219,7 +219,7 @@ subsystems:
         decision: "Security-first defaults with explicit review ergonomics"
         adr: .harmony/cognition/decisions/011-agency-subsystem-finalization.md
       - attributes: [autonomy, safety]
-        decision: "Autonomy remains bounded by deny-by-default and no-silent-apply checkpoints."
+        decision: "Autonomy remains bounded by deny-by-default and no-silent-apply ACP checkpoints."
         adr: .harmony/cognition/decisions/015-autonomy-quality-attribute.md
 
   capabilities:
@@ -251,7 +251,7 @@ subsystems:
         score: 4
     conflicts:
       - attributes: [autonomy, safety]
-        decision: "Orchestrations may automate planning/execution but cannot bypass approval gates for material changes."
+        decision: "Orchestrations may automate planning/execution but cannot bypass ACP promotion gates for material changes."
         adr: .harmony/cognition/decisions/015-autonomy-quality-attribute.md
 
   cognition:

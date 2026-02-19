@@ -52,7 +52,7 @@ description: Cross-agent memory classes, retention boundaries, and privacy contr
   - `.harmony/output/reports/<date>-memory-flush-evidence.md`.
 - Flush failure behavior:
   - default is fail-closed (block compaction),
-  - only continue with explicit HITL waiver and waiver evidence.
+  - only continue with explicit ACP waiver and waiver evidence.
 
 ## Forgetting and Redaction
 

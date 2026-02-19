@@ -1,24 +1,24 @@
 ---
 title: Governance Model
-description: Human-in-the-Loop checkpoints, waivers, risk rubric, and CI policy gates to achieve Speed with Safety.
+description: Autonomous Control Point checkpoints, waivers, risk rubric, and CI policy gates to achieve Speed with Safety.
 ---
 
 # Governance Model
 
-Technical governance for the Harmony Structural Paradigm (HSP) defines how changes are proposed, reviewed, validated, and released. This document specifies Human‑in‑the‑Loop (HITL) gates, the waiver policy, CI/CD quality gates, and a risk assessment rubric. The goal is Speed with Safety: rapid iteration without compromising correctness, security, or availability.
+Technical governance for the Harmony Structural Paradigm (HSP) defines how changes are proposed, reviewed, validated, and released. This document specifies ACP gates, the waiver policy, CI/CD quality gates, and a risk assessment rubric. The goal is Speed with Safety: rapid iteration without compromising correctness, security, or availability.
 
 Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [overview](./overview.md), [runtime architecture](./runtime-architecture.md), [runtime policy](./runtime-policy.md), [kaizen subsystem](./kaizen-subsystem.md), [tooling integration](./tooling-integration.md), [contracts registry](./contracts-registry.md), [python runtime workspace example](/.harmony/scaffolding/examples/stack-profiles/python-runtime-workspace.md)
 
 ## Objectives
 
 - Enforce consistent, auditable controls across planning, development, and delivery.
-- Align automated enforcement (CI/CD) with human judgment (HITL).
+- Align automated enforcement (CI/CD) with ACP policy decisions and human-on-the-loop oversight.
 - Scale decision quality with a risk‑proportional rubric and clear waive‑with‑accountability mechanics.
 
 ## Scope
 
 - Applies to all changes affecting production: code, configs, data models, infrastructure, and automated agent plans.
-- Covers Planner/Verifier agent interactions, human approvers, and CI/CD enforcement.
+- Covers Planner/Verifier agent interactions, escalation responders, and CI/CD enforcement.
 
 ### Autopilot vs Copilot Scope Boundaries
 
@@ -30,20 +30,20 @@ Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [overview
 Ownership & Checks (Repository Policy)
 
 - Ownership: `/kaizen/**` owned by platform/quality; CODEOWNERS patterns allow Kaizen PRs to touch `docs/**`, `.github/**`, `infra/**`, and per‑slice scaffolds (PR‑only; owners review).
-- Required cross‑cutting checks run on all PRs: `docs_hygiene`, `flags_hygiene`, `otel_scaffold`, `contracts_drift`. These checks provide evidence and do not bypass HITL.
+- Required cross‑cutting checks run on all PRs: `docs_hygiene`, `flags_hygiene`, `otel_scaffold`, `contracts_drift`. These checks provide evidence and do not bypass ACP.
 
 ## Definitions
 
-- HITL Gate: A mandatory human approval point that blocks progress until satisfied.
+- ACP Gate: A mandatory policy decision point that governs promotion and escalation.
 - Waiver: A time‑bound, documented override of a gate under controlled conditions.
 - CI Gate: An automated check enforced in the pipeline that must pass to merge or deploy.
 - Risk Rubric: Criteria used to categorize change risk and scale required controls.
 
 ---
 
-## Human‑in‑the‑Loop (HITL) Gates
+## ACP Gates
 
-HITL checkpoints appear at defined phases. Each gate documents trigger conditions, required approvers, artifacts, and whether it is blocking.
+ACP checkpoints appear at defined phases. Each gate documents trigger conditions, required evidence/quorum, escalation conditions, and whether it is blocking.
 
 ### Gates
 
@@ -185,8 +185,8 @@ Risk level determines the rigor of controls. The rubric guides both Planner agen
 
 - High
   - Typical: auth changes, large refactors, major dependency upgrades, concurrency/security‑critical paths, one‑way migrations.
-  - Controls: 2+ reviewers including domain expert; design note; extended testing (load/security as applicable); canary + soak; explicit rollback plan; pre‑production HITL approval.
-  - Two‑person rule: at least two human approvers (including a relevant domain/security expert) are mandatory before merge and production promotion.
+- Controls: verifier + recovery attestations, design note, extended testing (load/security as applicable), canary + soak, explicit rollback plan, and pre‑production ACP evaluation.
+- Quorum rule: ACP-2/ACP-3 promotions require policy-defined multi-agent quorum before merge and production promotion.
 
 Branch protection and CI may encode risk‑aware rules (e.g., label‑based reviewer count; extended suites for high‑risk labels).
 
@@ -195,7 +195,7 @@ Branch protection and CI may encode risk‑aware rules (e.g., label‑based revi
 - Autopilot (eligible under Trivial/Low):
   - Docs hygiene PRs (lint/links/titles), stale‑flag cleanup diffs, and preview smoke wiring. These changes still require normal review; no bot approvals or direct pushes are allowed.
 - Copilot (Medium/High):
-  - Observability scaffolding (adding missing spans/logs on changed paths with sample trace outlines), contract drift fixes (OpenAPI/JSON‑Schema with `oasdiff` evidence), performance budget adjustments, and threat‑model test PRs. Always require human approvals aligned to the risk rubric and applicable gates.
+  - Observability scaffolding (adding missing spans/logs on changed paths with sample trace outlines), contract drift fixes (OpenAPI/JSON‑Schema with `oasdiff` evidence), performance budget adjustments, and threat‑model test PRs. Always require ACP evidence/quorum aligned to the risk rubric and applicable gates.
 
 Non‑negotiables: bots never approve or push to protected branches; AI configs/models are pinned; every PR includes evidence and PR↔build↔trace correlation for provenance.
 
@@ -203,7 +203,7 @@ Non‑negotiables: bots never approve or push to protected branches; AI configs/
 
 - Bot identity: `@repo-improve-bot` (or similar) for clarity and auditability.
 - Labels: `autopilot`, `copilot`, `needs-owner`, `risk:low|med|high`, `docs`, `observability`, `contracts`, `perf`, `flags`.
-- Approvals: Autopilot PRs still require at least one human approval; bots cannot approve.
+- Promotion gates: Autopilot PRs still require ACP evidence checks before promotion; bots cannot self-approve protected-branch promotion.
 - Freeze respect: During release freezes/incidents, the Kaizen layer files issues (not PRs) and defers action until unfreezed.
 
 ---
@@ -212,8 +212,8 @@ Non‑negotiables: bots never approve or push to protected branches; AI configs/
 
 The elements work together to deliver Speed with Safety:
 
-- Risk rubric drives the depth of HITL scrutiny and which CI suites run.
-- CI gates encode objective, deterministic quality bars; HITL adds contextual judgment.
+- Risk rubric drives the depth of ACP scrutiny and which CI suites run.
+- CI gates encode objective, deterministic quality bars; ACP adds contextual judgment.
 - Waiver policy provides a controlled escape hatch when necessary, with logging and expiration.
 - Progressive deployment and monitoring create a fail‑closed posture with rapid rollback.
 - Feature flags act as a primary runtime control across both TS apps and Python runtimes (for example, flows executed by the **platform runtime service** under `platform/runtimes/flow-runtime/**`); manual promote/rollback is recorded, and flag state changes are auditable.

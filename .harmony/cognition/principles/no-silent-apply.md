@@ -1,6 +1,6 @@
 ---
 title: No Silent Apply
-description: Agents propose plans, diffs, and tests, while humans approve material side-effects.
+description: Agents propose plans, diffs, and tests; durable side-effects require ACP policy gates and receipts.
 pillar: Trust, Direction
 status: Active
 ---
@@ -11,9 +11,9 @@ status: Active
 
 ## What This Means
 
-Harmony agent loops default to Plan -> Diff -> Explain -> Test. Applying material side-effects (writes, merges, deploys, production mutations) requires human approval at defined checkpoints.
+Harmony agent loops default to Plan -> Diff -> Explain -> Test. Promoting material side-effects (writes, merges, deploys, production mutations) requires ACP policy gates with evidence, reversibility, and receipts.
 
-Local runs should default to `--dry-run` unless explicitly approved.
+Local runs should default to `--dry-run` unless explicitly promoted through ACP gates.
 
 ## Why It Matters
 
@@ -65,9 +65,9 @@ if tests_green:
 
 ## Relationship to Other Principles
 
-- `HITL Checkpoints` defines where approvals are required.
+- `Autonomous Control Points` defines where policy-gated promotion is required.
 - `Guardrails` enforces fail-closed execution policy.
-- `Determinism and Provenance` records approval context and run lineage.
+- `Determinism and Provenance` records gate decisions, evidence, and run lineage.
 
 ## Anti-Pattern: Invisible Autonomy
 
@@ -75,7 +75,7 @@ When agents can apply changes silently, teams lose accountability and incident d
 
 ## Exceptions
 
-Low-risk read-only automation (analysis, reporting, lint suggestions) can run without approval if no side-effects occur.
+Low-risk read-only automation (analysis, reporting, lint suggestions) can run without promotion gates if no side-effects occur.
 
 ## Related Documentation
 

@@ -89,7 +89,7 @@ harmony approve-spec <id>
 
 ### Step 4: AI Builds
 
-After human approval (explicit for T3, implicit for T1/T2):
+After ACP approval (explicit for T3, implicit for T1/T2):
 
 1. AI generates **plan** and **checklist**
 2. AI proposes **code diffs** with tests

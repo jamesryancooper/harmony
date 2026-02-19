@@ -87,7 +87,7 @@ Created `docs/principles/` with 8 formal definitions:
 | Simplicity Over Complexity | Minimum necessary complexity for current requirements |
 | Deny by Default | Explicit allowlists for permissions; no implicit access |
 | Determinism | Same inputs produce same outputs; no hidden state |
-| HITL Checkpoints | Human-in-the-loop for irreversible or high-impact actions |
+| Autonomous Control Points | Policy-gated controls for irreversible or high-impact actions |
 | Reversibility | Prefer reversible over irreversible actions |
 
 ### Extensions Documentation

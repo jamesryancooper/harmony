@@ -58,3 +58,155 @@ observability:
     false_deny_rate_max: 0.005
     median_deny_to_unblock_seconds_max: 60
     auto_remediation_success_rate_min: 0.9
+acp:
+  levels:
+    - id: ACP-0
+      name: Observe
+      description: Read only
+    - id: ACP-1
+      name: Reversible Local
+      description: Local reversible changes
+    - id: ACP-2
+      name: Stateful Reversible
+      description: Stateful reversible changes
+    - id: ACP-3
+      name: Destructive-Adjacent
+      description: Soft destructive with recovery window
+    - id: ACP-4
+      name: Irreversible
+      description: Irreversible operations
+  profile_defaults:
+    refactor:
+      ceiling: ACP-3
+      allow_stage_only_fallback: true
+    operate:
+      ceiling: ACP-3
+      allow_stage_only_fallback: true
+  rules:
+    - id: acp-commit
+      match:
+        class: git.commit
+        phase: [promote]
+      require:
+        acp: ACP-1
+        phase: promote
+        reversibility:
+          required: true
+          primitive: git.revert_commit
+        evidence_required: [diff, tests]
+        budget_set: budgets.repo-small
+        circuit_breaker_set: circuit_breakers.repo-stage
+      on_missing_requirements: STAGE_ONLY
+    - id: acp-merge-main
+      match:
+        class: git.merge
+        phase: [promote]
+        target:
+          branch: [main]
+      require:
+        acp: ACP-2
+        phase: promote
+        reversibility:
+          required: true
+          primitive: git.revert_merge
+          rollback_proof_required: true
+        evidence_required: [diff, tests]
+        quorum_required: quorum.acp2
+        budget_set: budgets.repo-merge
+        circuit_breaker_set: circuit_breakers.repo-promote
+      on_missing_requirements: STAGE_ONLY
+    - id: acp-soft-delete
+      match:
+        class: fs.soft_delete
+        phase: [promote]
+      require:
+        acp: ACP-3
+        phase: promote
+        reversibility:
+          required: true
+          primitive: fs.move_to_trash
+          rollback_proof_required: true
+        evidence_required: [diff]
+        quorum_required: quorum.acp3
+        budget_set: budgets.fs-delete
+        circuit_breaker_set: circuit_breakers.destructive
+      on_missing_requirements: STAGE_ONLY
+reversibility:
+  required_for_acp_at_or_above: ACP-1
+  primitives:
+    git.revert_commit:
+      description: Revert commit
+      rollback_handle_type: git-commit
+      default_recovery_window: P30D
+    git.revert_merge:
+      description: Revert merge
+      rollback_handle_type: git-merge
+      default_recovery_window: P30D
+    fs.move_to_trash:
+      description: Soft delete via trash
+      rollback_handle_type: fs-trash
+      default_recovery_window: P30D
+  blocked_when_not_break_glass:
+    - fs.hard_delete
+budgets:
+  repo-small:
+    repo.max_files_touched: 50
+    repo.max_loc_delta: 1500
+  repo-merge:
+    repo.max_files_touched: 200
+    repo.max_loc_delta: 8000
+  fs-delete:
+    fs.max_paths_deleted: 100
+quorum:
+  acp2:
+    min_signatures: 2
+    required_roles: [proposer, verifier]
+  acp3:
+    min_signatures: 3
+    required_roles: [proposer, verifier, recovery]
+attestations:
+  required_fields: [role, actor_id, timestamp, plan_hash, evidence_hash, signature]
+  roles:
+    proposer:
+      description: Proposes
+    verifier:
+      description: Verifies
+    recovery:
+      description: Recovery checks
+  binding:
+    require_plan_hash: true
+    require_evidence_hash: true
+    allowed_hash_algorithms: [sha256]
+circuit_breakers:
+  repo-stage:
+    triggers:
+      - id: cb-test-fail
+        type: invariant
+        signal: tests.failed
+        threshold: 1
+        action: stop_and_stage_only
+  repo-promote:
+    triggers:
+      - id: cb-ci-fail
+        type: invariant
+        signal: ci.failed
+        threshold: 1
+        action: auto_rollback_and_trip_killswitch
+  destructive:
+    triggers:
+      - id: cb-budget
+        type: budget
+        signal: budget.exceeded
+        threshold: 1
+        action: stop_and_stage_only
+receipts:
+  required_for_acp_at_or_above: ACP-1
+  emit_on: [ALLOW, STAGE_ONLY, DENY, ESCALATE]
+  paths:
+    runs_dir: ".harmony/continuity/runs"
+    decision_log: "logs/decisions.jsonl"
+    acp_decision_log: "logs/acp-decisions.jsonl"
+  required_fields:
+    - run_id
+    - decision
+    - reason_codes

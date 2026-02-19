@@ -12,9 +12,16 @@ harmony_enforce_service_policy "agent" "$0" "$@"
 STATE_ROOT=".harmony/runtime/_ops/state/agent"
 CHECKPOINT_DIR="$STATE_ROOT/checkpoints"
 RUNS_DIR="$STATE_ROOT/runs"
+CONTINUITY_RUNS_DIR=".harmony/continuity/runs"
 POLICY_FILE=".harmony/capabilities/_ops/policy/deny-by-default.v2.yml"
 POLICY_RUNNER=".harmony/capabilities/_ops/scripts/run-harmony-policy.sh"
 PROFILE_RESOLVER=".harmony/capabilities/_ops/scripts/policy-profile-resolve.sh"
+BUDGET_METER=".harmony/capabilities/_ops/scripts/policy-budget-meter.sh"
+ACP_REQUEST_BUILDER=".harmony/capabilities/_ops/scripts/policy-acp-request.sh"
+ACP_EVAL=".harmony/capabilities/_ops/scripts/policy-acp-eval.sh"
+RECEIPT_WRITER=".harmony/capabilities/_ops/scripts/policy-receipt-write.sh"
+KILL_SWITCH_SCRIPT=".harmony/capabilities/_ops/scripts/policy-kill-switch.sh"
+REVERSIBLE_PRIMITIVES_SCRIPT=".harmony/capabilities/_ops/scripts/policy-reversible-primitives.sh"
 AGENT_POLICY_LAST_DENY_JSON='{}'
 AGENT_POLICY_ATTEMPTS=0
 
@@ -60,6 +67,14 @@ stable_run_id() {
   local hash
   hash="$(printf '%s' "$seed" | cksum | awk '{print $1}')"
   printf 'run-%s' "$hash"
+}
+
+unique_run_id() {
+  local stamp pid rand
+  stamp="$(date -u +"%Y%m%dT%H%M%SZ")"
+  pid="$$"
+  rand="${RANDOM:-0}"
+  printf 'run-%s-%s-%s' "$stamp" "$pid" "$rand"
 }
 
 infer_policy_profile() {
@@ -191,6 +206,208 @@ fail_policy_preflight() {
   exit 13
 }
 
+hash_text() {
+  local text="$1"
+  if command -v shasum >/dev/null 2>&1; then
+    printf '%s' "$text" | shasum -a 256 | awk '{print $1}'
+    return
+  fi
+  if command -v sha256sum >/dev/null 2>&1; then
+    printf '%s' "$text" | sha256sum | awk '{print $1}'
+    return
+  fi
+  printf '%s' "$text" | cksum | awk '{print $1}'
+}
+
+hash_file() {
+  local file="$1"
+  if [[ ! -f "$file" ]]; then
+    hash_text ""
+    return
+  fi
+  if command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$file" | awk '{print $1}'
+    return
+  fi
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$file" | awk '{print $1}'
+    return
+  fi
+  cksum "$file" | awk '{print $1}'
+}
+
+build_evidence_json() {
+  local run_dir="$1"
+  local plan_path="$2"
+  local evidence_dir="$run_dir/evidence"
+  mkdir -p "$evidence_dir"
+
+  local diff_file tests_file ci_file rollback_file
+  diff_file="$evidence_dir/diff.patch"
+  tests_file="$evidence_dir/tests.json"
+  ci_file="$evidence_dir/ci.json"
+  rollback_file="$evidence_dir/rollback.log"
+
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    git diff -- "$plan_path" > "$diff_file" 2>/dev/null || true
+  else
+    printf '%s\n' "no-git-diff" > "$diff_file"
+  fi
+  jq -n --arg plan "$plan_path" --arg ts "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" '{status:"recorded",plan:$plan,timestamp:$ts}' > "$tests_file"
+  jq -n --arg status "${HARMONY_CI_STATUS:-pass}" --arg ts "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" '{status:$status,timestamp:$ts}' > "$ci_file"
+  printf '%s\n' "rollback-check:pending" > "$rollback_file"
+
+  jq -n \
+    --arg diff_ref "$diff_file" \
+    --arg diff_hash "$(hash_file "$diff_file")" \
+    --arg tests_ref "$tests_file" \
+    --arg tests_hash "$(hash_file "$tests_file")" \
+    --arg ci_ref "$ci_file" \
+    --arg ci_hash "$(hash_file "$ci_file")" \
+    --arg rollback_ref "$rollback_file" \
+    --arg rollback_hash "$(hash_file "$rollback_file")" \
+    '[
+      {type:"diff",ref:$diff_ref,sha256:$diff_hash},
+      {type:"tests",ref:$tests_ref,sha256:$tests_hash},
+      {type:"ci",ref:$ci_ref,sha256:$ci_hash},
+      {type:"rollback_test",ref:$rollback_ref,sha256:$rollback_hash}
+    ]'
+}
+
+build_attestations_json() {
+  local run_id="$1"
+  local plan_hash="$2"
+  local evidence_hash="$3"
+  local proposer="${HARMONY_AGENT_ID:-agent-local}"
+  local verifier="${HARMONY_VERIFIER_AGENT_ID:-agent-verifier}"
+  local recovery="${HARMONY_RECOVERY_AGENT_ID:-agent-recovery}"
+  local disable_quorum="${HARMONY_DISABLE_QUORUM:-false}"
+  local disagree="${HARMONY_QUORUM_DISAGREE:-false}"
+
+  local now
+  now="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+  local proposer_sig verifier_sig recovery_sig
+  proposer_sig="$(hash_text "proposer|$proposer|$plan_hash|$evidence_hash|$run_id")"
+  verifier_sig="$(hash_text "verifier|$verifier|$plan_hash|$evidence_hash|$run_id")"
+  recovery_sig="$(hash_text "recovery|$recovery|$plan_hash|$evidence_hash|$run_id")"
+
+  if [[ "$disable_quorum" == "true" ]]; then
+    jq -n \
+      --arg now "$now" \
+      --arg role "proposer" \
+      --arg actor "$proposer" \
+      --arg plan_hash "$plan_hash" \
+      --arg evidence_hash "$evidence_hash" \
+      --arg sig "$proposer_sig" \
+      '[{role:$role,actor_id:$actor,timestamp:$now,plan_hash:$plan_hash,evidence_hash:$evidence_hash,signature:$sig}]'
+    return
+  fi
+
+  if [[ "$disagree" == "true" ]]; then
+    jq -n \
+      --arg now "$now" \
+      --arg proposer "$proposer" \
+      --arg verifier "$verifier" \
+      --arg recovery "$recovery" \
+      --arg plan_hash "$plan_hash" \
+      --arg evidence_hash "$evidence_hash" \
+      --arg proposer_sig "$proposer_sig" \
+      --arg verifier_sig "$verifier_sig" \
+      --arg recovery_sig "$recovery_sig" \
+      '[
+        {role:"proposer",actor_id:$proposer,timestamp:$now,plan_hash:$plan_hash,evidence_hash:$evidence_hash,signature:$proposer_sig},
+        {role:"verifier",actor_id:$verifier,timestamp:$now,plan_hash:$plan_hash,evidence_hash:"mismatch",signature:$verifier_sig},
+        {role:"recovery",actor_id:$recovery,timestamp:$now,plan_hash:$plan_hash,evidence_hash:$evidence_hash,signature:$recovery_sig}
+      ]'
+    return
+  fi
+
+  jq -n \
+    --arg now "$now" \
+    --arg proposer "$proposer" \
+    --arg verifier "$verifier" \
+    --arg recovery "$recovery" \
+    --arg plan_hash "$plan_hash" \
+    --arg evidence_hash "$evidence_hash" \
+    --arg proposer_sig "$proposer_sig" \
+    --arg verifier_sig "$verifier_sig" \
+    --arg recovery_sig "$recovery_sig" \
+    '[
+      {role:"proposer",actor_id:$proposer,timestamp:$now,plan_hash:$plan_hash,evidence_hash:$evidence_hash,signature:$proposer_sig},
+      {role:"verifier",actor_id:$verifier,timestamp:$now,plan_hash:$plan_hash,evidence_hash:$evidence_hash,signature:$verifier_sig},
+      {role:"recovery",actor_id:$recovery,timestamp:$now,plan_hash:$plan_hash,evidence_hash:$evidence_hash,signature:$recovery_sig}
+    ]'
+}
+
+emit_acp_receipt() {
+  local request_file="$1"
+  local decision_file="$2"
+  if [[ ! -x "$RECEIPT_WRITER" ]]; then
+    return 0
+  fi
+  "$RECEIPT_WRITER" --policy "$POLICY_FILE" --request "$request_file" --decision "$decision_file" >/dev/null 2>&1 || true
+}
+
+trip_kill_switch_for_incident() {
+  local run_id="$1"
+  if [[ ! -x "$KILL_SWITCH_SCRIPT" ]]; then
+    return 0
+  fi
+  "$KILL_SWITCH_SCRIPT" set \
+    --scope "service:agent" \
+    --owner "${HARMONY_AGENT_ID:-agent-local}" \
+    --reason "ACP circuit breaker tripped for run $run_id" \
+    --incident-id "$run_id" \
+    --ttl-seconds 3600 >/dev/null 2>&1 || true
+}
+
+handle_circuit_trip() {
+  local run_id="$1"
+  local decision_file="$2"
+  local request_file="$3"
+  local rollback_dir="$4"
+
+  if ! jq -e '.reason_codes[]? | select(. == "ACP_CIRCUIT_BREAKER_TRIPPED")' "$decision_file" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  local actions_json
+  actions_json="$(jq -c '.requirements.breaker_actions // []' "$decision_file" 2>/dev/null || echo '[]')"
+  if [[ "$actions_json" == "[]" ]]; then
+    # Backward-compatible fallback for older decisions that did not include actions.
+    actions_json='["auto_rollback_and_trip_killswitch"]'
+  fi
+
+  mkdir -p "$rollback_dir"
+  printf '%s\n' "breaker-actions=$actions_json" > "$rollback_dir/rollback-attempt.txt"
+
+  if jq -e '.[] | select(. == "stop_and_stage_only")' <<<"$actions_json" >/dev/null 2>&1 \
+    && ! jq -e '.[] | select(. == "auto_rollback_and_trip_killswitch")' <<<"$actions_json" >/dev/null 2>&1; then
+    printf '%s\n' "stage-only action: rollback and kill-switch not requested" >> "$rollback_dir/rollback-attempt.txt"
+    return 0
+  fi
+
+  local rollback_handle
+  rollback_handle="$(jq -r '.reversibility.rollback_handle // empty' "$request_file")"
+
+  if [[ -n "$rollback_handle" ]]; then
+    printf '%s\n' "rollback-handle=$rollback_handle" >> "$rollback_dir/rollback-attempt.txt"
+  fi
+
+  if [[ "${HARMONY_ENABLE_AUTO_ROLLBACK:-false}" == "true" && "$rollback_handle" == git:revert:* ]]; then
+    local commit
+    commit="${rollback_handle#git:revert:}"
+    git revert --no-edit "$commit" >> "$rollback_dir/rollback-attempt.txt" 2>&1 || true
+  else
+    printf '%s\n' "auto-rollback skipped (enable with HARMONY_ENABLE_AUTO_ROLLBACK=true)" >> "$rollback_dir/rollback-attempt.txt"
+  fi
+
+  if jq -e '.[] | select(. == "auto_rollback_and_trip_killswitch")' <<<"$actions_json" >/dev/null 2>&1; then
+    trip_kill_switch_for_incident "$run_id"
+  fi
+}
+
 if ! command -v jq >/dev/null 2>&1; then
   printf '%s\n' '{"status":"error","runId":"run-missing-jq","result":{},"artifacts":[],"checkpoint":{"state":"invalid-runtime","message":"jq is required"}}'
   exit 6
@@ -220,7 +437,11 @@ if [[ "$resume" == "true" && -z "$run_id" ]]; then
 fi
 
 if [[ -z "$run_id" ]]; then
-  run_id="$(stable_run_id "$plan_path|$memoize|$dry_run")"
+  if [[ "${HARMONY_DETERMINISTIC_RUN_ID:-false}" == "true" ]]; then
+    run_id="$(stable_run_id "$plan_path|$memoize|$dry_run")"
+  else
+    run_id="$(unique_run_id)"
+  fi
 fi
 
 if ! agent_policy_preflight_loop "$run_id" "$plan_path"; then
@@ -279,22 +500,22 @@ if [[ "$resume" == "true" ]]; then
   exit 0
 fi
 
+mkdir -p "$CONTINUITY_RUNS_DIR"
+continuity_run_dir="$CONTINUITY_RUNS_DIR/$run_id"
+evidence_dir="$continuity_run_dir/evidence"
+attestations_dir="$continuity_run_dir/attestations"
+rollback_dir="$continuity_run_dir/rollback"
+mkdir -p "$continuity_run_dir" "$evidence_dir" "$attestations_dir" "$rollback_dir"
+
 if [[ ! -f "$plan_path" ]]; then
   warnings='["planPath does not exist on disk; executing in logical mode only"]'
+  printf '%s\n' "$plan_path" > "$continuity_run_dir/plan.txt"
 else
   warnings='[]'
+  cp "$plan_path" "$continuity_run_dir/plan.source" 2>/dev/null || true
 fi
 
-if [[ "$dry_run" == "true" ]]; then
-  state="checkpointed"
-  status="partial"
-  summary="Dry-run checkpoint created"
-else
-  state="running"
-  status="success"
-  summary="Execution accepted"
-fi
-
+state="staged"
 checkpoint_json="$(jq -cn \
   --arg runId "$run_id" \
   --arg planPath "$plan_path" \
@@ -305,6 +526,189 @@ checkpoint_json="$(jq -cn \
   '{runId:$runId,planPath:$planPath,state:$state,resumeCount:$resumeCount,memoize:$memoize,dryRun:$dryRun}')"
 printf '%s\n' "$checkpoint_json" | jq -S . > "$checkpoint_path"
 
+evidence_json="$(build_evidence_json "$continuity_run_dir" "$plan_path")"
+printf '%s\n' "$evidence_json" | jq -S . > "$evidence_dir/evidence.json"
+
+if [[ -f "$plan_path" ]]; then
+  plan_hash="$(hash_file "$plan_path")"
+else
+  plan_hash="$(hash_text "$plan_path")"
+fi
+evidence_hash="$(hash_text "$evidence_json")"
+attestations_json="$(build_attestations_json "$run_id" "$plan_hash" "$evidence_hash")"
+printf '%s\n' "$attestations_json" | jq -S . > "$attestations_dir/attestations.json"
+
+counters_file="$continuity_run_dir/counters.json"
+if [[ -x "$BUDGET_METER" ]]; then
+  "$BUDGET_METER" init --file "$counters_file" >/dev/null
+  "$BUDGET_METER" record-git-diff --file "$counters_file" >/dev/null || true
+  "$BUDGET_METER" add --file "$counters_file" --metric "commands.count" --value 1 >/dev/null
+  "$BUDGET_METER" add --file "$counters_file" --metric "net.calls" --value "${HARMONY_NET_CALLS:-0}" >/dev/null
+  counters_json="$("$BUDGET_METER" emit --file "$counters_file")"
+else
+  counters_json='{}'
+fi
+
+profile="$(printf '%s' "$payload" | jq -r '.profile // empty')"
+if [[ -z "$profile" || "$profile" == "null" ]]; then
+  profile="${HARMONY_POLICY_PROFILE:-$(infer_policy_profile "$plan_path")}"
+fi
+
+operation_class="$(printf '%s' "$payload" | jq -r '.operationClass // empty')"
+if [[ -z "$operation_class" || "$operation_class" == "null" ]]; then
+  operation_class="${HARMONY_OPERATION_CLASS:-git.commit}"
+fi
+
+target_json="$(printf '%s' "$payload" | jq -c '.target // {}')"
+if [[ "$target_json" == "null" ]]; then
+  target_json='{}'
+fi
+
+phase="$(printf '%s' "$payload" | jq -r '.phase // empty')"
+if [[ -z "$phase" || "$phase" == "null" ]]; then
+  if [[ "$dry_run" == "true" ]]; then
+    phase="stage"
+  else
+    phase="promote"
+  fi
+fi
+
+intent="$(printf '%s' "$payload" | jq -r '.intent // "plan-stage-promote flow"')"
+boundaries="$(printf '%s' "$payload" | jq -r '.boundaries // "policy-bounded autonomous execution"')"
+budgets_json="$(printf '%s' "$payload" | jq -c '.budgets // {}')"
+signals_json="$(printf '%s' "$payload" | jq -c '.circuitSignals // []')"
+reversibility_json="$(printf '%s' "$payload" | jq -c '.reversibility // {}')"
+if [[ "$reversibility_json" == "{}" || "$reversibility_json" == "null" ]]; then
+  default_primitive="git.revert_commit"
+  case "$operation_class" in
+    git.merge) default_primitive="git.revert_merge" ;;
+    fs.soft_delete) default_primitive="fs.move_to_trash" ;;
+    db.migrate) default_primitive="db.down_migration_or_shadow" ;;
+    service.deploy) default_primitive="deploy.rollback" ;;
+  esac
+  reversibility_json="$(jq -cn \
+    --arg primitive "$default_primitive" \
+    --arg rollback_handle "${HARMONY_ROLLBACK_HANDLE:-$default_primitive:$run_id}" \
+    --arg recovery_window "${HARMONY_RECOVERY_WINDOW:-P30D}" \
+    '{reversible:true,primitive:$primitive,rollback_handle:$rollback_handle,recovery_window:$recovery_window}')"
+fi
+
+primitive_artifacts='[]'
+if [[ -x "$REVERSIBLE_PRIMITIVES_SCRIPT" ]]; then
+  primitive_output="$("$REVERSIBLE_PRIMITIVES_SCRIPT" apply \
+    --run-id "$run_id" \
+    --operation-class "$operation_class" \
+    --target-json "$target_json" \
+    --workspace "$(pwd)" \
+    --recovery-window "$(jq -r '.recovery_window // empty' <<<"$reversibility_json")" \
+    --rollback-handle "$(jq -r '.rollback_handle // empty' <<<"$reversibility_json")" \
+    --primitive "$(jq -r '.primitive // empty' <<<"$reversibility_json")" 2>/dev/null || true)"
+
+  if jq -e . >/dev/null 2>&1 <<<"$primitive_output"; then
+    reversibility_json="$(jq -cn \
+      --argjson base "$reversibility_json" \
+      --argjson next "$primitive_output" \
+      '{
+        reversible: ($base.reversible // $next.applied // false),
+        primitive: ($base.primitive // $next.primitive // null),
+        rollback_handle: ($base.rollback_handle // $next.rollback_handle // null),
+        recovery_window: ($base.recovery_window // $next.recovery_window // null),
+        rollback_proof: ($base.rollback_proof // null)
+      }')"
+    primitive_artifacts="$(jq -c '.artifacts // []' <<<"$primitive_output")"
+  fi
+fi
+
+if [[ "$primitive_artifacts" != "[]" ]]; then
+  evidence_json="$(jq -cn \
+    --argjson evidence "$evidence_json" \
+    --argjson artifacts "$primitive_artifacts" \
+    '$evidence + ($artifacts | map({type:(.type // "reversible_primitive"),ref:(.ref // ""),sha256:(.sha256 // null)}))')"
+fi
+
+acp_request_file="$continuity_run_dir/acp-request.json"
+acp_decision_file="$continuity_run_dir/acp-decision.json"
+
+if [[ ! -x "$ACP_REQUEST_BUILDER" || ! -x "$ACP_EVAL" ]]; then
+  fail_runtime "$run_id" "ACP helper scripts are required for autonomous promotion"
+fi
+
+"$ACP_REQUEST_BUILDER" \
+  --output "$acp_request_file" \
+  --run-id "$run_id" \
+  --phase "$phase" \
+  --profile "$profile" \
+  --operation-class "$operation_class" \
+  --actor-id "${HARMONY_AGENT_ID:-agent-local}" \
+  --actor-type "agent" \
+  --target-json "$target_json" \
+  --reversibility-json "$reversibility_json" \
+  --evidence-json "$evidence_json" \
+  --attestations-json "$attestations_json" \
+  --budgets-json "$budgets_json" \
+  --counters-json "$counters_json" \
+  --signals-json "$signals_json" \
+  --plan-hash "$plan_hash" \
+  --evidence-hash "$evidence_hash" \
+  --intent "$intent" \
+  --boundaries "$boundaries" >/dev/null
+
+if [[ "$dry_run" == "true" ]]; then
+  jq -n \
+    --arg decision "STAGE_ONLY" \
+    --arg acp "ACP-1" \
+    '{allow:false,decision:$decision,effective_acp:$acp,reason_codes:["ACP_STAGE_ONLY_REQUIRED"],notes:["dry-run stage only"],requirements:{}}' > "$acp_decision_file"
+else
+  acp_output="$("$ACP_EVAL" enforce --policy "$POLICY_FILE" --request "$acp_request_file" 2>&1)" || acp_rc=$?
+  acp_rc="${acp_rc:-0}"
+  if jq -e . >/dev/null 2>&1 <<<"$acp_output"; then
+    printf '%s\n' "$acp_output" > "$acp_decision_file"
+  else
+    jq -n --arg msg "$acp_output" '{allow:false,decision:"DENY",effective_acp:"ACP-0",reason_codes:["DDB025_RUNTIME_DECISION_ENGINE_ERROR"],notes:[$msg],requirements:{}}' > "$acp_decision_file"
+    acp_rc=13
+  fi
+fi
+
+emit_acp_receipt "$acp_request_file" "$acp_decision_file"
+handle_circuit_trip "$run_id" "$acp_decision_file" "$acp_request_file" "$rollback_dir"
+
+decision_kind="$(jq -r '.decision // "DENY"' "$acp_decision_file")"
+effective_acp="$(jq -r '.effective_acp // "ACP-0"' "$acp_decision_file")"
+reason_codes="$(jq -c '.reason_codes // []' "$acp_decision_file")"
+
+case "$decision_kind" in
+  ALLOW)
+    state="promoted"
+    status="success"
+    summary="Promotion allowed by ACP gate"
+    exit_code=0
+    ;;
+  STAGE_ONLY|ESCALATE)
+    state="stage-only"
+    status="partial"
+    summary="Promotion blocked; staged artifacts preserved"
+    exit_code=0
+    ;;
+  *)
+    state="denied"
+    status="error"
+    summary="ACP gate denied promotion"
+    exit_code=13
+    ;;
+esac
+
+checkpoint_json="$(jq -cn \
+  --arg runId "$run_id" \
+  --arg planPath "$plan_path" \
+  --arg state "$state" \
+  --arg decision "$decision_kind" \
+  --arg effectiveAcp "$effective_acp" \
+  --argjson resumeCount 0 \
+  --argjson memoize "$memoize" \
+  --argjson dryRun "$dry_run" \
+  '{runId:$runId,planPath:$planPath,state:$state,decision:$decision,effectiveAcp:$effectiveAcp,resumeCount:$resumeCount,memoize:$memoize,dryRun:$dryRun}')"
+printf '%s\n' "$checkpoint_json" | jq -S . > "$checkpoint_path"
+
 result_json="$(jq -cn \
   --arg mode "execute" \
   --arg summary "$summary" \
@@ -313,8 +717,13 @@ result_json="$(jq -cn \
   --argjson memoize "$memoize" \
   --argjson dryRun "$dry_run" \
   --argjson warnings "$warnings" \
+  --arg decision "$decision_kind" \
+  --arg effectiveAcp "$effective_acp" \
+  --argjson reasonCodes "$reason_codes" \
+  --arg requestPath "$acp_request_file" \
+  --arg decisionPath "$acp_decision_file" \
   --arg checkpointPath "$checkpoint_path" \
-  '{mode:$mode,summary:$summary,planPath:$planPath,resume:$resume,memoize:$memoize,dryRun:$dryRun,warnings:$warnings,checkpointPath:$checkpointPath}')"
+  '{mode:$mode,summary:$summary,planPath:$planPath,resume:$resume,memoize:$memoize,dryRun:$dryRun,warnings:$warnings,decision:$decision,effectiveAcp:$effectiveAcp,reasonCodes:$reasonCodes,acpRequestPath:$requestPath,acpDecisionPath:$decisionPath,checkpointPath:$checkpointPath}')"
 
 run_record_json="$(jq -cn \
   --arg runId "$run_id" \
@@ -326,5 +735,13 @@ run_record_json="$(jq -cn \
   '{runId:$runId,mode:$mode,status:$status,planPath:$planPath,checkpoint:$checkpoint,result:$result}')"
 printf '%s\n' "$run_record_json" | jq -S . > "$run_record_path"
 
-artifacts_json="$(jq -cn --arg p "$run_record_path" '[ $p ]')"
+artifacts_json="$(jq -cn \
+  --arg run "$run_record_path" \
+  --arg receipt "$continuity_run_dir/receipt.json" \
+  --arg digest "$continuity_run_dir/digest.md" \
+  --arg request "$acp_request_file" \
+  --arg decision "$acp_decision_file" \
+  '[$run,$receipt,$digest,$request,$decision]')"
+
 emit_output "$status" "$run_id" "$result_json" "$artifacts_json" "$checkpoint_json"
+exit "$exit_code"

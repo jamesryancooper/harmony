@@ -155,7 +155,7 @@ Bounded agents in Harmony operate within explicit constraints:
 | **Capability limits** | What actions agents can take | PolicyKit rules |
 | **Domain restrictions** | What data agents can access | GuardKit boundaries |
 | **Safety constraints** | What outputs agents can produce | EvalKit + GuardKit |
-| **HITL checkpoints** | When human approval is required | FlowKit workflow |
+| **ACP checkpoints** | When ACP approval is required | FlowKit workflow |
 
 **Non-negotiables for agents:**
 - Cannot commit directly to protected branches

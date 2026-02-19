@@ -548,14 +548,14 @@ Use this page to curate external references that deepen or complement topics cov
 - Last reviewed: 2025-11-12
 - Related docs: [overview](./overview.md), [repository blueprint](./repository-blueprint.md)
 
-**Human-In-the-Loop Software Development Agents (HULA)** (Industry/SEIP) — ICSE 2025
+**human-on-the-loop Software Development Agents (HULA)** (Industry/SEIP) — ICSE 2025
 
 - Link: <https://arxiv.org/abs/2411.12924>
 - Why it matters: Production-aligned framework integrating agents with human oversight (e.g., JIRA), letting engineers steer planning and code generation step-by-step while retaining control. Ideal for 2–6 dev teams introducing agentic workflows without losing control.
 - Key takeaways:
   - Keep humans in-the-loop for planning, review, and governance.
   - Integrate with existing work management tools to reduce adoption friction.
-- Tags: multi-agent, hitl, governance, workflow
+- Tags: multi-agent, acp, governance, workflow
 - Level: Intermediate
 - Last reviewed: 2025-11-12
 - Related docs: [overview](./overview.md), [repository blueprint](./repository-blueprint.md)
@@ -615,7 +615,7 @@ Use this page to curate external references that deepen or complement topics cov
 - Key takeaways:
   - Coordinate specialized role agents with policy gates and audit trails.
   - Use semantic distillation to reduce noise and speed triage.
-  - Introduce HITL fallback and role negotiation when needed.
+  - Introduce ACP fallback and role negotiation when needed.
 - Tags: multi-agent, incident-triage, ops-automation, governance
 - Level: Intermediate
 - Last reviewed: 2025-11-12
@@ -683,7 +683,7 @@ Use this page to curate external references that deepen or complement topics cov
 - Link: [https://people.cs.umass.edu/~brun/pubs/pubs/Lemos13.pdf](https://people.cs.umass.edu/~brun/pubs/pubs/Lemos13.pdf)
 - Why it matters: Consolidates patterns for self-monitoring/adaptation with assurance concerns.
 - Key takeaways:
-  - Design guardrails and human-in-the-loop checkpoints.
+  - Design guardrails and ACP checkpoints.
 - Tags: self-adaptive, assurance, governance
 - Level: Advanced
 - Last reviewed: 2025-11-11
@@ -873,7 +873,7 @@ Use this page to curate external references that deepen or complement topics cov
 - Last reviewed: 2025-11-12
 - Related docs: [overview](./overview.md), [repository blueprint](./repository-blueprint.md)
 
-## Governance, Safety, and HITL
+## Governance, Safety, and ACP
 
 **Runtime Verification (Survey)** (Survey) — 2023
 
@@ -886,13 +886,13 @@ Use this page to curate external references that deepen or complement topics cov
 - Last reviewed: 2025-11-12
 - Related docs: [overview](./overview.md), [repository blueprint](./repository-blueprint.md)
 
-**AutoGen: Multi-Agent Conversation with Tools and HITL** (Paper/Framework) — Microsoft, 2023
+**AutoGen: Multi-Agent Conversation with Tools and ACP** (Paper/Framework) — Microsoft, 2023
 
 - Link: <https://arxiv.org/abs/2308.08155>
-- Why it matters: Configurable agent roles, tool use, and human-in-the-loop approvals; a pragmatic base for guided autonomy.
+- Why it matters: Configurable agent roles, tool use, and ACP-governed approvals; a pragmatic base for guided autonomy.
 - Key takeaways:
   - Encode roles/tools/policies; bound loops; gate risky actions via review.
-- Tags: llm-agents, orchestration, hitl, governance
+- Tags: llm-agents, orchestration, acp, governance
 - Level: Intermediate
 - Last reviewed: 2025-11-12
 - Related docs: [overview](./overview.md), [repository blueprint](./repository-blueprint.md)

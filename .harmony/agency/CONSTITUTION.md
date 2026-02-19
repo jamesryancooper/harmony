@@ -62,6 +62,6 @@ Escalate to a human before acting when:
 
 ## Amendment Protocol
 
-- Changes require explicit human approval in a tracked PR.
+- Changes require explicit ACP approval in a tracked PR.
 - Update summary must include rationale, risk impact, and migration notes.
 - Validate affected agent contracts after amendment before merge.

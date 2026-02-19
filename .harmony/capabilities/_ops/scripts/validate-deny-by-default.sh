@@ -20,6 +20,7 @@ PROFILE_RESOLVER="$CAPABILITIES_DIR/_ops/scripts/policy-profile-resolve.sh"
 GRANT_BROKER="$CAPABILITIES_DIR/_ops/scripts/policy-grant-broker.sh"
 KILL_SWITCH_SCRIPT="$CAPABILITIES_DIR/_ops/scripts/policy-kill-switch.sh"
 ROLLOUT_SCRIPT="$CAPABILITIES_DIR/_ops/scripts/policy-rollout-mode.sh"
+RA_ACP_MIGRATION_GUARD="$CAPABILITIES_DIR/_ops/scripts/validate-ra-acp-migration.sh"
 
 PROFILE="${HARMONY_VALIDATION_PROFILE:-dev-fast}"
 MODE="changed"
@@ -270,6 +271,19 @@ run_policy_contract_validation() {
   return 0
 }
 
+run_ra_acp_migration_guard() {
+  if [[ "$PROFILE" != "strict" ]]; then
+    return 0
+  fi
+
+  if [[ ! -x "$RA_ACP_MIGRATION_GUARD" ]]; then
+    echo "Missing RA+ACP migration guard: $RA_ACP_MIGRATION_GUARD" >&2
+    return 1
+  fi
+
+  "$RA_ACP_MIGRATION_GUARD"
+}
+
 run_profile_contract_validation() {
   if [[ ! -x "$PROFILE_RESOLVER" ]]; then
     echo "Missing profile resolver: $PROFILE_RESOLVER" >&2
@@ -314,6 +328,9 @@ main() {
   echo "Deny-by-default validation profile: $PROFILE"
 
   if ! run_policy_contract_validation; then
+    exit 1
+  fi
+  if ! run_ra_acp_migration_guard; then
     exit 1
   fi
   if ! run_profile_contract_validation; then

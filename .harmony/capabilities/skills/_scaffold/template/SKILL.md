@@ -148,7 +148,7 @@ Reference files are included based on your declared **capabilities**. Each capab
 skill_sets: [executor]
 capabilities: []
 
-# Multi-phase with human checkpoints
+# Multi-phase with ACP oversight
 skill_sets: [executor, collaborator]
 capabilities: []
 

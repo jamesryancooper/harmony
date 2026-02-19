@@ -670,7 +670,7 @@ slo_implications:
       target: ""
 
 # ------------------------------------------------------------------------------
-# Human Approval Checkpoints
+# ACP approval Checkpoints
 # ------------------------------------------------------------------------------
 approval_checkpoints:
   spec_approval:

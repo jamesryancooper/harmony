@@ -131,13 +131,13 @@ The primitives form a hierarchical multi-agent system:
 - **Multi-session** — Designed to span days or weeks
 - **State machine** — Formal YAML-defined states and transitions
 - **FlowKit-native** — Executes on FlowKit runtime
-- **Checkpoint-enabled** — Human approval gates with timeouts
+- **Checkpoint-enabled** — ACP approval gates with timeouts
 
 ### When to Use
 
 - Work that spans multiple sessions (days/weeks)
 - Complex decision trees with >5 branch points
-- Human approval gates mid-execution
+- ACP approval gates mid-execution
 - Durable execution that survives restarts
 - Orchestration of multiple skills
 

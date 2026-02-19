@@ -230,10 +230,56 @@ EOF
   rm -f "$ks_record"
 }
 
+run_acp_gate_tests() {
+  local guard_entrypoint="$SERVICES_ROOT/governance/guard/impl/guard.sh"
+  local receipt_run_id="runtime-acp-receipt-${RANDOM:-0}-$$"
+
+  assert_success \
+    "acp stage phase allows execution" \
+    bash -euo pipefail -c "
+      source '$ENFORCER_SCRIPT'
+      HARMONY_AGENT_ID=agent-a \\
+      HARMONY_AGENT_IDS='agent-a' \\
+      HARMONY_RISK_TIER=low \\
+      HARMONY_OPERATION_PHASE=stage \\
+      harmony_enforce_service_policy 'guard' '$guard_entrypoint'
+    "
+
+  assert_failure_contains \
+    "acp promote phase blocks promotion on stage-only decision" \
+    "promotion blocked" \
+    bash -euo pipefail -c "
+      source '$ENFORCER_SCRIPT'
+      HARMONY_AGENT_ID=agent-a \\
+      HARMONY_AGENT_IDS='agent-a' \\
+      HARMONY_RISK_TIER=low \\
+      HARMONY_POLICY_PROFILE=refactor \\
+      HARMONY_OPERATION_CLASS=git.commit \\
+      HARMONY_OPERATION_PHASE=promote \\
+      HARMONY_RUN_ID='$receipt_run_id' \\
+      harmony_enforce_service_policy 'guard' '$guard_entrypoint'
+    "
+
+  assert_success \
+    "acp receipt validates against policy contract" \
+    bash -euo pipefail -c "
+      receipt='.harmony/continuity/runs/$receipt_run_id/receipt.latest.json'
+      [[ -f \"\$receipt\" ]]
+      .harmony/capabilities/_ops/scripts/run-harmony-policy.sh receipt-validate --policy '$POLICY_V2_FILE' --receipt \"\$receipt\" >/dev/null
+    "
+
+  assert_success \
+    "acp receipts append decision log" \
+    bash -euo pipefail -c "
+      [[ -s '.harmony/capabilities/_ops/state/logs/acp-decisions.jsonl' ]]
+    "
+}
+
 main() {
   run_split_parser_regression_test
   run_active_shell_enforcement_smoke_test
   run_agent_only_required_deny_tests
+  run_acp_gate_tests
 
   echo ""
   echo "Runtime deny-by-default tests complete: $pass_count passed, $fail_count failed"

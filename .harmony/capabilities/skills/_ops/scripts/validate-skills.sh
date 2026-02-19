@@ -2578,7 +2578,7 @@ has_interaction_patterns() {
         return 1
     fi
 
-    # Look for human-in-the-loop indicators
+    # Look for human-collaboration indicators
     grep -qiE "(approval|approve|confirm|user input|ask user|human review|gate|checkpoint)" "$skill_md" 2>/dev/null
 }
 
@@ -2643,9 +2643,9 @@ validate_capability_heuristics() {
         should_add_caps=true
     fi
 
-    # Check 4: Human-in-the-loop patterns → suggest 'collaborator' skill set
+    # Check 4: human-collaboration patterns → suggest 'collaborator' skill set
     if has_interaction_patterns "$skill_dir"; then
-        suggestions="${suggestions}\n  - Contains human-in-the-loop patterns → consider 'collaborator' skill set"
+        suggestions="${suggestions}\n  - Contains human-collaboration patterns → consider 'collaborator' skill set"
         should_add_caps=true
     fi
 

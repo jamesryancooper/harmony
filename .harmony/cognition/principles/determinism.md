@@ -347,7 +347,7 @@ ENV GIT_SHA=${GIT_SHA}
 | Single Source of Truth | One source of version truth (lock files) |
 | Reversibility | Deterministic systems have predictable rollback |
 | Deny by Default | Predictable permission decisions |
-| HITL Checkpoints | Humans review deterministic diffs |
+| Autonomous Control Points | Policy gates evaluate deterministic diffs before promotion |
 
 ## Acceptable Non-Determinism
 
