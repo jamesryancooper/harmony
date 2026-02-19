@@ -383,7 +383,7 @@ jobs:
 Notes:
 
 - Autopilot tasks: docs/links/titles normalization; stale‑flag diffs with owners/expiry; preview smoke wiring for top routes.
-- Copilot tasks (PRs require ACP approval): observability scaffolding PRs for missing spans/logs (with sample trace outlines), contract drift fixes using `oasdiff` on OpenAPI/JSON‑Schema; perf budget nudges with budget delta evidence; targeted threat‑model test stubs (STRIDE‑driven). Contracts and observability jobs above attach artifacts (e.g., `kaizen/reports/oasdiff.md`, trace coverage report) to PRs.
+- Copilot tasks (PRs require ACP gate): observability scaffolding PRs for missing spans/logs (with sample trace outlines), contract drift fixes using `oasdiff` on OpenAPI/JSON‑Schema; perf budget nudges with budget delta evidence; targeted threat‑model test stubs (STRIDE‑driven). Contracts and observability jobs above attach artifacts (e.g., `kaizen/reports/oasdiff.md`, trace coverage report) to PRs.
 - Non‑negotiables: no bot approvals or direct pushes; AI configs pinned; artifacts produced for review. All PRs carry PR↔build↔trace correlation per Knowledge Plane schema.
 
 ```json

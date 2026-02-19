@@ -220,7 +220,7 @@ The AI Services Platform is designed as a cohesive, self-reinforcing system alig
   - All runs traced (OTel) and explainable; every material output is verifiable and reproducible.
 - **Guided Agentic Autonomy**
   - AI systems autonomously self‑build, self‑heal, and self‑tune within deterministic, observable, and reversible bounds—while humans retain ultimate authority, oversight, and accountability.
-  - Deterministic agent loops (Plan → Diff → Explain → Test) with ACP checkpoints; no silent apply.
+  - Deterministic agent loops (Plan → Diff → Explain → Test) with ACP gates; no silent apply.
   - Pinned AI config (provider/model/version/params) and stable prompt hash; golden tests guard outputs.
   - Observability and provenance: OTel traces for runs; PRs include trace links and Eval/Policy outcomes.
  - **Evolvable Modularity**
@@ -234,7 +234,7 @@ The AI Services Platform is designed as a cohesive, self-reinforcing system alig
 | Speed with Safety | Patch, Flag, Cache, Schedule, Observe | Tiny PRs with previews; progressive rollout via flags; cached/idempotent runs; scheduled non-blocking tasks; traces tie changes to outcomes |
 | Simplicity over Complexity | Stack, Scaffold, Tool, Cache | Monolith-first boundaries with clear ports/adapters; minimal, predictable service interfaces; reuse via small wrappers; memoization to avoid recomputation |
 | Quality through Determinism | Eval, Policy, Test, Compliance, Observe | Contract tests, policy gates, schema-guarded outputs, evidence packs; OTel spans/logs for explainability and postmortems |
-| Guided Agentic Autonomy | Agent, Guard, Policy, Eval, Observe, Patch/Notify (ACP) | Deterministic agent loops (Plan → Diff → Explain → Test); pinned AI config + prompt hash; golden tests; ACP checkpoints; traces/provenance; fail‑closed governance; no silent apply |
+| Guided Agentic Autonomy | Agent, Guard, Policy, Eval, Observe, Patch/Notify (ACP) | Deterministic agent loops (Plan → Diff → Explain → Test); pinned AI config + prompt hash; golden tests; ACP gates; traces/provenance; fail‑closed governance; no silent apply |
 | Evolvable Modularity | Stack, Tool, Agent, adapters across services | Hexagonal ports/adapters and stable contracts make databases, models, providers, and surfaces plug‑and‑play; new capabilities can be added or retired without destabilizing core flows |
 
 Note: Each service declares the pillar(s) it reinforces in its metadata and run records. This ensures systemic coherence and enables policy- and evidence-driven adoption.
@@ -348,7 +348,7 @@ Notes:
 ### Lifecycle Conformance Checklist (per change)
 
 - [ ] Spec/Shape: Spec one‑pager + ADR; micro‑STRIDE with mitigations/tests; contracts present (OpenAPI/JSON‑Schema where applicable).
-- [ ] Plan: `plan.json` (BMAD) with explicit steps and ACP checkpoints; risk class chosen; rollback and flag plan drafted.
+- [ ] Plan: `plan.json` (BMAD) with explicit steps and ACP gates; risk class chosen; rollback and flag plan drafted.
 - [ ] Implement: Proposed diffs (no silent apply); tests included; AI config pinned and recorded; idempotency keys for mutating ops.
 - [ ] Verify: Eval/Test/Policy pass; OpenAPI diff checked; license/provenance noted; secret scans clean.
 - [ ] Ship: PR opened with Preview URL; feature behind a flag by default; promote only from known‑good preview.
@@ -584,7 +584,7 @@ Enforcement:
 
 ### ACP States & Semantics
 
-ACP checkpoints are represented in run records and telemetry with explicit decisions to preserve determinism and auditability:
+ACP gates are represented in run records and telemetry with explicit decisions to preserve determinism and auditability:
 
 - Decisions: `ALLOW` | `STAGE_ONLY` | `DENY` | `ESCALATE`
 - Required fields
@@ -790,7 +790,7 @@ All services MUST print a one-line JSON summary to stdout on success/failure, ma
 - Typed errors used with exit codes (0–8); one‑line JSON summary printed on failure with actionable message.
 - Secrets/PII never serialized; Guard redaction on by default; Vault for secret reads.
 - Contracts updated in the service-local schema path (`.harmony/capabilities/services/<domain>/<service>/schema`); registry references refreshed; diffs linked in PR.
-- ACP checkpoints encoded when risk ≥ medium; PR body includes risk rubric, flags, rollback, trace URL.
+- ACP gates encoded when risk ≥ medium; PR body includes risk rubric, flags, rollback, trace URL.
 
 Reference run record (stored under `/runs/<timestamp>-<service>-<runId>.json`):
 
@@ -1080,7 +1080,7 @@ Example metadata:
 
 ### Run Record JSON‑Schema (standard v0.2)
 
-Extends the minimal schema with lifecycle metadata, ACP checkpoints, and determinism fields.
+Extends the minimal schema with lifecycle metadata, ACP gates, and determinism fields.
 
 ```json
 {

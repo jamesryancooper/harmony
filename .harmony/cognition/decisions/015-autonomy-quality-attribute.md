@@ -5,7 +5,7 @@
 
 ## Context
 
-Harmony explicitly governs agent behavior with deny-by-default permissions, no-silent-apply, and ACP checkpoints. The quality model scores safety, security, reliability, and auditability, but did not name autonomy as a first-class attribute.
+Harmony explicitly governs agent behavior with deny-by-default permissions, no-silent-apply, and ACP gates. The quality model scores safety, security, reliability, and auditability, but did not name autonomy as a first-class attribute.
 
 Without an explicit autonomy attribute, trade-offs between autonomous throughput and governance constraints are implicit and harder to tune per subsystem and maturity.
 

@@ -670,7 +670,7 @@ slo_implications:
       target: ""
 
 # ------------------------------------------------------------------------------
-# ACP approval Checkpoints
+# ACP Gates
 # ------------------------------------------------------------------------------
 approval_checkpoints:
   spec_approval:
@@ -764,4 +764,3 @@ adr:
   title: ""
   status: ""
   # proposed, accepted, deprecated, superseded
-

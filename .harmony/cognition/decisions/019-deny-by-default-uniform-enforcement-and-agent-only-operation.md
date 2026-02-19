@@ -40,7 +40,7 @@ rules:
    routine local changes without weakening repository safety defaults.
 7. Agent-only operation is supported via policy gates (risk tiers,
    separation-of-duties checks, and fail-closed rollback/kill-switch controls)
-   rather than ACP approval prompts.
+   rather than ACP gate prompts.
 
 ## Rationale
 

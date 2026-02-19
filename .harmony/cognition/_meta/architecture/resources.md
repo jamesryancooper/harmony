@@ -548,7 +548,7 @@ Use this page to curate external references that deepen or complement topics cov
 - Last reviewed: 2025-11-12
 - Related docs: [overview](./overview.md), [repository blueprint](./repository-blueprint.md)
 
-**human-on-the-loop Software Development Agents (HULA)** (Industry/SEIP) — ICSE 2025
+**Human-in-the-Loop Software Development Agents (HULA)** (Industry/SEIP) — ICSE 2025
 
 - Link: <https://arxiv.org/abs/2411.12924>
 - Why it matters: Production-aligned framework integrating agents with human oversight (e.g., JIRA), letting engineers steer planning and code generation step-by-step while retaining control. Ideal for 2–6 dev teams introducing agentic workflows without losing control.
@@ -683,7 +683,7 @@ Use this page to curate external references that deepen or complement topics cov
 - Link: [https://people.cs.umass.edu/~brun/pubs/pubs/Lemos13.pdf](https://people.cs.umass.edu/~brun/pubs/pubs/Lemos13.pdf)
 - Why it matters: Consolidates patterns for self-monitoring/adaptation with assurance concerns.
 - Key takeaways:
-  - Design guardrails and ACP checkpoints.
+  - Design guardrails and ACP gates.
 - Tags: self-adaptive, assurance, governance
 - Level: Advanced
 - Last reviewed: 2025-11-11

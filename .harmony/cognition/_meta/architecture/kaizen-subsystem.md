@@ -87,7 +87,7 @@ The loop executes on cadence or trigger and iterates over small, isolated change
 
 3) Plan Approval (ACP)
 
-- If risk ≥ threshold, await ACP approval; low‑risk routine maintenance may auto‑proceed per policy.
+- If risk ≥ threshold, await ACP gate; low‑risk routine maintenance may auto‑proceed per policy.
 - Early maturity: prefer quick human review of all plans to build trust.
 
 4) Execution as Dry‑Run (Builder)
@@ -196,7 +196,7 @@ Autopilot vs Copilot categories (applies to PR intent, not approvals):
 
 - Autopilot (eligible to proceed within normal review): docs hygiene (lint/links/titles), stale‑flags cleanup diffs, preview smoke wiring for top routes.
   (see `scripts/smoke-check.sh`)
-- Copilot (must open PRs with evidence; ACP approval required): observability scaffolding (missing spans/logs on changed paths with a sample trace outline), contract drift fixes using OpenAPI/JSON‑Schema + `oasdiff`, perf budget nudges (bundle/caching deltas), and targeted threat‑model test stubs (e.g., STRIDE‑driven checks).
+- Copilot (must open PRs with evidence; ACP gate required): observability scaffolding (missing spans/logs on changed paths with a sample trace outline), contract drift fixes using OpenAPI/JSON‑Schema + `oasdiff`, perf budget nudges (bundle/caching deltas), and targeted threat‑model test stubs (e.g., STRIDE‑driven checks).
 
 ## Validation and Quality Gates
 
@@ -318,7 +318,7 @@ This complements existing CI and prompts while keeping ownership clear.
 
 ### Merging Policy and Non‑Negotiables
 
-- Autopilot PRs still require at least one ACP approval; bots never approve or push to protected branches.
+- Autopilot PRs still require at least one ACP gate; bots never approve or push to protected branches.
 - AI configuration is pinned and versioned; every PR carries evidence artifacts and PR↔build↔trace correlation for provenance.
 
 ## Triggers & Schedules

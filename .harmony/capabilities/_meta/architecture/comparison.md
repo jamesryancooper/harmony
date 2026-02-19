@@ -66,7 +66,7 @@ Skills add structure and overhead. Avoid them when simpler primitives suffice:
 
 ### When to Use Workflows
 
-- Multiple steps with ACP checkpoints
+- Multiple steps with ACP gates
 - Steps may involve multiple tools
 - Procedure may vary based on context
 - Documentation of process is the goal
@@ -93,7 +93,7 @@ Once you've decided to create a skill, use capabilities to guide its structure:
 | If the skill... | Add skill set | Additional capabilities |
 |-----------------|---------------|------------------------|
 | Has multiple phases | `executor` | |
-| Requires ACP approval | `executor`, `collaborator` | |
+| Requires ACP gate | `executor`, `collaborator` | |
 | Has quality gates | `executor`, `guardian` | |
 | Can resume after interruption | `executor` | `resumable` |
 | Is a pipeline component | `integrator` | |

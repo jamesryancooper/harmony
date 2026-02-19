@@ -78,7 +78,7 @@ This keeps Spec semantics authoritative (from GitHub’s Spec Kit), makes BMAD u
 flowchart LR
   A[Spec (GitHub’s Spec Kit via SpecKit) + ADR stub] --> B[Shape & Scope Cuts]
   B --> C[PlanKit (BMAD plan + ADR)]
-  C --> D[Dev in AI IDE (ACP checkpoints)]
+  C --> D[Dev in AI IDE (ACP gates)]
   D --> E[PR -> Vercel Preview (feature-flagged; ObservaKit trace linked)]
   E --> F[CI Gates: lint/type/test/scan/contract/SBOM]
   F -->|all green| G[Merge to Trunk]
@@ -105,7 +105,7 @@ flowchart LR
   - In: intent/idea (issue), constraints.
   - Out: `docs/specs/<feature>/spec.md` and related GitHub’s Spec Kit docs; ADR is created in the next stage by PlanKit. (ASVS/SSDF per OWASP/NIST.) ([GitHub][7])
 - **Commands & hooks**: `speckit init …` to author; `speckit validate …` to ensure structure; `speckit render …` to publish. See `.harmony/capabilities/services/_meta/docs/platform-overview.md` (SpecKit + PlanKit sections) and `.harmony/capabilities/services/planning/spec/guide.md` for wrapper details and contracts.
-- **ACP checkpoint**: Driver & Navigator confirm problem, scope, non‑functionals (two passes if solo).
+- **ACP gate**: Driver & Navigator confirm problem, scope, non‑functionals (two passes if solo).
 - **Integrations**: Open an ObservaKit trace at spec start and persist the `trace_id` for downstream linkage.
 - **Gate**: **S‑1** passes when SpecKit validation succeeds and required fields are present.
 

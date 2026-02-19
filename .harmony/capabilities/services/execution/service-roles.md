@@ -98,7 +98,7 @@ An **agent** is a higher-level actor that:
 
 - Consumes a plan from Plan (`plan.json`).
 - Decides which flows to invoke when, with what parameters and context.
-- Handles retries, resume, long-term run identity, and ACP checkpoints.
+- Handles retries, resume, long-term run identity, and ACP gates.
 
 Agent:
 
@@ -212,7 +212,7 @@ To keep responsibilities clean:
 - An **agent** (Agent) is a higher-level actor that:
   - Consumes a plan from Plan (`plan.json`).
   - Decides which flows to invoke when, with what parameters and context.
-  - Handles retries, resume, long-term run identity, and ACP checkpoints.
+  - Handles retries, resume, long-term run identity, and ACP gates.
 
 ### 4.2 Where agents live physically
 

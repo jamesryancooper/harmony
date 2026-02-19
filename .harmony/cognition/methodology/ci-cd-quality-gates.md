@@ -110,7 +110,7 @@ flowchart TB
 
 | Gate | Tool | Blocking | Notes |
 |------|------|----------|-------|
-| Spec approval | ACP checkpoint | ✅ | **Before AI builds** |
+| Spec approval | ACP gate | ✅ | **Before AI builds** |
 | Full STRIDE | Human-reviewed | ✅ | Complete threat model |
 | Golden tests | EvalKit/TestKit | ✅ | Critical paths |
 | Integration tests | Full suite | ✅ | If applicable |

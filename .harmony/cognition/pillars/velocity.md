@@ -70,7 +70,7 @@ When this pillar fails, delivery stalls. PRs sit in review queues, deployments b
 
 - **Long PR queue times** — PRs waiting days for review
 - **Large batch deploys** — Accumulating changes instead of shipping continuously
-- **Manual gates everywhere** — Requiring ACP approval for routine operations
+- **Manual gates everywhere** — Requiring ACP gate for routine operations
 - **Waiting for review** — Processes that block on approvals and async feedback loops
 
 ---

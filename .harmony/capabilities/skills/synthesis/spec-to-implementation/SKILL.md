@@ -50,7 +50,7 @@ Or with inline spec:
 3. **Decompose** — Break down into discrete, independently deliverable tasks
 4. **Sequence** — Order tasks by dependencies, risk, and delivery value
 5. **Plan** — Generate the implementation plan with milestones and acceptance criteria
-6. **Review** — Present plan for ACP approval before proceeding
+6. **Review** — Present plan for ACP gate before proceeding
 
 ### Decomposition Principles
 

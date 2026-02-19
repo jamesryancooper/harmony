@@ -36,7 +36,7 @@ Map the complex archetype to skill sets based on the skill's behavior:
 | Skill Pattern | Skill Sets |
 |---------------|------------|
 | Standard multi-phase workflow | `[executor]` |
-| Multi-phase with ACP approval | `[executor, collaborator]` |
+| Multi-phase with ACP gate | `[executor, collaborator]` |
 | Multi-phase with quality gates | `[executor, guardian]` |
 | Pipeline component | `[integrator]` |
 | Task orchestrator | `[coordinator]` |

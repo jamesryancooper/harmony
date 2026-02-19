@@ -1,13 +1,13 @@
 ---
 title: MAPE-K Loop Modeling
-description: Application of the MAPE-K model with ACP checkpoints to drive safe, continuous improvement via Planner/Builder/Verifier agents.
+description: Application of the MAPE-K model with ACP gates to drive safe, continuous improvement via Planner/Builder/Verifier agents.
 ---
 
 # MAPE-K Loop Modeling (Technical)
 
 Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [agent roles](./agent-roles.md), [kaizen subsystem](./kaizen-subsystem.md), [knowledge plane](../../knowledge-plane/knowledge-plane.md), [contracts registry](./contracts-registry.md), [python runtime workspace example](/.harmony/scaffolding/examples/stack-profiles/python-runtime-workspace.md)
 
-This document specifies how Harmony applies the MAPE-K model with ACP checkpoints to continuously improve the system while maintaining safety and alignment with governance policies.
+This document specifies how Harmony applies the MAPE-K model with ACP gates to continuously improve the system while maintaining safety and alignment with governance policies.
 
 ## Summary
 
@@ -15,7 +15,7 @@ This document specifies how Harmony applies the MAPE-K model with ACP checkpoint
 - Managed Element: the Harmony SaaS monorepo/application.
 - Managing Element: AI agents plus human operators.
 - Core agents: Planner Agent, Builder Agent, Verifier Agent.
-- ACP checkpoints: plan approval and pre-merge review.
+- ACP gates: plan approval and pre-merge review.
 - Operation modes: continuous kaizen loop and event-driven loop.
 
 ## Audience and Scope

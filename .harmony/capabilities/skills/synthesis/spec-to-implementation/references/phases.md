@@ -45,7 +45,7 @@ behavior:
         - "Present plan summary to the user"
         - "Highlight key decisions and assumptions that need confirmation"
         - "List open questions that affect task scope or sequencing"
-        - "Wait for ACP approval before considering the plan final"
+        - "Wait for ACP gate before considering the plan final"
         - "Record review outcome in execution log"
   goals:
     - "Every spec requirement maps to at least one implementation task"
@@ -220,7 +220,7 @@ Generate the implementation plan document.
 
 ## Phase 6: Review
 
-Present plan for ACP approval.
+Present plan for ACP gate.
 
 ### Review Protocol
 

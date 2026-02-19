@@ -57,7 +57,7 @@ Quality requirements:
 ### Planner Agent Governance & Constraints
 
 - Policy Compliance: validate planned actions against policy knowledge (security, secrets, banned APIs, quality bars).
-- Risk Thresholds: require ACP approval for medium/high-risk or sensitive changes (ACP at planning).
+- Risk Thresholds: require ACP gate for medium/high-risk or sensitive changes (ACP at planning).
 - Explainability: provide rationale and evidence; opaque recommendations are rejected.
 - Scope Respect: do not plan architectural/infrastructure changes outside remit unless explicitly allowed.
 - Escalation: when ambiguous or beyond scope, request human decision rather than guessing.
@@ -128,7 +128,7 @@ Quality requirements:
 
 ### Verifier Agent Governance & Constraints
 
-- Strict by Default: fail-closed behavior; waivers require explicit ACP approval with justification.
+- Strict by Default: fail-closed behavior; waivers require explicit ACP gate with justification.
 - Independence: run in isolated environment; inputs are team-maintained standards that Builder cannot alter ad hoc.
 - ACP Gate: failing checks route to Builder for fixes or to humans for adjudication when tests are disputed.
 - Knowledge Updates: persist verification artifacts, coverage history, and waiver records.

@@ -46,7 +46,7 @@ At a high level:
    - A canonical `plan.json` describing BMAD-style steps and dependencies.
    - ADR/checklist updates for governance.
 4. **Execution domain services** consume `plan.json`:
-   - **Agent** orchestrates plan execution, retries/resume, and ACP checkpoints.
+   - **Agent** orchestrates plan execution, retries/resume, and ACP gates.
    - **Flow** executes flow manifests through native runtime by default, with optional adapter forwarding.
 
 This keeps **planning** (intent and sequencing) cleanly separated from **execution** (runtime and durable run control).

@@ -141,7 +141,7 @@ For non-trivial tasks (multiple modules, new contracts/schemas/migrations, auth/
 |---|---|---|
 | **A** | Reversible, limited blast radius, no new external contracts | Compact |
 | **B** | Cross-module coordination, contract evolution, moderate operational risk | Structured |
-| **C** | One-way-door decisions, compliance implications, high blast radius | Full with approval checkpoints |
+| **C** | One-way-door decisions, compliance implications, high blast radius | Full with policy gates |
 
 Assign by highest matched criterion. If uncertain, escalate one tier.
 

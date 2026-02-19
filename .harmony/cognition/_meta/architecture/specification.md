@@ -100,7 +100,7 @@ Expands in:
 
 ### HARMONY-SPEC-006: Risk-Tiered Human Governance
 
-Control intensity MUST scale with risk tier. Low-risk read-only automation MAY run without hard gates; consequential actions MUST use explicit ACP checkpoints.
+Control intensity MUST scale with risk tier. Low-risk read-only automation MAY run without hard gates; consequential actions MUST use explicit ACP gates.
 
 Expands in:
 

@@ -50,7 +50,7 @@ Checklist
   - Default dynamic reads to `no-store`. When enabling caches, use explicit keys/TTL and add tests/validation.
 - Deploy flow
   - Enable preview deployments for `apps/*`. Keep production promotion manual with a rehearsed instant rollback path.
-  - Adopt PatchKit for small, well‑formed PRs and NotifyKit for lightweight approvals/notifications (Slack/email) to reinforce ACP checkpoints.
+  - Adopt PatchKit for small, well‑formed PRs and NotifyKit for lightweight approvals/notifications (Slack/email) to reinforce ACP gates.
 - Knowledge and retrieval (optional on Day 1)
   - If helpful for developers, stand up QueryKit + IndexKit over first‑party docs/specs for cited Q&A; defer SearchKit (external sources) until needed.
 - Documentation
