@@ -131,13 +131,13 @@ The primitives form a hierarchical multi-agent system:
 - **Multi-session** — Designed to span days or weeks
 - **State machine** — Formal YAML-defined states and transitions
 - **FlowKit-native** — Executes on FlowKit runtime
-- **Checkpoint-enabled** — ACP approval gates with timeouts
+- **ACP-gated** — ACP policy gates with stage-only fallback and timeouts
 
 ### When to Use
 
 - Work that spans multiple sessions (days/weeks)
 - Complex decision trees with >5 branch points
-- ACP approval gates mid-execution
+- ACP promote/finalize gates mid-execution
 - Durable execution that survives restarts
 - Orchestration of multiple skills
 
@@ -156,13 +156,14 @@ states:
     transitions:
       - on: complete → plan
 
-  - id: human-review
-    type: checkpoint
-    prompt: "Approve migration plan?"
+  - id: acp-promote
+    type: acp_gate
+    phase: promote
     timeout: 72h
     transitions:
-      - on: approved → execute
-      - on: rejected → revise
+      - on: allow → execute
+      - on: stage_only → revise
+      - on: deny → rollback
 ```
 
 ### Missions vs Skills

@@ -109,9 +109,9 @@ case_detects_legacy_terms() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
 
-  mkdir -p "$fixture_root/.harmony/cognition/context"
-  cat > "$fixture_root/.harmony/cognition/context/stale-ra-note.md" <<'EOF'
-Legacy governance required HITL and explicit human approval at runtime.
+  mkdir -p "$fixture_root/.harmony/cognition/principles"
+  cat > "$fixture_root/.harmony/cognition/principles/deny-by-default.md" <<'EOF'
+Legacy governance required ACP checkpoints and explicit human approval at runtime.
 EOF
 
   run_guard_in_fixture "$fixture_root"

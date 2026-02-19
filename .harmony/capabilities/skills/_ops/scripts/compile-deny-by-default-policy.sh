@@ -85,10 +85,16 @@ get_skill_rows() {
 }
 
 mkdir -p "$(dirname "$OUT_PATH")"
+tmp_path="$(mktemp "${OUT_PATH}.tmp.XXXXXX")"
+trap 'rm -f "$tmp_path"' EXIT
+
+normalize_generated_at() {
+  sed -E 's/^generated_at: "[^"]*"/generated_at: "__GENERATED_AT__"/'
+}
 
 {
   echo "schema_version: \"1.0\""
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"__GENERATED_AT__\""
   echo "source_manifest: \"$MANIFEST\""
   echo "skills:"
 
@@ -142,6 +148,22 @@ mkdir -p "$(dirname "$OUT_PATH")"
       done < <(split_space_list "$allowed_services_raw")
     fi
   done < <(get_skill_rows)
-} > "$OUT_PATH"
+} > "$tmp_path"
+
+generated_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+if [[ -f "$OUT_PATH" ]]; then
+  existing_generated_at="$(awk -F'"' '/^generated_at:/ {print $2; exit}' "$OUT_PATH")"
+  if [[ -n "$existing_generated_at" ]]; then
+    existing_normalized="$(normalize_generated_at < "$OUT_PATH")"
+    candidate_normalized="$(normalize_generated_at < "$tmp_path")"
+    if [[ "$existing_normalized" == "$candidate_normalized" ]]; then
+      generated_at="$existing_generated_at"
+    fi
+  fi
+fi
+
+sed "s|__GENERATED_AT__|$generated_at|" "$tmp_path" > "$OUT_PATH"
+rm -f "$tmp_path"
+trap - EXIT
 
 echo "$OUT_PATH"

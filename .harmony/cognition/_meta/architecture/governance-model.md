@@ -1,6 +1,6 @@
 ---
 title: Governance Model
-description: Autonomous Control Point checkpoints, waivers, risk rubric, and CI policy gates to achieve Speed with Safety.
+description: Autonomous Control Point policy gates, waivers, risk rubric, and CI policy gates to achieve Speed with Safety.
 ---
 
 # Governance Model
@@ -23,7 +23,7 @@ Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [overview
 ### Autopilot vs Copilot Scope Boundaries
 
 - Autopilot (Kaizen layer) is cross‑cutting and limited to small, reversible, evidence‑driven, policyable changes that do not alter runtime semantics (e.g., docs hygiene, stale‑flag cleanup, span/log scaffolding, contract drift reports).
-- Anything changing runtime behavior or involving higher‑risk refactors is Copilot: routed to owning slice(s) via CODEOWNERS, always reviewed by humans.
+- Anything changing runtime behavior or involving higher‑risk refactors is Copilot: routed to owning slice(s) via CODEOWNERS and reviewed per repository policy.
 - Bots may open PRs; they never approve or push to protected branches.
 - During incidents/freezes, Kaizen operates in suggest‑only mode (issues over PRs) until the freeze lifts.
 
@@ -43,38 +43,35 @@ Ownership & Checks (Repository Policy)
 
 ## ACP Gates
 
-ACP checkpoints appear at defined phases. Each gate documents trigger conditions, required evidence/quorum, escalation conditions, and whether it is blocking.
+ACP policy gates appear at defined phases. Each gate documents trigger conditions, required evidence/quorum, escalation conditions, and whether it is blocking.
 
 ### Gates
 
-- Planning Gate
+- Plan/Stage Gate
   - Trigger: Planner agent produces a non‑trivial or multi‑option plan (e.g., core refactor, DB migration).
-  - Approvers: Designated lead/approver (e.g., tech lead, product lead for user‑facing changes).
-  - Artifacts: Plan rationale, alternatives, risk level, rollback/mitigations.
-  - Blocking: Yes; plan may not proceed without approval.
+  - Requirements: Plan rationale, alternatives, risk level, rollback strategy, evidence plan.
+  - Outcome: Stage work and run ACP preflight to determine required ACP/evidence/quorum before promotion.
 
-- Pre‑Merge Review Gate
-  - Trigger: Pull request to protected branches.
-  - Approvers: At least one human reviewer; additional reviewers based on risk rubric.
-  - Artifacts: Code diffs, tests, lint/scan results, design notes if applicable.
-  - Blocking: Yes; branch protection requires approvals and green checks.
+- Promotion Gate
+  - Trigger: Merge to protected branch, deployment promotion, migration promotion, or other durable state transition.
+  - Requirements: ACP rule match, reversibility metadata, required evidence bundle, budget compliance, quorum attestations (ACP-2/ACP-3).
+  - Outcomes: `ALLOW`, `STAGE_ONLY`, `DENY`, or `ESCALATE` (policy-defined).
+  - Blocking: Yes; only `ALLOW` may promote durable state.
 
-- Pre‑Production Gate
-  - Trigger: Deployment of significant or high‑risk changes.
-  - Approvers: Release manager or on‑call; additional approvers for high‑risk.
-  - Artifacts: Release notes, risk rating, rollout plan, rollback plan.
-  - Blocking: Conditional; always blocking for high‑risk changes.
+- Finalization Gate
+  - Trigger: Irreversible finalize actions (`ACP-4` classes).
+  - Requirements: Explicit break-glass posture plus audited receipt trail.
+  - Outcome: Default `DENY` unless break-glass policy is active and all constraints pass.
 
-- Post‑Deployment Oversight
-  - Trigger: Production deployment completes.
-  - Approvers: On‑call engineer monitors; can halt subsequent changes or roll back.
-  - Artifacts: Monitoring dashboards, alarms, change logs.
-  - Blocking: Indirect; anomalies halt rollout or trigger rollback.
+- Post‑Promotion Oversight
+  - Trigger: ACP decision emitted for promote/finalize.
+  - Requirements: Append-only receipt + digest + decision log entry.
+  - Escalation: Humans are notified on unresolved quorum, risk threshold crossing, or policy `ESCALATE`.
 
 ### Documentation and Templates
 
-- PR template includes: “AI‑generated or automated changes require thorough review. Approver: ______.”
-- Planning template includes: “Product approval required for user‑facing changes.”
+- PR template includes: ACP decision summary, reason codes, receipt path, rollback handle.
+- Planning template includes: risk class, evidence plan, quorum plan (where required), rollback strategy.
 
 Additional templates:
 
@@ -87,7 +84,7 @@ PR template (required fields):
 - Contracts changed: link to OpenAPI/JSON Schema diff and Pact/Schemathesis reports
 - Flags & rollback: flag name(s), default OFF, and rollback plan
 
-Principle: human judgment remains the ultimate arbitrator for non‑trivial change.
+Principle: human judgment remains the ultimate arbitrator for unresolved high‑risk escalation paths.
 
 Example Kaizen PR template (`.github/PULL_REQUEST_TEMPLATE/kaizen.md`):
 

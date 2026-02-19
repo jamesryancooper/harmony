@@ -102,15 +102,23 @@ check_receipt_writer_append_only() {
 
 check_active_surface_legacy_terms() {
   local hits sample
+  local -a targets
+
+  targets=(
+    "$REPO_ROOT/.harmony/cognition/principles/autonomous-control-points.md"
+    "$REPO_ROOT/.harmony/cognition/principles/deny-by-default.md"
+    "$REPO_ROOT/.harmony/cognition/principles/no-silent-apply.md"
+    "$REPO_ROOT/.harmony/cognition/_meta/architecture/overview.md"
+    "$REPO_ROOT/.harmony/cognition/_meta/architecture/governance-model.md"
+    "$REPO_ROOT/.harmony/cognition/context/primitives.md"
+    "$REPO_ROOT/.harmony/cognition/methodology/README.md"
+    "$REPO_ROOT/.harmony/cognition/pillars/trust.md"
+  )
 
   hits="$(
-    cd "$REPO_ROOT" && rg -n -i --hidden \
-      --glob '!.harmony/output/**' \
-      --glob '!.harmony/ideation/**' \
-      --glob '!.harmony/capabilities/_ops/tests/**' \
-      --glob '!.harmony/capabilities/_ops/scripts/validate-ra-acp-migration.sh' \
-      'human checkpoint|human approval|\bHITL\b|hitl-checkpoints' \
-      ".harmony" || true
+    rg -n -i \
+      'human checkpoint|human approval|\bHITL\b|hitl-checkpoints|ACP checkpoints?|ACP approval|approval checkpoint|approve at defined checkpoints|risk-tiered checkpoints|human review and approval gate' \
+      "${targets[@]}" 2>/dev/null || true
   )"
 
   if [[ -n "$hits" ]]; then

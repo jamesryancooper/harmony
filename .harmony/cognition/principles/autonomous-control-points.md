@@ -11,7 +11,7 @@ status: Active
 
 ## What This Means
 
-Autonomous Control Points (ACPs) replace legacy runtime approval checkpoints as Harmony’s
+Autonomous Control Points (ACPs) replace legacy manual runtime checkpoints as Harmony’s
 primary mechanism for governing consequential side effects.
 
 Under **Reversible Autonomy with Human-on-the-Loop Oversight**:

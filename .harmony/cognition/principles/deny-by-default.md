@@ -30,10 +30,10 @@ and auditable.
 
 ## What Changed with Reversible Autonomy
 
-Harmony previously used *ACP checkpoints* as a primary governance mechanism for
+Harmony previously used *manual review gates* as a primary governance mechanism for
 material side effects. Under **Reversible Autonomy with Human-on-the-Loop
-Oversight**, deny-by-default remains the baseline, but **ACP approval is no longer
-a runtime dependency**.
+Oversight**, deny-by-default remains the baseline, and **ACP policy evaluation is
+the runtime dependency for promotion decisions**.
 
 Instead:
 
@@ -182,7 +182,7 @@ This keeps individual edits fast while retaining repository-level safety.
 - broad workspace write grants without expiry
 - fail-open error handling
 - policy docs that diverge from enforceable behavior
-- using ACP approval as a substitute for reversibility, evidence, and budgets
+- using manual review as a substitute for reversibility, evidence, and budgets
 
 ## Related Documentation
 

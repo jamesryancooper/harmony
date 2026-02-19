@@ -23,7 +23,7 @@ No-silent-apply prevents invisible side-effects and keeps control boundaries exp
 
 ### Pillar Alignment: Direction through Validated Discovery
 
-Human gating ensures proposed execution still aligns with user intent and risk posture.
+ACP policy gating ensures proposed execution stays within intent and risk posture.
 
 ### Quality Attributes Promoted
 
@@ -38,21 +38,23 @@ Human gating ensures proposed execution still aligns with user intent and risk p
 ```typescript
 // Good: dry-run by default
 await runner.execute({ plan, dryRun: true });
-await approvals.require('apply_changes', { risk: 'medium', diffSummary });
-await runner.apply(plan);
+const decision = await acpGate.evaluate({ phase: 'promote', risk: 'medium', diffSummary });
+if (decision === 'ALLOW') {
+  await runner.apply(plan);
+}
 ```
 
 ```python
-# Good: explicit approval gate before side-effect
+# Good: ACP policy gate before side-effect
 result = agent.run(plan=plan, dry_run=True)
-if approval_service.granted("apply_changes", payload={"risk": "high"}):
+if acp_gate.decision(phase="promote", payload={"risk": "high"}) == "ALLOW":
     agent.run(plan=plan, dry_run=False)
 ```
 
 ### ❌ Don't
 
 ```typescript
-// Bad: direct mutation without checkpoint
+// Bad: direct mutation without ACP gate
 await agent.editFiles(changes);
 await git.push('origin', 'main');
 ```
