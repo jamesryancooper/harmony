@@ -155,7 +155,7 @@ Capability enforcement operates through two complementary gates:
 
 - Skills and commands declare allowlisted tools/services.
 - Deny-by-default; unknown capabilities fail closed.
-- HITL and no-silent-apply gates apply at this layer.
+- ACP and no-silent-apply gates apply at this layer.
 
 ### Gate B: Runtime capability engine
 

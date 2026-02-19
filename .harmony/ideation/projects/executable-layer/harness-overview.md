@@ -52,7 +52,7 @@ Six contract layers stack from repo-wide safety (`AGENTS.md`) down through const
 
 ### Permissions Are Deny-by-Default
 
-Agents get no tool access, file write, or service invocation unless explicitly allowlisted. Material side effects require explicit human approval, with approval intensity scaling by risk tier.
+Agents get no tool access, file write, or service invocation unless explicitly allowlisted. Material side effects require ACP policy gate approval, with control intensity scaling by risk tier.
 
 ### The Boot Sequence
 
@@ -72,7 +72,7 @@ The harness is pure files — markdown, YAML, shell scripts. No runtime dependen
 
 ### 2. Safe Autonomy for Solo Builders
 
-A solo developer cannot be both Driver and Navigator simultaneously. The harness fills that gap with structural guardrails: deny-by-default permissions, risk-tiered human-in-the-loop checkpoints, a conscience rubric before irreversible actions, red lines that agents cannot cross, and a "no silent apply" rule (agents produce proposals, humans authorize side effects). This lets agents operate with meaningful autonomy inside bounded, observable, reversible corridors.
+A solo developer cannot be both Driver and Navigator simultaneously. The harness fills that gap with structural guardrails: deny-by-default permissions, risk-tiered ACP checkpoints, a conscience rubric before irreversible actions, red lines that agents cannot cross, and a "no silent apply" rule (agents produce proposals, ACP policy gates authorize promotion). This lets agents operate with meaningful autonomy inside bounded, observable, reversible corridors.
 
 ### 3. Institutional Memory That Survives Context Windows
 
@@ -235,7 +235,7 @@ The contract is simple: read `tasks.json` + latest `log.md` entry before startin
 
 The umbrella specification defines **numbered invariants** (HARMONY-SPEC-001 through HARMONY-SPEC-801) organized as:
 
-- **Cross-cutting rules** (001-011): domain organization, metadata-driven portability, progressive disclosure, deny-by-default, no silent apply, risk-tiered HITL, continuity integrity, quality gates, human-led boundaries, doc coupling, project bootstrap
+- **Cross-cutting rules** (001-011): domain organization, metadata-driven portability, progressive disclosure, deny-by-default, no silent apply, risk-tiered ACP, continuity integrity, quality gates, human-led boundaries, doc coupling, project bootstrap
 - **Subsystem contracts** (101, 201, 301, 501, 601, 701, 801): each domain has a boundary contract preserving its taxonomy, interaction model, and lifecycle semantics
 
 Safety invariants compound across layers:
@@ -243,7 +243,7 @@ Safety invariants compound across layers:
 - **Constitution** -> red lines, conscience rubric, escalation triggers
 - **Deny-by-default** -> allowlist-based permissions, fail-closed
 - **No silent apply** -> agents propose, humans authorize
-- **HITL checkpoints** -> approval intensity scales with risk tier
+- **ACP checkpoints** -> approval intensity scales with risk tier
 - **Quality gates** -> definition-of-done and session-exit gates must pass before completion
 
 ---
@@ -328,7 +328,7 @@ Together these pillars create a self-reinforcing system: Direction ensures we bu
 | HARMONY-SPEC-002 | Portability Is Metadata-Driven | Portable assets and resolution rules declared in `harmony.yml` |
 | HARMONY-SPEC-003 | Progressive-Disclosure Discovery | Routable capabilities use manifest -> registry -> definition |
 | HARMONY-SPEC-004 | Deny-by-Default Permissions | Agent access is allowlist-based and fail-closed |
-| HARMONY-SPEC-005 | No Silent Apply for Material Side Effects | Material side effects require explicit human approval |
+| HARMONY-SPEC-005 | No Silent Apply for Material Side Effects | Material side effects require ACP policy approval |
 | HARMONY-SPEC-006 | Risk-Tiered Human Governance | Approval intensity scales with risk tier |
 | HARMONY-SPEC-007 | Continuity Artifact Integrity | Append-only artifacts preserve historical integrity |
 | HARMONY-SPEC-008 | Completion and Exit Quality Gates | Tasks must satisfy definition-of-done and session-exit gates |
@@ -359,5 +359,5 @@ Together these pillars create a self-reinforcing system: Direction ensures we bu
 | Reversibility | Ensure every material change has a tested rollback path |
 | Idempotency | Make mutating operations safe under retries and partial failures |
 | Guardrails | Apply policy/eval/security gates fail-closed across agent loops |
-| HITL Checkpoints | Use risk-tiered human checkpoints at consequential decisions |
+| ACP Checkpoints | Use risk-tiered ACP checkpoints at consequential decisions |
 | Documentation is Code | Version specs, ADRs, and runbooks with the same rigor as implementation |
