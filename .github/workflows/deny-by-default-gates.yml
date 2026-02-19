@@ -1,0 +1,39 @@
+name: Deny-by-Default Gates
+
+on:
+  pull_request:
+    paths:
+      - '.harmony/capabilities/_ops/**'
+      - '.harmony/capabilities/services/**'
+      - '.harmony/capabilities/skills/**'
+      - '.harmony/runtime/crates/policy_engine/**'
+  push:
+    paths:
+      - '.harmony/capabilities/_ops/**'
+      - '.harmony/capabilities/services/**'
+      - '.harmony/capabilities/skills/**'
+      - '.harmony/runtime/crates/policy_engine/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Validate deny-by-default contract and enforcement (strict)
+        run: |
+          chmod +x .harmony/capabilities/_ops/scripts/validate-deny-by-default.sh
+          .harmony/capabilities/_ops/scripts/validate-deny-by-default.sh --all --profile strict
+
+      - name: Friction SLO report
+        run: |
+          chmod +x .harmony/capabilities/_ops/scripts/policy-rollout-mode.sh
+          .harmony/capabilities/_ops/scripts/policy-rollout-mode.sh slo-report

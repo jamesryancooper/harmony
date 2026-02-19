@@ -35,7 +35,11 @@ impl:
   timeout_ms: 30000
   health_check: null
 dry_run: true
-allowed-tools: Read Glob Grep
+# Deny-by-default baseline:
+# - Use Bash(<command>) only; never bare Bash
+# - Use Write(<path>/*) only; never bare Write
+# - Broad scopes (e.g., ** ) require a time-boxed exception lease
+allowed-tools: Read Glob Grep Bash(bash)
 ---
 
 # {{service-id}}

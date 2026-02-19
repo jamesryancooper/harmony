@@ -39,7 +39,7 @@ impl:
   timeout_ms: 30000
   health_check: null
 dry_run: true
-allowed-tools: Read Glob Grep Bash
+allowed-tools: Read Glob Grep Bash(bash)
 ---
 
 # Playbook Service

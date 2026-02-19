@@ -3,6 +3,12 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Enforce deny-by-default policy at runtime for this shell service.
+source "$SCRIPT_DIR/../../../_ops/scripts/enforce-deny-by-default.sh"
+harmony_enforce_service_policy "capability-bind" "$0" "$@"
+
+
 emit_output() {
   local status="$1"
   local command="$2"

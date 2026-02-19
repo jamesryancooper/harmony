@@ -4395,6 +4395,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "policy_engine"
+version = "1.0.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "glob",
+ "jsonschema",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "thiserror 1.0.69",
+ "time",
+]
+
+[[package]]
 name = "polling"
 version = "3.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

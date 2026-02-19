@@ -7,390 +7,129 @@ status: Active
 
 # Deny by Default
 
-> Agents and systems have no permissions until explicitly granted. Start with zero access; add only what's needed.
+> Agents and systems have no permissions until explicitly granted. Start with zero access; add only what is needed.
 
-## What This Means
+## Purpose
 
-Deny by default is a security principle: rather than allowing everything and blocking specific threats (blocklist), allow nothing and explicitly permit specific actions (allowlist).
+Deny by default means Harmony grants no operational permissions unless they are
+explicitly allowlisted. Any missing, unknown, or ambiguous permission decision
+must fail closed.
 
-In Harmony, this applies especially to AI agents:
-- Agents cannot access tools until granted
-- Agents cannot write files outside designated paths
-- Agents cannot perform destructive actions without explicit permission
-- Skills operate within bounded capability sets
+This principle applies to:
 
-This is the principle of least privilege applied systematically.
+- tool access
+- filesystem writes
+- network access
+- service capability grants
+- exception handling and temporary elevation
 
 ## Why It Matters
 
-### Pillar Alignment: Trust through Governed Determinism
+- Limits blast radius from faulty prompts, code, or model behavior.
+- Preserves deterministic behavior across agent and service executions.
+- Makes policy intent auditable and reviewable.
+- Enables safe autonomous operation when no human is in the loop.
 
-The Trust pillar promises "agents are bounded, security is enforced." Deny by default delivers this by:
+## Enforced Model in Harmony
 
-- **Limiting blast radius**: Misbehaving agents can only affect what they're permitted to affect
-- **Enabling audit**: All permitted actions are explicitly listed and traceable
-- **Preventing accidents**: Dangerous operations require conscious enablement
+Harmony currently uses two enforcement lanes plus shared validation:
 
-### Defense in Depth
+1. Runtime service lane (WASM/native runtime):
+   - Services declare `capabilities_required` in `service.json`.
+   - Runtime policy allowlists live in `.harmony/runtime/config/policy.yml`.
+   - Runtime policy engine grants only declared capabilities and denies missing
+     capabilities (`.harmony/runtime/crates/core/src/policy.rs`).
 
-Deny by default works with other security layers:
+2. Skill and shell-service lane:
+   - `allowed-tools` in `SKILL.md` and `SERVICE.md` is authoritative for tool
+     and scoped write declarations.
+   - Validation scripts fail active artifacts that use unscoped or disallowed
+     patterns.
+   - Execution wrappers enforce scoped permissions at runtime before launching
+     shell entrypoints.
 
-```
-Layer 1: Deny by default (agent can't even try)
-Layer 2: Validation (input is checked if permitted)
-Layer 3: Sandboxing (execution is isolated)
-Layer 4: Audit (all actions are logged)
-```
+3. Shared safety invariants:
+   - deny-by-default baseline (`allow: []` unless explicit allowlist)
+   - fail-closed on parse/evaluation/enforcement errors
+   - auditable denial/elevation records
 
-If any layer fails, the others provide protection.
+## Permission Vocabulary
 
-### The Agent Safety Problem
+Harmony uses allowlisted tokens such as:
 
-AI agents can be surprisingly creative in achieving goals. Without explicit boundaries:
-- An agent asked to "clean up the codebase" might delete important files
-- An agent asked to "improve performance" might remove safety checks
-- An agent given shell access might run dangerous commands
+- `Read`, `Glob`, `Grep`, `Edit`
+- `Write(<scoped-path>)` with explicit path scope only
+- `Bash(<scoped-command>)` with explicit command scope only
+- `WebFetch`, `WebSearch`, `Task`, and approved packs
 
-Deny by default ensures agents operate within intended boundaries regardless of how goals are interpreted.
+Rules:
 
-## In Practice
+- Bare `Bash` and bare `Write` are prohibited for active skills and services.
+- Broad write scopes (for example, workspace-root recursive globs) require a
+  time-boxed exception lease.
+- Unknown tools are denied.
 
-### The Three-Tier Permission Model
+## Fail-Closed Requirements
 
-Harmony skills operate under a three-tier permission model:
+Any of the following must return deny and stop execution:
 
-| Tier | Description | Example |
-|------|-------------|---------|
-| Allowed | Explicitly permitted actions | Write to `.harmony/capabilities/skills/outputs/` |
-| Requires Approval | Permitted with human confirmation | Modify source files |
-| Denied | Never permitted | Delete files, access secrets, network calls |
+- missing policy data
+- unknown tool token or malformed scope
+- path/command scope mismatch
+- capability required but not granted
+- expired or missing exception metadata
 
-### ✅ Do
+No permissive fallback is allowed.
 
-**Define explicit output paths:**
+## Exception Protocol (Time-Boxed Elevation)
 
-```yaml
-# .harmony/capabilities/skills/registry.yml
-skills:
-  - id: code-analyzer
-    outputs:
-      allowed:
-        - .harmony/capabilities/skills/outputs/code-analyzer/**
-      requires_approval:
-        - src/**/*.ts  # Can suggest edits, human approves
-      denied:
-        - .env*
-        - secrets/**
-        - node_modules/**
-```
+Temporary elevation is allowed only when all fields are present:
 
-**Validate paths before operations:**
+- `id`
+- `scope` (`skill` or `service`)
+- `target`
+- `rule`
+- `owner`
+- `reason`
+- `created`
+- `expires`
 
-```typescript
-// Good: Explicit path validation
-function validateOutputPath(path: string, allowedPaths: string[]): boolean {
-  const resolved = resolve(path);
-  return allowedPaths.some(allowed => 
-    resolved.startsWith(resolve(allowed))
-  );
-}
+Exception leases must be stored in a tracked policy file, validated in CI, and
+rejected when expired. Permanent broad permissions are not allowed.
 
-async function writeOutput(path: string, content: string) {
-  if (!validateOutputPath(path, skill.outputs.allowed)) {
-    throw new SecurityError(`Path not in allowed list: ${path}`);
-  }
-  await fs.writeFile(path, content);
-}
-```
+## Human-in-the-Loop and Agent-Only Modes
 
-**Use capability-based tool access:**
+Deny-by-default supports both modes:
 
-```yaml
-# skill definition
-tools:
-  allowed:
-    - read_file
-    - write_output
-    - grep
-  denied:
-    - shell          # Too broad
-    - delete_file    # Destructive
-    - network_fetch  # External access
-```
+- HITL mode: high-risk actions may require explicit human confirmation.
+- Agent-only mode: policy packages replace manual approvals using risk tiers,
+  separation-of-duties checks, and automatic rollback/kill-switch behavior.
 
-**Log all permission checks:**
+In both modes, enforcement remains fail-closed and deterministic.
 
-```typescript
-// Good: Audit trail for permission decisions
-function checkPermission(action: string, resource: string): boolean {
-  const allowed = policy.isAllowed(action, resource);
-  
-  audit.log({
-    timestamp: Date.now(),
-    action,
-    resource,
-    allowed,
-    skill_id: currentSkill.id,
-    trace_id: context.traceId
-  });
-  
-  return allowed;
-}
-```
+## Development Speed Guidance
 
-**Fail closed on ambiguity:**
+Deny-by-default should not block normal low-risk iteration. Harmony uses:
 
-```typescript
-// Good: Deny when uncertain
-function resolvePermission(action: string): Permission {
-  const explicit = policy.getExplicit(action);
-  
-  if (explicit === undefined) {
-    // No explicit permission = denied
-    return Permission.DENIED;
-  }
-  
-  return explicit;
-}
-```
+- low-risk `dev-fast` profiles with pre-scoped safe defaults
+- policy suggestion tooling for minimal required grants
+- precise denial diagnostics that point to exact remediation
+- short-lived exception leases instead of permanent broad access
 
-### ❌ Don't
+This keeps individual edits fast while retaining repository-level safety.
 
-**Don't use blocklists for security:**
+## Anti-Patterns
 
-```yaml
-# Bad: Blocklist approach (will miss threats)
-tools:
-  blocked:
-    - rm
-    - delete
-    - drop
-  # Everything else allowed — dangerous!
-
-# Good: Allowlist approach
-tools:
-  allowed:
-    - read
-    - write_output
-    - search
-  # Everything else denied by default
-```
-
-**Don't grant broad permissions:**
-
-```yaml
-# Bad: Overly permissive
-outputs:
-  allowed:
-    - "**/*"  # Can write anywhere!
-
-# Good: Specific, minimal permissions
-outputs:
-  allowed:
-    - .harmony/capabilities/skills/outputs/this-skill/**
-```
-
-**Don't trust agent-provided paths:**
-
-```typescript
-// Bad: Agent controls path
-async function saveResult(agentProvidedPath: string, content: string) {
-  await fs.writeFile(agentProvidedPath, content);  // Path injection!
-}
-
-// Good: Agent provides key, system controls path
-async function saveResult(resultKey: string, content: string) {
-  const safePath = join(OUTPUTS_DIR, sanitize(resultKey));
-  await fs.writeFile(safePath, content);
-}
-```
-
-**Don't fail open:**
-
-```typescript
-// Bad: Fail open
-async function executeAction(action: Action) {
-  try {
-    const allowed = await checkPermission(action);
-    if (!allowed) throw new Error('Denied');
-  } catch (e) {
-    // Permission check failed, proceed anyway — dangerous!
-    console.warn('Permission check failed, allowing');
-  }
-  await action.execute();
-}
-
-// Good: Fail closed
-async function executeAction(action: Action) {
-  let allowed = false;
-  try {
-    allowed = await checkPermission(action);
-  } catch (e) {
-    // Permission check failed = denied
-    audit.log({ action, error: e, decision: 'denied' });
-    throw new SecurityError('Permission check failed');
-  }
-  
-  if (!allowed) {
-    throw new SecurityError('Action not permitted');
-  }
-  
-  await action.execute();
-}
-```
-
-## Implementation Patterns
-
-### Skill Permission Schema
-
-```yaml
-# SKILL.md frontmatter
-permissions:
-  files:
-    read:
-      - src/**/*.ts
-      - docs/**/*.md
-    write:
-      - .harmony/capabilities/skills/outputs/{{skill_id}}/**
-    deny:
-      - .env*
-      - secrets/**
-      - "**/*.key"
-  
-  tools:
-    allowed:
-      - read_file
-      - write_output
-      - grep
-      - glob
-    requires_approval:
-      - edit_file
-    denied:
-      - shell
-      - delete
-      - network
-  
-  resources:
-    cpu_seconds: 60
-    memory_mb: 512
-    output_size_mb: 10
-```
-
-### Hierarchical Scope Validation
-
-```typescript
-// Harness hierarchy determines write permissions
-function canWrite(harness: Harness, targetPath: string): boolean {
-  const target = resolve(targetPath);
-  const harnessRoot = resolve(harness.path);
-
-  // Can write within own harness
-  if (target.startsWith(harnessRoot)) {
-    return true;
-  }
-
-  // Can write to descendant harnesses
-  if (isDescendant(harness, targetPath)) {
-    return true;
-  }
-  
-  // Cannot write to ancestors or siblings
-  return false;
-}
-```
-
-### Human-in-the-Loop for Elevated Permissions
-
-```typescript
-async function executeWithApproval(action: Action): Promise<void> {
-  const permission = policy.getPermission(action);
-  
-  switch (permission) {
-    case 'allowed':
-      await action.execute();
-      break;
-      
-    case 'requires_approval':
-      const approved = await requestHumanApproval({
-        action: action.describe(),
-        risk: action.riskLevel,
-        reversible: action.isReversible
-      });
-      
-      if (approved) {
-        await action.execute();
-      } else {
-        throw new Error('Human denied action');
-      }
-      break;
-      
-    case 'denied':
-    default:
-      throw new SecurityError('Action not permitted');
-  }
-}
-```
-
-### Sandbox Enforcement
-
-```typescript
-// Runtime sandbox for skill execution
-const sandbox = createSandbox({
-  filesystem: {
-    read: skill.permissions.files.read,
-    write: skill.permissions.files.write,
-    // Everything else blocked at syscall level
-  },
-  network: false,  // No network by default
-  subprocess: false,  // No shell by default
-  resourceLimits: skill.permissions.resources
-});
-
-await sandbox.execute(skill.entrypoint);
-```
-
-## Relationship to Other Principles
-
-| Principle | Relationship |
-|-----------|--------------|
-| Locality | Scope boundaries naturally limit permissions |
-| HITL Checkpoints | Elevated permissions require human approval |
-| Reversibility | Even permitted actions should be reversible |
-| Determinism | Predictable permission decisions |
-
-## Exceptions
-
-Broader permissions may be granted when:
-
-- **Interactive sessions**: Human is actively reviewing agent actions
-- **Trusted automation**: Well-tested, versioned automation pipelines
-- **Recovery operations**: Incident response may need elevated access
-
-For these cases:
-1. Require explicit opt-in per session
-2. Log all elevated actions
-3. Time-box elevated permissions
-4. Review audit logs post-session
-
-## Anti-Pattern: Implicit Trust
-
-The primary failure mode of ignoring deny-by-default is **implicit trust** — assuming agents will behave well without enforcement.
-
-Signs of implicit trust:
-- "The agent knows not to delete important files"
-- Broad `**/*` permissions in configurations
-- No permission checks in skill implementations
-- Missing audit logs for agent actions
-
-Prevention:
-- Start with zero permissions, add explicitly
-- Validate every path and action
-- Log every permission decision
-- Review agent audit trails regularly
+- blocklist-first policy
+- unscoped `Bash` or `Write`
+- broad workspace write grants without expiry
+- fail-open error handling
+- policy docs that diverge from enforceable runtime behavior
 
 ## Related Documentation
 
-- [Trust Pillar](../pillars/trust.md) — Bounded agents, enforced security
-- [HITL Checkpoints](./hitl-checkpoints.md) — Human approval for elevated actions
-- [Skills Specification](../../capabilities/_meta/architecture/specification.md) — Permission model details
-- [Agentic Principles](./README.md#agentic-principles) — Full agent governance model
+- [Trust Pillar](../pillars/trust.md)
+- [HITL Checkpoints](./hitl-checkpoints.md)
+- [Skills Specification](../../capabilities/_meta/architecture/specification.md)
+- [Runtime Policy](../_meta/architecture/runtime-policy.md)
+- [ADR 019](../decisions/019-deny-by-default-uniform-enforcement-and-agent-only-operation.md)

@@ -25,6 +25,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Validate harness structure
         run: |
           chmod +x .harmony/assurance/_ops/scripts/validate-harness-structure.sh
@@ -44,6 +47,11 @@ jobs:
         run: |
           chmod +x .harmony/capabilities/services/_ops/scripts/validate-service-independence.sh
           .harmony/capabilities/services/_ops/scripts/validate-service-independence.sh
+
+      - name: Validate deny-by-default (strict)
+        run: |
+          chmod +x .harmony/capabilities/_ops/scripts/validate-deny-by-default.sh
+          .harmony/capabilities/_ops/scripts/validate-deny-by-default.sh --all --profile strict
 
       - name: Validate agency contracts
         run: |

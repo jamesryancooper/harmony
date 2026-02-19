@@ -1,0 +1,9 @@
+exceptions:
+  - id: service-agent-broad-write
+    scope: service
+    target: agent
+    rule: broad_write_scope
+    owner: agency/test
+    reason: broad write for tests
+    created: 2026-01-01
+    expires: 2026-12-31

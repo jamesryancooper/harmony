@@ -1,0 +1,5 @@
+services:
+  - id: agent
+    path: execution/agent
+    status: active
+    interface_type: shell

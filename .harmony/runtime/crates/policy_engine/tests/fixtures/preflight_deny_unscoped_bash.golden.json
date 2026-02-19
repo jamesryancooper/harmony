@@ -1,0 +1,1 @@
+{"allow":false,"mode":"hard-enforce","deny":{"code":"DDB004_UNSCOPED_BASH","scope":"service","target":"agent"}}

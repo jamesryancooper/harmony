@@ -22,6 +22,7 @@ Invocation │   Tools           │   Services             │
 | Subdirectory | Model | Purpose | Discovery |
 |---|---|---|---|
 | `_meta/architecture/` | Documentation | Capabilities subsystem architecture and contracts | `_meta/architecture/README.md` |
+| `_ops/` | Shared policy ops | Cross-lane deny-by-default exception leases, agent-only policy, and validation entrypoints | `_ops/README.md` |
 | `commands/` | Instruction-driven, atomic | Deterministic one-shot operations | `commands/manifest.yml` |
 | `skills/` | Instruction-driven, composite | Multi-step workflows with references and contracts | `skills/manifest.yml` |
 | `tools/` | Invocation-driven, atomic | Tool packs and custom tool definitions | `tools/manifest.yml` |
@@ -39,3 +40,5 @@ Invocation │   Tools           │   Services             │
 - Existing `allowed-tools` declarations remain valid.
 - `allowed-tools` now supports `pack:<id>` expansion through `tools/manifest.yml`.
 - Skills may optionally declare `allowed-services` with IDs from `services/manifest.yml`.
+- Deny-by-default uses a shared policy engine (`harmony-policy`) for runtime and
+  validation parity, driven by `.harmony/capabilities/_ops/policy/deny-by-default.v2.yml`.

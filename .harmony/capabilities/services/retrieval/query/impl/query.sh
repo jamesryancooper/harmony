@@ -4,6 +4,12 @@
 set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Enforce deny-by-default policy at runtime for this shell service.
+source "$SCRIPT_DIR/../../../_ops/scripts/enforce-deny-by-default.sh"
+harmony_enforce_service_policy "query" "$0" "$@"
+
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SIGNALS_DIR="$SCRIPT_DIR/signals"
 SERVICE_VERSION="0.1.0"
 SERVICE_NAME="harmony.service.query"
