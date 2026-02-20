@@ -14,9 +14,10 @@ Actor configuration in `agency/`:
 | Artifact | Description |
 |----------|-------------|
 | `agency/manifest.yml` | Actor discovery and routing metadata |
-| `agency/agents/registry.yml` | Supervisor definitions and delegation policy |
-| `agency/assistants/registry.yml` | Assistant aliases and escalation policy |
-| `agency/teams/registry.yml` | Reusable multi-actor compositions |
+| `agency/governance/` | Cross-agent governance contracts and precedence overlays |
+| `agency/actors/agents/registry.yml` | Supervisor definitions and delegation policy |
+| `agency/actors/assistants/registry.yml` | Assistant aliases and escalation policy |
+| `agency/actors/teams/registry.yml` | Reusable multi-actor compositions |
 
 ## Commands
 

@@ -5,12 +5,12 @@
 Adopt the default agent persona defined by the harness:
 
 - **Default agent:** `architect` (per `.harmony/agency/manifest.yml`)
-- **Constitution:** `.harmony/agency/CONSTITUTION.md`
-- **Delegation policy:** `.harmony/agency/DELEGATION.md`
-- **Memory policy:** `.harmony/agency/MEMORY.md`
-- **Execution contract:** `.harmony/agency/agents/architect/AGENT.md`
-- **Identity contract:** `.harmony/agency/agents/architect/SOUL.md`
-- **All agents:** `.harmony/agency/agents/registry.yml`
+- **Constitution:** `.harmony/agency/governance/CONSTITUTION.md`
+- **Delegation policy:** `.harmony/agency/governance/DELEGATION.md`
+- **Memory policy:** `.harmony/agency/governance/MEMORY.md`
+- **Execution contract:** `.harmony/agency/actors/agents/architect/AGENT.md`
+- **Identity contract:** `.harmony/agency/actors/agents/architect/SOUL.md`
+- **All agents:** `.harmony/agency/actors/agents/registry.yml`
 
 Read and follow your agent contract before beginning work.
 
@@ -41,7 +41,7 @@ structure, read `.harmony/START.md`.
 `.harmony/` is organized by domain. Each domain has a `README.md` for
 orientation.
 
-- **Agency:** `.harmony/agency/` (agents, assistants, teams)
+- **Agency:** `.harmony/agency/` (actors, governance, practices)
 - **Capabilities:** `.harmony/capabilities/` (skills, commands, tools)
   - Commands: `.harmony/capabilities/commands/manifest.yml`
 - **Cognition:** `.harmony/cognition/` (architecture, principles, methodology, context, decisions, analyses)

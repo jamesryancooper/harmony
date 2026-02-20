@@ -32,9 +32,12 @@ description: Boot sequence and orientation for this harness
 │
 ├── agency/
 │   ├── manifest.yml    ← Actor discovery and routing metadata
-│   ├── agents/         ← Autonomous supervisors
-│   ├── assistants/     ← Focused specialists (@mention invocation)
-│   └── teams/          ← Reusable multi-actor compositions
+│   ├── governance/     ← Cross-agent contracts (constitution, delegation, memory)
+│   ├── actors/
+│   │   ├── agents/     ← Autonomous supervisors
+│   │   ├── assistants/ ← Focused specialists (@mention invocation)
+│   │   └── teams/      ← Reusable multi-actor compositions
+│   └── practices/      ← Collaboration and delivery practices
 │
 ├── scaffolding/
 │   └── prompts/    ← Task templates (add as needed)

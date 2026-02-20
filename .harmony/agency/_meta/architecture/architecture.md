@@ -105,8 +105,8 @@ graph TD
 
 | Layer | Concern | Primary Artifacts |
 |---|---|---|
-| L1 | Actor identity and routing | `agency/manifest.yml`, actor registries |
-| L2 | Cross-agent governance contracts | `CONSTITUTION.md`, `DELEGATION.md`, `MEMORY.md` |
+| L1 | Actor identity and routing | `agency/manifest.yml`, `actors/*/registry.yml` |
+| L2 | Cross-agent governance contracts | `governance/CONSTITUTION.md`, `governance/DELEGATION.md`, `governance/MEMORY.md` |
 | L3 | Actor behavior contracts | `AGENT.md`, `SOUL.md`, `assistant.md`, `team.md` |
 | L4 | Capability execution | skills and workflows |
 | L5 | Durable progress/state | missions, continuity, cognition |
@@ -116,7 +116,7 @@ graph TD
 
 ### Boundary 0: Governance Precedence
 
-- Cross-agent governance (`CONSTITUTION.md`, `DELEGATION.md`, `MEMORY.md`) constrains all per-agent behavior.
+- Cross-agent governance (`governance/CONSTITUTION.md`, `governance/DELEGATION.md`, `governance/MEMORY.md`) constrains all per-agent behavior.
 - Per-agent contracts can specialize behavior but cannot override governance red lines.
 
 ### Boundary 1: Orchestration vs Capability
@@ -182,7 +182,7 @@ Operationally required controls:
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Legacy docs/config continue to reference `subagents/` | Routing confusion | Compatibility shim + explicit deprecation lint |
+| Legacy docs/config continue to reference `subagents/` | Routing confusion | Clean-break banlist + explicit deprecation lint |
 | Teams become redundant with workflows | Modeling drift | Define team as composition only; workflow remains procedure source of truth |
 | Skills start orchestrating actors | Circular complexity | Policy gate: no actor orchestration from skills without explicit delegator exemption |
 | Alias collisions across nested harnesses | Misrouting | Enforce nearest-scope precedence + uniqueness checks |
@@ -196,8 +196,8 @@ Operationally required controls:
 
 ### Phase 2
 
-- Migrate `subagents/` content into `agents/` or `assistants/` as needed.
-- Mark `subagents/` deprecated and block new usage.
+- Migrate `subagents/` content into canonical actor paths.
+- Remove `subagents/` from active topology in the same migration.
 
 ### Phase 3
 
@@ -206,7 +206,7 @@ Operationally required controls:
 
 ### Phase 4
 
-- Remove compatibility shim and delete `subagents/` path.
+- Remove `subagents/` path.
 
 ## Observability
 

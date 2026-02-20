@@ -130,9 +130,12 @@ check_meta_namespace_layout() {
 
 check_discovery_contracts() {
   require_file "$HARMONY_DIR/agency/manifest.yml"
-  require_file "$HARMONY_DIR/agency/agents/registry.yml"
-  require_file "$HARMONY_DIR/agency/assistants/registry.yml"
-  require_file "$HARMONY_DIR/agency/teams/registry.yml"
+  require_file "$HARMONY_DIR/agency/actors/agents/registry.yml"
+  require_file "$HARMONY_DIR/agency/actors/assistants/registry.yml"
+  require_file "$HARMONY_DIR/agency/actors/teams/registry.yml"
+  require_file "$HARMONY_DIR/agency/governance/CONSTITUTION.md"
+  require_file "$HARMONY_DIR/agency/governance/DELEGATION.md"
+  require_file "$HARMONY_DIR/agency/governance/MEMORY.md"
 
   require_file "$HARMONY_DIR/capabilities/commands/manifest.yml"
   require_file "$HARMONY_DIR/capabilities/skills/manifest.yml"
@@ -146,9 +149,11 @@ check_discovery_contracts() {
 }
 
 check_expected_internals() {
-  require_dir "$HARMONY_DIR/agency/agents"
-  require_dir "$HARMONY_DIR/agency/assistants"
-  require_dir "$HARMONY_DIR/agency/teams"
+  require_dir "$HARMONY_DIR/agency/actors"
+  require_dir "$HARMONY_DIR/agency/actors/agents"
+  require_dir "$HARMONY_DIR/agency/actors/assistants"
+  require_dir "$HARMONY_DIR/agency/actors/teams"
+  require_dir "$HARMONY_DIR/agency/governance"
 
   require_dir "$HARMONY_DIR/capabilities/skills"
   require_dir "$HARMONY_DIR/capabilities/commands"

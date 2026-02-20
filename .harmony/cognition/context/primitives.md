@@ -53,11 +53,11 @@ The primitives form a hierarchical multi-agent system:
 
 ## Agents
 
-**Location:** `.harmony/agency/agents/<agent-name>/AGENT.md` + `.harmony/agency/agents/<agent-name>/SOUL.md`
+**Location:** `.harmony/agency/actors/agents/<agent-name>/AGENT.md` + `.harmony/agency/actors/agents/<agent-name>/SOUL.md`
 
-**Cross-agent overlays:** `.harmony/agency/CONSTITUTION.md`, `.harmony/agency/DELEGATION.md`, `.harmony/agency/MEMORY.md`
+**Cross-agent overlays:** `.harmony/agency/governance/CONSTITUTION.md`, `.harmony/agency/governance/DELEGATION.md`, `.harmony/agency/governance/MEMORY.md`
 
-**Registry:** `.harmony/agency/agents/registry.yml`
+**Registry:** `.harmony/agency/actors/agents/registry.yml`
 
 **Purpose:** Autonomous supervisors that orchestrate complex work, command missions, and delegate to assistants.
 
@@ -266,9 +266,9 @@ See `.harmony/capabilities/_meta/architecture/` for migration guidance.
 
 ## Assistants
 
-**Location:** `.harmony/agency/assistants/<assistant-name>/assistant.md`
+**Location:** `.harmony/agency/actors/assistants/<assistant-name>/assistant.md`
 
-**Registry:** `.harmony/agency/assistants/registry.yml`
+**Registry:** `.harmony/agency/actors/assistants/registry.yml`
 
 **Purpose:** Specialized subagents that perform focused tasks for agents or humans within the multi-agent hierarchy.
 
@@ -577,11 +577,11 @@ Registry supports `pipelines` section for skill composition without manual orche
 
 | Primitive | Registry | Template | Documentation |
 |-----------|----------|----------|---------------|
-| Agents | `.harmony/agency/agents/registry.yml` | `.harmony/agency/agents/_scaffold/template/` | `.harmony/agency/_meta/architecture/README.md` |
-| Teams | `.harmony/agency/teams/registry.yml` | `.harmony/agency/teams/_scaffold/template/` | `.harmony/agency/_meta/architecture/architecture.md` |
+| Agents | `.harmony/agency/actors/agents/registry.yml` | `.harmony/agency/actors/agents/_scaffold/template/` | `.harmony/agency/_meta/architecture/README.md` |
+| Teams | `.harmony/agency/actors/teams/registry.yml` | `.harmony/agency/actors/teams/_scaffold/template/` | `.harmony/agency/_meta/architecture/architecture.md` |
 | Missions | `.harmony/orchestration/missions/registry.yml` | `.harmony/orchestration/missions/_scaffold/template/` | `.harmony/orchestration/_meta/architecture/missions.md` |
 | Skills | `.harmony/capabilities/skills/registry.yml` | `.harmony/capabilities/skills/_scaffold/template/` | `.harmony/capabilities/_meta/architecture/` |
-| Assistants | `.harmony/agency/assistants/registry.yml` | `.harmony/agency/assistants/_scaffold/template/` | `.harmony/agency/_meta/architecture/README.md` |
+| Assistants | `.harmony/agency/actors/assistants/registry.yml` | `.harmony/agency/actors/assistants/_scaffold/template/` | `.harmony/agency/_meta/architecture/README.md` |
 | Commands | — | — | `.harmony/capabilities/_meta/architecture/commands.md` |
 | Checklists | — | — | `.harmony/assurance/_meta/architecture/checklists.md` |
 | Prompts | — | — | `.harmony/scaffolding/_meta/architecture/prompts.md` |

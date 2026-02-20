@@ -19,6 +19,7 @@ Key decisions that constrain or guide work in this harness. For full rationale, 
 - [ADR-008](../decisions/008-skills-architecture-refactor.md) — Skills architecture refactor and agentskills.io alignment (D027, D028, D029, D030, D031, D032)
 - [ADR-009](../decisions/009-manifest-discovery-and-validation.md) — Manifest-based discovery and validation tooling (D033, D034, D035, D036, D037, D038, D039)
 - [ADR-011](../decisions/011-agency-subsystem-finalization.md) — Agency subsystem finalization and actor taxonomy consolidation (D043)
+- [ADR-021](../decisions/021-bounded-surfaces-contract-and-agency-migration.md) — Bounded surfaces contract and agency clean-break migration (D045)
 
 ## Active Decisions
 
@@ -67,6 +68,7 @@ Key decisions that constrain or guide work in this harness. For full rationale, 
 | D042 | Reference knowledge skills in manifest | Foundation children with `specialist` skill set appear in manifest.yml with triggers | Unlike scaffolding children (`disable-model-invocation: true`), reference knowledge skills are independently invocable and need manifest triggers for routing | 2026-02-09 |
 | D043 | Agency actor taxonomy | Canonical artifact model is agents + assistants + teams | `subagents/` removed as first-class artifact; routing and validation now use `agency/manifest.yml` and actor registries | 2026-02-11 |
 | D044 | Immutable engineering charter | `.harmony/cognition/principles/principles.md` is immutable (`mutability: immutable`, `agent_editable: false`) | Agents must not modify the charter; policy evolution requires a versioned successor plus ADR | 2026-02-20 |
+| D045 | Bounded surface separation | Separate runtime artifacts, governance contracts, and operating practices where materially applicable | First rollout is clean-break migration of agency to `actors/`, `governance/`, and `practices/` with CI enforcement of legacy-path removal | 2026-02-20 |
 
 ## Decision Format
 

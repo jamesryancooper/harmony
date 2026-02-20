@@ -11,7 +11,9 @@ This harness extends `.harmony/` for shared infrastructure.
 
 | Component | Local (Project-Specific) | Shared (in `.harmony/`) |
 |-----------|--------------------------|-------------------------|
-| Assistants | `.harmony/agency/assistants/` | `.harmony/agency/assistants/` |
+| Agents | `.harmony/agency/actors/agents/` | `.harmony/agency/actors/agents/` |
+| Assistants | `.harmony/agency/actors/assistants/` | `.harmony/agency/actors/assistants/` |
+| Teams | `.harmony/agency/actors/teams/` | `.harmony/agency/actors/teams/` |
 | Templates | `.harmony/scaffolding/templates/` | `.harmony/scaffolding/templates/` |
 | Workflows | `.harmony/orchestration/workflows/` | `.harmony/orchestration/workflows/` |
 | Skills | `.harmony/capabilities/skills/` | `.harmony/capabilities/skills/` |
@@ -52,10 +54,13 @@ Subsystem expansion specs:
 ├── agency/
 │   ├── manifest.yml    ← Actor registry discovery
 │   ├── _meta/architecture/   ← Agency subsystem specification
+│   ├── governance/     ← Cross-agent contracts (constitution, delegation, memory)
+│   ├── actors/         ← Runtime actor artifacts
+│   │   ├── agents/     ← Autonomous supervisors
+│   │   ├── assistants/ ← Focused specialists (@mention invocation)
+│   │   └── teams/      ← Reusable multi-actor compositions
 │   ├── practices/      ← Collaboration and delivery practices
-│   ├── agents/         ← Autonomous supervisors
-│   ├── assistants/     ← Focused specialists (@mention invocation)
-│   └── teams/          ← Reusable multi-actor compositions
+│   └── _ops/           ← Validation scripts and operational checks
 │
 ├── capabilities/
 │   ├── _meta/architecture/   ← Capabilities subsystem specification

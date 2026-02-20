@@ -6,12 +6,12 @@ AGENCY_DIR="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
 ROOT_DIR="$(cd -- "$AGENCY_DIR/.." && pwd)"
 
 MANIFEST="$AGENCY_DIR/manifest.yml"
-AGENTS_REG="$AGENCY_DIR/agents/registry.yml"
-ASSISTANTS_REG="$AGENCY_DIR/assistants/registry.yml"
-TEAMS_REG="$AGENCY_DIR/teams/registry.yml"
-CONSTITUTION_FILE="$AGENCY_DIR/CONSTITUTION.md"
-DELEGATION_FILE="$AGENCY_DIR/DELEGATION.md"
-MEMORY_FILE="$AGENCY_DIR/MEMORY.md"
+AGENTS_REG="$AGENCY_DIR/actors/agents/registry.yml"
+ASSISTANTS_REG="$AGENCY_DIR/actors/assistants/registry.yml"
+TEAMS_REG="$AGENCY_DIR/actors/teams/registry.yml"
+CONSTITUTION_FILE="$AGENCY_DIR/governance/CONSTITUTION.md"
+DELEGATION_FILE="$AGENCY_DIR/governance/DELEGATION.md"
+MEMORY_FILE="$AGENCY_DIR/governance/MEMORY.md"
 
 errors=0
 warnings=0
@@ -95,7 +95,7 @@ check_registry_paths() {
     relpath="${relpath%/}"
     pair_count=$((pair_count + 1))
 
-    local actor_dir="$AGENCY_DIR/$kind/$relpath"
+    local actor_dir="$AGENCY_DIR/actors/$kind/$relpath"
     local actor_file="$actor_dir/$contract_file"
 
     if [[ ! -d "$actor_dir" ]]; then
@@ -118,7 +118,7 @@ check_registry_paths() {
 
 check_agent_filename_capitalization() {
   local legacy_files
-  legacy_files="$(find "$AGENCY_DIR/agents" -type f -name 'agent.md' | sort || true)"
+  legacy_files="$(find "$AGENCY_DIR/actors/agents" -type f -name 'agent.md' | sort || true)"
 
   if [[ -n "$legacy_files" ]]; then
     while IFS= read -r file; do
@@ -137,7 +137,7 @@ check_agent_contract_layers() {
     relpath="${relpath%/}"
     pair_count=$((pair_count + 1))
 
-    local agent_dir="$AGENCY_DIR/agents/$relpath"
+    local agent_dir="$AGENCY_DIR/actors/agents/$relpath"
     local agent_file="$agent_dir/AGENT.md"
     local soul_file="$agent_dir/SOUL.md"
 
@@ -392,9 +392,9 @@ check_assistant_aliases() {
 }
 
 check_manifest_links() {
-  grep -q 'agents:\s*"agents/registry.yml"' "$MANIFEST" || fail "manifest missing agents registry link"
-  grep -q 'assistants:\s*"assistants/registry.yml"' "$MANIFEST" || fail "manifest missing assistants registry link"
-  grep -q 'teams:\s*"teams/registry.yml"' "$MANIFEST" || fail "manifest missing teams registry link"
+  grep -q 'agents:\s*"actors/agents/registry.yml"' "$MANIFEST" || fail "manifest missing agents registry link"
+  grep -q 'assistants:\s*"actors/assistants/registry.yml"' "$MANIFEST" || fail "manifest missing assistants registry link"
+  grep -q 'teams:\s*"actors/teams/registry.yml"' "$MANIFEST" || fail "manifest missing teams registry link"
 
   local default_agent
   default_agent="$(awk '/^default_agent:\s*/ {print $2}' "$MANIFEST" | tr -d '"')"
@@ -411,6 +411,42 @@ check_manifest_links() {
 }
 
 check_deprecations() {
+  if [[ -d "$AGENCY_DIR/agents" ]]; then
+    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/agents"
+  else
+    pass "deprecated root actors/agents path removed"
+  fi
+
+  if [[ -d "$AGENCY_DIR/assistants" ]]; then
+    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/assistants"
+  else
+    pass "deprecated root actors/assistants path removed"
+  fi
+
+  if [[ -d "$AGENCY_DIR/teams" ]]; then
+    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/teams"
+  else
+    pass "deprecated root actors/teams path removed"
+  fi
+
+  if [[ -f "$AGENCY_DIR/CONSTITUTION.md" ]]; then
+    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/CONSTITUTION.md"
+  else
+    pass "deprecated root governance/CONSTITUTION.md path removed"
+  fi
+
+  if [[ -f "$AGENCY_DIR/DELEGATION.md" ]]; then
+    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/DELEGATION.md"
+  else
+    pass "deprecated root governance/DELEGATION.md path removed"
+  fi
+
+  if [[ -f "$AGENCY_DIR/MEMORY.md" ]]; then
+    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/MEMORY.md"
+  else
+    pass "deprecated root governance/MEMORY.md path removed"
+  fi
+
   if [[ -d "$AGENCY_DIR/subagents" ]]; then
     fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/subagents"
   else
@@ -421,6 +457,42 @@ check_deprecations() {
     fail "harmony.yml still exports deprecated agency/subagents path"
   else
     pass "harmony.yml portable paths do not include deprecated subagents"
+  fi
+
+  if grep -q 'agency/agents/' "$ROOT_DIR/harmony.yml"; then
+    fail "harmony.yml still exports deprecated agency/agents path"
+  else
+    pass "harmony.yml portable paths do not include deprecated agency/agents path"
+  fi
+
+  if grep -q 'agency/assistants/' "$ROOT_DIR/harmony.yml"; then
+    fail "harmony.yml still exports deprecated agency/assistants path"
+  else
+    pass "harmony.yml portable paths do not include deprecated agency/assistants path"
+  fi
+
+  if grep -q 'agency/teams/' "$ROOT_DIR/harmony.yml"; then
+    fail "harmony.yml still exports deprecated agency/teams path"
+  else
+    pass "harmony.yml portable paths do not include deprecated agency/teams path"
+  fi
+
+  if grep -q 'agency/CONSTITUTION.md' "$ROOT_DIR/harmony.yml"; then
+    fail "harmony.yml still exports deprecated agency/CONSTITUTION.md path"
+  else
+    pass "harmony.yml portable paths do not include deprecated agency/CONSTITUTION.md path"
+  fi
+
+  if grep -q 'agency/DELEGATION.md' "$ROOT_DIR/harmony.yml"; then
+    fail "harmony.yml still exports deprecated agency/DELEGATION.md path"
+  else
+    pass "harmony.yml portable paths do not include deprecated agency/DELEGATION.md path"
+  fi
+
+  if grep -q 'agency/MEMORY.md' "$ROOT_DIR/harmony.yml"; then
+    fail "harmony.yml still exports deprecated agency/MEMORY.md path"
+  else
+    pass "harmony.yml portable paths do not include deprecated agency/MEMORY.md path"
   fi
 }
 

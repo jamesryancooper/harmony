@@ -1,35 +1,34 @@
 # Agency
 
-Canonical actor model for the Harmony harness.
+Canonical actor model and governance boundary for the Harmony harness.
 
-## Actor Types
+## Bounded Surfaces
 
 | Type | Purpose | Index |
 |------|---------|-------|
 | `_meta/architecture/` | Agency subsystem architecture and specification docs | `_meta/architecture/README.md` |
+| `actors/` | Runtime actor artifacts (`agents/`, `assistants/`, `teams/`) | `actors/README.md` |
+| `governance/` | Cross-agent governance contracts and precedence overlays | `governance/README.md` |
 | `practices/` | Human-agent operating practices and commit/PR standards | `practices/README.md` |
-| `agents/` | Autonomous supervisors (planning, orchestration, mission ownership) | `agents/registry.yml` |
-| `assistants/` | Focused specialists invoked by `@mention` or delegation | `assistants/registry.yml` |
-| `teams/` | Reusable multi-actor compositions with handoff policy | `teams/registry.yml` |
 
 ## Deprecated
 
 `subagents/` is no longer a first-class artifact type in `.harmony/agency/`.
 
 - Runtime term: "subagent" still means an assistant invocation context spawned by an agent.
-- Artifact model: use `agents/`, `assistants/`, and `teams/` only.
+- Artifact model: use `actors/agents/`, `actors/assistants/`, and `actors/teams/` only.
 
 ## Discovery
 
 Read in this order:
 
 1. `manifest.yml` for routing and registry paths
-2. `CONSTITUTION.md` for cross-agent non-negotiables and conscience rules
-3. `DELEGATION.md` for delegation protocol and escalation gates
-4. `MEMORY.md` for memory/retention/privacy policy
-5. `agents/registry.yml` for agent IDs and delegation rules
-6. `assistants/registry.yml` for alias (`@mention`) resolution
-7. `teams/registry.yml` for composition and handoff policy
+2. `governance/CONSTITUTION.md` for cross-agent non-negotiables and conscience rules
+3. `governance/DELEGATION.md` for delegation protocol and escalation gates
+4. `governance/MEMORY.md` for memory/retention/privacy policy
+5. `actors/agents/registry.yml` for agent IDs and delegation rules
+6. `actors/assistants/registry.yml` for alias (`@mention`) resolution
+7. `actors/teams/registry.yml` for composition and handoff policy
 
 ## Interaction Model
 
@@ -47,10 +46,10 @@ Each agent directory contains:
 
 ## Cross-Agent Contracts
 
-Cross-agent policies live at the agency root:
+Cross-agent policies live in `governance/`:
 
-- `CONSTITUTION.md` for non-negotiable governance and red lines.
-- `DELEGATION.md` for task handoff rules, authority, and escalation.
-- `MEMORY.md` for memory lifecycle and privacy controls.
+- `governance/CONSTITUTION.md` for non-negotiable governance and red lines.
+- `governance/DELEGATION.md` for task handoff rules, authority, and escalation.
+- `governance/MEMORY.md` for memory lifecycle and privacy controls.
 
 Conflict precedence is fixed: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> agent `AGENT.md` -> agent `SOUL.md`.

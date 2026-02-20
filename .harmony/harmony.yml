@@ -15,9 +15,11 @@ portable:
   - catalog.md
   - README.md
   - agency/manifest.yml
-  - agency/agents/
-  - agency/assistants/
-  - agency/teams/
+  - agency/governance/
+  - agency/actors/agents/
+  - agency/actors/assistants/
+  - agency/actors/teams/
+  - agency/practices/
   - capabilities/skills/manifest.yml
   - capabilities/skills/registry.yml
   - capabilities/skills/capabilities.yml

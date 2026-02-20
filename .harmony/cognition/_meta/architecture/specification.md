@@ -183,6 +183,21 @@ Expands in:
 - [Harmony Methodology](/.harmony/cognition/methodology/README.md)
 - [Services README](/.harmony/capabilities/services/README.md)
 
+### HARMONY-SPEC-013: Bounded Surface Separation
+
+Subsystems with executable actors or runtime-routing artifacts SHOULD separate:
+
+- runtime artifacts,
+- governance contracts,
+- operating practices.
+
+When adopted, each concern MUST have one canonical surface and legacy parallel surfaces MUST be removed by clean-break migration.
+
+Expands in:
+
+- [Bounded Surfaces Contract](/.harmony/cognition/_meta/architecture/bounded-surfaces-contract.md)
+- [Agency Subsystem Specification](/.harmony/agency/_meta/architecture/specification.md)
+
 ### HARMONY-SPEC-101: Agency Contract Boundary
 
 `/.harmony/agency/**` MUST define actor taxonomy, invocation model, and delegation boundaries as an explicit contract.

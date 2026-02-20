@@ -29,9 +29,9 @@ Required documentation deliverables (this cycle):
 Required implementation deliverables (execution cycles):
 
 - `.harmony/agency/manifest.yml`
-- `.harmony/agency/agents/registry.yml` (normalized)
-- `.harmony/agency/assistants/registry.yml` (normalized)
-- `.harmony/agency/teams/registry.yml` + team template/spec files
+- `.harmony/agency/actors/agents/registry.yml` (normalized)
+- `.harmony/agency/actors/assistants/registry.yml` (normalized)
+- `.harmony/agency/actors/teams/registry.yml` + team template/spec files
 - migration/deprecation treatment for `.harmony/agency/subagents/`
 - validation scripts and CI checks for agency contracts
 
@@ -40,25 +40,29 @@ Required implementation deliverables (execution cycles):
 ```text
 .harmony/agency/
 ├── README.md
-├── CONSTITUTION.md
-├── DELEGATION.md
-├── MEMORY.md
+├── governance/
+│   ├── CONSTITUTION.md
+│   ├── DELEGATION.md
+│   └── MEMORY.md
 ├── manifest.yml
-├── agents/
-│   ├── registry.yml
-│   ├── _scaffold/template/AGENT.md
-│   ├── _scaffold/template/SOUL.md
-│   └── <id>/
-│       ├── AGENT.md
-│       └── SOUL.md
-├── assistants/
-│   ├── registry.yml
-│   ├── _scaffold/template/assistant.md
-│   └── <id>/assistant.md
-└── teams/
-    ├── registry.yml
-    ├── _scaffold/template/team.md
-    └── <id>/team.md
+├── actors/
+│   ├── agents/
+│   │   ├── registry.yml
+│   │   ├── _scaffold/template/AGENT.md
+│   │   ├── _scaffold/template/SOUL.md
+│   │   └── <id>/
+│   │       ├── AGENT.md
+│   │       └── SOUL.md
+│   ├── assistants/
+│   │   ├── registry.yml
+│   │   ├── _scaffold/template/assistant.md
+│   │   └── <id>/assistant.md
+│   └── teams/
+│       ├── registry.yml
+│       ├── _scaffold/template/team.md
+│       └── <id>/team.md
+└── practices/
+    └── *.md
 ```
 
 ## Execution Phases
@@ -74,13 +78,13 @@ Tasks:
 
 1. Create ADR capturing actor taxonomy decision (remove `subagents` as first-class type).
 2. Catalog all references to `subagents` across `.harmony/`, docs, scripts.
-3. Define migration cutoff date and compatibility window.
+3. Define migration cutoff date and clean-break merge threshold.
 
 Exit criteria:
 
 - signed-off ADR,
 - complete reference inventory,
-- approved migration window.
+- approved clean-break cutoff date.
 
 ### Phase 1: Spec and Schema Stabilization
 
@@ -91,9 +95,9 @@ Goals:
 Tasks:
 
 1. Add `.harmony/agency/manifest.yml`.
-2. Normalize `agents/registry.yml` fields.
-3. Normalize `assistants/registry.yml` fields.
-4. Add `teams/registry.yml` schema and template.
+2. Normalize `actors/agents/registry.yml` fields.
+3. Normalize `actors/assistants/registry.yml` fields.
+4. Add `actors/teams/registry.yml` schema and template.
 5. Define schema validation rules (YAML shape + referential integrity).
 
 Exit criteria:
@@ -113,7 +117,7 @@ Tasks:
 1. Classify each `subagents/` artifact as agent-equivalent, assistant-equivalent, or obsolete.
 2. Move reusable content to canonical locations.
 3. Update links/references to canonical files.
-4. Mark `subagents/` read-only deprecated during compatibility window.
+4. Remove `subagents/` from active topology in the same migration change set.
 
 Exit criteria:
 
@@ -191,9 +195,8 @@ Goals:
 
 Tasks:
 
-1. Remove compatibility shim.
-2. Remove `.harmony/agency/subagents/` from active topology.
-3. Keep an archive note or migration log (if needed) outside active routing.
+1. Remove `.harmony/agency/subagents/` from active topology.
+2. Keep an archive note or migration log (if needed) outside active routing.
 
 Exit criteria:
 
@@ -232,7 +235,7 @@ Rollout strategy:
 
 Rollback strategy:
 
-- if routing breaks, restore previous registry files and retain `subagents/` compatibility shim,
+- if routing breaks, revert the full migration commit set,
 - keep migration map so moved content can be re-resolved quickly,
 - defer hard deletion until two green release cycles.
 
@@ -250,7 +253,7 @@ Rollback strategy:
 1. Should `use team: <id>` be exposed as first-class user syntax now or deferred?
 2. Do we need explicit per-actor skill allowlists in v1, or rely on skill/tool policy only?
 3. Should workflows include an explicit optional `actor` step field in this cycle?
-4. What is the deprecation window for `subagents/` (one release vs two)?
+4. Are there any active references to removed legacy paths that still need clean-break remediation?
 5. Which team definitions are necessary for initial rollout (if any)?
 
 ## Definition of Done

@@ -9,7 +9,7 @@ description: "[Identity contract for the [name] agent.]"
 
 - This file defines identity, interpersonal stance, and behavior under ambiguity.
 - Execution policy belongs in [AGENT.md](./AGENT.md).
-- Cross-agent governance overlays: [CONSTITUTION.md](../../../CONSTITUTION.md), [DELEGATION.md](../../../DELEGATION.md), [MEMORY.md](../../../MEMORY.md).
+- Cross-agent governance overlays: [CONSTITUTION.md](../../../../governance/CONSTITUTION.md), [DELEGATION.md](../../../../governance/DELEGATION.md), [MEMORY.md](../../../../governance/MEMORY.md).
 - This file must not override root safety/process constraints or execution boundaries.
 
 ## Philosophy

@@ -67,7 +67,7 @@ migration:
     - old: "missions/"
       new: "orchestration/missions/"
     - old: "assistants/"
-      new: "agency/assistants/"
+      new: "agency/actors/assistants/"
     - old: "templates/"
       new: "scaffolding/templates/"
     - old: "prompts/"

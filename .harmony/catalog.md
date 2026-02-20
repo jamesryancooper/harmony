@@ -23,27 +23,27 @@ Subsystem expansion specs:
 
 ## Assistants
 
-Focused specialists in `agency/assistants/`:
+Focused specialists in `agency/actors/assistants/`:
 
 | Assistant | Aliases | Description |
 |-----------|---------|-------------|
-| [reviewer](./agency/assistants/reviewer/assistant.md) | `@reviewer`, `@review`, `@rev` | Code review: quality, style, correctness, security |
-| [refactor](./agency/assistants/refactor/assistant.md) | `@refactor`, `@ref` | Code restructuring: extract, rename, simplify |
-| [docs](./agency/assistants/docs/assistant.md) | `@docs`, `@doc` | Documentation: clarity, completeness, accuracy |
+| [reviewer](./agency/actors/assistants/reviewer/assistant.md) | `@reviewer`, `@review`, `@rev` | Code review: quality, style, correctness, security |
+| [refactor](./agency/actors/assistants/refactor/assistant.md) | `@refactor`, `@ref` | Code restructuring: extract, rename, simplify |
+| [docs](./agency/actors/assistants/docs/assistant.md) | `@docs`, `@doc` | Documentation: clarity, completeness, accuracy |
 
 **Invocation:** Type `@name task` in chat or let agents delegate subtasks.
 
-See `agency/manifest.yml` for actor discovery and `agency/assistants/registry.yml` for alias mappings.
+See `agency/manifest.yml` for actor discovery and `agency/actors/assistants/registry.yml` for alias mappings.
 
 ---
 
 ## Teams
 
-Reusable multi-actor compositions in `agency/teams/`:
+Reusable multi-actor compositions in `agency/actors/teams/`:
 
 | Team | Lead | Members | Description |
 |------|------|---------|-------------|
-| [delivery-core](./agency/teams/delivery-core/team.md) | `architect` | `architect`, `auditor`, `reviewer`, `refactor`, `docs` | Default end-to-end delivery composition with verification handoffs |
+| [delivery-core](./agency/actors/teams/delivery-core/team.md) | `architect` | `architect`, `auditor`, `reviewer`, `refactor`, `docs` | Default end-to-end delivery composition with verification handoffs |
 
 **Invocation:** `use team: <id>` (if supported by caller) or by explicit agent/workflow routing.
 

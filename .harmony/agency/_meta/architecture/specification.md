@@ -147,25 +147,29 @@ Not allowed by default:
 ```text
 .harmony/agency/
 ├── README.md
-├── CONSTITUTION.md
-├── DELEGATION.md
-├── MEMORY.md
+├── governance/
+│   ├── CONSTITUTION.md
+│   ├── DELEGATION.md
+│   └── MEMORY.md
 ├── manifest.yml
-├── agents/
-│   ├── registry.yml
-│   ├── _scaffold/template/AGENT.md
-│   ├── _scaffold/template/SOUL.md
-│   └── <id>/
-│       ├── AGENT.md
-│       └── SOUL.md
-├── assistants/
-│   ├── registry.yml
-│   ├── _scaffold/template/assistant.md
-│   └── <id>/assistant.md
-└── teams/
-    ├── registry.yml
-    ├── _scaffold/template/team.md
-    └── <id>/team.md
+├── actors/
+│   ├── agents/
+│   │   ├── registry.yml
+│   │   ├── _scaffold/template/AGENT.md
+│   │   ├── _scaffold/template/SOUL.md
+│   │   └── <id>/
+│   │       ├── AGENT.md
+│   │       └── SOUL.md
+│   ├── assistants/
+│   │   ├── registry.yml
+│   │   ├── _scaffold/template/assistant.md
+│   │   └── <id>/assistant.md
+│   └── teams/
+│       ├── registry.yml
+│       ├── _scaffold/template/team.md
+│       └── <id>/team.md
+└── practices/
+    └── *.md
 ```
 
 `subagents/` is deprecated and removed after migration.
@@ -183,24 +187,24 @@ routing:
   assistant_prefix: "@"
   ambiguity_resolution: "ask"
 registries:
-  agents: "agents/registry.yml"
-  assistants: "assistants/registry.yml"
-  teams: "teams/registry.yml"
+  agents: "actors/agents/registry.yml"
+  assistants: "actors/assistants/registry.yml"
+  teams: "actors/teams/registry.yml"
 ```
 
 ### Cross-Agent Governance Contracts
 
-Required root contracts:
+Required governance contracts:
 
-- `CONSTITUTION.md`: non-negotiable policy, conscience rubric, and red lines.
-- `DELEGATION.md`: delegation authority, handoff protocol, and escalation.
-- `MEMORY.md`: memory classes, retention policy, and privacy boundaries.
+- `governance/CONSTITUTION.md`: non-negotiable policy, conscience rubric, and red lines.
+- `governance/DELEGATION.md`: delegation authority, handoff protocol, and escalation.
+- `governance/MEMORY.md`: memory classes, retention policy, and privacy boundaries.
 
 Precedence:
 
-`AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> `agents/<id>/AGENT.md` -> `agents/<id>/SOUL.md`
+`AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> `actors/agents/<id>/AGENT.md` -> `actors/agents/<id>/SOUL.md`
 
-### `agents/registry.yml`
+### `actors/agents/registry.yml`
 
 Minimum fields:
 
@@ -214,7 +218,7 @@ Minimum fields:
 - `allowed_skills` (optional allowlist)
 - `allowed_workflows` (optional allowlist)
 
-### `assistants/registry.yml`
+### `actors/assistants/registry.yml`
 
 Minimum fields:
 
@@ -225,7 +229,7 @@ Minimum fields:
 - `escalates_to`
 - `allowed_skills` (optional allowlist)
 
-### `teams/registry.yml`
+### `actors/teams/registry.yml`
 
 Minimum fields:
 
@@ -332,18 +336,18 @@ Must define:
 - No secret material in actor logs or output templates.
 - Escalate to human for ambiguous one-way-door decisions (schema, data migration, security boundary).
 
-## Deprecations and Compatibility
+## Deprecations and Clean-Break Enforcement
 
 ### Deprecated
 
 - `.harmony/agency/subagents/` as a top-level artifact class.
 
-### Backward Compatibility Window
+No compatibility window is allowed for agency artifact boundaries.
 
-During migration:
+During migration and after merge:
 
-- Reads from legacy `subagents/` may be supported by compatibility shim.
-- New definitions must be authored only under `agents/`, `assistants/`, `teams/`.
+- Legacy locations (`agents/`, `assistants/`, `teams/`, root governance files, `subagents/`) must not be present as active contract surfaces.
+- New definitions must be authored only under `actors/agents/`, `actors/assistants/`, and `actors/teams/`.
 
 ## Validation Requirements
 
@@ -351,7 +355,7 @@ Automated checks should enforce:
 
 - schema shape and required fields for all registries,
 - cross-reference integrity (`path` targets exist),
-- required root contracts (`CONSTITUTION.md`, `DELEGATION.md`, `MEMORY.md`),
+- required governance contracts (`governance/CONSTITUTION.md`, `governance/DELEGATION.md`, `governance/MEMORY.md`),
 - `CONSTITUTION.md` includes `Conscience` with `Decision Rubric` and `Red Lines`,
 - required `AGENT.md` + `SOUL.md` for every agent path,
 - required `Philosophy` section for every `SOUL.md`,

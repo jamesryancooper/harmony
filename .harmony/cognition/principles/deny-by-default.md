@@ -101,7 +101,7 @@ No permissive fallback is allowed.
 ## Exception Protocol (Time-Boxed Elevation)
 
 Exception semantics are canonical in
-[Waivers and Exceptions](./_meta/waivers-and-exceptions.md):
+[Waivers and Exceptions](./_meta/docs/waivers-and-exceptions.md):
 `exception` means capability elevation under deny-by-default, and must be
 policy-bound, time-boxed, reason-coded, and receipt-linked.
 
@@ -143,9 +143,9 @@ See: [Autonomous Control Points](./autonomous-control-points.md).
 
 - Capability attempt authorization (SSOT): this document.
 - Promotion/contraction mechanics (SSOT): [Autonomous Control Points](./autonomous-control-points.md).
-- Promotion inputs and receipt requirements (SSOT): [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md).
-- Shared terminology: [RA/ACP Glossary](./_meta/ra-acp-glossary.md).
-- Waiver/exception taxonomy (SSOT): [Waivers and Exceptions](./_meta/waivers-and-exceptions.md).
+- Promotion inputs and receipt requirements (SSOT): [RA/ACP Promotion Inputs Matrix](./_meta/docs/ra-acp-promotion-inputs-matrix.md).
+- Shared terminology: [RA/ACP Glossary](./_meta/docs/ra-acp-glossary.md).
+- Waiver/exception taxonomy (SSOT): [Waivers and Exceptions](./_meta/docs/waivers-and-exceptions.md).
 
 ## Arbitration
 

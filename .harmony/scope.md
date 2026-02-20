@@ -41,9 +41,9 @@ This harness contains:
 |--------------|----------|---------|
 | **Shared (in `.harmony/`)** | | |
 | Harness templates | `.harmony/scaffolding/templates/` | `harmony/`, `harmony-docs/` |
-| Generic agents | `.harmony/agency/agents/` | `architect/`, `auditor/` |
-| Generic assistants | `.harmony/agency/assistants/` | `reviewer/`, `refactor/`, `docs/` |
-| Team compositions | `.harmony/agency/teams/` | `delivery-core/` |
+| Generic agents | `.harmony/agency/actors/agents/` | `architect/`, `auditor/` |
+| Generic assistants | `.harmony/agency/actors/assistants/` | `reviewer/`, `refactor/`, `docs/` |
+| Team compositions | `.harmony/agency/actors/teams/` | `delivery-core/` |
 | Harness management workflows | `.harmony/orchestration/workflows/meta/` | `create-harness`, `migrate-harness` |
 | Mission management workflows | `.harmony/orchestration/workflows/missions/` | `create-mission`, `complete-mission` |
 | Generic skills | `.harmony/capabilities/skills/` | `synthesize-research/` |

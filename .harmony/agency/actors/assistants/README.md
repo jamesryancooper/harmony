@@ -59,7 +59,7 @@ Agent: "I need a code review for the authentication changes."
 
 ## Creating a New Assistant
 
-1. Copy `_scaffold/template/` to a new directory: `assistants/<name>/`
+1. Copy `_scaffold/template/` to a new directory: `actors/assistants/<name>/`
 2. Update `assistant.md` with mission, rules, and output format
 3. Register in `registry.yml`
 4. Define escalation rules (when to escalate to agents or humans)

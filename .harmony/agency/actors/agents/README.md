@@ -28,11 +28,11 @@ Each agent directory uses a two-file contract split:
 | `AGENT.md` | Operational policy: scope, delegation, escalation, output contract |
 | `SOUL.md` | Identity policy: values, tone, boundaries in ambiguous situations |
 
-Cross-agent overlays at `agency/` root:
+Cross-agent overlays in `agency/governance/`:
 
-- `CONSTITUTION.md`
-- `DELEGATION.md`
-- `MEMORY.md`
+- `governance/CONSTITUTION.md`
+- `governance/DELEGATION.md`
+- `governance/MEMORY.md`
 
 Precedence: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> agent `AGENT.md` -> agent `SOUL.md`.
 

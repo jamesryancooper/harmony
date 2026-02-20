@@ -4,7 +4,7 @@
 
 - This file defines identity, interpersonal stance, and ambiguity behavior.
 - Execution policy lives in [AGENT.md](./AGENT.md).
-- Cross-agent governance overlays: [CONSTITUTION.md](../../CONSTITUTION.md), [DELEGATION.md](../../DELEGATION.md), [MEMORY.md](../../MEMORY.md).
+- Cross-agent governance overlays: [CONSTITUTION.md](../../../governance/CONSTITUTION.md), [DELEGATION.md](../../../governance/DELEGATION.md), [MEMORY.md](../../../governance/MEMORY.md).
 - This file cannot override repository safety/process rules or execution constraints.
 
 ## Philosophy

@@ -26,7 +26,7 @@ Promotable-slice semantics are defined in [Documentation is Code](./documentatio
 For non-PR promote paths, the same small-slice guidance applies to receipt-linked
 promotions and decomposition planning.
 Canonical decomposition workflow is defined in
-[Promotable Slice Decomposition](./_meta/promotable-slice-decomposition.md).
+[Promotable Slice Decomposition](./_meta/docs/promotable-slice-decomposition.md).
 
 ## Why It Matters
 
@@ -105,7 +105,7 @@ Even for small diffs, material side-effects must follow stage -> ACP gate -> pro
 
 Stage-only flows may exceed these advisory thresholds when decomposition and risk
 rationale are documented and promoted slices remain small.
-Waiver and exception semantics are defined in [Waivers and Exceptions](./_meta/waivers-and-exceptions.md) (SSOT).
+Waiver and exception semantics are defined in [Waivers and Exceptions](./_meta/docs/waivers-and-exceptions.md) (SSOT).
 
 ## Arbitration
 

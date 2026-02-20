@@ -10,7 +10,7 @@ role: "[planner|architect|auditor|coordinator|custom]"
 
 - This file defines execution policy only.
 - Identity and interpersonal style belong in [SOUL.md](./SOUL.md).
-- Cross-agent governance overlays: [CONSTITUTION.md](../../../CONSTITUTION.md), [DELEGATION.md](../../../DELEGATION.md), [MEMORY.md](../../../MEMORY.md).
+- Cross-agent governance overlays: [CONSTITUTION.md](../../../../governance/CONSTITUTION.md), [DELEGATION.md](../../../../governance/DELEGATION.md), [MEMORY.md](../../../../governance/MEMORY.md).
 - Contract precedence: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> local `AGENT.md` -> local `SOUL.md`.
 
 ## Role

@@ -41,3 +41,6 @@ Every migration must include:
 - `ci-gates.md`
 - `legacy-banlist.md`
 
+## Active Migration Records
+
+- `2026-02-20-agency-bounded-surfaces/plan.md`

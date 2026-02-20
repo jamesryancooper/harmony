@@ -47,6 +47,10 @@ Use subsystem specs for expanded contract details:
 - `/.harmony/capabilities/_meta/architecture/specification.md`
 - `/.harmony/orchestration/_meta/architecture/specification.md`
 
+Cross-subsystem structure contract:
+
+- `/.harmony/cognition/_meta/architecture/bounded-surfaces-contract.md`
+
 ## Agency Subsystem Docs
 
 For the finalized agency model, see:
@@ -70,7 +74,7 @@ Canonical root-harness structure:
 .harmony/
     ├── harmony.yml          <- Portability metadata
     │
-    ├── agency/              <- Agents, assistants, teams
+    ├── agency/              <- Actors, governance, practices
     ├── capabilities/        <- Skills, commands, tools
     ├── cognition/           <- Context, decisions, analyses
     ├── continuity/          <- Progress log, tasks, next steps
@@ -143,22 +147,27 @@ Agents struggle when they "arrive with no memory of what came before." A `.harmo
 ├── conventions.md           # Style and formatting rules
 ├── catalog.md               # Index of commands and workflows
 │
-├── agency/                  # Agents, assistants, and teams
+├── agency/                  # Actors, governance, and operating practices
 │   ├── README.md            # Domain orientation (referenced)
-│   ├── CONSTITUTION.md      # Cross-agent governance and red lines
-│   ├── DELEGATION.md        # Cross-agent delegation contract
-│   ├── MEMORY.md            # Cross-agent memory and retention contract
-│   ├── agents/              # Autonomous agent definitions
-│   │   └── <name>/
-│   │       ├── AGENT.md     # Agent execution contract
-│   │       └── SOUL.md      # Agent identity contract
-│   ├── assistants/          # Focused specialists (serve agents/humans)
-│   │   ├── registry.yml     # @mention mappings
-│   │   ├── _scaffold/template/
-│   │   │   └── assistant.md
-│   │   └── <name>/
-│   │       └── assistant.md # Specialist definition
-│   └── teams/               # Team compositions
+│   ├── manifest.yml         # Actor discovery and routing metadata
+│   ├── governance/          # Cross-agent governance contracts
+│   │   ├── CONSTITUTION.md  # Non-negotiable governance and red lines
+│   │   ├── DELEGATION.md    # Delegation authority and escalation contract
+│   │   └── MEMORY.md        # Memory retention and privacy contract
+│   ├── actors/              # Runtime actor artifacts
+│   │   ├── agents/          # Autonomous agent definitions
+│   │   │   └── <name>/
+│   │   │       ├── AGENT.md # Agent execution contract
+│   │   │       └── SOUL.md  # Agent identity contract
+│   │   ├── assistants/      # Focused specialists (serve agents/humans)
+│   │   │   ├── registry.yml # @mention mappings
+│   │   │   ├── _scaffold/template/
+│   │   │   │   └── assistant.md
+│   │   │   └── <name>/
+│   │   │       └── assistant.md
+│   │   └── teams/           # Team compositions
+│   ├── practices/           # Operating standards and delivery guidance
+│   └── _ops/                # Validation scripts and operational checks
 │
 ├── orchestration/           # Workflows and missions
 │   ├── README.md            # Domain orientation (routable + referenced)
@@ -281,9 +290,9 @@ portable:
   - catalog.md
   - README.md
   - agency/manifest.yml
-  - agency/agents/
-  - agency/assistants/
-  - agency/teams/
+  - agency/actors/agents/
+  - agency/actors/assistants/
+  - agency/actors/teams/
   - capabilities/skills/manifest.yml
   - capabilities/skills/registry.yml
   - capabilities/skills/capabilities.yml
@@ -490,7 +499,7 @@ Each domain has a `README.md` that provides orientation. The README depth is pro
 
 | Directory | Purpose | Contains | Interaction Model |
 |-----------|---------|----------|-------------------|
-| `agency/` | Actor definitions | Agents, assistants, teams | Referenced |
+| `agency/` | Actor + governance boundaries | Actors, governance, practices | Referenced |
 | `capabilities/` | Executable capabilities | Skills, commands, tools | Routable + Referenced |
 | `cognition/` | Background knowledge and memory | Context, decisions, analyses | Reference material |
 | `continuity/` | Session-to-session state | Log, tasks, entities | State (read/write contract) |
@@ -506,9 +515,9 @@ For reference, here is how the previous flat structure maps to domains:
 
 | Previous Path | Current Path |
 |---------------|--------------|
-| `agents/` | `agency/agents/` |
-| `assistants/` | `agency/assistants/` |
-| `teams/` | `agency/teams/` |
+| `agents/` | `agency/actors/agents/` |
+| `assistants/` | `agency/actors/assistants/` |
+| `teams/` | `agency/actors/teams/` |
 | `context/` | `cognition/context/` |
 | `progress/` | `continuity/` |
 | `checklists/` | `assurance/` |
@@ -680,7 +689,7 @@ Harnesses are designed to be **portable across all AI harnesses**---Cursor, Clau
 |  +-- harmony.yml           (portability metadata)           |
 |  +-- orchestration/        (workflows, missions)            |
 |  +-- capabilities/         (skills, commands)               |
-|  +-- agency/               (agents, assistants)             |
+|  +-- agency/               (actors, governance, practices)  |
 |  +-- ...                                                    |
 +------------------------------------------------------------+
 ```

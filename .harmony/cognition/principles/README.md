@@ -44,7 +44,7 @@ For small teams, default to the smallest viable process, design, and tooling tha
 | Simplicity and complexity control | [Simplicity Over Complexity](./simplicity-over-complexity.md), [Monolith-first Modulith](./monolith-first-modulith.md) |
 | Quality and operational readiness | [Observability as a Contract](./observability-as-a-contract.md), [Reversibility](./reversibility.md), [Small Diffs, Trunk-based](./small-diffs-trunk-based.md) |
 | Security and privacy | [Security and Privacy Baseline](./security-and-privacy-baseline.md), [Deny by Default](./deny-by-default.md), [Guardrails](./guardrails.md) |
-| Exceptions and governance | [Arbitration and Precedence](./arbitration-and-precedence.md), [Autonomous Control Points](./autonomous-control-points.md), [Waivers and Exceptions](./_meta/waivers-and-exceptions.md) |
+| Exceptions and governance | [Arbitration and Precedence](./arbitration-and-precedence.md), [Autonomous Control Points](./autonomous-control-points.md), [Waivers and Exceptions](./_meta/docs/waivers-and-exceptions.md) |
 
 ## Normative SSOT Map
 

@@ -286,7 +286,7 @@ rules: {
 
 ## Exceptions
 
-Waiver and exception semantics are defined in [Waivers and Exceptions](./_meta/waivers-and-exceptions.md) (SSOT).
+Waiver and exception semantics are defined in [Waivers and Exceptions](./_meta/docs/waivers-and-exceptions.md) (SSOT).
 
 Manual duplication may be acceptable when:
 

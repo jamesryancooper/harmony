@@ -165,7 +165,7 @@ defaults:
       target_score: 4
       acceptance_criteria: "Developer or operator workflow remains understandable and low-friction."
       evidence:
-        - .harmony/agency/agents/architect/AGENT.md
+        - .harmony/agency/actors/agents/architect/AGENT.md
         - .harmony/cognition/principles/accessibility-baseline.md
     accessibility:
       score: 2

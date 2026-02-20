@@ -112,9 +112,9 @@ When resolving a resource, agents check local first, then shared:
 | Resource | Search Order |
 |----------|--------------|
 | Agency Manifest | `.harmony/agency/manifest.yml` |
-| Agents | `.harmony/agency/agents/` |
-| Assistants | `.harmony/agency/assistants/` |
-| Teams | `.harmony/agency/teams/` |
+| Agents | `.harmony/agency/actors/agents/` |
+| Assistants | `.harmony/agency/actors/assistants/` |
+| Teams | `.harmony/agency/actors/teams/` |
 | Templates | `.harmony/scaffolding/templates/` |
 | Workflows | `.harmony/orchestration/workflows/` |
 | Skills | `.harmony/capabilities/skills/` |
@@ -132,9 +132,13 @@ When resolving a resource, agents check local first, then shared:
 ├── agency/
 │   ├── manifest.yml    <- Actor discovery and routing metadata
 │   ├── _meta/architecture/ <- Agency subsystem specification
-│   ├── agents/         <- Autonomous supervisors
-│   ├── assistants/     <- Generic specialists (@mention invocation)
-│   └── teams/          <- Reusable multi-actor compositions
+│   ├── governance/     <- Cross-agent contracts (constitution, delegation, memory)
+│   ├── actors/         <- Runtime actor artifacts
+│   │   ├── agents/     <- Autonomous supervisors
+│   │   ├── assistants/ <- Generic specialists (@mention invocation)
+│   │   └── teams/      <- Reusable multi-actor compositions
+│   ├── practices/      <- Human-agent operating practices
+│   └── _ops/           <- Validation scripts and operational checks
 │
 ├── capabilities/
 │   ├── _meta/architecture/ <- Capabilities subsystem specification
@@ -269,9 +273,11 @@ If your tool supports harness commands, run `/init` instead of invoking the scri
 | Directory | Purpose |
 |-----------|---------|
 | `scaffolding/templates/` | Harness scaffolding (base + variants) |
-| `agency/agents/` | Supervisory actors and delegation policy |
-| `agency/assistants/` | Generic specialists (reviewer, refactor, docs) |
-| `agency/teams/` | Reusable multi-actor compositions |
+| `agency/governance/` | Cross-agent contracts and precedence overlays |
+| `agency/actors/agents/` | Supervisory actors and delegation policy |
+| `agency/actors/assistants/` | Generic specialists (reviewer, refactor, docs) |
+| `agency/actors/teams/` | Reusable multi-actor compositions |
+| `agency/practices/` | Human-agent operating standards and delivery discipline |
 | `orchestration/workflows/` | Harness management + mission lifecycle |
 | `capabilities/_ops/` | Agent-native deny-by-default control plane (policy, grants, kill-switches, validation) |
 | `capabilities/skills/` | Composable capabilities with defined I/O |

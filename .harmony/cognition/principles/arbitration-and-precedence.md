@@ -16,8 +16,8 @@ status: Active
 3. Durable promotion/finalize authority is ACP gate output only.
 4. `apply` for durable state is interpreted as `promote` unless explicitly stage-only/read-only.
 5. Owner attestation is quorum input only; it is never standalone promotion authority.
-6. Term collisions are resolved by [RA/ACP Glossary](./_meta/ra-acp-glossary.md) definitions.
-7. Evidence-minima collisions are resolved by [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md).
+6. Term collisions are resolved by [RA/ACP Glossary](./_meta/docs/ra-acp-glossary.md) definitions.
+7. Evidence-minima collisions are resolved by [RA/ACP Promotion Inputs Matrix](./_meta/docs/ra-acp-promotion-inputs-matrix.md).
 8. Non-normative guidance/examples cannot weaken fail-closed controls in policy.
 9. If principles disagree and no explicit mapping exists, fail closed with reason-coded `STAGE_ONLY` or `DENY`.
 10. Human intervention is exception-driven only (quorum unresolved, risk threshold crossed, or policy-triggered escalation).
@@ -34,4 +34,4 @@ status: Active
 - [Deny by Default](./deny-by-default.md)
 - [Guardrails](./guardrails.md)
 - [No Silent Apply](./no-silent-apply.md)
-- [Waivers and Exceptions](./_meta/waivers-and-exceptions.md)
+- [Waivers and Exceptions](./_meta/docs/waivers-and-exceptions.md)
