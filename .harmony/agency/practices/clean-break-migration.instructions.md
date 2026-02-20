@@ -29,7 +29,7 @@ You are working in a repository where migrations are clean-break by default.
 
 ## Required Outputs (MUST)
 
-- Create or update a migration plan from `/.harmony/scaffolding/templates/migrations/template.clean-break-migration.md`
+- Create or update a migration plan from `/.harmony/scaffolding/runtime/templates/migrations/template.clean-break-migration.md`
 - Update `/.harmony/cognition/methodology/migrations/legacy-banlist.md`
 - Provide verification evidence (test output, logs, receipts)
 

@@ -82,7 +82,7 @@ Canonical root-harness structure:
     ├── orchestration/       <- Runtime orchestration, governance, practices
     ├── output/              <- Reports, drafts, artifacts
     ├── assurance/             <- Completion checklists
-    └── scaffolding/         <- Templates, prompts, examples
+    └── scaffolding/         <- runtime, governance, practices
 ```
 
 | Layer | Mechanism | Description |
@@ -265,7 +265,7 @@ The full tree above is the **canonical superset**. In practice, harness profiles
 
 | Profile | Baseline | Notes |
 |---------|----------|-------|
-| **Root harness (repo-wide)** | `harmony.yml`, `START.md`, `scope.md`, `conventions.md`, `catalog.md`, `continuity/`, `assurance/`, `scaffolding/prompts/`, `orchestration/runtime/workflows/`, `orchestration/governance/`, `orchestration/practices/`, `capabilities/runtime/commands/`, `cognition/context/`, `runtime/` | Root is the primary coordination harness and is expected to carry full governance/state coverage |
+| **Root harness (repo-wide)** | `harmony.yml`, `START.md`, `scope.md`, `conventions.md`, `catalog.md`, `continuity/`, `assurance/`, `scaffolding/practices/prompts/`, `orchestration/runtime/workflows/`, `orchestration/governance/`, `orchestration/practices/`, `capabilities/runtime/commands/`, `cognition/context/`, `runtime/` | Root is the primary coordination harness and is expected to carry full governance/state coverage |
 | **Descendant harness (localized)** | `START.md`, `scope.md`, plus at least one active subsystem (`cognition/`, `capabilities/`, `orchestration/`, `continuity/`, or `assurance/`) | Descendants are intentionally minimal. They include only subsystems needed for that subtree |
 
 | Subsystem | Root Harness | Descendant Harness |
@@ -514,7 +514,7 @@ Each domain has a `README.md` that provides orientation. The README depth is pro
 | `orchestration/` | Coordination and execution | Runtime, governance, practices | Routable + Referenced |
 | `output/` | Generated artifacts | Reports, drafts, artifacts | State (write contract) |
 | `assurance/` | Verification and quality gates | Completion checklists, session-exit | State (quality gates) |
-| `scaffolding/` | Reusable building blocks | Templates, prompts, examples | Referenced |
+| `scaffolding/` | Reusable building blocks | runtime, governance, practices | Referenced |
 
 ### Mapping from Previous Structure
 
@@ -532,9 +532,10 @@ For reference, here is how the previous flat structure maps to domains:
 | `missions/` | `orchestration/runtime/missions/` |
 | `commands/` | `capabilities/runtime/commands/` |
 | `skills/` | `capabilities/runtime/skills/` |
-| `prompts/` | `scaffolding/prompts/` |
-| `templates/` | `scaffolding/templates/` |
-| `examples/` | `scaffolding/examples/` |
+| `prompts/` | `scaffolding/practices/prompts/` |
+| `templates/` | `scaffolding/runtime/templates/` |
+| `examples/` | `scaffolding/practices/examples/` |
+| `patterns/` | `scaffolding/governance/patterns/` |
 | `projects/` | `ideation/projects/` |
 | `.scratchpad/` | `ideation/scratchpad/` |
 | *(new)* | `output/` |
@@ -734,7 +735,7 @@ Harness-specific commands wrap workflows for integration. All workflows live in 
 | `/update-harness` | `.harmony/orchestration/runtime/workflows/meta/update-harness/` |
 | `/evaluate-harness` | `.harmony/orchestration/runtime/workflows/meta/evaluate-harness/` |
 | `/migrate-harness` | `.harmony/orchestration/runtime/workflows/meta/migrate-harness/` |
-| `/bootstrap` | `.harmony/scaffolding/prompts/bootstrap-session.md` |
+| `/bootstrap` | `.harmony/scaffolding/practices/prompts/bootstrap-session.md` |
 | `/synthesize-research` | `.harmony/capabilities/runtime/skills/synthesis/synthesize-research/` |
 | `/research` | `.harmony/orchestration/runtime/workflows/projects/create-project.md` |
 

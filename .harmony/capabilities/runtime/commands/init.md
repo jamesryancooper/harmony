@@ -37,15 +37,15 @@ Initialize project-level files after dropping `.harmony/` into a repository.
 Run:
 
 ```bash
-.harmony/scaffolding/_ops/scripts/init-project.sh [--repo-root <path>] [--force] [--dry-run] [--no-claude-alias] [--with-boot-files] [--with-agent-platform-adapters] [--agent-platform-adapters <csv>]
+.harmony/scaffolding/runtime/_ops/scripts/init-project.sh [--repo-root <path>] [--force] [--dry-run] [--no-claude-alias] [--with-boot-files] [--with-agent-platform-adapters] [--agent-platform-adapters <csv>]
 ```
 
 Behavior:
 
-1. Render `AGENTS.md` from `.harmony/scaffolding/templates/AGENTS.md`.
+1. Render `AGENTS.md` from `.harmony/scaffolding/runtime/templates/AGENTS.md`.
 2. Use `.harmony/agency/manifest.yml` `default_agent` for contract paths.
 3. Optionally render `BOOT.md` and `BOOTSTRAP.md` for BOOT compatibility.
-4. Render root `alignment-check` shim from `.harmony/scaffolding/templates/alignment-check`.
+4. Render root `alignment-check` shim from `.harmony/scaffolding/runtime/templates/alignment-check`.
 5. Optionally generate adapter bootstrap config at `.harmony/capabilities/runtime/services/interfaces/agent-platform/adapters/enabled.yml` (opt-in only).
 6. Create `CLAUDE.md -> AGENTS.md` symlink when safe.
 7. Preserve existing files unless `--force` is supplied.
@@ -61,6 +61,6 @@ Behavior:
 
 ## References
 
-- **Script:** `.harmony/scaffolding/_ops/scripts/init-project.sh`
-- **Templates:** `.harmony/scaffolding/templates/AGENTS.md`, `.harmony/scaffolding/templates/BOOT.md`, `.harmony/scaffolding/templates/BOOTSTRAP.md`, `.harmony/scaffolding/templates/alignment-check`
+- **Script:** `.harmony/scaffolding/runtime/_ops/scripts/init-project.sh`
+- **Templates:** `.harmony/scaffolding/runtime/templates/AGENTS.md`, `.harmony/scaffolding/runtime/templates/BOOT.md`, `.harmony/scaffolding/runtime/templates/BOOTSTRAP.md`, `.harmony/scaffolding/runtime/templates/alignment-check`
 - **Canonical:** `.harmony/README.md#adopting-in-other-repos`

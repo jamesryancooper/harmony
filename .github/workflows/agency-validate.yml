@@ -8,7 +8,7 @@ on:
       - '.harmony/START.md'
       - '.harmony/README.md'
       - '.harmony/scope.md'
-      - '.harmony/scaffolding/templates/harmony/**'
+      - '.harmony/scaffolding/runtime/templates/harmony/**'
   pull_request:
     paths:
       - '.harmony/agency/**'
@@ -16,7 +16,7 @@ on:
       - '.harmony/START.md'
       - '.harmony/README.md'
       - '.harmony/scope.md'
-      - '.harmony/scaffolding/templates/harmony/**'
+      - '.harmony/scaffolding/runtime/templates/harmony/**'
 
 permissions:
   contents: read

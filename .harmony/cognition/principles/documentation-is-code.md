@@ -76,9 +76,9 @@ apply_hotfix_without_runbook = True
 ## Canonical Guidance and Enforcement
 
 - Template guidance:
-  `.harmony/scaffolding/templates/documentation-standards.md`
+  `.harmony/scaffolding/runtime/templates/documentation-standards.md`
 - Template bundle:
-  `.harmony/scaffolding/templates/docs/documentation-standards/`
+  `.harmony/scaffolding/runtime/templates/docs/documentation-standards/`
 - Operational service guide:
   `.harmony/capabilities/runtime/services/authoring/doc/guide.md`
 - Enforcement:
@@ -155,8 +155,8 @@ contract, schema, or risk changes.
 ## Related Documentation
 
 - `.harmony/cognition/methodology/spec-first-planning.md`
-- `.harmony/scaffolding/patterns/adr-policy.md`
-- `.harmony/scaffolding/templates/documentation-standards.md`
+- `.harmony/scaffolding/governance/patterns/adr-policy.md`
+- `.harmony/scaffolding/runtime/templates/documentation-standards.md`
 - `.harmony/orchestration/runtime/workflows/quality-gate/documentation-quality-gate/WORKFLOW.md`
 - `.harmony/capabilities/runtime/skills/quality-gate/audit-documentation-standards/SKILL.md`
 - `.harmony/cognition/pillars/direction.md`

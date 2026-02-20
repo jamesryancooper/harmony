@@ -1,16 +1,16 @@
 ---
 title: Harness Prompts
-description: Reusable task templates stored in .harmony/scaffolding/prompts/
+description: Reusable task templates stored in .harmony/scaffolding/practices/prompts/
 ---
 
 # Harness Prompts
 
-Prompts are **reusable task templates** stored in `.harmony/scaffolding/prompts/`. They guide agents through context-dependent tasks that require judgment or parameterization.
+Prompts are **reusable task templates** stored in `.harmony/scaffolding/practices/prompts/`. They guide agents through context-dependent tasks that require judgment or parameterization.
 
 ## Location
 
 ```text
-.harmony/scaffolding/prompts/
+.harmony/scaffolding/practices/prompts/
 ├── audit-content.md
 ├── improve-clarity.md
 └── verify-completeness.md

@@ -16,7 +16,7 @@ This document clarifies the distinctions between harness artifact types: **comma
 | **Harness Entry Point** | `.<harness>/commands/` | Thin wrapper | Harness-specific invocation (Cursor, Claude Code, Codex) |
 | **Harness Command** | `.harmony/capabilities/runtime/commands/` | Deterministic procedure | Atomic, repeatable operation |
 | **Harness Workflow** | `.harmony/orchestration/runtime/workflows/` | Multi-step procedure (source of truth) | Complex, sequential operation |
-| **Harness Prompt** | `.harmony/scaffolding/prompts/` | Task template | Context-dependent, requires judgment |
+| **Harness Prompt** | `.harmony/scaffolding/practices/prompts/` | Task template | Context-dependent, requires judgment |
 | **Harness Skill** | `.harmony/capabilities/runtime/skills/` | Composable capability | Defined I/O, pipelines, auditability |
 | **Assistant** | `.harmony/agency/actors/assistants/` | Focused specialist | Scoped, delegatable tasks |
 | **Mission** | `.harmony/orchestration/runtime/missions/` | Sub-project | Isolated, time-bounded work |
@@ -48,7 +48,7 @@ This document clarifies the distinctions between harness artifact types: **comma
 | **Harness Entry Point** | `.<harness>/commands/` | User typing `/command` in any AI harness | Repository-wide, harness-specific |
 | **Harness Command** | `.harmony/capabilities/runtime/commands/` | Harness delegation or direct agent reference | Harness-specific, atomic |
 | **Harness Workflow** | `.harmony/orchestration/runtime/workflows/` | Harness delegation or direct agent reference | Harness-specific, multi-step |
-| **Harness Prompt** | `.harmony/scaffolding/prompts/` | Direct agent reference | Harness-specific, template |
+| **Harness Prompt** | `.harmony/scaffolding/practices/prompts/` | Direct agent reference | Harness-specific, template |
 
 ### Supported Harnesses
 
@@ -179,7 +179,7 @@ See [workflows.md](../../../orchestration/_meta/architecture/workflows.md) for f
 
 ## Harness Prompts
 
-**Location:** `.harmony/scaffolding/prompts/*.md`
+**Location:** `.harmony/scaffolding/practices/prompts/*.md`
 
 Task templates that guide agents through context-dependent work requiring judgment or parameterization.
 
@@ -334,7 +334,7 @@ See `.harmony/catalog.md` for complete decision flowcharts and examples.
 | Harness Entry Points | `.<harness>/commands/*.md` | Repository-wide | Yes (harness-specific) |
 | Harness Commands | `.harmony/capabilities/runtime/commands/*.md` | This harness only | No (unless wrapped) |
 | Harness Workflows | `.harmony/orchestration/runtime/workflows/*.md` | This harness only | No (unless wrapped) |
-| Prompts | `.harmony/scaffolding/prompts/*.md` | Task templates | No |
+| Prompts | `.harmony/scaffolding/practices/prompts/*.md` | Task templates | No |
 | Assistants | `.harmony/agency/actors/assistants/<name>/` | Focused specialists | Via @mention |
 | Missions | `.harmony/orchestration/runtime/missions/<slug>/` | Sub-projects | No |
 | Checklists | `.harmony/assurance/*.md` | Quality gates | No |
@@ -354,7 +354,7 @@ See `.harmony/catalog.md` for complete decision flowcharts and examples.
 
 - [Harness Commands](../../../capabilities/runtime/commands/manifest.yml) — Deterministic atomic operations
 - [Harness Workflows](../../../orchestration/runtime/workflows/README.md) — Multi-step procedures
-- [Harness Prompts](../../../scaffolding/prompts/README.md) — Context-dependent task templates
+- [Harness Prompts](../../../scaffolding/practices/prompts/README.md) — Context-dependent task templates
 - [Agency](../../../agency/README.md) — Canonical actor taxonomy and routing model
 - [Missions](../../../orchestration/runtime/missions/README.md) — Time-bounded sub-projects
 - [Checklists](../../../assurance/_meta/architecture/checklists.md) — Quality gates

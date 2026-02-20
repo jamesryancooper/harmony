@@ -181,7 +181,7 @@ The simple docs you're reading are the human-facing layer. For full details on m
 - **CLI Reference**: `.harmony/catalog.md` — Full command docs, options, integration points
 - **Kit CLIs**: [Kits Reference](/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md) — Quick reference for using kit CLIs directly
 - **Kit Technical Docs**: `/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md` — Full kit documentation
-- **Prompt Library**: `.harmony/scaffolding/prompts/README.md` — Canonical prompts with schemas and validation
+- **Prompt Library**: `.harmony/scaffolding/practices/prompts/README.md` — Canonical prompts with schemas and validation
 - **Full Methodology**: [cognition/methodology/README.md](../../cognition/methodology/README.md)
 - **Architecture**: [cognition architecture overview](../../cognition/_meta/architecture/overview.md)
 - **Kit Documentation**: [Kits Reference](/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md)

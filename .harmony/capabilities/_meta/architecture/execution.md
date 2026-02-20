@@ -27,7 +27,7 @@ ended_at: 2025-01-15T10:44:12Z
 inputs:
   - "add caching to the api"
 outputs:
-  - .harmony/scaffolding/prompts/20250115-refined.md
+  - .harmony/scaffolding/practices/prompts/20250115-refined.md
 tools_used:
   - filesystem.read
   - filesystem.write
@@ -167,7 +167,7 @@ Output paths are defined in the skill's registry I/O mapping. Skills produce two
 
 | Category | Path Pattern |
 |----------|--------------|
-| Prompts | `.harmony/scaffolding/prompts/{{timestamp}}-{{name}}.md` |
+| Prompts | `.harmony/scaffolding/practices/prompts/{{timestamp}}-{{name}}.md` |
 | Drafts | `.harmony/output/drafts/{{timestamp}}-{{name}}.md` |
 | Reports | `.harmony/output/reports/{{timestamp}}-{{name}}.md` |
 

@@ -62,7 +62,7 @@ Harmony implements locality through a single `.harmony/` directory organized by 
 | Quality | `assurance/` | Completion checklists, session-exit |
 | Orchestration | `orchestration/` | Workflows, missions |
 | Capabilities | `capabilities/` | Skills, commands |
-| Scaffolding | `scaffolding/` | Templates, prompts, examples |
+| Scaffolding | `scaffolding/` | runtime, governance, practices |
 
 Portability is declared via `harmony.yml` metadata — it specifies which paths are reusable framework assets vs. project-specific state.
 
@@ -111,7 +111,7 @@ packages/billing/
 **Use inheritance for shared defaults:**
 
 ```yaml
-# .harmony/scaffolding/templates/harmony/conventions.md (shared)
+# .harmony/scaffolding/runtime/templates/harmony/conventions.md (shared)
 - Use TypeScript strict mode
 - Format with Prettier
 

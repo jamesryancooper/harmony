@@ -29,7 +29,7 @@ All migrations are CLEAN-BREAK unless an exception is approved under `exceptions
 
 Every migration must include:
 
-- A plan based on `/.harmony/scaffolding/templates/migrations/template.clean-break-migration.md`
+- A plan based on `/.harmony/scaffolding/runtime/templates/migrations/template.clean-break-migration.md`
 - Verification evidence (tests, logs, receipts) linked from the plan
 - Banlist updates in `legacy-banlist.md` when legacy identifiers, paths, or keys are removed
 
@@ -47,3 +47,4 @@ Every migration must include:
 - `2026-02-20-orchestration-bounded-surfaces/plan.md`
 - `2026-02-20-capabilities-bounded-surfaces/plan.md`
 - `2026-02-20-assurance-bounded-surfaces/plan.md`
+- `2026-02-20-scaffolding-bounded-surfaces/plan.md`

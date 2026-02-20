@@ -173,7 +173,7 @@ Resources are organized by **capability category**. Each category groups related
 | **Orchestration** | `orchestration/` | Workflows, missions | Partially (workflow definitions are portable; missions are project-specific) |
 | **Continuity** | `continuity/` | Progress log, tasks, next steps | No (project-specific state) |
 | **Quality** | `assurance/` | Completion checklists, session gates | Yes |
-| **Scaffolding** | `scaffolding/` | Templates, prompts, examples | Yes |
+| **Scaffolding** | `scaffolding/` | runtime, governance, practices | Yes |
 | **Ideation** | `ideation/` | Scratchpad, projects (human-led) | No (project-specific, human-led) |
 | **Output** | `output/` | Reports, drafts, artifacts | No (project-specific artifacts) |
 
@@ -222,7 +222,7 @@ Add to `.harmony/` when you have:
 | Situation | Action |
 | --------- | ------ |
 | A new agent or assistant | Add to `.harmony/agency/actors/` |
-| A new harness template variant | Add to `.harmony/scaffolding/templates/` |
+| A new harness template variant | Add to `.harmony/scaffolding/runtime/templates/` |
 | A new skill that other projects could use | Add to `.harmony/capabilities/runtime/skills/` and mark its definition paths as `portable:` |
 | A workflow that applies to any harness | Add to `.harmony/orchestration/runtime/workflows/` |
 | Project-specific state (progress, missions) | Add under the relevant category; do **not** mark as `portable:` |
@@ -276,7 +276,7 @@ Use `harmony.yml` portable paths to bootstrap `.harmony/` in a new repository.
 | -------- | ---- | ----------- |
 | Agency | `agency/` | Actors, governance, practices |
 | Capabilities | `capabilities/` | Skills framework, commands, tools |
-| Scaffolding | `scaffolding/` | Templates, prompts, examples |
+| Scaffolding | `scaffolding/` | runtime, governance, practices |
 | Quality | `assurance/` | Completion checklists |
 | Cognition (partial) | `cognition/context/` | Reference material (tools, compaction) |
 
@@ -285,7 +285,7 @@ Use `harmony.yml` portable paths to bootstrap `.harmony/` in a new repository.
 After bootstrapping, you can:
 
 - **Add repo-specific agents** to `.harmony/agency/actors/agents/`
-- **Create custom templates** in `.harmony/scaffolding/templates/`
+- **Create custom templates** in `.harmony/scaffolding/runtime/templates/`
 - **Add new skills** to `.harmony/capabilities/runtime/skills/`
 - **Record project decisions** in `.harmony/cognition/decisions/`
 - **Track progress** in `.harmony/continuity/`

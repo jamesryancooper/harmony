@@ -158,6 +158,11 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/assurance/runtime/_ops/scripts/assurance-gate.sh"
   require_file "$HARMONY_DIR/assurance/practices/complete.md"
   require_file "$HARMONY_DIR/assurance/practices/session-exit.md"
+
+  require_file "$HARMONY_DIR/scaffolding/runtime/templates/manifest.schema.json"
+  require_file "$HARMONY_DIR/scaffolding/runtime/_ops/scripts/init-project.sh"
+  require_file "$HARMONY_DIR/scaffolding/governance/patterns/README.md"
+  require_file "$HARMONY_DIR/scaffolding/practices/README.md"
 }
 
 check_expected_internals() {
@@ -194,10 +199,15 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/assurance/practices"
   require_dir "$HARMONY_DIR/assurance/practices/standards"
 
-  require_dir "$HARMONY_DIR/scaffolding/patterns"
-  require_dir "$HARMONY_DIR/scaffolding/templates"
-  require_dir "$HARMONY_DIR/scaffolding/prompts"
-  require_dir "$HARMONY_DIR/scaffolding/examples"
+  require_dir "$HARMONY_DIR/scaffolding/runtime"
+  require_dir "$HARMONY_DIR/scaffolding/runtime/_ops"
+  require_dir "$HARMONY_DIR/scaffolding/runtime/_ops/scripts"
+  require_dir "$HARMONY_DIR/scaffolding/runtime/templates"
+  require_dir "$HARMONY_DIR/scaffolding/governance"
+  require_dir "$HARMONY_DIR/scaffolding/governance/patterns"
+  require_dir "$HARMONY_DIR/scaffolding/practices"
+  require_dir "$HARMONY_DIR/scaffolding/practices/prompts"
+  require_dir "$HARMONY_DIR/scaffolding/practices/examples"
 
   require_file "$HARMONY_DIR/assurance/practices/complete.md"
   require_file "$HARMONY_DIR/assurance/practices/session-exit.md"
@@ -281,6 +291,27 @@ check_deprecated_assurance_paths() {
   done
 }
 
+check_deprecated_scaffolding_paths() {
+  local deprecated
+  deprecated=(
+    "$HARMONY_DIR/scaffolding/patterns"
+    "$HARMONY_DIR/scaffolding/templates"
+    "$HARMONY_DIR/scaffolding/prompts"
+    "$HARMONY_DIR/scaffolding/examples"
+    "$HARMONY_DIR/scaffolding/_ops/scripts"
+  )
+
+  local path rel
+  for path in "${deprecated[@]}"; do
+    rel="${path#$ROOT_DIR/}"
+    if [[ -e "$path" ]]; then
+      fail "deprecated scaffolding path exists: $rel"
+    else
+      pass "deprecated scaffolding path removed: $rel"
+    fi
+  done
+}
+
 check_alignment_guardrail() {
   local script="$SCRIPT_DIR/validate-audit-subsystem-health-alignment.sh"
   if [[ ! -f "$script" ]]; then
@@ -311,6 +342,7 @@ main() {
   check_deprecated_orchestration_paths
   check_deprecated_capabilities_paths
   check_deprecated_assurance_paths
+  check_deprecated_scaffolding_paths
   check_alignment_guardrail
 
   echo

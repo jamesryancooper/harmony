@@ -50,4 +50,4 @@ Existing `.harmony/` directory.
 ## References
 
 - **Canonical:** `.harmony/cognition/_meta/architecture/README.md`
-- **Templates:** `.harmony/scaffolding/templates/harmony/` (for missing required files)
+- **Templates:** `.harmony/scaffolding/runtime/templates/harmony/` (for missing required files)

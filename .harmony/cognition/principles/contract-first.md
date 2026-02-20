@@ -106,7 +106,7 @@ Exploratory stage-only spikes may use provisional contracts. ACP-1 internal-only
 
 ## Related Documentation
 
-- `.harmony/scaffolding/patterns/api-design-guidelines.md`
+- `.harmony/scaffolding/governance/patterns/api-design-guidelines.md`
 - `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/methodology/README.md`
 - `.harmony/cognition/pillars/direction.md`

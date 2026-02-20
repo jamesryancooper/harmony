@@ -281,7 +281,7 @@ Phases 1-4 complete normally. Phase 5 verification runs:
 **VERIFICATION:** FAILED
 
 **Remaining References:**
-- `.harmony/scaffolding/templates/example.md:15` — contains `old-name`
+- `.harmony/scaffolding/runtime/templates/example.md:15` — contains `old-name`
 - `tests/fixtures/data.json:42` — contains `old-name`
 ```
 
@@ -291,7 +291,7 @@ Phases 1-4 complete normally. Phase 5 verification runs:
 ## Execution Log (Continuation)
 
 ### Discovered Items
-- [x] 14:45:01 Updated `.harmony/scaffolding/templates/example.md` (1 replacement)
+- [x] 14:45:01 Updated `.harmony/scaffolding/runtime/templates/example.md` (1 replacement)
 - [x] 14:45:05 Updated `tests/fixtures/data.json` (1 replacement)
 
 Note: These files were not in original audit. Added during verification loop.

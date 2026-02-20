@@ -776,7 +776,7 @@ Deliverables go directly to their **final destination** in `.harmony/{{category}
 
 | Category | Purpose | Example Path |
 |----------|---------|--------------|
-| `prompts` | Refined prompts | `.harmony/scaffolding/prompts/` |
+| `prompts` | Refined prompts | `.harmony/scaffolding/practices/prompts/` |
 | `drafts` | Document drafts | `.harmony/output/drafts/` |
 | `reports` | Analysis reports | `.harmony/output/reports/` |
 | `analyses` | Code/data analyses | `.harmony/cognition/analyses/` |
@@ -788,7 +788,7 @@ Skills can write deliverables to custom locations beyond the standard categories
 
 | Tier | Scope | Example Path | Use Case |
 |------|-------|--------------|----------|
-| **Tier 1** | `.harmony/{{category}}/` | `.harmony/scaffolding/prompts/refined.md` | Standard deliverables |
+| **Tier 1** | `.harmony/{{category}}/` | `.harmony/scaffolding/practices/prompts/refined.md` | Standard deliverables |
 | **Tier 2** | `.harmony/**` | `.harmony/custom/exports/data.json` | Custom harness locations |
 | **Tier 3** | `<harness-root>/**` | `src/generated/api-client.ts` | Project source locations |
 

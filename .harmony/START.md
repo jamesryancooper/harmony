@@ -14,13 +14,13 @@ This harness extends `.harmony/` for shared infrastructure.
 | Agents | `.harmony/agency/actors/agents/` | `.harmony/agency/actors/agents/` |
 | Assistants | `.harmony/agency/actors/assistants/` | `.harmony/agency/actors/assistants/` |
 | Teams | `.harmony/agency/actors/teams/` | `.harmony/agency/actors/teams/` |
-| Templates | `.harmony/scaffolding/templates/` | `.harmony/scaffolding/templates/` |
+| Templates | `.harmony/scaffolding/runtime/templates/` | `.harmony/scaffolding/runtime/templates/` |
 | Workflows | `.harmony/orchestration/runtime/workflows/` | `.harmony/orchestration/runtime/workflows/` |
 | Skills | `.harmony/capabilities/runtime/skills/` | `.harmony/capabilities/runtime/skills/` |
 | Commands | `.harmony/capabilities/runtime/commands/` | `.harmony/capabilities/runtime/commands/` |
 | Tools | `.harmony/capabilities/runtime/tools/` | `.harmony/capabilities/runtime/tools/` |
 | Services | `.harmony/capabilities/runtime/services/` | `.harmony/capabilities/runtime/services/` |
-| Prompts | `.harmony/scaffolding/prompts/` | `.harmony/scaffolding/prompts/` |
+| Prompts | `.harmony/scaffolding/practices/prompts/` | `.harmony/scaffolding/practices/prompts/` |
 | Context | `.harmony/cognition/context/` | `.harmony/cognition/context/` |
 | Checklists | `.harmony/assurance/` | `.harmony/assurance/` |
 
@@ -94,10 +94,11 @@ Subsystem expansion specs:
 │
 ├── scaffolding/
 │   ├── _meta/architecture/   ← Scaffolding subsystem specification
-│   ├── patterns/       ← Reusable design/policy patterns
-│   ├── templates/      ← Boilerplate for new content
-│   ├── prompts/        ← Task templates
-│   └── examples/       ← Reference patterns
+│   ├── runtime/        ← Runtime scaffolding artifacts
+│   │   ├── templates/  ← Boilerplate for new content
+│   │   └── _ops/scripts/ ← Scaffolding bootstrap scripts
+│   ├── governance/     ← Reusable design and policy patterns
+│   └── practices/      ← Task prompts and reference examples
 │
 ├── assurance/            ← complete.md, session-exit.md + standards
 │   └── _meta/architecture/   ← Assurance subsystem specification
@@ -138,7 +139,7 @@ Within these namespaces, common subpaths are:
 
 ## Boot Sequence
 
-0. **If `AGENTS.md` is missing at repo root:** run `/init` (or `.harmony/scaffolding/_ops/scripts/init-project.sh`) first; add `--with-boot-files` if `BOOT.md` and `BOOTSTRAP.md` compatibility files are needed; add `--with-agent-platform-adapters` for opt-in adapter bootstrap config
+0. **If `AGENTS.md` is missing at repo root:** run `/init` (or `.harmony/scaffolding/runtime/_ops/scripts/init-project.sh`) first; add `--with-boot-files` if `BOOT.md` and `BOOTSTRAP.md` compatibility files are needed; add `--with-agent-platform-adapters` for opt-in adapter bootstrap config
 1. **Read `scope.md`** → Know boundaries
 2. **Read `conventions.md`** → Know style rules
 3. **Read `cognition/_meta/architecture/specification.md`** → Know canonical harness rules
@@ -238,5 +239,5 @@ cognition/context/              → Permanent knowledge
 - Check `continuity/tasks.json` for blocked items and their blockers
 - Check `cognition/context/lessons.md` for anti-patterns to avoid
 - Check `cognition/context/decisions.md` for relevant past decisions
-- Review `scaffolding/prompts/` for relevant task templates
+- Review `scaffolding/practices/prompts/` for relevant task templates
 - If truly blocked, document the blocker in `continuity/log.md` and stop

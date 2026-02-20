@@ -241,7 +241,7 @@ No external dependencies required.
 /audit-migration manifest="..." structure_spec=".harmony/cognition/_meta/architecture/README.md"
 
 # Enable template smoke test layer
-/audit-migration manifest="..." template_dir=".harmony/scaffolding/templates/"
+/audit-migration manifest="..." template_dir=".harmony/scaffolding/runtime/templates/"
 ```
 
 ### With Partition (for parallel orchestration)

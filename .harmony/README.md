@@ -115,11 +115,11 @@ When resolving a resource, agents check local first, then shared:
 | Agents | `.harmony/agency/actors/agents/` |
 | Assistants | `.harmony/agency/actors/assistants/` |
 | Teams | `.harmony/agency/actors/teams/` |
-| Templates | `.harmony/scaffolding/templates/` |
+| Templates | `.harmony/scaffolding/runtime/templates/` |
 | Workflows | `.harmony/orchestration/runtime/workflows/` |
 | Skills | `.harmony/capabilities/runtime/skills/` |
 | Commands | `.harmony/capabilities/runtime/commands/` |
-| Prompts | `.harmony/scaffolding/prompts/` |
+| Prompts | `.harmony/scaffolding/practices/prompts/` |
 | Checklists | `.harmony/assurance/` |
 | Context | `.harmony/cognition/context/` |
 
@@ -169,9 +169,11 @@ When resolving a resource, agents check local first, then shared:
 │
 ├── scaffolding/
 │   ├── _meta/architecture/ <- Scaffolding subsystem specification
-│   ├── templates/      <- Harness scaffolding (harmony/, harmony-docs/, harmony-node-ts/)
-│   ├── prompts/        <- Task templates
-│   └── examples/       <- Reference patterns
+│   ├── runtime/        <- Runtime scaffolding artifacts
+│   │   ├── templates/  <- Harness scaffolding (harmony/, harmony-docs/, harmony-node-ts/)
+│   │   └── _ops/scripts/ <- Scaffolding bootstrap scripts
+│   ├── governance/     <- Reusable design and policy patterns
+│   └── practices/      <- Task templates and reference examples
 │
 ├── assurance/            <- Assurance gates (complete.md, session-exit.md)
 │   └── _meta/architecture/ <- Assurance subsystem specification
@@ -248,7 +250,7 @@ Harness command directories symlink to `.harmony/capabilities/runtime/commands/`
 **Note:** Codex CLI does not support project-level custom commands. Codex users have two options:
 
 1. Manually copy commands from `.harmony/capabilities/runtime/commands/` to `~/.codex/prompts/`
-2. Run script implementations directly (for example: `.harmony/scaffolding/_ops/scripts/init-project.sh`)
+2. Run script implementations directly (for example: `.harmony/scaffolding/runtime/_ops/scripts/init-project.sh`)
 
 ## Adopting in Other Repos
 
@@ -261,10 +263,10 @@ To use this harness infrastructure in another repository:
 cp -r /path/to/harmony/.harmony /path/to/your-repo/
 
 # 2. Initialize project-level bootstrap files (AGENTS.md, CLAUDE.md alias, alignment-check shim)
-.harmony/scaffolding/_ops/scripts/init-project.sh
+.harmony/scaffolding/runtime/_ops/scripts/init-project.sh
 
 # Optional: also generate BOOT compatibility files
-.harmony/scaffolding/_ops/scripts/init-project.sh --with-boot-files
+.harmony/scaffolding/runtime/_ops/scripts/init-project.sh --with-boot-files
 
 # 3. Customize .harmony/scope.md and .harmony/conventions.md
 ```
@@ -275,7 +277,7 @@ If your tool supports harness commands, run `/init` instead of invoking the scri
 
 | Directory | Purpose |
 |-----------|---------|
-| `scaffolding/templates/` | Harness scaffolding (base + variants) |
+| `scaffolding/runtime/templates/` | Harness scaffolding (base + variants) |
 | `agency/governance/` | Cross-agent contracts and precedence overlays |
 | `agency/actors/agents/` | Supervisory actors and delegation policy |
 | `agency/actors/assistants/` | Generic specialists (reviewer, refactor, docs) |
@@ -287,7 +289,7 @@ If your tool supports harness commands, run `/init` instead of invoking the scri
 | `capabilities/_ops/` | Agent-native deny-by-default control plane (policy, grants, kill-switches, validation) |
 | `capabilities/runtime/skills/` | Composable capabilities with defined I/O |
 | `capabilities/runtime/commands/` | Atomic operations |
-| `scaffolding/prompts/` | Task templates |
+| `scaffolding/practices/prompts/` | Task templates |
 | `assurance/` | Assurance gates |
 | `cognition/context/` | Tool usage, compaction guides |
 

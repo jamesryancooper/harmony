@@ -1,22 +1,23 @@
 # Scaffolding
 
-Templates, prompts, and examples for generating new content.
+Reusable scaffolding assets for harness creation and operating flows.
 
-## Contents
+## Surfaces
 
-| Subdirectory | Purpose | Index |
-|--------------|---------|-------|
-| `_meta/architecture/` | Scaffolding subsystem specification docs | `_meta/architecture/README.md` |
-| `patterns/` | Reusable design and policy patterns | `patterns/README.md` |
-| `templates/` | Boilerplate for new harnesses and artifacts | `templates/manifest.json` per template |
-| `prompts/` | Task templates requiring context and judgment | `prompts/README.md` |
-| `examples/` | Reference patterns for common operations | — |
+| Subdirectory | Surface | Purpose | Index |
+|--------------|---------|---------|-------|
+| `_meta/architecture/` | Reference metadata | Scaffolding subsystem specification docs | `_meta/architecture/README.md` |
+| `runtime/` | Runtime artifacts | Executable scripts and reusable templates consumed by workflows and commands | `runtime/README.md` |
+| `governance/` | Governing contracts | Reusable policy and design patterns that constrain scaffolding outputs | `governance/README.md` |
+| `practices/` | Operating standards | Prompt templates and reference examples used in day-to-day operation | `practices/README.md` |
 
 ## Interaction Model
 
-**Referenced.** Look up templates by name, prompts by task type.
+**Referenced.** Discover template and prompt assets by task, then route through canonical runtime/governance/practices surfaces.
 
-### Available Templates
+## Available Templates
+
+Template bundles live under `runtime/templates/`:
 
 | Template | Inherits | Purpose |
 |----------|----------|---------|

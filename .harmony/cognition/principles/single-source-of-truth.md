@@ -106,7 +106,7 @@ function createUser(input: unknown): User {
 
 ```markdown
 <!-- Good: Reference the source -->
-For API details, see the [API Design Guidelines](../../scaffolding/patterns/api-design-guidelines.md).
+For API details, see the [API Design Guidelines](../../scaffolding/governance/patterns/api-design-guidelines.md).
 
 <!-- Bad: Copy that will drift -->
 ## API Details

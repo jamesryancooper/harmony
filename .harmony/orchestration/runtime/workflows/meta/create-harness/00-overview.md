@@ -24,7 +24,7 @@ Parent directory where `.harmony/` will be created.
 ## Prerequisites
 
 - Exactly one parent directory reference provided
-- `.harmony/scaffolding/templates/harmony/` exists
+- `.harmony/scaffolding/runtime/templates/harmony/` exists
 
 ## Failure Conditions
 
@@ -55,4 +55,4 @@ After workflow completion, run `/init` in the target repo root to generate proje
 ## References
 
 - **Canonical:** `.harmony/cognition/_meta/architecture/README.md`
-- **Templates:** `.harmony/scaffolding/templates/harmony/`
+- **Templates:** `.harmony/scaffolding/runtime/templates/harmony/`

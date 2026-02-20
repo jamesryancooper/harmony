@@ -10,7 +10,7 @@ description: Confirm harness creation and provide next steps.
 1. List all created files
 2. Show customizations made
 3. Suggest next steps:
-   - **"Run `/init` (or `.harmony/scaffolding/_ops/scripts/init-project.sh`) in the target repo root; add `--with-boot-files` if BOOT compatibility is needed."**
+   - **"Run `/init` (or `.harmony/scaffolding/runtime/_ops/scripts/init-project.sh`) in the target repo root; add `--with-boot-files` if BOOT compatibility is needed."**
    - **"Run boot sequence in START.md."**
 
 ## Verification Checklist

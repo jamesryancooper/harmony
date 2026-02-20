@@ -57,7 +57,7 @@ behavior:
     - name: "Output"
       steps:
         - "Structure refined prompt with all context"
-        - "Save to .harmony/scaffolding/prompts/{{timestamp}}-refined.md"
+        - "Save to .harmony/scaffolding/practices/prompts/{{timestamp}}-refined.md"
         - "Log execution to _ops/state/logs/refine-prompt/"
         - "Optionally execute the refined prompt"
   goals:
@@ -304,7 +304,7 @@ Produce the final refined prompt:
    - End with negative constraints and success criteria
 
 2. **Save artifacts**
-   - Write to `.harmony/scaffolding/prompts/{{timestamp}}-refined.md`
+   - Write to `.harmony/scaffolding/practices/prompts/{{timestamp}}-refined.md`
    - Log to `_ops/state/logs/refine-prompt/{{timestamp}}-refine-prompt.md`
 
 3. **Execute (optional)**

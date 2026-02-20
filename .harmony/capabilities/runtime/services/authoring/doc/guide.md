@@ -11,8 +11,8 @@
   auditable, policy-aligned doc updates.
 - **Canonical inputs:**
   - `.harmony/cognition/principles/documentation-is-code.md`
-  - `.harmony/scaffolding/templates/documentation-standards.md`
-  - `.harmony/scaffolding/templates/docs/documentation-standards/`
+  - `.harmony/scaffolding/runtime/templates/documentation-standards.md`
+  - `.harmony/scaffolding/runtime/templates/docs/documentation-standards/`
 - **Integrates with:**
   - Query (fact gathering)
   - Prompt (templated drafting)
@@ -29,7 +29,7 @@
 ## Operational Usage
 
 1. Start from canonical templates in
-   `.harmony/scaffolding/templates/docs/documentation-standards/`.
+   `.harmony/scaffolding/runtime/templates/docs/documentation-standards/`.
 2. Draft or update documentation in the same change set as implementation.
 3. Run documentation quality enforcement before release:
    `/audit-documentation-standards` or `/documentation-quality-gate`.
@@ -42,7 +42,7 @@
 ```json
 {
   "paths": ["docs/**"],
-  "template_root": ".harmony/scaffolding/templates/docs/documentation-standards",
+  "template_root": ".harmony/scaffolding/runtime/templates/docs/documentation-standards",
   "mode": "update",
   "validate_links": true
 }
@@ -54,6 +54,6 @@
 {
   "docs_root": "docs",
   "policy_doc": ".harmony/cognition/principles/documentation-is-code.md",
-  "template_root": ".harmony/scaffolding/templates/docs/documentation-standards"
+  "template_root": ".harmony/scaffolding/runtime/templates/docs/documentation-standards"
 }
 ```

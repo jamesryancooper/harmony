@@ -23,7 +23,7 @@ Related docs:
   - `./overview.md`
   - `./monorepo-layout.md`
   - `./repository-blueprint.md`
-  - `../../scaffolding/examples/stack-profiles/nextjs-astro-vercel.md`
+  - `../../scaffolding/practices/examples/stack-profiles/nextjs-astro-vercel.md`
   - `./layers.md`
   - `./tooling-integration.md`
   - `./runtime-architecture.md`

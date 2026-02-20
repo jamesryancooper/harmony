@@ -20,7 +20,7 @@ skills:
       - "Read"
       - "Glob"
       - "Grep"
-      - "Write(../../scaffolding/prompts/*)"
+      - "Write(../../scaffolding/practices/prompts/*)"
       - "Write(_ops/state/logs/*)"
     allowed_services:
   - id: "refactor"

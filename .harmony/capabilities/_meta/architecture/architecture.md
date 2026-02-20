@@ -216,7 +216,7 @@ Deliverables go directly to their final destination with tiered permissions:
 
 | Tier | Scope | Example Path | Use Case |
 |------|-------|--------------|----------|
-| **Tier 1** | `.harmony/{{category}}/` | `.harmony/scaffolding/prompts/refined.md` | Standard deliverables |
+| **Tier 1** | `.harmony/{{category}}/` | `.harmony/scaffolding/practices/prompts/refined.md` | Standard deliverables |
 | **Tier 2** | `.harmony/**` | `.harmony/output/exports/data.json` | Custom harness locations |
 | **Tier 3** | `<harness-root>/**` | `src/generated/api-client.ts` | Project source locations |
 

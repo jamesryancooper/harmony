@@ -37,6 +37,11 @@ Each entry should be specific enough to avoid false positives.
 - `assurance/trust/` - legacy root assurance trust artifact path - removed by migration `2026-02-20-assurance-bounded-surfaces`
 - `assurance/_ops/scripts/` - legacy root assurance runtime scripts path - removed by migration `2026-02-20-assurance-bounded-surfaces`
 - `assurance/_ops/state/` - legacy root assurance runtime state path - removed by migration `2026-02-20-assurance-bounded-surfaces`
+- `scaffolding/templates/manifest.schema.json` - legacy root scaffolding template schema path - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
+- `scaffolding/_ops/scripts/init-project.sh` - legacy root scaffolding bootstrap script path - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
+- `scaffolding/prompts/README.md` - legacy root scaffolding prompts path - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
+- `scaffolding/examples/create-harness-flow.md` - legacy root scaffolding examples path - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
+- `scaffolding/patterns/api-design-guidelines.md` - legacy root scaffolding governance pattern path - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
 
 ## Banned Paths
 
@@ -50,9 +55,9 @@ Each entry should be specific enough to avoid false positives.
 - `/.harmony/orchestration/missions/` - replaced by `/.harmony/orchestration/runtime/missions/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
 - `/.harmony/orchestration/incidents.md` - moved to governance surface - removed by migration `2026-02-20-orchestration-bounded-surfaces`
 - `/.harmony/orchestration/incident-response.md` - compatibility redirect removed in clean-break migration `2026-02-20-orchestration-bounded-surfaces`
-- `/.harmony/scaffolding/templates/harmony/orchestration/workflows/` - replaced by `/.harmony/scaffolding/templates/harmony/orchestration/runtime/workflows/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
-- `/.harmony/scaffolding/templates/harmony/orchestration/missions/` - replaced by `/.harmony/scaffolding/templates/harmony/orchestration/runtime/missions/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
-- `/.harmony/scaffolding/templates/harmony-docs/orchestration/workflows/` - replaced by `/.harmony/scaffolding/templates/harmony-docs/orchestration/runtime/workflows/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
+- `/.harmony/scaffolding/runtime/templates/harmony/orchestration/workflows/` - replaced by `/.harmony/scaffolding/runtime/templates/harmony/orchestration/runtime/workflows/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
+- `/.harmony/scaffolding/runtime/templates/harmony/orchestration/missions/` - replaced by `/.harmony/scaffolding/runtime/templates/harmony/orchestration/runtime/missions/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
+- `/.harmony/scaffolding/runtime/templates/harmony-docs/orchestration/workflows/` - replaced by `/.harmony/scaffolding/runtime/templates/harmony-docs/orchestration/runtime/workflows/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
 - `/.harmony/capabilities/commands/` - replaced by `/.harmony/capabilities/runtime/commands/` - removed by migration `2026-02-20-capabilities-bounded-surfaces`
 - `/.harmony/capabilities/skills/` - replaced by `/.harmony/capabilities/runtime/skills/` - removed by migration `2026-02-20-capabilities-bounded-surfaces`
 - `/.harmony/capabilities/tools/` - replaced by `/.harmony/capabilities/runtime/tools/` - removed by migration `2026-02-20-capabilities-bounded-surfaces`
@@ -68,7 +73,12 @@ Each entry should be specific enough to avoid false positives.
 - `/.harmony/assurance/trust/` - moved to runtime surface - removed by migration `2026-02-20-assurance-bounded-surfaces`
 - `/.harmony/assurance/_ops/scripts/` - moved to runtime surface - removed by migration `2026-02-20-assurance-bounded-surfaces`
 - `/.harmony/assurance/_ops/state/` - moved to runtime surface - removed by migration `2026-02-20-assurance-bounded-surfaces`
+- `/.harmony/scaffolding/templates/` - replaced by `/.harmony/scaffolding/runtime/templates/` - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
+- `/.harmony/scaffolding/_ops/scripts/` - replaced by `/.harmony/scaffolding/runtime/_ops/scripts/` - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
+- `/.harmony/scaffolding/prompts/` - replaced by `/.harmony/scaffolding/practices/prompts/` - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
+- `/.harmony/scaffolding/examples/` - replaced by `/.harmony/scaffolding/practices/examples/` - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
+- `/.harmony/scaffolding/patterns/` - replaced by `/.harmony/scaffolding/governance/patterns/` - removed by migration `2026-02-20-scaffolding-bounded-surfaces`
 
 ## Banned Config Keys or Env Vars
 
-- `(none currently)` - no legacy config or env keys removed in migrations `2026-02-20-agency-bounded-surfaces`, `2026-02-20-orchestration-bounded-surfaces`, `2026-02-20-capabilities-bounded-surfaces`, or `2026-02-20-assurance-bounded-surfaces`
+- `(none currently)` - no legacy config or env keys removed in migrations `2026-02-20-agency-bounded-surfaces`, `2026-02-20-orchestration-bounded-surfaces`, `2026-02-20-capabilities-bounded-surfaces`, `2026-02-20-assurance-bounded-surfaces`, or `2026-02-20-scaffolding-bounded-surfaces`

@@ -95,7 +95,7 @@ Output paths are defined in `.harmony/capabilities/runtime/skills/registry.yml` 
 
 All operational categories in `.harmony/capabilities/runtime/skills/` follow the `{{category}}/{{skill-id}}/` pattern:
 
-- **Deliverables:** `.harmony/output/{{category}}/` (e.g., `.harmony/scaffolding/prompts/`, `.harmony/output/drafts/`)
+- **Deliverables:** `.harmony/output/{{category}}/` (e.g., `.harmony/scaffolding/practices/prompts/`, `.harmony/output/drafts/`)
 - **Configs:** `.harmony/capabilities/runtime/skills/_ops/state/configs/{{skill-id}}/` (per-skill configuration overrides)
 - **Resources:** `.harmony/capabilities/runtime/skills/_ops/state/resources/{{skill-id}}/` (per-skill input materials)
 - **Continuity Artifacts:** `.harmony/capabilities/runtime/skills/_ops/state/runs/{{skill-id}}/{{run-id}}/` (for stateful/resumable skills)

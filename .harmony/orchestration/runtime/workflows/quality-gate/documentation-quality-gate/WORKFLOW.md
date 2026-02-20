@@ -40,7 +40,7 @@ canonical docs-as-code standards.
 With explicit canonical paths:
 
 ```text
-/documentation-quality-gate docs_root="docs" template_root=".harmony/scaffolding/templates/docs/documentation-standards" policy_doc=".harmony/cognition/principles/documentation-is-code.md"
+/documentation-quality-gate docs_root="docs" template_root=".harmony/scaffolding/runtime/templates/docs/documentation-standards" policy_doc=".harmony/cognition/principles/documentation-is-code.md"
 ```
 
 ## Target
@@ -87,4 +87,4 @@ Documentation Quality Gate is NOT complete until:
 
 - **Skill:** `.harmony/capabilities/runtime/skills/quality-gate/audit-documentation-standards/SKILL.md`
 - **Policy:** `.harmony/cognition/principles/documentation-is-code.md`
-- **Guidance:** `.harmony/scaffolding/templates/documentation-standards.md`
+- **Guidance:** `.harmony/scaffolding/runtime/templates/documentation-standards.md`

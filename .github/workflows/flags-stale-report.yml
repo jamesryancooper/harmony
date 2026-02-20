@@ -26,7 +26,7 @@ jobs:
             --glob '!**/ideation/**' \
             --glob '!**/output/**' \
             --glob '!**/_scaffold/**' \
-            --glob '!**/scaffolding/templates/**' \
+            --glob '!**/scaffolding/runtime/templates/**' \
             --glob '!**/orchestration/runtime/workflows/meta/**' \
             --glob '!**/capabilities/runtime/skills/meta/**' \
             > reference-drift.txt || true

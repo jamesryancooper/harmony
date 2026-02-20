@@ -140,7 +140,7 @@ See `[reference]` for full details.
 | `Workflow:` | Delegating to a harness workflow (multi-step) |
 | `Prompt:` | Delegating to a harness prompt (template) |
 
-**Template:** `.harmony/scaffolding/templates/cursor-command.md`
+**Template:** `.harmony/scaffolding/runtime/templates/cursor-command.md`
 
 ## Progress Log Format
 

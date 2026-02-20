@@ -1,16 +1,16 @@
 ---
 title: Harness Examples
-description: Reference patterns stored in .harmony/scaffolding/examples/ for study and learning
+description: Reference patterns stored in .harmony/scaffolding/practices/examples/ for study and learning
 ---
 
 # Harness Examples
 
-Examples are **reference patterns** stored in `.harmony/scaffolding/examples/`. They demonstrate correct implementation of harness concepts.
+Examples are **reference patterns** stored in `.harmony/scaffolding/practices/examples/`. They demonstrate correct implementation of harness concepts.
 
 ## Location
 
 ```text
-.harmony/scaffolding/examples/
+.harmony/scaffolding/practices/examples/
 └── create-harness-flow.md    # Example of workflow execution
 ```
 
@@ -57,12 +57,12 @@ Examples demonstrate *how things should look*. Templates are *starting points fo
 
 ## Note on Scoped Harness Examples
 
-Complete harness structure examples (for documentation areas, Node.js/TypeScript packages, etc.) have been moved to **scoped templates** in `.harmony/scaffolding/templates/`:
+Complete harness structure examples (for documentation areas, Node.js/TypeScript packages, etc.) have been moved to **scoped templates** in `.harmony/scaffolding/runtime/templates/`:
 
 | Former Example | Now Template |
 |----------------|--------------|
-| `harmony-docs/` | `.harmony/scaffolding/templates/harmony-docs/` |
-| `harmony-node-ts/` | `.harmony/scaffolding/templates/harmony-node-ts/` |
+| `harmony-docs/` | `.harmony/scaffolding/runtime/templates/harmony-docs/` |
+| `harmony-node-ts/` | `.harmony/scaffolding/runtime/templates/harmony-node-ts/` |
 
 Scoped templates are more useful than static examples because they:
 

@@ -374,7 +374,7 @@ See `.harmony/capabilities/_meta/architecture/` for migration guidance.
 
 ## Prompts
 
-**Location:** `.harmony/scaffolding/prompts/<prompt>.md` or `.harmony/scaffolding/prompts/<category>/<prompt>.md`
+**Location:** `.harmony/scaffolding/practices/prompts/<prompt>.md` or `.harmony/scaffolding/practices/prompts/<category>/<prompt>.md`
 
 **Purpose:** Task templates with structured context, instructions, and expected output.
 
@@ -425,7 +425,7 @@ access: human
 
 ## Templates
 
-**Location:** `.harmony/scaffolding/templates/<template-name>/`
+**Location:** `.harmony/scaffolding/runtime/templates/<template-name>/`
 
 **Purpose:** Scaffolding for creating new structures (harnesses, projects, etc.).
 
@@ -585,6 +585,6 @@ Registry supports `pipelines` section for skill composition without manual orche
 | Commands | — | — | `.harmony/capabilities/_meta/architecture/commands.md` |
 | Checklists | — | — | `.harmony/assurance/_meta/architecture/checklists.md` |
 | Prompts | — | — | `.harmony/scaffolding/_meta/architecture/prompts.md` |
-| Templates | — | `.harmony/scaffolding/templates/` | `.harmony/scaffolding/_meta/architecture/templates.md` |
+| Templates | — | `.harmony/scaffolding/runtime/templates/` | `.harmony/scaffolding/_meta/architecture/templates.md` |
 
 > **Note:** Workflows are deprecated. See Skills and Missions.

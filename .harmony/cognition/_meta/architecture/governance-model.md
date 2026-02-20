@@ -7,7 +7,7 @@ description: Autonomous Control Point policy gates, waivers, risk rubric, and CI
 
 Technical governance for the Harmony Structural Paradigm (HSP) defines how changes are proposed, reviewed, validated, and released. This document specifies ACP gates, the waiver policy, CI/CD quality gates, and a risk assessment rubric. The goal is Speed with Safety: rapid iteration without compromising correctness, security, or availability.
 
-Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [overview](./overview.md), [runtime architecture](./runtime-architecture.md), [runtime policy](./runtime-policy.md), [kaizen subsystem](./kaizen-subsystem.md), [tooling integration](./tooling-integration.md), [contracts registry](./contracts-registry.md), [python runtime workspace example](/.harmony/scaffolding/examples/stack-profiles/python-runtime-workspace.md)
+Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [overview](./overview.md), [runtime architecture](./runtime-architecture.md), [runtime policy](./runtime-policy.md), [kaizen subsystem](./kaizen-subsystem.md), [tooling integration](./tooling-integration.md), [contracts registry](./contracts-registry.md), [python runtime workspace example](/.harmony/scaffolding/practices/examples/stack-profiles/python-runtime-workspace.md)
 
 ## Objectives
 

@@ -7,7 +7,7 @@ description: Harmony’s 12-Factor, monolith-first, Hexagonal architecture and T
 
 This document expands the architecture and repo structure sections from the Harmony Methodology. Use it as a high-level, practical guide to the Harmony Structural Paradigm (HSP) — the modular monolith layout, ports/adapters boundaries, and how feature flags and the thin control plane fit into the stack.
 
-The **normative source of truth** for architectural decisions lives under `.harmony/cognition/_meta/architecture/` (for example, `overview.md`, `monorepo-layout.md`, `repository-blueprint.md`, `runtime-architecture.md`, and `contracts-registry.md`). Stack-specific implementation profiles live under `.harmony/scaffolding/examples/stack-profiles/` and are non-normative examples.
+The **normative source of truth** for architectural decisions lives under `.harmony/cognition/_meta/architecture/` (for example, `overview.md`, `monorepo-layout.md`, `repository-blueprint.md`, `runtime-architecture.md`, and `contracts-registry.md`). Stack-specific implementation profiles live under `.harmony/scaffolding/practices/examples/stack-profiles/` and are non-normative examples.
 
 ## Structural Basics
 
@@ -24,7 +24,7 @@ The **normative source of truth** for architectural decisions lives under `.harm
 
 ## Framework Strategy (Next.js, Astro, Vercel, Python)
 
-Canonical framework constraints come from `.harmony/cognition/_meta/architecture/*`. A concrete stack profile example is available at `.harmony/scaffolding/examples/stack-profiles/nextjs-astro-vercel.md`. This repo applies that example profile as follows:
+Canonical framework constraints come from `.harmony/cognition/_meta/architecture/*`. A concrete stack profile example is available at `.harmony/scaffolding/practices/examples/stack-profiles/nextjs-astro-vercel.md`. This repo applies that example profile as follows:
 
 - **Next.js (App Router, React 19)**:
   - `apps/ai-console` is the canonical example: use Server Components and Server Actions as **thin controllers** that orchestrate flows and delegate to `packages/<feature>/domain` or to platform runtimes via contracts (for example, `runtime-flows` clients from `contracts/ts`).
@@ -40,7 +40,7 @@ For day‑to‑day work: treat Next.js and Astro apps as **thin edges** over sli
 
 ## Feature Flags and Thin Control Plane
 
-Harmony’s **feature flag strategy** is defined in `architecture/runtime-policy.md` and illustrated in `.harmony/scaffolding/examples/stack-profiles/nextjs-astro-vercel.md`. This repo applies that strategy with a thin flag client in `packages/config` and platform-level configuration under `platform/runtimes/config/**` (canonical in `repository-blueprint.md` and `runtime-architecture.md`):
+Harmony’s **feature flag strategy** is defined in `architecture/runtime-policy.md` and illustrated in `.harmony/scaffolding/practices/examples/stack-profiles/nextjs-astro-vercel.md`. This repo applies that strategy with a thin flag client in `packages/config` and platform-level configuration under `platform/runtimes/config/**` (canonical in `repository-blueprint.md` and `runtime-architecture.md`):
 
 - **Flag contract in TypeScript**:
   - `packages/config/src/flags.ts` exposes a `FlagProvider` contract plus helpers like `isFlagEnabled()` and `listFlags()`.

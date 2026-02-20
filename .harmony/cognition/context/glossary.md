@@ -18,7 +18,7 @@ Terms used consistently throughout harness documentation. Use these terms exactl
 | Cursor command | User entry point in `.cursor/commands/`, triggered by `/command-name`. |
 | Harness command | Atomic operation in `.harmony/capabilities/runtime/commands/`. |
 | Harness workflow | Multi-step procedure in `.harmony/orchestration/runtime/workflows/`. |
-| Prompt | Task template in `.harmony/scaffolding/prompts/` requiring judgment. |
+| Prompt | Task template in `.harmony/scaffolding/practices/prompts/` requiring judgment. |
 | Agent-ignored | Dot-prefixed directories that agents MUST NOT access autonomously. |
 | Human-led | Directories (`ideation/projects/`, `ideation/scratchpad/`) agents may access only when human explicitly directs to specific files. |
 | Scratchpad | Human-led zone (`ideation/scratchpad/`) for ephemeral content and the early-stage idea funnel. Subdirectories: `inbox/` (staging), `archive/` (deprecated), `brainstorm/` (exploration), `ideas/`, `drafts/`, `daily/`. |

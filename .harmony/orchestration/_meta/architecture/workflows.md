@@ -174,7 +174,7 @@ Each workflow subdirectory contains numbered step files for the agent to follow 
 |-------|----------|---------|
 | **Entry points** | `.<harness>/commands/*.md` | Harness-specific wrappers (Cursor, Claude Code, Codex, etc.) |
 | **Implementation** | `.harmony/orchestration/runtime/workflows/<category>/<name>/` | Multi-step procedure the agent executes (source of truth) |
-| **Templates** | `.harmony/scaffolding/templates/` | Boilerplate for scaffolding |
+| **Templates** | `.harmony/scaffolding/runtime/templates/` | Boilerplate for scaffolding |
 
 ### Usage Examples
 

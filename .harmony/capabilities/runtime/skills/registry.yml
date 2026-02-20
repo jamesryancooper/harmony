@@ -141,7 +141,7 @@ skills:
           description: "Optional folder containing prompt source files"
       outputs:
         - name: refined_prompt
-          path: "../../../scaffolding/prompts/{{timestamp}}-refined.md"
+          path: "../../../scaffolding/practices/prompts/{{timestamp}}-refined.md"
           kind: file
           format: markdown
           determinism: stable
@@ -479,7 +479,7 @@ skills:
       - name: template_root
         type: folder
         required: false
-        default: ".harmony/scaffolding/templates/docs/documentation-standards"
+        default: ".harmony/scaffolding/runtime/templates/docs/documentation-standards"
         description: "Canonical documentation template root"
       - name: policy_doc
         type: file

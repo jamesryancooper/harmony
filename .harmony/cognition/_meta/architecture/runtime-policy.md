@@ -5,7 +5,7 @@ description: Contract enforcement, flags, rollback, and safe rollout practices t
 
 # Runtime Policy: Contract Enforcement, Rollback, and Feature Flags
 
-Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [runtime architecture](./runtime-architecture.md), [observability requirements](./observability-requirements.md), [knowledge plane](../../knowledge-plane/knowledge-plane.md), [governance model](./governance-model.md), [tooling integration](./tooling-integration.md), [python runtime workspace example](/.harmony/scaffolding/examples/stack-profiles/python-runtime-workspace.md), [contracts registry](./contracts-registry.md)
+Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [runtime architecture](./runtime-architecture.md), [observability requirements](./observability-requirements.md), [knowledge plane](../../knowledge-plane/knowledge-plane.md), [governance model](./governance-model.md), [tooling integration](./tooling-integration.md), [python runtime workspace example](/.harmony/scaffolding/practices/examples/stack-profiles/python-runtime-workspace.md), [contracts registry](./contracts-registry.md)
 
 **Purpose:** Define how services behave under abnormal runtime conditions, how we isolate and mitigate failures, and how we roll out and roll back changes safely. This policy enables speed with safety through strong contracts, reversible changes, and progressive delivery.
 

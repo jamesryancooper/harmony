@@ -1,16 +1,16 @@
 ---
 title: Harness Templates
-description: Boilerplate files for creating new content stored in .harmony/scaffolding/templates/
+description: Boilerplate files for creating new content stored in .harmony/scaffolding/runtime/templates/
 ---
 
 # Harness Templates
 
-Templates are **boilerplate files** stored in `.harmony/scaffolding/templates/`. They provide starting points for creating new content within the harness's domain.
+Templates are **boilerplate files** stored in `.harmony/scaffolding/runtime/templates/`. They provide starting points for creating new content within the harness's domain.
 
 ## Location
 
 ```text
-.harmony/scaffolding/templates/
+.harmony/scaffolding/runtime/templates/
 ├── BOOT.md                 # Optional recurring startup checklist template
 ├── BOOTSTRAP.md            # Optional one-time bootstrap checklist template
 ├── AGENTS.md               # Template for project-level AGENTS.md bootstrap
@@ -23,17 +23,18 @@ Templates are **boilerplate files** stored in `.harmony/scaffolding/templates/`.
 │   ├── catalog.md
 │   ├── capabilities/runtime/commands/
 │   ├── orchestration/runtime/workflows/
-│   ├── scaffolding/prompts/
+│   ├── scaffolding/practices/prompts/
+│   ├── scaffolding/governance/patterns/
 │   ├── cognition/context/
 │   ├── continuity/
 │   ├── assurance/
-│   ├── scaffolding/templates/
+│   ├── scaffolding/runtime/templates/
 │   │   ├── AGENTS.md       # Included AGENTS bootstrap template
 │   │   ├── BOOT.md         # Included optional BOOT template
 │   │   └── BOOTSTRAP.md    # Included optional BOOTSTRAP template
-│   ├── scaffolding/_ops/scripts/
+│   ├── scaffolding/runtime/_ops/scripts/
 │   │   └── init-project.sh # Project bootstrap generator
-│   └── scaffolding/examples/
+│   └── scaffolding/practices/examples/
 ├── harmony-docs/           # Scoped template for documentation areas
 │   ├── MANIFEST.md         # Inheritance metadata
 │   ├── START.md            # Overrides base
@@ -82,7 +83,7 @@ The `manifest.json` file defines:
 3. Overlay files listed in `overrides` from the scoped template
 4. Copy additional directories and files from `additions`
 
-A JSON schema is available at `.harmony/scaffolding/templates/manifest.schema.json`.
+A JSON schema is available at `.harmony/scaffolding/runtime/templates/manifest.schema.json`.
 
 ---
 
@@ -141,7 +142,7 @@ See each template's `MANIFEST.md` for human-readable details or `manifest.json` 
 
 ## Using Templates
 
-Templates are typically used by workflows (e.g., `/create-harness` copies from `.harmony/scaffolding/templates/harmony/`).
+Templates are typically used by workflows (e.g., `/create-harness` copies from `.harmony/scaffolding/runtime/templates/harmony/`).
 
 ### With Scoped Templates
 
@@ -164,8 +165,8 @@ Templates are typically used by workflows (e.g., `/create-harness` copies from `
 
 | Type | Purpose | Location |
 |------|---------|----------|
-| **Template** | Starting point to copy and customize | `.harmony/scaffolding/templates/` |
-| **Example** | Reference to study and learn from | `.harmony/scaffolding/examples/` |
+| **Template** | Starting point to copy and customize | `.harmony/scaffolding/runtime/templates/` |
+| **Example** | Reference to study and learn from | `.harmony/scaffolding/practices/examples/` |
 
 Templates are *scaffolds*. Examples are *references*.
 

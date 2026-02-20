@@ -8,7 +8,7 @@ description: Copy harness template structure to target directory.
 Copy the template directory structure to the target:
 
 ```text
-.harmony/scaffolding/templates/harmony/    →    <target>/.harmony/
+.harmony/scaffolding/runtime/templates/harmony/    →    <target>/.harmony/
 ├── START.md                            ├── START.md
 ├── scope.md                            ├── scope.md
 ├── conventions.md                      ├── conventions.md

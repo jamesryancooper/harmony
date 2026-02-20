@@ -20,7 +20,7 @@ Validate all required paths and build an execution plan for the audit step.
 ## Actions
 
 1. Resolve defaults when optional values are not provided:
-   - `template_root` -> `.harmony/scaffolding/templates/docs/documentation-standards`
+   - `template_root` -> `.harmony/scaffolding/runtime/templates/docs/documentation-standards`
    - `policy_doc` -> `.harmony/cognition/principles/documentation-is-code.md`
    - `severity_threshold` -> `all`
 2. Validate paths exist.

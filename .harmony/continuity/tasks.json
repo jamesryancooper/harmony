@@ -34,13 +34,13 @@
     },
     {
       "id": "create-prompts",
-      "description": "Create additional prompt templates in scaffolding/prompts/",
+      "description": "Create additional prompt templates in scaffolding/practices/prompts/",
       "status": "completed",
       "completed_at": "2025-12-10"
     },
     {
       "id": "create-examples",
-      "description": "Add example content to scaffolding/examples/",
+      "description": "Add example content to scaffolding/practices/examples/",
       "status": "completed",
       "completed_at": "2025-12-10"
     },

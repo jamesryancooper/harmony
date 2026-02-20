@@ -71,6 +71,17 @@ Legacy root-level assurance contracts and runtime surfaces (`CHARTER.md`,
 `standards/`, `trust/`, `_ops/scripts/`, `_ops/state/`) are removed as part
 of the clean-break migration.
 
+## Scaffolding Application (Fifth Migration)
+
+Scaffolding applies the same contract:
+
+- runtime artifacts: `/.harmony/scaffolding/runtime/`
+- governance contracts: `/.harmony/scaffolding/governance/`
+- operating standards: `/.harmony/scaffolding/practices/`
+
+Legacy root-level scaffolding surfaces (`templates/`, `prompts/`, `examples/`,
+`patterns/`, `_ops/scripts/`) are removed as part of the clean-break migration.
+
 ## Benefits
 
 | Benefit | Why It Matters |

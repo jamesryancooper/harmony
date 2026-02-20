@@ -1,97 +1,52 @@
 ---
-title: Harness Scripts
-description: Shell scripts for harness health checks and automation.
+title: Harness Scaffolding Scripts
+description: Executable scaffolding scripts owned by the scaffolding runtime surface.
 ---
 
-# Harness Scripts
+# Harness Scaffolding Scripts
 
-Scripts are **shell utilities** stored at the primary (repo-root) `.harmony/` level. They provide automation for harness maintenance tasks that are better suited to shell execution than agent procedures.
+Scaffolding runtime scripts are executable utilities used to bootstrap and validate harness assets.
 
 ## Location
 
 ```text
-.harmony/
-└── init.sh    # Health check script
+.harmony/scaffolding/runtime/_ops/scripts/
+└── init-project.sh    # Bootstrap project-level AGENTS/BOOT/alignment files
 ```
 
----
+## `init-project.sh`
 
-## `init.sh`
-
-The primary root-harness script. Verifies that root-profile files and directories exist.
+The primary scaffolding bootstrap script. It renders project-level files from the canonical templates under `scaffolding/runtime/templates/`.
 
 ### Purpose
 
-- Validate harness structure integrity
-- Report missing required components
-- Identify available standard directories
-- Validate the repo-root harness profile (not minimal descendant profiles)
+- Generate `AGENTS.md` from template using default-agent interpolation
+- Optionally generate compatibility boot files (`BOOT.md`, `BOOTSTRAP.md`)
+- Generate root `alignment-check` shim
+- Optionally initialize agent-platform adapter bootstrap config
 
 ### Usage
 
 ```bash
-cd .harmony
-./init.sh
+.harmony/scaffolding/runtime/_ops/scripts/init-project.sh
 ```
 
-### Output
+Optional flags:
 
-```text
-=== .harmony Health Check ===
-✓ START.md
-✓ scope.md
-✓ conventions.md
-✓ catalog.md
-✓ continuity/
-✓ assurance/
-✓ scaffolding/prompts/
-✓ orchestration/runtime/workflows/
-✓ capabilities/runtime/commands/
-✓ cognition/context/
-
-Standard directories:
-✓ scaffolding/templates/
-○ scaffolding/examples/ (not created)
-
-=== Ready ===
-```
-
-### Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| `0` | All required files/directories present |
-| `1` | One or more required items missing |
-
-Descendant harnesses may intentionally omit many root-profile directories. Use `init.sh` as a root harness check, not as a strict descendant harness validator.
-
----
-
-## When to Use Scripts vs Workflows
-
-| Use Case | Use Script | Use Workflow |
-|----------|------------|--------------|
-| Simple file/directory checks | ✅ | — |
-| Complex multi-step procedures | — | ✅ |
-| Needs agent judgment | — | ✅ |
-| Pure validation (no changes) | ✅ | — |
-| Creates or modifies files | — | ✅ |
-
-Scripts are for **quick validation**. Workflows are for **agent-driven procedures**.
-
----
+- `--with-boot-files`
+- `--with-agent-platform-adapters`
+- `--agent-platform-adapters <csv>`
+- `--force`
+- `--dry-run`
 
 ## Script Conventions
 
-1. **Location** — Scripts live at `.harmony/` root, not in subdirectories
-2. **Naming** — Use descriptive names: `init.sh`, `validate.sh`
-3. **Shebang** — Always include `#!/bin/bash`
-4. **Exit on error** — Include `set -e` for fail-fast behavior
-5. **Output** — Use clear status indicators: `✓`, `✗`, `○`
-
----
+1. Scripts live under `scaffolding/runtime/_ops/scripts/`.
+2. Scripts use fail-fast shell settings (`set -euo pipefail`).
+3. Scripts operate only on canonical runtime/governance/practices surfaces.
+4. Scripts fail closed on missing required templates or manifests.
 
 ## See Also
 
-- [README.md](./README.md) — Canonical harness structure
-- [Checklists](../../../assurance/_meta/architecture/checklists.md) — Quality gates (agent-facing alternative to validation scripts)
+- [Templates](./templates.md) - canonical scaffolding templates
+- [README.md](./README.md) - scaffolding architecture index

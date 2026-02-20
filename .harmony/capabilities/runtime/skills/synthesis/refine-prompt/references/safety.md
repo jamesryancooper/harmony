@@ -5,7 +5,7 @@ description: Safety policies and constraints for the refine-prompt skill.
 #   - Tool permissions: SKILL.md frontmatter `allowed-tools`
 #   - Output paths: .harmony/capabilities/runtime/skills/registry.yml
 #
-# Current allowed-tools: Read Glob Grep Write(../../scaffolding/prompts/*) Write(_ops/state/logs/*)
+# Current allowed-tools: Read Glob Grep Write(../../scaffolding/practices/prompts/*) Write(_ops/state/logs/*)
 #
 # Prose descriptions below are derived from these sources.
 # If discrepancies exist, the authoritative sources are correct.
@@ -33,7 +33,7 @@ This skill requires read access to codebase files, glob for pattern matching, gr
 
 The skill may only write to:
 
-- `.harmony/scaffolding/prompts/**` — Refined prompts (deliverables)
+- `.harmony/scaffolding/practices/prompts/**` — Refined prompts (deliverables)
 - `.harmony/capabilities/runtime/skills/_ops/state/logs/**` — Execution logs
 
 ### Destructive Actions
