@@ -83,6 +83,10 @@ apply_hotfix_without_runbook = True
   `.harmony/capabilities/services/authoring/doc/guide.md`
 - Enforcement:
   `/audit-documentation-standards` or `/documentation-quality-gate`
+- Promotion input minimums and receipt field requirements:
+  [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md)
+- Shared terminology:
+  [RA/ACP Glossary](./_meta/ra-acp-glossary.md)
 
 ## Promotion-Time Artifact Completeness (SSOT)
 
@@ -95,7 +99,7 @@ any staged work begins.
 For ACP promotion, missing required governance artifacts MUST fail closed:
 
 - ACP decision MUST be `STAGE_ONLY` or `DENY` (never silent allow)
-- receipt MUST include a reason code (for example `DOCS_ARTIFACTS_MISSING`)
+- receipt MUST include reason codes (`ACP_EVIDENCE_MISSING` and `ACP_DOCS_EVIDENCE_MISSING`)
 - receipt MUST include missing artifact identifiers for remediation
 - durable promotion MUST remain blocked until artifacts are complete
 
@@ -106,13 +110,14 @@ Current enforcement assets:
 - audit command: `/audit-documentation-standards`
   (`.harmony/capabilities/skills/quality-gate/audit-documentation-standards/SKILL.md`)
 
-Required enforcement binding (status: Required, until runtime policy wiring is complete):
+Live enforcement binding:
 
-- ACP promotion evaluation must consume documentation gate evidence and emit
-  `STAGE_ONLY`/`DENY` with reason-coded receipt fields when required docs are
-  missing.
-- CI must run the principles governance checks and docs promotion fail-closed
-  contract test before merge:
+- ACP promotion evaluation consumes docs-gate evidence from policy at
+  `.harmony/capabilities/_ops/policy/deny-by-default.v2.yml#acp.docs_gate`.
+- Missing docs-gate evidence produces reason-coded `STAGE_ONLY` or `DENY`
+  outcomes (policy-mapped by ACP level) and emits receipts.
+- CI must run governance lint and docs promotion fail-closed contract tests
+  before merge:
   `.harmony/cognition/principles/_ops/scripts/lint-principles-governance.sh`
   and
   `.harmony/cognition/principles/_ops/scripts/test-docs-promotion-fail-closed.sh`.
@@ -151,5 +156,5 @@ contract, schema, or risk changes.
 - `.harmony/scaffolding/templates/documentation-standards.md`
 - `.harmony/orchestration/workflows/quality-gate/documentation-quality-gate/WORKFLOW.md`
 - `.harmony/capabilities/skills/quality-gate/audit-documentation-standards/SKILL.md`
-- `.harmony/cognition/principles/pillars/direction.md`
-- `.harmony/cognition/principles/pillars/continuity.md`
+- `.harmony/cognition/pillars/direction.md`
+- `.harmony/cognition/pillars/continuity.md`

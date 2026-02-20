@@ -22,9 +22,23 @@ In AI-assisted development, determinism is especially critical because LLMs are 
 
 This document defines determinism posture (default deterministic behavior with bounded policy variance).
 Canonical replay/provenance field requirements are defined in [Determinism and Provenance](./determinism-and-provenance.md).
+Canonical provenance schema pointer:
+`.harmony/capabilities/_ops/policy/acp-provenance-fields.schema.json`.
 
 Deterministic replay is required for ACP promote decisions and associated receipts.
 Bounded variance is allowed only inside policy-declared envelopes for long autonomous runs, with declared mode/parameters and receipt linkage.
+
+## Normative Boundary Matrix
+
+| Requirement class | Normative owner |
+|---|---|
+| Runtime posture (deterministic by default, bounded variance envelopes) | This document |
+| Required provenance/receipt fields for replay | [Determinism and Provenance](./determinism-and-provenance.md) |
+| Promotion decisions and gate outcomes | [Autonomous Control Points](./autonomous-control-points.md) |
+| Capability-attempt authorization | [Deny by Default](./deny-by-default.md) |
+
+Shared terms for apply/promote/finalize and approval/attestation/quorum are
+defined in [RA/ACP Glossary](./_meta/ra-acp-glossary.md).
 
 ## Why It Matters
 
@@ -424,4 +438,4 @@ Determinism is default; bounded variance requires explicit policy and receipt pr
 - [Insight Pillar](../pillars/insight.md) — Learning requires reproducibility
 - [Agentic Principles](./README.md#agentic-principles) — Determinism & provenance for AI
 - [Autonomous Control Points](./autonomous-control-points.md) — Policy gates and receipts for bounded variance
-- [EvalKit](/.harmony/capabilities/services/_meta/docs/kits-reference.md) — Deterministic AI evaluation
+- [EvalKit](../../capabilities/services/_meta/docs/kits-reference.md) — Deterministic AI evaluation

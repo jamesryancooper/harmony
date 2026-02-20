@@ -27,6 +27,11 @@ Owner attestation asserts:
 - exception TTL (time-bound validity)
 - rollback plan reference for the affected boundary
 
+Machine-attestable owner signal sources (canonical):
+- `CODEOWNERS`
+- ownership registry under `.harmony/`
+- boundaries manifests
+
 Owner attestation is policy-scoped:
 
 - required only for boundary exceptions and ACP-2/ACP-3 categories when policy says so
@@ -37,9 +42,13 @@ hash-bound to the staged artifacts so policy can verify integrity.
 
 Owner attestation is input to ACP quorum when policy requires it; it is not a
 separate gating mechanism.
-If required attestation is missing at policy timeout, default to `STAGE_ONLY`;
-policy may add `ESCALATE` where required. Never silently allow. Runs do not wait
-for standing human approval unless policy explicitly triggers escalation.
+If required attestation is missing, runtime behavior is deterministic and bounded:
+
+- immediate decision: `STAGE_ONLY` with `ACP_OWNER_ATTESTATION_MISSING`
+- bounded retry policy: policy-defined attempts/backoff and timeout window
+- exhausted window: policy may return `ESCALATE` with
+  `ACP_OWNER_ATTESTATION_TIMEOUT`
+- no indefinite waiting and no standalone human gate
 
 ## Arbitration
 
@@ -107,6 +116,8 @@ from billing._private.retries import force_retry_all
 
 - Promotion/contraction and quorum mechanics: [Autonomous Control Points](./autonomous-control-points.md)
 - Capability attempt authorization: [Deny by Default](./deny-by-default.md)
+- Promotion evidence/receipt minimums: [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md)
+- Shared terminology: [RA/ACP Glossary](./_meta/ra-acp-glossary.md)
 
 ## Anti-Pattern: Boundary Erosion
 
@@ -125,6 +136,6 @@ Promotion authority remains ACP policy gate + required quorum.
 - `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/principles/autonomous-control-points.md`
 - `.harmony/cognition/principles/deny-by-default.md`
-- `.harmony/cognition/principles/pillars/focus.md`
-- `.harmony/cognition/principles/pillars/continuity.md`
-- `.harmony/cognition/principles/pillars/trust.md`
+- `.harmony/cognition/pillars/focus.md`
+- `.harmony/cognition/pillars/continuity.md`
+- `.harmony/cognition/pillars/trust.md`

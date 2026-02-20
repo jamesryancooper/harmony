@@ -421,6 +421,7 @@
       "additionalProperties": false,
       "required": [
         "levels",
+        "risk_tier_mapping",
         "profile_defaults",
         "rules"
       ],
@@ -431,6 +432,12 @@
           "items": {
             "$ref": "#/$defs/acpLevelDescriptor"
           }
+        },
+        "risk_tier_mapping": {
+          "$ref": "#/$defs/riskTierAcpMapping"
+        },
+        "docs_gate": {
+          "$ref": "#/$defs/acpDocsGate"
         },
         "profile_defaults": {
           "type": "object",
@@ -517,6 +524,73 @@
         },
         "break_glass_required": {
           "type": "boolean"
+        }
+      }
+    },
+    "riskTierAcpMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "properties": {
+        "low": {
+          "$ref": "#/$defs/acpLevel"
+        },
+        "medium": {
+          "$ref": "#/$defs/acpLevel"
+        },
+        "high": {
+          "$ref": "#/$defs/acpLevel"
+        }
+      }
+    },
+    "acpDocsGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enforce_on_phase",
+        "evidence_types",
+        "missing_action_by_acp"
+      ],
+      "properties": {
+        "enforce_on_phase": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "stage",
+              "promote",
+              "finalize"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "evidence_types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "reason_code": {
+          "type": "string",
+          "pattern": "^ACP_[A-Z0-9_]+$"
+        },
+        "missing_action_by_acp": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/acpDecision"
+          },
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^ACP-[0-4]$"
+          }
         }
       }
     },
@@ -885,6 +959,91 @@
               "uniqueItems": true
             }
           }
+        },
+        "owner_attestation": {
+          "$ref": "#/$defs/ownerAttestationConfig"
+        }
+      }
+    },
+    "ownerAttestationConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "role",
+        "sources",
+        "required_for_acp",
+        "required_when_target_flags",
+        "timeout_seconds",
+        "retry",
+        "escalate_on_exhausted"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "codeowners",
+              "ownership_registry",
+              "boundaries_manifest"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "required_for_acp": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/acpLevel"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "required_when_target_flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "boundary_exception",
+              "owner_scope",
+              "owner_attestation_required"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_attempts",
+            "backoff_seconds"
+          ],
+          "properties": {
+            "max_attempts": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "backoff_seconds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "escalate_on_exhausted": {
+          "type": "boolean"
         }
       }
     },

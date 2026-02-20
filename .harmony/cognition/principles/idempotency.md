@@ -96,5 +96,5 @@ Pure read operations do not require idempotency keys.
 
 - `.harmony/scaffolding/patterns/api-design-guidelines.md`
 - `.harmony/cognition/methodology/README.md`
-- `.harmony/cognition/principles/pillars/trust.md`
-- `.harmony/cognition/principles/pillars/velocity.md`
+- `.harmony/cognition/pillars/trust.md`
+- `.harmony/cognition/pillars/velocity.md`

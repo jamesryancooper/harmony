@@ -15,7 +15,8 @@ Observability is not optional instrumentation added later. Every meaningful beha
 
 Harmony uses risk-tiered telemetry profiles (`minimal`, `sampled`, `full`) mapped to ACP level, side-effect profile, and run budgets.
 
-PR evidence must include at least one representative `trace_id` for changed flows.
+Receipt evidence must include at least one representative `trace_id` for changed flows.
+If a PR exists, PR evidence is an optional projection that links back to receipt artifacts.
 
 ## Why It Matters
 
@@ -42,13 +43,15 @@ Learning loops depend on measurable outcomes, not anecdotes.
 
 ### Telemetry Profiles (Risk + Budget Aware)
 
-| Tier | Minimum Signals | Typical ACP Mapping |
-|---|---|---|
-| `minimal` | Structured event + core metric + representative `trace_id` | ACP-1 promote (acceptable for low-risk reversible slices) |
-| `sampled` | Tiered spans/logs/metrics with trace correlation and sampling policy | ACP-1 promote and ACP-1/ACP-2 stage runs under budget/circuit constraints |
-| `full` | Complete spans, structured logs, key metrics, and rollback signals | ACP-2 promote default; ACP-3 promote required with additional recovery/breaker signals |
+| Tier | Minimum Signals |
+|---|---|
+| `minimal` | Structured event + core metric + representative `trace_id` |
+| `sampled` | Tiered spans/logs/metrics with trace correlation and sampling policy |
+| `full` | Complete spans, structured logs, key metrics, and rollback signals |
 
-Default mapping is policy-driven. ACP-1 promote may use `minimal` or `sampled`. ACP-2 promote defaults to `full`, and ACP-3 promote requires `full` plus additional recovery and breaker signals.
+Default risk tier to ACP mapping is policy-canonical (`acp.risk_tier_mapping`).
+Telemetry profile expectations by ACP level are defined in the RA/ACP promotion
+inputs matrix.
 
 Non-negotiable minimum signals (must never be dropped):
 - representative `trace_id`
@@ -112,6 +115,8 @@ service.submit(order_id)  # No span, no metric, no trace linkage
 
 - Promotion/contraction and budget envelopes: [Autonomous Control Points](./autonomous-control-points.md)
 - Capability attempt authorization: [Deny by Default](./deny-by-default.md)
+- Risk tier mapping and promotion evidence minimums: [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md)
+- Shared terminology: [RA/ACP Glossary](./_meta/ra-acp-glossary.md)
 
 ## Anti-Pattern: Blind Shipping
 
@@ -133,6 +138,6 @@ Telemetry profile requirements must stay inside ACP budget/circuit envelopes.
 - `.harmony/cognition/_meta/architecture/observability-requirements.md`
 - `.harmony/cognition/principles/autonomous-control-points.md`
 - `.harmony/cognition/principles/deny-by-default.md`
-- `.harmony/cognition/principles/pillars/continuity.md`
-- `.harmony/cognition/principles/pillars/trust.md`
-- `.harmony/cognition/principles/pillars/insight.md`
+- `.harmony/cognition/pillars/continuity.md`
+- `.harmony/cognition/pillars/trust.md`
+- `.harmony/cognition/pillars/insight.md`

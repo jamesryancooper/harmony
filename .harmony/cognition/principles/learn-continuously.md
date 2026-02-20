@@ -13,7 +13,8 @@ status: Active
 
 Learning is operationalized as a routine loop: capture evidence, identify causes, define small follow-ups, and verify impact. Harmony favors many small improvements over rare large process overhauls.
 
-Incident postmortems should be published within 48 hours of mitigation.
+Guidance (non-normative): publish incident postmortems within 48 hours of
+mitigation when practical. This timing target is not a fail-closed ACP gate.
 
 ## Why It Matters
 
@@ -86,5 +87,5 @@ For trivial incidents with no user impact, use a lightweight note instead of a f
 
 - `.harmony/cognition/methodology/reliability-and-ops.md`
 - `.harmony/cognition/methodology/tooling-and-metrics.md`
-- `.harmony/cognition/principles/pillars/insight.md`
-- `.harmony/cognition/principles/pillars/continuity.md`
+- `.harmony/cognition/pillars/insight.md`
+- `.harmony/cognition/pillars/continuity.md`

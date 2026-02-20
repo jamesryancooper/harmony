@@ -38,6 +38,8 @@ These always-visible fields are the minimum progressive-disclosure surface for p
 
 - Promotion/contraction mechanics: [Autonomous Control Points](./autonomous-control-points.md)
 - Capability attempt authorization: [Deny by Default](./deny-by-default.md)
+- Promotion evidence and receipt minimums: [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md)
+- Shared terminology: [RA/ACP Glossary](./_meta/ra-acp-glossary.md)
 
 ## Arbitration
 
@@ -96,5 +98,5 @@ Read-only automation (analysis, reporting, lint suggestions) can run without pro
 - `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/principles/autonomous-control-points.md`
 - `.harmony/cognition/principles/deny-by-default.md`
-- `.harmony/cognition/principles/pillars/trust.md`
-- `.harmony/cognition/principles/pillars/direction.md`
+- `.harmony/cognition/pillars/trust.md`
+- `.harmony/cognition/pillars/direction.md`

@@ -15,6 +15,9 @@ Every AI-assisted artifact should carry run metadata: provider, model/version, p
 
 This document is Harmony's single normative source for replay and reproducibility semantics across deterministic execution, idempotent retries, and ACP receipts.
 
+Canonical provenance schema pointer:
+`.harmony/capabilities/_ops/policy/acp-provenance-fields.schema.json`.
+
 ## SSOT: Replay and Reproducibility Contract
 
 For any materially relevant run, record:
@@ -25,6 +28,18 @@ For any materially relevant run, record:
 - evidence identity (trace/eval IDs, evidence bundle refs, receipt ID, rollback handle ref where applicable)
 
 Bounded variance is valid only when policy-approved and receipted. Deterministic mode remains the default.
+
+## Normative Boundary Matrix
+
+| Requirement class | Normative owner |
+|---|---|
+| Required provenance and receipt replay fields | This document |
+| Runtime variance posture (deterministic vs bounded variance) | [Governed Determinism](./determinism.md) |
+| Promotion/contraction gate outcomes and ACP levels | [Autonomous Control Points](./autonomous-control-points.md) |
+| Capability-attempt authorization | [Deny by Default](./deny-by-default.md) |
+
+Terminology for apply/promote/finalize and approval/attestation/quorum is
+defined in [RA/ACP Glossary](./_meta/ra-acp-glossary.md).
 
 ## Normative Boundary
 
@@ -117,6 +132,6 @@ Exploratory local prompts may skip full records, but production-impacting output
 - `.harmony/cognition/principles/determinism.md`
 - `.harmony/cognition/methodology/README.md`
 - `.harmony/capabilities/services/_meta/docs/platform-overview.md`
-- `.harmony/cognition/principles/pillars/trust.md`
-- `.harmony/cognition/principles/pillars/insight.md`
-- `.harmony/cognition/principles/pillars/continuity.md`
+- `.harmony/cognition/pillars/trust.md`
+- `.harmony/cognition/pillars/insight.md`
+- `.harmony/cognition/pillars/continuity.md`

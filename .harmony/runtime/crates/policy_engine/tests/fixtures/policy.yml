@@ -75,6 +75,19 @@ acp:
     - id: ACP-4
       name: Irreversible
       description: Irreversible operations
+  risk_tier_mapping:
+    low: ACP-1
+    medium: ACP-2
+    high: ACP-3
+  docs_gate:
+    enforce_on_phase: [promote]
+    evidence_types: [docs.spec, docs.adr, docs.runbook]
+    reason_code: ACP_DOCS_EVIDENCE_MISSING
+    missing_action_by_acp:
+      ACP-1: STAGE_ONLY
+      ACP-2: DENY
+      ACP-3: DENY
+      ACP-4: DENY
   profile_defaults:
     refactor:
       ceiling: ACP-3
@@ -189,10 +202,23 @@ attestations:
       description: Verifies
     recovery:
       description: Recovery checks
+    owner:
+      description: Boundary owner attestation
   binding:
     require_plan_hash: true
     require_evidence_hash: true
     allowed_hash_algorithms: [sha256]
+  owner_attestation:
+    enabled: true
+    role: owner
+    sources: [codeowners, ownership_registry, boundaries_manifest]
+    required_for_acp: [ACP-2, ACP-3]
+    required_when_target_flags: [boundary_exception, owner_scope, owner_attestation_required]
+    timeout_seconds: 900
+    retry:
+      max_attempts: 3
+      backoff_seconds: 60
+    escalate_on_exhausted: true
 circuit_breakers:
   repo-stage:
     triggers:

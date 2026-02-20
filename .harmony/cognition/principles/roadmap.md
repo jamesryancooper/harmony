@@ -92,5 +92,5 @@ Add a 1-page quick-reference that maps common decisions to relevant principles f
 
 - `.harmony/cognition/principles/principles.md`
 - `.harmony/cognition/principles/README.md`
-- `.harmony/cognition/principles/pillars/README.md`
+- `.harmony/cognition/pillars/README.md`
 - `.harmony/cognition/methodology/README.md`

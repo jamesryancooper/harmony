@@ -15,7 +15,7 @@ Harmony treats small-batch delivery as policy, not preference. Changes should be
 
 For material side-effects, fast merges are encouraged only after ACP promote requirements (evidence + receipts) are satisfied. "Merge quickly" never bypasses ACP stage/promote sequencing.
 
-Default thresholds:
+Default thresholds (review-quality guidance, not ACP hard gates):
 
 - Branch lifetime `<= 1 working day`
 - PR size `<= 400 changed lines` (excluding generated/lock files)
@@ -23,6 +23,8 @@ Default thresholds:
 
 Thresholds apply per promotable slice (receipt-linked unit), not mission wall-clock duration. Long autonomous runs may contain multiple staged slices; each promoted slice should remain small and single-purpose.
 Promotable-slice semantics are defined in [Documentation is Code](./documentation-is-code.md#promotable-slice-definition).
+For non-PR promote paths, the same small-slice guidance applies to receipt-linked
+promotions and decomposition planning.
 
 ## Why It Matters
 
@@ -114,5 +116,5 @@ Fast trunk flow cannot bypass stage/promote for material side effects.
 - `.harmony/cognition/methodology/flow-and-wip-policy.md`
 - `.harmony/cognition/principles/autonomous-control-points.md`
 - `.harmony/cognition/principles/no-silent-apply.md`
-- `.harmony/cognition/principles/pillars/velocity.md`
-- `.harmony/cognition/principles/pillars/trust.md`
+- `.harmony/cognition/pillars/velocity.md`
+- `.harmony/cognition/pillars/trust.md`

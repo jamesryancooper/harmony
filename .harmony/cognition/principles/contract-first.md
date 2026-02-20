@@ -21,6 +21,8 @@ Stage-only exploratory work may use provisional contracts while iterating on sha
 Before any durable promotion, contracts must be finalized, validated, and included in the promoted slice (receipt-linked unit).
 Promotion authority remains the ACP gate: see [Autonomous Control Points](./autonomous-control-points.md).
 Artifact timing and promotable-slice semantics are defined in [Documentation is Code](./documentation-is-code.md#promotable-slice-definition).
+Promotion input minimums and receipt requirements are canonical in the RA/ACP
+promotion inputs matrix.
 
 ## Why It Matters
 
@@ -89,6 +91,11 @@ def handle_event(evt: dict):
 - `Documentation is Code` keeps interface intent versioned.
 - `Observability as a Contract` ensures contract breakage is detectable.
 
+## Canonical References
+
+- Promotion inputs and receipt requirements: [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md)
+- Shared terminology: [RA/ACP Glossary](./_meta/ra-acp-glossary.md)
+
 ## Anti-Pattern: Code-first Drift
 
 When implementations change before contracts, generated clients drift, compatibility breaks late, and CI loses predictive power.
@@ -102,5 +109,5 @@ Skip full schema formalization only for short-lived exploratory spikes that neve
 - `.harmony/scaffolding/patterns/api-design-guidelines.md`
 - `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/methodology/README.md`
-- `.harmony/cognition/principles/pillars/direction.md`
-- `.harmony/cognition/principles/pillars/trust.md`
+- `.harmony/cognition/pillars/direction.md`
+- `.harmony/cognition/pillars/trust.md`

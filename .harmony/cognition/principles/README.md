@@ -131,9 +131,9 @@ These defaults are normative unless a documented waiver applies:
 - Waiver duration: `<= 7 days` or until merge (whichever is sooner).
 - Flag hygiene: each flag must have owner + expiry and be removed within `<= 2 release cycles` after GA.
 - Rollback-first rule: if safe fix-forward is not possible within `15 minutes`, execute rollback.
-- Incident postmortem SLA: publish within `48 hours` of incident mitigation.
+- Incident postmortem timing guidance: target publication within `48 hours` of incident mitigation.
 - Mutating APIs and kit calls: `idempotency_key` is mandatory.
-- Observability evidence: changed flows must emit OTel spans + structured logs and include a representative `trace_id` in PR evidence.
+- Observability evidence: changed flows must emit OTel spans + structured logs and include a representative `trace_id` in receipts (and PR projection when PR exists).
 - Contract drift threshold: generated implementations are valid only when all required fixtures pass.
 - Validation cache policy: content-hash keyed; invalidate immediately on relevant file change.
 - Tier 1 validator compliance: required input/output fields and exit-code semantics (`0/1/2/3`) must be preserved.
@@ -168,7 +168,7 @@ These defaults are normative unless a documented waiver applies:
 ## Related Docs
 
 - `.harmony/cognition/principles/arbitration-and-precedence.md`
-- `.harmony/cognition/principles/pillars/README.md`
+- `.harmony/cognition/pillars/README.md`
 - `.harmony/cognition/methodology/README.md`
 - `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/_meta/architecture/observability-requirements.md`

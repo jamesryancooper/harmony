@@ -54,12 +54,15 @@ policy engine.
 | `ACP_ROLLBACK_PROOF_MISSING` | Rollback proof required (ACP-2+) but missing. | Run rollback validation in staging and attach proof evidence. |
 | `ACP_RECOVERY_WINDOW_MISSING` | Recovery TTL/window required for destructive-adjacent action. | Set `recovery_window` (or rely on policy default when allowed). |
 | `ACP_EVIDENCE_MISSING` | Required evidence bundle entries are missing. | Attach required evidence refs + hashes (diff/tests/plan/etc.). |
+| `ACP_DOCS_EVIDENCE_MISSING` | Required docs-gate evidence (`docs.spec`, `docs.adr`, `docs.runbook`) is missing for promote evaluation. | Attach docs evidence refs/hashes or keep action staged. |
 | `ACP_EVIDENCE_INVALID` | Evidence present but malformed or hash mismatch. | Regenerate evidence artifact and ensure canonical hash binding. |
 | `ACP_ATTESTATION_FIELD_MISSING` | One or more required attestation fields were absent/blank. | Include all policy-required attestation fields before retrying quorum checks. |
 | `ACP_ATTESTATION_INVALID` | Attestation payload format was invalid (unsupported required field, invalid timestamp, or malformed record). | Regenerate attestations with schema-compliant field values. |
 | `ACP_ATTESTATION_ROLE_MISMATCH` | Attestation roles did not satisfy required role constraints. | Supply attestations from required roles (`proposer`, `verifier`, `recovery`) as policy requires. |
 | `ACP_QUORUM_MISSING` | Required quorum roles/signatures were missing. | Gather required attestations and resubmit gate request. |
 | `ACP_QUORUM_INVALID` | Attestations do not bind to shared plan/evidence hashes. | Re-issue attestations for the same plan/evidence identity. |
+| `ACP_OWNER_ATTESTATION_MISSING` | Boundary owner attestation was required by policy but not present. | Source owner signal from CODEOWNERS/registry/manifest and retry within policy window. |
+| `ACP_OWNER_ATTESTATION_TIMEOUT` | Owner attestation retry/time window was exhausted. | Escalate per policy and keep operation staged until owner signal is resolved. |
 | `ACP_BUDGET_SET_MISSING` | Required budget set is missing or unknown. | Fix budget set reference in policy or request payload. |
 | `ACP_BUDGET_EXCEEDED` | Runtime counters exceeded configured budget thresholds. | Reduce scope, split into smaller promotions, or request temporary exception. |
 | `ACP_CIRCUIT_BREAKER_TRIPPED` | Circuit breaker trigger fired for this operation. | Investigate trigger, rollback when possible, and rerun after remediation. |

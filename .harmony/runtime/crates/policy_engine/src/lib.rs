@@ -140,6 +140,10 @@ pub struct AcpConfig {
     #[serde(default)]
     pub levels: Vec<AcpLevelDefinition>,
     #[serde(default)]
+    pub risk_tier_mapping: HashMap<String, String>,
+    #[serde(default)]
+    pub docs_gate: Option<AcpDocsGateConfig>,
+    #[serde(default)]
     pub profile_defaults: HashMap<String, AcpProfileDefault>,
     #[serde(default)]
     pub stage_only_behavior: Option<AcpStageOnlyBehavior>,
@@ -182,6 +186,18 @@ pub struct AcpStageOnlyNotify {
     pub threshold_acp: Option<String>,
     #[serde(default)]
     pub channels: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpDocsGateConfig {
+    #[serde(default)]
+    pub enforce_on_phase: Vec<String>,
+    #[serde(default)]
+    pub evidence_types: Vec<String>,
+    #[serde(default)]
+    pub reason_code: Option<String>,
+    #[serde(default)]
+    pub missing_action_by_acp: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -274,6 +290,8 @@ pub struct AttestationsConfig {
     pub roles: HashMap<String, AttestationRoleDefinition>,
     #[serde(default)]
     pub binding: Option<AttestationBinding>,
+    #[serde(default)]
+    pub owner_attestation: Option<OwnerAttestationConfig>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -290,6 +308,34 @@ pub struct AttestationBinding {
     pub require_evidence_hash: bool,
     #[serde(default)]
     pub allowed_hash_algorithms: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct OwnerAttestationConfig {
+    #[serde(default)]
+    pub enabled: bool,
+    #[serde(default = "default_owner_attestation_role")]
+    pub role: String,
+    #[serde(default)]
+    pub sources: Vec<String>,
+    #[serde(default)]
+    pub required_for_acp: Vec<String>,
+    #[serde(default)]
+    pub required_when_target_flags: Vec<String>,
+    #[serde(default)]
+    pub timeout_seconds: u64,
+    #[serde(default)]
+    pub retry: OwnerAttestationRetryConfig,
+    #[serde(default)]
+    pub escalate_on_exhausted: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct OwnerAttestationRetryConfig {
+    #[serde(default)]
+    pub max_attempts: u64,
+    #[serde(default)]
+    pub backoff_seconds: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -497,6 +543,19 @@ pub struct AcpMissingRequirements {
     pub budget_remaining: BTreeMap<String, f64>,
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub budget_exceeded: BTreeMap<String, f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub owner_attestation: Option<OwnerAttestationRequirement>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct OwnerAttestationRequirement {
+    pub required: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sources: Vec<String>,
+    pub timeout_seconds: u64,
+    pub retry_max_attempts: u64,
+    pub retry_attempt: u64,
+    pub exhausted: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -518,6 +577,10 @@ fn default_acp_level_zero() -> String {
 
 fn default_acp_level_one() -> String {
     "ACP-1".to_string()
+}
+
+fn default_owner_attestation_role() -> String {
+    "owner".to_string()
 }
 
 fn default_phase_promote() -> String {
@@ -1082,6 +1145,16 @@ fn evaluate_acp_internal(
         &mut reason_codes,
         &mut reason_seen,
     );
+    let docs_gate_action = validate_docs_gate(
+        policy,
+        request,
+        &phase,
+        &effective_acp,
+        &mut requirements,
+        &mut reason_codes,
+        &mut reason_seen,
+        &mut notes,
+    );
     validate_quorum(
         policy,
         request,
@@ -1089,6 +1162,15 @@ fn evaluate_acp_internal(
         &mut requirements,
         &mut reason_codes,
         &mut reason_seen,
+    );
+    let owner_attestation_action = validate_owner_attestation(
+        policy,
+        request,
+        &effective_acp,
+        &mut requirements,
+        &mut reason_codes,
+        &mut reason_seen,
+        &mut notes,
     );
     validate_budgets(
         policy,
@@ -1102,6 +1184,24 @@ fn evaluate_acp_internal(
     let breaker_actions = evaluate_circuit_breaker_actions(policy, request, rule, &requirements);
     let mut force_stage_only = false;
     let mut force_escalate = false;
+
+    if let Some(action) = docs_gate_action {
+        match action {
+            AcpDecisionKind::Deny => hard_deny = true,
+            AcpDecisionKind::Escalate => force_escalate = true,
+            AcpDecisionKind::StageOnly => force_stage_only = true,
+            AcpDecisionKind::Allow => {}
+        }
+    }
+
+    if let Some(action) = owner_attestation_action {
+        match action {
+            AcpDecisionKind::Deny => hard_deny = true,
+            AcpDecisionKind::Escalate => force_escalate = true,
+            AcpDecisionKind::StageOnly => force_stage_only = true,
+            AcpDecisionKind::Allow => {}
+        }
+    }
 
     if !breaker_actions.is_empty() {
         requirements.breaker_actions = breaker_actions.clone();
@@ -1298,6 +1398,26 @@ fn value_to_string(value: &Value) -> Option<String> {
     value.as_str().map(|text| text.to_string())
 }
 
+fn target_flag_is_truthy(value: Option<&Value>) -> bool {
+    match value {
+        Some(Value::Bool(flag)) => *flag,
+        Some(Value::Number(number)) => number.as_u64().is_some_and(|raw| raw > 0),
+        Some(Value::String(text)) => {
+            let normalized = text.trim().to_ascii_lowercase();
+            matches!(normalized.as_str(), "1" | "true" | "yes" | "on")
+        }
+        _ => false,
+    }
+}
+
+fn target_u64(value: Option<&Value>) -> Option<u64> {
+    match value {
+        Some(Value::Number(number)) => number.as_u64(),
+        Some(Value::String(text)) => text.trim().parse::<u64>().ok(),
+        _ => None,
+    }
+}
+
 fn push_reason(reason_codes: &mut Vec<String>, reason_seen: &mut HashSet<String>, code: &str) {
     if reason_seen.insert(code.to_string()) {
         reason_codes.push(code.to_string());
@@ -1436,6 +1556,91 @@ fn validate_evidence(
     if invalid {
         push_reason(reason_codes, reason_seen, "ACP_EVIDENCE_INVALID");
     }
+}
+
+fn validate_docs_gate(
+    policy: &PolicyV2,
+    request: &AcpRequest,
+    phase: &str,
+    effective_acp: &str,
+    requirements: &mut AcpMissingRequirements,
+    reason_codes: &mut Vec<String>,
+    reason_seen: &mut HashSet<String>,
+    notes: &mut Vec<String>,
+) -> Option<AcpDecisionKind> {
+    let Some(config) = policy.acp.docs_gate.as_ref() else {
+        return None;
+    };
+
+    let enforce_on: Vec<String> = if config.enforce_on_phase.is_empty() {
+        vec!["promote".to_string()]
+    } else {
+        config
+            .enforce_on_phase
+            .iter()
+            .map(|item| item.trim().to_ascii_lowercase())
+            .collect()
+    };
+    if !enforce_on.iter().any(|candidate| candidate == phase) {
+        return None;
+    }
+
+    let required_types: Vec<String> = if config.evidence_types.is_empty() {
+        vec![
+            "docs.spec".to_string(),
+            "docs.adr".to_string(),
+            "docs.runbook".to_string(),
+        ]
+    } else {
+        config.evidence_types.clone()
+    };
+
+    let present: HashSet<String> = request
+        .evidence
+        .iter()
+        .map(|entry| entry.r#type.clone())
+        .collect();
+    let missing: Vec<String> = required_types
+        .iter()
+        .filter(|required| !present.contains(required.as_str()))
+        .cloned()
+        .collect();
+    if missing.is_empty() {
+        return None;
+    }
+
+    for entry in &missing {
+        if !requirements.missing_evidence.iter().any(|item| item == entry) {
+            requirements.missing_evidence.push(entry.clone());
+        }
+    }
+
+    push_reason(reason_codes, reason_seen, "ACP_EVIDENCE_MISSING");
+    push_reason(
+        reason_codes,
+        reason_seen,
+        config
+            .reason_code
+            .as_deref()
+            .filter(|value| !value.trim().is_empty())
+            .unwrap_or("ACP_DOCS_EVIDENCE_MISSING"),
+    );
+    notes.push(format!(
+        "docs-gate evidence missing for phase='{phase}': {}",
+        missing.join(",")
+    ));
+
+    let action = config
+        .missing_action_by_acp
+        .get(&effective_acp.to_ascii_uppercase())
+        .or_else(|| config.missing_action_by_acp.get("default"))
+        .map(|value| parse_acp_decision(value))
+        .unwrap_or(AcpDecisionKind::StageOnly);
+
+    Some(match action {
+        AcpDecisionKind::Allow => AcpDecisionKind::StageOnly,
+        other => other,
+    })
 }
 
 fn validate_quorum(
@@ -1604,6 +1809,110 @@ fn validate_quorum(
                 .push("evidence_hash_binding".to_string());
         }
     }
+}
+
+fn validate_owner_attestation(
+    policy: &PolicyV2,
+    request: &AcpRequest,
+    effective_acp: &str,
+    requirements: &mut AcpMissingRequirements,
+    reason_codes: &mut Vec<String>,
+    reason_seen: &mut HashSet<String>,
+    notes: &mut Vec<String>,
+) -> Option<AcpDecisionKind> {
+    let Some(config) = policy.attestations.owner_attestation.as_ref() else {
+        return None;
+    };
+    if !config.enabled {
+        return None;
+    }
+
+    let required_for_level = config
+        .required_for_acp
+        .iter()
+        .any(|level| level.eq_ignore_ascii_case(effective_acp));
+    if !required_for_level {
+        return None;
+    }
+
+    let required_flags: Vec<String> = if config.required_when_target_flags.is_empty() {
+        vec![
+            "boundary_exception".to_string(),
+            "owner_scope".to_string(),
+            "owner_attestation_required".to_string(),
+        ]
+    } else {
+        config.required_when_target_flags.clone()
+    };
+    let triggered = required_flags
+        .iter()
+        .any(|flag| target_flag_is_truthy(request.operation.target.get(flag)));
+    if !triggered {
+        return None;
+    }
+
+    let owner_role = if config.role.trim().is_empty() {
+        "owner".to_string()
+    } else {
+        config.role.trim().to_string()
+    };
+    let owner_present = request.attestations.iter().any(|entry| {
+        entry.role.eq_ignore_ascii_case(&owner_role)
+            && entry
+                .signature
+                .as_deref()
+                .is_some_and(|value| !value.trim().is_empty())
+    });
+    if owner_present {
+        return None;
+    }
+
+    if !requirements
+        .missing_attestations
+        .iter()
+        .any(|entry| entry == &owner_role)
+    {
+        requirements.missing_attestations.push(owner_role.clone());
+    }
+    push_reason(reason_codes, reason_seen, "ACP_OWNER_ATTESTATION_MISSING");
+    push_reason(reason_codes, reason_seen, "ACP_QUORUM_MISSING");
+
+    let timeout_seconds = config.timeout_seconds.max(1);
+    let retry_max_attempts = config.retry.max_attempts.max(1);
+    let retry_attempt =
+        target_u64(request.operation.target.get("owner_attestation_retry")).unwrap_or(0);
+    let elapsed_seconds =
+        target_u64(request.operation.target.get("owner_attestation_elapsed_seconds"))
+            .unwrap_or(0);
+    let exhausted = retry_attempt >= retry_max_attempts || elapsed_seconds >= timeout_seconds;
+
+    requirements.owner_attestation = Some(OwnerAttestationRequirement {
+        required: true,
+        sources: config.sources.clone(),
+        timeout_seconds,
+        retry_max_attempts,
+        retry_attempt,
+        exhausted,
+    });
+
+    notes.push(format!(
+        "owner attestation missing; sources={} retry={}/{} elapsed={}s timeout={}s",
+        config.sources.join(","),
+        retry_attempt,
+        retry_max_attempts,
+        elapsed_seconds,
+        timeout_seconds
+    ));
+
+    if exhausted {
+        push_reason(reason_codes, reason_seen, "ACP_OWNER_ATTESTATION_TIMEOUT");
+        if config.escalate_on_exhausted {
+            push_reason(reason_codes, reason_seen, "ACP_ESCALATE_POLICY");
+            return Some(AcpDecisionKind::Escalate);
+        }
+    }
+
+    Some(AcpDecisionKind::StageOnly)
 }
 
 fn validate_budgets(
@@ -2041,6 +2350,99 @@ pub fn doctor(request: &DoctorRequest) -> Result<DoctorReport> {
                 warnings.push(format!(
                     "profile '{profile_id}' includes broad write scope; prefer explicit subpaths"
                 ));
+            }
+        }
+
+        let mut declared_levels: HashSet<String> = policy
+            .acp
+            .levels
+            .iter()
+            .map(|level| level.id.to_ascii_uppercase())
+            .collect();
+        declared_levels.insert("ACP-0".to_string());
+        declared_levels.insert("ACP-1".to_string());
+        declared_levels.insert("ACP-2".to_string());
+        declared_levels.insert("ACP-3".to_string());
+        declared_levels.insert("ACP-4".to_string());
+
+        let low_level = policy
+            .acp
+            .risk_tier_mapping
+            .get("low")
+            .cloned()
+            .unwrap_or_else(default_acp_level_one);
+        let medium_level = policy
+            .acp
+            .risk_tier_mapping
+            .get("medium")
+            .cloned()
+            .unwrap_or_else(default_acp_level_one);
+        let high_level = policy
+            .acp
+            .risk_tier_mapping
+            .get("high")
+            .cloned()
+            .unwrap_or_else(default_acp_level_one);
+
+        if acp_level_rank(&low_level) > acp_level_rank(&medium_level)
+            || acp_level_rank(&medium_level) > acp_level_rank(&high_level)
+        {
+            semantic_errors.push(
+                "acp.risk_tier_mapping must satisfy low <= medium <= high ACP levels".to_string(),
+            );
+        }
+        if acp_level_rank(&high_level) > acp_level_rank("ACP-3") {
+            semantic_errors.push(
+                "acp.risk_tier_mapping.high must not exceed ACP-3 for routine autonomy"
+                    .to_string(),
+            );
+        }
+        for (tier, level) in &policy.acp.risk_tier_mapping {
+            if !declared_levels.contains(&level.to_ascii_uppercase()) {
+                semantic_errors.push(format!(
+                    "acp.risk_tier_mapping.{tier} references undeclared ACP level '{level}'"
+                ));
+            }
+        }
+
+        if let Some(docs_gate) = &policy.acp.docs_gate {
+            if docs_gate.evidence_types.is_empty() {
+                semantic_errors.push(
+                    "acp.docs_gate.evidence_types must declare at least one evidence type"
+                        .to_string(),
+                );
+            }
+            if docs_gate.enforce_on_phase.is_empty() {
+                semantic_errors.push(
+                    "acp.docs_gate.enforce_on_phase must declare at least one ACP phase"
+                        .to_string(),
+                );
+            }
+            if let Some(code) = docs_gate.reason_code.as_deref() {
+                if !code.starts_with("ACP_") {
+                    semantic_errors.push(
+                        "acp.docs_gate.reason_code must start with ACP_".to_string(),
+                    );
+                }
+            }
+        }
+
+        if let Some(owner) = &policy.attestations.owner_attestation {
+            if owner.enabled && owner.sources.is_empty() {
+                semantic_errors.push(
+                    "attestations.owner_attestation.sources must be non-empty when enabled"
+                        .to_string(),
+                );
+            }
+            if owner.enabled && owner.retry.max_attempts == 0 {
+                semantic_errors.push(
+                    "attestations.owner_attestation.retry.max_attempts must be >= 1".to_string(),
+                );
+            }
+            if owner.enabled && owner.timeout_seconds == 0 {
+                semantic_errors.push(
+                    "attestations.owner_attestation.timeout_seconds must be >= 1".to_string(),
+                );
             }
         }
 

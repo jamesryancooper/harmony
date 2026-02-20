@@ -52,6 +52,9 @@ handles. This does not require standing human authorizations.
 - Promotion and contraction semantics: this document.
 - Capability attempt authorization: [Deny by Default](./deny-by-default.md).
 - Replay and provenance semantics: [Determinism and Provenance](./determinism-and-provenance.md).
+- Promotion input minimums and receipt requirements: [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md).
+- Shared terminology: [RA/ACP Glossary](./_meta/ra-acp-glossary.md).
+- Conflict precedence: [Arbitration and Precedence](./arbitration-and-precedence.md).
 
 ## Why It Matters
 
@@ -89,6 +92,15 @@ Each action class maps to an ACP level. Higher levels require stronger interlock
 **Important:** ACP-3 is the highest level intended for routine autonomous operation.
 ACP-4 exists to make irreversibility explicit and difficult.
 
+## Risk Tier Mapping Authority
+
+Risk tier to ACP mapping is policy-canonical and must not be re-declared here:
+`.harmony/capabilities/_ops/policy/deny-by-default.v2.yml#acp.risk_tier_mapping`
+
+Operational references:
+- RA/ACP Promotion Inputs Matrix (`risk-tier-mapping-canonical` section)
+- [Observability as a Contract](./observability-as-a-contract.md)
+
 ## The ACP Gate
 
 An ACP gate is a policy evaluation that answers:
@@ -102,6 +114,10 @@ Outcomes:
 - **STAGE_ONLY:** keep change staged; emit receipt; notify humans if configured
 - **DENY:** block action; emit denial with reason codes
 - **ESCALATE:** request human intervention (rare; only when policy requires)
+
+Docs-gate evidence is consumed by ACP runtime evaluation on promote. Missing
+required documentation evidence returns fail-closed `STAGE_ONLY`/`DENY` with
+reason code `ACP_DOCS_EVIDENCE_MISSING`, as mapped by policy per ACP level.
 
 ## Reversible-by-Default Execution
 
@@ -147,16 +163,25 @@ If quorum cannot be reached, the system falls back to **stage-only** and notifie
 
 ## Ownership Attestation
 
-For boundary exceptions or owner-scoped systems, policy may require an **Owner
-Attestation** as a quorum input.
+For boundary exceptions or owner-scoped systems, policy may require an owner
+attestation as a quorum input.
 
-- Owner attestation is evidence supplied by the boundary owner as defined in
-  [Ownership and Boundaries](./ownership-and-boundaries.md).
-- It may satisfy a required attestation role but does not replace ACP policy
-  evaluation.
-- Promotion authority remains ACP policy gate + required quorum.
-- If required owner attestation is missing at policy timeout, decision defaults to
-  **STAGE_ONLY + ESCALATE**.
+Machine-attestable owner signal sources are policy-defined:
+- `CODEOWNERS`
+- ownership registry records
+- boundaries manifests
+
+Deterministic fallback behavior:
+- owner attestation is never standalone promotion authority
+- if required owner attestation is missing, ACP returns bounded `STAGE_ONLY`
+  with reason code `ACP_OWNER_ATTESTATION_MISSING`
+- ACP evaluator applies bounded retry and timeout windows from policy
+- if retry/timeout is exhausted, policy may return `ESCALATE` with
+  `ACP_OWNER_ATTESTATION_TIMEOUT`
+- runs do not wait indefinitely for human authorization
+
+See [Ownership and Boundaries](./ownership-and-boundaries.md) for boundary-owner
+semantics.
 
 ## Budgets and Circuit Breakers
 
@@ -213,6 +238,13 @@ Humans “pop in” by reviewing receipts and digests, not by approving every st
 If this principle conflicts with another, apply
 [Arbitration and Precedence](./arbitration-and-precedence.md).
 ACP remains the final promotion/contraction authority for durable state changes.
+
+## Arbitration and Precedence
+
+- Capability-attempt questions are resolved only by deny-by-default policy outputs.
+- Durable promotion/contraction questions are resolved only by ACP gate outcomes.
+- If cross-principle language disagrees and no explicit mapping exists, fail closed
+  to `STAGE_ONLY` or `DENY` with reason-coded receipt.
 
 ## Related Principles
 

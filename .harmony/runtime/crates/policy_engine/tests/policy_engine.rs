@@ -180,6 +180,21 @@ fn acp_request_base(class: &str) -> AcpRequest {
                 r#ref: "artifacts/tests.json".to_string(),
                 sha256: Some("bbb".to_string()),
             },
+            AcpEvidence {
+                r#type: "docs.spec".to_string(),
+                r#ref: "docs/specs/example/spec.md".to_string(),
+                sha256: Some("ccc".to_string()),
+            },
+            AcpEvidence {
+                r#type: "docs.adr".to_string(),
+                r#ref: "docs/adr/ADR-0001-example.md".to_string(),
+                sha256: Some("ddd".to_string()),
+            },
+            AcpEvidence {
+                r#type: "docs.runbook".to_string(),
+                r#ref: "docs/runbooks/example.md".to_string(),
+                sha256: Some("eee".to_string()),
+            },
         ],
         attestations: Vec::new(),
         budgets: Default::default(),
@@ -628,6 +643,15 @@ fn omit_attestation_field(attestation: &mut AcpAttestation, field: &str) {
     }
 }
 
+fn strip_docs_gate_evidence(request: &mut AcpRequest) {
+    request.evidence.retain(|entry| {
+        !matches!(
+            entry.r#type.as_str(),
+            "docs.spec" | "docs.adr" | "docs.runbook"
+        )
+    });
+}
+
 #[test]
 fn acp_breaker_halt_and_notify_escalates() {
     let policy_path =
@@ -755,4 +779,90 @@ fn acp3_missing_required_attestation_fields_stage_only() {
             .reason_codes
             .contains(&"ACP_ATTESTATION_FIELD_MISSING".to_string()));
     }
+}
+
+#[test]
+fn acp_docs_gate_missing_stage_only_for_acp1() {
+    let mut request = acp_request_base("git.commit");
+    request.profile = "refactor".to_string();
+    request.counters = HashMap::from([
+        ("repo.max_files_touched".to_string(), 4.0),
+        ("repo.max_loc_delta".to_string(), 120.0),
+    ]);
+    strip_docs_gate_evidence(&mut request);
+
+    let decision = evaluate_acp_enforce(&fixture_path("policy.yml"), &request)
+        .expect("acp enforce should evaluate");
+    assert!(matches!(decision.decision, AcpDecisionKind::StageOnly));
+    assert!(decision
+        .reason_codes
+        .contains(&"ACP_DOCS_EVIDENCE_MISSING".to_string()));
+    assert!(decision
+        .reason_codes
+        .contains(&"ACP_STAGE_ONLY_REQUIRED".to_string()));
+}
+
+#[test]
+fn acp_docs_gate_missing_denies_for_acp2() {
+    let mut request = acp2_complete_request();
+    strip_docs_gate_evidence(&mut request);
+
+    let decision = evaluate_acp_enforce(&fixture_path("policy.yml"), &request)
+        .expect("acp enforce should evaluate");
+    assert!(matches!(decision.decision, AcpDecisionKind::Deny));
+    assert!(decision
+        .reason_codes
+        .contains(&"ACP_DOCS_EVIDENCE_MISSING".to_string()));
+}
+
+#[test]
+fn acp_owner_attestation_missing_stage_only_with_retry_metadata() {
+    let mut request = acp2_complete_request();
+    request
+        .operation
+        .target
+        .insert("boundary_exception".to_string(), json!(true));
+
+    let decision = evaluate_acp_enforce(&fixture_path("policy.yml"), &request)
+        .expect("acp enforce should evaluate");
+
+    assert!(matches!(decision.decision, AcpDecisionKind::StageOnly));
+    assert!(decision
+        .reason_codes
+        .contains(&"ACP_OWNER_ATTESTATION_MISSING".to_string()));
+
+    let owner_req = decision
+        .requirements
+        .owner_attestation
+        .expect("owner attestation requirements should be captured");
+    assert!(owner_req.required);
+    assert!(!owner_req.exhausted);
+    assert_eq!(owner_req.retry_max_attempts, 3);
+}
+
+#[test]
+fn acp_owner_attestation_exhausted_escalates_when_configured() {
+    let mut request = acp2_complete_request();
+    request
+        .operation
+        .target
+        .insert("boundary_exception".to_string(), json!(true));
+    request
+        .operation
+        .target
+        .insert("owner_attestation_retry".to_string(), json!(3));
+    request.operation.target.insert(
+        "owner_attestation_elapsed_seconds".to_string(),
+        json!(1200),
+    );
+
+    let decision = evaluate_acp_enforce(&fixture_path("policy.yml"), &request)
+        .expect("acp enforce should evaluate");
+    assert!(matches!(decision.decision, AcpDecisionKind::Escalate));
+    assert!(decision
+        .reason_codes
+        .contains(&"ACP_OWNER_ATTESTATION_TIMEOUT".to_string()));
+    assert!(decision
+        .reason_codes
+        .contains(&"ACP_ESCALATE_POLICY".to_string()));
 }

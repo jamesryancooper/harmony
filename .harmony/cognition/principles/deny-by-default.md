@@ -160,12 +160,21 @@ See: [Autonomous Control Points](./autonomous-control-points.md).
 
 - Capability attempt authorization (SSOT): this document.
 - Promotion/contraction mechanics (SSOT): [Autonomous Control Points](./autonomous-control-points.md).
+- Promotion inputs and receipt requirements (SSOT): [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md).
+- Shared terminology: [RA/ACP Glossary](./_meta/ra-acp-glossary.md).
 
 ## Arbitration
 
 If this principle conflicts with another, apply
 [Arbitration and Precedence](./arbitration-and-precedence.md).
 This principle governs capability attempts; ACP governs promotion.
+
+## Arbitration and Precedence
+
+- Capability-attempt questions are resolved only by deny-by-default outputs.
+- Durable promotion/contraction decisions are delegated to ACP outcomes only.
+- Receipt-linked evidence is canonical; PR artifacts are optional projections when a PR exists.
+- Cross-principle disagreement without explicit mapping fails closed (`STAGE_ONLY` or `DENY`).
 
 ## Development Speed Guidance
 

@@ -86,5 +86,5 @@ Skip flags for internal refactors with no behavior change and no user impact.
 
 - `.harmony/cognition/methodology/README.md`
 - `.harmony/cognition/methodology/sandbox-flow.md`
-- `.harmony/cognition/principles/pillars/velocity.md`
-- `.harmony/cognition/principles/pillars/trust.md`
+- `.harmony/cognition/pillars/velocity.md`
+- `.harmony/cognition/pillars/trust.md`

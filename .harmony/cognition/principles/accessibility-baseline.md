@@ -89,5 +89,5 @@ Any waiver must be policy-bound, time-boxed, reason-coded, and receipted; ad-hoc
 
 - `.harmony/cognition/methodology/README.md`
 - `.harmony/cognition/methodology/ci-cd-quality-gates.md`
-- `.harmony/cognition/principles/pillars/direction.md`
-- `.harmony/cognition/principles/pillars/trust.md`
+- `.harmony/cognition/pillars/direction.md`
+- `.harmony/cognition/pillars/trust.md`

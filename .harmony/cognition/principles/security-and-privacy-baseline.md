@@ -88,4 +88,4 @@ Waivers must be policy-bound, receipted, and never used to bypass non-waivable c
 - `.harmony/cognition/methodology/security-baseline.md`
 - `.harmony/cognition/methodology/README.md`
 - `.harmony/cognition/_meta/architecture/governance-model.md`
-- `.harmony/cognition/principles/pillars/trust.md`
+- `.harmony/cognition/pillars/trust.md`

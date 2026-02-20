@@ -11,15 +11,16 @@ status: Active
 
 ## Rules
 
-1. ACP is the final authority for durable-state promotion and contraction.
-2. Deny-by-default is the final authority for capability attempts.
-3. Assurance overrides Productivity; Productivity overrides Integration.
-4. No Silent Apply is satisfied by receipts/evidence/rollback handles, never standing approvals.
-5. Owner attestation is quorum input only, never standalone promotion authority.
-6. Deterministic replay is mandatory for promote decisions/receipts; bounded variance requires policy bounds and provenance.
-7. Observability tiers must stay within budget/circuit constraints; downgrades require reason code and receipt linkage.
-8. Small-diff/trunk thresholds are evaluated per promotable slice, not mission duration.
-9. Waivers/overrides must be time-boxed, reason-coded, append-only, and receipt-linked.
+1. Capability attempt questions are resolved only by Deny-by-Default policy outputs.
+2. Durable promotion/contraction questions are resolved only by ACP gate outcomes.
+3. Receipt-required evidence is canonical; PR evidence is a derived projection when a PR exists.
+4. `apply` for durable state is interpreted as `promote` unless explicitly read-only or stage-only.
+5. Owner attestation is never a standalone gate; missing attestation defaults to bounded `STAGE_ONLY` with reason code.
+6. Risk tier to ACP mapping must come from one policy table (`acp.risk_tier_mapping`) referenced by ACP and observability docs.
+7. Cross-principle disagreement without explicit mapping fails closed (`STAGE_ONLY` or `DENY`).
+8. Waivers are valid only if time-boxed, reason-coded, append-only, and receipt-linked.
+9. ACP-4 is blocked-by-default and out-of-band for routine autonomous runs.
+10. Principle reference-integrity failures must fail governance lint before merge.
 
 ## How to Use This Rule
 
@@ -31,8 +32,8 @@ status: Active
 
 1. If the question is "can the actor attempt this operation?", use deny-by-default.
 2. If the question is "can this staged change become durable now?", use ACP.
-3. If supporting principles disagree, apply Assurance > Productivity > Integration.
-4. If uncertainty remains, fail closed to `STAGE_ONLY` or `DENY` and emit a reason-coded receipt.
+3. If supporting principles disagree and no explicit mapping exists, fail closed.
+4. If uncertainty remains, emit reason-coded `STAGE_ONLY`/`DENY` and receipts.
 
 ## Related Documentation
 
