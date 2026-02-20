@@ -241,10 +241,28 @@ acp:
         budget_set: budgets.fs-write
         circuit_breaker_set: circuit_breakers.repo-stage
       on_missing_requirements: STAGE_ONLY
-    - id: acp-fs-delete-soft
+    - id: acp-fs-delete-soft-local
       match:
         class: fs.soft_delete
-        phase: [stage, promote]
+        phase: [promote]
+        target:
+          scope: [local]
+      require:
+        acp: ACP-1
+        phase: promote
+        reversibility:
+          required: true
+          primitive: fs.move_to_trash
+          rollback_proof_required: false
+          recovery_window_default: P30D
+        evidence_required: [diff]
+        budget_set: budgets.fs-delete
+        circuit_breaker_set: circuit_breakers.destructive
+      on_missing_requirements: STAGE_ONLY
+    - id: acp-fs-delete-soft-broad
+      match:
+        class: fs.soft_delete
+        phase: [promote]
       require:
         acp: ACP-3
         phase: promote

@@ -21,6 +21,11 @@ This is an umbrella principle: enforcement mechanics are delegated to canonical 
 - Guardrails integrate these controls across design, CI, and runtime and block on missing required evidence.
 - Guardrails do not define independent gate levels, quorum rules, or receipt schemas.
 
+## Mechanism
+
+Operational mechanism is ACP policy gates for durable-state promotion and
+deny-by-default policy for capability attempts.
+
 ## Canonical References
 
 - Promotion/contraction mechanics: [Autonomous Control Points](./autonomous-control-points.md)
@@ -29,7 +34,7 @@ This is an umbrella principle: enforcement mechanics are delegated to canonical 
 ## Arbitration
 
 If this principle conflicts with another, apply
-[Arbitration & Precedence](./README.md#arbitration--precedence).
+[Arbitration and Precedence](./arbitration-and-precedence.md).
 Guardrails enforce fail-closed behavior through ACP and deny-by-default policies.
 
 ## Why It Matters
@@ -85,7 +90,7 @@ if engineer_says_ok:
 - `Deny by Default` is the permission model foundation.
 - `Autonomous Control Points` governs stage/promote/finalize authorization through policy.
 - `Security and Privacy Baseline` defines non-waivable controls.
-- `Harmony Principles` defines tie-break precedence for conflicts: [Arbitration & Precedence](./README.md#arbitration--precedence).
+- `Arbitration and Precedence` defines tie-break precedence: [Arbitration and Precedence](./arbitration-and-precedence.md).
 
 ## Anti-Pattern: Governance Theater
 

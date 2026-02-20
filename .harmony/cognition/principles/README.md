@@ -44,6 +44,7 @@ Use one canonical source per governance topic to prevent drift:
 ### Arbitration Rules
 
 Arbitration resolves principle tensions without weakening RA/ACP governance.
+Canonical arbitration contract: [Arbitration and Precedence](./arbitration-and-precedence.md).
 
 Hierarchy:
 
@@ -89,6 +90,7 @@ Recording requirement:
 | Foundational | Simplicity Over Complexity | Prefer minimal viable solutions; add complexity only with evidence. | Focus, Velocity | [Guide](./simplicity-over-complexity.md) |
 | Foundational | Single Source of Truth | Keep each core fact/contract authoritative in one place. | Continuity, Trust | [Guide](./single-source-of-truth.md) |
 | Foundational | Locality | Keep context and ownership near the work surface. | Focus, Continuity | [Guide](./locality.md) |
+| Foundational | Arbitration and Precedence | Resolve principle conflicts through deterministic governance tie-breaks. | Trust, Direction | [Guide](./arbitration-and-precedence.md) |
 | Foundational | Deny by Default | Deny dangerous actions unless explicitly permitted. | Trust | [Guide](./deny-by-default.md) |
 | Foundational | Portability and Independence | Keep core behavior self-contained, tech-agnostic, and OS-agnostic by default. | Velocity, Trust, Continuity | [Guide](./portability-and-independence.md) |
 | Core | Monolith-first Modulith | Start modular monolith-first; split only with measured evidence. | Focus, Velocity | [Guide](./monolith-first-modulith.md) |
@@ -108,6 +110,14 @@ Recording requirement:
 | Agentic | Idempotency | Make mutating operations safe under retries and partial failures. | Trust, Velocity | [Guide](./idempotency.md) |
 | Agentic | Guardrails | Apply policy/eval/security gates fail-closed across agent loops. | Trust | [Guide](./guardrails.md) |
 | Agentic | Autonomous Control Points | Use policy-gated ACPs for consequential promotions with stage-only fallback and receipts. | Direction, Trust | [Guide](./autonomous-control-points.md) |
+
+### Agentic Principles
+
+- [Autonomous Control Points](./autonomous-control-points.md)
+- [No Silent Apply](./no-silent-apply.md)
+- [Determinism and Provenance](./determinism-and-provenance.md)
+- [Idempotency](./idempotency.md)
+- [Guardrails](./guardrails.md)
 
 ## Concrete Threshold Defaults
 
@@ -157,6 +167,7 @@ These defaults are normative unless a documented waiver applies:
 
 ## Related Docs
 
+- `.harmony/cognition/principles/arbitration-and-precedence.md`
 - `.harmony/cognition/principles/pillars/README.md`
 - `.harmony/cognition/methodology/README.md`
 - `.harmony/cognition/_meta/architecture/governance-model.md`

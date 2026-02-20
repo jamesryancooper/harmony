@@ -61,7 +61,9 @@ If a non-default profile is used, the change receipt must include:
 - reason code (for example budget or circuit-breaker constraint)
 - policy/receipt reference
 
-This is a policy record, not a standing manual authorization checkpoint.
+This is a policy record, not a standing manual approval gate.
+Observability requirements are enforced via ACP gate decisions and receipts:
+see [Autonomous Control Points](./autonomous-control-points.md).
 Profile downgrades must be policy-bound and receipted; ad-hoc approval is not sufficient.
 
 ### ✅ Do
@@ -122,7 +124,7 @@ Low-risk internal scripts may use reduced telemetry, but production paths and sh
 ## Arbitration
 
 If this principle conflicts with another, apply
-[Arbitration & Precedence](./README.md#arbitration--precedence).
+[Arbitration and Precedence](./arbitration-and-precedence.md).
 Telemetry profile requirements must stay inside ACP budget/circuit envelopes.
 
 ## Related Documentation

@@ -81,7 +81,7 @@ blocked by default, explicitly audited, and out-of-band from normal autonomous r
 ## Arbitration
 
 If this principle conflicts with another, apply
-[Arbitration & Precedence](./README.md#arbitration--precedence).
+[Arbitration and Precedence](./arbitration-and-precedence.md).
 This principle defines reversible design patterns; ACP defines durable-state authority.
 
 ## In Practice

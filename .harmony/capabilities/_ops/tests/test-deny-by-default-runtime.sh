@@ -11,6 +11,7 @@ POLICY_V2_FILE="$CAPABILITIES_DIR/_ops/policy/deny-by-default.v2.yml"
 ENFORCER_SCRIPT="$SERVICES_ROOT/_ops/scripts/enforce-deny-by-default.sh"
 AGENT_ENTRYPOINT="$SERVICES_ROOT/execution/agent/impl/agent.sh"
 BREAKER_ACTIONS_SCRIPT="$CAPABILITIES_DIR/_ops/scripts/policy-circuit-breaker-actions.sh"
+POLICY_RUNNER="$CAPABILITIES_DIR/_ops/scripts/run-harmony-policy.sh"
 
 if [[ ! -f "$ENFORCER_SCRIPT" ]]; then
   echo "Missing runtime enforcer script: $ENFORCER_SCRIPT" >&2
@@ -24,6 +25,11 @@ fi
 
 if [[ ! -f "$AGENT_ENTRYPOINT" ]]; then
   echo "Missing agent entrypoint: $AGENT_ENTRYPOINT" >&2
+  exit 1
+fi
+
+if [[ ! -f "$POLICY_RUNNER" ]]; then
+  echo "Missing policy runner: $POLICY_RUNNER" >&2
   exit 1
 fi
 
@@ -242,6 +248,7 @@ run_acp_gate_tests() {
   local guard_entrypoint="$SERVICES_ROOT/governance/guard/impl/guard.sh"
   local receipt_run_id="runtime-acp-receipt-${RANDOM:-0}-$$"
   local phase_missing_run_id="runtime-acp-phase-missing-${RANDOM:-0}-$$"
+  local acp4_deny_run_id="runtime-acp4-deny-${RANDOM:-0}-$$"
 
   assert_success \
     "acp stage phase allows execution" \
@@ -334,6 +341,190 @@ run_acp_gate_tests() {
     bash -euo pipefail -c "
       [[ -s '.harmony/capabilities/_ops/state/logs/acp-decisions.jsonl' ]]
     "
+
+  assert_failure_contains \
+    "acp4 finalize denies without break-glass" \
+    "promotion blocked" \
+    bash -euo pipefail -c "
+      source '$ENFORCER_SCRIPT'
+      HARMONY_AGENT_ID=agent-a \\
+      HARMONY_AGENT_IDS='agent-a' \\
+      HARMONY_RISK_TIER=low \\
+      HARMONY_POLICY_PROFILE=emergency \\
+      HARMONY_BREAK_GLASS=false \\
+      HARMONY_OPERATION_CLASS=fs.hard_delete \\
+      HARMONY_OPERATION_PHASE=finalize \\
+      HARMONY_RUN_ID='$acp4_deny_run_id' \\
+      harmony_enforce_service_policy 'guard' '$guard_entrypoint'
+    "
+
+  assert_success \
+    "acp4 finalize deny includes ACP-4 and break-glass reason code" \
+    bash -euo pipefail -c "
+      receipt='.harmony/continuity/runs/$acp4_deny_run_id/receipt.latest.json'
+      [[ -f \"\$receipt\" ]]
+      jq -e '.decision == \"DENY\"' \"\$receipt\" >/dev/null
+      jq -e '.effective_acp == \"ACP-4\"' \"\$receipt\" >/dev/null
+      jq -e '.reason_codes | index(\"RA_BREAK_GLASS_REQUIRED\") != null' \"\$receipt\" >/dev/null
+      jq -e '.operation.class == \"fs.hard_delete\" and .phase == \"finalize\"' \"\$receipt\" >/dev/null
+    "
+
+  assert_success \
+    "acp4 finalize deny emits digest and appends acp decision log" \
+    bash -euo pipefail -c "
+      digest='.harmony/continuity/runs/$acp4_deny_run_id/digest.latest.md'
+      [[ -f \"\$digest\" ]]
+      grep -F -- 'Effective ACP:' \"\$digest\" >/dev/null
+      grep -F -- 'ACP-4' \"\$digest\" >/dev/null
+      grep -F -- 'RA_BREAK_GLASS_REQUIRED' '.harmony/capabilities/_ops/state/logs/acp-decisions.jsonl' >/dev/null
+      grep -F -- '\"run_id\":\"$acp4_deny_run_id\"' '.harmony/capabilities/_ops/state/logs/acp-decisions.jsonl' >/dev/null
+    "
+}
+
+run_fs_soft_delete_scope_mapping_tests() {
+  local local_request broad_request
+  local_request="$(mktemp "${TMPDIR:-/tmp}/acp-soft-delete-local.XXXXXX.json")"
+  broad_request="$(mktemp "${TMPDIR:-/tmp}/acp-soft-delete-broad.XXXXXX.json")"
+
+  jq -n \
+    --arg run_id "runtime-soft-delete-local-${RANDOM:-0}-$$" \
+    '{
+      run_id: $run_id,
+      actor: {id: "agent-a", type: "agent"},
+      profile: "operate",
+      operation: {class: "fs.soft_delete", target: {scope: "local"}, targets: [], resources: []},
+      phase: "promote",
+      break_glass: false,
+      reversibility: {
+        reversible: true,
+        primitive: "fs.move_to_trash",
+        rollback_handle: ("fs:trash:" + $run_id),
+        recovery_window: "P30D"
+      },
+      evidence: [{type: "diff", ref: "artifact://diff", sha256: "hash-diff"}],
+      attestations: [],
+      budgets: {},
+      counters: {"fs.max_paths_deleted": 1},
+      circuit_signals: [],
+      plan_hash: "plan-hash-1",
+      evidence_hash: "evidence-hash-1",
+      intent: "runtime scope mapping local",
+      boundaries: "runtime policy test"
+    }' > "$local_request"
+
+  jq -n \
+    --arg run_id "runtime-soft-delete-broad-${RANDOM:-0}-$$" \
+    '{
+      run_id: $run_id,
+      actor: {id: "agent-a", type: "agent"},
+      profile: "operate",
+      operation: {class: "fs.soft_delete", target: {scope: "broad"}, targets: [], resources: []},
+      phase: "promote",
+      break_glass: false,
+      reversibility: {
+        reversible: true,
+        primitive: "fs.move_to_trash",
+        rollback_handle: ("fs:trash:" + $run_id),
+        recovery_window: "P30D"
+      },
+      evidence: [{type: "diff", ref: "artifact://diff", sha256: "hash-diff"}],
+      attestations: [],
+      budgets: {},
+      counters: {"fs.max_paths_deleted": 1},
+      circuit_signals: [],
+      plan_hash: "plan-hash-1",
+      evidence_hash: "evidence-hash-1",
+      intent: "runtime scope mapping broad",
+      boundaries: "runtime policy test"
+    }' > "$broad_request"
+
+  assert_success \
+    "acp fs.soft_delete local scope maps to ACP-1" \
+    bash -euo pipefail -c "
+      set +e
+      output=\"\$('$POLICY_RUNNER' acp-enforce --policy '$POLICY_V2_FILE' --request '$local_request' 2>&1)\"
+      rc=\$?
+      set -e
+      [[ \$rc -eq 0 ]]
+      jq -e '.effective_acp == \"ACP-1\" and .decision == \"ALLOW\"' <<<\"\$output\" >/dev/null
+    "
+
+  assert_success \
+    "acp fs.soft_delete broad scope maps to ACP-3" \
+    bash -euo pipefail -c "
+      set +e
+      output=\"\$('$POLICY_RUNNER' acp-enforce --policy '$POLICY_V2_FILE' --request '$broad_request' 2>&1)\"
+      rc=\$?
+      set -e
+      [[ \$rc -eq 13 ]]
+      jq -e '.effective_acp == \"ACP-3\" and .decision == \"STAGE_ONLY\"' <<<\"\$output\" >/dev/null
+      jq -e '.reason_codes | index(\"ACP_QUORUM_MISSING\") != null' <<<\"\$output\" >/dev/null
+      jq -e '.reason_codes | index(\"ACP_STAGE_ONLY_REQUIRED\") != null' <<<\"\$output\" >/dev/null
+    "
+
+  rm -f "$local_request" "$broad_request"
+}
+
+run_direct_acp_enforce_emit_receipt_tests() {
+  local request_file stdout_file stderr_file run_id
+  request_file="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-emit.XXXXXX.json")"
+  stdout_file="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-emit-stdout.XXXXXX.json")"
+  stderr_file="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-emit-stderr.XXXXXX.log")"
+  run_id="runtime-acp-enforce-emit-${RANDOM:-0}-$$"
+
+  jq -n '{
+    run_id: "placeholder-run-id",
+    actor: {id: "agent-a", type: "agent"},
+    profile: "refactor",
+    operation: {class: "git.commit", target: {}, targets: [], resources: []},
+    phase: "promote",
+    break_glass: false,
+    reversibility: {
+      reversible: true,
+      primitive: "git.revert_commit",
+      rollback_handle: "git:revert:emit-test",
+      recovery_window: "P30D"
+    },
+    evidence: [{type: "diff", ref: "artifact://diff", sha256: "hash-diff"}],
+    attestations: [],
+    budgets: {},
+    counters: {
+      "repo.max_files_touched": 1,
+      "repo.max_loc_delta": 10,
+      "repo.max_commits": 1,
+      "time.max_seconds": 1
+    },
+    circuit_signals: [],
+    plan_hash: "plan-hash-1",
+    evidence_hash: "evidence-hash-1",
+    intent: "runtime acp-enforce emit receipt test",
+    boundaries: "runtime policy test"
+  }' > "$request_file"
+
+  assert_success \
+    "acp-enforce --emit-receipt writes receipt artifacts and keeps decision semantics" \
+    bash -euo pipefail -c "
+      run_id='$run_id'
+      request='$request_file'
+      stdout_file='$stdout_file'
+      stderr_file='$stderr_file'
+      receipt='.harmony/continuity/runs/$run_id/receipt.latest.json'
+      digest='.harmony/continuity/runs/$run_id/digest.latest.md'
+      set +e
+      '$POLICY_RUNNER' acp-enforce --policy '$POLICY_V2_FILE' --request \"\$request\" --emit-receipt --run-id \"\$run_id\" --digest >\"\$stdout_file\" 2>\"\$stderr_file\"
+      rc=\$?
+      set -e
+      [[ \$rc -eq 0 ]]
+      jq -e '.decision == \"ALLOW\" and .effective_acp == \"ACP-1\"' \"\$stdout_file\" >/dev/null
+      grep -F '[acp-enforce] digest:' \"\$stderr_file\" >/dev/null
+      [[ -f \"\$receipt\" ]]
+      [[ -f \"\$digest\" ]]
+      jq -e --arg run_id \"\$run_id\" '.run_id == \$run_id' \"\$receipt\" >/dev/null
+      jq -e '.decision == \"ALLOW\" and .effective_acp == \"ACP-1\"' \"\$receipt\" >/dev/null
+      grep -F -- \"\\\"run_id\\\":\\\"\$run_id\\\"\" '.harmony/capabilities/_ops/state/logs/acp-decisions.jsonl' >/dev/null
+    "
+
+  rm -f "$request_file" "$stdout_file" "$stderr_file"
 }
 
 run_service_wrapper_budget_metering_tests() {
@@ -560,6 +751,8 @@ main() {
   run_active_shell_enforcement_smoke_test
   run_agent_only_required_deny_tests
   run_acp_gate_tests
+  run_fs_soft_delete_scope_mapping_tests
+  run_direct_acp_enforce_emit_receipt_tests
   run_service_wrapper_budget_metering_tests
   run_acp_breaker_action_tests
   run_breaker_action_runner_token_tests

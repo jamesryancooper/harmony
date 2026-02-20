@@ -105,7 +105,7 @@ promotion slices.
 ## Arbitration
 
 If this principle conflicts with another, apply
-[Arbitration & Precedence](./README.md#arbitration--precedence).
+[Arbitration and Precedence](./arbitration-and-precedence.md).
 Fast trunk flow cannot bypass stage/promote for material side effects.
 
 ## Related Documentation

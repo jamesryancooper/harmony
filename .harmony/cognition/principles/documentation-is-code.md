@@ -90,6 +90,33 @@ This document is the canonical source for documentation artifact timing:
 required governance artifacts must be complete before ACP promotion, not before
 any staged work begins.
 
+## ACP Fail-Closed Enforcement (Required)
+
+For ACP promotion, missing required governance artifacts MUST fail closed:
+
+- ACP decision MUST be `STAGE_ONLY` or `DENY` (never silent allow)
+- receipt MUST include a reason code (for example `DOCS_ARTIFACTS_MISSING`)
+- receipt MUST include missing artifact identifiers for remediation
+- durable promotion MUST remain blocked until artifacts are complete
+
+Current enforcement assets:
+
+- workflow command: `/documentation-quality-gate`
+  (`.harmony/orchestration/workflows/quality-gate/documentation-quality-gate/WORKFLOW.md`)
+- audit command: `/audit-documentation-standards`
+  (`.harmony/capabilities/skills/quality-gate/audit-documentation-standards/SKILL.md`)
+
+Required enforcement binding (status: Required, until runtime policy wiring is complete):
+
+- ACP promotion evaluation must consume documentation gate evidence and emit
+  `STAGE_ONLY`/`DENY` with reason-coded receipt fields when required docs are
+  missing.
+- CI must run the principles governance checks and docs promotion fail-closed
+  contract test before merge:
+  `.harmony/cognition/principles/_ops/scripts/lint-principles-governance.sh`
+  and
+  `.harmony/cognition/principles/_ops/scripts/test-docs-promotion-fail-closed.sh`.
+
 ## Promotable Slice Definition
 
 A promotable slice is the receipt-linked unit evaluated at an ACP promote gate.
@@ -122,5 +149,7 @@ contract, schema, or risk changes.
 - `.harmony/cognition/methodology/spec-first-planning.md`
 - `.harmony/scaffolding/patterns/adr-policy.md`
 - `.harmony/scaffolding/templates/documentation-standards.md`
+- `.harmony/orchestration/workflows/quality-gate/documentation-quality-gate/WORKFLOW.md`
+- `.harmony/capabilities/skills/quality-gate/audit-documentation-standards/SKILL.md`
 - `.harmony/cognition/principles/pillars/direction.md`
 - `.harmony/cognition/principles/pillars/continuity.md`

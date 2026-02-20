@@ -301,6 +301,17 @@ harmony_acp_gate_enforce() {
   if [[ "$target_json" == "{}" && -n "${HARMONY_TARGET_BRANCH:-}" ]]; then
     target_json="$(jq -cn --arg branch "$HARMONY_TARGET_BRANCH" '{branch:$branch}')"
   fi
+  if [[ "$operation_class" == "fs.soft_delete" ]]; then
+    target_json="$(jq -c '
+      if type != "object" then
+        {scope:"broad"}
+      elif has("scope") then
+        .
+      else
+        . + {scope:"broad"}
+      end
+    ' <<<"$target_json" 2>/dev/null || echo '{"scope":"broad"}')"
+  fi
 
   evidence_json="${HARMONY_ACP_EVIDENCE_JSON:-}"
   [[ -n "$evidence_json" ]] || evidence_json='[]'

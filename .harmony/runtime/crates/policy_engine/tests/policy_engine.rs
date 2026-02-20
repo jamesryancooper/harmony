@@ -288,6 +288,29 @@ fn acp2_allow_with_quorum_and_rollback_proof() {
 }
 
 #[test]
+fn acp_soft_delete_local_maps_to_acp1_allow() {
+    let mut request = acp_request_base("fs.soft_delete");
+    request
+        .operation
+        .target
+        .insert("scope".to_string(), json!("local"));
+    request.reversibility = Some(AcpReversibilityProof {
+        reversible: true,
+        primitive: Some("fs.move_to_trash".to_string()),
+        rollback_handle: Some("fs:trash:local123".to_string()),
+        recovery_window: Some("P30D".to_string()),
+        rollback_proof: None,
+    });
+    request.counters = HashMap::from([("fs.max_paths_deleted".to_string(), 1.0)]);
+
+    let decision = evaluate_acp_enforce(&fixture_path("policy.yml"), &request)
+        .expect("acp enforce should evaluate");
+    assert!(matches!(decision.decision, AcpDecisionKind::Allow));
+    assert!(decision.allow);
+    assert_eq!(decision.effective_acp, "ACP-1");
+}
+
+#[test]
 fn acp3_denies_irreversible_primitive() {
     let mut request = acp_request_base("fs.soft_delete");
     request.reversibility = Some(AcpReversibilityProof {

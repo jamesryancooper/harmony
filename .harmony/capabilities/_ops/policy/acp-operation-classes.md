@@ -16,7 +16,9 @@ contract and should be treated as an extension candidate.
 ## Filesystem / Workspace
 
 - `fs.write` — writing files (non-protected, reversible via git)
-- `fs.soft_delete` — move-to-trash + manifest (ACP-3 if broad; ACP-1 if local)
+- `fs.soft_delete` — move-to-trash + manifest
+  - `target.scope=local` -> ACP-1 (reversible local promotion)
+  - `target.scope=broad` or missing scope -> ACP-3 (destructive-adjacent guardrails)
 - `fs.hard_delete` — hard delete without retention (ACP-4 blocked)
 
 ## Runtime / Services
@@ -47,6 +49,7 @@ Wrappers SHOULD include metadata so policy can bump ACP when targets are protect
 - `target.path`: file/glob path(s)
 - `target.env`: `dev`, `staging`, `prod`
 - `target.system`: `github`, `aws`, `k8s`, etc.
+- `target.scope`: `local` or `broad` (used by `fs.soft_delete`)
 
 ## Extension Guidance
 

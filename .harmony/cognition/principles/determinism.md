@@ -415,7 +415,7 @@ Prevention:
 ## Arbitration
 
 If this principle conflicts with another, apply
-[Arbitration & Precedence](./README.md#arbitration--precedence).
+[Arbitration and Precedence](./arbitration-and-precedence.md).
 Determinism is default; bounded variance requires explicit policy and receipt provenance.
 
 ## Related Documentation

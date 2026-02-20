@@ -1,0 +1,32 @@
+name: Principles Governance Lint
+
+on:
+  pull_request:
+    paths:
+      - '.harmony/cognition/principles/**/*.md'
+      - '.harmony/cognition/principles/_ops/scripts/*.sh'
+      - '.github/workflows/principles-governance-lint.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '.harmony/cognition/principles/**/*.md'
+      - '.harmony/cognition/principles/_ops/scripts/*.sh'
+      - '.github/workflows/principles-governance-lint.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  principles-governance-lint:
+    name: Lint principles governance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Link and legacy-term lint
+        run: bash .harmony/cognition/principles/_ops/scripts/lint-principles-governance.sh
+
+      - name: Docs promotion fail-closed contract test
+        run: bash .harmony/cognition/principles/_ops/scripts/test-docs-promotion-fail-closed.sh

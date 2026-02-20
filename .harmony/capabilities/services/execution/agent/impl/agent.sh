@@ -602,6 +602,17 @@ target_json="$(printf '%s' "$payload" | jq -c '.target // {}')"
 if [[ "$target_json" == "null" ]]; then
   target_json='{}'
 fi
+if [[ "$operation_class" == "fs.soft_delete" ]]; then
+  target_json="$(jq -c '
+    if type != "object" then
+      {scope:"broad"}
+    elif has("scope") then
+      .
+    else
+      . + {scope:"broad"}
+    end
+  ' <<<"$target_json" 2>/dev/null || echo '{"scope":"broad"}')"
+fi
 
 phase="$(printf '%s' "$payload" | jq -r '.phase // empty')"
 if [[ -z "$phase" || "$phase" == "null" ]]; then

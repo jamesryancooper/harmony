@@ -44,7 +44,7 @@ for standing human approval unless policy explicitly triggers escalation.
 ## Arbitration
 
 If this principle conflicts with another, apply
-[Arbitration & Precedence](./README.md#arbitration--precedence).
+[Arbitration and Precedence](./arbitration-and-precedence.md).
 Owner attestation is a quorum input and never a standalone promotion gate.
 
 ## Why It Matters

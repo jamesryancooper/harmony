@@ -164,7 +164,7 @@ See: [Autonomous Control Points](./autonomous-control-points.md).
 ## Arbitration
 
 If this principle conflicts with another, apply
-[Arbitration & Precedence](./README.md#arbitration--precedence).
+[Arbitration and Precedence](./arbitration-and-precedence.md).
 This principle governs capability attempts; ACP governs promotion.
 
 ## Development Speed Guidance
@@ -191,6 +191,7 @@ This keeps individual edits fast while retaining repository-level safety.
 
 - [Trust Pillar](../pillars/trust.md)
 - [Autonomous Control Points](./autonomous-control-points.md)
+- [Arbitration and Precedence](./arbitration-and-precedence.md)
 - [Skills Specification](../../capabilities/_meta/architecture/specification.md)
 - [Runtime Policy](../_meta/architecture/runtime-policy.md)
 - [ADR 019](../decisions/019-deny-by-default-uniform-enforcement-and-agent-only-operation.md)

@@ -211,13 +211,22 @@ Humans “pop in” by reviewing receipts and digests, not by approving every st
 ## Arbitration
 
 If this principle conflicts with another, apply
-[Arbitration & Precedence](./README.md#arbitration--precedence).
+[Arbitration and Precedence](./arbitration-and-precedence.md).
 ACP remains the final promotion/contraction authority for durable state changes.
+
+## Related Principles
+
+- [Guardrails](./guardrails.md)
+- [No Silent Apply](./no-silent-apply.md)
+- [Reversibility](./reversibility.md)
+- [Deny by Default](./deny-by-default.md)
+- [Documentation is Code](./documentation-is-code.md)
 
 ## Related Documentation
 
 - [Deny by Default](./deny-by-default.md)
 - [Observability as a Contract](./observability-as-a-contract.md)
 - [Ownership and Boundaries](./ownership-and-boundaries.md)
+- [Arbitration and Precedence](./arbitration-and-precedence.md)
 - [Trust Pillar](../pillars/trust.md)
 - [Direction Pillar](../pillars/direction.md)

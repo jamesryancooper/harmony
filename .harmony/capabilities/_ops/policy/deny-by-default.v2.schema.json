@@ -632,6 +632,28 @@
                   "uniqueItems": true
                 }
               ]
+            },
+            "scope": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "local",
+                    "broad"
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "local",
+                      "broad"
+                    ]
+                  },
+                  "uniqueItems": true
+                }
+              ]
             }
           }
         }

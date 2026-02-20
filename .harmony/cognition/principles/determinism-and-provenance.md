@@ -28,7 +28,9 @@ Bounded variance is valid only when policy-approved and receipted. Deterministic
 
 ## Normative Boundary
 
-This document is normative for required replay and provenance fields in RA/ACP receipts.
+This document is normative for required replay and provenance fields in
+RA/ACP receipts. RA = Reversible Autonomy with Human-on-the-Loop Oversight,
+governed via ACP gates.
 It does not define promotion/contraction gate outcomes or quorum policy.
 
 - Receipt/gate mechanics are defined in [Autonomous Control Points](./autonomous-control-points.md).

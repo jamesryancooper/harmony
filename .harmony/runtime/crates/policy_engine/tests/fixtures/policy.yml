@@ -115,7 +115,23 @@ acp:
         budget_set: budgets.repo-merge
         circuit_breaker_set: circuit_breakers.repo-promote
       on_missing_requirements: STAGE_ONLY
-    - id: acp-soft-delete
+    - id: acp-soft-delete-local
+      match:
+        class: fs.soft_delete
+        phase: [promote]
+        target:
+          scope: [local]
+      require:
+        acp: ACP-1
+        phase: promote
+        reversibility:
+          required: true
+          primitive: fs.move_to_trash
+        evidence_required: [diff]
+        budget_set: budgets.fs-delete
+        circuit_breaker_set: circuit_breakers.destructive
+      on_missing_requirements: STAGE_ONLY
+    - id: acp-soft-delete-broad
       match:
         class: fs.soft_delete
         phase: [promote]
