@@ -45,7 +45,7 @@ cd .harmony
 ✓ continuity/
 ✓ assurance/
 ✓ scaffolding/prompts/
-✓ orchestration/workflows/
+✓ orchestration/runtime/workflows/
 ✓ capabilities/commands/
 ✓ cognition/context/
 

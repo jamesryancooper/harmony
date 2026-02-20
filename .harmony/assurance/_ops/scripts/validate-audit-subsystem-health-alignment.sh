@@ -177,7 +177,7 @@ check_drift_alignment() {
     '^\.harmony/cognition/_meta/architecture/'
     '^\.harmony/cognition/principles/'
     '^\.harmony/[^/]+/_meta/architecture/'
-    '^\.harmony/orchestration/workflows/quality-gate/pre-release-audit/'
+    '^\.harmony/orchestration/runtime/workflows/quality-gate/pre-release-audit/'
     '^\.harmony/assurance/(complete\.md|session-exit\.md)$'
     '^\.harmony/assurance/_ops/scripts/validate-harness-structure\.sh$'
   )

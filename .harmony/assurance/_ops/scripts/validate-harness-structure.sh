@@ -144,8 +144,10 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/capabilities/services/registry.runtime.yml"
   require_file "$HARMONY_DIR/capabilities/tools/manifest.yml"
 
-  require_file "$HARMONY_DIR/orchestration/workflows/manifest.yml"
-  require_file "$HARMONY_DIR/orchestration/workflows/registry.yml"
+  require_file "$HARMONY_DIR/orchestration/runtime/workflows/manifest.yml"
+  require_file "$HARMONY_DIR/orchestration/runtime/workflows/registry.yml"
+  require_file "$HARMONY_DIR/orchestration/runtime/missions/registry.yml"
+  require_file "$HARMONY_DIR/orchestration/governance/incidents.md"
 }
 
 check_expected_internals() {
@@ -166,8 +168,11 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/cognition/decisions"
   require_dir "$HARMONY_DIR/cognition/analyses"
 
-  require_dir "$HARMONY_DIR/orchestration/workflows"
-  require_dir "$HARMONY_DIR/orchestration/missions"
+  require_dir "$HARMONY_DIR/orchestration/runtime/workflows"
+  require_dir "$HARMONY_DIR/orchestration/runtime/missions"
+  require_dir "$HARMONY_DIR/orchestration/runtime"
+  require_dir "$HARMONY_DIR/orchestration/governance"
+  require_dir "$HARMONY_DIR/orchestration/practices"
 
   require_dir "$HARMONY_DIR/scaffolding/patterns"
   require_dir "$HARMONY_DIR/scaffolding/templates"
@@ -188,6 +193,26 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/output/reports"
   require_dir "$HARMONY_DIR/output/drafts"
   require_dir "$HARMONY_DIR/output/artifacts"
+}
+
+check_deprecated_orchestration_paths() {
+  local deprecated
+  deprecated=(
+    "$HARMONY_DIR/orchestration/workflows"
+    "$HARMONY_DIR/orchestration/missions"
+    "$HARMONY_DIR/orchestration/incidents.md"
+    "$HARMONY_DIR/orchestration/incident-response.md"
+  )
+
+  local path rel
+  for path in "${deprecated[@]}"; do
+    rel="${path#$ROOT_DIR/}"
+    if [[ -e "$path" ]]; then
+      fail "deprecated orchestration path exists: $rel"
+    else
+      pass "deprecated orchestration path removed: $rel"
+    fi
+  done
 }
 
 check_alignment_guardrail() {
@@ -217,6 +242,7 @@ main() {
   check_meta_namespace_layout
   check_discovery_contracts
   check_expected_internals
+  check_deprecated_orchestration_paths
   check_alignment_guardrail
 
   echo

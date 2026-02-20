@@ -56,7 +56,7 @@ Harmony is organized by function:
 
 - `agency/`: actor model, delegation, and contracts
 - `capabilities/`: commands, skills, tools, services, and shared policy ops (`_ops/`)
-- `orchestration/`: workflows and missions for multi-step execution
+- `orchestration/`: runtime workflows/missions plus governance and practices
 - `cognition/`: principles, methodology, and architecture contracts
 - `continuity/`: operational memory across sessions
 - `assurance/`: definition-of-done and session-exit gates
@@ -116,7 +116,7 @@ When resolving a resource, agents check local first, then shared:
 | Assistants | `.harmony/agency/actors/assistants/` |
 | Teams | `.harmony/agency/actors/teams/` |
 | Templates | `.harmony/scaffolding/templates/` |
-| Workflows | `.harmony/orchestration/workflows/` |
+| Workflows | `.harmony/orchestration/runtime/workflows/` |
 | Skills | `.harmony/capabilities/skills/` |
 | Commands | `.harmony/capabilities/commands/` |
 | Prompts | `.harmony/scaffolding/prompts/` |
@@ -161,8 +161,11 @@ When resolving a resource, agents check local first, then shared:
 │
 ├── orchestration/
 │   ├── _meta/architecture/ <- Orchestration subsystem specification
-│   ├── workflows/      <- Multi-step procedures (harness, missions, skills)
-│   └── missions/       <- Time-bounded sub-projects
+│   ├── runtime/        <- Runtime orchestration artifacts
+│   │   ├── workflows/  <- Multi-step procedures (harness, missions, skills)
+│   │   └── missions/   <- Time-bounded sub-projects
+│   ├── governance/     <- Incident governance contracts
+│   └── practices/      <- Operating standards
 │
 ├── scaffolding/
 │   ├── _meta/architecture/ <- Scaffolding subsystem specification
@@ -205,7 +208,7 @@ When resolving a resource, agents check local first, then shared:
 
 - `START.md`, `scope.md`, `conventions.md`, `catalog.md`
 - `continuity/` (session log, tasks, entities)
-- `orchestration/missions/` instances (time-bounded sub-projects)
+- `orchestration/runtime/missions/` instances (time-bounded sub-projects)
 - Domain-specific context (`cognition/context/` — decisions, lessons, glossary, constraints)
 - Domain-specific workflows (e.g., flowkit)
 - Skills outputs and logs (always local)
@@ -278,7 +281,9 @@ If your tool supports harness commands, run `/init` instead of invoking the scri
 | `agency/actors/assistants/` | Generic specialists (reviewer, refactor, docs) |
 | `agency/actors/teams/` | Reusable multi-actor compositions |
 | `agency/practices/` | Human-agent operating standards and delivery discipline |
-| `orchestration/workflows/` | Harness management + mission lifecycle |
+| `orchestration/runtime/workflows/` | Harness management + mission lifecycle |
+| `orchestration/governance/` | Incident governance contracts |
+| `orchestration/practices/` | Orchestration operating standards |
 | `capabilities/_ops/` | Agent-native deny-by-default control plane (policy, grants, kill-switches, validation) |
 | `capabilities/skills/` | Composable capabilities with defined I/O |
 | `capabilities/commands/` | Atomic operations |

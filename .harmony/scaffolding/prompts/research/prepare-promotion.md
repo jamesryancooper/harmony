@@ -117,7 +117,7 @@ Use this prompt when research is mature enough to publish findings to agent-faci
 |------|------------|
 | [Term 1] | [Definition] |
 
-#### → orchestration/missions/ (if applicable)
+#### → orchestration/runtime/missions/ (if applicable)
 
 **Mission to create:**
 

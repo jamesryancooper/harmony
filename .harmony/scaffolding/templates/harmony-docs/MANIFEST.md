@@ -19,7 +19,7 @@ When creating a harness using this template:
 
 1. Copy all files from `.harmony/scaffolding/templates/harmony/` (base)
 2. Overlay files from this directory (scope-specific overrides)
-3. Copy `orchestration/workflows/are/` for document improvement workflows
+3. Copy `orchestration/runtime/workflows/are/` for document improvement workflows
 
 ### Files in This Template
 
@@ -30,7 +30,7 @@ When creating a harness using this template:
 | `scope.md` | Docs-specific scope template (overrides base) |
 | `conventions.md` | Docs-specific conventions (overrides base) |
 | `assurance/complete.md` | Docs-specific definition of done (overrides base) |
-| `orchestration/workflows/are/` | Analyze-Refine-Evaluate workflows for document improvement |
+| `orchestration/runtime/workflows/are/` | Analyze-Refine-Evaluate workflows for document improvement |
 
 ### Files Inherited from Base
 

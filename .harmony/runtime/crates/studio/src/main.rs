@@ -269,7 +269,7 @@ fn refresh_view(window: &AppWindow, state: &AppState) {
 
 fn find_harmony_root(start: &Path) -> Option<PathBuf> {
     start.ancestors().find_map(|ancestor| {
-        let manifest = ancestor.join(".harmony/orchestration/workflows/manifest.yml");
+        let manifest = ancestor.join(".harmony/orchestration/runtime/workflows/manifest.yml");
         if manifest.exists() {
             Some(ancestor.to_path_buf())
         } else {

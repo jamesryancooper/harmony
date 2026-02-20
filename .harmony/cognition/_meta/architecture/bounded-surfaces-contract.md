@@ -38,6 +38,16 @@ Agency is the first subsystem applying this contract:
 
 Legacy root-level actor and governance paths are removed as part of the clean-break migration.
 
+## Orchestration Application (Second Migration)
+
+Orchestration applies the same contract:
+
+- runtime artifacts: `/.harmony/orchestration/runtime/`
+- governance contracts: `/.harmony/orchestration/governance/`
+- operating standards: `/.harmony/orchestration/practices/`
+
+Legacy root-level runtime and governance paths (`workflows/`, `missions/`, root incident docs) are removed as part of the clean-break migration.
+
 ## Benefits
 
 | Benefit | Why It Matters |
@@ -63,4 +73,3 @@ Legacy root-level actor and governance paths are removed as part of the clean-br
 1. Establish subsystem-local migration plan and banlist entries.
 2. Migrate one subsystem at a time as a clean-break.
 3. Enforce via CI before propagating to the next subsystem.
-

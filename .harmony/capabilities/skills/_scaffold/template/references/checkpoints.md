@@ -163,7 +163,7 @@ phases:
     progress:
       total_items: 13
       completed_items: 7
-      current_item: ".harmony/orchestration/workflows/example.md"
+      current_item: ".harmony/orchestration/runtime/workflows/example.md"
   5_verify:
     status: pending
   6_document:
@@ -200,7 +200,7 @@ When user invokes `/refactor .scratch/ → .scratchpad/` again:
 │  4. ON RESUME                                                   │
 │     - Read change-manifest.md                                   │
 │     - Skip items 1-7 (already completed)                        │
-│     - Continue from item 8: .harmony/orchestration/workflows/example.md       │
+│     - Continue from item 8: .harmony/orchestration/runtime/workflows/example.md       │
 │     - Mark items complete as they finish                        │
 │     - Update checkpoint.progress.completed_items incrementally  │
 │                                                                  │

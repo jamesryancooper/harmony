@@ -76,7 +76,7 @@ Routable capabilities MUST use progressive disclosure:
 Expands in:
 
 - [Skills Manifest](/.harmony/capabilities/skills/manifest.yml)
-- [Workflows Manifest](/.harmony/orchestration/workflows/manifest.yml)
+- [Workflows Manifest](/.harmony/orchestration/runtime/workflows/manifest.yml)
 - [Progressive Disclosure Principle](/.harmony/cognition/principles/progressive-disclosure.md)
 
 ### HARMONY-SPEC-004: Deny-by-Default Permissions
@@ -197,6 +197,7 @@ Expands in:
 
 - [Bounded Surfaces Contract](/.harmony/cognition/_meta/architecture/bounded-surfaces-contract.md)
 - [Agency Subsystem Specification](/.harmony/agency/_meta/architecture/specification.md)
+- [Orchestration Subsystem Specification](/.harmony/orchestration/_meta/architecture/specification.md)
 
 ### HARMONY-SPEC-101: Agency Contract Boundary
 

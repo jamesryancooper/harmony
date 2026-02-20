@@ -41,7 +41,7 @@ When `studio` is invoked, the launcher uses source mode to avoid stale prebuilt 
 ## Output
 
 - Opens the `harmony_studio` desktop window
-- Loads workflows from `.harmony/orchestration/workflows/`
+- Loads workflows from `.harmony/orchestration/runtime/workflows/`
 - Enables graph inspection, staged edit buffer, patch preview export, and apply audit browsing
 
 ## References

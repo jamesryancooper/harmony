@@ -15,7 +15,7 @@ Teams coordinate actor handoffs. They complement, but do not replace:
 
 - **Composite Skills** (`.harmony/capabilities/skills/composite-skills.md`):
   reusable capability bundles.
-- **Workflows** (`.harmony/orchestration/workflows/`):
+- **Workflows** (`.harmony/orchestration/runtime/workflows/`):
   ordered procedural execution plans.
 
 In practice:

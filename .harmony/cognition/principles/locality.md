@@ -231,7 +231,7 @@ This enables parallel workstreams without pollution.
 Missions inherit locality principles:
 
 ```
-.harmony/orchestration/missions/
+.harmony/orchestration/runtime/missions/
 └── add-mfa/
     ├── brief.md       # Mission scope
     ├── continuity/

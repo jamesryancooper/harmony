@@ -53,7 +53,7 @@ Related composition primitives:
 - Composite Skills:
   - `.harmony/capabilities/skills/composite-skills.md`
 - Workflows:
-  - `.harmony/orchestration/workflows/README.md`
+  - `.harmony/orchestration/runtime/workflows/README.md`
 - Teams:
   - `.harmony/agency/actors/teams/README.md`
 

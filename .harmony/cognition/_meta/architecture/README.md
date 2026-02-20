@@ -79,7 +79,7 @@ Canonical root-harness structure:
     ├── cognition/           <- Context, decisions, analyses
     ├── continuity/          <- Progress log, tasks, next steps
     ├── ideation/            <- Scratchpad, projects (human-led)
-    ├── orchestration/       <- Workflows, missions
+    ├── orchestration/       <- Runtime orchestration, governance, practices
     ├── output/              <- Reports, drafts, artifacts
     ├── assurance/             <- Completion checklists
     └── scaffolding/         <- Templates, prompts, examples
@@ -169,19 +169,22 @@ Agents struggle when they "arrive with no memory of what came before." A `.harmo
 │   ├── practices/           # Operating standards and delivery guidance
 │   └── _ops/                # Validation scripts and operational checks
 │
-├── orchestration/           # Workflows and missions
+├── orchestration/           # Runtime orchestration, governance, practices
 │   ├── README.md            # Domain orientation (routable + referenced)
-│   ├── workflows/           # Multi-step procedures
-│   │   ├── manifest.yml     # Workflow index (Tier 1 discovery)
-│   │   ├── registry.yml     # Extended metadata + parameters
-│   │   └── <workflow-name>/
-│   └── missions/            # Time-bounded sub-projects
-│       ├── registry.yml     # Active/archived index
-│       ├── _scaffold/template/
-│       └── <mission-slug>/
-│           ├── mission.md   # Goal, scope, owner
-│           ├── tasks.json   # Mission-specific tasks
-│           └── log.md       # Mission-specific progress
+│   ├── runtime/             # Runtime orchestration artifacts
+│   │   ├── workflows/       # Multi-step procedures
+│   │   │   ├── manifest.yml # Workflow index (Tier 1 discovery)
+│   │   │   ├── registry.yml # Extended metadata + parameters
+│   │   │   └── <workflow-name>/
+│   │   └── missions/        # Time-bounded sub-projects
+│   │       ├── registry.yml # Active/archived index
+│   │       ├── _scaffold/template/
+│   │       └── <mission-slug>/
+│   │           ├── mission.md # Goal, scope, owner
+│   │           ├── tasks.json # Mission-specific tasks
+│   │           └── log.md     # Mission-specific progress
+│   ├── governance/          # Incident governance contracts
+│   └── practices/           # Operating standards and delivery guidance
 │
 ├── capabilities/            # Skills, commands, and tools
 │   ├── README.md            # Domain orientation (routable + referenced)
@@ -262,7 +265,7 @@ The full tree above is the **canonical superset**. In practice, harness profiles
 
 | Profile | Baseline | Notes |
 |---------|----------|-------|
-| **Root harness (repo-wide)** | `harmony.yml`, `START.md`, `scope.md`, `conventions.md`, `catalog.md`, `continuity/`, `assurance/`, `scaffolding/prompts/`, `orchestration/workflows/`, `capabilities/commands/`, `cognition/context/`, `runtime/` | Root is the primary coordination harness and is expected to carry full governance/state coverage |
+| **Root harness (repo-wide)** | `harmony.yml`, `START.md`, `scope.md`, `conventions.md`, `catalog.md`, `continuity/`, `assurance/`, `scaffolding/prompts/`, `orchestration/runtime/workflows/`, `orchestration/governance/`, `orchestration/practices/`, `capabilities/commands/`, `cognition/context/`, `runtime/` | Root is the primary coordination harness and is expected to carry full governance/state coverage |
 | **Descendant harness (localized)** | `START.md`, `scope.md`, plus at least one active subsystem (`cognition/`, `capabilities/`, `orchestration/`, `continuity/`, or `assurance/`) | Descendants are intentionally minimal. They include only subsystems needed for that subtree |
 
 | Subsystem | Root Harness | Descendant Harness |
@@ -290,9 +293,11 @@ portable:
   - catalog.md
   - README.md
   - agency/manifest.yml
+  - agency/governance/
   - agency/actors/agents/
   - agency/actors/assistants/
   - agency/actors/teams/
+  - agency/practices/
   - capabilities/skills/manifest.yml
   - capabilities/skills/registry.yml
   - capabilities/skills/capabilities.yml
@@ -301,7 +306,9 @@ portable:
   - capabilities/skills/**/SKILL.md
   - capabilities/skills/**/references/
   - capabilities/commands/
-  - orchestration/workflows/
+  - orchestration/runtime/workflows/
+  - orchestration/governance/
+  - orchestration/practices/
   - assurance/
   - scaffolding/
   - cognition/context/primitives.md
@@ -435,7 +442,7 @@ ideation/scratchpad/brainstorm/ -> Structured exploration (filter stage)
         |
 ideation/projects/              -> Committed research (produces artifacts)
         |
-orchestration/missions/         -> Committed execution
+orchestration/runtime/missions/         -> Committed execution
         |
 cognition/context/              -> Permanent knowledge
 ```
@@ -473,7 +480,7 @@ Projects (`ideation/projects/`) have a distinct role in the funnel because they 
 | Design decisions | `cognition/context/decisions.md` |
 | Anti-patterns | `cognition/context/lessons.md` |
 | New terminology | `cognition/context/glossary.md` |
-| Actionable work | Create mission in `orchestration/missions/` |
+| Actionable work | Create mission in `orchestration/runtime/missions/` |
 
 **Rule:** Summarize and distill findings; don't copy project notes verbatim.
 
@@ -504,7 +511,7 @@ Each domain has a `README.md` that provides orientation. The README depth is pro
 | `cognition/` | Background knowledge and memory | Context, decisions, analyses | Reference material |
 | `continuity/` | Session-to-session state | Log, tasks, entities | State (read/write contract) |
 | `ideation/` | Human-led exploration | Scratchpad, projects | Human-gated |
-| `orchestration/` | Coordination and execution | Workflows, missions | Routable + Referenced |
+| `orchestration/` | Coordination and execution | Runtime, governance, practices | Routable + Referenced |
 | `output/` | Generated artifacts | Reports, drafts, artifacts | State (write contract) |
 | `assurance/` | Verification and quality gates | Completion checklists, session-exit | State (quality gates) |
 | `scaffolding/` | Reusable building blocks | Templates, prompts, examples | Referenced |
@@ -521,8 +528,8 @@ For reference, here is how the previous flat structure maps to domains:
 | `context/` | `cognition/context/` |
 | `progress/` | `continuity/` |
 | `checklists/` | `assurance/` |
-| `workflows/` | `orchestration/workflows/` |
-| `missions/` | `orchestration/missions/` |
+| `workflows/` | `orchestration/runtime/workflows/` |
+| `missions/` | `orchestration/runtime/missions/` |
 | `commands/` | `capabilities/commands/` |
 | `skills/` | `capabilities/skills/` |
 | `prompts/` | `scaffolding/prompts/` |
@@ -687,7 +694,7 @@ Harnesses are designed to be **portable across all AI harnesses**---Cursor, Clau
 +------------------------------------------------------------+
 |  .harmony/                                                  |
 |  +-- harmony.yml           (portability metadata)           |
-|  +-- orchestration/        (workflows, missions)            |
+|  +-- orchestration/        (runtime, governance, practices) |
 |  +-- capabilities/         (skills, commands)               |
 |  +-- agency/               (actors, governance, practices)  |
 |  +-- ...                                                    |
@@ -723,13 +730,13 @@ Harness-specific commands wrap workflows for integration. All workflows live in 
 
 | Command | Delegates To |
 |---------|--------------|
-| `/create-harness` | `.harmony/orchestration/workflows/meta/create-harness/` |
-| `/update-harness` | `.harmony/orchestration/workflows/meta/update-harness/` |
-| `/evaluate-harness` | `.harmony/orchestration/workflows/meta/evaluate-harness/` |
-| `/migrate-harness` | `.harmony/orchestration/workflows/meta/migrate-harness/` |
+| `/create-harness` | `.harmony/orchestration/runtime/workflows/meta/create-harness/` |
+| `/update-harness` | `.harmony/orchestration/runtime/workflows/meta/update-harness/` |
+| `/evaluate-harness` | `.harmony/orchestration/runtime/workflows/meta/evaluate-harness/` |
+| `/migrate-harness` | `.harmony/orchestration/runtime/workflows/meta/migrate-harness/` |
 | `/bootstrap` | `.harmony/scaffolding/prompts/bootstrap-session.md` |
 | `/synthesize-research` | `.harmony/capabilities/skills/synthesis/synthesize-research/` |
-| `/research` | `.harmony/orchestration/workflows/projects/create-project.md` |
+| `/research` | `.harmony/orchestration/runtime/workflows/projects/create-project.md` |
 
 These commands live in `.<harness>/commands/` (e.g., `.cursor/commands/`, `.claude/commands/`) and are thin wrappers that delegate to `.harmony/` paths.
 

@@ -29,7 +29,7 @@ Atomic operations in `capabilities/commands/`:
 
 ## Workflows
 
-Multi-step procedures in `orchestration/workflows/`:
+Multi-step procedures in `orchestration/runtime/workflows/`:
 
 | Workflow | Access | Description |
 |----------|--------|-------------|

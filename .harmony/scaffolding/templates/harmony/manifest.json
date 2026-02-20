@@ -15,7 +15,7 @@
         "continuity",
         "quality",
         "scaffolding/prompts",
-        "orchestration/workflows",
+        "orchestration/runtime/workflows",
         "capabilities/commands",
         "cognition/context"
       ],
@@ -28,7 +28,7 @@
         "agency/actors/assistants",
         "agency/actors/teams",
         "agency/practices",
-        "orchestration/missions"
+        "orchestration/runtime/missions"
       ]
     }
   },
@@ -52,8 +52,8 @@
     "assurance/complete.md": "Definition of done for tasks",
     "assurance/session-exit.md": "Steps before ending a session",
     "scaffolding/prompts/README.md": "Placeholder for prompts",
-    "orchestration/workflows/README.md": "Placeholder for workflows",
-    "orchestration/workflows/00-overview.md": "Workflow overview template",
+    "orchestration/runtime/workflows/README.md": "Placeholder for workflows",
+    "orchestration/runtime/workflows/00-overview.md": "Workflow overview template",
     "capabilities/commands/README.md": "Placeholder for commands",
     "cognition/context/README.md": "Context directory overview",
     "cognition/context/decisions.md": "Agent-readable decision summaries",
@@ -75,10 +75,10 @@
     "agency/actors/teams/registry.yml": "Team composition index",
     "agency/actors/teams/README.md": "How to use and create teams",
     "agency/actors/teams/_scaffold/template/team.md": "Template for new teams",
-    "orchestration/missions/registry.yml": "Active and archived missions index",
-    "orchestration/missions/README.md": "How to create and manage missions",
-    "orchestration/missions/_scaffold/template/mission.md": "Mission template",
-    "orchestration/missions/_scaffold/template/tasks.json": "Mission tasks template",
-    "orchestration/missions/_scaffold/template/log.md": "Mission log template"
+    "orchestration/runtime/missions/registry.yml": "Active and archived missions index",
+    "orchestration/runtime/missions/README.md": "How to create and manage missions",
+    "orchestration/runtime/missions/_scaffold/template/mission.md": "Mission template",
+    "orchestration/runtime/missions/_scaffold/template/tasks.json": "Mission tasks template",
+    "orchestration/runtime/missions/_scaffold/template/log.md": "Mission log template"
   }
 }

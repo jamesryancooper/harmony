@@ -78,7 +78,7 @@ Read `.harmony/capabilities/skills/manifest.yml` for skill discovery.
 
 ## Workflows
 
-Read `.harmony/orchestration/workflows/manifest.yml` for workflow discovery.
+Read `.harmony/orchestration/runtime/workflows/manifest.yml` for workflow discovery.
 
 ### Workflow Discovery
 

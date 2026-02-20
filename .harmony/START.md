@@ -15,7 +15,7 @@ This harness extends `.harmony/` for shared infrastructure.
 | Assistants | `.harmony/agency/actors/assistants/` | `.harmony/agency/actors/assistants/` |
 | Teams | `.harmony/agency/actors/teams/` | `.harmony/agency/actors/teams/` |
 | Templates | `.harmony/scaffolding/templates/` | `.harmony/scaffolding/templates/` |
-| Workflows | `.harmony/orchestration/workflows/` | `.harmony/orchestration/workflows/` |
+| Workflows | `.harmony/orchestration/runtime/workflows/` | `.harmony/orchestration/runtime/workflows/` |
 | Skills | `.harmony/capabilities/skills/` | `.harmony/capabilities/skills/` |
 | Commands | `.harmony/capabilities/commands/` | `.harmony/capabilities/commands/` |
 | Tools | `.harmony/capabilities/tools/` | `.harmony/capabilities/tools/` |
@@ -82,8 +82,11 @@ Subsystem expansion specs:
 │
 ├── orchestration/
 │   ├── _meta/architecture/   ← Orchestration subsystem specification
-│   ├── workflows/      ← Multi-step procedures
-│   └── missions/       ← Time-bounded sub-projects
+│   ├── runtime/        ← Runtime orchestration artifacts
+│   │   ├── workflows/  ← Multi-step procedures
+│   │   └── missions/   ← Time-bounded sub-projects
+│   ├── governance/     ← Incident governance contracts
+│   └── practices/      ← Operating standards
 │
 ├── scaffolding/
 │   ├── _meta/architecture/   ← Scaffolding subsystem specification
@@ -139,7 +142,7 @@ Within these namespaces, common subpaths are:
 5. **Scan `catalog.md`** → Know available operations and assistants
 6. **Read `continuity/log.md`** → Know what's been done
 7. **Read `continuity/tasks.json`** → Know current priorities
-8. **Check `orchestration/missions/registry.yml`** → Know active missions (if any)
+8. **Check `orchestration/runtime/missions/registry.yml`** → Know active missions (if any)
 9. **Begin** highest-priority unblocked task
 10. **Before finishing:** Complete `assurance/session-exit.md`, verify against `assurance/complete.md`
 
@@ -199,7 +202,7 @@ ideation/scratchpad/brainstorm/ → Structured exploration (filter stage)
         ↓
 ideation/projects/              → Committed research (produces artifacts)
         ↓
-orchestration/missions/         → Committed execution
+orchestration/runtime/missions/         → Committed execution
         ↓
 cognition/context/              → Permanent knowledge
 ```

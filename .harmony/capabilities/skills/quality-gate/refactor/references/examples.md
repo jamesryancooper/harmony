@@ -47,7 +47,7 @@ Worked examples demonstrating the refactor skill.
 
 ### Pattern: `.scratch`
 - `.harmony/START.md` (3 matches)
-- `.harmony/orchestration/workflows/promote-from-scratch.md` (5 matches)
+- `.harmony/orchestration/runtime/workflows/promote-from-scratch.md` (5 matches)
 - `.harmony/cognition/_meta/architecture/overview.md` (2 matches)
 
 ### Pattern: `/.scratch/`
@@ -61,7 +61,7 @@ Worked examples demonstrating the refactor skill.
 | File | Match Count | Patterns Found |
 |------|-------------|----------------|
 | `.harmony/START.md` | 3 | `.scratch`, `/.scratch/` |
-| `.harmony/orchestration/workflows/promote-from-scratch.md` | 5 | `.scratch` |
+| `.harmony/orchestration/runtime/workflows/promote-from-scratch.md` | 5 | `.scratch` |
 | `.harmony/cognition/_meta/architecture/overview.md` | 2 | `.scratch` |
 | `CLAUDE.md` | 1 | `/.scratch/` |
 | `package.json` | 1 | `".scratch"` |
@@ -90,7 +90,7 @@ Worked examples demonstrating the refactor skill.
 
 ### Phase 3: Documentation & Code
 - [ ] `.harmony/START.md` (3 changes)
-- [ ] `.harmony/orchestration/workflows/promote-from-scratch.md` (5 changes)
+- [ ] `.harmony/orchestration/runtime/workflows/promote-from-scratch.md` (5 changes)
 - [ ] `.harmony/cognition/_meta/architecture/overview.md` (2 changes)
 - [ ] `CLAUDE.md` (1 change)
 
@@ -111,7 +111,7 @@ Worked examples demonstrating the refactor skill.
 
 ### Documentation & Code
 - [x] 14:32:08 Updated `.harmony/START.md` (3 replacements)
-- [x] 14:32:12 Updated `.harmony/orchestration/workflows/promote-from-scratch.md` (5 replacements)
+- [x] 14:32:12 Updated `.harmony/orchestration/runtime/workflows/promote-from-scratch.md` (5 replacements)
 - [x] 14:32:15 Updated `.harmony/cognition/_meta/architecture/overview.md` (2 replacements)
 - [x] 14:32:18 Updated `CLAUDE.md` (1 replacement)
 
@@ -360,7 +360,7 @@ Resuming refactor from Phase 4, item 8...
 ### Resumed Execution (items 8-13)
 - [x] 15:20:01 Updated `.harmony/cognition/_meta/architecture/overview.md`
 - [x] 15:20:05 Updated `CLAUDE.md`
-- [x] 15:20:08 Updated `.harmony/orchestration/workflows/promote.md`
+- [x] 15:20:08 Updated `.harmony/orchestration/runtime/workflows/promote.md`
 - [x] 15:20:11 Updated `tests/fixtures/config.yml`
 - [x] 15:20:14 Updated `.harmony/cognition/context/conventions.md`
 - [x] 15:20:18 Appended to `.harmony/continuity/log.md`

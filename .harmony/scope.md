@@ -44,15 +44,15 @@ This harness contains:
 | Generic agents | `.harmony/agency/actors/agents/` | `architect/`, `auditor/` |
 | Generic assistants | `.harmony/agency/actors/assistants/` | `reviewer/`, `refactor/`, `docs/` |
 | Team compositions | `.harmony/agency/actors/teams/` | `delivery-core/` |
-| Harness management workflows | `.harmony/orchestration/workflows/meta/` | `create-harness`, `migrate-harness` |
-| Mission management workflows | `.harmony/orchestration/workflows/missions/` | `create-mission`, `complete-mission` |
+| Harness management workflows | `.harmony/orchestration/runtime/workflows/meta/` | `create-harness`, `migrate-harness` |
+| Mission management workflows | `.harmony/orchestration/runtime/workflows/missions/` | `create-mission`, `complete-mission` |
 | Generic skills | `.harmony/capabilities/skills/` | `synthesize-research/` |
 | **Repo-wide (in `.harmony/`)** | | |
-| Repository-wide tool workflows | `.harmony/orchestration/workflows/<tool>/` | _None currently_ |
-| Repo-level missions | `.harmony/orchestration/missions/` | `auth-overhaul/`, `billing-v2/` |
+| Repository-wide tool workflows | `.harmony/orchestration/runtime/workflows/<tool>/` | _None currently_ |
+| Repo-level missions | `.harmony/orchestration/runtime/missions/` | `auth-overhaul/`, `billing-v2/` |
 | Repo-wide context | `.harmony/cognition/context/` | `decisions.md`, `lessons.md` |
 | **Domain-specific** | | |
-| Domain workflows | Domain's `.harmony/orchestration/workflows/` | `docs/api/.harmony/orchestration/workflows/` |
+| Domain workflows | Domain's `.harmony/orchestration/runtime/workflows/` | `docs/api/.harmony/orchestration/runtime/workflows/` |
 | Domain conventions | Domain's `.harmony/conventions.md` | Package-specific style rules |
 | **Harness entry points** | | |
 | Cursor command wrappers | `.cursor/commands/` | `create-harness.md`, `evaluate-harness.md` |

@@ -22,7 +22,7 @@ Templates are **boilerplate files** stored in `.harmony/scaffolding/templates/`.
 │   ├── conventions.md
 │   ├── catalog.md
 │   ├── capabilities/commands/
-│   ├── orchestration/workflows/
+│   ├── orchestration/runtime/workflows/
 │   ├── scaffolding/prompts/
 │   ├── cognition/context/
 │   ├── continuity/
@@ -40,7 +40,7 @@ Templates are **boilerplate files** stored in `.harmony/scaffolding/templates/`.
 │   ├── scope.md            # Overrides base
 │   ├── conventions.md      # Overrides base
 │   ├── assurance/complete.md     # Overrides base
-│   └── orchestration/workflows/are/  # Docs-specific workflows
+│   └── orchestration/runtime/workflows/are/  # Docs-specific workflows
 └── harmony-node-ts/        # Scoped template for Node.js/TypeScript
     ├── MANIFEST.md         # Inheritance metadata
     ├── START.md            # Overrides base

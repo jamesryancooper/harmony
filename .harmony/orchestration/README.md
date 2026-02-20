@@ -1,18 +1,27 @@
 # Orchestration
 
-Workflows and missions that coordinate multi-step work.
+Canonical workflow and mission coordination boundary for the Harmony harness.
 
-## Contents
+## Bounded Surfaces
 
 | Path | Purpose | Discovery |
 |------|---------|-----------|
-| `_meta/architecture/` | Orchestration subsystem specification docs | `_meta/architecture/README.md` |
-| `workflows/` | Multi-step procedures with numbered steps | `workflows/manifest.yml` |
-| `missions/` | Time-bounded sub-projects with isolated state | `missions/registry.yml` |
-| `incidents.md` | Canonical incident response playbook | `incidents.md` |
-| `incident-response.md` | Compatibility redirect for legacy incident-response references | `incident-response.md` |
+| `_meta/architecture/` | Orchestration subsystem architecture and specification docs | `_meta/architecture/README.md` |
+| `runtime/` | Runtime orchestration artifacts (`workflows/`, `missions/`) | `runtime/README.md` |
+| `governance/` | Incident governance and response contracts | `governance/README.md` |
+| `practices/` | Orchestration operating standards | `practices/README.md` |
+
+## Discovery
+
+Read in this order:
+
+1. `runtime/workflows/manifest.yml` for workflow discovery (Tier 1)
+2. `runtime/workflows/registry.yml` for workflow metadata and dependencies (Tier 2)
+3. `runtime/missions/registry.yml` for active mission registry
+4. `governance/incidents.md` for incident response governance
 
 ## Interaction Model
 
-- **Workflows:** Routable via intent matching. Read `workflows/manifest.yml` first, then `workflows/README.md` for group catalog.
-- **Missions:** Referenced by slug. Read `missions/README.md` for lifecycle and creation guidance.
+- **Workflows:** Routable via intent matching and executed from `runtime/workflows/`.
+- **Missions:** Time-bounded execution units managed in `runtime/missions/`.
+- **Governance:** Incident protocol and operational constraints are defined in `governance/`.

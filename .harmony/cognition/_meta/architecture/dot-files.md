@@ -50,7 +50,7 @@ ideation/scratchpad/brainstorm/ → Structured exploration (filter stage)
         ↓
 ideation/projects/              → Committed research (produces artifacts)
         ↓
-orchestration/missions/         → Committed execution
+orchestration/runtime/missions/         → Committed execution
         ↓
 cognition/context/              → Permanent knowledge
 ```
@@ -137,7 +137,7 @@ When project findings are ready:
 | Design decisions | `cognition/context/decisions.md` |
 | Anti-patterns | `cognition/context/lessons.md` |
 | New terminology | `cognition/context/glossary.md` |
-| Actionable work | Create mission in `orchestration/missions/` |
+| Actionable work | Create mission in `orchestration/runtime/missions/` |
 
 Since projects live at harness level, findings flow directly to their destinations without a separate "promotion" step.
 

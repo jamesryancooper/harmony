@@ -15,11 +15,11 @@ This document clarifies the distinctions between harness artifact types: **comma
 |------|----------|--------|-------------|
 | **Harness Entry Point** | `.<harness>/commands/` | Thin wrapper | Harness-specific invocation (Cursor, Claude Code, Codex) |
 | **Harness Command** | `.harmony/capabilities/commands/` | Deterministic procedure | Atomic, repeatable operation |
-| **Harness Workflow** | `.harmony/orchestration/workflows/` | Multi-step procedure (source of truth) | Complex, sequential operation |
+| **Harness Workflow** | `.harmony/orchestration/runtime/workflows/` | Multi-step procedure (source of truth) | Complex, sequential operation |
 | **Harness Prompt** | `.harmony/scaffolding/prompts/` | Task template | Context-dependent, requires judgment |
 | **Harness Skill** | `.harmony/capabilities/skills/` | Composable capability | Defined I/O, pipelines, auditability |
 | **Assistant** | `.harmony/agency/actors/assistants/` | Focused specialist | Scoped, delegatable tasks |
-| **Mission** | `.harmony/orchestration/missions/` | Sub-project | Isolated, time-bounded work |
+| **Mission** | `.harmony/orchestration/runtime/missions/` | Sub-project | Isolated, time-bounded work |
 
 ---
 
@@ -47,7 +47,7 @@ This document clarifies the distinctions between harness artifact types: **comma
 |------|----------|--------------|-------|
 | **Harness Entry Point** | `.<harness>/commands/` | User typing `/command` in any AI harness | Repository-wide, harness-specific |
 | **Harness Command** | `.harmony/capabilities/commands/` | Harness delegation or direct agent reference | Harness-specific, atomic |
-| **Harness Workflow** | `.harmony/orchestration/workflows/` | Harness delegation or direct agent reference | Harness-specific, multi-step |
+| **Harness Workflow** | `.harmony/orchestration/runtime/workflows/` | Harness delegation or direct agent reference | Harness-specific, multi-step |
 | **Harness Prompt** | `.harmony/scaffolding/prompts/` | Direct agent reference | Harness-specific, template |
 
 ### Supported Harnesses
@@ -80,7 +80,7 @@ Thin wrappers that provide harness-specific invocation for harness commands or w
          │                 │                   │
          ▼                 ▼                   ▼
 ┌─────────────────────────────────────────────────────────┐
-│  .harmony/orchestration/workflows/projects/create-project.md        │
+│  .harmony/orchestration/runtime/workflows/projects/create-project.md        │
 │                                                         │
 │  Source of truth — same workflow for all harnesses      │
 └─────────────────────────────────────────────────────────┘
@@ -92,7 +92,7 @@ Thin wrappers that provide harness-specific invocation for harness commands or w
 - **Harness-specific integration** — Autocomplete, slash commands, etc.
 - **Repository-wide scope** — Available everywhere in the repo
 - **User-initiated** — Triggered by typing `/command` in chat
-- **No business logic** — All logic lives in `.harmony/orchestration/workflows/` or `.harmony/capabilities/commands/`
+- **No business logic** — All logic lives in `.harmony/orchestration/runtime/workflows/` or `.harmony/capabilities/commands/`
 
 ### Entry Point Template
 
@@ -101,7 +101,7 @@ Thin wrappers that provide harness-specific invocation for harness commands or w
 
 Brief description.
 
-See `.harmony/orchestration/workflows/<category>/<name>/00-overview.md` for full description and steps.
+See `.harmony/orchestration/runtime/workflows/<category>/<name>/00-overview.md` for full description and steps.
 
 ## Usage
 
@@ -117,13 +117,13 @@ See `.harmony/orchestration/workflows/<category>/<name>/00-overview.md` for full
 
 ## Implementation
 
-Execute the workflow in `.harmony/orchestration/workflows/<category>/<name>/`.
+Execute the workflow in `.harmony/orchestration/runtime/workflows/<category>/<name>/`.
 
 Start with `00-overview.md` and follow each step in sequence.
 
 ## References
 
-- **Workflow:** `.harmony/orchestration/workflows/<category>/<name>/`
+- **Workflow:** `.harmony/orchestration/runtime/workflows/<category>/<name>/`
 ```
 
 ---
@@ -154,7 +154,7 @@ See [commands.md](../../../capabilities/_meta/architecture/commands.md) for full
 
 ## Harness Workflows
 
-**Location:** `.harmony/orchestration/workflows/*.md` or `.harmony/orchestration/workflows/<name>/`
+**Location:** `.harmony/orchestration/runtime/workflows/*.md` or `.harmony/orchestration/runtime/workflows/<name>/`
 
 Multi-step procedures that operate on artifacts in the harness's parent directory. Workflows are the **source of truth** for complex operations.
 
@@ -238,7 +238,7 @@ See [Agency](../../../agency/README.md) for canonical actor details.
 
 ## Missions
 
-**Location:** `.harmony/orchestration/missions/<slug>/`
+**Location:** `.harmony/orchestration/runtime/missions/<slug>/`
 
 Time-bounded sub-projects with isolated progress tracking.
 
@@ -333,10 +333,10 @@ See `.harmony/catalog.md` for complete decision flowcharts and examples.
 |------|----------|-------|---------------------|
 | Harness Entry Points | `.<harness>/commands/*.md` | Repository-wide | Yes (harness-specific) |
 | Harness Commands | `.harmony/capabilities/commands/*.md` | This harness only | No (unless wrapped) |
-| Harness Workflows | `.harmony/orchestration/workflows/*.md` | This harness only | No (unless wrapped) |
+| Harness Workflows | `.harmony/orchestration/runtime/workflows/*.md` | This harness only | No (unless wrapped) |
 | Prompts | `.harmony/scaffolding/prompts/*.md` | Task templates | No |
 | Assistants | `.harmony/agency/actors/assistants/<name>/` | Focused specialists | Via @mention |
-| Missions | `.harmony/orchestration/missions/<slug>/` | Sub-projects | No |
+| Missions | `.harmony/orchestration/runtime/missions/<slug>/` | Sub-projects | No |
 | Checklists | `.harmony/assurance/*.md` | Quality gates | No |
 
 ### Harness Entry Point Directories
@@ -353,9 +353,9 @@ See `.harmony/catalog.md` for complete decision flowcharts and examples.
 ## See Also
 
 - [Harness Commands](../../../capabilities/commands/manifest.yml) — Deterministic atomic operations
-- [Harness Workflows](../../../orchestration/workflows/README.md) — Multi-step procedures
+- [Harness Workflows](../../../orchestration/runtime/workflows/README.md) — Multi-step procedures
 - [Harness Prompts](../../../scaffolding/prompts/README.md) — Context-dependent task templates
 - [Agency](../../../agency/README.md) — Canonical actor taxonomy and routing model
-- [Missions](../../../orchestration/missions/README.md) — Time-bounded sub-projects
+- [Missions](../../../orchestration/runtime/missions/README.md) — Time-bounded sub-projects
 - [Checklists](../../../assurance/_meta/architecture/checklists.md) — Quality gates
 - [README.md](./README.md) — Canonical harness structure reference

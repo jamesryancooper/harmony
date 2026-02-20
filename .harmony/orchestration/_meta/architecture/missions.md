@@ -64,7 +64,7 @@ stateDiagram-v2
 ## Directory Structure
 
 ```text
-.harmony/orchestration/missions/
+.harmony/orchestration/runtime/missions/
 ├── registry.yml           # Index of active/archived missions
 ├── README.md              # Usage guide
 ├── .archive/              # Completed/cancelled missions (mission-specific archive)

@@ -130,7 +130,7 @@ portable:
   - capabilities/skills/**/SKILL.md
   - capabilities/skills/**/references/
   - capabilities/commands/
-  - orchestration/workflows/
+  - orchestration/runtime/workflows/
   - assurance/
   - scaffolding/
   - cognition/context/primitives.md
@@ -210,7 +210,7 @@ Harness commands in `.<harness>/commands/` are thin wrappers that delegate to `.
 
 | Command | Delegates To |
 | ------- | ------------ |
-| `/create-harness` | `.harmony/orchestration/workflows/meta/create-harness/` |
+| `/create-harness` | `.harmony/orchestration/runtime/workflows/meta/create-harness/` |
 | `/synthesize-research` | `.harmony/capabilities/skills/synthesize-research/` |
 
 ---
@@ -224,7 +224,7 @@ Add to `.harmony/` when you have:
 | A new agent or assistant | Add to `.harmony/agency/actors/` |
 | A new harness template variant | Add to `.harmony/scaffolding/templates/` |
 | A new skill that other projects could use | Add to `.harmony/capabilities/skills/` and mark its definition paths as `portable:` |
-| A workflow that applies to any harness | Add to `.harmony/orchestration/workflows/` |
+| A workflow that applies to any harness | Add to `.harmony/orchestration/runtime/workflows/` |
 | Project-specific state (progress, missions) | Add under the relevant category; do **not** mark as `portable:` |
 
 ---

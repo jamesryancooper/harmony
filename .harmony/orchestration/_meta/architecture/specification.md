@@ -13,6 +13,18 @@ This document defines the Agent Workflow Specification and describes how the Har
 
 ---
 
+## Bounded Surfaces
+
+Orchestration uses bounded surfaces with single canonical authorities:
+
+- Runtime artifacts: `/.harmony/orchestration/runtime/`
+- Governance contracts: `/.harmony/orchestration/governance/`
+- Operating standards: `/.harmony/orchestration/practices/`
+
+Legacy root paths (`/.harmony/orchestration/workflows/`, `/.harmony/orchestration/missions/`, root incident docs) are removed by clean-break migration and must not reappear.
+
+---
+
 ## Core Specification
 
 ### Overview
@@ -453,12 +465,12 @@ Steps (directory-based only):
 
 Discovery:
 
-- [ ] Workflow is listed in `.harmony/orchestration/workflows/manifest.yml`
+- [ ] Workflow is listed in `.harmony/orchestration/runtime/workflows/manifest.yml`
 - [ ] `id` matches directory name and WORKFLOW.md `name`
 - [ ] `display_name` is present
 - [ ] `summary` is present for routing
 - [ ] `triggers` are defined (if using natural language activation)
-- [ ] Workflow entry exists in `.harmony/orchestration/workflows/registry.yml`
+- [ ] Workflow entry exists in `.harmony/orchestration/runtime/workflows/registry.yml`
 - [ ] `version` is defined in registry
 - [ ] `commands` includes at least one slash command (if invocable)
 
@@ -474,5 +486,5 @@ Execution:
 
 - [Agent Skills Specification](/.harmony/capabilities/_meta/architecture/specification.md) -- Skills format specification
 - [Skills Architecture](/.harmony/capabilities/_meta/architecture/architecture.md) -- Skills implementation architecture
-- [Workflow Template](/.harmony/orchestration/workflows/_scaffold/template/) -- Canonical workflow template
+- [Workflow Template](/.harmony/orchestration/runtime/workflows/_scaffold/template/) -- Canonical workflow template
 - [Workflow Quality Rubric](/.harmony/cognition/context/workflow-quality.md) -- 100-point grading rubric

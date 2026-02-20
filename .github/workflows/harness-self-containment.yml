@@ -27,8 +27,8 @@ jobs:
 
       - name: Validate workflow manifest and dependency profiles
         run: |
-          chmod +x .harmony/orchestration/workflows/_ops/scripts/validate-workflows.sh
-          .harmony/orchestration/workflows/_ops/scripts/validate-workflows.sh
+          chmod +x .harmony/orchestration/runtime/workflows/_ops/scripts/validate-workflows.sh
+          .harmony/orchestration/runtime/workflows/_ops/scripts/validate-workflows.sh
 
       - name: Validate services independence
         run: |

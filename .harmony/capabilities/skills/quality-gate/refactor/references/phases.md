@@ -165,7 +165,7 @@ Exhaustively search for ALL references before making changes.
 
    ### Pattern: `old-name`
    - `.harmony/START.md` (3 matches)
-   - `.harmony/orchestration/workflows/example.md` (1 match)
+   - `.harmony/orchestration/runtime/workflows/example.md` (1 match)
 
    ### Pattern: `/old-name/`
    - `.cursor/commands/command.md` (1 match)
@@ -186,7 +186,7 @@ Exhaustively search for ALL references before making changes.
    | File | Match Count | Patterns Found |
    |------|-------------|----------------|
    | `.harmony/START.md` | 4 | `old-name`, `/old-name/` |
-   | `.harmony/orchestration/workflows/example.md` | 1 | `old-name` |
+   | `.harmony/orchestration/runtime/workflows/example.md` | 1 | `old-name` |
 
    **Total files:** 3
    **Total matches:** 6
@@ -250,7 +250,7 @@ Transform audit results into an actionable change manifest.
 
    ### Phase 3: Documentation & Code
    - [ ] `.harmony/START.md` (4 changes)
-   - [ ] `.harmony/orchestration/workflows/example.md` (3 changes)
+   - [ ] `.harmony/orchestration/runtime/workflows/example.md` (3 changes)
 
    ### Phase 4: Continuity Artifacts (APPEND ONLY)
    - [ ] `continuity/log.md` — Add entry (DO NOT MODIFY EXISTING)
@@ -373,7 +373,7 @@ phases:
     progress:
       total_items: 13
       completed_items: 7
-      current_item: ".harmony/orchestration/workflows/example.md"
+      current_item: ".harmony/orchestration/runtime/workflows/example.md"
 ```
 
 ---

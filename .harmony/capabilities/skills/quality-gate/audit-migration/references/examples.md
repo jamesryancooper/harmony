@@ -63,9 +63,9 @@ migration:
     - old: "checklists/"
       new: "quality/"
     - old: "workflows/"
-      new: "orchestration/workflows/"
+      new: "orchestration/runtime/workflows/"
     - old: "missions/"
-      new: "orchestration/missions/"
+      new: "orchestration/runtime/missions/"
     - old: "assistants/"
       new: "agency/actors/assistants/"
     - old: "templates/"
@@ -87,7 +87,7 @@ migration:
     - "ideation/scratchpad/archive/"
     - "capabilities/skills/archive/"
     # Migration workflow itself (intentionally references old names)
-    - "orchestration/workflows/workspace/migrate-workspace/"
+    - "orchestration/runtime/workflows/workspace/migrate-workspace/"
   scope: "."
 ```
 

@@ -121,7 +121,7 @@ The primitives form a hierarchical multi-agent system:
 
 ## Missions
 
-**Location:** `.harmony/orchestration/missions/<mission-id>/mission.yml`
+**Location:** `.harmony/orchestration/runtime/missions/<mission-id>/mission.yml`
 
 **Purpose:** Durable, multi-session orchestration units with formal state machines, commanded by agents.
 
@@ -232,7 +232,7 @@ See `.harmony/capabilities/skills/_scaffold/template/SKILL.md`
 ### Examples
 
 - `/init` → generate project-level bootstrap files from `.harmony` templates (optional `--with-boot-files`)
-- `/refactor` → delegates to `.harmony/orchestration/workflows/refactor/`
+- `/refactor` → delegates to `.harmony/orchestration/runtime/workflows/refactor/`
 - `/recover` → error recovery procedures
 - `/validate-frontmatter` → check markdown metadata
 
@@ -242,7 +242,7 @@ See `.harmony/capabilities/skills/_scaffold/template/SKILL.md`
 
 > **Deprecated:** Workflows are consolidated into Skills. Use Skills for single-session procedural work and Missions for durable multi-session orchestration.
 
-**Former Location:** `.harmony/orchestration/workflows/<workflow-name>/`
+**Former Location:** `.harmony/orchestration/runtime/workflows/<workflow-name>/`
 
 **Migration Path:**
 
@@ -579,7 +579,7 @@ Registry supports `pipelines` section for skill composition without manual orche
 |-----------|----------|----------|---------------|
 | Agents | `.harmony/agency/actors/agents/registry.yml` | `.harmony/agency/actors/agents/_scaffold/template/` | `.harmony/agency/_meta/architecture/README.md` |
 | Teams | `.harmony/agency/actors/teams/registry.yml` | `.harmony/agency/actors/teams/_scaffold/template/` | `.harmony/agency/_meta/architecture/architecture.md` |
-| Missions | `.harmony/orchestration/missions/registry.yml` | `.harmony/orchestration/missions/_scaffold/template/` | `.harmony/orchestration/_meta/architecture/missions.md` |
+| Missions | `.harmony/orchestration/runtime/missions/registry.yml` | `.harmony/orchestration/runtime/missions/_scaffold/template/` | `.harmony/orchestration/_meta/architecture/missions.md` |
 | Skills | `.harmony/capabilities/skills/registry.yml` | `.harmony/capabilities/skills/_scaffold/template/` | `.harmony/capabilities/_meta/architecture/` |
 | Assistants | `.harmony/agency/actors/assistants/registry.yml` | `.harmony/agency/actors/assistants/_scaffold/template/` | `.harmony/agency/_meta/architecture/README.md` |
 | Commands | — | — | `.harmony/capabilities/_meta/architecture/commands.md` |

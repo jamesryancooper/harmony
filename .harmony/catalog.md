@@ -51,16 +51,16 @@ Reusable multi-actor compositions in `agency/actors/teams/`:
 
 ## Missions
 
-Time-bounded sub-projects in `orchestration/missions/`:
+Time-bounded sub-projects in `orchestration/runtime/missions/`:
 
 | Status | Count | Description |
 |--------|-------|-------------|
 | Active | See `registry.yml` | Currently in progress |
-| Archived | See `orchestration/missions/.archive/` | Completed or cancelled |
+| Archived | See `orchestration/runtime/missions/.archive/` | Completed or cancelled |
 
 **Lifecycle:** Created → Active → Completed → Archived
 
-See `orchestration/missions/README.md` for when to create a mission.
+See `orchestration/runtime/missions/README.md` for when to create a mission.
 
 ---
 
@@ -150,46 +150,46 @@ allowed-services: guard cost
 
 ## Workflows
 
-Multi-step procedures in `orchestration/workflows/`.
+Multi-step procedures in `orchestration/runtime/workflows/`.
 
-**Discovery:** Read `orchestration/workflows/manifest.yml` for workflow index (Tier 1). After matching, read `orchestration/workflows/registry.yml` for extended metadata (Tier 2).
+**Discovery:** Read `orchestration/runtime/workflows/manifest.yml` for workflow index (Tier 1). After matching, read `orchestration/runtime/workflows/registry.yml` for extended metadata (Tier 2).
 
 ### Harness Management
 
 | Workflow | Access | Description |
 |----------|--------|-------------|
-| [create-harness](./orchestration/workflows/meta/create-harness/00-overview.md) | human | Scaffold a new `.harmony` directory |
-| [evaluate-harness](./orchestration/workflows/meta/evaluate-harness/00-overview.md) | human | Evaluate token efficiency and effectiveness |
-| [migrate-harness](./orchestration/workflows/meta/migrate-harness/00-overview.md) | human | Upgrade older harness to current conventions |
-| [update-harness](./orchestration/workflows/meta/update-harness/00-overview.md) | human | Align with canonical definition |
+| [create-harness](./orchestration/runtime/workflows/meta/create-harness/00-overview.md) | human | Scaffold a new `.harmony` directory |
+| [evaluate-harness](./orchestration/runtime/workflows/meta/evaluate-harness/00-overview.md) | human | Evaluate token efficiency and effectiveness |
+| [migrate-harness](./orchestration/runtime/workflows/meta/migrate-harness/00-overview.md) | human | Upgrade older harness to current conventions |
+| [update-harness](./orchestration/runtime/workflows/meta/update-harness/00-overview.md) | human | Align with canonical definition |
 
 ### Projects
 
 | Workflow | Access | Description |
 |----------|--------|-------------|
-| [create-project](./orchestration/workflows/projects/create-project.md) | human | Scaffold a new project in `projects/` |
+| [create-project](./orchestration/runtime/workflows/projects/create-project.md) | human | Scaffold a new project in `projects/` |
 
 ### Missions
 
 | Workflow | Access | Description |
 |----------|--------|-------------|
-| [create-mission](./orchestration/workflows/missions/create-mission/00-overview.md) | human | Scaffold a new mission from template |
-| [complete-mission](./orchestration/workflows/missions/complete-mission/00-overview.md) | human | Archive a completed mission |
+| [create-mission](./orchestration/runtime/workflows/missions/create-mission/00-overview.md) | human | Scaffold a new mission from template |
+| [complete-mission](./orchestration/runtime/workflows/missions/complete-mission/00-overview.md) | human | Archive a completed mission |
 
 ### Workflow Management
 
 | Workflow | Access | Description |
 |----------|--------|-------------|
-| [create-workflow](./orchestration/workflows/meta/create-workflow/00-overview.md) | human | Scaffold a new workflow with gap remediation features |
-| [evaluate-workflow](./orchestration/workflows/meta/evaluate-workflow/00-overview.md) | human | Assess workflow quality and gap coverage |
-| [update-workflow](./orchestration/workflows/meta/update-workflow/00-overview.md) | human | Add gap fixes to existing workflows |
+| [create-workflow](./orchestration/runtime/workflows/meta/create-workflow/00-overview.md) | human | Scaffold a new workflow with gap remediation features |
+| [evaluate-workflow](./orchestration/runtime/workflows/meta/evaluate-workflow/00-overview.md) | human | Assess workflow quality and gap coverage |
+| [update-workflow](./orchestration/runtime/workflows/meta/update-workflow/00-overview.md) | human | Add gap fixes to existing workflows |
 
 ### Quality Gate
 
 | Workflow | Access | Description |
 | -------- | ------ | ----------- |
-| [orchestrate-audit](./orchestration/workflows/quality-gate/orchestrate-audit/WORKFLOW.md) | human | Coordinate parallel audit-migration runs across codebase partitions |
-| [refactor](./orchestration/workflows/quality-gate/refactor/00-overview.md) | human | Execute a verified refactor with exhaustive audit |
+| [orchestrate-audit](./orchestration/runtime/workflows/quality-gate/orchestrate-audit/WORKFLOW.md) | human | Coordinate parallel audit-migration runs across codebase partitions |
+| [refactor](./orchestration/runtime/workflows/quality-gate/refactor/00-overview.md) | human | Execute a verified refactor with exhaustive audit |
 
 ---
 

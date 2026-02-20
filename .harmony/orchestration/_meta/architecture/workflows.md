@@ -1,13 +1,13 @@
 ---
 title: Harness Workflows
-description: Harness-scoped multi-step procedures defined in .harmony/orchestration/workflows/.
+description: Harness-scoped multi-step procedures defined in .harmony/orchestration/runtime/workflows/.
 ---
 
 # Harness Workflows
 
-Harness workflows are **harness-scoped multi-step procedures** defined in `.harmony/orchestration/workflows/`. They operate on artifacts in the harness's parent directory.
+Harness workflows are **harness-scoped multi-step procedures** defined in `.harmony/orchestration/runtime/workflows/`. They operate on artifacts in the harness's parent directory.
 
-> **Not runtime service contracts:** `.harmony/orchestration/workflows/**` contains **agent procedures**. Typed runtime service contracts live under `.harmony/capabilities/services/**` and are invoked through the runtime CLI.
+> **Not runtime service contracts:** `.harmony/orchestration/runtime/workflows/**` contains **agent procedures**. Typed runtime service contracts live under `.harmony/capabilities/services/**` and are invoked through the runtime CLI.
 
 ---
 
@@ -29,7 +29,7 @@ Harness workflows are designed to be **portable across all AI harnesses**—Curs
        │              │              │              │
        ▼              ▼              ▼              ▼
 ┌────────────────────────────────────────────────────────────┐
-│              .harmony/orchestration/workflows/<name>/                  │
+│              .harmony/orchestration/runtime/workflows/<name>/                  │
 │                                                            │
 │   Universal workflow with portable steps that work         │
 │   regardless of which harness invokes them                 │
@@ -40,7 +40,7 @@ Harness workflows are designed to be **portable across all AI harnesses**—Curs
 
 | Principle | Description |
 |-----------|-------------|
-| **Workflows are the source of truth** | All execution logic lives in `.harmony/orchestration/workflows/` |
+| **Workflows are the source of truth** | All execution logic lives in `.harmony/orchestration/runtime/workflows/` |
 | **Harness entry points are thin wrappers** | `.cursor/commands/`, `.claude/commands/`, etc. only provide syntax and delegation |
 | **No harness-specific logic in workflows** | Workflows should work identically regardless of invoking harness |
 | **Harness is portable** | Copy a `.harmony/` to any repo, and it works with any harness |
@@ -50,7 +50,7 @@ Harness workflows are designed to be **portable across all AI harnesses**—Curs
 **1. Create the workflow (source of truth):**
 
 ```text
-.harmony/orchestration/workflows/<category>/<name>/
+.harmony/orchestration/runtime/workflows/<category>/<name>/
 ├── 00-overview.md     # Purpose, prereqs, steps, references
 ├── 01-step-one.md     # First step (if multi-step)
 ├── 02-step-two.md     # Second step
@@ -69,7 +69,7 @@ For Cursor:
 
 Brief description.
 
-See `.harmony/orchestration/workflows/<category>/<name>/00-overview.md` for full description and steps.
+See `.harmony/orchestration/runtime/workflows/<category>/<name>/00-overview.md` for full description and steps.
 
 ## Usage
 
@@ -79,13 +79,13 @@ See `.harmony/orchestration/workflows/<category>/<name>/00-overview.md` for full
 
 ## Implementation
 
-Execute the workflow in `.harmony/orchestration/workflows/<category>/<name>/`.
+Execute the workflow in `.harmony/orchestration/runtime/workflows/<category>/<name>/`.
 
 Start with `00-overview.md` and follow each step in sequence.
 
 ## References
 
-- **Workflow:** `.harmony/orchestration/workflows/<category>/<name>/`
+- **Workflow:** `.harmony/orchestration/runtime/workflows/<category>/<name>/`
 ```
 
 For other harnesses, create equivalent wrappers in their respective directories (e.g., `.claude/commands/`, `.codex/commands/`).
@@ -93,7 +93,7 @@ For other harnesses, create equivalent wrappers in their respective directories 
 ### Example: Create Project Workflow
 
 **Workflow (source of truth):**
-`.harmony/orchestration/workflows/projects/create-project.md`
+`.harmony/orchestration/runtime/workflows/projects/create-project.md`
 
 **Cursor wrapper:**
 `.cursor/commands/research.md` → Points to workflow
@@ -111,7 +111,7 @@ Harness workflows can be invoked in multiple ways:
 
 | Method | Trigger | Example |
 |--------|---------|---------|
-| **Direct** | Agent references the workflow | Agent reads `.harmony/orchestration/workflows/publish-to-docs/00-overview.md` |
+| **Direct** | Agent references the workflow | Agent reads `.harmony/orchestration/runtime/workflows/publish-to-docs/00-overview.md` |
 | **Wrapped (Cursor)** | User types `/command` in Cursor | `/create-harness` via `.cursor/commands/` |
 | **Wrapped (Claude Code)** | User types `/command` in Claude Code | `/create-harness` via `.claude/commands/` |
 | **Wrapped (Codex)** | User invokes command in Codex | Via `.codex/commands/` |
@@ -126,7 +126,7 @@ When wrapped by a harness-specific command, the workflow gains that harness's in
 Simple workflows can be single files. Complex workflows use subdirectories with numbered step files:
 
 ```text
-.harmony/orchestration/workflows/my-workflow/
+.harmony/orchestration/runtime/workflows/my-workflow/
 ├── 00-overview.md
 ├── 01-first-step.md
 ├── 02-second-step.md
@@ -152,7 +152,7 @@ Workflow overview files (`00-overview.md`) require YAML frontmatter:
 | `description` | Yes | Brief summary (max 160 characters) |
 | `access` | Yes | `human` (has Cursor command wrapper) or `agent` (agent-only) |
 
-> This frontmatter contract applies to `.harmony/orchestration/workflows/**` only.
+> This frontmatter contract applies to `.harmony/orchestration/runtime/workflows/**` only.
 
 ---
 
@@ -162,9 +162,9 @@ The harness management commands demonstrate the **Cursor Command → Workflow** 
 
 | Cursor Command | Delegates To | Purpose |
 |----------------|--------------|---------|
-| `/create-harness` | `.harmony/orchestration/workflows/meta/create-harness/` | Scaffold a new `.harmony` directory |
-| `/update-harness` | `.harmony/orchestration/workflows/meta/update-harness/` | Align with canonical definition |
-| `/evaluate-harness` | `.harmony/orchestration/workflows/meta/evaluate-harness/` | Assess token efficiency |
+| `/create-harness` | `.harmony/orchestration/runtime/workflows/meta/create-harness/` | Scaffold a new `.harmony` directory |
+| `/update-harness` | `.harmony/orchestration/runtime/workflows/meta/update-harness/` | Align with canonical definition |
+| `/evaluate-harness` | `.harmony/orchestration/runtime/workflows/meta/evaluate-harness/` | Assess token efficiency |
 
 Each workflow subdirectory contains numbered step files for the agent to follow sequentially.
 
@@ -173,7 +173,7 @@ Each workflow subdirectory contains numbered step files for the agent to follow 
 | Layer | Location | Purpose |
 |-------|----------|---------|
 | **Entry points** | `.<harness>/commands/*.md` | Harness-specific wrappers (Cursor, Claude Code, Codex, etc.) |
-| **Implementation** | `.harmony/orchestration/workflows/<category>/<name>/` | Multi-step procedure the agent executes (source of truth) |
+| **Implementation** | `.harmony/orchestration/runtime/workflows/<category>/<name>/` | Multi-step procedure the agent executes (source of truth) |
 | **Templates** | `.harmony/scaffolding/templates/` | Boilerplate for scaffolding |
 
 ### Usage Examples

@@ -34,19 +34,19 @@ After comprehensive analysis of the skills system (production-ready, agentskills
 
 | Path | Files Present | Apparent Purpose | Maturity |
 |------|---------------|------------------|----------|
-| `.harmony/orchestration/workflows/_scaffold/template/` | 00-overview.md, 01-step.md, NN-verify.md, README.md | Scaffolding template | Draft |
-| `.harmony/orchestration/workflows/workspace/create-workspace/` | 00-overview.md + 6 step files | Scaffold new .harmony directory | Draft/Functional |
-| `.harmony/orchestration/workflows/workspace/update-workspace/` | 00-overview.md + 5 step files | Align workspace with canonical definition | Draft/Functional |
-| `.harmony/orchestration/workflows/workspace/evaluate-workspace/` | 00-overview.md + 3 step files | Assess token efficiency | Draft/Functional |
-| `.harmony/orchestration/workflows/workspace/migrate-workspace/` | 00-overview.md + 4 step files | Migrate workspace structure | Draft |
-| `.harmony/orchestration/workflows/workflows/create-workflow/` | 00-overview.md + 8 step files | Scaffold new workflow | Draft/Meta |
-| `.harmony/orchestration/workflows/workflows/update-workflow/` | 00-overview.md + 5 step files | Modify existing workflow | Draft/Meta |
-| `.harmony/orchestration/workflows/workflows/evaluate-workflow/` | 00-overview.md + 5 step files | Assess workflow quality | Draft/Meta |
-| `.harmony/orchestration/workflows/refactor/` | 00-overview.md + 6 step files | Execute verified codebase refactor | Draft/Functional |
-| `.harmony/orchestration/workflows/missions/create-mission/` | 00-overview.md | Scaffold new mission | Draft |
-| `.harmony/orchestration/workflows/missions/complete-mission/` | 00-overview.md | Archive completed mission | Draft |
-| `.harmony/orchestration/workflows/skills/create-skill/` | 00-overview.md + 6 step files | Scaffold new skill | Draft/Functional |
-| `.harmony/orchestration/workflows/promote-from-scratchpad.md` | Single file | Promote scratchpad content | Placeholder |
+| `.harmony/orchestration/runtime/workflows/_scaffold/template/` | 00-overview.md, 01-step.md, NN-verify.md, README.md | Scaffolding template | Draft |
+| `.harmony/orchestration/runtime/workflows/workspace/create-workspace/` | 00-overview.md + 6 step files | Scaffold new .harmony directory | Draft/Functional |
+| `.harmony/orchestration/runtime/workflows/workspace/update-workspace/` | 00-overview.md + 5 step files | Align workspace with canonical definition | Draft/Functional |
+| `.harmony/orchestration/runtime/workflows/workspace/evaluate-workspace/` | 00-overview.md + 3 step files | Assess token efficiency | Draft/Functional |
+| `.harmony/orchestration/runtime/workflows/workspace/migrate-workspace/` | 00-overview.md + 4 step files | Migrate workspace structure | Draft |
+| `.harmony/orchestration/runtime/workflows/workflows/create-workflow/` | 00-overview.md + 8 step files | Scaffold new workflow | Draft/Meta |
+| `.harmony/orchestration/runtime/workflows/workflows/update-workflow/` | 00-overview.md + 5 step files | Modify existing workflow | Draft/Meta |
+| `.harmony/orchestration/runtime/workflows/workflows/evaluate-workflow/` | 00-overview.md + 5 step files | Assess workflow quality | Draft/Meta |
+| `.harmony/orchestration/runtime/workflows/refactor/` | 00-overview.md + 6 step files | Execute verified codebase refactor | Draft/Functional |
+| `.harmony/orchestration/runtime/workflows/missions/create-mission/` | 00-overview.md | Scaffold new mission | Draft |
+| `.harmony/orchestration/runtime/workflows/missions/complete-mission/` | 00-overview.md | Archive completed mission | Draft |
+| `.harmony/orchestration/runtime/workflows/skills/create-skill/` | 00-overview.md + 6 step files | Scaffold new skill | Draft/Functional |
+| `.harmony/orchestration/runtime/workflows/promote-from-scratchpad.md` | Single file | Promote scratchpad content | Placeholder |
 
 **Observations:**
 
@@ -434,7 +434,7 @@ Is your task...
 **Option B: Consolidate to Skills (workflow archetype skills)**
 
 - Migrate all suitable workflows to skills
-- Deprecate the workflows primitive (`.harmony/orchestration/workflows/`)
+- Deprecate the workflows primitive (`.harmony/orchestration/runtime/workflows/`)
 - Position skills as the single primitive for multi-step procedures
 
 ### 6.2 Justification
@@ -498,10 +498,10 @@ A refactor is NOT complete until Phase 5 (Verify) passes with zero remaining ref
 
 ### 6.5 Action Items
 
-1. **Create `refactor` skill** - Migrate `.harmony/orchestration/workflows/refactor/` to `.harmony/capabilities/skills/refactor/`
+1. **Create `refactor` skill** - Migrate `.harmony/orchestration/runtime/workflows/refactor/` to `.harmony/capabilities/skills/refactor/`
 2. **Create `create-workspace` skill** - Migrate workspace scaffolding workflow
 3. **Update `create-skill` workflow** to be a skill itself (meta but consistent)
-4. **Deprecate `.harmony/orchestration/workflows/`** - Move templates to `.harmony/capabilities/skills/_scaffold/template/`
+4. **Deprecate `.harmony/orchestration/runtime/workflows/`** - Move templates to `.harmony/capabilities/skills/_scaffold/template/`
 5. **Update documentation** - Revise comparison.md to reflect consolidation
 6. **Add skill archetype guidance** - Document "workflow skills" pattern in skills docs
 
@@ -554,7 +554,7 @@ The key insight is that skills are not just "composable I/O operations" - they a
 - `.harmony/capabilities/skills/registry.yml` - Extended skill metadata
 - `.harmony/capabilities/skills/synthesis/refine-prompt/SKILL.md` - Example multi-phase skill
 - `.harmony/capabilities/skills/synthesis/refine-prompt/references/phases.md` - Detailed phase documentation
-- `.harmony/orchestration/workflows/refactor/` - Example workflow (candidate for migration)
+- `.harmony/orchestration/runtime/workflows/refactor/` - Example workflow (candidate for migration)
 - `.harmony/capabilities/_meta/architecture/` - Skills documentation
 - `docs/architecture/workspaces/workflows.md` - Workflows documentation
 
@@ -599,7 +599,7 @@ The original analysis evaluated single-session procedural tasks. Additional requ
 │  • First-class ACP gates                                 │
 │  • Interfaces with FlowKit runtime                              │
 │                                                                 │
-│  Location: .harmony/orchestration/missions/                      │
+│  Location: .harmony/orchestration/runtime/missions/                      │
 │  Format: mission.yml (state machine) + mission.md (docs)        │
 │                                                                 │
 │                      │ invokes                                  │
@@ -637,7 +637,7 @@ The original analysis evaluated single-session procedural tasks. Additional requ
 Missions orchestrate skills as execution units:
 
 ```yaml
-# .harmony/orchestration/missions/auth-migration/mission.yml
+# .harmony/orchestration/runtime/missions/auth-migration/mission.yml
 name: auth-migration
 goal: "Migrate from session-based to JWT authentication"
 runtime: flowkit
@@ -691,11 +691,11 @@ Migrate single-session procedural content to skills:
 
 | Current Location | Migrate To | Rationale |
 |------------------|------------|-----------|
-| `.harmony/orchestration/workflows/refactor/` | `.harmony/capabilities/skills/refactor/` | Single-session, clear phases |
-| `.harmony/orchestration/workflows/workspace/create-workspace/` | `.harmony/capabilities/skills/create-workspace/` | Single-session scaffolding |
-| `.harmony/orchestration/workflows/workspace/update-workspace/` | `.harmony/capabilities/skills/update-workspace/` | Single-session update |
-| `.harmony/orchestration/workflows/workspace/evaluate-workspace/` | `.harmony/capabilities/skills/evaluate-workspace/` | Single-session analysis |
-| `.harmony/orchestration/workflows/skills/create-skill/` | `.harmony/capabilities/skills/create-skill/` | Single-session scaffolding |
+| `.harmony/orchestration/runtime/workflows/refactor/` | `.harmony/capabilities/skills/refactor/` | Single-session, clear phases |
+| `.harmony/orchestration/runtime/workflows/workspace/create-workspace/` | `.harmony/capabilities/skills/create-workspace/` | Single-session scaffolding |
+| `.harmony/orchestration/runtime/workflows/workspace/update-workspace/` | `.harmony/capabilities/skills/update-workspace/` | Single-session update |
+| `.harmony/orchestration/runtime/workflows/workspace/evaluate-workspace/` | `.harmony/capabilities/skills/evaluate-workspace/` | Single-session analysis |
+| `.harmony/orchestration/runtime/workflows/skills/create-skill/` | `.harmony/capabilities/skills/create-skill/` | Single-session scaffolding |
 
 ### Phase 2: Deprecate Workflow Meta-Content
 
@@ -703,10 +703,10 @@ These become unnecessary after consolidation:
 
 | Deprecate | Reason |
 |-----------|--------|
-| `.harmony/orchestration/workflows/workflows/create-workflow/` | No longer creating workflows |
-| `.harmony/orchestration/workflows/workflows/update-workflow/` | No longer maintaining workflows |
-| `.harmony/orchestration/workflows/workflows/evaluate-workflow/` | No longer evaluating workflows |
-| `.harmony/orchestration/workflows/_scaffold/template/` | Move to `.harmony/capabilities/skills/_scaffold/template/` |
+| `.harmony/orchestration/runtime/workflows/workflows/create-workflow/` | No longer creating workflows |
+| `.harmony/orchestration/runtime/workflows/workflows/update-workflow/` | No longer maintaining workflows |
+| `.harmony/orchestration/runtime/workflows/workflows/evaluate-workflow/` | No longer evaluating workflows |
+| `.harmony/orchestration/runtime/workflows/_scaffold/template/` | Move to `.harmony/capabilities/skills/_scaffold/template/` |
 
 ### Phase 3: Evolve Missions into Durable Orchestration
 
@@ -714,7 +714,7 @@ Transform the draft `missions/` concept into the orchestration layer:
 
 | Current State | Target State |
 |---------------|--------------|
-| `.harmony/orchestration/workflows/missions/` (draft) | `.harmony/orchestration/missions/` (production) |
+| `.harmony/orchestration/runtime/workflows/missions/` (draft) | `.harmony/orchestration/runtime/missions/` (production) |
 | Prose-based steps | YAML state machine |
 | No runtime | FlowKit integration |
 | No durability | Checkpoint/resume semantics |
@@ -765,7 +765,7 @@ Transform the draft `missions/` concept into the orchestration layer:
 4. **State Persistence**
 
    ```
-   .harmony/orchestration/missions/<mission-id>/
+   .harmony/orchestration/runtime/missions/<mission-id>/
    ├── state.json          # Current state, checkpoint data
    ├── history.json        # State transition history
    ├── outputs/            # Skill outputs collected here
@@ -815,8 +815,8 @@ Missions delegate execution to FlowKit:
 | Primitive | Purpose | Location |
 |-----------|---------|----------|
 | **Skills** | Single-session composable capabilities | `.harmony/capabilities/skills/` |
-| **Missions** | Durable multi-session orchestration | `.harmony/orchestration/missions/` |
-| ~~Workflows~~ | **Deprecated** - consolidated into skills | ~~`.harmony/orchestration/workflows/`~~ |
+| **Missions** | Durable multi-session orchestration | `.harmony/orchestration/runtime/missions/` |
+| ~~Workflows~~ | **Deprecated** - consolidated into skills | ~~`.harmony/orchestration/runtime/workflows/`~~ |
 
 ### Decision Heuristic (Revised)
 
@@ -841,7 +841,7 @@ Is your task...
 3. Create `update-workspace` skill from workflow
 4. Create `evaluate-workspace` skill from workflow
 5. Create `create-skill` skill from workflow
-6. Deprecate `.harmony/orchestration/workflows/` (except missions/)
+6. Deprecate `.harmony/orchestration/runtime/workflows/` (except missions/)
 
 ### Near-Term (Missions Design)
 
@@ -869,7 +869,7 @@ Is your task...
 | `docs/architecture/workspaces/missions.md` | **Create** - Mission primitive docs |
 | `docs/architecture/workspaces/missions/schema.md` | **Create** - mission.yml schema |
 | `docs/architecture/workspaces/missions/flowkit-integration.md` | **Create** - FlowKit integration |
-| `.harmony/orchestration/missions/_scaffold/template/` | **Create** - Mission template |
+| `.harmony/orchestration/runtime/missions/_scaffold/template/` | **Create** - Mission template |
 | `CLAUDE.md` | Update with two-layer model |
 
 ---

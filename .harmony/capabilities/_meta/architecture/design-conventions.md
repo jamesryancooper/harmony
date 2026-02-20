@@ -249,7 +249,7 @@ phases:
     progress:
       total_items: 13
       completed_items: 7
-      current_item: ".harmony/orchestration/workflows/example.md"
+      current_item: ".harmony/orchestration/runtime/workflows/example.md"
   5_verify:
     status: pending
   6_document:
@@ -449,7 +449,7 @@ scope_limits:
 3. Report: "This task exceeds skill scope. Recommend creating a mission."
 4. Provide the mission template path for user to review and initiate
 
-See `.harmony/orchestration/workflows/` for mission templates and orchestration patterns.
+See `.harmony/orchestration/runtime/workflows/` for mission templates and orchestration patterns.
 
 ---
 

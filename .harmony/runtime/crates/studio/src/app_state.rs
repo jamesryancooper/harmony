@@ -1223,23 +1223,23 @@ mod tests {
 
     fn write_fixture_harness(root: &Path) {
         write_file(
-            &root.join(".harmony/orchestration/workflows/manifest.yml"),
+            &root.join(".harmony/orchestration/runtime/workflows/manifest.yml"),
             "workflows:\n  - id: alpha\n    path: alpha\n  - id: beta\n    path: beta\n",
         );
         write_file(
-            &root.join(".harmony/orchestration/workflows/registry.yml"),
+            &root.join(".harmony/orchestration/runtime/workflows/registry.yml"),
             "workflows:\n  alpha:\n    path: alpha\n  beta:\n    path: beta\n    depends_on:\n      - workflow: alpha\n",
         );
         write_file(
-            &root.join(".harmony/orchestration/workflows/alpha/WORKFLOW.md"),
+            &root.join(".harmony/orchestration/runtime/workflows/alpha/WORKFLOW.md"),
             "---\nname: Alpha Flow\ndescription: Alpha workflow for fixture tests.\nsteps:\n  - id: alpha-step\n    file: 01-alpha.md\n    description: Alpha step.\n---\n\n# Alpha\n",
         );
         write_file(
-            &root.join(".harmony/orchestration/workflows/alpha/01-alpha.md"),
+            &root.join(".harmony/orchestration/runtime/workflows/alpha/01-alpha.md"),
             "---\nname: alpha-step\ndescription: Alpha step.\n---\n",
         );
         write_file(
-            &root.join(".harmony/orchestration/workflows/beta/WORKFLOW.md"),
+            &root.join(".harmony/orchestration/runtime/workflows/beta/WORKFLOW.md"),
             "---\nname: Beta Flow\ndescription: Beta workflow with a missing step file.\nsteps:\n  - id: beta-step\n    file: 01-beta.md\n    description: Beta missing step.\n---\n\n# Beta\n",
         );
     }
@@ -1247,11 +1247,11 @@ mod tests {
     fn write_fixture_audits(root: &Path) {
         write_file(
             &root.join(".harmony/output/reports/1001-1-studio-apply-audit.md"),
-            "# Harmony Studio Apply Audit\n\n- timestamp_unix_ms: 1001\n- status: applied\n- attempted_files: 1\n- applied_files: 1\n- rolled_back_files: 0\n- summary: Applied 1 staged edits.\n\n## Staged Edits\n- update | .harmony/orchestration/workflows/alpha/WORKFLOW.md | Normalize WORKFLOW.md frontmatter defaults\n",
+            "# Harmony Studio Apply Audit\n\n- timestamp_unix_ms: 1001\n- status: applied\n- attempted_files: 1\n- applied_files: 1\n- rolled_back_files: 0\n- summary: Applied 1 staged edits.\n\n## Staged Edits\n- update | .harmony/orchestration/runtime/workflows/alpha/WORKFLOW.md | Normalize WORKFLOW.md frontmatter defaults\n",
         );
         write_file(
             &root.join(".harmony/output/reports/1002-1-studio-apply-audit.md"),
-            "# Harmony Studio Apply Audit\n\n- timestamp_unix_ms: 1002\n- status: failed-rolled-back\n- attempted_files: 2\n- applied_files: 1\n- rolled_back_files: 1\n- summary: Apply failed and rolled back 1 file(s): synthetic write error\n\n## Staged Edits\n- create | .harmony/orchestration/workflows/beta/01-beta.md | Create missing step file\n",
+            "# Harmony Studio Apply Audit\n\n- timestamp_unix_ms: 1002\n- status: failed-rolled-back\n- attempted_files: 2\n- applied_files: 1\n- rolled_back_files: 1\n- summary: Apply failed and rolled back 1 file(s): synthetic write error\n\n## Staged Edits\n- create | .harmony/orchestration/runtime/workflows/beta/01-beta.md | Create missing step file\n",
         );
     }
 

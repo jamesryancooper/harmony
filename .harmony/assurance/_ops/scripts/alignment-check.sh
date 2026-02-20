@@ -84,7 +84,7 @@ run_agency() {
 run_workflows() {
   run_step \
     "Validate workflow contracts" \
-    bash "$HARMONY_DIR/orchestration/workflows/_ops/scripts/validate-workflows.sh"
+    bash "$HARMONY_DIR/orchestration/runtime/workflows/_ops/scripts/validate-workflows.sh"
 }
 
 run_skills() {

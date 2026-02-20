@@ -33,7 +33,9 @@ portable:
   - capabilities/services/manifest.runtime.yml
   - capabilities/services/registry.runtime.yml
   - capabilities/services/interfaces/kv/
-  - orchestration/workflows/
+  - orchestration/runtime/workflows/
+  - orchestration/governance/
+  - orchestration/practices/
   - runtime/run
   - runtime/run.cmd
   - runtime/README.md

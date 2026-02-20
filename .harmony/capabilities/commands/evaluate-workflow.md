@@ -17,8 +17,8 @@ Assess an existing workflow for structure compliance, gap coverage, and content 
 
 **Examples:**
 ```text
-/evaluate-workflow .harmony/orchestration/workflows/quality-gate/refactor/
-/evaluate-workflow .harmony/orchestration/workflows/my-workflow/
+/evaluate-workflow .harmony/orchestration/runtime/workflows/quality-gate/refactor/
+/evaluate-workflow .harmony/orchestration/runtime/workflows/my-workflow/
 ```
 
 ## Parameters
@@ -29,7 +29,7 @@ Assess an existing workflow for structure compliance, gap coverage, and content 
 
 ## Implementation
 
-Execute the workflow in `.harmony/orchestration/workflows/meta/evaluate-workflow/`.
+Execute the workflow in `.harmony/orchestration/runtime/workflows/meta/evaluate-workflow/`.
 
 Steps:
 
@@ -76,7 +76,7 @@ Assessment report with:
 
 ## References
 
-- **Workflow:** `.harmony/orchestration/workflows/meta/evaluate-workflow/`
+- **Workflow:** `.harmony/orchestration/runtime/workflows/meta/evaluate-workflow/`
 - **Quality Criteria:** `.harmony/cognition/context/workflow-quality.md`
 - **Gap Checklist:** `.harmony/cognition/context/workflow-gaps.md`
 - **Update Workflow:** `.harmony/capabilities/commands/update-workflow.md`

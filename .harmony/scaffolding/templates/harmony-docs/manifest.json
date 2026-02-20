@@ -11,27 +11,27 @@
   ],
   "additions": {
     "directories": [
-      "orchestration/workflows/are"
+      "orchestration/runtime/workflows/are"
     ],
     "files": [
-      "orchestration/workflows/are/00-overview.md",
-      "orchestration/workflows/are/01-are-analyze-single-doc.md",
-      "orchestration/workflows/are/02-are-analyze-audits.md",
-      "orchestration/workflows/are/03-are-refine.md",
-      "orchestration/workflows/are/04-are-evaluate.md",
-      "orchestration/workflows/are/05-are-stress-tests.md",
-      "orchestration/workflows/are/06-are-quality-gates.md",
-      "orchestration/workflows/are/07-are-templates.md",
-      "orchestration/workflows/are/08-are-tooling.md",
-      "orchestration/workflows/are/09-are-best-practices.md",
-      "orchestration/workflows/are/10-are-quick-reference.md",
-      "orchestration/workflows/are/11-are-worked-example.md",
-      "orchestration/workflows/are/agent-harness.md",
-      "orchestration/workflows/are/are-document-sets.md",
-      "orchestration/workflows/are/are-init.sh",
-      "orchestration/workflows/are/are-loop.md",
-      "orchestration/workflows/are/concept-aligned-are-loop.meta.md",
-      "orchestration/workflows/are/workflow-document-set-improvement.md"
+      "orchestration/runtime/workflows/are/00-overview.md",
+      "orchestration/runtime/workflows/are/01-are-analyze-single-doc.md",
+      "orchestration/runtime/workflows/are/02-are-analyze-audits.md",
+      "orchestration/runtime/workflows/are/03-are-refine.md",
+      "orchestration/runtime/workflows/are/04-are-evaluate.md",
+      "orchestration/runtime/workflows/are/05-are-stress-tests.md",
+      "orchestration/runtime/workflows/are/06-are-quality-gates.md",
+      "orchestration/runtime/workflows/are/07-are-templates.md",
+      "orchestration/runtime/workflows/are/08-are-tooling.md",
+      "orchestration/runtime/workflows/are/09-are-best-practices.md",
+      "orchestration/runtime/workflows/are/10-are-quick-reference.md",
+      "orchestration/runtime/workflows/are/11-are-worked-example.md",
+      "orchestration/runtime/workflows/are/agent-harness.md",
+      "orchestration/runtime/workflows/are/are-document-sets.md",
+      "orchestration/runtime/workflows/are/are-init.sh",
+      "orchestration/runtime/workflows/are/are-loop.md",
+      "orchestration/runtime/workflows/are/concept-aligned-are-loop.meta.md",
+      "orchestration/runtime/workflows/are/workflow-document-set-improvement.md"
     ]
   },
   "usage": "/create-harness @path/to/docs --template docs"

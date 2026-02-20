@@ -87,7 +87,7 @@ struct WorkflowStepFrontmatter {
 }
 
 pub fn load_workflow_index(root: &Path) -> Result<WorkflowIndexSnapshot> {
-    let workflows_root = root.join(".harmony/orchestration/workflows");
+    let workflows_root = root.join(".harmony/orchestration/runtime/workflows");
     let manifest_path = workflows_root.join("manifest.yml");
     let registry_path = workflows_root.join("registry.yml");
 

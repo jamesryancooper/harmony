@@ -111,12 +111,12 @@ Add branch notation to Steps section:
 ```markdown
 ## Steps
 
-1. [Validate ID](../../orchestration/workflows/meta/create-workflow/01-validate-id.md)
-2. [Analyze requirements](../../orchestration/workflows/meta/create-workflow/02-analyze-requirements.md)
+1. [Validate ID](../../orchestration/runtime/workflows/meta/create-workflow/01-validate-id.md)
+2. [Analyze requirements](../../orchestration/runtime/workflows/meta/create-workflow/02-analyze-requirements.md)
 3. **Branch:**
-   - If complex workflow: [Select template](../../orchestration/workflows/meta/create-workflow/03-select-template.md)
-   - If simple workflow: [Generate structure](../../orchestration/workflows/meta/create-workflow/04-generate-structure.md)
-4. [Customize steps](../../orchestration/workflows/meta/create-workflow/05-customize-steps.md) _(branches merge here)_
+   - If complex workflow: [Select template](../../orchestration/runtime/workflows/meta/create-workflow/03-select-template.md)
+   - If simple workflow: [Generate structure](../../orchestration/runtime/workflows/meta/create-workflow/04-generate-structure.md)
+4. [Customize steps](../../orchestration/runtime/workflows/meta/create-workflow/05-customize-steps.md) _(branches merge here)_
 ```
 
 And in step files:
@@ -185,7 +185,7 @@ State schema:
   "branch": "parallel",
   "variables": {
     "workflow_id": "my-workflow",
-    "target_path": ".harmony/orchestration/workflows/my-workflow/"
+    "target_path": ".harmony/orchestration/runtime/workflows/my-workflow/"
   },
   "completed_steps": ["01-validate", "02-analyze"]
 }
