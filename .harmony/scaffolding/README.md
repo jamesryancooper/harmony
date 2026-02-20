@@ -26,3 +26,4 @@ Templates, prompts, and examples for generating new content.
 | `harmony/` | — | Base harness template |
 | `harmony-docs/` | `harmony/` | Documentation area harness |
 | `harmony-node-ts/` | `harmony/` | Node.js / TypeScript harness |
+| `migrations/` | — | Clean-break migration plan and release-notes templates |

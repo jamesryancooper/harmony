@@ -11,4 +11,4 @@ Project-specific prompts can be added here.
 
 ## Local Prompts
 
-(None currently - add project-specific prompts here)
+- `clean-break-migration.prompt.md` - Execute clean-break migrations with explicit legacy removal and CI regression prevention.
