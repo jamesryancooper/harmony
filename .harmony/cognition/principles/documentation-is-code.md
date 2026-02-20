@@ -99,7 +99,7 @@ any staged work begins.
 For ACP promotion, missing required governance artifacts MUST fail closed:
 
 - ACP decision MUST be `STAGE_ONLY` or `DENY` (never silent allow)
-- receipt MUST include reason codes (`ACP_EVIDENCE_MISSING` and `ACP_DOCS_EVIDENCE_MISSING`)
+- receipt MUST include `ACP_DOCS_EVIDENCE_MISSING` and any applicable generic evidence reason codes (for example `ACP_EVIDENCE_MISSING`)
 - receipt MUST include missing artifact identifiers for remediation
 - durable promotion MUST remain blocked until artifacts are complete
 

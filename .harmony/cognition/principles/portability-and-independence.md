@@ -84,11 +84,10 @@ interfaces/agent-platform/adapters/<provider>/
 
 Portability and Independence are operationalized through:
 
-- `.github/workflows/harness-self-containment.yml`
 - `.harmony/assurance/_ops/scripts/validate-harness-structure.sh`
 - `.harmony/capabilities/services/_ops/scripts/validate-service-independence.sh`
-- `.harmony/assurance/_ops/scripts/alignment-check.sh --profile harness`
-- `.harmony/assurance/_ops/scripts/alignment-check.sh --profile services`
+- `.harmony/assurance/_ops/scripts/alignment-check.sh` (`--profile harness` / `--profile services`)
+- Optional CI projection: `.github/workflows/harness-self-containment.yml`
 
 ## Relationship to Other Principles
 

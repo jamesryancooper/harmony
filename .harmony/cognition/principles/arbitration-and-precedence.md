@@ -12,19 +12,18 @@ status: Active
 ## Normative Rules (SSOT)
 
 1. Capability-attempt authority is deny-by-default policy output only.
-2. Durable promotion/contraction/finalize authority is ACP gate output only.
+2. Durable promotion/finalize authority is ACP gate output only.
 3. `apply` for durable state is interpreted as `promote` unless explicitly stage-only/read-only.
 4. Owner attestation is quorum input only; it is never standalone promotion authority.
-5. Waiver/exception behavior must use the canonical taxonomy in [Waivers and Exceptions](./_meta/waivers-and-exceptions.md); unmapped overrides fail closed.
-6. Governance-trigger evidence/receipt enforcement is keyed off canonical predicate `material_side_effect` (aliases must normalize to this predicate).
-7. If principles disagree and no explicit mapping exists, fail closed with reason-coded `STAGE_ONLY` or `DENY`.
-8. Non-normative guidance cannot weaken fail-closed controls in policy.
-9. Normative arbitration text must remain in this document only; other principles may include informational summaries and links.
-10. Broken/missing canonical references in principles must fail governance lint before merge.
+5. Term collisions are resolved by [RA/ACP Glossary](./_meta/ra-acp-glossary.md) definitions.
+6. Evidence-minima collisions are resolved by [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md).
+7. Non-normative guidance/examples cannot weaken fail-closed controls in policy.
+8. If principles disagree and no explicit mapping exists, fail closed with reason-coded `STAGE_ONLY` or `DENY`.
+9. Normative arbitration text remains in this document only; other principles must link out instead of restating arbitration rules.
 
 ## Application Order
 
-1. Determine whether the question is capability-attempt, durable promotion/contraction/finalize, or supporting governance semantics.
+1. Determine whether the question is capability-attempt, durable promotion/finalize (including `contraction` alias), or supporting governance semantics.
 2. Apply the corresponding authority rule above.
 3. If unresolved, apply fail-closed behavior and emit reason-coded receipts.
 

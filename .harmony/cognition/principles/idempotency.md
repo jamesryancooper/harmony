@@ -11,12 +11,8 @@ status: Active
 
 ## What This Means
 
-Externally retriable mutating interfaces (APIs, jobs, webhooks, and kit calls) must accept an `idempotency_key` and return the same canonical result when replayed. This is required for reliable retries, agent restarts, and network-failure recovery.
+Externally retriable mutating interfaces (APIs, jobs, webhooks, and kit calls) must expose a stable replay key (`idempotency_key` or equivalent stable replay identifier) and return the same canonical result when replayed. This is required for reliable retries, agent restarts, and network-failure recovery.
 
-## Equivalent Replay Keys
-
-For internal mutation transitions, an equivalent stable replay identifier is allowed when `idempotency_key` is not the native interface field.
-Accepted examples: `operation_id`, `receipt_id`, or `run_id + step_id`.
 Replay-key semantics must remain reproducible and auditable per [Determinism and Provenance](./determinism-and-provenance.md).
 
 ## Why It Matters
@@ -50,18 +46,6 @@ export async function createPayment(req: PaymentRequest, key: string) {
   await payments.save({ key, response });
   return response;
 }
-```
-
-```python
-# Good: atomic idempotency record
-
-def create_payment(req: dict, idem_key: str) -> dict:
-    cached = repo.get_by_idempotency_key(idem_key)
-    if cached:
-        return cached
-    result = charge(req)
-    repo.store_idempotency_result(idem_key, result)
-    return result
 ```
 
 ### ❌ Don't

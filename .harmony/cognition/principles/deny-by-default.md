@@ -29,24 +29,13 @@ and auditable.
 
 ## What Changed with Reversible Autonomy
 
-Harmony previously used *manual review gates* as a primary governance mechanism for
-material side effects. Under **Reversible Autonomy with Human-on-the-Loop
-Oversight**, deny-by-default remains the baseline, and **ACP policy evaluation is
-the runtime dependency for promotion decisions**.
+Under Reversible Autonomy, deny-by-default remains the baseline for capability attempts and ACP policy evaluation remains the durable-state authority.
+Historical migration context lives only in the ACP historical note: [Autonomous Control Points](./autonomous-control-points.md#historical-note-non-normative).
 
-Instead:
+Boundary split:
 
 - **Deny-by-default** governs *capabilities* (what an actor can attempt).
-- **Autonomous Control Points (ACPs)** govern *change promotion* (what can become
-  durable) using **reversibility, evidence, budgets, and quorum**.
-
-Humans are approached only when:
-
-- the agent quorum cannot reach a resolution,
-- an action crosses a configured risk threshold, or
-- after completion (digest/receipt), for optional review or rollback.
-
-See: `autonomous-control-points.md`.
+- **Autonomous Control Points (ACPs)** govern *promotion/finalize* decisions (what can become durable).
 
 ## Enforced Model in Harmony
 
@@ -160,10 +149,7 @@ See: [Autonomous Control Points](./autonomous-control-points.md).
 
 ## Arbitration
 
-If this principle conflicts with another, apply
-[Arbitration and Precedence](./arbitration-and-precedence.md).
-This section is informational only; normative arbitration rules live only in the
-arbitration SSOT.
+See [Arbitration and Precedence](./arbitration-and-precedence.md) (SSOT) for conflict resolution.
 
 ## Development Speed Guidance
 

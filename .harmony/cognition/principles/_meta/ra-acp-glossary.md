@@ -14,6 +14,7 @@ Use these terms consistently across principles, policy, receipts, and validators
 - `promote`: commit staged changes to durable state after ACP gate evaluation.
 - `apply`: interpreted as `promote` for durable state unless explicitly marked read-only or stage-only.
 - `finalize`: irreversible completion step (for example hard-delete after recovery window); ACP-4 by default.
+- `contraction`: glossary alias of `finalize` for durable-state cleanup semantics; it does not introduce a separate gate outcome.
 
 ## Governance Actors and Decisions
 

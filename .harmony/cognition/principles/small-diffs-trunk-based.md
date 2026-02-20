@@ -11,9 +11,10 @@ status: Active
 
 ## What This Means
 
-Harmony treats small-batch delivery as policy, not preference. Changes should be narrowly scoped and merged quickly into trunk.
+Harmony treats small-batch delivery as default guidance for flow and review quality. Changes should be narrowly scoped and merged quickly into trunk.
 
 For material side-effects, fast merges are encouraged only after ACP promote requirements (evidence + receipts) are satisfied. "Merge quickly" never bypasses ACP stage/promote sequencing.
+Git merge is a delivery mechanic; durable-state authority remains the ACP promote decision.
 
 Default thresholds (review-quality guidance, not ACP hard gates):
 
@@ -110,9 +111,7 @@ Waiver semantics are canonical in
 
 ## Arbitration
 
-If this principle conflicts with another, apply
-[Arbitration and Precedence](./arbitration-and-precedence.md).
-Fast trunk flow cannot bypass stage/promote for material side effects.
+See [Arbitration and Precedence](./arbitration-and-precedence.md) (SSOT) for conflict resolution.
 
 ## Related Documentation
 

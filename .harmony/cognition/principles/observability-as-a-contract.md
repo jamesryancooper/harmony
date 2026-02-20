@@ -46,22 +46,11 @@ Learning loops depend on measurable outcomes, not anecdotes.
 
 ### Telemetry Profiles (Risk + Budget Aware)
 
-| Tier | Minimum Signals |
-|---|---|
-| `minimal` | Structured event + core metric + representative `trace_id` |
-| `sampled` | Tiered spans/logs/metrics with trace correlation and sampling policy |
-| `full` | Complete spans, structured logs, key metrics, and rollback signals |
-
 Default risk tier to ACP mapping is policy-canonical (`acp.risk_tier_mapping`).
-Telemetry profile requirements by ACP level are canonical in
+Minimum telemetry requirements by ACP level are canonical in
 [RA/ACP Promotion Inputs Matrix](./_meta/ra-acp-promotion-inputs-matrix.md#telemetry-profile-gate-canonical)
 and enforced in policy at `acp.telemetry_gate`.
-
-Non-negotiable minimum signals (must never be dropped):
-- representative `trace_id`
-- decision identity (`run_id` + `operation_id` + ACP decision outcome)
-- receipt reference (`receipt_id` or equivalent)
-- rollback signal hook/event for promoted material side-effects
+This document requires telemetry to remain traceable and receipt-linked; profile-level minima, reason codes, and fail-closed outcomes are matrix/policy SSOT behavior.
 
 If a non-default profile is used, the change receipt must include:
 - selected profile
@@ -133,9 +122,7 @@ Low-risk internal scripts may use reduced telemetry, but production paths and sh
 
 ## Arbitration
 
-If this principle conflicts with another, apply
-[Arbitration and Precedence](./arbitration-and-precedence.md).
-Telemetry profile requirements must stay inside ACP budget/circuit envelopes.
+See [Arbitration and Precedence](./arbitration-and-precedence.md) (SSOT) for conflict resolution.
 
 ## Related Documentation
 

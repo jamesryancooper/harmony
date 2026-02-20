@@ -188,7 +188,7 @@ Need examples? → Read references/ (on demand)
 
 ## Enforcement
 
-- **Skill validation**: Manifests must include id, name, summary, triggers
+- **Skill validation**: Manifests must include `id`, `display_name`, `summary`, and `triggers` (SSOT: [skills manifest](../../capabilities/skills/manifest.yml))
 - **Token budgets**: SKILL.md files should target <5000 tokens
 - **Harness linting**: START.md required for harness directories
 

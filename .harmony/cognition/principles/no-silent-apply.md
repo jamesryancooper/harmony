@@ -18,7 +18,7 @@ the decision auditable and reversible.
 ## Mechanism
 
 Enforcement lives in [Autonomous Control Points](./autonomous-control-points.md). This document intentionally stays narrow to avoid duplicating ACP gate semantics.
-ACP is the single normative source for promotion/contraction mechanics, quorum behavior, and receipt schema rules.
+ACP is the single normative source for promotion/finalize mechanics (including `contraction` alias), quorum behavior, and receipt schema rules.
 No-silent-apply adds an outcome contract only; it does not define separate gate outcomes or approval workflows.
 Operational mechanism is ACP gate evaluation plus receipt emission.
 
@@ -45,10 +45,7 @@ These always-visible fields are the minimum progressive-disclosure surface for p
 
 ## Arbitration
 
-If this principle conflicts with another, apply
-[Arbitration and Precedence](./arbitration-and-precedence.md).
-This section is informational only; normative arbitration rules live only in the
-arbitration SSOT.
+See [Arbitration and Precedence](./arbitration-and-precedence.md) (SSOT) for conflict resolution.
 
 ## Why It Matters
 

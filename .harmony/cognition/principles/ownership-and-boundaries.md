@@ -52,9 +52,7 @@ If required attestation is missing, runtime behavior is deterministic and bounde
 
 ## Arbitration
 
-If this principle conflicts with another, apply
-[Arbitration and Precedence](./arbitration-and-precedence.md).
-Owner attestation is a quorum input and never a standalone promotion gate.
+See [Arbitration and Precedence](./arbitration-and-precedence.md) (SSOT) for conflict resolution.
 
 ## Why It Matters
 

@@ -11,8 +11,8 @@ status: Active
 
 ## What This Means
 
-User-facing flows must satisfy baseline accessibility expectations (semantic structure, keyboard operability, visible focus, and accessible names). CI should include automated checks and failures block promotion unless explicitly waived.
-Where policy requires quality evidence, accessibility evidence is an ACP promotion input for material user-facing side-effects.
+User-facing flows must satisfy baseline accessibility expectations (semantic structure, keyboard operability, visible focus, and accessible names). CI should include automated checks.
+Promotion behavior is policy-bound: where validators are configured, failures block promotion; otherwise missing accessibility evidence remains stage-only and receipted until remediated or waived per policy (see `.harmony/cognition/methodology/ci-cd-quality-gates.md`).
 
 ## Why It Matters
 

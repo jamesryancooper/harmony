@@ -80,234 +80,32 @@ blocked by default, explicitly audited, and out-of-band from normal autonomous r
 
 ## Arbitration
 
-If this principle conflicts with another, apply
-[Arbitration and Precedence](./arbitration-and-precedence.md).
-This principle defines reversible design patterns; ACP defines durable-state authority.
+See [Arbitration and Precedence](./arbitration-and-precedence.md) (SSOT) for conflict resolution.
 
 ## In Practice
 
-### Deployment Reversibility
-
-Every deployment should be instantly reversible:
-
-| Mechanism | Rollback Time | Use Case |
-|-----------|---------------|----------|
-| Re-promote prior version | Seconds | Standard rollback |
-| Feature flag toggle | Milliseconds | Disable specific feature |
-| Traffic shift | Seconds | Gradual rollout reversal |
-| Database restore | Minutes | Data corruption (last resort) |
+Aim for fast, tested rollback (typically seconds to minutes where platform/runtime supports it), with clear recovery windows for destructive-adjacent operations.
 
 ### ✅ Do
 
-**Use feature flags as kill switches:**
-
-```typescript
-// Good: Feature can be disabled instantly
-async function processPayment(order: Order) {
-  if (await flags.isEnabled('new-payment-processor')) {
-    return newProcessor.charge(order);
-  }
-  return legacyProcessor.charge(order);
-}
-```
-
-**Design migrations to be reversible:**
-
-```sql
--- Migration: Add column (reversible)
--- Up
-ALTER TABLE users ADD COLUMN preferred_name VARCHAR(255);
-
--- Down
-ALTER TABLE users DROP COLUMN preferred_name;
-```
-
-```sql
--- Migration: Rename column (expand/contract)
--- Step 1: Add new column
-ALTER TABLE users ADD COLUMN display_name VARCHAR(255);
-UPDATE users SET display_name = name;
-
--- Step 2: Application reads from both, writes to both
--- Step 3: After verification, drop old column
-ALTER TABLE users DROP COLUMN name;
-```
-
-**Rehearse rollback procedures:**
-
-```yaml
-# runbooks/rollback.md
-## Production Rollback Procedure
-
-### Prerequisites
-- [ ] Identify the last known good version
-- [ ] Verify rollback target is deployable
-
-### Steps
-1. Navigate to deployment dashboard
-2. Select prior version
-3. Click "Promote to Production"
-4. Verify health checks pass
-5. Monitor error rates for 5 minutes
-
-### Verification
-- [ ] Error rate returned to baseline
-- [ ] No increase in support tickets
-- [ ] Core flows functional (smoke test)
-```
-
-**Keep rollback paths tested:**
-
-```typescript
-// Good: Rollback path is exercised in tests
-describe('payment processor migration', () => {
-  it('processes payment with new processor', async () => {
-    await flags.enable('new-payment-processor');
-    const result = await processPayment(testOrder);
-    expect(result.status).toBe('success');
-  });
-
-  it('falls back to legacy processor when flag disabled', async () => {
-    await flags.disable('new-payment-processor');
-    const result = await processPayment(testOrder);
-    expect(result.status).toBe('success');  // Legacy still works
-  });
-});
-```
+- Use expand/contract and dual-write/dual-read patterns for state transitions.
+- Keep rollback handles and recovery windows in receipts for each promoted slice.
+- Rehearse rollback paths in staging and keep rollback checks in CI for risky changes.
+- Use feature flags and canary rollouts to reduce rollback blast radius.
 
 ### ❌ Don't
 
-**Don't make irreversible changes in a single step:**
+- Don’t couple durable promote steps with irreversible schema/data finalization.
+- Don’t hard-delete as part of routine autonomous runs.
+- Don’t ship changes without an explicit rollback path.
 
-```sql
--- Bad: Destructive migration
-DROP TABLE old_users;
-ALTER TABLE new_users RENAME TO users;
+## Operational Detail (Progressive Disclosure)
 
--- Good: Expand/contract
--- Step 1: Create new table, copy data
--- Step 2: Application uses new table
--- Step 3: After verification period, drop old table
-```
+Detailed runbooks and incident playbooks live in:
 
-**Don't couple deployment with data migration:**
-
-```yaml
-# Bad: Deploy and migrate atomically
-deploy:
-  - run: npm run build
-  - run: npm run db:migrate  # Irreversible
-  - run: npm run deploy
-
-# Good: Separate concerns
-deploy:
-  - run: npm run build
-  - run: npm run deploy
-  # Migration runs separately with rollback plan
-```
-
-**Don't skip the dual-write period:**
-
-```typescript
-// Bad: Instant cutover
-const user = await newDatabase.getUser(id);
-
-// Good: Dual-read with fallback during migration
-const user = await newDatabase.getUser(id)
-  ?? await legacyDatabase.getUser(id);
-```
-
-**Don't deploy without a rollback plan:**
-
-```markdown
-<!-- Bad: PR without rollback consideration -->
-## Changes
-- Updated payment processor integration
-
-<!-- Good: PR with rollback plan -->
-## Changes
-- Updated payment processor integration
-
-## Rollback Plan
-- Disable `new-payment-processor` flag
-- Re-promote v2.3.1 if flag disable insufficient
-- No data migration; rollback is clean
-```
-
-## Implementation Patterns
-
-### Feature Flag Lifecycle
-
-```
-OFF (default) → Canary (1%) → Gradual (10%, 50%) → GA (100%) → Cleanup
-     ↑                                                              │
-     └──────────────── Rollback at any stage ──────────────────────┘
-```
-
-### Database Migration Strategy
-
-| Change Type | Strategy | Rollback Complexity |
-|-------------|----------|---------------------|
-| Add column | Direct add | Drop column (simple) |
-| Remove column | Stop using → deploy → drop | Re-add (if within retention) |
-| Rename column | Add new → dual-write → drop old | Use old column |
-| Change type | Add new column → migrate → drop | Use old column |
-| Add table | Direct add | Drop table |
-| Remove table | Stop using → deploy → drop | Restore from backup |
-
-### Deployment Slots
-
-```
-Production Slots:
-├── Slot A: v2.3.1 (currently live)
-├── Slot B: v2.3.2 (warming up)
-└── Rollback: Redirect traffic A → B or B → A
-```
-
-### Configuration Rollback
-
-```yaml
-# config/production.yaml
-version: 2.3.2
-previous_version: 2.3.1  # Always track for rollback
-
-rollback_procedure:
-  1. Set version: 2.3.1
-  2. Redeploy
-  3. Verify
-```
-
-## Rollback Decision Framework
-
-When something goes wrong:
-
-```
-Issue detected
-     │
-     ▼
-Can we fix forward in < 15 minutes?
-     │
-   Yes ──→ Fix forward (hotfix)
-     │
-    No
-     │
-     ▼
-Is rollback safe (no data migration)?
-     │
-   Yes ──→ Rollback immediately
-     │
-    No
-     │
-     ▼
-Can we disable via feature flag?
-     │
-   Yes ──→ Disable flag, investigate
-     │
-    No
-     │
-     ▼
-Incident escalation: careful rollback with data consideration
-```
+- `.harmony/cognition/methodology/reliability-and-ops.md`
+- `.harmony/cognition/methodology/flow-and-wip-policy.md`
+- `.harmony/cognition/methodology/README.md`
 
 ## Relationship to Other Principles
 

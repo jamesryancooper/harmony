@@ -11,8 +11,11 @@ status: Active
 
 ## What This Means
 
-Autonomous Control Points (ACPs) replace legacy manual runtime checkpoints as Harmony’s
-primary mechanism for governing consequential side effects.
+Autonomous Control Points (ACPs) are Harmony’s primary mechanism for governing consequential side effects.
+
+## Historical Note (Non-Normative)
+
+ACP replaced legacy manual runtime checkpoints. Historical migration context is retained here only to explain the shift to machine-enforced governance.
 
 Under **Reversible Autonomy with Human-on-the-Loop Oversight**:
 
@@ -29,12 +32,11 @@ The standard loop becomes:
 
 ## SSOT: Governance Gates
 
-ACPs are Harmony's single normative specification for **promotion** and **contraction**
-gating into durable state.
+ACPs are Harmony's single normative specification for **promotion** and **finalize** gating into durable state.
 
 This includes the canonical semantics for:
 
-- stage/promote/contraction decision outcomes
+- stage/promote/finalize decision outcomes (`contraction` is a glossary alias of `finalize`)
 - evidence, quorum, and rollback requirements
 - budget and circuit-breaker enforcement
 - receipt requirements and disclosure completeness levels
@@ -49,7 +51,7 @@ handles. This does not require standing human authorizations.
 
 ## Canonical References
 
-- Promotion and contraction semantics: this document.
+- Promotion and finalize semantics (including `contraction` alias): this document.
 - Capability attempt authorization: [Deny by Default](./deny-by-default.md).
 - Replay and provenance semantics: [Determinism and Provenance](./determinism-and-provenance.md).
 - Promotion input minimums and receipt requirements: RA/ACP Promotion Inputs Matrix (canonical).
@@ -237,10 +239,7 @@ Humans “pop in” by reviewing receipts and digests, not by approving every st
 
 ## Arbitration
 
-If this principle conflicts with another, apply
-[Arbitration and Precedence](./arbitration-and-precedence.md).
-This section is informational only; normative arbitration rules live only in the
-arbitration SSOT.
+See [Arbitration and Precedence](./arbitration-and-precedence.md) (SSOT) for conflict resolution.
 
 ## Related Principles
 

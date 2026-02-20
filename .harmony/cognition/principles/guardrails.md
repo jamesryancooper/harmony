@@ -34,10 +34,7 @@ deny-by-default policy for capability attempts.
 
 ## Arbitration
 
-If this principle conflicts with another, apply
-[Arbitration and Precedence](./arbitration-and-precedence.md).
-This section is informational only; normative arbitration rules live only in the
-arbitration SSOT.
+See [Arbitration and Precedence](./arbitration-and-precedence.md) (SSOT) for conflict resolution.
 
 ## Why It Matters
 

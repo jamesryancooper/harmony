@@ -33,24 +33,11 @@ canonical predicate `material_side_effect` (see
 
 Bounded variance is valid only when policy-approved and receipted. Deterministic mode remains the default.
 
-## Normative Boundary Matrix
-
-| Requirement class | Normative owner |
-|---|---|
-| Required provenance and receipt replay fields | This document |
-| Runtime variance posture (deterministic vs bounded variance) | [Governed Determinism](./determinism.md) |
-| Promotion/contraction gate outcomes and ACP levels | [Autonomous Control Points](./autonomous-control-points.md) |
-| Capability-attempt authorization | [Deny by Default](./deny-by-default.md) |
-
-Terminology for apply/promote/finalize and approval/attestation/quorum is
-defined in [RA/ACP Glossary](./_meta/ra-acp-glossary.md).
-
 ## Normative Boundary
 
-This document is normative for required replay and provenance fields in
-RA/ACP receipts. RA = Reversible Autonomy with Human-on-the-Loop Oversight,
-governed via ACP gates.
-It does not define promotion/contraction gate outcomes or quorum policy.
+This document is normative for required provenance and replay fields only.
+Runtime posture is defined in [Governed Determinism](./determinism.md), gate outcomes in [Autonomous Control Points](./autonomous-control-points.md), and capability authority in [Deny by Default](./deny-by-default.md).
+Terminology for apply/promote/finalize (including `contraction` alias) and approval/attestation/quorum is defined in [RA/ACP Glossary](./_meta/ra-acp-glossary.md).
 
 - Receipt/gate mechanics are defined in [Autonomous Control Points](./autonomous-control-points.md).
 - Runtime variance posture is defined in [Governed Determinism](./determinism.md).

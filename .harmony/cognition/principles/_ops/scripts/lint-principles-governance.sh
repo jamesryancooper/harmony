@@ -85,6 +85,85 @@ check_arbitration_ssot_drift() {
   fi
 }
 
+check_stale_migration_phrasing() {
+  local acp_doc="$PRINCIPLES_DIR/autonomous-control-points.md"
+  local stale_hits
+
+  if [[ ! -f "$acp_doc" ]]; then
+    echo "[stale-migration] missing ACP principle file: $acp_doc"
+    failures+=1
+    return
+  fi
+
+  if ! rg -q '## Historical Note \(Non-Normative\)' "$acp_doc"; then
+    echo "[stale-migration] ACP historical note heading missing."
+    failures+=1
+  fi
+
+  stale_hits="$(rg -n -i 'manual runtime checkpoint|manual review gate|human-on-the-loop' "$PRINCIPLES_DIR" --glob '*.md' --glob '!**/autonomous-control-points.md' || true)"
+  if [[ -n "$stale_hits" ]]; then
+    echo "[stale-migration] stale migration phrasing found outside ACP historical note:"
+    printf '%s\n' "$stale_hits"
+    failures+=1
+  fi
+}
+
+check_arbitration_pointer_standardization() {
+  local legacy
+  local file
+  local pointer='See \[Arbitration and Precedence\]\(\./arbitration-and-precedence\.md\) \(SSOT\) for conflict resolution\.'
+  local -a required=(
+    "$PRINCIPLES_DIR/autonomous-control-points.md"
+    "$PRINCIPLES_DIR/deny-by-default.md"
+    "$PRINCIPLES_DIR/determinism.md"
+    "$PRINCIPLES_DIR/guardrails.md"
+    "$PRINCIPLES_DIR/no-silent-apply.md"
+    "$PRINCIPLES_DIR/observability-as-a-contract.md"
+    "$PRINCIPLES_DIR/ownership-and-boundaries.md"
+    "$PRINCIPLES_DIR/reversibility.md"
+    "$PRINCIPLES_DIR/small-diffs-trunk-based.md"
+  )
+
+  legacy="$(rg -n 'If this principle conflicts with another, apply|normative arbitration rules live only in the|This section is informational only' "$PRINCIPLES_DIR" --glob '*.md' || true)"
+  if [[ -n "$legacy" ]]; then
+    echo "[arbitration-pointer] legacy arbitration boilerplate detected:"
+    printf '%s\n' "$legacy"
+    failures+=1
+  fi
+
+  for file in "${required[@]}"; do
+    if [[ ! -f "$file" ]]; then
+      echo "[arbitration-pointer] missing required principle file: $file"
+      failures+=1
+      continue
+    fi
+    if ! rg -q "$pointer" "$file"; then
+      echo "[arbitration-pointer] missing standardized arbitration pointer: $file"
+      failures+=1
+    fi
+  done
+}
+
+check_contraction_finalize_glossary() {
+  local glossary="$PRINCIPLES_DIR/_meta/ra-acp-glossary.md"
+
+  if [[ ! -f "$glossary" ]]; then
+    echo "[glossary-contraction] missing glossary: $glossary"
+    failures+=1
+    return
+  fi
+
+  if ! rg -q '`finalize`' "$glossary"; then
+    echo "[glossary-contraction] glossary must define `finalize`."
+    failures+=1
+  fi
+
+  if ! rg -q '`contraction`:[^[:cntrl:]\n]{0,120}alias' "$glossary"; then
+    echo "[glossary-contraction] glossary must define `contraction` as alias semantics."
+    failures+=1
+  fi
+}
+
 check_waiver_exception_ssot_links() {
   local file
   local references_pattern='waivers-and-exceptions\.md'
@@ -210,6 +289,9 @@ check_pr_only_runtime_gating
 check_human_approval_runtime_dependency
 check_arbitration_ssot_drift
 check_waiver_exception_ssot_links
+check_stale_migration_phrasing
+check_arbitration_pointer_standardization
+check_contraction_finalize_glossary
 
 if [[ "$failures" -gt 0 ]]; then
   echo "Principles governance lint failed with $failures issue(s)."
