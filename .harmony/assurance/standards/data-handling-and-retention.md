@@ -19,7 +19,7 @@ Status: Draft stub (fill policy durations and owners)
 - Speed with Safety: Pre‑defined retention, erasure, and restore runbooks make operational changes fast and reversible while protecting user data.
 - Simplicity over Complexity: A single, clear classification model and explicit retention durations avoid bespoke policies per slice.
 - Quality through Determinism: Deterministic policies, auditable backups, and tested erasure/restore procedures ensure reproducible outcomes.
-- Guided Agentic Autonomy: Agents may propose classification mappings or retention updates, but human approval is required; GuardKit redaction defaults apply to logs/traces.
+- Guided Agentic Autonomy: Agents may propose classification mappings or retention updates, but ACP gate is required; GuardKit redaction defaults apply to logs/traces.
 
 See `.harmony/cognition/methodology/README.md` for Harmony’s five pillars.
 

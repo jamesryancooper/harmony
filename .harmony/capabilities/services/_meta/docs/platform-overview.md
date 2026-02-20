@@ -54,7 +54,7 @@ For Flow and Agent specifically:
   - Lives outside `apps/*` under `agents/runner/runtime/` and is treated as a shared runtime implementation behind Flow, not the service itself.
   - It consumes prompts and workflow YAML and exposes a small HTTP API/CLI (for example, `/flows/run`) that the Flow service calls.
 - **Agent (plan‑driven agents on top of Flow):**
-  - Uses Plan `plan.json` plans, Flow `FlowConfig`/`FlowRunner` helpers, and the shared LangGraph runtime to run durable agent graphs with retries/resume/HITL.
+  - Uses Plan `plan.json` plans, Flow `FlowConfig`/`FlowRunner` helpers, and the shared LangGraph runtime to run durable agent graphs with retries/resume/ACP.
   - Does not implement its own separate runtime; it always reuses the shared runtime under `agents/runner/runtime/**`.
 - **Apps (web, api, ai-console, ai-gateway)** can depend on Flow and Agent via the TS packages, not vice versa.
 
@@ -137,7 +137,7 @@ Each service embodies a single, crisp purpose, with clear inputs, outputs, and w
 
 In alignment with Harmony's principles of **simplicity over complexity**, **spec-first rather than ceremony**, and **flow over fluff**, the AI Services Platform is opinionated where it matters (interfaces, safety, structure) and flexible everywhere else. It favours minimal viable complexity — only introducing additional layers when required by SLOs, compliance, or scale.
 
-The AI Services Platform addresses the core pitfalls encountered when implementing multiple AI agents within an automated workflow: ambiguous hand-offs, uncontrolled tool invocation, context fragmentation, cascading hallucinations or mis-reasoning, and difficulty in debugging or observing inter-agent interactions. By enforcing **deterministic tool boundaries**, **human checkpoints**, and **observability across all runs**, the platform transforms multi-agent complexity into measurable, predictable progress rather than uncontrolled autonomous behaviour.
+The AI Services Platform addresses the core pitfalls encountered when implementing multiple AI agents within an automated workflow: ambiguous hand-offs, uncontrolled tool invocation, context fragmentation, cascading hallucinations or mis-reasoning, and difficulty in debugging or observing inter-agent interactions. By enforcing **deterministic tool boundaries**, **Autonomous Control Point (ACP) promotion gates**, and **observability across all runs**, the platform transforms multi-agent complexity into measurable, predictable progress rather than uncontrolled autonomous behaviour.
 
 In short: the AI Services Platform is the **practical backbone** of Harmony's promise — a modular, local-first framework that lets a tiny team ship outsized results, without sacrificing simplicity, safety, or correctness. It turns multi-agent chaos into structured, safe, high-velocity development — **fast, safe, and aligned by design**.
 
@@ -174,8 +174,8 @@ These invariants apply to every service and workflow so the Platform operates as
   - Policies are fail‑closed; violations block progression. Use typed errors with actionable summaries; assemble evidence with Compliance.
 - Safety and secret hygiene
   - Redact by default (Guard). All secret access flows through Vault. Never serialize secrets/PII in artifacts, logs, or span attributes.
-- Human‑in‑the‑Loop (HITL)
-  - Map risk (Trivial/Low/Medium/High) to gates and approvals; require flags and rollback plans; Preview smoke for Medium/High; navigator/security reviewers per rubric.
+- ACP Policy Gates
+  - Map risk (Trivial/Low/Medium/High) to ACP levels and policy outcomes; require flags and rollback plans; Preview smoke for Medium/High; escalate to humans only for unresolved risk conditions.
 - Local‑first operation
   - All services support `--dry-run` and function without network for validation/plan flows. Telemetry may buffer to disk and flush later.
 - Simplicity‑first ergonomics
@@ -220,7 +220,7 @@ The AI Services Platform is designed as a cohesive, self-reinforcing system alig
   - All runs traced (OTel) and explainable; every material output is verifiable and reproducible.
 - **Guided Agentic Autonomy**
   - AI systems autonomously self‑build, self‑heal, and self‑tune within deterministic, observable, and reversible bounds—while humans retain ultimate authority, oversight, and accountability.
-  - Deterministic agent loops (Plan → Diff → Explain → Test) with HITL checkpoints; no silent apply.
+  - Deterministic agent loops (Plan → Diff → Explain → Test) with ACP gates; no silent apply.
   - Pinned AI config (provider/model/version/params) and stable prompt hash; golden tests guard outputs.
   - Observability and provenance: OTel traces for runs; PRs include trace links and Eval/Policy outcomes.
  - **Evolvable Modularity**
@@ -234,7 +234,7 @@ The AI Services Platform is designed as a cohesive, self-reinforcing system alig
 | Speed with Safety | Patch, Flag, Cache, Schedule, Observe | Tiny PRs with previews; progressive rollout via flags; cached/idempotent runs; scheduled non-blocking tasks; traces tie changes to outcomes |
 | Simplicity over Complexity | Stack, Scaffold, Tool, Cache | Monolith-first boundaries with clear ports/adapters; minimal, predictable service interfaces; reuse via small wrappers; memoization to avoid recomputation |
 | Quality through Determinism | Eval, Policy, Test, Compliance, Observe | Contract tests, policy gates, schema-guarded outputs, evidence packs; OTel spans/logs for explainability and postmortems |
-| Guided Agentic Autonomy | Agent, Guard, Policy, Eval, Observe, Patch/Notify (HITL) | Deterministic agent loops (Plan → Diff → Explain → Test); pinned AI config + prompt hash; golden tests; HITL checkpoints; traces/provenance; fail‑closed governance; no silent apply |
+| Guided Agentic Autonomy | Agent, Guard, Policy, Eval, Observe, Patch/Notify (ACP) | Deterministic agent loops (Plan → Diff → Explain → Test); pinned AI config + prompt hash; golden tests; ACP gates; traces/provenance; fail‑closed governance; no silent apply |
 | Evolvable Modularity | Stack, Tool, Agent, adapters across services | Hexagonal ports/adapters and stable contracts make databases, models, providers, and surfaces plug‑and‑play; new capabilities can be added or retired without destabilizing core flows |
 
 Note: Each service declares the pillar(s) it reinforces in its metadata and run records. This ensures systemic coherence and enables policy- and evidence-driven adoption.
@@ -348,7 +348,7 @@ Notes:
 ### Lifecycle Conformance Checklist (per change)
 
 - [ ] Spec/Shape: Spec one‑pager + ADR; micro‑STRIDE with mitigations/tests; contracts present (OpenAPI/JSON‑Schema where applicable).
-- [ ] Plan: `plan.json` (BMAD) with explicit steps and HITL checkpoints; risk class chosen; rollback and flag plan drafted.
+- [ ] Plan: `plan.json` (BMAD) with explicit steps and ACP gates; risk class chosen; rollback and flag plan drafted.
 - [ ] Implement: Proposed diffs (no silent apply); tests included; AI config pinned and recorded; idempotency keys for mutating ops.
 - [ ] Verify: Eval/Test/Policy pass; OpenAPI diff checked; license/provenance noted; secret scans clean.
 - [ ] Ship: PR opened with Preview URL; feature behind a flag by default; promote only from known‑good preview.
@@ -391,7 +391,7 @@ This contract makes the end‑to‑end flow deterministic, observable, and gover
    - Artifacts: traces/logs/metrics, perf deltas, ADR/postmortem updates
    - Required spans: `service.observe.flush`, domain spans around changed flows
 
-Required run record additions for this flow (see schema v0.2 below): `stage`, `risk`, `hitl.checkpoint`, `prompt_hash` (if AI used), `idempotencyKey`, `cacheKey`, `policy.ruleset` and outcome.
+Required run record additions for this flow (see schema v0.2 below): `stage`, `risk`, `acp.checkpoint`, `prompt_hash` (if AI used), `idempotencyKey`, `cacheKey`, `policy.ruleset` and outcome.
 
 ### Service Lifecycle State Machine (standard v0.2)
 
@@ -403,7 +403,7 @@ Define consistent states and transitions across all services to improve determin
   - `inputs.validated`: `{ schema, result }`
   - `artifact.write`: `{ path, kind }`
   - `gate.pass` / `gate.block`: `{ gate, reason }`
-  - `hitl.requested` / `hitl.approved` / `hitl.rejected` / `hitl.waived`: `{ checkpoint, approver }`
+  - `acp.requested` / `acp.approved` / `acp.rejected` / `acp.waived`: `{ checkpoint, approver }`
   - `error`: `{ error_type, message }` (no secrets/PII)
 
 Recommended spans per state:
@@ -465,11 +465,11 @@ To align with Harmony governance, Policy rules MUST be explicit and versioned:
     "riskProfile": {
       "trivial": {
         "gates": ["lint", "typecheck"],
-        "hitl": "optional"
+        "acp": "optional"
       },
       "low": {
         "gates": ["lint", "typecheck", "unit", "openapi-diff?", "contracts?"],
-        "hitl": "reviewer"
+        "acp": "reviewer"
       },
       "medium": {
         "gates": [
@@ -482,7 +482,7 @@ To align with Harmony governance, Policy rules MUST be explicit and versioned:
           "security-scan",
           "observability"
         ],
-        "hitl": "navigator",
+        "acp": "navigator",
         "flags": { "required": true }
       },
       "high": {
@@ -497,7 +497,7 @@ To align with Harmony governance, Policy rules MUST be explicit and versioned:
           "observability",
           "sbom"
         ],
-        "hitl": "navigator+security",
+        "acp": "navigator+security",
         "flags": { "required": true, "canary": true }
       }
     }
@@ -543,13 +543,13 @@ To align with Harmony governance, Policy rules MUST be explicit and versioned:
 
 ---
 
-## Human‑in‑the‑Loop (HITL) Checkpoints
+## Autonomous Control Point (ACP) Checkpoints
 
-Harmony mandates human governance with minimal ceremony:
+Harmony mandates policy-gated governance with minimal ceremony:
 
 1. **Before implementation**: Spec one‑pager + ADR approved; micro‑STRIDE present; acceptance criteria clear.
 2. **Before merge**: PR review with risk rubric (Trivial/Low/Medium/High), license/provenance note, OpenAPI diff where applicable, Preview e2e smoke (recommended), Observe trace URL.
-3. **Before promotion**: Feature behind a flag; navigator approval; rollback path validated (promote prior Preview).
+3. **Before promotion**: Feature behind a flag; ACP gate passes with required evidence/quorum; rollback path validated (promote prior Preview).
 4. **After promotion**: Short watch window; check SLO burn‑rate and key SLIs; document in PR.
 
 Agent constraints:
@@ -559,16 +559,16 @@ Agent constraints:
 
 ---
 
-### Risk & HITL Policy (standard v0.2)
+### Risk & ACP Policy (standard v0.2)
 
-Map risk to mandatory gates and human checkpoints. All gates are fail‑closed unless explicitly waived by navigator with rationale in PR.
+Map risk to mandatory gates and ACP levels. All gates are fail‑closed unless explicitly waived by policy-defined break-glass controls with rationale.
 
-| Risk | Required Gates | HITL | Flags & Rollback |
+| Risk | Required Gates | ACP Level | Flags & Rollback |
 | --- | --- | --- | --- |
-| Trivial | Lint/typecheck only | Optional reviewer | Not required |
-| Low | Unit/contract tests; Policy/Eval pass | One reviewer | Optional flag; rollback note |
-| Medium | + Preview smoke; Observe trace link | Navigator review | Feature flag required; rollback plan required |
-| High | + Security review; license note; watch window | Navigator + security reviewer | Feature flag required; rollback path validated; promote‑back rehearsed |
+| Trivial | Lint/typecheck only | ACP-0 (observe) | Not required |
+| Low | Unit/contract tests; Policy/Eval pass | ACP-1 (reversible local) | Optional flag; rollback note |
+| Medium | + Preview smoke; Observe trace link | ACP-2 (stateful reversible) | Feature flag required; rollback plan required |
+| High | + Security review; license note; watch window | ACP-3 (destructive-adjacent, reversible) | Feature flag required; rollback path validated; promote‑back rehearsed |
 
 Role responsibilities:
 
@@ -582,18 +582,19 @@ Enforcement:
 - Policy encodes the rubric; Patch blocks merge on missing gates.
 - Compliance aggregates evidence (`/runs`, trace links, policy/eval outcomes) per PR.
 
-### HITL States & Semantics
+### ACP States & Semantics
 
-HITL checkpoints are represented in run records and telemetry with explicit states to preserve determinism and auditability:
+ACP gates are represented in run records and telemetry with explicit decisions to preserve determinism and auditability:
 
-- States: `planned` → `requested` → `approved` | `rejected` | `waived`
+- Decisions: `ALLOW` | `STAGE_ONLY` | `DENY` | `ESCALATE`
 - Required fields
-  - `hitl.checkpoint`: human gate (e.g., `pre-implement`, `pre-merge`, `pre-promote`, `post-promote`).
-  - `hitl.approver`: GitHub handle or email of approver.
-  - `hitl.approvedAt`: ISO8601 timestamp.
-  - For waivers: include `hitl.justification` and link to PR comment.
-- Operational note: use **Notify** to request and record approvals; include PR URLs and link the approval event to the active `run.id`.
-- Telemetry events (see Observe): emit span events `hitl.requested`, `hitl.approved`, `hitl.rejected`, `hitl.waived` on the parent lifecycle span.
+  - `acp.phase`: `stage | promote | finalize`.
+  - `acp.level`: effective ACP level (for example `ACP-2`).
+  - `acp.decision`: `ALLOW | STAGE_ONLY | DENY | ESCALATE`.
+  - `acp.reason_codes`: stable reason codes returned by policy.
+  - `acp.attestations`: proposer/verifier/recovery attestations for ACP-2+.
+- Operational note: use **Notify** for escalation digests and post-run summaries; include PR URLs and link the ACP decision event to the active `run.id`.
+- Telemetry events (see Observe): emit span events `acp.requested`, `acp.allow`, `acp.stage_only`, `acp.deny`, `acp.escalate` on the parent lifecycle span.
 
 ### Stop‑the‑Line Triggers (Platform enforcement)
 
@@ -765,7 +766,7 @@ Run interfaces are standardized to maximize determinism and ease orchestration. 
   - `--idempotency-key <string>`: overrides derived key; required for mutating ops.
   - `--cache-key <string>`: declare cache identity for pure/expensive ops.
   - `--stage <spec|plan|implement|verify|ship|operate|learn>`: lifecycle stage for telemetry/governance.
-  - `--risk <trivial|low|medium|high>`: risk class to bind gates/HITL policy.
+  - `--risk <trivial|low|medium|high>`: risk class to bind gates/ACP policy.
   - `--ai.provider <name>` `--ai.model <name>` `--ai.version <semver|date>` `--ai.temperature <0..1>` `--ai.top_p <0..1>` `--ai.seed <int>` (when AI is used).
 - Optional flags
   - `--inputs <path>` and `--outputs <dir>`: explicit I/O boundaries (schema-validated).
@@ -789,7 +790,7 @@ All services MUST print a one-line JSON summary to stdout on success/failure, ma
 - Typed errors used with exit codes (0–8); one‑line JSON summary printed on failure with actionable message.
 - Secrets/PII never serialized; Guard redaction on by default; Vault for secret reads.
 - Contracts updated in the service-local schema path (`.harmony/capabilities/services/<domain>/<service>/schema`); registry references refreshed; diffs linked in PR.
-- HITL checkpoints encoded when risk ≥ medium; PR body includes risk rubric, flags, rollback, trace URL.
+- ACP gates encoded when risk ≥ medium; PR body includes risk rubric, flags, rollback, trace URL.
 
 Reference run record (stored under `/runs/<timestamp>-<service>-<runId>.json`):
 
@@ -1022,7 +1023,7 @@ Define service‑level metadata to make responsibilities, governance, and observ
     "safety": {
       "type": "object",
       "properties": {
-        "hitl": { "type": "object", "properties": { "requiredFor": { "type": "array", "items": { "enum": ["medium", "high"] } } } }
+        "acp": { "type": "object", "properties": { "requiredFor": { "type": "array", "items": { "enum": ["medium", "high"] } } } }
       }
     },
     "idempotency": {
@@ -1066,7 +1067,7 @@ Example metadata:
     "ai": { "provider": "openai", "model": "gpt-4.1", "temperatureMax": 0.3, "supportsSeed": true, "promptHashAlgorithm": "sha256" },
     "artifactNaming": "runs/{timestamp}-{service}-{runId}/"
   },
-  "safety": { "hitl": { "requiredFor": ["medium", "high"] } },
+  "safety": { "acp": { "requiredFor": ["medium", "high"] } },
   "idempotency": { "required": true, "idempotencyKeyFrom": ["inputs.goal", "git.sha"] },
   "compatibility": {
     "contracts": ["plan.inputs.v1", "plan.outputs.v1"],
@@ -1079,7 +1080,7 @@ Example metadata:
 
 ### Run Record JSON‑Schema (standard v0.2)
 
-Extends the minimal schema with lifecycle metadata, HITL checkpoints, and determinism fields.
+Extends the minimal schema with lifecycle metadata, ACP gates, and determinism fields.
 
 ```json
 {
@@ -1100,7 +1101,7 @@ Extends the minimal schema with lifecycle metadata, HITL checkpoints, and determ
     "summary": { "type": "string" },
     "stage": { "type": "string", "enum": ["spec", "plan", "implement", "verify", "ship", "operate", "learn"] },
     "risk": { "type": "string", "enum": ["trivial", "low", "medium", "high"] },
-    "hitl": {
+    "acp": {
       "type": "object",
       "properties": {
         "checkpoint": { "type": "string" },
@@ -1216,7 +1217,7 @@ These defaults make outputs reproducible and reviewable:
 - [ ] Local `--dry-run` available and exercised for any file/network side‑effects; fail‑closed on policy/eval/test errors.
 - [ ] Observe spans/logs present with `trace_id` linked in the PR; errors include structured metadata without secrets.
 - [ ] Policy/Test/Eval outcomes attached (or linked) in the PR; license/provenance note included.
-- [ ] Human‑in‑the‑loop approvals recorded per risk class; feature behind a flag by default.
+- [ ] ACP decisions and reason codes recorded per risk class; feature behind a flag by default.
 
 ---
 
@@ -1392,7 +1393,7 @@ Emit low-cardinality span events on the active lifecycle span to improve explain
 - `policy.fail` with `{ ruleset, id }` for each violated rule; pair with an error log.
 - `eval.fail` with `{ suite, score, threshold }` on evaluation failure.
 - `gate.block` / `gate.pass` with `{ gate, reason }` when CI/policy gates block or pass.
-- `hitl.requested` / `hitl.approved` / `hitl.rejected` / `hitl.waived` with `{ checkpoint, approver }`.
+- `acp.requested` / `acp.approved` / `acp.rejected` / `acp.waived` with `{ checkpoint, approver }`.
 - `flag.toggle` with `{ flag, from, to }` when **Flag** changes rollout state.
 
 #### Offline/Local‑First Telemetry Mode
@@ -1485,7 +1486,7 @@ This convention ensures services compose cleanly around stable, testable ports, 
                                              ├─► Patch ─► Release
                                              └─► Eval, Policy & Compliance (gates)
 Search ─► Ingest ─► Index ◄─ Query ◄────────────┘
-Observe (traces) • Guard/Vault (safety) • Notify (HITL) • Cost/Model (routing)
+Observe (traces) • Guard/Vault (safety) • Notify (ACP) • Cost/Model (routing)
 ```
 
 ---

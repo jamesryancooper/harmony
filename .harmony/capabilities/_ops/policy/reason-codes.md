@@ -39,6 +39,32 @@ policy engine.
 | `DDB024_REMEDIATION_ATTEMPTS_EXCEEDED` | Auto-remediation loop hit retry cap. | Stop, surface deny payload, and require explicit scope change. |
 | `DDB025_RUNTIME_DECISION_ENGINE_ERROR` | Policy engine failed to evaluate deterministically. | Treat as deny; inspect diagnostics and fix engine/policy input. |
 
+## ACP / RA Codes
+
+| Code | Meaning | Typical Remediation |
+|---|---|---|
+| `ACP_RULE_NO_MATCH` | No ACP rule matched the operation class/target/phase. | Add a policy rule for the operation class or normalize wrapper taxonomy. |
+| `ACP_PROFILE_CEILING_EXCEEDED` | Active profile ACP ceiling is below required ACP. | Use a higher profile, or split action into lower-risk reversible operations. |
+| `ACP_PROTECTED_TARGET` | Target is protected and requires elevated ACP requirements. | Provide required evidence and quorum, or route through staged promotion. |
+| `ACP_IRREVERSIBLE_BLOCKED` | Irreversible primitive is blocked outside break-glass posture. | Use reversible primitive or enable audited, time-boxed break-glass posture. |
+| `ACP_REVERSIBILITY_REQUIRED` | Required reversible primitive details were missing. | Provide `reversibility` metadata with approved primitive and rollback handle. |
+| `ACP_ROLLBACK_HANDLE_MISSING` | Rollback handle required for promotion was absent. | Attach rollback handle (`git revert`, restore manifest, deployment rollback id). |
+| `ACP_ROLLBACK_PROOF_MISSING` | Rollback proof required (ACP-2+) but missing. | Run rollback validation in staging and attach proof evidence. |
+| `ACP_RECOVERY_WINDOW_MISSING` | Recovery TTL/window required for destructive-adjacent action. | Set `recovery_window` (or rely on policy default when allowed). |
+| `ACP_EVIDENCE_MISSING` | Required evidence bundle entries are missing. | Attach required evidence refs + hashes (diff/tests/plan/etc.). |
+| `ACP_EVIDENCE_INVALID` | Evidence present but malformed or hash mismatch. | Regenerate evidence artifact and ensure canonical hash binding. |
+| `ACP_QUORUM_MISSING` | Required quorum roles/signatures were missing. | Gather required attestations and resubmit gate request. |
+| `ACP_QUORUM_INVALID` | Attestations do not bind to shared plan/evidence hashes. | Re-issue attestations for the same plan/evidence identity. |
+| `ACP_BUDGET_SET_MISSING` | Required budget set is missing or unknown. | Fix budget set reference in policy or request payload. |
+| `ACP_BUDGET_EXCEEDED` | Runtime counters exceeded configured budget thresholds. | Reduce scope, split into smaller promotions, or request temporary exception. |
+| `ACP_CIRCUIT_BREAKER_TRIPPED` | Circuit breaker trigger fired for this operation. | Investigate trigger, rollback when possible, and rerun after remediation. |
+| `ACP_KILLSWITCH_ACTIVE` | Kill-switch blocks ACP promotion/finalization. | Clear or expire kill-switch only after safety checks. |
+| `ACP_RECEIPT_REQUIRED` | Receipt emission required for this decision but missing. | Fix receipt writer/config and retry promotion gate. |
+| `ACP_RECEIPT_INVALID` | Receipt exists but missing required fields/hash consistency. | Regenerate receipt with required fields and bound hashes. |
+| `ACP_STAGE_ONLY_REQUIRED` | Requirements not satisfied; operation may continue only as stage. | Gather missing requirements then re-run promote phase. |
+| `ACP_ESCALATE_POLICY` | Policy requires escalation for unresolved high-risk conditions. | Escalate with digest/receipt and keep artifacts staged. |
+| `RA_BREAK_GLASS_REQUIRED` | ACP-4 request attempted without break-glass posture. | Convert to reversible path or use explicit emergency break-glass mode. |
+
 ## Deny Payload Shape
 
 ```json

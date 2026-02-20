@@ -4,7 +4,7 @@ use jsonschema::JSONSchema;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 use time::format_description;
@@ -33,6 +33,20 @@ pub struct PolicyV2 {
     pub kill_switch: KillSwitchConfig,
     pub profiles: HashMap<String, ProfileConfig>,
     pub observability: ObservabilityConfig,
+    #[serde(default)]
+    pub acp: AcpConfig,
+    #[serde(default)]
+    pub reversibility: ReversibilityConfig,
+    #[serde(default)]
+    pub budgets: HashMap<String, HashMap<String, f64>>,
+    #[serde(default)]
+    pub quorum: HashMap<String, QuorumConfig>,
+    #[serde(default)]
+    pub attestations: AttestationsConfig,
+    #[serde(default)]
+    pub circuit_breakers: HashMap<String, CircuitBreakerConfig>,
+    #[serde(default)]
+    pub receipts: ReceiptsConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -119,6 +133,395 @@ pub struct FrictionSlo {
     pub false_deny_rate_max: f64,
     pub median_deny_to_unblock_seconds_max: u64,
     pub auto_remediation_success_rate_min: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpConfig {
+    #[serde(default)]
+    pub levels: Vec<AcpLevelDefinition>,
+    #[serde(default)]
+    pub profile_defaults: HashMap<String, AcpProfileDefault>,
+    #[serde(default)]
+    pub stage_only_behavior: Option<AcpStageOnlyBehavior>,
+    #[serde(default)]
+    pub rules: Vec<AcpRule>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpLevelDefinition {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpProfileDefault {
+    #[serde(default = "default_acp_level_zero")]
+    pub ceiling: String,
+    #[serde(default)]
+    pub allow_stage_only_fallback: bool,
+    #[serde(default)]
+    pub break_glass_required: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpStageOnlyBehavior {
+    #[serde(default)]
+    pub emit_receipt: bool,
+    #[serde(default)]
+    pub preserve_artifacts: bool,
+    #[serde(default)]
+    pub notify: Option<AcpStageOnlyNotify>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpStageOnlyNotify {
+    #[serde(default)]
+    pub enabled: bool,
+    #[serde(default)]
+    pub threshold_acp: Option<String>,
+    #[serde(default)]
+    pub channels: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpRule {
+    pub id: String,
+    pub r#match: AcpRuleMatch,
+    pub require: AcpRuleRequire,
+    pub on_missing_requirements: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpRuleMatch {
+    #[serde(default)]
+    pub class: OneOrManyString,
+    #[serde(default)]
+    pub phase: Vec<String>,
+    #[serde(default)]
+    pub target: Option<HashMap<String, Value>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpRuleRequire {
+    #[serde(default = "default_acp_level_zero")]
+    pub acp: String,
+    #[serde(default = "default_phase_promote")]
+    pub phase: String,
+    #[serde(default)]
+    pub break_glass_required: bool,
+    #[serde(default)]
+    pub reversibility: Option<AcpRuleReversibility>,
+    #[serde(default)]
+    pub evidence_required: Vec<String>,
+    #[serde(default)]
+    pub quorum_required: Option<String>,
+    #[serde(default)]
+    pub budget_set: Option<String>,
+    #[serde(default)]
+    pub circuit_breaker_set: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpRuleReversibility {
+    #[serde(default)]
+    pub required: bool,
+    #[serde(default)]
+    pub primitive: Option<String>,
+    #[serde(default)]
+    pub rollback_proof_required: bool,
+    #[serde(default)]
+    pub recovery_window_default: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ReversibilityConfig {
+    #[serde(default = "default_acp_level_one")]
+    pub required_for_acp_at_or_above: String,
+    #[serde(default)]
+    pub primitives: HashMap<String, ReversiblePrimitive>,
+    #[serde(default)]
+    pub blocked_when_not_break_glass: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ReversiblePrimitive {
+    #[serde(default)]
+    pub description: String,
+    #[serde(default)]
+    pub rollback_handle_type: String,
+    #[serde(default)]
+    pub default_recovery_window: Option<String>,
+    #[serde(default)]
+    pub trash_root: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct QuorumConfig {
+    #[serde(default)]
+    pub required_roles: Vec<String>,
+    #[serde(default)]
+    pub optional_roles: Vec<String>,
+    #[serde(default)]
+    pub min_signatures: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AttestationsConfig {
+    #[serde(default)]
+    pub required_fields: Vec<String>,
+    #[serde(default)]
+    pub roles: HashMap<String, AttestationRoleDefinition>,
+    #[serde(default)]
+    pub binding: Option<AttestationBinding>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AttestationRoleDefinition {
+    #[serde(default)]
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AttestationBinding {
+    #[serde(default)]
+    pub require_plan_hash: bool,
+    #[serde(default)]
+    pub require_evidence_hash: bool,
+    #[serde(default)]
+    pub allowed_hash_algorithms: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct CircuitBreakerConfig {
+    #[serde(default)]
+    pub triggers: Vec<CircuitBreakerTrigger>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct CircuitBreakerTrigger {
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub r#type: String,
+    #[serde(default)]
+    pub signal: String,
+    #[serde(default)]
+    pub threshold: u64,
+    #[serde(default)]
+    pub action: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ReceiptsConfig {
+    #[serde(default = "default_acp_level_one")]
+    pub required_for_acp_at_or_above: String,
+    #[serde(default)]
+    pub emit_on: Vec<String>,
+    #[serde(default)]
+    pub paths: ReceiptPathsConfig,
+    #[serde(default)]
+    pub required_fields: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ReceiptPathsConfig {
+    #[serde(default)]
+    pub runs_dir: String,
+    #[serde(default)]
+    pub decision_log: String,
+    #[serde(default)]
+    pub acp_decision_log: String,
+    #[serde(default)]
+    pub receipt_filename: Option<String>,
+    #[serde(default)]
+    pub digest_filename: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum OneOrManyString {
+    One(String),
+    Many(Vec<String>),
+}
+
+impl Default for OneOrManyString {
+    fn default() -> Self {
+        Self::Many(Vec::new())
+    }
+}
+
+impl OneOrManyString {
+    pub fn contains_value(&self, value: &str) -> bool {
+        match self {
+            OneOrManyString::One(single) => single == value,
+            OneOrManyString::Many(values) => values.iter().any(|item| item == value),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum AcpDecisionKind {
+    Allow,
+    StageOnly,
+    Deny,
+    Escalate,
+}
+
+impl Default for AcpDecisionKind {
+    fn default() -> Self {
+        Self::Deny
+    }
+}
+
+impl AcpDecisionKind {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            AcpDecisionKind::Allow => "ALLOW",
+            AcpDecisionKind::StageOnly => "STAGE_ONLY",
+            AcpDecisionKind::Deny => "DENY",
+            AcpDecisionKind::Escalate => "ESCALATE",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpRequest {
+    pub run_id: String,
+    #[serde(default)]
+    pub actor: AcpActor,
+    #[serde(default)]
+    pub profile: String,
+    #[serde(default)]
+    pub phase: String,
+    #[serde(default)]
+    pub operation: AcpOperation,
+    #[serde(default)]
+    pub acp_claim: Option<String>,
+    #[serde(default)]
+    pub break_glass: bool,
+    #[serde(default)]
+    pub reversibility: Option<AcpReversibilityProof>,
+    #[serde(default)]
+    pub evidence: Vec<AcpEvidence>,
+    #[serde(default)]
+    pub attestations: Vec<AcpAttestation>,
+    #[serde(default)]
+    pub budgets: HashMap<String, f64>,
+    #[serde(default)]
+    pub counters: HashMap<String, f64>,
+    #[serde(default)]
+    pub circuit_signals: Vec<String>,
+    #[serde(default)]
+    pub plan_hash: Option<String>,
+    #[serde(default)]
+    pub evidence_hash: Option<String>,
+    #[serde(default)]
+    pub intent: Option<String>,
+    #[serde(default)]
+    pub boundaries: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpActor {
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub r#type: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpOperation {
+    #[serde(default)]
+    pub class: String,
+    #[serde(default)]
+    pub targets: Vec<String>,
+    #[serde(default)]
+    pub resources: Vec<String>,
+    #[serde(default)]
+    pub target: HashMap<String, Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpReversibilityProof {
+    #[serde(default)]
+    pub reversible: bool,
+    #[serde(default)]
+    pub primitive: Option<String>,
+    #[serde(default)]
+    pub rollback_handle: Option<String>,
+    #[serde(default)]
+    pub recovery_window: Option<String>,
+    #[serde(default)]
+    pub rollback_proof: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpEvidence {
+    #[serde(default)]
+    pub r#type: String,
+    #[serde(default)]
+    pub r#ref: String,
+    #[serde(default)]
+    pub sha256: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpAttestation {
+    #[serde(default)]
+    pub role: String,
+    #[serde(default)]
+    pub actor_id: String,
+    #[serde(default)]
+    pub timestamp: Option<String>,
+    #[serde(default)]
+    pub plan_hash: Option<String>,
+    #[serde(default)]
+    pub evidence_hash: Option<String>,
+    #[serde(default)]
+    pub signature: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpMissingRequirements {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub missing_evidence: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub missing_attestations: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub missing_reversibility: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub breaker_actions: Vec<String>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub budget_remaining: BTreeMap<String, f64>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub budget_exceeded: BTreeMap<String, f64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct AcpDecision {
+    pub allow: bool,
+    pub decision: AcpDecisionKind,
+    pub effective_acp: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub reason_codes: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub notes: Vec<String>,
+    #[serde(default)]
+    pub requirements: AcpMissingRequirements,
+}
+
+fn default_acp_level_zero() -> String {
+    "ACP-0".to_string()
+}
+
+fn default_acp_level_one() -> String {
+    "ACP-1".to_string()
+}
+
+fn default_phase_promote() -> String {
+    "promote".to_string()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -287,6 +690,23 @@ pub struct DoctorReport {
 }
 
 #[derive(Debug, Clone)]
+pub struct ReceiptValidateRequest {
+    pub policy_path: PathBuf,
+    pub receipt_path: PathBuf,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReceiptValidateReport {
+    pub valid: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub reason_codes: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub errors: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub warnings: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
 struct ArtifactContext {
     status: String,
     interface_type: Option<String>,
@@ -310,7 +730,10 @@ pub fn load_policy(path: &Path) -> Result<PolicyV2> {
 
     if let Ok(mode_override) = std::env::var("HARMONY_POLICY_MODE_OVERRIDE") {
         let normalized = mode_override.trim().to_lowercase();
-        if matches!(normalized.as_str(), "shadow" | "soft-enforce" | "hard-enforce") {
+        if matches!(
+            normalized.as_str(),
+            "shadow" | "soft-enforce" | "hard-enforce"
+        ) {
             policy.mode = normalized;
         }
     }
@@ -402,8 +825,12 @@ pub fn evaluate_preflight(request: &PreflightRequest) -> Result<Decision> {
     let today = today_ymd_utc()?;
 
     let mut decision = match request.kind {
-        ScopeKind::Service => evaluate_service_preflight(&policy, request, &artifact, &exceptions, &today),
-        ScopeKind::Skill => evaluate_skill_preflight(&policy, request, &artifact, &exceptions, &today),
+        ScopeKind::Service => {
+            evaluate_service_preflight(&policy, request, &artifact, &exceptions, &today)
+        }
+        ScopeKind::Skill => {
+            evaluate_skill_preflight(&policy, request, &artifact, &exceptions, &today)
+        }
     };
 
     apply_mode(&policy.mode, &mut decision);
@@ -428,20 +855,12 @@ pub fn evaluate_enforce(request: &EnforceRequest) -> Result<Decision> {
     let today = today_ymd_utc()?;
 
     let mut decision = match request.preflight.kind {
-        ScopeKind::Service => evaluate_service_preflight(
-            &policy,
-            &request.preflight,
-            &artifact,
-            &exceptions,
-            &today,
-        ),
-        ScopeKind::Skill => evaluate_skill_preflight(
-            &policy,
-            &request.preflight,
-            &artifact,
-            &exceptions,
-            &today,
-        ),
+        ScopeKind::Service => {
+            evaluate_service_preflight(&policy, &request.preflight, &artifact, &exceptions, &today)
+        }
+        ScopeKind::Skill => {
+            evaluate_skill_preflight(&policy, &request.preflight, &artifact, &exceptions, &today)
+        }
     };
 
     if !decision.allow {
@@ -486,6 +905,691 @@ pub fn evaluate_enforce(request: &EnforceRequest) -> Result<Decision> {
 
     apply_mode(&policy.mode, &mut decision);
     Ok(decision)
+}
+
+pub fn evaluate_acp_preflight(policy_path: &Path, request: &AcpRequest) -> Result<AcpDecision> {
+    let policy = load_policy(policy_path)
+        .with_context(|| format!("failed to load policy {}", policy_path.display()))?;
+    evaluate_acp_internal(&policy, request, false)
+}
+
+pub fn evaluate_acp_enforce(policy_path: &Path, request: &AcpRequest) -> Result<AcpDecision> {
+    let policy = load_policy(policy_path)
+        .with_context(|| format!("failed to load policy {}", policy_path.display()))?;
+    evaluate_acp_internal(&policy, request, true)
+}
+
+fn evaluate_acp_internal(
+    policy: &PolicyV2,
+    request: &AcpRequest,
+    enforce: bool,
+) -> Result<AcpDecision> {
+    let phase = normalize_phase(&request.phase, enforce);
+    let operation_class = request.operation.class.trim();
+    let mut reason_codes = Vec::new();
+    let mut reason_seen = HashSet::new();
+    let mut notes = Vec::new();
+    let mut requirements = AcpMissingRequirements::default();
+
+    if operation_class.is_empty() {
+        push_reason(&mut reason_codes, &mut reason_seen, "ACP_RULE_NO_MATCH");
+        return Ok(AcpDecision {
+            allow: false,
+            decision: AcpDecisionKind::Deny,
+            effective_acp: request
+                .acp_claim
+                .clone()
+                .unwrap_or_else(default_acp_level_zero),
+            reason_codes,
+            notes: vec!["operation.class missing from ACP request".to_string()],
+            requirements,
+        });
+    }
+
+    let today = today_ymd_utc()?;
+    let mut scope_keys = vec!["global".to_string(), format!("operation:{operation_class}")];
+    if let Some(category) = request
+        .operation
+        .target
+        .get("category")
+        .and_then(value_to_string)
+    {
+        scope_keys.push(format!("category:{category}"));
+    }
+    if is_kill_switch_active(policy, &scope_keys, &today)? {
+        push_reason(&mut reason_codes, &mut reason_seen, "ACP_KILLSWITCH_ACTIVE");
+        return Ok(AcpDecision {
+            allow: false,
+            decision: AcpDecisionKind::Deny,
+            effective_acp: request
+                .acp_claim
+                .clone()
+                .unwrap_or_else(default_acp_level_zero),
+            reason_codes,
+            notes: vec!["Kill-switch active for ACP scope".to_string()],
+            requirements,
+        });
+    }
+
+    let Some(rule) =
+        find_matching_acp_rule(policy, operation_class, &phase, &request.operation.target)
+    else {
+        push_reason(&mut reason_codes, &mut reason_seen, "ACP_RULE_NO_MATCH");
+        return Ok(AcpDecision {
+            allow: false,
+            decision: AcpDecisionKind::Deny,
+            effective_acp: request
+                .acp_claim
+                .clone()
+                .unwrap_or_else(default_acp_level_zero),
+            reason_codes,
+            notes: vec![format!(
+                "No ACP rule matched class='{operation_class}' phase='{phase}'"
+            )],
+            requirements,
+        });
+    };
+
+    let effective_acp = rule.require.acp.clone();
+    let profile_cfg = policy
+        .acp
+        .profile_defaults
+        .get(&request.profile)
+        .cloned()
+        .unwrap_or(AcpProfileDefault {
+            ceiling: default_acp_level_zero(),
+            allow_stage_only_fallback: true,
+            break_glass_required: false,
+        });
+
+    let profile_ceiling_rank = acp_level_rank(&profile_cfg.ceiling);
+    let required_rank = acp_level_rank(&effective_acp);
+    let mut hard_deny = false;
+    if profile_ceiling_rank < required_rank {
+        push_reason(
+            &mut reason_codes,
+            &mut reason_seen,
+            "ACP_PROFILE_CEILING_EXCEEDED",
+        );
+        notes.push(format!(
+            "Profile '{}' ceiling '{}' below required '{}'",
+            request.profile, profile_cfg.ceiling, effective_acp
+        ));
+        if !profile_cfg.allow_stage_only_fallback {
+            hard_deny = true;
+        }
+    }
+
+    let break_glass_required =
+        rule.require.break_glass_required || profile_cfg.break_glass_required;
+    if break_glass_required && !request.break_glass {
+        push_reason(
+            &mut reason_codes,
+            &mut reason_seen,
+            "RA_BREAK_GLASS_REQUIRED",
+        );
+        hard_deny = true;
+    }
+
+    if let Some(primitive) = request
+        .reversibility
+        .as_ref()
+        .and_then(|value| value.primitive.as_deref())
+    {
+        if policy
+            .reversibility
+            .blocked_when_not_break_glass
+            .iter()
+            .any(|blocked| blocked == primitive)
+            && !request.break_glass
+        {
+            push_reason(
+                &mut reason_codes,
+                &mut reason_seen,
+                "ACP_IRREVERSIBLE_BLOCKED",
+            );
+            hard_deny = true;
+        }
+    }
+
+    let reversibility_required = rule
+        .require
+        .reversibility
+        .as_ref()
+        .map(|value| value.required)
+        .unwrap_or(false)
+        || required_rank >= acp_level_rank(&policy.reversibility.required_for_acp_at_or_above);
+
+    if reversibility_required {
+        validate_reversibility(
+            policy,
+            request,
+            rule,
+            &mut requirements,
+            &mut reason_codes,
+            &mut reason_seen,
+        );
+    }
+
+    validate_evidence(
+        request,
+        rule,
+        &mut requirements,
+        &mut reason_codes,
+        &mut reason_seen,
+    );
+    validate_quorum(
+        policy,
+        request,
+        rule,
+        &mut requirements,
+        &mut reason_codes,
+        &mut reason_seen,
+    );
+    validate_budgets(
+        policy,
+        request,
+        rule,
+        &mut requirements,
+        &mut reason_codes,
+        &mut reason_seen,
+    );
+
+    let breaker_actions = evaluate_circuit_breaker_actions(policy, request, rule, &requirements);
+    let mut force_stage_only = false;
+    let mut force_escalate = false;
+
+    if !breaker_actions.is_empty() {
+        requirements.breaker_actions = breaker_actions.clone();
+        push_reason(
+            &mut reason_codes,
+            &mut reason_seen,
+            "ACP_CIRCUIT_BREAKER_TRIPPED",
+        );
+        notes.push(format!(
+            "Circuit breaker trigger fired with actions: {}",
+            breaker_actions.join(",")
+        ));
+        if breaker_actions
+            .iter()
+            .any(|action| action == "auto_rollback_and_trip_killswitch")
+        {
+            hard_deny = true;
+        } else if breaker_actions
+            .iter()
+            .any(|action| action == "deny_and_escalate")
+        {
+            force_escalate = true;
+        } else {
+            force_stage_only = true;
+        }
+    }
+
+    let has_missing_requirements = !requirements.missing_evidence.is_empty()
+        || !requirements.missing_attestations.is_empty()
+        || !requirements.missing_reversibility.is_empty()
+        || !requirements.budget_exceeded.is_empty();
+
+    let decision = if hard_deny {
+        AcpDecisionKind::Deny
+    } else if force_escalate {
+        AcpDecisionKind::Escalate
+    } else if force_stage_only {
+        AcpDecisionKind::StageOnly
+    } else if has_missing_requirements {
+        match parse_acp_decision(&rule.on_missing_requirements) {
+            AcpDecisionKind::Deny => AcpDecisionKind::Deny,
+            AcpDecisionKind::Escalate => AcpDecisionKind::Escalate,
+            _ => AcpDecisionKind::StageOnly,
+        }
+    } else {
+        AcpDecisionKind::Allow
+    };
+
+    let mut final_decision = decision;
+    if matches!(final_decision, AcpDecisionKind::StageOnly)
+        && !profile_cfg.allow_stage_only_fallback
+    {
+        final_decision = AcpDecisionKind::Escalate;
+        push_reason(&mut reason_codes, &mut reason_seen, "ACP_ESCALATE_POLICY");
+    }
+
+    if matches!(final_decision, AcpDecisionKind::StageOnly) {
+        push_reason(
+            &mut reason_codes,
+            &mut reason_seen,
+            "ACP_STAGE_ONLY_REQUIRED",
+        );
+    }
+
+    Ok(AcpDecision {
+        allow: matches!(final_decision, AcpDecisionKind::Allow),
+        decision: final_decision,
+        effective_acp,
+        reason_codes,
+        notes,
+        requirements,
+    })
+}
+
+fn normalize_phase(phase: &str, enforce: bool) -> String {
+    let normalized = phase.trim().to_lowercase();
+    if !normalized.is_empty() {
+        return normalized;
+    }
+    if enforce {
+        "promote".to_string()
+    } else {
+        "stage".to_string()
+    }
+}
+
+fn parse_acp_decision(value: &str) -> AcpDecisionKind {
+    match value.trim().to_uppercase().as_str() {
+        "ALLOW" => AcpDecisionKind::Allow,
+        "STAGE_ONLY" => AcpDecisionKind::StageOnly,
+        "ESCALATE" => AcpDecisionKind::Escalate,
+        _ => AcpDecisionKind::Deny,
+    }
+}
+
+fn acp_level_rank(level: &str) -> usize {
+    match level.trim().to_uppercase().as_str() {
+        "ACP-0" => 0,
+        "ACP-1" => 1,
+        "ACP-2" => 2,
+        "ACP-3" => 3,
+        "ACP-4" => 4,
+        _ => 0,
+    }
+}
+
+fn normalize_ref(value: &str, prefix: &str) -> String {
+    value
+        .trim()
+        .strip_prefix(prefix)
+        .unwrap_or(value.trim())
+        .to_string()
+}
+
+fn find_matching_acp_rule<'a>(
+    policy: &'a PolicyV2,
+    operation_class: &str,
+    phase: &str,
+    target: &HashMap<String, Value>,
+) -> Option<&'a AcpRule> {
+    policy.acp.rules.iter().find(|rule| {
+        if !rule.r#match.class.contains_value(operation_class) {
+            return false;
+        }
+        if !rule.r#match.phase.is_empty()
+            && !rule
+                .r#match
+                .phase
+                .iter()
+                .any(|candidate| candidate.eq_ignore_ascii_case(phase))
+        {
+            return false;
+        }
+
+        let Some(match_target) = rule.r#match.target.as_ref() else {
+            return true;
+        };
+
+        match_target.iter().all(|(key, expected)| {
+            let actual = target.get(key);
+            target_value_matches(expected, actual)
+        })
+    })
+}
+
+fn target_value_matches(expected: &Value, actual: Option<&Value>) -> bool {
+    let Some(actual_value) = actual else {
+        return false;
+    };
+
+    match expected {
+        Value::String(text) => target_contains(actual_value, text),
+        Value::Array(values) => values
+            .iter()
+            .filter_map(value_to_string)
+            .any(|candidate| target_contains(actual_value, &candidate)),
+        _ => false,
+    }
+}
+
+fn target_contains(actual: &Value, expected: &str) -> bool {
+    match actual {
+        Value::String(text) => text == expected,
+        Value::Array(values) => values
+            .iter()
+            .filter_map(value_to_string)
+            .any(|candidate| candidate == expected),
+        _ => false,
+    }
+}
+
+fn value_to_string(value: &Value) -> Option<String> {
+    value.as_str().map(|text| text.to_string())
+}
+
+fn push_reason(reason_codes: &mut Vec<String>, reason_seen: &mut HashSet<String>, code: &str) {
+    if reason_seen.insert(code.to_string()) {
+        reason_codes.push(code.to_string());
+    }
+}
+
+fn validate_reversibility(
+    policy: &PolicyV2,
+    request: &AcpRequest,
+    rule: &AcpRule,
+    requirements: &mut AcpMissingRequirements,
+    reason_codes: &mut Vec<String>,
+    reason_seen: &mut HashSet<String>,
+) {
+    let Some(reversibility) = request.reversibility.as_ref() else {
+        requirements
+            .missing_reversibility
+            .push("reversibility".to_string());
+        push_reason(reason_codes, reason_seen, "ACP_REVERSIBILITY_REQUIRED");
+        return;
+    };
+
+    if !reversibility.reversible {
+        requirements
+            .missing_reversibility
+            .push("reversible=true".to_string());
+        push_reason(reason_codes, reason_seen, "ACP_REVERSIBILITY_REQUIRED");
+    }
+
+    if reversibility
+        .rollback_handle
+        .as_deref()
+        .unwrap_or_default()
+        .trim()
+        .is_empty()
+    {
+        requirements
+            .missing_reversibility
+            .push("rollback_handle".to_string());
+        push_reason(reason_codes, reason_seen, "ACP_ROLLBACK_HANDLE_MISSING");
+    }
+
+    if let Some(required) = rule
+        .require
+        .reversibility
+        .as_ref()
+        .and_then(|value| value.primitive.as_ref())
+    {
+        if reversibility.primitive.as_deref() != Some(required.as_str()) {
+            requirements
+                .missing_reversibility
+                .push(format!("primitive:{required}"));
+            push_reason(reason_codes, reason_seen, "ACP_REVERSIBILITY_REQUIRED");
+        }
+    }
+
+    if reversibility
+        .recovery_window
+        .as_deref()
+        .unwrap_or_default()
+        .trim()
+        .is_empty()
+    {
+        let primitive_default = reversibility
+            .primitive
+            .as_ref()
+            .and_then(|name| policy.reversibility.primitives.get(name))
+            .and_then(|value| value.default_recovery_window.as_ref());
+        let rule_default = rule
+            .require
+            .reversibility
+            .as_ref()
+            .and_then(|value| value.recovery_window_default.as_ref());
+        if primitive_default.is_none() && rule_default.is_none() {
+            requirements
+                .missing_reversibility
+                .push("recovery_window".to_string());
+            push_reason(reason_codes, reason_seen, "ACP_RECOVERY_WINDOW_MISSING");
+        }
+    }
+
+    let rollback_proof_required = rule
+        .require
+        .reversibility
+        .as_ref()
+        .map(|value| value.rollback_proof_required)
+        .unwrap_or(false);
+    if rollback_proof_required {
+        let has_rollback_proof = reversibility
+            .rollback_proof
+            .as_deref()
+            .is_some_and(|value| !value.trim().is_empty())
+            || request
+                .evidence
+                .iter()
+                .any(|item| matches!(item.r#type.as_str(), "rollback_test" | "rollback_proof"));
+        if !has_rollback_proof {
+            requirements
+                .missing_reversibility
+                .push("rollback_proof".to_string());
+            push_reason(reason_codes, reason_seen, "ACP_ROLLBACK_PROOF_MISSING");
+        }
+    }
+}
+
+fn validate_evidence(
+    request: &AcpRequest,
+    rule: &AcpRule,
+    requirements: &mut AcpMissingRequirements,
+    reason_codes: &mut Vec<String>,
+    reason_seen: &mut HashSet<String>,
+) {
+    let present: HashSet<String> = request
+        .evidence
+        .iter()
+        .map(|entry| entry.r#type.clone())
+        .collect();
+
+    for required in &rule.require.evidence_required {
+        if !present.contains(required) {
+            requirements.missing_evidence.push(required.clone());
+        }
+    }
+
+    if !requirements.missing_evidence.is_empty() {
+        push_reason(reason_codes, reason_seen, "ACP_EVIDENCE_MISSING");
+    }
+
+    let invalid = request.evidence.iter().any(|entry| {
+        entry.r#ref.trim().is_empty()
+            || !entry
+                .sha256
+                .as_deref()
+                .is_some_and(|value| !value.trim().is_empty())
+    });
+    if invalid {
+        push_reason(reason_codes, reason_seen, "ACP_EVIDENCE_INVALID");
+    }
+}
+
+fn validate_quorum(
+    policy: &PolicyV2,
+    request: &AcpRequest,
+    rule: &AcpRule,
+    requirements: &mut AcpMissingRequirements,
+    reason_codes: &mut Vec<String>,
+    reason_seen: &mut HashSet<String>,
+) {
+    let Some(quorum_ref) = rule.require.quorum_required.as_ref() else {
+        return;
+    };
+    let quorum_key = normalize_ref(quorum_ref, "quorum.");
+    let Some(quorum) = policy.quorum.get(&quorum_key) else {
+        requirements
+            .missing_attestations
+            .push(format!("quorum:{quorum_key}"));
+        push_reason(reason_codes, reason_seen, "ACP_QUORUM_MISSING");
+        return;
+    };
+
+    let signatures = request
+        .attestations
+        .iter()
+        .filter(|entry| {
+            entry
+                .signature
+                .as_deref()
+                .is_some_and(|value| !value.trim().is_empty())
+        })
+        .count();
+    if signatures < quorum.min_signatures {
+        requirements
+            .missing_attestations
+            .push(format!("signatures:{}", quorum.min_signatures));
+    }
+
+    for role in &quorum.required_roles {
+        let has_role = request.attestations.iter().any(|entry| {
+            entry.role == *role
+                && entry
+                    .signature
+                    .as_deref()
+                    .is_some_and(|sig| !sig.trim().is_empty())
+        });
+        if !has_role {
+            requirements.missing_attestations.push(role.clone());
+        }
+    }
+
+    if !requirements.missing_attestations.is_empty() {
+        push_reason(reason_codes, reason_seen, "ACP_QUORUM_MISSING");
+    }
+
+    let binding = policy
+        .attestations
+        .binding
+        .as_ref()
+        .cloned()
+        .unwrap_or_default();
+    if binding.require_plan_hash {
+        let Some(plan_hash) = request.plan_hash.as_ref() else {
+            push_reason(reason_codes, reason_seen, "ACP_QUORUM_INVALID");
+            requirements
+                .missing_attestations
+                .push("plan_hash_binding".to_string());
+            return;
+        };
+        if request
+            .attestations
+            .iter()
+            .any(|entry| entry.plan_hash.as_deref() != Some(plan_hash.as_str()))
+        {
+            push_reason(reason_codes, reason_seen, "ACP_QUORUM_INVALID");
+            requirements
+                .missing_attestations
+                .push("plan_hash_binding".to_string());
+        }
+    }
+    if binding.require_evidence_hash {
+        let Some(evidence_hash) = request.evidence_hash.as_ref() else {
+            push_reason(reason_codes, reason_seen, "ACP_QUORUM_INVALID");
+            requirements
+                .missing_attestations
+                .push("evidence_hash_binding".to_string());
+            return;
+        };
+        if request
+            .attestations
+            .iter()
+            .any(|entry| entry.evidence_hash.as_deref() != Some(evidence_hash.as_str()))
+        {
+            push_reason(reason_codes, reason_seen, "ACP_QUORUM_INVALID");
+            requirements
+                .missing_attestations
+                .push("evidence_hash_binding".to_string());
+        }
+    }
+}
+
+fn validate_budgets(
+    policy: &PolicyV2,
+    request: &AcpRequest,
+    rule: &AcpRule,
+    requirements: &mut AcpMissingRequirements,
+    reason_codes: &mut Vec<String>,
+    reason_seen: &mut HashSet<String>,
+) {
+    let Some(budget_ref) = rule.require.budget_set.as_ref() else {
+        return;
+    };
+    let budget_key = normalize_ref(budget_ref, "budgets.");
+    let Some(budget_set) = policy.budgets.get(&budget_key) else {
+        push_reason(reason_codes, reason_seen, "ACP_BUDGET_SET_MISSING");
+        return;
+    };
+
+    for (metric, limit) in budget_set {
+        let counter = request.counters.get(metric).copied().unwrap_or(0.0);
+        if counter > *limit {
+            requirements
+                .budget_exceeded
+                .insert(metric.clone(), counter - *limit);
+        } else {
+            requirements
+                .budget_remaining
+                .insert(metric.clone(), (*limit - counter).max(0.0));
+        }
+    }
+
+    if !requirements.budget_exceeded.is_empty() {
+        push_reason(reason_codes, reason_seen, "ACP_BUDGET_EXCEEDED");
+    }
+}
+
+fn evaluate_circuit_breaker_actions(
+    policy: &PolicyV2,
+    request: &AcpRequest,
+    rule: &AcpRule,
+    requirements: &AcpMissingRequirements,
+) -> Vec<String> {
+    let Some(breaker_ref) = rule.require.circuit_breaker_set.as_ref() else {
+        return Vec::new();
+    };
+    let breaker_key = normalize_ref(breaker_ref, "circuit_breakers.");
+    let Some(breaker_set) = policy.circuit_breakers.get(&breaker_key) else {
+        return Vec::new();
+    };
+
+    let mut seen = HashSet::new();
+    let mut actions = Vec::new();
+
+    for trigger in &breaker_set.triggers {
+        let threshold = trigger.threshold.max(1);
+        let mut signal_count = request
+            .circuit_signals
+            .iter()
+            .filter(|signal| *signal == &trigger.signal)
+            .count() as u64;
+        if trigger.signal == "budget.exceeded" && !requirements.budget_exceeded.is_empty() {
+            signal_count = threshold;
+        }
+        if signal_count < threshold {
+            continue;
+        }
+
+        let action = if trigger.action.trim().is_empty() {
+            "stop_and_stage_only".to_string()
+        } else {
+            trigger.action.trim().to_string()
+        };
+
+        if seen.insert(action.clone()) {
+            actions.push(action);
+        }
+    }
+
+    actions
 }
 
 pub fn evaluate_grant(request: &GrantEvalRequest) -> Result<GrantEvalResult> {
@@ -560,7 +1664,9 @@ pub fn evaluate_grant(request: &GrantEvalRequest) -> Result<GrantEvalResult> {
     }
 
     if policy.grants.require_provenance
-        && (request.request_id.is_none() || request.agent_id.is_none() || request.plan_step_id.is_none())
+        && (request.request_id.is_none()
+            || request.agent_id.is_none()
+            || request.plan_step_id.is_none())
     {
         return Ok(GrantEvalResult {
             allow: false,
@@ -724,7 +1830,8 @@ pub fn doctor(request: &DoctorRequest) -> Result<DoctorReport> {
             .starts_with(".harmony/capabilities/_ops/state/")
         {
             semantic_errors.push(
-                "exceptions.state_file must remain under .harmony/capabilities/_ops/state/".to_string(),
+                "exceptions.state_file must remain under .harmony/capabilities/_ops/state/"
+                    .to_string(),
             );
         }
 
@@ -744,16 +1851,17 @@ pub fn doctor(request: &DoctorRequest) -> Result<DoctorReport> {
             .starts_with(".harmony/capabilities/_ops/state/")
         {
             semantic_errors.push(
-                "kill_switch.state_dir must remain under .harmony/capabilities/_ops/state/".to_string(),
+                "kill_switch.state_dir must remain under .harmony/capabilities/_ops/state/"
+                    .to_string(),
             );
         }
 
         if policy.grants.max_ttl_seconds_by_tier.low < policy.grants.max_ttl_seconds_by_tier.medium
-            || policy.grants.max_ttl_seconds_by_tier.medium < policy.grants.max_ttl_seconds_by_tier.high
+            || policy.grants.max_ttl_seconds_by_tier.medium
+                < policy.grants.max_ttl_seconds_by_tier.high
         {
-            semantic_errors.push(
-                "max_ttl_seconds_by_tier must satisfy low >= medium >= high".to_string(),
-            );
+            semantic_errors
+                .push("max_ttl_seconds_by_tier must satisfy low >= medium >= high".to_string());
         }
 
         for (profile_id, profile) in &policy.profiles {
@@ -780,7 +1888,6 @@ pub fn doctor(request: &DoctorRequest) -> Result<DoctorReport> {
                 }
             }
         }
-
     }
 
     let valid = schema_errors.is_empty() && semantic_errors.is_empty();
@@ -788,6 +1895,117 @@ pub fn doctor(request: &DoctorRequest) -> Result<DoctorReport> {
         valid,
         schema_errors,
         semantic_errors,
+        warnings,
+    })
+}
+
+pub fn validate_receipt(request: &ReceiptValidateRequest) -> Result<ReceiptValidateReport> {
+    let policy = load_policy(&request.policy_path).with_context(|| {
+        format!(
+            "failed to load policy {}",
+            request.policy_path.display()
+        )
+    })?;
+
+    let mut errors = Vec::new();
+    let mut warnings = Vec::new();
+    let mut reason_codes = Vec::new();
+    let mut reason_seen = HashSet::new();
+
+    if !request.receipt_path.exists() {
+        errors.push(format!(
+            "receipt file missing: {}",
+            request.receipt_path.display()
+        ));
+        push_reason(
+            &mut reason_codes,
+            &mut reason_seen,
+            "ACP_RECEIPT_REQUIRED",
+        );
+        return Ok(ReceiptValidateReport {
+            valid: false,
+            reason_codes,
+            errors,
+            warnings,
+        });
+    }
+
+    let receipt = match load_json_value(&request.receipt_path) {
+        Ok(value) => value,
+        Err(err) => {
+            errors.push(format!(
+                "failed to parse receipt {}: {err}",
+                request.receipt_path.display()
+            ));
+            push_reason(
+                &mut reason_codes,
+                &mut reason_seen,
+                "ACP_RECEIPT_INVALID",
+            );
+            return Ok(ReceiptValidateReport {
+                valid: false,
+                reason_codes,
+                errors,
+                warnings,
+            });
+        }
+    };
+
+    if !receipt.is_object() {
+        errors.push("receipt must be a JSON object".to_string());
+    }
+
+    for field in &policy.receipts.required_fields {
+        if receipt_field_missing(&receipt, field) {
+            errors.push(format!("missing required receipt field '{field}'"));
+        }
+    }
+
+    let decision = receipt
+        .get("decision")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_string();
+    if !decision.is_empty()
+        && !policy.receipts.emit_on.is_empty()
+        && !policy.receipts.emit_on.iter().any(|expected| expected == &decision)
+    {
+        errors.push(format!(
+            "receipt decision '{decision}' is not in policy receipts.emit_on"
+        ));
+    }
+
+    let effective_acp = receipt
+        .get("effective_acp")
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_string();
+    if !effective_acp.is_empty() {
+        let required_rank = acp_level_rank(&policy.receipts.required_for_acp_at_or_above);
+        if acp_level_rank(&effective_acp) >= required_rank
+            && receipt_field_missing(&receipt, "rollback_handle")
+        {
+            errors.push(
+                "rollback_handle is required for receipts at or above configured ACP threshold"
+                    .to_string(),
+            );
+        }
+    } else {
+        warnings.push("receipt missing effective_acp; ACP threshold check skipped".to_string());
+    }
+
+    if !errors.is_empty() {
+        push_reason(
+            &mut reason_codes,
+            &mut reason_seen,
+            "ACP_RECEIPT_INVALID",
+        );
+    }
+
+    Ok(ReceiptValidateReport {
+        valid: errors.is_empty(),
+        reason_codes,
+        errors,
         warnings,
     })
 }
@@ -868,7 +2086,13 @@ fn evaluate_service_preflight(
     }
 
     if artifact.has_broad_write {
-        match check_active_exception(exceptions, "service", &request.target_id, "broad_write_scope", today) {
+        match check_active_exception(
+            exceptions,
+            "service",
+            &request.target_id,
+            "broad_write_scope",
+            today,
+        ) {
             ExceptionState::Active => {}
             ExceptionState::Missing => {
                 return deny(
@@ -1053,7 +2277,13 @@ fn evaluate_skill_preflight(
     }
 
     if artifact.has_broad_write {
-        match check_active_exception(exceptions, "skill", &request.target_id, "broad_write_scope", today) {
+        match check_active_exception(
+            exceptions,
+            "skill",
+            &request.target_id,
+            "broad_write_scope",
+            today,
+        ) {
             ExceptionState::Active => {}
             ExceptionState::Missing => {
                 return deny(
@@ -1087,7 +2317,11 @@ fn evaluate_skill_preflight(
     allow("hard-enforce", vec!["skill-preflight-pass".to_string()])
 }
 
-fn evaluate_agent_only(policy: &PolicyV2, request: &EnforceRequest, today: &str) -> Result<Decision> {
+fn evaluate_agent_only(
+    policy: &PolicyV2,
+    request: &EnforceRequest,
+    today: &str,
+) -> Result<Decision> {
     if !policy.agent_only.enabled {
         return Ok(deny(
             "hard-enforce",
@@ -1123,7 +2357,10 @@ fn evaluate_agent_only(policy: &PolicyV2, request: &EnforceRequest, today: &str)
     };
 
     let scope_keys = {
-        let mut keys = vec!["global".to_string(), format!("service:{}", request.preflight.target_id)];
+        let mut keys = vec![
+            "global".to_string(),
+            format!("service:{}", request.preflight.target_id),
+        ];
         if let Some(category) = &request.category {
             keys.push(format!("category:{category}"));
         }
@@ -1214,7 +2451,14 @@ fn evaluate_agent_only(policy: &PolicyV2, request: &EnforceRequest, today: &str)
         }
     }
 
-    if tier.require_quorum_token && request.quorum_token.as_deref().unwrap_or_default().trim().is_empty() {
+    if tier.require_quorum_token
+        && request
+            .quorum_token
+            .as_deref()
+            .unwrap_or_default()
+            .trim()
+            .is_empty()
+    {
         return Ok(deny(
             "hard-enforce",
             "DDB017_QUORUM_TOKEN_REQUIRED",
@@ -1251,7 +2495,9 @@ fn evaluate_agent_only(policy: &PolicyV2, request: &EnforceRequest, today: &str)
 
     Ok(allow(
         "hard-enforce",
-        vec![format!("agent-only-pass:tier={risk_tier}:distinct={distinct}")],
+        vec![format!(
+            "agent-only-pass:tier={risk_tier}:distinct={distinct}"
+        )],
     ))
 }
 
@@ -1261,9 +2507,12 @@ fn is_kill_switch_active(policy: &PolicyV2, scope_keys: &[String], today: &str) 
         return Ok(false);
     }
 
-    for entry in fs::read_dir(&state_dir)
-        .with_context(|| format!("failed to read kill-switch directory {}", state_dir.display()))?
-    {
+    for entry in fs::read_dir(&state_dir).with_context(|| {
+        format!(
+            "failed to read kill-switch directory {}",
+            state_dir.display()
+        )
+    })? {
         let entry = entry?;
         let path = entry.path();
         if !path.is_file() {
@@ -1329,9 +2578,10 @@ fn apply_mode(mode: &str, decision: &mut Decision) {
             if !is_critical_code(&deny.code) {
                 decision.allow = true;
                 decision.shadow_deny = true;
-                decision
-                    .notes
-                    .push(format!("soft-enforce: non-critical deny converted to warning ({})", deny.code));
+                decision.notes.push(format!(
+                    "soft-enforce: non-critical deny converted to warning ({})",
+                    deny.code
+                ));
             }
         }
         _ => {}
@@ -1545,9 +2795,9 @@ fn check_active_exception(
     rule: &str,
     today: &str,
 ) -> ExceptionState {
-    let matching = exceptions.iter().find(|lease| {
-        lease.scope == scope && lease.target == target && lease.rule == rule
-    });
+    let matching = exceptions
+        .iter()
+        .find(|lease| lease.scope == scope && lease.target == target && lease.rule == rule);
 
     let Some(lease) = matching else {
         return ExceptionState::Missing;
@@ -1611,12 +2861,30 @@ pub fn load_reason_codes(path: &Path) -> Result<HashSet<String>> {
 
     let mut set = HashSet::new();
     for raw in text.split(|ch: char| !ch.is_ascii_alphanumeric() && ch != '_') {
-        if raw.starts_with("DDB") && raw.contains('_') {
+        if (raw.starts_with("DDB") || raw.starts_with("ACP") || raw.starts_with("RA"))
+            && raw.contains('_')
+        {
             set.insert(raw.to_string());
         }
     }
 
     Ok(set)
+}
+
+fn receipt_field_missing(receipt: &Value, field: &str) -> bool {
+    let Some(value) = receipt.get(field) else {
+        return true;
+    };
+
+    if value.is_null() {
+        return true;
+    }
+
+    if let Some(text) = value.as_str() {
+        return text.trim().is_empty();
+    }
+
+    false
 }
 
 fn load_json_value(path: &Path) -> Result<Value> {
@@ -1649,7 +2917,8 @@ mod tests {
 
     #[test]
     fn split_allowed_tools_respects_parentheses_depth() {
-        let raw = "Read Bash(git diff --name-only) Write(.harmony/output/**) Bash(rg deny-by-default)";
+        let raw =
+            "Read Bash(git diff --name-only) Write(.harmony/output/**) Bash(rg deny-by-default)";
         let tokens = split_allowed_tools(raw);
         assert_eq!(
             tokens,
@@ -1669,7 +2938,10 @@ mod tests {
 
     #[test]
     fn bash_scope_match_supports_glob_patterns() {
-        assert!(matches_bash_scope("bash execution/agent/impl/agent.sh *", "bash execution/agent/impl/agent.sh --help"));
+        assert!(matches_bash_scope(
+            "bash execution/agent/impl/agent.sh *",
+            "bash execution/agent/impl/agent.sh --help"
+        ));
         assert!(!matches_bash_scope(
             "bash execution/agent/impl/agent.sh *",
             "bash execution/guard/impl/guard.sh"

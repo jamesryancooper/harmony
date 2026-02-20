@@ -127,7 +127,7 @@ Start with these potential challenges, then explore others through analysis:
 
 | Use Case | Potential Challenge | Can Skills Adapt? |
 |----------|---------------------|-------------------|
-| Human approval gates mid-execution | Not native to spec | (evaluate) |
+| ACP policy gates mid-execution | Not native to spec | (evaluate) |
 | Dynamic branching at runtime | Linear phase model | (evaluate) |
 | Process documentation as primary output | Output-focused design | (evaluate) |
 | Multi-session long-running tasks | Single-session focus | (evaluate) |
@@ -155,9 +155,9 @@ For each limitation, answer:
 
 ---
 
-### 3.1 Human Checkpoint Support
+### 3.1 ACP Checkpoint Support
 
-**The Question:** Can skills support mandatory human approval gates mid-execution?
+**The Question:** Can skills support mandatory ACP policy gates mid-execution?
 
 - What would checkpoints look like within a skill?
 - Does the spec prohibit this, or just not address it?
@@ -217,7 +217,7 @@ Summarize findings for all capabilities analyzed (include any additional ones id
 
 | Capability | Skills Handle It | Extension Feasible | Justifies New Primitive |
 |------------|------------------|-------------------|------------------------|
-| Human checkpoints | (yes/no) | (yes/no) | (yes/no) |
+| ACP checkpoints | (yes/no) | (yes/no) | (yes/no) |
 | Dynamic branching | (yes/no) | (yes/no) | (yes/no) |
 | Process documentation | (yes/no) | (yes/no) | (yes/no) |
 | Multi-session tasks | (yes/no) | (yes/no) | (yes/no) |
@@ -252,9 +252,9 @@ Synthesize findings from Phase 2.2 and Phase 3. For each constraint, identify wh
 
 Identify capabilities that might require a non-skills primitive. Start with these examples, then explore additional possibilities:
 
-**Capability 1: Human Checkpoint Orchestration**
+**Capability 1: ACP Checkpoint Orchestration**
 
-- What would human checkpoints look like in practice?
+- What would ACP checkpoints look like in practice?
 - Could skills be extended to support this? What would be lost?
 - Is this fundamentally incompatible with the skills model?
 
@@ -296,7 +296,7 @@ For each capability analyzed (including any additional ones identified), provide
 
 | Capability | Real Use Cases | Frequency | Skills Workaround | Workaround Quality |
 |------------|----------------|-----------|-------------------|-------------------|
-| Human checkpoints | (examples) | (how often) | (if any) | (adequate/poor/none) |
+| ACP checkpoints | (examples) | (how often) | (if any) | (adequate/poor/none) |
 | Dynamic branching | (examples) | (how often) | (if any) | (adequate/poor/none) |
 | Process documentation | (examples) | (how often) | (if any) | (adequate/poor/none) |
 | Multi-session tasks | (examples) | (how often) | (if any) | (adequate/poor/none) |

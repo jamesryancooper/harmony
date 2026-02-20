@@ -67,7 +67,7 @@ I’ll keep these tight and focus on what’s uniquely contributed.
 ### The Human-Centered AI Manifesto – Josh LaMar
 
 - **Thesis:** AI must be designed to **enhance human flourishing** (individual, systemic, environmental) with principles like transparency, inclusivity, contextual adaptability, human–AI collaboration, and ethical data practices.
-- **Mental models:** AI as a collaborator; flourishing as the evaluation metric; context-aware, human-in-the-loop systems.
+- **Mental models:** AI as a collaborator; flourishing as the evaluation metric; context-aware, Autonomous Control Point systems.
 - **Assumptions:** AI will be pervasive; only explicit commitments around data, representation, and accountability will keep it beneficial.
 
 ---

@@ -11,7 +11,7 @@ in native mode and in adapter mode.
 2. Validate session policy before execution.
 3. Enforce context budget thresholds (`80%` warning, `90%` flush-required).
 4. Enforce flush-before-compaction policy.
-5. Block compaction when mandatory flush fails unless explicit HITL waiver exists.
+5. Block compaction when mandatory flush fails unless explicit ACP waiver exists.
 6. Emit deterministic evidence for degraded or fail-closed paths.
 
 ## Output

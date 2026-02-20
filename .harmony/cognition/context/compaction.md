@@ -25,7 +25,7 @@ Evidence output:
 ## Fail-Closed Rule
 
 - If mandatory flush fails, compaction is blocked.
-- Continue only with explicit HITL waiver and waiver evidence.
+- Continue only with explicit ACP waiver and waiver evidence.
 
 ## Preserve During Compaction
 

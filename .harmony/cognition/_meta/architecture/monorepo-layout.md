@@ -171,7 +171,7 @@ When scale or isolation requirements arise (e.g., per‑tenant/region deployment
 - Scope: Autopilot for trivial/low‑risk changes (e.g., docs hygiene, stale‑flag cleanup, span/log scaffolding); Copilot PRs for anything touching runtime behavior or contracts.
 - Inputs: CI results, DORA/SRE metrics, OTel traces/logs, code ownership and risk rubric defined under `kaizen/policies/**`.
 - Outputs: PRs with evidence (plan/diff/tests/trace), weekly reports, and policy updates stored under `kaizen/reports/**` and referenced from `docs/`.
-- Safety: No direct pushes or approvals; AI configs pinned; human‑in‑the‑loop enforced by branch protections and review.
+- Safety: No direct pushes or approvals; AI configs pinned; ACP governance enforced by branch protections and review.
 
 Operational notes:
 

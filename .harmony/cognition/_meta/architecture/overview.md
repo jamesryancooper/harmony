@@ -1,6 +1,6 @@
 ---
 title: Harmony Structural Paradigm (HSP) Overview
-description: Modular-monolith architecture with vertical slices, deterministic quality gates, and a guided MAPE‑K autonomic loop with human‑in‑the‑loop governance for a small, fast team.
+description: Modular-monolith architecture with vertical slices, deterministic quality gates, and a guided MAPE‑K autonomic loop with ACP-governed autonomy for a small, fast team.
 ---
 
 # Harmony Structural Paradigm (HSP)
@@ -77,7 +77,7 @@ This keeps runtime concerns (processes and deployables) clearly separated from s
 
 ### Self‑Improvement (Kaizen/Autopilot) Layer
 
-An in‑repo Kaizen layer runs beside normal development to propose tiny, reversible improvements. It detects opportunities (metrics, gates, traces, docs hygiene), evaluates them against written policy (ASVS/SSDF, risk rubric, change‑type gates), and opens PRs with evidence. Autopilot is limited to Trivial/Low‑risk hygiene (e.g., docs, stale‑flags, span/log scaffolding); Copilot PRs for Medium/High‑risk or behavioral changes always require human approval. Non‑negotiables apply: no direct pushes, no bot approvals, pinned AI configs, and full provenance. See `.harmony/cognition/_meta/architecture/kaizen-subsystem.md` for technical design and operations, and `.harmony/cognition/_meta/architecture/tooling-integration.md` for the workflow wiring.
+An in‑repo Kaizen layer runs beside normal development to propose tiny, reversible improvements. It detects opportunities (metrics, gates, traces, docs hygiene), evaluates them against written policy (ASVS/SSDF, risk rubric, change‑type gates), and opens PRs with evidence. Autopilot is limited to Trivial/Low‑risk hygiene (e.g., docs, stale‑flags, span/log scaffolding); Copilot PRs for Medium/High‑risk or behavioral changes always require ACP promotion gating with evidence and quorum before durable promotion. Non‑negotiables apply: no direct pushes, no bot approvals, pinned AI configs, and full provenance. See `.harmony/cognition/_meta/architecture/kaizen-subsystem.md` for technical design and operations, and `.harmony/cognition/_meta/architecture/tooling-integration.md` for the workflow wiring.
 
 #### Cross‑Cutting Nature
 
@@ -100,9 +100,9 @@ Quick Rubric (Does it fit Autopilot?)
 ### Speed with Safety
 
 - Prefer a modular monolith: a single deployable application, logically partitioned into feature modules for fast iteration and low coordination overhead.
-- Gate every change with automated tests and human review prior to release.
+- Gate every change with automated tests and ACP policy evaluation prior to release.
 - Use feature flags to decouple deploy from user release, enabling progressive rollout and instant rollback.
-- Employ AI assistance (Planner/Builder/Verifier agents) to accelerate coding and maintenance, with explicit approval checkpoints to prevent unsafe changes.
+- Employ AI assistance (Planner/Builder/Verifier agents) to accelerate coding and maintenance, with explicit ACP promotion gates to prevent unsafe changes.
 - Favor trunk-based development with small PRs and preview environments to accelerate feedback while preserving safety through policy gates.
 
 ### Simplicity over Complexity
@@ -126,8 +126,8 @@ Quick Rubric (Does it fit Autopilot?)
 ### Guided Agentic Autonomy
 
 - Introduce an autonomic improvement loop with AI agents that Plan, Build, and Verify changes under strict governance.
-- Keep humans in control of high‑impact decisions via human‑in‑the‑loop (HITL) checkpoints.
-- Require provenance and transparency: log agent actions and rationales; require approvals for potentially risky actions.
+- Keep humans on the loop for high‑impact decisions via ACP receipts and escalation digests.
+- Require provenance and transparency: log agent actions and rationales; require ACP decisions and quorum attestations for potentially risky actions.
 - Favor fail‑closed behavior: unapproved or failing changes never reach production.
 - Establish a thin control plane (flags, policies, contracts, observability) so agents operate within guardrails and achieve deterministic outcomes.
 
@@ -151,8 +151,8 @@ MAPE‑K: Monitor → Analyze → Plan → Execute, backed by a shared Knowledge
 - Planner Agent: analyzes knowledge (requirements, code health, telemetry) and proposes improvements or features.
 - Builder Agent: implements proposed changes in a controlled sandbox (branches/PRs).
 - Verifier Agent: tests/evaluates against specifications and policies.
-- Human Gatekeepers: review and approve at defined checkpoints (e.g., before merge to `main`).
-- Fail‑closed posture: only approved, passing changes are eligible to ship.
+- ACP Gate: policy engine enforces promotion/finalize decisions using evidence, reversibility, budgets, and quorum; unresolved high‑risk cases escalate.
+- Fail‑closed posture: only ACP-allowed, passing changes are eligible to ship.
 - Provenance: associate runs, PRs, and releases with trace IDs and run records for auditability.
 
 ### Knowledge Plane
@@ -176,7 +176,7 @@ MAPE‑K: Monitor → Analyze → Plan → Execute, backed by a shared Knowledge
 - Propose change (human or Planner Agent) with traceable rationale tied to specs.
 - Implement change in a branch or PR (human or Builder Agent).
 - Verify with automated tests and policy checks (Verifier Agent + CI).
-- Human review and approval gate; deploy behind feature flags.
+- ACP promotion gate (plus human review where repository policy requires it); deploy behind feature flags.
 - Gradually enable via flags; monitor telemetry; promote rollout on healthy signals.
 - Prefer trunk‑based flow with small, reviewable PRs and preview deployments to shorten feedback loops.
 
@@ -189,8 +189,8 @@ MAPE‑K: Monitor → Analyze → Plan → Execute, backed by a shared Knowledge
 
 ## Governance and Safety
 
-- HITL checkpoints for merges, production promotion, and other high‑risk actions.
-- Full provenance of agent actions and approvals.
+- ACP promotion/finalize gates for merges, production promotion, and other high‑risk actions.
+- Full provenance of agent actions, decisions, and attestations.
 - Feature flags to decouple release from deploy; default to safe rollouts and instant rollback.
 - CI policy gates enforce security and quality controls (e.g., alignment with ASVS/SSDF), contract compliance, and observability baselines.
 
@@ -213,7 +213,7 @@ MAPE‑K: Monitor → Analyze → Plan → Execute, backed by a shared Knowledge
 - Repository structure blueprint (`repo_structure.json`).
 - Detailed MAPE‑K loop design and guardrails.
 - Knowledge Plane data model and workflows.
-- Agent roles, HITL governance model, and risk controls.
+- Agent roles, ACP governance model, and risk controls.
 - Continuous improvement (Kaizen) subsystem.
 - Operational policies and failure‑mode analysis.
 - Scoring rubric and risk analysis supporting HSP adoption.

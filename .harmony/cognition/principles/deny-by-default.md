@@ -11,9 +11,9 @@ status: Active
 
 ## Purpose
 
-Deny by default means Harmony grants no operational permissions unless they are
-explicitly allowlisted. Any missing, unknown, or ambiguous permission decision
-must fail closed.
+Deny by default means Harmony grants **no operational permissions** unless they are
+explicitly allowlisted. Any missing, unknown, ambiguous, or unevaluable permission
+decision **must fail closed**.
 
 This principle applies to:
 
@@ -23,35 +23,62 @@ This principle applies to:
 - service capability grants
 - exception handling and temporary elevation
 
-## Why It Matters
+Deny-by-default is the foundation that makes **autonomous operation safe**: agents
+can run without constant supervision because their authority is explicit, scoped,
+and auditable.
 
-- Limits blast radius from faulty prompts, code, or model behavior.
-- Preserves deterministic behavior across agent and service executions.
-- Makes policy intent auditable and reviewable.
-- Enables safe autonomous operation when no human is in the loop.
+## What Changed with Reversible Autonomy
+
+Harmony previously used *manual review gates* as a primary governance mechanism for
+material side effects. Under **Reversible Autonomy with Human-on-the-Loop
+Oversight**, deny-by-default remains the baseline, and **ACP policy evaluation is
+the runtime dependency for promotion decisions**.
+
+Instead:
+
+- **Deny-by-default** governs *capabilities* (what an actor can attempt).
+- **Autonomous Control Points (ACPs)** govern *change promotion* (what can become
+  durable) using **reversibility, evidence, budgets, and quorum**.
+
+Humans are approached only when:
+
+- the agent quorum cannot reach a resolution,
+- an action crosses a configured risk threshold, or
+- after completion (digest/receipt), for optional review or rollback.
+
+See: `autonomous-control-points.md`.
 
 ## Enforced Model in Harmony
 
-Harmony currently uses two enforcement lanes plus shared validation:
+Harmony enforces deny-by-default through a shared, deterministic control plane:
 
-1. Runtime service lane (WASM/native runtime):
-   - Services declare `capabilities_required` in `service.json`.
-   - Runtime policy allowlists live in `.harmony/runtime/config/policy.yml`.
-   - Runtime policy engine grants only declared capabilities and denies missing
-     capabilities (`.harmony/runtime/crates/core/src/policy.rs`).
+### 1) Policy Contract Layer
 
-2. Skill and shell-service lane:
-   - `allowed-tools` in `SKILL.md` and `SERVICE.md` is authoritative for tool
-     and scoped write declarations.
-   - Validation scripts fail active artifacts that use unscoped or disallowed
-     patterns.
-   - Execution wrappers enforce scoped permissions at runtime before launching
-     shell entrypoints.
+- The canonical policy contract is versioned and stored in-repo.
+- Defaults are deny; explicit allowlists define what is permitted.
+- Exception leases and kill-switches are tracked as state and validated in CI.
 
-3. Shared safety invariants:
-   - deny-by-default baseline (`allow: []` unless explicit allowlist)
-   - fail-closed on parse/evaluation/enforcement errors
-   - auditable denial/elevation records
+### 2) Decision Engine Layer (Single Source of Truth)
+
+A shared decision engine evaluates policy for:
+
+- validators (CI and local)
+- runtime wrappers
+- agent execution wrappers
+
+The engine produces **machine-readable allow/deny payloads** with stable reason codes.
+All failures (parse, schema, evaluation, IO) are **deny**.
+
+### 3) Enforcement Parity (Validation + Runtime)
+
+Deny-by-default must be enforced:
+
+- **before execution** (preflight)
+- **at execution time** (runtime gate)
+- **in CI** (cannot merge unsafe artifacts)
+
+Any lane that is not enforceable at runtime is treated as untrusted and must be
+downgraded (e.g., stage-only).
 
 ## Permission Vocabulary
 
@@ -78,6 +105,7 @@ Any of the following must return deny and stop execution:
 - path/command scope mismatch
 - capability required but not granted
 - expired or missing exception metadata
+- evaluation, schema, or enforcement errors
 
 No permissive fallback is allowed.
 
@@ -86,7 +114,7 @@ No permissive fallback is allowed.
 Temporary elevation is allowed only when all fields are present:
 
 - `id`
-- `scope` (`skill` or `service`)
+- `scope` (`skill` or `service` or `agent`)
 - `target`
 - `rule`
 - `owner`
@@ -97,24 +125,51 @@ Temporary elevation is allowed only when all fields are present:
 Exception leases must be stored in a tracked policy file, validated in CI, and
 rejected when expired. Permanent broad permissions are not allowed.
 
-## Human-in-the-Loop and Agent-Only Modes
+**Reversible Autonomy extension:** exceptions may also be used to temporarily raise
+budgets or widen scopes **only when the action remains reversible**. Exceptions
+must never be used to bypass irreversibility blocks.
 
-Deny-by-default supports both modes:
+## Autonomy Profiles (Least-Privilege by Default)
 
-- HITL mode: high-risk actions may require explicit human confirmation.
-- Agent-only mode: policy packages replace manual approvals using risk tiers,
-  separation-of-duties checks, and automatic rollback/kill-switch behavior.
+To keep long agent runs low-friction, Harmony groups common allowlists into
+**profiles**. Profiles are:
 
-In both modes, enforcement remains fail-closed and deterministic.
+- explicit, versioned, reviewable
+- scoped to actor type (agent vs service vs skill)
+- bounded by budgets and ACP ceilings
+
+Examples:
+
+- `observe` (read-only)
+- `iterate` (reversible local changes, tests, branch commits)
+- `operate` (stateful changes with canary + rollback proof + quorum)
+- `emergency` (break-glass; time-boxed; highest audit burden)
+
+Profiles reduce day-to-day friction without weakening deny-by-default.
+
+## Boundary with ACPs
+
+Deny-by-default answers: **“May this actor attempt this capability?”**
+
+ACP answers: **“May this staged change be promoted to durable state?”**
+
+Promotion criteria are defined in ACP, not in this document.
+See: [Autonomous Control Points](./autonomous-control-points.md).
+
+## Arbitration
+
+If this principle conflicts with another, apply
+[Arbitration & Precedence](./README.md#arbitration--precedence).
+This principle governs capability attempts; ACP governs promotion.
 
 ## Development Speed Guidance
 
 Deny-by-default should not block normal low-risk iteration. Harmony uses:
 
-- low-risk `dev-fast` profiles with pre-scoped safe defaults
-- policy suggestion tooling for minimal required grants
+- low-risk profiles with pre-scoped safe defaults
 - precise denial diagnostics that point to exact remediation
 - short-lived exception leases instead of permanent broad access
+- stage-only fallbacks that still produce useful artifacts (diffs, plans, receipts)
 
 This keeps individual edits fast while retaining repository-level safety.
 
@@ -124,12 +179,13 @@ This keeps individual edits fast while retaining repository-level safety.
 - unscoped `Bash` or `Write`
 - broad workspace write grants without expiry
 - fail-open error handling
-- policy docs that diverge from enforceable runtime behavior
+- policy docs that diverge from enforceable behavior
+- using manual review as a substitute for reversibility, evidence, and budgets
 
 ## Related Documentation
 
 - [Trust Pillar](../pillars/trust.md)
-- [HITL Checkpoints](./hitl-checkpoints.md)
+- [Autonomous Control Points](./autonomous-control-points.md)
 - [Skills Specification](../../capabilities/_meta/architecture/specification.md)
 - [Runtime Policy](../_meta/architecture/runtime-policy.md)
 - [ADR 019](../decisions/019-deny-by-default-uniform-enforcement-and-agent-only-operation.md)

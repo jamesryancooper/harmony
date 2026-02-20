@@ -317,7 +317,7 @@ changelog:
   - date: "2026-02-18"
     version: "1.2.0"
     change: "Added Autonomy as a canonical weighted/scored quality attribute with bounded-autonomy policy defaults."
-    rationale: "Autonomous execution is a primary harness concern and must be explicitly scored while remaining constrained by safety, security, and HITL approval boundaries."
+    rationale: "Autonomous execution is a primary harness concern and must be explicitly scored while remaining constrained by safety, security, and ACP promotion boundaries."
     adr: ".harmony/cognition/decisions/015-autonomy-quality-attribute.md"
   - date: "2026-02-18"
     version: "1.1.0"

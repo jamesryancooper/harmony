@@ -424,7 +424,7 @@ scope_limits:
 | Work Pattern | Handled By | Rationale |
 |--------------|------------|-----------|
 | Single-session, bounded scope | **Skill** | Agent maintains context throughout |
-| Multi-session, requires coordination | **Mission** | Explicit state management, human checkpoints |
+| Multi-session, requires coordination | **Mission** | Explicit state management, ACP governance |
 | Background/async execution | **Mission** | Session may disconnect; needs durable state |
 | Parallel workstreams | **Mission** | Coordinates multiple skills/agents |
 

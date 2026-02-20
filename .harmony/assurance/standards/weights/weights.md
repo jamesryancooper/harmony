@@ -31,15 +31,15 @@ Later layers override earlier layers for the same attribute.
 ## Attribute Guidance: `autonomy`
 
 - Definition: ability for Harmony to execute useful work independently within explicit policy boundaries.
-- Boundary rule: autonomy never overrides safety/security or no-silent-apply/HITL approval requirements.
+- Boundary rule: autonomy never overrides safety/security or no-silent-apply/ACP promotion requirements.
 - Primary tensions: `safety`, `security`, `auditability`, `simplicity`, `usability`.
 - Scoring cues:
   - `1`: mostly manual or autonomy is effectively disallowed for the subsystem.
-  - `3`: bounded autonomy for low-risk/read-only tasks; approvals still required for material effects.
-  - `5`: autonomous low/medium-risk execution is reliable, deterministic, and policy-bounded with clear approval gates.
+  - `3`: bounded autonomy for low-risk/read-only tasks; material effects remain ACP-gated.
+  - `5`: autonomous low/medium-risk execution is reliable, deterministic, and policy-bounded with clear ACP gates.
 - Evidence examples:
   - `/Users/jamesryancooper/Projects/harmony/.harmony/cognition/principles/no-silent-apply.md`
-  - `/Users/jamesryancooper/Projects/harmony/.harmony/cognition/principles/hitl-checkpoints.md`
+  - `/Users/jamesryancooper/Projects/harmony/.harmony/cognition/principles/autonomous-control-points.md`
   - `/Users/jamesryancooper/Projects/harmony/.harmony/cognition/principles/deny-by-default.md`
   - `/Users/jamesryancooper/Projects/harmony/.harmony/cognition/_meta/architecture/runtime-policy.md`
 

@@ -118,7 +118,7 @@ Skill sets are pre-defined **capability bundles** that provide sensible defaults
 | Pattern | Skill Sets | Description |
 |---------|------------|-------------|
 | Standard workflow | `[executor]` | Multi-phase skill with state |
-| Interactive workflow | `[executor, collaborator]` | Multi-phase with human checkpoints |
+| Interactive workflow | `[executor, collaborator]` | Multi-phase with ACP oversight |
 | Verified workflow | `[executor, guardian]` | Multi-phase with quality gates |
 | Domain workflow | `[executor, specialist, guardian]` | Multi-phase with domain expertise and quality |
 | Pipeline component | `[integrator]` | Building block for composition |

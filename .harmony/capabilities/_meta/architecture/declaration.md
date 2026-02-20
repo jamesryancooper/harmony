@@ -125,7 +125,7 @@ Resolved capabilities: `[phased, branching, stateful]`
 
 Required refs: `phases.md`, `decisions.md`, `checkpoints.md`
 
-### Multi-Phase with Human Checkpoints
+### Multi-Phase with ACP Oversight
 
 ```yaml
 skill_sets: [executor, collaborator]

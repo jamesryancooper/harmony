@@ -19,7 +19,7 @@ Status: Draft stub (adopt templates and numbering)
 - Speed with Safety: Favor lightweight ADRs to document decisions quickly and make changes reversible. Keep decisions linked to flags and rollback notes so promotion/rollback remains safe and fast.
 - Simplicity over Complexity: Default to concise ADRs that record only context, decision, and consequences. Avoid ceremony; escalate to full ADRs only for high‑risk changes.
 - Quality through Determinism: Require provenance (PR/build/trace IDs) and consistent numbering so decisions are auditable and reproducible across environments.
-- Guided Agentic Autonomy: Allow agents to draft ADR summaries and diffs, but require human approval. Record pinned AI configuration and link ObservaKit traces for runs that influenced the ADR.
+- Guided Agentic Autonomy: Allow agents to draft ADR summaries and diffs, but require ACP gate. Record pinned AI configuration and link ObservaKit traces for runs that influenced the ADR.
 
 See `.harmony/cognition/methodology/README.md` for Harmony’s five pillars.
 

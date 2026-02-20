@@ -7,7 +7,7 @@ description: Principled, AI-native methodology for solo builders — lean in cer
 
 Harmony is an AI-native, human-governed development methodology for solo builders.
 
-Harmony empowers solo developers across experience levels to ship high-quality software with speed, safety, and confidence. It combines spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered human checkpoints within a principled, progressively adoptable framework.
+Harmony empowers solo developers across experience levels to ship high-quality software with speed, safety, and confidence. It combines spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered ACP governance within a principled, progressively adoptable framework.
 
 Harmony is lean in ceremony and rich in capability: context-efficient artifacts, progressive disclosure, and fast feedback loops — without imposing vendor lock-in or stack prescription.
 
@@ -298,7 +298,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - Deterministic, reviewable agent loops: Plan → Diff → Explain → Test; no silent apply.
 - Pinned AI configuration and low‑variance defaults; golden tests guarded by JSON‑Schema prevent drift.
 - Observability and provenance: OTel traces/logs on runs; PRs include representative `trace_id` and Eval/Policy outcomes.
-- Fail-closed governance: risk-tiered HITL checkpoints enforced; agents cannot approve PRs or push to protected branches; humans retain ultimate authority, oversight, and accountability.
+- Fail-closed governance: risk-tiered ACP promotion gates enforced; agents cannot approve PRs or push to protected branches; humans retain ultimate authority, oversight, and accountability.
 - Outcome: AI systems autonomously self‑build, self‑heal, and self‑tune within deterministic, observable, and reversible bounds.
 
 ### In Short
@@ -311,7 +311,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 
 ## Harmony in Practice
 
-**Goal.** Ship small, quality, safe, and frequent changes with **enterprise‑grade** security, reliability, and performance using **AI-native** workflows with **risk-tiered human governance**. Humans own direction, safety boundaries, and material risk decisions.
+**Goal.** Ship small, quality, safe, and frequent changes with **enterprise‑grade** security, reliability, and performance using **AI-native** workflows with **risk-tiered policy governance** and human-on-the-loop oversight. Humans own direction, safety boundaries, and material risk decisions.
 
 **Guiding principle.** **Simplicity first**: prefer the smallest viable process, design, and tooling that satisfy the requirement. Add complexity only when SLOs, scale, or compliance clearly require it; avoid unnecessary dependencies.
 
@@ -319,7 +319,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 
 - **Simplicity‑first**: choose the simplest process, design, and tooling that meets the requirement. Defer advanced patterns until justified by SLOs/scale/compliance. Default to no new dependency unless it materially reduces complexity.
 - **Spec‑first**: every meaningful change starts with a **Specification one‑pager** + **ADR** capturing problem, scope, API/UI contracts, SLIs/SLOs, **non‑functionals**, and a **micro‑threat model (STRIDE)** mapped to **OWASP ASVS** & **NIST SSDF** tasks.
-- **Context-efficient planning**: Convert the Spec to a context packet (structured intent + agent plan + acceptance criteria). AI agents generate plans/diffs/tests from the Spec within governed bounds; risk-tiered checkpoints enforce human oversight on material changes.
+- **Context-efficient planning**: Convert the Spec to a context packet (structured intent + agent plan + acceptance criteria). AI agents generate plans/diffs/tests from the Spec within governed bounds; risk-tiered ACP promotion gates enforce reversibility, evidence, quorum, and budgets on material changes.
 - **Flow over ceremony**: **Trunk‑Based Development** (+ short‑lived branches), tiny PRs, gated **Vercel Preview** per PR, **feature‑flagged** releases with guarded manual promote to prod; rollbacks are instant by promoting a prior preview.
 - **Reliability guardrails**: Define **SLIs/SLOs**, manage via **error budgets**, alert on budget burn, run blameless postmortems with action items.
 - **Security by default**: **OWASP ASVS** controls + **NIST SSDF** activities embedded in **CI/CD** quality gates: static analysis (**CodeQL/Semgrep**), dependency & **license** scan, **secret scanning**, SBOM, and contract tests.
@@ -332,7 +332,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - **MTTR**: minutes–hours via instant rollback (promote a known‑good preview) and clear runbooks.
 - **SLO attainment**: measurable improvement by alerting on **burn‑rate** and holding code until budget recovers.
 
-### Human–AI Roles & HITL Checkpoints
+### Human-AI Roles & ACP Governance
 
 - Roles
   - Owner (you): accountable for risk, waivers, and promotion decisions.
@@ -350,10 +350,10 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
   - Classify PR risk (Trivial/Low/Medium/High) and confirm rollback/flag plan.
   - Verify license/provenance and secret hygiene; check OpenAPI/JSON‑Schema diff where applicable.
   - Confirm observability for changed flows (trace + structured logs) and attach a representative trace or trace_id in the PR.
-- Required human‑in‑the‑loop checkpoints
-  1. Before implementation: spec one-pager + micro-STRIDE + acceptance criteria approved by Navigator.
-  2. Before merge: PR review using the risk rubric (below) with license/provenance note and OpenAPI diff.
-  3. Before promotion: Feature behind a flag, Preview e2e smoke green, rollback noted, owner on‑call.
+- Required ACP control points (with human-on-the-loop oversight)
+  1. Before implementation: spec one-pager + micro-STRIDE + acceptance criteria staged with ACP preflight evidence.
+  2. Before merge: ACP promote decision includes required PR artifacts (risk rubric, license/provenance note, OpenAPI diff, and required attestations).
+  3. Before promotion: feature behind a flag, preview e2e smoke green, rollback noted, owner on‑call.
   4. After promote: 30‑minute watch window; check SLO burn‑rate and key SLIs; document in PR thread.
 - Stop‑the‑line triggers (any → block or rollback)
   - Secret exposure, license violation, security regression (ASVS high/critical), SLO burn‑rate breach.
@@ -363,7 +363,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - Decision log
   - Dockit auto‑prompts an ADR summary on merge; link PR, preview URL, post‑deploy notes, and (when agents were used) AI provider/model/version + parameters and ObservaKit/EvalKit run links.
 
-### HITL Waivers & Exceptions (minimal rules)
+### ACP Waivers & Exceptions (minimal rules)
 
 - Waivers are exceptional and rare—prefer scope cuts, flags, and staged rollouts.
 - Who can waive: Navigator (High‑risk requires Navigator security checklist). Agents cannot waive.
@@ -385,7 +385,7 @@ flowchart LR
   end
   
   subgraph SHIP ["SHIP Phase (Velocity + Trust)"]
-    C --> D["Dev in AI IDE (risk-tiered checkpoints)"]
+    C --> D["Dev in AI IDE (risk-tiered ACP gates)"]
     D --> E["PR -> Preview Deploy (flagged)"]
     E --> F[CI Gates]
     F -->|all green| G[Merge to Trunk]
@@ -450,7 +450,7 @@ See `flow-and-wip-policy.md` for the full board policy, WIP limits, definitions,
 
 ## Spec-First Planning (step-by-step)
 
-Harmony is explicitly spec-first: every meaningful change starts with a spec one-pager and feature story (structured context + agent plan + acceptance criteria), then runs through an AI-assisted loop of Plan → Diff → Explain → Test with risk-tiered human checkpoints.
+Harmony is explicitly spec-first: every meaningful change starts with a spec one-pager and feature story (structured context + agent plan + acceptance criteria), then runs through an AI-assisted loop of Plan → Diff → Explain → Test with risk-tiered ACP gates.
 
 See `spec-first-planning.md` for the full spec one-pager template, feature story pattern, and AI IDE integration guide.
 
@@ -679,7 +679,7 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 
 1. Write **spec one-pager** + **ADR**.
 2. Convert to **feature story** (context + plan + AC).
-3. Use **AI IDE** to propose plan/diffs/tests with risk-tiered checkpoints.
+3. Use **AI IDE** to propose plan/diffs/tests with risk-tiered ACP gates.
 4. Open tiny PR → **preview deploy** → run e2e smoke → merge if gates pass.
 
 **Required CI checks**: lint/format; TS `--strict`; unit; typecheck; **OpenAPI diff (oasdiff)**; **CodeQL + Semgrep**; **Dependabot/SCA + Dependency Review (license)**; **secret scanning + TruffleHog**; **SBOM**; Preview URL comment; **Observability for changed flows** (trace/logs + trace_id in PR). Recommended: Pact/Schemathesis and **e2e smoke (Playwright or `scripts/smoke-check.sh`)**; publish **bundle/perf budgets** (CI enforcement optional).

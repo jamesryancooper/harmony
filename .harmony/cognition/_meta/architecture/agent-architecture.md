@@ -27,7 +27,7 @@ This page does **not** prescribe implementation details of specific kits (PlanKi
 - The **Kaizen subsystem** defines an agentic improvement loop that:
   - Observes the repo and signals (CI, observability, contracts, flags).
   - Uses Planner/Builder/Verifier style behavior to open **dry‑run Kaizen PRs**.
-  - Enforces **fail‑closed** and **HITL** governance.
+  - Enforces **fail‑closed** and **ACP** governance.
 - Tooling integration docs position agents as consumers and producers in the **Knowledge Plane**, CI, and feature flag control plane.
 
 ### 1.2 Alignment with Harmony Methodology
@@ -35,7 +35,7 @@ This page does **not** prescribe implementation details of specific kits (PlanKi
 Strengths:
 
 - **Spec‑first and contract‑first**: agents are described in terms of contracts, roles, and provenance.
-- **Guided Agentic Autonomy**: agents are explicitly governed by risk rubrics, HITL checkpoints, and fail‑closed defaults.
+- **Guided Agentic Autonomy**: agents are explicitly governed by risk rubrics, ACP gates, and fail‑closed defaults.
 - **Monolith‑first and hexagonal**: agents sit on top of a modular monolith with clear planes (apps, agents, packages, contracts, platform).
 - **Kaizen layer**: a cross‑cutting, evidence‑driven layer for continuous improvement is already modeled.
 
@@ -101,7 +101,7 @@ Each agent is composed of four primary building blocks:
 - **Agent Spec** — declarative definition of:
   - Inputs/outputs (types, JSON Schema).
   - Responsibilities and constraints.
-  - Risk class, HITL requirements, and observability expectations.
+  - Risk class, ACP requirements, and observability expectations.
 - **Agent Definition** — configuration that binds:
   - Prompts (PromptKit manifests).
   - Plans and flows (PlanKit/FlowKit configurations).
@@ -137,7 +137,7 @@ Shared invariants across both models:
 - Contract-first interfaces.
 - Fail-closed governance.
 - Provenance and observability evidence.
-- Risk-tiered HITL controls.
+- Risk-tiered ACP controls.
 
 For harness-specific semantics, caveats, and controls, treat these as normative companions to this document:
 
@@ -350,7 +350,7 @@ This checklist is the **single source of truth** for adding a new agent under th
 
 1. **Write the Agent Spec**
    - Create `packages/agents/src/specs/<agent-id>/spec.md` and (optionally) `spec.json`:
-     - Define purpose, inputs/outputs, quality attributes, risk class, HITL checkpoints, and surfaces that will call this agent.
+     - Define purpose, inputs/outputs, quality attributes, risk class, ACP gates, and surfaces that will call this agent.
      - Align with Harmony’s **Spec‑First** and **Guided Agentic Autonomy** pillars.
 2. **Define Contracts**
    - Add TypeScript types for input/output to `packages/agents/src/agent.types.ts` (or a dedicated types file).

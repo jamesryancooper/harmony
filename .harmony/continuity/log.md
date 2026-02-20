@@ -487,7 +487,7 @@ The seven primitives were documented across various files but lacked a central r
 - Created `docs/principles/` with 8 formal principle definitions:
   - progressive-disclosure.md, single-source-of-truth.md, locality.md
   - simplicity-over-complexity.md, deny-by-default.md, determinism.md
-  - hitl-checkpoints.md, reversibility.md
+  - autonomous-control-points.md, reversibility.md
 - Added complete reference files for synthesize-research skill
 - Added errors.md to refine-prompt references
 - Documented `display_name` extension in specification.md

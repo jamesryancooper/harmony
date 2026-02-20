@@ -51,7 +51,7 @@ The guardrail layer that includes flags, policy gates, contracts, and observabil
 The unified, queryable engineering knowledge surface that links specs, code, tests, traces, and decisions.
 
 ### Improve Layer (Kaizen/Autopilot)
-Autonomous, bounded hygiene and improvement loop that proposes small reversible changes with human approval gates.
+Autonomous, bounded hygiene and improvement loop that proposes small reversible changes with ACP evidence/quorum promotion gates.
 
 ---
 
@@ -209,7 +209,7 @@ A specific AI model version locked for consistency. Prevents unexpected behavior
 | DoSafe | Definition of Safe |
 | DoSm | Definition of Small |
 | PR | Pull Request |
-| HITL | Human-in-the-Loop |
+| ACP | Autonomous Control Points |
 | WIP | Work in Progress |
 | MTTR | Mean Time to Recovery |
 | DORA | DevOps Research and Assessment (metrics) |

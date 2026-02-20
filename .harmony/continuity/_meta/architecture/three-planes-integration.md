@@ -55,7 +55,7 @@ Knowledge updates / implementation changes
 
 ## Governance Hooks
 
-- Human approval checkpoints and risk-tiering are enforced through workflow and policy docs, while continuity captures the resulting execution trail.
+- ACP policy gates and risk-tiering are enforced through workflow and policy docs, while continuity captures the resulting execution trail.
 - Post-change verification should be represented by both evidence in knowledge artifacts and status progression in `tasks.json`.
 
 ## Anti-Patterns

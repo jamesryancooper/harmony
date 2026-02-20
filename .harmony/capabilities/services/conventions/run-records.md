@@ -15,7 +15,7 @@ Core fields:
 - Identity: `runId`, `service name`, `version`
 - Inputs: sanitized `inputs` (sensitive keys redacted)
 - Outcome: `status`, `summary`, `durationMs`
-- Methodology: `stage`, `risk`, optional `hitl`
+- Methodology: `stage`, `risk`, optional `acp`
 - Telemetry: `telemetry.trace_id`, optional `telemetry.spans`
 - Determinism: optional `determinism.prompt_hash`, `idempotencyKey`, `inputsHash`, `cacheKey`
 - Replay: optional `outputs`

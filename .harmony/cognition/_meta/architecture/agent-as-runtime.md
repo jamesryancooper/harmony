@@ -279,7 +279,7 @@ The model integrates with governance as follows:
 - Waivers must be explicit, time-bounded, and auditable.
 - Run evidence is required for consequential decisions.
 
-This aligns with [governance model](./governance-model.md) and Harmony principles on determinism, guardrails, and HITL checkpoints.
+This aligns with [governance model](./governance-model.md) and Harmony principles on determinism, guardrails, and ACP gates.
 
 ## Adoption Guidance
 

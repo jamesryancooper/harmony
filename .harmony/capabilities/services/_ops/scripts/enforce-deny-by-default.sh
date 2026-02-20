@@ -3,6 +3,80 @@
 
 set -o pipefail
 
+HARMONY_ENFORCER_START_TS="${HARMONY_ENFORCER_START_TS:-$(date +%s)}"
+
+harmony_acp_collect_git_diff_counters() {
+  local repo_root="$1"
+  local files_touched=0
+  local loc_delta=0
+  local adds deletes path
+
+  if command -v git >/dev/null 2>&1 && git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    while IFS=$'\t' read -r adds deletes path; do
+      [[ -n "${path:-}" ]] || continue
+      [[ "$adds" == "-" ]] && adds=0
+      [[ "$deletes" == "-" ]] && deletes=0
+      [[ "$adds" =~ ^[0-9]+$ ]] || adds=0
+      [[ "$deletes" =~ ^[0-9]+$ ]] || deletes=0
+      files_touched=$((files_touched + 1))
+      loc_delta=$((loc_delta + adds + deletes))
+    done < <(git -C "$repo_root" diff --numstat 2>/dev/null || true)
+
+    jq -cn \
+      --argjson files_touched "$files_touched" \
+      --argjson loc_delta "$loc_delta" \
+      '{
+        "repo.files_touched": $files_touched,
+        "repo.max_files_touched": $files_touched,
+        "repo.loc_delta": $loc_delta,
+        "repo.max_loc_delta": $loc_delta,
+        "repo.git_diff_unknown": 0
+      }'
+    return 0
+  fi
+
+  jq -cn '{
+    "repo.files_touched": 0,
+    "repo.max_files_touched": 0,
+    "repo.loc_delta": 0,
+    "repo.max_loc_delta": 0,
+    "repo.git_diff_unknown": 1
+  }'
+}
+
+harmony_acp_default_counters_json() {
+  local repo_root="$1"
+  local now start elapsed command_count git_diff_json
+
+  now="$(date +%s)"
+  start="${HARMONY_ENFORCER_START_TS:-$now}"
+  if [[ ! "$start" =~ ^[0-9]+$ ]]; then
+    start="$now"
+  fi
+  elapsed=$((now - start))
+  if (( elapsed < 0 )); then
+    elapsed=0
+  fi
+
+  command_count="${HARMONY_COMMAND_COUNT:-0}"
+  if [[ ! "$command_count" =~ ^[0-9]+$ ]]; then
+    command_count=0
+  fi
+  command_count=$((command_count + 1))
+
+  git_diff_json="$(harmony_acp_collect_git_diff_counters "$repo_root")"
+  jq -cn \
+    --argjson git "$git_diff_json" \
+    --argjson command_count "$command_count" \
+    --argjson elapsed "$elapsed" \
+    '$git + {
+      "commands.count": $command_count,
+      "time.elapsed_seconds": $elapsed,
+      "time.max_seconds": $elapsed,
+      "repo.max_commits": 0
+    }'
+}
+
 harmony_ddb_split_allowed_tools() {
   local raw="$1"
   local token=""
@@ -117,6 +191,193 @@ harmony_ddb_emit_deny() {
   fi
 }
 
+harmony_acp_should_gate_phase() {
+  local phase="${1:-stage}"
+  case "$phase" in
+    promote|finalize) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+harmony_acp_emit_receipt() {
+  local receipt_writer="$1"
+  local policy_file="$2"
+  local request_file="$3"
+  local decision_file="$4"
+
+  if [[ ! -x "$receipt_writer" ]]; then
+    return 0
+  fi
+
+  "$receipt_writer" --policy "$policy_file" --request "$request_file" --decision "$decision_file" >/dev/null 2>&1 || true
+}
+
+harmony_acp_gate_enforce() {
+  local service_id="$1"
+  local harmony_root="$2"
+  local policy_file="$3"
+
+  local phase operation_class run_id profile actor_id actor_type break_glass keep_tmp
+  local target_json evidence_json attestations_json counters_json budgets_json signals_json reversibility_json
+  local request_builder acp_eval receipt_writer breaker_actions_script
+  local tmp_dir request_file decision_file decision_output rc request_rc
+  local continuity_run_dir rollback_dir decision_kind
+  local repo_root
+
+  phase="${HARMONY_OPERATION_PHASE:-stage}"
+  if ! harmony_acp_should_gate_phase "$phase"; then
+    return 0
+  fi
+
+  if ! command -v jq >/dev/null 2>&1; then
+    echo "[acp] jq is required for ACP promote/finalize gating" >&2
+    return 13
+  fi
+
+  operation_class="${HARMONY_OPERATION_CLASS:-service.execute}"
+  run_id="${HARMONY_RUN_ID:-run-$(date -u +"%Y%m%dT%H%M%SZ")-$$}"
+  profile="${HARMONY_POLICY_PROFILE:-refactor}"
+  actor_id="${HARMONY_AGENT_ID:-agent-local}"
+  actor_type="${HARMONY_ACTOR_TYPE:-agent}"
+  break_glass="${HARMONY_BREAK_GLASS:-false}"
+  keep_tmp="${HARMONY_ACP_KEEP_TMP:-false}"
+
+  target_json="${HARMONY_ACP_TARGET_JSON:-}"
+  [[ -n "$target_json" ]] || target_json='{}'
+  if [[ "$target_json" == "{}" && -n "${HARMONY_TARGET_BRANCH:-}" ]]; then
+    target_json="$(jq -cn --arg branch "$HARMONY_TARGET_BRANCH" '{branch:$branch}')"
+  fi
+
+  evidence_json="${HARMONY_ACP_EVIDENCE_JSON:-}"
+  [[ -n "$evidence_json" ]] || evidence_json='[]'
+  attestations_json="${HARMONY_ACP_ATTESTATIONS_JSON:-}"
+  [[ -n "$attestations_json" ]] || attestations_json='[]'
+  counters_json="${HARMONY_ACP_COUNTERS_JSON:-}"
+  if [[ -z "$counters_json" || "$counters_json" == "{}" || "$counters_json" == "null" ]]; then
+    repo_root="$(cd "$harmony_root/.." && pwd)"
+    counters_json="$(harmony_acp_default_counters_json "$repo_root")"
+  fi
+  budgets_json="${HARMONY_ACP_BUDGETS_JSON:-}"
+  [[ -n "$budgets_json" ]] || budgets_json='{}'
+  signals_json="${HARMONY_ACP_SIGNALS_JSON:-}"
+  [[ -n "$signals_json" ]] || signals_json='[]'
+  reversibility_json="${HARMONY_ACP_REVERSIBILITY_JSON:-}"
+  if [[ -z "$reversibility_json" ]]; then
+    local default_primitive default_recovery_window
+    default_primitive="git.revert_commit"
+    default_recovery_window="P30D"
+    case "$operation_class" in
+      git.merge) default_primitive="git.revert_merge" ;;
+      fs.soft_delete) default_primitive="fs.move_to_trash" ;;
+      db.migrate) default_primitive="db.down_migration_or_shadow" ;;
+      service.deploy) default_primitive="deploy.rollback" ;;
+      resource.detach) default_primitive="infra.detach_archive" ;;
+    esac
+    reversibility_json="$(jq -cn \
+      --arg primitive "${HARMONY_REVERSIBLE_PRIMITIVE:-$default_primitive}" \
+      --arg rollback_handle "${HARMONY_ROLLBACK_HANDLE:-$default_primitive:$run_id}" \
+      --arg recovery_window "${HARMONY_RECOVERY_WINDOW:-$default_recovery_window}" \
+      --arg rollback_proof "${HARMONY_ROLLBACK_PROOF:-}" \
+      '{
+        reversible: true,
+        primitive: (if ($primitive|length)==0 then null else $primitive end),
+        rollback_handle: (if ($rollback_handle|length)==0 then null else $rollback_handle end),
+        recovery_window: (if ($recovery_window|length)==0 then null else $recovery_window end),
+        rollback_proof: (if ($rollback_proof|length)==0 then null else $rollback_proof end)
+      }')"
+  fi
+
+  request_builder="$harmony_root/capabilities/_ops/scripts/policy-acp-request.sh"
+  acp_eval="$harmony_root/capabilities/_ops/scripts/policy-acp-eval.sh"
+  receipt_writer="$harmony_root/capabilities/_ops/scripts/policy-receipt-write.sh"
+  breaker_actions_script="$harmony_root/capabilities/_ops/scripts/policy-circuit-breaker-actions.sh"
+
+  if [[ ! -x "$request_builder" || ! -x "$acp_eval" ]]; then
+    echo "[acp] missing ACP helper scripts under .harmony/capabilities/_ops/scripts" >&2
+    return 13
+  fi
+
+  tmp_dir="$harmony_root/capabilities/_ops/state/.tmp/acp"
+  mkdir -p "$tmp_dir"
+  request_file="$tmp_dir/${run_id}-${service_id}-request.json"
+  decision_file="$tmp_dir/${run_id}-${service_id}-decision.json"
+
+  request_rc=0
+  "$request_builder" \
+    --output "$request_file" \
+    --run-id "$run_id" \
+    --phase "$phase" \
+    --profile "$profile" \
+    --operation-class "$operation_class" \
+    --actor-id "$actor_id" \
+    --actor-type "$actor_type" \
+    --target-json "$target_json" \
+    --reversibility-json "$reversibility_json" \
+    --evidence-json "$evidence_json" \
+    --attestations-json "$attestations_json" \
+    --budgets-json "$budgets_json" \
+    --counters-json "$counters_json" \
+    --signals-json "$signals_json" \
+    --plan-hash "${HARMONY_PLAN_HASH:-}" \
+    --evidence-hash "${HARMONY_EVIDENCE_HASH:-}" \
+    --intent "${HARMONY_ACP_INTENT:-runtime-service-enforcement}" \
+    --boundaries "${HARMONY_ACP_BOUNDARIES:-service policy envelope}" \
+    $( [[ "$break_glass" == "true" ]] && echo "--break-glass" ) >/dev/null || request_rc=$?
+
+  if [[ "$request_rc" -ne 0 ]]; then
+    echo "[acp] request envelope generation failed; failing closed" >&2
+    return 13
+  fi
+
+  rc=0
+  decision_output="$("$acp_eval" enforce --policy "$policy_file" --request "$request_file" 2>&1)" || rc=$?
+
+  if jq -e . >/dev/null 2>&1 <<<"$decision_output"; then
+    printf '%s\n' "$decision_output" > "$decision_file"
+  else
+    jq -n \
+      --arg decision "DENY" \
+      --arg effective_acp "ACP-0" \
+      --arg msg "$decision_output" \
+      '{allow:false,decision:$decision,effective_acp:$effective_acp,reason_codes:["DDB025_RUNTIME_DECISION_ENGINE_ERROR"],notes:[$msg],requirements:{}}' > "$decision_file"
+  fi
+
+  harmony_acp_emit_receipt "$receipt_writer" "$policy_file" "$request_file" "$decision_file"
+  decision_kind="$(jq -r '.decision // "DENY"' "$decision_file" 2>/dev/null || echo "DENY")"
+
+  continuity_run_dir="$harmony_root/continuity/runs/$run_id"
+  rollback_dir="$continuity_run_dir/rollback"
+  mkdir -p "$continuity_run_dir"
+  if [[ -x "$breaker_actions_script" ]]; then
+    "$breaker_actions_script" run \
+      --run-id "$run_id" \
+      --decision "$decision_file" \
+      --request "$request_file" \
+      --rollback-dir "$rollback_dir" \
+      --scope "service:$service_id" \
+      --owner "$actor_id" >/dev/null 2>&1 || true
+  fi
+
+  if [[ "$keep_tmp" != "true" ]]; then
+    rm -f "$request_file" "$decision_file" >/dev/null 2>&1 || true
+    rmdir "$tmp_dir" >/dev/null 2>&1 || true
+  fi
+
+  case "$rc" in
+    0)
+      return 0
+      ;;
+    13)
+      echo "[acp][$decision_kind] promotion blocked for operation '$operation_class' phase '$phase'" >&2
+      return 13
+      ;;
+    *)
+      echo "[acp] policy engine failure; failing closed" >&2
+      return 13
+      ;;
+  esac
+}
+
 harmony_enforce_service_policy() {
   local service_id="$1"
   local script_path="$2"
@@ -203,6 +464,9 @@ harmony_enforce_service_policy() {
 
   case "$rc" in
     0)
+      if ! harmony_acp_gate_enforce "$service_id" "$harmony_root" "$policy_file"; then
+        exit 13
+      fi
       return 0
       ;;
     13)

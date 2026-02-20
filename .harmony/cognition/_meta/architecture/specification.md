@@ -91,20 +91,20 @@ Expands in:
 
 ### HARMONY-SPEC-005: No Silent Apply for Material Side Effects
 
-Material side effects (edits, merges, deploys, runtime mutations) MUST require explicit human approval.
+Material side effects (edits, merges, deploys, runtime mutations) MUST require explicit ACP policy gating before durable promotion.
 
 Expands in:
 
 - [No Silent Apply](/.harmony/cognition/principles/no-silent-apply.md)
-- [HITL Checkpoints](/.harmony/cognition/principles/hitl-checkpoints.md)
+- [Autonomous Control Points](/.harmony/cognition/principles/autonomous-control-points.md)
 
 ### HARMONY-SPEC-006: Risk-Tiered Human Governance
 
-Approval intensity MUST scale with risk tier. Low-risk read-only automation MAY run without hard checkpoints; consequential actions MUST use explicit checkpoints.
+Control intensity MUST scale with risk tier. Low-risk read-only automation MAY run without hard gates; consequential actions MUST use explicit ACP gates.
 
 Expands in:
 
-- [HITL Checkpoints](/.harmony/cognition/principles/hitl-checkpoints.md)
+- [Autonomous Control Points](/.harmony/cognition/principles/autonomous-control-points.md)
 - [Harmony Methodology](/.harmony/cognition/methodology/README.md)
 
 ### HARMONY-SPEC-007: Continuity Artifact Integrity

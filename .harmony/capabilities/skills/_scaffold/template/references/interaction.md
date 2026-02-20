@@ -1,5 +1,5 @@
 ---
-# Human-in-the-Loop Documentation (Interactive Pattern)
+# Human Collaboration Documentation (Interactive Pattern)
 # Add this file when your skill requires user input at runtime.
 #
 # When to use:
@@ -64,7 +64,7 @@ interaction:
 
 **Required when capability:** `human-collaborative`
 
-Human-in-the-loop design for the {{skill-name}} skill.
+Human collaboration design for the {{skill-name}} skill.
 
 > **When to Add This File:**
 >

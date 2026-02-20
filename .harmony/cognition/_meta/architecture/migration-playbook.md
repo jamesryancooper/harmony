@@ -50,7 +50,7 @@ Checklist
   - Default dynamic reads to `no-store`. When enabling caches, use explicit keys/TTL and add tests/validation.
 - Deploy flow
   - Enable preview deployments for `apps/*`. Keep production promotion manual with a rehearsed instant rollback path.
-  - Adopt PatchKit for small, well‑formed PRs and NotifyKit for lightweight approvals/notifications (Slack/email) to reinforce HITL checkpoints.
+  - Adopt PatchKit for small, well‑formed PRs and NotifyKit for lightweight approvals/notifications (Slack/email) to reinforce ACP gates.
 - Knowledge and retrieval (optional on Day 1)
   - If helpful for developers, stand up QueryKit + IndexKit over first‑party docs/specs for cited Q&A; defer SearchKit (external sources) until needed.
 - Documentation
@@ -137,7 +137,7 @@ Checklist
 - Observability maturity
   - Finalize dashboards and alerts; ensure PR/promote/rollback events are captured for timelines.
   - Introduce focused performance benchmarking only when justified by product needs; prefer a lightweight BenchKit approach. Avoid premature perf frameworks in the first 60 days.
-- UI surfaces for approvals/search are optional; rely on PRs/CLI/Slack early. Consider a UIKit only when HITL workflows outgrow existing channels.
+- UI surfaces for approvals/search are optional; rely on PRs/CLI/Slack early. Consider a UIKit only when ACP workflows outgrow existing channels.
 - Localization and seeding (optional)
   - Introduce i18nKit for localization workflows and SeedKit for deterministic seed data only when product needs justify them; keep disabled by default for small teams.
 - Compliance and models

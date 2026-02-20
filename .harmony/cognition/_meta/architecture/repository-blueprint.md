@@ -267,7 +267,7 @@ Kaizen is the cross-cutting Autopilot layer that continuously proposes small, re
   - `kaizen/agents/`: Kaizen-specific agents and flows that orchestrate evaluators and codemods (they may call `packages/*`, the shared **platform flow runtime service** under `platform/runtimes/flow-runtime/**`, and the `agents/orchestrator` HTTP agent via contract-first APIs and generated clients).
   - `kaizen/reports/`: Generated reports, scorecards, and evidence artifacts referenced from docs and CI.
 - **Scope:** Autopilot for trivial/low-risk changes (for example, docs hygiene, stale-flag cleanup, span/log scaffolding); Copilot-style PRs for anything touching runtime behavior or contracts.
-- **Workflows:** `.github/workflows/kaizen.yaml` schedules and runs Kaizen jobs under normal branch protections and human-in-the-loop review; outputs land under `kaizen/reports/**` and are referenced from `docs/`.
+- **Workflows:** `.github/workflows/kaizen.yaml` schedules and runs Kaizen jobs under normal branch protections and ACP review; outputs land under `kaizen/reports/**` and are referenced from `docs/`.
 - **Ownership:** Use CODEOWNERS to route `/kaizen/**` to platform/quality. Allow Kaizen PRs to touch `docs/**`, `.github/**`, `infra/**`, and per-slice scaffolds as read-only suggest/PR changes; owners review and merge.
 
 ## Blueprint Visualization (Textual)

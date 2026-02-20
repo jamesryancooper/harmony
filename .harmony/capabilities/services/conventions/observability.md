@@ -47,10 +47,11 @@ Standard span events:
 - `artifact.write`
 - `gate.pass`
 - `gate.block`
-- `hitl.requested`
-- `hitl.approved`
-- `hitl.rejected`
-- `hitl.waived`
+- `acp.requested`
+- `acp.allow`
+- `acp.stage_only`
+- `acp.deny`
+- `acp.escalate`
 - `error`
 - `policy.fail`
 - `eval.fail`

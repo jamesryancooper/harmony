@@ -479,7 +479,7 @@ scopes_completed:
 - **>50 files** need modification
 - **>3 distinct systems/modules** are affected
 - **External dependencies** must be coordinated (APIs, databases, other repos)
-- **Human approval gates** are required mid-execution (not just at start)
+- **ACP policy gates** are required at promotion boundaries (not just at start)
 - **Execution will span multiple sessions** (too large to complete in one sitting)
 
 **Implementation:**

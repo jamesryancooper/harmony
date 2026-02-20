@@ -71,13 +71,13 @@ Discovery follows progressive disclosure:
 
 Governance is explicit:
 
-- Consequential side effects are governed by deny-by-default policy, risk tiers,
-  and explicit checkpoints (human review where policy requires it)
+- Consequential side effects are governed by deny-by-default policy, ACP gates,
+  reversibility requirements, and append-only receipts
 - Agent autonomy is bounded by contract precedence and policy
 - Human-led zones (for example, `ideation/`) are excluded unless explicitly scoped
 
 In short: Harmony is a governed acceleration system. AI increases speed and
-leverage; contracts, assurance gates, and checkpoints preserve trust,
+leverage; contracts, assurance gates, and ACPs preserve trust,
 traceability, and reversibility.
 
 ## Canonical Specification

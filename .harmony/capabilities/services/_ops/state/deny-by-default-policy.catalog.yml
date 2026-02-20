@@ -1,5 +1,5 @@
 schema_version: "1.0"
-generated_at: "2026-02-19T13:35:20Z"
+generated_at: "2026-02-19T20:09:32Z"
 source_manifest: "/Users/jamesryancooper/Projects/harmony/.harmony/capabilities/services/manifest.yml"
 services:
   - id: "guard"

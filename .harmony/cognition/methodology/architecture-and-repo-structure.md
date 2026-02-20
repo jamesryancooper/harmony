@@ -114,7 +114,7 @@ Use **CODEOWNERS** and the layer model in `architecture/layers.md` to enforce re
 This scaling policy is intentionally lightweight and SHOULD be read together with:
 
 - `architecture/overview.md` (Harmony Structural Paradigm objectives and evolution path).
-- `architecture/governance-model.md` (HITL gates, waiver policy, risk rubric).
+- `architecture/governance-model.md` (ACP gates, waiver policy, risk rubric).
 - `architecture/runtime-policy.md` (feature flags, rollback, runtime expectations).
 - `docs/testing-strategy.md` (test pyramid, preview smoke, and contract test gates).
 

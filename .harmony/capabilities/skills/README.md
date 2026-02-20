@@ -103,7 +103,7 @@ Recommended profile for Composite Skills:
 | Question | Yes → Add |
 |----------|-----------|
 | Does the skill have multiple phases? | `executor` skill set |
-| Does the skill need human approval? | `collaborator` skill set |
+| Does the skill need ACP gate? | `collaborator` skill set |
 | Does the skill have quality gates? | `guardian` skill set |
 | Can the skill resume after interruption? | `resumable` capability |
 | Is the skill a pipeline component? | `integrator` skill set |
