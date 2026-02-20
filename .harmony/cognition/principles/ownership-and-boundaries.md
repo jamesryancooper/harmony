@@ -27,13 +27,19 @@ Owner attestation asserts:
 - exception TTL (time-bound validity)
 - rollback plan reference for the affected boundary
 
+Owner attestation is policy-scoped:
+
+- required only for boundary exceptions and ACP-2/ACP-3 categories when policy says so
+- not required for routine ACP-1 promotions
+
 Attestation is recorded as a typed evidence item in receipts and must be
 hash-bound to the staged artifacts so policy can verify integrity.
 
 Owner attestation is input to ACP quorum when policy requires it; it is not a
 separate gating mechanism.
-If required attestation is missing at policy timeout, default to
-`STAGE_ONLY + ESCALATE` (per ACP policy), never silent allow.
+If required attestation is missing at policy timeout, default to `STAGE_ONLY`;
+policy may add `ESCALATE` where required. Never silently allow. Runs do not wait
+for standing human approval unless policy explicitly triggers escalation.
 
 ## Arbitration
 

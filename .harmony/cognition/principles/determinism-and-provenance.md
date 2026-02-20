@@ -26,6 +26,14 @@ For any materially relevant run, record:
 
 Bounded variance is valid only when policy-approved and receipted. Deterministic mode remains the default.
 
+## Normative Boundary
+
+This document is normative for required replay and provenance fields in RA/ACP receipts.
+It does not define promotion/contraction gate outcomes or quorum policy.
+
+- Receipt/gate mechanics are defined in [Autonomous Control Points](./autonomous-control-points.md).
+- Runtime variance posture is defined in [Governed Determinism](./determinism.md).
+
 ## Why It Matters
 
 ### Pillar Alignment: Trust through Governed Determinism

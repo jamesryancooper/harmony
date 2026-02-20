@@ -13,7 +13,7 @@ status: Active
 
 Harmony treats small-batch delivery as policy, not preference. Changes should be narrowly scoped and merged quickly into trunk.
 
-For material side-effects, "merge quickly" never means bypassing ACP stage/promote sequencing. Fast integration is valid only when required ACP evidence and receipts are present.
+For material side-effects, fast merges are encouraged only after ACP promote requirements (evidence + receipts) are satisfied. "Merge quickly" never bypasses ACP stage/promote sequencing.
 
 Default thresholds:
 
@@ -21,8 +21,8 @@ Default thresholds:
 - PR size `<= 400 changed lines` (excluding generated/lock files)
 - One concern per PR
 
-Thresholds apply per promotable slice. Long autonomous runs may contain multiple
-staged slices; each promoted slice should remain small and single-purpose.
+Thresholds apply per promotable slice (receipt-linked unit), not mission wall-clock duration. Long autonomous runs may contain multiple staged slices; each promoted slice should remain small and single-purpose.
+Promotable-slice semantics are defined in [Documentation is Code](./documentation-is-code.md#promotable-slice-definition).
 
 ## Why It Matters
 
@@ -81,6 +81,7 @@ if branch_age_days > 1:
 - `Flags by Default` enables shipping incomplete work safely.
 - `Autonomous Control Points` stay lightweight when diffs are small and reversible.
 - `No Silent Apply` requires evidence/receipt visibility for durable side-effects.
+- `Documentation is Code` defines promotable-slice artifact completeness at promotion time.
 
 ## Canonical References
 

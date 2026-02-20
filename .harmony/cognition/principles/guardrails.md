@@ -12,12 +12,14 @@ status: Active
 ## What This Means
 
 Guardrails combine policy checks, evaluation thresholds, and security controls at design, CI, and runtime boundaries. They enforce shared policy engines fail-closed; they do not define a separate promotion gate model.
+This is an umbrella principle: enforcement mechanics are delegated to canonical SSOTs so policy behavior cannot fork across documents.
 
 ## Where Enforcement Lives
 
 - Capability attempts are enforced by [Deny by Default](./deny-by-default.md).
 - Promotion/contraction to durable state is enforced by [Autonomous Control Points](./autonomous-control-points.md).
 - Guardrails integrate these controls across design, CI, and runtime and block on missing required evidence.
+- Guardrails do not define independent gate levels, quorum rules, or receipt schemas.
 
 ## Canonical References
 

@@ -6,7 +6,7 @@ description: Canonical principles index and thresholds that translate Harmony pi
 # Harmony Principles
 
 Status: Active (Production)
-Last updated: 2026-02-19
+Last updated: 2026-02-20
 
 Principles are Harmony's operational translation layer between philosophy and execution.
 
@@ -28,9 +28,20 @@ Harmony principles are the decision layer between pillars and methodology. They 
 
 For small teams, default to the smallest viable process, design, and tooling that preserves quality and governance. Escalate ceremony only for higher-risk changes.
 
+## Normative SSOT Map
+
+Use one canonical source per governance topic to prevent drift:
+
+| Topic | Canonical principle (SSOT) | Scope |
+|---|---|---|
+| Promotion/contraction to durable state | [Autonomous Control Points](./autonomous-control-points.md) | stage/promote/finalize semantics, receipts, budgets, quorum, recovery windows |
+| Capability attempts and permissions | [Deny by Default](./deny-by-default.md) | fail-closed capability evaluation, scoped grants/exceptions, deterministic permission decisions |
+| Replay/provenance and receipt lineage | [Determinism and Provenance](./determinism-and-provenance.md) | required replay fields, provenance fields, receipt-linked reproducibility |
+| Telemetry contract | [Observability as a Contract](./observability-as-a-contract.md) | telemetry profiles and minimum signals, constrained by ACP budget/circuit policy |
+
 ## Arbitration & Precedence
 
-### Tie-break Rules
+### Arbitration Rules
 
 Arbitration resolves principle tensions without weakening RA/ACP governance.
 
@@ -43,23 +54,17 @@ Routine autonomy scope:
 - ACP-1 through ACP-3 are routine autonomous operation levels.
 - ACP-4 is break-glass only, blocked by default, and out-of-band from normal runs.
 
-Canonical SSOTs:
-
-- Promotion/contraction semantics: [Autonomous Control Points](./autonomous-control-points.md)
-- Capability attempt semantics: [Deny by Default](./deny-by-default.md)
-- Replay/provenance semantics: [Determinism and Provenance](./determinism-and-provenance.md)
-
 Rules:
 
 1. For durable state changes, ACP policy decisions are the final promotion authority.
-2. Assurance principles override delivery-speed principles when they conflict.
-3. Within Assurance, prioritize `Deny by Default` + `Security and Privacy Baseline` + `Guardrails` + `Autonomous Control Points` + `Reversibility` over convenience.
-4. `No Silent Apply` is satisfied by receipts/evidence/rollback handles, not standing human authorization.
-5. Owner attestation is a required quorum input for boundary exceptions and never replaces required risk-tier quorum.
-6. Determinism is default; bounded variance is allowed only under explicit policy with full provenance in receipts.
-7. Observability requirements must fit budget/circuit envelopes via approved telemetry profiles; any relaxation requires a receipt.
-8. Trunk speed does not bypass stage -> ACP gate -> promote sequencing for material side effects.
-9. Every material arbitration outcome must be recorded in append-only audit trails and referenced in receipts/digests.
+2. For capability attempts, deny-by-default decisions are the final authorization authority.
+3. Assurance principles override Productivity principles, and Productivity overrides Integration when conflicts remain.
+4. `No Silent Apply` is satisfied by receipts/evidence/rollback handles, never by standing human approvals.
+5. Owner attestation is a quorum input only; it never replaces ACP policy evaluation or required risk-tier quorum.
+6. Determinism defaults apply to promote decisions and receipts; bounded variance requires policy bounds and provenance.
+7. Observability profile choices must stay within ACP budget/circuit envelopes; downgrades require reason code + receipt linkage.
+8. Trunk speed and threshold checks are evaluated per promotable slice, not full mission duration.
+9. Any override/waiver must be time-boxed, reason-coded, append-only, and receipt-linked.
 
 Vocabulary normalization:
 

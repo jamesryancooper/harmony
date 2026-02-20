@@ -23,6 +23,9 @@ In AI-assisted development, determinism is especially critical because LLMs are 
 This document defines determinism posture (default deterministic behavior with bounded policy variance).
 Canonical replay/provenance field requirements are defined in [Determinism and Provenance](./determinism-and-provenance.md).
 
+Deterministic replay is required for ACP promote decisions and associated receipts.
+Bounded variance is allowed only inside policy-declared envelopes for long autonomous runs, with declared mode/parameters and receipt linkage.
+
 ## Why It Matters
 
 ### Pillar Alignment: Trust through Governed Determinism
@@ -102,9 +105,20 @@ parameters:
   temperature: 0.0            # Default deterministic setting
   max_tokens: 4096
   # seed: 42                 # If supported by provider
-  # variance_mode: bounded_exploration  # Policy-approved only
-  # variance_seed: 42                  # Required when variance_mode is set
-  # acp_receipt_id: "rcpt-..."         # Required when variance_mode is set
+  # variance_mode: bounded_variance     # Policy-approved envelope only
+  # variance_seed: 42                   # Required when variance_mode is set
+  # variance_envelope_id: "acp-var-window-001"  # Required when variance_mode is set
+  # acp_receipt_id: "rcpt-..."          # Required when variance_mode is set
+```
+
+```yaml
+# Good: bounded variance explicitly declared and receipted
+parameters:
+  mode: bounded_variance
+  temperature: 0.2
+  seed: 42
+  variance_envelope_id: "acp-var-window-001"
+  acp_receipt_id: "rcpt-2026-02-20-001"
 ```
 
 **Track provenance for AI outputs:**
@@ -362,12 +376,12 @@ ENV GIT_SHA=${GIT_SHA}
 
 ## Policy-Bounded Variance and Acceptable Non-Determinism
 
-Harmony permits bounded variance only when policy allows it and the run is fully traceable in receipts.
+Harmony permits bounded variance only when policy allows it, the run stays inside a declared envelope, and the run is fully traceable in receipts.
 
 For bounded variance in autonomous runs:
 1. Declare mode as `bounded_variance` before execution
 2. Record variance parameters (for example `temperature`, `seed`, sampling controls)
-3. Attach the ACP receipt reference for the policy decision
+3. Attach the policy envelope identifier and ACP receipt reference
 4. Keep variance bounded to the approved range and time window
 
 Some non-determinism is acceptable when:

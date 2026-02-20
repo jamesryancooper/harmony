@@ -17,6 +17,7 @@ This principle defines an outcome: material side-effects must never be silent. D
 
 Enforcement lives in [Autonomous Control Points](./autonomous-control-points.md). This document intentionally stays narrow to avoid duplicating ACP gate semantics.
 ACP is the single normative source for promotion/contraction mechanics, quorum behavior, and receipt schema rules.
+No-silent-apply adds an outcome contract only; it does not define separate gate outcomes or approval workflows.
 
 Capability attempts still follow [Deny by Default](./deny-by-default.md).
 
@@ -30,6 +31,7 @@ No-silent-apply requires that every promoted change exposes, at minimum:
 - intent/boundary summary for the promoted scope
 
 Canonical receipt field definitions and completeness requirements live in `autonomous-control-points.md`.
+These always-visible fields are the minimum progressive-disclosure surface for post-run audit and rollback decisions.
 
 ## Canonical References
 

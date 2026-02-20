@@ -18,9 +18,9 @@ Contract-first keeps teams and agents aligned on expected behavior and reduces i
 ## Stage vs Promote
 
 Stage-only exploratory work may use provisional contracts while iterating on shape and constraints.
-Before any durable promotion, contracts must be finalized, validated, and included in the promoted changeset.
+Before any durable promotion, contracts must be finalized, validated, and included in the promoted slice (receipt-linked unit).
 Promotion authority remains the ACP gate: see [Autonomous Control Points](./autonomous-control-points.md).
-Artifact timing semantics are defined in [Documentation is Code](./documentation-is-code.md).
+Artifact timing and promotable-slice semantics are defined in [Documentation is Code](./documentation-is-code.md#promotable-slice-definition).
 
 ## Why It Matters
 

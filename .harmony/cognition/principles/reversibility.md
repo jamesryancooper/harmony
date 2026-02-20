@@ -54,7 +54,7 @@ Reversibility under RA/ACP uses explicit phases:
 
 1. **Stage**: apply changes in reversible form (branch/overlay/canary/tombstone) that can be discarded safely.
 2. **Promote**: move staged changes to durable state only after ACP gate pass (policy + evidence + rollback validation + quorum where applicable).
-3. **Finalize**: irreversible cleanup (for example hard delete) remains blocked by default and is separate from routine promotion.
+3. **Finalize**: irreversible cleanup (for example hard delete) is ACP-4, blocked by default, and separate from routine promotion.
 
 For destructive-adjacent operations, use soft destruction with a declared recovery window before any finalize step.
 
@@ -66,6 +66,9 @@ Promotion and contraction authority is defined in
 This document defines design guidance for reversible primitives, rollback paths,
 and recovery windows. Human escalation occurs only when ACP policy triggers it
 (for example threshold breach, unresolved disagreement, or break-glass policy).
+Contraction/finalize actions require ACP contraction gate pass (policy +
+evidence + rollback validation + quorum where applicable), not standing manual
+sign-off.
 
 Routine autonomy scope is ACP-1 through ACP-3. ACP-4 operations are break-glass,
 blocked by default, explicitly audited, and out-of-band from normal autonomous runs.

@@ -12,6 +12,7 @@ status: Active
 ## What This Means
 
 User-facing flows must satisfy baseline accessibility expectations (semantic structure, keyboard operability, visible focus, and accessible names). CI should include automated checks and failures block promotion unless explicitly waived.
+Where policy requires quality evidence, accessibility evidence is an ACP promotion input for material user-facing side-effects.
 
 ## Why It Matters
 
@@ -82,7 +83,7 @@ Treating accessibility as “later cleanup” creates compounding remediation co
 ## Exceptions
 
 Temporary exceptions are allowed only for non-user-facing prototypes and must not ship to production.
-Any waiver must be policy-bound, time-boxed, and receipted; ad-hoc approvals are invalid.
+Any waiver must be policy-bound, time-boxed, reason-coded, and receipted; ad-hoc approvals are invalid.
 
 ## Related Documentation
 

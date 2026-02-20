@@ -8,7 +8,7 @@ status: Active
 # Documentation is Code
 
 > If code changes intent, behavior, contracts, or operations, docs change in
-> the same diff.
+> the same promotable slice.
 
 ## What This Means
 
@@ -17,8 +17,8 @@ They are versioned, reviewed, and traceable like source code.
 
 Harmony requires spec-first planning and decision capture for material changes.
 For material side-effects, required specs/ADRs/runbooks must exist in the same
-changeset before ACP promotion to durable state. Docs may be authored during the
-run, but cannot be missing at promote time.
+promotable slice before ACP promotion to durable state. Docs may be authored
+during the run, but cannot be missing at promote time for that promoted slice.
 
 ## Why It Matters
 
@@ -90,11 +90,22 @@ This document is the canonical source for documentation artifact timing:
 required governance artifacts must be complete before ACP promotion, not before
 any staged work begins.
 
+## Promotable Slice Definition
+
+A promotable slice is the receipt-linked unit evaluated at an ACP promote gate.
+For each promoted slice, required docs/spec/ADR/runbook artifacts must be
+present and linked to the same promoted scope.
+
+- Promotion authority and receipt semantics: [Autonomous Control Points](./autonomous-control-points.md)
+- Contract completeness for promoted slices: [Contract-first](./contract-first.md)
+- Slice-size thresholds and flow policy: [Small Diffs, Trunk-based](./small-diffs-trunk-based.md)
+
 ## Relationship to Other Principles
 
 - `Contract-first` ties docs to machine-verifiable interfaces.
 - `Single Source of Truth` keeps one canonical location per decision.
 - `Learn Continuously` uses postmortem artifacts as input.
+- `Small Diffs, Trunk-based` applies delivery thresholds per promotable slice.
 
 ## Anti-Pattern: Tribal Knowledge
 

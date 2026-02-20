@@ -44,11 +44,17 @@ Learning loops depend on measurable outcomes, not anecdotes.
 
 | Tier | Minimum Signals | Typical ACP Mapping |
 |---|---|---|
-| `minimal` | Structured event + core metric + representative `trace_id` | ACP-1 low-risk, reversible local loops |
-| `sampled` | Tiered spans/logs/metrics with trace correlation and sampling policy | ACP-1/ACP-2 stage runs constrained by budgets or circuit-breakers |
-| `full` | Complete spans, structured logs, key metrics, and rollback signals | ACP-2 promote by default; ACP-3 promote with additional safety signals |
+| `minimal` | Structured event + core metric + representative `trace_id` | ACP-1 promote (acceptable for low-risk reversible slices) |
+| `sampled` | Tiered spans/logs/metrics with trace correlation and sampling policy | ACP-1 promote and ACP-1/ACP-2 stage runs under budget/circuit constraints |
+| `full` | Complete spans, structured logs, key metrics, and rollback signals | ACP-2 promote default; ACP-3 promote required with additional recovery/breaker signals |
 
-Default mapping is policy-driven. ACP-2 promote defaults to `full`, and ACP-3 promote requires `full` plus additional recovery and breaker signals.
+Default mapping is policy-driven. ACP-1 promote may use `minimal` or `sampled`. ACP-2 promote defaults to `full`, and ACP-3 promote requires `full` plus additional recovery and breaker signals.
+
+Non-negotiable minimum signals (must never be dropped):
+- representative `trace_id`
+- decision identity (`run_id` + `operation_id` + ACP decision outcome)
+- receipt reference (`receipt_id` or equivalent)
+- rollback signal hook/event for promoted material side-effects
 
 If a non-default profile is used, the change receipt must include:
 - selected profile
