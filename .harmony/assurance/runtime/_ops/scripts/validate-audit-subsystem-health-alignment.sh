@@ -176,6 +176,8 @@ check_drift_alignment() {
     '^\.harmony/(START\.md|README\.md|harmony\.yml|catalog\.md)$'
     '^\.harmony/cognition/_meta/architecture/'
     '^\.harmony/cognition/governance/principles/'
+    '^\.harmony/cognition/runtime/migrations/'
+    '^\.harmony/cognition/practices/methodology/migrations/'
     '^\.harmony/[^/]+/_meta/architecture/'
     '^\.harmony/orchestration/runtime/workflows/audit/pre-release-audit/'
     '^\.harmony/assurance/practices/(complete\.md|session-exit\.md)$'

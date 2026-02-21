@@ -242,6 +242,7 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/capabilities/practices/README.md"
 
   require_file "$HARMONY_DIR/cognition/runtime/context/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/migrations/index.yml"
   require_file "$HARMONY_DIR/cognition/governance/principles/principles.md"
   require_file "$HARMONY_DIR/cognition/practices/methodology/README.md"
   require_file "$HARMONY_DIR/cognition/_ops/principles/scripts/lint-principles-governance.sh"
@@ -281,6 +282,7 @@ check_expected_internals() {
 
   require_dir "$HARMONY_DIR/cognition/runtime"
   require_dir "$HARMONY_DIR/cognition/runtime/context"
+  require_dir "$HARMONY_DIR/cognition/runtime/migrations"
   require_dir "$HARMONY_DIR/cognition/runtime/decisions"
   require_dir "$HARMONY_DIR/cognition/runtime/analyses"
   require_dir "$HARMONY_DIR/cognition/runtime/knowledge-plane"
@@ -329,8 +331,122 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/ideation/projects"
 
   require_dir "$HARMONY_DIR/output/reports"
+  require_dir "$HARMONY_DIR/output/reports/migrations"
   require_dir "$HARMONY_DIR/output/drafts"
   require_dir "$HARMONY_DIR/output/artifacts"
+}
+
+check_cognition_migration_record_surface() {
+  local policy_dir="$HARMONY_DIR/cognition/practices/methodology/migrations"
+  local runtime_dir="$HARMONY_DIR/cognition/runtime/migrations"
+
+  require_dir "$runtime_dir"
+  require_file "$runtime_dir/README.md"
+  require_file "$runtime_dir/index.yml"
+
+  local legacy_records
+  legacy_records="$(find "$policy_dir" -mindepth 1 -maxdepth 1 -type d -name '20*-*' | sort || true)"
+  if [[ -n "$legacy_records" ]]; then
+    fail "dated migration records must not exist under practices surface: ${policy_dir#$ROOT_DIR/}"
+  else
+    pass "dated migration records isolated to runtime surface"
+  fi
+}
+
+check_output_migration_evidence_surface() {
+  local reports_root="$HARMONY_DIR/output/reports"
+  local migration_reports_dir="$reports_root/migrations"
+  local legacy_migration_evidence
+  local flat_migration_evidence
+  local bundle_dirs
+  local required_files
+  local bundle required rel bundle_name
+
+  required_files=(bundle.yml evidence.md commands.md validation.md inventory.md)
+
+  require_dir "$migration_reports_dir"
+  require_file "$migration_reports_dir/README.md"
+
+  mapfile -t legacy_migration_evidence < <(
+    find "$reports_root" -mindepth 1 -maxdepth 1 -type f | sort |
+      grep -E '/[0-9]{4}-[0-9]{2}-[0-9]{2}-.*(migration|clean-break).*evidence\.md$' || true
+  )
+
+  if [[ ${#legacy_migration_evidence[@]} -gt 0 ]]; then
+    fail "migration evidence reports must live under output/reports/migrations/"
+  else
+    pass "migration evidence reports isolated to output/reports/migrations/"
+  fi
+
+  mapfile -t flat_migration_evidence < <(
+    find "$migration_reports_dir" -mindepth 1 -maxdepth 1 -type f | sort |
+      grep -E '/[0-9]{4}-[0-9]{2}-[0-9]{2}-.*evidence\.md$' || true
+  )
+  if [[ ${#flat_migration_evidence[@]} -gt 0 ]]; then
+    fail "flat migration evidence files are forbidden; use bundle directories under output/reports/migrations/"
+  else
+    pass "no flat migration evidence files under output/reports/migrations/"
+  fi
+
+  mapfile -t bundle_dirs < <(
+    find "$migration_reports_dir" -mindepth 1 -maxdepth 1 -type d -name '20*-*' | sort
+  )
+  if [[ ${#bundle_dirs[@]} -eq 0 ]]; then
+    warn "no migration evidence bundle directories found under output/reports/migrations/"
+    return
+  fi
+  pass "found ${#bundle_dirs[@]} migration evidence bundle directories"
+
+  for bundle in "${bundle_dirs[@]}"; do
+    rel="${bundle#$ROOT_DIR/}"
+    bundle_name="$(basename "$bundle")"
+
+    for required in "${required_files[@]}"; do
+      if [[ ! -f "$bundle/$required" ]]; then
+        fail "migration evidence bundle missing required file (${required}): $rel"
+      else
+        pass "migration evidence bundle file present (${required}): $rel"
+      fi
+    done
+
+    if [[ -f "$bundle/bundle.yml" ]]; then
+      if grep -Eq '^kind:[[:space:]]*"?migration-evidence-bundle"?$' "$bundle/bundle.yml"; then
+        pass "bundle metadata kind valid: $rel/bundle.yml"
+      else
+        fail "bundle metadata missing/invalid kind (migration-evidence-bundle): $rel/bundle.yml"
+      fi
+
+      if grep -Eq "^id:[[:space:]]*\"?${bundle_name}\"?$" "$bundle/bundle.yml"; then
+        pass "bundle metadata id matches directory: $rel/bundle.yml"
+      else
+        fail "bundle metadata id must match directory name (${bundle_name}): $rel/bundle.yml"
+      fi
+
+      if grep -Eq '^evidence:[[:space:]]*"?evidence\.md"?$' "$bundle/bundle.yml"; then
+        pass "bundle metadata evidence pointer valid: $rel/bundle.yml"
+      else
+        fail "bundle metadata evidence pointer must be evidence.md: $rel/bundle.yml"
+      fi
+
+      if grep -Eq '^commands:[[:space:]]*"?commands\.md"?$' "$bundle/bundle.yml"; then
+        pass "bundle metadata commands pointer valid: $rel/bundle.yml"
+      else
+        fail "bundle metadata commands pointer must be commands.md: $rel/bundle.yml"
+      fi
+
+      if grep -Eq '^validation:[[:space:]]*"?validation\.md"?$' "$bundle/bundle.yml"; then
+        pass "bundle metadata validation pointer valid: $rel/bundle.yml"
+      else
+        fail "bundle metadata validation pointer must be validation.md: $rel/bundle.yml"
+      fi
+
+      if grep -Eq '^inventory:[[:space:]]*"?inventory\.md"?$' "$bundle/bundle.yml"; then
+        pass "bundle metadata inventory pointer valid: $rel/bundle.yml"
+      else
+        fail "bundle metadata inventory pointer must be inventory.md: $rel/bundle.yml"
+      fi
+    fi
+  done
 }
 
 check_profile_shape_bounded_surfaces() {
@@ -620,6 +736,8 @@ main() {
   check_domain_profile_registry
   check_discovery_contracts
   check_expected_internals
+  check_cognition_migration_record_surface
+  check_output_migration_evidence_surface
   check_domain_profile_shapes
   check_deprecated_agency_paths
   check_deprecated_engine_paths

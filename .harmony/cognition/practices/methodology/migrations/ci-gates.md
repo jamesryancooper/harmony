@@ -20,6 +20,16 @@ Prevent reintroduction of legacy systems after clean-break migrations.
    - CI must fail if schemas or manifests accept legacy keys or legacy enum variants.
 4. No dual-mode logic
    - CI should detect old or new branching patterns through targeted checks.
+5. Migration record surface split
+   - CI must fail if dated migration records appear under:
+     - `/.harmony/cognition/practices/methodology/migrations/`
+   - CI must require runtime migration discovery index at:
+     - `/.harmony/cognition/runtime/migrations/index.yml`
+6. Migration evidence bundle contract
+   - CI must fail if flat migration evidence files appear at:
+     - `/.harmony/output/reports/migrations/*.md` (date-prefixed evidence file form)
+   - CI must fail if any migration evidence bundle directory is missing required files:
+     - `bundle.yml`, `evidence.md`, `commands.md`, `validation.md`, `inventory.md`
 
 ## Implementation Options (Non-Prescriptive)
 
@@ -34,3 +44,6 @@ Maintain the SSOT banlist at:
 
 - `/.harmony/cognition/practices/methodology/migrations/legacy-banlist.md`
 
+Maintain the canonical runtime migration index at:
+
+- `/.harmony/cognition/runtime/migrations/index.yml`

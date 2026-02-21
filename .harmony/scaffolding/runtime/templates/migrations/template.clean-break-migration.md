@@ -5,7 +5,7 @@ description: Template for planning and verifying clean-break migrations with exp
 
 # Clean-Break Migration Plan (Template)
 
-Copy this into `migrations/<YYYY-MM-DD>-<slug>/plan.md`.
+Copy this into `/.harmony/cognition/runtime/migrations/<YYYY-MM-DD>-<slug>/plan.md`.
 
 ## 1) Summary
 
@@ -82,7 +82,16 @@ Define where the new authority lives and what the new interfaces or contracts ar
 - [ ] CI gates pass
 - [ ] Plan links to evidence (logs, test output, receipts)
 
+Required evidence bundle location:
+
+- `/.harmony/output/reports/migrations/<YYYY-MM-DD>-<slug>/`
+- bundle files:
+  - `bundle.yml`
+  - `evidence.md`
+  - `commands.md`
+  - `validation.md`
+  - `inventory.md`
+
 ## 9) Rollback
 
 Clean-break rollback strategy (for example, revert commits or re-tag). No partial rollback modes.
-

@@ -13,5 +13,9 @@ contract as other subsystems.
 
 - Generated content belongs under `output/` subdirectories (`artifacts/`,
   `drafts/`, `plans/`, `reports/`).
+- Migration evidence bundles belong under
+  `output/reports/migrations/<YYYY-MM-DD>-<slug>/` and include
+  `bundle.yml`, `evidence.md`, `commands.md`, `validation.md`, and
+  `inventory.md`.
 - Architecture metadata for this subsystem lives under
   `output/_meta/architecture/`.

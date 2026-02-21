@@ -8,3 +8,4 @@ Authoritative cognition artifacts that agents and humans consume during work.
 - `decisions/` - append-only ADR records.
 - `analyses/` - in-depth analytical outputs.
 - `knowledge-plane/` - runtime knowledge-plane contracts and guides.
+- `migrations/` - canonical migration plan records and discovery index.

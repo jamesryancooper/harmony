@@ -1,11 +1,11 @@
 ---
 title: Clean-Break Migrations
-description: SSOT hub for clean-break migration doctrine, invariants, exceptions, CI gates, and banlist governance.
+description: SSOT policy hub for clean-break migration doctrine, invariants, exceptions, CI gates, and banlist governance.
 ---
 
 # Clean-Break Migrations
 
-This directory defines how migrations are designed, executed, and verified in this repository.
+This directory defines migration policy and governance for how clean-break migrations are designed, executed, and verified in this repository.
 
 ## Purpose
 
@@ -29,8 +29,17 @@ All migrations are CLEAN-BREAK unless an exception is approved under `exceptions
 
 Every migration must include:
 
-- A plan based on `/.harmony/scaffolding/runtime/templates/migrations/template.clean-break-migration.md`
-- Verification evidence (tests, logs, receipts) linked from the plan
+- A runtime migration plan record at:
+  - `/.harmony/cognition/runtime/migrations/<YYYY-MM-DD>-<slug>/plan.md`
+  - based on `/.harmony/scaffolding/runtime/templates/migrations/template.clean-break-migration.md`
+- Verification evidence (tests, logs, receipts) linked from the plan, stored under:
+  - `/.harmony/output/reports/migrations/<YYYY-MM-DD>-<slug>/`
+  - required bundle files:
+    - `bundle.yml`
+    - `evidence.md`
+    - `commands.md`
+    - `validation.md`
+    - `inventory.md`
 - Banlist updates in `legacy-banlist.md` when legacy identifiers, paths, or keys are removed
 
 ## Companion Documents
@@ -41,15 +50,9 @@ Every migration must include:
 - `ci-gates.md`
 - `legacy-banlist.md`
 
-## Active Migration Records
+## Runtime Migration Records
 
-- `2026-02-20-agency-bounded-surfaces/plan.md`
-- `2026-02-20-orchestration-bounded-surfaces/plan.md`
-- `2026-02-20-capabilities-bounded-surfaces/plan.md`
-- `2026-02-20-assurance-bounded-surfaces/plan.md`
-- `2026-02-20-scaffolding-bounded-surfaces/plan.md`
-- `2026-02-20-engine-bounded-surfaces/plan.md`
-- `2026-02-20-cognition-bounded-surfaces/plan.md`
-- `2026-02-21-agency-actors-to-runtime/plan.md`
-- `2026-02-21-quality-gate-domain-split/plan.md`
-- `2026-02-21-documentation-audit-clean-break-rename/plan.md`
+Canonical migration records and discovery index now live at:
+
+- `/.harmony/cognition/runtime/migrations/README.md`
+- `/.harmony/cognition/runtime/migrations/index.yml`

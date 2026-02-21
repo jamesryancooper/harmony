@@ -1,0 +1,7 @@
+schema_version: "1.0"
+id: "2026-02-21-documentation-audit-clean-break-rename"
+kind: "migration-evidence-bundle"
+evidence: "evidence.md"
+commands: "commands.md"
+validation: "validation.md"
+inventory: "inventory.md"

@@ -128,3 +128,19 @@ Move here when a decision is replaced. Include reference to replacement.
 | ID | Decision | Choice | Constraint | Date |
 |----|----------|--------|------------|------|
 | D052 | Documentation workflow canonical rename | Replace `documentation-quality-gate` with `documentation-audit` as the only workflow id/command/path for docs release checks | Active docs/contracts/validators must route through `documentation-audit`; legacy `documentation-quality-gate` identifier/path is deprecated and blocked by validation guardrails | 2026-02-21 |
+
+### 2026-02-21 (continued III)
+
+- [ADR-031](../decisions/031-cognition-runtime-migrations-surface-split.md) — Cognition runtime migrations surface split (D053)
+
+| ID | Decision | Choice | Constraint | Date |
+|----|----------|--------|------------|------|
+| D053 | Cognition migration record surface split | Keep migration doctrine in `cognition/practices/methodology/migrations/`, move dated migration records to `cognition/runtime/migrations/`, and centralize migration evidence reports in `output/reports/migrations/` | Active docs/contracts/validators must resolve migration records through `cognition/runtime/migrations/*` and block dated migration records under the practices migration policy surface | 2026-02-21 |
+
+### 2026-02-21 (continued IV)
+
+- [ADR-032](../decisions/032-migration-evidence-bundle-format.md) — Migration evidence bundle format (D054)
+
+| ID | Decision | Choice | Constraint | Date |
+|----|----------|--------|------------|------|
+| D054 | Migration evidence bundle canonical format | Replace flat migration evidence files with bundle directories containing `bundle.yml`, `evidence.md`, `commands.md`, `validation.md`, and `inventory.md` under `output/reports/migrations/<YYYY-MM-DD>-<slug>/` | Active docs/contracts/validators must enforce bundle directories and required bundle files; flat `*-evidence.md` forms in `output/reports/migrations/` are deprecated and blocked by validation guardrails | 2026-02-21 |

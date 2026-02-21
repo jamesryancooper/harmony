@@ -61,6 +61,8 @@ Each entry should be specific enough to avoid false positives.
 - `path: quality-gate/` - deprecated quality-gate runtime path prefix - removed by migration `2026-02-21-quality-gate-domain-split`
 - `documentation-quality-gate` - deprecated workflow identifier and command token - removed by migration `2026-02-21-documentation-audit-clean-break-rename`
 - `orchestration/runtime/workflows/audit/documentation-quality-gate/` - deprecated docs workflow runtime path - removed by migration `2026-02-21-documentation-audit-clean-break-rename`
+- `cognition/practices/methodology/migrations/20` - deprecated migration record prefix under practices surface - removed by migration `2026-02-21-cognition-runtime-migrations-surface-split`
+- `output/reports/migrations/*-evidence.md` - deprecated flat migration evidence filename pattern - removed by migration `2026-02-21-migration-evidence-bundle-format`
 
 ## Banned Paths
 
@@ -123,7 +125,9 @@ Each entry should be specific enough to avoid false positives.
 - `/.harmony/capabilities/runtime/skills/quality-gate/` - replaced by focused runtime domains `/.harmony/capabilities/runtime/skills/audit/`, `/.harmony/capabilities/runtime/skills/remediation/`, and `/.harmony/capabilities/runtime/skills/refactor/` - removed by migration `2026-02-21-quality-gate-domain-split`
 - `/.harmony/orchestration/runtime/workflows/quality-gate/` - replaced by focused runtime domains `/.harmony/orchestration/runtime/workflows/audit/` and `/.harmony/orchestration/runtime/workflows/refactor/` - removed by migration `2026-02-21-quality-gate-domain-split`
 - `/.harmony/orchestration/runtime/workflows/audit/documentation-quality-gate/` - replaced by `/.harmony/orchestration/runtime/workflows/audit/documentation-audit/` - removed by migration `2026-02-21-documentation-audit-clean-break-rename`
+- `/.harmony/cognition/practices/methodology/migrations/20` - replaced by `/.harmony/cognition/runtime/migrations/20` for dated migration records - removed by migration `2026-02-21-cognition-runtime-migrations-surface-split`
+- `/.harmony/output/reports/migrations/<YYYY-MM-DD>-<slug>-evidence.md` - replaced by migration evidence bundle directories `/.harmony/output/reports/migrations/<YYYY-MM-DD>-<slug>/` - removed by migration `2026-02-21-migration-evidence-bundle-format`
 
 ## Banned Config Keys or Env Vars
 
-- `(none currently)` - no legacy config or env keys removed in migrations `2026-02-20-agency-bounded-surfaces`, `2026-02-21-agency-actors-to-runtime`, `2026-02-20-orchestration-bounded-surfaces`, `2026-02-20-capabilities-bounded-surfaces`, `2026-02-20-assurance-bounded-surfaces`, `2026-02-20-scaffolding-bounded-surfaces`, `2026-02-20-engine-bounded-surfaces`, `2026-02-20-cognition-bounded-surfaces`, `2026-02-21-quality-gate-domain-split`, or `2026-02-21-documentation-audit-clean-break-rename`
+- `(none currently)` - no legacy config or env keys removed in migrations `2026-02-20-agency-bounded-surfaces`, `2026-02-21-agency-actors-to-runtime`, `2026-02-20-orchestration-bounded-surfaces`, `2026-02-20-capabilities-bounded-surfaces`, `2026-02-20-assurance-bounded-surfaces`, `2026-02-20-scaffolding-bounded-surfaces`, `2026-02-20-engine-bounded-surfaces`, `2026-02-20-cognition-bounded-surfaces`, `2026-02-21-quality-gate-domain-split`, `2026-02-21-documentation-audit-clean-break-rename`, `2026-02-21-cognition-runtime-migrations-surface-split`, or `2026-02-21-migration-evidence-bundle-format`

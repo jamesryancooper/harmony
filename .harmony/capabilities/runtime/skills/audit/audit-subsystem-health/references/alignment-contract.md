@@ -30,6 +30,8 @@ Changes in any of the following paths must trigger an alignment check:
 - `.harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh`
 - `.harmony/assurance/practices/complete.md`
 - `.harmony/assurance/practices/session-exit.md`
+- `.harmony/cognition/runtime/migrations/`
+- `.harmony/cognition/practices/methodology/migrations/`
 
 ## Required Skill Artifacts
 

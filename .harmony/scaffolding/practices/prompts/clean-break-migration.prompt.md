@@ -20,10 +20,10 @@ Required actions:
 - Ensure the resulting system has exactly one authoritative implementation and one execution path.
 - Update contracts and docs so only the new model exists.
 - Update CI to fail if legacy identifiers/paths/keys reappear.
-- Produce a migration plan using `/.harmony/scaffolding/runtime/templates/migrations/template.clean-break-migration.md` and link verification evidence.
+- Produce a migration plan using `/.harmony/scaffolding/runtime/templates/migrations/template.clean-break-migration.md` at `/.harmony/cognition/runtime/migrations/<YYYY-MM-DD>-<slug>/plan.md` and link verification evidence.
+- Store migration evidence in bundle form at `/.harmony/output/reports/migrations/<YYYY-MM-DD>-<slug>/` with `bundle.yml`, `evidence.md`, `commands.md`, `validation.md`, and `inventory.md`.
 
 If preserving behavior is desired, reimplement it explicitly under the new system. Do not bridge.
 
 If you believe a clean-break is infeasible, produce an exception request with a hard removal deadline per `/.harmony/cognition/practices/methodology/migrations/exceptions.md`.
 ```
-
