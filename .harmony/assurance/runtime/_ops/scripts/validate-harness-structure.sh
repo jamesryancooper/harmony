@@ -87,6 +87,97 @@ check_index_path_contract() {
   fi
 }
 
+extract_sidecar_scalar() {
+  local index_file="$1"
+  local key="$2"
+  awk -v key="$key" '
+    $0 ~ "^[[:space:]]*" key ":[[:space:]]*" {
+      line=$0
+      sub("^[[:space:]]*" key ":[[:space:]]*", "", line)
+      sub(/[[:space:]]+#.*/, "", line)
+      gsub(/^"/, "", line)
+      gsub(/"$/, "", line)
+      print line
+      exit
+    }
+  ' "$index_file"
+}
+
+extract_sidecar_headings() {
+  local index_file="$1"
+  awk '
+    /^[[:space:]]+heading:[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]+heading:[[:space:]]*/, "", line)
+      sub(/[[:space:]]+#.*/, "", line)
+      gsub(/^"/, "", line)
+      gsub(/"$/, "", line)
+      if (length(line) > 0) print line
+    }
+  ' "$index_file"
+}
+
+markdown_has_heading() {
+  local markdown_file="$1"
+  local heading="$2"
+  awk -v heading="$heading" '
+    /^#+[[:space:]]+/ {
+      line=$0
+      sub(/^#+[[:space:]]+/, "", line)
+      if (line == heading) {
+        found=1
+        exit
+      }
+    }
+    END { exit(found ? 0 : 1) }
+  ' "$markdown_file"
+}
+
+check_section_sidecar_contract() {
+  local index_file="$1"
+  local base_dir="$2"
+  local label="$3"
+  local source_rel source_file heading_count heading
+
+  require_file "$index_file"
+  if [[ ! -f "$index_file" ]]; then
+    return
+  fi
+
+  source_rel="$(extract_sidecar_scalar "$index_file" "source")"
+  if [[ -z "$source_rel" ]]; then
+    fail "$label sidecar index missing source field: ${index_file#$ROOT_DIR/}"
+    return
+  fi
+
+  if [[ "$source_rel" == /* ]]; then
+    fail "$label sidecar source must be relative: ${index_file#$ROOT_DIR/} -> $source_rel"
+    return
+  fi
+
+  source_file="$base_dir/$source_rel"
+  if [[ ! -f "$source_file" ]]; then
+    fail "$label sidecar source file missing: ${index_file#$ROOT_DIR/} -> $source_rel"
+    return
+  fi
+  pass "$label sidecar source exists: ${index_file#$ROOT_DIR/} -> $source_rel"
+
+  heading_count=0
+  while IFS= read -r heading; do
+    [[ -z "$heading" ]] && continue
+    heading_count=$((heading_count + 1))
+    if markdown_has_heading "$source_file" "$heading"; then
+      pass "$label sidecar heading resolved: ${index_file#$ROOT_DIR/} -> $heading"
+    else
+      fail "$label sidecar heading missing in source: ${index_file#$ROOT_DIR/} -> $heading"
+    fi
+  done < <(extract_sidecar_headings "$index_file")
+
+  if [[ $heading_count -eq 0 ]]; then
+    warn "$label sidecar index has no heading entries: ${index_file#$ROOT_DIR/}"
+  fi
+}
+
 extract_domain_profile() {
   local domain="$1"
   awk -v domain="$domain" '
@@ -292,9 +383,11 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/cognition/governance/index.yml"
   require_file "$HARMONY_DIR/cognition/practices/index.yml"
   require_file "$HARMONY_DIR/cognition/practices/methodology/index.yml"
-  require_file "$HARMONY_DIR/cognition/practices/methodology/sections/index.yml"
+  require_file "$HARMONY_DIR/cognition/practices/methodology/README.index.yml"
+  require_file "$HARMONY_DIR/cognition/practices/methodology/implementation-guide.index.yml"
   require_file "$HARMONY_DIR/cognition/_meta/architecture/index.yml"
-  require_file "$HARMONY_DIR/cognition/_meta/architecture/sections/index.yml"
+  require_file "$HARMONY_DIR/cognition/_meta/architecture/README.index.yml"
+  require_file "$HARMONY_DIR/cognition/_meta/architecture/resources.index.yml"
   require_file "$HARMONY_DIR/cognition/governance/principles/principles.md"
   require_file "$HARMONY_DIR/cognition/practices/methodology/README.md"
   require_file "$HARMONY_DIR/cognition/_ops/principles/scripts/lint-principles-governance.sh"
@@ -732,20 +825,30 @@ check_cognition_discovery_indexes() {
     "$HARMONY_DIR/cognition/practices/methodology" \
     "cognition methodology"
 
-  check_index_path_contract \
-    "$HARMONY_DIR/cognition/practices/methodology/sections/index.yml" \
-    "$HARMONY_DIR/cognition/practices/methodology/sections" \
-    "cognition methodology sections"
+  check_section_sidecar_contract \
+    "$HARMONY_DIR/cognition/practices/methodology/README.index.yml" \
+    "$HARMONY_DIR/cognition/practices/methodology" \
+    "cognition methodology readme"
+
+  check_section_sidecar_contract \
+    "$HARMONY_DIR/cognition/practices/methodology/implementation-guide.index.yml" \
+    "$HARMONY_DIR/cognition/practices/methodology" \
+    "cognition methodology implementation guide"
 
   check_index_path_contract \
     "$HARMONY_DIR/cognition/_meta/architecture/index.yml" \
     "$HARMONY_DIR/cognition/_meta/architecture" \
     "cognition architecture"
 
-  check_index_path_contract \
-    "$HARMONY_DIR/cognition/_meta/architecture/sections/index.yml" \
-    "$HARMONY_DIR/cognition/_meta/architecture/sections" \
-    "cognition architecture sections"
+  check_section_sidecar_contract \
+    "$HARMONY_DIR/cognition/_meta/architecture/README.index.yml" \
+    "$HARMONY_DIR/cognition/_meta/architecture" \
+    "cognition architecture readme"
+
+  check_section_sidecar_contract \
+    "$HARMONY_DIR/cognition/_meta/architecture/resources.index.yml" \
+    "$HARMONY_DIR/cognition/_meta/architecture" \
+    "cognition architecture resources"
 }
 
 check_cognition_migration_index_cross_references() {
@@ -1081,6 +1184,24 @@ check_deprecated_cognition_paths() {
   done
 }
 
+check_deprecated_cognition_discovery_section_paths() {
+  local deprecated
+  deprecated=(
+    "$HARMONY_DIR/cognition/practices/methodology/sections"
+    "$HARMONY_DIR/cognition/_meta/architecture/sections"
+  )
+
+  local path rel
+  for path in "${deprecated[@]}"; do
+    rel="${path#$ROOT_DIR/}"
+    if [[ -e "$path" ]]; then
+      fail "deprecated cognition section-discovery path exists: $rel"
+    else
+      pass "deprecated cognition section-discovery path removed: $rel"
+    fi
+  done
+}
+
 check_alignment_guardrail() {
   local script="$SCRIPT_DIR/validate-audit-subsystem-health-alignment.sh"
   if [[ ! -f "$script" ]]; then
@@ -1119,6 +1240,7 @@ main() {
   check_deprecated_agency_paths
   check_deprecated_engine_paths
   check_deprecated_cognition_paths
+  check_deprecated_cognition_discovery_section_paths
   check_deprecated_orchestration_paths
   check_deprecated_capabilities_paths
   check_deprecated_assurance_paths

@@ -162,3 +162,11 @@ Move here when a decision is replaced. Include reference to replacement.
 |----|----------|--------|------------|------|
 | D056 | ADR numeric identity normalization | Renumber planning-services native-first ADR from `013` to `034` so each ADR numeric prefix is unique in runtime decisions | Decision indexes, ADR filenames, and validators must enforce unique numeric ADR identity and id/path numeric alignment | 2026-02-21 |
 | D057 | Cognition discovery and governance hardening | Adopt machine-readable governance/practices indexes, section-level heavy-doc indexes, stronger cognition drift watchers, and operational scorecard contract | Cognition discovery must resolve via indexes (`governance/index.yml`, `practices/index.yml`, methodology/architecture section indexes); validators fail closed on index/path/decision-identity drift | 2026-02-21 |
+
+### 2026-02-21 (continued VII)
+
+- [ADR-036](../decisions/036-cognition-sidecar-section-index-architecture.md) — Cognition sidecar section index architecture (D058)
+
+| ID | Decision | Choice | Constraint | Date |
+|----|----------|--------|------------|------|
+| D058 | Sidecar section index architecture | Replace cognition `sections/` surrogate docs with sidecar `*.index.yml` files colocated with canonical docs | Discovery contracts must resolve heavy-doc targeting through sidecar indexes (`README.index.yml`, `implementation-guide.index.yml`, `resources.index.yml`); legacy `sections/` paths are deprecated and blocked by harness validation | 2026-02-21 |

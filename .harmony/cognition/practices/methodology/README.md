@@ -10,7 +10,8 @@ Harmony is an AI-native, human-governed development methodology for solo builder
 ## Machine Discovery
 
 - `index.yml` - canonical methodology discovery index.
-- `sections/index.yml` - targeted section index for token-efficient partial reads.
+- `README.index.yml` - sidecar section index for methodology overview headings.
+- `implementation-guide.index.yml` - sidecar section index for implementation guide headings.
 
 Harmony empowers solo developers across experience levels to ship high-quality software with speed, safety, and confidence. It combines spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered ACP governance within a principled, progressively adoptable framework.
 

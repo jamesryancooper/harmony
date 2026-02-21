@@ -67,3 +67,8 @@ records:
     path: 2026-02-21-cognition-discovery-and-governance-hardening/plan.md
     adr: ../decisions/035-cognition-discovery-and-governance-hardening.md
     evidence: ../../../output/reports/migrations/2026-02-21-cognition-discovery-and-governance-hardening/evidence.md
+
+  - id: 2026-02-21-cognition-sidecar-section-indexes
+    path: 2026-02-21-cognition-sidecar-section-indexes/plan.md
+    adr: ../decisions/036-cognition-sidecar-section-index-architecture.md
+    evidence: ../../../output/reports/migrations/2026-02-21-cognition-sidecar-section-indexes/evidence.md

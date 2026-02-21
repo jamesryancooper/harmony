@@ -24,8 +24,10 @@ Changes in any of the following paths must trigger an alignment check:
 - `.harmony/harmony.yml`
 - `.harmony/catalog.md`
 - `.harmony/cognition/_meta/architecture/`
+- `.harmony/cognition/_meta/architecture/*.index.yml`
 - `.harmony/cognition/governance/`
 - `.harmony/cognition/practices/`
+- `.harmony/cognition/practices/methodology/*.index.yml`
 - `.harmony/cognition/runtime/context/`
 - `.harmony/*/_meta/architecture/`
 - `.harmony/orchestration/runtime/workflows/audit/pre-release-audit/`

@@ -73,3 +73,5 @@ records:
     path: 034-planning-services-native-first-no-python.md
   - id: 035-cognition-discovery-and-governance-hardening
     path: 035-cognition-discovery-and-governance-hardening.md
+  - id: 036-cognition-sidecar-section-index-architecture
+    path: 036-cognition-sidecar-section-index-architecture.md

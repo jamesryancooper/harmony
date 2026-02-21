@@ -1,0 +1,30 @@
+# Methodology Implementation Guide Section Index
+# Sidecar index for targeted discovery into implementation guide content.
+
+schema_version: "1.0"
+source: implementation-guide.md
+sections:
+  - id: executive-summary
+    heading: "1) Executive Summary"
+    summary: Implementation scope, outcomes, and migration intent.
+    when: Start here for rollout framing.
+
+  - id: lifecycle-matrix
+    heading: "3) Lifecycle matrix (A→J): responsibilities, artifacts, commands, gates"
+    summary: Detailed lifecycle responsibilities and controls.
+    when: When implementing end-to-end execution flow.
+
+  - id: command-cookbook
+    heading: "6) Command cookbook (copy‑paste)"
+    summary: Canonical operational command set.
+    when: During execution and operations handoff.
+
+  - id: operating-rules
+    heading: "7) Operating Rules (one page)"
+    summary: Always-on operating constraints.
+    when: When validating behavioral and governance conformity.
+
+  - id: stop-the-line-triggers
+    heading: "Stop‑the‑line triggers (enforced)"
+    summary: Immediate halt conditions and escalation controls.
+    when: For incident and high-risk execution policy.

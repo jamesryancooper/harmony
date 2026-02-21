@@ -8,7 +8,9 @@ description: Canonical reference for the domain-organized agent harness pattern.
 ## Machine Discovery
 
 - `index.yml` - canonical architecture discovery index for this surface.
-- `sections/index.yml` - targeted section index for token-efficient partial reads.
+- `discovery-index-model.md` - finalized cognition discovery architecture (canonical + sidecar + index contract).
+- `README.index.yml` - sidecar section index for this document's headings.
+- `resources.index.yml` - sidecar section index for architecture resource headings.
 
 ## Terminology
 
@@ -56,6 +58,7 @@ Use subsystem specs for expanded contract details:
 Cross-subsystem structure contract:
 
 - `/.harmony/cognition/_meta/architecture/bounded-surfaces-contract.md`
+- `/.harmony/cognition/_meta/architecture/discovery-index-model.md`
 
 ## Agency Subsystem Docs
 

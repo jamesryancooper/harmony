@@ -28,7 +28,17 @@ files:
     summary: Curated architecture reference corpus.
     when: When researching external patterns and design references.
 
-  - id: architecture-sections-index
-    path: sections/index.yml
-    summary: Targeted section map for heavyweight architecture docs.
-    when: For partial reads and token-efficient architecture lookup.
+  - id: cognition-discovery-index-model
+    path: discovery-index-model.md
+    summary: Finalized cognition discovery architecture and sidecar index contract.
+    when: When changing documentation discovery structure or index conventions.
+
+  - id: architecture-readme-sections
+    path: README.index.yml
+    summary: Sidecar section index for architecture README content.
+    when: For targeted discovery within architecture overview content.
+
+  - id: architecture-resources-sections
+    path: resources.index.yml
+    summary: Sidecar section index for architecture resources content.
+    when: For targeted discovery within architecture resource corpus.

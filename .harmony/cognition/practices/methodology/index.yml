@@ -28,7 +28,12 @@ files:
     summary: Clean-break migration doctrine and policy references.
     when: Before planning or executing migration work.
 
-  - id: methodology-sections-index
-    path: sections/index.yml
-    summary: Targeted section map for heavyweight methodology docs.
-    when: For partial reads and token-efficient retrieval.
+  - id: methodology-readme-sections
+    path: README.index.yml
+    summary: Sidecar section index for methodology overview content.
+    when: For targeted discovery within methodology README.
+
+  - id: methodology-implementation-guide-sections
+    path: implementation-guide.index.yml
+    summary: Sidecar section index for implementation guide content.
+    when: For targeted discovery within implementation-guide content.

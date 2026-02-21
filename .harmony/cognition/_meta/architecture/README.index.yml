@@ -1,0 +1,30 @@
+# Architecture README Section Index
+# Sidecar index for targeted discovery into architecture overview content.
+
+schema_version: "1.0"
+source: README.md
+sections:
+  - id: machine-discovery
+    heading: "Machine Discovery"
+    summary: Discovery contracts and architecture index entrypoints.
+    when: First read before opening architecture docs.
+
+  - id: canonical-specification
+    heading: "Canonical Specification"
+    summary: Primary architecture contract surfaces.
+    when: Before making structural contract changes.
+
+  - id: single-root-architecture
+    heading: "Single-Root Architecture"
+    summary: Root harness shape and portability boundary.
+    when: When changing top-level harness structure.
+
+  - id: interaction-model
+    heading: "Interaction Model"
+    summary: Discovery proportionality and index usage model.
+    when: When adjusting agent traversal behavior.
+
+  - id: design-rationale
+    heading: "Design Rationale"
+    summary: Why key structural decisions exist.
+    when: When evaluating alternatives or exceptions.
