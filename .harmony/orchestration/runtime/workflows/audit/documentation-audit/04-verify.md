@@ -9,7 +9,7 @@ description: Validate workflow executed successfully.
 ## Verification Checklist
 
 - [ ] Documentation standards audit report exists
-- [ ] Documentation quality gate report exists
+- [ ] Documentation audit report exists
 - [ ] Recommendation is present and justified
 - [ ] Severity summary is present
 - [ ] Coverage proof is present

@@ -190,9 +190,9 @@ workflows:
           determinism: unique
           description: "Individual freshness and supersession audit report (produced by audit-freshness-and-supersession, if enabled)"
 
-  documentation-quality-gate:
-    version: "1.0.0"
-    commands: ["/documentation-quality-gate"]
+  documentation-audit:
+    version: "2.0.0"
+    commands: ["/documentation-audit"]
     parameters:
       - name: docs_root
         type: folder
@@ -220,12 +220,12 @@ workflows:
     io:
       inputs: []
       outputs:
-        - name: docs_quality_gate_report
-          path: "../../output/reports/{{date}}-documentation-quality-gate.md"
+        - name: docs_audit_report
+          path: "../../output/reports/{{date}}-documentation-audit.md"
           kind: file
           format: markdown
           determinism: unique
-          description: "Consolidated docs quality gate report with go/no-go recommendation"
+          description: "Consolidated documentation audit report with release recommendation"
         - name: docs_standards_audit_report
           path: "../../output/reports/{{date}}-documentation-standards-audit.md"
           kind: file

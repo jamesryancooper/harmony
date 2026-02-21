@@ -24,11 +24,11 @@ Use this team for non-trivial changes that require architecture, implementation,
 ## Workflow Alignment
 
 - **Default workflow:** none
-- **Optional workflows:** `pre-release-audit`, `documentation-quality-gate`,
+- **Optional workflows:** `pre-release-audit`, `documentation-audit`,
   `orchestrate-audit`
 - **Routing guidance:**
   - Use `pre-release-audit` before risky promotions.
-  - Use `documentation-quality-gate` when docs-as-code artifacts are in scope.
+  - Use `documentation-audit` when docs-as-code artifacts are in scope.
   - Use `orchestrate-audit` for partitioned migration audits.
 
 ## Composite Skill Alignment

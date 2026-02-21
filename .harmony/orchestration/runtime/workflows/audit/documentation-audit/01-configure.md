@@ -1,10 +1,10 @@
 ---
 name: configure
-title: "Configure Documentation Quality Gate"
+title: "Configure Documentation Audit"
 description: "Parse parameters and validate canonical paths before execution."
 ---
 
-# Step 1: Configure Documentation Quality Gate
+# Step 1: Configure Documentation Audit
 
 ## Input
 

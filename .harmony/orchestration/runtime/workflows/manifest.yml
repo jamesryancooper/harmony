@@ -158,16 +158,16 @@ workflows:
       - "release readiness check"
       - "full audit before release"
 
-  - id: documentation-quality-gate
-    display_name: Documentation Quality Gate
+  - id: documentation-audit
+    display_name: Documentation Audit
     group: audit
     domain: audit
-    path: audit/documentation-quality-gate/
-    summary: Run docs-as-code standards enforcement and emit a release gate recommendation.
+    path: audit/documentation-audit/
+    summary: Run docs-as-code standards enforcement and emit a release audit recommendation.
     status: active
     triggers:
-      - "documentation quality gate"
-      - "run docs quality gate workflow"
+      - "documentation audit"
+      - "run docs audit workflow"
       - "audit docs for release"
       - "enforce documentation standards"
 
@@ -355,7 +355,7 @@ workflow_group_definitions:
   audit:
     description: Audit orchestration and release gates
     path: audit/
-    members: [documentation-quality-gate, orchestrate-audit, pre-release-audit]
+    members: [documentation-audit, orchestrate-audit, pre-release-audit]
 
   refactor:
     description: Verified structural refactor orchestration

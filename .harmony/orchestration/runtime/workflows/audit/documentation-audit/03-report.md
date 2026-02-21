@@ -1,10 +1,10 @@
 ---
 name: report
-title: "Generate Documentation Quality Gate Report"
-description: "Generate go/no-go recommendation from documentation audit results."
+title: "Generate Documentation Audit Report"
+description: "Generate release recommendation from documentation audit results."
 ---
 
-# Step 3: Generate Documentation Quality Gate Report
+# Step 3: Generate Documentation Audit Report
 
 ## Input
 
@@ -12,7 +12,7 @@ description: "Generate go/no-go recommendation from documentation audit results.
 
 ## Purpose
 
-Produce a concise gate decision artifact suitable for release checks.
+Produce a concise decision artifact suitable for release checks.
 
 ## Actions
 
@@ -21,7 +21,7 @@ Produce a concise gate decision artifact suitable for release checks.
    - `CONDITIONAL-GO` if no CRITICAL but HIGH findings exist
    - `GO` if only MEDIUM/LOW findings remain
 2. Write gate report to:
-   - `.harmony/output/reports/YYYY-MM-DD-documentation-quality-gate.md`
+   - `.harmony/output/reports/YYYY-MM-DD-documentation-audit.md`
 3. Include:
    - recommendation + rationale
    - severity table
@@ -31,7 +31,7 @@ Produce a concise gate decision artifact suitable for release checks.
 
 ## Output
 
-- Documentation quality gate report
+- Documentation audit report
 
 ## Proceed When
 

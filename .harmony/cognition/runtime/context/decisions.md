@@ -120,3 +120,11 @@ Move here when a decision is replaced. Include reference to replacement.
 | ID | Decision | Choice | Constraint | Date |
 |----|----------|--------|------------|------|
 | D051 | Quality-gate domain split | Replace monolithic `quality-gate/` runtime domains with focused `audit/`, `remediation/`, and `refactor/` domains | Active docs/contracts/validators must resolve these capabilities and workflows through new domain paths only; legacy `quality-gate` path/group authority is deprecated and blocked by validation gates | 2026-02-21 |
+
+### 2026-02-21 (continued II)
+
+- [ADR-030](../decisions/030-documentation-audit-clean-break-rename.md) — Documentation audit clean-break rename (D052)
+
+| ID | Decision | Choice | Constraint | Date |
+|----|----------|--------|------------|------|
+| D052 | Documentation workflow canonical rename | Replace `documentation-quality-gate` with `documentation-audit` as the only workflow id/command/path for docs release checks | Active docs/contracts/validators must route through `documentation-audit`; legacy `documentation-quality-gate` identifier/path is deprecated and blocked by validation guardrails | 2026-02-21 |

@@ -201,6 +201,7 @@ check_deprecated_paths() {
   deprecated=(
     "$ROOT_DIR/.harmony/orchestration/workflows"
     "$ROOT_DIR/.harmony/orchestration/runtime/workflows/quality-gate"
+    "$ROOT_DIR/.harmony/orchestration/runtime/workflows/audit/documentation-quality-gate"
   )
 
   local path rel

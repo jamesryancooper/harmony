@@ -59,6 +59,8 @@ Each entry should be specific enough to avoid false positives.
 - `orchestration/runtime/workflows/quality-gate/` - deprecated quality-gate workflow domain path - removed by migration `2026-02-21-quality-gate-domain-split`
 - `group: quality-gate` - deprecated quality-gate taxonomy group key - removed by migration `2026-02-21-quality-gate-domain-split`
 - `path: quality-gate/` - deprecated quality-gate runtime path prefix - removed by migration `2026-02-21-quality-gate-domain-split`
+- `documentation-quality-gate` - deprecated workflow identifier and command token - removed by migration `2026-02-21-documentation-audit-clean-break-rename`
+- `orchestration/runtime/workflows/audit/documentation-quality-gate/` - deprecated docs workflow runtime path - removed by migration `2026-02-21-documentation-audit-clean-break-rename`
 
 ## Banned Paths
 
@@ -120,7 +122,8 @@ Each entry should be specific enough to avoid false positives.
 - `/.harmony/cognition/principles/_meta/docs/` - replaced by `/.harmony/cognition/_meta/principles/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `/.harmony/capabilities/runtime/skills/quality-gate/` - replaced by focused runtime domains `/.harmony/capabilities/runtime/skills/audit/`, `/.harmony/capabilities/runtime/skills/remediation/`, and `/.harmony/capabilities/runtime/skills/refactor/` - removed by migration `2026-02-21-quality-gate-domain-split`
 - `/.harmony/orchestration/runtime/workflows/quality-gate/` - replaced by focused runtime domains `/.harmony/orchestration/runtime/workflows/audit/` and `/.harmony/orchestration/runtime/workflows/refactor/` - removed by migration `2026-02-21-quality-gate-domain-split`
+- `/.harmony/orchestration/runtime/workflows/audit/documentation-quality-gate/` - replaced by `/.harmony/orchestration/runtime/workflows/audit/documentation-audit/` - removed by migration `2026-02-21-documentation-audit-clean-break-rename`
 
 ## Banned Config Keys or Env Vars
 
-- `(none currently)` - no legacy config or env keys removed in migrations `2026-02-20-agency-bounded-surfaces`, `2026-02-21-agency-actors-to-runtime`, `2026-02-20-orchestration-bounded-surfaces`, `2026-02-20-capabilities-bounded-surfaces`, `2026-02-20-assurance-bounded-surfaces`, `2026-02-20-scaffolding-bounded-surfaces`, `2026-02-20-engine-bounded-surfaces`, `2026-02-20-cognition-bounded-surfaces`, or `2026-02-21-quality-gate-domain-split`
+- `(none currently)` - no legacy config or env keys removed in migrations `2026-02-20-agency-bounded-surfaces`, `2026-02-21-agency-actors-to-runtime`, `2026-02-20-orchestration-bounded-surfaces`, `2026-02-20-capabilities-bounded-surfaces`, `2026-02-20-assurance-bounded-surfaces`, `2026-02-20-scaffolding-bounded-surfaces`, `2026-02-20-engine-bounded-surfaces`, `2026-02-20-cognition-bounded-surfaces`, `2026-02-21-quality-gate-domain-split`, or `2026-02-21-documentation-audit-clean-break-rename`
