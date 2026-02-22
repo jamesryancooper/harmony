@@ -221,6 +221,29 @@ skills:
       - domain-specialized
       - self-validating
 
+  - id: audit-domain-architecture
+    display_name: Audit Domain Architecture
+    group: audit
+    path: audit/audit-domain-architecture/
+    summary: "Independent architecture critique for existing or planned Harmony domains using external robustness criteria."
+    status: active
+    tags:
+      - audit
+      - architecture
+      - independence
+      - maintainability
+    triggers:
+      - "independent architecture critique"
+      - "audit domain architecture externally"
+      - "architecture review outside governance doctrine"
+      - "run audit-domain-architecture"
+    skill_sets:
+      - executor
+      - guardian
+    capabilities:
+      - domain-specialized
+      - self-validating
+
   - id: audit-ui
     display_name: Audit UI
     group: audit

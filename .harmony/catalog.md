@@ -86,6 +86,7 @@ Composable capabilities in `capabilities/runtime/skills/`:
 |-------|----------|-------------|
 | [synthesize-research](./capabilities/runtime/skills/synthesis/synthesize-research/SKILL.md) | `/synthesize-research` | Synthesize scattered research notes into coherent findings |
 | [refine-prompt](./capabilities/runtime/skills/synthesis/refine-prompt/SKILL.md) | `/refine-prompt` | Context-aware prompt refinement: analyze repo, inject references, decompose tasks, validate feasibility |
+| [audit-domain-architecture](./capabilities/runtime/skills/audit/audit-domain-architecture/SKILL.md) | `/audit-domain-architecture` | Independent architecture critique for any Harmony domain using external robustness criteria |
 | [audit-ui](./capabilities/runtime/skills/audit/audit-ui/SKILL.md) | `/audit-ui` | Audit UI files against live external web design guidelines |
 | [react-composition-patterns](./capabilities/runtime/skills/foundations/react/composition-patterns/SKILL.md) | `/react-composition-patterns` | Apply React composition patterns: compound components, state lifting, explicit variants |
 | [react-best-practices](./capabilities/runtime/skills/foundations/react/best-practices/SKILL.md) | `/react-best-practices` | Apply 57 React/Next.js performance rules across 8 categories |

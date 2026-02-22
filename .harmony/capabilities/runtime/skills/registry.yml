@@ -522,6 +522,66 @@ skills:
           determinism: variable
           description: "Top-level log index (cross-skill)"
 
+  audit-domain-architecture:
+    version: "1.1.0"
+    commands:
+      - /audit-domain-architecture
+    parameters:
+      - name: domain_path
+        type: text
+        required: true
+        description: "Domain path or canonical .harmony domain target to critique"
+      - name: criteria
+        type: text
+        required: false
+        default: "modularity,discoverability,coupling,operability,change-safety,testability"
+        description: "Comma-separated external evaluation criteria"
+      - name: evidence_depth
+        type: text
+        required: false
+        default: "standard"
+        description: "Evidence intensity: quick, standard, deep"
+      - name: severity_threshold
+        type: text
+        required: false
+        default: "all"
+        description: "Minimum severity to report: critical, high, medium, low, all"
+      - name: domain_profiles_ref
+        type: file
+        required: false
+        default: ".harmony/cognition/governance/domain-profiles.yml"
+        description: "Domain profile registry used as baseline for prospective mode"
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs:
+        - name: domain_architecture_audit_report
+          path: "../../../output/reports/{{date}}-domain-architecture-audit-{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Independent architecture critique report with evidence-backed findings and recommendations"
+        - name: run_log
+          path: "_ops/state/logs/audit-domain-architecture/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for this architecture critique run"
+        - name: log_index
+          path: "_ops/state/logs/audit-domain-architecture/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of all audit-domain-architecture runs with metadata"
+        - name: top_log_index
+          path: "_ops/state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
   audit-ui:
     version: "1.0.1"
     commands:
