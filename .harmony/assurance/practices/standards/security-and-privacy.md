@@ -62,5 +62,5 @@ See `.harmony/cognition/practices/methodology/README.md` for Harmony’s five pi
 - Knowledge Plane: `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
 - Methodology overview: `.harmony/cognition/practices/methodology/README.md`
 - Implementation guide: `.harmony/cognition/practices/methodology/implementation-guide.md`
-- Layers model: `.harmony/cognition/practices/methodology/layers.md`
-- Improve layer: `.harmony/cognition/practices/methodology/improve-layer.md`
+- Layers model: `.harmony/cognition/_meta/architecture/layers.md`
+- Improve layer: `.harmony/cognition/_meta/architecture/layers.md#improve-layer`

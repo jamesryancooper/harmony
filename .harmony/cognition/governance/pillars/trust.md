@@ -171,6 +171,6 @@ Bounded agents in Harmony operate within explicit constraints:
 - [Velocity through Agentic Automation](./velocity.md) — Phase partner
 - [Focus through Absorbed Complexity](./focus.md) — Foundation
 - [Pillars Overview](./README.md) — All six pillars
-- [Methodology: Security Baseline](../methodology/security-baseline.md) — Security implementation
-- [Architecture: Governance Model](../_meta/architecture/governance-model.md) — Agent governance details
+- [Methodology: Security Baseline](../../practices/methodology/security-baseline.md) — Security implementation
+- [Architecture: Governance Model](../../_meta/architecture/governance-model.md) — Agent governance details
 - [Convivial Purpose](../purpose/convivial-purpose.md) — The "why" this pillar serves

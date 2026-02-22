@@ -32,15 +32,15 @@ This document centralizes Harmony’s tooling and metrics guidance. Use it along
 
 ## Metrics-to-Pillar Mapping
 
-Every metric category in Harmony traces back to one or more of the [Six Pillars](../pillars/README.md). This mapping ensures we measure what matters for the outcomes we care about.
+Every metric category in Harmony traces back to one or more of the [Six Pillars](../../governance/pillars/README.md). This mapping ensures we measure what matters for the outcomes we care about.
 
 | Metric Category | Primary Pillar | Connection |
 |-----------------|----------------|------------|
-| **DORA metrics** | [Velocity](../pillars/velocity.md) | Lead time and deploy frequency measure delivery speed; change-fail rate and MTTR measure sustainable velocity. |
-| **SRE targets** | [Trust](../pillars/trust.md) | SLOs and error budgets enforce governed determinism; they're the quantitative expression of trustworthy systems. |
-| **WIP/cycle analytics** | [Focus](../pillars/focus.md) | WIP aging and cycle time reveal cognitive load and flow health. High WIP signals lost focus. |
-| **Kaizen log** | [Insight](../pillars/insight.md) | Daily improvements and retro-driven changes embody structured learning. Each kaizen PR is learning made concrete. |
-| **Cost dashboard** | [Trust](../pillars/trust.md) | Cost governance is a trust guardrail—predictable costs mean predictable operations. |
+| **DORA metrics** | [Velocity](../../governance/pillars/velocity.md) | Lead time and deploy frequency measure delivery speed; change-fail rate and MTTR measure sustainable velocity. |
+| **SRE targets** | [Trust](../../governance/pillars/trust.md) | SLOs and error budgets enforce governed determinism; they're the quantitative expression of trustworthy systems. |
+| **WIP/cycle analytics** | [Focus](../../governance/pillars/focus.md) | WIP aging and cycle time reveal cognitive load and flow health. High WIP signals lost focus. |
+| **Kaizen log** | [Insight](../../governance/pillars/insight.md) | Daily improvements and retro-driven changes embody structured learning. Each kaizen PR is learning made concrete. |
+| **Cost dashboard** | [Trust](../../governance/pillars/trust.md) | Cost governance is a trust guardrail—predictable costs mean predictable operations. |
 
 ### Secondary Pillar Connections
 
@@ -59,4 +59,4 @@ The weekly retro prompts explicitly connect Insight back to Direction:
 - "Which SLI/SLO regressed?" → informs future perf/reliability requirements
 - "What guardrail to tighten/loosen?" → informs methodology refinement
 
-This is the [Insight → Direction feedback loop](../pillars/insight.md) made operational.
+This is the [Insight → Direction feedback loop](../../governance/pillars/insight.md) made operational.

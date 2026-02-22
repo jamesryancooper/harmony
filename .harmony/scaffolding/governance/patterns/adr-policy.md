@@ -44,11 +44,11 @@ See `.harmony/cognition/practices/methodology/README.md` for Harmony’s five pi
 
 ## Related Docs
 
-- Knowledge Plane: `.harmony/cognition/_meta/architecture/knowledge-plane/knowledge-plane.md`
+- Knowledge Plane: `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
 - Governance model: `.harmony/cognition/_meta/architecture/governance-model.md`
 - Methodology overview: `.harmony/cognition/practices/methodology/README.md`
 - Implementation guide: `.harmony/cognition/practices/methodology/implementation-guide.md`
-- Layers model: `.harmony/cognition/practices/methodology/layers.md`
-- Improve layer: `.harmony/cognition/practices/methodology/improve-layer.md`
+- Layers model: `.harmony/cognition/_meta/architecture/layers.md`
+- Improve layer: `.harmony/cognition/_meta/architecture/layers.md#improve-layer`
 - Architecture overview: `.harmony/cognition/_meta/architecture/overview.md`
 - Repository blueprint: `.harmony/cognition/_meta/architecture/repository-blueprint.md`

@@ -709,4 +709,4 @@ feedback_loop:
 - [Risk Tiers Overview](./risk-tiers.md)
 - [Spec Templates](./templates/README.md)
 - [CI/CD Quality Gates](./ci-cd-quality-gates.md)
-- [Human-Facing Risk Tiers](../context/risk-tiers.md)
+- [Human-Facing Risk Tiers](../../runtime/context/risk-tiers.md)

@@ -13,6 +13,66 @@ files:
     summary: Concrete implementation guidance and rollout details.
     when: During implementation and migration execution planning.
 
+  - id: spec-first-planning
+    path: spec-first-planning.md
+    summary: Spec-first planning flow and quality requirements.
+    when: Before starting implementation for non-trivial work.
+
+  - id: auto-tier-assignment
+    path: auto-tier-assignment.md
+    summary: Deterministic risk-tier classification rules.
+    when: When assigning risk tier and gate depth.
+
+  - id: risk-tiers
+    path: risk-tiers.md
+    summary: Full risk-tier contract, criteria, and governance flow.
+    when: When evaluating approval rigor and ACP posture.
+
+  - id: flow-and-wip-policy
+    path: flow-and-wip-policy.md
+    summary: Flow controls, WIP limits, and throughput guidance.
+    when: When adjusting execution cadence and batching policy.
+
+  - id: ci-cd-quality-gates
+    path: ci-cd-quality-gates.md
+    summary: CI/CD gate definitions, stop-the-line conditions, and waivers.
+    when: When changing release checks or enforcement gates.
+
+  - id: security-baseline
+    path: security-baseline.md
+    summary: Security baseline controls for delivery workflows.
+    when: When changing security controls or risk posture.
+
+  - id: reliability-and-ops
+    path: reliability-and-ops.md
+    summary: Reliability standards and operational readiness guidance.
+    when: When changing SLOs, incident posture, or run-time safeguards.
+
+  - id: performance-and-scalability
+    path: performance-and-scalability.md
+    summary: Performance and scalability planning standards.
+    when: When changing throughput, latency, or capacity assumptions.
+
+  - id: sandbox-flow
+    path: sandbox-flow.md
+    summary: Sandbox-aware execution flow and guardrail interactions.
+    when: When running or designing constrained execution in sandbox environments.
+
+  - id: methodology-as-code
+    path: methodology-as-code.md
+    summary: Methodology codification approach and maintenance rules.
+    when: When evolving methodology artifacts and enforcement patterns.
+
+  - id: tiny-team-assessment
+    path: tiny-team-assessment.md
+    summary: Tiny-team operating assessment and adoption heuristics.
+    when: When calibrating process depth for small teams.
+
+  - id: adoption-plan-30-60-90
+    path: adoption-plan-30-60-90.md
+    summary: Time-phased adoption plan for methodology rollout.
+    when: When planning phased adoption or remediation work.
+
   - id: architecture-and-repo-structure
     path: architecture-and-repo-structure.md
     summary: Repository shape and architecture operating expectations.

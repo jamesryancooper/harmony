@@ -34,7 +34,7 @@ Welcome to the implementation roadmap for Harmony's Convivial Purpose. The found
 | Convivial Purpose Synthesis | `convivial-purpose.md` | Published |
 | Pillar Integration | `../pillars/README.md` | Pillars reference Convivial Purpose as their grounding |
 | Direction Pillar | `../pillars/direction.md` | Convivial Impact Assessment listed as key kit |
-| Methodology Integration | `../methodology/README.md` | Convivial Impact Assessment in Pillars → Practices Map |
+| Methodology Integration | `../../practices/methodology/README.md` | Convivial Impact Assessment in Pillars → Practices Map |
 
 ### 🔲 Outstanding
 
@@ -291,5 +291,5 @@ The purpose documentation and operationalization is complete when:
 - [`../pillars/README.md`](../pillars/README.md) — The six pillars grounded in Convivial Purpose
 - [`./convivial-purpose.md`](./convivial-purpose.md) — Full synthesis and operationalization spec
 - [`./resonant-computing-design-stack.md`](./resonant-computing-design-stack.md) — Foundational RCDS framework
-- [`../methodology/README.md`](../methodology/README.md) — Methodology implementation
+- [`../../practices/methodology/README.md`](../../practices/methodology/README.md) — Methodology implementation
 

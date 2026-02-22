@@ -391,6 +391,6 @@ harmony tier-down <id> --reason "config change only, no auth logic"
 
 For the complete risk classification system, gate matrices, and policy details:
 
-- **Flow & WIP Policy**: [methodology/flow-and-wip-policy.md](../methodology/flow-and-wip-policy.md)
-- **CI/CD Gates**: [methodology/ci-cd-quality-gates.md](../methodology/ci-cd-quality-gates.md)
-- **Security Baseline**: [methodology/security-baseline.md](../methodology/security-baseline.md)
+- **Flow & WIP Policy**: [methodology/flow-and-wip-policy.md](../../practices/methodology/flow-and-wip-policy.md)
+- **CI/CD Gates**: [methodology/ci-cd-quality-gates.md](../../practices/methodology/ci-cd-quality-gates.md)
+- **Security Baseline**: [methodology/security-baseline.md](../../practices/methodology/security-baseline.md)

@@ -57,11 +57,11 @@ Background knowledge in `cognition/runtime/context/`:
 
 | File | Description |
 |------|-------------|
-| [decisions.md](./cognition/runtime/context/decisions.md) | Agent-readable decision summaries. |
-| [lessons.md](./cognition/runtime/context/lessons.md) | Anti-patterns and failures to avoid. |
-| [glossary.md](./cognition/runtime/context/glossary.md) | Domain-specific terminology. |
-| [dependencies.md](./cognition/runtime/context/dependencies.md) | External systems and references. |
-| [constraints.md](./cognition/runtime/context/constraints.md) | Technical and business rules. |
+| [decisions.md](../../../../cognition/runtime/context/decisions.md) | Agent-readable decision summaries. |
+| [lessons.md](../../../../cognition/runtime/context/lessons.md) | Anti-patterns and failures to avoid. |
+| [glossary.md](../../../../cognition/runtime/context/glossary.md) | Domain-specific terminology. |
+| [dependencies.md](../../../../cognition/runtime/context/dependencies.md) | External systems and references. |
+| [constraints.md](../../../../cognition/runtime/context/constraints.md) | Technical and business rules. |
 
 ## Access Key
 

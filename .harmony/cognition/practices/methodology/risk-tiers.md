@@ -7,7 +7,7 @@ description: Comprehensive AI-facing documentation for Harmony's three-tier risk
 
 This document provides the complete specification for Harmony's risk tier system. It is designed for AI agents to use when classifying changes, generating specs, and applying appropriate rigor.
 
-For the human-facing summary, see [../context/risk-tiers.md](../context/risk-tiers.md).
+For the human-facing summary, see [../../runtime/context/risk-tiers.md](../../runtime/context/risk-tiers.md).
 
 ---
 
@@ -23,19 +23,19 @@ Every change in Harmony is classified into one of three risk tiers:
 
 **Key Principle:** AI applies appropriate rigor at every tier. The difference is ACP strength (evidence, quorum, budgets, reversibility), while humans remain on-the-loop for escalation and optional post-run oversight.
 
-Governance references: [Autonomous Control Points](../principles/autonomous-control-points.md), [Deny by Default](../principles/deny-by-default.md), [Arbitration & Precedence](../principles/README.md#arbitration--precedence).
+Governance references: [Autonomous Control Points](../../governance/principles/autonomous-control-points.md), [Deny by Default](../../governance/principles/deny-by-default.md), [Arbitration & Precedence](../../governance/principles/README.md#arbitration--precedence).
 
 ---
 
 ## Pillar Alignment by Tier
 
-The risk tier system operationalizes Harmony's [Six Pillars](../pillars/README.md), with each tier emphasizing different pillars based on the nature and risk of the change.
+The risk tier system operationalizes Harmony's [Six Pillars](../../governance/pillars/README.md), with each tier emphasizing different pillars based on the nature and risk of the change.
 
 | Tier | Primary Pillars | Rationale |
 |------|-----------------|-----------|
-| **T1** | [Velocity](../pillars/velocity.md) | Fast delivery with basic gates. Trivial changes benefit from speed; minimal ceremony serves throughput. |
-| **T2** | [Direction](../pillars/direction.md), [Velocity](../pillars/velocity.md), [Trust](../pillars/trust.md) | Validated spec ensures we build the right thing. Threat analysis and feature flags balance speed with safety. |
-| **T3** | [Direction](../pillars/direction.md), [Trust](../pillars/trust.md), [Continuity](../pillars/continuity.md) | Full spec validation, security review, and ADRs. Elevated risk demands governed determinism and institutional memory. |
+| **T1** | [Velocity](../../governance/pillars/velocity.md) | Fast delivery with basic gates. Trivial changes benefit from speed; minimal ceremony serves throughput. |
+| **T2** | [Direction](../../governance/pillars/direction.md), [Velocity](../../governance/pillars/velocity.md), [Trust](../../governance/pillars/trust.md) | Validated spec ensures we build the right thing. Threat analysis and feature flags balance speed with safety. |
+| **T3** | [Direction](../../governance/pillars/direction.md), [Trust](../../governance/pillars/trust.md), [Continuity](../../governance/pillars/continuity.md) | Full spec validation, security review, and ADRs. Elevated risk demands governed determinism and institutional memory. |
 
 ### How Each Pillar Manifests Across Tiers
 

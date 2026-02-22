@@ -177,5 +177,5 @@ Velocity scored lowest on convivial alignment because speed alone can enable shi
 - [Trust through Governed Determinism](./trust.md) — Phase partner
 - [Direction through Validated Discovery](./direction.md) — Constraint source
 - [Pillars Overview](./README.md) — All six pillars
-- [Methodology: CI/CD Quality Gates](../methodology/ci-cd-quality-gates.md) — Implementation details
+- [Methodology: CI/CD Quality Gates](../../practices/methodology/ci-cd-quality-gates.md) — Implementation details
 - [Convivial Purpose](../purpose/convivial-purpose.md) — The "why" this pillar serves

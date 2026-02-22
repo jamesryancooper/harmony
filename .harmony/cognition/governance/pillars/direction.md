@@ -141,5 +141,5 @@ Validated specs become institutional memory—they're the "why we built this" th
 - [Focus through Absorbed Complexity](./focus.md) — Phase partner
 - [Insight through Structured Learning](./insight.md) — Feedback loop source
 - [Pillars Overview](./README.md) — All six pillars
-- [Methodology: Spec-First Planning](../methodology/spec-first-planning.md) — Implementation details
+- [Methodology: Spec-First Planning](../../practices/methodology/spec-first-planning.md) — Implementation details
 - [Convivial Purpose](../purpose/convivial-purpose.md) — The "why" this pillar serves

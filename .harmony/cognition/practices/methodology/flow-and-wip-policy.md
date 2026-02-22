@@ -215,14 +215,14 @@ Note: Terminology harmonization — we use **DoSafe** for "Definition of Safe" (
 
 ## Pillar Alignment
 
-The flow and WIP policy serves Harmony's [Six Pillars](../pillars/README.md) by operationalizing key principles from the PLAN and SHIP phases.
+The flow and WIP policy serves Harmony's [Six Pillars](../../governance/pillars/README.md) by operationalizing key principles from the PLAN and SHIP phases.
 
 | Pillar | How This Policy Serves It |
 |--------|---------------------------|
-| [Focus](../pillars/focus.md) | WIP limits reduce cognitive load and context-switching. Developers work on one thing at a time, preserving mental bandwidth for what matters. |
-| [Velocity](../pillars/velocity.md) | Flow optimization via Little's Law maximizes throughput. Strict WIP limits and aging targets keep cycle times low, enabling sustained high-frequency delivery. |
-| [Trust](../pillars/trust.md) | Definition of Safe (DoSafe) gates enforce safety at every tier. Rollback paths, feature flags, and security reviews ensure changes are reversible and governed. |
-| [Direction](../pillars/direction.md) | Definition of Ready (DoR) requires validated specs before work begins. No card moves to In-Dev without a tier-appropriate spec. |
+| [Focus](../../governance/pillars/focus.md) | WIP limits reduce cognitive load and context-switching. Developers work on one thing at a time, preserving mental bandwidth for what matters. |
+| [Velocity](../../governance/pillars/velocity.md) | Flow optimization via Little's Law maximizes throughput. Strict WIP limits and aging targets keep cycle times low, enabling sustained high-frequency delivery. |
+| [Trust](../../governance/pillars/trust.md) | Definition of Safe (DoSafe) gates enforce safety at every tier. Rollback paths, feature flags, and security reviews ensure changes are reversible and governed. |
+| [Direction](../../governance/pillars/direction.md) | Definition of Ready (DoR) requires validated specs before work begins. No card moves to In-Dev without a tier-appropriate spec. |
 
 ### Key Pillar Connections
 

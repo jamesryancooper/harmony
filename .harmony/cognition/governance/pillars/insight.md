@@ -217,5 +217,5 @@ This loop is Insight in action: systematic learning from AI behavior.
 - [Direction through Validated Discovery](./direction.md) — Feedback loop destination
 - [Pillars Overview](./README.md) — All six pillars
 - [EvalKit Documentation](/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md) — AI evaluation
-- [Postmortem Policy](../methodology/reliability-and-ops.md) — Incident learning
+- [Postmortem Policy](../../practices/methodology/reliability-and-ops.md) — Incident learning
 - [Convivial Purpose](../purpose/convivial-purpose.md) — The "why" this pillar serves

@@ -21,7 +21,7 @@ Harmony uses a **three-tier risk classification** that determines which CI gates
 
 → See [risk-tiers.md](./risk-tiers.md) for tier classification criteria.
 → See [auto-tier-assignment.md](./auto-tier-assignment.md) for how AI assigns tiers.
-→ Governance model: [Autonomous Control Points](../principles/autonomous-control-points.md), [Deny by Default](../principles/deny-by-default.md), [Arbitration & Precedence](../principles/README.md#arbitration--precedence).
+→ Governance model: [Autonomous Control Points](../../governance/principles/autonomous-control-points.md), [Deny by Default](../../governance/principles/deny-by-default.md), [Arbitration & Precedence](../../governance/principles/README.md#arbitration--precedence).
 
 Solo-first note: **Owner** and **Navigator** are roles. When you’re solo, you perform both as distinct passes (ideally time-separated); when you have collaborators, they can be separate people.
 
@@ -315,6 +315,6 @@ jobs:
 - [Auto-Tier Assignment](./auto-tier-assignment.md)
 - [Flow & WIP Policy](./flow-and-wip-policy.md)
 - [Spec Templates](./templates/README.md)
-- [Human-Facing Risk Tiers](../context/risk-tiers.md)
+- [Human-Facing Risk Tiers](../../runtime/context/risk-tiers.md)
 
 Reference: Use the PatchKit PR Template (canonical) in `.harmony/capabilities/runtime/services/delivery/patch/guide.md` to standardize PR bodies, determinism/provenance notes, and tier information.

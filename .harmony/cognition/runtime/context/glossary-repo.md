@@ -250,6 +250,6 @@ They differ from workflows (procedural sequences) and teams (actor handoffs).
 
 ## See Also
 
-- [Start Here](../../agency/practices/start-here.md) — Entry point for human developers
-- [Conventions](../../conventions.md) — Repository naming and formatting rules
-- [Methodology](../methodology/README.md) — Complete methodology documentation
+- [Start Here](../../../agency/practices/start-here.md) — Entry point for human developers
+- [Conventions](../../../conventions.md) — Repository naming and formatting rules
+- [Methodology](../../practices/methodology/README.md) — Complete methodology documentation

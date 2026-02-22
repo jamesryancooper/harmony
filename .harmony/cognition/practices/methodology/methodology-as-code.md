@@ -304,7 +304,7 @@ if (result.warnings?.length) {
 
 ## Related Documents
 
-- [Harmony Principles](../principles/README.md) — The five pillars
+- [Harmony Principles](../../governance/principles/README.md) — The five pillars
 - [Methodology Overview](./README.md) — Full methodology description
 - [Kits Reference](/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md) — Validation utilities and service entrypoints
 - [Kits README](/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md) — Kit architecture overview

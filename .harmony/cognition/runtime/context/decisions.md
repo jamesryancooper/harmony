@@ -6,7 +6,7 @@ mutability: append-only
 
 # Decisions
 
-Key decisions that constrain or guide work in this harness. For full rationale, see `.harmony/cognition/decisions/`.
+Key decisions that constrain or guide work in this harness. For full rationale, see `.harmony/cognition/runtime/decisions/`.
 
 **ADRs:**
 - [ADR-001](../decisions/001-harmony-shared-foundation.md) — Shared `.harmony/` foundation (D007)
@@ -38,7 +38,7 @@ Key decisions that constrain or guide work in this harness. For full rationale, 
 | D007 | Shared foundation | Single .harmony/ root organized by capability | Everything under .harmony/; organized by cognitive function | 2026-01-13 |
 | D008 | Consolidated scratchpad | `ideation/scratchpad/` with subdirectories | `inbox/`, `archive/`, `ideas/`, `brainstorm/` are subdirectories of `ideation/scratchpad/` | 2026-01-14 |
 | D009 | Human-led zone naming | `ideation/scratchpad/` over `.scratch/` | Explicit, self-documenting name preferred over shorter abbreviation | 2026-01-13 |
-| D010 | Projects location | Harness level (`ideation/projects/`) | Projects live at harness level, not in `ideation/scratchpad/`; direct artifact flow to `cognition/context/` | 2026-01-14 |
+| D010 | Projects location | Harness level (`ideation/projects/`) | Projects live at harness level, not in `ideation/scratchpad/`; direct artifact flow to `cognition/runtime/context/` | 2026-01-14 |
 | D011 | Brainstorm stage | Single-file exploration in `ideation/scratchpad/brainstorm/` | Filter stage between ideas and projects; most ideas die here | 2026-01-14 |
 | D012 | The Funnel | ideas → brainstorm → projects → missions → context | Clear pipeline from raw ideas to permanent knowledge | 2026-01-14 |
 | D013 | Refactor verification | Mandatory verification gate | Refactors cannot be declared complete until all audit searches return zero | 2026-01-14 |
@@ -53,7 +53,7 @@ Key decisions that constrain or guide work in this harness. For full rationale, 
 | D022 | Persona assignment | Explicit role/expertise in refined prompts | Refined prompts include Execution Persona section with role, level, perspective, style | 2026-01-14 |
 | D023 | Negative constraints | Anti-patterns and forbidden approaches | Refined prompts include "What NOT To Do" section; prevents common mistakes and scope creep | 2026-01-14 |
 | D024 | Intent confirmation | User confirms before execution | Refined prompts summarize understanding and request confirmation; skip with `--skip_confirmation` | 2026-01-14 |
-| D025 | Primitives documentation | Central reference in `.harmony/cognition/context/primitives.md` | Consult before creating new primitives; explains when to use each type | 2026-01-14 |
+| D025 | Primitives documentation | Central reference in `.harmony/cognition/runtime/context/primitives.md` | Consult before creating new primitives; explains when to use each type | 2026-01-14 |
 | D026 | Seven primitives | Skills, Commands, Workflows, Assistants, Checklists, Prompts, Templates | These are the canonical building blocks; new primitives require ADR | 2026-01-14 |
 | D027 | Skill naming convention | Verb-noun pattern (e.g., `refine-prompt`) | Skill names must use verb-noun for action-oriented clarity | 2026-01-15 |
 | D028 | Progressive disclosure | Three-tier: SKILL.md + references/ + assets/ | Keep SKILL.md under 500 lines; details in references/ | 2026-01-15 |
@@ -64,7 +64,7 @@ Key decisions that constrain or guide work in this harness. For full rationale, 
 | D033 | Four-tier progressive disclosure | manifest → registry → SKILL.md → references | Load in tiers; ~50 tokens at discovery, <5000 at activation | 2026-01-17 |
 | D034 | Manifest as Tier 1 discovery | Centralized index in manifest.yml | Read manifest.yml first for skill routing; ~50 tokens per skill | 2026-01-17 |
 | D035 | Validation tooling | validate-skills.sh with 21 checks | Run validation before commits; CI enforces in pr.yml | 2026-01-17 |
-| D036 | Principles documentation | Formal .harmony/cognition/principles/ directory | 8 principles documented; reference when designing new features | 2026-01-17 |
+| D036 | Principles documentation | Formal `.harmony/cognition/governance/principles/` directory | 8 principles documented; reference when designing new features | 2026-01-17 |
 | D037 | display_name extension | Title Case derived from id | Human-readable name; derivable but explicit for clarity | 2026-01-17 |
 | D038 | Placeholder validation | `{{snake_case}}` format enforced | Paths use `{{placeholder}}`; validation catches deprecated formats | 2026-01-17 |
 | D039 | CI integration | skills-validation job in pr.yml | tiktoken for accurate token counting; --strict mode | 2026-01-17 |
@@ -72,7 +72,7 @@ Key decisions that constrain or guide work in this harness. For full rationale, 
 | D041 | Platforms skill group | New `platforms/` group parallel to `foundations/` | Deployment platform skills (Vercel, etc.) organized separately from language/framework foundations; both use family pattern (parent SKILL.md + children) | 2026-02-09 |
 | D042 | Reference knowledge skills in manifest | Foundation children with `specialist` skill set appear in manifest.yml with triggers | Unlike scaffolding children (`disable-model-invocation: true`), reference knowledge skills are independently invocable and need manifest triggers for routing | 2026-02-09 |
 | D043 | Agency actor taxonomy | Canonical artifact model is agents + assistants + teams | `subagents/` removed as first-class artifact; routing and validation now use `agency/manifest.yml` and actor registries | 2026-02-11 |
-| D044 | Immutable engineering charter | `.harmony/cognition/principles/principles.md` is immutable (`mutability: immutable`, `agent_editable: false`) | Agents must not modify the charter; policy evolution requires a versioned successor plus ADR | 2026-02-20 |
+| D044 | Immutable engineering charter | `.harmony/cognition/governance/principles/principles.md` is immutable (`mutability: immutable`, `agent_editable: false`) | Agents must not modify the charter; policy evolution requires a versioned successor plus ADR | 2026-02-20 |
 | D045 | Bounded surface separation | Separate runtime artifacts, governance contracts, and operating practices where materially applicable | First rollout is clean-break migration of agency to `actors/`, `governance/`, and `practices/` with CI enforcement of legacy-path removal | 2026-02-20 |
 | D046 | Orchestration bounded surfaces | Apply bounded surfaces to orchestration using canonical `runtime/`, `governance/`, and `practices/` surfaces | Legacy orchestration root paths are removed and CI validators enforce no reintroduction | 2026-02-20 |
 | D047 | Capabilities bounded surfaces | Apply bounded surfaces to capabilities using canonical `runtime/`, `governance/`, and `practices/` surfaces | Legacy capabilities root runtime/policy paths are removed and CI validators enforce no reintroduction | 2026-02-20 |

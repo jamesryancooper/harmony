@@ -9,7 +9,7 @@ Harmony's six pillars organize the complete development lifecycle into three pha
 
 > **The software we ship should expand human capability, respect attention, and foster connection—not extract, manipulate, or diminish.**
 
-The pillars are the *what*. The [Convivial Purpose](../purpose/convivial-purpose.md) is the *why*. The [Methodology](../methodology/README.md) is the *how*.
+The pillars are the *what*. The [Convivial Purpose](../purpose/convivial-purpose.md) is the *why*. The [Methodology](../../practices/methodology/README.md) is the *how*.
 
 Harmony is written **solo-first**: one developer working with AI (agents + automation), following a pillar-guided lifecycle. If/when you have collaborators, the same pillars still apply.
 
@@ -229,5 +229,5 @@ Velocity scored lowest on convivial alignment because speed alone can enable shi
 
 - [Convivial Purpose](../purpose/convivial-purpose.md) — The *why* beneath the pillars
 - [Resonant Computing Design Stack](../purpose/resonant-computing-design-stack.md) — The four-layer framework
-- [Methodology Overview](../methodology/README.md) — Operational implementation of the pillars
+- [Methodology Overview](../../practices/methodology/README.md) — Operational implementation of the pillars
 - [Kit Documentation](/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md) — Tools that implement the pillars

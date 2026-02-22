@@ -21,6 +21,11 @@ files:
     summary: Agent-readable summary of key decisions affecting this harness.
     when: Before making decisions that might duplicate past choices.
 
+  - id: continuity
+    path: continuity.md
+    summary: Optional continuity artifact signals for append-only handling.
+    when: When classifying continuity files during refactors or migrations.
+
   - id: lessons
     path: lessons.md
     summary: Anti-patterns and failures to avoid repeating.

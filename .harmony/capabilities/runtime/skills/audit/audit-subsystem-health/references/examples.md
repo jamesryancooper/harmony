@@ -12,7 +12,7 @@ description: Full audit examples for the audit-subsystem-health skill.
 ### Invocation
 
 ```text
-/audit-subsystem-health subsystem=".harmony/capabilities/runtime/skills" docs=".harmony/cognition/_meta/architecture/skills"
+/audit-subsystem-health subsystem=".harmony/capabilities/runtime/skills" docs=".harmony/cognition/_meta/architecture"
 ```
 
 ### Phase 1: Configure
@@ -20,7 +20,7 @@ description: Full audit examples for the audit-subsystem-health skill.
 ```
 Subsystem: .harmony/capabilities/runtime/skills
 Schema reference: .harmony/capabilities/runtime/skills/capabilities.yml (auto-detected)
-Companion docs: .harmony/cognition/_meta/architecture/skills (19 files)
+Companion docs: .harmony/cognition/_meta/architecture (19 files)
 
 Config files discovered:
   - manifest.yml (32 entries)

@@ -97,5 +97,5 @@ context/                → Permanent knowledge
 ## Related
 
 - [Projects](/.harmony/ideation/_meta/architecture/projects.md) — Full documentation
-- [Registry](../../../ideation/projects/registry.md) — Project tracking
-- [Brainstorm](../../../ideation/scratchpad/brainstorm/README.md) — Upstream exploration
+- [Registry](../../../../ideation/projects/registry.md) — Project tracking
+- [Brainstorm](../../../../ideation/scratchpad/brainstorm/README.md) — Upstream exploration

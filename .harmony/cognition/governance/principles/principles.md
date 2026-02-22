@@ -323,7 +323,7 @@ When principles conflict, choose the earliest applicable rule:
 
 ## 7) Decision Protocols (RFC/ADR Thresholds)
 
-### ADR required when:
+### ADR required when
 
 - Making a significant change that is hard to undo
 - Introducing/changing a boundary, public API, or persistent data model
@@ -331,7 +331,7 @@ When principles conflict, choose the earliest applicable rule:
 - Adding new major configuration surfaces
 - Making a breaking change or major migration
 
-### Lightweight RFC required when:
+### Lightweight RFC required when
 
 - Multiple plausible solutions exist and tradeoffs are non-trivial
 - The change affects multiple teams/subsystems

@@ -47,13 +47,13 @@ Chain orchestrated migration and coherence audits into a comprehensive pre-relea
 ## Usage
 
 ```text
-/pre-release-audit subsystem=".harmony/capabilities/runtime/skills" docs=".harmony/cognition/_meta/architecture/skills"
+/pre-release-audit subsystem=".harmony/capabilities/runtime/skills" docs=".harmony/cognition/_meta/architecture"
 ```
 
 With migration manifest:
 
 ```text
-/pre-release-audit subsystem=".harmony/capabilities/runtime/skills" manifest=".harmony/migrations/restructure.yml" docs=".harmony/cognition/_meta/architecture/skills"
+/pre-release-audit subsystem=".harmony/capabilities/runtime/skills" manifest=".harmony/migrations/restructure.yml" docs=".harmony/cognition/_meta/architecture"
 ```
 
 With explicit stage controls:

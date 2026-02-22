@@ -26,7 +26,7 @@ Harmony uses a **three-tier risk classification** to right-size specs and review
 → See [risk-tiers.md](./risk-tiers.md) for full tier criteria.
 → See [auto-tier-assignment.md](./auto-tier-assignment.md) for classification algorithm.
 → See [templates/](./templates/) for spec templates.
-→ Governance model: [Autonomous Control Points](../principles/autonomous-control-points.md), [Deny by Default](../principles/deny-by-default.md), [Arbitration & Precedence](../principles/README.md#arbitration--precedence).
+→ Governance model: [Autonomous Control Points](../../governance/principles/autonomous-control-points.md), [Deny by Default](../../governance/principles/deny-by-default.md), [Arbitration & Precedence](../../governance/principles/README.md#arbitration--precedence).
 
 ### Tier Selection Flow
 

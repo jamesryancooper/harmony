@@ -31,19 +31,19 @@ Harmony unifies speed, safety, and simplicity so a solo builder can ship high-qu
 
 ### The Six Pillars
 
-Harmony's pillars are organized in three phases forming a complete feedback loop. For the complete pillar specifications, see [`../pillars/README.md`](../pillars/README.md).
+Harmony's pillars are organized in three phases forming a complete feedback loop. For the complete pillar specifications, see [`../../governance/pillars/README.md`](../../governance/pillars/README.md).
 
 **PLAN Phase:**
-1. **[Direction through Validated Discovery](../pillars/direction.md)** — Build the right thing because every feature is validated before investment.
-2. **[Focus through Absorbed Complexity](../pillars/focus.md)** — Build features, not infrastructure — Harmony handles the rest.
+1. **[Direction through Validated Discovery](../../governance/pillars/direction.md)** — Build the right thing because every feature is validated before investment.
+2. **[Focus through Absorbed Complexity](../../governance/pillars/focus.md)** — Build features, not infrastructure — Harmony handles the rest.
 
 **SHIP Phase:**
-3. **[Velocity through Agentic Automation](../pillars/velocity.md)** — Ship fast because AI automation removes bottlenecks and multiplies output.
-4. **[Trust through Governed Determinism](../pillars/trust.md)** — Ship confidently because behavior is predictable, agents are bounded, security is enforced, and mistakes are reversible.
+3. **[Velocity through Agentic Automation](../../governance/pillars/velocity.md)** — Ship fast because AI automation removes bottlenecks and multiplies output.
+4. **[Trust through Governed Determinism](../../governance/pillars/trust.md)** — Ship confidently because behavior is predictable, agents are bounded, security is enforced, and mistakes are reversible.
 
 **LEARN Phase:**
-5. **[Continuity through Institutional Memory](../pillars/continuity.md)** — Knowledge persists because decisions, traces, and context are captured durably.
-6. **[Insight through Structured Learning](../pillars/insight.md)** — Improve continuously because every outcome teaches us something.
+5. **[Continuity through Institutional Memory](../../governance/pillars/continuity.md)** — Knowledge persists because decisions, traces, and context are captured durably.
+6. **[Insight through Structured Learning](../../governance/pillars/insight.md)** — Improve continuously because every outcome teaches us something.
 
 Together these pillars create a self‑reinforcing system: Direction ensures we build the right thing, Focus gives us bandwidth to build it, Velocity and Trust let us ship fast and safely, Continuity preserves what we learned, and Insight feeds back to Direction for the next cycle.
 
@@ -51,12 +51,12 @@ Together these pillars create a self‑reinforcing system: Direction ensures we 
 
 | Phase | Pillar | Developer Question | Key Practice |
 |-------|--------|-------------------|--------------|
-| PLAN | [Direction](../pillars/direction.md) | "What are we building?" | Spec-first validation |
-| PLAN | [Focus](../pillars/focus.md) | "How do we think about it?" | Kits absorb complexity |
-| SHIP | [Velocity](../pillars/velocity.md) | "How do we deliver fast?" | Agentic automation |
-| SHIP | [Trust](../pillars/trust.md) | "How do we deliver safely?" | Governed determinism |
-| LEARN | [Continuity](../pillars/continuity.md) | "How do we remember?" | ADRs, traces, ObservaKit |
-| LEARN | [Insight](../pillars/insight.md) | "How do we improve?" | Postmortems, EvalKit |
+| PLAN | [Direction](../../governance/pillars/direction.md) | "What are we building?" | Spec-first validation |
+| PLAN | [Focus](../../governance/pillars/focus.md) | "How do we think about it?" | Kits absorb complexity |
+| SHIP | [Velocity](../../governance/pillars/velocity.md) | "How do we deliver fast?" | Agentic automation |
+| SHIP | [Trust](../../governance/pillars/trust.md) | "How do we deliver safely?" | Governed determinism |
+| LEARN | [Continuity](../../governance/pillars/continuity.md) | "How do we remember?" | ADRs, traces, ObservaKit |
+| LEARN | [Insight](../../governance/pillars/insight.md) | "How do we improve?" | Postmortems, EvalKit |
 
 > Terminology note: “SpecKit” (`speckit`) wraps GitHub’s Spec Kit. Mentions of the upstream tool use “GitHub’s Spec Kit” explicitly. PlanKit implements its planning kernel via BMAD; this adapter is transparent to methodology consumers.
 
@@ -528,7 +528,7 @@ See `security-baseline.md` for full control mappings, STRIDE guidance, header/se
 
 Harmony borrows heavily from Google SRE: SLIs/SLOs, error budgets, and blameless postmortems drive how we respond to incidents and tune guardrails over time.
 
-**Insight → Direction:** Postmortems are where the [LEARN phase](../pillars/insight.md) feeds back to [PLAN](../pillars/direction.md). Each postmortem should answer: *"What should we have validated in the spec that we didn't?"* Action items flow into future spec criteria, closing the feedback loop.
+**Insight → Direction:** Postmortems are where the [LEARN phase](../../governance/pillars/insight.md) feeds back to [PLAN](../../governance/pillars/direction.md). Each postmortem should answer: *"What should we have validated in the spec that we didn't?"* Action items flow into future spec criteria, closing the feedback loop.
 
 See `reliability-and-ops.md` for detailed SLI/SLO guidance, error budget policy, on-call expectations, and the full postmortem template and severity table.
 

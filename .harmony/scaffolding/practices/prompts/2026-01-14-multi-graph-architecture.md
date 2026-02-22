@@ -94,7 +94,7 @@ harmony/
 Source files declare graph nodes via YAML front matter:
 
 ```markdown
-<!-- apps/api/.harmony/cognition/runtime/context/decisions/API-001.md -->
+<!-- apps/api/.harmony/cognition/runtime/decisions/001-harmony-shared-foundation.md -->
 ---
 # Graph Identity (required for graph inclusion)
 graph:
@@ -167,7 +167,7 @@ Examples:
         "tags": ["architecture", "api"]
       },
       "meta": {
-        "source": "cognition/runtime/context/decisions/API-001.md",
+        "source": "cognition/runtime/decisions/001-harmony-shared-foundation.md",
         "created": "2026-01-10",
         "modified": "2026-01-14"
       }
