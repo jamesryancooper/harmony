@@ -6,38 +6,38 @@ This directory contains the complete specification for the Harmony Artifact Surf
 
 ## Status
 
-This surface is **optional** and **non-foundational** in Harmony.
-Foundational architecture concerns are modeled by governance, runtime,
-continuity, and knowledge planes.
+The **Artifact Plane is foundational** in Harmony.
+This directory defines the canonical **Artifact Surface architecture (HAS)** for
+that plane. Runtime overlay layers remain optional.
 
 ## Position Relative to the Foundational Planes
 
-The artifact surface complements the foundational planes:
+The artifact surface implements the foundational Artifact Plane and integrates
+with the other foundational planes:
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                   HARMONY FOUNDATIONAL PLANE MODEL                          │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐          │
-│   │ GOVERNANCE PLANE│   │  RUNTIME PLANE  │   │ CONTINUITY PLANE│          │
-│   └─────────────────┘   └─────────────────┘   └─────────────────┘          │
-│                                                                             │
-│                     ┌────────────────────────────────┐                      │
-│                     │        KNOWLEDGE PLANE         │                      │
-│                     └────────────────────────────────┘                      │
-│                                                                             │
-│      Optional Surface: Artifact architecture (this directory)               │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+Ingress -> Orchestration -> Capability -> Service -> Execution Kernel
+                                         |                 |
+                                         v                 v
+                                  Artifact Plane (HAS)  Runtime outcomes
+                                         |                 |
+                                         v                 v
+                                      Assurance <------ Continuity
+                                         |
+                                         v
+                                      Knowledge
 ```
 
 **Related Foundational Surfaces:**
 - [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) — Cross-plane contract
-- [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) — Process knowledge (decisions, handoffs)
-- [Knowledge Plane](../../../runtime/knowledge-plane/knowledge-plane.md) — System knowledge (specs, code, tests)
-- [Cognition Governance](../../../governance/README.md) — Normative policy and controls
-- [Cognition Runtime](../../../runtime/README.md) — Runtime cognition artifacts
+- [Execution Kernel](../../../../engine/runtime/) — Runtime dispatch entrypoint
+- [Services](../../../../capabilities/runtime/services/) — Typed runtime interfaces
+- [Commands (Ingress)](../../../../capabilities/runtime/commands/) — Human intent intake
+- [Skills (Capability)](../../../../capabilities/runtime/skills/) — Atomic execution units
+- [Workflows (Orchestration)](../../../../orchestration/runtime/workflows/) — Multi-step sequencing
+- [Assurance](../../../../assurance/runtime/) — Gate and validation profiles
+- [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) — Active operational memory
+- [Knowledge Plane](../../../runtime/knowledge/knowledge.md) — Durable context/decision/evidence indexing
 
 ---
 
@@ -85,10 +85,10 @@ The artifact surface complements the foundational planes:
 | Type | Location | Owner Surface | Description |
 |------|----------|---------------|-------------|
 | **Canonical Content** | `content/` | Artifact surface | Source of truth: public, internal, and agent-facing content |
-| **Continuity Artifacts** | `.continuity/` | [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) | Backlog, plans, handoffs, decisions with lifecycle rules |
+| **Continuity Artifacts** | `.harmony/continuity/` | [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) | Active tasks, entities, handoff-ready next actions, and progress history |
 | **Runtime Artifacts** | Server DB (optional) | Artifact runtime extension | Live overrides, personalization, session state |
 
-> **Note**: Continuity artifacts (`.continuity/`) are managed by the Continuity Plane with specialized lifecycle rules. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for details on decision records, handoffs, and progress tracking.
+> **Note**: Continuity artifacts (`.harmony/continuity/`) are managed by the Continuity Plane with specialized lifecycle rules. Durable decision records are managed by the Knowledge Plane under `/.harmony/cognition/runtime/decisions/`.
 
 ## Sources & Influences (non-normative)
 

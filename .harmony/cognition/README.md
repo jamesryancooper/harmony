@@ -7,7 +7,7 @@ governance contracts, and operating methodology remain explicit.
 
 | Surface | Purpose | Canonical Index |
 |---|---|---|
-| `runtime/` | Authoritative cognition artifacts (`context/`, `decisions/`, `analyses/`, `knowledge-plane/`, `migrations/`, `evidence/`, `evaluations/`, `projections/`) | `runtime/index.yml` |
+| `runtime/` | Authoritative cognition artifacts (`context/`, `decisions/`, `analyses/`, `knowledge/`, `migrations/`, `evidence/`, `evaluations/`, `projections/`) | `runtime/index.yml` |
 | `governance/` | Normative principles, controls, pillars, purpose, and exception contracts | `governance/index.yml` |
 | `practices/` | Operating methodology and execution runbooks | `practices/index.yml`, `practices/methodology/index.yml`, `practices/operations/index.yml` |
 | `_ops/` | Mutable scripts/state for cognition guardrails | `_ops/README.md` |

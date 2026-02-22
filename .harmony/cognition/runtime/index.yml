@@ -28,10 +28,10 @@ files:
     summary: Discovery index for runtime analysis artifacts.
     when: When locating in-depth analytical outputs.
 
-  - id: runtime-knowledge-plane-index
-    path: knowledge-plane/index.yml
-    summary: Discovery index for runtime knowledge-plane contracts and guides.
-    when: When tracing knowledge-plane architecture, scope, and operating contracts.
+  - id: runtime-knowledge-index
+    path: knowledge/index.yml
+    summary: Discovery index for runtime knowledge contracts and guides.
+    when: When tracing knowledge architecture, scope, and operating contracts.
 
   - id: runtime-evidence-index
     path: evidence/index.yml

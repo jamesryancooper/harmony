@@ -5,7 +5,7 @@ description: Unified, queryable engineering knowledge linking specs, contracts, 
 
 # Knowledge Plane: Linking Specifications, Contracts, Tests, Traces, and SBOM
 
-Related docs: [Foundational Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md), [Continuity Plane](/.harmony/continuity/_meta/architecture/continuity-plane.md), [Cognition Governance](/.harmony/cognition/governance/README.md), [Cognition Runtime](/.harmony/cognition/runtime/README.md), [monorepo polyglot (normative)](../../_meta/architecture/monorepo-polyglot.md), [runtime architecture](/.harmony/cognition/_meta/architecture/runtime-architecture.md), [tooling integration](../../_meta/architecture/tooling-integration.md), [observability requirements](../../_meta/architecture/observability-requirements.md), [governance model](../../_meta/architecture/governance-model.md), [contracts registry](../../_meta/architecture/contracts-registry.md), [Artifact Surface (optional)](/.harmony/cognition/_meta/architecture/artifact-surface/README.md)
+Related docs: [Foundational Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md), [Continuity Plane](/.harmony/continuity/_meta/architecture/continuity-plane.md), [Cognition Governance](/.harmony/cognition/governance/README.md), [Cognition Runtime](/.harmony/cognition/runtime/README.md), [monorepo polyglot (normative)](../../_meta/architecture/monorepo-polyglot.md), [runtime architecture](/.harmony/cognition/_meta/architecture/runtime-architecture.md), [tooling integration](../../_meta/architecture/tooling-integration.md), [observability requirements](../../_meta/architecture/observability-requirements.md), [governance model](../../_meta/architecture/governance-model.md), [contracts registry](../../_meta/architecture/contracts-registry.md), [Artifact Surface](/.harmony/cognition/_meta/architecture/artifact-surface/README.md)
 
 The Knowledge Plane is the unified, queryable body of **system knowledge**—specifications, contracts, code artifacts, tests, build outputs, runtime telemetry, and compliance. It provides traceability from requirements to runtime signals so that both developers and AI agents can reason about **what the system is** and **how it behaves**.
 
@@ -13,27 +13,18 @@ The Knowledge Plane is the unified, queryable body of **system knowledge**—spe
 
 ## Position in the Foundational Plane Model
 
-The Knowledge Plane is one of Harmony's four foundational planes:
+The Knowledge Plane is one of Harmony's nine foundational planes:
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                   HARMONY FOUNDATIONAL PLANE MODEL                          │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐          │
-│   │ GOVERNANCE PLANE│   │  RUNTIME PLANE  │   │ CONTINUITY PLANE│          │
-│   │                 │   │                 │   │                 │          │
-│   │ What is allowed │   │ What runs and   │   │ What happened + │          │
-│   │ + enforced      │   │ executes        │   │ what is next    │          │
-│   └─────────────────┘   └─────────────────┘   └─────────────────┘          │
-│                                                                             │
-│                     ┌────────────────────────────────┐                      │
-│                     │        KNOWLEDGE PLANE         │                      │
-│                     │            (you are here)      │                      │
-│                     │  What the system is + behaves  │                      │
-│                     └────────────────────────────────┘                      │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+Execution Kernel -> Service -> Capability/Orchestration -> Assurance
+                      |                           |             |
+                      v                           v             v
+                   Artifacts                  Continuity <-> Knowledge
+
+Knowledge Plane role:
+- Durable system context
+- Durable decision and evidence indexes
+- Traceability graph for specs/contracts/code/tests/runtime signals
 ```
 
 ### Core Question
@@ -49,22 +40,23 @@ The Knowledge Plane answers questions about the system itself:
 - What dependencies have vulnerabilities?
 
 This contrasts with:
-- **Governance Plane**: "What is allowed and required?" (principles, controls, contracts)
-- **Runtime Plane**: "What executes?" (workflows, commands, services, engine runtime)
-- **Continuity Plane**: "What did we decide and why?" (decisions, handoffs, rationale)
-
-Optional but non-foundational:
-- **Artifact surface**: "What artifacts do we produce and publish?" (docs/entities/pages/prompts/reports)
+- **Execution/Service/Capability/Orchestration Planes**: "How does work execute?"
+- **Assurance Plane**: "What must pass before completion?"
+- **Continuity Plane**: "What is actively in progress and what is next?"
+- **Artifact Plane**: "What durable outputs/evidence were produced?"
 
 ### Boundary Clarification
 
 The Knowledge Plane **does NOT own**:
-- **Decision records (ADRs)** — owned by Continuity Plane
-- **Decision rationale** — owned by Continuity Plane
-- **Session handoffs** — owned by Continuity Plane
-- **Progress logs** — owned by Continuity Plane
+- Active task state (`tasks.json`) — owned by Continuity Plane
+- Session handoffs and immediate-next routing (`next.md`) — owned by Continuity Plane
+- Execution gate outcomes — owned by Assurance Plane
+- Raw runtime dispatch surfaces — owned by Execution/Service planes
 
 The Knowledge Plane **DOES own**:
+- Durable context contracts (`context/`)
+- Durable decision records and indexes (`decisions/`, context decisions index)
+- Durable evidence/evaluation/projection indexes
 - Specifications (behavioral definitions)
 - Contracts (interface definitions)
 - Code module references
@@ -73,9 +65,9 @@ The Knowledge Plane **DOES own**:
 - SBOM and dependency graph
 
 The Knowledge Plane **indexes** (but doesn't own):
-- ADR effects via `ADR INFORMS Contract` edges
-- ADR impacts via `ADR AFFECTS CodeModule` edges
-- Decision references for traceability queries
+- Continuity task/entity references to system knowledge
+- Artifact evidence references used for verification
+- Assurance outcomes linked to specs/contracts/modules
 
 See [Foundational Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md) for complete boundary definitions.
 
@@ -100,18 +92,18 @@ The Knowledge Plane indexes and links **system knowledge** across these domains:
 | **Tests** | Test cases, coverage, results, flakiness | CI/CD pipelines |
 | **Runtime Telemetry** | Traces, logs, metrics, SLO signals | OpenTelemetry ingestion |
 | **SBOM** | Dependencies, versions, licenses, vulnerabilities | Build-time generation |
-| **Decision Effects** | ADR → Contract/Module links (indexed, not owned) | Cross-plane refs |
+| **Decision Records** | Durable architecture/system decisions with rationale and links | `cognition/runtime/decisions/` + indexes |
+| **Cross-Plane Effects** | Continuity/assurance/artifact links into system knowledge | Cross-plane refs |
 
 ### What Knowledge Plane Does NOT Own
 
 The following belong to the **Continuity Plane** (see [Continuity Plane](/.harmony/continuity/_meta/architecture/continuity-plane.md)):
 
-- Decision records (ADRs, CDRs) — their rationale and alternatives
 - Session handoffs — context transfer between agents/humans
 - Progress events — work audit trails
 - Backlogs — work item management
 
-The Knowledge Plane **indexes ADR effects** for traceability (e.g., "What decisions affect this module?") but the **source of truth** for decisions lives in Continuity.
+The Knowledge Plane maintains durable decision records and indexes while Continuity maintains active operational state.
 
 ### Runtime Telemetry Attributes
 
@@ -132,7 +124,7 @@ Runtime traces, logs, and metrics include standardized attributes from the platf
 | **Trace/Log/Metric** | Runtime telemetry for operations and SLOs | Knowledge Plane |
 | **RuntimeRun** | A run record for a flow (`flow_id`, `flow_version`, `run_id` + metadata) | Knowledge Plane |
 | **SBOM Component** | Third-party dependency with version/licensing | Knowledge Plane |
-| **Decision (ADR/CDR)** | Architectural or content decisions with rationale | **Continuity Plane** (indexed here) |
+| **Decision (ADR/CDR)** | Durable architectural/system decisions with rationale | Knowledge Plane |
 | **Link/Edge** | Typed relationship across entities enabling traceability | Both (within + cross-plane) |
 
 ### Contract Storage
@@ -194,18 +186,19 @@ Represent relationships in a knowledge graph (e.g., Neo4j/RDF) or equivalent ind
 | `CORRELATES_WITH` | Trace | PullRequest/PipelineRun | Trace-to-change link |
 | `AFFECTS` | FeatureFlagChange | Spec/Feature | Flag impacts behavior |
 
-### Cross-Plane Edges (Indexed from Continuity Plane)
+### Cross-Plane Edges (Continuity/Assurance/Artifact)
 
-These edges link to nodes **owned by the Continuity Plane** (see [Foundational Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md)):
+These edges link operational state and evidence from other foundational planes into Knowledge Plane traceability:
 
-| Edge | From (Continuity) | To (Knowledge) | Meaning |
-|------|-------------------|----------------|---------|
-| `INFORMS` | Decision (ADR) | Contract | Decision shapes interface |
-| `AFFECTS` | Decision (ADR) | CodeModule | Decision impacts implementation |
-| `MOTIVATED_BY` | Spec | Decision (ADR) | Spec driven by decision |
-| `VERIFIED_BY` | Decision | TestCase | Decision has test evidence |
+| Edge | From | To (Knowledge) | Meaning |
+|------|------|----------------|---------|
+| `TRACKS` | Continuity Task | Spec/Contract | Active work mapped to system intent |
+| `REFERENCES` | Continuity Task/Entity | Decision | Operational work tied to durable decisions |
+| `EVIDENCED_BY` | Continuity Task | BuildArtifact/Report | Task progression backed by artifacts |
+| `VERIFIED_BY` | Assurance Check | TestCase/Policy | Gate outcomes anchored to verifiable checks |
+| `PRODUCES` | RuntimeRun | BuildArtifact | Executions create durable outputs |
 
-**Important**: The Knowledge Plane indexes these edges for traceability queries, but the **Decision nodes themselves** (with rationale, alternatives, context) live in the Continuity Plane.
+**Important**: Continuity remains the source of truth for active session/task state, while Knowledge remains the source of truth for durable decision/context/evidence indexes.
 
 Example Cypher query (illustrative):
 

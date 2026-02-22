@@ -117,7 +117,7 @@ Each entry should be specific enough to avoid false positives.
 - `/.harmony/cognition/context/` - replaced by `/.harmony/cognition/runtime/context/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `/.harmony/cognition/decisions/` - replaced by `/.harmony/cognition/runtime/decisions/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `/.harmony/cognition/analyses/` - replaced by `/.harmony/cognition/runtime/analyses/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
-- `/.harmony/cognition/knowledge-plane/` - replaced by `/.harmony/cognition/runtime/knowledge-plane/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
+- `/.harmony/cognition/knowledge-plane/` - replaced by `/.harmony/cognition/runtime/knowledge/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `/.harmony/cognition/principles/` - replaced by `/.harmony/cognition/governance/principles/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `/.harmony/cognition/pillars/` - replaced by `/.harmony/cognition/governance/pillars/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `/.harmony/cognition/purpose/` - replaced by `/.harmony/cognition/governance/purpose/` - removed by migration `2026-02-20-cognition-bounded-surfaces`

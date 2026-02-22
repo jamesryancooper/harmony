@@ -76,7 +76,7 @@ The LangGraph-based platform runtime under `platform/runtimes/flow-runtime/**` i
 - Providing a stable HTTP API (`/flows/run`) whose schema is represented in the `contracts/` registry:
   - Request/response JSON Schemas and OpenAPI definitions under `contracts/openapi` and `contracts/schemas`.
   - Generated TS/Python clients for FlowKit in `contracts/ts` and `contracts/py`.
-- Emitting OpenTelemetry traces/logs/metrics with trace IDs correlated to PRs/builds (see `observability-requirements.md` and `knowledge-plane.md`).
+- Emitting OpenTelemetry traces/logs/metrics with trace IDs correlated to PRs/builds (see `observability-requirements.md` and `knowledge.md`).
 
 In this profile, additional endpoints exposed by the runtime should follow the
 same contracts-first pattern and be captured in the `contracts/` registry.

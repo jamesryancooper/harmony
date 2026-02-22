@@ -243,7 +243,7 @@ This section provides concrete sandbox patterns for common change types. Teams M
 
 ## 6. Audibility and Knowledge Plane Integration
 
-For each Sandbox Flow run, the following SHOULD be recorded in the Knowledge Plane (see `knowledge-plane.md` and `tooling-integration.md`):
+For each Sandbox Flow run, the following SHOULD be recorded in the Knowledge Plane (see `knowledge.md` and `tooling-integration.md`):
 
 - PR metadata: commit SHA, branch, PR number, risk class.
 - CI runs and gate results, including coverage, contract tests, and security scans.

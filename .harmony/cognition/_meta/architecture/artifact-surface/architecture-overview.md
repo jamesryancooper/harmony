@@ -7,20 +7,24 @@
 
 ## Status
 
-HAS is an **optional artifact architecture surface**.
-It is **not** a foundational Harmony plane.
+HAS is the canonical architecture surface for the **foundational Artifact Plane**.
+Runtime overlay layers are optional extensions.
 
 ## Position Relative to the Foundational Planes
 
-HAS complements the foundational model:
+HAS implements the Artifact Plane in Harmony's canonical model:
 
-| Foundational Surface | Core Question | Artifacts |
+| Foundational Plane | Core Question | Primary Surface |
 |-------|---------------|-----------|
-| [Governance](../../../governance/README.md) | "What is allowed and required?" | Principles, controls, policy contracts |
-| [Runtime](../../../runtime/README.md) | "What runs and executes work?" | Runtime artifacts, workflows, execution contracts |
-| [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) | "What happened and what is next?" | Decisions, handoffs, progress, backlogs |
-| [Knowledge Plane](../../../runtime/knowledge-plane/knowledge-plane.md) | "What is the system?" | Specs, contracts, code, tests, traces |
-| **HAS (optional)** | "What artifacts do we produce and publish?" | Docs, entities, pages, prompts |
+| Execution Kernel | How is executable work dispatched? | `.harmony/engine/runtime/` |
+| Service | What typed runtime operations exist? | `.harmony/capabilities/runtime/services/` |
+| Ingress | How does human intent enter? | `.harmony/capabilities/runtime/commands/` |
+| Capability | What atomic execution units exist? | `.harmony/capabilities/runtime/skills/` |
+| Orchestration | How are missions sequenced? | `.harmony/orchestration/runtime/workflows/` |
+| Assurance | What must pass before completion? | `.harmony/assurance/{runtime,practices}/` |
+| Continuity | What is active and next? | `.harmony/continuity/{log.md,tasks.json,entities.json,next.md}` |
+| Knowledge | What durable context/decisions/evidence exist? | `.harmony/cognition/runtime/{context,decisions,evidence,evaluations,projections,knowledge-plane}/` |
+| **Artifact (HAS)** | What durable outputs/evidence are produced? | `.harmony/output/` + this architecture surface |
 
 See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for cross-plane architecture.
 
@@ -72,7 +76,7 @@ When boundary conditions are crossed (see [boundary-conditions.md](./boundary-co
 
 | Layer | Storage | Mutability | Purpose |
 |-------|---------|------------|---------|
-| **Canonical** | `content/` + `.continuity/` in git | Immutable at runtime; changed via PR | Source of truth |
+| **Canonical** | `content/` + `.harmony/continuity/` in git | Immutable at runtime; changed via PR | Source of truth |
 | **Compiled** | `.harmony/content/` (HAG) | Regenerated each build | Query layer |
 | **Runtime Read** | SQLite at edge (Turso/D1/LiteFS) | Read-only replica | Fast global reads |
 | **Runtime Write** | Server DB (Postgres/Supabase) | Mutable | Live overrides, personalization |

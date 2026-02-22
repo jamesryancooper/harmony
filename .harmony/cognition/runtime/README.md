@@ -11,7 +11,7 @@ Authoritative cognition artifacts that agents and humans consume during work.
 - `context/` - shared reference context (constraints, lessons, glossary, etc.).
 - `decisions/` - append-only ADR records and discovery index (`index.yml`).
 - `analyses/` - in-depth analytical outputs.
-- `knowledge-plane/` - runtime knowledge-plane contracts and guides.
+- `knowledge/` - runtime knowledge contracts and guides.
 - `migrations/` - canonical migration plan records and discovery index.
 - `evidence/` - runtime map linking records to generated evidence bundles.
 - `evaluations/` - periodic scorecard digests and evaluation history.

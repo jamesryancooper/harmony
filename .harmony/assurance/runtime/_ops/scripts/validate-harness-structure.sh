@@ -382,7 +382,7 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/cognition/runtime/decisions/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/migrations/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/analyses/index.yml"
-  require_file "$HARMONY_DIR/cognition/runtime/knowledge-plane/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/knowledge/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/evidence/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/evaluations/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/projections/index.yml"
@@ -446,7 +446,7 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/cognition/runtime/migrations"
   require_dir "$HARMONY_DIR/cognition/runtime/decisions"
   require_dir "$HARMONY_DIR/cognition/runtime/analyses"
-  require_dir "$HARMONY_DIR/cognition/runtime/knowledge-plane"
+  require_dir "$HARMONY_DIR/cognition/runtime/knowledge"
   require_dir "$HARMONY_DIR/cognition/runtime/evidence"
   require_dir "$HARMONY_DIR/cognition/runtime/evaluations"
   require_dir "$HARMONY_DIR/cognition/runtime/projections"
@@ -846,9 +846,9 @@ check_cognition_discovery_indexes() {
     "cognition runtime analyses"
 
   check_index_path_contract \
-    "$HARMONY_DIR/cognition/runtime/knowledge-plane/index.yml" \
-    "$HARMONY_DIR/cognition/runtime/knowledge-plane" \
-    "cognition runtime knowledge-plane"
+    "$HARMONY_DIR/cognition/runtime/knowledge/index.yml" \
+    "$HARMONY_DIR/cognition/runtime/knowledge" \
+    "cognition runtime knowledge"
 
   check_index_path_contract \
     "$HARMONY_DIR/cognition/runtime/evidence/index.yml" \

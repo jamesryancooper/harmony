@@ -192,4 +192,4 @@ These defaults are normative unless a documented waiver applies:
 - `.harmony/cognition/_meta/architecture/governance-model.md`
 - `.harmony/cognition/_meta/architecture/observability-requirements.md`
 - `.harmony/cognition/_meta/architecture/runtime-policy.md`
-- `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
+- `.harmony/cognition/runtime/knowledge/knowledge.md`

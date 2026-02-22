@@ -70,7 +70,7 @@ Weekly digest MUST include:
 - Tooling and metrics: `.harmony/cognition/practices/methodology/tooling-and-metrics.md`
 - Reliability and ops: `.harmony/cognition/practices/methodology/reliability-and-ops.md`
 - Risk tiers: `.harmony/cognition/practices/methodology/risk-tiers.md`
-- Knowledge Plane: `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
+- Knowledge Plane: `.harmony/cognition/runtime/knowledge/knowledge.md`
 - Runtime evaluations surface: `.harmony/cognition/runtime/evaluations/README.md`
 - Observability requirements: `.harmony/cognition/_meta/architecture/observability-requirements.md`
 - Governance model: `.harmony/cognition/_meta/architecture/governance-model.md`

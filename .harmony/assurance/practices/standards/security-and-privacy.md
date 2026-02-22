@@ -59,7 +59,7 @@ See `.harmony/cognition/practices/methodology/README.md` for Harmony’s five pi
 - Governance model: `.harmony/cognition/_meta/architecture/governance-model.md`
 - Runtime policy: `.harmony/cognition/_meta/architecture/runtime-policy.md`
 - Observability requirements: `.harmony/cognition/_meta/architecture/observability-requirements.md`
-- Knowledge Plane: `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
+- Knowledge Plane: `.harmony/cognition/runtime/knowledge/knowledge.md`
 - Methodology overview: `.harmony/cognition/practices/methodology/README.md`
 - Implementation guide: `.harmony/cognition/practices/methodology/implementation-guide.md`
 - Layers model: `.harmony/cognition/_meta/architecture/layers.md`

@@ -87,7 +87,7 @@ This profile assumes that all callers (apps, agents, Kaizen, and the platform ru
 ## CI/CD and Knowledge Plane Correlation
 
 - PR annotation:
-  - A custom CI step posts `{ build_id, pr_number, trace_context, commit_sha }` to PRs and to the Knowledge Plane correlation API (`POST /kp/correlation`) as described in `knowledge-plane.md`.
+  - A custom CI step posts `{ build_id, pr_number, trace_context, commit_sha }` to PRs and to the Knowledge Plane correlation API (`POST /kp/correlation`) as described in `knowledge.md`.
   - This correlation is used to link PRs ↔ builds ↔ deployments ↔ traces for debugging and governance.
 - Vercel previews:
   - Every PR for `apps/*` produces a Vercel Preview; reviewers validate behavior (including runtime interactions) there before promotion.

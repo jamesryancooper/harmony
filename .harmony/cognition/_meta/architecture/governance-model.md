@@ -214,7 +214,7 @@ The elements work together to deliver Speed with Safety:
 - Waiver policy provides a controlled escape hatch when necessary, with logging and expiration.
 - Progressive deployment and monitoring create a fail‑closed posture with rapid rollback.
 - Feature flags act as a primary runtime control across both TS apps and Python runtimes (for example, flows executed by the **platform runtime service** under `platform/runtimes/flow-runtime/**`); manual promote/rollback is recorded, and flag state changes are auditable.
-- The **platform runtime service** provides a shared execution substrate whose run metadata (for example, `flow_id`, `flow_version`, `run_id`, `caller_kind`, `caller_id`, `project_id`, `environment`, `risk_tier`) is treated as governance evidence: Kaizen, planners, and reviewers use this data from the Knowledge Plane to assess risk, regressions, and waiver impact (see `runtime-architecture.md` and `knowledge-plane.md`).
+- The **platform runtime service** provides a shared execution substrate whose run metadata (for example, `flow_id`, `flow_version`, `run_id`, `caller_kind`, `caller_id`, `project_id`, `environment`, `risk_tier`) is treated as governance evidence: Kaizen, planners, and reviewers use this data from the Knowledge Plane to assess risk, regressions, and waiver impact (see `runtime-architecture.md` and `knowledge.md`).
 
 Transparency is foundational: approvals, waivers, risk levels, CI results, and runtime evidence are recorded and visible for retrospectives and audits.
 

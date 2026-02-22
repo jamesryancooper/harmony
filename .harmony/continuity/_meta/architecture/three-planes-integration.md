@@ -1,105 +1,115 @@
 ---
 title: Foundational Planes Integration
-description: Integration contract for Governance, Runtime, Continuity, and Knowledge planes, retained at a legacy path for compatibility.
+description: Canonical integration contract for Harmony foundational planes, retained at a legacy path for compatibility.
 ---
 
 # Foundational Planes Integration
 
 This file is retained at `three-planes-integration.md` for link compatibility.
-The canonical model is now a **foundational four-plane model**.
+The canonical model is now a **foundational nine-plane model**.
 
-Harmony separates concerns into four foundational planes while keeping explicit
-integration points.
+Harmony separates concerns into nine foundational planes while keeping explicit
+integration and ownership boundaries.
 
 ## Plane Roles
 
 | Plane | Core Question | Primary Surface |
 |---|---|---|
-| Governance Plane | What is allowed, required, and enforced? | `.harmony/*/governance/` with cognition governance as cross-cutting policy anchor |
-| Runtime Plane | What runs and performs work? | `.harmony/*/runtime/` (plus executable runtime authority in `.harmony/engine/runtime/`) |
+| Execution Kernel Plane | How is executable work dispatched? | `.harmony/engine/runtime/` |
+| Service Plane | What typed runtime operations exist? | `.harmony/capabilities/runtime/services/` |
+| Ingress Plane | How does human intent enter the system? | `.harmony/capabilities/runtime/commands/` |
+| Capability Plane | What atomic execution units are available? | `.harmony/capabilities/runtime/skills/` |
+| Orchestration Plane | How are multi-step missions sequenced? | `.harmony/orchestration/runtime/workflows/` |
+| Assurance Plane | What must pass before completion? | `.harmony/assurance/{runtime,practices}/` |
 | Continuity Plane | What happened and what is next? | `.harmony/continuity/{log.md,tasks.json,entities.json,next.md}` |
-| Knowledge Plane | What is the system and how does it behave? | cognition runtime knowledge contracts, evidence indexes, architecture links, and telemetry references |
+| Knowledge Plane | What durable system context and decisions exist? | `.harmony/cognition/runtime/{context,decisions,evidence,evaluations,projections,knowledge-plane}/` |
+| Artifact Plane | What durable deliverables/evidence are produced? | `.harmony/output/` (with optional artifact compilation architecture under `/.harmony/cognition/_meta/architecture/artifact-surface/`) |
 
-## Optional Publishing Surface (Non-Foundational)
+## Plane Boundaries
 
-`/.harmony/cognition/_meta/architecture/artifact-surface/` is an optional
-artifact architecture surface. It is not a foundational plane for Harmony
-governance/execution semantics.
+- Execution Kernel owns runtime dispatch and execution shims. It does not own workflow intent, policy, or knowledge contracts.
+- Service owns operation contracts and typed runtime interfaces. It does not own human command semantics or task continuity.
+- Ingress owns slash-command intake and routing. It does not own execution internals.
+- Capability owns reusable atomic skills and their execution contracts. It does not own mission sequencing.
+- Orchestration owns workflow sequencing and coordination. It does not own low-level interface execution.
+- Assurance owns gates, validation profiles, and completion criteria. It does not own product/runtime behavior itself.
+- Continuity owns active operational memory and handoff state.
+- Knowledge owns durable context, architectural decisions, evidence indexes, and cross-reference contracts.
+- Artifact owns durable outputs and evidence bundles consumed by audits, decision records, and downstream consumers.
+
+## Artifact Surface Note
+
+`/.harmony/cognition/_meta/architecture/artifact-surface/` defines the artifact compiler architecture used by the Artifact Plane. Runtime overlays in that surface are optional implementation layers; Artifact Plane ownership remains foundational.
 
 ## Integration Contract
 
-### Governance -> Runtime
+### Ingress -> Orchestration -> Capability
 
-- Runtime actions MUST respect governance controls (deny-by-default, ACP gates,
-  risk-tier contracts, waiver semantics).
-- Governance changes that alter execution policy SHOULD be reflected in runtime
-  procedures and enforcement artifacts.
+- Commands MUST resolve deterministically to workflow and/or capability contracts.
+- Workflow steps SHOULD be expressed as composition over capabilities, not ad hoc shell behavior.
 
-### Runtime -> Continuity
+### Capability -> Service -> Execution Kernel
 
-- Material runtime execution outcomes SHOULD be captured in `log.md`.
-- Active and blocked execution work MUST be represented in `tasks.json` and
-  surfaced in `next.md`.
-- Durable run receipts/digests SHOULD be stored in `continuity/runs/` and must
-  follow retention classes from `continuity/runs/retention.json`.
+- Capabilities SHOULD call typed service interfaces for deterministic behavior.
+- Services MUST route executable work through the execution kernel.
 
-### Continuity -> Knowledge
+### Execution + Orchestration -> Artifact
 
-- Active tasks in `tasks.json` should reference relevant specs, contracts, or architecture docs when available.
-- Entity records in `entities.json` should link to authoritative technical knowledge sources.
+- Material runs MUST emit durable artifacts/evidence when required by workflow/assurance contracts.
+- Artifact outputs SHOULD be discoverable by stable paths for audits and replay.
 
-### Knowledge -> Continuity
+### Execution + Orchestration -> Continuity
 
-- Architectural decisions and verification outcomes should be captured in continuity history (`log.md`) and future actions (`next.md`).
-- Breaking or risky system changes should update task metadata (risk, blockers, required approvals).
+- Material outcomes SHOULD be appended to `log.md`.
+- Active and blocked work MUST be represented in `tasks.json` and reflected in `next.md`.
+- Run receipts/digests SHOULD be stored in `continuity/runs/` following retention policy.
 
-### Optional Publishing Surface -> Continuity/Knowledge
+### Knowledge <-> Continuity
 
-- Publication/content work SHOULD still flow through continuity state when it is
-  active execution work.
-- Published artifacts MAY be indexed by knowledge/evidence systems but do not
-  redefine foundational plane ownership.
+- Continuity SHOULD link to relevant knowledge artifacts (specs, decisions, evidence indexes) for active work.
+- Knowledge SHOULD preserve durable context/decision artifacts referenced by continuity state transitions.
+
+### Assurance Across All Planes
+
+- Assurance checks MUST validate structural coherence across ingress, orchestration, capabilities, services, continuity, knowledge, and artifacts.
+- Completion MUST be gated on declared assurance criteria, not inferred from partial evidence.
 
 ## Data Flow
 
 ```text
-Governance policy/controls
-            |
-            v
- Runtime execution + outcomes -----> Continuity state
-            |                               |
-            v                               v
-      Knowledge updates <----------- decision/task linkage
+Ingress -> Orchestration -> Capability -> Service -> Execution Kernel
+                                         |                 |
+                                         v                 v
+                                    Artifact outputs   Runtime outcomes
+                                         |                 |
+                                         v                 v
+                                      Assurance <------ Continuity
+                                         |
+                                         v
+                                      Knowledge
 ```
 
 ## Consistency Requirements
 
+- Command/workflow/skill/service registries must stay route-consistent.
+- Artifact outputs required by assurance gates must exist and remain discoverable.
 - `next.md` must only reference active, unblocked tasks from `tasks.json`.
 - `entities.json` ownership should align with task ownership when work is entity-specific.
 - `log.md` entries should provide enough context to understand why task/entity state changed.
-- `runs/` artifacts should map to a retention class and must not replace active
-  task-state tracking surfaces.
-- Governance contracts and runtime behavior MUST NOT diverge without explicit
-  migration records.
-
-## Governance Hooks
-
-- ACP policy gates and risk-tiering are enforced through workflow and policy docs, while continuity captures the resulting execution trail.
-- Post-change verification should be represented by both evidence in knowledge artifacts and status progression in `tasks.json`.
+- `runs/` artifacts should map to retention classes and must not replace active task-state tracking surfaces.
+- Knowledge decision/evidence indexes and artifact outputs must remain cross-referenceable from continuity and assurance artifacts.
 
 ## Anti-Patterns
 
+- Treating foundational planes as interchangeable folders instead of ownership contracts.
+- Bypassing typed service/capability/orchestration contracts with ad hoc execution paths.
 - Treating continuity files as optional notes instead of operational state.
-- Recording decisions only in prose without updating structured continuity state.
-- Allowing task progression without corresponding log entries.
-- Treating artifact surface architecture as a foundational control/runtime
-  plane in Harmony.
+- Allowing task progression without corresponding continuity and assurance evidence.
+- Treating artifact runtime overlays as a replacement for canonical artifact evidence.
 
 ## Related Docs
 
 - `.harmony/continuity/_meta/architecture/continuity-plane.md`
-- `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
-- `.harmony/cognition/governance/README.md`
-- `.harmony/cognition/practices/README.md`
-- `.harmony/cognition/_meta/architecture/artifact-surface/README.md` (optional artifact architecture)
+- `.harmony/cognition/runtime/knowledge/knowledge.md`
+- `.harmony/cognition/_meta/architecture/artifact-surface/README.md`
 - `.harmony/START.md`

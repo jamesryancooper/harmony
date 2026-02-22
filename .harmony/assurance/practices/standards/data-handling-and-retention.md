@@ -42,7 +42,7 @@ See `.harmony/cognition/practices/methodology/README.md` for Harmony’s five pi
 ## Related Docs
 
 - Security baseline: `.harmony/assurance/practices/standards/security-and-privacy.md`
-- Knowledge Plane: `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
+- Knowledge Plane: `.harmony/cognition/runtime/knowledge/knowledge.md`
 - Methodology overview: `.harmony/cognition/practices/methodology/README.md`
 - Implementation guide: `.harmony/cognition/practices/methodology/implementation-guide.md`
 - Layers model: `.harmony/cognition/_meta/architecture/layers.md`

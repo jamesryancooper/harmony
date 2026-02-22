@@ -23,7 +23,7 @@
 
 **Continuity through Institutional Memory**:
 
-- `.continuity/` artifacts are owned by the [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) but indexed by Artifact Surface build pipeline.
+- `/.harmony/continuity/` artifacts are owned by the [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) but indexed by Artifact Surface build pipeline.
 - Provenance captured in envelopes; decisions become queryable documents across planes.
 - See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for cross-plane relationships.
 

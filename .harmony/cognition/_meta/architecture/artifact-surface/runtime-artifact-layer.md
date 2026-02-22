@@ -6,19 +6,22 @@ This section defines the **optional runtime artifact layer** that extends the ca
 
 ## Position Relative to Foundational Planes
 
-The Runtime Artifact Layer extends the **optional artifact surface**.
-It does not redefine Harmony's foundational planes (governance, runtime,
-continuity, knowledge).
+The Runtime Artifact Layer extends the **foundational Artifact Plane**
+implementation surface (HAS).
+It does not redefine foundational ownership across execution kernel, service,
+ingress, capability, orchestration, assurance, continuity, or knowledge planes.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     RUNTIME LAYER SCOPE                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Optional Artifact Surface    Foundational Planes              │
+│   Artifact Plane (HAS)         Other Foundational Planes        │
 │   ┌─────────────────┐         ┌─────────────────────────────┐  │
-│   │ Canonical       │         │ Governance / Runtime /      │  │
-│   │ content/        │         │ Continuity / Knowledge      │  │
+│   │ Canonical       │         │ Execution/Service/Ingress/  │  │
+│   │ content/        │         │ Capability/Orchestration/   │  │
+│   │                 │         │ Assurance/Continuity/       │  │
+│   │                 │         │ Knowledge                   │  │
 │   │                 │         │                             │  │
 │   │ Runtime Layer   │         │ (unchanged by this layer)   │  │
 │   │ ◄── Extends     │         │                             │  │
@@ -38,9 +41,9 @@ See [Foundational Planes Integration](../../../../continuity/_meta/architecture/
 
 | Term | Plane | Definition |
 |------|-------|------------|
-| **Canonical Content** | Optional artifact surface | Content stored in `content/` as the authoritative source of truth. Git-tracked, schema-validated, and compiled into the Harmony Artifact Graph (HAG). |
-| **Continuity Artifacts** | [Continuity](../../../../continuity/_meta/architecture/continuity-plane.md) | Content stored in `.continuity/` with special lifecycle rules (append-only logs, immutable decisions, session-scoped handoffs). Owned by Continuity Plane. |
-| **Runtime Artifacts** | Optional artifact-surface extension | Dynamic data that overlays canonical content at request time. May include live overrides, personalization, time-sensitive updates, or data fetched from external systems. |
+| **Canonical Content** | Artifact Plane (HAS) | Content stored in `content/` as authoritative source of truth. Git-tracked, schema-validated, and compiled into the Harmony Artifact Graph (HAG). |
+| **Continuity Artifacts** | [Continuity](../../../../continuity/_meta/architecture/continuity-plane.md) | State stored in `.harmony/continuity/` with continuity lifecycle rules (append-first log, structured tasks/entities, handoff-ready next state). |
+| **Runtime Artifacts** | Artifact runtime extension | Dynamic data that overlays canonical content at request time. May include live overrides, personalization, time-sensitive updates, or data fetched from external systems. |
 
 ### Artifact roots summary
 
@@ -48,15 +51,15 @@ HAS treats the following as **artifact roots** (indexing content from multiple p
 
 | Root | Plane | Type | Description |
 |------|-------|------|-------------|
-| `content/` | Optional artifact surface | Canonical content | Public, internal, and agent-facing content organized by surface |
-| `.continuity/` | [Continuity](../../../../continuity/_meta/architecture/continuity-plane.md) | Continuity artifacts | Backlog, plans, handoffs, progress events, decisions—with lifecycle rules |
-| `.harmony/content/` | Optional artifact surface | Compiled artifacts | SQLite indexes, JSON exports, dependency graphs (generated, not source) |
+| `content/` | Artifact Plane (HAS) | Canonical content | Public, internal, and agent-facing content organized by surface |
+| `.harmony/continuity/` | [Continuity](../../../../continuity/_meta/architecture/continuity-plane.md) | Continuity artifacts | Active tasks, entities, chronological log, and next actions |
+| `.harmony/content/` | Artifact Plane (HAS) | Compiled artifacts | SQLite indexes, JSON exports, dependency graphs (generated, not source) |
 
 ### The distinction
 
 - **Canonical content** (Artifact Surface) is the **source of truth** for published content. It lives in git, is versioned, auditable, and deterministically compiled.
 - **Runtime content** (Artifact Surface extension) is an **overlay**. It extends canonical content with dynamic data but does not replace the underlying source of truth.
-- **Continuity artifacts** (Continuity Plane) have **special lifecycle semantics** (append-only, session-scoped, immutable-after-merge). They are owned by the Continuity Plane but indexed by the Artifact Surface build pipeline.
+- **Continuity artifacts** (Continuity Plane) have **special lifecycle semantics** (append-first history + structured mutable state). They are owned by the Continuity Plane but indexed by the Artifact Surface build pipeline.
 
 ---
 
@@ -121,7 +124,7 @@ The Artifact Surface design already accommodates runtime extension:
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     CANONICAL LAYER                              │
-│   content/ + .continuity/ → git (source of truth)                     │
+│   content/ + .harmony/continuity/ → git (source of truth)       │
 │   Versioned, schema-validated, auditable                        │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -255,7 +258,7 @@ The recommended approach is a **tiered model** where each layer serves its appro
 | **Public** | Marketing pages, docs | CDN-served pages | Search, filtering | Personalization, A/B, live pricing |
 | **Internal** | ADRs, runbooks, policies | Internal portals | Dashboards | Incident docs, real-time status |
 | **Agent** | Prompts, context packs | Agent context injection | Semantic search | Session state, conversation history |
-| **Continuity** | Backlog, decisions | Handoff retrieval | Progress analytics | Real-time agent coordination |
+| **Continuity** | tasks/entities/log/next | Handoff retrieval | Progress analytics | Real-time agent coordination |
 
 ### When to escalate tiers
 

@@ -2,52 +2,36 @@
 
 ## Foundational Context
 
-The Artifact Surface (HAS) is an optional artifact surface. This diagram shows
-how it relates to Harmony's foundational planes:
+The Artifact Surface (HAS) is the canonical architecture for Harmony's
+foundational Artifact Plane. This diagram shows how it relates to the other
+foundational planes:
 
 ```mermaid
 flowchart TB
-  subgraph Foundational["Harmony Foundational Plane Model"]
+  subgraph Foundational["Harmony Canonical Foundational Plane Model"]
     direction LR
 
-    subgraph GP["Governance"]
-      GP1["Policy + controls"]
-    end
-
-    subgraph RP["Runtime"]
-      RP1["Executable surfaces"]
-    end
-
-    subgraph CnP["Continuity Plane"]
-      CnP1[".continuity/**"]
-      CnP2["Decisions, handoffs, progress"]
-    end
-
-    subgraph KP["Knowledge Plane"]
-      KP1["(generated graph)"]
-      KP2["Specs, contracts, code, tests"]
-    end
-
-    subgraph Shared["Shared Infrastructure"]
-      S1["Schema Registry"]
-      S2["Cross-Plane Refs"]
-      S3["Unified Query"]
-    end
+    IN["Ingress Plane\n(commands)"]
+    ORCH["Orchestration Plane\n(workflows)"]
+    CAP["Capability Plane\n(skills)"]
+    SVC["Service Plane\n(typed runtime interfaces)"]
+    KRN["Execution Kernel Plane\n(engine runtime/run)"]
+    ART["Artifact Plane\n(HAS + output evidence)"]
+    ASN["Assurance Plane\n(gates + validation)"]
+    CNT["Continuity Plane\n(active operational state)"]
+    KNO["Knowledge Plane\n(durable context/decisions/evidence indexes)"]
   end
 
-  subgraph Optional["Optional Publishing Surface"]
-    CP["Artifact Surface (HAS)"]
-  end
-
-  GP --> Shared
-  RP --> Shared
-  CnP --> Shared
-  KP --> Shared
-
-  CP --> Shared
-  CnP -->|"ADR INFORMS"| KP
-  CP -->|"publishing work tracked by"| CnP
-  KP -->|"spec MOTIVATED_BY"| CnP
+  IN --> ORCH --> CAP --> SVC --> KRN
+  ORCH --> ART
+  KRN --> ART
+  ORCH --> CNT
+  KRN --> CNT
+  ART --> ASN
+  KRN --> ASN
+  ASN --> KNO
+  CNT <--> KNO
+  ART --> KNO
 ```
 
 See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete cross-plane architecture.
@@ -60,7 +44,7 @@ See [Foundational Planes Integration](../../../../continuity/_meta/architecture/
 flowchart TB
   subgraph Source["Source Layer (git-tracked)"]
     A1["content/** (public/internal/agent)"]
-    A2[".continuity/** (continuity artifacts)"]
+    A2[".harmony/continuity/** (continuity artifacts)"]
     A3["assets/** (static assets)"]
     A4["content/_schemas/** (Zod schemas + migrations)"]
     A5["content/_meta/** (governance + taxonomy + locales)"]
@@ -102,7 +86,7 @@ When boundary conditions are crossed (see [boundary-conditions.md](./boundary-co
 flowchart TB
   subgraph Canonical["Canonical Layer (git)"]
     G1["content/** (canonical content)"]
-    G2[".continuity/** (continuity artifacts)"]
+    G2[".harmony/continuity/** (continuity artifacts)"]
   end
 
   subgraph Compiled["Compiled Layer (HAG)"]
@@ -187,12 +171,12 @@ flowchart TB
       CC3["Compositions: pages, emails, packs"]
     end
 
-    subgraph Continuity["Continuity Plane Artifacts (.continuity/)"]
-      CA1["Backlog (mutable, schema-validated)"]
-      CA2["Plan/Risks (snapshot, overwrite)"]
-      CA3["Handoffs (session-scoped)"]
-      CA4["Events (append-only)"]
-      CA5["Decisions (immutable after merge)"]
+    subgraph Continuity["Continuity Plane Artifacts (.harmony/continuity/)"]
+      CA1["Tasks (tasks.json)"]
+      CA2["Entities (entities.json)"]
+      CA3["Next actions (next.md)"]
+      CA4["Log (append-first)"]
+      CA5["Run evidence (runs/)"]
       CA6["See: Continuity Plane docs"]
     end
 

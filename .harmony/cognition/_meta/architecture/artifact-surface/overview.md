@@ -13,7 +13,7 @@ When build-time-only delivery is insufficient (e.g., content must update without
 - **Explicit references** (`ref:<type>:<id>[@locale]`) + build-time resolution; no magical string-grep workflows.
 - **Build-time indexes** (SQLite + JSON + dependency graph) enable semantic querying and blast-radius/impact analysis without runtime CMS infrastructure.
 - **Three content surfaces** (public, internal, agent-facing) share the same infrastructure; "surface" is a **metadata concern** and also optionally represented in folder layout for clarity.
-- **Continuity artifacts are first-class**: `.continuity/` artifacts (backlog, plan, handoff, progress, decisions) are validated, indexed, referenced, and exported to agent context—with specialized lifecycle rules (append-only logs, session-scoped briefs).
+- **Continuity artifacts are first-class**: `/.harmony/continuity/` artifacts (`log.md`, `tasks.json`, `entities.json`, `next.md`, `runs/`) are validated, indexed, referenced, and exported to agent context.
 - **Runtime layer is optional**: when boundary conditions are crossed, a tiered runtime layer (edge read → central read → write) can extend canonical content without replacing the source of truth.
 
 ## Top things this enables
@@ -22,7 +22,7 @@ When build-time-only delivery is insufficient (e.g., content must update without
 - **Schema-aware querying** like "top 3 finance case studies by date" and "products with price > $100 in stock" (i.e., *not grep*).
 - **Reuse with control** (pricing in 3 places / legal text in 47 pages solved via canonical entities + references).
 - **Deterministic multi-destination publishing** via an Intermediate Representation (IR) compiled once and rendered many ways.
-- **Continuity as infrastructure**: agent runs leave structured trails (backlog, decisions, progress events) that are queryable and safely reusable.
+- **Continuity as infrastructure**: agent runs leave structured trails (logs, task state, entities, next actions, run evidence) that are queryable and safely reusable.
 
 ## Top things this explicitly avoids
 

@@ -23,7 +23,7 @@ Continuity is represented by four canonical files:
 | Document | Description |
 |---|---|
 | `continuity-plane.md` | Continuity model, data contracts, and lifecycle rules |
-| `three-planes-integration.md` | Foundational plane integration contract (governance/runtime/continuity/knowledge; legacy filename retained for compatibility) |
+| `three-planes-integration.md` | Canonical foundational plane integration contract (nine-plane model; legacy filename retained for compatibility) |
 | `runs-retention.md` | Retention classes and lifecycle rules for `continuity/runs/` evidence artifacts |
 | `schemas/` | Canonical field-level schema contracts for continuity JSON artifacts |
 
@@ -39,7 +39,7 @@ Continuity is represented by four canonical files:
 
 ## Related Docs
 
-- `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
+- `.harmony/cognition/runtime/knowledge/knowledge.md`
 - `.harmony/cognition/governance/README.md`
 - `.harmony/cognition/practices/README.md`
 - `.harmony/START.md`

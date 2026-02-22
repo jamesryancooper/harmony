@@ -11,7 +11,7 @@
 - **IR**: Intermediate Representation—destination-neutral JSON form compiled from documents.
 - **HAG**: Harmony Artifact Graph—compiled indexes + dependency graph.
 - **Canonical Content**: content stored in `content/` as the authoritative source of truth—git-tracked, schema-validated.
-- **Continuity Artifacts**: content stored in `.continuity/` with special lifecycle rules (append-only, immutable, session-scoped).
+- **Continuity Artifacts**: state stored in `.harmony/continuity/` with continuity lifecycle rules (append-first log + structured mutable state).
 - **Runtime Artifacts**: dynamic data that overlays canonical content at request time (see [runtime-artifact-layer.md](./runtime-artifact-layer.md) for complete specification).
 
 ---
@@ -21,7 +21,7 @@
 HAS MUST treat the following as **artifact roots**:
 
 - `content/` — canonical content (public/internal/agent).
-- `.continuity/` — continuity artifacts (internal/agent-facing), validated and indexed.
+- `.harmony/continuity/` — continuity artifacts (internal/agent-facing), validated and indexed.
 - `assets/` — static assets and asset manifests.
 
 ### 5.2.1 Directory tree
@@ -51,9 +51,10 @@ content/
       email.schema.ts
       ...
     continuity/
-      backlog.schema.ts
-      plan.schema.ts
-      progress-event.schema.ts
+      task.schema.ts
+      entity.schema.ts
+      next.schema.ts
+      run-receipt.schema.ts
       ...
   public/
     entities/
@@ -92,20 +93,13 @@ content/
       onboarding.pack.yaml
       release-context.pack.yaml
 
-.continuity/
-  README.md
-  backlog.yaml
-  plan.md
-  risks.md
-  handoffs/
-    2025-12-15T10-00Z-session-abc123.md
-  events/
-    session-abc123.ndjson
-  decisions/
-    adr-0001.md
-  checklists/
-  templates/
-    prompts/
+.harmony/continuity/
+  log.md
+  tasks.json
+  entities.json
+  next.md
+  runs/
+    retention.json
 
 assets/
   manifest.yaml
@@ -273,20 +267,19 @@ The "envelope + blocks" approach is the explicit resolution of v2/v3 convergence
 
 ### Continuity Plane Integration
 
-> **Note**: `.continuity/` is the storage location for the **Continuity Plane** — one of Harmony's foundational planes. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for full specification.
+> **Note**: `/.harmony/continuity/` is the canonical storage location for the **Continuity Plane**. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for full specification.
 
-HAS MUST treat `.continuity/` as a **first-class artifact root**, even though it is owned by the Continuity Plane. The Artifact Surface's build pipeline validates and indexes Continuity artifacts alongside canonical content.
+HAS MUST treat `/.harmony/continuity/` as a **first-class artifact root**, even though it is owned by the Continuity Plane. The Artifact Surface build pipeline validates and indexes Continuity artifacts alongside canonical content.
 
 **Artifacts indexed from Continuity Plane:**
 
 | Artifact | Path | Schema Required |
 |----------|------|-----------------|
-| Backlog | `.continuity/backlog.yaml` | Yes |
-| Progress events | `.continuity/events/*.ndjson` | Yes (NDJSON) |
-| Decisions (ADRs) | `.continuity/decisions/adr-*.md` | Yes (frontmatter) |
-| Plans | `.continuity/plan.md` | Optional |
-| Risks | `.continuity/risks.md` | Optional |
-| Handoffs | `.continuity/handoffs/*.md` | Yes |
+| Activity log | `.harmony/continuity/log.md` | Yes (append-first markdown contract) |
+| Active tasks | `.harmony/continuity/tasks.json` | Yes (canonical schema) |
+| Entity ledger | `.harmony/continuity/entities.json` | Yes (canonical schema) |
+| Next actions | `.harmony/continuity/next.md` | Yes (coherence contract with tasks) |
+| Run receipts/evidence | `.harmony/continuity/runs/**` | Yes (retention-class contract) |
 
 **Format guidance**: YAML/JSON for state, Markdown for narrative, logs append-only.
 
@@ -294,13 +287,13 @@ HAS MUST treat `.continuity/` as a **first-class artifact root**, even though it
 
 | Artifact | Lifecycle | Rule |
 |----------|-----------|------|
-| **Backlog** | Mutable | Edits allowed; schema validated |
-| **Plan/Risks** | Snapshot | Edits allowed (overwrite); git provides history |
-| **Handoffs** | Session-scoped | One per session: `.continuity/handoffs/<timestamp>-<session>.md` |
-| **Progress/events** | Append-only | Per-session files: `.continuity/events/session-<id>.ndjson` |
-| **Decisions** | Immutable | Cannot modify after merge; supersede with new file |
+| **log.md** | Append-first | Add entries; avoid destructive rewrites except factual corrections |
+| **tasks.json** | Mutable | Keep status/ownership/blockers/acceptance criteria coherent |
+| **entities.json** | Mutable | Preserve stable IDs and ownership linkage to tasks |
+| **next.md** | Mutable | Keep concise and aligned with active unblocked task IDs |
+| **runs/** | Append-oriented evidence | Govern by `runs/retention.json`; do not replace active task state |
 
-HAS MUST enforce these lifecycle rules in CI by verifying diffs (e.g., append-only files only add lines; immutable types cannot be modified once published).
+HAS MUST enforce these lifecycle rules in CI by verifying append-first behavior, schema conformance, and retention-class policy checks.
 
 ### ADR Ownership Clarification
 
@@ -309,9 +302,9 @@ ADRs may appear in two locations with different purposes:
 | Location | Plane | Purpose | Lifecycle |
 |----------|-------|---------|-----------|
 | `content/internal/prose/adrs/` | Artifact Surface | Published ADR documentation for internal reference | Mutable (artifact-surface rules) |
-| `.continuity/decisions/` | Continuity Plane | **Source of truth** for decision records | Immutable (Continuity rules) |
+| `.harmony/cognition/runtime/decisions/` | Knowledge Plane | **Source of truth** for durable decision records | Immutable-by-record (supersede via new ADR) |
 
-The **Continuity Plane owns decisions** (rationale, context, alternatives). Artifact Surface may publish ADRs as internal documentation, but the authoritative record lives in `.continuity/decisions/`. The Knowledge Plane indexes ADR effects (links to contracts, modules) for impact analysis.
+The **Knowledge Plane owns durable decisions** (rationale, context, alternatives). Artifact Surface may publish ADR documentation for internal reference. Continuity links active work to decision IDs for execution traceability.
 
 See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete boundary definitions.
 
@@ -639,16 +632,14 @@ WHERE t.tag = 'enterprise'
   );
 ```
 
-**3) Find all decisions related to auth (Continuity Plane query)**:
-(Cross-plane query; decisions owned by Continuity Plane)
+**3) Find all decisions related to auth (Knowledge Plane query)**:
+(Durable decision records are owned by the Knowledge Plane)
 
 ```sql
--- Query the Continuity Plane's decision records
-SELECT d.doc_key, d.title, p.md
-FROM continuity.documents d
-JOIN continuity.prose p ON p.id = d.id AND p.locale = d.locale
-WHERE d.type IN ('adr','decision')
-  AND (p.md LIKE '%auth%' OR d.title LIKE '%auth%');
+SELECT d.decision_id, d.title, d.summary
+FROM knowledge_decisions d
+WHERE d.kind IN ('adr', 'decision')
+  AND (d.title LIKE '%auth%' OR d.summary LIKE '%auth%');
 ```
 
 **4) Find Knowledge Plane modules affected by a decision**:
@@ -657,8 +648,8 @@ WHERE d.type IN ('adr','decision')
 ```sql
 SELECT cpr.dst_id as module_path, d.title as decision_title
 FROM cross_plane_refs cpr
-JOIN continuity.documents d ON d.doc_key = cpr.src_id
-WHERE cpr.src_plane = 'continuity'
+JOIN knowledge_decisions d ON d.decision_id = cpr.src_id
+WHERE cpr.src_plane = 'knowledge'
   AND cpr.dst_plane = 'knowledge'
   AND cpr.edge_type = 'AFFECTS'
   AND d.title LIKE '%auth%';
@@ -673,18 +664,18 @@ WHERE cpr.src_plane = 'continuity'
 - Harmony defaults to **git PR workflows** (small diffs, frequent merges).
 - Real-time collaboration is not assumed; instead mitigate semantic conflicts using granularity and coordination (Knut highlights why prose conflicts are semantic and why teams end up using lock files and "don't touch it" workarounds).
 
-### Agent coordination roles (Continuity Plane-aligned)
+### Agent coordination roles (Continuity + Knowledge aligned)
 
-HAS SHOULD assume four roles aligned with the [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) agent coordination model:
+HAS SHOULD assume four roles aligned with the [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) and [Knowledge Plane](../../../runtime/knowledge/knowledge.md):
 
-| Role | Artifact Surface Responsibilities | Continuity Plane Responsibilities |
-|------|-------------------------------|-----------------------------------|
-| **Orchestrator** | Assigns write sets, manages leases | Creates sessions, manages handoffs |
-| **Implementer** | Edits content files within assigned write set | Records progress events |
-| **Archivist** | Updates internal docs | Maintains `.continuity/` decisions and handoffs |
-| **Verifier** | Runs validation, confirms acceptance criteria | Records verification evidence |
+| Role | Artifact Surface Responsibilities | Continuity Responsibilities | Knowledge Responsibilities |
+|------|-------------------------------|---------------------------|----------------------------|
+| **Orchestrator** | Assigns write sets, manages leases | Creates sessions and updates active task state | Links planned work to durable decision/context artifacts |
+| **Implementer** | Edits artifact files within assigned write set | Records progress in continuity state | References relevant specs/contracts/decisions |
+| **Archivist** | Updates published internal documentation | Maintains coherent handoff-ready continuity artifacts | Maintains durable decision/evidence indexes |
+| **Verifier** | Runs validation and confirms acceptance criteria | Records verification status transitions | Records evidence links for traceability queries |
 
-Continuity artifacts and templates exist under `.continuity/` and MUST be validated alongside Artifact Surface artifacts. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for session lifecycle and handoff protocols.
+Continuity artifacts and templates exist under `.harmony/continuity/` and MUST be validated alongside Artifact Surface artifacts. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for session lifecycle and handoff protocols.
 
 ### Leasing (advisory locks)
 
@@ -709,7 +700,7 @@ Lease semantics:
 HAS MUST reduce conflict probability structurally:
 
 1. **Bundle high-risk hotspots** into dedicated documents (pricing entities, legal clauses) referenced everywhere—so edits concentrate in one file and are governed.
-2. **Make append-only logs per session** (`.continuity/events/session-*.ndjson`) to avoid multiple writers to the same file.
+2. **Keep continuity logging append-first** (`.harmony/continuity/log.md`) and store per-session run evidence under `.harmony/continuity/runs/` when needed.
 3. **Avoid a single shared locks.yaml**; if you must lock, lock per bundle/document (v2+v3 warns about conflict magnets).
 4. For `high/critical` paths, CI SHOULD fail if multiple open PRs modify overlapping "hot sets" (optional GitHub API check).
 

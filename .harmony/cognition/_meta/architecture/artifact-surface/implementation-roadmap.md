@@ -8,8 +8,8 @@ The roadmap is optimized for a solo developer/tiny team building the minimum via
 
 - Decide repo layout (create directories + starter README).
 - Create `content/_meta/` files: `locales.yaml`, `surfaces.yaml`, `taxonomy.yaml`.
-- Add `.continuity/` folder with starter templates per Continuity minimum.
-- Define initial content type list (product, pricing, page, doc, adr/decision, continuity backlog).
+- Ensure `/.harmony/continuity/` canonical continuity artifacts exist per continuity contract.
+- Define initial content type list (product, pricing, page, doc, adr/decision).
 
 ## Phase 1: Core compiler (1–2 weeks)
 
@@ -49,7 +49,7 @@ The roadmap is optimized for a solo developer/tiny team building the minimum via
 - Implement lease system in `.harmony/leases` per spec.
 - Implement "write set" detection (files changed → doc keys).
 - Add optional CI overlap check for hot sets (configurable).
-- Add lifecycle checks for `.continuity/events/*.ndjson` append-only behavior.
+- Add lifecycle checks for `/.harmony/continuity/log.md` append-first behavior and `/.harmony/continuity/runs/` retention contract conformance.
 
 ## Phase 5: Multi-destination exports (1 week)
 
