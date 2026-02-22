@@ -1,0 +1,14 @@
+# Runtime Projection Definitions Index
+# Machine-readable discovery index for projection definition contracts.
+
+schema_version: "1.0"
+files:
+  - id: definitions-overview
+    path: README.md
+    summary: Projection-definition surface orientation and ownership boundaries.
+    when: First entrypoint for projection-definition discovery.
+
+  - id: cognition-runtime-surface-map-definition
+    path: cognition-runtime-surface-map.yml
+    summary: Definition for the cognition runtime surface map projection.
+    when: When regenerating runtime surface-map materializations.

@@ -1,0 +1,16 @@
+schema_version: "1.0"
+queries:
+  - id: spec-coverage-by-module
+    language: cypher
+    description: Return specs and the modules/tests that implement and verify them.
+    required_inputs: []
+    output_shape: spec-module-test-table
+    status: draft
+
+  - id: risk-surface-by-change
+    language: cypher
+    description: Return impacted specs, contracts, and runtime signals for a change unit.
+    required_inputs:
+      - change_id
+    output_shape: impact-graph
+    status: draft

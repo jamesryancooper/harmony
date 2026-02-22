@@ -1,0 +1,14 @@
+# Cognition Discovery Docs Index
+# Machine-readable index for non-normative cognition discovery aids.
+
+schema_version: "1.0"
+files:
+  - id: docs-overview
+    path: README.md
+    summary: Discovery-docs namespace orientation and ownership boundaries.
+    when: First entrypoint for cognition discovery-doc routing artifacts.
+
+  - id: intent-surface-atlas
+    path: intent-surface-atlas.md
+    summary: Intent-to-surface routing map across cognition runtime, governance, and practices.
+    when: When deciding where to read, update, or validate cognition artifacts by task intent.

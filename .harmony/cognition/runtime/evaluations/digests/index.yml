@@ -1,0 +1,16 @@
+# Runtime Evaluation Digests Index
+# Machine-readable discovery index for weekly scorecard digests.
+
+schema_version: "1.0"
+files:
+  - id: digests-overview
+    path: README.md
+    summary: Runtime digest surface orientation and naming conventions.
+    when: First entrypoint for digest artifact discovery.
+
+  - id: digest-template
+    path: template-weekly-digest.md
+    summary: Template for creating weekly scorecard digest artifacts.
+    when: When drafting a new weekly digest.
+
+records: []

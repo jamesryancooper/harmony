@@ -1,0 +1,13 @@
+# Runtime Knowledge Sources
+
+Canonical ingestion-source receipts for runtime knowledge artifacts.
+
+## Purpose
+
+- Record deterministic source provenance for ingested knowledge artifacts.
+- Track source freshness and ingestion status without relying on external systems.
+- Support auditability for runtime graph and query outputs.
+
+## Canonical Index
+
+- `index.yml` - machine-readable discovery index for source receipts.

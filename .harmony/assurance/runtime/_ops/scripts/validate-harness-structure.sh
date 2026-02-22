@@ -383,9 +383,16 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/cognition/runtime/migrations/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/analyses/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/knowledge/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/knowledge/graph/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/knowledge/sources/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/knowledge/queries/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/evidence/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/evaluations/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/evaluations/digests/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/evaluations/actions/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/projections/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/projections/definitions/index.yml"
+  require_file "$HARMONY_DIR/cognition/runtime/projections/materialized/index.yml"
   require_file "$HARMONY_DIR/cognition/governance/index.yml"
   require_file "$HARMONY_DIR/cognition/governance/controls/README.md"
   require_file "$HARMONY_DIR/cognition/governance/controls/index.yml"
@@ -404,9 +411,14 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/cognition/_meta/architecture/index.yml"
   require_file "$HARMONY_DIR/cognition/_meta/architecture/README.index.yml"
   require_file "$HARMONY_DIR/cognition/_meta/architecture/resources.index.yml"
+  require_file "$HARMONY_DIR/cognition/_meta/docs/index.yml"
+  require_file "$HARMONY_DIR/cognition/_meta/docs/intent-surface-atlas.md"
   require_file "$HARMONY_DIR/cognition/governance/principles/principles.md"
   require_file "$HARMONY_DIR/cognition/practices/methodology/README.md"
   require_file "$HARMONY_DIR/cognition/_ops/principles/scripts/lint-principles-governance.sh"
+  require_file "$HARMONY_DIR/cognition/_ops/knowledge/scripts/validate-knowledge-runtime.sh"
+  require_file "$HARMONY_DIR/cognition/_ops/evaluations/scripts/validate-evaluations-runtime.sh"
+  require_file "$HARMONY_DIR/cognition/_ops/projections/scripts/validate-projections-runtime.sh"
 
   require_file "$HARMONY_DIR/orchestration/runtime/workflows/manifest.yml"
   require_file "$HARMONY_DIR/orchestration/runtime/workflows/registry.yml"
@@ -447,9 +459,16 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/cognition/runtime/decisions"
   require_dir "$HARMONY_DIR/cognition/runtime/analyses"
   require_dir "$HARMONY_DIR/cognition/runtime/knowledge"
+  require_dir "$HARMONY_DIR/cognition/runtime/knowledge/graph"
+  require_dir "$HARMONY_DIR/cognition/runtime/knowledge/sources"
+  require_dir "$HARMONY_DIR/cognition/runtime/knowledge/queries"
   require_dir "$HARMONY_DIR/cognition/runtime/evidence"
   require_dir "$HARMONY_DIR/cognition/runtime/evaluations"
+  require_dir "$HARMONY_DIR/cognition/runtime/evaluations/digests"
+  require_dir "$HARMONY_DIR/cognition/runtime/evaluations/actions"
   require_dir "$HARMONY_DIR/cognition/runtime/projections"
+  require_dir "$HARMONY_DIR/cognition/runtime/projections/definitions"
+  require_dir "$HARMONY_DIR/cognition/runtime/projections/materialized"
   require_dir "$HARMONY_DIR/cognition/governance"
   require_dir "$HARMONY_DIR/cognition/governance/controls"
   require_dir "$HARMONY_DIR/cognition/governance/exceptions"
@@ -459,9 +478,16 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/cognition/practices"
   require_dir "$HARMONY_DIR/cognition/practices/operations"
   require_dir "$HARMONY_DIR/cognition/practices/methodology"
+  require_dir "$HARMONY_DIR/cognition/_meta/docs"
   require_dir "$HARMONY_DIR/cognition/_ops"
   require_dir "$HARMONY_DIR/cognition/_ops/principles"
   require_dir "$HARMONY_DIR/cognition/_ops/principles/scripts"
+  require_dir "$HARMONY_DIR/cognition/_ops/knowledge"
+  require_dir "$HARMONY_DIR/cognition/_ops/knowledge/scripts"
+  require_dir "$HARMONY_DIR/cognition/_ops/evaluations"
+  require_dir "$HARMONY_DIR/cognition/_ops/evaluations/scripts"
+  require_dir "$HARMONY_DIR/cognition/_ops/projections"
+  require_dir "$HARMONY_DIR/cognition/_ops/projections/scripts"
 
   require_dir "$HARMONY_DIR/orchestration/runtime/workflows"
   require_dir "$HARMONY_DIR/orchestration/runtime/missions"
@@ -851,6 +877,21 @@ check_cognition_discovery_indexes() {
     "cognition runtime knowledge"
 
   check_index_path_contract \
+    "$HARMONY_DIR/cognition/runtime/knowledge/graph/index.yml" \
+    "$HARMONY_DIR/cognition/runtime/knowledge/graph" \
+    "cognition runtime knowledge graph"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/runtime/knowledge/sources/index.yml" \
+    "$HARMONY_DIR/cognition/runtime/knowledge/sources" \
+    "cognition runtime knowledge sources"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/runtime/knowledge/queries/index.yml" \
+    "$HARMONY_DIR/cognition/runtime/knowledge/queries" \
+    "cognition runtime knowledge queries"
+
+  check_index_path_contract \
     "$HARMONY_DIR/cognition/runtime/evidence/index.yml" \
     "$HARMONY_DIR/cognition/runtime/evidence" \
     "cognition runtime evidence"
@@ -861,9 +902,29 @@ check_cognition_discovery_indexes() {
     "cognition runtime evaluations"
 
   check_index_path_contract \
+    "$HARMONY_DIR/cognition/runtime/evaluations/digests/index.yml" \
+    "$HARMONY_DIR/cognition/runtime/evaluations/digests" \
+    "cognition runtime evaluation digests"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/runtime/evaluations/actions/index.yml" \
+    "$HARMONY_DIR/cognition/runtime/evaluations/actions" \
+    "cognition runtime evaluation actions"
+
+  check_index_path_contract \
     "$HARMONY_DIR/cognition/runtime/projections/index.yml" \
     "$HARMONY_DIR/cognition/runtime/projections" \
     "cognition runtime projections"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/runtime/projections/definitions/index.yml" \
+    "$HARMONY_DIR/cognition/runtime/projections/definitions" \
+    "cognition runtime projection definitions"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/runtime/projections/materialized/index.yml" \
+    "$HARMONY_DIR/cognition/runtime/projections/materialized" \
+    "cognition runtime projection materialized"
 
   check_index_path_contract \
     "$HARMONY_DIR/cognition/governance/index.yml" \
@@ -904,6 +965,11 @@ check_cognition_discovery_indexes() {
     "$HARMONY_DIR/cognition/_meta/architecture/index.yml" \
     "$HARMONY_DIR/cognition/_meta/architecture" \
     "cognition architecture"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/_meta/docs/index.yml" \
+    "$HARMONY_DIR/cognition/_meta/docs" \
+    "cognition discovery docs"
 
   check_section_sidecar_contract \
     "$HARMONY_DIR/cognition/_meta/architecture/README.index.yml" \

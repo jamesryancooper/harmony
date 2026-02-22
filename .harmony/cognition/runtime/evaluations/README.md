@@ -12,6 +12,11 @@ Canonical runtime surface for periodic scorecard evaluations and follow-up actio
 
 - `index.yml` - machine-readable index of evaluation artifacts.
 
+## Subsurfaces
+
+- `digests/` - weekly scorecard digest artifacts and digest discovery index.
+- `actions/` - remediation action ledger artifacts and action discovery index.
+
 ## Source Contract
 
 - Scorecard contract: `/.harmony/cognition/runtime/context/metrics-scorecard.md`

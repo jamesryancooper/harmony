@@ -12,6 +12,11 @@ Derived runtime read models and indexes assembled from canonical runtime, contin
 
 - `index.yml` - machine-readable discovery index for runtime projection artifacts.
 
+## Subsurfaces
+
+- `definitions/` - projection contracts describing source inputs and refresh semantics.
+- `materialized/` - generated projection artifacts derived from canonical surfaces.
+
 ## Ownership Rule
 
 Projection artifacts are derived views. Source-of-truth remains in canonical runtime, continuity, governance, and output surfaces.

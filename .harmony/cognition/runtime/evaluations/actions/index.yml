@@ -1,0 +1,14 @@
+# Runtime Evaluation Actions Index
+# Machine-readable discovery index for remediation action artifacts.
+
+schema_version: "1.0"
+files:
+  - id: actions-overview
+    path: README.md
+    summary: Runtime action surface orientation and ownership boundaries.
+    when: First entrypoint for remediation action discovery.
+
+  - id: open-actions-ledger
+    path: open-actions.yml
+    summary: Canonical open-action ledger with owner, due date, and status.
+    when: When adding, updating, or closing weekly remediation actions.

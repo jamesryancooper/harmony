@@ -33,6 +33,21 @@ files:
     summary: Discovery index for runtime knowledge contracts and guides.
     when: When tracing knowledge architecture, scope, and operating contracts.
 
+  - id: runtime-knowledge-graph-index
+    path: knowledge/graph/index.yml
+    summary: Discovery index for runtime knowledge graph node and edge datasets.
+    when: When querying file-backed graph records.
+
+  - id: runtime-knowledge-sources-index
+    path: knowledge/sources/index.yml
+    summary: Discovery index for runtime ingestion source receipts.
+    when: When validating knowledge provenance and freshness.
+
+  - id: runtime-knowledge-queries-index
+    path: knowledge/queries/index.yml
+    summary: Discovery index for runtime knowledge query contracts.
+    when: When selecting named queries for knowledge traversal.
+
   - id: runtime-evidence-index
     path: evidence/index.yml
     summary: Evidence map linking runtime records to output evidence bundles.
@@ -43,7 +58,27 @@ files:
     summary: Discovery index for periodic scorecard and evaluation artifacts.
     when: When reviewing weekly scorecard digests and follow-up actions.
 
+  - id: runtime-evaluation-digests-index
+    path: evaluations/digests/index.yml
+    summary: Discovery index for weekly scorecard digest artifacts.
+    when: When creating or reviewing weekly digest records.
+
+  - id: runtime-evaluation-actions-index
+    path: evaluations/actions/index.yml
+    summary: Discovery index for remediation action ledgers.
+    when: When tracking open and closed remediation actions.
+
   - id: runtime-projections-index
     path: projections/index.yml
     summary: Discovery index for derived runtime read models and projections.
     when: When querying synthesized runtime views across canonical surfaces.
+
+  - id: runtime-projection-definitions-index
+    path: projections/definitions/index.yml
+    summary: Discovery index for projection-definition contracts.
+    when: Before changing projection logic or source inputs.
+
+  - id: runtime-projection-materialized-index
+    path: projections/materialized/index.yml
+    summary: Discovery index for materialized runtime projection outputs.
+    when: When consuming generated projection read models.

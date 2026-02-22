@@ -80,6 +80,18 @@ See [Foundational Planes Integration](/.harmony/continuity/_meta/architecture/th
 - Enable impact analysis for change, risk, and compliance.
 - Support agents and humans with fast, reliable queries over linked knowledge.
 
+## Runtime Knowledge Subsurfaces
+
+Runtime knowledge now includes file-backed subsurfaces so the contract can be
+materialized incrementally in-repo:
+
+- `graph/` — node and edge datasets that reflect the current knowledge graph snapshot.
+- `sources/` — ingestion source receipts and provenance metadata.
+- `queries/` — canonical query catalog and query-contract metadata.
+
+These subsurfaces do not replace external graph/search infrastructure. They
+provide deterministic local artifacts for planning, audits, and drift checks.
+
 ## Scope
 
 The Knowledge Plane indexes and links **system knowledge** across these domains:

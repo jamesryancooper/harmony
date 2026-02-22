@@ -7,3 +7,23 @@ files:
     path: README.md
     summary: Runtime evaluation surface orientation and scorecard linkage.
     when: First entrypoint for weekly digest and evaluation record discovery.
+
+  - id: evaluation-digests-overview
+    path: digests/README.md
+    summary: Runtime digest surface for weekly scorecard snapshots.
+    when: Before creating or reviewing weekly scorecard digests.
+
+  - id: evaluation-digests-index
+    path: digests/index.yml
+    summary: Machine-readable index for weekly digest artifacts.
+    when: For targeted digest artifact discovery.
+
+  - id: evaluation-actions-overview
+    path: actions/README.md
+    summary: Runtime action surface for remediation and follow-up tracking.
+    when: Before updating remediation action state.
+
+  - id: evaluation-actions-index
+    path: actions/index.yml
+    summary: Machine-readable index for remediation action artifacts.
+    when: For targeted remediation-action discovery.

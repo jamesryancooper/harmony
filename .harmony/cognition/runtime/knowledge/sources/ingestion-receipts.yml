@@ -1,0 +1,11 @@
+schema_version: "1.0"
+updated: "2026-02-22"
+
+# Expected fields per receipt:
+# - id
+# - source
+# - source_type
+# - artifact
+# - ingested_at
+# - status
+receipts: []

@@ -1,0 +1,13 @@
+# Runtime Evaluation Actions
+
+Canonical runtime action ledger for weekly scorecard follow-up remediation work.
+
+## Purpose
+
+- Track remediation actions selected during weekly digest review.
+- Keep owner, due date, and status fields explicit and machine-readable.
+- Preserve follow-up continuity without mutating digest history.
+
+## Canonical Index
+
+- `index.yml` - machine-readable discovery index for action artifacts.

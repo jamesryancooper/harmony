@@ -1,0 +1,6 @@
+schema_version: "1.0"
+updated: "2026-02-22"
+
+# Node records are materialized from canonical runtime, assurance, continuity,
+# and output surfaces. Keep this list deterministic and append-compatible.
+nodes: []

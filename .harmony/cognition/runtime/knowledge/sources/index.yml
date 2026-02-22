@@ -1,0 +1,14 @@
+# Runtime Knowledge Sources Index
+# Machine-readable discovery index for ingestion source receipts.
+
+schema_version: "1.0"
+files:
+  - id: sources-overview
+    path: README.md
+    summary: Runtime source-receipt surface orientation and ownership boundaries.
+    when: First entrypoint for ingestion provenance discovery.
+
+  - id: source-receipts
+    path: ingestion-receipts.yml
+    summary: Source ingestion receipts with freshness and provenance metadata.
+    when: When validating ingestion coverage or diagnosing stale knowledge data.

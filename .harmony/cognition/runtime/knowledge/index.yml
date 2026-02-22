@@ -7,3 +7,33 @@ files:
     path: knowledge.md
     summary: Unified contract for knowledge scope, graph model, and integration posture.
     when: When designing traceability, evidence correlation, or knowledge integrations.
+
+  - id: knowledge-graph-overview
+    path: graph/README.md
+    summary: Runtime surface for materialized knowledge graph nodes and edges.
+    when: When tracing concrete runtime graph records.
+
+  - id: knowledge-graph-index
+    path: graph/index.yml
+    summary: Machine-readable index for graph node and edge datasets.
+    when: For targeted graph artifact discovery.
+
+  - id: knowledge-sources-overview
+    path: sources/README.md
+    summary: Runtime surface for ingestion source receipts and provenance links.
+    when: When validating ingestion provenance and source freshness.
+
+  - id: knowledge-sources-index
+    path: sources/index.yml
+    summary: Machine-readable index for ingestion receipts and source contracts.
+    when: For targeted ingestion-source discovery.
+
+  - id: knowledge-queries-overview
+    path: queries/README.md
+    summary: Runtime surface for query catalog contracts over knowledge graph data.
+    when: When selecting or validating canonical knowledge queries.
+
+  - id: knowledge-queries-index
+    path: queries/index.yml
+    summary: Machine-readable index for query catalog artifacts.
+    when: For targeted query-contract discovery.

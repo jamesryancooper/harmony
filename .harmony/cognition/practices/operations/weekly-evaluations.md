@@ -7,7 +7,7 @@ description: Procedure for producing and reviewing weekly cognition scorecard ev
 
 ## Purpose
 
-Produce weekly scorecard evaluations under `/.harmony/cognition/runtime/evaluations/` from deterministic evidence sources.
+Produce weekly scorecard evaluations under `/.harmony/cognition/runtime/evaluations/digests/` from deterministic evidence sources.
 
 ## Inputs
 
@@ -17,11 +17,11 @@ Produce weekly scorecard evaluations under `/.harmony/cognition/runtime/evaluati
 
 ## Procedure
 
-1. Create or update a weekly digest artifact under `/.harmony/cognition/runtime/evaluations/`.
+1. Create a weekly digest artifact under `/.harmony/cognition/runtime/evaluations/digests/`.
 2. Record metric snapshots and status per scorecard category.
 3. Record week-over-week deltas and supporting evidence links.
-4. Select 1-2 remediation actions with explicit owners and due dates.
-5. Update `/.harmony/cognition/runtime/evaluations/index.yml` with the new artifact entry.
+4. Select 1-2 remediation actions with explicit owners and due dates and update `/.harmony/cognition/runtime/evaluations/actions/open-actions.yml`.
+5. Update `/.harmony/cognition/runtime/evaluations/digests/index.yml` with the new digest record entry.
 6. Validate harness structure after index updates.
 
 ## Required Output

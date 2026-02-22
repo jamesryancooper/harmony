@@ -42,3 +42,13 @@ files:
     path: resources.index.yml
     summary: Sidecar section index for architecture resources content.
     when: For targeted discovery within architecture resource corpus.
+
+  - id: cognition-discovery-docs-index
+    path: ../docs/index.yml
+    summary: Discovery docs index including the cognition intent-to-surface atlas.
+    when: When routing by intent across cognition runtime, governance, and practices.
+
+  - id: cognition-intent-surface-atlas
+    path: ../docs/intent-surface-atlas.md
+    summary: Intent-to-surface lookup map for common cognition tasks.
+    when: When unsure which cognition surface owns an artifact or action.

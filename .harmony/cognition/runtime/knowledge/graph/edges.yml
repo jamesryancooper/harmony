@@ -1,0 +1,6 @@
+schema_version: "1.0"
+updated: "2026-02-22"
+
+# Edge records are materialized from canonical contracts.
+# Expected fields per entry: id, type, from, to, evidence.
+edges: []

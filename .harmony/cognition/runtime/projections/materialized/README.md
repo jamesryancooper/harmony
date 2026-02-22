@@ -1,0 +1,13 @@
+# Runtime Materialized Projections
+
+Generated projection read models derived from runtime canonical surfaces.
+
+## Purpose
+
+- Provide query-friendly snapshots for frequently joined runtime facts.
+- Keep projection outputs explicitly derived and reproducible.
+- Preserve source-of-truth ownership in canonical runtime indexes.
+
+## Canonical Index
+
+- `index.yml` - machine-readable discovery index for materialized projections.

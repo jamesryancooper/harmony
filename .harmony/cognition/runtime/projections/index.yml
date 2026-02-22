@@ -7,3 +7,23 @@ files:
     path: README.md
     summary: Runtime projections surface orientation and ownership boundaries.
     when: First entrypoint for derived read-model discovery.
+
+  - id: projection-definitions-overview
+    path: definitions/README.md
+    summary: Runtime projection-definition surface and contract boundaries.
+    when: Before adding or changing projection definitions.
+
+  - id: projection-definitions-index
+    path: definitions/index.yml
+    summary: Machine-readable index for projection definition artifacts.
+    when: For targeted projection-definition discovery.
+
+  - id: projection-materialized-overview
+    path: materialized/README.md
+    summary: Runtime materialized projection surface and freshness posture.
+    when: Before consuming projection read models.
+
+  - id: projection-materialized-index
+    path: materialized/index.yml
+    summary: Machine-readable index for generated projection read models.
+    when: For targeted projection read-model discovery.

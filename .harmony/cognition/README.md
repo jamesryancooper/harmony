@@ -11,7 +11,7 @@ governance contracts, and operating methodology remain explicit.
 | `governance/` | Normative principles, controls, pillars, purpose, and exception contracts | `governance/index.yml` |
 | `practices/` | Operating methodology and execution runbooks | `practices/index.yml`, `practices/methodology/index.yml`, `practices/operations/index.yml` |
 | `_ops/` | Mutable scripts/state for cognition guardrails | `_ops/README.md` |
-| `_meta/` | Non-structural architecture/reference docs | `_meta/architecture/index.yml` |
+| `_meta/` | Non-structural architecture/reference docs and discovery maps | `_meta/architecture/index.yml`, `_meta/docs/index.yml` |
 
 ## Interaction Model
 
