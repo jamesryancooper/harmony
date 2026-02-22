@@ -3,6 +3,10 @@ updated: "2026-02-22"
 
 # Node records are materialized from canonical runtime surfaces.
 nodes:
+  - id: "action:ACTION-2026-W08-01"
+    type: "evaluation-action"
+    label: "ACTION-2026-W08-01"
+    path: "../../evaluations/actions/open-actions.yml"
   - id: "adr:001-harmony-shared-foundation"
     type: "decision-adr"
     label: "001-harmony-shared-foundation"
@@ -151,6 +155,10 @@ nodes:
     type: "decision-adr"
     label: "037-artifact-surface-clean-break-rename"
     path: "../../decisions/037-artifact-surface-clean-break-rename.md"
+  - id: "digest:2026-W08-weekly-scorecard"
+    type: "evaluation-digest"
+    label: "2026-W08-weekly-scorecard"
+    path: "../../evaluations/digests/2026-W08-weekly-scorecard.md"
   - id: "evidence:2026-02-20-agency-bounded-surfaces"
     type: "evidence-migration"
     label: "2026-02-20-agency-bounded-surfaces"

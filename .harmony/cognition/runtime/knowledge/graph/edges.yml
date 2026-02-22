@@ -4,6 +4,11 @@ updated: "2026-02-22"
 # Edge records are materialized from canonical contracts.
 # Expected fields per entry: id, type, from, to, evidence.
 edges:
+  - id: "action:ACTION-2026-W08-01->digest:2026-W08-weekly-scorecard"
+    type: "originates-from-digest"
+    from: "action:ACTION-2026-W08-01"
+    to: "digest:2026-W08-weekly-scorecard"
+    evidence: "../../evaluations/actions/open-actions.yml"
   - id: "migration:2026-02-20-agency-bounded-surfaces->adr:021-bounded-surfaces-contract-and-agency-migration"
     type: "references-adr"
     from: "migration:2026-02-20-agency-bounded-surfaces"

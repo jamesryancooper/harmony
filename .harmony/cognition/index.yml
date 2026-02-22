@@ -38,6 +38,11 @@ files:
     summary: Discovery index for non-normative principle support docs.
     when: When tracing legacy pointers for principles support materials.
 
+  - id: cognition-ops-index
+    path: _ops/index.yml
+    summary: Machine-readable discovery index for cognition operational script surfaces.
+    when: Before invoking cognition _ops scripts by intent.
+
   - id: cognition-ops-overview
     path: _ops/README.md
     summary: Cognition operational scripts surface and guardrail entrypoints.

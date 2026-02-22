@@ -1,0 +1,10 @@
+# Cognition Ops Projections Scripts Index
+# Machine-readable discovery index for projections runtime validators.
+
+schema_version: "1.0"
+files:
+  - id: validate-projections-runtime
+    path: scripts/validate-projections-runtime.sh
+    summary: Validates runtime projection definitions and materialized read models.
+    when: Before merge and when projection artifacts or indexes change.
+

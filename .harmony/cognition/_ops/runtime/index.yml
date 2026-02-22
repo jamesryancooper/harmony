@@ -1,0 +1,45 @@
+# Cognition Ops Runtime Scripts Index
+# Machine-readable discovery index for runtime artifact scripts.
+
+schema_version: "1.0"
+files:
+  - id: runtime-sync-all
+    path: scripts/sync-runtime-artifacts.sh
+    summary: Canonical full runtime artifact generator and drift checker.
+    when: When reconciling or validating all generated runtime artifacts.
+
+  - id: runtime-generate-decisions
+    path: scripts/generate-runtime-decisions.sh
+    summary: Targeted generator for runtime context decisions summary.
+    when: When only decision summary generation needs refresh.
+
+  - id: runtime-generate-projections
+    path: scripts/generate-runtime-projections.sh
+    summary: Targeted generator for materialized projection artifacts.
+    when: When only projection materialization needs refresh.
+
+  - id: runtime-generate-evidence
+    path: scripts/generate-runtime-evidence.sh
+    summary: Targeted generator for runtime evidence map index.
+    when: When migration/decision evidence mapping changed.
+
+  - id: runtime-generate-evaluations
+    path: scripts/generate-runtime-evaluations.sh
+    summary: Targeted generator for evaluation digest index and open-actions ledger.
+    when: When weekly digests/actions change.
+
+  - id: runtime-generate-knowledge
+    path: scripts/generate-runtime-knowledge.sh
+    summary: Targeted generator for runtime knowledge graph and source receipts.
+    when: When runtime indexes or migration/evidence records change.
+
+  - id: runtime-validate-generated
+    path: scripts/validate-generated-runtime-artifacts.sh
+    summary: Validation harness for generated artifact drift and contract checks.
+    when: Before merge and during CI structure checks.
+
+  - id: runtime-sync-fixture-tests
+    path: scripts/test-sync-runtime-artifacts-fixtures.sh
+    summary: Fixture tests for target-selective generation and digest-action parsing.
+    when: When changing sync-runtime-artifacts parsing or target selectors.
+

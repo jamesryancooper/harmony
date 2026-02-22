@@ -2,15 +2,24 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-COGNITION_DIR="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
+if [[ -n "${COGNITION_DIR_OVERRIDE:-}" ]]; then
+  COGNITION_DIR="$(cd -- "$COGNITION_DIR_OVERRIDE" && pwd)"
+else
+  COGNITION_DIR="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
+fi
 RUNTIME_DIR="$COGNITION_DIR/runtime"
-OUTPUT_DIR="$(cd -- "$COGNITION_DIR/../output" && pwd)"
+if [[ -n "${OUTPUT_DIR_OVERRIDE:-}" ]]; then
+  OUTPUT_DIR="$(cd -- "$OUTPUT_DIR_OVERRIDE" && pwd)"
+else
+  OUTPUT_DIR="$(cd -- "$COGNITION_DIR/../output" && pwd)"
+fi
 
 MODE="apply"
+declare -a REQUESTED_TARGETS=()
 
 usage() {
   cat <<'USAGE'
-Usage: sync-runtime-artifacts.sh [--check]
+Usage: sync-runtime-artifacts.sh [--check] [--target <name> ...]
 
 Generates deterministic cognition runtime derived artifacts:
 - runtime/context/decisions.md
@@ -24,6 +33,18 @@ Generates deterministic cognition runtime derived artifacts:
 
 Options:
   --check   Validate generated artifacts are up to date without writing files.
+  --target  Generate only specific artifact target(s). Repeatable.
+            Targets:
+              decisions
+              projections
+              evidence
+              evaluations-digests
+              evaluations-actions
+              evaluations
+              knowledge-nodes
+              knowledge-edges
+              knowledge-receipts
+              knowledge
   -h, --help  Show this message.
 USAGE
 }
@@ -32,6 +53,19 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --check)
       MODE="check"
+      shift
+      ;;
+    --target)
+      if [[ $# -lt 2 ]]; then
+        echo "Missing value for --target" >&2
+        usage >&2
+        exit 2
+      fi
+      REQUESTED_TARGETS+=("$2")
+      shift 2
+      ;;
+    --target=*)
+      REQUESTED_TARGETS+=("${1#--target=}")
       shift
       ;;
     -h|--help)
@@ -439,7 +473,8 @@ extract_digest_actions() {
   awk '
     function flush_action() {
       if (id == "") return
-      print id "\t" owner "\t" due_date "\t" status "\t" summary "\t" evidence
+      # Use Unit Separator to preserve empty fields when read by bash.
+      printf "%s\037%s\037%s\037%s\037%s\037%s\n", id, owner, due_date, status, summary, evidence
       id=""
       owner=""
       due_date=""
@@ -803,7 +838,7 @@ generate_evaluations_open_actions() {
     digest_id="$(basename "$digest_file")"
     digest_id="${digest_id%.md}"
 
-    while IFS=$'\t' read -r action_id owner due_date status summary evidence; do
+    while IFS=$'\x1f' read -r action_id owner due_date status summary evidence; do
       [[ -z "$action_id" ]] && continue
       local status_lc
       status_lc="$(printf '%s' "$status" | tr '[:upper:]' '[:lower:]')"
@@ -1111,14 +1146,83 @@ reconcile_outputs() {
 }
 
 main() {
-  generate_decisions_context
-  generate_projection_materialized
-  generate_evidence_index
-  generate_evaluations_digests_index
-  generate_evaluations_open_actions
-  generate_knowledge_nodes
-  generate_knowledge_edges
-  generate_knowledge_receipts
+  local -a default_generators=(
+    "generate_decisions_context"
+    "generate_projection_materialized"
+    "generate_evidence_index"
+    "generate_evaluations_digests_index"
+    "generate_evaluations_open_actions"
+    "generate_knowledge_nodes"
+    "generate_knowledge_edges"
+    "generate_knowledge_receipts"
+  )
+  local -a generators=()
+  local target
+  local generator
+  local existing
+
+  if [[ ${#REQUESTED_TARGETS[@]} -eq 0 ]]; then
+    generators=("${default_generators[@]}")
+  else
+    for target in "${REQUESTED_TARGETS[@]}"; do
+      case "$target" in
+        decisions)
+          generators+=("generate_decisions_context")
+          ;;
+        projections)
+          generators+=("generate_projection_materialized")
+          ;;
+        evidence)
+          generators+=("generate_evidence_index")
+          ;;
+        evaluations-digests)
+          generators+=("generate_evaluations_digests_index")
+          ;;
+        evaluations-actions)
+          generators+=("generate_evaluations_open_actions")
+          ;;
+        evaluations)
+          generators+=("generate_evaluations_digests_index" "generate_evaluations_open_actions")
+          ;;
+        knowledge-nodes)
+          generators+=("generate_knowledge_nodes")
+          ;;
+        knowledge-edges)
+          generators+=("generate_knowledge_edges")
+          ;;
+        knowledge-receipts)
+          generators+=("generate_knowledge_receipts")
+          ;;
+        knowledge)
+          generators+=("generate_knowledge_nodes" "generate_knowledge_edges" "generate_knowledge_receipts")
+          ;;
+        *)
+          echo "Unknown target selector: $target" >&2
+          usage >&2
+          exit 2
+          ;;
+      esac
+    done
+  fi
+
+  local -a deduped_generators=()
+  local seen
+  for generator in "${generators[@]}"; do
+    seen=0
+    for existing in "${deduped_generators[@]}"; do
+      if [[ "$existing" == "$generator" ]]; then
+        seen=1
+        break
+      fi
+    done
+    if [[ $seen -eq 0 ]]; then
+      deduped_generators+=("$generator")
+    fi
+  done
+
+  for generator in "${deduped_generators[@]}"; do
+    "$generator"
+  done
   reconcile_outputs
 }
 

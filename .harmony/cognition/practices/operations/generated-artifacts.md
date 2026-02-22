@@ -24,7 +24,13 @@ Keep derived cognition artifacts deterministic, internally generated, and drift-
 
 - Sync/apply: `bash .harmony/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh`
 - Drift check: `bash .harmony/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh --check`
+- Targeted decisions sync: `bash .harmony/cognition/_ops/runtime/scripts/generate-runtime-decisions.sh`
+- Targeted projections sync: `bash .harmony/cognition/_ops/runtime/scripts/generate-runtime-projections.sh`
+- Targeted evidence sync: `bash .harmony/cognition/_ops/runtime/scripts/generate-runtime-evidence.sh`
+- Targeted evaluations sync: `bash .harmony/cognition/_ops/runtime/scripts/generate-runtime-evaluations.sh`
+- Targeted knowledge sync: `bash .harmony/cognition/_ops/runtime/scripts/generate-runtime-knowledge.sh`
 - Full validator: `bash .harmony/cognition/_ops/runtime/scripts/validate-generated-runtime-artifacts.sh`
+- Fixture tests: `bash .harmony/cognition/_ops/runtime/scripts/test-sync-runtime-artifacts-fixtures.sh`
 
 ## Procedure
 

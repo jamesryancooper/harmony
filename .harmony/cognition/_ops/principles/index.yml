@@ -1,0 +1,25 @@
+# Cognition Ops Principles Scripts Index
+# Machine-readable discovery index for principles governance scripts.
+
+schema_version: "1.0"
+files:
+  - id: principles-lint-governance
+    path: scripts/lint-principles-governance.sh
+    summary: Canonical governance lint for principles invariants.
+    when: When principles docs or related governance scripts change.
+
+  - id: principles-reference-lint
+    path: scripts/reference-lint.sh
+    summary: Link and anchor lint for principles documentation.
+    when: When principles cross-references are added or updated.
+
+  - id: principles-fixture-tests
+    path: scripts/test-principles-governance-lint-fixtures.sh
+    summary: Fixture tests that ensure governance lint fails on known invalid inputs.
+    when: When updating principles lint behavior.
+
+  - id: principles-docs-promotion-fail-closed-tests
+    path: scripts/test-docs-promotion-fail-closed.sh
+    summary: Contract tests for docs evidence promotion fail-closed policy behavior.
+    when: When policy gate behavior or docs-evidence requirements change.
+

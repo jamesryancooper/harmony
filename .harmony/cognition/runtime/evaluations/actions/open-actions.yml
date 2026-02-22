@@ -9,4 +9,11 @@ updated: "2026-02-22"
 # - status
 # - summary
 # - evidence
-actions: []
+actions:
+  - id: "ACTION-2026-W08-01"
+    source_digest: "2026-W08-weekly-scorecard"
+    owner: "cognition-ops"
+    due_date: "2026-02-27"
+    status: "open"
+    summary: "Establish recurring weekly digest production cadence."
+    evidence: "/.harmony/cognition/practices/operations/weekly-evaluations.md"

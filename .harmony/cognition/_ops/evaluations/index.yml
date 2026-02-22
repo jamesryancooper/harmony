@@ -1,0 +1,10 @@
+# Cognition Ops Evaluations Scripts Index
+# Machine-readable discovery index for evaluations runtime validators.
+
+schema_version: "1.0"
+files:
+  - id: validate-evaluations-runtime
+    path: scripts/validate-evaluations-runtime.sh
+    summary: Validates runtime evaluation digest/action surface contracts.
+    when: Before merge and when digest/action artifacts or indexes change.
+

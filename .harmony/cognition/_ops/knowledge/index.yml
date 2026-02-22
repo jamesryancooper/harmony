@@ -1,0 +1,10 @@
+# Cognition Ops Knowledge Scripts Index
+# Machine-readable discovery index for knowledge runtime validators.
+
+schema_version: "1.0"
+files:
+  - id: validate-knowledge-runtime
+    path: scripts/validate-knowledge-runtime.sh
+    summary: Validates runtime knowledge graph/sources/queries contract integrity.
+    when: Before merge and when knowledge runtime artifacts or indexes change.
+
