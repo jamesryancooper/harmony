@@ -1,4 +1,4 @@
-# Content Plane Implementation Roadmap
+# Artifact Surface Implementation Roadmap
 
 The roadmap is optimized for a solo developer/tiny team building the minimum viable compiler and iterating.
 
@@ -73,10 +73,10 @@ The roadmap is optimized for a solo developer/tiny team building the minimum via
 
 ## Phase 7: Runtime Write Layer (as needed)
 
-**Deliverables (only if boundary conditions demand—see [runtime-content-layer.md](./runtime-content-layer.md) and [boundary-conditions.md](./boundary-conditions.md))**:
+**Deliverables (only if boundary conditions demand—see [runtime-artifact-layer.md](./runtime-artifact-layer.md) and [boundary-conditions.md](./boundary-conditions.md))**:
 
 - **Tier 2/3 server DB**: Set up Postgres/Supabase/PlanetScale.
-- Schema migration to sync HCG schema to server DB.
+- Schema migration to sync HAG schema to server DB.
 - Runtime override tables (personalization, A/B variants, live updates).
 - Merge logic for canonical + runtime content at request time.
 - Sync-back workflow:

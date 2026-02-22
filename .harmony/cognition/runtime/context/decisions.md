@@ -170,3 +170,11 @@ Move here when a decision is replaced. Include reference to replacement.
 | ID | Decision | Choice | Constraint | Date |
 |----|----------|--------|------------|------|
 | D058 | Sidecar section index architecture | Replace cognition `sections/` surrogate docs with sidecar `*.index.yml` files colocated with canonical docs | Discovery contracts must resolve heavy-doc targeting through sidecar indexes (`README.index.yml`, `implementation-guide.index.yml`, `resources.index.yml`); legacy `sections/` paths are deprecated and blocked by harness validation | 2026-02-21 |
+
+### 2026-02-22
+
+- [ADR-037](../decisions/037-artifact-surface-clean-break-rename.md) — Artifact surface clean-break rename (D059)
+
+| ID | Decision | Choice | Constraint | Date |
+|----|----------|--------|------------|------|
+| D059 | Optional artifact architecture surface canonicalization | Replace `cognition/_meta/architecture/content-plane/` with `cognition/_meta/architecture/artifact-surface/` as the only canonical optional artifact architecture path and rename `runtime-content-layer.md` to `runtime-artifact-layer.md` | Active docs/contracts/validators must resolve optional artifact architecture through `artifact-surface/*`; legacy `content-plane` path and `runtime-content-layer.md` filename are deprecated and blocked by migration banlist guardrails | 2026-02-22 |

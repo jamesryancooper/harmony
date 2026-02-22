@@ -55,6 +55,8 @@ Each entry should be specific enough to avoid false positives.
 - `cognition/methodology/README.md` - legacy root cognition methodology path - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `cognition/principles/_ops/scripts/lint-principles-governance.sh` - legacy principles-local ops script path - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `cognition/principles/_meta/docs/ra-acp-glossary.md` - legacy principles-local meta docs path - removed by migration `2026-02-20-cognition-bounded-surfaces`
+- `cognition/_meta/architecture/content-plane/` - deprecated optional architecture surface path token - removed by migration `2026-02-22-artifact-surface-clean-break-rename`
+- `runtime-content-layer.md` - deprecated optional artifact runtime layer filename token - removed by migration `2026-02-22-artifact-surface-clean-break-rename`
 - `capabilities/runtime/skills/quality-gate/` - deprecated quality-gate skill domain path - removed by migration `2026-02-21-quality-gate-domain-split`
 - `orchestration/runtime/workflows/quality-gate/` - deprecated quality-gate workflow domain path - removed by migration `2026-02-21-quality-gate-domain-split`
 - `group: quality-gate` - deprecated quality-gate taxonomy group key - removed by migration `2026-02-21-quality-gate-domain-split`
@@ -122,6 +124,8 @@ Each entry should be specific enough to avoid false positives.
 - `/.harmony/cognition/methodology/` - replaced by `/.harmony/cognition/practices/methodology/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `/.harmony/cognition/principles/_ops/` - replaced by `/.harmony/cognition/_ops/principles/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
 - `/.harmony/cognition/principles/_meta/docs/` - replaced by `/.harmony/cognition/_meta/principles/` - removed by migration `2026-02-20-cognition-bounded-surfaces`
+- `/.harmony/cognition/_meta/architecture/content-plane/` - replaced by `/.harmony/cognition/_meta/architecture/artifact-surface/` - removed by migration `2026-02-22-artifact-surface-clean-break-rename`
+- `/.harmony/cognition/_meta/architecture/artifact-surface/runtime-content-layer.md` - replaced by `/.harmony/cognition/_meta/architecture/artifact-surface/runtime-artifact-layer.md` - removed by migration `2026-02-22-artifact-surface-clean-break-rename`
 - `/.harmony/capabilities/runtime/skills/quality-gate/` - replaced by focused runtime domains `/.harmony/capabilities/runtime/skills/audit/`, `/.harmony/capabilities/runtime/skills/remediation/`, and `/.harmony/capabilities/runtime/skills/refactor/` - removed by migration `2026-02-21-quality-gate-domain-split`
 - `/.harmony/orchestration/runtime/workflows/quality-gate/` - replaced by focused runtime domains `/.harmony/orchestration/runtime/workflows/audit/` and `/.harmony/orchestration/runtime/workflows/refactor/` - removed by migration `2026-02-21-quality-gate-domain-split`
 - `/.harmony/orchestration/runtime/workflows/audit/documentation-quality-gate/` - replaced by `/.harmony/orchestration/runtime/workflows/audit/documentation-audit/` - removed by migration `2026-02-21-documentation-audit-clean-break-rename`
@@ -130,4 +134,4 @@ Each entry should be specific enough to avoid false positives.
 
 ## Banned Config Keys or Env Vars
 
-- `(none currently)` - no legacy config or env keys removed in migrations `2026-02-20-agency-bounded-surfaces`, `2026-02-21-agency-actors-to-runtime`, `2026-02-20-orchestration-bounded-surfaces`, `2026-02-20-capabilities-bounded-surfaces`, `2026-02-20-assurance-bounded-surfaces`, `2026-02-20-scaffolding-bounded-surfaces`, `2026-02-20-engine-bounded-surfaces`, `2026-02-20-cognition-bounded-surfaces`, `2026-02-21-quality-gate-domain-split`, `2026-02-21-documentation-audit-clean-break-rename`, `2026-02-21-cognition-runtime-migrations-surface-split`, or `2026-02-21-migration-evidence-bundle-format`
+- `(none currently)` - no legacy config or env keys removed in migrations `2026-02-20-agency-bounded-surfaces`, `2026-02-21-agency-actors-to-runtime`, `2026-02-20-orchestration-bounded-surfaces`, `2026-02-20-capabilities-bounded-surfaces`, `2026-02-20-assurance-bounded-surfaces`, `2026-02-20-scaffolding-bounded-surfaces`, `2026-02-20-engine-bounded-surfaces`, `2026-02-20-cognition-bounded-surfaces`, `2026-02-21-quality-gate-domain-split`, `2026-02-21-documentation-audit-clean-break-rename`, `2026-02-21-cognition-runtime-migrations-surface-split`, `2026-02-21-migration-evidence-bundle-format`, or `2026-02-22-artifact-surface-clean-break-rename`

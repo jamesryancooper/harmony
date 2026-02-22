@@ -75,3 +75,5 @@ records:
     path: 035-cognition-discovery-and-governance-hardening.md
   - id: 036-cognition-sidecar-section-index-architecture
     path: 036-cognition-sidecar-section-index-architecture.md
+  - id: 037-artifact-surface-clean-break-rename
+    path: 037-artifact-surface-clean-break-rename.md

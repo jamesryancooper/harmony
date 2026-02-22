@@ -1,8 +1,8 @@
-# Content Plane Problem Severity Matrix
+# Artifact Surface Problem Severity Matrix
 
 **Rating scale:** Non-issue | Minor friction | Significant hurdle | Dealbreaker
 
-|  # | Core problem                                       | Final severity for Harmony | Why (Harmony context)                                                             | HCP mitigation                                                                                  |
+|  # | Core problem                                       | Final severity for Harmony | Why (Harmony context)                                                             | HAS mitigation                                                                                  |
 | -: | -------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 |  1 | Editorial interfaces without git knowledge         | **Non-issue** (default)    | Harmony's primary editors are devs + agents; non-git SMEs are edge cases.         | GitHub web editor; agent-mediated edits; optional git-backed UI later.                          |
 |  2 | Real-time collaboration & merge conflicts on prose | **Significant hurdle**     | Conflicts are semantic; with parallel agents it can thrash even in small teams.   | Bundle granularity; lease-based coordination; append-only logs per session; CI overlap checks.  |

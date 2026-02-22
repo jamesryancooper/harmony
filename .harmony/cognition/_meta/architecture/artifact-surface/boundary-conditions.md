@@ -1,4 +1,4 @@
-# Content Plane Boundary Conditions & Warning Signs
+# Artifact Surface Boundary Conditions & Warning Signs
 
 ## Quantitative thresholds
 
@@ -7,11 +7,11 @@ Reconsider or escalate if:
 - **Build time > 5 minutes** consistently (indexing too slow; need incremental builds, caching, or alternative storage).
 - **Merge conflicts weekly** on content (need stricter leasing, more granular docs, or real-time tooling).
 - **> 3 frequent non-technical editors** (add a minimal GUI).
-- **Content must update without deployment** (need runtime layer—see [runtime-content-layer.md](./runtime-content-layer.md)).
+- **Content must update without deployment** (need runtime layer—see [runtime-artifact-layer.md](./runtime-artifact-layer.md)).
 - **> 10,000 content items** (indexes/search become heavy; consider specialized systems).
 - **Agent collision rate > 5%** of runs (coordination failure; strengthen orchestration + leasing).
-- **Personalization/A/B testing required** (need runtime write layer—see [runtime-content-layer.md](./runtime-content-layer.md)).
-- **Real-time subscriptions needed** (need server DB—see [runtime-content-layer.md](./runtime-content-layer.md)).
+- **Personalization/A/B testing required** (need runtime write layer—see [runtime-artifact-layer.md](./runtime-artifact-layer.md)).
+- **Real-time subscriptions needed** (need server DB—see [runtime-artifact-layer.md](./runtime-artifact-layer.md)).
 
 ## Qualitative indicators
 
@@ -26,9 +26,9 @@ Warning signs you're "building a CMS":
 If thresholds are crossed, escalate in this order:
 
 1. **Improve compiler**: incremental builds, caching, better SQL indexes.
-2. **Add Tier 1 runtime read layer**: edge-replicated SQLite (Turso/D1/LiteFS) for global reads and mobile/offline needs. See [runtime-content-layer.md](./runtime-content-layer.md).
+2. **Add Tier 1 runtime read layer**: edge-replicated SQLite (Turso/D1/LiteFS) for global reads and mobile/offline needs. See [runtime-artifact-layer.md](./runtime-artifact-layer.md).
 3. **Add Tier 2 central read layer**: server DB read replicas for complex queries and aggregations.
-4. **Add Tier 3 runtime write layer**: server DB (Postgres/Supabase) for live overrides, personalization, and content updates without deployment. See [runtime-content-layer.md](./runtime-content-layer.md).
+4. **Add Tier 3 runtime write layer**: server DB (Postgres/Supabase) for live overrides, personalization, and content updates without deployment. See [runtime-artifact-layer.md](./runtime-artifact-layer.md).
 5. **Add minimal editor UI**: git-backed UI (Keystatic/Decap) if SMEs blocked.
 6. **Adopt a CMS** only if:
 
@@ -52,4 +52,4 @@ Use this matrix to determine when to add runtime layers:
 | Real-time subscriptions | ❌ | ❌ | ✅ |
 | Concurrent multi-user editing | ❌ | ❌ | ✅ |
 
-See [runtime-content-layer.md](./runtime-content-layer.md) for complete runtime layer specification.
+See [runtime-artifact-layer.md](./runtime-artifact-layer.md) for complete runtime layer specification.

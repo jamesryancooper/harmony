@@ -1,66 +1,68 @@
-# Runtime Content Layer
+# Runtime Artifact Layer
 
-This section defines the **optional runtime content layer** that extends the canonical Content Plane when build-time-only content delivery is insufficient. The runtime layer is designed to gracefully extend—not replace—the canonical content model.
+This section defines the **optional runtime artifact layer** that extends the canonical Artifact Surface when build-time-only content delivery is insufficient. The runtime layer is designed to gracefully extend—not replace—the canonical content model.
 
 ---
 
-## Position in Three-Plane Architecture
+## Position Relative to Foundational Planes
 
-The Runtime Content Layer extends the **Content Plane** specifically. It does not affect the Continuity Plane or Knowledge Plane, which have their own data models and storage patterns.
+The Runtime Artifact Layer extends the **optional artifact surface**.
+It does not redefine Harmony's foundational planes (governance, runtime,
+continuity, knowledge).
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     RUNTIME LAYER SCOPE                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Content Plane              Continuity Plane    Knowledge Plane│
-│   ┌─────────────────┐        ┌────────────┐     ┌────────────┐ │
-│   │ Canonical       │        │ Decisions  │     │ Specs      │ │
-│   │ content/        │        │ Handoffs   │     │ Contracts  │ │
-│   │                 │        │ Progress   │     │ Tests      │ │
-│   │ Runtime Layer   │        │            │     │ Traces     │ │
-│   │ ◄── Extends     │        │ (No runtime│     │ (No runtime│ │
-│   │     here        │        │  layer)    │     │  layer)    │ │
-│   └─────────────────┘        └────────────┘     └────────────┘ │
+│   Optional Artifact Surface    Foundational Planes              │
+│   ┌─────────────────┐         ┌─────────────────────────────┐  │
+│   │ Canonical       │         │ Governance / Runtime /      │  │
+│   │ content/        │         │ Continuity / Knowledge      │  │
+│   │                 │         │                             │  │
+│   │ Runtime Layer   │         │ (unchanged by this layer)   │  │
+│   │ ◄── Extends     │         │                             │  │
+│   │     here        │         │                             │  │
+│   └─────────────────┘         └─────────────────────────────┘  │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-See [Three Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete architecture overview.
+See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete architecture overview.
 
 ---
 
-## Canonical vs Runtime Content
+## Canonical vs Runtime Artifacts
 
 ### Definitions
 
 | Term | Plane | Definition |
 |------|-------|------------|
-| **Canonical Content** | Content | Content stored in `content/` as the authoritative source of truth. Git-tracked, schema-validated, and compiled into the Harmony Content Graph (HCG). |
+| **Canonical Content** | Optional artifact surface | Content stored in `content/` as the authoritative source of truth. Git-tracked, schema-validated, and compiled into the Harmony Artifact Graph (HAG). |
 | **Continuity Artifacts** | [Continuity](../../../../continuity/_meta/architecture/continuity-plane.md) | Content stored in `.continuity/` with special lifecycle rules (append-only logs, immutable decisions, session-scoped handoffs). Owned by Continuity Plane. |
-| **Runtime Content** | Content (extension) | Dynamic data that overlays canonical content at request time. May include live overrides, personalization, time-sensitive updates, or data fetched from external systems. |
+| **Runtime Artifacts** | Optional artifact-surface extension | Dynamic data that overlays canonical content at request time. May include live overrides, personalization, time-sensitive updates, or data fetched from external systems. |
 
-### Content roots summary
+### Artifact roots summary
 
-HCP treats the following as **content roots** (indexing content from multiple planes):
+HAS treats the following as **artifact roots** (indexing content from multiple planes):
 
 | Root | Plane | Type | Description |
 |------|-------|------|-------------|
-| `content/` | Content | Canonical content | Public, internal, and agent-facing content organized by surface |
+| `content/` | Optional artifact surface | Canonical content | Public, internal, and agent-facing content organized by surface |
 | `.continuity/` | [Continuity](../../../../continuity/_meta/architecture/continuity-plane.md) | Continuity artifacts | Backlog, plans, handoffs, progress events, decisions—with lifecycle rules |
-| `.harmony/content/` | Content | Compiled artifacts | SQLite indexes, JSON exports, dependency graphs (generated, not source) |
+| `.harmony/content/` | Optional artifact surface | Compiled artifacts | SQLite indexes, JSON exports, dependency graphs (generated, not source) |
 
 ### The distinction
 
-- **Canonical content** (Content Plane) is the **source of truth** for published content. It lives in git, is versioned, auditable, and deterministically compiled.
-- **Runtime content** (Content Plane extension) is an **overlay**. It extends canonical content with dynamic data but does not replace the underlying source of truth.
-- **Continuity artifacts** (Continuity Plane) have **special lifecycle semantics** (append-only, session-scoped, immutable-after-merge). They are owned by the Continuity Plane but indexed by the Content Plane build pipeline.
+- **Canonical content** (Artifact Surface) is the **source of truth** for published content. It lives in git, is versioned, auditable, and deterministically compiled.
+- **Runtime content** (Artifact Surface extension) is an **overlay**. It extends canonical content with dynamic data but does not replace the underlying source of truth.
+- **Continuity artifacts** (Continuity Plane) have **special lifecycle semantics** (append-only, session-scoped, immutable-after-merge). They are owned by the Continuity Plane but indexed by the Artifact Surface build pipeline.
 
 ---
 
-## When Runtime Content is Justified
+## When Runtime Artifacts Are Justified
 
-Runtime content becomes necessary when the boundary conditions in [boundary-conditions.md](./boundary-conditions.md) are crossed—specifically when **content must update without deployment**. The following breakdown identifies legitimate runtime use cases by surface.
+Runtime artifacts become necessary when the boundary conditions in [boundary-conditions.md](./boundary-conditions.md) are crossed—specifically when **content must update without deployment**. The following breakdown identifies legitimate runtime use cases by surface.
 
 ### Public / External-Facing (strongest case)
 
@@ -99,17 +101,17 @@ Runtime content becomes necessary when the boundary conditions in [boundary-cond
 The runtime layer **extends** canonical content—it does not replace it. This preserves the benefits of git-based content (versioning, auditability, deterministic builds) while enabling dynamic capabilities where needed.
 
 ```text
-Canonical (git) → Compiled (HCG) → Runtime (overlay) → Consumer
+Canonical (git) → Compiled (HAG) → Runtime (overlay) → Consumer
                                          ↓
                     (scheduled sync back to git for persistence)
 ```
 
 ### How the spec supports hybrid gracefully
 
-The Content Plane design already accommodates runtime extension:
+The Artifact Surface design already accommodates runtime extension:
 
 1. **Canonical content stays in git** — Source of truth remains versioned and auditable
-2. **HCG provides queryable indexes** — SQLite/JSON artifacts can be deployed and read at runtime
+2. **HAG provides queryable indexes** — SQLite/JSON artifacts can be deployed and read at runtime
 3. **Thin read-only API** — [boundary-conditions.md](./boundary-conditions.md) escalation path already includes this as step 2
 4. **IR is destination-neutral** — Compiled Intermediate Representation can be consumed by any runtime layer
 5. **References are stable** — `ref:<type>:<id>[@locale]` syntax works across canonical and runtime contexts
@@ -123,9 +125,9 @@ The Content Plane design already accommodates runtime extension:
 │   Versioned, schema-validated, auditable                        │
 └─────────────────────────────────────────────────────────────────┘
                               │
-                              ▼ (build via HCP)
+                              ▼ (build via HAS)
 ┌─────────────────────────────────────────────────────────────────┐
-│                    COMPILED LAYER (HCG)                          │
+│                    COMPILED LAYER (HAG)                          │
 │   .harmony/content/content.sqlite + content.json + graph.json   │
 │   Deterministic, regenerated each build                         │
 └─────────────────────────────────────────────────────────────────┘
@@ -133,7 +135,7 @@ The Content Plane design already accommodates runtime extension:
                               ▼ (deploy/replicate)
 ┌─────────────────────────────────────────────────────────────────┐
 │                    RUNTIME READ LAYER                            │
-│   SQLite (Turso/D1/LiteFS) or replicated HCG                    │
+│   SQLite (Turso/D1/LiteFS) or replicated HAG                    │
 │   Read-heavy, global edge distribution                          │
 │   Serves: public pages, API reads, mobile sync, agent context   │
 └─────────────────────────────────────────────────────────────────┘
@@ -153,7 +155,7 @@ The Content Plane design already accommodates runtime extension:
 **Pattern 1: Read-only runtime (most common)**:
 
 ```text
-git → HCP build → SQLite/JSON → Edge CDN → Consumer
+git → HAS build → SQLite/JSON → Edge CDN → Consumer
 ```
 
 No runtime writes. Content updates require a build and deploy. Suitable for most public content.
@@ -161,7 +163,7 @@ No runtime writes. Content updates require a build and deploy. Suitable for most
 **Pattern 2: Runtime overlay (personalization, A/B)**:
 
 ```text
-git → HCP build → SQLite → Runtime API → merge(canonical, overlay) → Consumer
+git → HAS build → SQLite → Runtime API → merge(canonical, overlay) → Consumer
                               ↑
                          Runtime DB (overrides, user prefs, experiments)
 ```
@@ -180,7 +182,7 @@ Content is edited in runtime DB for speed, then synced back to git for persisten
 
 ---
 
-## Storage Choices for Runtime Content
+## Storage Choices for Runtime Artifacts
 
 Storage choice depends on **access patterns and operational requirements**. There is no single correct answer—choose based on your specific needs.
 
@@ -190,7 +192,7 @@ SQLite is excellent for **read-heavy, low-write-concurrency** scenarios:
 
 | Scenario | Why SQLite Works |
 |----------|------------------|
-| Read-only API over compiled HCG | No write contention; single-file deployment |
+| Read-only API over compiled HAG | No write contention; single-file deployment |
 | Single-node deployments | No replication complexity |
 | Edge/CDN deployments | File-based, easy to replicate to edge locations |
 | Mobile offline sync | Embedded database, no server dependency |
@@ -241,7 +243,7 @@ The recommended approach is a **tiered model** where each layer serves its appro
 
 | Tier | Storage | Access Pattern | Use Cases |
 |------|---------|----------------|-----------|
-| **Tier 0** | Git + HCG | Build-time only | Canonical content, no runtime needs |
+| **Tier 0** | Git + HAG | Build-time only | Canonical content, no runtime needs |
 | **Tier 1** | SQLite (edge) | Read-only, replicated | Public pages, API reads, agent context |
 | **Tier 2** | Server DB (read) | Read-heavy, centralized | Complex queries, aggregations, search |
 | **Tier 3** | Server DB (write) | Read-write, multi-user | Live overrides, personalization, events |
@@ -316,7 +318,7 @@ Default recommendation: **Canonical wins** for structure/schema; **Runtime wins*
 
 Runtime content MUST adhere to the same schemas as canonical content:
 
-- Runtime DB tables SHOULD mirror HCG SQLite schema
+- Runtime DB tables SHOULD mirror HAG SQLite schema
 - Runtime overrides SHOULD be validated against Zod schemas
 - Schema migrations MUST be coordinated across canonical and runtime
 
@@ -346,7 +348,7 @@ The runtime layer is an **escape hatch**, not a default. Watch for warning signs
 
 ### Boundary enforcement
 
-HCP SHOULD provide CLI commands to verify runtime/canonical alignment:
+HAS SHOULD provide CLI commands to verify runtime/canonical alignment:
 
 - `harmony-content runtime:check` — Compare runtime DB against canonical, report drift
 - `harmony-content runtime:sync` — Generate PRs for runtime changes
@@ -356,7 +358,7 @@ HCP SHOULD provide CLI commands to verify runtime/canonical alignment:
 
 ## Summary
 
-The runtime content layer is an **optional extension** that becomes relevant when:
+The runtime artifact layer is an **optional extension** that becomes relevant when:
 
 1. Content must update without deployment
 2. Personalization or A/B testing is required

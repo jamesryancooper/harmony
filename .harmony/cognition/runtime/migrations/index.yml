@@ -72,3 +72,8 @@ records:
     path: 2026-02-21-cognition-sidecar-section-indexes/plan.md
     adr: ../decisions/036-cognition-sidecar-section-index-architecture.md
     evidence: ../../../output/reports/migrations/2026-02-21-cognition-sidecar-section-indexes/evidence.md
+
+  - id: 2026-02-22-artifact-surface-clean-break-rename
+    path: 2026-02-22-artifact-surface-clean-break-rename/plan.md
+    adr: ../decisions/037-artifact-surface-clean-break-rename.md
+    evidence: ../../../output/reports/migrations/2026-02-22-artifact-surface-clean-break-rename/evidence.md

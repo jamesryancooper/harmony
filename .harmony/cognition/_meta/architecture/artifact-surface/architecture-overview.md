@@ -1,21 +1,28 @@
-# Content Plane Architecture Overview
+# Artifact Surface Architecture Overview
 
 ## Final architecture decision
 
-**Name:** **Harmony Content Plane (HCP)**
-**One sentence:** A **flat-file-first content compiler** that validates, resolves, indexes, and transforms content files into a **queryable Harmony Content Graph** and deterministic multi-destination outputs.
+**Name:** **Harmony Artifact Surface (HAS)**
+**One sentence:** A **flat-file-first artifact compiler** that validates, resolves, indexes, and transforms content files into a **queryable Harmony Artifact Graph** and deterministic multi-destination outputs.
 
-## Position in Three-Plane Architecture
+## Status
 
-The Content Plane is one of three architectural planes in Harmony:
+HAS is an **optional artifact architecture surface**.
+It is **not** a foundational Harmony plane.
 
-| Plane | Core Question | Artifacts |
+## Position Relative to the Foundational Planes
+
+HAS complements the foundational model:
+
+| Foundational Surface | Core Question | Artifacts |
 |-------|---------------|-----------|
-| **Content Plane** (this document) | "What do we publish?" | Docs, entities, pages, prompts |
-| [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) | "What did we decide?" | Decisions, handoffs, progress, backlogs |
+| [Governance](../../../governance/README.md) | "What is allowed and required?" | Principles, controls, policy contracts |
+| [Runtime](../../../runtime/README.md) | "What runs and executes work?" | Runtime artifacts, workflows, execution contracts |
+| [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) | "What happened and what is next?" | Decisions, handoffs, progress, backlogs |
 | [Knowledge Plane](../../../runtime/knowledge-plane/knowledge-plane.md) | "What is the system?" | Specs, contracts, code, tests, traces |
+| **HAS (optional)** | "What artifacts do we produce and publish?" | Docs, entities, pages, prompts |
 
-See [Three Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for cross-plane architecture.
+See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for cross-plane architecture.
 
 ---
 
@@ -32,7 +39,7 @@ See [Three Planes Integration](../../../../continuity/_meta/architecture/three-p
 
 ## What it IS vs what it is NOT
 
-**HCP IS:**
+**HAS IS:**
 
 - A **toolchain** (CLI + library) that compiles content into stable artifacts.
 - A **schema registry** for content types (Zod) with migrations.
@@ -40,7 +47,7 @@ See [Three Planes Integration](../../../../continuity/_meta/architecture/three-p
 - A **dependency graph** enabling impact analysis ("blast radius").
 - A shared infrastructure for **public, internal, and agent continuity** content.
 
-**HCP IS NOT:**
+**HAS IS NOT:**
 
 - A hosted CMS or a multi-user editorial product.
 - A real-time collaborative editor.
@@ -55,25 +62,25 @@ Harmony explicitly will **not** build:
 - Scheduling UI, release calendar, notification system.
 - Custom auth/user management beyond git hosting.
 - A custom query language server; use SQLite + helpers.
-- Bidirectional sync between files and a live database (runtime writes sync back to git via controlled PR workflows—see [runtime-content-layer.md](./runtime-content-layer.md).
+- Bidirectional sync between files and a live database (runtime writes sync back to git via controlled PR workflows—see [runtime-artifact-layer.md](./runtime-artifact-layer.md)).
 
 ## The Hybrid Model (Canonical + Runtime)
 
-When boundary conditions are crossed (see [boundary-conditions.md](./boundary-conditions.md)), HCP supports a **hybrid model** where runtime content extends canonical content:
+When boundary conditions are crossed (see [boundary-conditions.md](./boundary-conditions.md)), HAS supports a **hybrid model** where runtime content extends canonical content:
 
 ### Content layer hierarchy
 
 | Layer | Storage | Mutability | Purpose |
 |-------|---------|------------|---------|
 | **Canonical** | `content/` + `.continuity/` in git | Immutable at runtime; changed via PR | Source of truth |
-| **Compiled** | `.harmony/content/` (HCG) | Regenerated each build | Query layer |
+| **Compiled** | `.harmony/content/` (HAG) | Regenerated each build | Query layer |
 | **Runtime Read** | SQLite at edge (Turso/D1/LiteFS) | Read-only replica | Fast global reads |
 | **Runtime Write** | Server DB (Postgres/Supabase) | Mutable | Live overrides, personalization |
 
 ### How layers interact
 
-1. **Canonical content** is compiled into the **Harmony Content Graph (HCG)**
-2. **HCG artifacts** (SQLite, JSON) are deployed to runtime infrastructure
+1. **Canonical content** is compiled into the **Harmony Artifact Graph (HAG)**
+2. **HAG artifacts** (SQLite, JSON) are deployed to runtime infrastructure
 3. **Runtime read layer** serves content from edge-replicated SQLite
 4. **Runtime write layer** (when needed) overlays canonical with dynamic data
 5. **Sync-back workflows** preserve runtime changes in git for auditability
@@ -88,7 +95,7 @@ When boundary conditions are crossed (see [boundary-conditions.md](./boundary-co
 | Personalization / A/B testing | Runtime Write (server DB) |
 | Real-time subscriptions | Runtime Write (server DB) |
 
-See [runtime-content-layer.md](./runtime-content-layer.md) for complete runtime layer specification.
+See [runtime-artifact-layer.md](./runtime-artifact-layer.md) for complete runtime layer specification.
 
 ## Synthesis notes
 

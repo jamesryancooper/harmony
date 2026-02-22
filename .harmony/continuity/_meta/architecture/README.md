@@ -23,7 +23,9 @@ Continuity is represented by four canonical files:
 | Document | Description |
 |---|---|
 | `continuity-plane.md` | Continuity model, data contracts, and lifecycle rules |
-| `three-planes-integration.md` | Integration points across cognition, orchestration, and continuity |
+| `three-planes-integration.md` | Foundational plane integration contract (governance/runtime/continuity/knowledge; legacy filename retained for compatibility) |
+| `runs-retention.md` | Retention classes and lifecycle rules for `continuity/runs/` evidence artifacts |
+| `schemas/` | Canonical field-level schema contracts for continuity JSON artifacts |
 
 ## Lifecycle Rules
 
@@ -33,9 +35,11 @@ Continuity is represented by four canonical files:
 | `.harmony/continuity/tasks.json` | Mutable | Keep machine-readable task state current with blockers and ownership. |
 | `.harmony/continuity/entities.json` | Mutable | Keep tracked entities current; preserve stable IDs and ownership semantics. |
 | `.harmony/continuity/next.md` | Mutable | Keep focused and short; must be executable without extra context. |
+| `.harmony/continuity/runs/` | Append-oriented evidence | Govern by retention classes in `runs/retention.json`; do not use for active task state. |
 
 ## Related Docs
 
 - `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
-- `.harmony/cognition/_meta/architecture/content-plane/README.md`
+- `.harmony/cognition/governance/README.md`
+- `.harmony/cognition/practices/README.md`
 - `.harmony/START.md`

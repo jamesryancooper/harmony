@@ -1,4 +1,4 @@
-# Content Plane Technical Specification
+# Artifact Surface Technical Specification
 
 > **Normative language:** MUST / SHOULD / MAY are used as RFC-style requirements.
 
@@ -9,16 +9,16 @@
 - **Block**: a typed content fragment (hero, pricing, prose, cta…) used in compositions and exports.
 - **Reference**: a stable pointer to a document: `ref:<type>:<id>[@locale]`.
 - **IR**: Intermediate Representation—destination-neutral JSON form compiled from documents.
-- **HCG**: Harmony Content Graph—compiled indexes + dependency graph.
+- **HAG**: Harmony Artifact Graph—compiled indexes + dependency graph.
 - **Canonical Content**: content stored in `content/` as the authoritative source of truth—git-tracked, schema-validated.
 - **Continuity Artifacts**: content stored in `.continuity/` with special lifecycle rules (append-only, immutable, session-scoped).
-- **Runtime Content**: dynamic data that overlays canonical content at request time (see [runtime-content-layer.md](./runtime-content-layer.md) for complete specification.
+- **Runtime Artifacts**: dynamic data that overlays canonical content at request time (see [runtime-artifact-layer.md](./runtime-artifact-layer.md) for complete specification).
 
 ---
 
 ## Repository Layout
 
-HCP MUST treat the following as **content roots**:
+HAS MUST treat the following as **artifact roots**:
 
 - `content/` — canonical content (public/internal/agent).
 - `.continuity/` — continuity artifacts (internal/agent-facing), validated and indexed.
@@ -67,7 +67,7 @@ content/
       docs/
         getting-started.md
       blog/
-        2025-12-harmony-content-plane.md
+        2025-12-harmony-artifact-surface.md
       snippets/
         billing-terms.md
     compositions/
@@ -126,7 +126,7 @@ assets/
     governance.json
 ```
 
-The baseline content-plane repo layout and generated output directory align with the spec's canonical structure and `.harmony/content` artifacts.  
+The baseline artifact-surface repo layout and generated output directory align with the spec's canonical structure and `.harmony/content` artifacts.
 
 ### Naming conventions
 
@@ -146,12 +146,12 @@ The baseline content-plane repo layout and generated output directory align with
 
 ### Content type taxonomy
 
-HCP MUST support these primary categories (conceptual; implementation is via schemas):
+HAS MUST support these primary categories (conceptual; implementation is via schemas):
 
 1. **Entities** (structured state): products, pricing, features, legal clauses, taxonomy terms.
 2. **Prose** (narrative): docs, blog posts, ADRs/decisions, runbooks, handoffs.
 3. **Compositions** (assemblies): pages, emails, agent packs, app screens; built from blocks referencing entities/prose.
-4. **Continuity artifacts (Continuity)**: backlog, plan, risks, progress events, handoffs, decisions. These share the content plane but have lifecycle rules (append-only, session-scoped).  
+4. **Continuity artifacts (Continuity)**: backlog, plan, risks, progress events, handoffs, decisions. These share the artifact surface but have lifecycle rules (append-only, session-scoped).
 
 ### The envelope (required metadata)
 
@@ -269,13 +269,13 @@ blocks:
     prose: ref:doc:widget-pro-body
 ```
 
-The "envelope + blocks" approach is the explicit resolution of v2/v3 convergence: **use envelope-first for high reuse** and typed block structures.  
+The "envelope + blocks" approach is the explicit resolution of v2/v3 convergence: **use envelope-first for high reuse** and typed block structures.
 
 ### Continuity Plane Integration
 
-> **Note**: `.continuity/` is the storage location for the **Continuity Plane** — one of Harmony's three architectural planes. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for full specification.
+> **Note**: `.continuity/` is the storage location for the **Continuity Plane** — one of Harmony's foundational planes. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for full specification.
 
-HCP MUST treat `.continuity/` as a **first-class content root**, even though it is owned by the Continuity Plane. The Content Plane's build pipeline validates and indexes Continuity artifacts alongside canonical content.
+HAS MUST treat `.continuity/` as a **first-class artifact root**, even though it is owned by the Continuity Plane. The Artifact Surface's build pipeline validates and indexes Continuity artifacts alongside canonical content.
 
 **Artifacts indexed from Continuity Plane:**
 
@@ -300,7 +300,7 @@ HCP MUST treat `.continuity/` as a **first-class content root**, even though it 
 | **Progress/events** | Append-only | Per-session files: `.continuity/events/session-<id>.ndjson` |
 | **Decisions** | Immutable | Cannot modify after merge; supersede with new file |
 
-HCP MUST enforce these lifecycle rules in CI by verifying diffs (e.g., append-only files only add lines; immutable types cannot be modified once published).
+HAS MUST enforce these lifecycle rules in CI by verifying diffs (e.g., append-only files only add lines; immutable types cannot be modified once published).
 
 ### ADR Ownership Clarification
 
@@ -308,12 +308,12 @@ ADRs may appear in two locations with different purposes:
 
 | Location | Plane | Purpose | Lifecycle |
 |----------|-------|---------|-----------|
-| `content/internal/prose/adrs/` | Content Plane | Published ADR documentation for internal reference | Mutable (Content rules) |
+| `content/internal/prose/adrs/` | Artifact Surface | Published ADR documentation for internal reference | Mutable (artifact-surface rules) |
 | `.continuity/decisions/` | Continuity Plane | **Source of truth** for decision records | Immutable (Continuity rules) |
 
-The **Continuity Plane owns decisions** (rationale, context, alternatives). Content Plane may publish ADRs as internal documentation, but the authoritative record lives in `.continuity/decisions/`. The Knowledge Plane indexes ADR effects (links to contracts, modules) for impact analysis.
+The **Continuity Plane owns decisions** (rationale, context, alternatives). Artifact Surface may publish ADRs as internal documentation, but the authoritative record lives in `.continuity/decisions/`. The Knowledge Plane indexes ADR effects (links to contracts, modules) for impact analysis.
 
-See [Three Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete boundary definitions.
+See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete boundary definitions.
 
 ---
 
@@ -321,7 +321,7 @@ See [Three Planes Integration](../../../../continuity/_meta/architecture/three-p
 
 ### Schema technology
 
-HCP MUST use **Zod** for schema validation and TypeScript typing.
+HAS MUST use **Zod** for schema validation and TypeScript typing.
 
 ### Schema module contract
 
@@ -379,13 +379,13 @@ This aligns with the spec's schema registry concept (TypeScript modules exportin
 - Every document MUST declare a `$schema` URI:
 
   - `harmony://schemas/<type>@<version>`
-- HCP MUST fail validation if:
+- HAS MUST fail validation if:
 
   - `$schema` is missing, unknown, or version mismatch (unless configured for soft-accept during migration windows).
 
 ### Migrations
 
-HCP MUST provide:
+HAS MUST provide:
 
 - `harmony-content migrate --from <v> --to <v>` to update files in place (with a dry-run option).
 - Schema modules MUST define migrations as pure functions `old -> new`.
@@ -397,7 +397,7 @@ HCP MUST provide:
 
 ### Localization
 
-HCP MUST support locale variants:
+HAS MUST support locale variants:
 
 - `ref:<type>:<id>@<locale>` is canonical reference syntax.
 - Default locale is defined in `content/_meta/locales.yaml`.
@@ -414,7 +414,7 @@ Pick one and enforce; default recommendation: **file-suffix per locale** for sma
 
 ### Reference grammar
 
-HCP MUST implement:
+HAS MUST implement:
 
 - Canonical form: `ref:<type>:<id>[@<locale>]`
 - Examples:
@@ -445,7 +445,7 @@ During compilation:
 
 ### No implicit string linking
 
-HCP MUST NOT treat "mentions" (string occurrences) as references. Only explicit refs are dependency edges (this is how we avoid Knut's "markdown has strings, not entities" trap).
+HAS MUST NOT treat "mentions" (string occurrences) as references. Only explicit refs are dependency edges (this is how we avoid Knut's "markdown has strings, not entities" trap).
 
 ---
 
@@ -453,9 +453,9 @@ HCP MUST NOT treat "mentions" (string occurrences) as references. Only explicit 
 
 ### Pipeline stages
 
-HCP compiler stages MUST be:
+HAS compiler stages MUST be:
 
-1. **Discover**: find documents in content roots; apply ignore rules.
+1. **Discover**: find documents in artifact roots; apply ignore rules.
 2. **Parse**: YAML/JSON/frontmatter + Markdown to AST.
 3. **Validate**: schema validation + lifecycle validation + governance metadata merge.
 4. **Resolve**: resolve refs; build dependency graph.
@@ -467,7 +467,7 @@ This matches and extends the spec's described compiler pipeline and commands.
 
 ### CLI commands and contracts
 
-HCP MUST provide a CLI `harmony-content` (or `harmony content`) with:
+HAS MUST provide a CLI `harmony-content` (or `harmony content`) with:
 
 - `validate`
 
@@ -496,7 +496,7 @@ Spec v0.1 already defines `validate`, `build`, `query`, and `where` and output b
 
 ### Incremental builds (required)
 
-To stay within Harmony's "absorbed complexity," HCP SHOULD support incremental builds by default:
+To stay within Harmony's "absorbed complexity," HAS SHOULD support incremental builds by default:
 
 - Maintain `.harmony/cache/manifest.json` mapping `source_path → content_hash → outputs`.
 - On build:
@@ -510,7 +510,7 @@ To stay within Harmony's "absorbed complexity," HCP SHOULD support incremental b
 
 ### Risk tiers
 
-HCP MUST support risk tiers consistent with v1's governance table:
+HAS MUST support risk tiers consistent with v1's governance table:
 
 - **Low**: blog posts, changelogs
 - **Medium**: product pages, feature pages
@@ -534,7 +534,7 @@ This pattern is explicitly defined in v1.
 
 ### Content Decision Records (CDRs)
 
-For `risk_tier >= high`, HCP SHOULD require a **CDR** (Content Decision Record) or an ADR link, as in v1.
+For `risk_tier >= high`, HAS SHOULD require a **CDR** (Content Decision Record) or an ADR link, as in v1.
 
 Minimum rule:
 
@@ -542,7 +542,7 @@ Minimum rule:
 
 ### Agent guardrails
 
-HCP MUST support metadata-based constraints:
+HAS MUST support metadata-based constraints:
 
 - If `agent_editable: false`, automated agents MUST NOT modify the doc.
 - If `risk_tier: critical`, agents MUST NOT propose direct edits; they may draft a patch in a separate file or propose changes for human copy/paste.
@@ -567,11 +567,11 @@ A representative workflow exists in v1.
 
 ### Overview
 
-HCP MUST provide **build-time indexing** into SQLite as the primary query layer, plus JSON exports for framework builds. This directly resolves "grep ≠ query" concerns.  
+HAS MUST provide **build-time indexing** into SQLite as the primary query layer, plus JSON exports for framework builds. This directly resolves "grep ≠ query" concerns.
 
 ### SQLite schema (normative)
 
-HCP MUST write `.harmony/content/content.sqlite` with:
+HAS MUST write `.harmony/content/content.sqlite` with:
 
 **Core tables (compatible with spec v0.1 minimal set):**
 
@@ -598,7 +598,7 @@ This addresses the v2+v3 requirement to avoid "LIKE everywhere" and instead use 
 
 ### Query helpers and optional DSL
 
-HCP SHOULD ship:
+HAS SHOULD ship:
 
 - A TypeScript library `@harmony/content` that:
 
@@ -652,7 +652,7 @@ WHERE d.type IN ('adr','decision')
 ```
 
 **4) Find Knowledge Plane modules affected by a decision**:
-(Cross-plane join; see [Three Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md))
+(Cross-plane join; see [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md))
 
 ```sql
 SELECT cpr.dst_id as module_path, d.title as decision_title
@@ -675,20 +675,20 @@ WHERE cpr.src_plane = 'continuity'
 
 ### Agent coordination roles (Continuity Plane-aligned)
 
-HCP SHOULD assume four roles aligned with the [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) agent coordination model:
+HAS SHOULD assume four roles aligned with the [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) agent coordination model:
 
-| Role | Content Plane Responsibilities | Continuity Plane Responsibilities |
+| Role | Artifact Surface Responsibilities | Continuity Plane Responsibilities |
 |------|-------------------------------|-----------------------------------|
 | **Orchestrator** | Assigns write sets, manages leases | Creates sessions, manages handoffs |
 | **Implementer** | Edits content files within assigned write set | Records progress events |
 | **Archivist** | Updates internal docs | Maintains `.continuity/` decisions and handoffs |
 | **Verifier** | Runs validation, confirms acceptance criteria | Records verification evidence |
 
-Continuity artifacts and templates exist under `.continuity/` and MUST be validated alongside Content Plane artifacts. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for session lifecycle and handoff protocols.
+Continuity artifacts and templates exist under `.continuity/` and MUST be validated alongside Artifact Surface artifacts. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for session lifecycle and handoff protocols.
 
 ### Leasing (advisory locks)
 
-HCP MUST implement lease files (spec v0.1):
+HAS MUST implement lease files (spec v0.1):
 
 - Location: `.harmony/leases/<type>.<id>.json`
 - Fields: `content_id`, `holder`, `mode`, `expires_at`
@@ -706,7 +706,7 @@ Lease semantics:
 
 ### Preventing collisions on hot files
 
-HCP MUST reduce conflict probability structurally:
+HAS MUST reduce conflict probability structurally:
 
 1. **Bundle high-risk hotspots** into dedicated documents (pricing entities, legal clauses) referenced everywhere—so edits concentrate in one file and are governed.
 2. **Make append-only logs per session** (`.continuity/events/session-*.ndjson`) to avoid multiple writers to the same file.
@@ -729,7 +729,7 @@ HCP MUST reduce conflict probability structurally:
 
 ### Intermediate Representation (IR)
 
-HCP MUST compile documents into IR JSON objects that are:
+HAS MUST compile documents into IR JSON objects that are:
 
 - destination-neutral
 - fully resolved (refs expressed as explicit links + embedded summaries)
@@ -762,7 +762,7 @@ v3 gives the canonical rationale and a representative IR shape.
 
 ### Destination renderers
 
-HCP MUST support these renderer interfaces:
+HAS MUST support these renderer interfaces:
 
 - **Web renderer**: IR → HTML/React/Vue templates (framework-specific adapter, not source coupling)
 - **App renderer**: IR → JSON payloads for mobile (block mapping)
@@ -773,12 +773,12 @@ Destination renderers MUST consume IR, not raw markdown files, to keep framework
 
 ### Consumer access patterns
 
-HCP MUST support **at least** these consumption modes:
+HAS MUST support **at least** these consumption modes:
 
 1. **Static import** (SSG/SSR build time): import `.harmony/content/content.json`
 2. **SQLite query** (server-side build or API): query `.harmony/content/content.sqlite`
 3. **Thin read-only API (optional)**: reads SQLite and serves stable endpoints (recommended for mobile)
-4. **Runtime overlay (optional)**: merge canonical content with runtime overrides at request time (see [runtime-content-layer.md](./runtime-content-layer.md)
+4. **Runtime overlay (optional)**: merge canonical content with runtime overrides at request time (see [runtime-artifact-layer.md](./runtime-artifact-layer.md))
 
 v3 gives a Next.js import example and a minimalist Hono API reading SQLite.
 
@@ -788,11 +788,11 @@ When boundary conditions are crossed (see [boundary-conditions.md](./boundary-co
 - **Tier 2 (Central Read)**: Server DB read replicas for complex queries and aggregations
 - **Tier 3 (Write)**: Server DB for live updates, personalization, and content changes without deployment
 
-See [runtime-content-layer.md](./runtime-content-layer.md) for complete runtime content layer specification.
+See [runtime-artifact-layer.md](./runtime-artifact-layer.md) for complete runtime artifact layer specification.
 
 ### Agent context packs
 
-HCP MUST output agent packs under:
+HAS MUST output agent packs under:
 
 - `.harmony/content/agent-packs/<pack-id>/`
 

@@ -1,17 +1,21 @@
-# Content Plane Architecture Diagram
+# Artifact Surface Architecture Diagram
 
-## Three-Plane Context
+## Foundational Context
 
-The Content Plane is one of three architectural planes. This diagram shows how Content Plane relates to the other planes:
+The Artifact Surface (HAS) is an optional artifact surface. This diagram shows
+how it relates to Harmony's foundational planes:
 
 ```mermaid
 flowchart TB
-  subgraph ThreePlanes["Harmony Three-Plane Architecture"]
+  subgraph Foundational["Harmony Foundational Plane Model"]
     direction LR
 
-    subgraph CP["Content Plane"]
-      CP1["content/**"]
-      CP2["Published docs, entities, pages"]
+    subgraph GP["Governance"]
+      GP1["Policy + controls"]
+    end
+
+    subgraph RP["Runtime"]
+      RP1["Executable surfaces"]
     end
 
     subgraph CnP["Continuity Plane"]
@@ -31,16 +35,22 @@ flowchart TB
     end
   end
 
-  CP --> Shared
+  subgraph Optional["Optional Publishing Surface"]
+    CP["Artifact Surface (HAS)"]
+  end
+
+  GP --> Shared
+  RP --> Shared
   CnP --> Shared
   KP --> Shared
 
+  CP --> Shared
   CnP -->|"ADR INFORMS"| KP
-  CP -->|"doc DOCUMENTS"| CnP
+  CP -->|"publishing work tracked by"| CnP
   KP -->|"spec MOTIVATED_BY"| CnP
 ```
 
-See [Three Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete cross-plane architecture.
+See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete cross-plane architecture.
 
 ---
 
@@ -56,7 +66,7 @@ flowchart TB
     A5["content/_meta/** (governance + taxonomy + locales)"]
   end
 
-  subgraph Compiler["Compiler Layer (HCP CLI)"]
+  subgraph Compiler["Compiler Layer (HAS CLI)"]
     B1["Discover + Parse"]
     B2["Validate (schemas + lifecycles)"]
     B3["Resolve refs + build graph"]
@@ -95,7 +105,7 @@ flowchart TB
     G2[".continuity/** (continuity artifacts)"]
   end
 
-  subgraph Compiled["Compiled Layer (HCG)"]
+  subgraph Compiled["Compiled Layer (HAG)"]
     H1[".harmony/content/content.sqlite"]
     H2[".harmony/content/content.json"]
     H3[".harmony/content/graph.json"]
@@ -120,8 +130,8 @@ flowchart TB
     C4["Internal tools"]
   end
 
-  G1 --> |"HCP build"| H1
-  G2 --> |"HCP build"| H1
+  G1 --> |"HAS build"| H1
+  G2 --> |"HAS build"| H1
   H1 --> |"deploy/replicate"| R1
   H2 --> |"deploy"| R2
 
@@ -143,7 +153,7 @@ flowchart TB
 ```mermaid
 flowchart LR
   subgraph Tier0["Tier 0: Build-Only"]
-    T0["Git + HCG artifacts"]
+    T0["Git + HAG artifacts"]
   end
 
   subgraph Tier1["Tier 1: Edge Read"]
@@ -186,7 +196,7 @@ flowchart TB
       CA6["See: Continuity Plane docs"]
     end
 
-    subgraph Runtime["Runtime Content (optional)"]
+    subgraph Runtime["Runtime Artifacts (optional)"]
       RC1["Live overrides"]
       RC2["Personalization data"]
       RC3["Session state"]

@@ -34,29 +34,37 @@ This contract is authoritative. Continuity artifacts must be represented through
 ### `.harmony/continuity/tasks.json`
 
 - Structured queue of active and deferred work.
-- Fields should support deterministic filtering (status, priority, owner, blockers, acceptance criteria).
+- Canonical statuses: `pending`, `in_progress`, `blocked`, `completed`, `cancelled`.
+- Active work (`pending`, `in_progress`, `blocked`) requires ownership, blocker state, acceptance criteria, and knowledge links.
 - Purpose: machine-readable task state for routing and prioritization.
 
 ### `.harmony/continuity/entities.json`
 
 - Structured entity index (services, modules, missions, domains, workflows, or other tracked units).
-- Includes stable IDs, ownership, lifecycle state, and relevant links.
+- Includes ownership, lifecycle state, related tasks, and knowledge links.
 - Purpose: shared object model for continuity-aware planning.
 
 ### `.harmony/continuity/next.md`
 
 - Short, actionable next steps.
-- Includes immediate work sequencing and dependencies.
+- Must reference active unblocked task IDs from `tasks.json`.
 - Purpose: fast handoff surface for the next execution session.
+
+### `.harmony/continuity/runs/`
+
+- Append-oriented run evidence artifacts (receipts, digests, policy traces).
+- Lifecycle governed by `/.harmony/continuity/runs/retention.json`.
+- Not a source of active task state.
 
 ## Lifecycle Rules
 
 | Artifact | Mutability | Rule |
 |---|---|---|
 | `log.md` | Append-first | Add new entries; avoid destructive edits. |
-| `tasks.json` | Mutable | Update status/ownership/blockers as work changes. |
-| `entities.json` | Mutable | Keep IDs stable and state consistent. |
-| `next.md` | Mutable | Keep concise and executable. |
+| `tasks.json` | Mutable | Update status/ownership/blockers and knowledge links as work changes. |
+| `entities.json` | Mutable | Keep IDs stable; align owner/related_tasks with task state. |
+| `next.md` | Mutable | Keep concise, executable, and coherent with active unblocked tasks. |
+| `runs/` | Append-oriented evidence | Apply retention classes and lifecycle actions from `runs/retention.json`. |
 
 ## Cross-Subsystem Integration
 
@@ -69,16 +77,21 @@ This contract is authoritative. Continuity artifacts must be represented through
 - Every material session should append at least one meaningful `log.md` entry.
 - `tasks.json` and `next.md` must be coherent: `next.md` should point to active, unblocked items.
 - `entities.json` should reflect ownership and lifecycle before handoff.
+- Continuity JSON artifacts must satisfy canonical schema contracts under `_meta/architecture/schemas/`.
+- Run evidence directories under `runs/` must map to a declared retention class.
 
 ## Anti-Patterns
 
 - Storing active work state outside the canonical four-file contract.
 - Letting `next.md` diverge from `tasks.json`.
 - Backfilling large historical edits into `log.md` without clear correction notes.
+- Using legacy task fields such as `blocked_by` instead of canonical `blockers`.
+- Leaving `next.md` in placeholder state while active unblocked tasks exist.
 
 ## Related Docs
 
 - `.harmony/continuity/_meta/architecture/three-planes-integration.md`
 - `.harmony/cognition/runtime/knowledge-plane/knowledge-plane.md`
-- `.harmony/cognition/_meta/architecture/content-plane/README.md`
+- `.harmony/cognition/governance/README.md`
+- `.harmony/cognition/practices/README.md`
 - `.harmony/START.md`

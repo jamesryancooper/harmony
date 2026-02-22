@@ -88,3 +88,8 @@ records:
     kind: migration
     path: ../../../output/reports/migrations/2026-02-21-cognition-sidecar-section-indexes/evidence.md
     source_record: ../migrations/index.yml
+
+  - id: 2026-02-22-artifact-surface-clean-break-rename
+    kind: migration
+    path: ../../../output/reports/migrations/2026-02-22-artifact-surface-clean-break-rename/evidence.md
+    source_record: ../migrations/index.yml

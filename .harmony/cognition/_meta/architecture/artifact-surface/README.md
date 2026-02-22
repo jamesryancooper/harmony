@@ -1,41 +1,43 @@
-# Harmony Content Plane: Final Specification v1.0
+# Harmony Artifact Surface: Final Specification v1.0
 
-This directory contains the complete specification for the Harmony Content Plane (HCP) - a flat-file-first content compiler that validates, resolves, indexes, and transforms content files into a queryable Harmony Content Graph and deterministic multi-destination outputs.
+This directory contains the complete specification for the Harmony Artifact Surface (HAS) - a flat-file-first artifact compiler that validates, resolves, indexes, and transforms content files into a queryable Harmony Artifact Graph and deterministic multi-destination outputs.
 
 ---
 
-## Position in the Three-Plane Architecture
+## Status
 
-The Content Plane is one of three architectural planes in Harmony:
+This surface is **optional** and **non-foundational** in Harmony.
+Foundational architecture concerns are modeled by governance, runtime,
+continuity, and knowledge planes.
+
+## Position Relative to the Foundational Planes
+
+The artifact surface complements the foundational planes:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        THE THREE PLANES OF HARMONY                          │
+│                   HARMONY FOUNDATIONAL PLANE MODEL                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐          │
-│   │  CONTENT PLANE  │   │ CONTINUITY PLANE│   │ KNOWLEDGE PLANE │          │
-│   │  ◄── You are    │   │                 │   │                 │          │
-│   │      here       │   │  "What we       │   │  "What the      │          │
-│   │                 │   │   decided"      │   │   system is"    │          │
-│   │  "What we       │   │                 │   │                 │          │
-│   │   publish"      │   │  • Decisions    │   │  • Specs        │          │
-│   │                 │   │  • Handoffs     │   │  • Contracts    │          │
-│   │  • Docs         │   │  • Progress     │   │  • Code refs    │          │
-│   │  • Entities     │   │  • Backlogs     │   │  • Tests        │          │
-│   │  • Pages        │   │                 │   │  • Traces       │          │
-│   │  • Prompts      │   │                 │   │  • SBOM         │          │
+│   │ GOVERNANCE PLANE│   │  RUNTIME PLANE  │   │ CONTINUITY PLANE│          │
 │   └─────────────────┘   └─────────────────┘   └─────────────────┘          │
 │                                                                             │
-│   See: Three Planes Integration for cross-plane architecture                │
+│                     ┌────────────────────────────────┐                      │
+│                     │        KNOWLEDGE PLANE         │                      │
+│                     └────────────────────────────────┘                      │
+│                                                                             │
+│      Optional Surface: Artifact architecture (this directory)               │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Related Planes:**
+**Related Foundational Surfaces:**
+- [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) — Cross-plane contract
 - [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) — Process knowledge (decisions, handoffs)
 - [Knowledge Plane](../../../runtime/knowledge-plane/knowledge-plane.md) — System knowledge (specs, code, tests)
-- [Three Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) — Cross-plane architecture
+- [Cognition Governance](../../../governance/README.md) — Normative policy and controls
+- [Cognition Runtime](../../../runtime/README.md) — Runtime cognition artifacts
 
 ---
 
@@ -43,12 +45,12 @@ The Content Plane is one of three architectural planes in Harmony:
 
 | File | Description |
 |------|-------------|
-| [overview.md](./overview.md) | Overview, key decisions, and what HCP enables/avoids |
+| [overview.md](./overview.md) | Overview, key decisions, and what HAS enables/avoids |
 | [problem-severity-matrix.md](./problem-severity-matrix.md) | Analysis of core problems and their severity for Harmony |
 | [architecture-overview.md](./architecture-overview.md) | Core design principles, boundaries, hybrid model, and synthesis notes |
 | [architecture-diagram.md](./architecture-diagram.md) | Visual architecture diagrams (Mermaid) including runtime layers |
 | [technical-specification.md](./technical-specification.md) | Full technical spec: terminology, layout, modeling, schemas, refs, build pipeline, governance, queries, collaboration, multi-destination publishing |
-| [runtime-content-layer.md](./runtime-content-layer.md) | **Runtime content layer**: canonical vs runtime content, hybrid model, storage choices, tiered architecture |
+| [runtime-artifact-layer.md](./runtime-artifact-layer.md) | **Runtime artifact layer**: canonical vs runtime artifacts, hybrid model, storage choices, tiered architecture |
 | [pillar-convivial-alignment.md](./pillar-convivial-alignment.md) | Alignment with Harmony pillars and convivial design principles |
 | [implementation-roadmap.md](./implementation-roadmap.md) | Phased implementation roadmap including runtime layer phases |
 | [tool-recommendations.md](./tool-recommendations.md) | Tool recommendations by category |
@@ -58,11 +60,11 @@ The Content Plane is one of three architectural planes in Harmony:
 
 ## Quick Summary
 
-**Name:** Harmony Content Plane (HCP)
+**Name:** Harmony Artifact Surface (HAS)
 
-**One sentence:** A flat-file-first content compiler that validates, resolves, indexes, and transforms content files into a queryable Harmony Content Graph and deterministic multi-destination outputs.
+**One sentence:** A flat-file-first artifact compiler that validates, resolves, indexes, and transforms content files into a queryable Harmony Artifact Graph and deterministic multi-destination outputs.
 
-### What HCP IS
+### What HAS IS
 
 - A **toolchain** (CLI + library) that compiles content into stable artifacts
 - A **schema registry** for content types (Zod) with migrations
@@ -71,20 +73,20 @@ The Content Plane is one of three architectural planes in Harmony:
 - A shared infrastructure for **public, internal, and agent continuity** content
 - An **extensible architecture** that supports optional runtime layers when boundary conditions are crossed
 
-### What HCP IS NOT
+### What HAS IS NOT
 
 - A hosted CMS or a multi-user editorial product
 - A real-time collaborative editor (by default—runtime layer is optional)
 - A workflow engine (draft/review/publish state machines beyond simple metadata)
-- A runtime content mutation API with auth/RBAC (unless you explicitly cross boundaries and adopt the runtime layer—see [runtime-content-layer.md](./runtime-content-layer.md)
+- A runtime content mutation API with auth/RBAC (unless you explicitly cross boundaries and adopt the runtime layer—see [runtime-artifact-layer.md](./runtime-artifact-layer.md))
 
 ### Content Classification
 
-| Type | Location | Plane | Description |
-|------|----------|-------|-------------|
-| **Canonical Content** | `content/` | Content Plane | Source of truth: public, internal, and agent-facing content |
+| Type | Location | Owner Surface | Description |
+|------|----------|---------------|-------------|
+| **Canonical Content** | `content/` | Artifact surface | Source of truth: public, internal, and agent-facing content |
 | **Continuity Artifacts** | `.continuity/` | [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) | Backlog, plans, handoffs, decisions with lifecycle rules |
-| **Runtime Content** | Server DB (optional) | Content Plane (runtime) | Live overrides, personalization, session state |
+| **Runtime Artifacts** | Server DB (optional) | Artifact runtime extension | Live overrides, personalization, session state |
 
 > **Note**: Continuity artifacts (`.continuity/`) are managed by the Continuity Plane with specialized lifecycle rules. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for details on decision records, handoffs, and progress tracking.
 

@@ -5,36 +5,33 @@ description: Unified, queryable engineering knowledge linking specs, contracts, 
 
 # Knowledge Plane: Linking Specifications, Contracts, Tests, Traces, and SBOM
 
-Related docs: [Content Plane](/.harmony/cognition/_meta/architecture/content-plane/README.md), [Continuity Plane](/.harmony/continuity/_meta/architecture/continuity-plane.md), [Three Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md), [monorepo polyglot (normative)](../../_meta/architecture/monorepo-polyglot.md), [runtime architecture](/.harmony/cognition/_meta/architecture/runtime-architecture.md), [tooling integration](../../_meta/architecture/tooling-integration.md), [observability requirements](../../_meta/architecture/observability-requirements.md), [governance model](../../_meta/architecture/governance-model.md), [contracts registry](../../_meta/architecture/contracts-registry.md)
+Related docs: [Foundational Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md), [Continuity Plane](/.harmony/continuity/_meta/architecture/continuity-plane.md), [Cognition Governance](/.harmony/cognition/governance/README.md), [Cognition Runtime](/.harmony/cognition/runtime/README.md), [monorepo polyglot (normative)](../../_meta/architecture/monorepo-polyglot.md), [runtime architecture](/.harmony/cognition/_meta/architecture/runtime-architecture.md), [tooling integration](../../_meta/architecture/tooling-integration.md), [observability requirements](../../_meta/architecture/observability-requirements.md), [governance model](../../_meta/architecture/governance-model.md), [contracts registry](../../_meta/architecture/contracts-registry.md), [Artifact Surface (optional)](/.harmony/cognition/_meta/architecture/artifact-surface/README.md)
 
 The Knowledge Plane is the unified, queryable body of **system knowledge**—specifications, contracts, code artifacts, tests, build outputs, runtime telemetry, and compliance. It provides traceability from requirements to runtime signals so that both developers and AI agents can reason about **what the system is** and **how it behaves**.
 
 ---
 
-## Position in the Three-Plane Architecture
+## Position in the Foundational Plane Model
 
-The Knowledge Plane is one of three architectural planes in Harmony:
+The Knowledge Plane is one of Harmony's four foundational planes:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        THE THREE PLANES OF HARMONY                          │
+│                   HARMONY FOUNDATIONAL PLANE MODEL                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐          │
-│   │  CONTENT PLANE  │   │ CONTINUITY PLANE│   │ KNOWLEDGE PLANE │          │
-│   │                 │   │                 │   │   ◄── You are   │          │
-│   │  "What we       │   │  "What we       │   │       here      │          │
-│   │   publish"      │   │   decided"      │   │                 │          │
-│   │                 │   │                 │   │  "What the      │          │
-│   │  • Docs         │   │  • Decisions    │   │   system is"    │          │
-│   │  • Entities     │   │  • Handoffs     │   │                 │          │
-│   │  • Pages        │   │  • Progress     │   │  • Specs        │          │
-│   │  • Prompts      │   │  • Backlogs     │   │  • Contracts    │          │
-│   │                 │   │                 │   │  • Code refs    │          │
-│   │                 │   │                 │   │  • Tests        │          │
-│   │                 │   │                 │   │  • Traces       │          │
-│   │                 │   │                 │   │  • SBOM         │          │
+│   │ GOVERNANCE PLANE│   │  RUNTIME PLANE  │   │ CONTINUITY PLANE│          │
+│   │                 │   │                 │   │                 │          │
+│   │ What is allowed │   │ What runs and   │   │ What happened + │          │
+│   │ + enforced      │   │ executes        │   │ what is next    │          │
 │   └─────────────────┘   └─────────────────┘   └─────────────────┘          │
+│                                                                             │
+│                     ┌────────────────────────────────┐                      │
+│                     │        KNOWLEDGE PLANE         │                      │
+│                     │            (you are here)      │                      │
+│                     │  What the system is + behaves  │                      │
+│                     └────────────────────────────────┘                      │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -52,8 +49,12 @@ The Knowledge Plane answers questions about the system itself:
 - What dependencies have vulnerabilities?
 
 This contrasts with:
-- **Content Plane**: "What content do we publish?" (documents, entities, pages)
+- **Governance Plane**: "What is allowed and required?" (principles, controls, contracts)
+- **Runtime Plane**: "What executes?" (workflows, commands, services, engine runtime)
 - **Continuity Plane**: "What did we decide and why?" (decisions, handoffs, rationale)
+
+Optional but non-foundational:
+- **Artifact surface**: "What artifacts do we produce and publish?" (docs/entities/pages/prompts/reports)
 
 ### Boundary Clarification
 
@@ -76,7 +77,7 @@ The Knowledge Plane **indexes** (but doesn't own):
 - ADR impacts via `ADR AFFECTS CodeModule` edges
 - Decision references for traceability queries
 
-See [Three Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md) for complete boundary definitions.
+See [Foundational Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md) for complete boundary definitions.
 
 ---
 
@@ -93,7 +94,7 @@ The Knowledge Plane indexes and links **system knowledge** across these domains:
 
 | Domain | What It Contains | Source |
 |--------|------------------|--------|
-| **Specifications** | Behavioral definitions, policies, constraints | Content Plane docs, inline code |
+| **Specifications** | Behavioral definitions, policies, constraints | Governance/practice/runtime docs, contracts, inline code |
 | **Contracts** | OpenAPI, JSON Schema, interface definitions | `contracts/` directory |
 | **Code Modules** | Implementation references, AST metadata | Codebase parsing |
 | **Tests** | Test cases, coverage, results, flakiness | CI/CD pipelines |
@@ -195,7 +196,7 @@ Represent relationships in a knowledge graph (e.g., Neo4j/RDF) or equivalent ind
 
 ### Cross-Plane Edges (Indexed from Continuity Plane)
 
-These edges link to nodes **owned by the Continuity Plane** (see [Three Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md)):
+These edges link to nodes **owned by the Continuity Plane** (see [Foundational Planes Integration](/.harmony/continuity/_meta/architecture/three-planes-integration.md)):
 
 | Edge | From (Continuity) | To (Knowledge) | Meaning |
 |------|-------------------|----------------|---------|

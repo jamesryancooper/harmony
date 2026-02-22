@@ -77,7 +77,7 @@ JOIN changed c
 ## Appendix D: Example CI workflow (GitHub Actions)
 
 ```yaml
-name: Content Plane Validation
+name: Artifact Surface Validation
 on: [pull_request]
 
 jobs:
