@@ -13,4 +13,4 @@ files:
     summary: Template for creating weekly scorecard digest artifacts.
     when: When drafting a new weekly digest.
 
-records: []
+records:

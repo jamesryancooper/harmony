@@ -1,0 +1,24 @@
+# Methodology Spec Templates Index
+# Machine-readable discovery index for risk-tiered spec templates.
+
+schema_version: "1.0"
+files:
+  - id: spec-templates-overview
+    path: README.md
+    summary: Template selection guidance and validation posture.
+    when: First entrypoint before selecting tier-specific templates.
+
+  - id: spec-template-tier1
+    path: spec-tier1.yaml
+    summary: Tier-1 template for low-risk, low-scope changes.
+    when: When a change is classified as T1 by auto-tier assignment.
+
+  - id: spec-template-tier2
+    path: spec-tier2.yaml
+    summary: Tier-2 template for standard feature and refactor changes.
+    when: When a change is classified as T2 by auto-tier assignment.
+
+  - id: spec-template-tier3
+    path: spec-tier3.yaml
+    summary: Tier-3 template for high-impact or high-risk changes.
+    when: When a change is classified as T3 by auto-tier assignment.

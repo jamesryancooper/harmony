@@ -21,7 +21,7 @@ files:
   - id: evaluation-actions-overview
     path: actions/README.md
     summary: Runtime action surface for remediation and follow-up tracking.
-    when: Before updating remediation action state.
+    when: Before reviewing generated remediation action state.
 
   - id: evaluation-actions-index
     path: actions/index.yml

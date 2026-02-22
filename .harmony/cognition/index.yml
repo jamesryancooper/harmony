@@ -1,0 +1,44 @@
+# Cognition Domain Index
+# Machine-readable discovery index for cognition domain surfaces.
+
+schema_version: "1.0"
+files:
+  - id: cognition-overview
+    path: README.md
+    summary: Cognition domain orientation and bounded-surface map.
+    when: First entrypoint for cognition routing and ownership boundaries.
+
+  - id: cognition-runtime-index
+    path: runtime/index.yml
+    summary: Canonical discovery index for cognition runtime artifacts.
+    when: When locating runtime context, decisions, analyses, and projections.
+
+  - id: cognition-governance-index
+    path: governance/index.yml
+    summary: Canonical discovery index for cognition governance contracts.
+    when: When interpreting principles, controls, pillars, purpose, and exceptions.
+
+  - id: cognition-practices-index
+    path: practices/index.yml
+    summary: Canonical discovery index for cognition operating methodology and runbooks.
+    when: When changing operating standards or recurring procedures.
+
+  - id: cognition-meta-architecture-index
+    path: _meta/architecture/index.yml
+    summary: Discovery index for architecture references and non-normative design docs.
+    when: When researching cognition architecture and structure rationale.
+
+  - id: cognition-meta-docs-index
+    path: _meta/docs/index.yml
+    summary: Discovery index for cognition routing aids and documentation maps.
+    when: When routing by intent or resolving uncertain artifact ownership.
+
+  - id: cognition-meta-principles-index
+    path: _meta/principles/index.yml
+    summary: Discovery index for non-normative principle support docs.
+    when: When tracing legacy pointers for principles support materials.
+
+  - id: cognition-ops-overview
+    path: _ops/README.md
+    summary: Cognition operational scripts surface and guardrail entrypoints.
+    when: Before running cognition maintenance and validation scripts.

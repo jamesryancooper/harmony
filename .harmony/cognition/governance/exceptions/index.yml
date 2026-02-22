@@ -1,0 +1,14 @@
+# Governance Exceptions Index
+# Machine-readable discovery index for waiver and exception contracts.
+
+schema_version: "1.0"
+files:
+  - id: exceptions-overview
+    path: README.md
+    summary: Exceptions surface orientation and scope boundaries.
+    when: First entrypoint before interpreting override semantics.
+
+  - id: waivers-and-exceptions
+    path: waivers-and-exceptions.md
+    summary: Canonical taxonomy and required fields for governance overrides.
+    when: When defining, validating, or reviewing waiver/exception records.

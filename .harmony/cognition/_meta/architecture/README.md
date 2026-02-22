@@ -11,6 +11,7 @@ description: Canonical reference for the domain-organized agent harness pattern.
 - `discovery-index-model.md` - finalized cognition discovery architecture (canonical + sidecar + index contract).
 - `README.index.yml` - sidecar section index for this document's headings.
 - `resources.index.yml` - sidecar section index for architecture resource headings.
+- `artifact-surface/index.yml` - machine-readable index for optional artifact-surface architecture docs.
 
 ## Terminology
 

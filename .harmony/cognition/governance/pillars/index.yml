@@ -1,0 +1,39 @@
+# Governance Pillars Index
+# Machine-readable discovery index for pillar contracts.
+
+schema_version: "1.0"
+files:
+  - id: pillars-overview
+    path: README.md
+    summary: Pillars surface orientation and lifecycle structure.
+    when: First entrypoint before opening specific pillar contracts.
+
+  - id: pillar-direction
+    path: direction.md
+    summary: Direction pillar contract for validated discovery.
+    when: When shaping problem selection and intent validation.
+
+  - id: pillar-focus
+    path: focus.md
+    summary: Focus pillar contract for absorbed complexity and bounded cognitive load.
+    when: When evaluating developer workflow complexity and abstraction burden.
+
+  - id: pillar-velocity
+    path: velocity.md
+    summary: Velocity pillar contract for AI-enabled throughput and delivery cadence.
+    when: When optimizing execution speed and automation leverage.
+
+  - id: pillar-trust
+    path: trust.md
+    summary: Trust pillar contract for governed determinism and safe delivery.
+    when: When evaluating risk controls and delivery confidence.
+
+  - id: pillar-continuity
+    path: continuity.md
+    summary: Continuity pillar contract for durable institutional memory.
+    when: When defining context retention and decision traceability posture.
+
+  - id: pillar-insight
+    path: insight.md
+    summary: Insight pillar contract for structured learning and improvement loops.
+    when: When designing feedback mechanisms and evaluation cycles.

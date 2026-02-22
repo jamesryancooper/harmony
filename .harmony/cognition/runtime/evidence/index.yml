@@ -24,9 +24,9 @@ records:
     path: ../../../output/reports/migrations/2026-02-20-agency-bounded-surfaces/evidence.md
     source_record: ../migrations/index.yml
 
-  - id: 2026-02-20-orchestration-bounded-surfaces
+  - id: 2026-02-20-assurance-bounded-surfaces
     kind: migration
-    path: ../../../output/reports/migrations/2026-02-20-orchestration-bounded-surfaces/evidence.md
+    path: ../../../output/reports/migrations/2026-02-20-assurance-bounded-surfaces/evidence.md
     source_record: ../migrations/index.yml
 
   - id: 2026-02-20-capabilities-bounded-surfaces
@@ -34,14 +34,9 @@ records:
     path: ../../../output/reports/migrations/2026-02-20-capabilities-bounded-surfaces/evidence.md
     source_record: ../migrations/index.yml
 
-  - id: 2026-02-20-assurance-bounded-surfaces
+  - id: 2026-02-20-cognition-bounded-surfaces
     kind: migration
-    path: ../../../output/reports/migrations/2026-02-20-assurance-bounded-surfaces/evidence.md
-    source_record: ../migrations/index.yml
-
-  - id: 2026-02-20-scaffolding-bounded-surfaces
-    kind: migration
-    path: ../../../output/reports/migrations/2026-02-20-scaffolding-bounded-surfaces/evidence.md
+    path: ../../../output/reports/migrations/2026-02-20-cognition-bounded-surfaces/evidence.md
     source_record: ../migrations/index.yml
 
   - id: 2026-02-20-engine-bounded-surfaces
@@ -49,9 +44,14 @@ records:
     path: ../../../output/reports/migrations/2026-02-20-engine-bounded-surfaces/evidence.md
     source_record: ../migrations/index.yml
 
-  - id: 2026-02-20-cognition-bounded-surfaces
+  - id: 2026-02-20-orchestration-bounded-surfaces
     kind: migration
-    path: ../../../output/reports/migrations/2026-02-20-cognition-bounded-surfaces/evidence.md
+    path: ../../../output/reports/migrations/2026-02-20-orchestration-bounded-surfaces/evidence.md
+    source_record: ../migrations/index.yml
+
+  - id: 2026-02-20-scaffolding-bounded-surfaces
+    kind: migration
+    path: ../../../output/reports/migrations/2026-02-20-scaffolding-bounded-surfaces/evidence.md
     source_record: ../migrations/index.yml
 
   - id: 2026-02-21-agency-actors-to-runtime
@@ -59,14 +59,9 @@ records:
     path: ../../../output/reports/migrations/2026-02-21-agency-actors-to-runtime/evidence.md
     source_record: ../migrations/index.yml
 
-  - id: 2026-02-21-quality-gate-domain-split
+  - id: 2026-02-21-cognition-discovery-and-governance-hardening
     kind: migration
-    path: ../../../output/reports/migrations/2026-02-21-quality-gate-domain-split/evidence.md
-    source_record: ../migrations/index.yml
-
-  - id: 2026-02-21-documentation-audit-clean-break-rename
-    kind: migration
-    path: ../../../output/reports/migrations/2026-02-21-documentation-audit-clean-break-rename/evidence.md
+    path: ../../../output/reports/migrations/2026-02-21-cognition-discovery-and-governance-hardening/evidence.md
     source_record: ../migrations/index.yml
 
   - id: 2026-02-21-cognition-runtime-migrations-surface-split
@@ -74,22 +69,28 @@ records:
     path: ../../../output/reports/migrations/2026-02-21-cognition-runtime-migrations-surface-split/evidence.md
     source_record: ../migrations/index.yml
 
+  - id: 2026-02-21-cognition-sidecar-section-indexes
+    kind: migration
+    path: ../../../output/reports/migrations/2026-02-21-cognition-sidecar-section-indexes/evidence.md
+    source_record: ../migrations/index.yml
+
+  - id: 2026-02-21-documentation-audit-clean-break-rename
+    kind: migration
+    path: ../../../output/reports/migrations/2026-02-21-documentation-audit-clean-break-rename/evidence.md
+    source_record: ../migrations/index.yml
+
   - id: 2026-02-21-migration-evidence-bundle-format
     kind: migration
     path: ../../../output/reports/migrations/2026-02-21-migration-evidence-bundle-format/evidence.md
     source_record: ../migrations/index.yml
 
-  - id: 2026-02-21-cognition-discovery-and-governance-hardening
+  - id: 2026-02-21-quality-gate-domain-split
     kind: migration
-    path: ../../../output/reports/migrations/2026-02-21-cognition-discovery-and-governance-hardening/evidence.md
-    source_record: ../migrations/index.yml
-
-  - id: 2026-02-21-cognition-sidecar-section-indexes
-    kind: migration
-    path: ../../../output/reports/migrations/2026-02-21-cognition-sidecar-section-indexes/evidence.md
+    path: ../../../output/reports/migrations/2026-02-21-quality-gate-domain-split/evidence.md
     source_record: ../migrations/index.yml
 
   - id: 2026-02-22-artifact-surface-clean-break-rename
     kind: migration
     path: ../../../output/reports/migrations/2026-02-22-artifact-surface-clean-break-rename/evidence.md
     source_record: ../migrations/index.yml
+

@@ -20,9 +20,16 @@ Produce weekly scorecard evaluations under `/.harmony/cognition/runtime/evaluati
 1. Create a weekly digest artifact under `/.harmony/cognition/runtime/evaluations/digests/`.
 2. Record metric snapshots and status per scorecard category.
 3. Record week-over-week deltas and supporting evidence links.
-4. Select 1-2 remediation actions with explicit owners and due dates and update `/.harmony/cognition/runtime/evaluations/actions/open-actions.yml`.
-5. Update `/.harmony/cognition/runtime/evaluations/digests/index.yml` with the new digest record entry.
-6. Validate harness structure after index updates.
+4. Populate digest frontmatter machine fields:
+   - `week`
+   - `digest_date`
+   - `status`
+   - `actions` (id, owner, due_date, status, summary, evidence)
+5. Run:
+   - `bash .harmony/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh`
+6. Validate:
+   - `bash .harmony/cognition/_ops/runtime/scripts/validate-generated-runtime-artifacts.sh`
+   - `bash .harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh`
 
 ## Required Output
 

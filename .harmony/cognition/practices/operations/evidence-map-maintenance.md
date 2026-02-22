@@ -22,14 +22,17 @@ Keep runtime evidence discovery aligned with decision and migration records.
 
 ## Procedure
 
-1. When a new migration record is added, add/update its evidence entry under `records`.
-2. When decision evidence bundles are introduced, add corresponding entries.
-3. Keep `path` references relative and resolvable from the evidence index location.
-4. Keep `kind` accurate (`migration` or `decision`).
-5. Keep `source_record` aligned to the governing runtime index.
-6. Run structure validation and correct any missing-target failures.
+1. Add or update source records:
+   - migration records in `/.harmony/cognition/runtime/migrations/index.yml`
+   - optional decision evidence bundles in `/.harmony/output/reports/decisions/<NNN>-<slug>/`
+2. Run:
+   - `bash .harmony/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh`
+3. Validate:
+   - `bash .harmony/cognition/_ops/runtime/scripts/validate-generated-runtime-artifacts.sh`
+   - `bash .harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh`
 
 ## Guardrails
 
-- Do not point evidence entries to non-canonical report locations.
-- Do not leave stale records after record ID/path renames.
+- Do not manually edit `/.harmony/cognition/runtime/evidence/index.yml`.
+- Do not point evidence bundles to non-canonical report locations.
+- Do not bypass generated-artifact drift checks.

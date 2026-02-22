@@ -11,6 +11,10 @@ This directory defines migration policy and governance for how clean-break migra
 
 Establish clean-break migrations by default: no transitional modes, no compatibility shims, and no dual systems unless an explicit exception is approved.
 
+## Machine Discovery
+
+- `index.yml` - canonical machine-readable index for migration governance doctrine artifacts.
+
 ## Scope
 
 A change is a migration when it changes any of the following in a way that can affect consumers (humans, tools, or internal subsystems):

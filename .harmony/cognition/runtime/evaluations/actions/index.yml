@@ -10,5 +10,5 @@ files:
 
   - id: open-actions-ledger
     path: open-actions.yml
-    summary: Canonical open-action ledger with owner, due date, and status.
-    when: When adding, updating, or closing weekly remediation actions.
+    summary: Generated open-action ledger with owner, due date, and status.
+    when: When reviewing active remediation actions derived from digest metadata.

@@ -7,6 +7,10 @@ description: Risk-tiered spec templates for AI agents to use when generating spe
 
 This directory contains spec templates for each risk tier. AI agents should select the appropriate template based on the auto-tier-assignment algorithm.
 
+## Machine Discovery
+
+- `index.yml` - canonical machine-readable spec template index.
+
 ## Template Selection
 
 | Tier | Template | When to Use |

@@ -33,6 +33,16 @@ files:
     summary: Finalized cognition discovery architecture and sidecar index contract.
     when: When changing documentation discovery structure or index conventions.
 
+  - id: artifact-surface-overview
+    path: artifact-surface/README.md
+    summary: Optional artifact-surface architecture overview and scope.
+    when: When evaluating optional artifact publication architecture posture.
+
+  - id: artifact-surface-index
+    path: artifact-surface/index.yml
+    summary: Machine-readable discovery index for artifact-surface architecture docs.
+    when: For targeted artifact-surface document lookup.
+
   - id: architecture-readme-sections
     path: README.index.yml
     summary: Sidecar section index for architecture README content.

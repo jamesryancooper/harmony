@@ -1,6 +1,16 @@
 ---
 title: Weekly Scorecard Digest Template
 description: Template for cognition runtime weekly scorecard digests.
+week: YYYY-Www
+digest_date: YYYY-MM-DD
+status: green
+actions:
+  - id: ACTION-YYYY-Www-01
+    owner: owner-id
+    due_date: YYYY-MM-DD
+    status: open
+    summary: Short remediation summary
+    evidence: Link or artifact reference
 ---
 
 # Weekly Scorecard Digest: YYYY-Www

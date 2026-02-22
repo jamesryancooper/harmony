@@ -10,6 +10,10 @@ Last updated: 2026-02-20
 
 Principles are Harmony's operational translation layer between philosophy and execution.
 
+## Machine Discovery
+
+- `index.yml` - canonical machine-readable principles index.
+
 ```text
 Convivial Purpose (WHY)
         ↓

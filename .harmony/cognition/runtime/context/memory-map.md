@@ -15,7 +15,7 @@ This document prevents duplicated memory surfaces by clarifying canonical owners
 | Session continuity and active work state | `.harmony/continuity/{log.md,tasks.json,entities.json,next.md}` | Operational memory for handoff and resumption. |
 | Run evidence memory lifecycle | `.harmony/continuity/runs/retention.json` and `.harmony/continuity/_meta/architecture/runs-retention.md` | Retention classes and lifecycle actions for run receipts/digests. |
 | Shared context and operational guidance | `.harmony/cognition/runtime/context/*.md` | Durable reference material and guardrails. |
-| Durable architecture decisions (ADRs) | `.harmony/cognition/runtime/decisions/*.md` and `.harmony/cognition/runtime/context/decisions.md` | Append-only decision memory artifacts. |
+| Durable architecture decisions (ADRs) | `.harmony/cognition/runtime/decisions/*.md` and `.harmony/cognition/runtime/context/decisions.md` | ADR files are append-only; the context summary is generated from ADR metadata. |
 | System knowledge graph contracts | `.harmony/cognition/runtime/knowledge/*` | System behavior/traceability knowledge, not task state. |
 | Compaction evidence artifacts | `.harmony/output/reports/<date>-memory-flush-evidence.md` | Required when flush/compaction occurs. |
 

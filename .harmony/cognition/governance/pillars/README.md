@@ -13,6 +13,10 @@ The pillars are the *what*. The [Convivial Purpose](../purpose/convivial-purpose
 
 Harmony is written **solo-first**: one developer working with AI (agents + automation), following a pillar-guided lifecycle. If/when you have collaborators, the same pillars still apply.
 
+## Machine Discovery
+
+- `index.yml` - canonical machine-readable pillars index.
+
 ---
 
 ## Visual Architecture

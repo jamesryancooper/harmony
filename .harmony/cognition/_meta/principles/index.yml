@@ -1,0 +1,14 @@
+# Principles Support Docs Index
+# Machine-readable discovery index for non-normative principles support artifacts.
+
+schema_version: "1.0"
+files:
+  - id: principles-support-overview
+    path: README.md
+    summary: Orientation and boundary contract for support docs in this namespace.
+    when: First entrypoint when tracing legacy principle support pointers.
+
+  - id: principles-waivers-legacy-pointer
+    path: waivers-and-exceptions.md
+    summary: Legacy pointer document to canonical governance exception contracts.
+    when: When resolving historical references to pre-split exception docs.

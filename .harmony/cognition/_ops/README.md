@@ -8,3 +8,4 @@ Mutable operational scripts and state for cognition-domain guardrails.
 - `knowledge/scripts/` - runtime knowledge subsurface integrity checks.
 - `evaluations/scripts/` - runtime evaluation digest/action integrity checks.
 - `projections/scripts/` - runtime projection definition/materialization checks.
+- `runtime/scripts/` - cross-surface runtime artifact generation and drift validation.

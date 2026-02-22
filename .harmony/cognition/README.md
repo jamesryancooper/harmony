@@ -7,6 +7,7 @@ governance contracts, and operating methodology remain explicit.
 
 | Surface | Purpose | Canonical Index |
 |---|---|---|
+| `./` | Cognition domain root discovery and routing map | `index.yml` |
 | `runtime/` | Authoritative cognition artifacts (`context/`, `decisions/`, `analyses/`, `knowledge/`, `migrations/`, `evidence/`, `evaluations/`, `projections/`) | `runtime/index.yml` |
 | `governance/` | Normative principles, controls, pillars, purpose, and exception contracts | `governance/index.yml` |
 | `practices/` | Operating methodology and execution runbooks | `practices/index.yml`, `practices/methodology/index.yml`, `practices/operations/index.yml` |
@@ -37,6 +38,6 @@ as normative policy constraints.
 
 ### Mutability
 
-- `runtime/context/decisions.md` is append-only. Never modify existing entries.
+- `runtime/context/decisions.md` is generated from ADR metadata. Do not edit manually.
 - All files in `runtime/decisions/` are append-only (full ADRs).
 - Other runtime context files are mutable.

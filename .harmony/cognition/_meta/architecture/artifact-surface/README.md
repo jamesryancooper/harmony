@@ -2,6 +2,10 @@
 
 This directory contains the complete specification for the Harmony Artifact Surface (HAS) - a flat-file-first artifact compiler that validates, resolves, indexes, and transforms content files into a queryable Harmony Artifact Graph and deterministic multi-destination outputs.
 
+## Machine Discovery
+
+- `index.yml` - canonical machine-readable index for artifact-surface architecture docs.
+
 ---
 
 ## Status

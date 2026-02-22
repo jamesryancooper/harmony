@@ -10,7 +10,7 @@ This directory is the canonical runtime surface for full ADR artifacts.
 ## Purpose
 
 - Keep full append-only ADR records in one runtime-owned location.
-- Preserve lightweight decision summaries in `/.harmony/cognition/runtime/context/decisions.md`.
+- Provide generated lightweight decision summaries in `/.harmony/cognition/runtime/context/decisions.md`.
 - Provide machine discovery through a single index.
 - Allow optional companion evidence bundles when deeper verification receipts are needed.
 
@@ -22,7 +22,7 @@ This directory is the canonical runtime surface for full ADR artifacts.
   index entries.
 - Machine discovery MUST resolve through:
   - `/.harmony/cognition/runtime/decisions/index.yml`
-- Human-oriented summary and active decision table remain in:
+- Human-oriented summary is generated and remains in:
   - `/.harmony/cognition/runtime/context/decisions.md`
 
 ## Optional Evidence Bundles

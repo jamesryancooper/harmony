@@ -7,6 +7,10 @@ Non-structural support documentation for the principles subsystem.
 - Keep non-normative support and compatibility pointers out of structural governance roots.
 - Preserve governance surfaces (`principles/`, `controls/`, `exceptions/`) for canonical policy contracts.
 
+## Canonical Index
+
+- `index.yml` - machine-readable discovery index for principles support docs.
+
 ## Contents
 
 | File | Purpose |

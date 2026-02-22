@@ -18,7 +18,7 @@ files:
 
   - id: decisions
     path: decisions.md
-    summary: Agent-readable summary of key decisions affecting this harness.
+    summary: Generated ADR summary for key decisions affecting this harness.
     when: Before making decisions that might duplicate past choices.
 
   - id: memory-map

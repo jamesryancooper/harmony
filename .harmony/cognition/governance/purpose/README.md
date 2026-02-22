@@ -2,6 +2,10 @@
 
 This directory contains Harmony purpose documents that define the long-horizon intent behind pillars, principles, and methodology.
 
+## Machine Discovery
+
+- `index.yml` - canonical machine-readable purpose index.
+
 ## Files
 
 - `convivial-purpose.md`

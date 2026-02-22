@@ -18,3 +18,4 @@ Operational runbooks for maintaining cognition contracts and discovery hygiene.
 - `index-hygiene.md`
 - `governance-lint-triage.md`
 - `evidence-map-maintenance.md`
+- `generated-artifacts.md`

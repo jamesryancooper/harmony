@@ -88,6 +88,21 @@ files:
     summary: Clean-break migration doctrine and policy references.
     when: Before planning or executing migration work.
 
+  - id: migration-governance-index
+    path: migrations/index.yml
+    summary: Machine-readable discovery index for migration governance doctrine artifacts.
+    when: For targeted migration policy lookup without full-doc scans.
+
+  - id: spec-templates-overview
+    path: templates/README.md
+    summary: Risk-tiered spec template surface and usage guidance.
+    when: Before selecting or updating tier-specific spec templates.
+
+  - id: spec-templates-index
+    path: templates/index.yml
+    summary: Machine-readable discovery index for methodology spec templates.
+    when: For targeted template lookup by risk tier.
+
   - id: methodology-readme-sections
     path: README.index.yml
     summary: Sidecar section index for methodology overview content.

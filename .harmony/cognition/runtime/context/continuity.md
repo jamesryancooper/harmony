@@ -25,4 +25,5 @@ It supplements built-in pattern matching when a repository needs local overrides
 ## Mutability
 
 - This file is mutable.
-- Files matched by these signals are generally append-only and should be updated by adding new entries, not rewriting history.
+- `runtime/context/decisions.md` is generated from ADR metadata and should not be manually edited.
+- Other files matched by these signals are generally append-only and should be updated by adding new entries, not rewriting history.

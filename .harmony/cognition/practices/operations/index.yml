@@ -27,3 +27,8 @@ files:
     path: evidence-map-maintenance.md
     summary: Procedure for maintaining runtime evidence map coverage and correctness.
     when: When migration or decision evidence records change.
+
+  - id: generated-artifacts-runbook
+    path: generated-artifacts.md
+    summary: Procedure and policy for generated cognition runtime artifacts and drift prevention.
+    when: When maintaining derived runtime artifacts or triaging generation drift failures.

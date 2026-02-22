@@ -377,6 +377,7 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/capabilities/governance/policy/deny-by-default.v2.yml"
   require_file "$HARMONY_DIR/capabilities/practices/README.md"
 
+  require_file "$HARMONY_DIR/cognition/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/context/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/decisions/index.yml"
@@ -394,6 +395,9 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/cognition/runtime/projections/definitions/index.yml"
   require_file "$HARMONY_DIR/cognition/runtime/projections/materialized/index.yml"
   require_file "$HARMONY_DIR/cognition/governance/index.yml"
+  require_file "$HARMONY_DIR/cognition/governance/principles/index.yml"
+  require_file "$HARMONY_DIR/cognition/governance/pillars/index.yml"
+  require_file "$HARMONY_DIR/cognition/governance/purpose/index.yml"
   require_file "$HARMONY_DIR/cognition/governance/controls/README.md"
   require_file "$HARMONY_DIR/cognition/governance/controls/index.yml"
   require_file "$HARMONY_DIR/cognition/governance/controls/ra-acp-glossary.md"
@@ -401,17 +405,22 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/cognition/governance/controls/flag-metadata-contract.md"
   require_file "$HARMONY_DIR/cognition/governance/controls/promotable-slice-decomposition.md"
   require_file "$HARMONY_DIR/cognition/governance/exceptions/README.md"
+  require_file "$HARMONY_DIR/cognition/governance/exceptions/index.yml"
   require_file "$HARMONY_DIR/cognition/governance/exceptions/waivers-and-exceptions.md"
   require_file "$HARMONY_DIR/cognition/practices/index.yml"
   require_file "$HARMONY_DIR/cognition/practices/operations/README.md"
   require_file "$HARMONY_DIR/cognition/practices/operations/index.yml"
   require_file "$HARMONY_DIR/cognition/practices/methodology/index.yml"
+  require_file "$HARMONY_DIR/cognition/practices/methodology/migrations/index.yml"
+  require_file "$HARMONY_DIR/cognition/practices/methodology/templates/index.yml"
   require_file "$HARMONY_DIR/cognition/practices/methodology/README.index.yml"
   require_file "$HARMONY_DIR/cognition/practices/methodology/implementation-guide.index.yml"
   require_file "$HARMONY_DIR/cognition/_meta/architecture/index.yml"
+  require_file "$HARMONY_DIR/cognition/_meta/architecture/artifact-surface/index.yml"
   require_file "$HARMONY_DIR/cognition/_meta/architecture/README.index.yml"
   require_file "$HARMONY_DIR/cognition/_meta/architecture/resources.index.yml"
   require_file "$HARMONY_DIR/cognition/_meta/docs/index.yml"
+  require_file "$HARMONY_DIR/cognition/_meta/principles/index.yml"
   require_file "$HARMONY_DIR/cognition/_meta/docs/intent-surface-atlas.md"
   require_file "$HARMONY_DIR/cognition/governance/principles/principles.md"
   require_file "$HARMONY_DIR/cognition/practices/methodology/README.md"
@@ -419,6 +428,8 @@ check_discovery_contracts() {
   require_file "$HARMONY_DIR/cognition/_ops/knowledge/scripts/validate-knowledge-runtime.sh"
   require_file "$HARMONY_DIR/cognition/_ops/evaluations/scripts/validate-evaluations-runtime.sh"
   require_file "$HARMONY_DIR/cognition/_ops/projections/scripts/validate-projections-runtime.sh"
+  require_file "$HARMONY_DIR/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh"
+  require_file "$HARMONY_DIR/cognition/_ops/runtime/scripts/validate-generated-runtime-artifacts.sh"
 
   require_file "$HARMONY_DIR/orchestration/runtime/workflows/manifest.yml"
   require_file "$HARMONY_DIR/orchestration/runtime/workflows/registry.yml"
@@ -478,7 +489,12 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/cognition/practices"
   require_dir "$HARMONY_DIR/cognition/practices/operations"
   require_dir "$HARMONY_DIR/cognition/practices/methodology"
+  require_dir "$HARMONY_DIR/cognition/practices/methodology/migrations"
+  require_dir "$HARMONY_DIR/cognition/practices/methodology/templates"
+  require_dir "$HARMONY_DIR/cognition/_meta/architecture"
+  require_dir "$HARMONY_DIR/cognition/_meta/architecture/artifact-surface"
   require_dir "$HARMONY_DIR/cognition/_meta/docs"
+  require_dir "$HARMONY_DIR/cognition/_meta/principles"
   require_dir "$HARMONY_DIR/cognition/_ops"
   require_dir "$HARMONY_DIR/cognition/_ops/principles"
   require_dir "$HARMONY_DIR/cognition/_ops/principles/scripts"
@@ -488,6 +504,8 @@ check_expected_internals() {
   require_dir "$HARMONY_DIR/cognition/_ops/evaluations/scripts"
   require_dir "$HARMONY_DIR/cognition/_ops/projections"
   require_dir "$HARMONY_DIR/cognition/_ops/projections/scripts"
+  require_dir "$HARMONY_DIR/cognition/_ops/runtime"
+  require_dir "$HARMONY_DIR/cognition/_ops/runtime/scripts"
 
   require_dir "$HARMONY_DIR/orchestration/runtime/workflows"
   require_dir "$HARMONY_DIR/orchestration/runtime/missions"
@@ -857,6 +875,11 @@ check_output_decision_evidence_surface() {
 
 check_cognition_discovery_indexes() {
   check_index_path_contract \
+    "$HARMONY_DIR/cognition/index.yml" \
+    "$HARMONY_DIR/cognition" \
+    "cognition domain"
+
+  check_index_path_contract \
     "$HARMONY_DIR/cognition/runtime/index.yml" \
     "$HARMONY_DIR/cognition/runtime" \
     "cognition runtime"
@@ -932,9 +955,29 @@ check_cognition_discovery_indexes() {
     "cognition governance"
 
   check_index_path_contract \
+    "$HARMONY_DIR/cognition/governance/principles/index.yml" \
+    "$HARMONY_DIR/cognition/governance/principles" \
+    "cognition governance principles"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/governance/pillars/index.yml" \
+    "$HARMONY_DIR/cognition/governance/pillars" \
+    "cognition governance pillars"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/governance/purpose/index.yml" \
+    "$HARMONY_DIR/cognition/governance/purpose" \
+    "cognition governance purpose"
+
+  check_index_path_contract \
     "$HARMONY_DIR/cognition/governance/controls/index.yml" \
     "$HARMONY_DIR/cognition/governance/controls" \
     "cognition governance controls"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/governance/exceptions/index.yml" \
+    "$HARMONY_DIR/cognition/governance/exceptions" \
+    "cognition governance exceptions"
 
   check_index_path_contract \
     "$HARMONY_DIR/cognition/practices/index.yml" \
@@ -950,6 +993,16 @@ check_cognition_discovery_indexes() {
     "$HARMONY_DIR/cognition/practices/methodology/index.yml" \
     "$HARMONY_DIR/cognition/practices/methodology" \
     "cognition methodology"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/practices/methodology/migrations/index.yml" \
+    "$HARMONY_DIR/cognition/practices/methodology/migrations" \
+    "cognition methodology migrations"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/practices/methodology/templates/index.yml" \
+    "$HARMONY_DIR/cognition/practices/methodology/templates" \
+    "cognition methodology templates"
 
   check_section_sidecar_contract \
     "$HARMONY_DIR/cognition/practices/methodology/README.index.yml" \
@@ -967,9 +1020,19 @@ check_cognition_discovery_indexes() {
     "cognition architecture"
 
   check_index_path_contract \
+    "$HARMONY_DIR/cognition/_meta/architecture/artifact-surface/index.yml" \
+    "$HARMONY_DIR/cognition/_meta/architecture/artifact-surface" \
+    "cognition artifact-surface architecture"
+
+  check_index_path_contract \
     "$HARMONY_DIR/cognition/_meta/docs/index.yml" \
     "$HARMONY_DIR/cognition/_meta/docs" \
     "cognition discovery docs"
+
+  check_index_path_contract \
+    "$HARMONY_DIR/cognition/_meta/principles/index.yml" \
+    "$HARMONY_DIR/cognition/_meta/principles" \
+    "cognition principles support docs"
 
   check_section_sidecar_contract \
     "$HARMONY_DIR/cognition/_meta/architecture/README.index.yml" \
@@ -1337,6 +1400,20 @@ check_deprecated_cognition_discovery_section_paths() {
   done
 }
 
+check_cognition_generated_runtime_artifacts() {
+  local script="$HARMONY_DIR/cognition/_ops/runtime/scripts/validate-generated-runtime-artifacts.sh"
+  if [[ ! -f "$script" ]]; then
+    fail "missing generated runtime artifact validator: ${script#$ROOT_DIR/}"
+    return
+  fi
+
+  if bash "$script"; then
+    pass "generated cognition runtime artifact validator passed"
+  else
+    fail "generated cognition runtime artifact validator failed"
+  fi
+}
+
 check_alignment_guardrail() {
   local script="$SCRIPT_DIR/validate-audit-subsystem-health-alignment.sh"
   if [[ ! -f "$script" ]]; then
@@ -1368,6 +1445,7 @@ main() {
   check_cognition_decision_record_surface
   check_cognition_migration_record_surface
   check_cognition_discovery_indexes
+  check_cognition_generated_runtime_artifacts
   check_cognition_migration_index_cross_references
   check_output_decision_evidence_surface
   check_output_migration_evidence_surface

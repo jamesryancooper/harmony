@@ -18,6 +18,11 @@ files:
     summary: Principles surface orientation and navigation.
     when: Before opening specific principle artifacts.
 
+  - id: principles-index
+    path: principles/index.yml
+    summary: Machine-readable discovery index for principle contracts.
+    when: For targeted principle lookup without broad document scans.
+
   - id: principles-charter
     path: principles/principles.md
     summary: Immutable constitutional charter for cognition governance.
@@ -38,6 +43,11 @@ files:
     summary: Governance exception surface orientation and scope.
     when: Before applying or interpreting waiver/exception semantics.
 
+  - id: governance-exceptions-index
+    path: exceptions/index.yml
+    summary: Machine-readable discovery index for waiver and exception contracts.
+    when: For targeted exception-contract lookup without full-doc scans.
+
   - id: governance-waivers-and-exceptions
     path: exceptions/waivers-and-exceptions.md
     summary: Canonical waiver and exception taxonomy and required fields.
@@ -48,7 +58,17 @@ files:
     summary: Pillar model orientation and lifecycle framing.
     when: When reasoning about strategic framework alignment.
 
+  - id: pillars-index
+    path: pillars/index.yml
+    summary: Machine-readable discovery index for pillar contracts.
+    when: For targeted pillar lookup without full-doc scans.
+
   - id: purpose-overview
     path: purpose/README.md
     summary: Purpose surface orientation and long-horizon intent.
     when: When framing direction or intent-level decisions.
+
+  - id: purpose-index
+    path: purpose/index.yml
+    summary: Machine-readable discovery index for purpose artifacts.
+    when: For targeted purpose-artifact lookup without full-doc scans.
