@@ -9,8 +9,8 @@ Immediate steps to take. Items here are typically derived from project findings 
 
 ## Current
 
-<!-- Add immediate next actions here -->
+- `test-scaffolding`: Run `/create-harness` on a real target directory and capture validation outcomes in `continuity/log.md`.
 
 ## Backlog
 
-<!-- Add lower-priority items here -->
+- `test-harness`: Execute an end-to-end agent session after `test-scaffolding` completes.

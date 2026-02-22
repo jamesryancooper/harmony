@@ -29,9 +29,12 @@ Changes in any of the following paths must trigger an alignment check:
 - `.harmony/cognition/practices/`
 - `.harmony/cognition/practices/methodology/*.index.yml`
 - `.harmony/cognition/runtime/context/`
+- `.harmony/continuity/_meta/architecture/`
+- `.harmony/continuity/runs/retention.json`
 - `.harmony/*/_meta/architecture/`
 - `.harmony/orchestration/runtime/workflows/audit/pre-release-audit/`
 - `.harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh`
+- `.harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`
 - `.harmony/assurance/practices/complete.md`
 - `.harmony/assurance/practices/session-exit.md`
 - `.harmony/cognition/runtime/migrations/`
@@ -65,4 +68,5 @@ Expected invocation points:
 
 - Standalone: `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh`
 - Structural gate (static checks): `bash .harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh`
+- Continuity memory gate: `bash .harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`
 - Pre-release gate verification (drift checks): pre-release audit workflow verify step

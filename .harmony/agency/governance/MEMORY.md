@@ -16,6 +16,7 @@ description: Cross-agent memory classes, retention boundaries, and privacy contr
 - Session memory: transient working context for current execution.
 - Operational memory: reusable process knowledge (patterns, runbooks, constraints).
 - Decision memory: durable decision records and rationale.
+- Run evidence memory: append-oriented execution evidence (receipts, digests, counters).
 - Sensitive memory: secrets, credentials, or regulated data requiring strict controls.
 
 ## Retention and Placement
@@ -23,6 +24,7 @@ description: Cross-agent memory classes, retention boundaries, and privacy contr
 - Session memory: do not persist unless explicitly needed for continuity.
 - Operational memory: persist only in designated documentation locations.
 - Decision memory: persist in approved append-only decision artifacts.
+- Run evidence memory: persist in continuity run-evidence paths and follow declared retention classes.
 - Sensitive memory: do not persist outside authorized secure systems.
 
 ## Privacy and Safety Constraints

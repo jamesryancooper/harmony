@@ -13,6 +13,7 @@ description: Assurance criteria and completion checklist for harness tasks.
 - [ ] Native-first rule preserved (core behavior works with zero adapters)
 - [ ] Updated `continuity/log.md` with session summary
 - [ ] Updated `continuity/tasks.json` status
+- [ ] `validate-continuity-memory.sh` passes when continuity/memory artifacts changed
 
 ## Assurance Criteria
 
@@ -49,6 +50,7 @@ description: Assurance criteria and completion checklist for harness tasks.
 ### For .harmony Architecture Changes
 
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh` passes
+- [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness` passes
 - [ ] `pre-release-audit` workflow executed (or explicit rationale recorded for not running it)

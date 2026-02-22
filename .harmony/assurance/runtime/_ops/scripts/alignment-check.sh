@@ -71,6 +71,10 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-harness-structure.sh"
 
   run_step \
+    "Validate continuity memory contracts" \
+    bash "$SCRIPT_DIR/validate-continuity-memory.sh"
+
+  run_step \
     "Validate audit-subsystem-health drift alignment" \
     bash "$SCRIPT_DIR/validate-audit-subsystem-health-alignment.sh"
 }

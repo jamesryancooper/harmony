@@ -11,6 +11,7 @@ Session state and progress tracking.
 | `tasks.json` | Structured task list with goal | read-write |
 | `entities.json` | Entity state tracking | read-write |
 | `next.md` | Immediate actionable steps | read-write |
+| `runs/` | Append-oriented run evidence artifacts | retention-governed |
 
 ## Contract
 
@@ -18,6 +19,7 @@ Session state and progress tracking.
 
 1. Read `tasks.json` to identify highest-priority unblocked task.
 2. Read `log.md` (latest entry) for recent context.
+3. Read `next.md` to follow immediate execution sequencing.
 
 ### Before Ending a Session
 
@@ -25,3 +27,4 @@ Session state and progress tracking.
 2. Update `tasks.json` status for all affected tasks.
 3. Update `entities.json` if entity state changed.
 4. Update `next.md` with immediate next actions.
+5. Run `bash .harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`.

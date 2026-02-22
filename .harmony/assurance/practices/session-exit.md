@@ -19,6 +19,9 @@ Complete before ending a session, context reset, or handoff.
 - [ ] **Run filesystem interface validation** (when filesystem interface files changed)
   - `bash .harmony/capabilities/runtime/services/_ops/scripts/validate-filesystem-interfaces.sh`
 
+- [ ] **Run continuity memory validation** (when continuity artifacts or memory policy changed)
+  - `bash .harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`
+
 - [ ] **Update `continuity/log.md`** with session summary
   - Date header
   - Session focus

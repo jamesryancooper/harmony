@@ -1,169 +1,125 @@
 ---
 title: Harness Progress Tracking
-description: Session continuity via continuity/log.md, tasks.json, and entities.json
+description: Session continuity via log, tasks, entities, and next-action coherence.
 ---
 
 # Harness Progress Tracking
 
-The `continuity/` directory maintains **session-to-session continuity**. It's how agents "remember" what happened in previous sessions.
+The `continuity/` directory maintains session-to-session operational memory.
 
 ## Location
 
 ```text
 .harmony/continuity/
-├── log.md        # Append-only session log
-├── tasks.json    # Structured task list with goal and status
-└── entities.json # Entity state tracking (optional)
+├── log.md        # Append-only session history
+├── tasks.json    # Structured active/deferred work queue
+├── entities.json # Structured entity state linked to tasks
+└── next.md       # Immediate next actions linked to active tasks
 ```
-
----
 
 ## `log.md`
 
-An **append-only log** of completed work and decisions.
+Append-only historical timeline of sessions, outcomes, blockers, and decisions.
 
-### Log Format
+Rules:
 
-```markdown
-## YYYY-MM-DD
-
-**Session focus:** [one-line summary]
-
-**Completed:**
-- [task 1]
-- [task 2]
-
-**Next:**
-- [priority item]
-
-**Blockers:**
-- [if any]
-```
-
-### Log Rules
-
-- MUST append only (never edit previous entries)
-- MUST include date header for each session
-- SHOULD be updated before ending any session
-- MAY include blockers and decisions
-
----
+- MUST append only (no destructive rewrites).
+- MUST include enough context to explain task/entity transitions.
+- SHOULD include blockers and handoff context when work is incomplete.
 
 ## `tasks.json`
 
-A **structured task list** with goal tracking and status.
+Machine-readable task state for routing and prioritization.
 
-### Tasks Format
+Canonical root contract:
+
+```json
+{
+  "schema_version": "1.2",
+  "goal": "High-level objective this harness serves",
+  "tasks": []
+}
+```
+
+Canonical status values:
+
+| Status | Meaning |
+|---|---|
+| `pending` | Not started but actionable |
+| `in_progress` | Actively being executed |
+| `blocked` | Cannot proceed due to blockers |
+| `completed` | Done and verified |
+| `cancelled` | Intentionally retired |
+
+Active task requirements (`pending`, `in_progress`, `blocked`):
+
+- `owner`
+- `blockers` (array; use `external:<id>` for non-task blockers)
+- `acceptance_criteria` (non-empty array)
+- `knowledge_links` with at least one reference across `specs`, `contracts`, `decisions`, `evidence`
+
+Additional invariants:
+
+- At most one task MAY be `in_progress`.
+- Legacy `blocked_by` MUST NOT be used; canonical field is `blockers`.
+- `completed` tasks MUST include `completed_at` (`YYYY-MM-DD`).
+
+## `entities.json`
+
+Structured state for actively relevant entities and their linkage to tasks.
+
+Canonical root contract:
 
 ```json
 {
   "schema_version": "1.1",
-  "goal": "High-level objective this harness serves",
-  "tasks": [
-    {
-      "id": "task-001",
-      "description": "Implement feature X",
-      "status": "in_progress",
-      "priority": 1,
-      "blockers": [],
-      "goal_contribution": "Advances the main goal by..."
-    },
-    {
-      "id": "task-002", 
-      "description": "Review documentation",
-      "status": "pending",
-      "priority": 2,
-      "blockers": ["task-001"]
-    }
-  ]
+  "description": "Tracks state of entities relevant to continuity planning",
+  "entities": {}
 }
 ```
 
-### Goal Field
+Entity minimum fields:
 
-The `goal` field captures **intent** that spans multiple sessions. This helps agents understand *why* work is being done, not just *what* tasks to complete.
+- `type`
+- `status`
+- `last_modified`
+- `owner`
 
-- MUST be a single sentence describing the harness's objective
-- SHOULD be referenced when prioritizing tasks
-- MAY be updated if the harness's purpose evolves
+For non-stable entities (`in_progress`, `blocked`, `needs_review`):
 
-### Tasks Status Values
+- `related_tasks` (non-empty array)
+- `knowledge_links` (at least one reference)
 
-| Status | Meaning |
-|--------|---------|
-| `pending` | Not started |
-| `in_progress` | Currently working on |
-| `blocked` | Cannot proceed; see `blockers` array |
-| `completed` | Done |
-| `cancelled` | No longer needed |
+## `next.md`
 
-### Tasks Rules
+Immediate execution surface for the next session.
 
-- MUST update status when task state changes
-- MUST set only one task to `in_progress` at a time
-- SHOULD include `blockers` array for blocked tasks
-- MAY include `priority` for ordering
+Rules:
 
----
+- `## Current` MUST contain actionable list items when active unblocked tasks exist.
+- Current list items SHOULD reference task IDs from `tasks.json`.
+- Placeholder-only content is invalid when actionable work exists.
 
-## `entities.json`
+## Runs Evidence
 
-**Entity state tracking** for artifacts being actively worked on. More granular than tasks.
+`continuity/runs/` contains append-oriented run evidence.
 
-### Entities Format
+- Retention policy: `/.harmony/continuity/runs/retention.json`
+- Lifecycle contract: `runs-retention.md`
+- Not a source of active task state
 
-```json
-{
-  "schema_version": "1.0",
-  "description": "Tracks state of specific artifacts being actively worked on",
-  "entities": {
-    "src/api/auth.ts": {
-      "type": "file",
-      "status": "in_progress",
-      "last_modified": "2024-01-15",
-      "notes": "Refactoring auth flow, step 2 of 4 complete"
-    },
-    "docs/api/": {
-      "type": "directory",
-      "status": "stable",
-      "last_modified": "2024-01-14",
-      "notes": "Documentation complete"
-    }
-  }
-}
-```
+## Validation
 
-### Entity Status Values
+Canonical continuity validation is enforced by:
 
-| Status | Meaning |
-|--------|---------|
-| `stable` | Not currently being modified |
-| `in_progress` | Active work happening |
-| `blocked` | Cannot proceed |
-| `needs_review` | Work complete, awaiting review |
+- `bash .harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`
 
-### When to Use
-
-- Track **in-flight changes** that aren't yet committed
-- Record **partial progress** on file modifications
-- Note **relationships** between entities being modified together
-
----
+This validator enforces schema shape, status/field invariants, cross-file coherence (`tasks`/`entities`/`next`), and `runs/` retention policy conformance.
 
 ## Boot Sequence Integration
 
-In `START.md`, the boot sequence includes:
+In `START.md`, continuity loading is:
 
-1. Read `continuity/log.md` → Know what's been done
-2. Read `continuity/tasks.json` → Know current priorities and goal
-3. Begin highest-priority unblocked task
-
-This ensures agents pick up where previous sessions left off.
-
----
-
-## See Also
-
-- [Checklists](../../../assurance/_meta/architecture/checklists.md) — Assurance gates before completion
-- [Decisions](../../../cognition/runtime/context/decisions.md) and [Lessons](../../../cognition/runtime/context/lessons.md) — Continuity context and historical learning
-- [README.md](./README.md) — Canonical harness structure
+1. Read `continuity/log.md` for recent history.
+2. Read `continuity/tasks.json` for priorities/blockers.
+3. Read `continuity/next.md` for immediate execution order.

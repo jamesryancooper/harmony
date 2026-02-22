@@ -24,6 +24,7 @@ as normative policy constraints.
 |---|---|
 | `runtime/context/constraints.md` | Before any work - know hard limits |
 | `runtime/context/decisions.md` | Before making decisions that might duplicate past choices |
+| `runtime/context/memory-map.md` | Before adding memory artifacts or changing memory placement |
 | `runtime/context/lessons.md` | Before proposing approaches (check anti-patterns) |
 | `runtime/context/glossary.md` | When encountering harness-specific terms |
 | `runtime/context/glossary-repo.md` | When encountering repo-wide terms |

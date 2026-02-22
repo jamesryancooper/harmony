@@ -493,6 +493,9 @@ check_expected_internals() {
   require_file "$HARMONY_DIR/continuity/tasks.json"
   require_file "$HARMONY_DIR/continuity/entities.json"
   require_file "$HARMONY_DIR/continuity/next.md"
+  require_dir "$HARMONY_DIR/continuity/runs"
+  require_file "$HARMONY_DIR/continuity/runs/README.md"
+  require_file "$HARMONY_DIR/continuity/runs/retention.json"
 
   require_dir "$HARMONY_DIR/ideation/scratchpad"
   require_dir "$HARMONY_DIR/ideation/projects"

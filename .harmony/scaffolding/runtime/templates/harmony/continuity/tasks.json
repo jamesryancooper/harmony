@@ -1,19 +1,35 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "goal": "{{HARNESS_GOAL or 'Define the high-level objective this harness serves'}}",
   "tasks": [
     {
       "id": "initial-setup",
       "description": "Define scope and initial tasks",
-      "status": "done",
+      "status": "completed",
       "completed_at": "{{DATE}}"
     },
     {
       "id": "{{FIRST_TASK_ID}}",
       "description": "{{FIRST_TASK_DESCRIPTION}}",
       "status": "pending",
-      "blocked_by": null,
-      "goal_contribution": "{{HOW_THIS_ADVANCES_THE_GOAL}}"
+      "owner": "{{TASK_OWNER or 'unassigned'}}",
+      "priority": 1,
+      "blockers": [],
+      "acceptance_criteria": [
+        "{{FIRST_TASK_ACCEPTANCE_CRITERION or 'Define clear completion criteria for this task'}}"
+      ],
+      "knowledge_links": {
+        "specs": [
+          "{{PRIMARY_SPEC_REF or 'external:pending-spec-link'}}"
+        ],
+        "contracts": [],
+        "decisions": [],
+        "evidence": []
+      },
+      "risk_tier": "{{RISK_TIER or 'T1'}}",
+      "required_approvals": [],
+      "goal_contribution": "{{HOW_THIS_ADVANCES_THE_GOAL}}",
+      "note": "{{FIRST_TASK_NOTE or 'Fill references and acceptance criteria before execution.'}}"
     }
   ]
 }
