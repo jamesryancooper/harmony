@@ -9,6 +9,11 @@ Human-led exploration and idea management.
 | `scratchpad/` | Ephemeral content: inbox, brainstorm, ideas, drafts, daily, archive |
 | `projects/` | Committed human-led explorations |
 
+## Convention Authority
+
+- This domain has no local `practices/` surface.
+- It inherits naming and authoring conventions from `/.harmony/conventions.md`.
+
 ## Access Rules
 
 - **Autonomous mode:** Treat this directory as if it does not exist.

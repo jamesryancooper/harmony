@@ -12,6 +12,12 @@ The `engine/` domain is the executable harness authority. It is organized into b
 | `_ops/` | Mutable operational assets | binaries and runtime state |
 | `_meta/` | Architecture/evidence docs | architecture contracts and verification evidence |
 
+## Convention Authority
+
+- Domain-local naming, authoring, and operating conventions belong in `practices/`.
+- `_meta/` reference docs are not the canonical conventions surface.
+- Cross-domain baseline conventions come from `/.harmony/conventions.md`.
+
 ## Invariants
 
 - `engine/runtime/` is the only executable authority surface.

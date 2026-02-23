@@ -11,7 +11,7 @@ This document covers what happens when a skill runs, including run logging, safe
 
 ## Run Logging
 
-> **Note:** For skills with the `phased` capability, see [Design Conventions](./design-conventions.md) for the recommended log structure using `_ops/state/logs/{{skill-id}}/` with multi-level indexes.
+> **Note:** For skills with the `phased` capability, see [Design Conventions](../../practices/design-conventions.md) for the recommended log structure using `_ops/state/logs/{{skill-id}}/` with multi-level indexes.
 
 Every skill execution produces a log. The log location follows this pattern:
 
@@ -378,7 +378,7 @@ When creating a new skill, replace all `{{placeholder}}` values with actual cont
 
 ## See Also
 
-- [Design Conventions](./design-conventions.md) — Log structure, checkpoints, and cross-cutting patterns
+- [Design Conventions](../../practices/design-conventions.md) — Log structure, checkpoints, and cross-cutting patterns
 - [Architecture](./architecture.md) — Hierarchical harness model and scope authority
 - [Discovery](./discovery.md) — Path declaration and scope validation rules
 - [Reference Artifacts](./reference-artifacts.md) — The `safety.md` and `validation.md` files

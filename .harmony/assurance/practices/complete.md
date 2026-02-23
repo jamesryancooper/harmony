@@ -54,7 +54,7 @@ description: Assurance criteria and completion checklist for harness tasks.
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-convergence-contract.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness` passes
-- [ ] `pre-release-audit` workflow executed (or explicit rationale recorded for not running it)
+- [ ] `audit-pre-release-workflow` workflow executed (or explicit rationale recorded for not running it)
 
 ### For Commit/PR Standards Changes
 

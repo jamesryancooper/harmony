@@ -9,6 +9,7 @@
 #
 # Fields:
 #   id           - Unique identifier (matches directory name and WORKFLOW.md name)
+#                  Naming contract: <objective>-workflow; audit workflows use audit-<objective>-workflow
 #   display_name - Human-readable display name
 #   group        - Workflow group for directory organization
 #                  Resolved via workflow_group_definitions below
@@ -132,11 +133,11 @@ workflows:
       - "workflow rename across codebase"
       - "verified refactor"
 
-  - id: orchestrate-audit
+  - id: audit-orchestration-workflow
     display_name: Orchestrate Audit
     group: audit
     domain: audit
-    path: audit/orchestrate-audit/
+    path: audit/audit-orchestration-workflow/
     summary: Coordinate partitioned migration audits with optional cross-subsystem and freshness global stages.
     status: active
     triggers:
@@ -145,11 +146,11 @@ workflows:
       - "parallel audit"
       - "coordinate audit partitions"
 
-  - id: pre-release-audit
+  - id: audit-pre-release-workflow
     display_name: Pre-Release Audit
     group: audit
     domain: audit
-    path: audit/pre-release-audit/
+    path: audit/audit-pre-release-workflow/
     summary: Chain orchestrated migration, health, cross-subsystem, and freshness audits into a pre-release quality gate.
     status: active
     triggers:
@@ -158,11 +159,11 @@ workflows:
       - "release readiness check"
       - "full audit before release"
 
-  - id: change-risk-audit
+  - id: audit-change-risk-workflow
     display_name: Change Risk Audit
     group: audit
     domain: audit
-    path: audit/change-risk-audit/
+    path: audit/audit-change-risk-workflow/
     summary: Orchestrate layered integrity, migration, contract, quality, operational, coherence, and freshness audits into one bounded change-risk gate.
     status: active
     triggers:
@@ -171,11 +172,11 @@ workflows:
       - "audit change risk"
       - "change impact risk gate"
 
-  - id: continuous-audit
+  - id: audit-continuous-workflow
     display_name: Continuous Audit
     group: audit
     domain: audit
-    path: audit/continuous-audit/
+    path: audit/audit-continuous-workflow/
     summary: Orchestrate recurring layered subsystem health, observability, operational, contract, quality, security, governance, coherence, and freshness audits into one bounded continuous-risk gate.
     status: active
     triggers:
@@ -184,11 +185,11 @@ workflows:
       - "continuous risk audit"
       - "ongoing audit workflow"
 
-  - id: post-incident-audit
+  - id: audit-post-incident-workflow
     display_name: Post-Incident Audit
     group: audit
     domain: audit
-    path: audit/post-incident-audit/
+    path: audit/audit-post-incident-workflow/
     summary: Orchestrate layered post-incident audits for response, observability, security, governance, and recurrence-risk closure.
     status: active
     triggers:
@@ -197,11 +198,11 @@ workflows:
       - "incident closure audit"
       - "incident remediation audit workflow"
 
-  - id: release-readiness-audit
+  - id: audit-release-readiness-workflow
     display_name: Release Readiness Audit Workflow
     group: audit
     domain: audit
-    path: audit/release-readiness-audit/
+    path: audit/audit-release-readiness-workflow/
     summary: Orchestrate layered release, operational, API, test, observability, security, and data-governance audits into one bounded release gate.
     status: active
     triggers:
@@ -210,11 +211,11 @@ workflows:
       - "layered release readiness audit"
       - "orchestrate release readiness audits"
 
-  - id: documentation-audit
+  - id: audit-documentation-workflow
     display_name: Documentation Audit
     group: audit
     domain: audit
-    path: audit/documentation-audit/
+    path: audit/audit-documentation-workflow/
     summary: Run bounded docs-as-code standards enforcement with deterministic bundle evidence and done-gate outcomes.
     status: active
     triggers:
@@ -407,7 +408,7 @@ workflow_group_definitions:
   audit:
     description: Audit orchestration and release gates
     path: audit/
-    members: [documentation-audit, orchestrate-audit, pre-release-audit, change-risk-audit, continuous-audit, post-incident-audit, release-readiness-audit]
+    members: [audit-documentation-workflow, audit-orchestration-workflow, audit-pre-release-workflow, audit-change-risk-workflow, audit-continuous-workflow, audit-post-incident-workflow, audit-release-readiness-workflow]
 
   refactor:
     description: Verified structural refactor orchestration

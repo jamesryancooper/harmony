@@ -9,26 +9,33 @@ Applies to all workflows under `/.harmony/orchestration/runtime/workflows/`.
 
 ## Standards
 
-1. **Use canonical workflow shape**
+1. **Use canonical workflow naming and command contract**
+   - Workflow identifier (`id`) must end with `-workflow`.
+   - Audit workflow identifier must follow `audit-<objective>-workflow`.
+   - Workflow directory path must be `<group>/<workflow-id>/`.
+   - `WORKFLOW.md` frontmatter `name` must exactly match workflow `id`.
+   - Workflow command must be exactly `/<workflow-id>` (no alias commands).
+   - Triggers may use natural language, but must not include deprecated IDs or legacy command aliases.
+2. **Use canonical workflow shape**
    - Directory workflow: `WORKFLOW.md` plus ordered step files.
    - Single-file workflow is allowed only for small procedures that do not
      require multi-file decomposition.
-2. **Keep metadata contract-complete**
+3. **Keep metadata contract-complete**
    - `WORKFLOW.md` must include `name` and `description`.
    - Multi-file workflows must include an ordered `steps` list whose `file`
      entries exist.
    - Step files must include `name` and `description` frontmatter.
-3. **Require an explicit verification gate**
+4. **Require an explicit verification gate**
    - Every multi-file workflow must include a final verify step.
    - Workflow body must define completion criteria that are testable.
-4. **Make each step idempotent**
+5. **Make each step idempotent**
    - Each step must document how to detect "already complete."
    - Re-running a step must not corrupt state or produce conflicting artifacts.
-5. **Fail closed on ambiguous side effects**
+6. **Fail closed on ambiguous side effects**
    - If a step can create durable side effects, it must require explicit
      operator confirmation or a governing gate before execution.
    - No implicit fallback behavior is allowed for failed prerequisite checks.
-6. **Keep boundary ownership correct**
+7. **Keep boundary ownership correct**
    - Runtime execution logic belongs in `runtime/`.
    - Incident policy belongs in `governance/`.
    - Authoring discipline and runbook guidance belong in `practices/`.
@@ -36,6 +43,8 @@ Applies to all workflows under `/.harmony/orchestration/runtime/workflows/`.
 ## Author Checklist
 
 - [ ] Workflow location and naming follow canonical conventions.
+- [ ] Workflow `id`, `WORKFLOW.md` `name`, runtime directory, and command are identical (`/<workflow-id>`).
+- [ ] Audit workflows follow `audit-<objective>-workflow`.
 - [ ] `WORKFLOW.md` metadata is valid and complete.
 - [ ] Every step has clear input, actions, output, and proceed conditions.
 - [ ] Final verify step exists and enforces completion.

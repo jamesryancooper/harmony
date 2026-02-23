@@ -7,6 +7,7 @@
 # Fields:
 #   id           - Unique identifier (matches directory name and SKILL.md name)
 #                  Format: lowercase, hyphens only (per agentskills.io spec)
+#                  Audit naming contract: audit-<objective> (e.g., audit-api-contract)
 #   display_name - Human-readable display name
 #                  Convention: Title Case derived from id (e.g., "refine-prompt" → "Refine Prompt")
 #   path         - Relative path to skill directory
@@ -359,10 +360,10 @@ skills:
       - domain-specialized
       - self-validating
 
-  - id: release-readiness-audit
-    display_name: Release Readiness Audit
+  - id: audit-release-readiness
+    display_name: Audit Release Readiness
     group: audit
-    path: audit/release-readiness-audit/
+    path: audit/audit-release-readiness/
     summary: "Bounded release-readiness audit that verifies release criteria, deployment/rollback safeguards, operational readiness, and gate evidence."
     status: active
     tags:
@@ -374,7 +375,7 @@ skills:
       - "release readiness audit"
       - "audit release readiness"
       - "pre-release operational gate audit"
-      - "run release-readiness-audit"
+      - "run audit-release-readiness"
     skill_sets:
       - executor
       - guardian

@@ -11,6 +11,12 @@ Canonical workflow and mission coordination boundary for the Harmony harness.
 | `governance/` | Incident governance and response contracts | `governance/README.md` |
 | `practices/` | Orchestration operating standards | `practices/README.md` |
 
+## Convention Authority
+
+- Domain-local naming, authoring, and operating conventions belong in `practices/`.
+- `_meta/architecture/` is reference architecture, not the canonical conventions surface.
+- Cross-domain baseline conventions come from `/.harmony/conventions.md`.
+
 ## Discovery
 
 Read in this order:

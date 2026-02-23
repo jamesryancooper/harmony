@@ -11,6 +11,12 @@ Canonical actor model and governance boundary for the Harmony harness.
 | `governance/` | Cross-agent governance contracts and precedence overlays | `governance/README.md` |
 | `practices/` | Human-agent operating practices and commit/PR standards | `practices/README.md` |
 
+## Convention Authority
+
+- Domain-local naming, authoring, and operating conventions belong in `practices/`.
+- `_meta/architecture/` is reference architecture, not the canonical conventions surface.
+- Cross-domain baseline conventions come from `/.harmony/conventions.md`.
+
 ## Deprecated
 
 `subagents/` is no longer a first-class artifact type in `.harmony/agency/`.

@@ -14,6 +14,12 @@ governance contracts, and operating methodology remain explicit.
 | `_ops/` | Mutable scripts/state for cognition guardrails | `_ops/README.md` |
 | `_meta/` | Non-structural architecture/reference docs and discovery maps | `_meta/architecture/index.yml`, `_meta/docs/index.yml` |
 
+## Convention Authority
+
+- Domain-local naming, authoring, and operating conventions belong in `practices/`.
+- `_meta/architecture/` is reference architecture, not the canonical conventions surface.
+- Cross-domain baseline conventions come from `/.harmony/conventions.md`.
+
 ## Interaction Model
 
 Use runtime context as operational reference material and governance principles

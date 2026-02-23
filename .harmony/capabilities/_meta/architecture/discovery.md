@@ -268,7 +268,7 @@ skills:
           description: "Refined prompt output"
 ```
 
-> **Note:** All `.harmony/capabilities/runtime/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. See [Design Conventions](./design-conventions.md#harness-skills-directory-structure) for details.
+> **Note:** All `.harmony/capabilities/runtime/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. See [Design Conventions](../../practices/design-conventions.md#harness-skills-directory-structure) for details.
 
 ### I/O Schema
 

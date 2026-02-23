@@ -26,6 +26,12 @@ Assurance follows bounded surfaces with three canonical authorities:
 - `practices/` - operating checklists and assurance standards for human/agent
   execution discipline.
 
+## Convention Authority
+
+- Domain-local naming, authoring, and operating conventions belong in `practices/`.
+- `_meta/architecture/` is reference architecture, not the canonical conventions surface.
+- Cross-domain baseline conventions come from `/.harmony/conventions.md`.
+
 ## Enforcement Engine
 
 The local resolver and gate tooling is the authoritative assurance engine:

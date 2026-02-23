@@ -187,7 +187,7 @@ All operational categories follow the `{{category}}/{{skill-id}}/` pattern withi
 
 > **Bounded top-level:** The top level has fixed entries regardless of skill count: `manifest.yml`, `registry.yml`, `capabilities.yml`, `_ops/state/configs/`, `_ops/state/resources/`, `_ops/state/runs/`, `_ops/state/logs/`.
 
-> **Terminology Note:** The `_ops/state/runs/` directory stores **execution state** for session recovery (checkpoints, manifests). This is distinct from **harness continuity files** (`continuity/log.md`, ADRs, decisions) which preserve project history. See [Design Conventions](./design-conventions.md#continuity-artifact-detection) for continuity file handling.
+> **Terminology Note:** The `_ops/state/runs/` directory stores **execution state** for session recovery (checkpoints, manifests). This is distinct from **harness continuity files** (`continuity/log.md`, ADRs, decisions) which preserve project history. See [Design Conventions](../../practices/design-conventions.md#continuity-artifact-detection) for continuity file handling.
 
 ### Output Paths
 
@@ -421,7 +421,7 @@ Every skill execution produces:
 
 ## See Also
 
-- [Design Conventions](./design-conventions.md) — Log structure, checkpoints, and operational patterns
+- [Design Conventions](../../practices/design-conventions.md) — Log structure, checkpoints, and operational patterns
 - [Discovery](./discovery.md) — Manifest and registry formats
 - [Execution](./execution.md) — Run logging and scope enforcement
 - [Reference Artifacts](./reference-artifacts.md) — Progressive disclosure content

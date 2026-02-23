@@ -91,8 +91,8 @@ Read `.harmony/orchestration/runtime/workflows/manifest.yml` for workflow discov
 
 ### Workflow Invocation
 
-- Explicit command: `/orchestrate-audit manifest="..."`
-- Explicit call: `use workflow: orchestrate-audit`
+- Explicit command: `/audit-orchestration-workflow manifest="..."`
+- Explicit call: `use workflow: audit-orchestration-workflow`
 - Natural triggers: Match against `triggers` in manifest
 
 ## Commit Discipline

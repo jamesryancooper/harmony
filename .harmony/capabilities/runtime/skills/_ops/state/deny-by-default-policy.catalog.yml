@@ -173,8 +173,8 @@ skills:
       - "Write(../../output/reports/*)"
       - "Write(_ops/state/logs/*)"
     allowed_services:
-  - id: "release-readiness-audit"
-    path: "audit/release-readiness-audit/"
+  - id: "audit-release-readiness"
+    path: "audit/audit-release-readiness/"
     status: "active"
     broad_write_scope: false
     allowed_tools:

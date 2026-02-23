@@ -82,7 +82,7 @@ apply_hotfix_without_runbook = True
 - Operational service guide:
   `.harmony/capabilities/runtime/services/authoring/doc/guide.md`
 - Enforcement:
-  `/audit-documentation-standards` or `/documentation-audit`
+  `/audit-documentation-standards` or `/audit-documentation-workflow`
 - Promotion input minimums and receipt field requirements:
   [RA/ACP Promotion Inputs Matrix](../controls/ra-acp-promotion-inputs-matrix.md)
 - Shared terminology:
@@ -105,8 +105,8 @@ For ACP promotion, missing required governance artifacts MUST fail closed:
 
 Current enforcement assets:
 
-- workflow command: `/documentation-audit`
-  (`.harmony/orchestration/runtime/workflows/audit/documentation-audit/WORKFLOW.md`)
+- workflow command: `/audit-documentation-workflow`
+  (`.harmony/orchestration/runtime/workflows/audit/audit-documentation-workflow/WORKFLOW.md`)
 - audit command: `/audit-documentation-standards`
   (`.harmony/capabilities/runtime/skills/audit/audit-documentation-standards/SKILL.md`)
 
@@ -157,7 +157,7 @@ contract, schema, or risk changes.
 - `.harmony/cognition/practices/methodology/spec-first-planning.md`
 - `.harmony/scaffolding/governance/patterns/adr-policy.md`
 - `.harmony/scaffolding/runtime/templates/documentation-standards.md`
-- `.harmony/orchestration/runtime/workflows/audit/documentation-audit/WORKFLOW.md`
+- `.harmony/orchestration/runtime/workflows/audit/audit-documentation-workflow/WORKFLOW.md`
 - `.harmony/capabilities/runtime/skills/audit/audit-documentation-standards/SKILL.md`
 - `.harmony/cognition/governance/pillars/direction.md`
 - `.harmony/cognition/governance/pillars/continuity.md`

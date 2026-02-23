@@ -18,9 +18,9 @@ routing:
 workflows:
   # --- Fully specified (spec-compliant) ---
 
-  orchestrate-audit:
+  audit-orchestration-workflow:
     version: "2.0.0"
-    commands: ["/orchestrate-audit"]
+    commands: ["/audit-orchestration-workflow"]
     parameters:
       - name: manifest
         type: file
@@ -130,9 +130,9 @@ workflows:
           determinism: unique
           description: "Authoritative bounded-audit evidence bundle with findings, coverage, and convergence artifacts"
 
-  pre-release-audit:
+  audit-pre-release-workflow:
     version: "2.1.0"
-    commands: ["/pre-release-audit"]
+    commands: ["/audit-pre-release-workflow"]
     parameters:
       - name: subsystem
         type: folder
@@ -184,7 +184,7 @@ workflows:
     depends_on:
       - skill: audit-subsystem-health
         condition: "active in skill manifest"
-      - workflow: orchestrate-audit
+      - workflow: audit-orchestration-workflow
         condition: "active in workflow manifest (required only when manifest parameter is provided)"
       - skill: audit-cross-subsystem-coherence
         condition: "active in skill manifest (required when run_cross_subsystem parameter is true)"
@@ -194,7 +194,7 @@ workflows:
       inputs: []
       outputs:
         - name: pre_release_report
-          path: "../../output/reports/{{date}}-pre-release-audit.md"
+          path: "../../output/reports/{{date}}-audit-pre-release-workflow.md"
           kind: file
           format: markdown
           determinism: unique
@@ -210,7 +210,7 @@ workflows:
           kind: file
           format: markdown
           determinism: unique
-          description: "Consolidated migration audit report (produced by orchestrate-audit in migration-only mode, if manifest provided)"
+          description: "Consolidated migration audit report (produced by audit-orchestration-workflow in migration-only mode, if manifest provided)"
         - name: cross_subsystem_audit_report
           path: "../../output/reports/{{date}}-cross-subsystem-coherence-audit.md"
           kind: file
@@ -230,9 +230,9 @@ workflows:
           determinism: unique
           description: "Authoritative bounded-audit bundle for release recommendation and done-gate evidence"
 
-  change-risk-audit:
+  audit-change-risk-workflow:
     version: "1.0.0"
-    commands: ["/change-risk-audit"]
+    commands: ["/audit-change-risk-workflow"]
     parameters:
       - name: subsystem
         type: folder
@@ -320,7 +320,7 @@ workflows:
       inputs: []
       outputs:
         - name: change_risk_report
-          path: "../../output/reports/{{date}}-change-risk-audit.md"
+          path: "../../output/reports/{{date}}-audit-change-risk-workflow.md"
           kind: file
           format: markdown
           determinism: unique
@@ -374,9 +374,9 @@ workflows:
           determinism: unique
           description: "Authoritative bounded-audit bundle for change-risk recommendation and done-gate evidence"
 
-  continuous-audit:
+  audit-continuous-workflow:
     version: "1.0.0"
-    commands: ["/continuous-audit"]
+    commands: ["/audit-continuous-workflow"]
     parameters:
       - name: subsystem
         type: folder
@@ -479,11 +479,11 @@ workflows:
       inputs: []
       outputs:
         - name: continuous_audit_report
-          path: "../../output/reports/{{date}}-continuous-audit.md"
+          path: "../../output/reports/{{date}}-audit-continuous-workflow.md"
           kind: file
           format: markdown
           determinism: unique
-          description: "Consolidated continuous-audit report with ongoing risk recommendation"
+          description: "Consolidated audit-continuous-workflow report with ongoing risk recommendation"
         - name: subsystem_health_audit_report
           path: "../../output/reports/{{date}}-subsystem-health-audit.md"
           kind: file
@@ -545,9 +545,9 @@ workflows:
           determinism: unique
           description: "Authoritative bounded-audit bundle for continuous risk recommendation and done-gate evidence"
 
-  post-incident-audit:
+  audit-post-incident-workflow:
     version: "1.0.0"
-    commands: ["/post-incident-audit"]
+    commands: ["/audit-post-incident-workflow"]
     parameters:
       - name: incident_id
         type: text
@@ -641,7 +641,7 @@ workflows:
       inputs: []
       outputs:
         - name: post_incident_report
-          path: "../../output/reports/{{date}}-post-incident-audit.md"
+          path: "../../output/reports/{{date}}-audit-post-incident-workflow.md"
           kind: file
           format: markdown
           determinism: unique
@@ -701,9 +701,9 @@ workflows:
           determinism: unique
           description: "Authoritative bounded-audit bundle for post-incident closure recommendation and done-gate evidence"
 
-  release-readiness-audit:
+  audit-release-readiness-workflow:
     version: "1.0.0"
-    commands: ["/release-readiness-workflow"]
+    commands: ["/audit-release-readiness-workflow"]
     parameters:
       - name: scope
         type: folder
@@ -760,7 +760,7 @@ workflows:
         description: "Comma-separated deterministic seeds used for multi-run consistency checks"
     access: human
     depends_on:
-      - skill: release-readiness-audit
+      - skill: audit-release-readiness
         condition: "active in skill manifest"
       - skill: audit-operational-readiness
         condition: "active in skill manifest (required when run_operational parameter is true)"
@@ -778,17 +778,17 @@ workflows:
       inputs: []
       outputs:
         - name: release_readiness_workflow_report
-          path: "../../output/reports/{{date}}-release-readiness-workflow.md"
+          path: "../../output/reports/{{date}}-audit-release-readiness-workflow.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Consolidated layered release-readiness workflow report with recommendation"
         - name: release_core_audit_report
-          path: "../../output/reports/{{date}}-release-readiness-audit-{{run_id}}.md"
+          path: "../../output/reports/{{date}}-audit-release-readiness-{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
-          description: "Release-core stage report produced by release-readiness-audit"
+          description: "Release-core stage report produced by audit-release-readiness"
         - name: operational_readiness_audit_report
           path: "../../output/reports/{{date}}-operational-readiness-audit-{{run_id}}.md"
           kind: file
@@ -832,9 +832,9 @@ workflows:
           determinism: unique
           description: "Authoritative bounded-audit bundle for layered release-readiness recommendation and done-gate evidence"
 
-  documentation-audit:
+  audit-documentation-workflow:
     version: "3.0.0"
-    commands: ["/documentation-audit"]
+    commands: ["/audit-documentation-workflow"]
     parameters:
       - name: docs_root
         type: folder
@@ -877,7 +877,7 @@ workflows:
       inputs: []
       outputs:
         - name: docs_audit_report
-          path: "../../output/reports/{{date}}-documentation-audit.md"
+          path: "../../output/reports/{{date}}-audit-documentation-workflow.md"
           kind: file
           format: markdown
           determinism: unique

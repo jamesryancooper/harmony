@@ -14,7 +14,7 @@ teams:
       assistants: [reviewer, refactor, docs]
     handoff_policy: "architect-plans -> assistants-execute -> auditor-verifies-high-risk-changes"
     default_workflow: null
-    recommended_workflows: [pre-release-audit, documentation-audit, orchestrate-audit]
+    recommended_workflows: [audit-pre-release-workflow, audit-documentation-workflow, audit-orchestration-workflow]
     composite_skill_policy:
       preferred: []
       requirements: [fail-closed, self-validating, explicit-depends-on]

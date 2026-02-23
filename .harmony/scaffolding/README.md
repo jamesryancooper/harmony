@@ -11,6 +11,12 @@ Reusable scaffolding assets for harness creation and operating flows.
 | `governance/` | Governing contracts | Reusable policy and design patterns that constrain scaffolding outputs | `governance/README.md` |
 | `practices/` | Operating standards | Prompt templates and reference examples used in day-to-day operation | `practices/README.md` |
 
+## Convention Authority
+
+- Domain-local naming, authoring, and operating conventions belong in `practices/`.
+- `_meta/architecture/` is reference architecture, not the canonical conventions surface.
+- Cross-domain baseline conventions come from `/.harmony/conventions.md`.
+
 ## Interaction Model
 
 **Referenced.** Discover template and prompt assets by task, then route through canonical runtime/governance/practices surfaces.

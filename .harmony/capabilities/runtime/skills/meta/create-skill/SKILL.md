@@ -83,7 +83,7 @@ Outputs are written to:
 | verb-noun | `refine-prompt`, `build-mcp-server` | `prompt-refiner`, `report-generator` |
 | verb-object | `audit-migration`, `resolve-pr-comments` | `codebase-analyzer`, `payment-processor` |
 
-**Verb vocabulary:** See [Verb Vocabulary](/.harmony/capabilities/_meta/architecture/design-conventions.md#verb-vocabulary) for the full list with semantic definitions, boundaries, and retired verbs.
+**Verb vocabulary:** See [Verb Vocabulary](/.harmony/capabilities/practices/design-conventions.md#verb-vocabulary) for the full list with semantic definitions, boundaries, and retired verbs.
 
 **Key distinctions:**
 - `create` (scaffold from template) vs `build` (end-to-end construction)

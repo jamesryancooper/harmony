@@ -11,7 +11,7 @@ description: Style and formatting rules for the root .harmony harness.
 - Commands: `{verb}-{noun}.md` (e.g., `validate-frontmatter.md`)
 - Prompts: `{action}-{target}.md` (e.g., `audit-content.md`)
 - Workflows: `{verb}-{noun}/` directory (e.g., `create-harness/`)
-- Skills & Workflows: Use verbs from the [Verb Vocabulary](/.harmony/capabilities/_meta/architecture/design-conventions.md#verb-vocabulary)
+- Skills & Workflows: Use verbs from the [Verb Vocabulary](/.harmony/capabilities/practices/design-conventions.md#verb-vocabulary)
 
 ## Command vs Prompt Decision
 

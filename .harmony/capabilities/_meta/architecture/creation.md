@@ -280,7 +280,7 @@ skills:
           description: "Skill output document"
 ```
 
-**Note:** All `.harmony/capabilities/runtime/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. See [Design Conventions](./design-conventions.md#harness-skills-directory-structure) for details.
+**Note:** All `.harmony/capabilities/runtime/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. See [Design Conventions](../../practices/design-conventions.md#harness-skills-directory-structure) for details.
 
 **Placeholder Syntax:** Use `{{snake_case}}` for path placeholders (e.g., `{{timestamp}}`, `{{project}}`). See [Placeholder Resolution](./execution.md#placeholder-resolution) for details.
 

@@ -15,6 +15,15 @@ Harmony is an **AI-native, human-governed engineering harness**. It is not the
 product code itself; it is the operating layer around the codebase that makes
 planning, delivery, governance, and learning consistent and repeatable.
 
+## Conventions Placement
+
+- Global cross-domain conventions live in `/.harmony/conventions.md`.
+- Domain-local naming and authoring conventions live in `<domain>/practices/`.
+- `_meta/architecture/` is for reference architecture/specification artifacts, not
+  canonical conventions.
+- Domains without a `practices/` surface inherit conventions from
+  `/.harmony/conventions.md`.
+
 ### What Harmony Is
 
 Harmony combines:

@@ -13,6 +13,12 @@ Session state and progress tracking.
 | `next.md` | Immediate actionable steps | read-write |
 | `runs/` | Append-oriented run evidence artifacts | retention-governed |
 
+## Convention Authority
+
+- This domain has no local `practices/` surface.
+- It inherits naming and authoring conventions from `/.harmony/conventions.md`.
+- `_meta/architecture/` remains a reference surface.
+
 ## Contract
 
 ### Before Starting Work

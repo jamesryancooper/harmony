@@ -203,9 +203,9 @@ Multi-step procedures in `orchestration/runtime/workflows/`.
 
 | Workflow | Access | Description |
 | -------- | ------ | ----------- |
-| [orchestrate-audit](./orchestration/runtime/workflows/audit/orchestrate-audit/WORKFLOW.md) | human | Coordinate bounded multi-pass audits with deterministic bundle evidence |
-| [pre-release-audit](./orchestration/runtime/workflows/audit/pre-release-audit/WORKFLOW.md) | human | Merge bounded audit stages into a release recommendation with explicit done-gate |
-| [documentation-audit](./orchestration/runtime/workflows/audit/documentation-audit/WORKFLOW.md) | human | Run bounded docs-as-code audit and emit recommendation with convergence metadata |
+| [audit-orchestration-workflow](./orchestration/runtime/workflows/audit/audit-orchestration-workflow/WORKFLOW.md) | human | Coordinate bounded multi-pass audits with deterministic bundle evidence |
+| [audit-pre-release-workflow](./orchestration/runtime/workflows/audit/audit-pre-release-workflow/WORKFLOW.md) | human | Merge bounded audit stages into a release recommendation with explicit done-gate |
+| [audit-documentation-workflow](./orchestration/runtime/workflows/audit/audit-documentation-workflow/WORKFLOW.md) | human | Run bounded docs-as-code audit and emit recommendation with convergence metadata |
 | [refactor](./orchestration/runtime/workflows/refactor/refactor/00-overview.md) | human | Execute a verified refactor with exhaustive audit |
 
 ---

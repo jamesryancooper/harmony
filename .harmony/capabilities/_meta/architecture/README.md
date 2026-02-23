@@ -101,10 +101,13 @@ Per the [agentskills.io specification](https://agentskills.io/what-are-skills), 
 | [Invocation](./invocation.md) | Commands, triggers, routing rules |
 | [Execution](./execution.md) | Run logging, safety policies |
 | [Harness Resolution](./harness-resolution.md) | Nearest ancestor model |
-| [Design Conventions](./design-conventions.md) | Cross-cutting patterns |
+| [Design Conventions](../../practices/design-conventions.md) | Cross-cutting patterns |
 | [Comparison](./comparison.md) | Skills vs. other primitives |
 | [Specification](./specification.md) | Spec compliance, extensions |
 | [Migration Guide](./migration-guide.md) | Migrating from archetype model |
+
+Conventions placement: canonical naming and authoring conventions are defined in
+`../../practices/design-conventions.md`.
 
 ---
 

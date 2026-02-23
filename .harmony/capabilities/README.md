@@ -12,6 +12,12 @@ Capability subsystem for command/skill/tool/service execution contracts and poli
 | Architecture reference | Non-structural specification and design docs | `_meta/architecture/` |
 | Operations | Validation scripts and mutable operational state | `_ops/` |
 
+## Convention Authority
+
+- Domain-local naming, authoring, and operating conventions belong in `practices/`.
+- `_meta/architecture/` is reference architecture, not the canonical conventions surface.
+- Cross-domain baseline conventions come from `/.harmony/conventions.md`.
+
 ## Runtime Taxonomy
 
 ```text

@@ -14,6 +14,12 @@ Deliverables produced by skills, workflows, and agent work.
 | `reports/migrations/` | Migration verification evidence bundles | `YYYY-MM-DD-{slug}/` |
 | `reports/decisions/` | Decision-specific optional evidence bundles | `NNN-{slug}/` |
 
+## Convention Authority
+
+- This domain has no local `practices/` surface.
+- It inherits naming and authoring conventions from `/.harmony/conventions.md`.
+- `_meta/architecture/` remains a reference surface.
+
 ## Contract
 
 - Write deliverables here, not in source directories.

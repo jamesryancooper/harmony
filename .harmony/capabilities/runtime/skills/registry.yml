@@ -1197,10 +1197,10 @@ skills:
           determinism: variable
           description: "Top-level log index (cross-skill)"
 
-  release-readiness-audit:
+  audit-release-readiness:
     version: "2.0.0"
     commands:
-      - /release-readiness-audit
+      - /audit-release-readiness
     parameters:
       - name: scope
         type: folder
@@ -1267,7 +1267,7 @@ skills:
       inputs: []
       outputs:
         - name: release_readiness_audit_report
-          path: "../../../output/reports/{{date}}-release-readiness-audit-{{run_id}}.md"
+          path: "../../../output/reports/{{date}}-audit-release-readiness-{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
@@ -1279,17 +1279,17 @@ skills:
           determinism: unique
           description: "Authoritative bounded-audit bundle with findings/coverage/convergence artifacts"
         - name: run_log
-          path: "_ops/state/logs/release-readiness-audit/{{run_id}}.md"
+          path: "_ops/state/logs/audit-release-readiness/{{run_id}}.md"
           kind: file
           format: markdown
           determinism: unique
           description: "Execution log for this release-readiness audit run"
         - name: log_index
-          path: "_ops/state/logs/release-readiness-audit/index.yml"
+          path: "_ops/state/logs/audit-release-readiness/index.yml"
           kind: file
           format: yaml
           determinism: variable
-          description: "Index of all release-readiness-audit runs with metadata"
+          description: "Index of all audit-release-readiness runs with metadata"
         - name: top_log_index
           path: "_ops/state/logs/index.yml"
           kind: file
