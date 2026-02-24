@@ -14,6 +14,7 @@
 Harmony is an **agent-first, system-governed engineering harness**. It is not the
 product code itself; it is the operating layer around the codebase that makes
 planning, delivery, governance, and learning consistent and repeatable.
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 ## Conventions Placement
 

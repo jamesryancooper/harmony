@@ -6,6 +6,7 @@ description: Continuity architecture aligned to the active `.harmony/continuity/
 # Continuity Plane
 
 The Continuity Plane preserves operational memory so work can resume safely across sessions, agents, and humans.
+It supports reliable agent execution by preserving deterministic evidence, maintaining observability for debugging, and keeping handoffs evolvable as the system changes.
 
 ## Core Question
 

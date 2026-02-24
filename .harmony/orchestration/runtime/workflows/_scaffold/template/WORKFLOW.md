@@ -22,6 +22,10 @@ parallel_steps: []
 
 [One-line description of what this workflow accomplishes.]
 
+## Goal Alignment
+
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
+
 ## Usage
 
 ```text

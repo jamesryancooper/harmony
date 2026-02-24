@@ -13,6 +13,7 @@ description: Cross-agent delegation authority, handoff protocol, and escalation 
 
 ## Delegation Principles
 
+- Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 - Delegate only bounded tasks with explicit outcomes.
 - Keep authority aligned with actor role and allowed capabilities.
 - Avoid recursive delegation unless explicitly permitted.

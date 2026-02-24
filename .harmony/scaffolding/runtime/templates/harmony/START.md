@@ -5,6 +5,8 @@ description: Boot sequence and orientation for this harness
 
 # .harmony: Start Here
 
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
+
 ## Prerequisites
 
 {{PREREQUISITES or "None required"}}

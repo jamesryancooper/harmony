@@ -11,6 +11,7 @@ Execution receipts, digests, and related run evidence.
 - incident and regression reconstruction.
 
 This directory is append-oriented evidence storage, not a task state source of truth.
+It exists to keep execution evidence deterministic enough to trust, observable enough to debug, and durable enough to support safe evolution.
 
 ## Canonical Policy
 

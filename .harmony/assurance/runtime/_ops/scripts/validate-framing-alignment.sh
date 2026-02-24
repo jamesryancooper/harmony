@@ -9,6 +9,7 @@ ROOT_DIR="$(cd -- "$HARMONY_DIR/.." && pwd)"
 errors=0
 warnings=0
 
+CANONICAL_GOAL='Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.'
 TERM_HUMAN_GOV='AI-native, '"human-governed"
 TERM_RISK_TIER='risk-tiered '"human governance"
 TERM_SIMPLICITY_TITLE='Simplicity '"Over Complexity"
@@ -59,6 +60,18 @@ require_contains() {
   fi
 }
 
+require_contains_literal() {
+  local file="$1"
+  local text="$2"
+  local message="$3"
+
+  if rg -n -F -m 1 "$text" "$file" >/dev/null 2>&1; then
+    pass "$message"
+  else
+    fail "$message"
+  fi
+}
+
 validate_canonical_markers() {
   require_contains "$ROOT_DIR/AGENTS.md" 'agent-first' "root AGENTS.md contains agent-first framing"
   require_contains "$HARMONY_DIR/README.md" 'system-governed' ".harmony/README.md contains system-governed framing"
@@ -67,6 +80,20 @@ validate_canonical_markers() {
   require_contains "$HARMONY_DIR/assurance/governance/weights/weights.yml" 'complexity_calibration' "weights policy uses complexity_calibration id"
   require_contains "$HARMONY_DIR/assurance/governance/scores/scores.yml" 'complexity_calibration' "scores policy uses complexity_calibration id"
   require_contains "$HARMONY_DIR/assurance/governance/CHARTER.md" 'Assurance > Productivity > Integration' "assurance charter contains canonical umbrella order"
+}
+
+validate_goal_explicitness_control_points() {
+  require_contains_literal "$ROOT_DIR/AGENTS.md" "$CANONICAL_GOAL" "root AGENTS.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/agency/governance/CONSTITUTION.md" "$CANONICAL_GOAL" "CONSTITUTION.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/agency/governance/DELEGATION.md" "$CANONICAL_GOAL" "DELEGATION.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/agency/governance/MEMORY.md" "$CANONICAL_GOAL" "MEMORY.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/agency/runtime/agents/architect/AGENT.md" "$CANONICAL_GOAL" "architect AGENT.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/agency/runtime/agents/architect/SOUL.md" "$CANONICAL_GOAL" "architect SOUL.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/README.md" "$CANONICAL_GOAL" ".harmony/README.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/START.md" "$CANONICAL_GOAL" ".harmony/START.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/scaffolding/runtime/templates/AGENTS.md" "$CANONICAL_GOAL" "template AGENTS.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/scaffolding/runtime/templates/harmony/START.md" "$CANONICAL_GOAL" "template harmony START.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/scaffolding/runtime/templates/harmony/continuity/tasks.json" "$CANONICAL_GOAL" "template continuity tasks goal defaults to canonical goal text"
 }
 
 validate_deprecated_tokens() {
@@ -82,6 +109,7 @@ validate_deprecated_tokens() {
       --glob '!.git' \
       --glob '!.harmony/output/plans/**' \
       --glob '!.harmony/assurance/runtime/_ops/scripts/validate-framing-alignment.sh' \
+      --glob '!.harmony/assurance/runtime/_ops/scripts/validate-ssot-precedence-drift.sh' \
       "$DEPRECATED_PATTERN" "$ROOT_DIR" || true
   )"
   if [[ -z "$matches" ]]; then
@@ -119,9 +147,23 @@ validate_deprecated_tokens() {
   done <<< "$matches"
 }
 
+validate_active_wording_drift() {
+  local purpose_file="$HARMONY_DIR/cognition/governance/purpose/convivial-purpose.md"
+  local matches
+
+  matches="$(rg -n -i "five pillars|the five pillars" "$purpose_file" || true)"
+  if [[ -z "$matches" ]]; then
+    pass "no active five-pillar wording drift in convivial-purpose.md"
+  else
+    fail "active five-pillar wording drift detected in convivial-purpose.md"
+  fi
+}
+
 main() {
   echo "== Framing Alignment Validation =="
   validate_canonical_markers
+  validate_goal_explicitness_control_points
+  validate_active_wording_drift
   validate_deprecated_tokens
   echo "Validation summary: errors=$errors warnings=$warnings"
   if [[ $errors -gt 0 ]]; then

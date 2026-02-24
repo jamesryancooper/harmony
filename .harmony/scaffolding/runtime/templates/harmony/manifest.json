@@ -2,6 +2,7 @@
   "$schema": "../manifest.schema.json",
   "name": "harmony",
   "description": "Base .harmony/ template for all harnesses.",
+  "goal_alignment": "Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.",
   "inherits": null,
   "files": {
     "required": [
@@ -13,13 +14,13 @@
     "directories": {
       "required": [
         "continuity",
-        "quality",
+        "assurance",
         "scaffolding/runtime/templates",
         "scaffolding/governance/patterns",
         "scaffolding/practices/prompts",
         "orchestration/runtime/workflows",
         "capabilities/runtime/commands",
-        "cognition/context"
+        "cognition/runtime/context"
       ],
       "standard": [
         "scaffolding/runtime/_ops/scripts",

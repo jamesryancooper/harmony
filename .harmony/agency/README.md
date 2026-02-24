@@ -1,6 +1,7 @@
 # Agency
 
 Canonical actor model and governance boundary for the Harmony harness.
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 ## Bounded Surfaces
 

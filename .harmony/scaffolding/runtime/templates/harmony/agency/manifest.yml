@@ -1,4 +1,5 @@
 # Agency Manifest (Template)
+# Goal alignment: Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 schema_version: "1.0"
 default_agent: null

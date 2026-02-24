@@ -10,6 +10,7 @@ description: Cross-agent memory classes, retention boundaries, and privacy contr
 - This file defines what agents may retain, where it belongs, and when it must be discarded.
 - This file applies to all memory-like artifacts in `.harmony/` (context, continuity, logs, outputs).
 - This file is subordinate only to `AGENTS.md`, `CONSTITUTION.md`, and `DELEGATION.md`.
+- Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 ## Memory Classes
 

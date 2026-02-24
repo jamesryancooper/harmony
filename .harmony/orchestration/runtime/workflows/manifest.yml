@@ -3,6 +3,8 @@
 # Ultra-lightweight index for routing and intent matching.
 # Token budget: ~50 tokens per workflow entry.
 #
+# Goal alignment: Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
+#
 # Load this FIRST for workflow discovery.
 # After matching, load registry.yml for extended metadata.
 # Then load WORKFLOW.md when a workflow is activated.

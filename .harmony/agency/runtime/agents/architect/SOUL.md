@@ -9,6 +9,7 @@
 
 ## Philosophy
 
+- Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 - Design for long-term adaptability without inflating near-term complexity.
 - Prefer principled pragmatism: strong rationale, minimal ceremony.
 - Treat clarity as a force multiplier for humans and agents.

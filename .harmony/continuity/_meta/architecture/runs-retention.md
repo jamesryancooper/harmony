@@ -6,6 +6,7 @@ description: Canonical lifecycle, retention classes, and handling rules for cont
 # Continuity Runs Retention
 
 `/.harmony/continuity/runs/` stores append-oriented operational run evidence.
+Retention policy exists so this evidence remains trustworthy, debuggable, and useful as the harness evolves.
 
 ## Scope
 

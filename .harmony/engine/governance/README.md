@@ -1,6 +1,7 @@
 # Engine Governance
 
 `governance/` defines normative contracts for engine evolution and release safety.
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 ## Runtime Authority Contract (ENGINE-GOV-001)
 

@@ -21,27 +21,28 @@ The unifying concept is **conviviality** (Illich): tools that remain small enoug
 
 ## 2. The Gap in Harmony's Current Pillars
 
-Harmony's five pillars are **inward-facing**: they govern *how* a small team operates—safely, simply, deterministically, with agent assistance and modular architecture.
+Harmony's six pillars are primarily **execution-facing**: they govern *how* planning, shipping, and learning operate with governed agent execution.
 
 | Pillar | Orientation |
 |--------|-------------|
-| Speed with Safety | Engineering process |
-| Simplicity over Complexity | Architecture & scope |
-| Quality through Determinism | Verification & contracts |
-| Guided Agentic Autonomy | Human-AI workflow |
-| Evolvable Modularity | System boundaries |
+| Direction through Validated Discovery | Problem selection and scope intent |
+| Focus through Absorbed Complexity | Architecture and cognitive load management |
+| Velocity through Agentic Automation | Delivery throughput and automation |
+| Trust through Governed Determinism | Verification, safety, and bounded autonomy |
+| Continuity through Institutional Memory | Durable context and traceability |
+| Insight through Structured Learning | Feedback loops and iterative improvement |
 
 **What's missing:** An explicit statement of *purpose*—what kind of technology Harmony teams put into the world, and for whom.
 
 RCDS fills this gap. It answers: *We ship fast, safe, simple, deterministic, modular software—**to what end?***
 
-Without this anchor, Harmony could produce technically excellent, ethically neutral (or harmful) systems. RCDS provides the **telos**: technology that expands human flourishing rather than extracting from it.
+Without this anchor, Harmony could produce technically excellent but ethically neutral systems. RCDS provides the **telos**: technology that expands human flourishing rather than extracting from it.
 
 ---
 
 ## 3. Proposed Synthesis: "Convivial Purpose"
 
-I propose adding a **foundational principle** that sits *beneath* the five pillars as their shared purpose. This is not a sixth pillar (which would dilute the operational focus) but a **grounding statement** that gives the pillars their meaning.
+I propose adding a **foundational principle** that sits *beneath* the six pillars as their shared purpose. This is not an additional lifecycle pillar, but a **grounding statement** that gives the pillars their meaning.
 
 ### Convivial Purpose
 
@@ -68,19 +69,20 @@ I propose adding a **foundational principle** that sits *beneath* the five pilla
 
 | Pillar | Without Convivial Purpose | With Convivial Purpose |
 |--------|--------------------------|------------------------|
-| **Speed with Safety** | Fast, safe delivery to... anyone, for any purpose | Fast, safe delivery of *tools that expand human capability* |
-| **Simplicity over Complexity** | Minimal architecture for team efficiency | Minimal architecture *that users can also understand and trust* |
-| **Quality through Determinism** | Verifiable, testable, reversible systems | Verifiable, testable, reversible systems *with explicit attention and dignity constraints* |
-| **Guided Agentic Autonomy** | Agents operate within engineering bounds | Agents operate within engineering bounds *and cannot propose features that manipulate or extract* |
-| **Evolvable Modularity** | Plug-and-play boundaries for tech choices | Plug-and-play boundaries *that also give users control over their data and experience* |
+| **Direction through Validated Discovery** | Roadmaps optimize delivery mechanics only | Roadmaps prioritize features that expand human capability and reduce extractive outcomes |
+| **Focus through Absorbed Complexity** | Complexity is reduced only for builder throughput | Complexity is reduced for both builders and users so systems stay legible and controllable |
+| **Velocity through Agentic Automation** | Fast shipping can amplify poor product intent | Fast shipping accelerates humane outcomes without relaxing safeguards |
+| **Trust through Governed Determinism** | Determinism is treated as a technical quality only | Determinism, safety, and reversibility become dignity and autonomy protections |
+| **Continuity through Institutional Memory** | Memory is operational bookkeeping | Memory becomes accountability infrastructure for humane governance |
+| **Insight through Structured Learning** | Learning optimizes generic KPIs | Learning explicitly measures flourishing, attention respect, and extraction risk |
 
 ### Reinforcing Loops
 
-1. **Convivial Purpose → Simplicity over Complexity**: If the goal is tools users can understand, we avoid unnecessary abstraction and opaque AI.
+1. **Convivial Purpose -> Focus through Absorbed Complexity**: If the goal is tools users can understand, we avoid unnecessary abstraction and opaque AI.
 
-2. **Convivial Purpose → Guided Agentic Autonomy**: Agents must be constrained not just by engineering contracts but by humane design principles—they cannot propose dark patterns, addictive loops, or surveillance mechanisms.
+2. **Convivial Purpose -> Trust through Governed Determinism**: Agents must be constrained not just by engineering contracts but by humane design principles; they cannot propose dark patterns, addictive loops, or surveillance mechanisms.
 
-3. **Convivial Purpose → Quality through Determinism**: "Flourishing" becomes a measurable constraint. We can track attention metrics (interruption frequency, time-on-task), user control indicators (undo rate, customization usage), and extraction signals (data collected, sold, inferred).
+3. **Convivial Purpose -> Insight through Structured Learning**: "Flourishing" becomes a measurable constraint. We can track attention metrics (interruption frequency, time-on-task), user control indicators (undo rate, customization usage), and extraction signals (data collected, sold, inferred).
 
 ---
 
@@ -210,15 +212,15 @@ Add to PR review rubric:
 
 ## 6. Updated Harmony Framing
 
-### Before (Five Pillars)
+### Before (Six Pillars, no explicit purpose anchor)
 
-> Harmony unifies speed, safety, and simplicity so a tiny team can ship high-quality software quickly, safely, and predictably.
+> Harmony unifies speed, safety, and minimal sufficient complexity so a tiny team can ship high-quality software quickly, safely, and predictably.
 
 ### After (Grounded in Convivial Purpose)
 
-> **Harmony unifies speed, safety, and simplicity so a tiny team can ship *convivial* software—technology that expands human capability rather than extracting from it—quickly, safely, and predictably.**
+> **Harmony unifies speed, safety, and minimal sufficient complexity so a tiny team can ship *convivial* software—technology that expands human capability rather than extracting from it—quickly, safely, and predictably.**
 >
-> The five pillars (Speed with Safety, Simplicity over Complexity, Quality through Determinism, Guided Agentic Autonomy, Evolvable Modularity) are the *how*. **Convivial Purpose** is the *why*: we build this way because humane tools deserve fast delivery, trustworthy operation, and adaptable boundaries.
+> The six pillars (Direction, Focus, Velocity, Trust, Continuity, Insight) are the *how*. **Convivial Purpose** is the *why*: we build this way because humane tools deserve fast delivery, trustworthy operation, and adaptable boundaries.
 
 ### Visual Hierarchy
 
@@ -230,12 +232,11 @@ Add to PR review rubric:
 └─────────────────────────────────────────────────────────────┘
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     THE FIVE PILLARS                        │
-├─────────────┬─────────────┬─────────────┬─────────────┬─────┤
-│   Speed     │ Simplicity  │  Quality    │   Guided    │Evolv│
-│    with     │    over     │  through    │  Agentic    │able │
-│   Safety    │ Complexity  │Determinism  │  Autonomy   │Modul│
-└─────────────┴─────────────┴─────────────┴─────────────┴─────┘
+│                      SIX PILLARS                            │
+├──────────────┬────────────┬────────────┬────────────┬────────┤
+│ Direction    │ Focus      │ Velocity   │ Trust      │        │
+│ Trust +      │ Continuity │ Insight    │ (closed feedback loop) │
+└──────────────┴────────────┴────────────┴────────────┴────────┘
 ```
 
 ---

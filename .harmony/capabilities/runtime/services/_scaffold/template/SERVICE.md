@@ -44,5 +44,7 @@ allowed-tools: Read Glob Grep Bash(bash)
 
 # {{service-id}}
 
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
+
 Document runtime contract, behavioral guarantees, and failure semantics.
 Contract artifacts are authoritative; implementations are derived.

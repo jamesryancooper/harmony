@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "goal": "{{HARNESS_GOAL or 'Define the high-level objective this harness serves'}}",
+  "goal": "{{HARNESS_GOAL or 'Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.'}}",
   "tasks": [
     {
       "id": "initial-setup",

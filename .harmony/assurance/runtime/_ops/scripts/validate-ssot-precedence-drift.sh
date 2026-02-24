@@ -9,6 +9,7 @@ ROOT_DIR="$(cd -- "$HARMONY_DIR/.." && pwd)"
 SPEC_FILE="$HARMONY_DIR/cognition/_meta/architecture/specification.md"
 ASSURANCE_PRECEDENCE="$HARMONY_DIR/assurance/governance/precedence.md"
 ENGINE_GOVERNANCE="$HARMONY_DIR/engine/governance/README.md"
+CANONICAL_GOAL='Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.'
 
 errors=0
 
@@ -119,6 +120,39 @@ check_cross_doc_alignment() {
     "engine governance declares runtime tie-breaker (outcome)"
 }
 
+check_precedence_goal_alignment() {
+  local precedence_files=(
+    "$ROOT_DIR/AGENTS.md"
+    "$HARMONY_DIR/agency/governance/CONSTITUTION.md"
+    "$HARMONY_DIR/agency/governance/DELEGATION.md"
+    "$HARMONY_DIR/agency/governance/MEMORY.md"
+    "$HARMONY_DIR/agency/runtime/agents/architect/AGENT.md"
+    "$HARMONY_DIR/agency/runtime/agents/architect/SOUL.md"
+  )
+  local file
+
+  for file in "${precedence_files[@]}"; do
+    require_text \
+      "$file" \
+      "$CANONICAL_GOAL" \
+      "precedence-layer goal alignment present in ${file#$ROOT_DIR/}"
+  done
+
+  local deprecated_framing_pattern
+  deprecated_framing_pattern='(AI-native,\ human-governed|risk-tiered\ human\ governance|Simplicity\ Over\ Complexity|simplicity-first|smallest\ viable)'
+  local deprecated_hits
+  deprecated_hits="$(
+    rg -n -i \
+      "$deprecated_framing_pattern" \
+      "${precedence_files[@]}" || true
+  )"
+  if [[ -z "$deprecated_hits" ]]; then
+    pass "no deprecated framing tokens in precedence-layer goal surfaces"
+  else
+    fail "deprecated framing tokens detected in precedence-layer goal surfaces"
+  fi
+}
+
 check_for_conflicting_wording() {
   local pattern
   local matches
@@ -178,6 +212,7 @@ main() {
 
   check_matrix_contract
   check_cross_doc_alignment
+  check_precedence_goal_alignment
   check_for_conflicting_wording
 
   echo "Validation summary: errors=$errors"

@@ -6,6 +6,7 @@
 - Identity, interpersonal stance, and ambiguity posture are defined in [SOUL.md](./SOUL.md).
 - Cross-agent governance overlays: [CONSTITUTION.md](../../../governance/CONSTITUTION.md), [DELEGATION.md](../../../governance/DELEGATION.md), [MEMORY.md](../../../governance/MEMORY.md).
 - Contract precedence: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> local `AGENT.md` -> local `SOUL.md`.
+- Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 > **Prime Directive**: Ship the smallest robust solution that meets constraints, solves the real problem, protects users and data, and keeps the codebase clean and adaptable — today and in the future.
 >

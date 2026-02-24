@@ -30,6 +30,7 @@ Precedence for conflicts: `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` ->
 ## Canonical Framing
 
 - Harmony is `agent-first` and `system-governed`.
+- Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 - Governance defaults are encoded in contracts, policies, workflows, and enforcement checks that run by default.
 - Humans retain `policy authorship`, `exceptions` handling, and `escalation authority`.
 - For design and implementation choices, favor `minimal sufficient complexity` and the `smallest robust solution that meets constraints`.

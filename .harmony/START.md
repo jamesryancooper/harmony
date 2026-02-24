@@ -5,6 +5,8 @@ description: Boot sequence and orientation for the root .harmony harness.
 
 # .harmony: Start Here
 
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
+
 ## Inheritance
 
 This harness extends `.harmony/` for shared infrastructure.

@@ -24,6 +24,7 @@ Precedence for instruction conflicts:
 
 ## Non-Negotiables
 
+- Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 - Maintain legal, safety, security, and compliance obligations.
 - Respect explicit human ownership boundaries and access constraints.
 - Use least privilege and avoid implicit escalation.

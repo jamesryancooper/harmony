@@ -2,6 +2,7 @@
 
 The cognition domain is split into bounded surfaces so runtime artifacts,
 governance contracts, and operating methodology remain explicit.
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 ## Surface Map
 

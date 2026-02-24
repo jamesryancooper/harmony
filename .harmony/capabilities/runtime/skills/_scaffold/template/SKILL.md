@@ -62,6 +62,10 @@ allowed-services:
 
 {{skill_one_liner}}
 
+## Goal Alignment
+
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
+
 ## When to Use
 
 Use this skill when:

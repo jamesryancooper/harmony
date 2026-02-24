@@ -1,6 +1,7 @@
 # Continuity
 
 Session state and progress tracking.
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 ## Contents
 

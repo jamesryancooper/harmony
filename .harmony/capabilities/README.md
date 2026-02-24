@@ -2,6 +2,7 @@
 
 Capability subsystem for command/skill/tool/service declaration contracts and
 policy governance.
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 Authority boundary with `engine/`: capabilities defines what capabilities are
 and what they require; engine defines how runtime execution and enforcement
