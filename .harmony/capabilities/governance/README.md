@@ -2,7 +2,8 @@
 
 ## Purpose
 
-Canonical governance surface for capabilities policy contracts.
+Canonical governance surface for capability declaration contracts and policy
+contracts that define what capabilities are and what they require.
 
 ## Contents
 
@@ -11,3 +12,18 @@ Canonical governance surface for capabilities policy contracts.
 ## Rule
 
 Normative policy definitions for capabilities must live under this surface.
+
+## Boundary
+
+- `capabilities/` governs declaration semantics (taxonomy, schema, discovery,
+  and declared requirements).
+- `capabilities/` does not govern engine runtime execution semantics.
+- Runtime semantics and enforcement behavior belong to `engine/` contracts in
+  `/.harmony/engine/governance/`.
+
+## Dependency Direction
+
+- Allowed: depend on stable engine contract boundaries (`engine/runtime/spec/**`
+  and launch interfaces).
+- Prohibited: depend on engine implementation internals (`engine/runtime/crates/**`
+  and engine-private runtime logic).

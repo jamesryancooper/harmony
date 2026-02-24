@@ -2,6 +2,10 @@
 
 The `engine/` domain is the executable harness authority. It is organized into bounded surfaces so runtime behavior, normative policy, and operating standards are explicit and independently governed.
 
+Authority boundary with `capabilities/`: engine governs runtime execution
+semantics and enforcement behavior; capabilities governs capability declaration
+semantics.
+
 ## Surface Map
 
 | Surface | Role | Canonical Contents |

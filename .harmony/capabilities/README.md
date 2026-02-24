@@ -1,6 +1,11 @@
 # Capabilities
 
-Capability subsystem for command/skill/tool/service execution contracts and policy governance.
+Capability subsystem for command/skill/tool/service declaration contracts and
+policy governance.
+
+Authority boundary with `engine/`: capabilities defines what capabilities are
+and what they require; engine defines how runtime execution and enforcement
+work.
 
 ## Bounded Surfaces
 
