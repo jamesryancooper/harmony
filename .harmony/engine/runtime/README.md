@@ -5,6 +5,7 @@
 ## Contents
 
 - `run` / `run.cmd`: launcher entrypoints
+- `policy` / `policy.cmd`: policy-engine launcher interface
 - `crates/`: runtime implementations
 - `config/`: runtime-local configuration
 - `spec/`: runtime schema/protocol contracts

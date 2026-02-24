@@ -9,3 +9,5 @@ Engine protocol/schema changes MUST use explicit versioning and MUST NOT silentl
 - New incompatible protocol behavior requires a new version identifier.
 - Existing version semantics are immutable once released.
 - Runtime validation must reject unsupported protocol versions (fail closed).
+- Engine policy launcher contracts under `engine/runtime/spec/` follow the same
+  versioning rule (for example `policy-interface-v1.md`).
