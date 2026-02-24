@@ -58,6 +58,11 @@ jobs:
           chmod +x .harmony/capabilities/_ops/scripts/validate-deny-by-default.sh
           .harmony/capabilities/_ops/scripts/validate-deny-by-default.sh --all --profile strict
 
+      - name: Validate engine capabilities boundary
+        run: |
+          chmod +x .harmony/assurance/runtime/_ops/scripts/validate-engine-capability-boundary.sh
+          .harmony/assurance/runtime/_ops/scripts/validate-engine-capability-boundary.sh
+
       - name: Validate agency contracts
         run: |
           chmod +x .harmony/agency/_ops/scripts/validate-agency.sh

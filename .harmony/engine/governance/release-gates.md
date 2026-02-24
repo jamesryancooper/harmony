@@ -5,6 +5,7 @@
 - Harness structure validation passes.
 - Engine runtime build/tests pass.
 - Legacy path banlist and migration CI checks pass.
+- Engine/capabilities boundary validation passes.
 
 ## Merge Rule
 

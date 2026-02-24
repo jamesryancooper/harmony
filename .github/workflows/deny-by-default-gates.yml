@@ -33,6 +33,11 @@ jobs:
           chmod +x .harmony/capabilities/_ops/scripts/validate-deny-by-default.sh
           .harmony/capabilities/_ops/scripts/validate-deny-by-default.sh --all --profile strict
 
+      - name: Validate engine capabilities boundary
+        run: |
+          chmod +x .harmony/assurance/runtime/_ops/scripts/validate-engine-capability-boundary.sh
+          .harmony/assurance/runtime/_ops/scripts/validate-engine-capability-boundary.sh
+
       - name: Friction SLO report
         run: |
           chmod +x .harmony/capabilities/_ops/scripts/policy-rollout-mode.sh
