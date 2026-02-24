@@ -368,7 +368,7 @@ Use this page to curate external references that deepen or complement topics cov
 - Last reviewed: 2025-11-12
 - Related docs: [comparative landscape](./comparative-landscape.md)
 
-## Flow, Delivery, and Team Design (Speed with Safety)
+## Flow, Delivery, and Team Design (Velocity through Agentic Automation and Trust through Governed Determinism)
 
 **Accelerate** (Book) — Nicole Forsgren, Jez Humble, Gene Kim, 2018
 

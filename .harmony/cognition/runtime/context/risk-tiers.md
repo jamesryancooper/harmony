@@ -5,9 +5,9 @@ description: How Harmony classifies changes by risk, and what level of review yo
 
 # Risk Tiers
 
-Harmony classifies every change into one of three risk tiers. This determines how much AI handles automatically vs. how much human attention is required.
+Harmony classifies every change into one of three risk tiers. Agent workflows and ACP checks run by default; this determines how much human governance attention is required.
 
-**The key insight:** AI does the same rigorous work for all tiers. The difference is how much *you* need to review.
+**The key insight:** Agents do the same rigorous work for all tiers under system-governed controls. The difference is how much *you* need to review and whether policy escalation is required.
 
 ---
 

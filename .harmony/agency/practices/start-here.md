@@ -1,11 +1,11 @@
 ---
 title: Start Here
-description: Your entry point to Harmony—a methodology where you orchestrate AI agents to build enterprise-quality software.
+description: Your entry point to Harmony—an agent-first, system-governed methodology for building enterprise-quality software.
 ---
 
 # Harmony: Start Here
 
-Welcome to Harmony. This is a methodology where **you orchestrate AI agents** to build enterprise-quality software. You make decisions. AI does the work. You approve. AI executes.
+Welcome to Harmony. Harmony is **agent-first and system-governed**: agents run standardized contracts, workflows, and checks by default. You provide governance oversight, policy decisions, and escalation authority.
 
 ---
 
@@ -13,21 +13,21 @@ Welcome to Harmony. This is a methodology where **you orchestrate AI agents** to
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  YOU THINK IN          │  AI HANDLES                           │
+│  YOU GOVERN            │  AGENTS HANDLE                        │
 ├─────────────────────────────────────────────────────────────────┤
-│  Spec → Plan → Build   │  Templates, code, tests, docs,        │
-│  → Verify → Ship       │  gates, security analysis,            │
-│                        │  observability, migrations            │
+│  Policy → Priorities   │  Specs, code, tests, docs, gates,     │
+│  → Review → Escalate   │  security analysis, observability,    │
+│                        │  migrations, and execution evidence   │
 └─────────────────────────────────────────────────────────────────┘
 
 Kits: The tools AI uses under the hood. You don't call them directly.
 ```
 
 **The simple version:**
-- You describe what you want
-- AI does the heavy lifting
-- You review and approve
-- AI ships it safely
+- You set policy and priorities
+- Agents do the heavy lifting under default governance
+- You review risk-tiered outputs and approve when required
+- Agents ship safely with receipts and rollback paths
 
 ---
 

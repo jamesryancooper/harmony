@@ -1,11 +1,11 @@
 ---
 title: Governance Model
-description: Autonomous Control Point policy gates, waivers, risk rubric, and CI policy gates to achieve Speed with Safety.
+description: Autonomous Control Point policy gates, waivers, risk rubric, and CI policy gates to achieve Velocity through Agentic Automation and Trust through Governed Determinism.
 ---
 
 # Governance Model
 
-Technical governance for the Harmony Structural Paradigm (HSP) defines how changes are proposed, reviewed, validated, and released. This document specifies ACP gates, the waiver policy, CI/CD quality gates, and a risk assessment rubric. The goal is Speed with Safety: rapid iteration without compromising correctness, security, or availability.
+Technical governance for the Harmony Structural Paradigm (HSP) defines how changes are proposed, reviewed, validated, and released. This document specifies ACP gates, the waiver policy, CI/CD quality gates, and a risk assessment rubric. The goal is Velocity through Agentic Automation and Trust through Governed Determinism: rapid iteration without compromising correctness, security, or availability.
 
 Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [overview](./overview.md), [runtime architecture](./runtime-architecture.md), [runtime policy](./runtime-policy.md), [kaizen subsystem](./kaizen-subsystem.md), [tooling integration](./tooling-integration.md), [contracts registry](./contracts-registry.md), [python runtime workspace example](/.harmony/scaffolding/practices/examples/stack-profiles/python-runtime-workspace.md)
 
@@ -207,7 +207,7 @@ Non‑negotiables: bots never approve or push to protected branches; AI configs/
 
 ## Governance Integration
 
-The elements work together to deliver Speed with Safety:
+The elements work together to deliver Velocity through Agentic Automation and Trust through Governed Determinism:
 
 - Risk rubric drives the depth of ACP scrutiny and which CI suites run.
 - CI gates encode objective, deterministic quality bars; ACP adds contextual judgment.

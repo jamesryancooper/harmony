@@ -23,14 +23,14 @@ This migration is a **clean break**. No compatibility layer is provided for
 
 ### Absolute Old -> New Mapping
 
-1. `/Users/jamesryancooper/Projects/harmony/.harmony/quality/` -> `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/`
-2. `/Users/jamesryancooper/Projects/harmony/.harmony/runtime/crates/quality_tools` -> `/Users/jamesryancooper/Projects/harmony/.harmony/runtime/crates/assurance_tools`
-3. `/Users/jamesryancooper/Projects/harmony/.github/workflows/quality-weight-gates.yml` -> `/Users/jamesryancooper/Projects/harmony/.github/workflows/assurance-weight-gates.yml`
-4. `/Users/jamesryancooper/Projects/harmony/.harmony/output/quality/` -> `/Users/jamesryancooper/Projects/harmony/.harmony/output/assurance/`
-5. `/Users/jamesryancooper/Projects/harmony/.harmony/quality/_ops/scripts/compute-quality-score.sh` -> `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/_ops/scripts/compute-assurance-score.sh`
-6. `/Users/jamesryancooper/Projects/harmony/.harmony/quality/_ops/scripts/quality-gate.sh` -> `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/_ops/scripts/assurance-gate.sh`
-7. `harmony_quality_tools` -> `harmony_assurance_tools`
-8. `harmony-quality` -> `harmony-assurance`
+1. `legacy quality subsystem root` -> `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/`
+2. `legacy quality tools crate` -> `/Users/jamesryancooper/Projects/harmony/.harmony/engine/runtime/crates/assurance_tools`
+3. `legacy quality weight-gates workflow` -> `/Users/jamesryancooper/Projects/harmony/.github/workflows/assurance-weight-gates.yml`
+4. `legacy quality output root` -> `/Users/jamesryancooper/Projects/harmony/.harmony/output/assurance/`
+5. `legacy score resolver script` -> `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/runtime/_ops/scripts/compute-assurance-score.sh`
+6. `legacy gate script` -> `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/runtime/_ops/scripts/assurance-gate.sh`
+7. `legacy tool binary id` -> `harmony_assurance_tools`
+8. `legacy package token` (`harmony-quality`) -> `harmony-assurance`
 
 ## Re-Run Verification Coverage
 
@@ -38,15 +38,12 @@ This migration is a **clean break**. No compatibility layer is provided for
 
 Patterns re-checked across active scope (excluding historical/human-led zones):
 
-- `.harmony/quality/`
-- `.harmony/runtime/crates/quality_tools`
-- `.github/workflows/quality-weight-gates.yml`
-- `.harmony/output/quality/`
+- `quality_tools` (identifier form)
+- `quality-weight-gates.yml`
 - `compute-quality-score.sh`
 - `quality-gate.sh`
-- `harmony_quality_tools`
 - `harmony-quality`
-- `quality_tools`
+- `legacy quality namespace aliases` (path-family token set)
 
 **Result:** 0 matches for all patterns.
 
@@ -67,11 +64,11 @@ Previously missing references (from `2026-02-18-migration-audit.md`) are now res
 
 Executed:
 
-- `bash .harmony/assurance/_ops/scripts/validate-harness-structure.sh` -> PASS
-- `bash .harmony/assurance/_ops/scripts/alignment-check.sh --profile commit-pr` -> PASS
-- `bash .harmony/assurance/_ops/scripts/alignment-check.sh --profile harness` -> PASS
-- `bash .harmony/assurance/_ops/scripts/alignment-check.sh --profile weights` -> PASS
-- `bash .harmony/assurance/_ops/scripts/alignment-check.sh --profile all` -> PASS
+- `bash .harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh` -> PASS
+- `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile commit-pr` -> PASS
+- `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness` -> PASS
+- `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile weights` -> PASS
+- `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile all` -> PASS
 
 ## Files Updated in This Cleanup Pass
 

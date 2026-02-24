@@ -1,11 +1,11 @@
 ---
 title: Daily Flow
-description: How your day looks as a human developer orchestrating AI agents in Harmony.
+description: How your day looks as a governance owner working in Harmony's agent-first, system-governed model.
 ---
 
 # Daily Flow
 
-This document describes the daily rhythm of working with Harmony. As a human developer, you orchestrate AI agents who do the bulk of the work. Your job is to direct, review, and approve.
+This document describes the daily rhythm of working with Harmony. Harmony runs agent workflows by default under system-governed contracts and checks. Your role is governance oversight: set direction, review risk-tiered output, and handle policy exceptions or escalation.
 
 ---
 

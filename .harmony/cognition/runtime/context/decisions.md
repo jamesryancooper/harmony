@@ -55,6 +55,7 @@ Do not edit manually. Update ADR files and `runtime/decisions/index.yml` instead
 | ADR-037 | Accepted | 2026-02-22 | ADR 037: Artifact Surface Clean-Break Rename | `../decisions/037-artifact-surface-clean-break-rename.md` |
 | ADR-038 | Accepted | 2026-02-24 | ADR 038: Engine and Capabilities Authority Boundary | `../decisions/038-engine-capabilities-authority-boundary.md` |
 | ADR-039 | Accepted | 2026-02-24 | ADR 039: Clean-Break Governance Cutover Contract | `../decisions/039-clean-break-governance-cutover-contract.md` |
+| ADR-040 | Accepted | 2026-02-24 | ADR 040: Principles Charter Successor v2026-02-24 | `../decisions/040-principles-charter-successor-v2026-02-24.md` |
 
 ## Update Procedure
 

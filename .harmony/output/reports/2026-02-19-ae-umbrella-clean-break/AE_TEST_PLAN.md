@@ -62,7 +62,7 @@ Add CI checks:
 
 ```bash
 rg -n "trust|speed_of_development|ease_of_use" .harmony/runtime/crates/assurance_tools/src/main.rs .harmony/assurance/standards/weights/weights.yml
-rg -n "QGE|Quality Governance Engine" .harmony .github
+rg -n "QGE|legacy QGE label" .harmony .github
 ```
 
 Rules:

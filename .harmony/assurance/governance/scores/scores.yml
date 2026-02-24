@@ -1,6 +1,6 @@
 meta:
   version: "1"
-  updated_at: "2026-02-18"
+  updated_at: "2026-02-24"
   owner: "harmony-platform"
   status: "active"
   schema_version: "1"
@@ -83,12 +83,12 @@ defaults:
       evidence:
         - .harmony/cognition/governance/principles/security-and-privacy-baseline.md
         - .harmony/cognition/practices/methodology/ci-cd-quality-gates.md
-    simplicity:
+    complexity_calibration:
       score: 4
       target_score: 5
-      acceptance_criteria: "No unnecessary complexity introduced for changed scope."
+      acceptance_criteria: "Complexity is minimal sufficient, proportional, and justified by risk, scale, safety, performance, or compliance."
       evidence:
-        - .harmony/cognition/governance/principles/simplicity-over-complexity.md
+        - .harmony/cognition/governance/principles/complexity-calibration.md
         - .harmony/agency/practices/pull-request-standards.md
     evolvability:
       score: 4
@@ -233,7 +233,7 @@ subsystems:
       scalability:
         score: 3
     conflicts:
-      - attributes: [simplicity, interoperability]
+      - attributes: [complexity_calibration, interoperability]
         decision: "Interop breadth is constrained by native-first boundaries"
         adr: .harmony/cognition/runtime/decisions/012-agent-platform-interop-native-first.md
 
@@ -320,7 +320,7 @@ subsystems:
     owner: "scaffolding-owner"
     last_updated: "2026-02-18"
     attributes:
-      simplicity:
+      complexity_calibration:
         score: 5
       portability:
         score: 5

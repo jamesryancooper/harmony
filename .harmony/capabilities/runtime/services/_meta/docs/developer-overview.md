@@ -354,7 +354,7 @@ Content-Type: application/json
 
 ---
 
-**Bottom line:** Keep core service-to-service comms boring (typed calls + artifacts + events). Use the Agent service for judgment where it clearly pays off. Add MCP providers as a facade when agents (yours or external) need to call services as tools—all without bending Harmony's simplicity-first guardrails.
+**Bottom line:** Keep core service-to-service comms boring (typed calls + artifacts + events). Use the Agent service for judgment where it clearly pays off. Add MCP providers as a facade when agents (yours or external) need to call services as tools—all without bending Harmony's complexity-calibrated guardrails.
 
 ---
 

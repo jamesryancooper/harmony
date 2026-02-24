@@ -21,7 +21,7 @@ Every change in Harmony is classified into one of three risk tiers:
 | **T2** | Standard | 15-20 min | Standard + threat analysis + preview | Stage -> evidence -> ACP-2 gate (+ quorum) -> promote/stage-only -> receipt |
 | **T3** | Elevated | 30-60 min | Full analysis + staged safety checks | Stage -> evidence -> ACP-3 gate (+ quorum) -> promote/stage-only -> receipt |
 
-**Key Principle:** AI applies appropriate rigor at every tier. The difference is ACP strength (evidence, quorum, budgets, reversibility), while humans remain on-the-loop for escalation and optional post-run oversight.
+**Key Principle:** Agents apply appropriate rigor at every tier under system-governed ACP controls. The difference is ACP strength (evidence, quorum, budgets, reversibility), while humans retain policy authorship, exceptions handling, and escalation authority.
 
 Governance references: [Autonomous Control Points](../../governance/principles/autonomous-control-points.md), [Deny by Default](../../governance/principles/deny-by-default.md), [Arbitration & Precedence](../../governance/principles/README.md#arbitration--precedence).
 

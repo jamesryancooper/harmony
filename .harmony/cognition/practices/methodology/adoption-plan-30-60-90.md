@@ -17,7 +17,7 @@ This document is a focused onboarding and adoption guide for Harmony. Use it whe
 ## Quick-Start Cadence (Tomorrow Morning)
 
 - **Cadence & roles**: 1‑week cycle; switch hats between **Driver (build)** and **Navigator (review)**; async daily check‑ins.
-- **Simplicity‑first**: Ship the smallest viable change that meets the requirement; avoid new dependencies unless they clearly reduce complexity or meet a non‑functional requirement.
+- **Complexity Calibration**: Ship the smallest robust solution that meets constraints; avoid new dependencies unless they clearly reduce complexity or satisfy a non-functional requirement.
 - **Board & WIP**: Backlog → Ready (3) → In‑Dev (1) → In‑Review (1) → Preview (1) → Release → Done → Blocked.
 
 ### Spec → Plan → PR Flow

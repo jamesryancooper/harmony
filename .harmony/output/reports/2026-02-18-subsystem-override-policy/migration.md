@@ -5,10 +5,10 @@
 - Status: **Completed**
 - Active enforcement phase: `phase2`
 - Effective policy files:
-  - `/Users/jamesryancooper/Projects/harmony/.harmony/quality/policy/subsystem-classes.yml`
-  - `/Users/jamesryancooper/Projects/harmony/.harmony/quality/policy/overrides.yml`
+  - `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/subsystem-classes.yml`
+  - `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/overrides.yml`
 - Verification evidence:
-  - resolver emits policy deviations report under `/Users/jamesryancooper/Projects/harmony/.harmony/output/quality/policy/deviations/*.md`
+  - resolver emits policy deviations report under `/Users/jamesryancooper/Projects/harmony/.harmony/output/assurance/policy/deviations/*.md`
   - gate passes under strict warning mode with baseline inputs
 
 ## Phase 0 (Grace)

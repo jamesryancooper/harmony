@@ -16,13 +16,13 @@ Status: Draft stub (confirm roles and cadence)
 
 ## Pillars Alignment
 
-- Speed with Safety: Clear roles, WIP discipline, and review gates enable frequent, safe merges and guarded promotions.
-- Simplicity over Complexity: Minimal ceremonies and a straightforward RACI reduce coordination overhead for a tiny team.
-- Quality through Determinism: Required checks and protected branches create predictable, auditable flow from PR to promote/rollback.
-- Guided Agentic Autonomy: Agents can suggest plans and diffs; humans approve changes and waivers. High‑risk changes require two‑person rule.
-- Evolvable Modularity: Clear ownership boundaries and slice-aligned roles make it easy to evolve responsibilities, tools, and runtimes without large‑scale reorgs or rewrites.
+- Agent-First Purpose: Shared agent contracts and workflows standardize delivery across projects while humans provide governance oversight and escalation.
+- Managed Complexity (Complexity Calibration): Favor minimal sufficient complexity and the smallest robust solution that meets constraints; increase ceremony only when risk or scale requires it.
+- System-Governed Operations: Contracts, policy gates, and enforcement checks run by default; humans own policy authorship, exceptions, and escalation.
+- Reliability and Auditability: Required checks and protected branches create predictable, auditable flow from PR to promote/rollback.
+- Evolvable Modularity: Clear ownership boundaries and slice-aligned roles make it easy to evolve responsibilities, tools, and runtimes without large-scale reorgs or rewrites.
 
-See `.harmony/cognition/practices/methodology/README.md` for Harmony’s five pillars.
+See `.harmony/cognition/practices/methodology/README.md` for Harmony's active six-pillar framing and methodology alignment.
 
 ## Roles (suggested)
 

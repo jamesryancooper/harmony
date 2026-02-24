@@ -1,6 +1,6 @@
 # Research Prompts
 
-Prompts for human-led research projects in `projects/`.
+Prompts for governance-owned research projects in `projects/`.
 
 ## Available Prompts
 
@@ -14,7 +14,7 @@ Prompts for human-led research projects in `projects/`.
 
 ## Usage
 
-These prompts are designed for human-directed use within research projects. Point the agent to a prompt when you need structured help:
+These prompts are designed for directed use within research projects. Point the agent to a prompt when you need structured help:
 
 ```text
 Human: "Use .harmony/scaffolding/practices/prompts/research/synthesize-findings.md to consolidate

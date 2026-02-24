@@ -16,6 +16,7 @@ Finalize an agency architecture for `.harmony/agency` that is:
 - semantically clear,
 - operationally simple,
 - composable with skills/workflows/missions,
+- aligned with agent-first and system-governed operation,
 - aligned with AGENTS.md ecosystem patterns.
 
 ## Current State Summary
@@ -42,7 +43,7 @@ Cons:
 
 - high conceptual overlap (`subagents` vs `assistants`),
 - larger configuration and validation surface,
-- contradicts simplicity-first guidance.
+- contradicts minimal-sufficient-complexity guidance.
 
 ### Option B: Consolidate `subagents` into `assistants`; keep `teams`
 

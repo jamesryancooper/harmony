@@ -113,7 +113,7 @@ Detailed runbooks and incident playbooks live in:
 
 | Principle | Relationship |
 |-----------|--------------|
-| Simplicity Over Complexity | Simple systems are easier to roll back |
+| Complexity Calibration | Complexity level must stay proportional so rollback paths remain robust and operable |
 | Small Diffs, Trunk-Based | Small changes have smaller rollback blast radius |
 | Flags by Default | Feature flags enable instant reversibility |
 | Determinism | Deterministic systems have predictable rollback behavior |

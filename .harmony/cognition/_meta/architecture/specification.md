@@ -44,6 +44,9 @@ Within harness documentation, precedence is:
 
 If this file conflicts with `/.harmony/scope.md` or `/.harmony/conventions.md`, scope and conventions for this harness take precedence.
 
+When agency actor contracts are in scope, contract-layer precedence remains:
+`AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> `AGENT.md` -> `SOUL.md`.
+
 ## SSOT Precedence Matrix (Runtime, Governance, Practices)
 
 | Authority ID | Canonical SSOT | Constraint | Conflict Resolution |
@@ -106,9 +109,11 @@ Expands in:
 - [No Silent Apply](/.harmony/cognition/governance/principles/no-silent-apply.md)
 - [Autonomous Control Points](/.harmony/cognition/governance/principles/autonomous-control-points.md)
 
-### HARMONY-SPEC-006: Risk-Tiered Human Governance
+### HARMONY-SPEC-006: Risk-Tiered System Governance
 
-Control intensity MUST scale with risk tier. Low-risk read-only automation MAY run without hard gates; consequential actions MUST use explicit ACP gates.
+Control intensity MUST scale with risk tier under a system-governed model. Low-risk read-only automation MAY run without hard gates; consequential actions MUST use explicit ACP gates that run by default.
+
+Humans retain policy authorship, exceptions handling, and escalation authority.
 
 Expands in:
 

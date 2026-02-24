@@ -11,7 +11,7 @@
 
 ## One-Page Overview
 
-Harmony is an **AI-native, human-governed engineering harness**. It is not the
+Harmony is an **agent-first, system-governed engineering harness**. It is not the
 product code itself; it is the operating layer around the codebase that makes
 planning, delivery, governance, and learning consistent and repeatable.
 
@@ -40,7 +40,7 @@ and what assurance/safety gates must be met before work is considered complete.
 Harmony gives a solo builder or small team a structured control plane for
 software delivery by:
 
-- Standardizing execution through agents, assistants, workflows, and skills
+- Standardizing cross-project agent execution through shared contracts, workflows, capabilities, and auditability
 - Enforcing safety via an agent-native deny-by-default control plane (shared
   policy engine, scoped permissions, and CI/runtime parity gates)
 - Preventing unsafe autonomy with no-silent-apply for material side effects
@@ -83,6 +83,7 @@ Governance is explicit:
 - Consequential side effects are governed by deny-by-default policy, ACP gates,
   reversibility requirements, and append-only receipts
 - Agent autonomy is bounded by contract precedence and policy
+- Humans retain policy authorship, exceptions handling, and escalation authority
 - Human-led zones (for example, `ideation/`) are excluded unless explicitly scoped
 
 In short: Harmony is a governed acceleration system. AI increases speed and

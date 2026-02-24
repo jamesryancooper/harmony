@@ -27,7 +27,7 @@ Small-batch automation works best when changes land in one deployable unit with 
 
 ### Quality Attributes Promoted
 
-- **Simplicity**: one runtime/deploy surface by default.
+- **Complexity Fitness**: one runtime/deploy surface by default unless constraints justify more.
 - **Maintainability**: slice boundaries remain explicit inside one repo.
 - **Scalability**: extraction paths are preserved through ports/adapters.
 - **Reliability**: fewer network hops and partial-failure modes in early stages.
@@ -77,7 +77,7 @@ if traffic < 1000 and team_size == 1:
 
 ## Relationship to Other Principles
 
-- `Simplicity Over Complexity` keeps the topology minimal.
+- `Complexity Calibration` keeps topology at minimal sufficient complexity.
 - `Ownership and Boundaries` keeps slices clean while still in one deployable.
 - `Contract-first` makes future extraction reversible.
 

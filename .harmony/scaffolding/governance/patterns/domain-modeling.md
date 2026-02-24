@@ -16,12 +16,13 @@ Status: Draft stub (capture product domain choices)
 
 ## Pillars Alignment
 
-- Speed with Safety: Vertical slices and bounded contexts reduce blast radius, enabling small, reversible changes with clear ownership.
-- Simplicity over Complexity: Prefer a modular monolith and in‑process domain events before adding infrastructure or choreography.
-- Quality through Determinism: Explicit invariants and contracts (DTOs/schemas) make behavior testable and reproducible across adapters.
-- Guided Agentic Autonomy: Agents can scaffold ports/adapters from contracts; humans verify invariants and approve domain changes.
+- Direction through Validated Discovery: Domain boundaries and invariants keep implementation grounded in validated intent.
+- Focus through Absorbed Complexity: Use Complexity Calibration to prefer a modular monolith and in-process events until constraints justify more.
+- Velocity through Agentic Automation: Clear bounded contexts let agents scaffold ports/adapters quickly with low coordination overhead.
+- Trust through Governed Determinism: Explicit invariants and contracts (DTOs/schemas) make behavior testable and reproducible across adapters.
+- Continuity through Institutional Memory and Insight through Structured Learning: Durable domain contracts preserve context and improve future modeling decisions.
 
-See `.harmony/cognition/practices/methodology/README.md` for Harmony’s five pillars.
+See `.harmony/cognition/practices/methodology/README.md` for Harmony's six pillars.
 
 ## Scope
 

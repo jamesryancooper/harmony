@@ -6,7 +6,7 @@ description: Canonical principles index and thresholds that translate Harmony pi
 # Harmony Principles
 
 Status: Active (Production)
-Last updated: 2026-02-20
+Last updated: 2026-02-24
 
 Principles are Harmony's operational translation layer between philosophy and execution.
 
@@ -28,16 +28,18 @@ Convivial Purpose (WHY)
 
 ## Scope
 
-Harmony principles are the decision layer between pillars and methodology. They define how day-to-day technical choices preserve the six pillars while optimizing for velocity, maintainability, scalability, reliability, security, and simplicity.
+Harmony principles are the decision layer between pillars and methodology. They define how day-to-day technical choices preserve the six pillars while optimizing for velocity, maintainability, scalability, reliability, security, and minimal sufficient complexity.
 
-For small teams, default to the smallest viable process, design, and tooling that preserves quality and governance. Escalate ceremony only for higher-risk changes.
+For small teams, default to the smallest robust solution that meets constraints for process, design, and tooling while preserving quality and governance. Escalate ceremony only for higher-risk changes.
 
 ## Constitutional Charter (Immutable)
 
 - Canonical charter: [Engineering Principles & Standards (Authoritative)](./principles.md)
+- Active successor charter: [Engineering Principles & Standards (Successor v2026-02-24)](./principles-v2026-02-24.md)
 - Classification: immutable constitutional artifact (`mutability: immutable`, `agent_editable: false`, `risk_tier: critical`)
 - Agent rule: agents MUST NOT modify `principles.md`
 - Evolution model: create a versioned successor (`principles-vYYYY-MM-DD.md`) plus ADR; do not edit `principles.md`
+- Active framing: `agent-first`, `system-governed`, and `complexity calibration` language is defined in the successor charter.
 
 ## Charter-to-Guide Mapping
 
@@ -45,7 +47,7 @@ For small teams, default to the smallest viable process, design, and tooling tha
 |---|---|
 | SSOT and documentation discipline | [Single Source of Truth](./single-source-of-truth.md), [Documentation is Code](./documentation-is-code.md), [Progressive Disclosure](./progressive-disclosure.md) |
 | Boundaries and contracts | [Ownership and Boundaries](./ownership-and-boundaries.md), [Contract-first](./contract-first.md) |
-| Simplicity and complexity control | [Simplicity Over Complexity](./simplicity-over-complexity.md), [Monolith-first Modulith](./monolith-first-modulith.md) |
+| Managed complexity and complexity fitness | [Complexity Calibration](./complexity-calibration.md), [Monolith-first Modulith](./monolith-first-modulith.md) |
 | Quality and operational readiness | [Observability as a Contract](./observability-as-a-contract.md), [Reversibility](./reversibility.md), [Small Diffs, Trunk-based](./small-diffs-trunk-based.md) |
 | Security and privacy | [Security and Privacy Baseline](./security-and-privacy-baseline.md), [Deny by Default](./deny-by-default.md), [Guardrails](./guardrails.md) |
 | Exceptions and governance | [Arbitration and Precedence](./arbitration-and-precedence.md), [Autonomous Control Points](./autonomous-control-points.md), [Waivers and Exceptions](../exceptions/waivers-and-exceptions.md) |
@@ -110,7 +112,7 @@ Recording requirement:
 | Category | Principle | Summary | Pillars | Guide |
 |---|---|---|---|---|
 | Foundational | Progressive Disclosure | Layer context from concise to deep to preserve focus. | Focus, Insight | [Guide](./progressive-disclosure.md) |
-| Foundational | Simplicity Over Complexity | Prefer minimal viable solutions; add complexity only with evidence. | Focus, Velocity | [Guide](./simplicity-over-complexity.md) |
+| Foundational | Complexity Calibration | Favor minimal sufficient complexity; add complexity only with explicit constraint evidence and fitness checks. | Focus, Velocity, Trust | [Guide](./complexity-calibration.md) |
 | Foundational | Single Source of Truth | Keep each core fact/contract authoritative in one place. | Continuity, Trust | [Guide](./single-source-of-truth.md) |
 | Foundational | Locality | Keep context and ownership near the work surface. | Focus, Continuity | [Guide](./locality.md) |
 | Foundational | Arbitration and Precedence | Resolve principle conflicts through deterministic governance tie-breaks. | Trust, Direction | [Guide](./arbitration-and-precedence.md) |

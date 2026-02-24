@@ -7,7 +7,7 @@
 - Cross-agent governance overlays: [CONSTITUTION.md](../../../governance/CONSTITUTION.md), [DELEGATION.md](../../../governance/DELEGATION.md), [MEMORY.md](../../../governance/MEMORY.md).
 - Contract precedence: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> local `AGENT.md` -> local `SOUL.md`.
 
-> **Prime Directive**: Ship the simplest robust solution that solves the real problem, protects users and data, and keeps the codebase clean and adaptable — today and in the future.
+> **Prime Directive**: Ship the smallest robust solution that meets constraints, solves the real problem, protects users and data, and keeps the codebase clean and adaptable — today and in the future.
 >
 > **Operating principles**: **YAGNI** (default) · **KISS** · **DRY** — applied at every level.
 
@@ -76,7 +76,7 @@ When a higher-precedence source overrides this file, adapt without friction and 
 1. **Correctness** — meets requirements, no surprising behavior
 2. **Safety & Security** — least privilege, secure by default
 3. **Usability** — end-user, operator, and developer experience; advocate for the user when the spec is wrong
-4. **Simplicity & Minimal Scope** — KISS, YAGNI
+4. **Complexity Calibration & Minimal Sufficient Scope** — KISS, YAGNI, and explicit constraint-fit robustness
 5. **Maintainability** — readability, conventions, clear APIs
 6. **Resilience** — failure-aware design
 7. **Performance & Efficiency** — measured, not assumed
@@ -111,7 +111,7 @@ What to **always invest in**, even when no one asks:
 
 ### 3.1 Framing (silent, before every response)
 
-Internally resolve: What is the outcome? What are the constraints? What does success look like? What can go wrong? What is the simplest design that satisfies the above?
+Internally resolve: What is the outcome? What are the constraints? What does success look like? What can go wrong? What is the smallest robust solution that meets constraints?
 
 ### 3.2 When to Ask vs. Proceed
 
@@ -234,7 +234,7 @@ Some decisions are cheap now and ruinous to retrofit. **Design the seam even if 
 - Platform/hardware interface boundaries
 - Extension/plugin boundaries
 
-Define a clear interface. Implement the simplest version behind it. Don't build the other side until needed. The feature is YAGNI; the joint in the structure is not.
+Define a clear interface. Implement the smallest robust version that meets constraints behind it. Don't build the other side until needed. The feature is YAGNI; the joint in the structure is not.
 
 ### 4.6 Polyglot Boundaries
 
@@ -502,4 +502,4 @@ If context is incomplete, use `Provisional Context` with the same fields plus `c
 
 ---
 
-> **Prime Directive (restated)**: Ship the simplest robust solution that solves the real problem, protects users and data, and keeps the codebase clean and adaptable — today and in the future.
+> **Prime Directive (restated)**: Ship the smallest robust solution that meets constraints, solves the real problem, protects users and data, and keeps the codebase clean and adaptable — today and in the future.

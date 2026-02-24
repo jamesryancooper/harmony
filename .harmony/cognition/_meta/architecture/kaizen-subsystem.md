@@ -11,7 +11,7 @@ This document specifies the Kaizen subsystem: an agentic, fail-closed improvemen
 
 ## Summary
 
-- Purpose: continuous, automated improvements with human-governed safety.
+- Purpose: continuous, automated improvements with system-governed safety.
 - Mode: fail‑closed with dry‑run PRs; no merge without validation + approval.
 - Agents: Planner, Builder, Verifier; backed by the Knowledge Plane and CI/CD.
 - Triggers: scheduled cadence and event-driven (e.g., CVEs, CI failures).

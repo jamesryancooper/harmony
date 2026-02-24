@@ -64,7 +64,7 @@
 | `winner_outcome` -> `winner_umbrella` | Clean (no hits) |
 | `loser_outcome` -> `loser_umbrella` | Clean (no hits) |
 | `QGE` -> `AE` | Context-only hits in migration-report docs |
-| `Quality Governance Engine` -> `Assurance Engine` | Context-only hits in migration-report docs |
+| `legacy QGE label` -> `Assurance Engine` | Context-only hits in migration-report docs |
 | `Trust-first` -> `Assurance-first` | Context-only hit in migration-report docs |
 
 ### Scope Accounting

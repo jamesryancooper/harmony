@@ -32,7 +32,7 @@ Later layers override earlier layers for the same attribute.
 
 - Definition: ability for Harmony to execute useful work independently within explicit policy boundaries.
 - Boundary rule: autonomy never overrides safety/security or no-silent-apply/ACP promotion requirements.
-- Primary tensions: `safety`, `security`, `auditability`, `simplicity`, `usability`.
+- Primary tensions: `safety`, `security`, `auditability`, `complexity_calibration`, `usability`.
 - Scoring cues:
   - `1`: mostly manual or autonomy is effectively disallowed for the subsystem.
   - `3`: bounded autonomy for low-risk/read-only tasks; material effects remain ACP-gated.

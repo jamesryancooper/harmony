@@ -15,14 +15,14 @@
 
 Mappings audited:
 
-1. `.harmony/quality/` -> `.harmony/assurance/`
-2. `.harmony/runtime/crates/quality_tools` -> `.harmony/runtime/crates/assurance_tools`
-3. `.github/workflows/quality-weight-gates.yml` -> `.github/workflows/assurance-weight-gates.yml`
-4. `.harmony/output/quality/` -> `.harmony/output/assurance/`
-5. `compute-quality-score.sh` -> `compute-assurance-score.sh`
-6. `quality-gate.sh` -> `assurance-gate.sh`
-7. `harmony_quality_tools` -> `harmony_assurance_tools`
-8. `harmony-quality` -> `harmony-assurance`
+1. `legacy quality subsystem root` -> `.harmony/assurance/`
+2. `legacy quality tools crate` -> `.harmony/engine/runtime/crates/assurance_tools`
+3. `legacy quality weight-gates workflow` -> `.github/workflows/assurance-weight-gates.yml`
+4. `legacy quality output root` -> `.harmony/output/assurance/`
+5. `legacy score resolver script` -> `compute-assurance-score.sh`
+6. `legacy gate script` -> `assurance-gate.sh`
+7. `legacy tool binary id` -> `harmony_assurance_tools`
+8. `legacy package token` (`harmony-quality`) -> `harmony-assurance`
 
 Exclusion zones (intentional):
 
@@ -39,15 +39,12 @@ Exclusion zones (intentional):
 
 Searched legacy/migration-sensitive patterns across active scope:
 
-- `.harmony/quality/`
-- `.harmony/runtime/crates/quality_tools`
-- `.github/workflows/quality-weight-gates.yml`
-- `.harmony/output/quality/`
+- `quality_tools` (identifier form)
+- `quality-weight-gates.yml`
 - `compute-quality-score.sh`
 - `quality-gate.sh`
-- `harmony_quality_tools`
 - `harmony-quality`
-- `quality_tools` (identifier form)
+- `legacy quality namespace aliases` (path-family token set)
 
 **Result:** No matches in active scope.  
 **Severity outcome:** No CRITICAL/HIGH/MEDIUM/LOW migration findings.
@@ -95,7 +92,7 @@ Checks executed:
 1. **Mapping coverage:** Every migration mapping had explicit sweep patterns; no active hits.
 2. **Blind spots review:** Human-led and historical zones were excluded by policy, then reviewed separately for rationale (preserve continuity).
 3. **Finding validation:** Each cross-reference miss was re-validated after anchor/placeholder filtering.
-4. **Counter-example search:** Additional sweeps for known stale variants (`quality_tools`, `harmony-quality`, `assurance/(weights|scores|policy)` old layout patterns) returned no migration findings.
+4. **Counter-example search:** Additional sweeps for known stale variants (`quality_tools`, `harmony-quality`, and legacy quality layout aliases) returned no migration findings.
 
 Outcome:
 

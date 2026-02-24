@@ -1,11 +1,11 @@
 ---
-title: AI-Native, Human-Governed Methodology Overview
-description: Principled, AI-native methodology for solo builders — lean in ceremony, rich in capability — with spec-led intent capture, context-efficient planning, autonomous execution loops, and risk-tiered human governance.
+title: Agent-First, System-Governed Methodology Overview
+description: Principled, agent-first methodology for cross-project execution — lean in ceremony, rich in capability — with spec-led intent capture, context-efficient planning, autonomous execution loops, and risk-tiered system governance.
 ---
 
 # Harmony Methodology
 
-Harmony is an AI-native, human-governed development methodology for solo builders.
+Harmony is an agent-first, system-governed development methodology for cross-project execution with practical solo-builder ergonomics.
 
 ## Machine Discovery
 
@@ -30,7 +30,7 @@ Work is organized as a closed loop across **PLAN** (Direction, Focus), **SHIP** 
 
 ## Harmony’s Unifying Objective
 
-Harmony unifies speed, safety, and simplicity so a solo builder can ship high-quality software quickly, safely, and predictably. AI agents drive planning, implementation, and verification autonomously within principled bounds, while humans govern direction, define safety boundaries, and exercise risk-tiered oversight. Every principle, guardrail, and artifact reinforces one or more of Harmony's six pillars and closes the loop from validated intent → focused implementation → fast shipping → safe delivery → preserved knowledge → structured learning.
+Harmony unifies speed, safety, and minimal sufficient complexity so a solo builder can ship high-quality software quickly, safely, and predictably. AI agents drive planning, implementation, and verification autonomously within principled bounds, while humans own policy authorship, exception handling, and escalation authority. Every principle, guardrail, and artifact reinforces one or more of Harmony's six pillars and closes the loop from validated intent -> focused implementation -> fast shipping -> safe delivery -> preserved knowledge -> structured learning.
 
 ### The Six Pillars
 
@@ -189,7 +189,7 @@ Use these companion documents when you need deeper operational detail:
 
 ## Harmony's Components
 
-Here’s an explanation of each framework, method, and tool in the **Harmony Methodology** — and *why* it aligns with Harmony’s AI-native, human-governed delivery model. Together, these ensure that every change — human or AI-generated — is **traceable, testable, and reversible**, fulfilling Harmony’s promise of fast, safe, high-confidence shipping.
+Here’s an explanation of each framework, method, and tool in the **Harmony Methodology** — and *why* it aligns with Harmony’s agent-first, system-governed delivery model. Together, these ensure that every change — human or AI-generated — is **traceable, testable, and reversible**, fulfilling Harmony’s promise of fast, safe, high-confidence shipping.
 
 ### Frameworks & Standards
 
@@ -304,7 +304,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - Combined with JSON Schema validations and EvalKit, they produce verifiable AI and code outputs.
 - Outcome: agent‑assisted changes are safe, observable, and reversible.
 
-### 6) Guided Agentic Autonomy (Deterministic Agent Loops & Risk-Tiered Governance)
+### 6) Agent-First System Governance (Deterministic Agent Loops & Risk-Tiered ACP Governance)
 
 - Deterministic, reviewable agent loops: Plan → Diff → Explain → Test; no silent apply.
 - Pinned AI configuration and low‑variance defaults; golden tests guarded by JSON‑Schema prevent drift.
@@ -322,13 +322,13 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 
 ## Harmony in Practice
 
-**Goal.** Ship small, quality, safe, and frequent changes with **enterprise‑grade** security, reliability, and performance using **AI-native** workflows with **risk-tiered policy governance** and human-on-the-loop oversight. Humans own direction, safety boundaries, and material risk decisions.
+**Goal.** Ship small, quality, safe, and frequent changes with **enterprise‑grade** security, reliability, and performance using **agent-first** workflows with **risk-tiered system governance** and human governance oversight. Humans own policy authorship, exceptions, and escalation authority.
 
-**Guiding principle.** **Simplicity first**: prefer the smallest viable process, design, and tooling that satisfy the requirement. Add complexity only when SLOs, scale, or compliance clearly require it; avoid unnecessary dependencies.
+**Guiding principle.** **Complexity Calibration** with **Complexity Fitness**: favor **minimal sufficient complexity** and the **smallest robust solution that meets constraints**. Add complexity only when SLOs, scale, safety, performance, or compliance clearly require it; avoid unnecessary dependencies.
 
 **Methodology**:
 
-- **Simplicity‑first**: choose the simplest process, design, and tooling that meets the requirement. Defer advanced patterns until justified by SLOs/scale/compliance. Default to no new dependency unless it materially reduces complexity.
+- **Complexity Calibration**: choose minimal sufficient process, design, and tooling that meets constraints. Defer advanced patterns until justified by SLOs/scale/safety/performance/compliance. Default to no new dependency unless it materially reduces complexity while preserving robustness.
 - **Spec‑first**: every meaningful change starts with a **Specification one‑pager** + **ADR** capturing problem, scope, API/UI contracts, SLIs/SLOs, **non‑functionals**, and a **micro‑threat model (STRIDE)** mapped to **OWASP ASVS** & **NIST SSDF** tasks.
 - **Context-efficient planning**: Convert the Spec to a context packet (structured intent + agent plan + acceptance criteria). AI agents generate plans/diffs/tests from the Spec within governed bounds; risk-tiered ACP promotion gates enforce reversibility, evidence, quorum, and budgets on material changes.
 - **Flow over ceremony**: **Trunk‑Based Development** (+ short‑lived branches), tiny PRs, gated **Vercel Preview** per PR, **feature‑flagged** releases with guarded manual promote to prod; rollbacks are instant by promoting a prior preview.
@@ -702,7 +702,7 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 
 **Cadence & roles**: 1‑week cycle; switch hats between **Driver** and **Navigator**; async daily check‑ins.
 
-**Simplicity‑first**: Ship the smallest viable change that meets the requirement; avoid new dependencies unless they clearly reduce complexity or meet a non‑functional requirement.
+**Complexity Calibration**: Ship the smallest robust solution that meets constraints; avoid new dependencies unless they clearly reduce complexity or satisfy a non-functional requirement.
 
 **Board & WIP**: Backlog → Ready (3) → In‑Dev (1) → In‑Review (1) → Preview (1) → Release → Done → Blocked.
 
@@ -753,6 +753,6 @@ See `adoption-plan-30-60-90.md` for the full staged adoption plan and quick-star
 
 ### Final notes
 
-- This method intentionally **minimizes ceremony and maximizes capability**: few meetings, tiny PRs, clear gates, strong **spec-led intent capture** with **AI-native execution loops** and **risk-tiered human governance**.
+- This method intentionally **minimizes ceremony and maximizes capability**: few meetings, tiny PRs, clear gates, strong **spec-led intent capture** with **agent-first execution loops** and **risk-tiered system governance**.
 - It **scales with your risk**: tighten gates when error budget burns, loosen when healthy.
 - It is **stack-, host-, and environment-agnostic**, adapting to your project's needs while providing **enterprise‑grade** security and reliability from day one.

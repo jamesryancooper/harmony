@@ -27,6 +27,13 @@ Contract responsibilities are intentionally split to prevent drift:
 
 Precedence for conflicts: `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> `AGENT.md` -> `SOUL.md`.
 
+## Canonical Framing
+
+- Harmony is `agent-first` and `system-governed`.
+- Governance defaults are encoded in contracts, policies, workflows, and enforcement checks that run by default.
+- Humans retain `policy authorship`, `exceptions` handling, and `escalation authority`.
+- For design and implementation choices, favor `minimal sufficient complexity` and the `smallest robust solution that meets constraints`.
+
 ## Immutable Charter
 
 - Treat `.harmony/cognition/governance/principles/principles.md` as an immutable constitutional artifact.

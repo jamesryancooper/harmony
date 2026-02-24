@@ -118,4 +118,4 @@ This scaling policy is intentionally lightweight and SHOULD be read together wit
 - `architecture/runtime-policy.md` (feature flags, rollback, runtime expectations).
 - `docs/testing-strategy.md` (test pyramid, preview smoke, and contract test gates).
 
-Together, these documents keep solo developers and 2-person teams fast while preserving **Speed with Safety**, **Simplicity over Complexity**, and **Quality through Determinism**.
+Together, these documents keep solo developers and 2-person teams fast while preserving **Direction**, **Focus**, **Velocity**, **Trust**, **Continuity**, and **Insight** outcomes.

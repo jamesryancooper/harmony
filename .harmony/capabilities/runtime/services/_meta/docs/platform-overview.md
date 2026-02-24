@@ -135,11 +135,11 @@ The **AI Services Platform** exists to accelerate software development through A
 
 Each service embodies a single, crisp purpose, with clear inputs, outputs, and well-defined integration points. This ensures that AI agents operate in a **transparent, reproducible, and controlled** environment rather than drifting into undocumented or unpredictable behaviour. By guiding agents down **guarded paths**, the platform ensures safety, accuracy, quality, and speed — all while reducing cognitive and operational load for developers.
 
-In alignment with Harmony's principles of **simplicity over complexity**, **spec-first rather than ceremony**, and **flow over fluff**, the AI Services Platform is opinionated where it matters (interfaces, safety, structure) and flexible everywhere else. It favours minimal viable complexity — only introducing additional layers when required by SLOs, compliance, or scale.
+In alignment with Harmony's principles of **Complexity Calibration**, **spec-first rather than ceremony**, and **flow over fluff**, the AI Services Platform is opinionated where it matters (interfaces, safety, structure) and flexible everywhere else. It favors **minimal sufficient complexity** — only introducing additional layers when required by SLOs, compliance, safety, performance, or scale.
 
 The AI Services Platform addresses the core pitfalls encountered when implementing multiple AI agents within an automated workflow: ambiguous hand-offs, uncontrolled tool invocation, context fragmentation, cascading hallucinations or mis-reasoning, and difficulty in debugging or observing inter-agent interactions. By enforcing **deterministic tool boundaries**, **Autonomous Control Point (ACP) promotion gates**, and **observability across all runs**, the platform transforms multi-agent complexity into measurable, predictable progress rather than uncontrolled autonomous behaviour.
 
-In short: the AI Services Platform is the **practical backbone** of Harmony's promise — a modular, local-first framework that lets a tiny team ship outsized results, without sacrificing simplicity, safety, or correctness. It turns multi-agent chaos into structured, safe, high-velocity development — **fast, safe, and aligned by design**.
+In short: the AI Services Platform is the **practical backbone** of Harmony's promise — a modular, local-first framework that lets a tiny team ship outsized results, without sacrificing complexity fitness, safety, or correctness. It turns multi-agent chaos into structured, safe, high-velocity development — **fast, safe, and aligned by design**.
 
 ---
 
@@ -178,12 +178,12 @@ These invariants apply to every service and workflow so the Platform operates as
   - Map risk (Trivial/Low/Medium/High) to ACP levels and policy outcomes; require flags and rollback plans; Preview smoke for Medium/High; escalate to humans only for unresolved risk conditions.
 - Local‑first operation
   - All services support `--dry-run` and function without network for validation/plan flows. Telemetry may buffer to disk and flush later.
-- Simplicity‑first ergonomics
+- Complexity-calibrated ergonomics
   - Prefer platform features (Vercel envs/cron/flags) over new deps. Monolith‑first with clear ports/adapters. One small change per PR. Consistent CLI flags across all services.
 
 ## Harmony Alignment
 
-Harmony is an AI-native, human-governed methodology for solo builders — lean in ceremony and rich in capability. It pairs spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered human governance while staying stack-, host-, and environment-agnostic. Harmony aligns with OWASP ASVS, NIST SSDF, and STRIDE, and adopts architectural principles from 12‑Factor, Monolith‑First, and Hexagonal—so you can ship fast, ship safe, and ship with confidence. For the full methodology and lifecycle overview, see .harmony/cognition/practices/methodology/README.md
+Harmony is an agent-first, system-governed methodology for cross-project execution with practical solo-builder ergonomics. It pairs spec-led intent capture, context-efficient planning, autonomous AI execution loops, and risk-tiered ACP governance while staying stack-, host-, and environment-agnostic. Harmony aligns with OWASP ASVS, NIST SSDF, and STRIDE, and adopts architectural principles from 12‑Factor, Monolith‑First, and Hexagonal—so you can ship fast, ship safe, and ship with confidence. For the full methodology and lifecycle overview, see .harmony/cognition/practices/methodology/README.md
 
 This platform maps directly to Harmony. Use the services as ready‑to‑run building blocks with AI‑driven quality, security, and reliability built in.
 
@@ -198,44 +198,43 @@ This platform maps directly to Harmony. Use the services as ready‑to‑run bui
 
 Harmony alignment notes are called out inline below in the relevant services.
 
-Alignment stamp (2025‑11‑07): PASS — AI Services Platform covers all four Harmony pillars and every lifecycle stage. This revision clarifies Next.js bundling/security guidance and UI collaboration patterns; see "Pillars Coverage Matrix" and "Lifecycle Alignment Map" for systemic coverage.
+Alignment stamp (2025‑11‑07): PASS — AI Services Platform covers all six Harmony pillars and every lifecycle stage. This revision clarifies Next.js bundling/security guidance and UI collaboration patterns; see "Pillars Coverage Matrix" and "Lifecycle Alignment Map" for systemic coverage.
 
 ---
 
 ## System Coherence: Harmony's Pillars Implemented by the AI Services Platform
 
-The AI Services Platform is designed as a cohesive, self-reinforcing system aligned to Harmony's five pillars. Each pillar is made concrete by specific services, artifacts, and gates that create a closed-loop from Spec → Plan → Implement → Verify → Ship → Operate → Learn.
+The AI Services Platform is designed as a cohesive, self-reinforcing system aligned to Harmony's six pillars. Each pillar is made concrete by specific services, artifacts, and gates that create a closed-loop from Spec -> Plan -> Implement -> Verify -> Ship -> Operate -> Learn.
 
-- **Speed with Safety**
-  - Trunk-based flow with tiny PRs via **Patch** and **Vercel Previews**; controlled rollout via **Flag**.
-  - Fast, repeatable runs with **Cache** and minimal service interfaces; background tasks via **Schedule**.
-  - Release confidence and instant rollback: promote prior Preview; changes are always small, observable, and reversible.
-- **Simplicity over Complexity**
-  - Monolith-first (Turborepo) boundaries with clear ports/adapters; services expose small, predictable contracts.
-  - "One way to do it" discipline: standard service inputs/outputs, shared run records under `/runs`, single observability surface via **Observe**.
-  - Local-first by default; avoid new dependencies and prefer platform features unless SLOs/compliance demand otherwise.
-- **Quality through Determinism**
-  - Pinned AI config (provider/model/version/params) and low-variance defaults, plus **golden tests** via **Dataset** + **Eval**.
-  - **Policy** enforces ASVS/SSDF/STRIDE policies; **Test** covers contracts (OpenAPI/JSON‑Schema, Pact, Schemathesis).
-  - All runs traced (OTel) and explainable; every material output is verifiable and reproducible.
-- **Guided Agentic Autonomy**
-  - AI systems autonomously self‑build, self‑heal, and self‑tune within deterministic, observable, and reversible bounds—while humans retain ultimate authority, oversight, and accountability.
-  - Deterministic agent loops (Plan → Diff → Explain → Test) with ACP gates; no silent apply.
-  - Pinned AI config (provider/model/version/params) and stable prompt hash; golden tests guard outputs.
-  - Observability and provenance: OTel traces for runs; PRs include trace links and Eval/Policy outcomes.
- - **Evolvable Modularity**
-  - Hexagonal ports/adapters and service‑level contracts keep edges (models, providers, tools, runtimes) loosely coupled and hot‑swappable.
-  - Modular monolith defaults (Turborepo + Stack) and stable OpenAPI/JSON‑Schema contracts allow adopting new technologies as plug‑and‑play adapters instead of rewrites.
+- **Direction through Validated Discovery**
+  - Spec and Plan services anchor intent before implementation.
+  - Policy and contract checks prevent ambiguous scope from entering execution.
+- **Focus through Absorbed Complexity**
+  - Monolith-first boundaries, typed contracts, and service defaults absorb incidental complexity.
+  - Complexity Calibration keeps architecture at minimal sufficient complexity.
+- **Velocity through Agentic Automation**
+  - Patch, Release, Cache, and Schedule compress cycle time with deterministic automation.
+  - Small PRs, previews, and rapid feedback keep throughput high.
+- **Trust through Governed Determinism**
+  - Pinned model/runtime settings, policy gates, and deterministic tests enforce predictable behavior.
+  - OTel traces, receipts, and typed failures preserve operational confidence.
+- **Continuity through Institutional Memory**
+  - Run artifacts, manifests, and compliance packs preserve decision and execution lineage.
+  - Shared contracts and evidence surfaces keep context durable across sessions.
+- **Insight through Structured Learning**
+  - Eval signals, regressions, and postmortem-ready evidence convert outcomes into improvements.
+  - Metrics and deviations guide targeted hardening in subsequent cycles.
 
 ### Pillars Coverage Matrix (Services ↔ Pillars)
 
 | Pillar | Primary Services | Reinforcement Mechanisms |
 | --- | --- | --- |
-| Speed with Safety | Patch, Flag, Cache, Schedule, Observe | Tiny PRs with previews; progressive rollout via flags; cached/idempotent runs; scheduled non-blocking tasks; traces tie changes to outcomes |
-| Simplicity over Complexity | Stack, Scaffold, Tool, Cache | Monolith-first boundaries with clear ports/adapters; minimal, predictable service interfaces; reuse via small wrappers; memoization to avoid recomputation |
-| Quality through Determinism | Eval, Policy, Test, Compliance, Observe | Contract tests, policy gates, schema-guarded outputs, evidence packs; OTel spans/logs for explainability and postmortems |
-| Guided Agentic Autonomy | Agent, Guard, Policy, Eval, Observe, Patch/Notify (ACP) | Deterministic agent loops (Plan → Diff → Explain → Test); pinned AI config + prompt hash; golden tests; ACP gates; traces/provenance; fail‑closed governance; no silent apply |
-| Evolvable Modularity | Stack, Tool, Agent, adapters across services | Hexagonal ports/adapters and stable contracts make databases, models, providers, and surfaces plug‑and‑play; new capabilities can be added or retired without destabilizing core flows |
+| Direction through Validated Discovery | Spec, Plan, Policy | Spec-first intent capture, explicit contracts, and early policy validation before implementation |
+| Focus through Absorbed Complexity | Stack, Scaffold, Tool, Cache | Monolith-first boundaries, predictable interfaces, and complexity-calibrated defaults |
+| Velocity through Agentic Automation | Agent, Patch, Release, Schedule | Automated execution loops, tiny PR cadence, and fast promotion/rollback paths |
+| Trust through Governed Determinism | Eval, Policy, Test, Observe, Compliance | Deterministic settings, fail-closed policy gates, contract tests, and traceable evidence |
+| Continuity through Institutional Memory | Observe, Compliance, Parse, Cache | Durable run artifacts, manifests, and cross-run context preservation |
+| Insight through Structured Learning | Eval, Observe, Compliance | Regression evidence, telemetry trends, and postmortem-ready outputs for improvement loops |
 
 Note: Each service declares the pillar(s) it reinforces in its metadata and run records. This ensures systemic coherence and enables policy- and evidence-driven adoption.
 
@@ -247,20 +246,20 @@ This catalog clarifies how the essential services reinforce Harmony's pillars an
 
 | Service | Pillars | Lifecycle | Required Spans (minimum) |
 | --- | --- | --- | --- |
-| Spec | simplicity_over_complexity, quality_through_determinism | spec | `service.spec.specify` |
-| Plan | speed_with_safety, quality_through_determinism | plan | `service.plan.plan` |
-| Agent | speed_with_safety, guided_agentic_autonomy | implement | `service.agent.execute` |
-| Tool | speed_with_safety, simplicity_over_complexity | implement | `service.tool.call.<action>` |
-| Eval | quality_through_determinism | verify | `service.eval.verify` |
-| Policy | quality_through_determinism | spec·plan·verify·ship | `service.policy.check` |
-| Test | quality_through_determinism | verify | `service.test.run` |
-| Patch | speed_with_safety | ship | `service.patch.open_pr` |
-| Release | speed_with_safety | ship | `service.release.tag` |
-| Flag | speed_with_safety | ship·operate | `service.flag.evaluate`, `service.flag.toggle` |
-| Observe | quality_through_determinism | all | `service.observe.flush` + required attributes |
-| Compliance | quality_through_determinism | verify·ship·learn | `service.compliance.assemble` |
-| Cache | speed_with_safety, simplicity_over_complexity | implement | `service.cache.hit`, `service.cache.miss` |
-| Parse | simplicity_over_complexity, speed_with_safety | implement | `service.parse.run` |
+| Spec | focus_through_absorbed_complexity, trust_through_governed_determinism | spec | `service.spec.specify` |
+| Plan | velocity_through_agentic_automation, trust_through_governed_determinism | plan | `service.plan.plan` |
+| Agent | velocity_through_agentic_automation, direction_through_validated_discovery | implement | `service.agent.execute` |
+| Tool | velocity_through_agentic_automation, focus_through_absorbed_complexity | implement | `service.tool.call.<action>` |
+| Eval | trust_through_governed_determinism | verify | `service.eval.verify` |
+| Policy | trust_through_governed_determinism | spec·plan·verify·ship | `service.policy.check` |
+| Test | trust_through_governed_determinism | verify | `service.test.run` |
+| Patch | velocity_through_agentic_automation | ship | `service.patch.open_pr` |
+| Release | velocity_through_agentic_automation | ship | `service.release.tag` |
+| Flag | velocity_through_agentic_automation | ship·operate | `service.flag.evaluate`, `service.flag.toggle` |
+| Observe | trust_through_governed_determinism | all | `service.observe.flush` + required attributes |
+| Compliance | trust_through_governed_determinism | verify·ship·learn | `service.compliance.assemble` |
+| Cache | velocity_through_agentic_automation, focus_through_absorbed_complexity | implement | `service.cache.hit`, `service.cache.miss` |
+| Parse | focus_through_absorbed_complexity, velocity_through_agentic_automation | implement | `service.parse.run` |
 
 Notes:
 
@@ -967,10 +966,10 @@ Define service‑level metadata to make responsibilities, governance, and observ
     "pillars": {
       "type": "array",
       "items": { "enum": [
-        "speed_with_safety",
-        "simplicity_over_complexity",
-        "quality_through_determinism",
-        "guided_agentic_autonomy"
+        "velocity_through_agentic_automation",
+        "focus_through_absorbed_complexity",
+        "trust_through_governed_determinism",
+        "direction_through_validated_discovery"
       ]}
     },
     "lifecycleStages": {
@@ -1053,7 +1052,7 @@ Example metadata:
 {
   "name": "plan",
   "version": "0.2.0",
-  "pillars": ["speed_with_safety", "quality_through_determinism"],
+  "pillars": ["velocity_through_agentic_automation", "trust_through_governed_determinism"],
   "lifecycleStages": ["plan", "implement"],
   "inputsSchema": "schema/plan.inputs.json",
   "outputsSchema": "schema/plan.outputs.json",

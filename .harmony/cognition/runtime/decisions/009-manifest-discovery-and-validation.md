@@ -11,6 +11,12 @@ mutability: append-only
 
 Accepted
 
+## Superseding Links (Framing Terminology)
+
+- Superseded by: `040-principles-charter-successor-v2026-02-24.md`
+- Canonical principle: `/.harmony/cognition/governance/principles/complexity-calibration.md`
+- Scope of supersession: legacy principle label only; manifest/validation decisions remain accepted.
+
 ## Context
 
 The skills system needed improvements in three areas:

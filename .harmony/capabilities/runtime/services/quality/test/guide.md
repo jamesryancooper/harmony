@@ -2,7 +2,7 @@
 
 - **Purpose:** Enforce UI/E2E, API contract, and fuzz tests as CI gates, adding governed contract enforcement to Harmony.
 - **Responsibilities:** authoring UI/E2E flows (Playwright), validating consumer/provider contracts (Pact), fuzzing OpenAPI endpoints (Schemathesis), running unit/integration suites, emitting reports/status checks.
-- **Harmony alignment:** advances consistent contracts and safe trunk-based flow by gating PRs with deterministic tests; aligns with AI-native, human-governed gates for hexagonal boundaries.
+- **Harmony alignment:** advances consistent contracts and safe trunk-based flow by gating PRs with deterministic tests; aligns with agent-first, system-governed gates for hexagonal boundaries.
 - **Integrates with:** Agent (executes checks), Dev (emits stubs), A11y (piggybacks UI flows), Seed (fixtures).
 - **I/O:** reads `tests/**`, `openapi.*`, `pact/*.json`; emits JUnit/HTML reports and PR status checks.
 - **Wins:** Prevents regressions at boundaries; stabilizes critical flows for fast, safe merges.

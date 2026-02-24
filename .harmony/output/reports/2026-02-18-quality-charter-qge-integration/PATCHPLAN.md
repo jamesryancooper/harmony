@@ -2,7 +2,7 @@
 
 ## Scope
 
-Integrate the Quality Charter as a first-class, enforced input in the Quality Governance Engine (QGE) rooted at `/Users/jamesryancooper/Projects/harmony/.harmony/quality/`.
+Integrate the Assurance Charter as a first-class, enforced input in the Assurance Engine (historical alias: `QGE`) rooted at `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/`.
 
 ## Incremental Plan
 
@@ -11,14 +11,14 @@ Integrate the Quality Charter as a first-class, enforced input in the Quality Go
 - Keep precedence unchanged: `global -> run-mode -> subsystem -> maturity -> repo`.
 - Keep two-file policy/measurement model (`weights.yml` + `scores.yml`).
 
-1. Canonicalize Charter under QGE root
+1. Canonicalize Charter under Assurance governance root
 
-- Add `/Users/jamesryancooper/Projects/harmony/.harmony/quality/CHARTER.md`.
-- Update `/Users/jamesryancooper/Projects/harmony/.harmony/quality/README.md` with Charter-first QGE flow.
+- Add `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/CHARTER.md`.
+- Update `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/README.md` with Charter-first Assurance Engine flow.
 
 1. Make Charter machine-verifiable from policy
 
-- Add `charter` contract block in `/Users/jamesryancooper/Projects/harmony/.harmony/quality/weights/weights.yml`:
+- Add `charter` contract block in `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/weights/weights.yml`:
   - `ref`, `version`, `priority_chain`, `tie_break_rule`, `tradeoff_rules`, `required_references`, `attribute_outcome_map`.
 - Bump weights version and add changelog entry with ADR + `charter_ref`.
 
@@ -55,21 +55,21 @@ Integrate the Quality Charter as a first-class, enforced input in the Quality Go
 ## Completion Audit
 
 - [x] Baseline semantics preserved (precedence unchanged; two-file model retained).
-  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/runtime/crates/quality_tools/src/main.rs` (`build_effective_weights` applies `global -> run-mode -> subsystem -> maturity -> repo`).
-- [x] Charter canonicalized at QGE root and linked from QGE entrypoint.
-  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/CHARTER.md`, `/Users/jamesryancooper/Projects/harmony/.harmony/quality/README.md`.
+  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/engine/runtime/crates/assurance_tools/src/main.rs` (`build_effective_weights` applies `global -> run-mode -> subsystem -> maturity -> repo`).
+- [x] Charter canonicalized at Assurance governance root and linked from the Assurance Engine entrypoint.
+  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/CHARTER.md`, `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/README.md`.
 - [x] Charter contract made machine-verifiable in policy with governed changelog metadata.
-  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/weights/weights.yml` (`charter` block, `meta.version=1.3.0`, changelog entry with `adr` + `charter_ref`).
+  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/weights/weights.yml` (`charter` block, `meta.version=1.3.0`, changelog entry with `adr` + `charter_ref`).
 - [x] Resolver wired to load/validate Charter and emit charter-aware outputs.
-  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/runtime/crates/quality_tools/src/main.rs` (`parse_charter_spec`, `parse_charter_doc`, `validate_charter_alignment`, charter sections in effective/results renderers).
+  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/engine/runtime/crates/assurance_tools/src/main.rs` (`parse_charter_spec`, `parse_charter_doc`, `validate_charter_alignment`, charter sections in effective/results renderers).
 - [x] Deterministic Charter tie-break behavior implemented for top drivers.
-  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/runtime/crates/quality_tools/src/main.rs` (`charter_rank` sort tie-break, `detect_tie_break_resolutions`).
+  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/engine/runtime/crates/assurance_tools/src/main.rs` (`charter_rank` sort tie-break, `detect_tie_break_resolutions`).
 - [x] Gate enforcement extended with Charter hard-fail and warn checks.
-  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/runtime/crates/quality_tools/src/main.rs` (missing charter, contract drift, changelog/ADR/charter_ref checks, tie-break warnings, charter-priority override warning).
+  - Evidence: `/Users/jamesryancooper/Projects/harmony/.harmony/engine/runtime/crates/assurance_tools/src/main.rs` (missing charter, contract drift, changelog/ADR/charter_ref checks, tie-break warnings, charter-priority override warning).
 - [x] CI/local migration wired for Charter baselines and args.
-  - Evidence: `/Users/jamesryancooper/Projects/harmony/.github/workflows/quality-weight-gates.yml`, `/Users/jamesryancooper/Projects/harmony/.harmony/quality/_ops/scripts/alignment-check.sh`.
+  - Evidence: `/Users/jamesryancooper/Projects/harmony/.github/workflows/assurance-weight-gates.yml`, `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/runtime/_ops/scripts/alignment-check.sh`.
 - [x] Local strict validation completed successfully.
-  - Evidence: `compute-quality-score.sh` + `quality-gate.sh --strict-warnings` run with baselines: `status: PASS`, `hard-findings: 0`, `warn-findings: 0`.
+  - Evidence: `compute-assurance-score.sh` + `assurance-gate.sh --strict-warnings` run with baselines: `status: PASS`, `hard-findings: 0`, `warn-findings: 0`.
 - [ ] First PR workflow observation (operational follow-up).
   - Status: pending external PR event.
-  - Scope: confirm `quality-weight-gates` runs with repo baseline files in GitHub Actions and produces expected PASS/WARN/FAIL behavior.
+  - Scope: confirm `assurance-weight-gates` runs with repo baseline files in GitHub Actions and produces expected PASS/WARN/FAIL behavior.

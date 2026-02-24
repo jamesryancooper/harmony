@@ -329,7 +329,7 @@ Together these pillars create a self-reinforcing system: Direction ensures we bu
 | HARMONY-SPEC-003 | Progressive-Disclosure Discovery | Routable capabilities use manifest -> registry -> definition |
 | HARMONY-SPEC-004 | Deny-by-Default Permissions | Agent access is allowlist-based and fail-closed |
 | HARMONY-SPEC-005 | No Silent Apply for Material Side Effects | Material side effects require ACP policy approval |
-| HARMONY-SPEC-006 | Risk-Tiered Human Governance | Approval intensity scales with risk tier |
+| HARMONY-SPEC-006 | Risk-Tiered System Governance | Approval intensity scales with risk tier |
 | HARMONY-SPEC-007 | Continuity Artifact Integrity | Append-only artifacts preserve historical integrity |
 | HARMONY-SPEC-008 | Completion and Exit Quality Gates | Tasks must satisfy definition-of-done and session-exit gates |
 | HARMONY-SPEC-009 | Human-Led Ideation Boundaries | `ideation/**` is human-led; autonomous access prohibited |
@@ -339,7 +339,7 @@ Together these pillars create a self-reinforcing system: Direction ensures we bu
 | HARMONY-SPEC-201 | Capabilities Contract Boundary | Capabilities preserves the four-part taxonomy and interaction model |
 | HARMONY-SPEC-301 | Orchestration Contract Boundary | Orchestration preserves workflow and mission boundaries |
 | HARMONY-SPEC-501 | Continuity Contract Boundary | Continuity preserves session-state through explicit artifacts |
-| HARMONY-SPEC-601 | Quality Contract Boundary | Quality preserves completion and exit contracts as enforceable gates |
+| HARMONY-SPEC-601 | Assurance Contract Boundary | Assurance preserves completion and exit contracts as enforceable gates |
 | HARMONY-SPEC-701 | Ideation Contract Boundary | Ideation remains human-led and separate from autonomous execution |
 | HARMONY-SPEC-801 | Output Contract Boundary | Output used for generated artifacts, separated from source and policy |
 
@@ -350,7 +350,7 @@ Together these pillars create a self-reinforcing system: Direction ensures we bu
 | Principle | Summary |
 |---|---|
 | Progressive Disclosure | Layer context from concise to deep to preserve focus |
-| Simplicity Over Complexity | Prefer minimal viable solutions; add complexity only with evidence |
+| Complexity Calibration | Favor minimal sufficient complexity; add complexity only when justified by constraints |
 | Single Source of Truth | Keep each core fact/contract authoritative in one place |
 | Locality | Keep context and ownership near the work surface |
 | Deny by Default | Deny dangerous actions unless explicitly permitted |

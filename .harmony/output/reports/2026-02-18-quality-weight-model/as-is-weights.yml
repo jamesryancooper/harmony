@@ -76,7 +76,7 @@ evidence:
     - .harmony/cognition/principles/portability-and-independence.md
   functional_suitability:
     - .harmony/cognition/principles/contract-first.md
-    - .harmony/quality/_ops/scripts/validate-harness-structure.sh
+    - .harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh
   completeness:
     - .github/workflows/pr-quality.yml
     - .harmony/cognition/principles/observability-as-a-contract.md
@@ -86,7 +86,7 @@ evidence:
     - .harmony/cognition/principles/observability-as-a-contract.md
     - .harmony/cognition/methodology/ci-cd-quality-gates.md
   testability:
-    - .harmony/quality/testing-strategy.md
+    - .harmony/assurance/testing-strategy.md
     - .github/workflows/filesystem-interfaces-runtime.yml
   auditability:
     - .harmony/cognition/principles/determinism.md

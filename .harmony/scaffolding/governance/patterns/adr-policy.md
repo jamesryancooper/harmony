@@ -16,12 +16,13 @@ Status: Draft stub (adopt templates and numbering)
 
 ## Pillars Alignment
 
-- Speed with Safety: Favor lightweight ADRs to document decisions quickly and make changes reversible. Keep decisions linked to flags and rollback notes so promotion/rollback remains safe and fast.
-- Simplicity over Complexity: Default to concise ADRs that record only context, decision, and consequences. Avoid ceremony; escalate to full ADRs only for high‑risk changes.
-- Quality through Determinism: Require provenance (PR/build/trace IDs) and consistent numbering so decisions are auditable and reproducible across environments.
-- Guided Agentic Autonomy: Allow agents to draft ADR summaries and diffs, but require ACP gate. Record pinned AI configuration and link ObservaKit traces for runs that influenced the ADR.
+- Direction through Validated Discovery: ADRs make consequential decisions explicit before implementation drift can spread.
+- Focus through Absorbed Complexity: Keep ADRs concise by default and escalate depth only when risk or scope requires it.
+- Velocity through Agentic Automation: Lightweight ADR templates preserve delivery speed while keeping changes reviewable and reversible.
+- Trust through Governed Determinism: Require provenance (PR/build/trace IDs), consistent numbering, and ACP-compatible evidence linkage.
+- Continuity through Institutional Memory and Insight through Structured Learning: ADRs preserve durable decision memory and provide structured inputs for future improvement.
 
-See `.harmony/cognition/practices/methodology/README.md` for Harmony’s five pillars.
+See `.harmony/cognition/practices/methodology/README.md` for Harmony's six pillars.
 
 ## When to write an ADR
 

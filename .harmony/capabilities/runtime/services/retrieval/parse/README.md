@@ -21,7 +21,7 @@ Convert PDFs into clean, reviewable Markdown using Docling, with an optional tin
 
 ## Harmony Alignment
 
-- Pillars: simplicity_over_complexity, speed_with_safety, quality_through_determinism.
+- Pillars: focus_through_absorbed_complexity, velocity_through_agentic_automation, trust_through_governed_determinism.
 - Lifecycle stage: implement (feeds docs/ingest/index flows).
 - Invariants:
   - Determinism: stable inputs → stable outputs; run record includes one‑line JSON summary.

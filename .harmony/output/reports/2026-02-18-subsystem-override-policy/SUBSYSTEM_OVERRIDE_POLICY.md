@@ -6,7 +6,7 @@ Ensure repo-level overrides that alter subsystem-provided quality weights are ex
 
 `global -> run-mode -> subsystem -> maturity -> repo` (later wins).
 
-The policy introduces governance around repo overrides; it does not alter how effective weights are computed.
+The policy introduces governance around repo overrides; it does not alter how effective weights are computed by the Assurance Engine.
 
 ## Non-goals
 
@@ -18,13 +18,13 @@ The policy introduces governance around repo overrides; it does not alter how ef
 
 - **Override**: A value set at `weights.profiles.<profile>.weights.repo.<repo_id>.<attribute>`.
 - **Deviation**: A repo override that changes a subsystem-provided weight for a specific context (profile/run-mode/maturity/repo/subsystem).
-- **Control-plane subsystem**: High-governance surfaces (`runtime`, `quality`, `continuity`, `agency`) where override drift can compromise trust/safety.
+- **Control-plane subsystem**: High-governance surfaces (`runtime`, `assurance`, `continuity`, `agency`) where override drift can compromise trust/safety.
 - **Productivity subsystem**: Lower-blast-radius surfaces focused on ergonomics and throughput (`scaffolding`, `output`, `ideation`, `capabilities`, `orchestration`, `cognition`).
 - **Permitted reasons**: `regulated`, `incident-response`, `experimental`, `performance`, `security`, `reliability`, `portability`, `developer-experience`, `compatibility`, `governance`.
 
 ## Required Artifacts For A Deviation
 
-A declared deviation record in `/Users/jamesryancooper/Projects/harmony/.harmony/quality/policy/overrides.yml` with:
+A declared deviation record in `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/overrides.yml` with:
 
 - target: `repo`, `profile` (optional), `subsystem`, `attribute`
 - value delta: `old_value`, `new_value`
@@ -84,3 +84,4 @@ Without explicit deviation records, repo-level weight nudges can silently neutra
 - Productivity override without declaration: warn.
 - Productivity large-change missing ADR: hard fail (active in Phase 2).
 - Weights policy changes must include version bump, changelog entry, and deviation capture for changed repo overrides.
+- Umbrella chain alignment must preserve the active charter order: `Assurance > Productivity > Integration`.

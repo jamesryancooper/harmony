@@ -182,7 +182,7 @@ Need examples? → Read references/ (on demand)
 
 | Principle | Relationship |
 |-----------|--------------|
-| Simplicity Over Complexity | Progressive disclosure enables simplicity by hiding complexity until needed |
+| Complexity Calibration | Progressive disclosure keeps complexity proportional by loading only what the task requires |
 | Single Source of Truth | Each tier references the same source, not duplicates at different detail levels |
 | Documentation is Code | Tier structure is enforced, not aspirational |
 

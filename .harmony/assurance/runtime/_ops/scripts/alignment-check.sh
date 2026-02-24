@@ -30,6 +30,7 @@ list_profiles() {
 Profiles:
   commit-pr   Commit and PR standards alignment checks
   harness     .harmony architecture and drift guardrail checks
+  framing     Canonical framing drift checks
   agency      Agency contract and registry checks
   workflows   Workflow manifest/registry/path contract checks
   skills      Skill contract and drift checks (strict mode)
@@ -97,6 +98,16 @@ run_harness() {
   run_step \
     "Validate bounded-audit convergence contract" \
     bash "$SCRIPT_DIR/validate-audit-convergence-contract.sh"
+
+  run_step \
+    "Validate canonical framing alignment" \
+    bash "$SCRIPT_DIR/validate-framing-alignment.sh"
+}
+
+run_framing() {
+  run_step \
+    "Validate canonical framing alignment" \
+    bash "$SCRIPT_DIR/validate-framing-alignment.sh"
 }
 
 run_agency() {
@@ -165,6 +176,7 @@ run_profile() {
   case "$profile" in
     commit-pr) run_commit_pr ;;
     harness) run_harness ;;
+    framing) run_framing ;;
     agency) run_agency ;;
     workflows) run_workflows ;;
     skills) run_skills ;;

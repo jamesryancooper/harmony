@@ -85,7 +85,7 @@ No legacy chain compatibility is provided in this release.
 5. Validate no old-chain strings remain:
 
 ```bash
-rg -n "Trust > Speed of development > Ease of use > Portability > Interoperability|QGE|Quality Governance Engine" .harmony .github
+rg -n "Trust > Speed of development > Ease of use > Portability > Interoperability|QGE|legacy QGE label" .harmony .github
 ```
 
 ## Doc Acceptance Criteria

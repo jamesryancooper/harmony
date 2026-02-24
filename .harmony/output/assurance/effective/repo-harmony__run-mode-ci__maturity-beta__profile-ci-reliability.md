@@ -41,7 +41,7 @@ Priority ties were resolved using the umbrella chain (higher-ranked umbrellas wi
 | `Safety` (`safety`) | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
 | `Autonomy` (`autonomy`) | 5 | 4 | 4 | 4 | 4 | 1 | 5 | 4 | 4 | 4 |
 | `Security` (`security`) | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
-| `Simplicity` (`simplicity`) | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
+| `Complexity Calibration` (`complexity_calibration`) | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
 | `Evolvability` (`evolvability`) | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 | 4 |
 | `Long-term Maintainability` (`maintainability`) | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
 | `Portability` (`portability`) | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 |

@@ -246,7 +246,7 @@ Missions inherit locality principles:
 |-----------|--------------|
 | Progressive Disclosure | Locality scopes what's disclosed; disclosure layers what's loaded |
 | Single Source of Truth | Local harnesses reference shared sources, not duplicate them |
-| Simplicity Over Complexity | Locality reduces complexity by scoping context |
+| Complexity Calibration | Locality reduces complexity by scoping context proportionally to actual work |
 | Deny-by-Default | Scope boundaries enforce access control |
 
 ## When to Create a Harness

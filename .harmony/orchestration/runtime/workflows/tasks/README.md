@@ -1,6 +1,6 @@
 # Task Workflows
 
-This directory contains single-file, human-invoked task workflows migrated from `.harmony/orchestration/runtime/workflows/tasks/`.
+This directory contains single-file, agent-invoked task workflows migrated from `.harmony/orchestration/runtime/workflows/tasks/`.
 
 ## Workflows
 

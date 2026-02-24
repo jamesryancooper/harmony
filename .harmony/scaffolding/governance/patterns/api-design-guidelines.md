@@ -16,12 +16,13 @@ Status: Draft stub (confirm defaults and envelopes)
 
 ## Pillars Alignment
 
-- Speed with Safety: Contract‑first APIs enable rapid, reversible iterations; idempotency keys make retries safe and predictable during deploys and rollbacks.
-- Simplicity over Complexity: A single repo‑wide approach to pagination, error envelopes, timeouts, and retries reduces cognitive load and integration friction.
-- Quality through Determinism: OpenAPI/JSON Schema validated in CI, plus Pact and Schemathesis, prevent drift and enforce backwards compatibility.
-- Guided Agentic Autonomy: Machine‑checkable contracts allow agents to propose diffs and generate tests; humans approve. Pin AI configs and link ObservaKit traces for agent‑assisted changes.
+- Direction through Validated Discovery: Contract-first APIs keep implementation aligned with validated intent.
+- Focus through Absorbed Complexity: Apply Complexity Calibration to keep pagination, errors, timeouts, and retries standardized and minimal sufficient.
+- Velocity through Agentic Automation: Stable contracts accelerate automated diff/test generation and safe iteration speed.
+- Trust through Governed Determinism: OpenAPI/JSON Schema validation, Pact, and Schemathesis enforce deterministic compatibility.
+- Continuity through Institutional Memory and Insight through Structured Learning: Explicit API contracts and test evidence preserve integration history and improve future design choices.
 
-See `.harmony/cognition/practices/methodology/README.md` for Harmony’s five pillars.
+See `.harmony/cognition/practices/methodology/README.md` for Harmony's six pillars.
 
 ## Principles
 

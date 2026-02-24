@@ -12,7 +12,7 @@ This glossary defines key terms used throughout Harmony documentation.
 ## Core Concepts
 
 ### Harmony
-The methodology itself—an AI-native, human-governed approach where developers orchestrate AI agents to build enterprise-quality software.
+The methodology itself—an agent-first, system-governed approach where agents execute standardized contracts and workflows by default, and humans provide policy authorship, exceptions handling, and escalation authority.
 
 ### Spec (Specification)
 A structured document describing what you want to build. Includes problem statement, solution approach, contracts, and acceptance criteria. AI generates specs from your descriptions; you review and approve.

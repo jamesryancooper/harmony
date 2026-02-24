@@ -6,6 +6,11 @@ Accepted
 ## Date
 2026-02-18
 
+## Superseding Links (Historical Terminology)
+
+- Superseded by: `040-principles-charter-successor-v2026-02-24.md`
+- Scope of supersession: legacy path-token references only; migration decision remains accepted.
+
 ## Context
 
 Harmony's legitimacy layer evolved from `quality` checks to a broader

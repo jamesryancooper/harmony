@@ -1,6 +1,6 @@
 meta:
-  version: "2.0.0"
-  updated_at: "2026-02-19"
+  version: "2.1.0"
+  updated_at: "2026-02-24"
   owner: "harmony-platform"
   status: "active"
   schema_version: "2"
@@ -8,7 +8,7 @@ meta:
 
 charter:
   ref: ".harmony/assurance/governance/CHARTER.md"
-  version: "2.0.0"
+  version: "2.1.0"
   priority_chain:
     - id: assurance
       name: Assurance
@@ -37,7 +37,7 @@ charter:
     safety: assurance
     autonomy: productivity
     security: assurance
-    simplicity: productivity
+    complexity_calibration: productivity
     evolvability: productivity
     maintainability: productivity
     portability: integration
@@ -76,8 +76,8 @@ attributes:
     name: Autonomy
   - id: security
     name: Security
-  - id: simplicity
-    name: Simplicity
+  - id: complexity_calibration
+    name: Complexity Calibration
   - id: evolvability
     name: Evolvability
   - id: maintainability
@@ -141,7 +141,7 @@ profiles:
         safety: 5
         autonomy: 4
         security: 5
-        simplicity: 5
+        complexity_calibration: 5
         evolvability: 4
         maintainability: 5
         portability: 5
@@ -162,7 +162,7 @@ profiles:
         local:
           autonomy: 3
           usability: 5
-          simplicity: 5
+          complexity_calibration: 5
           auditability: 3
         ci:
           autonomy: 4
@@ -197,7 +197,7 @@ profiles:
           observability: 5
           auditability: 5
         scaffolding:
-          simplicity: 5
+          complexity_calibration: 5
           portability: 5
           usability: 4
         ideation:
@@ -206,7 +206,7 @@ profiles:
         prototype:
           autonomy: 3
           usability: 5
-          simplicity: 5
+          complexity_calibration: 5
           availability: 3
           deployability: 3
           auditability: 3
@@ -239,7 +239,7 @@ profiles:
       repo:
         harmony:
           portability: 5
-          simplicity: 5
+          complexity_calibration: 5
           auditability: 5
 
   ci-reliability:
@@ -265,7 +265,7 @@ profiles:
       global:
         autonomy: 3
         performance: 4
-        simplicity: 5
+        complexity_calibration: 5
         usability: 5
         portability: 5
         auditability: 3
@@ -302,6 +302,12 @@ guardrails:
     min_release_cycles_before_removal: 2
 
 changelog:
+  - date: "2026-02-24"
+    version: "2.1.0"
+    change: "Renamed legacy managed-complexity attribute id to complexity_calibration and aligned policy weights to managed-complexity framing."
+    rationale: "Align assurance policy contracts with canonical Complexity Calibration and Complexity Fitness language."
+    adr: ".harmony/cognition/runtime/decisions/040-principles-charter-successor-v2026-02-24.md"
+    charter_ref: ".harmony/assurance/governance/CHARTER.md"
   - date: "2026-02-19"
     version: "2.0.0"
     change: "Breaking migration to umbrella priority chain (Assurance > Productivity > Integration) with canonical attribute_umbrella_map."

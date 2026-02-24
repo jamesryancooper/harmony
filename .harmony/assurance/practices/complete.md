@@ -10,6 +10,7 @@ description: Assurance criteria and completion checklist for harness tasks.
 - [ ] Output matches task requirements
 - [ ] Stayed within `scope.md` boundaries
 - [ ] Follows `conventions.md` style rules
+- [ ] Framing-complete checks passed (for framing-sensitive changes)
 - [ ] Native-first rule preserved (core behavior works with zero adapters)
 - [ ] Updated `continuity/log.md` with session summary
 - [ ] Updated `continuity/tasks.json` status
@@ -55,6 +56,7 @@ description: Assurance criteria and completion checklist for harness tasks.
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-convergence-contract.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness` passes
+- [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-framing-alignment.sh` passes
 - [ ] `audit-pre-release-workflow` workflow executed (or explicit rationale recorded for not running it)
 - [ ] Contract coverage report exists at `.harmony/output/assurance/results/contract-coverage-latest.md`
 

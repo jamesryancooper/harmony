@@ -61,7 +61,7 @@ autonomy.
 * **Autonomy**
 * **Performance**
 * **Scalability**
-* **Simplicity**
+* **Complexity Calibration**
 * **Evolvability**
 * **Maintainability**
 * **Completeness**

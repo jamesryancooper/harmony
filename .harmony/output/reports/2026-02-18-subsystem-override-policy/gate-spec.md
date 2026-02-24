@@ -2,10 +2,10 @@
 
 ## Inputs
 
-- Weights: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/weights/weights.yml`
+- Weights: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/weights/weights.yml`
 - Scorecard context (`profile`, `repo`, `run_mode`, `maturity`)
-- Subsystem classes: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/policy/subsystem-classes.yml`
-- Override declarations: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/policy/overrides.yml`
+- Subsystem classes: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/subsystem-classes.yml`
+- Override declarations: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/overrides.yml`
 - Optional baseline weights for policy drift checks
 
 ## Hard Fail Checks

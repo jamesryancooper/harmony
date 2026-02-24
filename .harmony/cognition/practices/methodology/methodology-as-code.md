@@ -298,13 +298,13 @@ if (result.warnings?.length) {
 
 ### Updating from Methodology v0.1 to v0.2
 
-1. Ensure all five pillars are recognized
-2. Add `evolvable_modularity` to pillar lists where applicable
+1. Ensure all six pillars are recognized
+2. Use canonical pillar identifiers: `direction`, `focus`, `velocity`, `trust`, `continuity`, `insight`
 3. Update lifecycle stage references if any custom stages were used
 
 ## Related Documents
 
-- [Harmony Principles](../../governance/principles/README.md) — The five pillars
+- [Harmony Principles](../../governance/principles/README.md) — The six pillars
 - [Methodology Overview](./README.md) — Full methodology description
 - [Kits Reference](/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md) — Validation utilities and service entrypoints
 - [Kits README](/.harmony/capabilities/runtime/services/_meta/docs/kits-reference.md) — Kit architecture overview

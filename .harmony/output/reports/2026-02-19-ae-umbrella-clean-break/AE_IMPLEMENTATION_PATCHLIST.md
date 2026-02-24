@@ -182,7 +182,7 @@ Change:
 Command (dry-run first):
 
 ```bash
-rg -n "QGE|Quality Governance Engine" .harmony .github
+rg -n "QGE|legacy QGE label" .harmony .github
 ```
 
 Required updates:

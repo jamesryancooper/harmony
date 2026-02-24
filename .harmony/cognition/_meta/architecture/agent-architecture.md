@@ -11,7 +11,7 @@ This document defines the **target architecture** for Harmony agents—how they 
 
 It is intentionally **spec‑first and forward‑looking** and should be treated as **normative** over any older references to agents or runtimes in this folder. It aligns with:
 
-- The **Harmony Methodology** (Spec‑First, Quality through Determinism, Guided Agentic Autonomy).
+- The **Harmony Methodology** (Spec‑First, Trust through Governed Determinism, Agent-First System Governance).
 - The **Harmony Structural Paradigm (HSP)** and polyglot layout.
 - The **Kaizen subsystem** and **runtime policy** documents.
 
@@ -35,7 +35,7 @@ This page does **not** prescribe implementation details of specific kits (PlanKi
 Strengths:
 
 - **Spec‑first and contract‑first**: agents are described in terms of contracts, roles, and provenance.
-- **Guided Agentic Autonomy**: agents are explicitly governed by risk rubrics, ACP gates, and fail‑closed defaults.
+- **Agent-First System Governance**: agents are explicitly governed by risk rubrics, ACP gates, and fail‑closed defaults.
 - **Monolith‑first and hexagonal**: agents sit on top of a modular monolith with clear planes (apps, agents, packages, contracts, platform).
 - **Kaizen layer**: a cross‑cutting, evidence‑driven layer for continuous improvement is already modeled.
 
@@ -351,7 +351,7 @@ This checklist is the **single source of truth** for adding a new agent under th
 1. **Write the Agent Spec**
    - Create `packages/agents/src/specs/<agent-id>/spec.md` and (optionally) `spec.json`:
      - Define purpose, inputs/outputs, quality attributes, risk class, ACP gates, and surfaces that will call this agent.
-     - Align with Harmony’s **Spec‑First** and **Guided Agentic Autonomy** pillars.
+     - Align with Harmony’s **Spec‑First** and **Agent-First System Governance** pillars.
 2. **Define Contracts**
    - Add TypeScript types for input/output to `packages/agents/src/agent.types.ts` (or a dedicated types file).
    - If the agent is also exposed via HTTP:

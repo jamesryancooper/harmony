@@ -1,7 +1,7 @@
 # gate-spec
 
-QGE Charter-driven enforcement implemented in:
-`/Users/jamesryancooper/Projects/harmony/.harmony/runtime/crates/quality_tools/src/main.rs` (`gate` command).
+Assurance Engine charter-driven enforcement implemented in:
+`/Users/jamesryancooper/Projects/harmony/.harmony/engine/runtime/crates/assurance_tools/src/main.rs` (`gate` command).
 
 ## Hard Fail Checks
 
@@ -26,7 +26,7 @@ QGE Charter-driven enforcement implemented in:
 - Missing/invalid ADR reference.
 - Missing/mismatched `charter_ref` in changelog entry.
 
-5. Existing QGE hard gates retained
+5. Existing Assurance Engine hard gates retained
 - Missing criteria/evidence for high-weight attributes per mode/maturity.
 - Regressions beyond configured thresholds.
 - Missing ADR for unresolved `5 vs 5` conflicts.

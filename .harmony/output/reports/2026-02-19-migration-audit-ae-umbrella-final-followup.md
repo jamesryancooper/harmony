@@ -44,7 +44,7 @@ Mappings searched (11 total) across active migration scope:
 - `winner_outcome` -> `winner_umbrella`
 - `loser_outcome` -> `loser_umbrella`
 - `QGE` -> `AE`
-- `Quality Governance Engine` -> `Assurance Engine`
+- `legacy QGE label` -> `Assurance Engine`
 - `Trust-first` -> `Assurance-first`
 
 Results:

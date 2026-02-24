@@ -3,8 +3,8 @@
 ## Gate Inputs
 
 - Resolver artifact: `scorecard.yml`
-- Current policy: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/weights/weights.yml`
-- Current scores: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/scores/scores.yml`
+- Current policy: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/weights/weights.yml`
+- Current scores: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/scores/scores.yml`
 - Optional baseline policy/scores from base commit
 
 ## Hard-Fail Checks
@@ -15,7 +15,7 @@
 - Missing/empty changelog rationale.
 - Missing/invalid ADR reference.
 
-2. Mandatory quality checks (non-local modes)
+2. Mandatory assurance checks (non-local modes)
 - Missing acceptance criteria for effective weight 5 attributes.
 - Missing evidence for effective weight 5 attributes in `ci/release/prod-runtime`.
 - High-weight regressions beyond threshold:

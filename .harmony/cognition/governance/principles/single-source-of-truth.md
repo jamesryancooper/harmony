@@ -282,7 +282,7 @@ rules: {
 | Contract-first | Contracts are the single source; implementations derive |
 | Documentation is code | Code/schemas are source; docs derive |
 | Progressive Disclosure | Different views of same source at different depths |
-| Simplicity Over Complexity | SSOT reduces the complexity of keeping things in sync |
+| Complexity Calibration | SSOT keeps complexity intentional by eliminating duplicate sources and drift work |
 
 ## Exceptions
 

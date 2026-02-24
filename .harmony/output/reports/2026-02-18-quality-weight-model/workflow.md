@@ -1,11 +1,11 @@
 # Scoring Workflow, Regression Detection, and Enforcement
 
 ## 1. Engineer Workflow (Update + Score)
-1. Update subsystem measured scores in `.harmony/quality/weights/inputs/subsystem-scores.yml`.
+1. Update subsystem measured scores in `.harmony/assurance/governance/scores/scores.yml`.
 2. Include acceptance criteria and evidence refs per updated attribute.
 3. Select context (`run_mode`, `subsystem`, `maturity`, `repo`) in context input.
 4. Run score computation locally:
-   - `compute-quality-score --profile <id> --context <context.yml> --scores <subsystem-scores.yml>`
+   - `compute-assurance-score.sh --profile <id> --context <context.yml> --scores <scores.yml>`
 5. Review generated scorecard and top drivers.
 6. If any `5 vs 5` conflict was intentionally accepted, add ADR link.
 7. Commit score artifacts (or attach in CI output) for review.
@@ -18,7 +18,7 @@ For each run, publish:
 - `regressions.md` (threshold breaches and driver list)
 
 Suggested output path:
-- `.harmony/output/quality/scorecards/<YYYY-MM-DD>/<run-id>/`
+- `.harmony/output/assurance/scorecards/<YYYY-MM-DD>/<run-id>/`
 
 ## 3. Regression Detection Rules
 
@@ -82,7 +82,7 @@ Before pass:
 | critical | + DR drills + full threat model + compliance audit trail |
 
 ## 7. Publishing and Consumption
-1. CI publishes scorecard artifacts as build artifacts and (optionally) commits summary markdown under `.harmony/output/quality/scorecards/`.
+1. CI publishes scorecard artifacts as build artifacts and (optionally) commits summary markdown under `.harmony/output/assurance/scorecards/`.
 2. PR template includes “Quality Weight Delta” section linking current scorecard.
 3. Backlog automation consumes `top_drivers` from scorecard and opens/updates prioritized tasks.
 

@@ -20,7 +20,7 @@ Analyze the architecture and content of @.harmony/skills and @.workspace/skills 
 | **Progressive Disclosure** | Is the four-tier model (manifest → registry → SKILL.md → references) implemented correctly? Are token budgets respected (~50 tokens/manifest entry, <5000 tokens/SKILL.md)? |
 | **Single Source of Truth** | Is each piece of metadata defined in exactly one location? Are there any duplicate definitions that could drift? Is `allowed-tools` in SKILL.md the sole source for tool permissions? |
 | **Locality** | Does context live close to where it's needed? Is the two-tier architecture (shared `.harmony/` vs local `.workspace/`) correctly separating concerns? |
-| **Simplicity Over Complexity** | Are there unnecessary abstractions, configuration options, or indirection? Could anything be simpler without losing functionality? |
+| **Complexity Calibration** | Is complexity proportional to risk/scale/safety/performance/compliance constraints? Could structure be reduced while preserving robustness? |
 | **Deny by Default** | Are tool permissions explicit allowlists? Are output paths constrained to designated directories? |
 | **Determinism** | Will the same inputs produce the same routing decisions? Are there any sources of non-determinism in discovery or execution? |
 

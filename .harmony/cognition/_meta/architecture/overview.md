@@ -11,14 +11,14 @@ Related docs: [monorepo polyglot (normative)](./monorepo-polyglot.md), [reposito
 
 The Harmony Structural Paradigm (HSP) is the architectural blueprint for our Harmony-driven monorepo. It combines proven software patterns with an AI-guided, self-improvement loop while enforcing four non‑negotiable pillars:
 
-- Speed with Safety
-- Simplicity over Complexity
-- Quality through Determinism
-- Guided Agentic Autonomy
+- Velocity through Agentic Automation and Trust through Governed Determinism
+- Focus through Absorbed Complexity
+- Trust through Governed Determinism
+- Agent-First System Governance
 
 HSP is optimized for a small team (2 developers, scaling to ~6) to build and evolve a SaaS platform quickly, safely, and predictably.
 
-HSP aligns process and tooling end‑to‑end across all lifecycle stages (Spec → Plan → Implement → Verify → Ship → Operate → Learn) while upholding the five pillars above. The toolkit is designed to cover each stage with thin, predictable interfaces and fail‑closed governance.
+HSP aligns process and tooling end‑to‑end across all lifecycle stages (Spec → Plan → Implement → Verify → Ship → Operate → Learn) while upholding the six pillars above. The toolkit is designed to cover each stage with thin, predictable interfaces and fail‑closed governance.
 
 ## Terminology: Slices vs Layers
 
@@ -57,7 +57,7 @@ This keeps runtime concerns (processes and deployables) clearly separated from s
 ### Alignment Coverage (Stamp)
 
 - Lifecycle: Each stage is covered by at least one kit (e.g., SpecKit/PlanKit for Spec/Plan; AgentKit for Implement; EvalKit/TestKit for Verify; PatchKit for Ship; ObservaKit for Operate; Dockit for Learn).
-- Pillars: All four Harmony pillars are reinforced in practice (e.g., Speed with Safety via flags/rollback and CI gates; Quality through Determinism via contracts/tests/observability; Simplicity over Complexity via monolith‑first/vertical slices; Guided Agentic Autonomy via the governed MAPE‑K loop).
+- Pillars: All four Harmony pillars are reinforced in practice (e.g., Velocity through Agentic Automation and Trust through Governed Determinism via flags/rollback and CI gates; Trust through Governed Determinism via contracts/tests/observability; Focus through Absorbed Complexity via monolith‑first/vertical slices; Agent-First System Governance via the governed MAPE‑K loop).
 - Optional kits extend quality and learning without changing core decisions (e.g., A11yKit for accessibility checks; PostmortemKit for structured incident learning).
 
 ### Non‑negotiables satisfied
@@ -97,7 +97,7 @@ Quick Rubric (Does it fit Autopilot?)
 
 ## Pillars and Design Practices
 
-### Speed with Safety
+### Velocity through Agentic Automation and Trust through Governed Determinism
 
 - Prefer a modular monolith: a single deployable application, logically partitioned into feature modules for fast iteration and low coordination overhead.
 - Gate every change with automated tests and ACP policy evaluation prior to release.
@@ -105,14 +105,14 @@ Quick Rubric (Does it fit Autopilot?)
 - Employ AI assistance (Planner/Builder/Verifier agents) to accelerate coding and maintenance, with explicit ACP promotion gates to prevent unsafe changes.
 - Favor trunk-based development with small PRs and preview environments to accelerate feedback while preserving safety through policy gates.
 
-### Simplicity over Complexity
+### Focus through Absorbed Complexity
 
 - Adopt a monolith‑first approach with clear internal modularity; avoid premature microservices.
 - Organize by vertical slices (feature‑focused folders) rather than strictly layered architecture to localize change and reduce cognitive load.
 - Eliminate unnecessary distributed coordination (e.g., cross‑service RPC) for a small team; add distribution only when demanded by scale or boundaries.
 - Keep shared tooling thin: maintain ToolKit as a minimal wrapper over deterministic actions; if scope grows, prefer specialized sub‑kits to retain clarity and single purpose.
 
-### Quality through Determinism
+### Trust through Governed Determinism
 
 - Separate pure domain logic from side effects using Hexagonal Architecture (Ports & Adapters) to make behavior predictable and testable.
 - Ensure reproducible builds (locked dependencies, deterministic build steps) and run automated tests on every change.
@@ -123,7 +123,7 @@ Quick Rubric (Does it fit Autopilot?)
 - Treat accessibility as a first‑class quality concern: integrate automated a11y checks into CI and handle violations as policy/evaluation failures. Prefer deterministic, reproducible checks and record evidence/provenance.
 - AI determinism: pin provider/model/version, prefer low temperature (≤ 0.3), record prompt hashes and idempotency/cache keys for reproducibility.
 
-### Guided Agentic Autonomy
+### Agent-First System Governance
 
 - Introduce an autonomic improvement loop with AI agents that Plan, Build, and Verify changes under strict governance.
 - Keep humans on the loop for high‑impact decisions via ACP receipts and escalation digests.

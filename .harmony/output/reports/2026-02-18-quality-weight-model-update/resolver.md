@@ -2,8 +2,8 @@
 
 ## Resolver Inputs
 
-- Policy: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/weights/weights.yml`
-- Measurement: `/Users/jamesryancooper/Projects/harmony/.harmony/quality/scores/scores.yml`
+- Policy: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/weights/weights.yml`
+- Measurement: `/Users/jamesryancooper/Projects/harmony/.harmony/assurance/governance/scores/scores.yml`
 - Context: `repo`, `run-mode`, `maturity`, optional explicit `profile`, optional subsystem filter.
 - Optional baseline scorecard for deltas.
 
@@ -66,13 +66,13 @@ Driver payload includes:
 
 Resolver writes:
 
-- `/Users/jamesryancooper/Projects/harmony/.harmony/output/quality/effective/<context>.md`
-- `/Users/jamesryancooper/Projects/harmony/.harmony/output/quality/results/<context>.md`
+- `/Users/jamesryancooper/Projects/harmony/.harmony/output/assurance/effective/<context>.md`
+- `/Users/jamesryancooper/Projects/harmony/.harmony/output/assurance/results/<context>.md`
 
 Gate artifacts written by resolver:
 
-- `/Users/jamesryancooper/Projects/harmony/.harmony/output/quality/scorecards/<date>/<run-id>/scorecard.yml`
-- `/Users/jamesryancooper/Projects/harmony/.harmony/output/quality/scorecards/<date>/<run-id>/scorecard.md`
+- `/Users/jamesryancooper/Projects/harmony/.harmony/output/assurance/scorecards/<date>/<run-id>/scorecard.yml`
+- `/Users/jamesryancooper/Projects/harmony/.harmony/output/assurance/scorecards/<date>/<run-id>/scorecard.md`
 
 ## Example Context
 
