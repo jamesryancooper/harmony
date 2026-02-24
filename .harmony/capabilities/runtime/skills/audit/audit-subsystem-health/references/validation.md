@@ -78,3 +78,5 @@ After skill execution, verify:
     `bash .harmony/assurance/runtime/_ops/scripts/validate-harness-version-contract.sh`
 12. SSOT precedence drift validator is run when runtime/governance/practices authority contracts change:
     `bash .harmony/assurance/runtime/_ops/scripts/validate-ssot-precedence-drift.sh`
+13. Framing alignment validator is run when canonical framing contracts or language surfaces change:
+    `bash .harmony/assurance/runtime/_ops/scripts/validate-framing-alignment.sh`

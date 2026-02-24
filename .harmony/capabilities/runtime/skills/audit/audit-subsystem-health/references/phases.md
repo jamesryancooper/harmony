@@ -58,6 +58,7 @@ behavior:
         - "Blind spot analysis: file types not searched, directories not visited"
         - "Finding verification: confirm each finding is real (file exists, line correct)"
         - "Counter-example search: look for issues the three lenses missed"
+        - "Governance drift challenge: rerun alignment/framing validators when watched architecture surfaces changed"
         - "Record self-challenge outcomes: confirmed, disproved, or new findings added"
     - name: "Report"
       steps:
