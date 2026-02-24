@@ -34,6 +34,7 @@ Changes in any of the following paths must trigger an alignment check:
 - `.harmony/*/_meta/architecture/`
 - `.harmony/orchestration/runtime/workflows/audit/audit-pre-release-workflow/`
 - `.harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh`
+- `.harmony/assurance/runtime/_ops/scripts/validate-contract-governance.sh`
 - `.harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`
 - `.harmony/assurance/practices/complete.md`
 - `.harmony/assurance/practices/session-exit.md`

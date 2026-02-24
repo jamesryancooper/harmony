@@ -41,6 +41,35 @@ This document applies to any Harmony domain that exposes both `runtime/` and
    live in runtime-local `_ops/` (for example `runtime/_ops/`).
 7. When an operational asset coordinates multiple runtime classes in the same
    domain, it SHOULD live in domain-level `_ops/`.
+8. Mutable control-plane state in `_ops/` MUST be scoped to declared allowlist
+   roots and MUST fail closed when a write target falls outside those roots.
+9. `_ops/` automation MUST emit enforcement receipts for failed-closed
+   decisions and out-of-policy write attempts.
+10. `_ops/` automation MUST NOT mutate immutable governance targets without a
+    time-boxed, explicitly recorded exception lease.
+
+## Default Mutation Allowlist (Fail-Closed)
+
+Unless a stricter domain contract is declared, `_ops/` automation is limited to
+these mutable targets:
+
+- `<domain>/_ops/state/**`
+- `/.harmony/output/**`
+- `/.harmony/continuity/**`
+- domain-specific generated artifacts that are explicitly declared in the
+  contract registry and linked to enforcement checks
+
+Any undeclared write target is denied by default.
+
+## Immutable Targets for `_ops/` Automation
+
+The following targets are immutable to `_ops/` automation by default:
+
+- `/.harmony/cognition/governance/principles/principles.md`
+- any `/.harmony/*/governance/**` contract path unless an explicit
+  exception lease is approved and recorded
+- canonical runtime discovery contracts (`manifest.yml`, `registry.yml`) unless
+  changed through governed contract updates with matching assurance evidence
 
 ## Classification Test
 
@@ -52,6 +81,8 @@ Use this decision sequence:
    or other mutable operational support data, place it in `_ops/`.
 3. If the artifact defines normative policy intent, place it in `governance/`
    (not `_ops/`).
+4. If the artifact is mutable control-plane state, verify that writes are
+   constrained to allowlist roots and not targeting immutable governance paths.
 
 ## Canonical Examples
 

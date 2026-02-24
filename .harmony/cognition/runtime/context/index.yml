@@ -7,8 +7,86 @@
 #   path       - Relative path to file
 #   summary    - One-line description
 #   when       - When an agent should read this file
+#
+# Contract registry fields:
+#   contract_id - Stable contract identifier
+#   owner       - Owning subsystem
+#   version     - Contract version for change tracking
+#   supersedes  - Prior contract IDs replaced by this contract
+#   enforced_by - Enforcement paths that gate compliance
 
 schema_version: "1.0"
+
+contracts:
+  - contract_id: HARMONY-SPEC-014
+    path: ../../_meta/architecture/runtime-vs-ops-contract.md
+    owner: cognition
+    version: "1.1.0"
+    supersedes: []
+    enforced_by:
+      - ../../../assurance/runtime/_ops/scripts/validate-harness-structure.sh
+      - ../../../assurance/runtime/_ops/scripts/validate-contract-governance.sh
+
+  - contract_id: HARMONY-SPEC-015
+    path: ../../_meta/architecture/specification.md
+    owner: cognition
+    version: "1.1.0"
+    supersedes: []
+    enforced_by:
+      - ../../../assurance/runtime/_ops/scripts/validate-contract-governance.sh
+
+  - contract_id: HARMONY-SPEC-016
+    path: ../../_meta/architecture/specification.md
+    owner: cognition
+    version: "1.1.0"
+    supersedes: []
+    enforced_by:
+      - ../../../assurance/runtime/_ops/scripts/validate-contract-governance.sh
+
+  - contract_id: ASSURANCE-PRECEDENCE-001
+    path: ../../../assurance/governance/precedence.md
+    owner: assurance
+    version: "1.1.0"
+    supersedes: []
+    enforced_by:
+      - ../../../assurance/runtime/_ops/scripts/assurance-gate.sh
+      - ../../../assurance/runtime/_ops/scripts/validate-contract-governance.sh
+
+  - contract_id: ENGINE-GOV-001
+    path: ../../../engine/governance/README.md
+    owner: engine
+    version: "1.1.0"
+    supersedes: []
+    enforced_by:
+      - ../../../assurance/runtime/_ops/scripts/validate-contract-governance.sh
+
+  - contract_id: OPS-MUTATION-001
+    path: ../../_meta/architecture/runtime-vs-ops-contract.md
+    owner: cognition
+    version: "1.1.0"
+    supersedes: []
+    enforced_by:
+      - ../../../assurance/runtime/_ops/scripts/validate-contract-governance.sh
+
+ops_mutation_policy:
+  allow_write_roots:
+    - ../../../capabilities/_ops/state
+    - ../../../engine/_ops/state
+    - ../../../cognition/_ops
+    - ../../../assurance/runtime/_ops
+    - ../../../output
+    - ../../../continuity
+  immutable_targets:
+    - ../../governance/principles/principles.md
+    - ../../../agency/governance
+    - ../../../capabilities/governance
+    - ../../../cognition/governance
+    - ../../../orchestration/governance
+    - ../../../assurance/governance
+    - ../../../engine/governance
+    - ../../../scaffolding/governance
+  enforce_with:
+    - ../../../assurance/runtime/_ops/scripts/validate-contract-governance.sh
 
 files:
   - id: constraints

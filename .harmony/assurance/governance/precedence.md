@@ -17,6 +17,19 @@ Assurance resolves policy inputs in this order (later wins):
 
 The same order applies to scorecard computation and gate enforcement.
 
+## Runtime Authority Tie-Breaker
+
+When runtime authority is shared between capabilities and engine contracts,
+Assurance resolves execution authority in this order:
+
+1. Engine runtime safety and lifecycle enforcement (`engine/runtime/**`)
+2. Capabilities runtime behavioral semantics (`capabilities/runtime/**`)
+3. Domain-local practices and helper guidance
+
+If engine enforcement and capability semantics conflict and no explicit contract
+override exists, Assurance MUST fail closed, emit a policy violation, and
+require ADR-backed contract reconciliation before promotion.
+
 ## Resolution Rules
 
 - Missing keys are ignored; only declared keys participate in merge.
@@ -32,6 +45,7 @@ The same order applies to scorecard computation and gate enforcement.
 - Override declarations: `.harmony/assurance/governance/overrides.yml`
 - Override governance: `.harmony/assurance/governance/SUBSYSTEM_OVERRIDE_POLICY.md`
 - Subsystem classes: `.harmony/assurance/governance/subsystem-classes.yml`
+- Runtime tie-breaker contract: `.harmony/cognition/_meta/architecture/specification.md` (`HARMONY-SPEC-016`)
 
 ## Enforcement Surfaces
 

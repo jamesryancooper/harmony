@@ -72,3 +72,5 @@ After skill execution, verify:
 8. No source files were modified (read-only guarantee)
 9. Alignment validator is run when architecture surfaces change:
    `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh`
+10. Contract governance validator is run when contract metadata or `_ops` boundaries change:
+    `bash .harmony/assurance/runtime/_ops/scripts/validate-contract-governance.sh`

@@ -50,5 +50,6 @@ bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --list-profiles
 ## References
 
 - **Runner:** `.harmony/assurance/runtime/_ops/scripts/alignment-check.sh`
+- **Contract governance validator:** `.harmony/assurance/runtime/_ops/scripts/validate-contract-governance.sh`
 - **Commit/PR validator:** `.harmony/assurance/runtime/_ops/scripts/validate-commit-pr-alignment.sh`
 - **Quality baseline:** `.harmony/assurance/README.md`

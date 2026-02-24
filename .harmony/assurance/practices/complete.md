@@ -50,11 +50,13 @@ description: Assurance criteria and completion checklist for harness tasks.
 ### For .harmony Architecture Changes
 
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh` passes
+- [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-contract-governance.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-convergence-contract.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness` passes
 - [ ] `audit-pre-release-workflow` workflow executed (or explicit rationale recorded for not running it)
+- [ ] Contract coverage report exists at `.harmony/output/assurance/results/contract-coverage-latest.md`
 
 ### For Commit/PR Standards Changes
 

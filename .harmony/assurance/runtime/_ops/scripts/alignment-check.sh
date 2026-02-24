@@ -71,6 +71,10 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-harness-structure.sh"
 
   run_step \
+    "Validate contract governance coverage and _ops boundaries" \
+    bash "$SCRIPT_DIR/validate-contract-governance.sh"
+
+  run_step \
     "Validate continuity memory contracts" \
     bash "$SCRIPT_DIR/validate-continuity-memory.sh"
 

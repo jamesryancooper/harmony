@@ -224,6 +224,49 @@ Expands in:
 - [Runtime vs Ops Surface Contract](/.harmony/cognition/_meta/architecture/runtime-vs-ops-contract.md)
 - [Start Here](/.harmony/START.md)
 
+### HARMONY-SPEC-015: Contract Registry Metadata and Coverage
+
+Contract-bearing surfaces MUST be represented in a canonical contract registry
+with machine-readable metadata.
+
+Each registry entry MUST declare:
+
+- `contract_id`
+- `path`
+- `owner`
+- `version`
+- `supersedes`
+- `enforced_by` (at least one enforcement path)
+
+Assurance gates MUST fail closed for missing metadata, missing enforcement
+bindings, or broken registry path resolution.
+
+Expands in:
+
+- [Context Index](/.harmony/cognition/runtime/context/index.yml)
+- [Definition of Done](/.harmony/assurance/practices/complete.md)
+- [Contract Governance Validator](/.harmony/assurance/runtime/_ops/scripts/validate-contract-governance.sh)
+
+### HARMONY-SPEC-016: Engine and Capabilities Runtime Tie-Breaker
+
+Runtime authority is split intentionally:
+
+- `capabilities/runtime/` defines behavioral contract semantics and discovery
+  routing for capability classes.
+- `engine/runtime/` defines execution lifecycle, runtime safety policy
+  enforcement, and final execution authority.
+
+When capability semantics and engine runtime enforcement disagree, the engine
+decision is authoritative for execution. If conflict cannot be resolved via a
+declared contract, enforcement MUST fail closed and require an ADR-backed
+contract update before promotion.
+
+Expands in:
+
+- [Engine Governance](/.harmony/engine/governance/README.md)
+- [Assurance Precedence Contract](/.harmony/assurance/governance/precedence.md)
+- [Assurance Contract Boundary](/.harmony/assurance/README.md)
+
 ### HARMONY-SPEC-101: Agency Contract Boundary
 
 `/.harmony/agency/**` MUST define actor taxonomy, invocation model, and delegation boundaries as an explicit contract.
@@ -349,3 +392,5 @@ Changes to this specification SHOULD:
 2. Add new rules instead of mutating semantics silently
 3. Update affected expansion docs in the same change
 4. Record material governance shifts in ADRs when applicable
+5. Update contract registry metadata (`contract_id`, `version`, `enforced_by`)
+   when new or modified contracts are introduced

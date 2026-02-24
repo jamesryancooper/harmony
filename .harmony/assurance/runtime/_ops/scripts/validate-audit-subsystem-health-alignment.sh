@@ -185,6 +185,7 @@ check_drift_alignment() {
     '^\.harmony/orchestration/runtime/workflows/audit/audit-pre-release-workflow/'
     '^\.harmony/assurance/practices/(complete\.md|session-exit\.md)$'
     '^\.harmony/assurance/runtime/_ops/scripts/validate-harness-structure\.sh$'
+    '^\.harmony/assurance/runtime/_ops/scripts/validate-contract-governance\.sh$'
   )
   local update_regexes=(
     '^\.harmony/capabilities/runtime/skills/audit/audit-subsystem-health/'
