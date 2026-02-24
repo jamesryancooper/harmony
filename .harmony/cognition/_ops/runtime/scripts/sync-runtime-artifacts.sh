@@ -141,7 +141,10 @@ normalize_dynamic_value() {
   local file="$1"
   local key="$2"
   local placeholder="$3"
-  sed -E "s#^(${key}:[[:space:]]*)\"?[^\"[:space:]]+\"?#\\1\"${placeholder}\"#" "$file"
+  sed -E \
+    -e "s#^(${key}:[[:space:]]*)\"?[^\"[:space:]]+\"?#\\1\"${placeholder}\"#" \
+    -e "s#^([[:space:]]*ingested_at:[[:space:]]*)\"?[^\"[:space:]]+\"?#\\1\"${placeholder}\"#" \
+    "$file"
 }
 
 extract_yaml_scalar() {
