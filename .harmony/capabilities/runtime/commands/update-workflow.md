@@ -1,7 +1,7 @@
 ---
 title: Update Workflow
 description: Modify an existing workflow to add features or fix gaps.
-access: human
+access: agent
 argument-hint: <path>
 ---
 

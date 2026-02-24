@@ -1,7 +1,7 @@
 ---
 title: Query Explain
 description: Run query service in `explain` mode to return ranking rationale and signal-level diagnostics.
-access: human
+access: agent
 argument-hint: "--file <path-to-query-json>"
 ---
 

@@ -38,7 +38,7 @@ Harness command files require YAML frontmatter with the following fields:
 |-------|----------|-------------|
 | `title` | Yes | Document title |
 | `description` | Yes | Brief summary (max 160 characters) |
-| `access` | Yes | `human` (has Cursor command wrapper) or `agent` (agent-only) |
+| `access` | Yes | `agent` for runtime capability commands in this repository; `human` remains a supported schema value for wrapper-oriented entry points |
 
 ---
 
@@ -54,7 +54,7 @@ A harness command for validating YAML frontmatter in markdown files.
 ---
 title: Validate Frontmatter
 description: Validate YAML frontmatter in markdown files
-access: human
+access: agent
 ---
 
 # Validate Frontmatter

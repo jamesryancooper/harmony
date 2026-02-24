@@ -18,6 +18,22 @@ This document explains the core building blocks in Harmony and when to use each.
 
 > **Note:** Workflows are deprecated and consolidated into Skills. See the workflows → skills migration in `.harmony/capabilities/_meta/architecture/`.
 
+## Execution Capability Surfaces
+
+Within autonomous execution, `.harmony/capabilities/runtime/` defines four
+capability surfaces:
+
+| Surface | Model | Granularity | Role in agent execution |
+|---|---|---|---|
+| `commands` | Instruction-driven | Atomic | Lightweight command contracts the agent executes |
+| `skills` | Instruction-driven | Composite | Multi-step capability contracts with explicit I/O |
+| `tools` | Invocation-driven | Atomic | Tool or tool-pack invocations the agent performs |
+| `services` | Invocation-driven | Composite | Typed domain-service invocations the agent performs |
+
+`tools` and `services` are capability surfaces in the runtime execution layer.
+They are intentionally not listed as top-level primitives in the quick-reference
+table above.
+
 ---
 
 ## Multi-Agent Hierarchy

@@ -1,5 +1,7 @@
 ---
+title: Refactor
 description: Execute a verified codebase refactor with exhaustive audit and mandatory verification.
+access: agent
 argument-hint: <old-pattern> <new-pattern>
 ---
 

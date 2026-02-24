@@ -1,7 +1,7 @@
 ---
 title: Query Ask
 description: Run query service in `ask` mode to return a grounded answer with citations and evidence.
-access: human
+access: agent
 argument-hint: "--file <path-to-query-json>"
 ---
 

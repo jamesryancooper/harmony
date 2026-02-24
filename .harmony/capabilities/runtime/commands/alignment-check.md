@@ -1,7 +1,7 @@
 ---
 title: Alignment Check
 description: Run profile-based harness alignment validations through a single command.
-access: human
+access: agent
 argument-hint: "--profile <aspect>[,<aspect>...] [--dry-run] [--list-profiles]"
 ---
 

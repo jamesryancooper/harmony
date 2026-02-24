@@ -1,7 +1,7 @@
 ---
 title: Validate Frontmatter
 description: Validate YAML frontmatter in markdown files.
-access: human
+access: agent
 ---
 
 # Validate Frontmatter

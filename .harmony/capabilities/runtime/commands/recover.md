@@ -1,7 +1,7 @@
 ---
 title: Recover from Errors
 description: Recovery procedures for common agent failure modes.
-access: human
+access: agent
 ---
 
 # Recover from Errors

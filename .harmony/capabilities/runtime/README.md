@@ -11,6 +11,17 @@ Canonical runtime surface for executable capability artifacts.
 - `tools/` - Atomic invocation-driven tool packs.
 - `services/` - Composite invocation-driven domain capabilities.
 
+## Agent Capability Model
+
+For autonomous AI agents, these are four capability classes in one runtime.
+
+| Surface | Control model | Granularity |
+|---|---|---|
+| `commands/` | Instruction-driven | Atomic |
+| `skills/` | Instruction-driven | Composite |
+| `tools/` | Invocation-driven | Atomic |
+| `services/` | Invocation-driven | Composite |
+
 ## Discovery
 
 - `commands/manifest.yml`

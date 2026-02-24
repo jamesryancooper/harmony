@@ -1,7 +1,7 @@
 ---
 title: Discover Expand
 description: Expand progressive discovery frontier by traversing graph neighbors.
-access: human
+access: agent
 argument-hint: "--node-ids '<json-array>' [--limit <n>]"
 ---
 

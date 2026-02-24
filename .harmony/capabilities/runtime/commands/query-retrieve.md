@@ -1,7 +1,7 @@
 ---
 title: Query Retrieve
 description: Run query service in `retrieve` mode to return ranked candidates with citations and evidence.
-access: human
+access: agent
 argument-hint: "--file <path-to-query-json>"
 ---
 

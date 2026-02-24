@@ -1,7 +1,7 @@
 ---
 title: Watch Poll
 description: Poll for filesystem changes using the filesystem-watch service.
-access: human
+access: agent
 argument-hint: "[--root <path>] [--state-key <key>] [--max-events <n>] [--max-files <n>]"
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Discover Start
 description: Start progressive discovery for a query using the active snapshot.
-access: human
+access: agent
 argument-hint: "--query <text> [--limit <n>]"
 ---
 

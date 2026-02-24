@@ -1,7 +1,7 @@
 ---
 title: Evaluate Workflow
 description: Assess a workflow against quality criteria and gap coverage.
-access: human
+access: agent
 argument-hint: <path>
 ---
 

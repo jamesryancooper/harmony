@@ -1,7 +1,7 @@
 ---
 title: Launch Studio
 description: Launch Harmony Studio for workflow graph design, inspection, and safe staged edits.
-access: human
+access: agent
 argument-hint: "[--root <project-root>]"
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Discover Resolve
 description: Resolve a discovered node back to file path.
-access: human
+access: agent
 argument-hint: "--node-id <node-id>"
 ---
 

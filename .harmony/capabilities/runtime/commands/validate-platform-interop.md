@@ -1,7 +1,7 @@
 ---
 title: Validate Platform Interop
 description: Run native-first interop checks across core independence, adapter conformance, and degradation behavior.
-access: human
+access: agent
 argument-hint: "[--mode all|services-core|platform-core|adapters|conformance|degradation]"
 ---
 

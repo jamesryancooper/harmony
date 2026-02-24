@@ -1,7 +1,7 @@
 ---
 title: Snapshot Build
 description: Build deterministic snapshot artifacts via filesystem-snapshot.
-access: human
+access: agent
 argument-hint: "[--root <path>] [--state-dir <path>] [--set-current true|false]"
 ---
 

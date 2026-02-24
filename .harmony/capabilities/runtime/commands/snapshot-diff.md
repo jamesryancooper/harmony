@@ -1,7 +1,7 @@
 ---
 title: Snapshot Diff
 description: Compare two filesystem-snapshot artifacts.
-access: human
+access: agent
 argument-hint: "--base <snapshot-id|path> --head <snapshot-id|path> [--state-dir <path>]"
 ---
 

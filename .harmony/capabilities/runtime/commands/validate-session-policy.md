@@ -1,7 +1,7 @@
 ---
 title: Validate Session Policy
 description: Validate a session policy JSON file against native interop semantics.
-access: human
+access: agent
 argument-hint: "--file <path-to-session-policy-json>"
 ---
 

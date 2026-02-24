@@ -1,7 +1,7 @@
 ---
 title: Initialize Project
 description: Generate project-level bootstrap files from .harmony templates.
-access: human
+access: agent
 argument-hint: "[@project-root] [--force] [--no-claude-alias] [--with-boot-files] [--with-agent-platform-adapters] [--agent-platform-adapters <csv>]"
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Create Workflow
 description: Scaffold a new workflow with gap-aware structure.
-access: human
+access: agent
 argument-hint: <workflow-id>
 ---
 

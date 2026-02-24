@@ -1,7 +1,7 @@
 ---
 title: Context Budget
 description: Emit deterministic native context budget state and threshold classification.
-access: human
+access: agent
 argument-hint: "--limit <int> --used <int> [--unit tokens|characters] [--report <path>]"
 ---
 

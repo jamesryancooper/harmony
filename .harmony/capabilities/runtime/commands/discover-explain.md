@@ -1,7 +1,7 @@
 ---
 title: Discover Explain
 description: Explain candidate relevance and provenance for progressive discovery.
-access: human
+access: agent
 argument-hint: "--query <text> --candidate-node-ids '<json-array>'"
 ---
 

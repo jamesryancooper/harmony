@@ -33,6 +33,17 @@ Invocation │   Tools           │   Services             │
            └───────────────────┴────────────────────────┘
 ```
 
+For autonomous AI agents, all four runtime surfaces are capability classes.
+They differ by control model (`instruction-driven` vs `invocation-driven`) and
+granularity (`atomic` vs `composite`).
+
+| Surface | Agent capability role |
+|---|---|
+| `commands` | Atomic instruction capability executed from a single command contract |
+| `skills` | Composite instruction capability executed from a multi-step `SKILL.md` contract |
+| `tools` | Atomic invocation capability where the agent calls a tool/tool-pack and consumes its result |
+| `services` | Composite invocation capability where the agent calls typed domain service contracts |
+
 Runtime discovery surfaces:
 
 - `runtime/commands/manifest.yml`

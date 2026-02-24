@@ -17,150 +17,150 @@ commands:
     display_name: Alignment Check
     path: alignment-check.md
     summary: Run profile-based harness alignment validations through a single command.
-    access: human
+    access: agent
     argument_hint: "--profile <aspect>[,<aspect>...] [--dry-run] [--list-profiles]"
 
   - id: init
     display_name: Initialize Project
     path: init.md
     summary: Generate project-level bootstrap files from .harmony templates.
-    access: human
+    access: agent
     argument_hint: "[@project-root] [--force] [--no-claude-alias] [--with-boot-files] [--with-agent-platform-adapters] [--agent-platform-adapters <csv>]"
 
   - id: studio
     display_name: Launch Studio
     path: studio.md
     summary: Launch Harmony Studio for workflow graph design, inspection, and safe staged edits.
-    access: human
+    access: agent
     argument_hint: "[--root <project-root>]"
 
   - id: recover
     display_name: Recover from Errors
     path: recover.md
     summary: Recovery procedures for common agent failure modes.
-    access: human
+    access: agent
 
   - id: validate-frontmatter
     display_name: Validate Frontmatter
     path: validate-frontmatter.md
     summary: Validate YAML frontmatter in markdown files.
-    access: human
+    access: agent
 
   - id: context-budget
     display_name: Context Budget
     path: context-budget.md
     summary: Emit deterministic native context budget state and threshold classification.
-    access: human
+    access: agent
     argument_hint: "--limit <int> --used <int> [--unit tokens|characters] [--report <path>]"
 
   - id: validate-session-policy
     display_name: Validate Session Policy
     path: validate-session-policy.md
     summary: Validate a session policy JSON file against native interop semantics.
-    access: human
+    access: agent
     argument_hint: "--file <path-to-session-policy-json>"
 
   - id: validate-platform-interop
     display_name: Validate Platform Interop
     path: validate-platform-interop.md
     summary: Run native-first interop checks across core independence, adapter conformance, and degradation behavior.
-    access: human
+    access: agent
     argument_hint: "[--mode all|services-core|platform-core|adapters|conformance|degradation]"
 
   - id: query-ask
     display_name: Query Ask
     path: query-ask.md
     summary: Run query service in ask mode and return grounded answer output.
-    access: human
+    access: agent
     argument_hint: "--file <path-to-query-json>"
 
   - id: query-retrieve
     display_name: Query Retrieve
     path: query-retrieve.md
     summary: Run query service in retrieve mode and return ranked candidates.
-    access: human
+    access: agent
     argument_hint: "--file <path-to-query-json>"
 
   - id: query-explain
     display_name: Query Explain
     path: query-explain.md
     summary: Run query service in explain mode and return ranking rationale.
-    access: human
+    access: agent
     argument_hint: "--file <path-to-query-json>"
 
   - id: snapshot-build
     display_name: Snapshot Build
     path: snapshot-build.md
     summary: Build deterministic snapshot artifacts via filesystem-snapshot.
-    access: human
+    access: agent
     argument_hint: "[--root <path>] [--state-dir <path>] [--set-current true|false]"
 
   - id: snapshot-diff
     display_name: Snapshot Diff
     path: snapshot-diff.md
     summary: Compare two filesystem-snapshot artifacts.
-    access: human
+    access: agent
     argument_hint: "--base <snapshot-id|path> --head <snapshot-id|path> [--state-dir <path>]"
 
   - id: discover-start
     display_name: Discover Start
     path: discover-start.md
     summary: Start progressive discovery via filesystem-discovery.
-    access: human
+    access: agent
     argument_hint: "--query <text> [--limit <n>]"
 
   - id: discover-expand
     display_name: Discover Expand
     path: discover-expand.md
     summary: Expand discovery frontier via filesystem-discovery graph traversal.
-    access: human
+    access: agent
     argument_hint: "--node-ids '<json-array>' [--limit <n>]"
 
   - id: discover-explain
     display_name: Discover Explain
     path: discover-explain.md
     summary: Explain candidate relevance/provenance via filesystem-discovery.
-    access: human
+    access: agent
     argument_hint: "--query <text> --candidate-node-ids '<json-array>'"
 
   - id: discover-resolve
     display_name: Discover Resolve
     path: discover-resolve.md
     summary: Resolve a discovered node back to file path via filesystem-discovery.
-    access: human
+    access: agent
     argument_hint: "--node-id <node-id>"
 
   - id: watch-poll
     display_name: Watch Poll
     path: watch-poll.md
     summary: Run filesystem-watch polling change detection for the current workspace.
-    access: human
+    access: agent
     argument_hint: "[--root <path>] [--state-key <key>] [--max-events <n>] [--max-files <n>]"
 
   - id: create-workflow
     display_name: Create Workflow
     path: create-workflow.md
     summary: Scaffold a new workflow with gap-aware structure.
-    access: human
+    access: agent
     argument_hint: "<workflow-id>"
 
   - id: evaluate-workflow
     display_name: Evaluate Workflow
     path: evaluate-workflow.md
     summary: Assess a workflow against quality criteria and gap coverage.
-    access: human
+    access: agent
     argument_hint: "<path>"
 
   - id: update-workflow
     display_name: Update Workflow
     path: update-workflow.md
     summary: Modify an existing workflow to add features or fix gaps.
-    access: human
+    access: agent
     argument_hint: "<path>"
 
   - id: refactor
     display_name: Refactor
     path: refactor.md
     summary: Execute a verified codebase refactor with exhaustive audit and mandatory verification.
-    access: human
+    access: agent
     argument_hint: "<old-pattern> <new-pattern>"
