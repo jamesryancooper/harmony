@@ -21,6 +21,8 @@ These launchers are the canonical invocation boundary for policy operations.
 - Runtime implementation owner: `engine/runtime/crates/policy_engine/**`
 - Caller contract: invoke launchers only; do not couple to crate paths or
   build paths.
+- Launcher behavior defaults are runtime-configured in:
+  - `engine/runtime/config/policy-interface.yml`
 
 ## Supported Command Surface (v1)
 

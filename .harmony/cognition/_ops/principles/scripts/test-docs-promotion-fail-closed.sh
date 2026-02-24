@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
 cd "$ROOT_DIR"
 
 POLICY=".harmony/capabilities/governance/policy/deny-by-default.v2.yml"
-RUNNER=".harmony/capabilities/_ops/scripts/run-harmony-policy.sh"
+RUNNER=".harmony/engine/runtime/policy"
 
 assert_pattern() {
   local value="$1"

@@ -8,9 +8,88 @@ ENGINE_DIR="$(cd "$RUNTIME_DIR/.." && pwd)"
 HARMONY_DIR="$(cd "$ENGINE_DIR/.." && pwd)"
 RUNTIME_CRATES_DIR="$RUNTIME_DIR/crates"
 DEFAULT_BIN="$ENGINE_DIR/_ops/state/build/runtime-crates-target/debug/harmony-policy"
-ROLLOUT_STATE_FILE="$HARMONY_DIR/capabilities/_ops/state/rollout-mode.state"
-DEFAULT_POLICY="$HARMONY_DIR/capabilities/governance/policy/deny-by-default.v2.yml"
-RECEIPT_WRITER="$HARMONY_DIR/capabilities/_ops/scripts/policy-receipt-write.sh"
+POLICY_INTERFACE_CONFIG="$RUNTIME_DIR/config/policy-interface.yml"
+
+DEFAULT_POLICY_REL=".harmony/capabilities/governance/policy/deny-by-default.v2.yml"
+RECEIPT_WRITER_REL=".harmony/capabilities/_ops/scripts/policy-receipt-write.sh"
+ROLLOUT_STATE_REL=".harmony/capabilities/_ops/state/rollout-mode.state"
+ALLOW_EXIT_CODE=0
+DENY_EXIT_CODE=13
+CONTRACT_ERROR_EXIT_CODE=2
+
+config_paths_value() {
+  local key="$1"
+  awk -v key="$key" '
+    /^paths:/ {in_paths=1; next}
+    in_paths && /^[a-z_]+:/ {in_paths=0}
+    in_paths && $1 == key ":" {
+      value=$2
+      gsub(/["'\'' ]/, "", value)
+      print value
+      exit
+    }
+  ' "$POLICY_INTERFACE_CONFIG"
+}
+
+config_exit_code_value() {
+  local key="$1"
+  awk -v key="$key" '
+    /^exit_codes:/ {in_codes=1; next}
+    in_codes && /^[a-z_]+:/ {in_codes=0}
+    in_codes && $1 == key ":" {
+      print $2
+      exit
+    }
+  ' "$POLICY_INTERFACE_CONFIG"
+}
+
+load_policy_interface_config() {
+  if [[ ! -f "$POLICY_INTERFACE_CONFIG" ]]; then
+    return 0
+  fi
+
+  local value
+  value="$(config_paths_value "default_policy" || true)"
+  [[ -n "$value" ]] && DEFAULT_POLICY_REL="$value"
+
+  value="$(config_paths_value "receipt_writer" || true)"
+  [[ -n "$value" ]] && RECEIPT_WRITER_REL="$value"
+
+  value="$(config_paths_value "rollout_mode_state" || true)"
+  [[ -n "$value" ]] && ROLLOUT_STATE_REL="$value"
+
+  value="$(config_exit_code_value "allow" || true)"
+  [[ -n "$value" ]] && ALLOW_EXIT_CODE="$value"
+
+  value="$(config_exit_code_value "deny" || true)"
+  [[ -n "$value" ]] && DENY_EXIT_CODE="$value"
+
+  value="$(config_exit_code_value "contract_error" || true)"
+  [[ -n "$value" ]] && CONTRACT_ERROR_EXIT_CODE="$value"
+}
+
+load_policy_interface_config
+
+resolve_from_harmony() {
+  local rel="$1"
+  if [[ "$rel" == .harmony/* ]]; then
+    echo "$HARMONY_DIR/${rel#.harmony/}"
+    return 0
+  fi
+  if [[ "$rel" == ./* ]]; then
+    echo "$HARMONY_DIR/${rel#./}"
+    return 0
+  fi
+  if [[ "$rel" == /* ]]; then
+    echo "$rel"
+    return 0
+  fi
+  echo "$HARMONY_DIR/$rel"
+}
+
+DEFAULT_POLICY="$(resolve_from_harmony "$DEFAULT_POLICY_REL")"
+RECEIPT_WRITER="$(resolve_from_harmony "$RECEIPT_WRITER_REL")"
+ROLLOUT_STATE_FILE="$(resolve_from_harmony "$ROLLOUT_STATE_REL")"
 
 binary_is_stale() {
   local bin="$1"
@@ -97,7 +176,7 @@ run_acp_enforce() {
         idx=$((idx + 1))
         if (( idx >= ${#input_args[@]} )); then
           echo "--run-id requires a value" >&2
-          return 2
+          return "$CONTRACT_ERROR_EXIT_CODE"
         fi
         run_id_override="${input_args[$idx]}"
         ;;
@@ -105,7 +184,7 @@ run_acp_enforce() {
         idx=$((idx + 1))
         if (( idx >= ${#input_args[@]} )); then
           echo "--policy requires a value" >&2
-          return 2
+          return "$CONTRACT_ERROR_EXIT_CODE"
         fi
         policy_path="${input_args[$idx]}"
         passthrough+=("$token" "$policy_path")
@@ -114,7 +193,7 @@ run_acp_enforce() {
         idx=$((idx + 1))
         if (( idx >= ${#input_args[@]} )); then
           echo "--request requires a value" >&2
-          return 2
+          return "$CONTRACT_ERROR_EXIT_CODE"
         fi
         request_path="${input_args[$idx]}"
         passthrough+=("$token" "$request_path")
@@ -141,7 +220,7 @@ USAGE
   if [[ "$emit_receipt" != "true" ]]; then
     if [[ -n "$run_id_override" || "$emit_digest" == "true" ]]; then
       echo "--run-id/--digest require --emit-receipt" >&2
-      return 2
+      return "$CONTRACT_ERROR_EXIT_CODE"
     fi
   fi
 
@@ -150,17 +229,17 @@ USAGE
   if [[ -n "$run_id_override" ]]; then
     if [[ -z "$request_path" || "$request_arg_index" -lt 0 ]]; then
       echo "--run-id requires --request for acp-enforce" >&2
-      return 2
+      return "$CONTRACT_ERROR_EXIT_CODE"
     fi
     if ! command -v jq >/dev/null 2>&1; then
       echo "jq is required for --run-id request override" >&2
-      return 2
+      return "$CONTRACT_ERROR_EXIT_CODE"
     fi
     tmp_request="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-request.XXXXXX.json")"
     if ! jq --arg run_id "$run_id_override" '.run_id = $run_id' "$request_path" > "$tmp_request"; then
       rm -f "$tmp_request"
       echo "failed to apply run_id override to request: $request_path" >&2
-      return 2
+      return "$CONTRACT_ERROR_EXIT_CODE"
     fi
     passthrough[$request_arg_index]="$tmp_request"
     effective_request_path="$tmp_request"
@@ -178,25 +257,25 @@ USAGE
     if [[ -z "$effective_request_path" ]]; then
       echo "--emit-receipt requires --request <path>" >&2
       rm -f "$tmp_request"
-      [[ "$rc" -eq 0 ]] && return 13
+      [[ "$rc" -eq "$ALLOW_EXIT_CODE" ]] && return "$DENY_EXIT_CODE"
       return "$rc"
     fi
     if [[ ! -x "$RECEIPT_WRITER" ]]; then
       echo "receipt writer unavailable: $RECEIPT_WRITER" >&2
       rm -f "$tmp_request"
-      [[ "$rc" -eq 0 ]] && return 13
+      [[ "$rc" -eq "$ALLOW_EXIT_CODE" ]] && return "$DENY_EXIT_CODE"
       return "$rc"
     fi
     if ! command -v jq >/dev/null 2>&1; then
       echo "jq is required for --emit-receipt mode" >&2
       rm -f "$tmp_request"
-      [[ "$rc" -eq 0 ]] && return 13
+      [[ "$rc" -eq "$ALLOW_EXIT_CODE" ]] && return "$DENY_EXIT_CODE"
       return "$rc"
     fi
     if ! jq -e . >/dev/null 2>&1 <<<"$decision_output"; then
       echo "acp-enforce did not return JSON; cannot emit receipt" >&2
       rm -f "$tmp_request"
-      [[ "$rc" -eq 0 ]] && return 13
+      [[ "$rc" -eq "$ALLOW_EXIT_CODE" ]] && return "$DENY_EXIT_CODE"
       return "$rc"
     fi
 
@@ -210,7 +289,7 @@ USAGE
     if [[ "$receipt_rc" -ne 0 ]]; then
       echo "failed to emit ACP receipt: $receipt_output" >&2
       rm -f "$tmp_request" "$tmp_decision"
-      [[ "$rc" -eq 0 ]] && return 13
+      [[ "$rc" -eq "$ALLOW_EXIT_CODE" ]] && return "$DENY_EXIT_CODE"
       return "$rc"
     fi
 
@@ -218,7 +297,7 @@ USAGE
     if [[ -z "$receipt_validate_path" || ! -f "$receipt_validate_path" ]]; then
       echo "receipt writer did not return a valid receipt path for validation" >&2
       rm -f "$tmp_request" "$tmp_decision"
-      [[ "$rc" -eq 0 ]] && return 13
+      [[ "$rc" -eq "$ALLOW_EXIT_CODE" ]] && return "$DENY_EXIT_CODE"
       return "$rc"
     fi
     set +e
@@ -228,7 +307,7 @@ USAGE
     if [[ "$receipt_validate_rc" -ne 0 ]]; then
       echo "failed ACP receipt validation: $receipt_validate_output" >&2
       rm -f "$tmp_request" "$tmp_decision"
-      [[ "$rc" -eq 0 ]] && return 13
+      [[ "$rc" -eq "$ALLOW_EXIT_CODE" ]] && return "$DENY_EXIT_CODE"
       return "$rc"
     fi
 

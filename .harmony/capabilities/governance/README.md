@@ -27,3 +27,9 @@ Normative policy definitions for capabilities must live under this surface.
   and launch interfaces).
 - Prohibited: depend on engine implementation internals (`engine/runtime/crates/**`
   and engine-private runtime logic).
+
+Runtime evaluation semantics (launcher behavior, exit-code semantics, and mode
+state interpretation) are defined by engine contracts/config:
+
+- `/.harmony/engine/runtime/spec/policy-interface-v1.md`
+- `/.harmony/engine/runtime/config/policy-interface.yml`

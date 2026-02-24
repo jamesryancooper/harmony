@@ -5,13 +5,14 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CAPABILITIES_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REPO_ROOT="$(cd "$CAPABILITIES_DIR/../.." && pwd)"
 SERVICES_ROOT="$CAPABILITIES_DIR/runtime/services"
 SERVICES_MANIFEST="$SERVICES_ROOT/manifest.yml"
 POLICY_V2_FILE="$CAPABILITIES_DIR/governance/policy/deny-by-default.v2.yml"
 ENFORCER_SCRIPT="$SERVICES_ROOT/_ops/scripts/enforce-deny-by-default.sh"
 AGENT_ENTRYPOINT="$SERVICES_ROOT/execution/agent/impl/agent.sh"
 BREAKER_ACTIONS_SCRIPT="$CAPABILITIES_DIR/_ops/scripts/policy-circuit-breaker-actions.sh"
-POLICY_RUNNER="$CAPABILITIES_DIR/_ops/scripts/run-harmony-policy.sh"
+POLICY_RUNNER="$REPO_ROOT/.harmony/engine/runtime/policy"
 
 if [[ ! -f "$ENFORCER_SCRIPT" ]]; then
   echo "Missing runtime enforcer script: $ENFORCER_SCRIPT" >&2
@@ -317,7 +318,7 @@ run_acp_gate_tests() {
     bash -euo pipefail -c "
       receipt='.harmony/continuity/runs/$receipt_run_id/receipt.latest.json'
       [[ -f \"\$receipt\" ]]
-      .harmony/capabilities/_ops/scripts/run-harmony-policy.sh receipt-validate --policy '$POLICY_V2_FILE' --receipt \"\$receipt\" >/dev/null
+      .harmony/engine/runtime/policy receipt-validate --policy '$POLICY_V2_FILE' --receipt \"\$receipt\" >/dev/null
     "
 
   assert_success \

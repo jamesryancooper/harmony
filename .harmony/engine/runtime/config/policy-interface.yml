@@ -1,0 +1,16 @@
+format_version: policy-interface-config-v1
+
+paths:
+  default_policy: ".harmony/capabilities/governance/policy/deny-by-default.v2.yml"
+  receipt_writer: ".harmony/capabilities/_ops/scripts/policy-receipt-write.sh"
+  rollout_mode_state: ".harmony/capabilities/_ops/state/rollout-mode.state"
+
+exit_codes:
+  allow: 0
+  deny: 13
+  contract_error: 2
+
+wrapper:
+  acp_enforce:
+    supports_emit_receipt: true
+    validates_receipt: true

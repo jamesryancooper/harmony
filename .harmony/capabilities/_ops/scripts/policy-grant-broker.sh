@@ -5,8 +5,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CAPABILITIES_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REPO_ROOT="$(cd "$CAPABILITIES_DIR/../.." && pwd)"
 POLICY_FILE="${HARMONY_DDB_POLICY_FILE:-$CAPABILITIES_DIR/governance/policy/deny-by-default.v2.yml}"
-POLICY_RUNNER="$CAPABILITIES_DIR/_ops/scripts/run-harmony-policy.sh"
+POLICY_RUNNER="$REPO_ROOT/.harmony/engine/runtime/policy"
 
 usage() {
   cat <<'USAGE'

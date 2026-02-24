@@ -80,7 +80,7 @@ EXCEPTIONS_FILE="$REPO_ROOT/.harmony/capabilities/_ops/state/deny-by-default-exc
 AGENT_ONLY_POLICY_FILE="$REPO_ROOT/.harmony/capabilities/governance/policy/agent-only-governance.yml"
 AGENT_ONLY_VALIDATOR="$REPO_ROOT/.harmony/capabilities/_ops/scripts/validate-agent-only-governance.sh"
 POLICY_V2_FILE="$REPO_ROOT/.harmony/capabilities/governance/policy/deny-by-default.v2.yml"
-POLICY_RUNNER="$REPO_ROOT/.harmony/capabilities/_ops/scripts/run-harmony-policy.sh"
+POLICY_RUNNER="$REPO_ROOT/.harmony/engine/runtime/policy"
 TODAY="$(date +%F)"
 
 # Configuration

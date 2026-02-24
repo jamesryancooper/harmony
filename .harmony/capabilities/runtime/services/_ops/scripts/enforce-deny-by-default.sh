@@ -476,7 +476,7 @@ harmony_enforce_service_policy() {
   manifest="$services_root/manifest.yml"
   policy_file="$harmony_root/capabilities/governance/policy/deny-by-default.v2.yml"
   exceptions_file="$harmony_root/capabilities/_ops/state/deny-by-default-exceptions.yml"
-  policy_runner="$harmony_root/capabilities/_ops/scripts/run-harmony-policy.sh"
+  policy_runner="$harmony_root/engine/runtime/policy"
   enforcement_log="$services_root/_ops/state/logs/deny-by-default-enforcement.log"
   decision_json_log="$harmony_root/capabilities/_ops/state/logs/deny-by-default-decisions.jsonl"
 
