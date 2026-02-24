@@ -2,10 +2,10 @@
 title: Engineering Principles & Standards (Authoritative)
 description: Binding engineering standards aligned to agent-first, system-governed, complexity-calibrated operation.
 status: Binding
-mutability: mutable
-agent_editable: true
+mutability: immutable
+agent_editable: false
 risk_tier: critical
-change_policy: update-only
+change_policy: supersede-only
 owner: "@you"
 last_reviewed: 2026-02-24
 applies_to:
