@@ -21,10 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      # Phase A default: advisory mode. Set to "true" in Phase B.
-      AUTONOMY_POLICY_ENFORCE: ${{ vars.AUTONOMY_POLICY_ENFORCE }}
+      # Phase B default: enforce unless explicitly disabled.
+      AUTONOMY_POLICY_ENFORCE: ${{ vars.AUTONOMY_POLICY_ENFORCE || 'true' }}
     steps:
-      - name: Validate autonomy policy (advisory by default)
+      - name: Validate autonomy policy
         uses: actions/github-script@v7
         with:
           script: |
@@ -184,4 +184,4 @@ jobs:
             }
 
             core.warning(`Autonomy policy found ${errors.length} issue(s) in advisory mode:\n${details}`);
-            core.notice("Phase A advisory mode active. Set repo variable AUTONOMY_POLICY_ENFORCE=true to enforce failures.");
+            core.notice("Advisory override active. Set repo variable AUTONOMY_POLICY_ENFORCE=true to fail on violations.");

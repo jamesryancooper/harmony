@@ -1,0 +1,105 @@
+name: PR Auto Merge
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    name: auto-merge
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: >-
+      ${{
+        github.event.pull_request.state == 'open' &&
+        github.event.pull_request.base.ref == 'main' &&
+        !github.event.pull_request.head.repo.fork
+      }}
+    env:
+      AUTONOMY_AUTO_MERGE_ENABLED: ${{ vars.AUTONOMY_AUTO_MERGE_ENABLED || 'false' }}
+      GH_REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_DRAFT: ${{ github.event.pull_request.draft }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+    steps:
+      - name: Enable auto-merge for eligible low-risk PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_LABELS_JSON: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          set -euo pipefail
+
+          enabled="$(echo "${AUTONOMY_AUTO_MERGE_ENABLED}" | tr '[:upper:]' '[:lower:]')"
+          if [[ "$enabled" != "true" ]]; then
+            echo "Auto-merge kill switch is OFF (AUTONOMY_AUTO_MERGE_ENABLED=${AUTONOMY_AUTO_MERGE_ENABLED})."
+            exit 0
+          fi
+
+          has_label() {
+            local name="$1"
+            jq -e --arg name "$name" 'index($name) != null' <<<"${PR_LABELS_JSON}" >/dev/null
+          }
+
+          if [[ "${PR_DRAFT}" == "true" ]]; then
+            echo "Skipping: PR is draft."
+            exit 0
+          fi
+
+          if [[ "${HEAD_REF}" == exp/* ]]; then
+            echo "Skipping: exp/* branches are non-mergeable."
+            exit 0
+          fi
+
+          if ! has_label "autonomy:auto-merge"; then
+            echo "Skipping: autonomy:auto-merge label missing."
+            exit 0
+          fi
+
+          if has_label "autonomy:no-automerge"; then
+            echo "Skipping: autonomy:no-automerge label present."
+            exit 0
+          fi
+
+          if ! has_label "risk:low"; then
+            echo "Skipping: risk:low label missing."
+            exit 0
+          fi
+
+          if has_label "risk:med" || has_label "risk:high"; then
+            echo "Skipping: non-low risk label present."
+            exit 0
+          fi
+
+          if has_label "accept:human"; then
+            echo "Skipping: accept:human label present."
+            exit 0
+          fi
+
+          pr_json="$(gh pr view "${PR_NUMBER}" --repo "${GH_REPO}" --json autoMergeRequest,state,isDraft)"
+          if [[ "$(jq -r '.state' <<<"${pr_json}")" != "OPEN" ]]; then
+            echo "Skipping: PR is no longer open."
+            exit 0
+          fi
+
+          if [[ "$(jq -r '.isDraft' <<<"${pr_json}")" == "true" ]]; then
+            echo "Skipping: PR is draft in latest state."
+            exit 0
+          fi
+
+          if [[ "$(jq -r '.autoMergeRequest != null' <<<"${pr_json}")" == "true" ]]; then
+            echo "Auto-merge is already enabled for PR #${PR_NUMBER}."
+            exit 0
+          fi
+
+          gh pr merge "${PR_NUMBER}" --repo "${GH_REPO}" --squash --delete-branch --auto
+          echo "Enabled auto-merge for PR #${PR_NUMBER}."
