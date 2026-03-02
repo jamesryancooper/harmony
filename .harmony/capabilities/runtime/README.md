@@ -29,3 +29,5 @@ For autonomous AI agents, these are four capability classes in one runtime.
 - `skills/manifest.yml`
 - `tools/manifest.yml`
 - `services/manifest.yml`
+
+<!-- shadow validation pass2 medium risk 2026-03-02 -->
