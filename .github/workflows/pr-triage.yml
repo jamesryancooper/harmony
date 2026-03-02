@@ -7,7 +7,10 @@ on:
       - reopened
       - synchronize
       - ready_for_review
+      - converted_to_draft
       - edited
+      - labeled
+      - unlabeled
 
 permissions:
   contents: read
@@ -186,6 +189,20 @@ jobs:
               desiredLabels.add("bot:dependabot");
             }
 
+            // Phase B autonomy lane:
+            // - Low-risk, non-draft PRs are auto-merge eligible unless explicitly opted out.
+            // - Everything else is labeled out of the autonomous lane.
+            const manualNoAuto = labels.has("autonomy:no-automerge");
+            const isAutoMergeEligible =
+              !pr.draft &&
+              desiredRisk === "risk:low" &&
+              !headRef.startsWith("exp/") &&
+              !labels.has("accept:human") &&
+              !manualNoAuto;
+
+            const desiredAutonomy = isAutoMergeEligible ? "autonomy:auto-merge" : "autonomy:no-automerge";
+            desiredLabels.add(desiredAutonomy);
+
             // Keep exactly one type and one risk label managed by triage.
             const labelsToRemove = [];
             for (const current of labels) {
@@ -193,6 +210,9 @@ jobs:
                 labelsToRemove.push(current);
               }
               if (current.startsWith("risk:") && current !== desiredRisk) {
+                labelsToRemove.push(current);
+              }
+              if (current.startsWith("autonomy:") && current !== desiredAutonomy) {
                 labelsToRemove.push(current);
               }
             }
@@ -244,4 +264,10 @@ jobs:
 
             if (isHighImpact) {
               core.notice("High-impact change detected. Explicit 'accept:human' is required by autonomy policy before merge.");
+            }
+
+            if (isAutoMergeEligible) {
+              core.notice("PR triaged into autonomy auto-merge lane.");
+            } else {
+              core.info("PR triaged out of autonomy auto-merge lane.");
             }

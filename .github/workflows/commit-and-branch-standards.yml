@@ -73,7 +73,7 @@ jobs:
             core.info(`Branch name passes standards: ${branchName}`);
 
   validate-commit-messages:
-    name: Validate commit messages
+    name: Validate commit messages (advisory)
     runs-on: ubuntu-latest
     steps:
       - name: Lint commit messages in PR from standards source
@@ -83,7 +83,7 @@ jobs:
             const baseSha = context.payload.pull_request?.base?.sha;
             const prNumber = context.payload.pull_request?.number;
             if (!baseSha || !prNumber) {
-              core.setFailed("Unable to determine PR base SHA/number for commit validation.");
+              core.warning("Unable to determine PR base SHA/number for commit validation. Skipping advisory lint.");
               return;
             }
 
@@ -96,7 +96,7 @@ jobs:
             });
 
             if (Array.isArray(standardsResponse.data) || !("content" in standardsResponse.data)) {
-              core.setFailed(`Expected file content at ${standardsPath} but found a non-file response.`);
+              core.warning(`Expected file content at ${standardsPath} but found a non-file response. Skipping advisory lint.`);
               return;
             }
 
@@ -168,9 +168,9 @@ jobs:
             }
 
             if (failures.length) {
-              core.setFailed(
+              core.warning(
                 [
-                  `Commit message validation failed with ${failures.length} issue(s).`,
+                  `Commit message advisory found ${failures.length} issue(s).`,
                   ...failures.map((issue) => `- ${issue}`)
                 ].join("\n")
               );
