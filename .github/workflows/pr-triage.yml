@@ -1,0 +1,247 @@
+name: PR Triage
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - edited
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  triage:
+    name: triage
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Auto-label and normalize bot titles
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr = context.payload.pull_request;
+            const pull_number = pr.number;
+
+            const headRef = pr.head?.ref || "";
+            const author = pr.user?.login || "";
+            const labels = new Set((pr.labels || []).map((l) => l.name));
+            const currentTitle = pr.title || "";
+
+            const isDependabot = author === "dependabot[bot]" || headRef.startsWith("dependabot/");
+
+            // Keep this label catalog minimal and aligned to this phase.
+            const labelCatalog = {
+              "type:feat": { color: "1D76DB", description: "New feature" },
+              "type:fix": { color: "D73A4A", description: "Bug fix" },
+              "type:refactor": { color: "A2EEEF", description: "Refactor" },
+              "type:perf": { color: "C2E0C6", description: "Performance improvement" },
+              "type:test": { color: "FBCA04", description: "Tests" },
+              "type:docs": { color: "0075CA", description: "Documentation" },
+              "type:chore": { color: "C5DEF5", description: "Maintenance and chores" },
+              "type:ci": { color: "5319E7", description: "CI or automation" },
+              "type:revert": { color: "BFD4F2", description: "Revert change" },
+              "type:unknown": { color: "D4C5F9", description: "Unclassified branch type" },
+
+              "area:agency": { color: "0E8A16", description: "Harmony agency domain" },
+              "area:capabilities": { color: "0E8A16", description: "Harmony capabilities domain" },
+              "area:cognition": { color: "0E8A16", description: "Harmony cognition domain" },
+              "area:orchestration": { color: "0E8A16", description: "Harmony orchestration domain" },
+              "area:scaffolding": { color: "0E8A16", description: "Harmony scaffolding domain" },
+              "area:assurance": { color: "0E8A16", description: "Harmony assurance domain" },
+              "area:engine": { color: "0E8A16", description: "Harmony engine domain" },
+              "area:continuity": { color: "0E8A16", description: "Harmony continuity domain" },
+              "area:ideation": { color: "0E8A16", description: "Harmony ideation domain" },
+              "area:output": { color: "0E8A16", description: "Harmony output domain" },
+              "area:github": { color: "0052CC", description: "GitHub workflow or settings surface" },
+              "area:root": { color: "0052CC", description: "Root contract or repository surface" },
+              "area:uncategorized": { color: "BFDADC", description: "No known area match" },
+
+              "risk:low": { color: "D4C5F9", description: "Low risk routine change" },
+              "risk:med": { color: "FBCA04", description: "Medium risk change" },
+              "risk:high": { color: "B60205", description: "High impact governance/control-plane change" },
+
+              "accept:human": { color: "000000", description: "Explicit human acceptance for high-impact merge" },
+              "autonomy:auto-merge": { color: "1B8835", description: "Eligible for autonomous auto-merge lane" },
+              "autonomy:no-automerge": { color: "B60205", description: "Excluded from autonomous auto-merge lane" },
+              "bot:dependabot": { color: "0366D6", description: "Dependabot pull request" }
+            };
+
+            async function ensureLabel(name) {
+              const cfg = labelCatalog[name];
+              if (!cfg) return;
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (error) {
+                if (error.status === 404) {
+                  try {
+                    await github.rest.issues.createLabel({
+                      owner,
+                      repo,
+                      name,
+                      color: cfg.color,
+                      description: cfg.description
+                    });
+                    core.info(`Created label: ${name}`);
+                  } catch (createError) {
+                    core.warning(`Could not create label ${name}: ${createError.message}`);
+                  }
+                } else {
+                  core.warning(`Could not read label ${name}: ${error.message}`);
+                }
+              }
+            }
+
+            // Read changed files directly from API (no checkout in pull_request_target).
+            const changedFiles = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100
+            });
+            const paths = changedFiles.map((f) => f.filename);
+
+            const typeFromPrefix = {
+              feat: "type:feat",
+              fix: "type:fix",
+              refactor: "type:refactor",
+              perf: "type:perf",
+              test: "type:test",
+              docs: "type:docs",
+              chore: "type:chore",
+              ci: "type:ci",
+              revert: "type:revert"
+            };
+
+            const branchPrefix = headRef.split("/")[0] || "";
+            let desiredType = typeFromPrefix[branchPrefix] || "type:unknown";
+            if (isDependabot) {
+              desiredType = "type:chore";
+            }
+
+            const areaPrefixMap = [
+              [".harmony/agency/", "area:agency"],
+              [".harmony/capabilities/", "area:capabilities"],
+              [".harmony/cognition/", "area:cognition"],
+              [".harmony/orchestration/", "area:orchestration"],
+              [".harmony/scaffolding/", "area:scaffolding"],
+              [".harmony/assurance/", "area:assurance"],
+              [".harmony/engine/", "area:engine"],
+              [".harmony/continuity/", "area:continuity"],
+              [".harmony/ideation/", "area:ideation"],
+              [".harmony/output/", "area:output"],
+              [".github/", "area:github"]
+            ];
+
+            const desiredAreas = new Set();
+            for (const path of paths) {
+              let matched = false;
+              for (const [prefix, label] of areaPrefixMap) {
+                if (path.startsWith(prefix)) {
+                  desiredAreas.add(label);
+                  matched = true;
+                }
+              }
+
+              if (!matched && !path.includes("/")) {
+                desiredAreas.add("area:root");
+                matched = true;
+              }
+            }
+            if (desiredAreas.size === 0) {
+              desiredAreas.add("area:uncategorized");
+            }
+
+            const highImpactPathPatterns = [
+              ".github/",
+              "AGENTS.md",
+              ".harmony/agency/governance/",
+              ".harmony/cognition/governance/",
+              ".harmony/capabilities/governance/",
+              ".harmony/engine/governance/",
+              ".harmony/engine/runtime/spec/",
+              ".harmony/assurance/governance/"
+            ];
+            const mediumImpactPathPatterns = [
+              ".harmony/agency/runtime/",
+              ".harmony/capabilities/runtime/",
+              ".harmony/orchestration/runtime/",
+              ".harmony/assurance/runtime/",
+              ".harmony/engine/runtime/"
+            ];
+
+            const isHighImpact = paths.some((path) => highImpactPathPatterns.some((prefix) => path.startsWith(prefix) || path === prefix));
+            const isMediumImpact = !isHighImpact && paths.some((path) => mediumImpactPathPatterns.some((prefix) => path.startsWith(prefix)));
+
+            const desiredRisk = isHighImpact ? "risk:high" : (isMediumImpact ? "risk:med" : "risk:low");
+
+            const desiredLabels = new Set([desiredType, desiredRisk, ...desiredAreas]);
+            if (isDependabot) {
+              desiredLabels.add("bot:dependabot");
+            }
+
+            // Keep exactly one type and one risk label managed by triage.
+            const labelsToRemove = [];
+            for (const current of labels) {
+              if (current.startsWith("type:") && current !== desiredType) {
+                labelsToRemove.push(current);
+              }
+              if (current.startsWith("risk:") && current !== desiredRisk) {
+                labelsToRemove.push(current);
+              }
+            }
+
+            // Best effort label creation and mutation.
+            for (const name of desiredLabels) {
+              await ensureLabel(name);
+            }
+
+            const labelsToAdd = [...desiredLabels].filter((name) => !labels.has(name));
+            if (labelsToAdd.length > 0) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner,
+                  repo,
+                  issue_number: pull_number,
+                  labels: labelsToAdd
+                });
+                core.info(`Added labels: ${labelsToAdd.join(", ")}`);
+              } catch (error) {
+                core.warning(`Could not add one or more labels: ${error.message}`);
+              }
+            }
+
+            for (const name of labelsToRemove) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner,
+                  repo,
+                  issue_number: pull_number,
+                  name
+                });
+                core.info(`Removed label: ${name}`);
+              } catch (error) {
+                core.warning(`Could not remove label ${name}: ${error.message}`);
+              }
+            }
+
+            const conventionalRegex = /^(feat|fix|refactor|perf|test|docs|chore|ci|revert)(\([a-z0-9][a-z0-9-]*\))?!?: .+/;
+            if (isDependabot && !conventionalRegex.test(currentTitle)) {
+              const normalized = `chore(deps): ${currentTitle}`.replace(/\s+/g, " ").trim().slice(0, 256);
+              try {
+                await github.rest.pulls.update({ owner, repo, pull_number, title: normalized });
+                core.info(`Normalized dependabot title: ${normalized}`);
+              } catch (error) {
+                core.warning(`Could not normalize dependabot title: ${error.message}`);
+              }
+            }
+
+            if (isHighImpact) {
+              core.notice("High-impact change detected. Explicit 'accept:human' is required by autonomy policy before merge.");
+            }
