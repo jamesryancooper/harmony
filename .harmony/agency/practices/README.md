@@ -8,3 +8,5 @@
 - [Commits - Convention and Discipline](commits.md)
 - [Pull Requests - Convention and Quality Standards](pull-request-standards.md)
 - [Commit and PR Standards (Machine Contract)](standards/commit-pr-standards.json)
+
+<!-- shadow validation low risk 2026-03-02 -->
