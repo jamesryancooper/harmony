@@ -1,0 +1,187 @@
+name: PR Autonomy Policy
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+      - ready_for_review
+      - labeled
+      - unlabeled
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      # Phase A default: advisory mode. Set to "true" in Phase B.
+      AUTONOMY_POLICY_ENFORCE: ${{ vars.AUTONOMY_POLICY_ENFORCE }}
+    steps:
+      - name: Validate autonomy policy (advisory by default)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr = context.payload.pull_request;
+            const pull_number = pr.number;
+            const baseSha = pr.base?.sha;
+
+            const body = (pr.body || "").trim();
+            const title = (pr.title || "").trim();
+            const headRef = pr.head?.ref || "";
+            const author = pr.user?.login || "";
+            const labels = new Set((pr.labels || []).map((l) => l.name));
+
+            const isDependabot = author === "dependabot[bot]" || headRef.startsWith("dependabot/");
+            const isAutorelease = headRef.startsWith("release-please--") || [...labels].some((name) => name.startsWith("autorelease:"));
+            const isBotPath = isDependabot || isAutorelease;
+            const enforce = String(process.env.AUTONOMY_POLICY_ENFORCE || "").toLowerCase() === "true";
+
+            const errors = [];
+
+            if (!baseSha) {
+              errors.push("Unable to determine PR base SHA.");
+            }
+
+            async function readTextFile(path) {
+              const response = await github.rest.repos.getContent({
+                owner,
+                repo,
+                path,
+                ref: baseSha
+              });
+
+              if (Array.isArray(response.data) || !("content" in response.data)) {
+                throw new Error(`Expected file content at ${path}, received non-file response.`);
+              }
+
+              return Buffer.from(
+                response.data.content,
+                response.data.encoding || "base64"
+              ).toString("utf8");
+            }
+
+            let standards;
+            let templateText;
+            try {
+              standards = JSON.parse(await readTextFile(".harmony/agency/practices/standards/commit-pr-standards.json"));
+              templateText = await readTextFile(".github/PULL_REQUEST_TEMPLATE.md");
+            } catch (error) {
+              errors.push(`Could not load standards/template from base SHA: ${error.message}`);
+            }
+
+            if (!isBotPath && standards) {
+              const allowedTypes = (standards.commit?.allowed_types || []).map((value) =>
+                String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+              ).join("|");
+              const scopePattern = standards.commit?.scope_pattern || "[a-z0-9][a-z0-9-]*";
+              const titleRegex = new RegExp(`^(?<type>${allowedTypes})\\((?<scope>${scopePattern})\\)(?<breaking>!)?: (?<summary>.+)$`);
+
+              const titleMatch = title.match(titleRegex);
+              if (!titleMatch || !titleMatch.groups) {
+                errors.push(`PR title '${title}' must match Conventional Commits format ${standards.commit?.header_format || "<type>(<scope>): <summary>"}.`);
+              } else {
+                const summary = titleMatch.groups.summary || "";
+                if (standards.commit?.summary_must_be_lowercase && summary !== summary.toLowerCase()) {
+                  errors.push("PR title summary must be lowercase.");
+                }
+                if (standards.commit?.summary_must_not_end_with_period && summary.endsWith(".")) {
+                  errors.push("PR title summary must not end with a period.");
+                }
+                if (standards.commit?.header_max_length && title.length > standards.commit.header_max_length) {
+                  errors.push(`PR title exceeds ${standards.commit.header_max_length} characters.`);
+                }
+              }
+            }
+
+            if (!isBotPath && standards) {
+              const branch = standards.branch || {};
+              const allowedTypes = (branch.allowed_types || []).map((value) =>
+                String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+              ).join("|");
+              const ticketPattern = branch.ticket_pattern || "[A-Za-z0-9]+-[0-9]+";
+              const slugPattern = branch.slug_pattern || "[a-z0-9]+(?:-[a-z0-9]+)*";
+              const branchRegex = new RegExp(`^(?<type>${allowedTypes})/(?:(?<ticket>${ticketPattern})-)?(?<slug>${slugPattern})$`);
+
+              if (!branchRegex.test(headRef)) {
+                errors.push(
+                  `Branch '${headRef}' must match ${branch.default_format || "<type>/<ticket-id>-<short-description>"} with allowed types: ${(branch.allowed_types || []).join(", ")}.`
+                );
+              }
+            }
+
+            if (headRef.startsWith("exp/")) {
+              errors.push("Branches under 'exp/' are non-mergeable in autonomy policy. Rename branch before merge.");
+            }
+
+            if (!isBotPath && templateText) {
+              const headingMatches = [...templateText.matchAll(/^##\s+(.+)\s*$/gm)];
+              const headings = headingMatches.map((match) => `## ${match[1].trim()}`);
+              const checklistHeading = "## Checklist";
+              const checklistIndex = headings.indexOf(checklistHeading);
+
+              if (checklistIndex === -1) {
+                errors.push("Canonical template is missing '## Checklist'.");
+              } else {
+                const requiredHeadings = headings.slice(0, checklistIndex + 1);
+                const missingHeadings = requiredHeadings.filter((heading) => {
+                  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                  return !new RegExp(`^${escaped}\\s*$`, "mi").test(body);
+                });
+                if (missingHeadings.length > 0) {
+                  errors.push(`PR body missing required sections: ${missingHeadings.join(", ")}`);
+                }
+              }
+
+              const hasIssueLink = /(close[sd]?|fixe?[sd]?|resolve[sd]?)\s+#\d+/i.test(body);
+              const hasNoIssue = /No-Issue:\s*\S+/i.test(body);
+              if (!hasIssueLink && !hasNoIssue) {
+                errors.push("PR body must include issue linkage (`Closes/Fixes/Resolves #...`) or `No-Issue: <reason>`.");
+              }
+            }
+
+            const changedFiles = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number,
+              per_page: 100
+            });
+            const paths = changedFiles.map((file) => file.filename);
+
+            const highImpactPaths = [
+              ".github/",
+              "AGENTS.md",
+              ".harmony/agency/governance/",
+              ".harmony/cognition/governance/",
+              ".harmony/capabilities/governance/",
+              ".harmony/engine/governance/",
+              ".harmony/engine/runtime/spec/",
+              ".harmony/assurance/governance/"
+            ];
+
+            const isHighImpact = paths.some((path) => highImpactPaths.some((prefix) => path.startsWith(prefix) || path === prefix));
+            if (isHighImpact && !labels.has("accept:human")) {
+              errors.push("High-impact change requires explicit `accept:human` label before merge.");
+            }
+
+            if (errors.length === 0) {
+              core.info(`Autonomy policy passed (${enforce ? "enforced" : "advisory"} mode).`);
+              return;
+            }
+
+            const details = errors.map((item) => `- ${item}`).join("\n");
+            if (enforce) {
+              core.setFailed(`Autonomy policy failed (enforced mode):\n${details}`);
+              return;
+            }
+
+            core.warning(`Autonomy policy found ${errors.length} issue(s) in advisory mode:\n${details}`);
+            core.notice("Phase A advisory mode active. Set repo variable AUTONOMY_POLICY_ENFORCE=true to enforce failures.");
