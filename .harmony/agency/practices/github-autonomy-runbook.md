@@ -31,7 +31,7 @@ Use this document when setting up or rotating `AUTONOMY_PAT`.
   - `token: ${{ secrets.AUTONOMY_PAT || secrets.GITHUB_TOKEN }}`
 - Workflow wiring (Phase D steady-state monitoring):
   `.github/workflows/autonomy-release-health.yml`
-  - `GH_TOKEN: ${{ secrets.AUTONOMY_PAT || secrets.GITHUB_TOKEN }}`
+  - `GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}`
   - `AUTONOMY_PAT_VALUE: ${{ secrets.AUTONOMY_PAT }}`
 
 If `AUTONOMY_PAT` is not set, workflow falls back to `GITHUB_TOKEN`.

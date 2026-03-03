@@ -22,7 +22,9 @@ jobs:
     timeout-minutes: 10
     env:
       GH_REPO: ${{ github.repository }}
-      GH_TOKEN: ${{ secrets.AUTONOMY_PAT || secrets.GITHUB_TOKEN }}
+      # Use the workflow token for Actions API reads so fine-grained PAT
+      # minimum permissions can keep Actions access disabled.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       AUTONOMY_PAT_VALUE: ${{ secrets.AUTONOMY_PAT }}
       AUTONOMY_AUTO_MERGE_ENABLED: ${{ vars.AUTONOMY_AUTO_MERGE_ENABLED || '' }}
       AUTONOMY_POLICY_ENFORCE: ${{ vars.AUTONOMY_POLICY_ENFORCE || '' }}
@@ -94,20 +96,23 @@ jobs:
           release_please_runs="$(
             gh run list \
               --workflow "Release Please" \
-              --limit 1 \
+              --branch main \
+              --event push \
+              --limit 10 \
               --json conclusion,status,createdAt,url
           )"
-          run_count="$(jq 'length' <<< "${release_please_runs}")"
-          if [[ "${run_count}" -eq 0 ]]; then
-            fail "No Release Please workflow runs were found."
+          latest_completed="$(
+            jq -c '[.[] | select(.status == "completed")] | .[0]' <<< "${release_please_runs}"
+          )"
+          if [[ -z "${latest_completed}" || "${latest_completed}" == "null" ]]; then
+            fail "No completed Release Please push runs on main were found."
           else
-            latest_conclusion="$(jq -r '.[0].conclusion' <<< "${release_please_runs}")"
-            latest_status="$(jq -r '.[0].status' <<< "${release_please_runs}")"
-            latest_url="$(jq -r '.[0].url' <<< "${release_please_runs}")"
-            if [[ "${latest_status}" == "completed" && "${latest_conclusion}" == "success" ]]; then
+            latest_conclusion="$(jq -r '.conclusion' <<< "${latest_completed}")"
+            latest_url="$(jq -r '.url' <<< "${latest_completed}")"
+            if [[ "${latest_conclusion}" == "success" ]]; then
               pass "Latest Release Please run succeeded (${latest_url})."
             else
-              fail "Latest Release Please run is not successful (${latest_status}/${latest_conclusion}): ${latest_url}"
+              fail "Latest completed Release Please run failed (${latest_conclusion}): ${latest_url}"
             fi
           fi
 
