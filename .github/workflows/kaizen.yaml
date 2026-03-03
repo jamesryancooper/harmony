@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Note
         run: |
           echo "Kaizen workflow placeholder. Replace with real steps (e.g., kaizen/agents and kaizen/evaluators) when ready."
