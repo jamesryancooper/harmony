@@ -1,0 +1,118 @@
+---
+title: Git Autonomy Playbook
+description: Local operator playbook for autonomy-first Git and GitHub workflow execution.
+---
+
+# Git Autonomy Playbook
+
+This playbook covers the local script lane for autonomy-first Git/GitHub flow:
+
+- `.harmony/agency/_ops/scripts/git-wt-new.sh`
+- `.harmony/agency/_ops/scripts/git-pr-open.sh`
+- `.harmony/agency/_ops/scripts/git-pr-ship.sh`
+- `.harmony/agency/_ops/scripts/sync-github-labels.sh`
+
+Use this with [GitHub Autonomy Runbook](./github-autonomy-runbook.md) for token,
+permissions, and control-plane drift operations.
+
+---
+
+## Preconditions
+
+- `gh auth status` is healthy for the target account.
+- Branch naming and commit conventions remain governed by:
+  - `.harmony/agency/practices/standards/commit-pr-standards.json`
+- Repository autonomy variables/secrets are configured:
+  - `AUTONOMY_AUTO_MERGE_ENABLED=true`
+  - `AUTONOMY_PAT` repository Actions secret
+
+---
+
+## Script Quick Reference
+
+### 1) Create a branch + worktree
+
+```bash
+.harmony/agency/_ops/scripts/git-wt-new.sh \
+  --type fix \
+  --slug phase-e-local-autonomy-scripts
+```
+
+Behavior:
+
+- Validates branch format against repository branch policy contract.
+- Creates a new worktree in a sibling folder.
+- Creates branch from `main` (or `--base` override).
+
+### 2) Commit, push, and open a draft PR
+
+```bash
+.harmony/agency/_ops/scripts/git-pr-open.sh \
+  --title "fix(github): tighten autonomy script defaults" \
+  --summary "Adds safer defaults for local autonomy helper scripts." \
+  --stage-all \
+  --no-issue "operator-tooling"
+```
+
+Behavior:
+
+- Commits staged changes, or stages everything when `--stage-all` is set.
+- Pushes the current branch to `origin`.
+- Builds PR body from `.github/PULL_REQUEST_TEMPLATE.md`.
+- Ensures issue-link policy with either `Closes #...` or `No-Issue: ...`.
+
+### 3) Label, ready, and request auto-merge
+
+```bash
+.harmony/agency/_ops/scripts/git-pr-ship.sh --accept-human
+```
+
+Behavior:
+
+- Adds autonomy lane labels (`autonomy:auto-merge` by default).
+- Removes `autonomy:no-automerge` when requesting autonomous lane.
+- Marks draft PR as ready (unless `--no-ready`).
+- Requests squash auto-merge (unless `--no-automerge`).
+
+### 4) Sync required GitHub labels
+
+```bash
+.harmony/agency/_ops/scripts/sync-github-labels.sh
+```
+
+Behavior:
+
+- Creates or updates triage/policy labels idempotently.
+- Keeps color/description aligned with workflow expectations.
+
+---
+
+## Lane Guidance
+
+### Low-risk autonomous lane
+
+1. Create worktree/branch with `git-wt-new.sh`.
+2. Implement change.
+3. Open draft PR with `git-pr-open.sh`.
+4. Mark ready + request merge with `git-pr-ship.sh`.
+5. Let required checks and branch rules enforce final merge safety.
+
+### High-impact guarded lane
+
+When touching high-impact paths (for example `.github/` or governance paths):
+
+1. Add `accept:human` before merge.
+2. Keep PR focused and explicitly document risk/rollback.
+3. Use `git-pr-ship.sh --accept-human` to preserve metadata-level check-in.
+
+---
+
+## Safety and Exceptions
+
+- Do not bypass required checks or branch rules via local scripts.
+- Keep `main` PR-first; direct push remains break-glass only.
+- If autonomy behavior regresses:
+  1. Set `AUTONOMY_AUTO_MERGE_ENABLED=false`
+  2. Keep triage/policy checks active
+  3. Follow rollback guidance in
+     [GitHub Autonomy Runbook](./github-autonomy-runbook.md).
