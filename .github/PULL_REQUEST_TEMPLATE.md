@@ -7,7 +7,8 @@ One or two sentences describing what this PR changes.
 
 ## Why
 
-The problem this solves and why it matters. Include ticket/issue links.
+The problem this solves and why it matters. Include `Closes/Fixes/Resolves #...`
+or `No-Issue: <reason>`.
 
 ## How
 
@@ -29,7 +30,9 @@ Release strategy (flags, migration sequencing, canary/gradual rollout) or `n/a`.
 
 - Risk class: [ ] Trivial [ ] Low [ ] Medium [ ] High
 - Rollback plan:
+- Rollback handle:
 - Flags changed (name, owner, expiry, rollout):
+- Autonomy eligibility: [ ] autonomy:auto-merge [ ] autonomy:no-automerge
 
 ## Contracts and Threat Model
 

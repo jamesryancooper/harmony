@@ -125,6 +125,16 @@ Verify before committing: required quality checks for your stack pass
 Squash false starts, debugging artifacts, and WIP checkpoints before merging.
 Final history should read as a clean narrative of deliberate changes.
 
+### 3.1 Autonomy Mode
+
+In autonomy-first flow, iterative branch-local commits are allowed while an
+agent is actively refining a solution. The durable trunk artifact is still the
+squash commit on `main`, and it must satisfy the canonical Conventional Commit
+contract (`<type>(<scope>): <summary>`).
+
+Treat branch commits as working narration and trunk commits as permanent
+history.
+
 ### 4. Never Commit
 
 - Secrets, credentials, API keys, `.env` files

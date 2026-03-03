@@ -11,6 +11,7 @@ GitHub autonomy workflows:
 - `.github/workflows/pr-triage.yml`
 - `.github/workflows/pr-autonomy-policy.yml`
 - `.github/workflows/pr-auto-merge.yml`
+- `.github/workflows/pr-stale-close.yml`
 - `.github/workflows/release-please.yml`
 - `.github/workflows/autonomy-release-health.yml`
 
@@ -95,12 +96,14 @@ Before expecting autonomous low-risk merges:
 2. Main branch ruleset is active with required checks and PR-first merge.
 3. Actions workflow setting has `can_approve_pull_request_reviews=true`.
 4. `AUTONOMY_PAT` is set as a repository Actions secret.
+5. (Optional) `AUTONOMY_AUTO_CLOSE_ENABLED=true` if stale draft auto-close is desired.
 
 Useful verification commands:
 
 ```bash
 gh secret list --app actions | rg '^AUTONOMY_PAT'
 gh variable list | rg '^AUTONOMY_AUTO_MERGE_ENABLED'
+gh variable list | rg '^AUTONOMY_AUTO_CLOSE_ENABLED'
 gh api repos/<owner>/<repo>/actions/permissions/workflow
 gh api repos/<owner>/<repo>/rulesets
 ```

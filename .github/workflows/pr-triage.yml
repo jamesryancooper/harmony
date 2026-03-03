@@ -185,7 +185,9 @@ jobs:
             const isHighImpact = paths.some((path) => highImpactPathPatterns.some((prefix) => path.startsWith(prefix) || path === prefix));
             const isMediumImpact = !isHighImpact && paths.some((path) => mediumImpactPathPatterns.some((prefix) => path.startsWith(prefix)));
 
-            const desiredRisk = isHighImpact ? "risk:high" : (isMediumImpact ? "risk:med" : "risk:low");
+            const desiredRisk = isHighImpact
+              ? "risk:high"
+              : ((isReleasePlease || isMediumImpact) ? "risk:med" : "risk:low");
 
             const desiredLabels = new Set([desiredType, desiredRisk, ...desiredAreas]);
             if (isDependabot) {
