@@ -21,7 +21,7 @@ jobs:
       CLOSE_AFTER_STALE_DAYS: ${{ vars.AUTONOMY_AUTO_CLOSE_CLOSE_DAYS || '3' }}
     steps:
       - name: Manage stale draft PRs
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const enabled = String(process.env.AUTONOMY_AUTO_CLOSE_ENABLED || "").toLowerCase() === "true";

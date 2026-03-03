@@ -106,7 +106,7 @@ jobs:
       issues: write
     steps:
       - name: Upsert GitHub issue alert
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const owner = context.repo.owner;
@@ -146,7 +146,7 @@ jobs:
 
       - name: Send Slack alert (optional)
         if: ${{ secrets.FILESYSTEM_INTERFACES_SLO_ALERT_WEBHOOK != '' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           ALERT_WEBHOOK: ${{ secrets.FILESYSTEM_INTERFACES_SLO_ALERT_WEBHOOK }}
         with:
@@ -182,7 +182,7 @@ jobs:
       issues: write
     steps:
       - name: Close open GitHub issue alert on recovery
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const owner = context.repo.owner;
@@ -217,7 +217,7 @@ jobs:
 
       - name: Send Slack recovery notification (optional)
         if: ${{ secrets.FILESYSTEM_INTERFACES_SLO_ALERT_WEBHOOK != '' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           ALERT_WEBHOOK: ${{ secrets.FILESYSTEM_INTERFACES_SLO_ALERT_WEBHOOK }}
         with:

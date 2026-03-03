@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Auto-label and normalize bot titles
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const owner = context.repo.owner;
