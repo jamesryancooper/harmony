@@ -64,7 +64,7 @@ jobs:
                   .conclusion == "SUCCESS");
               passed("PR Quality Standards"; "PR Quality Standards") and
               passed("Commit and Branch Standards"; "Validate branch naming") and
-              passed("PR Autonomy Policy"; "validate")
+              passed("PR Autonomy Policy"; "Validate autonomy policy")
             ' <<<"${payload}" >/dev/null
           }
 
@@ -79,7 +79,7 @@ jobs:
                   (.conclusion == "FAILURE" or .conclusion == "CANCELLED" or .conclusion == "TIMED_OUT" or .conclusion == "ACTION_REQUIRED"));
               failed("PR Quality Standards"; "PR Quality Standards") or
               failed("Commit and Branch Standards"; "Validate branch naming") or
-              failed("PR Autonomy Policy"; "validate")
+              failed("PR Autonomy Policy"; "Validate autonomy policy")
             ' <<<"${payload}" >/dev/null
           }
 
