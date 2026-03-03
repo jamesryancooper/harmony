@@ -26,6 +26,22 @@ Use this progressive path to get only the depth you need:
 
 ---
 
+## Autonomy-First Flow
+
+Default PR execution in Harmony is autonomy-first:
+
+1. Open early as draft.
+2. Let triage apply `type:*`, `area:*`, and `risk:*`.
+3. Move to ready when policy and required checks are green.
+4. Use autonomous squash merge for eligible low-risk PRs.
+
+Human check-ins are exception-based:
+
+- High-impact path changes must carry explicit `accept:human` before merge.
+- `accept:human` is a policy acknowledgement, not a substitute for failing CI.
+
+---
+
 ## Enforcement
 
 This practice is platform-agnostic. Repositories can enforce it with any source
@@ -80,6 +96,9 @@ summary is acceptable.
 ### Context for Reviewers
 
 - Link the ticket/issue. Don't make the reviewer search for context.
+- Every PR description must include either:
+  - `Closes/Fixes/Resolves #<issue>` or
+  - `No-Issue: <reason>`
 - If the PR introduces a pattern the team hasn't used before, call it out explicitly and explain the reasoning.
 - If there's a visual change, include a screenshot or recording.
 - If there's a performance impact, include before/after measurements.

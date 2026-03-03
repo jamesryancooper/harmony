@@ -1,0 +1,154 @@
+name: PR Stale Close
+
+on:
+  schedule:
+    - cron: '15 08 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  stale-close:
+    name: stale-close
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AUTONOMY_AUTO_CLOSE_ENABLED: ${{ vars.AUTONOMY_AUTO_CLOSE_ENABLED || 'false' }}
+      STALE_DAYS: ${{ vars.AUTONOMY_AUTO_CLOSE_STALE_DAYS || '7' }}
+      CLOSE_AFTER_STALE_DAYS: ${{ vars.AUTONOMY_AUTO_CLOSE_CLOSE_DAYS || '3' }}
+    steps:
+      - name: Manage stale draft PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const enabled = String(process.env.AUTONOMY_AUTO_CLOSE_ENABLED || "").toLowerCase() === "true";
+            if (!enabled) {
+              core.notice("Skipping stale close: AUTONOMY_AUTO_CLOSE_ENABLED is not true.");
+              return;
+            }
+
+            const staleDays = Number.parseInt(process.env.STALE_DAYS || "7", 10);
+            const closeAfter = Number.parseInt(process.env.CLOSE_AFTER_STALE_DAYS || "3", 10);
+            if (!Number.isFinite(staleDays) || !Number.isFinite(closeAfter)) {
+              core.setFailed("Invalid stale/close day configuration.");
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const staleLabel = "autonomy:stale-draft";
+            const exemptLabels = new Set(["accept:human", "autonomy:no-automerge", "risk:high"]);
+
+            async function ensureStaleLabel() {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name: staleLabel });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({
+                  owner,
+                  repo,
+                  name: staleLabel,
+                  color: "C5DEF5",
+                  description: "Draft PR marked stale by automation"
+                });
+                core.info(`Created label: ${staleLabel}`);
+              }
+            }
+
+            await ensureStaleLabel();
+
+            const pulls = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: "open",
+              per_page: 100
+            });
+
+            let markedStale = 0;
+            let closed = 0;
+            let cleaned = 0;
+            const now = Date.now();
+            const closeThreshold = staleDays + closeAfter;
+
+            for (const pr of pulls) {
+              if (!pr.draft) {
+                continue;
+              }
+
+              const labels = new Set((pr.labels || []).map((label) => label.name));
+              const hasExempt = [...exemptLabels].some((name) => labels.has(name));
+              if (hasExempt) {
+                continue;
+              }
+
+              const idleDays = (now - Date.parse(pr.updated_at)) / (1000 * 60 * 60 * 24);
+              const isStale = idleDays >= staleDays;
+              const shouldClose = idleDays >= closeThreshold;
+              const hasStaleLabel = labels.has(staleLabel);
+
+              if (shouldClose) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: [
+                    `Closing stale draft PR after ${Math.floor(idleDays)} days without updates.`,
+                    "Add `autonomy:no-automerge` or `accept:human` to exempt future stale-close automation."
+                  ].join("\n\n")
+                });
+                await github.rest.pulls.update({
+                  owner,
+                  repo,
+                  pull_number: pr.number,
+                  state: "closed"
+                });
+                closed += 1;
+                continue;
+              }
+
+              if (isStale && !hasStaleLabel) {
+                await github.rest.issues.addLabels({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  labels: [staleLabel]
+                });
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: [
+                    `Marking draft PR as stale after ${Math.floor(idleDays)} days without updates.`,
+                    `This PR will be auto-closed after ${closeAfter} additional idle day(s) unless updated.`
+                  ].join("\n\n")
+                });
+                markedStale += 1;
+                continue;
+              }
+
+              if (!isStale && hasStaleLabel) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner,
+                    repo,
+                    issue_number: pr.number,
+                    name: staleLabel
+                  });
+                  cleaned += 1;
+                } catch (error) {
+                  core.warning(`Could not remove stale label from #${pr.number}: ${error.message}`);
+                }
+              }
+            }
+
+            core.summary
+              .addHeading("Stale Draft PR Sweep")
+              .addRaw(`- stale threshold: ${staleDays} day(s)\n`)
+              .addRaw(`- close-after-stale threshold: ${closeAfter} day(s)\n`)
+              .addRaw(`- marked stale: ${markedStale}\n`)
+              .addRaw(`- closed: ${closed}\n`)
+              .addRaw(`- stale label removed: ${cleaned}\n`)
+              .write();
