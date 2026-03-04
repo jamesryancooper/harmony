@@ -12,7 +12,7 @@ assert_pattern() {
   local pattern="$2"
   local label="$3"
 
-  if ! printf '%s' "$value" | rg -q "$pattern"; then
+  if ! printf '%s' "$value" | grep -E -q -- "$pattern"; then
     echo "[fail] $label"
     echo "value: $value"
     exit 1
