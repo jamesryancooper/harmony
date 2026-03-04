@@ -10,7 +10,7 @@ on:
       - labeled
       - unlabeled
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
     inputs:
       pr_number:
@@ -21,6 +21,10 @@ on:
 permissions:
   contents: write
   pull-requests: write
+
+concurrency:
+  group: pr-auto-merge-${{ github.event_name }}
+  cancel-in-progress: true
 
 jobs:
   discover-prs:

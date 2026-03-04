@@ -19,10 +19,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: principles-governance-lint-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   principles-governance-lint:
     name: Lint principles governance
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4

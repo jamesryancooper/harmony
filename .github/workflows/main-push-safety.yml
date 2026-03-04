@@ -28,6 +28,11 @@ jobs:
       - name: Set up Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Restore Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          cache-bin: true
+
       - name: Validate harness structure
         run: |
           chmod +x .harmony/assurance/runtime/_ops/scripts/validate-harness-structure.sh

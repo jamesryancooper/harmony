@@ -7,24 +7,58 @@ on:
       - reopened
       - synchronize
       - ready_for_review
+      - labeled
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: codex-pr-review-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: classify-changes
+    runs-on: ubuntu-latest
+    outputs:
+      risky: ${{ steps.filter.outputs.risky }}
+    steps:
+      - name: Checkout PR merge commit
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+
+      - id: filter
+        name: Detect risky changed paths
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            risky:
+              - '.github/workflows/**'
+              - '.harmony/agency/governance/**'
+              - '.harmony/cognition/governance/**'
+              - '.harmony/capabilities/runtime/**'
+              - '.harmony/engine/runtime/**'
+              - '.harmony/assurance/runtime/**'
+              - 'AGENTS.md'
+
   codex-review:
     name: Run Codex Review
+    needs:
+      - changes
     if: >-
       ${{
         !github.event.pull_request.draft &&
         github.event.pull_request.head.repo.fork == false &&
-        secrets.OPENAI_API_KEY != ''
+        secrets.OPENAI_API_KEY != '' &&
+        (
+          contains(github.event.pull_request.labels.*.name, 'codex:review') ||
+          needs.changes.outputs.risky == 'true'
+        )
       }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     outputs:
       final_message: ${{ steps.run_codex.outputs.final-message }}
     steps:

@@ -409,3 +409,8 @@ Phase 5 (provider-agnostic AI gate):
 - `AI Review Gate` reports blockers in strict mode:
   fix blockers or apply temporary waiver labels (`ai-gate:waive` +
   `accept:human`) with explicit human acknowledgement.
+- PR remains `BLOCKED` after billing was fixed and reruns are green:
+  stale failed check contexts can remain attached to the old head SHA.
+  Push a no-op commit to mint a fresh SHA, then rerun required checks.
+  Example:
+  `git commit --allow-empty -m "chore(ci): refresh required-check contexts" && git push`.
