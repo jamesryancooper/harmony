@@ -17,6 +17,10 @@ permissions:
   pull-requests: write
   issues: write
 
+concurrency:
+  group: pr-triage-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   triage:
     name: triage

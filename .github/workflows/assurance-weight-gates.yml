@@ -30,10 +30,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: assurance-weight-gates-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   score-and-gate:
     name: score-and-gate
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +49,11 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
+
+      - name: Restore Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          cache-bin: true
 
       - name: Resolve baseline files
         shell: bash
@@ -135,4 +145,4 @@ jobs:
             ${{ env.OUT_DIR }}/effective-weights.yml
             ${{ env.OUT_DIR }}/regressions.md
             ${{ env.OUT_DIR }}/gate-summary.md
-          retention-days: 30
+          retention-days: 7

@@ -2,6 +2,8 @@ name: Agency Validation
 
 on:
   push:
+    branches:
+      - main
     paths:
       - '.harmony/agency/**'
       - '.harmony/harmony.yml'
@@ -21,9 +23,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: agency-validate-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4

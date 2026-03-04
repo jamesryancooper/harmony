@@ -11,6 +11,8 @@ on:
       - '.harmony/engine/runtime/spec/policy-interface-v1.md'
       - '.harmony/engine/runtime/crates/policy_engine/**'
   push:
+    branches:
+      - main
     paths:
       - '.harmony/capabilities/_ops/**'
       - '.harmony/capabilities/runtime/services/**'
@@ -23,6 +25,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: deny-by-default-gates-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -33,6 +39,11 @@ jobs:
 
       - name: Set up Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Restore Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          cache-bin: true
 
       - name: Validate deny-by-default contract and enforcement (strict)
         run: |

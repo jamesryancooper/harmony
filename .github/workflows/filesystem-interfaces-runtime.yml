@@ -2,13 +2,15 @@ name: filesystem-interfaces-runtime
 
 on:
   push:
+    branches:
+      - main
     paths:
       - '.harmony/capabilities/runtime/services/interfaces/filesystem-snapshot/**'
       - '.harmony/capabilities/runtime/services/interfaces/filesystem-discovery/**'
       - '.harmony/capabilities/runtime/services/interfaces/filesystem-watch/**'
       - '.harmony/capabilities/runtime/services/manifest.runtime.yml'
       - '.harmony/capabilities/runtime/services/registry.runtime.yml'
-      - '.harmony/engine/**'
+      - '.harmony/engine/runtime/**'
       - '.harmony/capabilities/runtime/services/_ops/scripts/validate-filesystem-interfaces.sh'
       - '.harmony/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-determinism.sh'
       - '.harmony/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-integration.sh'
@@ -23,7 +25,7 @@ on:
       - '.harmony/capabilities/runtime/services/interfaces/filesystem-watch/**'
       - '.harmony/capabilities/runtime/services/manifest.runtime.yml'
       - '.harmony/capabilities/runtime/services/registry.runtime.yml'
-      - '.harmony/engine/**'
+      - '.harmony/engine/runtime/**'
       - '.harmony/capabilities/runtime/services/_ops/scripts/validate-filesystem-interfaces.sh'
       - '.harmony/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-determinism.sh'
       - '.harmony/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-integration.sh'
@@ -35,10 +37,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: filesystem-interfaces-runtime-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     name: validate-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -54,9 +61,16 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Restore Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          cache-bin: true
+
       - name: Install cargo-component
         run: |
-          cargo install --locked cargo-component
+          if ! command -v cargo-component >/dev/null 2>&1; then
+            cargo install --locked cargo-component
+          fi
 
       - name: Build split filesystem wasm services from source
         run: |
@@ -136,7 +150,7 @@ jobs:
         with:
           name: filesystem-interfaces-slo-summary
           path: ${{ runner.temp }}/filesystem-interfaces-slo/filesystem-interfaces-slo.summary.tsv
-          retention-days: 30
+          retention-days: 7
 
       - name: Upload SLO raw metrics artifact
         if: ${{ matrix.publish_slo_artifacts }}
@@ -144,13 +158,14 @@ jobs:
         with:
           name: filesystem-interfaces-slo-raw
           path: ${{ runner.temp }}/filesystem-interfaces-slo/filesystem-interfaces-slo.raw.tsv
-          retention-days: 14
+          retention-days: 3
 
   cross-os-determinism:
     name: cross-os-determinism
     runs-on: ubuntu-latest
     needs: validate
     if: ${{ needs.validate.result == 'success' }}
+    timeout-minutes: 10
     steps:
       - name: Download snapshot id artifacts
         uses: actions/download-artifact@v4
@@ -184,6 +199,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [validate, cross-os-determinism]
     if: ${{ always() && (needs.validate.result == 'failure' || needs.cross-os-determinism.result == 'failure') }}
+    timeout-minutes: 10
     permissions:
       contents: read
       issues: write
@@ -261,6 +277,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [validate, cross-os-determinism]
     if: ${{ always() && github.event_name != 'pull_request' && needs.validate.result == 'success' && needs.cross-os-determinism.result == 'success' }}
+    timeout-minutes: 10
     permissions:
       contents: read
       issues: write

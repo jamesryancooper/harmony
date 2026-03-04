@@ -13,10 +13,15 @@ permissions:
   contents: read
   pull-requests: read
 
+concurrency:
+  group: required-pr-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-branch-name:
     name: Validate branch naming
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Validate head branch from standards source
         uses: actions/github-script@v7
@@ -90,6 +95,7 @@ jobs:
   validate-commit-messages:
     name: Validate commit messages (advisory)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Lint commit messages in PR from standards source
         uses: actions/github-script@v7
