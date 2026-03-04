@@ -118,6 +118,7 @@ jobs:
             && workflow_permissions_payload="$(gh api "repos/${GH_REPO}/actions/permissions/workflow" 2>/dev/null)"; then
             pass "Fetched workflow permissions via API (workflow token fallback)."
           else
+            workflow_permissions_payload=""
             echo "::warning::Unable to fetch workflow permissions (repos/${GH_REPO}/actions/permissions/workflow); skipping this invariant for this run."
             pass "Workflow permissions endpoint inaccessible; skipped can_approve_pull_request_reviews invariant."
           fi
