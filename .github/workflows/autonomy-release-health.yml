@@ -22,9 +22,9 @@ jobs:
     timeout-minutes: 10
     env:
       GH_REPO: ${{ github.repository }}
-      # Prefer AUTONOMY_PAT for admin-level settings/ruleset reads; fall back
-      # to workflow token when the PAT is unavailable.
-      GH_TOKEN: ${{ secrets.AUTONOMY_PAT || secrets.GITHUB_TOKEN }}
+      # Use workflow token for Actions API reads. Elevated PAT use is scoped
+      # per-call for repository/ruleset admin endpoints below.
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       AUTONOMY_PAT_VALUE: ${{ secrets.AUTONOMY_PAT }}
       AUTONOMY_AUTO_MERGE_ENABLED: ${{ vars.AUTONOMY_AUTO_MERGE_ENABLED || '' }}
       AUTONOMY_POLICY_ENFORCE: ${{ vars.AUTONOMY_POLICY_ENFORCE || '' }}
@@ -98,14 +98,15 @@ jobs:
           repo_payload=""
           rulesets_payload=""
           workflow_permissions_payload=""
+          admin_token="${AUTONOMY_PAT_VALUE:-${GH_TOKEN}}"
 
-          if repo_payload="$(gh api "repos/${GH_REPO}" 2>/dev/null)"; then
+          if repo_payload="$(GH_TOKEN="${admin_token}" gh api "repos/${GH_REPO}" 2>/dev/null)"; then
             pass "Fetched repository settings via API."
           else
             fail "Unable to fetch repository settings (repos/${GH_REPO})."
           fi
 
-          if rulesets_payload="$(gh api "repos/${GH_REPO}/rulesets?includes_parents=false" 2>/dev/null)"; then
+          if rulesets_payload="$(GH_TOKEN="${admin_token}" gh api "repos/${GH_REPO}/rulesets?includes_parents=false" 2>/dev/null)"; then
             pass "Fetched repository rulesets via API."
           else
             fail "Unable to fetch repository rulesets (repos/${GH_REPO}/rulesets)."
@@ -156,7 +157,7 @@ jobs:
 
             for ruleset_id in "${branch_ruleset_ids[@]}"; do
               [[ -n "${ruleset_id}" ]] || continue
-              candidate_ruleset="$(gh api "repos/${GH_REPO}/rulesets/${ruleset_id}" 2>/dev/null || true)"
+              candidate_ruleset="$(GH_TOKEN="${admin_token}" gh api "repos/${GH_REPO}/rulesets/${ruleset_id}" 2>/dev/null || true)"
               [[ -n "${candidate_ruleset}" ]] || continue
 
               matches_default_branch="$(jq -r --arg branch "${default_branch}" '
