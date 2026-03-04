@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.4.0](https://github.com/jamesryancooper/harmony/compare/harmony-v0.3.0...harmony-v0.4.0) (2026-03-04)
+
+
+### Features
+
+* **agency:** implement revised autonomy workflow patch ([#55](https://github.com/jamesryancooper/harmony/issues/55)) ([22a3eed](https://github.com/jamesryancooper/harmony/commit/22a3eed7b817f220aff1b9b0d40e993f87be4bee))
+
+
+### Bug Fixes
+
+* **agency:** clear failed workflow permissions payload ([#60](https://github.com/jamesryancooper/harmony/issues/60)) ([e58f563](https://github.com/jamesryancooper/harmony/commit/e58f5635eb164e46345e6e59aeef1df9177e4d75))
+* **agency:** fail closed on workflow permissions reads ([#61](https://github.com/jamesryancooper/harmony/issues/61)) ([88da3f0](https://github.com/jamesryancooper/harmony/commit/88da3f0f5f0f2cb319bd2f76a5d7a91535f20954))
+* **agency:** harden autonomy health invariant checks ([#59](https://github.com/jamesryancooper/harmony/issues/59)) ([e7ce60c](https://github.com/jamesryancooper/harmony/commit/e7ce60cbf0b5be71fdabb320b4079cb1285644d1))
+* **agency:** harden autonomy health ruleset resolution ([#58](https://github.com/jamesryancooper/harmony/issues/58)) ([13c0579](https://github.com/jamesryancooper/harmony/commit/13c057967520544f54823d6c7b4448c500fb354a))
+
 ## [0.3.0](https://github.com/jamesryancooper/harmony/compare/harmony-v0.2.1...harmony-v0.3.0) (2026-03-03)
 
 
