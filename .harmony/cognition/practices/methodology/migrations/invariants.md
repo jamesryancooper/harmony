@@ -1,6 +1,16 @@
 ---
 title: Architectural Invariants for Profile-Governed Migrations
 description: Repository-level invariants that preserve explicit profile selection, deterministic migration behavior, and final-state convergence.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # Architectural Invariants for Profile-Governed Migrations
@@ -17,6 +27,17 @@ These are repository-level invariants and are expected to remain true over time.
 6. Transitional boundedness: every transitional migration has explicit phases, exit criteria, and a final decommission/removal date.
 7. Final-state convergence: transitional coexistence is temporary and must be removed at final state.
 8. Contract authority: schemas, manifests, templates, and validators enforce profile-governance requirements.
+
+## Enforcement Artifacts (Concrete)
+
+These invariants are enforced through repository contracts and CI policy surfaces:
+
+- `/.harmony/cognition/practices/methodology/migrations/ci-gates.md`
+- `/.harmony/cognition/practices/methodology/migrations/legacy-banlist.md`
+- `/.harmony/cognition/practices/methodology/migrations/index.yml`
+- `/.github/workflows/main-pr-first-guard.yml`
+- `/.github/workflows/pr-quality.yml`
+- `/.github/workflows/alignment-check.yml`
 
 ## Allowed Patterns (MAY)
 

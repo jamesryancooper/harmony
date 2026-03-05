@@ -1,6 +1,16 @@
 ---
 title: CI Gates for Bounded Audits
 description: Required CI controls that enforce audit coverage, finding identity, and convergence contracts.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # CI Gates for Bounded Audits
@@ -18,7 +28,8 @@ Prevent infinite audit loops and non-reproducible findings.
 3. Findings identity gate
    - Fail if `findings.yml` has duplicate IDs, missing acceptance criteria, or unstable ID format.
 4. Determinism receipt gate
-   - Fail if run receipt metadata is missing required fields (`commit_sha`, `scope_hash`, `prompt_hash`, `seed` or unsupported marker, `params_hash`, `findings_hash`).
+   - Fail if run receipt metadata is missing required fields (`run_id`, `commit_sha`, `scope_hash`, `prompt_hash`, `seed` or unsupported marker, `params_hash`, `findings_hash`).
+   - Fail if neither `system_fingerprint` nor `fingerprint_unsupported` is present.
 5. Convergence gate
    - For remediation reruns, fail if K-run policy fails (`stable=false` or `union_blocking_findings > 0`).
 6. Done gate

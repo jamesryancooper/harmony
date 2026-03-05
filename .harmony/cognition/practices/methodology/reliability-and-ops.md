@@ -1,70 +1,62 @@
 ---
 title: Reliability and Operations
-description: SRE-aligned reliability and operations guide for Harmony, covering SLIs/SLOs, error budgets, on-call, incidents, and the blameless postmortem template.
+description: Provider-agnostic reliability and operations policy for SLIs/SLOs, incidents, rollbacks, and postmortems.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # Reliability and Ops
 
-This document is the detailed SRE and operations companion to the Harmony Methodology. Use it to define SLIs/SLOs, manage error budgets, and run incidents and postmortems in a way that aligns with Harmony’s guardrails.
+Use this policy for reliability governance independent of deployment provider.
 
 ## SLIs, SLOs, and Error Budgets
 
-- **SLIs**: availability, p95 latency, error rate, saturation (CPU/DB connections/queue depth).
-- **SLOs (starter)**:
-  - API availability ≥ **99.9%** (monthly).
-  - p95 API latency ≤ **300 ms** (warm), ≤ **600 ms** (includes cold starts).
-  - p95 page **TTFB ≤ 400 ms** for top route.
-  - 5xx error rate ≤ **0.5%**.
-- **Error budgets**: 43m/month at 99.9%; if burned, freeze feature flags and focus on reliability until recovered. Alert on **burn‑rate** (multi‑window).
-- **Cost guardrails**: publish monthly AI token and infra cost budgets; alert on anomalies (spend or unit‑cost spikes). Treat sustained anomalies like error‑budget burns: freeze risky merges/promotions and resolve before widening rollout.
+- SLIs: availability, p95 latency, 5xx error rate, saturation.
+- Starter SLOs:
+  - API availability >= 99.9% monthly
+  - p95 API latency <= 300ms warm and <= 600ms including cold starts
+  - p95 top-route TTFB <= 400ms
+  - 5xx error rate <= 0.5%
+- Error budget burn triggers a freeze on risky merges/promotions until recovery.
 
-## Baseline Release Hygiene Defaults
+## Release Hygiene Defaults
 
-- **Release behind a flag**: ship with `flag.<feature>=off`, validate with internal cohorts, then widen gradually.
-- **Rollback is first response for SLO threat**: promote the previously known-good deployment before fix-forward.
-- **Canonical rollback command**: `vercel promote <deployment-url>`.
+- Release behind default-off flags for risky or user-visible behavior.
+- Rollback-first policy for SLO threats.
+- Canonical rollback path: promote the previous known-good deployment using your deployment platform's promote/rollback primitive.
 
-## On-call and Incidents
+## On-call and Incident Handling
 
-- **On‑call (solo)**: define your paging window; no 24/7 pages for low‑impact; page only for SLO threats.
-- **Incidents**: severities, **rollback first** (Vercel promote), then fix‑forward; blameless **postmortem** template below.
-- **Observability**: **OpenTelemetry** for traces/metrics + structured logs (**pino**) wired to your vendor. Next.js supports OTel and `@vercel/otel`; Astro can emit server traces when using SSR adapters. Bootstrap OTel early from `infra/otel/instrumentation.ts` (default OTLP endpoint `http://localhost:4318`, override with `OTEL_EXPORTER_OTLP_ENDPOINT`).
-  - Coverage: target trace/span coverage for the top 5 user flows; add spans around new/changed paths.
-  - Safety: use GuardKit to redact PII in logs by default; only log IDs and non‑sensitive metadata.
-  - Hygiene: include `trace_id`/`span_id` in all logs; set retention appropriate to data policies; link a representative trace in the PR comment for High‑risk changes.
-  - Local‑first telemetry: when offline or in `--dry-run`, buffer spans/logs locally and flush later (per ObservaKit’s offline mode) to preserve provenance without leaking secrets.
+- Page only for SLO threats and material user impact.
+- Incident sequence: stabilize, rollback if needed, then fix-forward.
+- Postmortems are blameless and required for Sev-1 and material Sev-2 incidents.
+- Observability contract:
+  - required trace/log coverage for changed critical flows
+  - `trace_id`/`span_id` in operational logs
+  - redaction of sensitive fields at log boundaries
 
-## Blameless Postmortem Template (Outline)
+## Incident Severity (Summary)
 
-- Title & metadata
-  - Short, descriptive title; incident ID; date/time window.
-  - Severity level (Sev‑1/Sev‑2/Sev‑3), owners, and reviewers.
-- Summary and impact
-  - One‑paragraph summary of what happened.
-  - User/customer impact, duration, and SLO/SLA effects.
+| Severity | Impact | Action |
+|---|---|---|
+| Sev-1 | Broad customer impact or active SLO breach | Page immediately, rollback-first, 30-min watch window, postmortem within 48h |
+| Sev-2 | Partial degradation or material budget risk | Mitigate quickly, prioritize fix in current cycle, postmortem when budget materially affected |
+| Sev-3 | Minor issue with workaround | Triage in normal flow and capture in retro |
+
+## Postmortem Minimum Sections
+
+- Title and metadata (time window, severity, owner)
+- Impact summary
 - Timeline
-  - Ordered list of key events from first symptom to full recovery.
-  - Include detection, paging, mitigation, and verification steps.
-- Detection and response
-  - How the incident was detected (alert, support ticket, manual).
-  - What worked well and what was slow or missing in the response.
+- Detection and response evaluation
 - Root cause and contributing factors
-  - Technical root cause (including flags, configs, and deployments).
-  - Contributing factors (gaps in tests, observability, process, or documentation).
-- What went well / what was painful
-  - Practices that helped (for example, clear runbooks, fast rollback).
-  - Pain points (for example, flaky alerts, missing dashboards, unclear ownership).
-- Follow‑ups and owners
-  - Concrete actions with owners and due dates (tests, docs, tooling, process).
-  - How success will be measured (for example, new SLOs, alert quality, reduced MTTR).
-- Learning and knowledge capture
-  - Links to traces, dashboards, PRs, and ADRs updated or created.
-  - Notes for Kaizen/autopilot candidates (for example, automation or guardrail improvements).
-
-## Incident Severity Levels (Summary)
-
-| Severity | Impact & Examples | Action |
-| --- | --- | --- |
-| Sev‑1 | Broad customer impact or SLO breach in production; revenue/security risk | Page on‑call; rollback first (promote prior preview); freeze risky merges; 30‑min watch window; postmortem within 48h |
-| Sev‑2 | Limited cohort impact or partial degradation; error budget at risk | Page on‑call; mitigate (flag, rollback subset); prioritize fix in current cycle; postmortem if SLO budget materially affected |
-| Sev‑3 | Minor issue with workaround; no SLO risk | Triage during focus hours; fix‑forward via small PR behind a flag; include note in weekly retro |
+- Follow-up actions with owners and due dates
+- Links to traces, dashboards, PRs, and ADR updates

@@ -1,6 +1,16 @@
 ---
 title: Flow and WIP Policy
 description: Harmony's Kanban policy for a solo developer, including board columns, WIP limits, tiered risk classification, and Definitions of Ready/Done/Safe/Small.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # Flow & WIP Policy (Kanban for Solo + AI)
@@ -74,12 +84,13 @@ Harmony uses a **three-tier risk classification** that determines spec detail, g
 
 - Tier assigned (T1/T2/T3) with rollback and flag plan noted
 - AI config recorded (if agents used)
+- Profile governance recorded before implementation: `change_profile`, `release_state`, and `Profile Selection Receipt`
 
 ### Definition of Done (DoD) - Tier-Specific
 
 **T1:**
 - Basic CI gates pass (lint, typecheck, unit tests)
-- PR summary reviewed and approved
+- PR summary reviewed and receipt digest checked
 - Merged to trunk
 
 **T2:**
@@ -146,12 +157,12 @@ Note: Terminology harmonization — we use **DoSafe** for "Definition of Safe" (
 | Lint & format | ✅ | ESLint, Prettier |
 | Type check | ✅ | `tsc --noEmit` |
 | Unit tests | ✅ | Existing must pass |
-| Secret scan | ✅ | GitHub + TruffleHog |
+| Secret scan | ✅ | CI secret scanning |
 | SBOM | ✅ | Syft |
 | Preview deploy | ❌ | Optional |
 | Feature flag | ❌ | Optional |
 
-**Human: Skim summary (2-3 min), approve**
+**Human: Skim summary and receipt digest (2-3 min), escalate only when policy thresholds are crossed**
 
 ### T2 Gates (Standard)
 

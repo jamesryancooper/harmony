@@ -1,11 +1,23 @@
 ---
 title: Auto-Tier Assignment Algorithm
 description: Algorithm and rules for AI agents to automatically classify changes into risk tiers.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # Auto-Tier Assignment Algorithm
 
 This document specifies the algorithm AI agents use to automatically classify changes into risk tiers (T1, T2, T3).
+
+Taxonomy authority for tier semantics is `risk-tiers.md`; this classifier operationalizes that taxonomy and must not diverge from it.
 
 ## Overview
 
@@ -74,6 +86,45 @@ signals:
     - database_changes: false
     - auth_changes: false
     - security_changes: false
+```
+
+---
+
+## Classifier Output Contract (Required)
+
+Classifier results MUST emit this shape:
+
+```yaml
+classification_output:
+  tier: 0
+  # Required: 1 | 2 | 3
+
+  acp_target: ""
+  # Required mapping: 1 -> ACP-1, 2 -> ACP-2, 3 -> ACP-3
+
+  profile_selection_required: true
+  # Always true for governance-impacting changes.
+
+  required_profile_facts:
+    downtime_tolerance: ""
+    external_consumer_coordination: ""
+    migration_or_backfill_required: false
+    rollback_mechanism: ""
+    blast_radius_and_uncertainty: ""
+    compliance_or_policy_constraints: ""
+
+  confidence: 0.0
+  reason: ""
+  triggers: []
+```
+
+`acp_target` and `tier` are deterministic:
+
+```yaml
+tier_to_acp:
+  1: ACP-1
+  2: ACP-2
+  3: ACP-3
 ```
 
 ---
@@ -413,6 +464,9 @@ async function classifyChange(intent: string, files: string[]): Promise<Tier> {
   if (t3Match.triggered) {
     return {
       tier: 3,
+      acp_target: "ACP-3",
+      profile_selection_required: true,
+      required_profile_facts: defaultProfileFactsChecklist(),
       confidence: t3Match.confidence,
       reason: t3Match.reason,
       triggers: t3Match.triggers
@@ -424,6 +478,9 @@ async function classifyChange(intent: string, files: string[]): Promise<Tier> {
   if (t2Match.triggered) {
     return {
       tier: 2,
+      acp_target: "ACP-2",
+      profile_selection_required: true,
+      required_profile_facts: defaultProfileFactsChecklist(),
       confidence: t2Match.confidence,
       reason: t2Match.reason,
       triggers: t2Match.triggers
@@ -435,6 +492,9 @@ async function classifyChange(intent: string, files: string[]): Promise<Tier> {
   if (t1Valid.allMet) {
     return {
       tier: 1,
+      acp_target: "ACP-1",
+      profile_selection_required: true,
+      required_profile_facts: defaultProfileFactsChecklist(),
       confidence: t1Valid.confidence,
       reason: "All T1 criteria met",
       criteria: t1Valid.criteria
@@ -444,6 +504,9 @@ async function classifyChange(intent: string, files: string[]): Promise<Tier> {
   // Step 5: Default to T2 when uncertain
   return {
     tier: 2,
+    acp_target: "ACP-2",
+    profile_selection_required: true,
+    required_profile_facts: defaultProfileFactsChecklist(),
     confidence: 0.6,
     reason: "Defaulting to T2 (uncertain classification)",
     note: "Consider manual review"
@@ -593,11 +656,11 @@ bump_down:
       - "File in auth/ but not auth logic"
       - "Migration is additive-only with no data changes"
       - "Security config update is defensive improvement"
-      
-		  t3_to_t1:
-		    allowed: true
-		    requires_justification: true
-		    approval_required: true  # Navigator/verifier attestation (security checklist)
+
+  t3_to_t1:
+    allowed: true
+    requires_justification: true
+    approval_required: true  # Navigator/verifier attestation (security checklist)
     
     valid_reasons:
       - "Documentation in security directory"
@@ -613,6 +676,7 @@ bump_down:
 ### SpecKit Integration
 
 ```typescript
+// Illustrative pseudocode (adapt to your runtime and package layout)
 // SpecKit uses this algorithm when generating specs
 import { classifyChange } from '@harmony/tier-classifier';
 

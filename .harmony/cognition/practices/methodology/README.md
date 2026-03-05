@@ -1,6 +1,16 @@
 ---
 title: Agent-First, System-Governed Methodology Overview
 description: Principled, agent-first methodology for cross-project execution — lean in ceremony, rich in capability — with spec-led intent capture, context-efficient planning, autonomous execution loops, and risk-tiered system governance.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # Harmony Methodology
@@ -69,7 +79,7 @@ Together these pillars create a self‑reinforcing system: Direction ensures we 
 | --- | --- | --- | --- |
 | Direction | PLAN | SpecKit; PlanKit (planning kernel); Shape Up; Convivial Impact Assessment | Validated specs ensure effort is well-spent; no code without approved spec |
 | Focus | PLAN | kit-base; PromptKit; Turborepo; Hexagonal adapters | Absorbed complexity frees cognitive bandwidth; build features, not infrastructure |
-| Velocity | SHIP | AgentKit; FlowKit; CIKit; Trunk‑Based Development; Vercel Previews | AI automation removes bottlenecks; fast, frequent delivery within validated direction |
+| Velocity | SHIP | AgentKit; FlowKit; CIKit; Trunk‑Based Development; Preview Environments | AI automation removes bottlenecks; fast, frequent delivery within validated direction |
 | Trust | SHIP | PolicyKit; GuardKit; EvalKit; FlagKit; Pact; OpenAPI/JSON‑Schema | Typed contracts; bounded agents; rollback capability; fail‑closed governance |
 | Continuity | LEARN | Dockit; ObservaKit; ADR templates; RunbookKit; OnboardKit | ADRs, traces, decision logs preserve context; knowledge survives time and handoffs |
 | Insight | LEARN | EvalKit; DatasetKit; postmortem templates; retro practices | Postmortems, evals, retros drive continuous improvement; Insight → Direction loop |
@@ -89,7 +99,7 @@ Harmony's kit layer provides the building blocks that implement Harmony's gates 
   - Flow orchestration: FlowKit (defines `FlowConfig`/`FlowRunner`/`FlowRunResult` and calls the shared LangGraph runtime under `agents/runner/runtime/**` to instantiate long‑running, stateful flows from plans or canonical prompts)
   - Implement (agentic): AgentKit (plan‑driven agents built on top of FlowKit and the shared runtime), DevKit, CodeModKit (as needed)
   - Verify/Govern: EvalKit (structure/hallucination), PolicyKit (ASVS/SSDF policy), GuardKit (redaction), TestKit (unit/contract/e2e), ComplianceKit (evidence)
-  - Ship: PatchKit (PRs), Vercel Previews (promotion), ReleaseKit (changelog)
+  - Ship: PatchKit (PRs), preview/staging promotion surfaces, ReleaseKit (changelog)
   - Observe/Learn: ObservaKit (OTel traces + logs), BenchKit (perf), Dockit (docs/ADR), ScheduleKit (jobs)
 
 #### LLMOps & ContextOps kit expectations
@@ -152,17 +162,18 @@ Prompt templates and variants used in these loops are standardized and compiled 
 
 Harmony operates as a closed loop with a few non‑negotiable, compounding habits that keep solo development fast, safe, and sustainable:
 
+- Profile-first execution: before implementation, record exactly one `change_profile`, `release_state`, and a `Profile Selection Receipt`.
 - Spec‑first changes: Every material change starts with a one‑pager + ADR and micro‑STRIDE. No spec, no start.
-- No silent apply: Agents produce plans/diffs/tests only; humans gate side‑effects. Local runs default to `--dry-run`.
+- No silent apply: Agents produce plans/diffs/tests only. ACP receipt outcomes determine runtime promotion authority; humans retain policy authorship, exceptions, and escalation authority.
 - Deterministic AI: Provider/model/version/params pinned; low variance (temperature ≤ 0.3); prompt hash recorded; golden tests guard drift.
 - Observability required: Changed flows must emit OTel spans/logs; PRs link a `trace_id`. Evidence packs are assembled per PR.
 - Idempotency & rollback: Mutations use idempotency keys; risky features ship behind flags; rollback is “promote prior preview”.
-- Fail‑closed governance: Policy/Eval/Test gates block on missing evidence or violations; High‑risk changes require a Navigator pass with an explicit security checklist.
+- Fail‑closed governance: Policy/Eval/Test gates block on missing evidence or violations; T3 changes require a Navigator pass with an explicit security checklist.
 - Local‑first & privacy‑first: Secrets never leave Vault/env; PII redacted at log/write boundaries; offline telemetry buffers flush later.
 - Cost & efficiency guardrails: Publish monthly AI token and infra budgets; alert on cost anomalies; freeze risky merges/promotions on sustained anomalies until budgets recover. PRs that use AI must include pinned model config and a short cost note (estimated/observed).
 - Supply chain provenance: SBOMs are produced for releases and build artifacts are attested (e.g., GitHub attestations/Sigstore). Provenance notes are linked in PRs for changes that affect build/release surfaces.
 - Small batches by policy: Trunk‑based, tiny PRs, explicit WIP limits, and preview smoke keep cycle time short and outcomes reversible.
-- Waiver discipline: Gate waivers are exceptional and rare; Navigator approval (with a security checklist for High‑risk) is required with an explicit scope/timebox (≤ 7 days or until merge) and a PR‑linked justification. Waivers are disallowed for secrets/PII exposure, missing observability on changed flows, missing rollback/flag, and sustained SLO burn‑rate violations. Waivers auto‑expire at merge and must include a follow‑up issue for any residual risk or work.
+- Waiver discipline: Gate waivers are exceptional and rare; Navigator approval (with a security checklist for T3) is required with an explicit scope/timebox (≤ 7 days or until merge) and a PR‑linked justification. Waivers are disallowed for secrets/PII exposure, missing observability on changed flows, missing rollback/flag, and sustained SLO burn‑rate violations. Waivers auto‑expire at merge and must include a follow‑up issue for any residual risk or work.
 
 These guarantees align 1:1 with Harmony’s kit-layer invariants (determinism, typed contracts, idempotency, observability, and fail‑closed policy), ensuring the methodology is self‑reinforcing instead of fragile.
 
@@ -179,7 +190,7 @@ Use these companion documents when you need deeper operational detail:
 - `reliability-and-ops.md` — SLIs/SLOs, error budgets, incidents, and postmortems.
 - `performance-and-scalability.md` — Perf budgets, caching, queues, and load testing.
 - `architecture-and-repo-structure.md` — 12-Factor modulith, Hexagonal boundaries, and feature flags.
-- `tooling-and-metrics.md` — GitHub/Vercel/Turborepo tooling map and improvement metrics.
+- `tooling-and-metrics.md` — provider-agnostic tooling policy and improvement metrics.
 - `sandbox-flow.md` — Canonical end-to-end sandbox flow using previews, flags, CI gates, and observability before production rollout.
 - `migrations/README.md` — Profile-governed migration policy, invariants, exceptions, CI gates, and legacy banlist governance.
 - `audits/README.md` — Bounded audit policy, invariants, convergence controls, CI gates, and stable findings contract.
@@ -223,7 +234,7 @@ Here’s an explanation of each framework, method, and tool in the **Harmony Met
 
 | Item       | Role                           | Why it aligns with Harmony                                                                                                                                                |
 | ---------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Vercel** | Deployment platform            | Implements Harmony’s **safe deploys**: PR previews, feature flags, and instant rollback (`vercel promote`)—turning SLO-based release gating into a one-command operation. |
+| **Deployment platform (example)** | Deployment platform            | Implements Harmony’s **safe deploys**: PR previews/staging, feature flags, and fast rollback using platform-native promotion controls. |
 | **GitHub** | Source of truth and guardrails | Provides branch protection, CODEOWNERS, and built-in secret scanning—Harmony integrates all into its CI/CD quality gates.                                                 |
 
 ### Build & Repo Tooling
@@ -243,7 +254,7 @@ Here’s an explanation of each framework, method, and tool in the **Harmony Met
 
 | Item             | Role                       | Why it aligns with Harmony                                                                                                        |
 | ---------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **Playwright**   | End-to-end testing         | Powers preview smoke tests to validate deployments in **Vercel previews** before promotion.                                       |
+| **Playwright**   | End-to-end testing         | Powers preview smoke tests to validate deployments in non-production targets before promotion.                                       |
 | **Pact**         | Contract testing           | Enforces boundary contracts across adapters (Hexagonal pattern) and aligns with Harmony’s **ports/adapters testing discipline**.  |
 | **Schemathesis** | Property-based API testing | Tests OpenAPI contracts automatically; enforces correctness and prevents drift—Harmony mandates this for APIs with OpenAPI specs. |
 
@@ -264,7 +275,7 @@ Here’s an explanation of each framework, method, and tool in the **Harmony Met
 
 ## How Harmony’s Components Reinforce Each Other
 
-Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (ASVS, SSDF, STRIDE) define what “safe” means. Tools and platforms (Vercel, GitHub, OTel, Turborepo) ensure speed and safety coexist. This alignment makes Harmony AI-native, principled, and safe by default — so solo builders can move fast without breaking trust.
+Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (ASVS, SSDF, STRIDE) define what “safe” means. Tooling and platform controls ensure speed and safety coexist. This alignment makes Harmony AI-native, principled, and safe by default.
 
 ### 1) Security and Compliance (Defense‑in‑Depth)
 
@@ -286,7 +297,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 
 - Google SRE introduces SLIs/SLOs and error budgets; DORA metrics measure speed versus stability to guide release decisions.
 - OpenTelemetry powers the observability stack (via ObservaKit) for traces, metrics, and structured logs.
-- Vercel and GitHub provide controlled deployment and governance surfaces that enforce reliability goals.
+- Deployment and source-control platforms provide controlled governance surfaces that enforce reliability goals.
 - Outcome: reliability is measurable, and feedback loops are fast.
 
 ### 4) Architecture and Maintainability
@@ -330,7 +341,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
 - **Complexity Calibration**: choose minimal sufficient process, design, and tooling that meets constraints. Defer advanced patterns until justified by SLOs/scale/safety/performance/compliance. Default to no new dependency unless it materially reduces complexity while preserving robustness.
 - **Spec‑first**: every meaningful change starts with a **Specification one‑pager** + **ADR** capturing problem, scope, API/UI contracts, SLIs/SLOs, **non‑functionals**, and a **micro‑threat model (STRIDE)** mapped to **OWASP ASVS** & **NIST SSDF** tasks.
 - **Context-efficient planning**: Convert the Spec to a context packet (structured intent + agent plan + acceptance criteria). AI agents generate plans/diffs/tests from the Spec within governed bounds; risk-tiered ACP promotion gates enforce reversibility, evidence, quorum, and budgets on material changes.
-- **Flow over ceremony**: **Trunk‑Based Development** (+ short‑lived branches), tiny PRs, gated **Vercel Preview** per PR, **feature‑flagged** releases with guarded manual promote to prod; rollbacks are instant by promoting a prior preview.
+- **Flow over ceremony**: **Trunk‑Based Development** (+ short‑lived branches), tiny PRs, gated preview/staging validation per PR, **feature‑flagged** releases with guarded manual promotion; rollbacks use the prior known-good deployment.
 - **Reliability guardrails**: Define **SLIs/SLOs**, manage via **error budgets**, alert on budget burn, run blameless postmortems with action items.
 - **Security by default**: **OWASP ASVS** controls + **NIST SSDF** activities embedded in **CI/CD** quality gates: static analysis (**CodeQL/Semgrep**), dependency & **license** scan, **secret scanning**, SBOM, and contract tests.
 - **Architecture**: **12‑Factor** monolith‑first in a **Turborepo** monorepo with **Hexagonal** boundaries enforced by **contract tests**, and observability via **OpenTelemetry** + structured logs.
@@ -349,7 +360,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
   - Driver (usually you): owns implementation and rollout plan (often the Owner).
   - Navigator (you, separate pass): owns review, security/license checks, and rollout readiness.
   - Agents (AI IDE/terminal/harness): drive planning, implementation, and verification within governed bounds; never approve risk or production changes.
-- Two‑pass rule: High‑risk changes require a Driver pass and a distinct Navigator pass (ideally time-separated) from spec to promotion; with 2 devs, Navigator is the other person.
+- Two‑pass rule: T3 changes require a Driver pass and a distinct Navigator pass (ideally time-separated) from spec to promotion; with 2 devs, Navigator is the other person.
 
 - Non‑negotiables (AI)
   - Cannot commit directly to protected branches; cannot approve PRs; cannot handle secrets or long‑lived credentials.
@@ -357,7 +368,7 @@ Methods (SRE, DORA, Shape Up) define how work flows. Frameworks and standards (A
   - Must operate with pinned provider/model/version and documented parameters (temperature, top_p, max_tokens, seed if supported); runs record a stable prompt hash.
 
 - Non‑negotiables (Humans)
-  - Classify PR risk (Trivial/Low/Medium/High) and confirm rollback/flag plan.
+  - Classify PR risk (T1/T2/T3) and confirm rollback/flag plan.
   - Verify license/provenance and secret hygiene; check OpenAPI/JSON‑Schema diff where applicable.
   - Confirm observability for changed flows (trace + structured logs) and attach a representative trace or trace_id in the PR.
 - Required ACP control points (with human-on-the-loop oversight)
@@ -396,7 +407,7 @@ Resolver contract:
 ### ACP Waivers & Exceptions (minimal rules)
 
 - Waivers are exceptional and rare—prefer scope cuts, flags, and staged rollouts.
-- Who can waive: Navigator (High‑risk requires Navigator security checklist). Agents cannot waive.
+- Who can waive: Navigator (T3 requires Navigator security checklist). Agents cannot waive.
 - PR requirements: waiver justification (why safe now), explicit scope/timebox (≤ 7 days or until merge), named owner, and link to a follow‑up issue.
 - Disallowed waivers: secrets/PII exposure, missing rollback/flag, missing observability on changed flows, sustained SLO burn‑rate breaches (see Stop‑the‑line triggers).
 - Expiration & tracking: waivers auto‑expire at merge; reopening requires a new waiver. Add a `waiver` label and review in the weekly retro.
@@ -491,12 +502,12 @@ See `spec-first-planning.md` for the full spec one-pager template, feature story
 ## Branching & Release Model
 
 - **Trunk‑Based**: short‑lived branches (≤1 day). One small change per PR. Use **feature flags** for any risky behavior.
-- **Vercel Previews**: every PR gets a live URL for acceptance and e2e smoke. **Promote** a known‑good preview to production (instant rollback path).
-- **Environment naming & Production policy**: Use **PR Preview** (per PR), **Trunk Preview** (on `main`), and **Production** (manual promote only). In Vercel, disable **Auto Production Deployments** so Production is updated exclusively via `vercel promote <preview-url>`.
-- **Feature flags**: use **Vercel Flags** (Edge Config‑backed) as the provider (server‑evaluated). The in‑repo `packages/config/flags.ts` reads flag values from the Vercel provider (registered at app startup) and falls back to env overrides (`HARMONY_FLAG_*`) for local/dev. Call `setFlagProvider(vercelFlagsProvider)` during application startup — for this repo, register in `apps/api/src/server.ts` (API) and in Next.js SSR entry points (e.g., `apps/ai-console/instrumentation.ts` or your App Router root) when adding SSR surfaces. For **Astro SSG/static** pages, evaluate flags server‑side and inject values at build time or via Edge middleware; avoid using `process.env` in the browser. Otherwise, evaluation uses env (`HARMONY_FLAG_*`) and defaults. Clean up flags within 2 cycles.
-- **Environments & secrets**: use **Vercel envs** + CLI to manage; never commit secrets; rely on **GitHub secret scanning** + **TruffleHog** in CI.
-- **Preview smoke (fast path)**: Use Playwright or the provided helper `scripts/smoke-check.sh` to verify the PR Preview URL for core routes; link results in the PR.
-- **Flags hygiene automation**: Run `scripts/flags-stale-report.js` weekly and remove or consolidate stale flags; each flag must have an owner and explicit expiry.
+- **Preview environments**: every PR should expose a preview URL for acceptance and smoke tests. Promote only from known-good staged artifacts.
+- **Environment naming & Production policy**: Use **PR Preview**, **Trunk Preview**, and **Production**. Production updates should be manual promote only.
+- **Feature flags**: use a provider-agnostic, server-evaluated flag contract. Keep default-off behavior for new features, use explicit rollout cohorts, and remove stale flags within 2 cycles.
+- **Environments & secrets**: use your platform secret manager and CI secret scanning. Never commit secrets.
+- **Preview smoke (fast path)**: run smoke checks against preview URLs for core routes and link evidence in PR artifacts.
+- **Flags hygiene automation**: run a weekly stale-flag report in CI and remove or consolidate stale flags; each flag must have an owner and explicit expiry.
 - **Next.js 15+/16 and React 19 note**: Defaults for `fetch`/GET handlers are `no-store`; opt into caching explicitly when stable and record cache keys. Prefer Server Actions for mutations and `next/after` for non‑blocking tasks; heed hydration mismatch warnings before enabling caching.
 - **Small change policy**: PRs should satisfy **DoSm** by default. If not feasible, split scope or include a brief “size‑override” justification and obtain Navigator approval before merge.
 - **Review cadence**: Aim to complete the Navigator review pass within 4 working hours of opening a PR to prevent idle WIP.
@@ -505,7 +516,7 @@ See `spec-first-planning.md` for the full spec one-pager template, feature story
 
 Triggered when multi‑window burn‑rate alerts sustain > 30 minutes or SLOs are at risk:
 
-1. Freeze risky merges and promotions (Medium/High risk) until budgets recover.
+1. Freeze risky merges and promotions (T2/T3 risk) until budgets recover.
 2. Keep features behind flags; reduce or disable canary cohorts; validate rollback by promoting a known‑good preview.
 3. Prioritize reliability fixes: incident triage, perf regressions, error spikes, and missing observability on changed flows.
 4. Exit criteria: error‑budget burn returns to healthy thresholds for two consecutive alert windows (or 24h) and preview smoke is green.
@@ -594,7 +605,7 @@ See `architecture-and-repo-structure.md` for the detailed layout, feature flag i
 - **Perf budget enforcement**:
   *“Check this change against our perf budgets. Identify bundle increases and server latency risks. Suggest reductions.”*
 - **PR risk rubric (summarize & gate)**:
-  *“Classify this PR as Trivial/Low/Medium/High using the lightweight rubric. List gating steps met (flag, rollback, preview smoke, Navigator pass + security checklist) and any missing gates.”*
+  *“Classify this PR as T1/T2/T3 using the lightweight rubric. List gating steps met (flag, rollback, preview smoke, Navigator pass + security checklist) and any missing gates.”*
 - **Observability scaffolding**:
   *“Add OTel spans and structured logs to `<path/function>`. Ensure `trace_id` is logged on errors and key events. Show before/after snippets and a sample trace outline.”*
 
@@ -606,11 +617,11 @@ See `tooling-and-metrics.md` for a dedicated deep-dive into tooling and metrics.
 
 > **Reference implementation.** The tooling below reflects Harmony's reference stack. Substitute your own equivalents as needed.
 
-- **GitHub Projects**: board columns above; templates for Spec/Story/bug; Insights for cycle time. Protect `main` with **required checks**.
+- **Work tracking**: use your issue/board system with explicit Ready/In-Dev/In-Review/Preview states and cycle-time reporting.
 - **Actions matrix per package**: `turbo run lint test build --filter=...` using remote cache.
-- **Required checks**: the gates configured in `infra/ci/pr.yml` (subset of §7); add additional gates as policy requires.
-- **Vercel**: previews on every PR; **promote** for instant rollback; env & secret management; **feature flags** via Vercel Flags/Toolbar; **cron** for schedules.
-- **Scripts**: `scripts/smoke-check.sh` for quick PR preview smoke checks; `scripts/flags-stale-report.js` for weekly flag hygiene reports.
+- **Required checks**: the gates configured in repository workflow surfaces (for example `.github/workflows/pr-quality.yml` and `.github/workflows/smoke.yml`), plus any additional policy gates.
+- **Deployment surface**: preview/staging per PR, guarded manual promotion, rollback to previous known-good deployment, managed environment and secret controls.
+- **Flag hygiene**: run a scheduled stale-flag job (for example `.github/workflows/flags-stale-report.yml`) and remove stale flags within two cycles.
 
 ---
 
@@ -713,13 +724,13 @@ Harmony's canonical operating defaults are captured directly in the core methodo
 3. Use **AI IDE** to propose plan/diffs/tests with risk-tiered ACP gates.
 4. Open tiny PR → **preview deploy** → run e2e smoke → merge if gates pass.
 
-**Required CI checks**: lint/format; TS `--strict`; unit; typecheck; **OpenAPI diff (oasdiff)**; **CodeQL + Semgrep**; **Dependabot/SCA + Dependency Review (license)**; **secret scanning + TruffleHog**; **SBOM**; Preview URL comment; **Observability for changed flows** (trace/logs + trace_id in PR). Recommended: Pact/Schemathesis and **e2e smoke (Playwright or `scripts/smoke-check.sh`)**; publish **bundle/perf budgets** (CI enforcement optional).
+**Required CI checks**: lint/format; strict typing; unit tests; API/contract diff checks; static/security analysis; dependency/license policy checks; secret scanning; SBOM; preview URL evidence; observability evidence for changed flows (`trace_id` linked in PR). Recommended: contract fuzzing and e2e smoke; publish bundle/perf budgets (enforcement risk-tiered).
 
 **SLOs (starter)**: Availability 99.9%; p95 API ≤300 ms warm (≤600 ms incl. cold); p95 TTFB ≤400 ms; 5xx ≤0.5%. **Error budget** gates releases.
 
-**Release behind a flag**: ship with `flag.<feature>=off` → enable for internal → ramp; **rollback** = *promote prior preview to production*.
+**Release behind a flag**: ship with `flag.<feature>=off` → enable for internal → ramp; rollback uses your platform's fastest known-good deploy restoration path.
 
-**How to rollback**: Vercel dashboard/CLI: `vercel promote <deployment-url>`.
+**How to rollback**: use your deployment platform's deterministic rollback/promotion command and capture the command/evidence in the PR receipt.
 
 **Top 10 security/perf checks**:
 
@@ -746,7 +757,7 @@ Harmony's canonical operating defaults are captured directly in the core methodo
 - **Static analysis & SCA**: CodeQL; Semgrep; Dependabot; OWASP Dependency‑Check; SBOM: Syft; Secret scanning: GitHub, TruffleHog
 - **Testing & contract**: Playwright; Pact; Schemathesis
 - **Observability**: OpenTelemetry (Next.js/Astro SSR + Node); pino
-- **Delivery platform (reference implementation)**: Turborepo (caching/monorepo); Vercel (previews, envs, promote/rollback, feature flags, cron)
+- **Delivery platform (reference implementation)**: Turborepo (caching/monorepo) plus a deployment platform that supports previews, promote/rollback, feature flags, and scheduled jobs
 - **OWASP cheat sheets**: CSP, CSRF, SSRF
 
 ---

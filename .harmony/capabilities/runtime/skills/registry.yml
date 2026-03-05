@@ -2172,6 +2172,246 @@ skills:
           determinism: variable
           description: "Top-level log index (cross-skill)"
 
+  provider-vercel-delivery:
+    version: "0.1.0"
+    commands:
+      - /provider-vercel-delivery
+    parameters:
+      - name: operation
+        type: text
+        required: false
+        default: "preview"
+        description: "Delivery operation mode (preview, promote, rollback)"
+      - name: environment
+        type: text
+        required: false
+        default: "production"
+        description: "Target environment context"
+      - name: deployment
+        type: text
+        required: false
+        description: "Optional deployment URL or id"
+    requires:
+      context:
+        - type: command_available
+          command: "vercel"
+          description: "Requires Vercel CLI installed and authenticated"
+    depends_on:
+      - vercel-deploy
+      - deploy-status
+    io:
+      inputs: []
+      outputs:
+        - name: run_log
+          path: "_ops/state/logs/provider-vercel-delivery/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for provider-specific delivery actions"
+        - name: log_index
+          path: "_ops/state/logs/provider-vercel-delivery/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of provider-vercel-delivery runs"
+        - name: top_log_index
+          path: "_ops/state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
+  provider-github-gates:
+    version: "0.1.0"
+    commands:
+      - /provider-github-gates
+    parameters:
+      - name: repository
+        type: text
+        required: false
+        description: "Repository in owner/name format"
+      - name: pr
+        type: text
+        required: false
+        description: "Pull request number to inspect"
+      - name: gate_scope
+        type: text
+        required: false
+        default: "required"
+        description: "Gate scope (required, all)"
+    requires:
+      context:
+        - type: command_available
+          command: "gh"
+          description: "Requires GitHub CLI installed and authenticated"
+    depends_on: []
+    io:
+      inputs: []
+      outputs:
+        - name: run_log
+          path: "_ops/state/logs/provider-github-gates/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for provider-specific gate mapping"
+        - name: log_index
+          path: "_ops/state/logs/provider-github-gates/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of provider-github-gates runs"
+        - name: top_log_index
+          path: "_ops/state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
+  provider-nextjs-astro-runtime:
+    version: "0.1.0"
+    commands:
+      - /provider-nextjs-astro-runtime
+    parameters:
+      - name: surface
+        type: text
+        required: false
+        default: "nextjs"
+        description: "Surface to analyze (nextjs, astro, mixed)"
+      - name: mode
+        type: text
+        required: false
+        default: "ssr"
+        description: "Runtime mode (ssr, ssg, edge, serverless)"
+      - name: focus
+        type: text
+        required: false
+        default: "observability"
+        description: "Focus area (observability, caching, headers)"
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs:
+        - name: run_log
+          path: "_ops/state/logs/provider-nextjs-astro-runtime/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for framework/runtime adapter analysis"
+        - name: log_index
+          path: "_ops/state/logs/provider-nextjs-astro-runtime/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of provider-nextjs-astro-runtime runs"
+        - name: top_log_index
+          path: "_ops/state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
+  provider-preview-smoke:
+    version: "0.1.0"
+    commands:
+      - /provider-preview-smoke
+    parameters:
+      - name: url
+        type: text
+        required: true
+        description: "Preview target URL"
+      - name: profile
+        type: text
+        required: false
+        default: "t2"
+        description: "Smoke profile depth (t1, t2, t3)"
+      - name: retries
+        type: text
+        required: false
+        default: "2"
+        description: "Retry count for transient failures"
+    requires:
+      context:
+        - type: command_available
+          command: "curl"
+          description: "Requires curl for HTTP smoke checks"
+    depends_on: []
+    io:
+      inputs: []
+      outputs:
+        - name: smoke_report
+          path: "../../../output/reports/{{date}}-provider-preview-smoke-{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Preview smoke summary with readiness classification"
+        - name: run_log
+          path: "_ops/state/logs/provider-preview-smoke/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for provider preview smoke checks"
+        - name: log_index
+          path: "_ops/state/logs/provider-preview-smoke/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of provider-preview-smoke runs"
+        - name: top_log_index
+          path: "_ops/state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
+  turborepo-taskgraph:
+    version: "0.1.0"
+    commands:
+      - /turborepo-taskgraph
+    parameters:
+      - name: scope
+        type: text
+        required: false
+        default: "repo"
+        description: "Diagnostic scope (repo, workspace, pipeline)"
+      - name: focus
+        type: text
+        required: false
+        default: "graph"
+        description: "Primary focus (graph, cache, scripts)"
+      - name: task
+        type: text
+        required: false
+        description: "Optional pipeline task to target"
+    requires:
+      context:
+        - type: command_available
+          command: "turbo"
+          description: "Requires Turborepo CLI available in execution context"
+    depends_on: []
+    io:
+      inputs: []
+      outputs:
+        - name: run_log
+          path: "_ops/state/logs/turborepo-taskgraph/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for Turborepo taskgraph diagnostics"
+        - name: log_index
+          path: "_ops/state/logs/turborepo-taskgraph/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of turborepo-taskgraph runs"
+        - name: top_log_index
+          path: "_ops/state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
   create-skill:
     version: "1.0.1"
     commands:
@@ -2335,6 +2575,118 @@ skills:
           format: yaml
           determinism: variable
           description: "Index of all triage-ci-failure runs"
+        - name: top_log_index
+          path: "_ops/state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
+  ci-gate-triage:
+    version: "0.1.0"
+    commands:
+      - /ci-gate-triage
+    parameters:
+      - name: repository
+        type: text
+        required: false
+        description: "Repository in owner/name format"
+      - name: pr
+        type: text
+        required: false
+        description: "Pull request number or URL"
+      - name: run
+        type: text
+        required: false
+        description: "Optional CI run identifier"
+      - name: gate_scope
+        type: text
+        required: false
+        default: "required"
+        description: "Gate scope (required, all, failing)"
+    requires:
+      context:
+        - type: command_available
+          command: "gh"
+          description: "Requires GitHub CLI installed and authenticated"
+    depends_on:
+      - triage-ci-failure
+    io:
+      inputs: []
+      outputs:
+        - name: triage_report
+          path: "../../../output/reports/{{date}}-ci-gate-triage-{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Structured gate triage report with prioritized remediation plan"
+        - name: run_log
+          path: "_ops/state/logs/ci-gate-triage/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for CI gate triage runs"
+        - name: log_index
+          path: "_ops/state/logs/ci-gate-triage/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of ci-gate-triage runs"
+        - name: top_log_index
+          path: "_ops/state/logs/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Top-level log index (cross-skill)"
+
+  incident-response:
+    version: "0.1.0"
+    commands:
+      - /incident-response
+    parameters:
+      - name: severity
+        type: text
+        required: false
+        default: "sev2"
+        description: "Incident severity label (sev1, sev2, sev3)"
+      - name: scope
+        type: text
+        required: false
+        default: "runtime"
+        description: "Incident scope surface"
+      - name: mode
+        type: text
+        required: false
+        default: "mitigate"
+        description: "Response mode (mitigate, rollback, document)"
+      - name: evidence_refs
+        type: text
+        required: false
+        description: "Comma-separated evidence references (trace IDs, links, IDs)"
+    requires:
+      context: []
+    depends_on: []
+    io:
+      inputs: []
+      outputs:
+        - name: incident_report
+          path: "../../../output/reports/{{date}}-incident-response-{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Incident response receipt with timeline, mitigation, and follow-ups"
+        - name: run_log
+          path: "_ops/state/logs/incident-response/{{run_id}}.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Execution log for incident-response runs"
+        - name: log_index
+          path: "_ops/state/logs/incident-response/index.yml"
+          kind: file
+          format: yaml
+          determinism: variable
+          description: "Index of incident-response runs"
         - name: top_log_index
           path: "_ops/state/logs/index.yml"
           kind: file

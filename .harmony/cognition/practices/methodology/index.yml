@@ -63,6 +63,11 @@ files:
     summary: Methodology codification approach and maintenance rules.
     when: When evolving methodology artifacts and enforcement patterns.
 
+  - id: methodology-authority-crosswalk
+    path: authority-crosswalk.md
+    summary: Authority mapping between agency contract precedence and cognition governance framing.
+    when: When resolving wording or policy precedence conflicts across methodology artifacts.
+
   - id: architecture-and-repo-structure
     path: architecture-and-repo-structure.md
     summary: Repository shape and architecture operating expectations.

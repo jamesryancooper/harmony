@@ -1,6 +1,16 @@
 ---
 title: CI/CD Quality Gates
 description: Detailed CI/CD gate design for Harmony, including tiered gates, pipeline diagram, required checks, and waiver policy.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # CI/CD Quality Gates
@@ -74,7 +84,7 @@ flowchart TB
 | Lint/format | ESLint + Prettier | ✅ | Type-aware ESLint |
 | Type check | `tsc --noEmit` | ✅ | Strict mode |
 | Unit tests | Vitest/Jest | ✅ | Existing must pass |
-| Secret scan | GitHub + TruffleHog | ✅ | Always run |
+| Secret scan | CI secret scanning | ✅ | Always run |
 | Dependency alerts | Dependabot | ✅ | Check for CVEs |
 | SBOM | Syft | ✅ | Generate artifact |
 
@@ -99,7 +109,7 @@ flowchart TB
 | License scan | Dependency Review | ✅ | Block restricted licenses |
 | Contract tests | Pact/Schemathesis | ✅ | If API changes |
 | OpenAPI diff | oasdiff | ✅ | Breaking change detection |
-| Preview deploy | Vercel | ✅ | Auto-deploy PR |
+| Preview deploy | Deployment platform preview/staging | ✅ | Auto-provision per PR |
 | E2E smoke | Playwright | ✅ | Core flows |
 | STRIDE-lite | Automated | ✅ | AI-generated analysis |
 | Observability | Check spans/logs | ✅ | Changed flows only |
@@ -117,14 +127,14 @@ flowchart TB
 | Full STRIDE | Automated + verifier attestation | ✅ | Complete threat model |
 | Golden tests | EvalKit/TestKit | ✅ | Critical paths |
 | Integration tests | Full suite | ✅ | If applicable |
-| Provenance | GitHub attestation | ✅ | For releases |
+| Provenance | Artifact attestation | ✅ | Required for release artifacts |
 | Verifier attestation | Independent agent/service | ✅ | Required for ACP-3 quorum |
 | Recovery attestation | Independent agent/service | ✅ | Rollback path proven |
 | ADR | Updated | ✅ | Architecture decision |
 | Watch window | Post-promote | ✅ | 30 minutes |
 
 **Human-on-the-loop oversight:** 
-1. Review evidence summary before/after promote (optional, recommended for T3)
+1. Review evidence summary before/after promote (required for T3)
 2. Inspect receipts/digest and escalation artifacts when ACP returns `STAGE_ONLY`
 3. Participate only when policy escalation thresholds are crossed
 4. Run post-promote watch window (30 min)
@@ -138,7 +148,7 @@ flowchart TB
 - [ ] **Lint/format**: ESLint (type-aware) + Prettier
 - [ ] **Type Check**: TypeScript (`tsc --noEmit` with strict)
 - [ ] **Unit Tests**: Existing tests pass
-- [ ] **Secret scan**: GitHub secret scanning + TruffleHog
+- [ ] **Secret scan**: CI secret scanning is enabled and clean
 - [ ] **Dependency alerts**: Dependabot active
 - [ ] **SBOM**: Syft generates artifact
 
@@ -148,7 +158,7 @@ flowchart TB
 - [ ] **License scan**: Dependency Review; block restricted
 - [ ] **Contract tests**: Pact/Schemathesis if API changes
 - [ ] **OpenAPI diff**: oasdiff for breaking changes
-- [ ] **Preview deploy**: Vercel preview with URL comment
+- [ ] **Preview deploy**: preview/staging URL is attached to the PR
 - [ ] **E2E smoke**: Playwright core flows
 - [ ] **Feature flag**: Present and default OFF
 - [ ] **Observability**: Changed flows emit traces/logs
@@ -173,9 +183,8 @@ flowchart TB
 - [ ] **Bundle budgets**: Size-Limit (report first, enforce later)
 - [ ] **Perf budgets**: Lighthouse CI (report first)
 - [ ] **SPDX headers**: Add to new files
-- [ ] **Provenance/attestation**: For release artifacts
-- [ ] **Preview smoke helper**: `scripts/smoke-check.sh` run against preview URLs
-- [ ] **Flags hygiene report**: `scripts/flags-stale-report.js` reviewed weekly
+- [ ] **Preview smoke helper**: optional helper script or workflow-run smoke tests against preview URLs
+- [ ] **Flags hygiene report**: reviewed weekly via CI workflow or equivalent automation
 
 ---
 
@@ -232,11 +241,11 @@ Gate waivers are rare and tightly controlled.
 
 | Tier | Who Can Waive | Notes |
 |------|---------------|-------|
-| T1 | Owner | Rare; document reason |
-| T2 | Navigator | Requires justification |
-| T3 | Navigator (security checklist) | Avoid waivers; explicit sign-off required |
+| T1 | Policy owner | Rare; document reason |
+| T2 | Policy owner + navigator review | Requires justification and expiry |
+| T3 | Policy owner + navigator security checklist | Avoid waivers; explicit sign-off required |
 
-**AI agents cannot waive gates.**
+**AI agents cannot waive gates. ACP receipt outcomes determine runtime promotion authority; humans retain policy authorship, exceptions, and escalation authority.**
 
 ### Waiver Process
 
@@ -274,7 +283,7 @@ These gates cannot be waived under any circumstances:
 ### Tier Detection in CI
 
 ```yaml
-# .github/workflows/ci.yml
+# .github/workflows/pr-quality.yml
 jobs:
   detect-tier:
     runs-on: ubuntu-latest
