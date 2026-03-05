@@ -2,7 +2,7 @@
 title: Harmony Charter
 description: Foundational charter for Harmony's purpose, objective, operating model, scope, and governance as a portable agent-first filesystem harness.
 status: Active
-version: "1.0.0"
+version: "1.0.1"
 owner: Harmony governance
 review_cadence: Quarterly or per minor release
 effective_date: 2026-03-05
