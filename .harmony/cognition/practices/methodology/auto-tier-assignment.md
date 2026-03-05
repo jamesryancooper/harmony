@@ -198,7 +198,8 @@ t3_path_triggers:
     - "**/ci/**"
     - "**/cd/**"
     - "**/deploy/**"
-    - "vercel.json"
+    - "**/*deploy*.json"
+    - "**/*deploy*.toml"
     - "docker-compose*.yml"
     - "Dockerfile*"
 

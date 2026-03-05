@@ -71,3 +71,12 @@ Updated 2026-03-05 for Batch 7 methodology alignment touchpoints.
   as explicit non-normative historical reference.
 - This note links watched cognition-practices drift to the
   audit-subsystem-health artifact set for alignment validation.
+
+Updated 2026-03-05 for Batch 8 methodology alignment touchpoints.
+
+- `README.md` now uses provider-neutral wording in the reference-stack note for
+  methodology orientation.
+- `auto-tier-assignment.md` now uses provider-neutral infrastructure deployment
+  pattern examples instead of a single vendor manifest path.
+- This note links watched cognition-practices drift to the
+  audit-subsystem-health artifact set for alignment validation.
