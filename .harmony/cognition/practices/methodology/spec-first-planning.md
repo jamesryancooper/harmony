@@ -1,6 +1,16 @@
 ---
 title: Spec-First Planning Workflow
 description: How to run Harmony's spec-first planning loop end-to-end, including tiered spec templates, the feature story pattern, and AI-assisted workflow.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # Spec-First Planning (Step-by-Step)
@@ -36,7 +46,7 @@ Harmony uses a **three-tier risk classification** to right-size specs and review
 2. AI classifies → T2 (new API endpoint)
 3. AI loads spec-tier2.yaml template
 4. AI fills template completely
-5. Human optionally reviews summary (T2 = 15-20 min)
+5. Human reviews summary based on tier policy (T2 = 15-20 min)
 6. AI proceeds via stage -> evidence -> ACP gate
 ```
 
@@ -49,9 +59,10 @@ Harmony uses a **three-tier risk classification** to right-size specs and review
 Use this concise path for day-to-day execution while preserving full governance:
 
 1. Author or update a tier-appropriate spec and ADR notes.
-2. Convert spec outputs into a feature story with acceptance criteria.
-3. Generate implementation diffs/tests in the AI IDE and run tier gates.
-4. Open a small PR, validate preview smoke, and merge only when ACP/CI outcomes are green.
+2. Record `change_profile`, `release_state`, and `Profile Selection Receipt` before implementation.
+3. Convert spec outputs into a feature story with acceptance criteria.
+4. Generate implementation diffs/tests in the AI IDE and run tier gates.
+5. Open a small PR, validate preview smoke, and merge only when ACP/CI outcomes are green.
 
 ### Step 1: Initiate Change
 
@@ -93,6 +104,10 @@ AI automatically:
 - Escalate to humans only on policy thresholds or unresolved disagreements
 
 **Human-on-the-loop option:** review digest/receipt artifacts before or after promotion; this is oversight, not a standing runtime dependency.
+
+Promotion authority sentence:
+
+`ACP receipt outcomes determine runtime promotion authority; humans retain policy authorship, exceptions, and escalation authority.`
 
 ### Step 4: AI Builds
 
@@ -160,7 +175,7 @@ For T3, AI also handles:
 
 **T3:**
 - Review full spec and ACP evidence bundle for discretionary escalation
-- Review full PR as part of post-run optional oversight
+- Review full PR as part of post-run oversight required by tier policy
 - Security evidence review when ACP returns `STAGE_ONLY`/`ESCALATE`
 - Post-promotion watch
 
@@ -171,7 +186,7 @@ When using an AI IDE:
 ```
 1. Paste spec summary → AI generates plan and checklist
 2. AI proposes diffs with tests and contracts
-3. Human optional pause points for on-the-loop review when configured by policy
+3. Human pause points for on-the-loop review when required by policy thresholds
 4. AI config pinned and recorded in PR
 5. Threat model prompt generates security test cases
 ```
@@ -311,10 +326,10 @@ threat_model:
 
 oversight_touchpoints:
   spec_review:
-    required: false # optional human-on-the-loop unless policy escalation is raised
+    required: true # required for T3 by policy; execution may escalate further
     reviewers: [owner, verifier]
   receipt_review:
-    required: false # optional human-on-the-loop unless policy escalation is raised
+    required: true # required for T3 by policy; escalation rules still apply
     reviewers: [owner, verifier]
 ```
 
@@ -330,7 +345,7 @@ For reference, the original SpecKit one-pager outline (now superseded by tiered 
 
 - Title & metadata
   - Working title, date, owner(s), related issue/PR links.
-  - Risk class (Trivial/Low/Medium/High) and affected slices/surfaces.
+  - Risk class (T1/T2/T3) and affected slices/surfaces.
 - Problem and goal
   - Concise problem statement and “why now”.
   - Target outcome framed in user and system terms.

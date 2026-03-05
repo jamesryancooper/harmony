@@ -1,6 +1,16 @@
 ---
 title: Bounded Audits
 description: SSOT policy hub for bounded, convergent audits with deterministic receipts, coverage accounting, stable findings, and explicit done gates.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # Bounded Audits
@@ -59,6 +69,8 @@ Every bounded audit must include:
     - `commands: commands.md`
     - `validation: validation.md`
     - `inventory: inventory.md`
+
+CI MUST validate these bundle keys at key level (not file-presence only), including determinism receipt fields required by `ci-gates.md`.
 
 ## Companion Documents
 

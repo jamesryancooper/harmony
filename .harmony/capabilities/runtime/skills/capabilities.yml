@@ -70,7 +70,12 @@ skill_group_definitions:
   remediation:
     description: Resolve review and CI quality issues
     path: remediation/
-    members: [resolve-pr-comments, triage-ci-failure]
+    members: [resolve-pr-comments, triage-ci-failure, ci-gate-triage]
+
+  operations:
+    description: Operational response and incident handling workflows
+    path: operations/
+    members: [incident-response]
 
   refactor:
     description: Execute verified structural codebase refactors
@@ -95,7 +100,7 @@ skill_group_definitions:
   platforms:
     description: Deployment platform integrations and operations
     path: platforms/
-    members: [vercel, vercel-deploy, deploy-status]
+    members: [vercel, vercel-deploy, deploy-status, provider-vercel-delivery, provider-github-gates, provider-nextjs-astro-runtime, provider-preview-smoke, turborepo-taskgraph]
 
 # ============================================================================
 # VALID CAPABILITIES

@@ -1,5 +1,5 @@
 schema_version: "1.0"
-generated_at: "2026-03-04T14:17:26Z"
+generated_at: "2026-03-05T03:22:57Z"
 source_manifest: "/Users/jamesryancooper/Projects/harmony/.harmony/capabilities/runtime/skills/manifest.yml"
 skills:
   - id: "synthesize-research"
@@ -478,6 +478,62 @@ skills:
       - "Grep"
       - "Glob"
     allowed_services:
+  - id: "provider-vercel-delivery"
+    path: "platforms/provider-vercel-delivery/"
+    status: "draft"
+    broad_write_scope: false
+    allowed_tools:
+      - "Read"
+      - "Glob"
+      - "Grep"
+      - "Bash(vercel *)"
+      - "Write(_ops/state/logs/*)"
+    allowed_services:
+  - id: "provider-github-gates"
+    path: "platforms/provider-github-gates/"
+    status: "draft"
+    broad_write_scope: false
+    allowed_tools:
+      - "Read"
+      - "Glob"
+      - "Grep"
+      - "Bash(gh *)"
+      - "Write(_ops/state/logs/*)"
+    allowed_services:
+  - id: "provider-nextjs-astro-runtime"
+    path: "platforms/provider-nextjs-astro-runtime/"
+    status: "draft"
+    broad_write_scope: false
+    allowed_tools:
+      - "Read"
+      - "Glob"
+      - "Grep"
+      - "Write(_ops/state/logs/*)"
+    allowed_services:
+  - id: "provider-preview-smoke"
+    path: "platforms/provider-preview-smoke/"
+    status: "draft"
+    broad_write_scope: false
+    allowed_tools:
+      - "Read"
+      - "Glob"
+      - "Grep"
+      - "Bash(curl *)"
+      - "Write(_ops/state/logs/*)"
+      - "Write(../../output/reports/*)"
+    allowed_services:
+  - id: "turborepo-taskgraph"
+    path: "platforms/turborepo-taskgraph/"
+    status: "draft"
+    broad_write_scope: false
+    allowed_tools:
+      - "Read"
+      - "Glob"
+      - "Grep"
+      - "Bash(turbo *)"
+      - "Bash(pnpm turbo *)"
+      - "Write(_ops/state/logs/*)"
+    allowed_services:
   - id: "resolve-pr-comments"
     path: "remediation/resolve-pr-comments/"
     status: "active"
@@ -505,6 +561,29 @@ skills:
       - "Bash(npx)"
       - "Write(../../output/reports/*)"
       - "Write(_ops/state/logs/*)"
+    allowed_services:
+  - id: "ci-gate-triage"
+    path: "remediation/ci-gate-triage/"
+    status: "draft"
+    broad_write_scope: false
+    allowed_tools:
+      - "Read"
+      - "Glob"
+      - "Grep"
+      - "Bash(gh *)"
+      - "Write(_ops/state/logs/*)"
+      - "Write(../../../output/reports/*)"
+    allowed_services:
+  - id: "incident-response"
+    path: "operations/incident-response/"
+    status: "draft"
+    broad_write_scope: false
+    allowed_tools:
+      - "Read"
+      - "Glob"
+      - "Grep"
+      - "Write(_ops/state/logs/*)"
+      - "Write(../../../output/reports/*)"
     allowed_services:
   - id: "postgres-best-practices"
     path: "foundations/postgres/best-practices/"

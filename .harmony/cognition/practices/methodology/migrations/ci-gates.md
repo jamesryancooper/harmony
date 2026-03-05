@@ -1,6 +1,16 @@
 ---
 title: CI Gates for Profile-Governed Migrations
 description: Required CI controls that enforce profile selection, receipt completeness, and final-state migration convergence.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # CI Gates for Profile-Governed Migrations
@@ -15,7 +25,11 @@ Prevent profile-selection drift and incomplete migration governance execution.
    - CI must fail when required `Profile Selection Receipt` fields are missing in migration/governance plans.
 2. Release-state and profile consistency
    - CI must fail when `release_state` and selected `change_profile` violate selection rules.
-   - Pre-1.0 transitional selection without required `transitional_exception_note` must fail.
+   - Pre-1.0 transitional selection without required `transitional_exception_note` subkeys must fail:
+     - `rationale`
+     - `risks`
+     - `owner`
+     - `target_removal_date`
 3. Required plan sections
    - CI must fail when required top-level sections are missing:
      - `Profile Selection Receipt`

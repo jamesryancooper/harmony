@@ -25,6 +25,45 @@ title: ""
 # Example: "Implement Google OAuth login"
 # Concise, descriptive, action-oriented
 
+# ------------------------------------------------------------------------------
+# Governance and ACP receipts (required)
+# ------------------------------------------------------------------------------
+governance:
+  profile_selection:
+    change_profile: ""
+    # Required: atomic | transitional
+
+    release_state: ""
+    # Required: pre-1.0 | stable
+
+    selection_facts:
+      downtime_tolerance: ""
+      external_consumer_coordination: ""
+      migration_or_backfill_required: false
+      rollback_mechanism: ""
+      blast_radius_and_uncertainty: ""
+      compliance_or_policy_constraints: ""
+
+    profile_selection_required: true
+    profile_receipt_ref: ""
+    # Path or reference to the Profile Selection Receipt evidence.
+
+    transitional_exception_note:
+      required: false
+      # Required=true only when change_profile=transitional in pre-1.0 mode.
+      rationale: ""
+      risks: ""
+      owner: ""
+      target_removal_date: ""
+
+  acp:
+    target: "ACP-3"
+    decision_outcome: ""
+    # Expected values: ALLOW | STAGE_ONLY | DENY
+    receipt_ref: ""
+    # ACP receipt outcomes determine runtime promotion authority; humans retain
+    # policy authorship, exceptions, and escalation authority.
+
 created: ""
 # ISO date: YYYY-MM-DD
 
@@ -698,7 +737,7 @@ slo_implications:
 # ------------------------------------------------------------------------------
 oversight_touchpoints:
   spec_review:
-    required: false
+    required: true
     reviewers:
       - role: owner
         name: ""
@@ -722,7 +761,7 @@ oversight_touchpoints:
     # If escalation is raised, capture required follow-up.
   
   pr_review:
-    required: false
+    required: true
     reviewers:
       - role: owner
         name: ""
@@ -743,7 +782,7 @@ oversight_touchpoints:
     concerns: []
   
   promotion_readiness_review:
-    required: false
+    required: true
     reviewer:
       role: owner
       name: ""
@@ -775,8 +814,8 @@ _metadata:
   stride_automated: false
   # STRIDE is human-reviewed for T3
   
-  human_review_required_before_build: false
-  # Human oversight is optional unless policy escalation thresholds are crossed.
+  human_review_required_before_build: true
+  # T3 requires deterministic, policy-triggered human oversight before build.
 
 # ==============================================================================
 # ADR LINK (required for T3)

@@ -1,6 +1,16 @@
 ---
 title: Risk Tier Classification System
 description: Comprehensive AI-facing documentation for Harmony's three-tier risk classification system, including criteria, gates, responsibilities, and automation logic.
+owner: "cognition-owner"
+audience: internal
+scope: methodology-governance
+last_reviewed: 2026-03-05
+canonical_links:
+  - "/AGENTS.md"
+  - "/.harmony/agency/governance/CONSTITUTION.md"
+  - "/.harmony/agency/governance/DELEGATION.md"
+  - "/.harmony/agency/governance/MEMORY.md"
+  - "/.harmony/cognition/practices/methodology/authority-crosswalk.md"
 ---
 
 # Risk Tier Classification System
@@ -24,6 +34,27 @@ Every change in Harmony is classified into one of three risk tiers:
 **Key Principle:** Agents apply appropriate rigor at every tier under system-governed ACP controls. The difference is ACP strength (evidence, quorum, budgets, reversibility), while humans retain policy authorship, exceptions handling, and escalation authority.
 
 Governance references: [Autonomous Control Points](../../governance/principles/autonomous-control-points.md), [Deny by Default](../../governance/principles/deny-by-default.md), [Arbitration & Precedence](../../governance/principles/README.md#arbitration--precedence).
+
+---
+
+## Risk Tier and Profile Governance Crosswalk
+
+Risk tier and change profile are complementary and both are mandatory for governance-impacting work:
+
+- Tier (`T1/T2/T3`) controls evidence depth, CI strictness, and ACP gate strength.
+- Profile (`atomic/transitional`) controls rollout/migration shape and release-state rules.
+
+Before implementation, plans must include:
+
+1. `change_profile`
+2. `release_state`
+3. `Profile Selection Receipt`
+
+For pre-1.0 `transitional` selection, include `transitional_exception_note` with `rationale`, `risks`, `owner`, and `target_removal_date`.
+
+Promotion authority sentence:
+
+`ACP receipt outcomes determine runtime promotion authority; humans retain policy authorship, exceptions, and escalation authority.`
 
 ---
 
@@ -154,7 +185,7 @@ verification:
 | Lint & format | ✅ | ESLint, Prettier |
 | Type check | ✅ | `tsc --noEmit` |
 | Unit tests | ✅ | Existing must pass |
-| Secret scan | ✅ | GitHub + TruffleHog |
+| Secret scan | ✅ | CI secret scanning |
 | Dependency scan | ✅ | Dependabot alerts |
 | SBOM generation | ✅ | Syft |
 | Preview deploy | ❌ | Optional |
@@ -171,7 +202,7 @@ verification:
 2. **Verify CI green** (10 seconds)
    - All gates pass
 
-3. **Optional on-the-loop check** (if required by team policy)
+3. **On-the-loop check** (required when escalation thresholds are crossed)
    - Verify run receipts and ACP outcome
    - Confirm no unresolved escalation before promotion
 
@@ -347,7 +378,7 @@ observability:
 | Unit tests | ✅ | New + existing |
 | Contract tests | ✅ | If API changes |
 | OpenAPI diff | ✅ | oasdiff |
-| Secret scan | ✅ | GitHub + TruffleHog |
+| Secret scan | ✅ | CI secret scanning |
 | Dependency scan | ✅ | Dependabot |
 | CodeQL | ✅ | Security analysis |
 | Semgrep | ✅ | Security patterns |
@@ -370,7 +401,7 @@ observability:
    - Code quality acceptable?
    - Tests cover key paths?
    
-3. **Check preview** (optional, 2-3 minutes)
+3. **Check preview** (required for elevated-impact or uncertain T2 changes, 2-3 minutes)
    - Feature works as expected?
    
 4. **Approve PR** (click)
@@ -776,7 +807,7 @@ t3_requirements:
 | Contract tests | ✅ | Required |
 | Integration tests | ✅ | If applicable |
 | OpenAPI diff | ✅ | Breaking change review |
-| Secret scan | ✅ | GitHub + TruffleHog |
+| Secret scan | ✅ | CI secret scanning |
 | Dependency scan | ✅ | Dependabot + license |
 | CodeQL | ✅ | Full analysis |
 | Semgrep | ✅ | Security patterns |
@@ -804,9 +835,9 @@ t3_requirements:
 1. **Promote only on ACP `ALLOW`**.
 2. **On missing quorum/disagreement**, remain stage-only and emit escalation artifact.
 
-**Stage 3: Optional Oversight + Watch**
+**Stage 3: Required Oversight + Watch**
 
-1. **Review receipt/digest** (optional, recommended for T3).
+1. **Review receipt/digest** (required for T3).
 2. **Monitor watch window** and execute rollback if circuit breakers trip.
 
 **Total on-loop time: 30-60 minutes** (primarily post-gate oversight).

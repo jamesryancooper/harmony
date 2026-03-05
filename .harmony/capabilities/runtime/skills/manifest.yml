@@ -18,7 +18,7 @@
 #   status       - Lifecycle state: active | deprecated | experimental | draft
 #   tags         - Freeform labels for filtering/grouping
 #   triggers     - Natural language phrases for intent matching
-#   group        - Skill group for directory organization: audit, remediation, refactor, synthesis, meta, foundations
+#   group        - Skill group for directory organization: audit, remediation, operations, refactor, synthesis, meta, foundations, platforms
 #                  Resolved via skill_group_definitions in capabilities.yml
 #   skill_sets   - Capability bundles: executor, coordinator, delegator, collaborator, integrator, specialist, guardian
 #   capabilities - Additional capabilities beyond skill set bundles (see registry.yml for valid values)
@@ -868,6 +868,117 @@ skills:
       - specialist
     capabilities: []
 
+  - id: provider-vercel-delivery
+    display_name: Provider Vercel Delivery
+    group: platforms
+    path: platforms/provider-vercel-delivery/
+    summary: "Provider-specific Vercel delivery adapter for preview/promote/rollback evidence workflows."
+    status: draft
+    tags:
+      - provider
+      - vercel
+      - delivery
+      - rollout
+    triggers:
+      - "provider specific vercel delivery"
+      - "vercel promote rollback adapter"
+      - "collect vercel delivery evidence"
+    skill_sets:
+      - executor
+      - specialist
+      - guardian
+    capabilities:
+      - external-dependent
+      - external-output
+
+  - id: provider-github-gates
+    display_name: Provider GitHub Gates
+    group: platforms
+    path: platforms/provider-github-gates/
+    summary: "Provider-specific GitHub gate mapping for required checks and branch-protection evidence."
+    status: draft
+    tags:
+      - provider
+      - github
+      - ci
+      - gates
+    triggers:
+      - "provider specific github gates"
+      - "map github required checks"
+      - "collect github gate evidence"
+    skill_sets:
+      - executor
+      - specialist
+      - guardian
+    capabilities:
+      - external-dependent
+
+  - id: provider-nextjs-astro-runtime
+    display_name: Provider Nextjs Astro Runtime
+    group: platforms
+    path: platforms/provider-nextjs-astro-runtime/
+    summary: "Framework/runtime adapter for Next.js and Astro provider-specific operational guidance."
+    status: draft
+    tags:
+      - provider
+      - nextjs
+      - astro
+      - runtime
+    triggers:
+      - "nextjs astro runtime adapter"
+      - "provider specific nextjs runtime guidance"
+      - "provider specific astro runtime guidance"
+    skill_sets:
+      - executor
+      - specialist
+      - guardian
+    capabilities: []
+
+  - id: provider-preview-smoke
+    display_name: Provider Preview Smoke
+    group: platforms
+    path: platforms/provider-preview-smoke/
+    summary: "Provider-specific preview smoke adapter that emits gate-ready readiness evidence."
+    status: draft
+    tags:
+      - provider
+      - preview
+      - smoke
+      - verification
+    triggers:
+      - "provider specific preview smoke"
+      - "preview readiness smoke evidence"
+      - "run provider preview smoke checks"
+    skill_sets:
+      - executor
+      - specialist
+      - guardian
+    capabilities:
+      - external-dependent
+      - external-output
+
+  - id: turborepo-taskgraph
+    display_name: Turborepo Taskgraph
+    group: platforms
+    path: platforms/turborepo-taskgraph/
+    summary: "Diagnose Turborepo task graph and cache behavior with bounded, evidence-first outputs."
+    status: draft
+    tags:
+      - platform
+      - turborepo
+      - cache
+      - ci
+    triggers:
+      - "turborepo task graph diagnostics"
+      - "debug turbo cache drift"
+      - "analyze turbo pipeline mismatch"
+    skill_sets:
+      - executor
+      - specialist
+      - guardian
+    capabilities:
+      - external-dependent
+
   - id: resolve-pr-comments
     display_name: Resolve PR Comments
     group: remediation
@@ -909,6 +1020,49 @@ skills:
       - executor
     capabilities:
       - external-dependent
+
+  - id: ci-gate-triage
+    display_name: CI Gate Triage
+    group: remediation
+    path: remediation/ci-gate-triage/
+    summary: "Triage contract, security, and quality gate failures into prioritized remediation steps."
+    status: draft
+    tags:
+      - ci
+      - gates
+      - triage
+      - remediation
+    triggers:
+      - "triage required ci gates"
+      - "analyze contract security quality gate failures"
+      - "prepare ci gate remediation plan"
+    skill_sets:
+      - executor
+      - specialist
+      - guardian
+    capabilities:
+      - external-dependent
+
+  - id: incident-response
+    display_name: Incident Response
+    group: operations
+    path: operations/incident-response/
+    summary: "Run a bounded incident response workflow with mitigation decisioning and evidence receipts."
+    status: draft
+    tags:
+      - operations
+      - incident
+      - mitigation
+      - reliability
+    triggers:
+      - "run incident response workflow"
+      - "prepare rollback mitigation incident receipt"
+      - "capture post incident evidence and actions"
+    skill_sets:
+      - executor
+      - specialist
+      - guardian
+    capabilities: []
 
   - id: postgres-best-practices
     display_name: Postgres Best Practices
