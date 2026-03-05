@@ -84,7 +84,9 @@ Together these pillars create a self‑reinforcing system: Direction ensures we 
 | Continuity | LEARN | Dockit; ObservaKit; ADR templates; RunbookKit; OnboardKit | ADRs, traces, decision logs preserve context; knowledge survives time and handoffs |
 | Insight | LEARN | EvalKit; DatasetKit; postmortem templates; retro practices | Postmortems, evals, retros drive continuous improvement; Insight → Direction loop |
 
-> **Reference implementation.** Specific platforms above (Turborepo, Vercel) reflect Harmony's reference stack. Substitute your own build system and deployment platform. Harmony's principles and gates are stack-, host-, and environment-agnostic.
+> **Reference implementation.** Specific tools above reflect Harmony's
+> reference stack. Substitute your own build system and deployment platform.
+> Harmony's principles and gates are stack-, host-, and environment-agnostic.
 
 ---
 
