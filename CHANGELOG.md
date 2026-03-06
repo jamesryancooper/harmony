@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.5](https://github.com/jamesryancooper/harmony/compare/harmony-v0.4.4...harmony-v0.4.5) (2026-03-06)
+
+
+### Features
+
+* **init:** scaffold objective-aware bootstrap ([#103](https://github.com/jamesryancooper/harmony/issues/103)) ([9069417](https://github.com/jamesryancooper/harmony/commit/90694173ced805533ff6687f8a54892b83440f77))
+
 ## [0.4.4](https://github.com/jamesryancooper/harmony/compare/harmony-v0.4.3...harmony-v0.4.4) (2026-03-06)
 
 
