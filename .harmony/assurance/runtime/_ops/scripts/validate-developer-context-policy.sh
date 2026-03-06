@@ -63,7 +63,7 @@ read_limit_value() {
 
 check_allowlisted_artifacts() {
   local -a allowlist=("$@")
-  local -a known_context_files=("AGENTS.md" "CLAUDE.md" "AGENT.md" "CURSOR.md" "RULES.md" ".cursorrules")
+  local -a known_context_files=("AGENTS.md" "CLAUDE.md" ".harmony/AGENTS.md" "AGENT.md" "CURSOR.md" "RULES.md" ".cursorrules")
   local file rel allowed
 
   for file in "${known_context_files[@]}"; do
@@ -77,7 +77,7 @@ check_allowlisted_artifacts() {
       fi
     done
     if [[ "$allowed" -ne 1 ]]; then
-      fail "non-allowlisted developer context artifact detected at repo root: $rel"
+      fail "non-allowlisted developer context artifact detected: $rel"
     fi
   done
 }

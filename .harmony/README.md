@@ -302,16 +302,17 @@ cp -r /path/to/harmony/.harmony /path/to/your-repo/
 # Or run without --objective in an interactive terminal and choose from the prompt
 .harmony/scaffolding/runtime/_ops/scripts/init-project.sh
 
-# 4. Customize OBJECTIVE.md, .harmony/scope.md, and .harmony/conventions.md
+# 4. Customize .harmony/AGENTS.md, .harmony/OBJECTIVE.md, .harmony/scope.md, and .harmony/conventions.md
 ```
 
-If your tool supports harness commands, run `/init` instead of invoking the script directly. Interactive `/init` prompts for a common objective and writes the objective contract for the workspace. Use `--objective <id>` for scripted bootstrap and `--with-boot-files` when `BOOT.md` and `BOOTSTRAP.md` compatibility files are needed.
+If your tool supports harness commands, run `/init` instead of invoking the script directly. Interactive `/init` prompts for a common objective, writes canonical authored bootstrap files under `/.harmony/`, and refreshes the repo-root `AGENTS.md` and `CLAUDE.md` ingress adapters. Use `--objective <id>` for scripted bootstrap and `--with-boot-files` when `BOOT.md` and `BOOTSTRAP.md` compatibility files are needed.
 
 ### What's Included
 
 | Directory | Purpose |
 |-----------|---------|
-| `scaffolding/runtime/templates/` | Harness scaffolding (base + variants) |
+| `scaffolding/runtime/bootstrap/` | Canonical bootstrap assets consumed by `/init` |
+| `scaffolding/runtime/templates/` | Harness scaffolding and reusable templates |
 | `agency/governance/` | Cross-agent contracts and precedence overlays |
 | `agency/runtime/agents/` | Supervisory actors and delegation policy |
 | `agency/runtime/assistants/` | Generic specialists (reviewer, refactor, docs) |
@@ -329,12 +330,13 @@ If your tool supports harness commands, run `/init` instead of invoking the scri
 
 ### Next Steps
 
-1. Edit `OBJECTIVE.md` to sharpen the repo's active objective
-2. Review `.harmony/cognition/runtime/context/intent.contract.yml` and adjust it to match the approved objective
-3. Edit `.harmony/scope.md` to define your repo's boundaries
-4. Edit `.harmony/conventions.md` for your style rules
-5. Add repo-specific context to `.harmony/cognition/runtime/context/`
-6. Create scoped harnesses as needed: `domains/foo/.harmony/`, `services/foo/.harmony/`
+1. Edit `.harmony/AGENTS.md` to finalize repo-local governance and orientation
+2. Edit `.harmony/OBJECTIVE.md` to sharpen the repo's active objective
+3. Review `.harmony/cognition/runtime/context/intent.contract.yml` and adjust it to match the approved objective
+4. Edit `.harmony/scope.md` to define your repo's boundaries
+5. Edit `.harmony/conventions.md` for your style rules
+6. Add repo-specific context to `.harmony/cognition/runtime/context/`
+7. Create scoped harnesses as needed: `domains/foo/.harmony/`, `services/foo/.harmony/`
 
 For detailed documentation, see `.harmony/cognition/_meta/architecture/shared-foundation.md`.
 

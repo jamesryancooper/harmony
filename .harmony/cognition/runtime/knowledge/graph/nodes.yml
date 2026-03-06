@@ -1,5 +1,5 @@
 schema_version: "1.0"
-updated: "2026-03-04"
+updated: "2026-03-06"
 
 # Node records are materialized from canonical runtime surfaces.
 nodes:
@@ -191,6 +191,10 @@ nodes:
     type: "decision-adr"
     label: "046-execution-profile-governance-cutover-contract"
     path: "../../decisions/046-execution-profile-governance-cutover-contract.md"
+  - id: "adr:047-self-contained-bootstrap-and-ingress-adapters"
+    type: "decision-adr"
+    label: "047-self-contained-bootstrap-and-ingress-adapters"
+    path: "../../decisions/047-self-contained-bootstrap-and-ingress-adapters.md"
   - id: "audit:2026-02-22-audit-contract-bootstrap"
     type: "audit-record"
     label: "2026-02-22-audit-contract-bootstrap"

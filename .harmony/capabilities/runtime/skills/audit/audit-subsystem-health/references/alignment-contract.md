@@ -11,11 +11,16 @@ Keep `audit-subsystem-health` synchronized with `.harmony` architecture evolutio
 
 Current bootstrap alignment expectation:
 
-- repo-level `/init` now scaffolds both the human-readable objective brief at
-  `/OBJECTIVE.md` and the machine-readable intent contract at
+- repo-level `/init` now authors canonical bootstrap governance inside
+  `/.harmony/`, including `/.harmony/AGENTS.md`, `/.harmony/OBJECTIVE.md`, and
+  the machine-readable intent contract at
   `/.harmony/cognition/runtime/context/intent.contract.yml`
+- repo-root `AGENTS.md` and `CLAUDE.md` are ingress adapters to
+  `/.harmony/AGENTS.md`, not hand-maintained authority surfaces
+- canonical bootstrap assets live under `.harmony/scaffolding/runtime/bootstrap/`
+  and projected harness copies must stay in sync with that source
 - when watched architecture surfaces change bootstrap or onboarding behavior,
-  this skill's references must continue to reflect that objective-aware init
+  this skill's references must continue to reflect that self-contained bootstrap
   model
 
 This contract defines:
@@ -46,6 +51,8 @@ Changes in any of the following paths must trigger an alignment check:
 - `.harmony/assurance/runtime/_ops/scripts/validate-contract-governance.sh`
 - `.harmony/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`
 - `.harmony/assurance/runtime/_ops/scripts/validate-framing-alignment.sh`
+- `.harmony/assurance/runtime/_ops/scripts/validate-bootstrap-ingress.sh`
+- `.harmony/assurance/runtime/_ops/scripts/validate-bootstrap-projections.sh`
 - `.harmony/assurance/practices/complete.md`
 - `.harmony/assurance/practices/session-exit.md`
 - `.harmony/cognition/runtime/migrations/`
@@ -79,6 +86,8 @@ If skill behavior/check logic changes (for example updates to `SKILL.md` or `ref
 Automated enforcement lives in:
 
 - `.harmony/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh`
+- `.harmony/assurance/runtime/_ops/scripts/validate-bootstrap-ingress.sh`
+- `.harmony/assurance/runtime/_ops/scripts/validate-bootstrap-projections.sh`
 
 Expected invocation points:
 

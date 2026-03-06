@@ -161,9 +161,9 @@ Canonical workflow:
 Flow:
 
 1. Bootstrap
-   - If `AGENTS.md` or `OBJECTIVE.md` is missing at repo root, run `/init` (or
+   - If root `AGENTS.md`, `/.harmony/AGENTS.md`, or `/.harmony/OBJECTIVE.md` is missing, run `/init` (or
      `.harmony/scaffolding/runtime/_ops/scripts/init-project.sh`) first.
-   - Read `/OBJECTIVE.md`, `scope.md`, `conventions.md`,
+   - Read `/AGENTS.md`, `/.harmony/OBJECTIVE.md`, `scope.md`, `conventions.md`,
      `cognition/_meta/architecture/specification.md`, and
      `cognition/governance/principles/README.md`.
 2. Execute

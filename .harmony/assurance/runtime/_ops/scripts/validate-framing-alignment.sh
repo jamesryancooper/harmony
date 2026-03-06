@@ -74,6 +74,7 @@ require_contains_literal() {
 
 validate_canonical_markers() {
   require_contains "$ROOT_DIR/AGENTS.md" 'agent-first' "root AGENTS.md contains agent-first framing"
+  require_contains "$HARMONY_DIR/AGENTS.md" 'agent-first' ".harmony/AGENTS.md contains agent-first framing"
   require_contains "$HARMONY_DIR/README.md" 'system-governed' ".harmony/README.md contains system-governed framing"
   require_contains "$HARMONY_DIR/cognition/governance/principles/complexity-calibration.md" 'Complexity Fitness' "complexity-calibration principle declares Complexity Fitness"
   require_contains "$HARMONY_DIR/cognition/governance/principles/complexity-calibration.md" 'minimal sufficient complexity' "complexity-calibration principle declares minimal sufficient complexity"
@@ -84,6 +85,7 @@ validate_canonical_markers() {
 
 validate_goal_explicitness_control_points() {
   require_contains_literal "$ROOT_DIR/AGENTS.md" "$CANONICAL_GOAL" "root AGENTS.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/AGENTS.md" "$CANONICAL_GOAL" ".harmony/AGENTS.md contains canonical goal text"
   require_contains_literal "$HARMONY_DIR/agency/governance/CONSTITUTION.md" "$CANONICAL_GOAL" "CONSTITUTION.md contains canonical goal text"
   require_contains_literal "$HARMONY_DIR/agency/governance/DELEGATION.md" "$CANONICAL_GOAL" "DELEGATION.md contains canonical goal text"
   require_contains_literal "$HARMONY_DIR/agency/governance/MEMORY.md" "$CANONICAL_GOAL" "MEMORY.md contains canonical goal text"
@@ -91,7 +93,7 @@ validate_goal_explicitness_control_points() {
   require_contains_literal "$HARMONY_DIR/agency/runtime/agents/architect/SOUL.md" "$CANONICAL_GOAL" "architect SOUL.md contains canonical goal text"
   require_contains_literal "$HARMONY_DIR/README.md" "$CANONICAL_GOAL" ".harmony/README.md contains canonical goal text"
   require_contains_literal "$HARMONY_DIR/START.md" "$CANONICAL_GOAL" ".harmony/START.md contains canonical goal text"
-  require_contains_literal "$HARMONY_DIR/scaffolding/runtime/templates/AGENTS.md" "$CANONICAL_GOAL" "template AGENTS.md contains canonical goal text"
+  require_contains_literal "$HARMONY_DIR/scaffolding/runtime/bootstrap/AGENTS.md" "$CANONICAL_GOAL" "bootstrap AGENTS.md contains canonical goal text"
   require_contains_literal "$HARMONY_DIR/scaffolding/runtime/templates/harmony/START.md" "$CANONICAL_GOAL" "template harmony START.md contains canonical goal text"
   require_contains_literal "$HARMONY_DIR/scaffolding/runtime/templates/harmony/continuity/tasks.json" "$CANONICAL_GOAL" "template continuity tasks goal defaults to canonical goal text"
 }

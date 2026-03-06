@@ -14,7 +14,7 @@ Legacy onboarding variants are hard-deprecated for new runs.
 ## Flow
 
 1. Bootstrap
-   - Read `AGENTS.md`, `.harmony/START.md`, `.harmony/scope.md`, and `.harmony/conventions.md`.
+   - Read `AGENTS.md`, `/.harmony/OBJECTIVE.md`, `.harmony/START.md`, `.harmony/scope.md`, and `.harmony/conventions.md`.
    - Confirm canonical cross-subsystem rules in `.harmony/cognition/_meta/architecture/specification.md`.
 2. Execute
    - Read `.harmony/continuity/log.md` and `.harmony/continuity/tasks.json`.

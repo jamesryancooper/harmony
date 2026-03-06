@@ -165,14 +165,16 @@ After a harness is introduced into a repository, project-level bootstrap artifac
 
 Minimum bootstrap outputs:
 
-- `AGENTS.md` rendered from `.harmony/scaffolding/runtime/templates/AGENTS.md`
-- `CLAUDE.md` alias to `AGENTS.md` when safe and non-destructive
-- `alignment-check` shim rendered from `.harmony/scaffolding/runtime/templates/alignment-check`
+- canonical `/.harmony/AGENTS.md` rendered from `.harmony/scaffolding/runtime/bootstrap/AGENTS.md`
+- repo-root `AGENTS.md` ingress adapter to `/.harmony/AGENTS.md`
+- repo-root `CLAUDE.md` ingress adapter to `/.harmony/AGENTS.md` when safe and non-destructive
+- canonical `/.harmony/OBJECTIVE.md` rendered from `.harmony/scaffolding/runtime/bootstrap/objectives/`
+- `alignment-check` shim rendered from `.harmony/scaffolding/runtime/bootstrap/alignment-check`
 
 Optional compatibility outputs (when explicitly requested):
 
-- `BOOT.md` rendered from `.harmony/scaffolding/runtime/templates/BOOT.md`
-- `BOOTSTRAP.md` rendered from `.harmony/scaffolding/runtime/templates/BOOTSTRAP.md`
+- `BOOT.md` rendered from `.harmony/scaffolding/runtime/bootstrap/BOOT.md`
+- `BOOTSTRAP.md` rendered from `.harmony/scaffolding/runtime/bootstrap/BOOTSTRAP.md`
 
 Expands in:
 

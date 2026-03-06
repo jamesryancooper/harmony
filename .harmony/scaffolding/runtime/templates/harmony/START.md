@@ -35,15 +35,16 @@ Enable reliable agent execution that is deterministic enough to trust, observabl
 ├── agency/
 │   ├── manifest.yml    ← Actor discovery and routing metadata
 │   ├── governance/     ← Cross-agent contracts (constitution, delegation, memory)
-│   ├── actors/
+│   ├── runtime/
 │   │   ├── agents/     ← Autonomous supervisors
 │   │   ├── assistants/ ← Focused specialists (@mention invocation)
 │   │   └── teams/      ← Reusable multi-actor compositions
 │   └── practices/      ← Collaboration and delivery practices
 │
 ├── scaffolding/
-│   ├── runtime/templates/      ← Boilerplate templates (add as needed)
-│   ├── runtime/_ops/scripts/   ← Scaffolding scripts
+│   ├── runtime/bootstrap/      ← Canonical bootstrap assets for /init
+│   ├── runtime/templates/      ← Reusable templates (add as needed)
+│   ├── runtime/_ops/scripts/   ← Stable wrapper scripts
 │   ├── governance/patterns/    ← Reusable governance patterns
 │   ├── practices/prompts/      ← Task templates (add as needed)
 │   └── practices/examples/     ← Reference examples
@@ -57,15 +58,16 @@ Enable reliable agent execution that is deterministic enough to trust, observabl
 
 ## Boot Sequence
 
-0. **If `AGENTS.md` or `OBJECTIVE.md` is missing at repo root:** run `/init` (or `.harmony/scaffolding/runtime/_ops/scripts/init-project.sh`) first; add `--list-objectives` to inspect common use cases, `--objective <id>` for non-interactive selection, `--with-boot-files` if `BOOT.md` and `BOOTSTRAP.md` compatibility files are needed, and `--with-agent-platform-adapters` for opt-in adapter bootstrap config
-1. **Read `../OBJECTIVE.md`** → Know the active workspace objective
-2. **Read `scope.md`** → Know boundaries
-3. **Read `conventions.md`** → Know style rules
-4. **Scan `catalog.md`** → Know available operations
-5. **Read `continuity/log.md`** → Know what's been done
-6. **Read `continuity/tasks.json`** → Know current priorities and goal
-7. **Begin** highest-priority unblocked task
-8. **Before finishing:** Complete `assurance/practices/session-exit.md`, verify against `assurance/practices/complete.md`
+0. **If root `AGENTS.md`, `.harmony/AGENTS.md`, or `.harmony/OBJECTIVE.md` is missing:** run `/init` (or `.harmony/scaffolding/runtime/_ops/scripts/init-project.sh`) first; add `--list-objectives` to inspect common use cases, `--objective <id>` for non-interactive selection, `--with-boot-files` if `BOOT.md` and `BOOTSTRAP.md` compatibility files are needed, and `--with-agent-platform-adapters` for opt-in adapter bootstrap config
+1. **Read `AGENTS.md`** → Root ingress adapter to the canonical `.harmony/AGENTS.md`
+2. **Read `.harmony/OBJECTIVE.md`** → Know the active workspace objective
+3. **Read `scope.md`** → Know boundaries
+4. **Read `conventions.md`** → Know style rules
+5. **Scan `catalog.md`** → Know available operations
+6. **Read `continuity/log.md`** → Know what's been done
+7. **Read `continuity/tasks.json`** → Know current priorities and goal
+8. **Begin** highest-priority unblocked task
+9. **Before finishing:** Complete `assurance/practices/session-exit.md`, verify against `assurance/practices/complete.md`
 
 ## Visibility & Autonomy Rules
 
