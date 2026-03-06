@@ -5,18 +5,15 @@ description: Boilerplate files for creating new content stored in .harmony/scaff
 
 # Harness Templates
 
-Templates are **boilerplate files** stored in `.harmony/scaffolding/runtime/templates/`. They provide starting points for creating new content within the harness's domain.
+Templates are **boilerplate files** stored in `.harmony/scaffolding/runtime/templates/`. They provide starting points for creating new reusable content within the harness's domain.
+
+Bootstrap assets used by `/init` are not part of this surface. They live under `.harmony/scaffolding/runtime/bootstrap/`.
 
 ## Location
 
 ```text
 .harmony/scaffolding/runtime/templates/
-├── BOOT.md                 # Optional recurring startup checklist template
-├── BOOTSTRAP.md            # Optional one-time bootstrap checklist template
-├── AGENTS.md               # Template for project-level AGENTS.md bootstrap
-├── objectives/             # Common objective packs for /init
-│   ├── registry.txt
-│   └── <objective-id>/
+├── README.md               # Reusable templates overview
 ├── cursor-command.md       # Template for Cursor commands
 ├── document.md             # Template for new documents
 ├── harmony/                # Base .harmony/ template
@@ -31,11 +28,13 @@ Templates are **boilerplate files** stored in `.harmony/scaffolding/runtime/temp
 │   ├── cognition/runtime/context/
 │   ├── continuity/
 │   ├── assurance/
-│   ├── scaffolding/runtime/templates/
-│   │   ├── AGENTS.md       # Included AGENTS bootstrap template
+│   ├── scaffolding/runtime/bootstrap/
+│   │   ├── AGENTS.md       # Included canonical .harmony/AGENTS.md source
 │   │   ├── BOOT.md         # Included optional BOOT template
 │   │   ├── BOOTSTRAP.md    # Included optional BOOTSTRAP template
 │   │   └── objectives/     # Included objective packs for /init
+│   ├── scaffolding/runtime/templates/
+│   │   └── README.md       # Included reusable template placeholder
 │   ├── scaffolding/runtime/_ops/scripts/
 │   │   └── init-project.sh # Project bootstrap generator
 │   └── scaffolding/practices/examples/
@@ -127,9 +126,9 @@ See each template's `MANIFEST.md` for human-readable details or `manifest.json` 
 | Situation | Use Templates |
 |-----------|---------------|
 | Creating new harnesses | ✅ Yes |
-| Initializing project-level agent bootstrap files | ✅ Yes (`templates/AGENTS.md` via `/init`) |
-| Initializing workspace objective contracts | ✅ Yes (`templates/objectives/` via `/init`) |
-| Initializing optional BOOT compatibility files | ✅ Optional (`templates/BOOT.md`, `templates/BOOTSTRAP.md` via `/init --with-boot-files`) |
+| Initializing project-level agent bootstrap files | ✅ Yes (`runtime/bootstrap/AGENTS.md` via `/init`) |
+| Initializing workspace objective contracts | ✅ Yes (`runtime/bootstrap/objectives/` via `/init`) |
+| Initializing optional BOOT compatibility files | ✅ Optional (`runtime/bootstrap/BOOT.md`, `runtime/bootstrap/BOOTSTRAP.md` via `/init --with-boot-files`) |
 | Adding new documents of a standard type | ✅ Yes |
 | One-off content creation | ❌ No (write directly) |
 | Content with no standard structure | ❌ No |
@@ -147,7 +146,7 @@ See each template's `MANIFEST.md` for human-readable details or `manifest.json` 
 
 ## Using Templates
 
-Templates are typically used by workflows (e.g., `/create-harness` copies from `.harmony/scaffolding/runtime/templates/harmony/`).
+Templates are typically used by workflows (e.g., `/create-harness` copies from `.harmony/scaffolding/runtime/templates/harmony/`). The base `harmony` template also carries a projected copy of the canonical bootstrap bundle under `scaffolding/runtime/bootstrap/`.
 
 ### With Scoped Templates
 

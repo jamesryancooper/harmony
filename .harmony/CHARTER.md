@@ -122,7 +122,7 @@ Harmony is governed by these non-negotiable concepts:
 | Term | Meaning |
 | ---- | ------- |
 | `objective contract` | The required two-artifact objective source for material autonomy: the objective brief and the active intent contract. |
-| `objective brief` | The human-readable objective statement stored at `/OBJECTIVE.md`. It explains goals, scope, constraints, and acceptance context for the workspace. |
+| `objective brief` | The human-readable objective statement stored at `/.harmony/OBJECTIVE.md`. It explains goals, scope, constraints, and acceptance context for the workspace. |
 | `intent contract` | The machine-readable artifact stored at `/.harmony/cognition/runtime/context/intent.contract.yml`. It is the runtime authority for evaluating scope, binding execution, and validating autonomous material runs. |
 | `material side effect` | Any write, delete, permission change, authority-surface change, external integration action, durable state mutation, destructive operation, or irreversible state transition. |
 | `material run` | Any autonomous or human-assisted execution that can produce one or more material side effects. |
@@ -193,11 +193,11 @@ Harmony resolves conflicts using the following precedence ladder:
 | Order | Authority source                                                                                                                           | Effect                                                                                                                                             |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1     | Applicable law and other non-waivable external obligations                                                                                 | Always controls.                                                                                                                                   |
-| 2     | Repository-root and agency governance that explicitly governs the same decision, including `AGENTS.md` and the agency contract chain       | Overrides this charter only for that explicitly governed decision. Silence, implication, or looser wording does not displace charter requirements. |
+| 2     | Repository-root ingress and agency governance that explicitly governs the same decision, including repo-root `AGENTS.md` as the ingress surface for `/.harmony/AGENTS.md` and the agency contract chain | Overrides this charter only for that explicitly governed decision. Silence, implication, or looser wording does not displace charter requirements. |
 | 3     | This charter                                                                                                                               | The highest Harmony-wide cross-domain authority within the managed filesystem boundary after higher-precedence rules.                              |
 | 4     | Domain `governance/` contracts                                                                                                             | MAY specialize this charter for a domain but MUST NOT weaken or contradict it.                                                                     |
 | 5     | Domain `runtime/` contracts and executable runtime artifacts                                                                               | Implement behavior required by this charter and domain governance.                                                                                 |
-| 6     | Domain `practices/` documents and workspace adoption artifacts such as `.harmony/scope.md`, `.harmony/conventions.md`, and `/OBJECTIVE.md` | Supply local operating values and standards within the slots allowed by higher-precedence rules.                                                   |
+| 6     | Domain `practices/` documents and workspace adoption artifacts such as `/.harmony/scope.md`, `/.harmony/conventions.md`, and `/.harmony/OBJECTIVE.md` | Supply local operating values and standards within the slots allowed by higher-precedence rules.                                                   |
 | 7     | Informative documentation, including `_meta/` and root-level orientation documents                                                         | Explain or orient; never create competing authority.                                                                                               |
 | 8     | `_ops/` scripts and mutable operational state                                                                                              | Execute operations or hold mutable state; never become canonical policy or runtime authority.                                                      |
 
@@ -287,7 +287,7 @@ Harmony uses the following objective-contract artifacts:
 
 | Artifact        | Location                                                  | Role                                                                                   |
 | --------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Objective brief | `/OBJECTIVE.md`                                           | Human-readable objective source for goals, scope, constraints, and acceptance context. |
+| Objective brief | `/.harmony/OBJECTIVE.md`                                  | Human-readable objective source for goals, scope, constraints, and acceptance context. |
 | Intent contract | `/.harmony/cognition/runtime/context/intent.contract.yml` | Machine-readable runtime authority for binding and evaluating material autonomy.       |
 
 
@@ -317,7 +317,7 @@ Boundary-routing rules:
 
 Before the first autonomous material run in a target filesystem, bootstrap initialization MUST establish the minimum entry artifacts below:
 
-- root-level `AGENTS.md` rendered from Harmony scaffolding templates,
+- canonical `/.harmony/AGENTS.md` rendered from Harmony scaffolding bootstrap assets plus repo-root ingress adapters (`AGENTS.md` and `CLAUDE.md`),
 - `alignment-check` or a policy-owner-approved equivalent assurance entrypoint,
 - scoped updates to `.harmony/scope.md` for local boundary exclusions and human-led zones,
 - scoped updates to `.harmony/conventions.md` for local standards, support targets, compatibility constraints, and any measurement records required by Section 13.

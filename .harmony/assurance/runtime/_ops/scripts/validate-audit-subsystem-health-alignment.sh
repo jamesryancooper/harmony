@@ -186,6 +186,9 @@ check_drift_alignment() {
     '^\.harmony/assurance/practices/(complete\.md|session-exit\.md)$'
     '^\.harmony/assurance/runtime/_ops/scripts/validate-harness-structure\.sh$'
     '^\.harmony/assurance/runtime/_ops/scripts/validate-contract-governance\.sh$'
+    '^\.harmony/assurance/runtime/_ops/scripts/validate-bootstrap-ingress\.sh$'
+    '^\.harmony/assurance/runtime/_ops/scripts/validate-bootstrap-projections\.sh$'
+    '^\.harmony/scaffolding/runtime/bootstrap/'
   )
   local update_regexes=(
     '^\.harmony/capabilities/runtime/skills/audit/audit-subsystem-health/'

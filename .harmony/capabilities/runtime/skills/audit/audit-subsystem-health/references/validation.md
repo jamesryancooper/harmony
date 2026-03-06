@@ -73,8 +73,9 @@ After skill execution, verify:
 9. Alignment validator is run when architecture surfaces change:
    `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh`
 10. If bootstrap/init behavior changed, the alignment references still reflect
-    repo-level objective contract outputs (`OBJECTIVE.md` and
-    `.harmony/cognition/runtime/context/intent.contract.yml`)
+    canonical `/.harmony/AGENTS.md`, canonical `/.harmony/OBJECTIVE.md`, repo-root
+    ingress adapters (`AGENTS.md`, `CLAUDE.md`), and
+    `.harmony/cognition/runtime/context/intent.contract.yml`
 11. Contract governance validator is run when contract metadata or `_ops` boundaries change:
     `bash .harmony/assurance/runtime/_ops/scripts/validate-contract-governance.sh`
 12. Harness version compatibility validator is run when portability/version contracts change:

@@ -165,6 +165,11 @@ files:
     summary: External systems and references this harness interacts with.
     when: When integrating with external resources.
 
+  - id: intent-contract
+    path: intent.contract.yml
+    summary: Active machine-readable objective contract bound to repo-local autonomy.
+    when: Before evaluating scope, routing, or material execution authority.
+
   - id: tools
     path: tools.md
     summary: Available tools and selection guidance.

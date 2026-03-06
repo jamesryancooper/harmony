@@ -101,6 +101,14 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-developer-context-policy.sh"
 
   run_step \
+    "Validate bootstrap ingress and objective contract" \
+    bash "$SCRIPT_DIR/validate-bootstrap-ingress.sh"
+
+  run_step \
+    "Validate bootstrap projection parity" \
+    bash "$SCRIPT_DIR/validate-bootstrap-projections.sh"
+
+  run_step \
     "Validate context overhead budget contract" \
     bash "$SCRIPT_DIR/validate-context-overhead-budget.sh"
 

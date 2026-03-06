@@ -10,6 +10,7 @@ MANIFEST="$AGENCY_DIR/manifest.yml"
 AGENTS_REG="$AGENCY_DIR/runtime/agents/registry.yml"
 ASSISTANTS_REG="$AGENCY_DIR/runtime/assistants/registry.yml"
 TEAMS_REG="$AGENCY_DIR/runtime/teams/registry.yml"
+CANONICAL_AGENTS_FILE="$ROOT_DIR/AGENTS.md"
 ROOT_AGENTS_FILE="$REPO_ROOT/AGENTS.md"
 CONSTITUTION_FILE="$AGENCY_DIR/governance/CONSTITUTION.md"
 DELEGATION_FILE="$AGENCY_DIR/governance/DELEGATION.md"
@@ -285,38 +286,58 @@ check_main_branch_deletion_policy() {
 }
 
 check_execution_profile_governance_contract() {
-  if [[ ! -f "$ROOT_AGENTS_FILE" ]]; then
+  if [[ ! -f "$CANONICAL_AGENTS_FILE" ]]; then
+    fail "missing file: $CANONICAL_AGENTS_FILE"
+  else
+    pass "found file: ${CANONICAL_AGENTS_FILE#$ROOT_DIR/}"
+  fi
+
+  if [[ ! -f "$ROOT_AGENTS_FILE" && ! -L "$ROOT_AGENTS_FILE" ]]; then
     fail "missing file: $ROOT_AGENTS_FILE"
   else
     pass "found file: ${ROOT_AGENTS_FILE#$REPO_ROOT/}"
   fi
 
-  if ! grep -q '^## Execution Profile Governance (Required)' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing '## Execution Profile Governance (Required)' section"
+  if [[ -L "$ROOT_AGENTS_FILE" ]]; then
+    local target
+    target="$(readlink "$ROOT_AGENTS_FILE")"
+    if [[ "$target" == ".harmony/AGENTS.md" ]]; then
+      pass "root AGENTS.md symlink points to .harmony/AGENTS.md"
+    else
+      fail "root AGENTS.md symlink target mismatch: $target"
+    fi
+  elif cmp -s "$CANONICAL_AGENTS_FILE" "$ROOT_AGENTS_FILE"; then
+    pass "root AGENTS.md matches .harmony/AGENTS.md"
+  else
+    fail "root AGENTS.md diverges from .harmony/AGENTS.md"
   fi
-  if ! grep -Fq 'change_profile' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing change_profile governance key"
+
+  if ! grep -q '^## Execution Profile Governance (Required)' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing '## Execution Profile Governance (Required)' section"
   fi
-  if ! grep -Fq 'release_state' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing release_state governance key"
+  if ! grep -Fq 'change_profile' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing change_profile governance key"
   fi
-  if ! grep -Fq 'transitional_exception_note' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing transitional_exception_note governance key"
+  if ! grep -Fq 'release_state' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing release_state governance key"
   fi
-  if ! grep -Fq 'Profile Selection Receipt' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing required section: Profile Selection Receipt"
+  if ! grep -Fq 'transitional_exception_note' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing transitional_exception_note governance key"
   fi
-  if ! grep -Fq 'Implementation Plan' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing required section: Implementation Plan"
+  if ! grep -Fq 'Profile Selection Receipt' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing required section: Profile Selection Receipt"
   fi
-  if ! grep -Fq 'Impact Map (code, tests, docs, contracts)' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing required section: Impact Map (code, tests, docs, contracts)"
+  if ! grep -Fq 'Implementation Plan' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing required section: Implementation Plan"
   fi
-  if ! grep -Fq 'Compliance Receipt' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing required section: Compliance Receipt"
+  if ! grep -Fq 'Impact Map (code, tests, docs, contracts)' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing required section: Impact Map (code, tests, docs, contracts)"
   fi
-  if ! grep -Fq 'Exceptions/Escalations' "$ROOT_AGENTS_FILE"; then
-    fail "AGENTS.md missing required section: Exceptions/Escalations"
+  if ! grep -Fq 'Compliance Receipt' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing required section: Compliance Receipt"
+  fi
+  if ! grep -Fq 'Exceptions/Escalations' "$CANONICAL_AGENTS_FILE"; then
+    fail ".harmony/AGENTS.md missing required section: Exceptions/Escalations"
   fi
 
   if ! grep -q '^## Execution Profile Governance' "$CONSTITUTION_FILE"; then
