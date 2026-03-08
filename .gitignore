@@ -30,7 +30,6 @@ runs/
 
 # Additional local outputs and proposal workspaces
 out/
-.proposals/
 
 # Harmony runtime state (local/cache/traces)
 .harmony/engine/_ops/state/
