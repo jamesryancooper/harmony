@@ -1,27 +1,36 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://harmony.local/design-packages/orchestration/workflow-execution.schema.json",
-  "title": "Workflow Execution Metadata",
+  "title": "Workflow Definition And Execution Contract",
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "workflow_group",
-    "workflow_id",
+    "schema_version",
+    "name",
+    "description",
     "version",
-    "entrypoint_ref",
+    "entry_mode",
+    "execution_profile",
     "side_effect_class",
     "execution_controls",
     "coordination_key_strategy",
-    "required_inputs",
-    "produced_outputs",
+    "inputs",
+    "stages",
+    "artifacts",
+    "done_gate",
+    "constraints",
     "executor_interface_version"
   ],
   "properties": {
-    "workflow_group": {
+    "schema_version": {
+      "type": "string",
+      "const": "workflow-contract-v1"
+    },
+    "name": {
       "type": "string",
       "minLength": 1
     },
-    "workflow_id": {
+    "description": {
       "type": "string",
       "minLength": 1
     },
@@ -29,9 +38,16 @@
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
-    "entrypoint_ref": {
+    "entry_mode": {
       "type": "string",
       "minLength": 1
+    },
+    "execution_profile": {
+      "type": "string",
+      "enum": [
+        "core",
+        "external-dependent"
+      ]
     },
     "side_effect_class": {
       "type": "string",
@@ -85,17 +101,30 @@
         }
       }
     },
-    "required_inputs": {
+    "inputs": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/ioField"
+        "$ref": "#/$defs/inputField"
       }
     },
-    "produced_outputs": {
+    "stages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/stage"
+      }
+    },
+    "artifacts": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/ioField"
+        "$ref": "#/$defs/artifact"
       }
+    },
+    "done_gate": {
+      "$ref": "#/$defs/doneGate"
+    },
+    "constraints": {
+      "$ref": "#/$defs/constraints"
     },
     "executor_interface_version": {
       "type": "string",
@@ -103,12 +132,12 @@
     }
   },
   "$defs": {
-    "ioField": {
+    "inputField": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "name",
-        "value_type",
+        "type",
         "required"
       ],
       "properties": {
@@ -116,13 +145,15 @@
           "type": "string",
           "minLength": 1
         },
-        "value_type": {
+        "type": {
           "type": "string",
           "enum": [
-            "string",
+            "text",
+            "boolean",
+            "file",
+            "folder",
             "integer",
             "number",
-            "boolean",
             "object",
             "array"
           ]
@@ -130,7 +161,142 @@
         "required": {
           "type": "boolean"
         },
-        "default": {}
+        "default": {},
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "asset",
+        "kind",
+        "consumes",
+        "produces",
+        "mutation_scope"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset": {
+          "type": "string",
+          "pattern": "^stages/.+\\.md$"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "analysis",
+            "mutation",
+            "projection",
+            "verification"
+          ]
+        },
+        "consumes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "produces": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mutation_scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "path",
+        "kind",
+        "format",
+        "determinism",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "directory"
+          ]
+        },
+        "format": {
+          "type": "string",
+          "minLength": 1
+        },
+        "determinism": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "doneGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checks"
+      ],
+      "properties": {
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fail_closed",
+        "require_relative_local_assets"
+      ],
+      "properties": {
+        "fail_closed": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_relative_local_assets": {
+          "type": "boolean",
+          "const": true
+        },
+        "forbid_design_packages": {
+          "type": "boolean"
+        }
       }
     }
   },

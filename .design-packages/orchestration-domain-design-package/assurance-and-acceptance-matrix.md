@@ -31,11 +31,15 @@ Define how the orchestration model will be validated before promotion into live
 - prohibited fields or states are rejected
 - package-normative and schema-backed contracts are explicitly marked in
   `implementation-readiness.md`
+- workflow execution authority is validated at `workflow.yml`, not in README or
+  registry prose
 
 ### Schema And Shape Validation
 
 - runtime tree matches canonical shapes
 - required top-level discovery artifacts exist
+- every workflow unit contains a valid `workflow.yml`
+- every stage asset referenced from `workflow.yml` resolves under `stages/`
 - state directories and indexes are present where required
 - schema-backed fixtures pass/fail under
   `validate-orchestration-design-package.sh`
@@ -108,12 +112,14 @@ Define how the orchestration model will be validated before promotion into live
 - promoted collection surfaces have `manifest.yml` and `registry.yml`
 - infrastructure surfaces satisfy the discovery-and-authority contract
 - routing metadata stays lightweight and does not carry mutable state
+- existing workflow surfaces preserve `manifest.yml -> registry.yml ->
+  workflow.yml` authority order and keep `README.md` non-authoritative
 
 ## Surface Acceptance Criteria
 
 | Surface | Acceptance Criteria |
 |---|---|
-| `workflows` | execution context can emit runs; evidence linkage rules hold |
+| `workflows` | `workflow.yml` validates, stage references resolve, registry projections do not outrank the definition artifact, execution context can emit runs, and evidence linkage rules hold |
 | `missions` | workflow bindings and run linkage validate; no recurrence leakage |
 | `runs` | continuity evidence linkage validates; `decision_id` resolves; projections do not outrank evidence |
 | `automations` | trigger selection deterministic; concurrency and idempotency rules enforced across `serialize`, `drop`, `parallel`, and `replace` |

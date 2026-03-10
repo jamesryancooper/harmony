@@ -1,8 +1,10 @@
 {
-  "workflow_group": "audit",
-  "workflow_id": "audit-continuous-workflow",
+  "schema_version": "workflow-contract-v1",
+  "name": "audit-continuous-workflow",
+  "description": "Run a bounded continuous audit and publish a unique report bundle.",
   "version": "1.0.0",
-  "entrypoint_ref": "audit/audit-continuous-workflow/WORKFLOW.md",
+  "entry_mode": "human",
+  "execution_profile": "core",
   "side_effect_class": "mutating",
   "execution_controls": {
     "cancel_safe": false
@@ -14,19 +16,57 @@
     ],
     "format": "target:{target_path}"
   },
-  "required_inputs": [
+  "inputs": [
     {
       "name": "target_path",
-      "value_type": "string",
-      "required": true
+      "type": "folder",
+      "required": true,
+      "description": "Root path to audit"
     }
   ],
-  "produced_outputs": [
+  "stages": [
     {
-      "name": "result_summary",
-      "value_type": "string",
-      "required": true
+      "id": "analyze",
+      "asset": "stages/01-analyze.md",
+      "kind": "analysis",
+      "consumes": [],
+      "produces": [
+        "stage:analyze"
+      ],
+      "mutation_scope": []
+    },
+    {
+      "id": "verify",
+      "asset": "stages/99-verify.md",
+      "kind": "verification",
+      "consumes": [
+        "stage:analyze"
+      ],
+      "produces": [
+        "stage:verify"
+      ],
+      "mutation_scope": []
     }
   ],
+  "artifacts": [
+    {
+      "name": "continuous_audit_report",
+      "path": "../../output/reports/{{date}}-continuous-audit.md",
+      "kind": "file",
+      "format": "markdown",
+      "determinism": "unique",
+      "description": "Top-level workflow report"
+    }
+  ],
+  "done_gate": {
+    "checks": [
+      "verification stage passes"
+    ]
+  },
+  "constraints": {
+    "fail_closed": true,
+    "require_relative_local_assets": true,
+    "forbid_design_packages": false
+  },
   "executor_interface_version": "workflow-executor-v1"
 }

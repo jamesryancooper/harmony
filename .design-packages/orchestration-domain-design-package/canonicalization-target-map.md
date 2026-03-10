@@ -64,14 +64,27 @@ If the mature model is promoted, the current Harmony surfaces should receive the
 following addenda:
 
 - `runtime/workflows/README.md`
-  - add workflow execution context rules for `run_id`, `mission_id`,
-    `automation_id`, `incident_id`, and `decision_id`
+  - reaffirm the discovery order and mark `README.md` as subordinate guidance,
+    not the canonical execution contract
 - `runtime/workflows/registry.yml`
-  - add `execution_controls.cancel_safe: true|false` for machine-readable
-    cancellation safety
+  - keep commands, access, and dependency summaries as routing projections only;
+    do not make registry projections canonical for inputs, artifacts, or
+    execution controls
+- `runtime/workflows/_scaffold/template/workflow.yml`
+  - add the orchestration-required top-level fields
+    (`side_effect_class`, `execution_controls`, `coordination_key_strategy`,
+    `executor_interface_version`) to the schema-backed definition contract
+- `runtime/workflows/<group>/<workflow-id>/workflow.yml`
+  - make `workflow.yml` the authoritative execution artifact for version,
+    inputs, stage graph, artifacts, and execution controls
+- `runtime/workflows/<group>/<workflow-id>/stages/`
+  - keep stage assets executor-facing and subordinate to `workflow.yml`
 - `practices/workflow-authoring-standards.md`
-  - add requirements for run emission, decision linkage, and cancel-safe
-    declarations
+  - add requirements for schema-backed `workflow.yml` authority, stage-asset
+    locality, run emission, decision linkage, and cancel-safe declarations
+- `runtime/workflows/_ops/scripts/validate-workflows.sh`
+  - validate `workflow.yml`, stage asset resolution, and non-authoritative
+    registry/README drift checks
 - `runtime/missions/README.md`
   - add mission linkage fields for `campaign_id`, `default_workflow_refs`, and
     `related_run_ids`

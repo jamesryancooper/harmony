@@ -38,6 +38,9 @@ rollout remains a separate canonicalization step.
   contracts
 - added machine-readable schemas and fixtures for approvals, automation
   bindings, and selected surface-local artifacts
+- strengthened `workflows` so the executable definition is a schema-backed
+  `workflow.yml` rather than markdown-first metadata scattered across prose and
+  routing projections
 - internalized the orchestration-domain behavior previously left implicit or
   externally assumed
 - aligned decision evidence and durable run evidence with their continuity-owned
@@ -47,7 +50,7 @@ rollout remains a separate canonicalization step.
 
 | Surface | Status | Basis |
 |---|---|---|
-| `workflows` | implementation-ready | package-local domain, execution, lifecycle, governance, and run-linkage rules plus workflow-specific contracts |
+| `workflows` | implementation-ready | package-local domain, execution, lifecycle, governance, run-linkage rules, and a schema-backed `workflow.yml` definition contract |
 | `missions` | implementation-ready | package-local domain, execution, lifecycle, and mission-binding rules plus mission/run linkage contracts |
 | `campaigns` | implementation-ready | package-local domain and lifecycle rules plus campaign contracts |
 | `automations` | implementation-ready | execution model, dependency resolution, failure model, and automation execution contract |
@@ -144,8 +147,12 @@ This package aligns with Harmony's philosophy because it preserves:
       boundaries.
 - [ ] Every side-effectful material action derives a `coordination_key` and
       acquires the required lock before external side effects begin.
-- [ ] Every workflow advertises executable metadata including `version`,
-      `side_effect_class`, `cancel_safe`, and `coordination_key_strategy`.
+- [ ] Every `workflow.yml` advertises executable metadata including `version`,
+      `side_effect_class`, `execution_controls.cancel_safe`, and
+      `coordination_key_strategy`.
+- [ ] Every workflow stage asset resolves from `workflow.yml`, remains local to
+      `stages/`, and no README or registry projection outranks the definition
+      artifact.
 - [ ] Every watcher emits the canonical event envelope.
 - [ ] Every queue item conforms to the canonical queue item schema and lease
       behavior.
@@ -173,7 +180,7 @@ This package aligns with Harmony's philosophy because it preserves:
 - [ ] Every schema-backed contract has a valid JSON Schema plus one valid and
       one invalid fixture.
 - [ ] Required surface-local artifacts validate against their declared schemas.
-- [ ] Workflow execution metadata, coordination lock artifacts, and approver
+- [ ] Workflow definition artifacts, coordination lock artifacts, and approver
       authority registry artifacts validate against their schemas.
 - [ ] `validate-orchestration-design-package.sh` passes.
 - [ ] Every promoted surface satisfies the discovery-and-authority layering

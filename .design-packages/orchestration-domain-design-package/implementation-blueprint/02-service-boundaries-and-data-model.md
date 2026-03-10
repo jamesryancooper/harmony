@@ -33,28 +33,35 @@ Stable details:
 
 ## Authoritative Data Model
 
-### WorkflowMetadata
+### WorkflowDefinition
 
 Purpose:
 - executable workflow contract consumed by orchestration
 
 Required fields:
-- `workflow_group`
-- `workflow_id`
+- `schema_version`
+- `name`
+- `description`
 - `version`
-- `entrypoint_ref`
+- `entry_mode`
+- `execution_profile`
 - `side_effect_class`
 - `execution_controls.cancel_safe`
 - `coordination_key_strategy`
-- `required_inputs[]`
-- `produced_outputs[]`
+- `inputs[]`
+- `stages[]`
+- `artifacts[]`
+- `done_gate.checks[]`
+- `constraints.fail_closed`
+- `constraints.require_relative_local_assets`
 - `executor_interface_version`
 
 Relationships:
 - referenced by automations, missions, incidents
 
 Validation:
-- schema-backed
+- schema-backed `workflow.yml`
+- `stages/*.md` resolved only through the validated workflow definition
 - side-effectful workflows cannot use `coordination_key_strategy.kind=none`
 
 ### TriggerDefinition

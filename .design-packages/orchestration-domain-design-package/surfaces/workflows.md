@@ -49,9 +49,9 @@ Live Harmony workflow docs remain important integration context for the current
 runtime surface shape. They are not the primary source of target
 cross-surface orchestration behavior here.
 
-Canonicalization addenda should define machine-readable
-`execution_controls.cancel_safe` for workflows that may be preempted by
-automation `replace` mode.
+Canonicalization addenda should keep `workflow.yml` as the machine-readable
+definition contract and keep Markdown limited to subordinate stage assets and
+human guidance.
 
 ## Example Use Cases
 
@@ -92,6 +92,24 @@ automation `replace` mode.
 - overlaps missions if workflow definitions start holding long-lived initiative
   state
 
+## Authority Model
+
+- discovery
+  - `manifest.yml`
+- routing and metadata
+  - `registry.yml`
+- definition
+  - `<group>/<workflow-id>/workflow.yml`
+- executor-facing instruction assets
+  - `<group>/<workflow-id>/stages/*.md`
+- human guidance
+  - `<group>/<workflow-id>/README.md`
+- state and evidence
+  - `runtime/runs/` plus `continuity/runs/`
+
+`workflow.yml` is authoritative for version, inputs, stage graph, artifacts,
+and execution controls. `README.md` is never the canonical execution contract.
+
 ## Proposed Canonical Artifacts
 
 ```text
@@ -99,10 +117,12 @@ workflows/
 ├── manifest.yml
 ├── registry.yml
 └── <group>/<workflow-id>/
-    ├── WORKFLOW.md
-    ├── 01-*.md
-    ├── ...
-    └── NN-verify.md
+    ├── workflow.yml
+    ├── stages/
+    │   ├── 01-*.md
+    │   ├── ...
+    │   └── 99-verify.md
+    └── README.md
 ```
 
 ## Non-Goals

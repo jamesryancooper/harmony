@@ -76,10 +76,27 @@ Applies to:
 The package-local workflow integration contract is:
 
 - Tier 1: `manifest.yml`
+  - discovery identity, summary, trigger hints, and canonical path reference
 - Tier 2: `registry.yml`
-- Tier 3: `WORKFLOW.md` plus step files
+  - routing metadata, commands, access, dependency projections, and optional
+    summaries derived from the workflow definition
+- Tier 3: `<group>/<workflow-id>/workflow.yml`
+  - authoritative machine-readable workflow definition
+- Tier 3 subordinate assets: `stages/*.md` and optional `README.md`
+  - executor-facing instructions and human guidance resolved only through
+    `workflow.yml`
 - Tier 4: execution-time run and evidence context outside the workflow
   definition tree (`runtime/runs/` and `continuity/runs/`)
+
+Workflow-specific authority rules:
+
+1. `workflow.yml` is the single source of truth for workflow version, stage
+   graph, inputs, artifacts, done gate, and execution controls.
+2. `stages/*.md` may elaborate how a stage is executed, but they must not
+   redefine execution controls, input contracts, or output declarations.
+3. `README.md` is never the canonical execution contract.
+4. Registry projections may duplicate selected facts for routing, but they must
+   not outrank `workflow.yml`.
 
 ### `missions`
 
@@ -100,6 +117,8 @@ package-local source of truth for how they participate in orchestration.
 3. Evidence bundles must not become the source of live execution state.
 4. Projection indexes may duplicate references for queryability, but must never
    outrank object records or evidence stores as authority.
+5. For `workflows`, Markdown instruction assets remain subordinate to the
+   schema-backed `workflow.yml` definition artifact.
 
 ## Schema Requirement
 

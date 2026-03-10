@@ -30,7 +30,7 @@ orchestration-domain specification defined by this package.
 - `decision-record-contract.md`
   - Canonical decision evidence for `allow`, `block`, and `escalate` outcomes
 - `workflow-execution-contract.md`
-  - Workflow metadata schema, launch interface, and executor state contract
+  - Workflow definition artifact, launch interface, and executor state contract
 - `campaign-object-contract.md`
   - Minimum campaign schema, lifecycle, and invariants
 - `automation-execution-contract.md`
@@ -90,7 +90,7 @@ Validation is enforced by:
 | `versioning-and-compatibility-policy.md` | `package-normative` | package-local change-control rules plus validator coverage |
 | `cross-surface-reference-contract.md` | `package-normative` | `domain-model.md`, `dependency-resolution.md`, and schema-backed object contracts |
 | `decision-record-contract.md` | `schema-backed` | `contracts/schemas/decision-record.schema.json` |
-| `workflow-execution-contract.md` | `schema-backed` | `contracts/schemas/workflow-execution.schema.json` |
+| `workflow-execution-contract.md` | `schema-backed` | `contracts/schemas/workflow-execution.schema.json` validating `workflow.yml` |
 | `campaign-object-contract.md` | `package-normative` | `domain-model.md` and `orchestration-lifecycle.md` |
 | `automation-execution-contract.md` | `schema-backed` | `contracts/schemas/automation-execution.schema.json` |
 | `coordination-lock-contract.md` | `schema-backed` | `contracts/schemas/coordination-lock.schema.json` |

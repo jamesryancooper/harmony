@@ -12,13 +12,20 @@ This document is normative for schema coverage expectations.
 | Surface | Artifact | Required Schema |
 |---|---|---|
 | `automations` | `bindings.yml` | `contracts/schemas/automation-bindings.schema.json` |
-| `workflows` | workflow execution metadata | `contracts/schemas/workflow-execution.schema.json` |
+| `workflows` | `workflow.yml` | `contracts/schemas/workflow-execution.schema.json` |
 | `watchers` | `watcher.yml` | `contracts/schemas/watcher-definition.schema.json` |
 | `watchers` | `rules.yml` | `contracts/schemas/watcher-rules.schema.json` |
 | `incidents` | `actions.yml` | `contracts/schemas/incident-actions.schema.json` |
 | coordination manager | lock artifact | `contracts/schemas/coordination-lock.schema.json` |
 | approvals / overrides | approval artifact | `contracts/schemas/approval-and-override.schema.json` |
 | governance | approver authority registry | `contracts/schemas/approver-authority-registry.schema.json` |
+
+For `workflows`, the schema-backed artifact is the definition contract
+(`workflow.yml`), not registry metadata or prose guidance.
+
+`stages/*.md` remain Markdown assets. They do not require a JSON Schema, but
+they must be resolved only from a valid `workflow.yml` and remain subject to
+drift checks for relative pathing and local asset ownership.
 
 ## Validation Mode
 

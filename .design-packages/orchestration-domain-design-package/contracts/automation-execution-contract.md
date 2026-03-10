@@ -141,7 +141,8 @@ Required for all automations.
 ## Workflow-Side Requirement
 
 - Workflows that may be targeted by `replace` must expose
-  `execution_controls.cancel_safe` in workflow registry metadata.
+  `execution_controls.cancel_safe` in the schema-backed `workflow.yml`
+  definition artifact.
 - Omitted `execution_controls.cancel_safe` is treated as `false`.
 
 ## Behavioral Rules

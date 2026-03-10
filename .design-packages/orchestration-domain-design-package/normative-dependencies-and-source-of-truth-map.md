@@ -108,7 +108,7 @@ primary source of target orchestration behavior for this package.
 | approvals and overrides | `approval-and-override-contract.md` | `governance-and-policy.md` | privileged action authorization |
 | automation binding semantics | `automation-bindings-contract.md` | `contracts/automation-execution-contract.md` | event-to-parameter mapping and validation |
 | run liveness and recovery | `run-liveness-and-recovery-spec.md` | `runtime-architecture.md`, `failure-model.md` | executor ownership and stale-run recovery |
-| workflow execution metadata | `contracts/workflow-execution-contract.md` | `orchestration-execution-model.md` | executable workflow metadata and launch interface |
+| workflow definition and execution contract | `contracts/workflow-execution-contract.md` | `orchestration-execution-model.md` | schema-backed `workflow.yml`, subordinate stage assets, and launch interface |
 | coordination lock artifact | `contracts/coordination-lock-contract.md` | `concurrency-control-model.md` | lock schema, lease, and CAS semantics |
 | approver authority verification | `approver-authority-model.md` | `approval-and-override-contract.md` | approver registry and scope validation |
 | surface artifact schema coverage | `surface-artifact-schemas.md` | `contracts/discovery-and-authority-layer-contract.md` | required schema-backed runtime artifacts |
@@ -154,7 +154,7 @@ When two package docs overlap, resolve in this order:
 | How does orchestration begin and schedule work? | `orchestration-execution-model.md` |
 | How are references and triggers resolved? | `dependency-resolution.md` |
 | How are conflicting executions prevented? | `concurrency-control-model.md` |
-| What workflow metadata must exist to launch execution? | `contracts/workflow-execution-contract.md` |
+| What workflow definition contract must exist to launch execution? | `contracts/workflow-execution-contract.md` |
 | What is the canonical lock artifact? | `contracts/coordination-lock-contract.md` |
 | What approval or break-glass artifact is required? | `approval-and-override-contract.md` |
 | How is approver authority verified? | `approver-authority-model.md` |

@@ -347,18 +347,55 @@ validate_workflow_execution_fixture() {
   local file="$1"
   jq -e '
     def nonempty_string: type == "string" and length > 0;
+    def string_array: type == "array" and all(.[]; type == "string" and length > 0);
     type == "object"
-    and (.workflow_group | nonempty_string)
-    and (.workflow_id | nonempty_string)
+    and (.schema_version == "workflow-contract-v1")
+    and (.name | nonempty_string)
+    and (.description | nonempty_string)
     and (.version | type == "string" and test("^[0-9]+\\.[0-9]+\\.[0-9]+$"))
-    and (.entrypoint_ref | nonempty_string)
+    and (.entry_mode | nonempty_string)
+    and ((.execution_profile as $p | ["core","external-dependent"] | index($p)) != null)
     and ((.side_effect_class as $c | ["none","read_only","mutating","destructive"] | index($c)) != null)
     and (.execution_controls | type == "object")
     and (.execution_controls.cancel_safe | type == "boolean")
     and (.coordination_key_strategy | type == "object")
     and ((.coordination_key_strategy.kind as $k | ["none","workflow-target","mission-target","incident-target","explicit-input"] | index($k)) != null)
-    and (.required_inputs | type == "array")
-    and (.produced_outputs | type == "array")
+    and (.inputs | type == "array")
+    and all(
+      .inputs[];
+      (.name | nonempty_string)
+      and ((.type as $t | ["text","boolean","file","folder","integer","number","object","array"] | index($t)) != null)
+      and (.required | type == "boolean")
+    )
+    and (.stages | type == "array" and length > 0)
+    and all(
+      .stages[];
+      (.id | nonempty_string)
+      and (.asset | type == "string" and test("^stages/.+\\.md$"))
+      and ((.kind as $k | ["analysis","mutation","projection","verification"] | index($k)) != null)
+      and (.consumes | string_array or (.consumes | type == "array" and length == 0))
+      and (.produces | string_array or (.produces | type == "array" and length == 0))
+      and (.mutation_scope | string_array or (.mutation_scope | type == "array" and length == 0))
+    )
+    and (.artifacts | type == "array")
+    and all(
+      .artifacts[];
+      (.name | nonempty_string)
+      and (.path | nonempty_string)
+      and ((.kind as $k | ["file","directory"] | index($k)) != null)
+      and (.format | nonempty_string)
+      and (.determinism | nonempty_string)
+      and (.description | nonempty_string)
+    )
+    and (.done_gate | type == "object")
+    and (.done_gate.checks | string_array)
+    and (.constraints | type == "object")
+    and (.constraints.fail_closed == true)
+    and (.constraints.require_relative_local_assets == true)
+    and (
+      ((.constraints | has("forbid_design_packages")) | not)
+      or (.constraints.forbid_design_packages | type == "boolean")
+    )
     and (.executor_interface_version == "workflow-executor-v1")
     and (
       (.side_effect_class == "none" or .side_effect_class == "read_only")
