@@ -11,9 +11,9 @@ use std::process::{Command, Stdio};
 use time::format_description;
 use walkdir::WalkDir;
 
-const WORKFLOW_ID: &str = "audit-design-package-workflow";
-const PIPELINE_ROOT_REL: &str =
-    ".harmony/orchestration/runtime/pipelines/audit/audit-design-package-workflow";
+const WORKFLOW_ID: &str = "audit-design-package";
+const WORKFLOW_ROOT_REL: &str =
+    ".harmony/orchestration/runtime/workflows/audit/audit-design-package";
 const REPORTS_ROOT_REL: &str = ".harmony/output/reports";
 const AUDIT_BUNDLES_REL: &str = ".harmony/output/reports/audits";
 
@@ -221,7 +221,7 @@ struct BundleMetadata {
 struct Runner {
     repo_root: PathBuf,
     target_package: PathBuf,
-    pipeline_root: PathBuf,
+    workflow_root: PathBuf,
     options: RunDesignPackageOptions,
     bundle_root: PathBuf,
     reports_dir: PathBuf,
@@ -276,7 +276,7 @@ impl Runner {
             bail!("target package not found: {}", target_package.display());
         }
 
-        let pipeline_root = repo_root.join(PIPELINE_ROOT_REL);
+        let workflow_root = repo_root.join(WORKFLOW_ROOT_REL);
         let reports_root = repo_root.join(REPORTS_ROOT_REL);
         let audit_bundles_root = repo_root.join(AUDIT_BUNDLES_REL);
         fs::create_dir_all(&reports_root)
@@ -305,7 +305,7 @@ impl Runner {
 
         let summary_report = unique_file(
             &reports_root,
-            &format!("{date}-audit-design-package-workflow"),
+            &format!("{date}-audit-design-package"),
             "md",
         )?;
 
@@ -317,7 +317,7 @@ impl Runner {
         Ok(Self {
             repo_root,
             target_package,
-            pipeline_root,
+            workflow_root,
             options,
             bundle_root,
             reports_dir,
@@ -331,7 +331,7 @@ impl Runner {
     }
 
     fn run(self) -> Result<RunDesignPackageResult> {
-        self.ensure_pipeline_files()?;
+        self.ensure_workflow_files()?;
 
         let mut validation_notes = Vec::new();
         let mut report_paths = BTreeMap::new();
@@ -404,14 +404,14 @@ impl Runner {
         })
     }
 
-    fn ensure_pipeline_files(&self) -> Result<()> {
+    fn ensure_workflow_files(&self) -> Result<()> {
         let required_paths = [
-            self.pipeline_root.join("pipeline.yml"),
-            self.pipeline_root.join("stages"),
+            self.workflow_root.join("workflow.yml"),
+            self.workflow_root.join("stages"),
         ];
         for path in required_paths {
             if !path.exists() {
-                bail!("required pipeline path is missing: {}", path.display());
+                bail!("required workflow path is missing: {}", path.display());
             }
         }
 
@@ -780,7 +780,7 @@ impl Runner {
     }
 
     fn prompt_path(&self, stage: &StageDefinition) -> PathBuf {
-        self.pipeline_root.join("stages").join(stage.prompt_file)
+        self.workflow_root.join("stages").join(stage.prompt_file)
     }
 
     fn write_plan(&self) -> Result<()> {
@@ -1400,10 +1400,10 @@ mod tests {
         fs::create_dir_all(&target_package).expect("target package should exist");
         write_file(&target_package.join("README.md"), "# Target Package\n");
 
-        let pipeline_root = root.join(PIPELINE_ROOT_REL);
-        fs::create_dir_all(pipeline_root.join("stages"))
-            .expect("pipeline stages dir should exist");
-        write_file(&pipeline_root.join("pipeline.yml"), "name: audit-design-package-workflow\n");
+        let workflow_root = root.join(WORKFLOW_ROOT_REL);
+        fs::create_dir_all(workflow_root.join("stages"))
+            .expect("workflow stages dir should exist");
+        write_file(&workflow_root.join("workflow.yml"), "name: audit-design-package\n");
 
         for name in [
             "02-design-audit.md",
@@ -1426,7 +1426,7 @@ mod tests {
                 }
                 _ => "Target: <PACKAGE_PATH>",
             };
-            write_file(&pipeline_root.join("stages").join(name), body);
+            write_file(&workflow_root.join("stages").join(name), body);
         }
 
         (harmony_dir, target_package)

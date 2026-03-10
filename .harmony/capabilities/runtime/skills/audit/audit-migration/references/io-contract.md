@@ -207,7 +207,7 @@ runs:
 
 ### Authoritative Bundle (Orchestrated Mode)
 
-When called through `audit-orchestration-workflow`, output is also materialized into:
+When called through `audit-orchestration`, output is also materialized into:
 
 - `.harmony/output/reports/audits/YYYY-MM-DD-<slug>/bundle.yml`
 - `.harmony/output/reports/audits/YYYY-MM-DD-<slug>/findings.yml`
@@ -274,4 +274,4 @@ No external dependencies required.
 /audit-migration manifest="..." partition="config-files" file_filter="**/*.{yml,yaml,json}"
 ```
 
-**Note:** Partition mode is designed for use by the `audit-orchestration-workflow` workflow. Direct use is supported but the partition label and filter must be manually coordinated.
+**Note:** Partition mode is designed for use by the `audit-orchestration` workflow. Direct use is supported but the partition label and filter must be manually coordinated.

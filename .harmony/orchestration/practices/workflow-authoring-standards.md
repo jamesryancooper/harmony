@@ -1,42 +1,39 @@
-# Workflow Projection Standards
+# Workflow Authoring Standards
 
-These standards define how Harmony keeps workflow projections aligned to their
-canonical backing pipelines.
+These standards govern canonical orchestration authoring under
+`/.harmony/orchestration/runtime/workflows/`.
 
 ## Scope
 
-Applies to all workflow surfaces under
-`/.harmony/orchestration/runtime/workflows/`.
+Applies to every workflow unit, guide generator, validator, and meta workflow
+that authors or evaluates workflows.
 
 ## Standards
 
-1. Workflows are projections, not the source of truth.
-   - Do not author new canonical execution behavior directly in `WORKFLOW.md`
-     or numbered step files.
-2. Every workflow must have a backing pipeline.
-   - Registry metadata must declare `projection.pipeline_id`,
-     `projection.pipeline_path`, `projection.generated`, and
-     `projection.projection_format`.
-3. Generated projections must be deterministic.
-   - Validators must be able to detect drift against the source pipeline.
-4. Preserve identity stability.
-   - Existing workflow ids and slash-facing names remain stable unless a human
-     explicitly authorizes a rename.
-5. Keep local wrapper assets bounded.
-   - Workflow-local `prompts/`, `references/`, or `_ops/` are allowed only as
-     wrapper-local aids around a canonical pipeline.
-   - Those assets must be referenced relatively and must not depend on
-     `/.design-packages/`.
-6. Keep projections reviewable.
-   - `WORKFLOW.md` should clearly state that it is generated from or backed by a
-     canonical pipeline.
-7. Manual workflow authoring is deprecated.
-   - New authoring starts from the pipeline scaffold, not the workflow scaffold.
+1. `workflow.yml` is authoritative.
+   - Do not encode canonical execution semantics only in `README.md`.
+2. Use the canonical workflow unit layout.
+   - `<group>/<id>/workflow.yml`
+   - `<group>/<id>/stages/`
+   - `<group>/<id>/README.md`
+3. Keep the contract complete.
+   - `workflow.yml` must declare `name`, `description`, `version`,
+     `entry_mode`, `execution_profile`, `inputs`, `stages`, `artifacts`,
+     `done_gate`, and `constraints`.
+4. Keep stage contracts explicit.
+   - Every stage must declare `id`, `asset`, `kind`, `produces`, `consumes`,
+     and `mutation_scope`.
+5. Keep the README generated.
+   - `README.md` is derived from `workflow.yml + stages/`.
+   - README drift is a validation failure.
+6. Keep temporary material non-canonical.
+   - `/.design-packages/` may inform work, but must never be a live dependency
+     of canonical workflows, generated READMEs, or validators.
 
-## Projection Checklist
+## Checklist
 
-- [ ] Workflow registry entry includes projection metadata.
-- [ ] Backing pipeline exists and validates.
-- [ ] The projection shape matches the declared format.
-- [ ] Generated projections contain canonical-pipeline references.
-- [ ] No live projection asset references temporary design-package content.
+- [ ] `workflow.yml` exists and validates.
+- [ ] `stages/` exists and matches the declared stage assets.
+- [ ] `README.md` is generated and in sync with the canonical workflow contract.
+- [ ] No unit retains deprecated root `WORKFLOW.md`.
+- [ ] No unit depends on `runtime/pipelines/`.

@@ -1,15 +1,16 @@
 # Task Workflows
 
-This directory contains single-file, agent-invoked task workflows migrated from `.harmony/orchestration/runtime/workflows/tasks/`.
+This directory contains canonical task workflow units with `workflow.yml`,
+`stages/`, and generated `guide/` content.
 
 ## Workflows
 
-- `agent-led-happy-path.md` (canonical onboarding flow)
-- `add-api-endpoint.md`
-- `add-ui-feature.md`
-- `fix-a-bug.md`
-- `handle-security-issue.md`
-- `run-data-migration.md`
+- `agent-led-happy-path/`
+- `add-api-endpoint/`
+- `add-ui-feature/`
+- `fix-a-bug/`
+- `handle-security-issue/`
+- `run-data-migration/`
 
 Retired workflow artifacts are kept only for historical traceability and are not discoverable via manifest/registry routing.
 

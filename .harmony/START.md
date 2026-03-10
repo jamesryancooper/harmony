@@ -17,7 +17,6 @@ This harness extends `.harmony/` for shared infrastructure.
 | Assistants | `.harmony/agency/runtime/assistants/` | `.harmony/agency/runtime/assistants/` |
 | Teams | `.harmony/agency/runtime/teams/` | `.harmony/agency/runtime/teams/` |
 | Templates | `.harmony/scaffolding/runtime/templates/` | `.harmony/scaffolding/runtime/templates/` |
-| Pipelines | `.harmony/orchestration/runtime/pipelines/` | `.harmony/orchestration/runtime/pipelines/` |
 | Workflows | `.harmony/orchestration/runtime/workflows/` | `.harmony/orchestration/runtime/workflows/` |
 | Skills | `.harmony/capabilities/runtime/skills/` | `.harmony/capabilities/runtime/skills/` |
 | Commands | `.harmony/capabilities/runtime/commands/` | `.harmony/capabilities/runtime/commands/` |
@@ -90,8 +89,7 @@ Subsystem expansion specs:
 ├── orchestration/
 │   ├── _meta/architecture/   ← Orchestration subsystem specification
 │   ├── runtime/        ← Runtime orchestration artifacts
-│   │   ├── pipelines/  ← Canonical autonomous orchestration contracts
-│   │   ├── workflows/  ← Generated workflow projections
+│   │   ├── workflows/  ← Canonical workflows with generated READMEs
 │   │   └── missions/   ← Time-bounded sub-projects
 │   ├── governance/     ← Incident governance contracts
 │   └── practices/      ← Operating standards
@@ -156,13 +154,13 @@ Within these namespaces, common subpaths are:
 
 Use this as the only recommended onboarding path for agent execution.
 
-Canonical pipeline:
+Canonical workflow contract:
 
-- `/.harmony/orchestration/runtime/pipelines/tasks/agent-led-happy-path/pipeline.yml`
+- `/.harmony/orchestration/runtime/workflows/tasks/agent-led-happy-path/workflow.yml`
 
-Human-readable projection:
+Human-readable guide:
 
-- `/.harmony/orchestration/runtime/workflows/tasks/agent-led-happy-path.md`
+- `/.harmony/orchestration/runtime/workflows/tasks/agent-led-happy-path/README.md`
 
 Flow:
 

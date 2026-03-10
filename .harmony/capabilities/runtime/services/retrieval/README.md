@@ -33,4 +33,4 @@ Nuances (where the work lives):
 
 ## Bottom Line
 
-If you run the canonical pipeline — Ingest (deterministic chunks + dedup/redaction) → Index (`hybrid` with optional `also_emit.document`) → Query (hybrid retrieval + rerank + citations) — you're aligned with current RAG best practices for small-to-mid corpora, with a clean path to ColBERT and DB-backed serving when needed.
+If you run the canonical workflow — Ingest (deterministic chunks + dedup/redaction) → Index (`hybrid` with optional `also_emit.document`) → Query (hybrid retrieval + rerank + citations) — you're aligned with current RAG best practices for small-to-mid corpora, with a clean path to ColBERT and DB-backed serving when needed.

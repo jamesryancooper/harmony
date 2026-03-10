@@ -82,7 +82,7 @@ Routable capabilities MUST use progressive disclosure:
 
 - discovery index (`manifest.yml`)
 - extended metadata (`registry.yml`)
-- full definition (`SKILL.md` / `WORKFLOW.md`)
+- full definition (`SKILL.md` / `README.md`)
 
 Expands in:
 

@@ -240,7 +240,7 @@ The canonical cross-domain contract for classifying artifacts between
 - `continuity/` (session log, tasks, entities)
 - `orchestration/runtime/missions/` instances (time-bounded sub-projects)
 - Domain-specific context (`cognition/runtime/context/` — decisions, lessons, glossary, constraints)
-- Domain-specific workflows (e.g., flowkit)
+- Domain-specific workflows (for example `audit/` and `tasks/`)
 - Skills outputs and logs (always local)
 - `ideation/scratchpad/` (human-led zone with inbox/, archive/, etc.)
 

@@ -75,7 +75,7 @@ run_runner() {
   local executor="$2"
   local slug="$3"
   shift 3
-  "$RUNNER" pipeline run audit-design-package-workflow \
+  "$RUNNER" workflow run audit-design-package \
     --set "package_path=$package_rel" \
     --set "mode=short" \
     --executor "$executor" \

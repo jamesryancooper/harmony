@@ -404,8 +404,8 @@ scan_disk_workflows() {
     [[ "$(basename "$group_dir")" == _* ]] && continue
     for item in "$group_dir"/*; do
       [[ -e "$item" ]] || continue
-      if [[ -d "$item" && -f "$item/WORKFLOW.md" ]]; then
-        workflow_name="$(frontmatter_query "$item/WORKFLOW.md" '.name')"
+      if [[ -d "$item" && -f "$item/workflow.yml" && -f "$item/README.md" ]]; then
+        workflow_name="$(yq -r '.name // ""' "$item/workflow.yml" 2>/dev/null || true)"
         [[ -n "$workflow_name" ]] || workflow_name="$(basename "$item")"
         DISK_WORKFLOWS["$workflow_name"]="$(rel_path "$item")"
         DISK_FORMATS["$workflow_name"]="directory"
@@ -421,7 +421,7 @@ scan_disk_workflows() {
 
 workflow_primary_doc() {
   local artifact="$1"
-  local workflow_file="$artifact/WORKFLOW.md"
+  local workflow_file="$artifact/README.md"
   if [[ -f "$artifact/00-overview.md" ]]; then
     if ! has_any_section "$workflow_file" "Prerequisites" "Usage" "Target"; then
       printf '%s\n' "$artifact/00-overview.md"
@@ -445,6 +445,7 @@ score_workflow() {
   local artifact="$ROOT_DIR/.harmony/orchestration/runtime/workflows/$artifact_rel"
   local format="single-file"
   local workflow_file=""
+  local workflow_contract=""
   local primary_doc=""
   local front_name=""
   local front_description=""
@@ -459,7 +460,8 @@ score_workflow() {
 
   if [[ -d "$artifact" ]]; then
     format="directory"
-    workflow_file="$artifact/WORKFLOW.md"
+    workflow_file="$artifact/README.md"
+    workflow_contract="$artifact/workflow.yml"
     primary_doc="$(workflow_primary_doc "$artifact")"
   else
     workflow_file="$artifact"
@@ -472,20 +474,25 @@ score_workflow() {
     add_finding "contract-schema" "high" "$artifact_rel" "missing workflow entrypoint" "Provide a valid workflow entrypoint document." "existing-blocking"
   fi
 
-  front_name="$(frontmatter_query "$workflow_file" '.name')"
-  front_description="$(frontmatter_query "$workflow_file" '.description')"
+  if [[ "$format" == "directory" ]]; then
+    front_name="$(yq -r '.name // ""' "$workflow_contract" 2>/dev/null || true)"
+    front_description="$(yq -r '.description // ""' "$workflow_contract" 2>/dev/null || true)"
+  else
+    front_name="$(frontmatter_query "$workflow_file" '.name')"
+    front_description="$(frontmatter_query "$workflow_file" '.description')"
+  fi
   declared_format="$(workflow_format_for_id "$workflow_id")"
 
   if [[ "$format" == "directory" ]]; then
     while IFS= read -r step_file; do
       [[ -z "$step_file" ]] && continue
       step_files+=("$step_file")
-      if [[ -f "$artifact/$step_file" ]]; then
+      if [[ -f "$artifact/stages/$step_file" ]]; then
         :
       else
         add_finding "contract-schema" "high" "$artifact_rel" "declared step missing: $step_file" "Ensure every declared step file exists." "existing-blocking"
       fi
-    done < <(frontmatter_query "$workflow_file" '.steps[].file')
+    done < <(yq -r '.stages[].asset // ""' "$workflow_contract" 2>/dev/null | xargs -n1 basename 2>/dev/null || true)
 
     if [[ "${#step_files[@]}" -gt 0 ]]; then
       contract=$((contract + 5))
@@ -772,13 +779,13 @@ run_representative_scenarios() {
       fi
       if ! has_any_section "$primary_doc" "Required Outcome" "Verification Gate" "Workflow Complete When" "Proceed When"; then
         local has_verify=0
-        if [[ -d "$artifact_path" && -f "$artifact_path/WORKFLOW.md" ]]; then
+        if [[ -d "$artifact_path" && -f "$artifact_path/workflow.yml" ]]; then
           while IFS= read -r step_file; do
             [[ -z "$step_file" ]] && continue
             if [[ "$step_file" == *verify* || "$step_file" == *validat* ]]; then
               has_verify=1
             fi
-          done < <(frontmatter_query "$artifact_path/WORKFLOW.md" '.steps[].file')
+          done < <(yq -r '.stages[].asset // ""' "$artifact_path/workflow.yml" 2>/dev/null | xargs -n1 basename 2>/dev/null || true)
         fi
         if [[ "$has_verify" -eq 0 ]]; then
           add_finding "scenario-failure" "high" "$artifact_rel" "representative full rehearsal lacks verification gate" "Add an explicit verification gate or required outcome." "new-audit-only"
@@ -1130,11 +1137,11 @@ main() {
       ;;
     report)
       destination_root="$AUDIT_REPORTS_DIR/$RUN_ID"
-      report_path="$REPORTS_DIR/$(date +%F)-audit-workflow-system-workflow.md"
+      report_path="$REPORTS_DIR/$(date +%F)-audit-workflow-system.md"
       ;;
     full)
       destination_root="$AUDIT_REPORTS_DIR/$RUN_ID"
-      report_path="$REPORTS_DIR/$(date +%F)-audit-workflow-system-workflow.md"
+      report_path="$REPORTS_DIR/$(date +%F)-audit-workflow-system.md"
       runtime_dir="$RUNTIME_AUDITS_DIR/$RUN_ID"
       mkdir -p "$runtime_dir"
       ;;

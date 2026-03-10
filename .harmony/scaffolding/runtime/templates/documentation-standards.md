@@ -6,7 +6,7 @@ This is the canonical guidance for docs-as-code in Harmony. Use it with:
 - Template bundle: `.harmony/scaffolding/runtime/templates/docs/documentation-standards/`
 - Operational tooling: `.harmony/capabilities/runtime/services/authoring/doc/guide.md`
 - Enforcement gate: `audit-documentation-standards` skill and
-  `audit-documentation-workflow` workflow
+  `audit-documentation` workflow
 
 ## Minimum Documentation Set
 
@@ -72,7 +72,7 @@ Template structure:
 Run either:
 
 - Skill: `/audit-documentation-standards docs_root="docs"`
-- Workflow: `/audit-documentation-workflow docs_root="docs"`
+- Workflow: `/audit-documentation docs_root="docs"`
 
 The quality gate should be run before release or when introducing significant
 scope changes.

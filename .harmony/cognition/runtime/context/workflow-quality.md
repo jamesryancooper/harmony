@@ -10,7 +10,7 @@ and the Workflow System Audit.
 
 ## Supported Workflow Formats
 
-- **Directory workflow:** a directory with `WORKFLOW.md` plus declared step files
+- **Directory workflow:** a directory with `README.md` plus declared step files
 - **Single-file workflow:** one `.md` file with workflow frontmatter and inline flow
 
 Both formats score on the same 100-point scale. Checks differ by format where the
@@ -39,7 +39,7 @@ contract differs.
 
 | Criterion | Points | Notes |
 |-----------|--------|-------|
-| Valid workflow entrypoint | 5 | `WORKFLOW.md` for directory workflows, workflow `.md` for single-file |
+| Valid workflow entrypoint | 5 | `README.md` for directory workflows, workflow `.md` for single-file |
 | Declared step/file parity | 5 | Directory workflows only; single-file gets full credit when inline format is valid |
 | Required frontmatter present | 5 | `name`, `description`, access/version as applicable to current workflow contract |
 | Manifest/registry parity | 5 | Registered workflows align across manifest, registry, and workflow artifact |
@@ -82,9 +82,9 @@ contract differs.
 
 ### Directory Workflows
 
-- `WORKFLOW.md` is the contract entrypoint
+- `README.md` is the contract entrypoint
 - The `steps` array is the source of truth for step files
-- A wrapper style that delegates to `00-overview.md` is valid if `WORKFLOW.md` declares it
+- A wrapper style that delegates to `00-overview.md` is valid if `README.md` declares it
 
 ### Single-File Workflows
 

@@ -24,12 +24,12 @@ Use this team for non-trivial changes that require architecture, implementation,
 ## Workflow Alignment
 
 - **Default workflow:** none
-- **Optional workflows:** `audit-pre-release-workflow`, `audit-documentation-workflow`,
-  `audit-orchestration-workflow`
+- **Optional workflows:** `audit-pre-release`, `audit-documentation`,
+  `audit-orchestration`
 - **Routing guidance:**
-  - Use `audit-pre-release-workflow` before risky promotions.
-  - Use `audit-documentation-workflow` when docs-as-code artifacts are in scope.
-  - Use `audit-orchestration-workflow` for partitioned migration audits.
+  - Use `audit-pre-release` before risky promotions.
+  - Use `audit-documentation` when docs-as-code artifacts are in scope.
+  - Use `audit-orchestration` for partitioned migration audits.
 
 ## Composite Skill Alignment
 

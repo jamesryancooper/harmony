@@ -442,7 +442,7 @@ function onErrorHook(error, context) {
 
 ```bash
 # Run entire pipeline
-/pipeline run "{{pipeline-name}}" --input "{{user_input}}"
+/workflow run "{{workflow-name}}" --input "{{user_input}}"
 
 # Or chain manually
 /{{skill-1}} "{{input}}" | /{{skill-2}} | /{{skill-3}}

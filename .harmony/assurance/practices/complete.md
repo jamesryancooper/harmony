@@ -61,7 +61,7 @@ description: Assurance criteria and completion checklist for harness tasks.
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-audit-convergence-contract.sh` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness` passes
 - [ ] `bash .harmony/assurance/runtime/_ops/scripts/validate-framing-alignment.sh` passes
-- [ ] `audit-pre-release-workflow` workflow executed (or explicit rationale recorded for not running it)
+- [ ] `audit-pre-release` workflow executed (or explicit rationale recorded for not running it)
 - [ ] Contract coverage report exists at `.harmony/output/assurance/results/contract-coverage-latest.md`
 - [ ] Material run evidence includes instruction-layer manifest and context-acquisition telemetry fields
 

@@ -19,7 +19,7 @@ tags:
 
 # Document Set Improvement Workflow
 
-This workflow guides an AI agent through the complete process of improving a documentation set using the ARE Loop methodology. It consists of three main phases:
+This workflow READMEs an AI agent through the complete process of improving a documentation set using the ARE Loop methodology. It consists of three main phases:
 
 1. **Setup**: Generate a concept-aligned ARE Loop prompt for your documentation set
 2. **Analysis**: Run document set analysis to identify cross-cutting issues

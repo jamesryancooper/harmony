@@ -9,7 +9,7 @@ use time::format_description;
 
 use crate::workflow::{self, ExecutorKind, PipelineMode, RunDesignPackageOptions};
 
-const PIPELINE_REPORTS_ROOT_REL: &str = ".harmony/output/reports/pipelines";
+const WORKFLOW_REPORTS_ROOT_REL: &str = ".harmony/output/reports/workflows";
 
 #[derive(Debug, Clone)]
 pub struct RunPipelineOptions {
@@ -31,7 +31,8 @@ pub struct RunPipelineResult {
 
 #[derive(Debug, Deserialize)]
 struct PipelineCollectionManifest {
-    pipelines: Vec<PipelineManifestEntry>,
+    #[serde(alias = "pipelines")]
+    workflows: Vec<PipelineManifestEntry>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -43,7 +44,8 @@ struct PipelineManifestEntry {
 
 #[derive(Debug, Deserialize)]
 struct PipelineRegistry {
-    pipelines: BTreeMap<String, PipelineRegistryEntry>,
+    #[serde(alias = "pipelines")]
+    workflows: BTreeMap<String, PipelineRegistryEntry>,
 }
 
 #[derive(Debug, Deserialize, Default, Clone)]
@@ -92,9 +94,9 @@ pub struct PipelineListEntry {
 pub fn list_pipelines_from_harmony_dir(harmony_dir: &Path) -> Result<Vec<PipelineListEntry>> {
     let (manifest, registry, _) = load_pipeline_collection(harmony_dir)?;
     let mut entries = Vec::new();
-    for pipeline in manifest.pipelines {
+    for pipeline in manifest.workflows {
         let reg = registry
-            .pipelines
+            .workflows
             .get(&pipeline.id)
             .cloned()
             .unwrap_or_default();
@@ -118,21 +120,21 @@ pub fn validate_pipelines_from_harmony_dir(
     let script = harmony_dir
         .join("orchestration")
         .join("runtime")
-        .join("pipelines")
+        .join("workflows")
         .join("_ops")
         .join("scripts")
-        .join("validate-pipelines.sh");
+        .join("validate-workflows.sh");
     let mut command = Command::new("bash");
     command.arg(script);
     if let Some(pipeline_id) = pipeline_id {
-        command.arg("--pipeline-id").arg(pipeline_id);
+        command.arg("--workflow-id").arg(pipeline_id);
     }
     let status = command
         .current_dir(harmony_dir.parent().unwrap_or(harmony_dir))
         .status()
-        .context("failed to run validate-pipelines.sh")?;
+        .context("failed to run validate-workflows.sh")?;
     if !status.success() {
-        bail!("pipeline validation failed with status {}", status);
+        bail!("workflow validation failed with status {}", status);
     }
     Ok(())
 }
@@ -141,7 +143,7 @@ pub fn run_pipeline_from_harmony_dir(
     harmony_dir: &Path,
     options: RunPipelineOptions,
 ) -> Result<RunPipelineResult> {
-    if options.pipeline_id == "audit-design-package-workflow" {
+    if options.pipeline_id == "audit-design-package" {
         return run_design_package_pipeline(harmony_dir, options);
     }
     run_generic_pipeline(harmony_dir, options)
@@ -157,7 +159,7 @@ fn run_design_package_pipeline(
         .cloned()
         .ok_or_else(|| {
             anyhow::anyhow!(
-                "pipeline 'audit-design-package-workflow' requires --set package_path=<path>"
+                "workflow 'audit-design-package' requires --set package_path=<path>"
             )
         })?;
 
@@ -169,7 +171,7 @@ fn run_design_package_pipeline(
     {
         "rigorous" => PipelineMode::Rigorous,
         "short" => PipelineMode::Short,
-        other => bail!("unsupported design-package pipeline mode '{other}'"),
+        other => bail!("unsupported audit-design-package mode '{other}'"),
     };
 
     let result = workflow::run_design_package_from_harmony_dir(
@@ -198,10 +200,10 @@ fn run_generic_pipeline(
 ) -> Result<RunPipelineResult> {
     let (entry, _, pipeline_dir) = load_pipeline_definition(harmony_dir, &options.pipeline_id)?;
     let contract: PipelineContract = serde_yaml::from_str(
-        &fs::read_to_string(pipeline_dir.join("pipeline.yml"))
-            .with_context(|| format!("read {}", pipeline_dir.join("pipeline.yml").display()))?,
+        &fs::read_to_string(pipeline_dir.join("workflow.yml"))
+            .with_context(|| format!("read {}", pipeline_dir.join("workflow.yml").display()))?,
     )
-    .with_context(|| format!("parse {}", pipeline_dir.join("pipeline.yml").display()))?;
+    .with_context(|| format!("parse {}", pipeline_dir.join("workflow.yml").display()))?;
 
     let repo_root = harmony_dir
         .parent()
@@ -209,7 +211,7 @@ fn run_generic_pipeline(
         .canonicalize()
         .context("failed to canonicalize repository root")?;
 
-    let reports_root = repo_root.join(PIPELINE_REPORTS_ROOT_REL);
+    let reports_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
     fs::create_dir_all(&reports_root)?;
 
     let date = today_string()?;
@@ -237,7 +239,7 @@ fn run_generic_pipeline(
         .transpose()?;
 
     let mut summary = format!(
-        "# Pipeline Run Summary\n\n- pipeline_id: `{}`\n- version: `{}`\n- entry_mode: `{}`\n- description: `{}`\n- execution_profile: `{}`\n- canonical_path: `{}`\n- bundle_root: `{}`\n- prepare_only: `{}`\n",
+        "# Workflow Run Summary\n\n- workflow_id: `{}`\n- version: `{}`\n- entry_mode: `{}`\n- description: `{}`\n- execution_profile: `{}`\n- canonical_path: `{}`\n- bundle_root: `{}`\n- prepare_only: `{}`\n",
         entry.id,
         contract.version,
         contract.entry_mode,
@@ -350,17 +352,17 @@ fn load_pipeline_collection(
     let pipelines_root = harmony_dir
         .join("orchestration")
         .join("runtime")
-        .join("pipelines");
+        .join("workflows");
     let manifest: PipelineCollectionManifest = serde_yaml::from_str(
         &fs::read_to_string(pipelines_root.join("manifest.yml"))
             .with_context(|| format!("read {}", pipelines_root.join("manifest.yml").display()))?,
     )
-    .with_context(|| "parse pipeline manifest")?;
+    .with_context(|| "parse workflow manifest")?;
     let registry: PipelineRegistry = serde_yaml::from_str(
         &fs::read_to_string(pipelines_root.join("registry.yml"))
             .with_context(|| format!("read {}", pipelines_root.join("registry.yml").display()))?,
     )
-    .with_context(|| "parse pipeline registry")?;
+    .with_context(|| "parse workflow registry")?;
     Ok((manifest, registry, pipelines_root))
 }
 
@@ -370,12 +372,12 @@ fn load_pipeline_definition(
 ) -> Result<(PipelineManifestEntry, PipelineRegistryEntry, PathBuf)> {
     let (manifest, registry, pipelines_root) = load_pipeline_collection(harmony_dir)?;
     let entry = manifest
-        .pipelines
+        .workflows
         .into_iter()
         .find(|entry| entry.id == pipeline_id)
-        .ok_or_else(|| anyhow::anyhow!("unknown pipeline id '{}'", pipeline_id))?;
+        .ok_or_else(|| anyhow::anyhow!("unknown workflow id '{}'", pipeline_id))?;
     let registry_entry = registry
-        .pipelines
+        .workflows
         .get(pipeline_id)
         .cloned()
         .unwrap_or_default();
@@ -403,7 +405,7 @@ fn resolve_inputs(
         }
         if input.required {
             bail!(
-                "missing required pipeline input '{}'; pass it with --set {}=<value>",
+                "missing required workflow input '{}'; pass it with --set {}=<value>",
                 input.name,
                 input.name
             );

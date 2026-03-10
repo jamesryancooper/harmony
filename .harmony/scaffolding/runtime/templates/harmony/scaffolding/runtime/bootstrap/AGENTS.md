@@ -70,13 +70,13 @@ Read `.harmony/orchestration/runtime/workflows/manifest.yml` for workflow discov
 
 1. Read `manifest.yml` for workflow index (id, name, summary, triggers)
 2. After matching, read `registry.yml` for extended metadata and parameters
-3. Load `WORKFLOW.md` when a workflow is activated
+3. Load `README.md` when a workflow is activated
 4. Load step files (01-*.md, 02-*.md, ...) during execution
 
 ### Workflow Invocation
 
-- Explicit command: `/audit-orchestration-workflow manifest="..."`
-- Explicit call: `use workflow: audit-orchestration-workflow`
+- Explicit command: `/audit-orchestration manifest="..."`
+- Explicit call: `use workflow: audit-orchestration`
 - Natural triggers: Match against `triggers` in manifest
 
 ## Commit Discipline

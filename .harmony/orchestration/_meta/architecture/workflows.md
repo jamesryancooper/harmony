@@ -1,65 +1,36 @@
 ---
-title: Workflow Projections
-description: Human-readable projection layer over canonical pipelines.
+title: Workflow Units
+description: Unified canonical workflow units and generated READMEs.
 ---
 
-# Workflow Projections
+# Workflow Units
 
-Workflows are no longer the canonical autonomous contract in Harmony.
+Harmony workflow units are contract-first.
 
-`/.harmony/orchestration/runtime/workflows/` is a generated projection surface
-that keeps existing slash-facing and human-readable workflow identities stable
-while canonical execution authority lives in `runtime/pipelines/`.
+Each unit under `runtime/workflows/` contains both:
 
-## Role
+- the canonical machine-readable contract (`workflow.yml`, `stages/`)
+- the generated human-readable facet (`README.md`)
 
-Workflow projections exist for:
+This avoids a split orchestration model. There is one workflow system, not a
+separate workflow system and pipeline system.
 
-- staged human readability
-- slash-command compatibility
-- reviewable procedural summaries
-- bridge surfaces for tooling that still expects `WORKFLOW.md`
+## Human Facet
 
-They do not exist to define the primary execution contract.
+`README.md` exists for:
 
-## Projection Shape
+- human readability
+- staged walkthroughs
+- slash-command-facing documentation
 
-Directory projections retain:
+They do not define execution authority.
 
-- `WORKFLOW.md`
-- numbered step files
+## Canonical Facet
 
-Single-file projections remain valid where the source pipeline is simple enough
-to project into one document.
+`workflow.yml` and `stages/` define:
 
-## Source of Authority
-
-Source of truth for projection metadata and content:
-
-- pipeline collection manifest and registry
-- per-pipeline `pipeline.yml`
-- canonical stage assets under `stages/`
-
-Not a source of truth:
-
-- `WORKFLOW.md`
-- numbered workflow step files
-- harness-specific command wrappers
-
-## Allowed Exceptions
-
-Workflow-local helper assets such as `prompts/` or `references/` are allowed
-only when the workflow projection is an explicitly managed wrapper over a
-canonical pipeline and the pipeline contract remains authoritative.
-
-Those assets must:
-
-- remain local to the workflow directory
-- use relative references
-- avoid any dependency on temporary design-package content
-
-## Harness Entry Points
-
-Harness-specific commands remain thin entry points. They should route to the
-canonical pipeline or its generated workflow projection, but they must not
-introduce a second source of orchestration authority.
+- execution order
+- inputs and outputs
+- mutation permissions
+- done gates
+- executor-facing stage assets

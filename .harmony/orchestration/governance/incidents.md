@@ -12,7 +12,7 @@ It defines:
 - what counts as an incident
 - how incident severity and lifecycle work
 - which actions may be automated
-- which actions require human approval
+- which actions require explicit human acceptance
 - what evidence is required before closure
 
 It does not prescribe product-specific rollback commands. Those belong in

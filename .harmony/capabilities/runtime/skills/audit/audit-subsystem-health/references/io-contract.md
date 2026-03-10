@@ -60,7 +60,7 @@ Written to `.harmony/capabilities/runtime/skills/_ops/state/logs/audit-subsystem
 
 ### Authoritative Bundle (Orchestrated Mode)
 
-When called through `audit-orchestration-workflow`, output is also materialized into:
+When called through `audit-orchestration`, output is also materialized into:
 
 - `.harmony/output/reports/audits/YYYY-MM-DD-<slug>/bundle.yml`
 - `.harmony/output/reports/audits/YYYY-MM-DD-<slug>/findings.yml`
