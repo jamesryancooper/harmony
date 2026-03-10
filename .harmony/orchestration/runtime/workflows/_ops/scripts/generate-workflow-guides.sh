@@ -55,7 +55,6 @@ for row in "${workflow_rows[@]}"; do
   readme_path="$OUTPUT_ROOT/.harmony/orchestration/runtime/workflows/$rel_path/README.md"
 
   require_file "$workflow_file"
-  rm -rf "$OUTPUT_ROOT/.harmony/orchestration/runtime/workflows/$rel_path/guide"
   mkdir -p "$(dirname "$readme_path")"
 
   description="$(yq -r '.description // ""' "$workflow_file")"
