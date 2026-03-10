@@ -121,6 +121,7 @@ primary source of target orchestration behavior for this package.
 | observability and operator lookup | `observability.md` | `evidence-observability-and-retention-spec.md` | health, correlation, and lookup guarantees |
 | decision evidence | `contracts/decision-record-contract.md` | continuity decision authorities | canonical `decision_id` and storage shape |
 | run object/state, projection, and evidence linkage | `contracts/run-linkage-contract.md` | continuity run authorities | canonical `<run-id>.yml` record plus subordinate runtime projections and continuity evidence linkage |
+| incident object/state and local evidence split | `contracts/incident-object-contract.md` | `orchestration-lifecycle.md`, `governance-and-policy.md`, `.harmony/orchestration/governance/incidents.md` | canonical `incident.yml` state plus subordinate local evidence and external governance authority |
 | discovery layering and SSOT | `contracts/discovery-and-authority-layer-contract.md` | `runtime-architecture.md` | package-local discovery, state ownership, and evidence-layer separation |
 | promotion criteria | `implementation-readiness.md` and `assurance-and-acceptance-matrix.md` | `canonicalization-target-map.md` | build-readiness vs live rollout readiness |
 

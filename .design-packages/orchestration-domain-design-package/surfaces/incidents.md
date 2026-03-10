@@ -5,6 +5,8 @@
 - Governance guidance exists today
 - runtime incident state is proposed only if incident operations become more
   active and object-oriented
+- when promoted, runtime incident state should use a schema-backed response
+  object model rather than Markdown-first per-incident folders
 
 ## Core Purpose
 
@@ -38,6 +40,17 @@ require containment, escalation, rollback, mitigation, and closure evidence.
 
 See `../contracts/incident-object-contract.md` and
 `../contracts/cross-surface-reference-contract.md`.
+
+## Authority Model
+
+- `incident.yml` is the canonical machine-readable incident object and mutable
+  state authority
+- `actions.yml` is the optional machine-readable coordination layer for
+  containment, rollback, remediation, or review actions
+- `timeline.md` and `closure.md` are subordinate evidence and operator
+  guidance, not execution authority
+- governance severity and closure authority still come from live incident
+  governance policy, not from runtime incident objects alone
 
 ## Example Use Cases
 
@@ -82,15 +95,23 @@ See `../contracts/incident-object-contract.md` and
 ```text
 incidents/
 ├── README.md
-├── manifest.yml
-├── registry.yml
+├── index.yml
 └── <incident-id>/
-    ├── incident.md
-    ├── timeline.md
+    ├── incident.yml
     ├── actions.yml
-    ├── linked-runs.yml
+    ├── timeline.md
     └── closure.md
 ```
+
+Why this shape fits `incidents`:
+
+- incidents are runtime-created response records, so a canonical per-incident
+  object is more appropriate than a collection-surface manifest/registry split
+- status, severity, ownership, linkage, and closure metadata must be
+  machine-readable to support fail-closed behavior and deterministic promotion
+- narrative timeline and closure summaries remain valuable, but they should be
+  evidence attached to the incident object rather than the object authority
+  itself
 
 ## Non-Goals
 

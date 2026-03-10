@@ -40,6 +40,9 @@ Define how the orchestration model will be validated before promotion into live
 - run execution authority is validated at the canonical `<run-id>.yml` record
   plus continuity evidence linkage, not in `index.yml` or `by-surface/`
   projections
+- incident response authority is validated at schema-backed `incident.yml` and
+  `actions.yml` when present, not in `timeline.md`, `closure.md`, or lookup
+  projections
 
 ### Schema And Shape Validation
 
@@ -54,6 +57,9 @@ Define how the orchestration model will be validated before promotion into live
 - runs preserve `index.yml`, canonical `<run-id>.yml` records, and
   `by-surface/` reverse-lookup projections without collapsing authority into a
   single projection layer
+- incidents preserve `index.yml`, canonical per-incident `incident.yml`
+  records, optional `actions.yml`, and subordinate evidence artifacts without
+  collapsing authority into prose
 - state directories and indexes are present where required
 - schema-backed fixtures pass/fail under
   `validate-orchestration-design-package.sh`
@@ -139,6 +145,8 @@ Define how the orchestration model will be validated before promotion into live
   item contract/schema -> lane state -> receipts` authority order
 - runs preserve `README.md -> index.yml -> <run-id>.yml -> by-surface/ ->
   continuity/runs/` authority order
+- incidents preserve `README.md -> index.yml -> incident.yml / actions.yml ->
+  timeline/closure evidence` authority order
 
 ## Surface Acceptance Criteria
 
@@ -150,7 +158,7 @@ Define how the orchestration model will be validated before promotion into live
 | `automations` | trigger selection deterministic; concurrency and idempotency rules enforced across `serialize`, `drop`, `parallel`, and `replace` |
 | `watchers` | watcher definition family validates; rule and emitted-event references resolve; event envelope valid; mutable state and evidence stay separate; no direct launch authority |
 | `queue` | automation-ingress only; event fan-out, claim token, lease, retry, and dead-letter semantics deterministic |
-| `incidents` | lifecycle valid; closure evidence required; escalation visible |
+| `incidents` | `incident.yml` validates; `actions.yml` validates when present; lifecycle and closure evidence rules hold; escalation is visible; prose evidence remains subordinate to machine state |
 | `campaigns` | aggregation only; no execution ownership; optionality preserved |
 
 ## Portability And Support-Target Considerations

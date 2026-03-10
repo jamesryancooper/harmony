@@ -28,7 +28,9 @@ rollout remains a separate canonicalization step.
 - codified automation concurrency and idempotency behavior
 - codified run-object authority plus projection/evidence separation between
   `runtime/runs/` and `continuity/runs/`
-- codified incident object lifecycle and closure rules
+- codified incident object lifecycle and closure rules, clarifying that runtime
+  incident state lives in schema-backed `incident.yml` with subordinate action
+  and evidence artifacts
 - codified campaign object state and lifecycle
 - codified canonical cross-surface identifiers and references
 - added package-local domain model, runtime architecture, execution model,
@@ -60,7 +62,7 @@ rollout remains a separate canonicalization step.
 | `watchers` | implementation-ready | runtime architecture, dependency resolution, observability, watcher definition contract, and watcher event contract |
 | `queue` | implementation-ready | dependency resolution, runtime architecture, failure model, and queue item / lease contract |
 | `runs` | implementation-ready | runtime architecture, workflow execution, coordination lock, liveness, observability, and a run-linkage contract that keeps canonical per-run state separate from subordinate projections and continuity evidence |
-| `incidents` | implementation-ready | governance model, lifecycle, failure model, and incident object contract |
+| `incidents` | implementation-ready | governance model, lifecycle, failure model, discovery-layer contract, schema-backed `incident.yml`, and schema-backed `actions.yml` when present |
 
 ## Required Contract Set
 
@@ -196,7 +198,12 @@ This package aligns with Harmony's philosophy because it preserves:
       deterministic recovery path if that lease expires.
 - [ ] The promoted `runs` surface includes `README.md`, `index.yml`,
       canonical per-run records, and `by-surface/` reverse-lookup projections.
-- [ ] Every incident object satisfies lifecycle and closure evidence rules.
+- [ ] The promoted `incidents` surface includes `README.md`, `index.yml`, and
+      canonical per-incident `incident.yml` records.
+- [ ] Every `incident.yml` validates against the incident object schema, and
+      `actions.yml` validates whenever present.
+- [ ] `timeline.md` and `closure.md` remain subordinate evidence and never
+      replace required structured closure fields or linkage in `incident.yml`.
 - [ ] Every schema-backed contract has a valid JSON Schema plus one valid and
       one invalid fixture.
 - [ ] Required surface-local artifacts validate against their declared schemas.

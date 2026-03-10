@@ -67,6 +67,15 @@
         "$ref": "#/$defs/workflowRef"
       }
     },
+    "automation_ids": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "event_ids": {
+      "$ref": "#/$defs/stringArray"
+    },
+    "decision_ids": {
+      "$ref": "#/$defs/stringArray"
+    },
     "external_impact": {
       "type": "string",
       "minLength": 1

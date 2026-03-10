@@ -17,6 +17,7 @@ This document is normative for schema coverage expectations.
 | `watchers` | `sources.yml` | `contracts/schemas/watcher-sources.schema.json` |
 | `watchers` | `rules.yml` | `contracts/schemas/watcher-rules.schema.json` |
 | `watchers` | `emits.yml` | `contracts/schemas/watcher-emits.schema.json` |
+| `incidents` | `incident.yml` | `contracts/schemas/incident-object.schema.json` |
 | `incidents` | `actions.yml` | `contracts/schemas/incident-actions.schema.json` |
 | coordination manager | lock artifact | `contracts/schemas/coordination-lock.schema.json` |
 | approvals / overrides | approval artifact | `contracts/schemas/approval-and-override.schema.json` |
@@ -36,6 +37,13 @@ Watcher `state/*.json` artifacts remain runner-owned mutable state in v1. They
 must satisfy behavioral guarantees from the lifecycle, observability, and
 retention specs, but they are not promoted as schema-backed cross-runtime
 definition artifacts in this package pass.
+
+For `incidents`, `incident.yml` is the canonical object/state artifact because
+incidents are runtime-born response records rather than author-authored
+definitions. `actions.yml` is subordinate machine-readable coordination data
+and is required whenever the incident tracks executable response actions.
+`timeline.md` and `closure.md` remain prose evidence and must not outrank
+`incident.yml`.
 
 For `queue`, v1 does not introduce a separate surface-local definition artifact
 beyond runtime discovery projections. The authoritative machine-readable

@@ -24,7 +24,7 @@ A package-defined surface is not live canonical until it has:
 | `watchers` | `runtime/watchers/README.md`, `runtime/watchers/manifest.yml`, `runtime/watchers/registry.yml`, `runtime/watchers/<watcher-id>/watcher.yml`, `runtime/watchers/<watcher-id>/sources.yml`, `runtime/watchers/<watcher-id>/rules.yml`, `runtime/watchers/<watcher-id>/emits.yml`, `runtime/watchers/<watcher-id>/state/` | `practices/watcher-authoring-standards.md`, `practices/watcher-operations.md` | `governance/watcher-signal-policy.md` | `runtime/watchers/_ops/scripts/validate-watchers.sh` |
 | `queue` | `runtime/queue/README.md`, `runtime/queue/registry.yml`, `runtime/queue/schema.yml`, `runtime/queue/pending/`, `runtime/queue/claimed/`, `runtime/queue/retry/`, `runtime/queue/dead-letter/`, `runtime/queue/receipts/` | `practices/queue-operations-standards.md` | `governance/queue-safety-policy.md` | `runtime/queue/_ops/scripts/validate-queue.sh` |
 | `runs` | `runtime/runs/README.md`, `runtime/runs/index.yml`, `runtime/runs/by-surface/workflows/`, `runtime/runs/by-surface/missions/`, `runtime/runs/by-surface/automations/`, `runtime/runs/by-surface/incidents/`, `runtime/runs/<run-id>.yml` | `practices/run-linkage-standards.md` | addendum to continuity evidence policy if needed | `runtime/runs/_ops/scripts/validate-runs.sh` |
-| `incidents` | `runtime/incidents/README.md`, `runtime/incidents/manifest.yml`, `runtime/incidents/registry.yml` | `practices/incident-lifecycle-standards.md` | extend generic `governance/incidents.md`; keep product steps in `governance/production-incident-runbook.md` | `runtime/incidents/_ops/scripts/validate-incidents.sh` |
+| `incidents` | `runtime/incidents/README.md`, `runtime/incidents/index.yml`, `runtime/incidents/<incident-id>/incident.yml`, `runtime/incidents/<incident-id>/actions.yml`, `runtime/incidents/<incident-id>/timeline.md`, `runtime/incidents/<incident-id>/closure.md` | `practices/incident-lifecycle-standards.md` | extend generic `governance/incidents.md`; keep product steps in `governance/production-incident-runbook.md` | `runtime/incidents/_ops/scripts/validate-incidents.sh` |
 
 ## Live Shared Continuity Authorities
 
@@ -135,3 +135,19 @@ When `watchers` are promoted, live Harmony must preserve:
 - watcher-runner-owned mutable state under `state/`
 - emitted event lineage as an evidence layer distinct from watcher mutable
   state and distinct from registry projections
+
+## Incident Promotion Note
+
+When `incidents` are promoted, live Harmony must preserve:
+
+- `governance/incidents.md` as the governance authority for severity, closure
+  authority, and escalation rules
+- `runtime/incidents/README.md` as operator orientation only
+- `runtime/incidents/index.yml` as the global incident lookup projection
+- `runtime/incidents/<incident-id>/incident.yml` as the canonical incident
+  object/state record
+- `runtime/incidents/<incident-id>/actions.yml` as subordinate schema-backed
+  coordination data when executable response actions exist
+- `runtime/incidents/<incident-id>/timeline.md` and `closure.md` as
+  operator-visible evidence that must not outrank `incident.yml` or linked run
+  and decision evidence

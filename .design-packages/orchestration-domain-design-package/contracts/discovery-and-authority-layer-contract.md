@@ -31,7 +31,6 @@ Applies to:
 - `campaigns`
 - `automations`
 - `watchers`
-- `incidents`
 
 ### Layers
 
@@ -81,6 +80,39 @@ Watcher-specific authority rules:
    replace emitted event lineage.
 4. Evidence lookup by `event_id` must resolve without using `state/` as the
    canonical source.
+
+## Response Object Surface Pattern
+
+Applies to:
+
+- `incidents`
+
+### `incidents`
+
+| Tier | Artifact | Source Of Truth |
+|---|---|---|
+| 1 | `README.md` | operator discovery and surface purpose |
+| 2 | `index.yml` | global incident lookup projection and lightweight status metadata |
+| 3 | `<incident-id>/incident.yml` | canonical incident object and mutable state authority |
+| 3 subordinate | `<incident-id>/actions.yml` | optional schema-backed coordination/action set for machine-readable containment, rollback, remediation, or review actions |
+| 4 | none separate in v1 | incidents are runtime-born objects, so canonical state lives in `incident.yml` rather than an authored definition layer plus a second mutable-state layer |
+| 5 | `<incident-id>/timeline.md`, `<incident-id>/closure.md`, linked run/decision evidence | durable operator-visible evidence and narrative context |
+
+Incident-specific authority rules:
+
+1. `incident.yml` is the single source of truth for severity, status, owner,
+   linkage fields, and closure metadata.
+2. `index.yml` may project status, severity, owner, closure readiness, and
+   path refs, but it must not outrank `incident.yml`.
+3. `actions.yml` may coordinate launchable response actions, but it must not
+   redefine incident lifecycle or closure authority.
+4. `timeline.md` and `closure.md` are evidence and operator guidance. They do
+   not become canonical state or authorization.
+5. If `status=closed`, closure evidence must exist and `incident.yml` must
+   carry the matching closure fields.
+6. `incidents` intentionally do not use the `manifest.yml -> registry.yml`
+   collection pattern in v1 because they are runtime-created response records,
+   not author-authored object definitions.
 
 ## Infrastructure Surface Pattern
 
@@ -176,6 +208,8 @@ package-local source of truth for how they participate in orchestration.
 7. For `queue`, local `registry.yml` or `schema.yml` projections must not
    outrank the queue-item contract/schema or imply unsupported named-queue
    identity in v1.
+8. For `incidents`, `index.yml` and narrative evidence must remain subordinate
+   to the schema-backed `incident.yml` object/state record.
 
 ## Schema Requirement
 
