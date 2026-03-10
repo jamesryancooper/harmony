@@ -252,6 +252,68 @@ validate_incident_object_fixture() {
   ' "$file" >/dev/null
 }
 
+validate_campaign_object_fixture() {
+  local file="$1"
+  jq -e '
+    def nonempty_string: type == "string" and length > 0;
+    def valid_time: type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T.+$");
+    type == "object"
+    and (.campaign_id | nonempty_string)
+    and (.title | nonempty_string)
+    and (.objective | nonempty_string)
+    and ((.status as $s | ["proposed","active","paused","completed","cancelled","archived"] | index($s)) != null)
+    and (.owner | nonempty_string)
+    and (.created_at | valid_time)
+    and (.mission_ids | type == "array" and all(.[]; type == "string" and length > 0))
+    and ((.mission_ids | length) == (.mission_ids | unique | length))
+    and (.success_criteria | type == "array" and length > 0 and all(.[]; type == "string" and length > 0))
+    and (.milestones | type == "array")
+    and (([.milestones[]?.milestone_id] | length) == ([.milestones[]?.milestone_id] | unique | length))
+    and (
+      (.status == "proposed")
+      or (.mission_ids | length > 0)
+    )
+    and (
+      (.status != "completed")
+      or (has("completed_at") and (.completed_at | valid_time))
+    )
+    and (
+      (.status != "cancelled")
+      or (has("cancelled_at") and (.cancelled_at | valid_time))
+    )
+    and (
+      (.status != "archived")
+      or (has("archived_at") and (.archived_at | valid_time))
+    )
+    and (
+      .mission_ids as $campaign_missions
+      | all(
+          .milestones[];
+          (.milestone_id | nonempty_string)
+          and (.title | nonempty_string)
+          and ((.status as $ms | ["planned","in_progress","completed","waived"] | index($ms)) != null)
+          and (
+            (has("mission_ids") | not)
+            or (
+              .mission_ids as $milestone_missions
+              | ($milestone_missions | type == "array")
+              and ($milestone_missions | all(.[]; . as $mission_id | type == "string" and length > 0 and (($campaign_missions | index($mission_id)) != null)))
+              and (($milestone_missions | length) == ($milestone_missions | unique | length))
+            )
+          )
+          and (
+            (.status != "completed")
+            or (has("completed_at") and (.completed_at | valid_time))
+          )
+          and (
+            (.status != "waived")
+            or (has("waiver_note") and (.waiver_note | nonempty_string))
+          )
+        )
+    )
+  ' "$file" >/dev/null
+}
+
 validate_automation_execution_fixture() {
   local file="$1"
   jq -e '
@@ -849,6 +911,9 @@ validate_schema_fixture() {
       ;;
     incident-object)
       validate_incident_object_fixture "$file"
+      ;;
+    campaign-object)
+      validate_campaign_object_fixture "$file"
       ;;
     automation-execution)
       validate_automation_execution_fixture "$file"

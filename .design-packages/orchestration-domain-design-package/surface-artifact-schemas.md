@@ -13,6 +13,7 @@ This document is normative for schema coverage expectations.
 |---|---|---|
 | `automations` | `automation.yml` | `contracts/schemas/automation-definition.schema.json` |
 | `automations` | `trigger.yml` | `contracts/schemas/automation-trigger.schema.json` |
+| `campaigns` | `campaign.yml` | `contracts/schemas/campaign-object.schema.json` |
 | `automations` | `bindings.yml` | `contracts/schemas/automation-bindings.schema.json` |
 | `automations` | `policy.yml` | `contracts/schemas/automation-policy.schema.json` |
 | `workflows` | `workflow.yml` | `contracts/schemas/workflow-execution.schema.json` |
@@ -31,6 +32,11 @@ For `automations`, the schema-backed definition layer is split across
 `automation.yml`, `trigger.yml`, `bindings.yml`, and `policy.yml`. Aggregate
 bundle validation may exist for contract proof, but validators must target the
 real authored runtime artifacts first.
+
+For `campaigns`, `campaign.yml` is the canonical object/state artifact because
+campaign coordination needs machine-readable identity, lifecycle status,
+mission membership, milestones, and waiver-sensitive completion metadata.
+`log.md` remains subordinate prose evidence and operator guidance.
 
 For `workflows`, the schema-backed artifact is the definition contract
 (`workflow.yml`), not registry metadata or prose guidance.

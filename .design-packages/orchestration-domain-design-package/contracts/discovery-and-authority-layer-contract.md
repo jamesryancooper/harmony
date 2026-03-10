@@ -28,7 +28,6 @@ must explicitly name the external authority surface that owns that layer.
 
 Applies to:
 
-- `campaigns`
 - `automations`
 - `watchers`
 
@@ -80,6 +79,39 @@ Watcher-specific authority rules:
    replace emitted event lineage.
 4. Evidence lookup by `event_id` must resolve without using `state/` as the
    canonical source.
+
+## Coordination Object Collection Pattern
+
+Applies to:
+
+- `campaigns`
+
+### `campaigns`
+
+| Tier | Artifact | Source Of Truth |
+|---|---|---|
+| 1 | `manifest.yml` | surface discovery identity |
+| 2 | `registry.yml` | campaign lookup projection and lightweight coordination metadata |
+| 3 | `<campaign-id>/campaign.yml` | canonical campaign object and mutable coordination-state authority |
+| 3 subordinate | `<campaign-id>/log.md` | append-oriented operator notes, waiver rationale, and outcome narrative |
+| 4 | none separate in v1 | current campaign state lives in `campaign.yml` rather than a separate `state/` tree |
+| 5 | linked mission / decision / run / incident evidence | durable supporting evidence referenced by the campaign without displacing the home-surface authorities |
+
+Campaign-specific authority rules:
+
+1. `campaign.yml` is the single source of truth for campaign identity,
+   lifecycle status, mission membership, milestone definitions, and
+   completion-waiver metadata.
+2. `registry.yml` may project title, status, owner, mission count, milestone
+   summaries, and path refs, but it must not outrank `campaign.yml`.
+3. `log.md` is evidence and operator guidance. It does not replace required
+   structured state or membership fields.
+4. Mission lifecycle, run lineage, incident state, and decision evidence remain
+   authoritative in their home surfaces. `campaigns` may aggregate them, but
+   they do not replace them.
+5. `campaigns` intentionally do not use a separate `state/` layer in v1 because
+   they coordinate authored mission sets rather than own executor-driven runtime
+   state.
 
 ## Response Object Surface Pattern
 
@@ -270,6 +302,9 @@ Mission-specific authority rules:
    identity in v1.
 10. For `incidents`, `index.yml` and narrative evidence must remain subordinate
     to the schema-backed `incident.yml` object/state record.
+11. For `campaigns`, `campaign.yml` is the canonical object/state record;
+    `registry.yml` and `log.md` remain subordinate projection and narrative
+    layers.
 
 ## Schema Requirement
 

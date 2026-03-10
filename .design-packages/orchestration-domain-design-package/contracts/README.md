@@ -36,7 +36,7 @@ orchestration-domain specification defined by this package.
 - `mission-object-contract.md`
   - Schema-backed mission definition, lifecycle, ownership, and linkage object
 - `campaign-object-contract.md`
-  - Minimum campaign schema, lifecycle, and invariants
+  - Schema-backed campaign object/state authority, lifecycle, and invariants
 - `automation-execution-contract.md`
   - Split automation definition artifacts, trigger model, policy model,
     concurrency, idempotency, and run rules for automations
@@ -100,7 +100,7 @@ Validation is enforced by:
 | `decision-record-contract.md` | `schema-backed` | `contracts/schemas/decision-record.schema.json` |
 | `workflow-execution-contract.md` | `schema-backed` | `contracts/schemas/workflow-execution.schema.json` validating `workflow.yml` |
 | `mission-object-contract.md` | `schema-backed` | `contracts/schemas/mission-object.schema.json` validating `mission.yml` |
-| `campaign-object-contract.md` | `package-normative` | `domain-model.md` and `orchestration-lifecycle.md` |
+| `campaign-object-contract.md` | `schema-backed` | `contracts/schemas/campaign-object.schema.json` validating `campaign.yml` |
 | `automation-execution-contract.md` | `schema-backed` | aggregate `contracts/schemas/automation-execution.schema.json` plus file-level schemas for `automation.yml`, `trigger.yml`, `bindings.yml`, and `policy.yml` |
 | `coordination-lock-contract.md` | `schema-backed` | `contracts/schemas/coordination-lock.schema.json` |
 | `watcher-definition-contract.md` | `package-normative` | `contracts/schemas/watcher-definition.schema.json`, `contracts/schemas/watcher-sources.schema.json`, `contracts/schemas/watcher-rules.schema.json`, and `contracts/schemas/watcher-emits.schema.json` |
