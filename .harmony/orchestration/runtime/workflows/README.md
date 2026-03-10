@@ -22,6 +22,13 @@ Each workflow unit contains:
 - `README.md` is generated and must not be treated as authoritative.
 - No peer legacy orchestration surface remains.
 
+## Contract Disambiguation
+
+- `execution_profile` is required in each `workflow.yml`.
+- Allowed `execution_profile` values are `core` and `external-dependent`.
+- Governance-impacting changes to workflow contracts, validators, or runtime
+  behavior must declare exactly one `change_profile` before implementation.
+
 ## Groups
 
 - `meta/`
