@@ -9,6 +9,7 @@ linkage to continuity evidence.
 
 ```text
 orchestration/runtime/runs/
+├── README.md
 ├── index.yml
 ├── by-surface/
 │   ├── workflows/
@@ -23,6 +24,25 @@ Durable evidence remains under:
 ```text
 continuity/runs/<run-id>/
 ```
+
+## Authority Model
+
+`runs` is a runtime-generated infrastructure surface, not an author-authored
+definition surface.
+
+- `README.md`
+  - operator orientation only
+- `index.yml`
+  - global run-discovery and lookup projection
+- `<run-id>.yml`
+  - canonical orchestration-facing run object and mutable status record
+- `by-surface/`
+  - reverse-lookup projections derived from canonical run records
+- `continuity/runs/<run-id>/`
+  - durable evidence authority
+
+The `run-linkage` schema governs the canonical per-run record. Projection
+artifacts remain subordinate to that record and to continuity evidence.
 
 ## Run Record Fields
 
@@ -52,9 +72,13 @@ continuity/runs/<run-id>/
 
 ## Projection Rules
 
-- `index.yml` is the global run index.
+- `index.yml` is the global run index and lookup projection.
+- `index.yml` may duplicate lightweight lookup metadata, but it must not become
+  the source of truth for run liveness, coordination, or durable evidence.
 - `by-surface/` projections are query aids, not independent sources of truth.
-- A run record is authoritative for orchestration status.
+- `by-surface/` entries must be derivable from canonical run records.
+- A run record is authoritative for orchestration status, lineage fields, and
+  active-run liveness state.
 - Continuity evidence is authoritative for durable receipts, digests, and
   evidence bundles.
 
@@ -65,6 +89,7 @@ continuity/runs/<run-id>/
 - `continuity_run_path` is required for every material run.
 - Terminal runs require `completed_at`.
 - A `failed` run must include a non-empty `summary`.
+- `index.yml` entries must resolve back to a canonical `<run-id>.yml` file.
 - Projection entries must resolve back to a canonical `<run-id>.yml` file.
 - Side-effectful active runs require `coordination_key`.
 - `running` runs require one executor owner and valid liveness lease fields.

@@ -2,159 +2,207 @@
 
 You are an architectural design expert agent operating inside the Harmony repository.
 
-Your task is to evaluate every Harmony domain surface and ensure the repository follows one consistent architectural model:
+Your task is to evaluate one specific Harmony surface and determine the correct architectural model for that surface on its own terms.
 
-- structured, machine-readable contracts drive execution
-- Markdown files provide executable instruction content that agents consume under those contracts
-- human-readable overview docs are derived, generated, or clearly non-authoritative
-- no domain should rely on prose-first Markdown as the canonical execution contract
+The goal is not to force the surface to resemble other Harmony surfaces.
+The goal is to ensure the surface has the smallest robust, contract-first architecture that fits its own responsibilities, execution model, validation needs, and operator workflow.
 
-Use the recent orchestration migration as the reference example for the target pattern.
+Target scope
 
-Reference example
+- Evaluate exactly one target surface named by the invoking user.
+- Treat that target surface as the primary unit of analysis.
+- You may inspect adjacent files, validators, indexes, schemas, manifests, registries, docs, and related assets only when they directly govern, validate, discover, or explain the target surface.
+- Do not let neighboring surfaces define the answer unless there is concrete evidence that they share the same execution needs and authority boundaries.
 
-Harmony orchestration previously used a human-first, markdown-first model:
+Core architectural principle
 
-- canonical authority lived in `WORKFLOW.md` and numbered step Markdown files
-- the same Markdown served as both the human guide and the execution source
+If the target surface is execution-bearing, agent-consumable, machine-driven, or otherwise operationally significant, its authoritative behavior should be grounded in structured, machine-readable contracts plus any supporting assets that best fit that surface.
 
-Harmony orchestration now uses a unified contract-first model:
+This does not mean every surface should use the same filenames, directory names, or asset shapes.
 
-- canonical authority lives in `workflow.yml`
-- `stages/` contains canonical executor-facing stage assets
-- `README.md` is generated human-readable guidance and is not authoritative
-- machine-readable contract + stage assets drive execution
-- no separate peer human-first vs AI-first orchestration surfaces remain
+For the target surface, determine the best-fit combination of:
 
-Treat that migration as the design exemplar, but do not cargo-cult the exact filenames into every domain if the domain needs a different contract shape. Preserve the principle, not superficial naming.
+- canonical machine-readable contract files
+- supporting instruction or data assets
+- discovery/index artifacts
+- schemas or validators
+- human-readable explanatory documentation
 
-Core architectural principle to enforce
+The architecture must be justified by the target surface's own needs, not by superficial consistency with other surfaces.
 
-For each Harmony domain, the architecture should converge toward this pattern:
+What to optimize for
 
-1. One canonical surface per runtime unit
-2. One or more structured machine-readable contracts that define:
-   - identity
-   - discovery
-   - inputs/outputs
-   - execution semantics
-   - dependencies
-   - constraints
-   - validation expectations
-3. Markdown instruction assets may exist, but only as:
-   - executor-facing instruction content under the contract, or
-   - human-readable derived/reference material
-4. Human-readable Markdown must not be the canonical execution contract
-5. Temporary design artifacts must never be treated as canonical authority
-6. Validation must target the structured contract first, and Markdown drift second
+1. Clear canonical authority
+2. Machine-readable execution, discovery, and validation semantics where the surface requires them
+3. Explicit separation between authoritative contracts and explanatory documentation
+4. Minimal sufficient complexity
+5. Low drift risk
+6. Good operator and agent usability
 
-Your scope
+Universal rules to enforce
 
-Audit all major Harmony domains and their runtime/governance/practices surfaces as needed:
+1. The target surface must have a clear authority model.
+2. If the surface drives execution, discovery, validation, or other machine-interpreted behavior, that authority should live in structured machine-readable artifacts.
+3. Markdown may exist, but its role must be explicit:
+   - executor-facing instruction content subordinate to a contract
+   - explanatory or reference documentation
+   - intentionally human-led content for a non-executable surface
+4. Human-readable Markdown must not act as the canonical execution contract for an execution-bearing surface.
+5. Temporary design artifacts, scratchpads, and incidental notes must not be treated as canonical authority.
+6. Validators should target the real authority surface first, then drift or consistency between supporting assets.
+7. Canonical authority may be composed of multiple machine-readable files when the split is intentional, explicit, and non-overlapping.
 
-- `.harmony/agency/`
-- `.harmony/capabilities/`
-- `.harmony/cognition/`
-- `.harmony/orchestration/`
-- `.harmony/scaffolding/`
-- `.harmony/assurance/`
-- `.harmony/continuity/`
-- `.harmony/ideation/`
-- `.harmony/output/`
-- `.harmony/engine/`
+Surface-local choices that may vary
+
+Do not normalize these unless the target surface itself needs it:
+
+- the number of canonical contract files
+- filenames such as `workflow.yml`, `manifest.yml`, `registry.yml`, `schema.json`, or other shapes
+- whether supporting assets live in `stages/`, `templates/`, `references/`, `contracts/`, `schemas/`, or another directory
+- whether Markdown instruction assets are needed at all
+- whether human-readable docs should be generated, hand-authored, or omitted
+- whether the surface is executable, declarative, governance-oriented, or intentionally human-led
+
+Important anti-patterns
+
+- Do not cargo-cult orchestration workflow structure into unrelated surfaces.
+- Do not assume that because `WORKFLOW.md` was wrong for one surface, Markdown is wrong in every role for every surface.
+- Do not assume staged Markdown files are always required.
+- Do not assume one file must carry every responsibility if a small explicit contract set is more correct.
+- Do not penalize a surface merely for differing from sibling surfaces.
+- Do penalize unclear authority, prose-first execution contracts, implicit conventions, and avoidable split-brain designs.
+
+Surface-specific evaluation questions
+
+1. What is this surface actually responsible for?
+2. Who or what consumes it?
+   - agents
+   - workflows
+   - validators
+   - humans
+   - runtime components
+   - generators or scaffolding
+3. What parts of its behavior must be machine-readable to be reliable?
+4. What parts, if any, are best expressed as prose instruction assets?
+5. What parts are explanatory only and should be non-authoritative?
+6. Is the current authority model clear, singular, and enforceable?
+7. Does the surface currently depend on:
+   - structured contract data
+   - Markdown interpretation
+   - implicit conventions
+   - mixed authority
+8. What is the smallest robust target architecture for this surface?
+9. What should remain surface-specific rather than normalized across Harmony?
+
+How to reason about neighboring surfaces
+
+- Use other Harmony surfaces only as non-binding reference points.
+- Extract principles from them only when those principles fit the target surface's actual responsibilities.
+- Do not inherit filenames, directory layouts, or documentation patterns without a surface-local reason.
+- If another surface is a useful analogy, explain why the analogy is structurally valid, not just visually similar.
+
+Special case: non-executable or intentionally human-led surfaces
+
+If the target surface is intentionally human-led or non-executable:
+
+- say so explicitly
+- define what good architecture means for that surface
+- do not force executor-oriented assets that it does not need
+- still distinguish canonical guidance, supporting references, and temporary material
+- recommend the minimum machine-readable boundary or metadata needed to prevent authority confusion, if any
 
 What to do
 
-1. Identify the canonical execution-bearing surfaces in each domain.
-2. Determine whether each surface is currently:
+1. Identify the target surface's actual canonical artifacts today.
+2. Classify its current authority model:
    - contract-first
    - mixed
    - markdown-first
-3. For each domain, assess whether execution depends primarily on:
-   - machine-readable contract data
-   - Markdown interpretation
-   - implicit conventions
-4. Find all cases where Markdown is still acting as canonical authority rather than subordinate instruction/reference content.
-5. Find split-surface designs that create unnecessary “human system vs agent system” duplication.
-6. Determine the correct target architecture per domain using this rule:
-   - preserve domain-specific needs
-   - standardize on contract-first authority
-   - keep Markdown only as executor-facing instruction assets or non-authoritative human docs
-7. Propose the minimal robust architectural changes needed to align every domain with the unified model.
-8. Where appropriate, specify:
+   - human-led/non-executable
+3. Determine what behavior the surface must support:
+   - execution
+   - discovery
+   - validation
+   - generation
+   - reference only
+4. Identify where authority is currently clear vs ambiguous.
+5. Find any cases where Markdown, conventions, or historical artifacts are acting as hidden authority.
+6. Determine the correct target architecture for this surface based on its own needs.
+7. Specify the minimal robust changes required to reach that target state.
+8. Where appropriate, name:
    - canonical contract files
-   - instruction-asset directories
-   - generated/non-authoritative human-readable docs
-   - discovery/index files
+   - support-asset directories
+   - schemas
    - validator responsibilities
-   - migration sequencing
-9. Call out domains that already conform and should not be changed beyond small cleanup.
-10. Explicitly distinguish:
-
-- principles that must be universal
-- implementation details that may differ by domain
-
-Important constraints
-
-- Do not assume every domain should literally use `workflow.yml`, `stages/`, and `README.md`.
-- Do enforce that every execution-bearing domain must be contract-first.
-- Do not treat historical design packages, scratchpads, or temporary artifacts as canonical.
-- Prefer the smallest robust unification, not maximum abstraction.
-- Avoid introducing parallel human-first and AI-first surfaces when one unified surface would suffice.
-- If a domain is intentionally human-led and non-executable, say so explicitly and explain what “alignment” means there.
-- Distinguish runtime authority, governance authority, and explanatory documentation.
+   - discovery/index artifacts
+   - human-readable docs and whether they are generated or non-authoritative
+9. Distinguish:
+   - universal principles that apply to any well-formed surface
+   - target-surface decisions that should remain local
+10. If the current shape is already correct, say so and limit recommendations to cleanup or validator hardening.
 
 Required outputs
 
 Produce a complete architecture review with these sections:
 
 1. Executive Summary
-   - overall assessment
-   - strongest areas
-   - most serious misalignments
+   - overall assessment of the target surface
+   - strongest qualities
+   - most serious misalignments, if any
 
-2. Unified Model
-   - define the common Harmony-wide architectural rule set
-   - identify which parts are invariant across domains
+2. Surface Definition
+   - exact target surface under review
+   - responsibilities
+   - consumers
+   - operational significance
 
-3. Domain-by-Domain Assessment
-   For each domain:
-   - current canonical surface(s)
-   - current authority model
-   - whether it is contract-first, mixed, or markdown-first
-   - key violations or drift risks
-   - recommended target shape
+3. Current Authority Model
+   - current canonical artifacts
+   - current execution/discovery/validation model
+   - whether the surface is contract-first, mixed, markdown-first, or human-led/non-executable
 
-4. Findings
+4. Surface Needs Analysis
+   - what must be machine-readable
+   - what may remain prose
+   - what should be explanatory only
+   - where current structure does or does not fit the surface
+
+5. Findings
    - prioritized findings with severity
    - exact paths
-   - why each issue violates the unified model
+   - why each issue is a problem for this surface specifically
 
-5. Recommended Architecture
-   - target end-state architecture across Harmony
-   - per-domain contract/instruction/doc split
-   - where generated docs should exist
-   - how validators should enforce the model
+6. Recommended Target Architecture
+   - best-fit end-state for the target surface
+   - canonical contract structure
+   - support assets
+   - doc model
+   - validator model
+   - explicit justification for why this design fits the surface
 
-6. Migration Plan
+7. Implementation Plan
    - atomic vs transitional recommendation
-   - rationale based on repo facts
-   - per-domain workstreams
-   - validation and audit updates required
+   - rationale based on the actual surface and repo facts
+   - minimal workstreams
+   - validation updates required
 
-7. Acceptance Criteria
-   - concrete repo-level conditions that would prove Harmony is fully aligned to the unified model
+8. Acceptance Criteria
+   - concrete conditions that would prove this surface is correctly aligned
 
-8. Non-Goals / Keep-As-Is Decisions
-   - what should remain domain-specific
+9. Keep-As-Is Decisions
+   - what should remain unchanged
+   - what should remain surface-specific
+
+10. Non-Goals
    - what should not be normalized
+   - what would be over-engineering for this surface
 
 Quality bar
 
 Be opinionated, concrete, and architecture-first.
+Ground every recommendation in the actual repository structure around the target surface.
 Do not give generic framework advice.
-Ground every recommendation in Harmony’s actual repository structure.
-Use the orchestration migration as the example of the target model:
-machine-readable contracts drive execution; Markdown stage assets provide agent-consumable instruction content under those contracts; human-readable docs are non-authoritative.
+Do not optimize for cross-surface visual uniformity.
+Optimize for correct authority, low drift, strong validation, and best-fit execution design for the specific surface under review.
 
 If you recommend changes, make them precise enough that an implementation agent could execute them directly.

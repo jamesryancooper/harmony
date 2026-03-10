@@ -21,10 +21,10 @@ A package-defined surface is not live canonical until it has:
 |---|---|---|---|---|
 | `campaigns` | `runtime/campaigns/README.md`, `runtime/campaigns/manifest.yml`, `runtime/campaigns/registry.yml` | `practices/campaign-lifecycle-standards.md` | optional addendum in `governance/README.md` | `runtime/campaigns/_ops/scripts/validate-campaigns.sh` |
 | `automations` | `runtime/automations/README.md`, `runtime/automations/manifest.yml`, `runtime/automations/registry.yml` | `practices/automation-authoring-standards.md`, `practices/automation-operations.md` | `governance/automation-policy.md` | `runtime/automations/_ops/scripts/validate-automations.sh` |
-| `watchers` | `runtime/watchers/README.md`, `runtime/watchers/manifest.yml`, `runtime/watchers/registry.yml` | `practices/watcher-authoring-standards.md`, `practices/watcher-operations.md` | `governance/watcher-signal-policy.md` | `runtime/watchers/_ops/scripts/validate-watchers.sh` |
-| `queue` | `runtime/queue/README.md`, `runtime/queue/registry.yml`, `runtime/queue/schema.yml` | `practices/queue-operations-standards.md` | `governance/queue-safety-policy.md` | `runtime/queue/_ops/scripts/validate-queue.sh` |
-| `runs` | `runtime/runs/README.md`, `runtime/runs/index.yml` | `practices/run-linkage-standards.md` | addendum to continuity evidence policy if needed | `runtime/runs/_ops/scripts/validate-runs.sh` |
-| `incidents` | `runtime/incidents/README.md`, `runtime/incidents/manifest.yml`, `runtime/incidents/registry.yml` | `practices/incident-lifecycle-standards.md` | extend generic `governance/incidents.md`; keep product steps in `governance/production-incident-runbook.md` | `runtime/incidents/_ops/scripts/validate-incidents.sh` |
+| `watchers` | `runtime/watchers/README.md`, `runtime/watchers/manifest.yml`, `runtime/watchers/registry.yml`, `runtime/watchers/<watcher-id>/watcher.yml`, `runtime/watchers/<watcher-id>/sources.yml`, `runtime/watchers/<watcher-id>/rules.yml`, `runtime/watchers/<watcher-id>/emits.yml`, `runtime/watchers/<watcher-id>/state/` | `practices/watcher-authoring-standards.md`, `practices/watcher-operations.md` | `governance/watcher-signal-policy.md` | `runtime/watchers/_ops/scripts/validate-watchers.sh` |
+| `queue` | `runtime/queue/README.md`, `runtime/queue/registry.yml`, `runtime/queue/schema.yml`, `runtime/queue/pending/`, `runtime/queue/claimed/`, `runtime/queue/retry/`, `runtime/queue/dead-letter/`, `runtime/queue/receipts/` | `practices/queue-operations-standards.md` | `governance/queue-safety-policy.md` | `runtime/queue/_ops/scripts/validate-queue.sh` |
+| `runs` | `runtime/runs/README.md`, `runtime/runs/index.yml`, `runtime/runs/by-surface/workflows/`, `runtime/runs/by-surface/missions/`, `runtime/runs/by-surface/automations/`, `runtime/runs/by-surface/incidents/`, `runtime/runs/<run-id>.yml` | `practices/run-linkage-standards.md` | addendum to continuity evidence policy if needed | `runtime/runs/_ops/scripts/validate-runs.sh` |
+| `incidents` | `runtime/incidents/README.md`, `runtime/incidents/index.yml`, `runtime/incidents/<incident-id>/incident.yml`, `runtime/incidents/<incident-id>/actions.yml`, `runtime/incidents/<incident-id>/timeline.md`, `runtime/incidents/<incident-id>/closure.md` | `practices/incident-lifecycle-standards.md` | extend generic `governance/incidents.md`; keep product steps in `governance/production-incident-runbook.md` | `runtime/incidents/_ops/scripts/validate-incidents.sh` |
 
 ## Live Shared Continuity Authorities
 
@@ -64,14 +64,27 @@ If the mature model is promoted, the current Harmony surfaces should receive the
 following addenda:
 
 - `runtime/workflows/README.md`
-  - add workflow execution context rules for `run_id`, `mission_id`,
-    `automation_id`, `incident_id`, and `decision_id`
+  - reaffirm the discovery order and mark `README.md` as subordinate guidance,
+    not the canonical execution contract
 - `runtime/workflows/registry.yml`
-  - add `execution_controls.cancel_safe: true|false` for machine-readable
-    cancellation safety
+  - keep commands, access, and dependency summaries as routing projections only;
+    do not make registry projections canonical for inputs, artifacts, or
+    execution controls
+- `runtime/workflows/_scaffold/template/workflow.yml`
+  - add the orchestration-required top-level fields
+    (`side_effect_class`, `execution_controls`, `coordination_key_strategy`,
+    `executor_interface_version`) to the schema-backed definition contract
+- `runtime/workflows/<group>/<workflow-id>/workflow.yml`
+  - make `workflow.yml` the authoritative execution artifact for version,
+    inputs, stage graph, artifacts, and execution controls
+- `runtime/workflows/<group>/<workflow-id>/stages/`
+  - keep stage assets executor-facing and subordinate to `workflow.yml`
 - `practices/workflow-authoring-standards.md`
-  - add requirements for run emission, decision linkage, and cancel-safe
-    declarations
+  - add requirements for schema-backed `workflow.yml` authority, stage-asset
+    locality, run emission, decision linkage, and cancel-safe declarations
+- `runtime/workflows/_ops/scripts/validate-workflows.sh`
+  - validate `workflow.yml`, stage asset resolution, and non-authoritative
+    registry/README drift checks
 - `runtime/missions/README.md`
   - add mission linkage fields for `campaign_id`, `default_workflow_refs`, and
     `related_run_ids`
@@ -89,3 +102,52 @@ following addenda:
 
 This sequence keeps Harmony aligned to minimal sufficient complexity while still
 allowing the mature model to land cleanly.
+
+## Runs Promotion Note
+
+When `runs` is promoted, live Harmony must preserve:
+
+- `runtime/runs/README.md` as operator orientation only
+- `runtime/runs/index.yml` as the global discovery and lookup projection
+- `runtime/runs/<run-id>.yml` as the canonical orchestration-facing run
+  object/state record
+- `runtime/runs/by-surface/` as non-authoritative reverse-lookup projections
+- `continuity/runs/<run-id>/` as the durable evidence authority
+
+## Queue Promotion Note
+
+When `queue` is promoted, live Harmony must preserve:
+
+- the singular top-level surface path `runtime/queue/`
+- queue-item definition authority in `contracts/queue-item-and-lease-contract.md`
+  plus `contracts/schemas/queue-item-and-lease.schema.json`
+- `registry.yml` and any local `schema.yml` as discovery/reference artifacts,
+  not as the primary behavioral contract
+- lane directories as mutable state and `receipts/` as append-only evidence
+- the absence of `queue_id` or named-queue collection semantics in v1
+
+## Watcher Promotion Note
+
+When `watchers` are promoted, live Harmony must preserve:
+
+- schema-backed authority for `watcher.yml`, `sources.yml`, `rules.yml`, and
+  `emits.yml`
+- watcher-runner-owned mutable state under `state/`
+- emitted event lineage as an evidence layer distinct from watcher mutable
+  state and distinct from registry projections
+
+## Incident Promotion Note
+
+When `incidents` are promoted, live Harmony must preserve:
+
+- `governance/incidents.md` as the governance authority for severity, closure
+  authority, and escalation rules
+- `runtime/incidents/README.md` as operator orientation only
+- `runtime/incidents/index.yml` as the global incident lookup projection
+- `runtime/incidents/<incident-id>/incident.yml` as the canonical incident
+  object/state record
+- `runtime/incidents/<incident-id>/actions.yml` as subordinate schema-backed
+  coordination data when executable response actions exist
+- `runtime/incidents/<incident-id>/timeline.md` and `closure.md` as
+  operator-visible evidence that must not outrank `incident.yml` or linked run
+  and decision evidence

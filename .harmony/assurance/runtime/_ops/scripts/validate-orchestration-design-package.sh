@@ -38,7 +38,9 @@ SUPPLEMENTARY_SCHEMA_BASES=(
   "coordination-lock"
   "workflow-execution"
   "watcher-definition"
+  "watcher-sources"
   "watcher-rules"
+  "watcher-emits"
   "incident-actions"
 )
 
@@ -150,6 +152,7 @@ validate_watcher_event_fixture() {
     type == "object"
     and (.event_id | nonempty_string)
     and (.watcher_id | nonempty_string)
+    and (.rule_id | nonempty_string)
     and (.event_type | nonempty_string)
     and (((.emitted_at // "") | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T.+$")))
     and ((.severity as $s | ["info","warning","high","critical"] | index($s)) != null)
@@ -347,18 +350,55 @@ validate_workflow_execution_fixture() {
   local file="$1"
   jq -e '
     def nonempty_string: type == "string" and length > 0;
+    def string_array: type == "array" and all(.[]; type == "string" and length > 0);
     type == "object"
-    and (.workflow_group | nonempty_string)
-    and (.workflow_id | nonempty_string)
+    and (.schema_version == "workflow-contract-v1")
+    and (.name | nonempty_string)
+    and (.description | nonempty_string)
     and (.version | type == "string" and test("^[0-9]+\\.[0-9]+\\.[0-9]+$"))
-    and (.entrypoint_ref | nonempty_string)
+    and (.entry_mode | nonempty_string)
+    and ((.execution_profile as $p | ["core","external-dependent"] | index($p)) != null)
     and ((.side_effect_class as $c | ["none","read_only","mutating","destructive"] | index($c)) != null)
     and (.execution_controls | type == "object")
     and (.execution_controls.cancel_safe | type == "boolean")
     and (.coordination_key_strategy | type == "object")
     and ((.coordination_key_strategy.kind as $k | ["none","workflow-target","mission-target","incident-target","explicit-input"] | index($k)) != null)
-    and (.required_inputs | type == "array")
-    and (.produced_outputs | type == "array")
+    and (.inputs | type == "array")
+    and all(
+      .inputs[];
+      (.name | nonempty_string)
+      and ((.type as $t | ["text","boolean","file","folder","integer","number","object","array"] | index($t)) != null)
+      and (.required | type == "boolean")
+    )
+    and (.stages | type == "array" and length > 0)
+    and all(
+      .stages[];
+      (.id | nonempty_string)
+      and (.asset | type == "string" and test("^stages/.+\\.md$"))
+      and ((.kind as $k | ["analysis","mutation","projection","verification"] | index($k)) != null)
+      and (.consumes | string_array or (.consumes | type == "array" and length == 0))
+      and (.produces | string_array or (.produces | type == "array" and length == 0))
+      and (.mutation_scope | string_array or (.mutation_scope | type == "array" and length == 0))
+    )
+    and (.artifacts | type == "array")
+    and all(
+      .artifacts[];
+      (.name | nonempty_string)
+      and (.path | nonempty_string)
+      and ((.kind as $k | ["file","directory"] | index($k)) != null)
+      and (.format | nonempty_string)
+      and (.determinism | nonempty_string)
+      and (.description | nonempty_string)
+    )
+    and (.done_gate | type == "object")
+    and (.done_gate.checks | string_array)
+    and (.constraints | type == "object")
+    and (.constraints.fail_closed == true)
+    and (.constraints.require_relative_local_assets == true)
+    and (
+      ((.constraints | has("forbid_design_packages")) | not)
+      or (.constraints.forbid_design_packages | type == "boolean")
+    )
     and (.executor_interface_version == "workflow-executor-v1")
     and (
       (.side_effect_class == "none" or .side_effect_class == "read_only")
@@ -452,19 +492,98 @@ validate_watcher_definition_fixture() {
     and (.title | nonempty_string)
     and (.owner | nonempty_string)
     and ((.status as $s | ["active","paused","disabled","error"] | index($s)) != null)
+    and (.runner | type == "object")
+    and ((.runner.kind as $k | ["poll","subscription"] | index($k)) != null)
+    and (
+      (.runner.kind != "poll")
+      or (
+        (.runner | has("cadence"))
+        and (.runner.cadence | type == "string" and test("^P(T.*)?[0-9A-Z]+.*$"))
+      )
+    )
+    and ((.cursor_mode as $m | ["none","per-source-watermark","opaque"] | index($m)) != null)
+    and (
+      (has("suppression_window") | not)
+      or (.suppression_window | type == "string" and test("^P(T.*)?[0-9A-Z]+.*$"))
+    )
+  ' "$file" >/dev/null
+}
+
+validate_watcher_sources_fixture() {
+  local file="$1"
+  jq -e '
+    def nonempty_string: type == "string" and length > 0;
+    type == "object"
+    and (.sources | type == "array" and length > 0)
+    and all(
+      .sources[];
+      (.source_id | nonempty_string)
+      and (.kind | nonempty_string)
+      and (.ref | nonempty_string)
+      and ((.required_access as $a | ["read","read-metadata"] | index($a)) != null)
+      and ((has("cursor_field") | not) or (.cursor_field | nonempty_string))
+    )
   ' "$file" >/dev/null
 }
 
 validate_watcher_rules_fixture() {
   local file="$1"
   jq -e '
+    def nonempty_string: type == "string" and length > 0;
     type == "object"
     and (.rules | type == "array" and length > 0)
     and all(
       .rules[];
-      (.rule_id | type == "string" and length > 0)
-      and (.event_type | type == "string" and length > 0)
+      (.rule_id | nonempty_string)
+      and (.source_ids | type == "array" and length > 0 and all(.[]; nonempty_string))
+      and (.condition | type == "object")
+      and ((.condition.kind as $k | ["threshold","absence","change","match"] | index($k)) != null)
+      and (
+        (has("condition") | not)
+        or (
+          ((.condition | has("window")) | not)
+          or (.condition.window | type == "string" and test("^P(T.*)?[0-9A-Z]+.*$"))
+        )
+      )
+      and (.event_type | nonempty_string)
       and ((.severity as $s | ["info","warning","high","critical"] | index($s)) != null)
+      and (.summary_template | nonempty_string)
+      and (
+        (has("dedupe_key_fields") | not)
+        or (.dedupe_key_fields | type == "array" and length > 0 and all(.[]; nonempty_string))
+      )
+      and (
+        (has("routing_hints") | not)
+        or (
+          (.routing_hints | type == "object")
+          and (
+            ((.routing_hints | has("target_automation_id")) | not)
+            or (.routing_hints.target_automation_id | nonempty_string)
+          )
+          and (
+            ((.routing_hints | has("candidate_incident_id")) | not)
+            or (.routing_hints.candidate_incident_id | nonempty_string)
+          )
+        )
+      )
+    )
+  ' "$file" >/dev/null
+}
+
+validate_watcher_emits_fixture() {
+  local file="$1"
+  jq -e '
+    def nonempty_string: type == "string" and length > 0;
+    type == "object"
+    and (.emits | type == "array" and length > 0)
+    and all(
+      .emits[];
+      (.event_type | nonempty_string)
+      and (.payload_fields | type == "array" and all(.[]; nonempty_string))
+      and (.allow_payload_ref | type == "boolean")
+      and (.routing_hints | type == "object")
+      and (.routing_hints.allow_target_automation_id | type == "boolean")
+      and (.routing_hints.allow_candidate_incident_id | type == "boolean")
     )
   ' "$file" >/dev/null
 }
@@ -543,8 +662,14 @@ validate_schema_fixture() {
     watcher-definition)
       validate_watcher_definition_fixture "$file"
       ;;
+    watcher-sources)
+      validate_watcher_sources_fixture "$file"
+      ;;
     watcher-rules)
       validate_watcher_rules_fixture "$file"
+      ;;
+    watcher-emits)
+      validate_watcher_emits_fixture "$file"
       ;;
     incident-actions)
       validate_incident_actions_fixture "$file"

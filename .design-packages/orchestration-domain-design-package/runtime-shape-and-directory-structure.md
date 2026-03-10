@@ -59,7 +59,7 @@ The mature model should preserve a split between:
 | Automation definitions | `orchestration/runtime/automations/` | Proposed launch policy definitions |
 | Watcher definitions | `orchestration/runtime/watchers/` | Proposed event detector definitions |
 | Queue state | `orchestration/runtime/queue/` | Proposed intake and claim/ack state |
-| Incident runtime state | `orchestration/runtime/incidents/` | Proposed incident objects and timelines |
+| Incident runtime state | `orchestration/runtime/incidents/` | Proposed incident objects, response action plans, and subordinate evidence |
 | Run status/index | `orchestration/runtime/runs/` | Proposed orchestration projection layer |
 | Durable run evidence | `continuity/runs/` | Existing append-oriented evidence store |
 | Durable decision evidence | `continuity/decisions/` | Proposed continuity-owned routing and authority evidence |
@@ -102,11 +102,12 @@ workflows/
 │   └── scripts/
 ├── <group>/
 │   ├── <workflow-id>/
-│   │   ├── WORKFLOW.md
-│   │   ├── 01-*.md
-│   │   ├── ...
-│   │   └── NN-verify.md
-│   └── <single-file-workflow>.md
+│   │   ├── workflow.yml
+│   │   ├── stages/
+│   │   │   ├── 01-*.md
+│   │   │   ├── ...
+│   │   │   └── 99-verify.md
+│   │   └── README.md
 ```
 
 ### `missions/`
@@ -191,6 +192,9 @@ queue/
 └── receipts/
 ```
 
+The singular surface name reflects that v1 uses one shared queueing substrate.
+Lane directories remain the local mutable state for that substrate.
+
 ### `runs/`
 
 ```text
@@ -212,15 +216,19 @@ Each run record should point to evidence in `continuity/runs/<run-id>/`.
 ```text
 incidents/
 ├── README.md
-├── manifest.yml
-├── registry.yml
+├── index.yml
 └── <incident-id>/
-    ├── incident.md
-    ├── timeline.md
+    ├── incident.yml
     ├── actions.yml
-    ├── linked-runs.yml
+    ├── timeline.md
     └── closure.md
 ```
+
+`incident.yml` is the canonical machine-readable incident object and mutable
+state authority. `actions.yml` is subordinate schema-backed coordination data
+when the incident tracks executable response actions. `timeline.md` and
+`closure.md` remain operator-visible evidence and must not outrank
+`incident.yml`.
 
 ## Directory-Shape Guidance
 

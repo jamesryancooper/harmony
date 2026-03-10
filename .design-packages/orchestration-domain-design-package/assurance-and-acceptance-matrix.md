@@ -31,11 +31,35 @@ Define how the orchestration model will be validated before promotion into live
 - prohibited fields or states are rejected
 - package-normative and schema-backed contracts are explicitly marked in
   `implementation-readiness.md`
+- workflow execution authority is validated at `workflow.yml`, not in README or
+  registry prose
+- watcher authority is validated at `watcher.yml`, `sources.yml`, `rules.yml`,
+  and `emits.yml`, not in registry projections or state files
+- queue execution authority is validated at the queue-item contract/schema, not
+  in `registry.yml` prose or a local `schema.yml` projection
+- run execution authority is validated at the canonical `<run-id>.yml` record
+  plus continuity evidence linkage, not in `index.yml` or `by-surface/`
+  projections
+- incident response authority is validated at schema-backed `incident.yml` and
+  `actions.yml` when present, not in `timeline.md`, `closure.md`, or lookup
+  projections
 
 ### Schema And Shape Validation
 
 - runtime tree matches canonical shapes
 - required top-level discovery artifacts exist
+- every workflow unit contains a valid `workflow.yml`
+- every stage asset referenced from `workflow.yml` resolves under `stages/`
+- every watcher unit contains valid `watcher.yml`, `sources.yml`, `rules.yml`,
+  and `emits.yml`
+- queue preserves lane directories and `receipts/`, while keeping queue-item
+  definition authority external to mutable runtime state
+- runs preserve `index.yml`, canonical `<run-id>.yml` records, and
+  `by-surface/` reverse-lookup projections without collapsing authority into a
+  single projection layer
+- incidents preserve `index.yml`, canonical per-incident `incident.yml`
+  records, optional `actions.yml`, and subordinate evidence artifacts without
+  collapsing authority into prose
 - state directories and indexes are present where required
 - schema-backed fixtures pass/fail under
   `validate-orchestration-design-package.sh`
@@ -51,6 +75,10 @@ Define how the orchestration model will be validated before promotion into live
 - schedule-window resolution is deterministic across timezone and DST handling
 - every material action attempt resolves to exactly one `decision_id`
 - unresolved references block
+- watcher `rule_id` and `event_type` resolve back to the emitting watcher
+  definition without ambiguous fallback
+- watcher routing hints appear only when the corresponding emitted-event
+  declaration permits them
 
 ### Fail-Closed Checks
 
@@ -70,6 +98,7 @@ Define how the orchestration model will be validated before promotion into live
 - workflows do not own recurrence
 - campaigns do not become execution containers
 - runtime surfaces do not self-authorize policy exceptions
+- watcher `state/` does not become the canonical event or evidence surface
 
 ### Queue Lease And Retry Checks
 
@@ -108,18 +137,28 @@ Define how the orchestration model will be validated before promotion into live
 - promoted collection surfaces have `manifest.yml` and `registry.yml`
 - infrastructure surfaces satisfy the discovery-and-authority contract
 - routing metadata stays lightweight and does not carry mutable state
+- existing workflow surfaces preserve `manifest.yml -> registry.yml ->
+  workflow.yml` authority order and keep `README.md` non-authoritative
+- watcher surfaces preserve `manifest.yml -> registry.yml -> watcher definition
+  family -> state -> evidence` authority order
+- queue preserves `README.md -> registry.yml / schema.yml projection -> queue
+  item contract/schema -> lane state -> receipts` authority order
+- runs preserve `README.md -> index.yml -> <run-id>.yml -> by-surface/ ->
+  continuity/runs/` authority order
+- incidents preserve `README.md -> index.yml -> incident.yml / actions.yml ->
+  timeline/closure evidence` authority order
 
 ## Surface Acceptance Criteria
 
 | Surface | Acceptance Criteria |
 |---|---|
-| `workflows` | execution context can emit runs; evidence linkage rules hold |
+| `workflows` | `workflow.yml` validates, stage references resolve, registry projections do not outrank the definition artifact, execution context can emit runs, and evidence linkage rules hold |
 | `missions` | workflow bindings and run linkage validate; no recurrence leakage |
-| `runs` | continuity evidence linkage validates; `decision_id` resolves; projections do not outrank evidence |
+| `runs` | continuity evidence linkage validates; `decision_id` resolves; `index.yml` and `by-surface/` projections resolve back to canonical `<run-id>.yml`; projections do not outrank the canonical run record or continuity evidence |
 | `automations` | trigger selection deterministic; concurrency and idempotency rules enforced across `serialize`, `drop`, `parallel`, and `replace` |
-| `watchers` | event envelope valid; emits only through contract; no direct launch authority |
+| `watchers` | watcher definition family validates; rule and emitted-event references resolve; event envelope valid; mutable state and evidence stay separate; no direct launch authority |
 | `queue` | automation-ingress only; event fan-out, claim token, lease, retry, and dead-letter semantics deterministic |
-| `incidents` | lifecycle valid; closure evidence required; escalation visible |
+| `incidents` | `incident.yml` validates; `actions.yml` validates when present; lifecycle and closure evidence rules hold; escalation is visible; prose evidence remains subordinate to machine state |
 | `campaigns` | aggregation only; no execution ownership; optionality preserved |
 
 ## Portability And Support-Target Considerations

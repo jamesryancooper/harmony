@@ -2,10 +2,10 @@
 
 ## Status
 
-- Mixed
+- Contract-first
 - durable run evidence already exists today in `continuity/runs/`
 - a first-class orchestration `runs` surface is proposed for runtime-facing run
-  identity and lineage
+  identity, status, and lineage projection
 
 ## Core Purpose
 
@@ -38,8 +38,27 @@ evidence links.
 
 ## Implementation Contract
 
-See `../contracts/run-linkage-contract.md` and
+See `../contracts/run-linkage-contract.md`,
+`../contracts/discovery-and-authority-layer-contract.md`, and
 `../contracts/cross-surface-reference-contract.md`.
+
+## Authority Model
+
+- `README.md`
+  - operator discovery and orientation only
+- `index.yml`
+  - global run-discovery and lookup projection
+- `<run-id>.yml`
+  - canonical orchestration-facing run object and mutable status record
+- `by-surface/`
+  - non-authoritative reverse-lookup projections derived from canonical run
+    records
+- `continuity/runs/<run-id>/`
+  - durable evidence authority
+
+`runs` does not have a separate author-authored definition layer in v1. The
+runtime-generated per-run record is the authoritative object/state layer, while
+continuity remains the durable evidence layer.
 
 ## Example Use Cases
 

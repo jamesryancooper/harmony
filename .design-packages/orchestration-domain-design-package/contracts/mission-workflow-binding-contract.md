@@ -33,8 +33,8 @@ Mission-level linkage fields may include:
 
 ## Workflow Execution Controls
 
-- Workflow registry addenda may define machine-readable execution controls for
-  orchestration-time behavior.
+- Workflow definition artifacts may define machine-readable execution controls
+  for orchestration-time behavior.
 - `execution_controls.cancel_safe: true|false` is the canonical control used by
   automation `replace` semantics.
 - Omitted `execution_controls.cancel_safe` is treated as `false`.

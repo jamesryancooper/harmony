@@ -9,6 +9,15 @@
   "run_ids": [
     "run-20260308-audit-continuous-01"
   ],
+  "automation_ids": [
+    "auto-audit-containment"
+  ],
+  "event_ids": [
+    "evt-20260308-governance-drift-01"
+  ],
+  "decision_ids": [
+    "dec-20260308-audit-containment-01"
+  ],
   "workflow_refs": [
     {
       "workflow_group": "audit",

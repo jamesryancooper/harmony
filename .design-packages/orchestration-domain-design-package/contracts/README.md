@@ -12,13 +12,14 @@ orchestration-domain specification defined by this package.
 5. `campaign-object-contract.md`
 6. `automation-execution-contract.md`
 7. `coordination-lock-contract.md`
-8. `watcher-event-contract.md`
-9. `queue-item-and-lease-contract.md`
-10. `run-linkage-contract.md`
-11. `incident-object-contract.md`
-12. `discovery-and-authority-layer-contract.md`
-13. `mission-workflow-binding-contract.md`
-14. `campaign-mission-coordination-contract.md`
+8. `watcher-definition-contract.md`
+9. `watcher-event-contract.md`
+10. `queue-item-and-lease-contract.md`
+11. `run-linkage-contract.md`
+12. `incident-object-contract.md`
+13. `discovery-and-authority-layer-contract.md`
+14. `mission-workflow-binding-contract.md`
+15. `campaign-mission-coordination-contract.md`
 
 ## Contract Roles
 
@@ -30,7 +31,7 @@ orchestration-domain specification defined by this package.
 - `decision-record-contract.md`
   - Canonical decision evidence for `allow`, `block`, and `escalate` outcomes
 - `workflow-execution-contract.md`
-  - Workflow metadata schema, launch interface, and executor state contract
+  - Workflow definition artifact, launch interface, and executor state contract
 - `campaign-object-contract.md`
   - Minimum campaign schema, lifecycle, and invariants
 - `automation-execution-contract.md`
@@ -39,13 +40,17 @@ orchestration-domain specification defined by this package.
 - `coordination-lock-contract.md`
   - Lock artifact schema, lease semantics, and compare-and-swap acquisition
     behavior
+- `watcher-definition-contract.md`
+  - Watcher definition-layer artifacts, authority split, and watcher-local
+    state/evidence separation
 - `watcher-event-contract.md`
   - Event envelope emitted by watchers
 - `queue-item-and-lease-contract.md`
   - Queue item schema, lane semantics, claim lease behavior, retry, and
-    dead-letter rules
+    dead-letter rules for `queue`
 - `run-linkage-contract.md`
-  - Run record shape and linkage to continuity evidence
+  - Run record shape, projection-layer rules, and linkage to continuity
+    evidence
 - `incident-object-contract.md`
   - Incident object schema, state machine, and closure evidence rules
 - `discovery-and-authority-layer-contract.md`
@@ -90,10 +95,11 @@ Validation is enforced by:
 | `versioning-and-compatibility-policy.md` | `package-normative` | package-local change-control rules plus validator coverage |
 | `cross-surface-reference-contract.md` | `package-normative` | `domain-model.md`, `dependency-resolution.md`, and schema-backed object contracts |
 | `decision-record-contract.md` | `schema-backed` | `contracts/schemas/decision-record.schema.json` |
-| `workflow-execution-contract.md` | `schema-backed` | `contracts/schemas/workflow-execution.schema.json` |
+| `workflow-execution-contract.md` | `schema-backed` | `contracts/schemas/workflow-execution.schema.json` validating `workflow.yml` |
 | `campaign-object-contract.md` | `package-normative` | `domain-model.md` and `orchestration-lifecycle.md` |
 | `automation-execution-contract.md` | `schema-backed` | `contracts/schemas/automation-execution.schema.json` |
 | `coordination-lock-contract.md` | `schema-backed` | `contracts/schemas/coordination-lock.schema.json` |
+| `watcher-definition-contract.md` | `package-normative` | `contracts/schemas/watcher-definition.schema.json`, `contracts/schemas/watcher-sources.schema.json`, `contracts/schemas/watcher-rules.schema.json`, and `contracts/schemas/watcher-emits.schema.json` |
 | `watcher-event-contract.md` | `schema-backed` | `contracts/schemas/watcher-event.schema.json` |
 | `queue-item-and-lease-contract.md` | `schema-backed` | `contracts/schemas/queue-item-and-lease.schema.json` |
 | `run-linkage-contract.md` | `schema-backed` | `contracts/schemas/run-linkage.schema.json` |
@@ -113,5 +119,7 @@ contract list:
 - `contracts/schemas/coordination-lock.schema.json`
 - `contracts/schemas/workflow-execution.schema.json`
 - `contracts/schemas/watcher-definition.schema.json`
+- `contracts/schemas/watcher-sources.schema.json`
 - `contracts/schemas/watcher-rules.schema.json`
+- `contracts/schemas/watcher-emits.schema.json`
 - `contracts/schemas/incident-actions.schema.json`

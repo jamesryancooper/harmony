@@ -21,11 +21,16 @@ rollout remains a separate canonicalization step.
 ## What Changed To Reach Implementation Readiness
 
 - codified watcher event envelope rules
+- codified watcher definition-layer authority across `watcher.yml`,
+  `sources.yml`, `rules.yml`, and `emits.yml`
 - codified material decision evidence with canonical `decision_id` linkage
 - codified queue item and lease semantics
 - codified automation concurrency and idempotency behavior
-- codified run linkage between orchestration projections and continuity evidence
-- codified incident object lifecycle and closure rules
+- codified run-object authority plus projection/evidence separation between
+  `runtime/runs/` and `continuity/runs/`
+- codified incident object lifecycle and closure rules, clarifying that runtime
+  incident state lives in schema-backed `incident.yml` with subordinate action
+  and evidence artifacts
 - codified campaign object state and lifecycle
 - codified canonical cross-surface identifiers and references
 - added package-local domain model, runtime architecture, execution model,
@@ -38,6 +43,9 @@ rollout remains a separate canonicalization step.
   contracts
 - added machine-readable schemas and fixtures for approvals, automation
   bindings, and selected surface-local artifacts
+- strengthened `workflows` so the executable definition is a schema-backed
+  `workflow.yml` rather than markdown-first metadata scattered across prose and
+  routing projections
 - internalized the orchestration-domain behavior previously left implicit or
   externally assumed
 - aligned decision evidence and durable run evidence with their continuity-owned
@@ -47,14 +55,14 @@ rollout remains a separate canonicalization step.
 
 | Surface | Status | Basis |
 |---|---|---|
-| `workflows` | implementation-ready | package-local domain, execution, lifecycle, governance, and run-linkage rules plus workflow-specific contracts |
+| `workflows` | implementation-ready | package-local domain, execution, lifecycle, governance, run-linkage rules, and a schema-backed `workflow.yml` definition contract |
 | `missions` | implementation-ready | package-local domain, execution, lifecycle, and mission-binding rules plus mission/run linkage contracts |
 | `campaigns` | implementation-ready | package-local domain and lifecycle rules plus campaign contracts |
 | `automations` | implementation-ready | execution model, dependency resolution, failure model, and automation execution contract |
-| `watchers` | implementation-ready | runtime architecture, dependency resolution, observability, and watcher event contract |
+| `watchers` | implementation-ready | runtime architecture, dependency resolution, observability, watcher definition contract, and watcher event contract |
 | `queue` | implementation-ready | dependency resolution, runtime architecture, failure model, and queue item / lease contract |
-| `runs` | implementation-ready | runtime architecture, workflow execution, coordination lock, liveness, observability, and run linkage contract |
-| `incidents` | implementation-ready | governance model, lifecycle, failure model, and incident object contract |
+| `runs` | implementation-ready | runtime architecture, workflow execution, coordination lock, liveness, observability, and a run-linkage contract that keeps canonical per-run state separate from subordinate projections and continuity evidence |
+| `incidents` | implementation-ready | governance model, lifecycle, failure model, discovery-layer contract, schema-backed `incident.yml`, and schema-backed `actions.yml` when present |
 
 ## Required Contract Set
 
@@ -65,6 +73,7 @@ rollout remains a separate canonicalization step.
 - `contracts/workflow-execution-contract.md` — `schema-backed` via `contracts/schemas/workflow-execution.schema.json`
 - `contracts/automation-execution-contract.md` — `schema-backed` via `contracts/schemas/automation-execution.schema.json`
 - `contracts/coordination-lock-contract.md` — `schema-backed` via `contracts/schemas/coordination-lock.schema.json`
+- `contracts/watcher-definition-contract.md` — `package-normative`
 - `contracts/watcher-event-contract.md` — `schema-backed` via `contracts/schemas/watcher-event.schema.json`
 - `contracts/queue-item-and-lease-contract.md` — `schema-backed` via `contracts/schemas/queue-item-and-lease.schema.json`
 - `contracts/run-linkage-contract.md` — `schema-backed` via `contracts/schemas/run-linkage.schema.json`
@@ -136,6 +145,9 @@ This package aligns with Harmony's philosophy because it preserves:
 - [ ] Every material action attempt emits exactly one continuity decision record.
 - [ ] Every material autonomous execution emits a run record linked to
       continuity evidence and `decision_id`.
+- [ ] Every `runtime/runs/index.yml` entry and every `runtime/runs/by-surface/`
+      projection entry resolves back to a canonical `<run-id>.yml` record, and
+      neither projection outranks that record or `continuity/runs/`.
 - [ ] Event-to-automation routing is deterministic, including zero-match,
       target-hint, and multi-match fan-out behavior.
 - [ ] `match_mode`, `dedupe_window`, and `bindings.yml` semantics are defined
@@ -144,13 +156,28 @@ This package aligns with Harmony's philosophy because it preserves:
       boundaries.
 - [ ] Every side-effectful material action derives a `coordination_key` and
       acquires the required lock before external side effects begin.
-- [ ] Every workflow advertises executable metadata including `version`,
-      `side_effect_class`, `cancel_safe`, and `coordination_key_strategy`.
+- [ ] Every `workflow.yml` advertises executable metadata including `version`,
+      `side_effect_class`, `execution_controls.cancel_safe`, and
+      `coordination_key_strategy`.
+- [ ] Every workflow stage asset resolves from `workflow.yml`, remains local to
+      `stages/`, and no README or registry projection outranks the definition
+      artifact.
+- [ ] Every watcher defines valid `watcher.yml`, `sources.yml`, `rules.yml`,
+      and `emits.yml` artifacts, and rule/event references resolve without
+      guessing.
 - [ ] Every watcher emits the canonical event envelope.
+- [ ] Every watcher event includes the canonical `rule_id` for the matched
+      rule, and routing hints appear only when allowed by the matching emitted
+      event declaration.
+- [ ] Watcher mutable state stays in `state/` and does not become the canonical
+      evidence layer for emitted events.
 - [ ] Every queue item conforms to the canonical queue item schema and lease
       behavior.
 - [ ] Every claimed queue item carries `claimed_at`, `claim_deadline`, and
       `claim_token`, and stale ack attempts are rejected.
+- [ ] The `queue` surface preserves discovery, routing metadata, external
+      definition authority, mutable lane state, and receipts as distinct
+      layers.
 - [ ] Queue ingress remains automation-only; missions are created only
       downstream when bounded follow-up work is needed.
 - [ ] Every automation defines explicit concurrency, idempotency, and retry
@@ -169,11 +196,18 @@ This package aligns with Harmony's philosophy because it preserves:
       failures are detected by reconciliation and surfaced operator-visibly.
 - [ ] Every active run has one executor owner, a valid liveness lease, and a
       deterministic recovery path if that lease expires.
-- [ ] Every incident object satisfies lifecycle and closure evidence rules.
+- [ ] The promoted `runs` surface includes `README.md`, `index.yml`,
+      canonical per-run records, and `by-surface/` reverse-lookup projections.
+- [ ] The promoted `incidents` surface includes `README.md`, `index.yml`, and
+      canonical per-incident `incident.yml` records.
+- [ ] Every `incident.yml` validates against the incident object schema, and
+      `actions.yml` validates whenever present.
+- [ ] `timeline.md` and `closure.md` remain subordinate evidence and never
+      replace required structured closure fields or linkage in `incident.yml`.
 - [ ] Every schema-backed contract has a valid JSON Schema plus one valid and
       one invalid fixture.
 - [ ] Required surface-local artifacts validate against their declared schemas.
-- [ ] Workflow execution metadata, coordination lock artifacts, and approver
+- [ ] Workflow definition artifacts, coordination lock artifacts, and approver
       authority registry artifacts validate against their schemas.
 - [ ] `validate-orchestration-design-package.sh` passes.
 - [ ] Every promoted surface satisfies the discovery-and-authority layering
