@@ -23,7 +23,7 @@ A package-defined surface is not live canonical until it has:
 | `automations` | `runtime/automations/README.md`, `runtime/automations/manifest.yml`, `runtime/automations/registry.yml` | `practices/automation-authoring-standards.md`, `practices/automation-operations.md` | `governance/automation-policy.md` | `runtime/automations/_ops/scripts/validate-automations.sh` |
 | `watchers` | `runtime/watchers/README.md`, `runtime/watchers/manifest.yml`, `runtime/watchers/registry.yml`, `runtime/watchers/<watcher-id>/watcher.yml`, `runtime/watchers/<watcher-id>/sources.yml`, `runtime/watchers/<watcher-id>/rules.yml`, `runtime/watchers/<watcher-id>/emits.yml`, `runtime/watchers/<watcher-id>/state/` | `practices/watcher-authoring-standards.md`, `practices/watcher-operations.md` | `governance/watcher-signal-policy.md` | `runtime/watchers/_ops/scripts/validate-watchers.sh` |
 | `queue` | `runtime/queue/README.md`, `runtime/queue/registry.yml`, `runtime/queue/schema.yml`, `runtime/queue/pending/`, `runtime/queue/claimed/`, `runtime/queue/retry/`, `runtime/queue/dead-letter/`, `runtime/queue/receipts/` | `practices/queue-operations-standards.md` | `governance/queue-safety-policy.md` | `runtime/queue/_ops/scripts/validate-queue.sh` |
-| `runs` | `runtime/runs/README.md`, `runtime/runs/index.yml` | `practices/run-linkage-standards.md` | addendum to continuity evidence policy if needed | `runtime/runs/_ops/scripts/validate-runs.sh` |
+| `runs` | `runtime/runs/README.md`, `runtime/runs/index.yml`, `runtime/runs/by-surface/workflows/`, `runtime/runs/by-surface/missions/`, `runtime/runs/by-surface/automations/`, `runtime/runs/by-surface/incidents/`, `runtime/runs/<run-id>.yml` | `practices/run-linkage-standards.md` | addendum to continuity evidence policy if needed | `runtime/runs/_ops/scripts/validate-runs.sh` |
 | `incidents` | `runtime/incidents/README.md`, `runtime/incidents/manifest.yml`, `runtime/incidents/registry.yml` | `practices/incident-lifecycle-standards.md` | extend generic `governance/incidents.md`; keep product steps in `governance/production-incident-runbook.md` | `runtime/incidents/_ops/scripts/validate-incidents.sh` |
 
 ## Live Shared Continuity Authorities
@@ -103,7 +103,16 @@ following addenda:
 This sequence keeps Harmony aligned to minimal sufficient complexity while still
 allowing the mature model to land cleanly.
 
-## Watcher Promotion Note
+## Runs Promotion Note
+
+When `runs` is promoted, live Harmony must preserve:
+
+- `runtime/runs/README.md` as operator orientation only
+- `runtime/runs/index.yml` as the global discovery and lookup projection
+- `runtime/runs/<run-id>.yml` as the canonical orchestration-facing run
+  object/state record
+- `runtime/runs/by-surface/` as non-authoritative reverse-lookup projections
+- `continuity/runs/<run-id>/` as the durable evidence authority
 
 ## Queue Promotion Note
 
@@ -116,6 +125,8 @@ When `queue` is promoted, live Harmony must preserve:
   not as the primary behavioral contract
 - lane directories as mutable state and `receipts/` as append-only evidence
 - the absence of `queue_id` or named-queue collection semantics in v1
+
+## Watcher Promotion Note
 
 When `watchers` are promoted, live Harmony must preserve:
 

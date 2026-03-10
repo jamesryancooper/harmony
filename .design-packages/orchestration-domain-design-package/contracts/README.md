@@ -49,7 +49,8 @@ orchestration-domain specification defined by this package.
   - Queue item schema, lane semantics, claim lease behavior, retry, and
     dead-letter rules for `queue`
 - `run-linkage-contract.md`
-  - Run record shape and linkage to continuity evidence
+  - Run record shape, projection-layer rules, and linkage to continuity
+    evidence
 - `incident-object-contract.md`
   - Incident object schema, state machine, and closure evidence rules
 - `discovery-and-authority-layer-contract.md`

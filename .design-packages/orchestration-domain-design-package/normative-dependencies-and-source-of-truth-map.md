@@ -120,7 +120,7 @@ primary source of target orchestration behavior for this package.
 | failure semantics and recovery | `failure-model.md` | `failure-modes-and-safety-analysis.md` | canonical failure classes and recovery posture |
 | observability and operator lookup | `observability.md` | `evidence-observability-and-retention-spec.md` | health, correlation, and lookup guarantees |
 | decision evidence | `contracts/decision-record-contract.md` | continuity decision authorities | canonical `decision_id` and storage shape |
-| run evidence and linkage | `contracts/run-linkage-contract.md` | continuity run authorities | runtime projection plus evidence linkage |
+| run object/state, projection, and evidence linkage | `contracts/run-linkage-contract.md` | continuity run authorities | canonical `<run-id>.yml` record plus subordinate runtime projections and continuity evidence linkage |
 | discovery layering and SSOT | `contracts/discovery-and-authority-layer-contract.md` | `runtime-architecture.md` | package-local discovery, state ownership, and evidence-layer separation |
 | promotion criteria | `implementation-readiness.md` and `assurance-and-acceptance-matrix.md` | `canonicalization-target-map.md` | build-readiness vs live rollout readiness |
 

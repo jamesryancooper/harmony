@@ -26,7 +26,8 @@ rollout remains a separate canonicalization step.
 - codified material decision evidence with canonical `decision_id` linkage
 - codified queue item and lease semantics
 - codified automation concurrency and idempotency behavior
-- codified run linkage between orchestration projections and continuity evidence
+- codified run-object authority plus projection/evidence separation between
+  `runtime/runs/` and `continuity/runs/`
 - codified incident object lifecycle and closure rules
 - codified campaign object state and lifecycle
 - codified canonical cross-surface identifiers and references
@@ -58,7 +59,7 @@ rollout remains a separate canonicalization step.
 | `automations` | implementation-ready | execution model, dependency resolution, failure model, and automation execution contract |
 | `watchers` | implementation-ready | runtime architecture, dependency resolution, observability, watcher definition contract, and watcher event contract |
 | `queue` | implementation-ready | dependency resolution, runtime architecture, failure model, and queue item / lease contract |
-| `runs` | implementation-ready | runtime architecture, workflow execution, coordination lock, liveness, observability, and run linkage contract |
+| `runs` | implementation-ready | runtime architecture, workflow execution, coordination lock, liveness, observability, and a run-linkage contract that keeps canonical per-run state separate from subordinate projections and continuity evidence |
 | `incidents` | implementation-ready | governance model, lifecycle, failure model, and incident object contract |
 
 ## Required Contract Set
@@ -142,6 +143,9 @@ This package aligns with Harmony's philosophy because it preserves:
 - [ ] Every material action attempt emits exactly one continuity decision record.
 - [ ] Every material autonomous execution emits a run record linked to
       continuity evidence and `decision_id`.
+- [ ] Every `runtime/runs/index.yml` entry and every `runtime/runs/by-surface/`
+      projection entry resolves back to a canonical `<run-id>.yml` record, and
+      neither projection outranks that record or `continuity/runs/`.
 - [ ] Event-to-automation routing is deterministic, including zero-match,
       target-hint, and multi-match fan-out behavior.
 - [ ] `match_mode`, `dedupe_window`, and `bindings.yml` semantics are defined
@@ -190,6 +194,8 @@ This package aligns with Harmony's philosophy because it preserves:
       failures are detected by reconciliation and surfaced operator-visibly.
 - [ ] Every active run has one executor owner, a valid liveness lease, and a
       deterministic recovery path if that lease expires.
+- [ ] The promoted `runs` surface includes `README.md`, `index.yml`,
+      canonical per-run records, and `by-surface/` reverse-lookup projections.
 - [ ] Every incident object satisfies lifecycle and closure evidence rules.
 - [ ] Every schema-backed contract has a valid JSON Schema plus one valid and
       one invalid fixture.

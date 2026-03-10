@@ -104,9 +104,21 @@ Applies to:
 | Tier | Artifact | Source Of Truth |
 |---|---|---|
 | 1 | `README.md` | operator discovery and orientation |
-| 2 | `index.yml` | run discovery and lightweight projection |
-| 3 | `<run-id>.yml`, `by-surface/` | orchestration-facing run records and query projections |
-| 4 | `continuity/runs/<run-id>/` | durable evidence bundles |
+| 2 | `index.yml` | global run-discovery and lightweight lookup projection |
+| 3 | `<run-id>.yml` | canonical orchestration-facing run object and current status authority |
+| 4 | `by-surface/` | non-authoritative reverse-lookup projections |
+| 5 | `continuity/runs/<run-id>/` | durable evidence bundles |
+
+Run-specific authority rules:
+
+1. `runs` has no separate author-authored definition layer in v1; the
+   schema-backed `<run-id>.yml` record is the canonical object/state layer.
+2. `index.yml` may duplicate lightweight lookup fields, but it must not become
+   the source of truth for liveness, coordination, or evidence payload data.
+3. `by-surface/` entries are rebuildable query projections derived from
+   canonical run records; they must not outrank `<run-id>.yml`.
+4. Durable evidence remains external in `continuity/runs/`; runtime
+   projections may point to it but must not replace it.
 
 ## Existing Surface Integration
 
