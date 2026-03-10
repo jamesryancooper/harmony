@@ -732,7 +732,7 @@ Action-oriented skill and workflow names use a **verb-noun** pattern. The verb c
 | Verb | Semantics | Output | Examples |
 |------|-----------|--------|----------|
 | `run` | Execute a defined process | Process output | `run-data-migration` |
-| `orchestrate` | Coordinate parallel or partitioned work | Aggregated results | `audit-orchestration-workflow` |
+| `orchestrate` | Coordinate parallel or partitioned work | Aggregated results | `audit-orchestration` |
 | `deploy` | Ship artifact to a target environment | Deployed service/site | `vercel-deploy` |
 
 #### Lifecycle

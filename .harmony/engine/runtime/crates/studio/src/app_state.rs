@@ -411,14 +411,14 @@ impl AppState {
                 workflow.workflow_file.clone(),
                 original,
                 normalized,
-                "Normalize WORKFLOW.md frontmatter defaults".to_string(),
+                "Normalize README.md frontmatter defaults".to_string(),
             );
             touched_targets += 1;
         } else {
             self.staged_edits.stage_create(
                 workflow.workflow_file.clone(),
                 workflow_file_template(&workflow.id),
-                "Create missing WORKFLOW.md from safe template".to_string(),
+                "Create missing README.md from safe template".to_string(),
             );
             touched_targets += 1;
         }
@@ -1231,7 +1231,7 @@ mod tests {
             "workflows:\n  alpha:\n    path: alpha\n  beta:\n    path: beta\n    depends_on:\n      - workflow: alpha\n",
         );
         write_file(
-            &root.join(".harmony/orchestration/runtime/workflows/alpha/WORKFLOW.md"),
+            &root.join(".harmony/orchestration/runtime/workflows/alpha/README.md"),
             "---\nname: Alpha Flow\ndescription: Alpha workflow for fixture tests.\nsteps:\n  - id: alpha-step\n    file: 01-alpha.md\n    description: Alpha step.\n---\n\n# Alpha\n",
         );
         write_file(
@@ -1239,7 +1239,7 @@ mod tests {
             "---\nname: alpha-step\ndescription: Alpha step.\n---\n",
         );
         write_file(
-            &root.join(".harmony/orchestration/runtime/workflows/beta/WORKFLOW.md"),
+            &root.join(".harmony/orchestration/runtime/workflows/beta/README.md"),
             "---\nname: Beta Flow\ndescription: Beta workflow with a missing step file.\nsteps:\n  - id: beta-step\n    file: 01-beta.md\n    description: Beta missing step.\n---\n\n# Beta\n",
         );
     }
@@ -1247,7 +1247,7 @@ mod tests {
     fn write_fixture_audits(root: &Path) {
         write_file(
             &root.join(".harmony/output/reports/1001-1-studio-apply-audit.md"),
-            "# Harmony Studio Apply Audit\n\n- timestamp_unix_ms: 1001\n- status: applied\n- attempted_files: 1\n- applied_files: 1\n- rolled_back_files: 0\n- summary: Applied 1 staged edits.\n\n## Staged Edits\n- update | .harmony/orchestration/runtime/workflows/alpha/WORKFLOW.md | Normalize WORKFLOW.md frontmatter defaults\n",
+            "# Harmony Studio Apply Audit\n\n- timestamp_unix_ms: 1001\n- status: applied\n- attempted_files: 1\n- applied_files: 1\n- rolled_back_files: 0\n- summary: Applied 1 staged edits.\n\n## Staged Edits\n- update | .harmony/orchestration/runtime/workflows/alpha/README.md | Normalize README.md frontmatter defaults\n",
         );
         write_file(
             &root.join(".harmony/output/reports/1002-1-studio-apply-audit.md"),

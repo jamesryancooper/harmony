@@ -6,7 +6,7 @@ Desktop workflow studio for Harmony harness projects.
 
 - Workflow inventory and validation overview
 - Dependency graph canvas with pan/zoom/select
-- Workflow detail inspector from parsed `WORKFLOW.md` frontmatter steps
+- Workflow detail inspector from parsed `README.md` frontmatter steps
 - Staged edit buffer with patch preview export
 - Guarded apply flow with transactional rollback
 - Apply audit index, filtering, preview, and path actions

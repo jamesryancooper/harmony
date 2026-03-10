@@ -32,7 +32,7 @@
    `.harmony/scaffolding/runtime/templates/docs/documentation-standards/`.
 2. Draft or update documentation in the same change set as implementation.
 3. Run documentation quality enforcement before release:
-   `/audit-documentation-standards` or `/audit-documentation-workflow`.
+   `/audit-documentation-standards` or `/audit-documentation`.
 4. Merge only when docs and behavior are aligned.
 
 ## Minimal Interfaces (Scaffolds)

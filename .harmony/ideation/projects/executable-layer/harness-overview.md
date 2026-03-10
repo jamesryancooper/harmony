@@ -44,7 +44,7 @@ Instead of reading everything at boot, agents follow a layered path:
 
 1. `manifest.yml` — lightweight index (id, name, summary, triggers)
 2. `registry.yml` — extended metadata and I/O paths
-3. `SKILL.md` / `WORKFLOW.md` — full definition loaded only on activation
+3. `SKILL.md` / `README.md` — full definition loaded only on activation
 
 ### Governance Is Layered and Precedence-Ordered
 
@@ -199,7 +199,7 @@ Everything routable uses a **four-tier discovery stack** (HARMONY-SPEC-003), so 
 |---|---|---|---|
 | **1** | `manifest.yml` | ~50 tokens/item | Session start — scan for routing matches |
 | **2** | `registry.yml` | ~100 tokens/item | After matching — get extended metadata, I/O paths, dependencies |
-| **3** | `SKILL.md` / `WORKFLOW.md` | <500 lines | Activation — load full definition |
+| **3** | `SKILL.md` / `README.md` | <500 lines | Activation — load full definition |
 | **4** | `references/` or step files | As needed | Execution — load detailed phase instructions, safety rules, examples |
 
 This keeps cold-start cost low (~2,000 tokens total target for the orientation layer) while still allowing deep context when a specific capability is activated.

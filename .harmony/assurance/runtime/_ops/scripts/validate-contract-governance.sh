@@ -445,7 +445,7 @@ check_ops_boundary_violations() {
     base="$(basename "$file")"
 
     case "$base" in
-      manifest.yml|registry.yml|capabilities.yml|SKILL.md|WORKFLOW.md|SERVICE.md|AGENT.md|SOUL.md|CONSTITUTION.md|DELEGATION.md|MEMORY.md)
+      manifest.yml|registry.yml|capabilities.yml|SKILL.md|README.md|SERVICE.md|AGENT.md|SOUL.md|CONSTITUTION.md|DELEGATION.md|MEMORY.md)
         echo "$rel|canonical artifact under _ops/" >> "$ops_violations_tsv"
         ;;
     esac

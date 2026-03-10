@@ -71,19 +71,12 @@ create_fixture_repo() {
 
   mkdir -p \
     "$fixture_root/.harmony/assurance/runtime/_ops/scripts" \
-    "$fixture_root/.harmony/orchestration/runtime/pipelines/audit" \
     "$fixture_root/.harmony/orchestration/runtime/workflows/audit" \
     "$fixture_root/.harmony/orchestration/governance" \
     "$fixture_root/.design-packages"
 
   cp "$REPO_ROOT/.harmony/assurance/runtime/_ops/scripts/validate-architecture-validation-pipeline.sh" \
     "$fixture_root/.harmony/assurance/runtime/_ops/scripts/validate-architecture-validation-pipeline.sh"
-  cp "$REPO_ROOT/.harmony/orchestration/runtime/pipelines/manifest.yml" \
-    "$fixture_root/.harmony/orchestration/runtime/pipelines/manifest.yml"
-  cp "$REPO_ROOT/.harmony/orchestration/runtime/pipelines/registry.yml" \
-    "$fixture_root/.harmony/orchestration/runtime/pipelines/registry.yml"
-  cp "$REPO_ROOT/.harmony/orchestration/runtime/pipelines/README.md" \
-    "$fixture_root/.harmony/orchestration/runtime/pipelines/README.md"
   cp "$REPO_ROOT/.harmony/orchestration/runtime/workflows/manifest.yml" \
     "$fixture_root/.harmony/orchestration/runtime/workflows/manifest.yml"
   cp "$REPO_ROOT/.harmony/orchestration/runtime/workflows/registry.yml" \
@@ -94,9 +87,7 @@ create_fixture_repo() {
     "$fixture_root/.harmony/orchestration/governance/capability-map-v1.yml"
   cp "$REPO_ROOT/.design-packages/README.md" \
     "$fixture_root/.design-packages/README.md"
-  cp -R "$REPO_ROOT/.harmony/orchestration/runtime/pipelines/audit/audit-design-package-workflow" \
-    "$fixture_root/.harmony/orchestration/runtime/pipelines/audit/"
-  cp -R "$REPO_ROOT/.harmony/orchestration/runtime/workflows/audit/audit-design-package-workflow" \
+  cp -R "$REPO_ROOT/.harmony/orchestration/runtime/workflows/audit/audit-design-package" \
     "$fixture_root/.harmony/orchestration/runtime/workflows/audit/"
 
   printf '%s\n' "$fixture_root"
@@ -119,7 +110,7 @@ case_valid_pipeline_passes() {
 case_missing_stage_fails() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
-  rm "$fixture_root/.harmony/orchestration/runtime/pipelines/audit/audit-design-package-workflow/stages/05-specification-closure.md"
+  rm "$fixture_root/.harmony/orchestration/runtime/workflows/audit/audit-design-package/stages/05-specification-closure.md"
   run_validator_in_fixture "$fixture_root"
 }
 
@@ -127,14 +118,14 @@ case_missing_change_manifest_rule_fails() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
   perl -0pi -e 's/CHANGE MANIFEST/change receipt/' \
-    "$fixture_root/.harmony/orchestration/runtime/pipelines/audit/audit-design-package-workflow/stages/03-remediation-track.md"
+    "$fixture_root/.harmony/orchestration/runtime/workflows/audit/audit-design-package/stages/03-remediation-track.md"
   run_validator_in_fixture "$fixture_root"
 }
 
 case_missing_capability_map_registration_fails() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
-  perl -0pi -e 's/\n  - workflow_id: "audit-design-package-workflow"\n    classification: "agent-augmented"\n    autonomous_allowed: false\n    required_contracts:\n      - "delegation-boundaries-v1"\n//' \
+  perl -0pi -e 's/\n  - workflow_id: "audit-design-package"\n    classification: "agent-augmented"\n    autonomous_allowed: false\n    required_contracts:\n      - "delegation-boundaries-v1"\n//' \
     "$fixture_root/.harmony/orchestration/governance/capability-map-v1.yml"
   run_validator_in_fixture "$fixture_root"
 }
@@ -143,32 +134,32 @@ case_temporary_dependency_fails() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
   printf '\n- legacy: .design-packages/architecture-validation-pipeline-package\n' >> \
-    "$fixture_root/.harmony/orchestration/runtime/pipelines/audit/audit-design-package-workflow/stages/02-design-audit.md"
+    "$fixture_root/.harmony/orchestration/runtime/workflows/audit/audit-design-package/stages/02-design-audit.md"
   run_validator_in_fixture "$fixture_root"
 }
 
 main() {
   assert_success \
-    "architecture validation pipeline validator accepts the baseline pipeline" \
+    "architecture validation workflow validator accepts the baseline workflow" \
     case_valid_pipeline_passes
 
   assert_failure_contains \
-    "architecture validation pipeline validator rejects missing stage files" \
-    "missing file: .harmony/orchestration/runtime/pipelines/audit/audit-design-package-workflow/stages/05-specification-closure.md" \
+    "architecture validation workflow validator rejects missing stage files" \
+    "missing file: .harmony/orchestration/runtime/workflows/audit/audit-design-package/stages/05-specification-closure.md" \
     case_missing_stage_fails
 
   assert_failure_contains \
-    "architecture validation pipeline validator rejects remediation stages without change manifest guidance" \
+    "architecture validation workflow validator rejects remediation stages without change manifest guidance" \
     "remediation track requires change manifest" \
     case_missing_change_manifest_rule_fails
 
   assert_failure_contains \
-    "architecture validation pipeline validator rejects missing workflow capability-map registration" \
+    "architecture validation workflow validator rejects missing workflow capability-map registration" \
     "capability map classifies workflow" \
     case_missing_capability_map_registration_fails
 
   assert_failure_contains \
-    "architecture validation pipeline validator rejects temporary design-package dependencies" \
+    "architecture validation workflow validator rejects temporary design-package dependencies" \
     "design audit stage avoids temporary package path references" \
     case_temporary_dependency_fails
 

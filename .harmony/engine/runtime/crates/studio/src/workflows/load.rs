@@ -122,7 +122,7 @@ pub fn load_workflow_index(root: &Path) -> Result<WorkflowIndexSnapshot> {
                 workflow.path.as_deref(),
                 registry_path_hint.as_deref(),
             );
-            let workflow_file = workflow_dir.join("WORKFLOW.md");
+            let workflow_file = workflow_dir.join("README.md");
             let dependencies = registry_entry
                 .map(|entry| {
                     entry

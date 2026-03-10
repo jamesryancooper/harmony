@@ -6,7 +6,7 @@ behavior:
         - "Parse parameters (subsystem root, schema_ref, docs, severity_threshold, file_types)"
         - "Verify subsystem directory exists"
         - "Discover config files: manifest.yml, registry.yml, capabilities.yml"
-        - "Discover definition files: **/SKILL.md (or WORKFLOW.md, depending on subsystem type)"
+        - "Discover definition files: **/SKILL.md (or README.md, depending on subsystem type)"
         - "Load schema reference (capabilities.yml or equivalent) for conformance checks"
         - "If docs parameter set: enumerate companion documentation files"
         - "Enumerate scope manifest (complete sorted file list)"
@@ -128,7 +128,7 @@ Parse and validate parameters before any scanning begins.
 
 4. **Discover definition files:**
 
-   Glob recursively for `**/SKILL.md` (or `**/WORKFLOW.md` if the subsystem contains workflows).
+   Glob recursively for `**/SKILL.md` (or `**/README.md` if the subsystem contains workflows).
 
 5. **Load schema reference:**
 

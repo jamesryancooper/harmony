@@ -182,7 +182,7 @@ check_drift_alignment() {
     '^\.harmony/cognition/runtime/decisions/'
     '^\.harmony/output/reports/decisions/'
     '^\.harmony/[^/]+/_meta/architecture/'
-    '^\.harmony/orchestration/runtime/workflows/audit/audit-pre-release-workflow/'
+    '^\.harmony/orchestration/runtime/workflows/audit/audit-pre-release/'
     '^\.harmony/assurance/practices/(complete\.md|session-exit\.md)$'
     '^\.harmony/assurance/runtime/_ops/scripts/validate-harness-structure\.sh$'
     '^\.harmony/assurance/runtime/_ops/scripts/validate-contract-governance\.sh$'

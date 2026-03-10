@@ -138,7 +138,7 @@ orientation.
   - Skills: `.harmony/capabilities/runtime/skills/manifest.yml`
 - **Cognition:** `.harmony/cognition/` (runtime, governance, practices)
   - Context index: `.harmony/cognition/runtime/context/index.yml`
-- **Orchestration:** `.harmony/orchestration/` (pipelines, workflows, missions)
+- **Orchestration:** `.harmony/orchestration/` (workflows, missions)
 - **Scaffolding:** `.harmony/scaffolding/` (runtime, governance, practices)
 - **Assurance:** `.harmony/assurance/` (runtime, governance, practices)
 - **Continuity:** `.harmony/continuity/` (progress log, tasks, next steps)
@@ -169,34 +169,25 @@ Read `.harmony/capabilities/runtime/skills/manifest.yml` for skill discovery.
 - Follow `deny-by-default` tool policy
 - Log every execution to `capabilities/runtime/skills/_ops/state/logs/`
 
-## Pipelines and Workflows
+## Workflows
 
-Read `.harmony/orchestration/runtime/pipelines/manifest.yml` for canonical
-orchestration discovery.
+Read `.harmony/orchestration/runtime/workflows/manifest.yml` for canonical
+workflow discovery.
 
-### Pipeline Discovery
+### Workflow Discovery
 
-1. Read `manifest.yml` for pipeline index (id, group, summary, triggers)
+1. Read `manifest.yml` for workflow index (id, group, summary, triggers)
 2. After matching, read `registry.yml` for extended metadata and I/O
-3. Load `<group>/<pipeline-id>/pipeline.yml` for the canonical contract
+3. Load `<group>/<workflow-id>/workflow.yml` for the canonical contract
 4. Load `stages/` assets during execution
-
-### Workflow Projections
-
-- `/.harmony/orchestration/runtime/workflows/` is a generated projection surface
-  for readability and slash-facing compatibility.
-- Use workflow discovery when the user explicitly invokes a workflow-facing
-  surface or when a human-readable staged projection is the relevant artifact.
-- Do not treat `WORKFLOW.md` or numbered workflow step files as the canonical
-  autonomous contract when a backing pipeline exists.
+5. Load `README.md` only when human-readable staged guidance is needed
 
 ### Invocation
 
-- Explicit pipeline command: `.harmony/engine/runtime/run pipeline run <pipeline-id>`
-- Explicit workflow command: `/audit-orchestration-workflow manifest="..."`
-- Explicit calls: `use pipeline: audit-orchestration-workflow` or
-  `use workflow: audit-orchestration-workflow`
-- Natural triggers: Match against canonical pipeline triggers first
+- Explicit workflow command: `.harmony/engine/runtime/run workflow run <workflow-id>`
+- Explicit slash command: `/audit-orchestration`
+- Explicit call: `use workflow: audit-orchestration`
+- Natural triggers: Match against canonical workflow triggers first
 
 ## Commit Discipline
 

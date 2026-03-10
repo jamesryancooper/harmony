@@ -57,7 +57,7 @@
       ],
       "knowledge_links": {
         "specs": [
-          "external:.harmony/orchestration/runtime/workflows/meta/create-harness/WORKFLOW.md"
+          "external:.harmony/orchestration/runtime/workflows/meta/create-harness/README.md"
         ],
         "contracts": [
           "external:.harmony/scaffolding/runtime/templates/harmony/continuity/tasks.json"

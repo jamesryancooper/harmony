@@ -35,7 +35,7 @@ case "$OS" in
 esac
 
 case "${1:-}" in
-  ""|studio|workflow|pipeline|-h|--help|help)
+  ""|studio|workflow|-h|--help|help)
     BIN=""
     ;;
 esac

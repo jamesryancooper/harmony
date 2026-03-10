@@ -4,7 +4,8 @@
 # Token budget: ~50 tokens per workflow entry.
 #
 # Load AFTER matching a workflow in manifest.yml.
-# Then load WORKFLOW.md when the workflow is activated.
+# Then load workflow.yml as the authoritative contract.
+# Load README.md only when human-readable staged guidance is needed.
 #
 # Composition note:
 # - Workflows are procedural orchestrations.
@@ -27,9 +28,9 @@ governance:
     fallback_modes: ["agent-augmented", "human-only"]
 workflows:
   # --- Fully specified (spec-compliant) ---
-  audit-orchestration-workflow:
+  audit-orchestration:
     version: "2.0.0"
-    commands: ["/audit-orchestration-workflow"]
+    commands: ["/audit-orchestration"]
     parameters:
       - name: manifest
         type: file
@@ -138,14 +139,9 @@ workflows:
           format: mixed
           determinism: unique
           description: "Authoritative bounded-audit evidence bundle with findings, coverage, and convergence artifacts"
-    projection:
-      pipeline_id: audit-orchestration-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-orchestration-workflow/
-      generated: true
-      projection_format: directory
-  audit-pre-release-workflow:
+  audit-pre-release:
     version: "2.2.0"
-    commands: ["/audit-pre-release-workflow"]
+    commands: ["/audit-pre-release"]
     parameters:
       - name: subsystem
         type: folder
@@ -197,7 +193,7 @@ workflows:
     depends_on:
       - skill: audit-subsystem-health
         condition: "active in skill manifest"
-      - workflow: audit-orchestration-workflow
+      - workflow: audit-orchestration
         condition: "active in workflow manifest (required only when manifest parameter is provided)"
       - skill: audit-cross-subsystem-coherence
         condition: "active in skill manifest (required when run_cross_subsystem parameter is true)"
@@ -207,7 +203,7 @@ workflows:
       inputs: []
       outputs:
         - name: pre_release_report
-          path: "../../output/reports/{{date}}-audit-pre-release-workflow.md"
+          path: "../../output/reports/{{date}}-audit-pre-release.md"
           kind: file
           format: markdown
           determinism: unique
@@ -223,7 +219,7 @@ workflows:
           kind: file
           format: markdown
           determinism: unique
-          description: "Consolidated migration audit report (produced by audit-orchestration-workflow in migration-only mode, if manifest provided)"
+          description: "Consolidated migration audit report (produced by audit-orchestration in migration-only mode, if manifest provided)"
         - name: cross_subsystem_audit_report
           path: "../../output/reports/{{date}}-cross-subsystem-coherence-audit.md"
           kind: file
@@ -242,14 +238,9 @@ workflows:
           format: mixed
           determinism: unique
           description: "Authoritative bounded-audit bundle for release recommendation, context-governance evidence, and done-gate verification"
-    projection:
-      pipeline_id: audit-pre-release-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-pre-release-workflow/
-      generated: true
-      projection_format: directory
-  audit-change-risk-workflow:
+  audit-change-risk:
     version: "1.0.0"
-    commands: ["/audit-change-risk-workflow"]
+    commands: ["/audit-change-risk"]
     parameters:
       - name: subsystem
         type: folder
@@ -337,7 +328,7 @@ workflows:
       inputs: []
       outputs:
         - name: change_risk_report
-          path: "../../output/reports/{{date}}-audit-change-risk-workflow.md"
+          path: "../../output/reports/{{date}}-audit-change-risk.md"
           kind: file
           format: markdown
           determinism: unique
@@ -390,14 +381,9 @@ workflows:
           format: mixed
           determinism: unique
           description: "Authoritative bounded-audit bundle for change-risk recommendation and done-gate evidence"
-    projection:
-      pipeline_id: audit-change-risk-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-change-risk-workflow/
-      generated: true
-      projection_format: directory
-  audit-continuous-workflow:
+  audit-continuous:
     version: "1.0.0"
-    commands: ["/audit-continuous-workflow"]
+    commands: ["/audit-continuous"]
     parameters:
       - name: subsystem
         type: folder
@@ -500,11 +486,11 @@ workflows:
       inputs: []
       outputs:
         - name: continuous_audit_report
-          path: "../../output/reports/{{date}}-audit-continuous-workflow.md"
+          path: "../../output/reports/{{date}}-audit-continuous.md"
           kind: file
           format: markdown
           determinism: unique
-          description: "Consolidated audit-continuous-workflow report with ongoing risk recommendation"
+          description: "Consolidated audit-continuous report with ongoing risk recommendation"
         - name: subsystem_health_audit_report
           path: "../../output/reports/{{date}}-subsystem-health-audit.md"
           kind: file
@@ -565,14 +551,9 @@ workflows:
           format: mixed
           determinism: unique
           description: "Authoritative bounded-audit bundle for continuous risk recommendation and done-gate evidence"
-    projection:
-      pipeline_id: audit-continuous-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-continuous-workflow/
-      generated: true
-      projection_format: directory
-  audit-post-incident-workflow:
+  audit-post-incident:
     version: "1.0.0"
-    commands: ["/audit-post-incident-workflow"]
+    commands: ["/audit-post-incident"]
     parameters:
       - name: incident_id
         type: text
@@ -666,7 +647,7 @@ workflows:
       inputs: []
       outputs:
         - name: post_incident_report
-          path: "../../output/reports/{{date}}-audit-post-incident-workflow.md"
+          path: "../../output/reports/{{date}}-audit-post-incident.md"
           kind: file
           format: markdown
           determinism: unique
@@ -725,14 +706,9 @@ workflows:
           format: mixed
           determinism: unique
           description: "Authoritative bounded-audit bundle for post-incident closure recommendation and done-gate evidence"
-    projection:
-      pipeline_id: audit-post-incident-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-post-incident-workflow/
-      generated: true
-      projection_format: directory
-  audit-release-readiness-workflow:
+  audit-release-readiness:
     version: "1.0.0"
-    commands: ["/audit-release-readiness-workflow"]
+    commands: ["/audit-release-readiness"]
     parameters:
       - name: scope
         type: folder
@@ -807,7 +783,7 @@ workflows:
       inputs: []
       outputs:
         - name: release_readiness_workflow_report
-          path: "../../output/reports/{{date}}-audit-release-readiness-workflow.md"
+          path: "../../output/reports/{{date}}-audit-release-readiness.md"
           kind: file
           format: markdown
           determinism: unique
@@ -860,14 +836,9 @@ workflows:
           format: mixed
           determinism: unique
           description: "Authoritative bounded-audit bundle for layered release-readiness recommendation and done-gate evidence"
-    projection:
-      pipeline_id: audit-release-readiness-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-release-readiness-workflow/
-      generated: true
-      projection_format: directory
-  audit-documentation-workflow:
+  audit-documentation:
     version: "3.0.0"
-    commands: ["/audit-documentation-workflow"]
+    commands: ["/audit-documentation"]
     parameters:
       - name: docs_root
         type: folder
@@ -910,7 +881,7 @@ workflows:
       inputs: []
       outputs:
         - name: docs_audit_report
-          path: "../../output/reports/{{date}}-audit-documentation-workflow.md"
+          path: "../../output/reports/{{date}}-audit-documentation.md"
           kind: file
           format: markdown
           determinism: unique
@@ -927,14 +898,9 @@ workflows:
           format: mixed
           determinism: unique
           description: "Authoritative bounded-audit bundle for documentation recommendation and done-gate evidence"
-    projection:
-      pipeline_id: audit-documentation-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-documentation-workflow/
-      generated: true
-      projection_format: directory
-  audit-design-package-workflow:
+  audit-design-package:
     version: "1.0.0"
-    commands: ["/audit-design-package-workflow"]
+    commands: ["/audit-design-package"]
     parameters:
       - name: package_path
         type: folder
@@ -989,7 +955,7 @@ workflows:
           description: "Target package treated as temporary implementation design material under review, not canonical runtime authority"
       outputs:
         - name: design_package_workflow_summary
-          path: "../../output/reports/{{date}}-audit-design-package-workflow.md"
+          path: "../../output/reports/{{date}}-audit-design-package.md"
           kind: file
           format: markdown
           determinism: unique
@@ -1054,14 +1020,9 @@ workflows:
           format: markdown
           determinism: unique
           description: "First production implementation plan derived from the blueprint"
-    projection:
-      pipeline_id: audit-design-package-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-design-package-workflow/
-      generated: true
-      projection_format: directory
-  audit-workflow-system-workflow:
+  audit-workflow-system:
     version: "1.0.0"
-    commands: ["/audit-workflow-system-workflow"]
+    commands: ["/audit-workflow-system"]
     parameters:
       - name: scope
         type: folder
@@ -1113,7 +1074,7 @@ workflows:
       inputs: []
       outputs:
         - name: workflow_system_audit_report
-          path: "../../output/reports/{{date}}-audit-workflow-system-workflow.md"
+          path: "../../output/reports/{{date}}-audit-workflow-system.md"
           kind: file
           format: markdown
           determinism: unique
@@ -1124,42 +1085,22 @@ workflows:
           format: mixed
           determinism: unique
           description: "Authoritative bounded-audit bundle for workflow-system findings, scores, scenarios, and done-gate evidence."
-    projection:
-      pipeline_id: audit-workflow-system-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/audit/audit-workflow-system-workflow/
-      generated: true
-      projection_format: directory
   # --- Skeleton entries (existing workflows, not yet fully migrated) ---
   create-harness:
     version: "1.2.0"
     commands: ["/create-harness"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: create-harness
-      pipeline_path: .harmony/orchestration/runtime/pipelines/meta/create-harness/
-      generated: true
-      projection_format: directory
   evaluate-harness:
     version: "1.1.0"
     commands: ["/evaluate-harness"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: evaluate-harness
-      pipeline_path: .harmony/orchestration/runtime/pipelines/meta/evaluate-harness/
-      generated: true
-      projection_format: directory
   migrate-harness:
     version: "1.1.0"
     commands: ["/migrate-harness"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: migrate-harness
-      pipeline_path: .harmony/orchestration/runtime/pipelines/meta/migrate-harness/
-      generated: true
-      projection_format: directory
   update-harness:
     version: "1.1.0"
     commands: ["/update-harness"]
@@ -1167,21 +1108,11 @@ workflows:
     depends_on:
       - workflow: evaluate-harness
         condition: "optional but recommended to run first"
-    projection:
-      pipeline_id: update-harness
-      pipeline_path: .harmony/orchestration/runtime/pipelines/meta/update-harness/
-      generated: true
-      projection_format: directory
   create-mission:
     version: "1.1.0"
     commands: ["/create-mission"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: create-mission
-      pipeline_path: .harmony/orchestration/runtime/pipelines/missions/create-mission/
-      generated: true
-      projection_format: directory
   complete-mission:
     version: "1.1.0"
     commands: ["/complete-mission"]
@@ -1189,11 +1120,6 @@ workflows:
     depends_on:
       - workflow: create-mission
         condition: "Mission must exist"
-    projection:
-      pipeline_id: complete-mission
-      pipeline_path: .harmony/orchestration/runtime/pipelines/missions/complete-mission/
-      generated: true
-      projection_format: directory
   create-skill:
     version: "2.0.0"
     commands: ["/create-skill"]
@@ -1201,31 +1127,16 @@ workflows:
     depends_on: []
     deprecated: true
     deprecated_by: ".harmony/capabilities/runtime/skills/meta/create-skill/"
-    projection:
-      pipeline_id: create-skill
-      pipeline_path: .harmony/orchestration/runtime/pipelines/meta/create-skill/
-      generated: true
-      projection_format: directory
   create-workflow:
     version: "1.0.0"
     commands: ["/create-workflow"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: create-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/meta/create-workflow/
-      generated: true
-      projection_format: directory
   evaluate-workflow:
     version: "1.1.0"
     commands: ["/evaluate-workflow"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: evaluate-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/meta/evaluate-workflow/
-      generated: true
-      projection_format: directory
   update-workflow:
     version: "1.0.0"
     commands: ["/update-workflow"]
@@ -1233,91 +1144,46 @@ workflows:
     depends_on:
       - workflow: evaluate-workflow
         condition: "optional but recommended to run first"
-    projection:
-      pipeline_id: update-workflow
-      pipeline_path: .harmony/orchestration/runtime/pipelines/meta/update-workflow/
-      generated: true
-      projection_format: directory
   refactor:
     version: "1.1.0"
     commands: ["/refactor"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: refactor
-      pipeline_path: .harmony/orchestration/runtime/pipelines/refactor/refactor/
-      generated: true
-      projection_format: directory
   create-project:
     version: "1.0.0"
     commands: ["/create-project"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: create-project
-      pipeline_path: .harmony/orchestration/runtime/pipelines/projects/create-project/
-      generated: true
-      projection_format: single-file
   agent-led-happy-path:
     version: "1.0.0"
     commands: ["/agent-led-happy-path"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: agent-led-happy-path
-      pipeline_path: .harmony/orchestration/runtime/pipelines/tasks/agent-led-happy-path/
-      generated: true
-      projection_format: single-file
   add-api-endpoint:
     version: "1.0.0"
     commands: ["/add-api-endpoint"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: add-api-endpoint
-      pipeline_path: .harmony/orchestration/runtime/pipelines/tasks/add-api-endpoint/
-      generated: true
-      projection_format: single-file
   add-ui-feature:
     version: "1.0.0"
     commands: ["/add-ui-feature"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: add-ui-feature
-      pipeline_path: .harmony/orchestration/runtime/pipelines/tasks/add-ui-feature/
-      generated: true
-      projection_format: single-file
   fix-a-bug:
     version: "1.0.0"
     commands: ["/fix-a-bug"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: fix-a-bug
-      pipeline_path: .harmony/orchestration/runtime/pipelines/tasks/fix-a-bug/
-      generated: true
-      projection_format: single-file
   handle-security-issue:
     version: "1.0.0"
     commands: ["/handle-security-issue"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: handle-security-issue
-      pipeline_path: .harmony/orchestration/runtime/pipelines/tasks/handle-security-issue/
-      generated: true
-      projection_format: single-file
   run-data-migration:
     version: "1.0.0"
     commands: ["/run-data-migration"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: run-data-migration
-      pipeline_path: .harmony/orchestration/runtime/pipelines/tasks/run-data-migration/
-      generated: true
-      projection_format: single-file
   python-api-foundation:
     version: "1.0.0"
     commands: ["/python-api-foundation"]
@@ -1390,11 +1256,6 @@ workflows:
           format: markdown
           determinism: unique
           description: "AI agent orientation document"
-    projection:
-      pipeline_id: python-api-foundation
-      pipeline_path: .harmony/orchestration/runtime/pipelines/foundations/python-api/
-      generated: true
-      projection_format: directory
   swift-macos-app-foundation:
     version: "1.0.0"
     commands: ["/swift-macos-app-foundation"]
@@ -1472,18 +1333,8 @@ workflows:
           format: markdown
           determinism: unique
           description: "AI agent orientation document"
-    projection:
-      pipeline_id: swift-macos-app-foundation
-      pipeline_path: .harmony/orchestration/runtime/pipelines/foundations/swift-macos-app/
-      generated: true
-      projection_format: directory
   promote-from-scratchpad:
     version: "1.0.0"
     commands: ["/promote-from-scratchpad"]
     access: human
     depends_on: []
-    projection:
-      pipeline_id: promote-from-scratchpad
-      pipeline_path: .harmony/orchestration/runtime/pipelines/ideation/promote-from-scratchpad/
-      generated: true
-      projection_format: single-file

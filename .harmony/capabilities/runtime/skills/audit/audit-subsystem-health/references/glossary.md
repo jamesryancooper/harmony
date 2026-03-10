@@ -19,7 +19,7 @@ Terminology used in the audit-subsystem-health skill.
 : A section in the audit report that documents what was checked and found clean, not just what had findings. Proves the audit was exhaustive, not just that it found issues.
 
 **Definition file**
-: The primary specification file for a skill (`SKILL.md`) or workflow (`WORKFLOW.md`). Contains frontmatter with authoritative field values.
+: The primary specification file for a skill (`SKILL.md`) or workflow (`README.md`). Contains frontmatter with authoritative field values.
 
 **Entry**
 : A single skill or workflow registered in the subsystem. Identified by its `id` in `manifest.yml`.

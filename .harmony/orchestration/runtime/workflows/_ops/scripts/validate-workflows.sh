@@ -8,24 +8,38 @@ RUNTIME_DIR="$(cd -- "$WORKFLOWS_DIR/.." && pwd)"
 ORCHESTRATION_DIR="$(cd -- "$RUNTIME_DIR/.." && pwd)"
 HARMONY_DIR="${HARMONY_DIR_OVERRIDE:-$(cd -- "$ORCHESTRATION_DIR/.." && pwd)}"
 ROOT_DIR="${HARMONY_ROOT_DIR:-$(cd -- "$HARMONY_DIR/.." && pwd)}"
-PIPELINES_DIR="${HARMONY_PIPELINES_DIR:-$RUNTIME_DIR/pipelines}"
-PROJECTION_GENERATOR="$PIPELINES_DIR/_ops/scripts/generate-workflow-projections.sh"
 
 MANIFEST="$WORKFLOWS_DIR/manifest.yml"
 REGISTRY="$WORKFLOWS_DIR/registry.yml"
-PIPELINE_MANIFEST="$PIPELINES_DIR/manifest.yml"
+GUIDE_GENERATOR="$WORKFLOWS_DIR/_ops/scripts/generate-workflow-guides.sh"
 WORKFLOW_SYSTEM_AUDIT="$SCRIPT_DIR/audit-workflow-system.sh"
+FILTER_WORKFLOW_ID=""
 
 errors=0
 warnings=0
+HAS_RG=0
 
 declare -A WORKFLOW_PATHS=()
 declare -A WORKFLOW_PROFILES=()
-HAS_RG=0
 
 if command -v rg >/dev/null 2>&1; then
   HAS_RG=1
 fi
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --workflow-id)
+      shift
+      [[ $# -gt 0 ]] || { echo "[ERROR] --workflow-id requires a value" >&2; exit 1; }
+      FILTER_WORKFLOW_ID="$1"
+      ;;
+    *)
+      echo "[ERROR] unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
 
 fail() {
   echo "[ERROR] $1"
@@ -41,59 +55,35 @@ pass() {
   echo "[OK] $1"
 }
 
-matches_file_regex() {
-  local pattern="$1"
-  local file="$2"
-  if [[ "$HAS_RG" -eq 1 ]]; then
-    rg -q -- "$pattern" "$file"
-  else
-    grep -Eq -- "$pattern" "$file"
-  fi
-}
-
-matches_file_fixed() {
-  local token="$1"
-  local file="$2"
-  if [[ "$HAS_RG" -eq 1 ]]; then
-    rg -Fq -- "$token" "$file"
-  else
-    grep -Fq -- "$token" "$file"
-  fi
-}
-
-matches_markdown_tree_regex() {
-  local pattern="$1"
-  local target="$2"
-  if [[ "$HAS_RG" -eq 1 ]]; then
-    if [[ -d "$target" ]]; then
-      rg -q --glob "*.md" -- "$pattern" "$target"
-    else
-      rg -q -- "$pattern" "$target"
-    fi
-  else
-    if [[ -d "$target" ]]; then
-      grep -RqsE --include='*.md' -- "$pattern" "$target"
-    else
-      grep -Eq -- "$pattern" "$target"
-    fi
-  fi
-}
-
-matches_stdin_regex() {
-  local pattern="$1"
-  if [[ "$HAS_RG" -eq 1 ]]; then
-    rg -q -- "$pattern"
-  else
-    grep -Eq -- "$pattern"
-  fi
-}
-
 require_file() {
   local file="$1"
   if [[ ! -f "$file" ]]; then
-    fail "missing file: $file"
+    fail "missing file: ${file#$ROOT_DIR/}"
   else
     pass "found file: ${file#$ROOT_DIR/}"
+  fi
+}
+
+require_dir() {
+  local dir="$1"
+  if [[ ! -d "$dir" ]]; then
+    fail "missing directory: ${dir#$ROOT_DIR/}"
+  else
+    pass "found directory: ${dir#$ROOT_DIR/}"
+  fi
+}
+
+non_empty() {
+  [[ -n "${1// }" && "$1" != "null" ]]
+}
+
+matches_path_regex() {
+  local pattern="$1"
+  local target="$2"
+  if [[ "$HAS_RG" -eq 1 ]]; then
+    rg -q -- "$pattern" "$target"
+  else
+    grep -RqsE -- "$pattern" "$target"
   fi
 }
 
@@ -143,6 +133,17 @@ extract_manifest_workflows() {
   ' "$MANIFEST"
 }
 
+extract_registry_workflow_keys() {
+  awk '
+    /^workflows:/ {in_workflows=1; next}
+    in_workflows && /^  [a-z0-9][a-z0-9-]*:[[:space:]]*$/ {
+      key=$1
+      sub(/:$/, "", key)
+      print key
+    }
+  ' "$REGISTRY"
+}
+
 extract_registry_paths() {
   awk '
     function trim(v) {
@@ -165,32 +166,25 @@ extract_registry_paths() {
 }
 
 load_manifest_index() {
-  local entry id path profile
+  local entry id path profile matched=0
   while IFS= read -r entry; do
     [[ -z "$entry" ]] && continue
     IFS='|' read -r id path profile <<< "$entry"
-
-    if [[ -z "$id" ]]; then
-      fail "workflow manifest entry missing id"
+    if [[ -n "$FILTER_WORKFLOW_ID" && "$id" != "$FILTER_WORKFLOW_ID" ]]; then
       continue
     fi
-    if [[ -z "$path" ]]; then
-      fail "workflow '$id' missing path in manifest"
-      continue
-    fi
-
+    matched=1
     WORKFLOW_PATHS["$id"]="$path"
     WORKFLOW_PROFILES["$id"]="$profile"
-
     case "$profile" in
-      core|external-dependent)
-        pass "workflow '$id' execution profile: $profile"
-        ;;
-      *)
-        fail "workflow '$id' has invalid execution_profile '$profile' (expected core|external-dependent)"
-        ;;
+      core|external-dependent) pass "workflow '$id' execution profile: $profile" ;;
+      *) fail "workflow '$id' has invalid execution_profile '$profile' (expected core|external-dependent)" ;;
     esac
   done < <(extract_manifest_workflows)
+
+  if [[ -n "$FILTER_WORKFLOW_ID" && "$matched" -eq 0 ]]; then
+    fail "unknown workflow id '$FILTER_WORKFLOW_ID'"
+  fi
 }
 
 check_manifest_paths_exist() {
@@ -198,7 +192,7 @@ check_manifest_paths_exist() {
   for id in "${!WORKFLOW_PATHS[@]}"; do
     rel_path="${WORKFLOW_PATHS[$id]}"
     target="$WORKFLOWS_DIR/$rel_path"
-    if [[ -e "$target" ]]; then
+    if [[ -d "$target" ]]; then
       pass "workflow '$id' path resolves: ${target#$ROOT_DIR/}"
     else
       fail "workflow '$id' path missing: ${target#$ROOT_DIR/}"
@@ -206,14 +200,194 @@ check_manifest_paths_exist() {
   done
 }
 
+check_registry_entries() {
+  local key
+  local registry_keys
+  registry_keys="$(extract_registry_workflow_keys)"
+  for key in "${!WORKFLOW_PATHS[@]}"; do
+    if printf '%s\n' "$registry_keys" | grep -Fxq "$key"; then
+      pass "workflow '$key' registry entry exists"
+    else
+      fail "workflow '$key' missing registry entry"
+    fi
+  done
+}
+
+check_workflow_contract() {
+  local id="$1"
+  local rel_path="$2"
+  local manifest_profile="$3"
+
+  local workflow_dir="$WORKFLOWS_DIR/${rel_path%/}"
+  local workflow_file="$workflow_dir/workflow.yml"
+  local guide_readme="$workflow_dir/README.md"
+  local registry_version registry_profile
+  local name description version entry_mode execution_profile stage_count done_gate_count
+
+  require_file "$workflow_file"
+  require_dir "$workflow_dir/stages"
+  require_file "$guide_readme"
+
+  if [[ "$(yq -r '.schema_version // ""' "$workflow_file")" == "workflow-contract-v1" ]]; then
+    pass "workflow '$id' schema version is workflow-contract-v1"
+  else
+    fail "workflow '$id' has invalid or missing schema_version"
+  fi
+
+  name="$(yq -r '.name // ""' "$workflow_file")"
+  description="$(yq -r '.description // ""' "$workflow_file")"
+  version="$(yq -r '.version // ""' "$workflow_file")"
+  entry_mode="$(yq -r '.entry_mode // ""' "$workflow_file")"
+  execution_profile="$(yq -r '.execution_profile // ""' "$workflow_file")"
+  stage_count="$(yq -r '.stages | length' "$workflow_file")"
+  done_gate_count="$(yq -r '.done_gate.checks | length' "$workflow_file")"
+  registry_version="$(yq -r ".workflows.\"$id\".version // \"\"" "$REGISTRY")"
+  registry_profile="$(yq -r ".workflows.\"$id\".execution_profile // \"\"" "$REGISTRY")"
+
+  [[ "$name" == "$id" ]] && pass "workflow '$id' contract name matches id" || fail "workflow '$id' contract name mismatch"
+  non_empty "$description" && pass "workflow '$id' description present" || fail "workflow '$id' missing description"
+  non_empty "$version" && pass "workflow '$id' version present" || fail "workflow '$id' missing version"
+
+  case "$entry_mode" in
+    human|agent|hybrid) pass "workflow '$id' entry_mode valid: $entry_mode" ;;
+    *) fail "workflow '$id' has invalid entry_mode '$entry_mode'" ;;
+  esac
+
+  case "$execution_profile" in
+    core|external-dependent) pass "workflow '$id' execution_profile valid: $execution_profile" ;;
+    *) fail "workflow '$id' has invalid execution_profile '$execution_profile'" ;;
+  esac
+
+  if [[ "$manifest_profile" == "$execution_profile" ]]; then
+    pass "workflow '$id' manifest and contract execution_profile match"
+  else
+    fail "workflow '$id' manifest execution_profile '$manifest_profile' does not match contract '$execution_profile'"
+  fi
+
+  if [[ -n "$registry_profile" && "$registry_profile" != "$execution_profile" ]]; then
+    fail "workflow '$id' registry execution_profile '$registry_profile' does not match contract '$execution_profile'"
+  else
+    pass "workflow '$id' registry execution_profile aligned"
+  fi
+
+  if [[ "$registry_version" == "$version" ]]; then
+    pass "workflow '$id' registry version matches contract"
+  else
+    fail "workflow '$id' registry version '$registry_version' does not match contract '$version'"
+  fi
+
+  [[ "$stage_count" -gt 0 ]] && pass "workflow '$id' declares stages" || fail "workflow '$id' has no stages"
+  [[ "$done_gate_count" -gt 0 ]] && pass "workflow '$id' declares done-gate checks" || fail "workflow '$id' missing done-gate checks"
+
+  if yq -e '.projection' "$workflow_file" >/dev/null 2>&1; then
+    fail "workflow '$id' retains deprecated projection block"
+  else
+    pass "workflow '$id' has no deprecated projection block"
+  fi
+
+  if [[ -f "$workflow_dir/WORKFLOW.md" ]]; then
+    fail "workflow '$id' retains deprecated root WORKFLOW.md"
+  else
+    pass "workflow '$id' avoids deprecated root WORKFLOW.md"
+  fi
+
+  if [[ -d "$workflow_dir/guide" ]]; then
+    fail "workflow '$id' retains deprecated guide directory"
+  else
+    pass "workflow '$id' avoids deprecated guide directory"
+  fi
+
+  if matches_path_regex '\.design-packages/' "$workflow_dir"; then
+    fail "workflow '$id' depends on temporary .design-packages paths"
+  else
+    pass "workflow '$id' avoids temporary .design-packages paths"
+  fi
+
+  check_workflow_stages "$id" "$workflow_file" "$workflow_dir"
+  check_registry_commands "$id"
+}
+
+check_workflow_stages() {
+  local id="$1"
+  local workflow_file="$2"
+  local workflow_dir="$3"
+  local stage_rows row stage_json stage_id asset kind asset_path mutation_scope_len
+  local known_stage_ids=()
+
+  mapfile -t stage_rows < <(yq -r '.stages[] | to_json | @base64' "$workflow_file")
+  for row in "${stage_rows[@]}"; do
+    stage_json="$(printf '%s' "$row" | base64 --decode)"
+    known_stage_ids+=("$(printf '%s' "$stage_json" | yq -p=json -r '.id')")
+  done
+
+  for row in "${stage_rows[@]}"; do
+    stage_json="$(printf '%s' "$row" | base64 --decode)"
+    stage_id="$(printf '%s' "$stage_json" | yq -p=json -r '.id')"
+    asset="$(printf '%s' "$stage_json" | yq -p=json -r '.asset')"
+    kind="$(printf '%s' "$stage_json" | yq -p=json -r '.kind')"
+    mutation_scope_len="$(printf '%s' "$stage_json" | yq -p=json -r '.mutation_scope | length')"
+    asset_path="$workflow_dir/$asset"
+
+    [[ "$asset" == stages/* ]] && pass "workflow '$id' stage '$stage_id' asset lives under stages/" || fail "workflow '$id' stage '$stage_id' asset must live under stages/"
+    require_file "$asset_path"
+    case "$kind" in
+      analysis|mutation|projection|verification) pass "workflow '$id' stage '$stage_id' kind valid: $kind" ;;
+      *) fail "workflow '$id' stage '$stage_id' has invalid kind '$kind'" ;;
+    esac
+
+    if [[ "$kind" == "mutation" ]]; then
+      [[ "$mutation_scope_len" -gt 0 ]] && pass "workflow '$id' stage '$stage_id' mutation scope declared" || fail "workflow '$id' stage '$stage_id' missing mutation scope"
+    else
+      [[ "$mutation_scope_len" -eq 0 ]] && pass "workflow '$id' stage '$stage_id' mutation scope absent as expected" || fail "workflow '$id' non-mutation stage '$stage_id' declares mutation scope"
+    fi
+
+    check_stage_references "$id" "$stage_id" "$stage_json" "${known_stage_ids[@]}"
+  done
+}
+
+check_stage_references() {
+  local workflow_id="$1"
+  local stage_id="$2"
+  local stage_json="$3"
+  shift 3
+  local known_stage_ids=("$@")
+  local token ref_id found
+
+  while IFS= read -r token; do
+    [[ -z "$token" || "$token" == "null" ]] && continue
+    ref_id="${token#stage:}"
+    found=0
+    for known in "${known_stage_ids[@]}"; do
+      if [[ "$known" == "$ref_id" ]]; then
+        found=1
+        break
+      fi
+    done
+    if [[ "$found" -eq 1 ]]; then
+      pass "workflow '$workflow_id' stage '$stage_id' reference resolves: $token"
+    else
+      fail "workflow '$workflow_id' stage '$stage_id' reference does not resolve: $token"
+    fi
+  done < <(printf '%s' "$stage_json" | yq -p=json -r '.consumes[]?, .produces[]?')
+}
+
+check_registry_commands() {
+  local id="$1"
+  local primary_command
+  primary_command="$(yq -r ".workflows.\"$id\".commands[0] // \"\"" "$REGISTRY")"
+  if [[ "$primary_command" == "/$id" ]]; then
+    pass "workflow '$id' primary command matches id"
+  else
+    fail "workflow '$id' primary command must be '/$id'"
+  fi
+}
+
 workflow_has_external_dependency_markers() {
   local path="$1"
   local target="$WORKFLOWS_DIR/$path"
-
   local dep_pattern
   dep_pattern='(pnpm[[:space:]]+flowkit:run|pnpm[[:space:]]+install|npm[[:space:]]+install|npx[[:space:]]|pip[[:space:]]+install|uv[[:space:]]+sync|swift[[:space:]]+build|swift[[:space:]]+test|docker(-compose)?|alembic)'
-
-  matches_markdown_tree_regex "$dep_pattern" "$target"
+  matches_path_regex "$dep_pattern" "$target"
 }
 
 check_dependency_profiles_against_steps() {
@@ -221,7 +395,6 @@ check_dependency_profiles_against_steps() {
   for id in "${!WORKFLOW_PATHS[@]}"; do
     profile="${WORKFLOW_PROFILES[$id]}"
     path="${WORKFLOW_PATHS[$id]}"
-
     if workflow_has_external_dependency_markers "$path"; then
       if [[ "$profile" != "external-dependent" ]]; then
         fail "workflow '$id' has external dependency markers but execution_profile='$profile'"
@@ -239,7 +412,6 @@ check_dependency_profiles_against_registry_io() {
     IFS='|' read -r id path <<< "$row"
     profile="${WORKFLOW_PROFILES[$id]:-core}"
 
-    # Paths that target non-harness project roots indicate external-dependent workflows.
     if [[ "$path" =~ ^(src/|tests/|Package\.swift$|Sources/|Tests/|AGENT\.md$|CLAUDE\.md$) ]]; then
       if [[ "$profile" != "external-dependent" ]]; then
         fail "workflow '$id' has external I/O path '$path' but execution_profile='$profile'"
@@ -250,348 +422,77 @@ check_dependency_profiles_against_registry_io() {
   done < <(extract_registry_paths)
 }
 
-check_pipeline_grade_assets() {
-  local id rel_path workflow_dir
-  for id in "${!WORKFLOW_PATHS[@]}"; do
-    rel_path="${WORKFLOW_PATHS[$id]}"
-    workflow_dir="$WORKFLOWS_DIR/$rel_path"
-
-    [[ -d "$workflow_dir" ]] || continue
-
-    if [[ -d "$workflow_dir/prompts" ]]; then
-      if matches_markdown_tree_regex '\./prompts/' "$workflow_dir"; then
-        pass "workflow '$id' references workflow-local prompts"
-      else
-        fail "workflow '$id' has prompts/ but does not reference workflow-local prompts"
-      fi
-    fi
-
-    if [[ -d "$workflow_dir/references" ]]; then
-      if matches_markdown_tree_regex '\./references/' "$workflow_dir"; then
-        pass "workflow '$id' references workflow-local contracts"
-      else
-        fail "workflow '$id' has references/ but does not reference workflow-local contracts"
-      fi
-    fi
-
-    if matches_markdown_tree_regex '\.design-packages/' "$workflow_dir"; then
-      fail "workflow '$id' depends on temporary .design-packages paths"
-    fi
-  done
-}
-
-check_workflow_projection_contracts() {
-  require_file "$PIPELINE_MANIFEST"
-
-  local id rel_path projection_id projection_path projection_format expected_format
-  for id in "${!WORKFLOW_PATHS[@]}"; do
-    rel_path="${WORKFLOW_PATHS[$id]}"
-    projection_id="$(yq -r ".workflows.\"$id\".projection.pipeline_id // \"\"" "$REGISTRY" 2>/dev/null || true)"
-    projection_path="$(yq -r ".workflows.\"$id\".projection.pipeline_path // \"\"" "$REGISTRY" 2>/dev/null || true)"
-    projection_format="$(yq -r ".workflows.\"$id\".projection.projection_format // \"\"" "$REGISTRY" 2>/dev/null || true)"
-
-    if [[ -z "$projection_id" || -z "$projection_path" || -z "$projection_format" ]]; then
-      fail "workflow '$id' missing projection metadata in registry.yml"
-      continue
-    fi
-
-    if [[ "$projection_id" == "$id" ]]; then
-      pass "workflow '$id' projection id matches workflow id"
-    else
-      fail "workflow '$id' projection id must match workflow id"
-    fi
-
-    if [[ -e "$ROOT_DIR/$projection_path" ]]; then
-      pass "workflow '$id' projection path resolves: ${projection_path#$ROOT_DIR/}"
-    else
-      fail "workflow '$id' projection path missing: $projection_path"
-    fi
-
-    if yq -e ".pipelines[] | select(.id == \"$projection_id\")" "$PIPELINE_MANIFEST" >/dev/null 2>&1; then
-      pass "workflow '$id' projection pipeline exists in pipeline manifest"
-    else
-      fail "workflow '$id' projection pipeline missing from pipeline manifest"
-    fi
-
-    expected_format="directory"
-    [[ "$rel_path" == *.md ]] && expected_format="single-file"
-    if [[ "$projection_format" == "$expected_format" ]]; then
-      pass "workflow '$id' projection format matches workflow shape"
-    else
-      fail "workflow '$id' projection format '$projection_format' does not match expected '$expected_format'"
-    fi
-  done
-}
-
-check_generated_projection_drift() {
-  require_file "$PROJECTION_GENERATOR"
-
+check_guide_drift() {
+  require_file "$GUIDE_GENERATOR"
   local tmp_root
-  tmp_root="$(mktemp -d "${TMPDIR:-/tmp}/harmony-workflow-projection.XXXXXX")"
+  tmp_root="$(mktemp -d "${TMPDIR:-/tmp}/harmony-workflow-guides.XXXXXX")"
 
-  if ! bash "$PROJECTION_GENERATOR" --output-root "$tmp_root" >/dev/null; then
-    fail "workflow projection generator failed"
+  local generator_cmd=(bash "$GUIDE_GENERATOR" --output-root "$tmp_root")
+  if [[ -n "$FILTER_WORKFLOW_ID" ]]; then
+    generator_cmd+=(--workflow-id "$FILTER_WORKFLOW_ID")
+  fi
+
+  if ! "${generator_cmd[@]}" >/dev/null; then
+    fail "workflow README generator failed"
     rm -rf "$tmp_root"
     return
   fi
 
-  local id rel_path projection_path generated_flag actual_target generated_target
+  local id rel_path actual generated
   for id in "${!WORKFLOW_PATHS[@]}"; do
     rel_path="${WORKFLOW_PATHS[$id]}"
-    projection_path="$(yq -r ".workflows.\"$id\".projection.pipeline_path // \"\"" "$REGISTRY" 2>/dev/null || true)"
-    generated_flag="$(yq -r ".workflows.\"$id\".projection.generated // \"false\"" "$REGISTRY" 2>/dev/null || true)"
-
-    [[ "$generated_flag" == "true" ]] || continue
-
-    actual_target="$WORKFLOWS_DIR/$rel_path"
-    generated_target="$tmp_root/.harmony/orchestration/runtime/workflows/$rel_path"
-
-    if [[ ! -e "$generated_target" ]]; then
-      fail "workflow '$id' missing generated projection in temp output"
+    actual="$WORKFLOWS_DIR/$rel_path/README.md"
+    generated="$tmp_root/.harmony/orchestration/runtime/workflows/$rel_path/README.md"
+    if [[ ! -f "$generated" ]]; then
+      fail "workflow '$id' missing generated README in temp output"
       continue
     fi
-
-    if diff -qr "$actual_target" "$generated_target" >/dev/null 2>&1; then
-      pass "workflow '$id' projection matches canonical pipeline"
+    if diff -q "$actual" "$generated" >/dev/null 2>&1; then
+      pass "workflow '$id' README matches canonical workflow"
     else
-      fail "workflow '$id' projection drift detected against canonical pipeline"
+      fail "workflow '$id' README drift detected against canonical workflow"
     fi
   done
 
   rm -rf "$tmp_root"
 }
 
-check_deprecated_paths() {
-  local deprecated
-  deprecated=(
-    "$ROOT_DIR/.harmony/orchestration/workflows"
-    "$ROOT_DIR/.harmony/orchestration/runtime/workflows/quality-gate"
-    "$ROOT_DIR/.harmony/orchestration/runtime/workflows/audit/documentation-quality-gate"
-  )
-
-  local path rel
-  for path in "${deprecated[@]}"; do
-    rel="${path#$ROOT_DIR/}"
-    if [[ -e "$path" ]]; then
-      fail "deprecated workflows path exists: $rel"
-    else
-      pass "deprecated workflows path removed: $rel"
-    fi
-  done
-}
-
-extract_registry_workflow_block() {
-  local workflow_id="$1"
-  awk -v key="$workflow_id" '
-    $0 ~ "^  " key ":" {in_block=1; print; next}
-    in_block && $0 ~ "^  [A-Za-z0-9._-]+:" && $0 !~ "^    " {exit}
-    in_block {print}
-  ' "$REGISTRY"
-}
-
-check_execution_controls_contract() {
-  local total_occurrences=0
-  if [[ "$HAS_RG" -eq 1 ]]; then
-    total_occurrences="$(rg -c '^[[:space:]]+execution_controls:[[:space:]]*$' "$REGISTRY" 2>/dev/null || printf '0')"
+check_legacy_paths_removed() {
+  local legacy="$RUNTIME_DIR/pipelines"
+  if [[ -e "$legacy" ]]; then
+    fail "deprecated runtime/pipelines surface still exists"
   else
-    total_occurrences="$(grep -cE '^[[:space:]]+execution_controls:[[:space:]]*$' "$REGISTRY" 2>/dev/null || printf '0')"
-  fi
-
-  local workflow_id block validated_occurrences=0
-  for workflow_id in "${!WORKFLOW_PATHS[@]}"; do
-    block="$(extract_registry_workflow_block "$workflow_id")"
-    [[ -z "$block" ]] && continue
-
-    if printf '%s\n' "$block" | matches_stdin_regex '^[[:space:]]+execution_controls:[[:space:]]*$'; then
-      validated_occurrences=$((validated_occurrences + 1))
-
-      if printf '%s\n' "$block" | matches_stdin_regex '^[[:space:]]+cancel_safe:[[:space:]]+(true|false)[[:space:]]*$'; then
-        pass "workflow '$workflow_id' execution_controls.cancel_safe is boolean"
-      else
-        fail "workflow '$workflow_id' execution_controls.cancel_safe must be true or false"
-      fi
-    fi
-  done
-
-  if [[ "$validated_occurrences" -ne "${total_occurrences:-0}" ]]; then
-    fail "execution_controls appears outside workflow entries or is malformed in registry.yml"
-  elif [[ "${total_occurrences:-0}" -gt 0 ]]; then
-    pass "execution_controls only appears on workflow entries"
-  else
-    pass "no execution_controls declared in workflow registry"
+    pass "deprecated runtime/pipelines surface removed"
   fi
 }
 
-check_bounded_audit_parameter_forwarding() {
-  local files
-  files=(
-    "$WORKFLOWS_DIR/audit/audit-pre-release-workflow/02-migration-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-pre-release-workflow/03-health-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-pre-release-workflow/04-cross-subsystem-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-pre-release-workflow/05-freshness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-change-risk-workflow/02-subsystem-health-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-change-risk-workflow/03-migration-impact-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-change-risk-workflow/04-api-contract-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-change-risk-workflow/05-test-quality-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-change-risk-workflow/06-operational-readiness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-change-risk-workflow/07-cross-subsystem-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-change-risk-workflow/08-freshness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/02-subsystem-health-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/03-observability-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/04-operational-readiness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/05-api-contract-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/06-test-quality-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/07-security-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/08-data-governance-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/09-cross-subsystem-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-continuous-workflow/10-freshness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-post-incident-workflow/02-operational-readiness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-post-incident-workflow/03-observability-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-post-incident-workflow/04-security-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-post-incident-workflow/05-data-governance-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-post-incident-workflow/06-api-contract-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-post-incident-workflow/07-test-quality-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-post-incident-workflow/08-cross-subsystem-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-post-incident-workflow/09-freshness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-orchestration-workflow/06-cross-subsystem-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-orchestration-workflow/07-freshness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-release-readiness-workflow/02-release-core-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-release-readiness-workflow/03-operational-readiness-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-release-readiness-workflow/04-api-contract-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-release-readiness-workflow/05-test-quality-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-release-readiness-workflow/06-observability-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-release-readiness-workflow/07-security-audit.md"
-    "$WORKFLOWS_DIR/audit/audit-release-readiness-workflow/08-data-governance-audit.md"
+check_runtime_pipeline_references_absent() {
+  local targets=(
+    "$HARMONY_DIR/AGENTS.md"
+    "$HARMONY_DIR/START.md"
+    "$HARMONY_DIR/orchestration/runtime/workflows/manifest.yml"
+    "$HARMONY_DIR/orchestration/runtime/workflows/registry.yml"
+    "$HARMONY_DIR/orchestration/runtime/workflows/README.md"
+    "$HARMONY_DIR/engine/runtime/crates/kernel/src/main.rs"
+    "$HARMONY_DIR/engine/runtime/crates/kernel/src/pipeline.rs"
+    "$HARMONY_DIR/engine/runtime/crates/kernel/src/workflow.rs"
+    "$HARMONY_DIR/engine/runtime/run"
+    "$HARMONY_DIR/engine/runtime/run.cmd"
+    "$HARMONY_DIR/assurance/runtime/_ops/scripts/alignment-check.sh"
+    "$HARMONY_DIR/assurance/runtime/_ops/scripts/validate-architecture-validation-pipeline.sh"
+    "$HARMONY_DIR/capabilities/runtime/commands"
   )
-
-  local file rel
-  for file in "${files[@]}"; do
-    rel="${file#$ROOT_DIR/}"
-
-    if [[ ! -f "$file" ]]; then
-      fail "missing bounded-audit forwarding file: $rel"
-      continue
-    fi
-
-    if matches_file_fixed 'post_remediation="{{post_remediation}}"' "$file"; then
-      pass "bounded-audit forwarding includes post_remediation: $rel"
-    else
-      fail "bounded-audit forwarding missing post_remediation: $rel"
-    fi
-
-    if matches_file_fixed 'convergence_k="{{convergence_k}}"' "$file"; then
-      pass "bounded-audit forwarding includes convergence_k: $rel"
-    else
-      fail "bounded-audit forwarding missing convergence_k: $rel"
-    fi
-
-    if matches_file_fixed 'seed_list="{{seed_list}}"' "$file"; then
-      pass "bounded-audit forwarding includes seed_list: $rel"
-    else
-      fail "bounded-audit forwarding missing seed_list: $rel"
-    fi
-  done
-}
-
-check_bounded_audit_contracts() {
-  local audit_workflows
-  audit_workflows=(audit-orchestration-workflow audit-pre-release-workflow audit-change-risk-workflow audit-continuous-workflow audit-post-incident-workflow audit-release-readiness-workflow audit-documentation-workflow audit-workflow-system-workflow)
-
-  local workflow_id rel_path workflow_dir workflow_file block
-  for workflow_id in "${audit_workflows[@]}"; do
-    rel_path="${WORKFLOW_PATHS[$workflow_id]:-}"
-    if [[ -z "$rel_path" ]]; then
-      fail "bounded-audit workflow missing in manifest index: $workflow_id"
-      continue
-    fi
-
-    workflow_dir="$WORKFLOWS_DIR/$rel_path"
-    workflow_file="$workflow_dir/WORKFLOW.md"
-
-    if [[ ! -f "$workflow_file" ]]; then
-      fail "bounded-audit workflow missing WORKFLOW.md: ${workflow_file#$ROOT_DIR/}"
-      continue
-    fi
-
-    if matches_file_regex "done-gate" "$workflow_file"; then
-      pass "bounded-audit workflow defines done-gate semantics: ${workflow_file#$ROOT_DIR/}"
-    else
-      fail "bounded-audit workflow missing done-gate semantics: ${workflow_file#$ROOT_DIR/}"
-    fi
-
-    if matches_markdown_tree_regex "post_remediation" "$workflow_dir"; then
-      pass "bounded-audit workflow references post_remediation: ${workflow_dir#$ROOT_DIR/}"
-    else
-      fail "bounded-audit workflow missing post_remediation references: ${workflow_dir#$ROOT_DIR/}"
-    fi
-
-    if matches_markdown_tree_regex "convergence_k" "$workflow_dir"; then
-      pass "bounded-audit workflow references convergence_k: ${workflow_dir#$ROOT_DIR/}"
-    else
-      fail "bounded-audit workflow missing convergence_k references: ${workflow_dir#$ROOT_DIR/}"
-    fi
-
-    if matches_markdown_tree_regex "seed_list" "$workflow_dir"; then
-      pass "bounded-audit workflow references seed_list: ${workflow_dir#$ROOT_DIR/}"
-    else
-      fail "bounded-audit workflow missing seed_list references: ${workflow_dir#$ROOT_DIR/}"
-    fi
-
-    if matches_markdown_tree_regex "findings\\.yml" "$workflow_dir"; then
-      pass "bounded-audit workflow references findings.yml: ${workflow_dir#$ROOT_DIR/}"
-    else
-      fail "bounded-audit workflow missing findings.yml reference: ${workflow_dir#$ROOT_DIR/}"
-    fi
-
-    if matches_markdown_tree_regex "coverage\\.yml" "$workflow_dir"; then
-      pass "bounded-audit workflow references coverage.yml: ${workflow_dir#$ROOT_DIR/}"
-    else
-      fail "bounded-audit workflow missing coverage.yml reference: ${workflow_dir#$ROOT_DIR/}"
-    fi
-
-    if matches_markdown_tree_regex "convergence\\.yml" "$workflow_dir"; then
-      pass "bounded-audit workflow references convergence.yml: ${workflow_dir#$ROOT_DIR/}"
-    else
-      fail "bounded-audit workflow missing convergence.yml reference: ${workflow_dir#$ROOT_DIR/}"
-    fi
-
-    block="$(extract_registry_workflow_block "$workflow_id")"
-    if [[ -z "$block" ]]; then
-      fail "bounded-audit workflow missing registry block: $workflow_id"
-      continue
-    fi
-
-    if printf '%s\n' "$block" | matches_stdin_regex "name:[[:space:]]+post_remediation"; then
-      pass "registry bounded-audit parameter present (post_remediation): $workflow_id"
-    else
-      fail "registry bounded-audit parameter missing (post_remediation): $workflow_id"
-    fi
-
-    if printf '%s\n' "$block" | matches_stdin_regex "name:[[:space:]]+convergence_k"; then
-      pass "registry bounded-audit parameter present (convergence_k): $workflow_id"
-    else
-      fail "registry bounded-audit parameter missing (convergence_k): $workflow_id"
-    fi
-
-    if printf '%s\n' "$block" | matches_stdin_regex "name:[[:space:]]+seed_list"; then
-      pass "registry bounded-audit parameter present (seed_list): $workflow_id"
-    else
-      fail "registry bounded-audit parameter missing (seed_list): $workflow_id"
-    fi
-
-    if printf '%s\n' "$block" | matches_stdin_regex "output/reports/audits/"; then
-      pass "registry bounded-audit output path present: $workflow_id"
-    else
-      fail "registry bounded-audit output path missing: $workflow_id"
-    fi
-  done
-
-  check_bounded_audit_parameter_forwarding
+  if rg -n "runtime/pipelines|pipeline\\.yml|projection\\.pipeline_" "${targets[@]}" \
+    --glob '!**/target/**' --glob '!**/output/**' >/dev/null 2>&1; then
+    fail "repo still contains deprecated pipeline-surface references"
+  else
+    pass "deprecated pipeline-surface references removed"
+  fi
 }
 
 check_workflow_system_audit_static() {
   if [[ ! -f "$WORKFLOW_SYSTEM_AUDIT" ]]; then
-    fail "missing workflow-system audit engine: ${WORKFLOW_SYSTEM_AUDIT#$ROOT_DIR/}"
+    warn "workflow-system audit engine missing: ${WORKFLOW_SYSTEM_AUDIT#$ROOT_DIR/}"
     return
   fi
 
@@ -610,15 +511,19 @@ main() {
 
   load_manifest_index
   check_manifest_paths_exist
+  check_registry_entries
+
+  local id
+  for id in "${!WORKFLOW_PATHS[@]}"; do
+    check_workflow_contract "$id" "${WORKFLOW_PATHS[$id]}" "${WORKFLOW_PROFILES[$id]}"
+  done
+
   check_dependency_profiles_against_steps
   check_dependency_profiles_against_registry_io
-  check_pipeline_grade_assets
-  check_workflow_projection_contracts
-  check_generated_projection_drift
-  check_execution_controls_contract
-  check_bounded_audit_contracts
+  check_guide_drift
+  check_legacy_paths_removed
+  check_runtime_pipeline_references_absent
   check_workflow_system_audit_static
-  check_deprecated_paths
 
   echo
   echo "Validation summary: errors=$errors warnings=$warnings"

@@ -18,7 +18,7 @@ pub fn validate_snapshot(snapshot: &WorkflowIndexSnapshot) -> Vec<ValidationIssu
             issues.push(ValidationIssue {
                 code: "missing-workflow-file",
                 workflow_id: Some(workflow.id.clone()),
-                message: format!("Workflow '{}' is missing WORKFLOW.md", workflow.id),
+                message: format!("Workflow '{}' is missing README.md", workflow.id),
                 path: Some(workflow.workflow_file.clone()),
             });
         }

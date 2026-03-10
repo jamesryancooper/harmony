@@ -44,7 +44,7 @@ Canonical post-cutover authorities:
   - `/.harmony/capabilities/governance/policy/deny-by-default.v2.yml`
 - Assurance and workflow fail-closed enforcement:
   - `/.harmony/assurance/runtime/_ops/scripts/alignment-check.sh`
-  - `/.harmony/orchestration/runtime/workflows/audit/audit-pre-release-workflow/`
+  - `/.harmony/orchestration/runtime/workflows/audit/audit-pre-release/`
 
 ## 4) Clean-Break Constraints (Affirm)
 
