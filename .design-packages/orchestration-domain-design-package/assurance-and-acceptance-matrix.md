@@ -48,6 +48,8 @@ Define how the orchestration model will be validated before promotion into live
   projections
 - mission identity, lifecycle, and linkage authority are validated at
   `mission.yml`, not in `mission.md` or registry projections
+- campaign coordination authority is validated at schema-backed `campaign.yml`,
+  not in `log.md` narrative notes or `registry.yml` projections
 
 ### Schema And Shape Validation
 
@@ -68,6 +70,9 @@ Define how the orchestration model will be validated before promotion into live
 - incidents preserve `index.yml`, canonical per-incident `incident.yml`
   records, optional `actions.yml`, and subordinate evidence artifacts without
   collapsing authority into prose
+- campaigns preserve `manifest.yml`, `registry.yml`, canonical per-campaign
+  `campaign.yml` records, and subordinate `log.md` evidence without collapsing
+  authority into Markdown
 - state directories and indexes are present where required
 - schema-backed fixtures pass/fail under
   `validate-orchestration-design-package.sh`
@@ -109,6 +114,7 @@ Define how the orchestration model will be validated before promotion into live
 - campaigns do not become execution containers
 - runtime surfaces do not self-authorize policy exceptions
 - watcher `state/` does not become the canonical event or evidence surface
+- campaigns do not become execution containers or override mission state
 
 ### Queue Lease And Retry Checks
 
@@ -163,6 +169,8 @@ Define how the orchestration model will be validated before promotion into live
 - existing mission surfaces preserve `registry.yml -> mission.yml -> mission.md`
   authority order and keep task/log/context state subordinate to the canonical
   mission object
+- campaigns preserve `manifest.yml -> registry.yml -> campaign.yml -> log.md`
+  authority order
 
 ## Surface Acceptance Criteria
 
@@ -175,7 +183,7 @@ Define how the orchestration model will be validated before promotion into live
 | `watchers` | watcher definition family validates; rule and emitted-event references resolve; event envelope valid; mutable state and evidence stay separate; no direct launch authority |
 | `queue` | automation-ingress only; event fan-out, claim token, lease, retry, and dead-letter semantics deterministic |
 | `incidents` | `incident.yml` validates; `actions.yml` validates when present; lifecycle and closure evidence rules hold; escalation is visible; prose evidence remains subordinate to machine state |
-| `campaigns` | aggregation only; no execution ownership; optionality preserved |
+| `campaigns` | `campaign.yml` validates; mission and milestone references resolve; registry/log artifacts remain subordinate; aggregation-only and optionality rules hold |
 
 ## Portability And Support-Target Considerations
 

@@ -53,7 +53,7 @@ The mature model should preserve a split between:
 
 | Concern | Canonical Home | Notes |
 |---|---|---|
-| Campaign definitions | `orchestration/runtime/campaigns/` | Proposed strategic portfolio containers |
+| Campaign objects | `orchestration/runtime/campaigns/` | Proposed strategic coordination objects above missions |
 | Workflow definitions | `orchestration/runtime/workflows/` | Bounded procedural definitions |
 | Mission state | `orchestration/runtime/missions/` | Bounded initiative state |
 | Automation definitions | `orchestration/runtime/automations/` | Proposed launch policy definitions |
@@ -142,9 +142,7 @@ campaigns/
 ├── manifest.yml
 ├── registry.yml
 └── <campaign-id>/
-    ├── campaign.md
-    ├── milestones.yml
-    ├── missions.yml
+    ├── campaign.yml
     └── log.md
 ```
 

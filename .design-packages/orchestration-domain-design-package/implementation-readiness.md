@@ -34,7 +34,8 @@ rollout remains a separate canonicalization step.
 - codified incident object lifecycle and closure rules, clarifying that runtime
   incident state lives in schema-backed `incident.yml` with subordinate action
   and evidence artifacts
-- codified campaign object state and lifecycle
+- codified `campaigns` as an optional coordination-object surface with a
+  schema-backed `campaign.yml` authority artifact and subordinate `log.md`
 - codified canonical cross-surface identifiers and references
 - added package-local domain model, runtime architecture, execution model,
   lifecycle model, dependency-resolution algorithm, governance model,
@@ -63,7 +64,7 @@ rollout remains a separate canonicalization step.
 |---|---|---|
 | `workflows` | implementation-ready | package-local domain, execution, lifecycle, governance, run-linkage rules, and a schema-backed `workflow.yml` definition contract |
 | `missions` | implementation-ready | package-local domain, execution, lifecycle, schema-backed `mission.yml` mission object, and mission/run linkage contracts |
-| `campaigns` | implementation-ready | package-local domain and lifecycle rules plus campaign contracts |
+| `campaigns` | implementation-ready | package-local domain and lifecycle rules, a schema-backed `campaign.yml` object contract, and campaign/mission coordination rules |
 | `automations` | implementation-ready | execution model, dependency resolution, failure model, automation execution contract, and schema-backed `automation.yml` / `trigger.yml` / `bindings.yml` / `policy.yml` authority artifacts |
 | `watchers` | implementation-ready | runtime architecture, dependency resolution, observability, watcher definition contract, and watcher event contract |
 | `queue` | implementation-ready | dependency resolution, runtime architecture, failure model, and queue item / lease contract |
@@ -75,7 +76,7 @@ rollout remains a separate canonicalization step.
 - `contracts/versioning-and-compatibility-policy.md` — `package-normative`
 - `contracts/cross-surface-reference-contract.md` — `package-normative`
 - `contracts/decision-record-contract.md` — `schema-backed` via `contracts/schemas/decision-record.schema.json`
-- `contracts/campaign-object-contract.md` — `package-normative`
+- `contracts/campaign-object-contract.md` — `schema-backed` via `contracts/schemas/campaign-object.schema.json`
 - `contracts/workflow-execution-contract.md` — `schema-backed` via `contracts/schemas/workflow-execution.schema.json`
 - `contracts/mission-object-contract.md` — `schema-backed` via `contracts/schemas/mission-object.schema.json`
 - `contracts/automation-execution-contract.md` — `schema-backed` via `contracts/schemas/automation-execution.schema.json` (aggregate proof over `automation.yml`, `trigger.yml`, `bindings.yml`, and `policy.yml`)
@@ -228,6 +229,13 @@ This package aligns with Harmony's philosophy because it preserves:
       `actions.yml` validates whenever present.
 - [ ] `timeline.md` and `closure.md` remain subordinate evidence and never
       replace required structured closure fields or linkage in `incident.yml`.
+- [ ] Every `campaign.yml` validates against the campaign object schema.
+- [ ] `campaign.yml` is authoritative for campaign lifecycle, mission
+      membership, milestones, and completion-waiver metadata; `registry.yml`
+      and `log.md` remain subordinate.
+- [ ] Campaign mission references resolve by canonical `mission_id`, and
+      campaign rollups do not override mission lifecycle or run evidence
+      authority.
 - [ ] Every schema-backed contract has a valid JSON Schema plus one valid and
       one invalid fixture.
 - [ ] Required surface-local artifacts validate against their declared schemas.

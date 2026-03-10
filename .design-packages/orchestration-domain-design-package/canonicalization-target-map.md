@@ -19,7 +19,7 @@ A package-defined surface is not live canonical until it has:
 
 | Surface | Runtime Targets | Practices Targets | Governance Targets | Validation Targets |
 |---|---|---|---|---|
-| `campaigns` | `runtime/campaigns/README.md`, `runtime/campaigns/manifest.yml`, `runtime/campaigns/registry.yml` | `practices/campaign-lifecycle-standards.md` | optional addendum in `governance/README.md` | `runtime/campaigns/_ops/scripts/validate-campaigns.sh` |
+| `campaigns` | `runtime/campaigns/README.md`, `runtime/campaigns/manifest.yml`, `runtime/campaigns/registry.yml`, `runtime/campaigns/<campaign-id>/campaign.yml`, `runtime/campaigns/<campaign-id>/log.md` | `practices/campaign-lifecycle-standards.md` | optional addendum in `governance/README.md` | `runtime/campaigns/_ops/scripts/validate-campaigns.sh` |
 | `automations` | `runtime/automations/README.md`, `runtime/automations/manifest.yml`, `runtime/automations/registry.yml` | `practices/automation-authoring-standards.md`, `practices/automation-operations.md` | `governance/automation-policy.md` | `runtime/automations/_ops/scripts/validate-automations.sh` |
 | `watchers` | `runtime/watchers/README.md`, `runtime/watchers/manifest.yml`, `runtime/watchers/registry.yml`, `runtime/watchers/<watcher-id>/watcher.yml`, `runtime/watchers/<watcher-id>/sources.yml`, `runtime/watchers/<watcher-id>/rules.yml`, `runtime/watchers/<watcher-id>/emits.yml`, `runtime/watchers/<watcher-id>/state/` | `practices/watcher-authoring-standards.md`, `practices/watcher-operations.md` | `governance/watcher-signal-policy.md` | `runtime/watchers/_ops/scripts/validate-watchers.sh` |
 | `queue` | `runtime/queue/README.md`, `runtime/queue/registry.yml`, `runtime/queue/schema.yml`, `runtime/queue/pending/`, `runtime/queue/claimed/`, `runtime/queue/retry/`, `runtime/queue/dead-letter/`, `runtime/queue/receipts/` | `practices/queue-operations-standards.md` | `governance/queue-safety-policy.md` | `runtime/queue/_ops/scripts/validate-queue.sh` |
@@ -167,6 +167,19 @@ When `runs` is promoted, live Harmony must preserve:
   object/state record
 - `runtime/runs/by-surface/` as non-authoritative reverse-lookup projections
 - `continuity/runs/<run-id>/` as the durable evidence authority
+
+## Campaign Promotion Note
+
+When `campaigns` are promoted, live Harmony must preserve:
+
+- `runtime/campaigns/manifest.yml` as lightweight surface discovery
+- `runtime/campaigns/registry.yml` as campaign lookup projection only
+- `runtime/campaigns/<campaign-id>/campaign.yml` as the canonical campaign
+  object/state record
+- `runtime/campaigns/<campaign-id>/log.md` as subordinate coordination notes
+  and waiver/evidence context
+- campaign optionality and the rule that campaigns do not become execution
+  containers or a second mission system
 
 ## Queue Promotion Note
 
