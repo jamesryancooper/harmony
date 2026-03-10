@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.8](https://github.com/jamesryancooper/harmony/compare/harmony-v0.4.7...harmony-v0.4.8) (2026-03-10)
+
+
+### Features
+
+* **orchestration:** model campaigns as schema-backed objects ([#126](https://github.com/jamesryancooper/harmony/issues/126)) ([b4c0408](https://github.com/jamesryancooper/harmony/commit/b4c0408c30fd05f81f745427cbaa1ecf05bb3a14))
+
 ## [0.4.7](https://github.com/jamesryancooper/harmony/compare/harmony-v0.4.6...harmony-v0.4.7) (2026-03-07)
 
 
