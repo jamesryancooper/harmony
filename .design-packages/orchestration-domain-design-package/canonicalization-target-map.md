@@ -86,10 +86,64 @@ following addenda:
   - validate `workflow.yml`, stage asset resolution, and non-authoritative
     registry/README drift checks
 - `runtime/missions/README.md`
-  - add mission linkage fields for `campaign_id`, `default_workflow_refs`, and
-    `related_run_ids`
+  - define mission authority order as `registry.yml -> mission.yml ->
+    mission.md`; keep tasks/log/context subordinate to the canonical mission
+    object
+- `runtime/missions/registry.yml`
+  - keep discovery and lifecycle projections lightweight; do not make registry
+    entries canonical for mission ownership, success criteria, or linkage
+- `runtime/missions/_scaffold/template/mission.yml`
+  - add the schema-backed mission object with lifecycle, ownership, success
+    criteria, and linkage fields
+- `runtime/missions/<mission-id>/mission.yml`
+  - make `mission.yml` the authoritative mission artifact for identity,
+    lifecycle, and cross-surface linkage
+- `runtime/missions/<mission-id>/mission.md`
+  - keep goal, scope, and operator narrative subordinate to `mission.yml`
 - `practices/mission-lifecycle-standards.md`
-  - add mission/run/decision linkage expectations
+  - add `mission.yml` authority, mission/run/decision linkage expectations, and
+    archive semantics
+- `runtime/missions/_ops/scripts/validate-missions.sh`
+  - validate `mission.yml`, registry projection drift, and archive-state
+    semantics
+
+## Automation Promotion Targets
+
+If `automations` are promoted, the live Harmony surface should receive the
+following artifacts and constraints:
+
+- `runtime/automations/README.md`
+  - define authority order as `manifest.yml -> registry.yml -> automation.yml +
+    trigger.yml + bindings.yml + policy.yml -> state/`; keep README
+    explanatory only
+- `runtime/automations/manifest.yml`
+  - discovery identity, summary, and canonical path projection only
+- `runtime/automations/registry.yml`
+  - lightweight routing metadata, dependency projections, and state pointers;
+    do not make registry fields canonical for trigger or policy semantics
+- `runtime/automations/_scaffold/template/automation.yml`
+  - canonical automation identity, workflow target, owner, and lifecycle state
+- `runtime/automations/_scaffold/template/trigger.yml`
+  - canonical schedule/event selection contract
+- `runtime/automations/_scaffold/template/bindings.yml`
+  - canonical defaults and event-binding contract, including the empty-object
+    case
+- `runtime/automations/_scaffold/template/policy.yml`
+  - canonical concurrency, idempotency, retry, and incident-escalation policy
+- `runtime/automations/<automation-id>/`
+  - preserve the split definition layer rather than collapsing authority into
+    registry metadata or prose
+- `practices/automation-authoring-standards.md`
+  - require file-level schema-backed authority and forbid trigger selection in
+    bindings or policy
+- `practices/automation-operations.md`
+  - define pause/resume, replay, retry, and state/evidence operating guidance
+- `governance/automation-policy.md`
+  - define how automation launch authority composes with workflow governance,
+    approvals, incident thresholds, and objective scope
+- `runtime/automations/_ops/scripts/validate-automations.sh`
+  - validate `automation.yml`, `trigger.yml`, `bindings.yml`, and `policy.yml`
+    first, then drift-check registry and state projections
 
 ## Canonicalization Sequence
 

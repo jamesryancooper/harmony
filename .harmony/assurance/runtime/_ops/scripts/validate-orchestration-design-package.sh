@@ -34,7 +34,10 @@ REQUIRED_NORMATIVE_DOCS=(
 SUPPLEMENTARY_SCHEMA_BASES=(
   "approval-and-override"
   "approver-authority-registry"
+  "automation-definition"
   "automation-bindings"
+  "automation-trigger"
+  "automation-policy"
   "coordination-lock"
   "workflow-execution"
   "watcher-definition"
@@ -254,6 +257,13 @@ validate_automation_execution_fixture() {
   jq -e '
     def nonempty_string: type == "string" and length > 0;
     def iso_duration: type == "string" and test("^P(T.*)?[0-9A-Z]+.*$");
+    def scalar_param_map_valid:
+      type == "object"
+      and all(
+        to_entries[];
+        (.key | type == "string" and length > 0)
+        and (.value | type == "string" or type == "number" or type == "boolean")
+      );
     def binding_map_valid:
       type == "object"
       and all(
@@ -268,14 +278,26 @@ validate_automation_execution_fixture() {
           or ((.value | has("default")) | not)
         )
       );
+    def incident_policy_valid:
+      type == "object"
+      and (.open_incident_on | type == "array" and length > 0)
+      and all(
+        .open_incident_on[];
+        ["repeated-terminal-failure","retry-exhausted","launch-commit-failure","evidence-write-failure"] | index(.) != null
+      );
     def workflow_ref_valid:
       type == "object"
       and (.workflow_group | nonempty_string)
       and (.workflow_id | nonempty_string);
+    def positive_integer:
+      type == "number"
+      and . >= 1
+      and floor == .;
     def string_array:
       type == "array"
       and length > 0
-      and all(.[]; type == "string" and length > 0);
+      and all(.[]; type == "string" and length > 0)
+      and ((unique | length) == length);
     type == "object"
     and (.automation | type == "object")
     and (.automation.automation_id | nonempty_string)
@@ -293,6 +315,7 @@ validate_automation_execution_fixture() {
         and (.trigger.schedule.at | type == "string" and test("^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"))
         and (.trigger.schedule.timezone | nonempty_string)
         and ((.trigger.schedule.missed_run_policy as $m | ["skip","run_immediately","next_window"] | index($m)) != null)
+        and ((.trigger | has("event")) | not)
       )
     )
     and (
@@ -306,37 +329,42 @@ validate_automation_execution_fixture() {
           ((.trigger.event | has("dedupe_window")) | not)
           or (.trigger.event.dedupe_window | iso_duration)
         )
+        and ((.trigger | has("schedule")) | not)
       )
+    )
+    and (.bindings | type == "object")
+    and (
+      ((.bindings | has("default_params")) | not)
+      or (.bindings.default_params | scalar_param_map_valid)
     )
     and (
-      (has("bindings") | not)
-      or (
-        (.bindings | type == "object")
-        and (
-          ((.bindings | has("event_to_param_map")) | not)
-          or (.bindings.event_to_param_map | binding_map_valid)
-        )
-      )
+      ((.bindings | has("event_to_param_map")) | not)
+      or (.bindings.event_to_param_map | binding_map_valid)
     )
     and (.policy | type == "object")
-    and (.policy.max_concurrency | type == "number" and . >= 1)
+    and (.policy.max_concurrency | positive_integer)
     and ((.policy.concurrency_mode as $m | ["serialize","drop","replace","parallel"] | index($m)) != null)
     and (.policy.idempotency_strategy | type == "object")
     and ((.policy.idempotency_strategy.kind as $k | ["event-dedupe","schedule-window"] | index($k)) != null)
     and (.policy.idempotency_strategy.key_fields | string_array)
     and (.policy.retry_policy | type == "object")
-    and (.policy.retry_policy.max_attempts | type == "number" and . >= 1)
+    and (.policy.retry_policy.max_attempts | positive_integer)
     and ((.policy.retry_policy.backoff as $b | ["fixed","linear","exponential"] | index($b)) != null)
     and (
       .policy.retry_policy.retryable_classes
       | type == "array"
       and length > 0
+      and ((unique | length) == length)
       and all(
         .[];
         ["validation_failure","reference_resolution_failure","policy_denied","approval_missing","transient_runtime_failure","terminal_runtime_failure","concurrency_conflict","binding_validation_failure","lock_acquisition_failure","lock_lost_during_execution","executor_liveness_failure","stale_claim","evidence_write_failure","launch_commit_failure","manual_quarantine"] | index(.) != null
       )
     )
     and (.policy.pause_on_error | type == "boolean")
+    and (
+      ((.policy | has("incident_policy")) | not)
+      or (.policy.incident_policy | incident_policy_valid)
+    )
     and (
       if (.policy.concurrency_mode == "serialize" or .policy.concurrency_mode == "replace")
       then (.policy.max_concurrency == 1)
@@ -411,6 +439,63 @@ validate_workflow_execution_fixture() {
   ' "$file" >/dev/null
 }
 
+validate_mission_object_fixture() {
+  local file="$1"
+  jq -e '
+    def nonempty_string: type == "string" and length > 0;
+    def valid_time: type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T.+$");
+    def workflow_ref_valid:
+      type == "object"
+      and (.workflow_group | nonempty_string)
+      and (.workflow_id | nonempty_string);
+    def string_array_or_empty:
+      type == "array"
+      and all(.[]; type == "string" and length > 0);
+    type == "object"
+    and (.schema_version == "mission-object-v1")
+    and (.mission_id | nonempty_string)
+    and (.title | nonempty_string)
+    and (.summary | nonempty_string)
+    and ((.status as $s | ["created","active","completed","cancelled","archived"] | index($s)) != null)
+    and (.owner | nonempty_string)
+    and (.created_at | valid_time)
+    and (
+      .success_criteria
+      | type == "array"
+      and length > 0
+      and all(.[]; type == "string" and length > 0)
+    )
+    and (
+      (has("campaign_id") | not)
+      or (.campaign_id | nonempty_string)
+    )
+    and (
+      (has("default_workflow_refs") | not)
+      or (
+        .default_workflow_refs
+        | type == "array"
+        and all(.[]; workflow_ref_valid)
+      )
+    )
+    and (
+      (has("active_run_ids") | not)
+      or (.active_run_ids | string_array_or_empty)
+    )
+    and (
+      (has("recent_run_ids") | not)
+      or (.recent_run_ids | string_array_or_empty)
+    )
+    and (
+      (has("related_run_ids") | not)
+      or (.related_run_ids | string_array_or_empty)
+    )
+    and (
+      (.status != "archived")
+      or (.archived_from_status == "completed" or .archived_from_status == "cancelled")
+    )
+  ' "$file" >/dev/null
+}
+
 validate_coordination_lock_fixture() {
   local file="$1"
   jq -e '
@@ -469,16 +554,140 @@ validate_automation_bindings_fixture() {
   jq -e '
     type == "object"
     and (
-      (.event_to_param_map | type == "object")
-      and all(
+      ((has("default_params") | not)
+      or (
+        .default_params
+        | type == "object"
+        and all(
+          to_entries[];
+          (.key | type == "string" and length > 0)
+          and (.value | type == "string" or type == "number" or type == "boolean")
+        )
+      ))
+    )
+    and (
+      ((has("event_to_param_map") | not)
+      or (
         .event_to_param_map
-        | to_entries[];
-        (.key | type == "string" and length > 0)
-        and (.value.from | type == "string" and test("^event(\\.[A-Za-z0-9_-]+)+$"))
-        and (.value.required | type == "boolean")
-        and (.value.value_type as $t | ["string","integer","number","boolean"] | index($t) != null)
-        and ((.value.required == false) or ((.value | has("default")) | not))
+        | type == "object"
+        and all(
+          to_entries[];
+          (.key | type == "string" and length > 0)
+          and (.value.from | type == "string" and test("^event(\\.[A-Za-z0-9_-]+)+$"))
+          and (.value.required | type == "boolean")
+          and (.value.value_type as $t | ["string","integer","number","boolean"] | index($t) != null)
+          and ((.value.required == false) or ((.value | has("default")) | not))
+        )
+      ))
+    )
+  ' "$file" >/dev/null
+}
+
+validate_automation_definition_fixture() {
+  local file="$1"
+  jq -e '
+    def nonempty_string: type == "string" and length > 0;
+    type == "object"
+    and (.automation_id | nonempty_string)
+    and (.title | nonempty_string)
+    and (.workflow_ref | type == "object")
+    and (.workflow_ref.workflow_group | nonempty_string)
+    and (.workflow_ref.workflow_id | nonempty_string)
+    and (.owner | nonempty_string)
+    and ((.status as $s | ["active","paused","disabled","error"] | index($s)) != null)
+  ' "$file" >/dev/null
+}
+
+validate_automation_trigger_fixture() {
+  local file="$1"
+  jq -e '
+    def nonempty_string: type == "string" and length > 0;
+    def iso_duration: type == "string" and test("^P(T.*)?[0-9A-Z]+.*$");
+    def string_array:
+      type == "array"
+      and length > 0
+      and all(.[]; type == "string" and length > 0);
+    type == "object"
+    and ((.kind as $k | ["schedule","event"] | index($k)) != null)
+    and (
+      (.kind != "schedule")
+      or (
+        (.schedule | type == "object")
+        and (.schedule.cadence | type == "string" and test("^(hourly:(?:[1-9]|1[0-9]|2[0-4])|daily|weekly:(?:MO|TU|WE|TH|FR|SA|SU)(?:,(?:MO|TU|WE|TH|FR|SA|SU))*)$"))
+        and (.schedule.at | type == "string" and test("^(?:[01][0-9]|2[0-3]):[0-5][0-9]$"))
+        and (.schedule.timezone | nonempty_string)
+        and ((.schedule.missed_run_policy as $m | ["skip","run_immediately","next_window"] | index($m)) != null)
+        and ((has("event")) | not)
       )
+    )
+    and (
+      (.kind != "event")
+      or (
+        (.event | type == "object")
+        and (.event.watcher_ids | string_array)
+        and (.event.event_types | string_array)
+        and ((.event.match_mode as $m | ["all","any"] | index($m)) != null)
+        and (
+          ((.event | has("severity_at_or_above")) | not)
+          or (.event.severity_at_or_above as $s | ["info","warning","high","critical"] | index($s) != null)
+        )
+        and (
+          ((.event | has("source_ref_globs")) | not)
+          or (.event.source_ref_globs | string_array)
+        )
+        and (
+          ((.event | has("dedupe_window")) | not)
+          or (.event.dedupe_window | iso_duration)
+        )
+        and ((has("schedule")) | not)
+      )
+    )
+  ' "$file" >/dev/null
+}
+
+validate_automation_policy_fixture() {
+  local file="$1"
+  jq -e '
+    def string_array:
+      type == "array"
+      and length > 0
+      and all(.[]; type == "string" and length > 0);
+    type == "object"
+    and (.max_concurrency | type == "number" and . >= 1)
+    and ((.concurrency_mode as $m | ["serialize","drop","replace","parallel"] | index($m)) != null)
+    and (.idempotency_strategy | type == "object")
+    and ((.idempotency_strategy.kind as $k | ["event-dedupe","schedule-window"] | index($k)) != null)
+    and (.idempotency_strategy.key_fields | string_array)
+    and (.retry_policy | type == "object")
+    and (.retry_policy.max_attempts | type == "number" and . >= 1)
+    and ((.retry_policy.backoff as $b | ["fixed","linear","exponential"] | index($b)) != null)
+    and (
+      .retry_policy.retryable_classes
+      | type == "array"
+      and length > 0
+      and all(
+        .[];
+        ["validation_failure","reference_resolution_failure","policy_denied","approval_missing","transient_runtime_failure","terminal_runtime_failure","concurrency_conflict","binding_validation_failure","lock_acquisition_failure","lock_lost_during_execution","executor_liveness_failure","stale_claim","evidence_write_failure","launch_commit_failure","manual_quarantine"] | index(.) != null
+      )
+    )
+    and (.pause_on_error | type == "boolean")
+    and (
+      ((has("incident_policy")) | not)
+      or (
+        .incident_policy
+        | type == "object"
+        and (.open_incident_on | type == "array" and length > 0)
+        and all(
+          .open_incident_on[];
+          ["repeated-terminal-failure","retry-exhausted","launch-commit-failure","evidence-write-failure"] | index(.) != null
+        )
+      )
+    )
+    and (
+      if (.concurrency_mode == "serialize" or .concurrency_mode == "replace")
+      then (.max_concurrency == 1)
+      else true
+      end
     )
   ' "$file" >/dev/null
 }
@@ -647,6 +856,9 @@ validate_schema_fixture() {
     workflow-execution)
       validate_workflow_execution_fixture "$file"
       ;;
+    mission-object)
+      validate_mission_object_fixture "$file"
+      ;;
     coordination-lock)
       validate_coordination_lock_fixture "$file"
       ;;
@@ -656,8 +868,17 @@ validate_schema_fixture() {
     approver-authority-registry)
       validate_approver_authority_registry_fixture "$file"
       ;;
+    automation-definition)
+      validate_automation_definition_fixture "$file"
+      ;;
     automation-bindings)
       validate_automation_bindings_fixture "$file"
+      ;;
+    automation-trigger)
+      validate_automation_trigger_fixture "$file"
+      ;;
+    automation-policy)
+      validate_automation_policy_fixture "$file"
       ;;
     watcher-definition)
       validate_watcher_definition_fixture "$file"

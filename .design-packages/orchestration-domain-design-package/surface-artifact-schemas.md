@@ -11,8 +11,12 @@ This document is normative for schema coverage expectations.
 
 | Surface | Artifact | Required Schema |
 |---|---|---|
+| `automations` | `automation.yml` | `contracts/schemas/automation-definition.schema.json` |
+| `automations` | `trigger.yml` | `contracts/schemas/automation-trigger.schema.json` |
 | `automations` | `bindings.yml` | `contracts/schemas/automation-bindings.schema.json` |
+| `automations` | `policy.yml` | `contracts/schemas/automation-policy.schema.json` |
 | `workflows` | `workflow.yml` | `contracts/schemas/workflow-execution.schema.json` |
+| `missions` | `mission.yml` | `contracts/schemas/mission-object.schema.json` |
 | `watchers` | `watcher.yml` | `contracts/schemas/watcher-definition.schema.json` |
 | `watchers` | `sources.yml` | `contracts/schemas/watcher-sources.schema.json` |
 | `watchers` | `rules.yml` | `contracts/schemas/watcher-rules.schema.json` |
@@ -23,8 +27,17 @@ This document is normative for schema coverage expectations.
 | approvals / overrides | approval artifact | `contracts/schemas/approval-and-override.schema.json` |
 | governance | approver authority registry | `contracts/schemas/approver-authority-registry.schema.json` |
 
+For `automations`, the schema-backed definition layer is split across
+`automation.yml`, `trigger.yml`, `bindings.yml`, and `policy.yml`. Aggregate
+bundle validation may exist for contract proof, but validators must target the
+real authored runtime artifacts first.
+
 For `workflows`, the schema-backed artifact is the definition contract
 (`workflow.yml`), not registry metadata or prose guidance.
+
+For `missions`, the schema-backed artifact is `mission.yml`, not `mission.md`.
+Mission Markdown, task state, and progress logs remain subordinate narrative or
+mutable local state/evidence assets.
 
 `stages/*.md` remain Markdown assets. They do not require a JSON Schema, but
 they must be resolved only from a valid `workflow.yml` and remain subject to

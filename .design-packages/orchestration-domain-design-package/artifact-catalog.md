@@ -73,6 +73,7 @@ listing.
 - `contracts/cross-surface-reference-contract.md`
 - `contracts/decision-record-contract.md`
 - `contracts/workflow-execution-contract.md`
+- `contracts/mission-object-contract.md`
 - `contracts/campaign-object-contract.md`
 - `contracts/automation-execution-contract.md`
 - `contracts/coordination-lock-contract.md`
@@ -89,12 +90,16 @@ listing.
 
 - `contracts/schemas/approval-and-override.schema.json`
 - `contracts/schemas/approver-authority-registry.schema.json`
+- `contracts/schemas/automation-definition.schema.json`
 - `contracts/schemas/automation-bindings.schema.json`
 - `contracts/schemas/automation-execution.schema.json`
+- `contracts/schemas/automation-policy.schema.json`
+- `contracts/schemas/automation-trigger.schema.json`
 - `contracts/schemas/coordination-lock.schema.json`
 - `contracts/schemas/decision-record.schema.json`
 - `contracts/schemas/incident-actions.schema.json`
 - `contracts/schemas/incident-object.schema.json`
+- `contracts/schemas/mission-object.schema.json`
 - `contracts/schemas/queue-item-and-lease.schema.json`
 - `contracts/schemas/run-linkage.schema.json`
 - `contracts/schemas/watcher-definition.schema.json`
@@ -108,12 +113,16 @@ listing.
 
 - `contracts/fixtures/valid/approval-and-override.valid.json`
 - `contracts/fixtures/valid/approver-authority-registry.valid.json`
+- `contracts/fixtures/valid/automation-definition.valid.json`
 - `contracts/fixtures/valid/automation-bindings.valid.json`
 - `contracts/fixtures/valid/automation-execution.valid.json`
+- `contracts/fixtures/valid/automation-policy.valid.json`
+- `contracts/fixtures/valid/automation-trigger.valid.json`
 - `contracts/fixtures/valid/coordination-lock.valid.json`
 - `contracts/fixtures/valid/decision-record.valid.json`
 - `contracts/fixtures/valid/incident-actions.valid.json`
 - `contracts/fixtures/valid/incident-object.valid.json`
+- `contracts/fixtures/valid/mission-object.valid.json`
 - `contracts/fixtures/valid/queue-item-and-lease.valid.json`
 - `contracts/fixtures/valid/run-linkage.valid.json`
 - `contracts/fixtures/valid/watcher-definition.valid.json`
@@ -127,12 +136,16 @@ listing.
 
 - `contracts/fixtures/invalid/approval-and-override.invalid.json`
 - `contracts/fixtures/invalid/approver-authority-registry.invalid.json`
+- `contracts/fixtures/invalid/automation-definition.invalid.json`
 - `contracts/fixtures/invalid/automation-bindings.invalid.json`
 - `contracts/fixtures/invalid/automation-execution.invalid.json`
+- `contracts/fixtures/invalid/automation-policy.invalid.json`
+- `contracts/fixtures/invalid/automation-trigger.invalid.json`
 - `contracts/fixtures/invalid/coordination-lock.invalid.json`
 - `contracts/fixtures/invalid/decision-record.invalid.json`
 - `contracts/fixtures/invalid/incident-actions.invalid.json`
 - `contracts/fixtures/invalid/incident-object.invalid.json`
+- `contracts/fixtures/invalid/mission-object.invalid.json`
 - `contracts/fixtures/invalid/queue-item-and-lease.invalid.json`
 - `contracts/fixtures/invalid/run-linkage.invalid.json`
 - `contracts/fixtures/invalid/watcher-definition.invalid.json`
