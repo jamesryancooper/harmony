@@ -28,3 +28,8 @@ documentation, policy, or contract authority.
 ## Exit Path
 
 {{EXIT_EXPECTATION}}
+
+## Registry
+
+Add or update the matching entry in `/.design-packages/registry.yml` when this
+package is created, archived, or materially reclassified.

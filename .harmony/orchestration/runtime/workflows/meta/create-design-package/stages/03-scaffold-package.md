@@ -25,11 +25,13 @@ baseline standard validator.
 4. Regenerate `navigation/artifact-catalog.md` from the on-disk package shape.
 5. Render `navigation/source-of-truth-map.md` from the selected class and
    modules.
+6. Add or update the matching active entry in `.design-packages/registry.yml`.
 
 ## Proceed When
 
 - [ ] Package directory exists
 - [ ] `design-package.yml` exists
+- [ ] `.design-packages/registry.yml` includes the scaffolded package
 - [ ] Core artifacts exist
 - [ ] Class-specific required docs exist
 - [ ] Selected optional modules exist

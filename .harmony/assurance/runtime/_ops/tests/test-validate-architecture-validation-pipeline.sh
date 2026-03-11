@@ -8,6 +8,7 @@ ASSURANCE_DIR="$(cd "$RUNTIME_DIR/.." && pwd)"
 HARMONY_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$HARMONY_DIR/.." && pwd)"
 VALIDATE_SCRIPT=".harmony/assurance/runtime/_ops/scripts/validate-architecture-validation-pipeline.sh"
+WORKFLOW_PACKAGE_ID="architecture-validation-workflow-package"
 
 pass_count=0
 fail_count=0
@@ -141,7 +142,7 @@ case_missing_capability_map_registration_fails() {
 case_temporary_dependency_fails() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
-  printf '\n- current: .design-packages/architecture-validation-workflow-package\n' >> \
+  printf '\n- current: .design-packages/${WORKFLOW_PACKAGE_ID}\n' >> \
     "$fixture_root/.harmony/orchestration/runtime/workflows/audit/audit-design-package/stages/02-design-audit.md"
   run_validator_in_fixture "$fixture_root"
 }

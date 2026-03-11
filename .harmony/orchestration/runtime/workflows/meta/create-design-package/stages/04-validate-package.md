@@ -21,4 +21,5 @@ Ensure the scaffolded package is standard-compliant before reporting success.
 
 - [ ] Standard validator passes
 - [ ] Manifest-bearing module requirements are satisfied
+- [ ] Registry entry is valid and synchronized
 - [ ] README wording and exit path requirements are satisfied

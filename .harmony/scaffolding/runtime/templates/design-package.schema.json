@@ -56,6 +56,42 @@
       "type": "string",
       "enum": ["draft", "in-review", "implementation-ready", "archived"]
     },
+    "archive": {
+      "type": "object",
+      "required": [
+        "archived_at",
+        "archived_from_status",
+        "disposition",
+        "original_path",
+        "promotion_evidence"
+      ],
+      "properties": {
+        "archived_at": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "archived_from_status": {
+          "type": "string",
+          "enum": ["draft", "in-review", "implementation-ready", "legacy-unknown"]
+        },
+        "disposition": {
+          "type": "string",
+          "enum": ["implemented", "historical"]
+        },
+        "original_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "promotion_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
     "lifecycle": {
       "type": "object",
       "required": ["temporary", "exit_expectation"],
@@ -93,5 +129,50 @@
       "additionalProperties": false
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "archived"
+          }
+        }
+      },
+      "then": {
+        "required": ["archive"],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "archive": {
+                  "properties": {
+                    "disposition": {
+                      "const": "implemented"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "archive": {
+                  "properties": {
+                    "promotion_evidence": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "else": {
+        "not": {
+          "required": ["archive"]
+        }
+      }
+    }
+  ]
 }
