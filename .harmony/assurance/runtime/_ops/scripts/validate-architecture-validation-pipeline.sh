@@ -13,7 +13,8 @@ WORKFLOW_REGISTRY="$HARMONY_DIR/orchestration/runtime/workflows/registry.yml"
 CAPABILITY_MAP="$HARMONY_DIR/orchestration/governance/capability-map-v1.yml"
 WORKFLOWS_README="$HARMONY_DIR/orchestration/runtime/workflows/README.md"
 LEGACY_PACKAGE_PATH=".design-packages/architecture-validation-pipeline-package"
-WORKFLOW_PACKAGE_PATH=".design-packages/architecture-validation-workflow-package"
+WORKFLOW_PACKAGE_ID="architecture-validation-workflow-package"
+WORKFLOW_PACKAGE_PATH=".design-packages/${WORKFLOW_PACKAGE_ID}"
 
 errors=0
 

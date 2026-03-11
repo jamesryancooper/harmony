@@ -6,7 +6,12 @@ ASSURANCE_DIR="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
 HARMONY_DIR="$(cd -- "$ASSURANCE_DIR/.." && pwd)"
 ROOT_DIR="$(cd -- "$HARMONY_DIR/.." && pwd)"
 
-PACKAGE_DIR="$ROOT_DIR/.design-packages/orchestration-domain-design-package"
+PACKAGE_ARG="${1:-.design-packages/orchestration-domain-design-package}"
+if [[ "$PACKAGE_ARG" = /* ]]; then
+  PACKAGE_DIR="$PACKAGE_ARG"
+else
+  PACKAGE_DIR="$ROOT_DIR/$PACKAGE_ARG"
+fi
 CONTRACTS_DIR="$PACKAGE_DIR/contracts"
 SCHEMAS_DIR="$CONTRACTS_DIR/schemas"
 VALID_FIXTURES_DIR="$CONTRACTS_DIR/fixtures/valid"
@@ -1019,7 +1024,7 @@ check_module_layout() {
   local root_file
   while IFS= read -r root_file; do
     [[ -z "$root_file" ]] && continue
-    if [[ "$(basename "$root_file")" != "README.md" ]]; then
+    if [[ "$(basename "$root_file")" != "README.md" && "$(basename "$root_file")" != "design-package.yml" ]]; then
       fail "unexpected root-level file in package: ${root_file#$ROOT_DIR/}"
     fi
   done < <(find "$PACKAGE_DIR" -maxdepth 1 -type f | sort)

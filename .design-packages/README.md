@@ -8,6 +8,13 @@ include a root `design-package.yml`. Packages without that manifest remain
 legacy implementation material and are not validated against the standard by
 default.
 
+Manifest-governed packages are registered in `registry.yml`.
+
+- active manifest-governed packages live directly under `/.design-packages/<id>/`
+- archived manifest-governed packages live under `/.design-packages/.archive/<id>/`
+- packages without a manifest remain legacy material outside the registry until
+  they are normalized
+
 ## Non-Canonical Rule
 
 Design packages are implementation aids. They are not canonical runtime,
@@ -43,3 +50,14 @@ Each design package should make its exit path obvious:
 - implementation target surfaces
 - archive or removal expectation after implementation
 - any temporary assumptions that must be resolved before the package is retired
+
+## Manifest-Governed Discovery
+
+For manifest-governed packages, use this authority order:
+
+1. `design-package.yml`
+2. `registry.yml`
+3. `README.md`
+
+`registry.yml` is a projection for fast lookup. It must not replace the package
+manifest as the lifecycle authority.

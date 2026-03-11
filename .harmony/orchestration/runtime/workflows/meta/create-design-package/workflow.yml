@@ -88,10 +88,17 @@ artifacts:
     format: yaml
     determinism: unique
     description: "Root manifest for the standard-governed design package"
+  - name: design_package_registry
+    path: "../../../../../.design-packages/registry.yml"
+    kind: file
+    format: yaml
+    determinism: shared
+    description: "Manifest-governed design-package registry updated with the new active package entry"
 done_gate:
   checks:
     - "scaffolded package directory exists under .design-packages/"
     - "design-package.yml is present and valid"
+    - "registry.yml includes the scaffolded package"
     - "validate-design-package-standard.sh passes for the scaffolded package"
     - "verification stage passes"
 constraints:

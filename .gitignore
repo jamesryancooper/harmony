@@ -1,5 +1,7 @@
-# Archive
+# Archive directories
 .archive/
+**/.archive/
+**/archive/
 
 # Environment files
 .env

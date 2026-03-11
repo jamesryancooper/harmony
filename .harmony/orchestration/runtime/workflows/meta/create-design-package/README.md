@@ -62,6 +62,7 @@ This README summarizes the canonical workflow unit at `.harmony/orchestration/ru
 
 - `design_package_root` -> `../../../../../.design-packages/{{package_id}}/`: Scaffolded standard-governed design package
 - `design_package_manifest` -> `../../../../../.design-packages/{{package_id}}/design-package.yml`: Root manifest for the standard-governed design package
+- `design_package_registry` -> `../../../../../.design-packages/registry.yml`: Manifest-governed package registry updated with the new active entry
 
 ## Steps
 
@@ -75,6 +76,7 @@ This README summarizes the canonical workflow unit at `.harmony/orchestration/ru
 
 - [ ] scaffolded package directory exists under .design-packages/
 - [ ] design-package.yml is present and valid
+- [ ] registry.yml includes the scaffolded package
 - [ ] validate-design-package-standard.sh passes for the scaffolded package
 - [ ] verification stage passes
 
@@ -88,4 +90,3 @@ This README summarizes the canonical workflow unit at `.harmony/orchestration/ru
 | Version | Changes |
 |---------|---------|
 | 1.0.0 | Generated from canonical workflow `create-design-package` |
-

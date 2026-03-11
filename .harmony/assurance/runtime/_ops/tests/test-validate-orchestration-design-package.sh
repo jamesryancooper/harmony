@@ -10,6 +10,7 @@ ASSURANCE_DIR="$(cd "$RUNTIME_DIR/.." && pwd)"
 HARMONY_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$HARMONY_DIR/.." && pwd)"
 VALIDATE_SCRIPT=".harmony/assurance/runtime/_ops/scripts/validate-orchestration-design-package.sh"
+PACKAGE_PATH=".design-packages/.archive/orchestration-domain-design-package"
 
 pass_count=0
 fail_count=0
@@ -71,11 +72,11 @@ create_fixture_repo() {
   fixture_root="$(mktemp -d "${TMPDIR:-/tmp}/design-package-validation.XXXXXX")"
   CLEANUP_DIRS+=("$fixture_root")
 
-  mkdir -p "$fixture_root/.harmony/assurance/runtime/_ops/scripts" "$fixture_root/.design-packages"
+  mkdir -p "$fixture_root/.harmony/assurance/runtime/_ops/scripts" "$fixture_root/.design-packages/.archive"
   cp "$REPO_ROOT/.harmony/assurance/runtime/_ops/scripts/validate-orchestration-design-package.sh" \
     "$fixture_root/.harmony/assurance/runtime/_ops/scripts/validate-orchestration-design-package.sh"
-  cp -R "$REPO_ROOT/.design-packages/orchestration-domain-design-package" \
-    "$fixture_root/.design-packages/"
+  cp -R "$REPO_ROOT/.design-packages/.archive/orchestration-domain-design-package" \
+    "$fixture_root/.design-packages/.archive/"
 
   printf '%s\n' "$fixture_root"
 }
@@ -84,7 +85,7 @@ run_validator_in_fixture() {
   local fixture_root="$1"
   (
     cd "$fixture_root"
-    bash "$VALIDATE_SCRIPT"
+    bash "$VALIDATE_SCRIPT" "$PACKAGE_PATH"
   )
 }
 
@@ -97,7 +98,7 @@ case_valid_package_passes() {
 case_missing_schema_fails() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
-  rm "$fixture_root/.design-packages/orchestration-domain-design-package/contracts/schemas/decision-record.schema.json"
+  rm "$fixture_root/.design-packages/.archive/orchestration-domain-design-package/contracts/schemas/decision-record.schema.json"
   run_validator_in_fixture "$fixture_root"
 }
 
@@ -105,7 +106,7 @@ case_missing_coverage_marker_fails() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
   perl -0pi -e 's/`contracts\/decision-record-contract\.md` — `schema-backed` via `contracts\/schemas\/decision-record\.schema\.json`/`contracts\/decision-record-contract.md`/' \
-    "$fixture_root/.design-packages/orchestration-domain-design-package/implementation-readiness.md"
+    "$fixture_root/.design-packages/.archive/orchestration-domain-design-package/normative/assurance/implementation-readiness.md"
   run_validator_in_fixture "$fixture_root"
 }
 
@@ -113,8 +114,8 @@ case_invalid_fixture_that_passes_is_detected() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
   cp \
-    "$fixture_root/.design-packages/orchestration-domain-design-package/contracts/fixtures/valid/decision-record.valid.json" \
-    "$fixture_root/.design-packages/orchestration-domain-design-package/contracts/fixtures/invalid/decision-record.invalid.json"
+    "$fixture_root/.design-packages/.archive/orchestration-domain-design-package/contracts/fixtures/valid/decision-record.valid.json" \
+    "$fixture_root/.design-packages/.archive/orchestration-domain-design-package/contracts/fixtures/invalid/decision-record.invalid.json"
   run_validator_in_fixture "$fixture_root"
 }
 
