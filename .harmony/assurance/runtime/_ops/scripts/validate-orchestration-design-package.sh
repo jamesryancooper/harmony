@@ -6,7 +6,7 @@ ASSURANCE_DIR="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
 HARMONY_DIR="$(cd -- "$ASSURANCE_DIR/.." && pwd)"
 ROOT_DIR="$(cd -- "$HARMONY_DIR/.." && pwd)"
 
-PACKAGE_ARG="${1:-.design-packages/orchestration-domain-design-package}"
+PACKAGE_ARG="${1:-.design-packages/.archive/orchestration-domain-design-package}"
 if [[ "$PACKAGE_ARG" = /* ]]; then
   PACKAGE_DIR="$PACKAGE_ARG"
 else
