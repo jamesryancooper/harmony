@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.12](https://github.com/jamesryancooper/harmony/compare/harmony-v0.4.11...harmony-v0.4.12) (2026-03-11)
+
+
+### Features
+
+* **audit:** add architecture readiness capability ([#139](https://github.com/jamesryancooper/harmony/issues/139)) ([ee84627](https://github.com/jamesryancooper/harmony/commit/ee8462792db5a8dc08432dcebee05e988dde8d94))
+
+
+### Bug Fixes
+
+* **audit:** reduce architecture audit trigger ambiguity ([#141](https://github.com/jamesryancooper/harmony/issues/141)) ([efb41bd](https://github.com/jamesryancooper/harmony/commit/efb41bd0b4c22f783b2268365f9498422adad135))
+
 ## [0.4.11](https://github.com/jamesryancooper/harmony/compare/harmony-v0.4.10...harmony-v0.4.11) (2026-03-11)
 
 
