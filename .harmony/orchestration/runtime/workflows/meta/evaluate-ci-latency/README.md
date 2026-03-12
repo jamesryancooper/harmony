@@ -70,3 +70,4 @@ This README summarizes the canonical workflow unit at `.harmony/orchestration/ru
 | Version | Changes |
 |---------|---------|
 | 0.1.0 | Generated from canonical workflow `evaluate-ci-latency` |
+
