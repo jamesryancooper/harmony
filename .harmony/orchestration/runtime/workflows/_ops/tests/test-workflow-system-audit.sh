@@ -125,8 +125,8 @@ case_score_directory_workflow() {
 case_score_single_file_workflow() {
   (
     cd "$REPO_ROOT"
-    bash "$AUDIT_SCRIPT" --mode score-workflow --target ".harmony/orchestration/runtime/workflows/projects/create-project.md" \
-      | grep -F "Workflow Assessment: create-project"
+    bash "$AUDIT_SCRIPT" --mode score-workflow --target ".harmony/orchestration/runtime/workflows/tasks/onboard-new-developer.md" \
+      | grep -F "Workflow Assessment: onboard-new-developer"
   )
 }
 
@@ -152,11 +152,11 @@ case_duplicate_trigger_fails_validator() {
 case_missing_required_outcome_fails_scenario_pack() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
-  local workflow_file="$fixture_root/.harmony/orchestration/runtime/workflows/projects/create-project.md"
+  local workflow_file="$fixture_root/.harmony/orchestration/runtime/workflows/projects/create-project/README.md"
   local tmp_file
   tmp_file="$(mktemp "${TMPDIR:-/tmp}/workflow-required-outcome.XXXXXX")"
   awk '
-    /^## Required Outcome$/ { skip=1; next }
+    /^## Verification Gate$/ { skip=1; next }
     skip && /^## / { skip=0 }
     !skip { print }
   ' "$workflow_file" >"$tmp_file"
@@ -188,20 +188,28 @@ case_external_profile_mismatch_fails_validator() {
 case_execution_controls_boolean_is_allowed() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
-  local registry="$fixture_root/.harmony/orchestration/runtime/workflows/registry.yml"
+  local workflow="$fixture_root/.harmony/orchestration/runtime/workflows/meta/create-workflow/workflow.yml"
   yq -i '
-    .workflows."create-workflow".execution_controls.cancel_safe = true
-  ' "$registry"
+    .execution_controls.cancel_safe = true
+  ' "$workflow"
   run_validator_in_fixture "$fixture_root"
 }
 
 case_execution_controls_non_boolean_fails_validator() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
-  local registry="$fixture_root/.harmony/orchestration/runtime/workflows/registry.yml"
+  local workflow="$fixture_root/.harmony/orchestration/runtime/workflows/meta/create-workflow/workflow.yml"
   yq -i '
-    .workflows."create-workflow".execution_controls.cancel_safe = "sometimes"
-  ' "$registry"
+    .execution_controls.cancel_safe = "sometimes"
+  ' "$workflow"
+  run_validator_in_fixture "$fixture_root"
+}
+
+case_legacy_authoring_guide_ref_fails_validator() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  local stage_file="$fixture_root/.harmony/orchestration/runtime/workflows/meta/create-workflow/stages/03-select-template.md"
+  printf '\nLegacy scaffold note: `guide/NN-*.md`\n' >>"$stage_file"
   run_validator_in_fixture "$fixture_root"
 }
 
@@ -224,6 +232,16 @@ case_parameter_drift_is_reported() {
   ' "$registry"
   run_audit_in_fixture "$fixture_root" --mode ci-static >/dev/null
   grep -F "registry parameter 'mystery_param' is undocumented in workflow content" \
+    "$fixture_root/.harmony/output/.tmp/workflow-system-audit/findings.yml"
+}
+
+case_missing_terminal_verification_is_reported() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  local workflow="$fixture_root/.harmony/orchestration/runtime/workflows/meta/create-workflow/workflow.yml"
+  yq -i '(.stages[-1].kind) = "analysis"' "$workflow"
+  run_audit_in_fixture "$fixture_root" --mode ci-static >/dev/null
+  grep -F "side-effectful workflow does not terminate in a verification stage" \
     "$fixture_root/.harmony/output/.tmp/workflow-system-audit/findings.yml"
 }
 
@@ -276,8 +294,13 @@ main() {
 
   assert_failure_contains \
     "validator rejects non-boolean execution_controls.cancel_safe metadata" \
-    "execution_controls.cancel_safe must be true or false" \
+    "must declare execution_controls.cancel_safe as boolean" \
     case_execution_controls_non_boolean_fails_validator
+
+  assert_failure_contains \
+    "validator rejects deprecated guide layout in workflow authoring surfaces" \
+    "deprecated guide/NN-* authoring layout" \
+    case_legacy_authoring_guide_ref_fails_validator
 
   assert_success \
     "capability map drift is reported by the workflow-system audit" \
@@ -286,6 +309,10 @@ main() {
   assert_success \
     "parameter contract drift is reported by the workflow-system audit" \
     case_parameter_drift_is_reported
+
+  assert_success \
+    "terminal verification gaps are reported for side-effectful workflows" \
+    case_missing_terminal_verification_is_reported
 
   assert_success \
     "full mode emits bundle and runtime audit artifacts" \

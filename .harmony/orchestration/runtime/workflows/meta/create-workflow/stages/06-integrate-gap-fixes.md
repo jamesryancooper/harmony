@@ -1,141 +1,107 @@
 ---
-title: Integrate Gap Fixes
-description: Add idempotency, checkpoints, versioning, and parallel support.
+title: Integrate Architecture Guidance
+description: Add contract-complete metadata, recovery guidance, and explicit verification.
 ---
 
-# Step 6: Integrate Gap Fixes
+# Step 6: Integrate Architecture Guidance
 
 ## Input
 
 - Customized workflow files from Step 5
 - Requirements from Step 2
-- Template selection from Step 3 (parallel groups)
+- Template selection from Step 3
 
 ## Purpose
 
-Ensure the new workflow incorporates all gap remediation features for reliability, resumability, and maintainability.
+Ensure the new workflow is structurally complete, uses the right abstraction
+boundary, and documents how side effects are verified and recovered.
 
 ## Actions
 
-### 6.1 Add Version Field
+### 6.1 Complete the Canonical Contract in `workflow.yml`
 
-In `00-overview.md` frontmatter, ensure:
+Ensure `workflow.yml`, not an overview companion, carries the execution
+metadata:
+
 ```yaml
 version: "1.0.0"
+entry_mode: "human"
+execution_profile: "core"
+side_effect_class: "read_only"
+execution_controls:
+  cancel_safe: true
+coordination_key_strategy:
+  kind: "none"
+executor_interface_version: "workflow-executor-v1"
+artifacts: []
+done_gate:
+  checks:
+    - "verification stage passes"
+constraints:
+  fail_closed: true
+  forbid_design_packages: true
+  require_relative_local_assets: true
 ```
 
-### 6.2 Add Dependency Declarations
+### 6.2 Keep the Workflow Boundary Honest
 
-If the workflow depends on other workflows:
-```yaml
-depends_on:
-  - workflow: <dependency-path>
-    condition: "<when dependency is required>"
-```
+Reflect the Step 2 boundary decision in the workflow shape:
 
-If no dependencies, ensure empty array:
-```yaml
-depends_on: []
-```
+- If orchestration value is thin or purely single-capability, stop and collapse
+  the design into a skill, command, or narrower surface instead of inflating a
+  workflow.
+- Keep stage count and stage responsibilities aligned with one clear reason to
+  change.
+- Do not invent placeholder dependency or parallel metadata when no real
+  orchestration need exists.
 
-### 6.3 Add Checkpoint Configuration
+### 6.3 Add Idempotency and Recovery Guidance to Stage Assets
 
-In `00-overview.md` frontmatter:
-```yaml
-checkpoints:
-  enabled: true
-  storage: ".harmony/continuity/checkpoints/"
-```
-
-### 6.4 Add Idempotency Sections
-
-For EACH step file, ensure `## Idempotency` section exists with:
+For mutating or long-running stages, ensure `## Idempotency` exists with:
 
 ```markdown
 ## Idempotency
 
-**Check:** [Specific check for this step]
-- [ ] [Condition that indicates completion]
+**Check:** [Specific signal that the stage is already complete]
+- [ ] [Completion condition]
 
 **If Already Complete:**
-- [Skip action or cleanup action]
+- [Skip or resume guidance]
 
-**Marker:** `checkpoints/<workflow-id>/<step>.complete`
+**Marker:** `checkpoints/<workflow-id>/<stage>.complete`
 ```
 
-Customize the check for each step:
-- Validation steps: Check if validated data exists
-- Creation steps: Check if artifact exists
-- Transformation steps: Check if output exists
-- Verification steps: Check if results logged
+If the workflow is side-effectful, add restart, rollback, or cleanup guidance
+to the relevant stage assets so partial execution is recoverable.
 
-### 6.5 Identify and Declare Parallel Steps
+### 6.4 Keep Dependencies in the Right Surface
 
-Review step dependencies:
+- Workflow-to-workflow dependencies belong in registry metadata and reference
+  updates, not ad hoc frontmatter or compatibility files.
+- Keep dependency fan-out small and acyclic.
+- Do not encode canonical behavior in `guide/` or root `00-overview.md`
+  layouts.
 
-```text
-For each pair of steps (N, N+1):
-  Q1: Does step N+1 read files that step N writes?
-  Q2: Does step N+1 use output variables from step N?
-  Q3: If step N fails, must step N+1 be skipped?
+### 6.5 Require Terminal Verification for Side Effects
 
-  If all answers are NO: Steps can potentially run in parallel
-```
+If `side_effect_class` is `mutating` or `destructive`:
 
-If parallel steps identified, add to frontmatter:
-```yaml
-parallel_steps:
-  - group: "<descriptive-group-name>"
-    steps: ["<step-a-filename>", "<step-b-filename>"]
-    join_at: "<step-that-needs-both>"
-```
-
-If no parallel opportunities:
-```yaml
-parallel_steps: []
-```
-
-### 6.6 Add Version History Section
-
-Add to `00-overview.md` before References:
-```markdown
-## Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | <today's date> | Initial version |
-```
-
-### 6.7 Add Parallel Execution Notes (if applicable)
-
-For steps in parallel groups, add to step file:
-```markdown
-## Parallel Execution
-
-**Group:** <group-name>
-**Can run with:** <other-step-filename>
-**Join point:** <join-step-filename>
-
-**Independence Check:**
-- [ ] This step does not write to files read by parallel steps
-- [ ] This step does not depend on outputs from parallel steps
-- [ ] Failure in this step does not invalidate parallel steps
-```
+- The final stage kind must be `verification`
+- The done gate must align with that terminal verification stage
+- The generated README must describe the verification gate clearly
 
 ## Idempotency
 
-**Check:** Are gap fixes already integrated?
-- [ ] `version` field present in overview frontmatter
-- [ ] `depends_on` field present (even if empty)
-- [ ] `checkpoints` field present with storage path
-- [ ] `parallel_steps` field present (even if empty)
-- [ ] Each step file has `## Idempotency` section
-- [ ] Version History section present
+**Check:** Is the workflow architecture guidance already integrated?
+- [ ] `workflow.yml` carries contract-complete execution metadata
+- [ ] Side-effectful workflows end in a verification stage
+- [ ] Relevant mutation or long-running stages have `## Idempotency`
+- [ ] No canonical authoring surface points to `guide/` or root `00-overview.md`
 
 **If Already Complete:**
-- Verify all fields are present and valid
-- Skip to next step if complete
-- Resume integration if partial
+- Verify the contract and stage assets still match the current requirements
+- Skip to the next step if no architecture gaps remain
+- Resume remediation only for the missing items
 
 **Marker:** `checkpoints/create-workflow/<workflow-id>/06-gaps.complete`
 
@@ -143,23 +109,19 @@ For steps in parallel groups, add to step file:
 
 Before proceeding, confirm:
 
-- [ ] Overview frontmatter has `version: "X.Y.Z"`
-- [ ] Overview frontmatter has `depends_on: [...]`
-- [ ] Overview frontmatter has `checkpoints: {enabled: true, storage: "..."}`
-- [ ] Overview frontmatter has `parallel_steps: [...]`
-- [ ] Overview body has `## Version History` section
-- [ ] Every step file has `## Idempotency` section
-- [ ] Idempotency sections have Check, If Already Complete, Marker
-- [ ] Parallel steps (if any) have Independence Check
+- [ ] `workflow.yml` declares the required execution metadata
+- [ ] Stage responsibilities still match the workflow boundary decision
+- [ ] Side-effectful workflows terminate in verification
+- [ ] Relevant mutation or long-running stages have idempotency guidance
+- [ ] No deprecated `guide/` or root `00-overview.md` authoring layout is introduced
 
 ## Output
 
-- All gap fix fields present in frontmatter
-- All step files have idempotency sections
-- Parallel opportunities documented
-- Version history initialized
+- Contract-complete `workflow.yml`
+- Stage assets with recovery and idempotency guidance where needed
+- Verified workflow boundary and terminal verification shape
 
 ## Proceed When
 
 - [ ] All items in Gap Fix Verification Checklist pass
-- [ ] No missing gap fix fields
+- [ ] No architecture guidance gaps remain

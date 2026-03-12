@@ -431,6 +431,12 @@ workflow_primary_doc() {
   printf '%s\n' "$workflow_file"
 }
 
+workflow_stage_file() {
+  local artifact="$1"
+  local step_file="$2"
+  printf '%s\n' "$artifact/stages/$step_file"
+}
+
 workflow_has_external_markers() {
   local artifact="$1"
   matches_paths_regex '\b(pnpm|npm|npx|uv|pip install|swift build|swift test|docker|alembic)\b' "$artifact"
@@ -457,6 +463,12 @@ score_workflow() {
   local parameter_name=""
   local parameter_mentions=1
   local has_output_contract=1
+  local side_effect_class=""
+  local coordination_kind=""
+  local last_stage_kind=""
+  local workflow_input_count=0
+  local workflow_artifact_count=0
+  local workflow_dependency_count=0
 
   if [[ -d "$artifact" ]]; then
     format="directory"
@@ -477,6 +489,12 @@ score_workflow() {
   if [[ "$format" == "directory" ]]; then
     front_name="$(yq -r '.name // ""' "$workflow_contract" 2>/dev/null || true)"
     front_description="$(yq -r '.description // ""' "$workflow_contract" 2>/dev/null || true)"
+    side_effect_class="$(yq -r '.side_effect_class // ""' "$workflow_contract" 2>/dev/null || true)"
+    coordination_kind="$(yq -r '.coordination_key_strategy.kind // ""' "$workflow_contract" 2>/dev/null || true)"
+    last_stage_kind="$(yq -r '.stages[-1].kind // ""' "$workflow_contract" 2>/dev/null || true)"
+    workflow_input_count="$(yq -r '.inputs | length // 0' "$workflow_contract" 2>/dev/null || true)"
+    workflow_artifact_count="$(yq -r '.artifacts | length // 0' "$workflow_contract" 2>/dev/null || true)"
+    workflow_dependency_count="$(yq -r ".workflows.\"$workflow_id\".depends_on // [] | map(select(has(\"workflow\"))) | length" "$REGISTRY" 2>/dev/null || true)"
   else
     front_name="$(frontmatter_query "$workflow_file" '.name')"
     front_description="$(frontmatter_query "$workflow_file" '.description')"
@@ -557,8 +575,10 @@ score_workflow() {
     quality=$((quality + 5))
   elif [[ "$format" == "directory" ]]; then
     local has_actions=0
+    local stage_path=""
     for step_file in "${step_files[@]}"; do
-      if [[ -f "$artifact/$step_file" ]] && has_section "$artifact/$step_file" "Actions"; then
+      stage_path="$(workflow_stage_file "$artifact" "$step_file")"
+      if [[ -f "$stage_path" ]] && has_section "$stage_path" "Actions"; then
         has_actions=1
       fi
     done
@@ -631,6 +651,20 @@ score_workflow() {
     else
       add_finding "workflow-skill-boundary" "low" "$artifact_rel" "workflow is overly broad" "Split the workflow into more focused steps or a different abstraction." "not-yet-automatable"
     fi
+
+    case "$side_effect_class" in
+      mutating|destructive)
+        if [[ "$last_stage_kind" != "verification" ]]; then
+          add_finding "architecture-shape" "medium" "$artifact_rel" "side-effectful workflow does not terminate in a verification stage" "End mutating or destructive workflows with a terminal verification stage." "new-audit-only"
+        fi
+        ;;
+    esac
+
+    if [[ "$side_effect_class" == "none" || "$side_effect_class" == "read_only" ]]; then
+      if [[ "${#step_files[@]}" -le 2 && "$workflow_dependency_count" -eq 0 && "$workflow_input_count" -eq 0 && "$workflow_artifact_count" -eq 0 && "$coordination_kind" == "none" ]]; then
+        add_finding "workflow-skill-boundary" "low" "$artifact_rel" "workflow is thin enough to be modeled as a skill or command" "Use a workflow only when staged orchestration adds material operator or coordination value." "not-yet-automatable"
+      fi
+    fi
   fi
 
   local link_stats link_ratio link_count
@@ -696,6 +730,8 @@ system_level_checks() {
     fi
   done
 
+  check_authoring_surface_alignment
+
   local trigger_line
   declare -A TRIGGER_OWNERS=()
   while IFS=$'\t' read -r workflow_id trigger_line; do
@@ -734,6 +770,41 @@ system_level_checks() {
     fi
   fi
   rm -f "$edge_file"
+}
+
+check_authoring_surface_alignment() {
+  local targets=(
+    "$ROOT_DIR/.harmony/orchestration/practices/workflow-authoring-standards.md"
+    "$ROOT_DIR/.harmony/orchestration/runtime/workflows/meta/create-workflow/stages/02-analyze-requirements.md"
+    "$ROOT_DIR/.harmony/orchestration/runtime/workflows/meta/create-workflow/stages/03-select-template.md"
+    "$ROOT_DIR/.harmony/orchestration/runtime/workflows/meta/create-workflow/stages/06-integrate-gap-fixes.md"
+    "$ROOT_DIR/.harmony/orchestration/runtime/workflows/meta/create-workflow/stages/08-verify.md"
+    "$ROOT_DIR/.harmony/cognition/runtime/context/workflow-quality.md"
+    "$ROOT_DIR/.harmony/cognition/runtime/context/workflow-gaps.md"
+  )
+  local target
+  local stale_checks=(
+    'guide/NN-\*\.md|workflow authoring surface retains deprecated guide/NN-* layout'
+    'Generated README exists under `guide/`|workflow authoring surface retains deprecated guide/ README placement'
+    'wrapper style that delegates to `00-overview\.md` is valid|workflow authoring surface still treats root 00-overview.md as canonical'
+    'In `00-overview\.md` frontmatter|workflow authoring surface still teaches 00-overview.md frontmatter as canonical'
+    'Add to `00-overview\.md`|workflow authoring surface still teaches 00-overview.md as a canonical authoring target'
+    'Overview frontmatter has `|workflow authoring surface still teaches overview frontmatter as canonical'
+  )
+  local stale_check
+  local pattern
+  local predicate
+
+  for target in "${targets[@]}"; do
+    [[ -f "$target" ]] || continue
+
+    for stale_check in "${stale_checks[@]}"; do
+      IFS='|' read -r pattern predicate <<< "$stale_check"
+      if matches_file_regex "$pattern" "$target"; then
+        add_finding "architecture-shape" "high" "$(rel_path "$target")" "$predicate" "Keep canonical workflow authoring anchored to workflow.yml, stages/, and the root README.md only." "existing-blocking"
+      fi
+    done
+  done
 }
 
 run_representative_scenarios() {

@@ -408,11 +408,11 @@ workflow_group_definitions:
   meta:
     description: Operate on the harness itself (CRUD for harness components)
     path: meta/
-    members: [create-harness, evaluate-harness, migrate-harness, update-harness, create-workflow, evaluate-workflow, update-workflow, create-skill]
+    members: [create-harness, evaluate-harness, migrate-harness, update-harness, create-workflow, evaluate-workflow, update-workflow, create-skill, create-design-package]
   audit:
     description: Audit orchestration and release gates
     path: audit/
-    members: [audit-documentation, audit-design-package, audit-workflow-system, audit-orchestration, audit-pre-release, audit-change-risk, audit-continuous, audit-post-incident, audit-release-readiness]
+    members: [audit-documentation, audit-design-package, audit-workflow-system, audit-orchestration, audit-pre-release, audit-change-risk, audit-continuous, audit-post-incident, audit-release-readiness, audit-architecture-readiness]
   refactor:
     description: Verified structural refactor orchestration
     path: refactor/

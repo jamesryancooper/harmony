@@ -63,12 +63,16 @@ contract differs.
 | Step graph/inline flow is coherent | 4 | No unreachable or contradictory structure |
 | Execution profile is honest | 4 | `core` vs `external-dependent` matches documented behavior |
 
+For side-effectful directory workflows, the preferred shape is a terminal
+verification stage rather than an implicit "the last mutation probably worked"
+ending.
+
 ### 5. Maintainability (10 points)
 
 | Criterion | Points | Notes |
 |-----------|--------|-------|
 | Naming and structure are consistent | 5 | File naming and step layout follow repo conventions |
-| Workflow is focused | 5 | Steps and content have one clear reason to change |
+| Workflow is focused | 5 | Steps and content have one clear reason to change; very thin wrappers may indicate a skill or command boundary instead |
 
 ### 6. Documentation and References (15 points)
 
@@ -82,9 +86,11 @@ contract differs.
 
 ### Directory Workflows
 
-- `README.md` is the contract entrypoint
-- The `steps` array is the source of truth for step files
-- A wrapper style that delegates to `00-overview.md` is valid if `README.md` declares it
+- `workflow.yml` is the canonical contract
+- `README.md` is the generated operator-facing facet
+- The `stages` array in `workflow.yml` is the source of truth for stage assets
+- Legacy compatibility companions such as a root `00-overview.md` are not part
+  of the canonical authoring layout
 
 ### Single-File Workflows
 
@@ -100,6 +106,7 @@ contract differs.
 - [ ] Registered workflow path resolves on disk
 - [ ] Entry/frontmatter identity is coherent
 - [ ] Verification or required outcome is present
+- [ ] Side-effectful directory workflows terminate in verification
 - [ ] No dependency cycle or command collision is introduced
 
 ### Non-Blocking but Important
