@@ -536,7 +536,8 @@ check_runtime_pipeline_references_absent() {
     "$HARMONY_DIR/engine/runtime/run"
     "$HARMONY_DIR/engine/runtime/run.cmd"
     "$HARMONY_DIR/assurance/runtime/_ops/scripts/alignment-check.sh"
-    "$HARMONY_DIR/assurance/runtime/_ops/scripts/validate-architecture-validation-pipeline.sh"
+    "$HARMONY_DIR/assurance/runtime/_ops/scripts/validate-audit-design-package-workflow.sh"
+    "$HARMONY_DIR/assurance/runtime/_ops/scripts/validate-create-design-package-workflow.sh"
     "$HARMONY_DIR/capabilities/runtime/commands"
   )
   if rg -n "runtime/pipelines|pipeline\\.yml|projection\\.pipeline_" "${targets[@]}" \
@@ -545,6 +546,41 @@ check_runtime_pipeline_references_absent() {
   else
     pass "deprecated pipeline-surface references removed"
   fi
+}
+
+check_legacy_workflow_authoring_references_absent() {
+  local targets=(
+    "$HARMONY_DIR/orchestration/practices/workflow-authoring-standards.md"
+    "$HARMONY_DIR/orchestration/runtime/workflows/meta/create-workflow/stages/02-analyze-requirements.md"
+    "$HARMONY_DIR/orchestration/runtime/workflows/meta/create-workflow/stages/03-select-template.md"
+    "$HARMONY_DIR/orchestration/runtime/workflows/meta/create-workflow/stages/06-integrate-gap-fixes.md"
+    "$HARMONY_DIR/orchestration/runtime/workflows/meta/create-workflow/stages/08-verify.md"
+    "$HARMONY_DIR/cognition/runtime/context/workflow-quality.md"
+    "$HARMONY_DIR/cognition/runtime/context/workflow-gaps.md"
+  )
+  local target
+  local stale_checks=(
+    'guide/NN-\*\.md|deprecated guide/NN-* authoring layout'
+    'Generated README exists under `guide/`|deprecated guide/ README placement'
+    'wrapper style that delegates to `00-overview\.md` is valid|deprecated root 00-overview wrapper guidance'
+    'In `00-overview\.md` frontmatter|deprecated 00-overview frontmatter guidance'
+    'Add to `00-overview\.md`|deprecated 00-overview authoring target'
+    'Overview frontmatter has `|deprecated overview frontmatter guidance'
+  )
+  local stale_check
+  local pattern
+  local label
+
+  for target in "${targets[@]}"; do
+    for stale_check in "${stale_checks[@]}"; do
+      IFS='|' read -r pattern label <<< "$stale_check"
+      if matches_path_regex "$pattern" "$target"; then
+        fail "workflow authoring surface retains ${label}: ${target#$ROOT_DIR/}"
+      else
+        pass "workflow authoring surface avoids ${label}: ${target#$ROOT_DIR/}"
+      fi
+    done
+  done
 }
 
 check_workflow_system_audit_static() {
@@ -585,6 +621,7 @@ main() {
   check_guide_drift
   check_legacy_paths_removed
   check_runtime_pipeline_references_absent
+  check_legacy_workflow_authoring_references_absent
   check_workflow_system_audit_static
 
   echo

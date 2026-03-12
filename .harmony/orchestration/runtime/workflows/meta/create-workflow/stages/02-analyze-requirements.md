@@ -20,7 +20,7 @@ Understand what the workflow needs to do so we can generate appropriate steps an
    ```text
    Ask: "What should this workflow accomplish?"
    Record: One-line description (max 160 chars for frontmatter)
-   Record: Expanded description for overview body
+   Record: Expanded description for the generated operator guidance
    ```
 
 2. **Identify steps:**
@@ -44,13 +44,36 @@ Understand what the workflow needs to do so we can generate appropriate steps an
    Record: List of STOP conditions with recovery actions
    ```
 
-5. **Determine access level:**
+5. **Determine workflow boundary:**
    ```text
-   Ask: "Will humans trigger this from IDE, or is it agent-only?"
-   Record: access = human | agent
+   Ask: "Why is this a workflow instead of a skill, command, or simpler surface?"
+   Record: workflow_boundary_reason
+   Ask: "Is this orchestrating a broader portfolio concern or one bounded runtime surface?"
+   Record: boundary_class = portfolio | surface
    ```
 
-6. **Check for dependencies:**
+6. **Determine entry and execution shape:**
+   ```text
+   Ask: "Will humans, agents, or both trigger this workflow?"
+   Record: entry_mode = human | agent | hybrid
+   Ask: "Is the workflow read-only, mutating, or destructive?"
+   Record: side_effect_class = none | read_only | mutating | destructive
+   Ask: "Can cancellation safely stop work without leaving partial state?"
+   Record: cancel_safe = true | false
+   Ask: "What should define the coordination identity for concurrent runs?"
+   Record: coordination_key_strategy draft
+   ```
+
+7. **Define verification and recovery posture:**
+   ```text
+   Ask: "What proves the workflow completed correctly?"
+   Record: verification_strategy
+   If side_effect_class is mutating or destructive:
+   Ask: "How does an operator resume or recover from partial execution?"
+   Record: recovery_posture
+   ```
+
+8. **Check for dependencies:**
    ```text
    Ask: "Does this workflow require other workflows to complete first?"
    Record: depends_on list (if any)
@@ -77,7 +100,16 @@ Understand what the workflow needs to do so we can generate appropriate steps an
   "title": "Example Workflow",
   "description": "Brief description for frontmatter.",
   "purpose": "Expanded description of what workflow accomplishes.",
-  "access": "human",
+  "workflow_boundary_reason": "Requires explicit multi-stage orchestration and verification.",
+  "boundary_class": "surface",
+  "entry_mode": "human",
+  "side_effect_class": "read_only",
+  "cancel_safe": true,
+  "coordination_key_strategy": {
+    "kind": "none"
+  },
+  "verification_strategy": "Final verification stage confirms the generated artifacts and metadata are aligned.",
+  "recovery_posture": "N/A for read-only workflows.",
   "steps": [
     {
       "number": 1,
@@ -103,7 +135,7 @@ Understand what the workflow needs to do so we can generate appropriate steps an
 - Complete requirements document
 - Saved to `checkpoints/create-workflow/<workflow-id>/requirements.json`
 - Step count determined
-- Access level determined
+- Entry and execution shape determined
 
 ## Proceed When
 
@@ -111,4 +143,6 @@ Understand what the workflow needs to do so we can generate appropriate steps an
 - [ ] At least 2 steps identified (including verify)
 - [ ] At least one prerequisite listed
 - [ ] At least one failure condition listed
-- [ ] Access level determined
+- [ ] Workflow boundary is justified
+- [ ] Entry mode and side-effect class are determined
+- [ ] Verification strategy is defined
