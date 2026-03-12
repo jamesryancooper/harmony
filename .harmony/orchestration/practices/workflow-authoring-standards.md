@@ -38,6 +38,29 @@ that authors or evaluates workflows.
    - Exception: workflows whose explicit purpose is to scaffold, validate, or
      harden design packages may target `/.design-packages/` directly, but that
      allowance does not extend to unrelated runtime workflows.
+8. Keep the workflow boundary honest.
+   - Use a workflow when the unit needs explicit multi-stage orchestration,
+     operator-visible sequencing, or coordination across multiple runtime
+     surfaces.
+   - Prefer a skill, command, or single narrower capability when the work is a
+     thin wrapper around one focused action with no meaningful orchestration
+     value.
+9. Make side effects terminate in verification.
+   - Workflows with `side_effect_class: mutating` or `destructive` must end in
+     a terminal verification stage.
+   - Read-only workflows may use a done gate without a dedicated verify stage
+     when the flow remains structurally unambiguous.
+10. Keep recovery and dependency shape explicit.
+   - Side-effectful workflows must document failure conditions and rerun or
+     recovery posture in their stage assets or generated operator guidance.
+   - Workflow-to-workflow dependencies should be rare, acyclic, and justified
+     by real orchestration boundaries rather than authoring convenience.
+11. Keep compatibility helpers non-authoritative.
+   - Legacy compatibility helpers, such as root-level `00-overview.md`, are
+     exceptional companion artifacts and must not be taught as part of the
+     canonical authoring layout.
+   - Authoring surfaces and scaffolds must not reference `guide/` as a required
+     workflow artifact.
 
 ## Checklist
 
@@ -49,3 +72,8 @@ that authors or evaluates workflows.
 - [ ] Workflow artifacts do not carry recurrence or scheduler semantics.
 - [ ] No unit retains deprecated root `WORKFLOW.md`.
 - [ ] No unit depends on `runtime/pipelines/`.
+- [ ] Side-effectful workflows end in a terminal verification stage.
+- [ ] Workflow authoring guidance keeps `workflow.yml`, `stages/`, and root
+      `README.md` as the only canonical layout.
+- [ ] Workflow boundaries are justified; thin wrappers are not promoted to
+      workflows without orchestration value.

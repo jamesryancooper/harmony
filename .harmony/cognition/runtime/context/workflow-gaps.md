@@ -20,6 +20,7 @@ workflows.
 | Versioning | `version` plus Version History | Version metadata or clear maintenance state |
 | Parallelism | `parallel_steps` or explicit N/A | Explicitly state when work is sequential |
 | Verification | Final verify step or verification gate | `Required Outcome` or equivalent verification section |
+| Boundary | More than a thin wrapper; clear orchestration value | Clear reason not to collapse into a simpler capability |
 
 ## 1. Idempotency
 
@@ -80,6 +81,15 @@ workflows.
 
 - Directory workflows should end in a verify step or explicit verification gate.
 - Single-file workflows should have a `Required Outcome`, `Verification Gate`, or equivalent section describing success criteria.
+- Mutating or destructive directory workflows should terminate in a final
+  verification stage instead of ending on the last side effect.
+
+## 8. Workflow Boundary
+
+- Use a workflow when staged orchestration adds real operator or execution
+  value.
+- If the unit is a narrow, one-surface capability with no meaningful
+  orchestration, prefer a skill, command, or simpler runtime surface.
 
 ## How the Shared Evaluator Uses This Guide
 
