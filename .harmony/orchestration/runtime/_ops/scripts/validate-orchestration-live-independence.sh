@@ -18,10 +18,10 @@ pass() {
 
 filter_allowed_matches() {
   awk '
-    /runtime\/workflows\/registry\.yml:[0-9]+:.*Kebab-case design package id and directory name under \.design-packages\// { next }
-    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.design-packages\/\{\{package_id\}\}\/"/ { next }
-    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.design-packages\/\{\{package_id\}\}\/design-package\.yml"/ { next }
-    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.design-packages\/registry\.yml"/ { next }
+    /runtime\/workflows\/registry\.yml:[0-9]+:.*Kebab-case design package id and directory name under \.proposals\// { next }
+    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/\{\{package_id\}\}\/"/ { next }
+    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/\{\{package_id\}\}\/design-package\.yml"/ { next }
+    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/registry\.yml"/ { next }
     { print }
   '
 }
@@ -39,21 +39,21 @@ scan_matches() {
           --glob '!runtime/_ops/tests/test-orchestration-live-independence.sh' \
           --glob '!runtime/queue/_ops/scripts/validate-queue.sh' \
           --glob '!runtime/workflows/_ops/scripts/validate-workflows.sh' \
-          --glob '!runtime/workflows/meta/create-design-package/**' \
-          --glob '!runtime/workflows/audit/audit-design-package/**' \
-          '\.design-packages/' . || true
+          --glob '!runtime/workflows/meta/create-design-proposal/**' \
+          --glob '!runtime/workflows/audit/audit-design-proposal/**' \
+          '\.proposals/' . || true
     )"
   else
     raw_matches="$(
-      grep -R -n -E '\.design-packages/' "$ORCHESTRATION_DIR" 2>/dev/null \
+      grep -R -n -E '\.proposals/' "$ORCHESTRATION_DIR" 2>/dev/null \
         | grep -v '/_meta/architecture/specification.md:' \
         | grep -v '/practices/workflow-authoring-standards.md:' \
         | grep -v '/runtime/_ops/scripts/validate-orchestration-live-independence.sh:' \
         | grep -v '/runtime/_ops/tests/test-orchestration-live-independence.sh:' \
         | grep -v '/runtime/queue/_ops/scripts/validate-queue.sh:' \
         | grep -v '/runtime/workflows/_ops/scripts/validate-workflows.sh:' \
-        | grep -v '/runtime/workflows/meta/create-design-package/' \
-        | grep -v '/runtime/workflows/audit/audit-design-package/' \
+        | grep -v '/runtime/workflows/meta/create-design-proposal/' \
+        | grep -v '/runtime/workflows/audit/audit-design-proposal/' \
         || true
     )"
   fi
@@ -64,10 +64,10 @@ scan_matches() {
 matches="$(scan_matches)"
 
 if [[ -n "$matches" ]]; then
-  fail "live orchestration artifacts must not depend on temporary .design-packages paths"
+  fail "live orchestration artifacts must not depend on temporary .proposals paths"
   printf '%s\n' "$matches"
 else
-  pass "live orchestration artifacts avoid temporary .design-packages paths"
+  pass "live orchestration artifacts avoid temporary .proposals paths"
 fi
 
 echo "orchestration live-independence validation summary: errors=$errors"

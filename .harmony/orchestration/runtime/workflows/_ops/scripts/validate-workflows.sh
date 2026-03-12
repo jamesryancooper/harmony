@@ -347,14 +347,14 @@ check_workflow_contract() {
     pass "workflow '$id' avoids deprecated guide directory"
   fi
 
-  if matches_path_regex '\.design-packages/' "$workflow_dir"; then
-    if [[ "$id" == "audit-design-package" || "$id" == "create-design-package" ]]; then
+  if matches_path_regex '\.proposals/' "$workflow_dir"; then
+    if [[ "$id" == "audit-design-proposal" || "$id" == "create-design-proposal" ]]; then
       pass "workflow '$id' design-package references allowed by explicit exception"
     else
-      fail "workflow '$id' depends on temporary .design-packages paths"
+      fail "workflow '$id' depends on temporary .proposals paths"
     fi
   else
-    pass "workflow '$id' avoids temporary .design-packages paths"
+    pass "workflow '$id' avoids temporary .proposals paths"
   fi
 
   check_workflow_stages "$id" "$workflow_file" "$workflow_dir"
@@ -536,8 +536,8 @@ check_runtime_pipeline_references_absent() {
     "$HARMONY_DIR/engine/runtime/run"
     "$HARMONY_DIR/engine/runtime/run.cmd"
     "$HARMONY_DIR/assurance/runtime/_ops/scripts/alignment-check.sh"
-    "$HARMONY_DIR/assurance/runtime/_ops/scripts/validate-audit-design-package-workflow.sh"
-    "$HARMONY_DIR/assurance/runtime/_ops/scripts/validate-create-design-package-workflow.sh"
+    "$HARMONY_DIR/assurance/runtime/_ops/scripts/validate-audit-design-proposal-workflow.sh"
+    "$HARMONY_DIR/assurance/runtime/_ops/scripts/validate-create-design-proposal-workflow.sh"
     "$HARMONY_DIR/capabilities/runtime/commands"
   )
   if rg -n "runtime/pipelines|pipeline\\.yml|projection\\.pipeline_" "${targets[@]}" \
