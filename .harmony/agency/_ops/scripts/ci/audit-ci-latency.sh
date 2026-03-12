@@ -288,7 +288,7 @@ fi
 mkdir -p "$(dirname "$out_json")" "$(dirname "$out_markdown")"
 
 tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/ci-latency-audit.XXXXXX")"
-trap 'rm -rf "$tmpdir"' EXIT
+trap '[[ -d "$tmpdir" ]] && rm -r "$tmpdir"' EXIT
 
 runs_file="$tmpdir/runs.json"
 workflow_scan_file="$tmpdir/workflow-scan.json"
