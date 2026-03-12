@@ -18,9 +18,10 @@ pass() {
 
 filter_allowed_matches() {
   awk '
-    /runtime\/workflows\/registry\.yml:[0-9]+:.*Kebab-case design package id and directory name under \.proposals\// { next }
-    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/\{\{package_id\}\}\/"/ { next }
-    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/\{\{package_id\}\}\/design-package\.yml"/ { next }
+    /runtime\/workflows\/registry\.yml:[0-9]+:.*Kebab-case (design|migration|policy|architecture) proposal id and directory name under \.proposals\// { next }
+    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/(design|migration|policy|architecture)\/\{\{proposal_id\}\}\/"/ { next }
+    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/(design|migration|policy|architecture)\/\{\{proposal_id\}\}\/proposal\.yml"/ { next }
+    /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/(design|migration|policy|architecture)\/\{\{proposal_id\}\}\/(design|migration|policy|architecture)-proposal\.yml"/ { next }
     /runtime\/workflows\/registry\.yml:[0-9]+:.*path: "\.\.\/\.\.\/\.\.\/\.\.\/\.\.\/\.proposals\/registry\.yml"/ { next }
     { print }
   '
@@ -40,7 +41,13 @@ scan_matches() {
           --glob '!runtime/queue/_ops/scripts/validate-queue.sh' \
           --glob '!runtime/workflows/_ops/scripts/validate-workflows.sh' \
           --glob '!runtime/workflows/meta/create-design-proposal/**' \
+          --glob '!runtime/workflows/meta/create-migration-proposal/**' \
+          --glob '!runtime/workflows/meta/create-policy-proposal/**' \
+          --glob '!runtime/workflows/meta/create-architecture-proposal/**' \
           --glob '!runtime/workflows/audit/audit-design-proposal/**' \
+          --glob '!runtime/workflows/audit/audit-migration-proposal/**' \
+          --glob '!runtime/workflows/audit/audit-policy-proposal/**' \
+          --glob '!runtime/workflows/audit/audit-architecture-proposal/**' \
           '\.proposals/' . || true
     )"
   else
@@ -53,7 +60,13 @@ scan_matches() {
         | grep -v '/runtime/queue/_ops/scripts/validate-queue.sh:' \
         | grep -v '/runtime/workflows/_ops/scripts/validate-workflows.sh:' \
         | grep -v '/runtime/workflows/meta/create-design-proposal/' \
+        | grep -v '/runtime/workflows/meta/create-migration-proposal/' \
+        | grep -v '/runtime/workflows/meta/create-policy-proposal/' \
+        | grep -v '/runtime/workflows/meta/create-architecture-proposal/' \
         | grep -v '/runtime/workflows/audit/audit-design-proposal/' \
+        | grep -v '/runtime/workflows/audit/audit-migration-proposal/' \
+        | grep -v '/runtime/workflows/audit/audit-policy-proposal/' \
+        | grep -v '/runtime/workflows/audit/audit-architecture-proposal/' \
         || true
     )"
   fi
