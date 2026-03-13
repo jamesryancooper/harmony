@@ -267,7 +267,6 @@ See `.harmony/capabilities/runtime/skills/_scaffold/template/SKILL.md`
 | Single-session procedures | **Skill** (phases in SKILL.md) |
 | Multi-session durable work | **Mission** (state machine) |
 | `refactor/` | `refactor` skill |
-| `create-harness/` | `create-harness` skill |
 
 **Why deprecated:**
 
@@ -449,7 +448,7 @@ access: human
 
 - Directory structure copied to target location
 - Contains placeholder files to be customized
-- Often used by workflows (e.g., `create-harness` workflow)
+- Often used by bootstrap or scaffolding flows
 - Not executed—just copied and modified
 
 ### When to Use
@@ -461,23 +460,13 @@ access: human
 
 ### Examples
 
-- `harmony/`: Base .harmony/ structure
-- `harmony-docs/`: Documentation-focused variant
-- `harmony-node-ts/`: Node.js + TypeScript variant
+- `harmony/`: Base repo-root `.harmony/` structure
 
 ### Structure
 
 ```
 templates/
-├── harness/             # Base template
-│   ├── START.md
-│   ├── scope.md
-│   ├── conventions.md
-│   ├── catalog.md
-│   ├── context/
-│   └── progress/
-├── harmony-docs/        # Variant for docs projects
-└── harmony-node-ts/     # Variant for Node+TS projects
+└── harmony/            # Base repo-root harness template
 ```
 
 ---
@@ -575,11 +564,12 @@ Verification gate with actionable criteria and failure mode prevention.
 
 Template with context, instructions, and expected output format.
 
-### "Create a new harness for a subproject"
+### "Adopt Harmony in a new repository"
 
-→ **Template** (via `create-harness` workflow)
+→ **Template** + `/init`
 
-Scaffolding copied and customized for the new harness.
+Bootstrap the repo-root harness bundle, then initialize repo-specific
+contracts.
 
 ### "Chain prompt refinement → research synthesis"
 

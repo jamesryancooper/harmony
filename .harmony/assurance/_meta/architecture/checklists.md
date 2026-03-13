@@ -9,8 +9,7 @@ The `assurance/` directory contains **assurance gates** that agents verify befor
 
 Applicability by harness type:
 
-- Root harness: `assurance/` is strongly recommended and typically present.
-- Descendant harness: `assurance/` is optional; include it when local completion gates are needed.
+- Repo-root harness: `assurance/` is strongly recommended and typically present.
 
 ## Location
 
@@ -29,8 +28,7 @@ Applicability by harness type:
 
 If a harness includes the `assurance/` subsystem, it MUST define `assurance/practices/complete.md` with completion criteria.
 
-- Root harness: should always include this file.
-- Descendant harness: include this file only when the descendant defines local assurance gates.
+- Repo-root harness: should always include this file.
 
 ### Structure
 

@@ -1,17 +1,19 @@
 # Artifact Catalog
 
-This catalog lists the files currently present in the package. Regenerate it
+This catalog lists the files currently present in the archived proposal.
+Regenerate it
 whenever files are added, removed, or reorganized.
 
-## Package
+## Proposal
 
-- `package_id`: `architectural-evaluation-framework-package`
-- `package_path`: `.design-packages/architectural-evaluation-framework-package`
+- `proposal_id`: `architectural-evaluation-framework-package`
+- `proposal_path`: `.proposals/.archive/design/architectural-evaluation-framework-package`
 
 ## Files
 
 - `README.md`
-- `design-package.yml`
+- `proposal.yml`
+- `design-proposal.yml`
 - `adr-acceptance-matrix.md`
 - `architectural-design-checklist.md`
 - `architectural-evaluation-framework.md`

@@ -102,7 +102,7 @@ Each entry should be specific enough to avoid false positives.
 - `/.harmony/orchestration/incident-response.md` - compatibility redirect removed in clean-break migration `2026-02-20-orchestration-bounded-surfaces`
 - `/.harmony/scaffolding/runtime/templates/harmony/orchestration/workflows/` - replaced by `/.harmony/scaffolding/runtime/templates/harmony/orchestration/runtime/workflows/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
 - `/.harmony/scaffolding/runtime/templates/harmony/orchestration/missions/` - replaced by `/.harmony/scaffolding/runtime/templates/harmony/orchestration/runtime/missions/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
-- `/.harmony/scaffolding/runtime/templates/harmony-docs/orchestration/workflows/` - replaced by `/.harmony/scaffolding/runtime/templates/harmony-docs/orchestration/runtime/workflows/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
+- `/.harmony/scaffolding/runtime/templates/<legacy-docs-template>/orchestration/workflows/` - replaced by `/.harmony/scaffolding/runtime/templates/<legacy-docs-template>/orchestration/runtime/workflows/` - removed by migration `2026-02-20-orchestration-bounded-surfaces`
 - `/.harmony/capabilities/commands/` - replaced by `/.harmony/capabilities/runtime/commands/` - removed by migration `2026-02-20-capabilities-bounded-surfaces`
 - `/.harmony/capabilities/skills/` - replaced by `/.harmony/capabilities/runtime/skills/` - removed by migration `2026-02-20-capabilities-bounded-surfaces`
 - `/.harmony/capabilities/tools/` - replaced by `/.harmony/capabilities/runtime/tools/` - removed by migration `2026-02-20-capabilities-bounded-surfaces`

@@ -75,7 +75,7 @@ repo/                              ← Root workspace (scope: repo/**)
 ```
 
 **Authority rules:**
-- DOWN: Can write into descendant workspaces
+- DOWN: Can write into lower-level workspace paths
 - UP: Cannot write into ancestor workspaces
 - SIDEWAYS: Cannot write into sibling workspaces
 

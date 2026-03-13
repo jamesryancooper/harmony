@@ -32,6 +32,8 @@ It is not a canonical runtime, documentation, policy, or contract authority.
 7. `reference/catalog.schema.json`
 8. `reference/pack.schema.json`
 9. `examples/.extensions/nextjs/`
+10. `examples/.extensions/docs/`
+11. `examples/.extensions/node-ts/`
 
 ## Supporting Reference Set
 
@@ -40,7 +42,10 @@ This proposal also includes:
 - a proposed schema for `/.extensions/catalog.yml`
 - a proposed schema for `/.extensions/<pack-id>/pack.yml`
 - a merge and precedence spec for Harmony effective indexes
-- a concrete example pack rooted at `/.extensions/nextjs/`
+- concrete example packs rooted at:
+  - `/.extensions/nextjs/`
+  - `/.extensions/docs/`
+  - `/.extensions/node-ts/`
 
 ## Exit Path
 

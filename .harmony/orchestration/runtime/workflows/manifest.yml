@@ -24,17 +24,6 @@
 
 workflows:
   # --- meta: Operate on the harness itself ---
-  - id: create-harness
-    display_name: Create Harness
-    group: meta
-    domain: harness
-    path: meta/create-harness/
-    summary: Scaffold a new .harmony/ directory in a target location.
-    status: active
-    triggers:
-      - "create a harness"
-      - "scaffold a harmony directory"
-      - "initialize harness"
   - id: evaluate-harness
     display_name: Evaluate Harness
     group: meta
@@ -487,7 +476,7 @@ workflow_group_definitions:
   meta:
     description: Operate on the harness itself (CRUD for harness components)
     path: meta/
-    members: [create-harness, evaluate-harness, migrate-harness, update-harness, create-workflow, evaluate-workflow, update-workflow, create-skill, create-design-proposal, create-migration-proposal, create-policy-proposal, create-architecture-proposal]
+    members: [evaluate-harness, migrate-harness, update-harness, create-workflow, evaluate-workflow, update-workflow, create-skill, create-design-proposal, create-migration-proposal, create-policy-proposal, create-architecture-proposal]
   audit:
     description: Audit orchestration and release gates
     path: audit/

@@ -173,7 +173,7 @@ See [workflows.md](../../../orchestration/_meta/architecture/workflows.md) for f
 
 - `audit-and-refactor.md` — Multi-step audit procedure
 - `publish-to-docs.md` — Multi-step publication workflow
-- `create-harness/` — Subdirectory with sequential steps
+- `create-workflow/` — Subdirectory with sequential steps
 
 ---
 
@@ -272,7 +272,7 @@ stateDiagram-v2
 | Time-bounded initiative | Yes |
 | Delegatable unit of work | Yes |
 | Single task, one session | No |
-| Different codebase area | No (use nested harness) |
+| Different codebase area | No (use repo-root missions or domain-specific root-harness context) |
 
 ---
 

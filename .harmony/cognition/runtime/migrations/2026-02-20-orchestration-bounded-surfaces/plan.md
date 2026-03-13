@@ -23,7 +23,7 @@ description: Clean-break migration plan for separating orchestration runtime art
 - Legacy template runtime paths:
   - `/.harmony/scaffolding/templates/harmony/orchestration/workflows/`
   - `/.harmony/scaffolding/templates/harmony/orchestration/missions/`
-  - `/.harmony/scaffolding/templates/harmony-docs/orchestration/workflows/`
+  - `/.harmony/scaffolding/templates/<legacy-docs-template>/orchestration/workflows/`
 
 ## 3) What Is the New SSOT (Explicit)
 
@@ -37,7 +37,7 @@ description: Clean-break migration plan for separating orchestration runtime art
 - Template authority:
   - `/.harmony/scaffolding/templates/harmony/orchestration/runtime/workflows/`
   - `/.harmony/scaffolding/templates/harmony/orchestration/runtime/missions/`
-  - `/.harmony/scaffolding/templates/harmony-docs/orchestration/runtime/workflows/`
+  - `/.harmony/scaffolding/templates/<legacy-docs-template>/orchestration/runtime/workflows/`
 
 ## 4) Clean-Break Constraints (Affirm)
 

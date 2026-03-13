@@ -5,6 +5,7 @@ mod workflows;
 
 use anyhow::{Context, Result};
 use app_state::AppState;
+use harmony_core::root::RootResolver;
 use slint::{ModelRc, VecModel};
 use std::cell::RefCell;
 use std::path::{Path, PathBuf};
@@ -325,12 +326,7 @@ fn refresh_view(window: &AppWindow, state: &AppState) {
 }
 
 fn find_harmony_root(start: &Path) -> Option<PathBuf> {
-    start.ancestors().find_map(|ancestor| {
-        let manifest = ancestor.join(".harmony/orchestration/runtime/workflows/manifest.yml");
-        if manifest.exists() {
-            Some(ancestor.to_path_buf())
-        } else {
-            None
-        }
-    })
+    RootResolver::resolve_from(start)
+        .ok()
+        .and_then(|harmony_dir| harmony_dir.parent().map(Path::to_path_buf))
 }

@@ -8,9 +8,9 @@
 | Pack installation and enablement | `.extensions/catalog.yml` | Selection plane only; no trust or provenance authority |
 | Pack-local identity, version, trust, compatibility, dependencies, and content entrypoints | `.extensions/<pack-id>/pack.yml` | Authoritative pack manifest for one installed pack id |
 | Pack-contributed skills metadata | `.extensions/<pack-id>/skills/manifest.fragment.yml` and `registry.fragment.yml` | Additive only; cannot redefine core globals |
-| Pack-contributed skill instructions | `.extensions/<pack-id>/skills/<pack-id>--<skill-id>/SKILL.md` | Authoritative for the pack skill only |
+| Pack-contributed skill instructions | `.extensions/<pack-id>/skills/<skill-id>/SKILL.md` | Authoritative for the pack skill only |
 | Pack-contributed commands metadata | `.extensions/<pack-id>/commands/manifest.fragment.yml` | Additive only |
-| Pack-contributed command content | `.extensions/<pack-id>/commands/<pack-id>--<command-id>.md` | Authoritative for the pack command only |
+| Pack-contributed command content | `.extensions/<pack-id>/commands/<command-id>.md` | Authoritative for the pack command only |
 | Pack-contributed templates metadata | `.extensions/<pack-id>/templates/catalog.fragment.yml` | Additive template catalog fragment |
 | Pack-contributed templates content | `.extensions/<pack-id>/templates/**` | Template-local manifests remain authoritative |
 | Pack-contributed prompts metadata | `.extensions/<pack-id>/prompts/catalog.fragment.yml` | Additive prompts catalog fragment |

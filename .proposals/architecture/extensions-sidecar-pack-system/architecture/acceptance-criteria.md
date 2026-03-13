@@ -6,7 +6,7 @@ following are true:
 1. The v1 layout is defined with each pack rooted directly under
    `/.extensions/<pack-id>/`.
 2. The proposal is explicit that `/.extensions/` binds only to the repo-root
-   harness and that descendant harnesses are out of scope.
+   harness.
 3. The allowed content set is explicit:
    - `catalog.yml`
    - `pack.yml`
@@ -82,3 +82,7 @@ following are true:
    enable flows.
 18. The proposal leaves no ambiguity about which implementation work must land
     in `/.harmony/` versus repo-root `/.extensions/`.
+19. The proposal includes concrete example packs showing how removed Harmony
+    scoped-template material is re-expressed inside `/.extensions/`:
+    - `docs` as a template example plus an ARE-derived skill
+    - `node-ts` as a template example

@@ -70,33 +70,33 @@ case_primitives_round_trip() {
 
   local envs=("HARMONY_DIR_OVERRIDE=$fixture_root/.harmony" "HARMONY_ROOT_DIR=$fixture_root")
 
-  discovery_output="$(env "${envs[@]}" bash "$REPO_ROOT/$DISCOVERY_SCRIPT" resolve-workflow --workflow-group meta --workflow-id create-harness)"
-  jq -e '.workflow_ref.workflow_group == "meta" and .workflow_ref.workflow_id == "create-harness"' <<<"$discovery_output" >/dev/null
+  discovery_output="$(env "${envs[@]}" bash "$REPO_ROOT/$DISCOVERY_SCRIPT" resolve-workflow --workflow-group meta --workflow-id evaluate-harness)"
+  jq -e '.workflow_ref.workflow_group == "meta" and .workflow_ref.workflow_id == "evaluate-harness"' <<<"$discovery_output" >/dev/null
 
   decision_path="$(env "${envs[@]}" bash "$REPO_ROOT/$DECISION_SCRIPT" \
     --decision-id dec-test-001 \
     --outcome allow \
     --surface workflows \
     --action launch-workflow \
-    --actor create-harness \
+    --actor evaluate-harness \
     --workflow-group meta \
-    --workflow-id create-harness \
+    --workflow-id evaluate-harness \
     --reason-code target-resolved \
-    --summary 'Create harness workflow admitted for execution.')"
+    --summary 'Evaluate harness workflow admitted for execution.')"
   [[ -f "$decision_path" ]]
 
   run_path="$(env "${envs[@]}" bash "$REPO_ROOT/$RUN_SCRIPT" create \
     --run-id run-test-001 \
     --decision-id dec-test-001 \
-    --summary 'Create harness run started.' \
+    --summary 'Evaluate harness run started.' \
     --workflow-group meta \
-    --workflow-id create-harness \
+    --workflow-id evaluate-harness \
     --executor-id executor-test-01 \
     --lease-seconds 300)"
   [[ -f "$run_path" ]]
 
   lock_output="$(env "${envs[@]}" bash "$REPO_ROOT/$LOCK_SCRIPT" acquire \
-    --coordination-key workflow:meta/create-harness \
+    --coordination-key workflow:meta/evaluate-harness \
     --lock-class exclusive \
     --owner-run-id run-test-001 \
     --lease-seconds 300)"

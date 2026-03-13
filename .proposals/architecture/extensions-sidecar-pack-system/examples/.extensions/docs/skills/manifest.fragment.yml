@@ -1,0 +1,18 @@
+schema_version: "extensions-skills-fragment-v1"
+skills:
+  - id: docs-are-improvement-loop
+    display_name: Docs Are Improvement Loop
+    group: extensions
+    path: are-improvement-loop/
+    skill_class: invocable
+    summary: "Additive docs-improvement loop derived from the former ARE workflow family."
+    status: active
+    tags:
+      - docs
+      - are
+      - improvement
+      - evaluation
+    triggers:
+      - "docs are loop"
+      - "documentation improvement loop"
+      - "analyze refine evaluate docs"

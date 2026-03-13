@@ -23,7 +23,7 @@ success criteria, and cross-surface linkage. `mission.md`, `tasks.json`,
 | Time-bounded initiative (weeks) | Yes | — |
 | Delegatable unit of work | Yes | — |
 | Single task, completes in one session | No | Use harness `tasks.json` |
-| Different codebase area | No | Create nested `.harmony` |
+| Different codebase area | No | Use repo-root domain context or start a separate mission |
 
 ## Active Missions
 

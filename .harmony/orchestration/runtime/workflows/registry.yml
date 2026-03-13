@@ -1263,11 +1263,6 @@ workflows:
           determinism: unique
           description: "Authoritative bounded-audit bundle for workflow-system findings, scores, scenarios, and done-gate evidence."
   # --- Skeleton entries (existing workflows, not yet fully migrated) ---
-  create-harness:
-    version: "1.2.0"
-    commands: ["/create-harness"]
-    access: human
-    depends_on: []
   evaluate-harness:
     version: "1.1.0"
     commands: ["/evaluate-harness"]

@@ -38,7 +38,7 @@ Introduce a **two-layer architecture** with a shared `.harmony/` foundation:
 | Component | Contents |
 |-----------|----------|
 | `assistants/` | reviewer, refactor, docs (generic specialists) |
-| `templates/` | harmony/, harmony-docs/, harmony-node-ts/ |
+| `templates/` | harmony/ plus reusable template bundles |
 | `workflows/` | workspace management, missions, skills, promote-from-scratchpad |
 | `commands/` | recover, validate-frontmatter |
 | `context/` | tools.md, compaction.md |

@@ -1,0 +1,24 @@
+schema_version: "extension-pack-v1"
+id: "docs"
+version: "1.0.0"
+display_name: "Docs"
+summary: "Documentation-focused additive capabilities and scaffolds carried as an extension-pack example."
+compatibility:
+  harmony_version: "^1.4.0"
+  extensions_api_version: "1.0"
+trust:
+  tier: "first-party"
+  provenance: "repo-local"
+dependencies:
+  requires: []
+  conflicts: []
+contents:
+  skills:
+    manifest: "skills/manifest.fragment.yml"
+    registry: "skills/registry.fragment.yml"
+  commands: null
+  templates:
+    catalog: "templates/catalog.fragment.yml"
+  prompts: null
+  context: null
+  validation: null

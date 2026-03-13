@@ -10,12 +10,6 @@ defaults:
   autonomous_allowed: false
 
 workflows:
-  - workflow_id: "create-harness"
-    classification: "agent-augmented"
-    autonomous_allowed: false
-    required_contracts:
-      - "delegation-boundaries-v1"
-
   - workflow_id: "evaluate-harness"
     classification: "agent-augmented"
     autonomous_allowed: false

@@ -30,7 +30,7 @@ Missions let you run parallel workstreams within the same harness without pollut
 | Time-bounded initiative (weeks) | Yes | — |
 | Delegatable unit of work | Yes | — |
 | Single task, completes in one session | No | Use harness `tasks.json` |
-| Different codebase area | No | Create nested `.harmony` |
+| Different codebase area | No | Use repo-root domain context or start a separate mission |
 
 **Decision heuristic:** If you need isolated progress tracking for a bounded effort, create a mission.
 

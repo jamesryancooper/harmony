@@ -40,11 +40,11 @@ This harness contains:
 | Content Type | Location | Example |
 |--------------|----------|---------|
 | **Shared (in `.harmony/`)** | | |
-| Harness templates | `.harmony/scaffolding/runtime/templates/` | `harmony/`, `harmony-docs/` |
+| Harness templates | `.harmony/scaffolding/runtime/templates/` | `harmony/` |
 | Generic agents | `.harmony/agency/runtime/agents/` | `architect/`, `auditor/` |
 | Generic assistants | `.harmony/agency/runtime/assistants/` | `reviewer/`, `refactor/`, `docs/` |
 | Team compositions | `.harmony/agency/runtime/teams/` | `delivery-core/` |
-| Harness management workflows | `.harmony/orchestration/runtime/workflows/meta/` | `create-harness`, `migrate-harness` |
+| Harness management workflows | `.harmony/orchestration/runtime/workflows/meta/` | `migrate-harness`, `update-harness` |
 | Mission management workflows | `.harmony/orchestration/runtime/workflows/missions/` | `create-mission`, `complete-mission` |
 | Generic skills | `.harmony/capabilities/runtime/skills/` | `synthesize-research/` |
 | **Repo-wide (in `.harmony/`)** | | |
@@ -52,10 +52,10 @@ This harness contains:
 | Repo-level missions | `.harmony/orchestration/runtime/missions/` | `auth-overhaul/`, `billing-v2/` |
 | Repo-wide context | `.harmony/cognition/runtime/context/` | `decisions.md`, `lessons.md` |
 | **Domain-specific** | | |
-| Domain workflows | Domain's `.harmony/orchestration/runtime/workflows/` | `docs/api/.harmony/orchestration/runtime/workflows/` |
-| Domain conventions | Domain's `.harmony/conventions.md` | Package-specific style rules |
+| Domain workflows | Repo-root `.harmony/orchestration/runtime/workflows/` grouped by domain | `docs/`, `packages/`, `services/` concerns represented under the root harness |
+| Domain conventions | Repo-root `.harmony/cognition/runtime/context/` or domain docs | Package- or area-specific style rules |
 | **Harness entry points** | | |
-| Cursor command wrappers | `.cursor/commands/` | `create-harness.md`, `evaluate-harness.md` |
+| Cursor command wrappers | `.cursor/commands/` | `evaluate-harness.md`, `update-harness.md` |
 | Global Cursor commands | `~/.cursor/commands/` | Git utilities, personal workflows |
 
 ## Decision Authority

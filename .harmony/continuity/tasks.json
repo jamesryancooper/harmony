@@ -45,41 +45,14 @@
       "completed_at": "2025-12-10"
     },
     {
-      "id": "test-scaffolding",
-      "description": "Test /create-harness command on a target directory",
-      "status": "pending",
-      "owner": "harmony-maintainers",
-      "priority": 1,
-      "blockers": [],
-      "acceptance_criteria": [
-        "Run /create-harness against a real target and capture results in continuity/log.md",
-        "Verify generated continuity files satisfy validate-continuity-memory.sh"
-      ],
-      "knowledge_links": {
-        "specs": [
-          "external:.harmony/orchestration/runtime/workflows/meta/create-harness/README.md"
-        ],
-        "contracts": [
-          "external:.harmony/scaffolding/runtime/templates/harmony/continuity/tasks.json"
-        ],
-        "decisions": [],
-        "evidence": []
-      },
-      "risk_tier": "T1",
-      "required_approvals": [],
-      "note": "Deferred — will complete in future session"
-    },
-    {
       "id": "test-harness",
       "description": "Test the harness with actual agent sessions",
-      "status": "blocked",
+      "status": "pending",
       "owner": "harmony-maintainers",
       "priority": 2,
-      "blockers": [
-        "test-scaffolding"
-      ],
+      "blockers": [],
       "acceptance_criteria": [
-        "Execute at least one end-to-end agent session using the generated harness",
+        "Execute at least one end-to-end agent session using the root harness",
         "Record findings and required adjustments in continuity/log.md"
       ],
       "knowledge_links": {

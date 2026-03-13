@@ -10,7 +10,7 @@ description: Style and formatting rules for the root .harmony harness.
 - Lowercase with hyphens: `my-prompt.md`
 - Commands: `{verb}-{noun}.md` (e.g., `validate-frontmatter.md`)
 - Prompts: `{action}-{target}.md` (e.g., `audit-content.md`)
-- Workflows: `{verb}-{noun}/` directory (e.g., `create-harness/`)
+- Workflows: `{verb}-{noun}/` directory (e.g., `create-workflow/`)
 - Skills & Workflows: Use verbs from the [Verb Vocabulary](/.harmony/capabilities/practices/design-conventions.md#verb-vocabulary)
 
 ## Command vs Prompt Decision

@@ -1,11 +1,11 @@
 ---
 title: Skill Execution
-description: Run logging, safety policies, and hierarchical scope enforcement.
+description: Run logging, safety policies, and repository-scope enforcement.
 ---
 
 # Skill Execution
 
-This document covers what happens when a skill runs, including run logging, safety policies, and hierarchical scope enforcement.
+This document covers what happens when a skill runs, including run logging, safety policies, and repository-scope enforcement.
 
 ---
 
@@ -79,7 +79,7 @@ Skills follow a **deny-by-default** tool policy.
 
 ### File Policy
 
-Skills may only write to paths defined in their registry I/O mappings, validated against hierarchical scope. Skills produce two distinct artifact types with different permission models.
+Skills may only write to paths defined in their registry I/O mappings, validated against the repository-root harness boundary. Skills produce two distinct artifact types with different permission models.
 
 **Deliverables (Final Products):**
 
@@ -100,15 +100,14 @@ Skills may only write to paths defined in their registry I/O mappings, validated
 
 > **Note:** All `.harmony/capabilities/runtime/skills/` categories follow the `{{category}}/{{skill-id}}/` pattern. Skills typically read from `_ops/state/configs/` and `_ops/state/resources/`, and write to `_ops/state/runs/` and `_ops/state/logs/`.
 
-### Hierarchical Scope Enforcement
+### Repository Scope Enforcement
 
-All output paths (Tier 2 and 3) are validated against the harness's hierarchical scope:
+All output paths (Tier 2 and 3) are validated against the repository-root harness scope:
 
-| Direction | Allowed | Example |
-|-----------|---------|---------|
-| **DOWN** (descendants) | ✓ | repo harness → `flowkit/README.md` |
-| **UP** (ancestors) | ✗ | flowkit harness → `../README.md` |
-| **SIDEWAYS** (siblings) | ✗ | docs harness → `../packages/kits/x.md` |
+| Boundary | Allowed | Example |
+|----------|---------|---------|
+| **Within repo root** | ✓ | repo harness → `packages/flowkit/README.md` |
+| **Outside repo root** | ✗ | `../README.md` |
 
 **Enforcement points:**
 1. **Registry load** — Validate declared paths are within scope
@@ -193,11 +192,11 @@ outputs:
   # Tier 3: Harness root (within scope)
   - path: "docs/generated/{{name}}.md"
 
-  # Tier 3: Descendant harness (within scope)
-  - path: "flowkit/README.md"
+  # Tier 3: Project tree path (within scope)
+  - path: "packages/flowkit/README.md"
 ```
 
-Custom paths must fall within the harness's hierarchical scope (can write down, not up or sideways).
+Custom paths must remain within the repository-root harness scope.
 
 ### Timestamp Format
 
@@ -313,7 +312,7 @@ outputs:
 At execution time, validate that:
 
 1. All placeholders in output paths can be resolved
-2. Resolved paths remain within hierarchical scope
+2. Resolved paths remain within the repository boundary
 3. No unresolved `{{placeholder}}` patterns remain in final paths
 
 If resolution fails, report the specific placeholder and suggest how to provide the value.
@@ -350,7 +349,7 @@ When creating a new skill, replace all `{{placeholder}}` values with actual cont
 │                                                                 │
 │  2. CHECK SAFETY & SCOPE                                        │
 │     ├── Verify tool permissions                                 │
-│     ├── Validate output paths against hierarchical scope        │
+│     ├── Validate output paths against repository scope          │
 │     │   ├── Can write DOWN (descendants): ✓                     │
 │     │   ├── Cannot write UP (ancestors): ✗ BLOCK                │
 │     │   └── Cannot write SIDEWAYS (siblings): ✗ BLOCK           │
@@ -367,7 +366,7 @@ When creating a new skill, replace all `{{placeholder}}` values with actual cont
 │     └── Run quality checklist                                   │
 │                                                                 │
 │  5. WRITE OUTPUT (scope-validated)                              │
-│     ├── Re-validate path is within hierarchical scope           │
+│     ├── Re-validate path is within repository scope             │
 │     ├── Save to declared output path                            │
 │     └── Log to _ops/state/logs/{{skill-id}}/{{run-id}}.md                  │
 │                                                                 │

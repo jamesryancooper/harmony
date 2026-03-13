@@ -171,16 +171,16 @@
 - Keep these operational entrypoints inside `/.harmony/`, not under
   `/.extensions/`.
 
-## Workstream 10: First Proving Pack
+## Workstream 10: Proving Packs And Legacy Conversion Examples
 
-- Author one first-party pack, such as `nextjs`, directly under
-  `/.extensions/nextjs/` using the v1 bucket model:
-  - `skills/`
-  - `commands/`
-  - `templates/` plus `catalog.fragment.yml`
-  - `prompts/` plus `catalog.fragment.yml`
-  - `context/` plus `catalog.fragment.yml`
-  - `validation/` plus `catalog.fragment.yml`
-- Prove that the harness can discover, validate, compile, and consume the pack
+- Author a small first-party example set directly under `/.extensions/`:
+  - `nextjs/` for a broad multi-bucket pack
+  - `docs/` for a docs-focused template example plus an ARE-derived skill
+  - `node-ts/` for a Node.js/TypeScript template example
+- Use those examples to prove the preferred bucket mapping for removed scoped
+  Harmony surfaces:
+  - template-shaped specialization becomes `templates/`
+  - workflow-like specialist guidance becomes `skills/`
+- Prove that Harmony can discover, validate, compile, and consume those packs
   through effective indexes without adding new governance, orchestration, or
   agency surfaces outside `/.harmony/`.

@@ -184,7 +184,7 @@ When resolving a resource, agents check local first, then shared:
 ├── scaffolding/
 │   ├── _meta/architecture/ <- Scaffolding subsystem specification
 │   ├── runtime/        <- Runtime scaffolding artifacts
-│   │   ├── templates/  <- Harness scaffolding (harmony/, harmony-docs/, harmony-node-ts/)
+│   │   ├── templates/  <- Harness scaffolding (harmony/ plus proposal/support bundles)
 │   │   └── _ops/scripts/ <- Scaffolding bootstrap scripts
 │   ├── governance/     <- Reusable design and policy patterns
 │   └── practices/      <- Task templates and reference examples
@@ -336,7 +336,7 @@ If your tool supports harness commands, run `/init` instead of invoking the scri
 4. Edit `.harmony/scope.md` to define your repo's boundaries
 5. Edit `.harmony/conventions.md` for your style rules
 6. Add repo-specific context to `.harmony/cognition/runtime/context/`
-7. Create scoped harnesses as needed: `domains/foo/.harmony/`, `services/foo/.harmony/`
+7. Keep the repo-root `/.harmony/` authoritative and extend it there as new needs emerge.
 
 For detailed documentation, see `.harmony/cognition/_meta/architecture/shared-foundation.md`.
 
