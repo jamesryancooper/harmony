@@ -1,65 +1,50 @@
 ---
 title: Harness Skills Architecture
-description: Hierarchical harness model with scoped authority and progressive disclosure.
+description: Repository-root harness model with repository-scoped authority and progressive disclosure.
 ---
 
 # Harness Skills Architecture
 
-This document describes the architectural design of the skills system, including the hierarchical harness model, scope authority, and progressive disclosure.
+This document describes the architectural design of the skills system, including the repository-root harness model, scope authority, and progressive disclosure.
 
 ---
 
 ## Harness Definition
 
-A `.harmony/` directory designates its **parent directory** as a harness root. Harnesses can be nested at any level, creating a hierarchy.
+A `.harmony/` directory designates its **parent directory** as the repository harness root.
 
 ```markdown
 repo/                              ← Root harness (scope: repo/**)
 ├── .harmony/
 ├── src/
-├── docs/                          ← Docs harness (scope: docs/**)
-│   ├── .harmony/
-│   └── guides/
+├── docs/
 └── packages/
-    └── kits/                      ← Kits harness (scope: kits/**)
-        ├── .harmony/
-        ├── shared/
-        └── flowkit/               ← FlowKit harness (scope: flowkit/**)
-            ├── .harmony/
-            └── src/
 ```
 
 ---
 
-## Hierarchical Scope
+## Repository Scope
 
-Each harness's scope includes its parent directory and **all descendants**, including directories that contain their own `.harmony/`.
+The root harness scope includes the repository root and all repository descendants.
 
 ### Scope Authority Rules
 
 | Direction    | Allowed | Description                              |
 |--------------|---------|------------------------------------------|
-| **DOWN**     | ✓       | Can write into descendant harnesses     |
-| **UP**       | ✗       | Cannot write into ancestor harnesses    |
-| **SIDEWAYS** | ✗       | Cannot write into sibling harnesses     |
+| **WITHIN REPO** | ✓ | Can write to declared paths within the repository root |
+| **OUTSIDE REPO** | ✗ | Cannot write outside the repository root |
 
 ### Write Permission Matrix
 
-| Harness     | Can Write To                                             |
-|-------------|----------------------------------------------------------|
-| **repo**    | `repo/**` (includes `docs/**`, `kits/**`, `flowkit/**`)  |
-| **docs**    | `docs/**` only                                           |
-| **kits**    | `kits/**` (includes `flowkit/**`)                        |
-| **flowkit** | `flowkit/**` only                                        |
+| Harness | Can Write To |
+|---------|--------------|
+| **repo** | `repo/**` subject to declared output paths and policy |
 
 ### Example: Who Can Write `flowkit/src/generated.ts`
 
-| Harness   | Permission | Reason                                |
-|-----------|:----------:|---------------------------------------|
-| repo      |     ✓      | flowkit is a descendant               |
-| kits      |     ✓      | flowkit is a descendant               |
-| flowkit   |     ✓      | within own scope                      |
-| docs      |     ✗      | flowkit is not a descendant of docs   |
+| Harness   | Permission | Reason |
+|-----------|:----------:|--------|
+| repo      |     ✓      | path stays within repo root and declared outputs |
 
 ---
 
@@ -194,7 +179,7 @@ All operational categories follow the `{{category}}/{{skill-id}}/` pattern withi
 
 ### Output Paths
 
-Output paths are declared in `registry.yml` under each skill's `io:` section and validated against the harness's hierarchical scope.
+Output paths are declared in `registry.yml` under each skill's `io:` section and validated against the repository-root harness scope.
 
 | Path Type | Example | Purpose |
 |-----------|---------|---------|
@@ -203,9 +188,9 @@ Output paths are declared in `registry.yml` under each skill's `io:` section and
 | **Resources** | `_ops/state/resources/{{skill-id}}/` | Per-skill input materials |
 | **Execution state** | `_ops/state/runs/{{skill-id}}/{{run-id}}/` | Checkpoints, manifests |
 | **Logs** | `_ops/state/logs/{{skill-id}}/{{run-id}}.md` | Execution audit |
-| **Descendant harness** | `flowkit/docs/api.md` | Must be declared, scope-validated |
+| **Project tree path** | `packages/flowkit/docs/api.md` | Must be declared, scope-validated |
 
-**Scope validation:** Paths are checked to ensure they fall within the harness's hierarchical scope (can write down, not up or sideways).
+**Scope validation:** Paths are checked to ensure they remain within the repository-root harness scope.
 
 ---
 
@@ -223,7 +208,7 @@ Deliverables go directly to their final destination with tiered permissions:
 | **Tier 2** | `.harmony/**` | `.harmony/output/exports/data.json` | Custom harness locations |
 | **Tier 3** | `<harness-root>/**` | `src/generated/api-client.ts` | Project source locations |
 
-**Scope validation:** All paths are validated against the harness's hierarchical scope—skills can write **down** into descendant harnesses but never **up** to ancestors or **sideways** to siblings.
+**Scope validation:** All paths are validated against the repository-root harness boundary.
 
 **Permission requirements:** Tier 3 paths (harness root locations) require explicit declaration in `registry.yml`.
 
@@ -248,7 +233,7 @@ Output paths declared in the registry are validated at two points:
 
 | Point | Action |
 |-------|--------|
-| **Registry load** | Validate paths are within hierarchical scope |
+| **Registry load** | Validate paths are within repository scope |
 | **Execution time** | Re-validate before write; block out-of-scope writes |
 
 ### Validation Logic
@@ -259,7 +244,7 @@ VALIDATE_PATH(declared_path, harness_root):
   2. Normalize to absolute path
   3. Check: resolved_path starts with harness_root
      - True: ✓ Valid (within scope)
-     - False: ✗ Reject (outside hierarchical scope)
+     - False: ✗ Reject (outside repository scope)
 ```
 
 ### Invalid Path Examples
@@ -270,8 +255,8 @@ skills:
   generate-guide:
     io:
       outputs:
-        - path: "../README.md"           # ✗ REJECTED: ancestor (repo)
-        - path: "../packages/kits/x.md"  # ✗ REJECTED: sibling path
+        - path: "../README.md"           # ✗ REJECTED: escapes repo root
+        - path: "/tmp/x.md"              # ✗ REJECTED: outside repo root
         - path: "guides/quickstart.md"   # ✓ Valid: within scope
 ```
 
@@ -391,11 +376,11 @@ Tags enable filtering ("show me all validators") without affecting capabilities.
 
 ## Design Principles
 
-### Hierarchical Authority
+### Repository Authority
 
-- Parent harnesses can orchestrate across descendant harnesses
-- Child harnesses remain focused and contained
-- Sibling harnesses are independent
+- The repo-root harness is the single orchestration authority
+- Domain-specific context lives under repo-root harness paths
+- Validation and discovery stay deterministic because there is one active harness root
 
 ### Separation of Concerns
 

@@ -14,3 +14,5 @@
 | `reference/pack.schema.json` | Proposed schema for `/.extensions/<pack-id>/pack.yml` |
 | `reference/effective-index-merge-and-precedence.md` | Proposed merge and precedence contract for compiled effective indexes |
 | `examples/.extensions/nextjs/` | Concrete example extension pack rooted at the proposed repo-root path |
+| `examples/.extensions/docs/` | Example extension pack showing docs-template recovery plus ARE-as-skill conversion |
+| `examples/.extensions/node-ts/` | Example extension pack showing Node.js/TypeScript template recovery |

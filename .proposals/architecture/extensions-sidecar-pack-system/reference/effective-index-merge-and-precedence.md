@@ -6,8 +6,7 @@ Define the proposed v1 merge rules that Harmony uses when compiling effective
 discovery indexes from core `/.harmony/` content plus enabled `/.extensions/`
 content.
 
-This contract assumes a single repo-root harness. It does not support
-descendant harness extension scopes.
+This contract assumes a single repo-root harness.
 
 ## Inputs
 

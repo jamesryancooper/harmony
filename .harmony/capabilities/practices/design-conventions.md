@@ -833,7 +833,7 @@ skills:
         type: deliverable
 ```
 
-**Scope validation:** All paths are validated against the harness's hierarchical scope—skills can write **down** into descendant harnesses but never **up** to ancestors or **sideways** to siblings.
+**Scope validation:** All paths are validated against the repo-root harness boundary and may write only within the repository root and declared output locations.
 
 **Permission requirements:** Tier 3 paths (harness root locations) require explicit declaration in `registry.yml`. Skills should document why project-level writes are necessary.
 

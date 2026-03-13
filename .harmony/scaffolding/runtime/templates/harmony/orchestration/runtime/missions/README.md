@@ -15,7 +15,7 @@ Missions are **time-bounded sub-projects** within a harness. They provide isolat
 | Time-bounded initiative | Yes | — |
 | Delegatable unit of work | Yes | — |
 | Single task, one session | No | Use harness `tasks.json` |
-| Different codebase area | No | Create nested `.harmony` |
+| Different codebase area | No | Track it with a mission or root-harness domain-specific context |
 
 ## Active Missions
 

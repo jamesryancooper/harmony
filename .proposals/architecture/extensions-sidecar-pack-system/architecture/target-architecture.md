@@ -10,7 +10,6 @@ keep all Harmony authority surfaces in `/.harmony/`.
 ## Scope Binding
 
 - `/.extensions/` binds to the repo-root harness only.
-- Descendant harness support is removed and out of scope for this design.
 - Every extension resolution, effective-index compile, and host integration
   operation runs against the root harness at repo root.
 
@@ -26,24 +25,24 @@ keep all Harmony authority surfaces in `/.harmony/`.
     skills/
       manifest.fragment.yml
       registry.fragment.yml
-      <pack-id>--<skill-id>/
+      <skill-id>/
         SKILL.md
         references/
     commands/
       manifest.fragment.yml
-      <pack-id>--<command-id>.md
+      <command-id>.md
     templates/
       catalog.fragment.yml
-      <pack-id>--<template-id>/
+      <template-id>/
         manifest.json
         MANIFEST.md
         ...
     prompts/
       catalog.fragment.yml
-      <pack-id>--<prompt-id>.md
+      <prompt-id>.md
     context/
       catalog.fragment.yml
-      <pack-id>--<doc-id>.md
+      <doc-id>.md
     validation/
       catalog.fragment.yml
       schemas/
@@ -91,6 +90,22 @@ Disallowed in v1:
 - mutable operational state (`_ops/state`, logs, runs, caches)
 - compiled effective manifests or registries
 - any direct replacement for `.harmony` authority files
+
+## Legacy Scoped-Template Conversion Pattern
+
+Removed Harmony template material should be re-expressed inside
+`/.extensions/` using the bucket that best matches the artifact's role:
+
+- template variants become pack-local `templates/` examples
+- former workflow-like specialist guidance becomes pack-local `skills/`
+- pack-local skills and templates remain additive and subordinate to
+  `/.harmony/` authority
+
+The proposal example set demonstrates that split explicitly:
+
+- `docs` carries a docs-focused template example and the ARE workflow family as
+  an additive skill
+- `node-ts` carries a Node.js/TypeScript template example
 
 ## Runtime And Authority Model
 
@@ -208,6 +223,16 @@ the effective extension view when extensions are enabled. This includes:
 - deny-by-default policy compilation for extension-provided skills
 - extension-aware validation and audit entrypoints
 
+## Example Conversion Set
+
+The proposal examples should prove more than one content shape:
+
+- `nextjs` demonstrates a broad multi-bucket pack
+- `docs` demonstrates a mixed pack where docs-focused template content and ARE
+  coexist in one pack
+- `node-ts` demonstrates a template-focused pack for Node.js/TypeScript
+  customization
+
 ## Harmony Implementation Required
 
 The v1 design is not complete until `/.harmony/` can effectively consume and
@@ -312,7 +337,7 @@ model operable, not merely documented.
 ## Naming And Safety Rules
 
 - Every pack id is globally unique.
-- Every pack-contributed artifact id must start with `<pack-id>--`.
+- Every pack-contributed artifact id must be unique within its pack and stable across pack releases.
 - Raw `.extensions/` paths must not become direct live dependencies of
   canonical `.harmony/` surfaces.
 - Pack-local validation assets may validate pack content only; they do not

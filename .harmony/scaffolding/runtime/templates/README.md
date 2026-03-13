@@ -7,8 +7,6 @@ Bootstrap assets for `/init` live under `../bootstrap/`.
 ## Included
 
 - `harmony/` — base `.harmony/` harness template
-- `harmony-docs/` — documentation-focused harness variant
-- `harmony-node-ts/` — Node.js and TypeScript harness variant
 - `proposal-core/` — generic core files for standard-governed proposals
 - `proposal-design-core/` — core files for design proposals
 - `proposal-design-domain-runtime/` — domain/runtime design overlay

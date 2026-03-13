@@ -80,9 +80,7 @@ See `.harmony/START.md` for the full structure reference, including:
 
 | Template | Path | Use For |
 |----------|------|---------|
-| Base harness | `.harmony/scaffolding/templates/harmony/` | All harnesses inherit from this |
-| Docs harness | `.harmony/scaffolding/templates/harmony-docs/` | Documentation areas |
-| Node.js/TS harness | `.harmony/scaffolding/templates/harmony-node-ts/` | TypeScript packages |
+| Base harness | `.harmony/scaffolding/templates/harmony/` | Repo-root harness bootstrap |
 | Cursor command | `.harmony/scaffolding/templates/cursor-command.md` | Cursor command wrappers (local) |
 | Document | `.harmony/scaffolding/templates/document.md` | General documents (local) |
 

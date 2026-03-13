@@ -1406,8 +1406,8 @@ check_io_mappings() {
 # ============================================================================
 # I/O Path Scope Validation
 # ============================================================================
-# Validates that output paths in skills registry are within hierarchical scope.
-# Paths must not escape upward (../) to ancestor harnesses.
+# Validates that output paths in skills registry remain within the repo-root harness scope.
+# Paths must not escape the repository boundary.
 
 # Get output paths for a skill from skills registry
 get_output_paths() {

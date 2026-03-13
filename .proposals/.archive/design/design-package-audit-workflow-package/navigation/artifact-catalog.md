@@ -1,16 +1,17 @@
 # Artifact Catalog
 
-This catalog lists the current package artifacts for
+This catalog lists the current archived proposal artifacts for
 `design-package-audit-workflow-package`.
 
-## Package
+## Proposal
 
-- `package_id`: `design-package-audit-workflow-package`
-- `package_path`: `.design-packages/.archive/design-package-audit-workflow-package`
+- `proposal_id`: `design-package-audit-workflow-package`
+- `proposal_path`: `.proposals/.archive/design/design-package-audit-workflow-package`
 
 ## Core Package Docs
 
-- `design-package.yml`
+- `proposal.yml`
+- `design-proposal.yml`
 - `README.md`
 - `pipeline-overview.md`
 - `stage-contracts.md`

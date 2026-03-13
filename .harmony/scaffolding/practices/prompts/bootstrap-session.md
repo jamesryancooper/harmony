@@ -13,9 +13,8 @@ Quick-start a new agent session in a `.harmony`-enabled directory.
 ## Instructions
 
 1. **Locate harness**
-   - Check for `.harmony/` in current directory
-   - If not found, check parent directories
-   - If none exists, suggest `/create-harness`
+   - Check for `.harmony/` at the repository root
+   - If none exists, stop and note that the repo-root harness must be adopted before session bootstrap can continue
 
 2. **Execute boot sequence**
    Follow the boot sequence in `START.md`

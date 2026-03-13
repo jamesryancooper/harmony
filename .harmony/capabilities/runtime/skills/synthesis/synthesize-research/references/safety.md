@@ -41,11 +41,10 @@ The skill may only write to designated output locations:
 
 ### Scope Authority
 
-| Direction | Permission | Description |
-|-----------|------------|-------------|
-| **Down** | Allowed | Can write into descendant harnesses |
-| **Up** | Blocked | Cannot write into ancestor harnesses |
-| **Sideways** | Blocked | Cannot write into sibling harnesses |
+| Boundary | Permission | Description |
+|----------|------------|-------------|
+| **Within repo root** | Allowed | Can write to declared repo-root harness paths |
+| **Outside repo root** | Blocked | Cannot write outside the repository boundary |
 
 ### Destructive Actions
 
@@ -56,7 +55,7 @@ The skill must never:
 - Delete files
 - Overwrite source research notes
 - Modify files outside designated output paths
-- Write to ancestor or sibling harness paths
+- Write outside the repo-root harness boundary
 
 ## Behavioral Boundaries
 

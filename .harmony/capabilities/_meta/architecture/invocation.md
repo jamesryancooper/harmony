@@ -107,15 +107,14 @@ Reference a file as input:
 
 ## Harness Context
 
-Skills execute within a harness context that determines their scope and permissions. The active harness is resolved before skill execution.
+Skills execute within the repo-root harness context that determines their scope and permissions. The active harness is resolved before skill execution.
 
 ### Resolution Priority
 
 | Priority |         Method          |                  Example                         |
 |----------|-------------------------|--------------------------------------------------|
-|    1     | Explicit `--harness`  | `/skill --harness=path/to/ws "input"`          |
-|    2     | Input path              | Nearest `.harmony/` ancestor of input files    |
-|    3     | Current directory       | Nearest `.harmony/` ancestor of CWD            |
+|    1     | Explicit `--harness`  | `/skill --harness=/repo "input"`               |
+|    2     | Current directory       | Outermost `.harmony/` ancestor of CWD          |
 
 ### Harness Flag
 
@@ -125,32 +124,28 @@ Override harness resolution explicitly:
 # Execute in repo harness regardless of CWD
 /refine-prompt --harness=/repo "add caching"
 
-# Execute in a specific nested harness
-/generate-docs --harness=packages/kits/flowkit "api docs"
+# Execute in a specific repository root
+/generate-docs --harness=/repo "api docs"
 ```
 
 ### Automatic Resolution
 
-Without an explicit flag, the harness is determined automatically:
+Without an explicit flag, the repo-root harness is determined automatically:
 
 ```bash
 # CWD: /repo/packages/kits/flowkit/src/
 /refine-prompt "add caching"
-# → Resolves to flowkit harness (nearest .harmony/ from CWD)
-
-# Input-based resolution
-/synthesize-research packages/kits/flowkit/notes/
-# → Resolves to flowkit harness (nearest .harmony/ from input path)
+# → Resolves to repo-root harness
 ```
 
 ### Harness Context Affects
 
 | Aspect               | How Harness Context Applies                                                         |
 |----------------------|---------------------------------------------------------------------------------------|
-| **Registry loading** | Loads the active harness's `.harmony/capabilities/runtime/skills/registry.yml`                         |
-| **Output paths**     | Validates paths against harness's hierarchical scope                                |
-| **Write permissions**| Can write down (descendants), not up (ancestors), or sideways (siblings)              |
-| **Run logs**         | Written to active harness's `.harmony/capabilities/runtime/skills/_ops/state/logs/{{skill-id}}/{{run-id}}.md`     |
+| **Registry loading** | Loads the repo-root `.harmony/capabilities/runtime/skills/registry.yml` |
+| **Output paths**     | Validates paths against the repository root boundary |
+| **Write permissions**| Can write only within the repo-root harness scope and declared project paths |
+| **Run logs**         | Written to `.harmony/capabilities/runtime/skills/_ops/state/logs/{{skill-id}}/{{run-id}}.md` |
 
 See [Harness Resolution](./harness-resolution.md) for the complete resolution algorithm.
 
@@ -174,7 +169,7 @@ See [Harness Resolution](./harness-resolution.md) for the complete resolution al
 /refine-prompt path/to/rough-prompt.txt
 
 # With explicit harness
-/refine-prompt --harness=packages/kits "add kit utilities"
+/refine-prompt --harness=/repo "add kit utilities"
 ```
 
 ### Explicit Pattern
@@ -220,7 +215,7 @@ The agent will load the skill's `SKILL.md` and description.
 
 ## See Also
 
-- [Architecture](./architecture.md) — Harness resolution and hierarchical scope
+- [Architecture](./architecture.md) — Harness resolution and repository scope
 - [Discovery](./discovery.md) — Manifest and registry formats
 - [Reference Artifacts](./reference-artifacts.md) — Reference file documentation
 - [Execution](./execution.md) — What happens after invocation

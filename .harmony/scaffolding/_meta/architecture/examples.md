@@ -11,7 +11,7 @@ Examples are **reference patterns** stored in `.harmony/scaffolding/practices/ex
 
 ```text
 .harmony/scaffolding/practices/examples/
-└── create-harness-flow.md    # Example of workflow execution
+└── stack-profiles/           # Example reference profiles
 ```
 
 ---
@@ -49,26 +49,20 @@ Examples demonstrate *how things should look*. Templates are *starting points fo
 
 ## Available Examples
 
-### Workflow Execution Examples
+### Stack Profile Examples
 
-- `create-harness-flow.md` — Shows a complete workflow execution trace
+- `stack-profiles/nextjs-astro-vercel.md` — Example platform profile
+- `stack-profiles/python-runtime-workspace.md` — Example runtime/workspace profile
 
 ---
 
-## Note on Scoped Harness Examples
+## Note on Harness Examples
 
-Complete harness structure examples (for documentation areas, Node.js/TypeScript packages, etc.) have been moved to **scoped templates** in `.harmony/scaffolding/runtime/templates/`:
+The root harness is the only supported harness form. Example coverage therefore focuses on:
 
-| Former Example | Now Template |
-|----------------|--------------|
-| `harmony-docs/` | `.harmony/scaffolding/runtime/templates/harmony-docs/` |
-| `harmony-node-ts/` | `.harmony/scaffolding/runtime/templates/harmony-node-ts/` |
-
-Scoped templates are more useful than static examples because they:
-
-1. Inherit from the base `harmony/` template (stay in sync)
-2. Can be directly used by `/create-harness` workflow
-3. Contain only scope-specific customizations
+1. The base `harmony/` template under `.harmony/scaffolding/runtime/templates/`
+2. Stack profile examples under `.harmony/scaffolding/practices/examples/stack-profiles/`
+3. Repo-root customization after `/init`
 
 ---
 

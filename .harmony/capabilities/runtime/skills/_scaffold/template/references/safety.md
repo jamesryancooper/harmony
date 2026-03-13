@@ -9,7 +9,7 @@
 # - Tool and file policies (permissions, write scope)
 # - Must/must-not behavioral constraints
 # - Escalation triggers
-# - Hierarchical scope authority rules
+# - Repository-root scope authority rules
 #
 # If this file exceeds 100 lines AND domain-specific content (patterns, algorithms, rationale)
 # exceeds 30 lines, extract that content to a `<domain>.md` file.
@@ -26,11 +26,10 @@ safety:
       - ".harmony/capabilities/runtime/skills/_ops/state/runs/**"      # Execution state (session recovery)
       - ".harmony/capabilities/runtime/skills/_ops/state/logs/**"      # Logs (always allowed)
       # Custom paths as defined in registry I/O mapping
-      # Must be within harness's hierarchical scope
-    scope_authority:               # Hierarchical scope rules
-      down: allowed                # Can write into descendant harnesses
-      up: blocked                  # Cannot write into ancestor harnesses
-      sideways: blocked            # Cannot write into sibling harnesses
+      # Must remain within the repository-root harness scope
+    scope_authority:               # Repository-root scope rules
+      repo_root: allowed           # Can write within the repository boundary when declared
+      outside_repo: blocked        # Cannot write outside the repository boundary
     destructive_actions: never     # Always 'never'
 ---
 
@@ -67,11 +66,10 @@ The skill may only write to designated output locations:
 
 ### Scope Authority
 
-| Direction     | Permission | Description                          |
-|---------------|------------|--------------------------------------|
-| **Down**      | Allowed    | Can write into descendant harnesses  |
-| **Up**        | Blocked    | Cannot write into ancestor harnesses |
-| **Sideways**  | Blocked    | Cannot write into sibling harnesses  |
+| Boundary         | Permission | Description |
+|------------------|------------|-------------|
+| **Within repo root** | Allowed | Can write to declared repository paths |
+| **Outside repo root** | Blocked | Cannot write outside the repository boundary |
 
 ### Destructive Actions
 
@@ -82,7 +80,7 @@ The skill must never:
 - Delete files
 - Overwrite source code
 - Modify files outside designated output paths
-- Write to ancestor or sibling harness paths
+- Write outside the repo-root harness boundary
 
 ## Behavioral Boundaries
 

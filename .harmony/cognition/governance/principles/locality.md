@@ -83,64 +83,47 @@ repo/
 
 ### Scope Authority
 
-Locality includes boundaries. Harnesses follow strict scope rules:
+Locality includes boundaries. The repo-root harness follows strict scope rules:
 
-| Direction | Allowed | Example |
-|-----------|---------|---------|
-| Down (descendants) | ✅ Write | Root harness can configure child harnesses |
-| Up (ancestors) | ❌ Read only | Child cannot modify parent's context |
-| Sideways (siblings) | ❌ No access | `packages/auth/` cannot access `packages/billing/` harness |
+| Boundary | Allowed | Example |
+|----------|---------|---------|
+| Within repository | ✅ Write where policy allows | Root harness can maintain repo-wide context and declared outputs |
+| Outside repository | ❌ No access | Harness artifacts do not write outside repo root |
 
 ### ✅ Do
 
-**Place domain-specific guidance in domain harnesses:**
+**Place domain-specific guidance in the repo-root harness under domain-specific paths:**
 
 ```
-packages/billing/
-├── .harmony/
-│   ├── START.md           # Billing-specific orientation
-│   ├── conventions.md     # Billing coding standards
-│   ├── assurance/
-│   │   └── payment-flow.md  # Billing-specific checklist
-│   └── cognition/runtime/context/
-│       └── glossary.md    # Billing terminology
-└── src/
+.harmony/
+├── cognition/runtime/context/
+│   └── billing-glossary.md    # Billing terminology
+├── assurance/practices/
+│   └── payment-flow.md        # Billing-specific checklist
+└── orchestration/runtime/workflows/billing/
     └── ...
 ```
 
-**Use inheritance for shared defaults:**
-
-```yaml
-# .harmony/scaffolding/runtime/templates/harmony/conventions.md (shared)
-- Use TypeScript strict mode
-- Format with Prettier
-
-# packages/billing/.harmony/conventions.md (local override)
-- Use TypeScript strict mode
-- Format with Prettier
-- Additional: All money values use Decimal.js  # Domain-specific
-```
-
-**Check for local harness on directory entry:**
+**Check for the repo-root harness on directory entry:**
 
 ```markdown
 <!-- Agent behavior -->
 When entering a directory:
-1. Check if .harmony/ exists
-2. If yes, read START.md for orientation
-3. If no, use nearest ancestor harness
+1. Resolve the repository root
+2. Read `/.harmony/START.md` for orientation
+3. Load domain-specific context from repo-root harness paths as needed
 ```
 
 **Scope context to reduce noise:**
 
 ```yaml
 # Good: Domain-specific skill configuration
-# packages/auth/.harmony/capabilities/runtime/skills/registry.yml
+# .harmony/capabilities/runtime/skills/registry.yml
 skills:
   - id: security-audit
     input_paths:
-      - ./src/**/*.ts  # Only auth code
-    output_path: ./.harmony/capabilities/runtime/skills/outputs/
+      - packages/auth/src/**/*.ts
+    output_path: .harmony/capabilities/runtime/skills/outputs/
 ```
 
 ### ❌ Don't
@@ -158,66 +141,64 @@ skills:
 └── ...
 ```
 
-**Don't reach across harness boundaries:**
+**Don't invent alternate harness roots:**
 
 ```typescript
-// Bad: Cross-harness access
+// Bad: Create ad hoc local harness files outside the repo root
 import { billingContext } from '../../billing/.harmony/cognition/runtime/context';
 
-// Good: Request through proper channels or shared foundation
-import { sharedContext } from '../../../.harmony/cognition/runtime/context';
+// Good: Keep domain-specific context under the repo-root harness
+import { billingContext } from '../../../.harmony/cognition/runtime/context/billing-glossary.md';
 ```
 
-**Don't duplicate shared content in every harness:**
+**Don't duplicate shared content in multiple local harness roots:**
 
 ```
 # Bad: Same content copied everywhere
-packages/auth/.harmony/conventions.md      # Copy of shared
-packages/billing/.harmony/conventions.md   # Copy of shared
-packages/web/.harmony/conventions.md       # Copy of shared
+.harmony/cognition/runtime/context/auth.md
+.harmony/cognition/runtime/context/billing.md
+.harmony/cognition/runtime/context/web.md
 
-# Good: Inherit shared, override only what's different
-packages/auth/.harmony/conventions.md      # "Extends shared, plus: ..."
+# Good: Keep domain-specific additions in distinct repo-root files
+.harmony/cognition/runtime/context/billing.md
 ```
 
 ## Implementation Patterns
 
 ### Harness Discovery
 
-Agents discover harnesses using nearest-ancestor resolution (like git finding `.git/`):
+Agents discover the repo-root harness from the current repository:
 
 ```
 Current: /repo/packages/auth/src/handlers/login.ts
 
 Resolution chain:
-1. /repo/packages/auth/src/handlers/.harmony/ → not found
-2. /repo/packages/auth/src/.harmony/ → not found
-3. /repo/packages/auth/.harmony/ → FOUND, use this
-4. (fallback) /repo/.harmony/
+1. Resolve repository root: /repo/
+2. Load active harness: /repo/.harmony/
 ```
 
 ### Context Composition
 
-Local context composes with shared context:
+Repo-root context composes shared and domain-specific files:
 
 ```yaml
 # Effective context for packages/auth/
 sources:
-  - .harmony/cognition/runtime/context/tools.md           # Shared tools knowledge
-  - .harmony/cognition/runtime/context/compaction.md      # Shared compaction rules
-  - .harmony/cognition/runtime/context/decisions.md     # Root decisions
-  - packages/auth/.harmony/cognition/runtime/context/decisions.md  # Auth decisions (overrides)
-  - packages/auth/.harmony/cognition/runtime/context/glossary.md   # Auth-specific terms
+  - .harmony/cognition/runtime/context/tools.md
+  - .harmony/cognition/runtime/context/compaction.md
+  - .harmony/cognition/runtime/context/decisions.md
+  - .harmony/cognition/runtime/context/auth-decisions.md
+  - .harmony/cognition/runtime/context/auth-glossary.md
 ```
 
 ### Progress Isolation
 
-Each harness tracks its own progress:
+The root harness tracks progress for the repository and its domains:
 
 ```
-packages/auth/.harmony/continuity/
-├── log.md         # Auth-specific session log
-└── tasks.json     # Auth-specific task list
+.harmony/continuity/
+├── log.md         # Repository session log
+└── tasks.json     # Repository task list
 
 packages/billing/.harmony/continuity/
 ├── log.md         # Billing-specific session log

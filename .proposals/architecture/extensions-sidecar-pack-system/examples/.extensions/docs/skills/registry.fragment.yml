@@ -1,0 +1,19 @@
+schema_version: "extensions-skills-registry-fragment-v1"
+skills:
+  docs-are-improvement-loop:
+    version: "1.0.0"
+    commands:
+      - /docs-are-improvement-loop
+    parameters:
+      - name: target_path
+        type: text
+        required: false
+        default: "docs/"
+        description: "Repo-relative documentation scope for the loop."
+      - name: emphasis
+        type: text
+        required: false
+        default: "quality"
+        description: "Primary review emphasis such as quality, coverage, or readability."
+    requires:
+      context: []

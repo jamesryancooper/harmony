@@ -38,31 +38,18 @@ Bootstrap assets used by `/init` are not part of this surface. They live under `
 │   ├── scaffolding/runtime/_ops/scripts/
 │   │   └── init-project.sh # Project bootstrap generator
 │   └── scaffolding/practices/examples/
-├── harmony-docs/           # Scoped template for documentation areas
-│   ├── MANIFEST.md         # Inheritance metadata
-│   ├── START.md            # Overrides base
-│   ├── scope.md            # Overrides base
-│   ├── conventions.md      # Overrides base
-│   ├── assurance/practices/complete.md     # Overrides base
-│   └── orchestration/runtime/workflows/are/  # Docs-specific workflows
-└── harmony-node-ts/        # Scoped template for Node.js/TypeScript
-    ├── MANIFEST.md         # Inheritance metadata
-    ├── START.md            # Overrides base
-    ├── scope.md            # Overrides base
-    ├── conventions.md      # Overrides base
-    └── assurance/practices/complete.md     # Overrides base
+└── proposal-*/             # Proposal/support templates
 ```
 
 ---
 
 ## Template Manifests
 
-Each template directory contains two manifest files:
+Each harness template directory contains a manifest file:
 
 | File | Format | Purpose |
 |------|--------|---------|
-| `manifest.json` | JSON | Machine-readable; used by `/create-harness` workflow |
-| `MANIFEST.md` | Markdown | Human-readable; detailed documentation and examples |
+| `manifest.json` | JSON | Machine-readable template metadata |
 
 ### manifest.json Structure
 
@@ -72,52 +59,28 @@ The `manifest.json` file defines:
 |-------|-------------|
 | `name` | Template identifier |
 | `description` | Brief description |
-| `inherits` | Parent template name (or `null` for base) |
+| `inherits` | Parent template name (or `null` for base/support template) |
 | `files` | Required files and directories (base template only) |
 | `contents` | Map of file paths to descriptions (base template only) |
-| `overrides` | Files from parent that this template replaces |
-| `additions` | New directories and files added by this template |
 | `usage` | Example command to use this template |
 
-### How `/create-harness` Uses Manifests
+### How Template Metadata Is Used
 
 1. Read the target template's `manifest.json`
-2. If `inherits` is set, first copy all files from the parent template
-3. Overlay files listed in `overrides` from the scoped template
-4. Copy additional directories and files from `additions`
+2. Copy the base `harmony/` template for the target repository root
+3. Customize the copied files to the repository context
 
 A JSON schema is available at `.harmony/scaffolding/runtime/templates/manifest.schema.json`.
 
 ---
 
-## Template Inheritance
+## Supported Harness Template
 
-Scoped templates **extend** the base `harmony/` template:
+Harmony supports one harness template for one supported harness shape:
 
-| Template | Inherits From | Adds/Overrides |
-|----------|---------------|----------------|
-| `harmony/` | — | Base structure for all harnesses |
-| `harmony-docs/` | `harmony/` | Docs conventions, ARE workflows |
-| `harmony-node-ts/` | `harmony/` | TypeScript/React conventions |
-
-### Root vs Descendant Usage
-
-| Harness Type | Template Guidance |
-|--------------|-------------------|
-| **Root harness** | Use the base `harmony/` profile as-is (full governance/state coverage) |
-| **Descendant harness** | Start from a template, then prune unused subsystems to keep local harnesses minimal |
-
-The scaffold intentionally starts comprehensive; localized descendant harnesses may omit subsystems that are not needed in that subtree.
-
-### Resolution Order
-
-When creating a harness with a scoped template:
-
-1. Copy all files from `harmony/` (base)
-2. Overlay files from the scoped template (overrides)
-3. Copy any scope-specific directories (e.g., `workflows/are/`)
-
-See each template's `MANIFEST.md` for human-readable details or `manifest.json` for machine-readable structure.
+| Template | Purpose |
+|----------|---------|
+| `harmony/` | Base structure for the repo-root harness |
 
 ---
 
@@ -146,22 +109,14 @@ See each template's `MANIFEST.md` for human-readable details or `manifest.json` 
 
 ## Using Templates
 
-Templates are typically used by workflows (e.g., `/create-harness` copies from `.harmony/scaffolding/runtime/templates/harmony/`). The base `harmony` template also carries a projected copy of the canonical bootstrap bundle under `scaffolding/runtime/bootstrap/`.
-
-### With Scoped Templates
-
-```text
-/create-harness @docs/api-reference --template docs
-/create-harness @domains/ui --template docs
-```
+Templates are used as reusable scaffolding assets. The base `harmony` template also carries a projected copy of the canonical bootstrap bundle under `scaffolding/runtime/bootstrap/`.
 
 ### Manual Usage
 
 1. Copy base template to target location
-2. If using a scoped template, overlay its files
-3. Replace all `{{PLACEHOLDER}}` markers
-4. Remove any guidance comments
-5. Verify against harness conventions
+2. Replace all `{{PLACEHOLDER}}` markers
+3. Remove any guidance comments
+4. Verify against harness conventions
 
 ---
 

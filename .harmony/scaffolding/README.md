@@ -28,8 +28,6 @@ Bootstrap assets live under `runtime/bootstrap/`, and reusable template bundles 
 | Template | Inherits | Purpose |
 |----------|----------|---------|
 | `harmony/` | — | Base harness template |
-| `harmony-docs/` | `harmony/` | Documentation area harness |
-| `harmony-node-ts/` | `harmony/` | Node.js / TypeScript harness |
 | `migrations/` | — | Clean-break migration plan and release-notes templates |
 
 Bootstrap bundle contents under `runtime/bootstrap/`:

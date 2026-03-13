@@ -1,0 +1,22 @@
+schema_version: "extension-pack-v1"
+id: "node-ts"
+version: "1.0.0"
+display_name: "Node.js / TypeScript"
+summary: "Node.js and TypeScript scaffolding carried as a template-focused extension-pack example."
+compatibility:
+  harmony_version: "^1.4.0"
+  extensions_api_version: "1.0"
+trust:
+  tier: "first-party"
+  provenance: "repo-local"
+dependencies:
+  requires: []
+  conflicts: []
+contents:
+  skills: null
+  commands: null
+  templates:
+    catalog: "templates/catalog.fragment.yml"
+  prompts: null
+  context: null
+  validation: null

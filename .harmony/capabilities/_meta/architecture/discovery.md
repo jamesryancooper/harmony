@@ -298,7 +298,7 @@ Input and output entries use a standardized schema:
 
 ### Output Paths and Permission Tiers
 
-Output paths are declared in the registry and validated against the harness's hierarchical scope. Skills produce two distinct artifact types with different permission models.
+Output paths are declared in the registry and validated against the repository-root harness boundary. Skills produce two distinct artifact types with different permission models.
 
 #### Deliverables (Final Products)
 
@@ -350,36 +350,35 @@ skills:
         - path: "docs/generated/{{name}}.md"          # {{harness_root}}/docs/...
           type: markdown
 
-  # Tier 3: Into descendant harness
+  # Tier 3: Into the project tree
   scaffold-kit:
     io:
       outputs:
-        - path: "flowkit/README.md"                 # Descendant harness
+        - path: "packages/flowkit/README.md"
           type: markdown
 ```
 
 ---
 
-### Hierarchical Scope Validation
+### Repository Scope Validation
 
-Output paths must fall within the harness's hierarchical scope:
+Output paths must fall within the repository-root harness scope:
 
-- **Can write DOWN:** Into descendant harnesss
-- **Cannot write UP:** Into ancestor harnesses
-- **Cannot write SIDEWAYS:** Into sibling harnesses
+- **Can write within the repo root:** including declared project source paths
+- **Cannot write outside the repository:** no upward traversal or external paths
 
 #### Valid Paths
 
 ```yaml
-# In repo/.harmony/capabilities/runtime/skills/registry.yml (scope: repo/**)
+# In repo/.harmony/capabilities/runtime/skills/registry.yml
 skills:
   scaffold-all:
     io:
       outputs:
         - path: "README.md"                         # ✓ Harness root
         - path: "src/generated.ts"                  # ✓ Harness subdirectory
-        - path: "docs/guides/setup.md"              # ✓ Descendant harness (docs)
-        - path: "packages/kits/flowkit/README.md"   # ✓ Deep descendant harness
+        - path: "docs/guides/setup.md"              # ✓ Repo path
+        - path: "packages/kits/flowkit/README.md"   # ✓ Deep repo path
 ```
 
 #### Invalid Paths
@@ -409,7 +408,7 @@ skills:
 Paths are validated at:
 
 1. **Registry load time** — Warn/error if paths are outside scope
-2. **Execution time** — Block writes that escape hierarchical scope
+2. **Execution time** — Block writes that escape the repository boundary
 
 ### Composition
 

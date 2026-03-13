@@ -47,23 +47,17 @@ See [Alignment Policy](./alignment-policy.md).
 
 ## Harness Model
 
-A `.harmony/` directory designates its parent as a **harness root**. Harnesses can be nested, creating a hierarchy where parent harnesses have authority over descendants.
+Harmony uses one repo-root `.harmony/` directory per repository.
 
 ```markdown
-repo/                          ← Root harness
-├── .harmony/
-├── docs/                      ← Docs harness (nested)
-│   └── .harmony/
-└── packages/kits/             ← Kits harness (nested)
-    ├── .harmony/
-    └── flowkit/               ← FlowKit harness (nested)
-        └── .harmony/
+repo/
+└── .harmony/
 ```
 
-**Hierarchical authority:**
+**Repo-root authority:**
 
-- Harnesses can write **down** into descendant harnesses
-- Harnesses cannot write **up** into ancestors or **sideways** into siblings
+- Skills and workflows resolve the outermost repo-root `.harmony/`
+- Writes stay within the repository root and declared output locations
 - Deliverables go to `.harmony/{{category}}/` (final destination)
 - Execution state goes to `.harmony/capabilities/runtime/skills/_ops/state/runs/{{skill-id}}/{{run-id}}/`
 
@@ -100,7 +94,7 @@ Per the [agentskills.io specification](https://agentskills.io/what-are-skills), 
 | [Creation](./creation.md) | Creating new skills with capabilities |
 | [Invocation](./invocation.md) | Commands, triggers, routing rules |
 | [Execution](./execution.md) | Run logging, safety policies |
-| [Harness Resolution](./harness-resolution.md) | Nearest ancestor model |
+| [Harness Resolution](./harness-resolution.md) | Repo-root resolution model |
 | [Design Conventions](../../practices/design-conventions.md) | Cross-cutting patterns |
 | [Comparison](./comparison.md) | Skills vs. other primitives |
 | [Specification](./specification.md) | Spec compliance, extensions |
