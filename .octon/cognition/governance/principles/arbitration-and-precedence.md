@@ -12,15 +12,16 @@ status: Active
 ## Normative Rules (SSOT)
 
 1. Determine decision class first: capability-attempt, durable promotion/finalize, or supporting governance semantics.
-2. Capability-attempt authority is deny-by-default policy output only.
-3. Durable promotion/finalize authority is ACP gate output only.
-4. `apply` for durable state is interpreted as `promote` unless explicitly stage-only/read-only.
-5. Owner attestation is quorum input only; it is never standalone promotion authority.
-6. Term collisions are resolved by [RA/ACP Glossary](../controls/ra-acp-glossary.md) definitions.
-7. Evidence-minima collisions are resolved by [RA/ACP Promotion Inputs Matrix](../controls/ra-acp-promotion-inputs-matrix.md).
-8. Non-normative guidance/examples cannot weaken fail-closed controls in policy.
-9. If principles disagree and no explicit mapping exists, fail closed with reason-coded `STAGE_ONLY` or `DENY`.
-10. Human intervention is exception-driven only (quorum unresolved, risk threshold crossed, or policy-triggered escalation).
+2. Autonomous-by-default is execution posture only; it does not grant capability-attempt or promotion authority.
+3. Capability-attempt authority is deny-by-default policy output only.
+4. Durable promotion/finalize authority is ACP gate output only.
+5. `apply` for durable state is interpreted as `promote` unless explicitly stage-only/read-only.
+6. Owner attestation is quorum input only; it is never standalone promotion authority.
+7. Term collisions are resolved by [RA/ACP Glossary](../controls/ra-acp-glossary.md) definitions.
+8. Evidence-minima collisions are resolved by [RA/ACP Promotion Inputs Matrix](../controls/ra-acp-promotion-inputs-matrix.md).
+9. Non-normative guidance/examples cannot weaken fail-closed controls in policy.
+10. If principles disagree and no explicit mapping exists, fail closed with reason-coded `STAGE_ONLY` or `DENY`.
+11. Human intervention is exception-driven only (quorum unresolved, risk threshold crossed, or policy-triggered escalation).
 
 ## Application Order
 

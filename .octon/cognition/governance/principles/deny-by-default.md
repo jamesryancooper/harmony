@@ -37,6 +37,15 @@ Boundary split:
 - **Deny-by-default** governs *capabilities* (what an actor can attempt).
 - **Autonomous Control Points (ACPs)** govern *promotion/finalize* decisions (what can become durable).
 
+Execution posture clarification:
+
+- **Autonomous-by-default** is the execution posture: agents should proceed without
+  waiting on humans for routine work when policy permits.
+- **Deny-by-default** is the authority posture: agents start with zero permissions
+  and gain only explicit, scoped capability grants.
+- These are complementary, not competing defaults. Autonomy must never be
+  interpreted as implicit authority.
+
 ## Enforced Model in Octon
 
 Octon enforces deny-by-default through a shared, deterministic control plane:

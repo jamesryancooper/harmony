@@ -22,6 +22,14 @@ Under reversible autonomy:
 - Humans review by exception and post-run receipts; runs do not halt waiting for
   default runtime approvals.
 
+Execution posture clarification:
+
+- ACP makes Octon **autonomous-by-default for execution**, not authority-by-default.
+- Capability attempts remain governed by [Deny by Default](./deny-by-default.md).
+- Durable promotion and finalize decisions remain governed by ACP policy gates.
+- Agent autonomy must not be read as ambient permission or implicit promotion
+  rights.
+
 The standard loop becomes:
 
 **Intent → Boundaries → Plan/Diff/Test → Stage → ACP Gate (policy+quorum) → Promote → Attest → Report**
