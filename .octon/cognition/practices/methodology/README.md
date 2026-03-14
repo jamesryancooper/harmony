@@ -115,6 +115,7 @@ Octon operates as a closed loop with a few non‑negotiable, compounding habits 
 
 - Profile-first execution: before implementation, record exactly one `change_profile`, `release_state`, and a `Profile Selection Receipt`.
 - Release-maturity gate: when `release_state` is `pre-1.0`, default `change_profile` to `atomic`; use `transitional` only when hard gates require coexistence and include `transitional_exception_note` (rationale, risks, owner, decommission date).
+- Autonomous-by-default execution, least-privilege authority: agents run by default inside deny-by-default capability bounds and ACP promotion gates. This is not authority-by-default, and humans are not default step-by-step runtime approvers.
 - Spec‑first changes: Every material change starts with a one‑pager + ADR and micro‑STRIDE. No spec, no start.
 - No silent apply: Agents produce plans/diffs/tests only. ACP receipt outcomes determine runtime promotion authority; humans retain policy authorship, exceptions, and escalation authority.
 - Deterministic AI: Provider/model/version/params pinned; low variance (temperature ≤ 0.3); prompt hash recorded; golden tests guard drift.
