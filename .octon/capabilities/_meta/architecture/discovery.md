@@ -384,23 +384,14 @@ skills:
 #### Invalid Paths
 
 ```yaml
-# In apps/docs-site/.octon/capabilities/runtime/skills/registry.yml (scope: apps/docs-site/**)
+# In repo/.octon/capabilities/runtime/skills/registry.yml
 skills:
   generate-guide:
     io:
       outputs:
-        - path: "guides/quickstart.md"              # ✓ Valid: within scope
-        - path: "../README.md"                      # ✗ REJECTED: ancestor (repo)
-        - path: "../packages/kits/README.md"        # ✗ REJECTED: sibling path
-
-# In flowkit/.octon/capabilities/runtime/skills/registry.yml (scope: flowkit/**)
-skills:
-  generate-types:
-    io:
-      outputs:
-        - path: "src/types.ts"                      # ✓ Valid: within scope
-        - path: "../shared/types.ts"                # ✗ REJECTED: ancestor (kits)
-        - path: "../../README.md"                   # ✗ REJECTED: ancestor (repo)
+        - path: "guides/quickstart.md"              # ✓ Valid: within repo root
+        - path: "../README.md"                      # ✗ REJECTED: escapes repo root
+        - path: "../other-repo/README.md"           # ✗ REJECTED: sibling workspace outside repo root
 ```
 
 #### Validation Rules
@@ -443,7 +434,7 @@ When a user invokes a skill, the system:
 
 ## See Also
 
-- [Architecture](./architecture.md) — Hierarchical harness model and scope authority
+- [Architecture](./architecture.md) — Single-root harness model and scope authority
 - [Invocation](./invocation.md) — How routing rules are applied
 - [Execution](./execution.md) — Scope enforcement during execution
 - [Creation](./creation.md) — Adding skills to the manifest and registry

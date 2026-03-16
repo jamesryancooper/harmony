@@ -85,7 +85,7 @@ Octon supports one harness per repository:
 | Purpose | Repo-wide policy, defaults, shared assets, and operational state |
 | Scope | Entire repository |
 | Subsystems | Canonical full profile, trimmed only by normal repository-specific customization |
-| Resolution | Always resolve to the outermost repo-root `.octon/` |
+| Resolution | Resolve the only repo-root `.octon/` on the ancestor chain; fail if multiple `.octon/` directories appear there |
 
 ---
 

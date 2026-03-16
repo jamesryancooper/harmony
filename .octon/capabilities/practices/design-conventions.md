@@ -971,6 +971,6 @@ This pattern is documented but **not yet implemented** in any skill.
 ## See Also
 
 - [Execution](../_meta/architecture/execution.md) — Run logging format and safety policies
-- [Architecture](../_meta/architecture/architecture.md) — Hierarchical harness model
+- [Architecture](../_meta/architecture/architecture.md) — Single-root harness model
 - [Reference Artifacts](../_meta/architecture/reference-artifacts.md) — Archetype system and file purposes
 - [Discovery](../_meta/architecture/discovery.md) — Manifest and registry structure

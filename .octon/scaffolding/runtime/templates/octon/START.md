@@ -84,5 +84,5 @@ Subdirectories: `inbox/` (staging), `archive/` (deprecated).
 - Check `continuity/tasks.json` for blocked items
 - Check `cognition/runtime/context/lessons.md` for anti-patterns to avoid
 - Check `cognition/runtime/context/decisions.md` for relevant past decisions
-- Review parent harness for patterns
+- Review repo-root context and adjacent domain docs for patterns
 - Document blocker in `continuity/log.md` and stop

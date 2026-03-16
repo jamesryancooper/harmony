@@ -104,7 +104,7 @@ Canonical root-harness structure:
 
 ## Core Concept
 
-A `.octon` directory is a **co-located support structure** that contains everything needed to effectively work on a specific area of your project. It's the "working memory" and "instruction set" for that part of the codebase---useful to both human developers and AI agents.
+A repo-root `.octon` directory is the **co-located support structure** for the repository. It's the "working memory" and "instruction set" for the codebase, with domain-specific guidance organized under repo-root paths rather than descendant harnesses.
 
 The key insight: **context should live close to where it's needed**, but still remain inside the single repo-root harness so governance, discovery, and validation stay coherent.
 
@@ -131,7 +131,7 @@ Your methodology documentation has different workflows than, say, a React compon
 
 3. **Discoverability**
 
-An agent (or human) landing in a directory can immediately ask: "Is there a `.octon` here?" If yes, they know exactly where to find context, instructions, and progress tracking. It's a **convention that scales**.
+An agent (or human) landing anywhere in the repository can resolve the repo root and load `/.octon/`. That keeps discovery deterministic without supporting descendant harnesses.
 
 4. **Encapsulation of Working State**
 
@@ -599,7 +599,7 @@ Not every directory needs a `.octon`. Use this guide to decide.
 
 | Risk | Mitigation |
 |------|------------|
-| **Proliferation** | Don't create harnesses everywhere---only where sustained agent work happens |
+| **Proliferation** | Don't add `.octon/` to every folder; use one repo-root harness and organize domain guidance beneath it |
 | **Drift** | Use harness rules to enforce consistency; consider a linter |
 | **Maintenance burden** | Keep harnesses minimal; archive stale ones |
 | **Discovery** | Harness rules auto-trigger; boot sequence is standardized |

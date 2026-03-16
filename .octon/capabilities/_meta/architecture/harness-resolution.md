@@ -12,8 +12,10 @@ When a skill is invoked, the system resolves the repository-root harness for the
 ```markdown
 RESOLVE_HARNESS(cwd, explicit_harness):
   1. If explicit_harness provided → use it
-  2. Else → find the outermost `.octon/` ancestor of cwd
-  3. If none found → error: "No repository-root harness context"
+  2. Else → collect `.octon/` directories on the cwd ancestor chain
+  3. If exactly one found → use it
+  4. If none found → error: "No repository-root harness context"
+  5. If more than one found → error: "Exactly one repo-root harness is allowed"
 ```
 
 ## Resolution Priority
@@ -21,21 +23,23 @@ RESOLVE_HARNESS(cwd, explicit_harness):
 | Priority | Method | Description |
 |----------|--------|-------------|
 | 1 | Explicit flag | `--harness=/repo` overrides auto-resolution |
-| 2 | Current directory | Outermost `.octon/` ancestor of CWD |
+| 2 | Current directory | The only `.octon/` directory found on the CWD ancestor chain |
 
 ## Finding the Repo-Root Harness
 
-Walk up from the starting directory and keep the outermost `.octon/` ancestor:
+Walk up from the starting directory and inspect only the ancestor chain:
 
 ```markdown
 Starting: /repo/packages/kits/flowkit/src/
-         ↑ collect any ancestor `.octon/`
-         /repo/.octon/ → outermost match
+         ↑ inspect ancestors for `.octon/`
+         /repo/.octon/ → only match
 
 Active harness: repo root
 Harness root: /repo/
 Scope: repo/**
 ```
+
+If the walk finds both `/repo/.octon/` and `/repo/packages/kits/.octon/`, resolution fails because exactly one repo-root harness is allowed on an ancestor chain. A sibling repository such as `/workspace/other-repo/.octon/` is ignored because it is not on the ancestor chain.
 
 ## Examples
 
@@ -72,3 +76,11 @@ If no repo-root `.octon/` is found walking up from the starting point:
 - **Error state** — Skills requiring harness context cannot execute
 - **Fallback** — Some read-only operations may proceed without harness context
 - **User action** — Create a repo-root `.octon/` directory or specify `--harness` explicitly
+
+## Invalid Multiple Harness Roots
+
+If multiple `.octon/` directories are found on the same ancestor chain:
+
+- **Error state** — Execution stops with an ancestor-chain conflict error
+- **Reason** — Octon supports sibling repo-root harnesses, but only one repo-root harness per ancestor chain
+- **User action** — Remove the descendant or ancestor `.octon/` so exactly one repo-root harness remains for that repository

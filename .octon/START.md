@@ -9,26 +9,26 @@ Octon is a portable harness that turns any repository into a governed autonomous
 
 Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
-## Inheritance
+## Single-Root Model
 
-This harness extends `.octon/` for shared infrastructure.
+This harness uses one repo-root `.octon/` per repository.
 
-| Component | Local (Project-Specific) | Shared (in `.octon/`) |
-|-----------|--------------------------|-------------------------|
-| Agents | `.octon/agency/runtime/agents/` | `.octon/agency/runtime/agents/` |
-| Assistants | `.octon/agency/runtime/assistants/` | `.octon/agency/runtime/assistants/` |
-| Teams | `.octon/agency/runtime/teams/` | `.octon/agency/runtime/teams/` |
-| Templates | `.octon/scaffolding/runtime/templates/` | `.octon/scaffolding/runtime/templates/` |
-| Workflows | `.octon/orchestration/runtime/workflows/` | `.octon/orchestration/runtime/workflows/` |
-| Skills | `.octon/capabilities/runtime/skills/` | `.octon/capabilities/runtime/skills/` |
-| Commands | `.octon/capabilities/runtime/commands/` | `.octon/capabilities/runtime/commands/` |
-| Tools | `.octon/capabilities/runtime/tools/` | `.octon/capabilities/runtime/tools/` |
-| Services | `.octon/capabilities/runtime/services/` | `.octon/capabilities/runtime/services/` |
-| Prompts | `.octon/scaffolding/practices/prompts/` | `.octon/scaffolding/practices/prompts/` |
-| Context | `.octon/cognition/runtime/context/` | `.octon/cognition/runtime/context/` |
-| Checklists | `.octon/assurance/` | `.octon/assurance/` |
+| Component | Canonical Path |
+|-----------|----------------|
+| Agents | `.octon/agency/runtime/agents/` |
+| Assistants | `.octon/agency/runtime/assistants/` |
+| Teams | `.octon/agency/runtime/teams/` |
+| Templates | `.octon/scaffolding/runtime/templates/` |
+| Workflows | `.octon/orchestration/runtime/workflows/` |
+| Skills | `.octon/capabilities/runtime/skills/` |
+| Commands | `.octon/capabilities/runtime/commands/` |
+| Tools | `.octon/capabilities/runtime/tools/` |
+| Services | `.octon/capabilities/runtime/services/` |
+| Prompts | `.octon/scaffolding/practices/prompts/` |
+| Context | `.octon/cognition/runtime/context/` |
+| Checklists | `.octon/assurance/` |
 
-**Resolution:** All resources now live under `.octon/`.
+**Resolution:** The active harness is the only `.octon/` on the current repository ancestor chain. Sibling repositories may each have their own repo-root harness.
 
 ---
 

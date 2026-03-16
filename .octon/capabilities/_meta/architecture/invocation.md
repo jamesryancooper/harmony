@@ -50,13 +50,12 @@ Triggers are matched against the `triggers` field in the manifest.
 When a user invokes a skill, the system follows these steps:
 
 1. **Resolve harness** — Determine active harness (see below)
-2. **Read shared manifest** — Load `.octon/capabilities/runtime/skills/manifest.yml` for skill index
-3. **Read harness manifest** — Load active harness's `.octon/capabilities/runtime/skills/manifest.yml`
-4. **Check explicit command** — If `/skill-name`, route directly
-5. **Check explicit pattern** — If `use skill: <name>`, route directly
-6. **Match triggers** — Compare input against registered triggers in manifest
-7. **Resolve ambiguity** — If multiple matches, use `ambiguity_resolution` setting (from registry)
-8. **Load extended metadata** — Read `registry.yml` for matched skill's commands/requires
+2. **Read repo-root manifest** — Load `.octon/capabilities/runtime/skills/manifest.yml` for skill index
+3. **Check explicit command** — If `/skill-name`, route directly
+4. **Check explicit pattern** — If `use skill: <name>`, route directly
+5. **Match triggers** — Compare input against registered triggers in manifest
+6. **Resolve ambiguity** — If multiple matches, use `ambiguity_resolution` setting (from registry)
+7. **Load extended metadata** — Read `.octon/capabilities/runtime/skills/registry.yml` for matched skill metadata
 
 ### Ambiguity Resolution
 
@@ -114,7 +113,7 @@ Skills execute within the repo-root harness context that determines their scope 
 | Priority |         Method          |                  Example                         |
 |----------|-------------------------|--------------------------------------------------|
 |    1     | Explicit `--harness`  | `/skill --harness=/repo "input"`               |
-|    2     | Current directory       | Outermost `.octon/` ancestor of CWD          |
+|    2     | Current directory       | The only `.octon/` directory on the CWD ancestor chain |
 
 ### Harness Flag
 
@@ -137,6 +136,8 @@ Without an explicit flag, the repo-root harness is determined automatically:
 /refine-prompt "add caching"
 # → Resolves to repo-root harness
 ```
+
+If both `/repo/.octon/` and `/repo/packages/kits/.octon/` exist, invocation fails instead of choosing one.
 
 ### Harness Context Affects
 
@@ -193,13 +194,11 @@ Agent: [Matches "refine my prompt" trigger → routes to refine-prompt skill]
 
 Skills are discovered from manifest files (Tier 1):
 
-- `.octon/capabilities/runtime/skills/manifest.yml` — Shared skill index
-- `.octon/capabilities/runtime/skills/manifest.yml` — Harness-specific skills
+- `.octon/capabilities/runtime/skills/manifest.yml` — Repo-root skill index
 
 Extended metadata is loaded from registry files after matching:
 
-- `.octon/capabilities/runtime/skills/registry.yml` — Commands, requires, composition
-- `.octon/capabilities/runtime/skills/registry.yml` — I/O mappings and composition bindings
+- `.octon/capabilities/runtime/skills/registry.yml` — Commands, requires, composition, and I/O mappings
 
 ### Skill Information
 
