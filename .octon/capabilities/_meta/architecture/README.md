@@ -56,7 +56,8 @@ repo/
 
 **Repo-root authority:**
 
-- Skills and workflows resolve the outermost repo-root `.octon/`
+- Skills and workflows resolve the single repo-root `.octon/` on the current ancestor chain
+- If more than one `.octon/` exists on that chain, resolution fails because exactly one repo-root harness is allowed
 - Writes stay within the repository root and declared output locations
 - Deliverables go to `.octon/{{category}}/` (final destination)
 - Execution state goes to `.octon/capabilities/runtime/skills/_ops/state/runs/{{skill-id}}/{{run-id}}/`
@@ -82,7 +83,7 @@ Per the [agentskills.io specification](https://agentskills.io/what-are-skills), 
 
 | Document | Description |
 |----------|-------------|
-| [Architecture](./architecture.md) | Hierarchical harness model, scope authority, progressive disclosure |
+| [Architecture](./architecture.md) | Single-root harness model, scope authority, progressive disclosure |
 | [Capabilities](./capabilities.md) | All 20 capabilities with reference file mapping |
 | [Skill Sets](./skill-sets.md) | Pre-defined capability bundles and common combinations |
 | [Declaration](./declaration.md) | How to declare capabilities, resolution rules |

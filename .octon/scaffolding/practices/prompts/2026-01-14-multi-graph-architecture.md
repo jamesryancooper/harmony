@@ -8,40 +8,20 @@
 
 ## 1. Octon Architecture Overview
 
-Octon uses a **two-layer inheritance model** for AI agent coordination:
+This example assumes Octon's canonical single-root harness model. Graph data lives under the repo-root `.octon/` using namespaced paths rather than additional `.octon/` directories inside the repository.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  .octon/  (Shared Foundation - Portable)              │
-│  ├── capabilities/runtime/skills/       Shared skill definitions           │
-│  ├── orchestration/runtime/workflows/   Workspace management workflows     │
-│  ├── scaffolding/runtime/templates/     Workspace scaffolding              │
-│  ├── agency/runtime/assistants/         Generic specialists (@reviewer)    │
-│  └── cognition/runtime/context/         Shared tools, compaction guides    │
-└──────────────────────┬──────────────────────────────────┘
-                       │ inherits from
-                       ▼
-┌─────────────────────────────────────────────────────────┐
-│  .octon/  (Project-Specific Harness)                  │
-│  ├── cognition/runtime/context/  Decisions, constraints, glossary│
-│  ├── continuity/     tasks.json, log.md, entities.json  │
-│  ├── orchestration/runtime/missions/  Time-bounded sub-projects │
-│  ├── graph/          ← Knowledge graph lives here       │
-│  └── capabilities/runtime/skills/  Project-specific skill mappings│
-└─────────────────────────────────────────────────────────┘
-```
+Canonical references:
 
-**Resolution rule:** Local workspace (`.octon/`) overrides shared foundation (`.octon/` root).
+- `.octon/README.md`
+- `.octon/cognition/governance/principles/locality.md`
 
 ### Where Graphs Fit
 
-Graphs follow the same inheritance pattern:
-
 | Layer | Graph Role |
 |-------|------------|
-| `.octon/graph/` | Shared schema, types, rebuild skill |
-| `.octon/graph/` | Root-level graph + subgraph registry |
-| `apps/*/.octon/graph/` | Domain-specific graphs |
+| `.octon/graph/schema/` | Shared schema, types, rebuild helpers |
+| `.octon/graph/root/` | Root-level graph + registry |
+| `.octon/graph/domains/<domain>/` | Domain-specific graph slices |
 
 ---
 
@@ -51,30 +31,29 @@ Graphs follow the same inheritance pattern:
 octon/
 ├── .octon/
 │   └── graph/
-│       ├── schema.json          # Shared node/edge JSON Schema
-│       └── types.ts             # Shared TypeScript types
-│
-├── .octon/                    # Root workspace (graph portion)
-│   └── graph/
-│       ├── graph.json           # Root graph (decisions, repo-wide entities)
-│       ├── manifest.json        # Source file hashes for staleness
-│       └── subgraphs.json       # Registry of domain graphs
-│
-├── apps/
-│   ├── api/
-│   │   └── .octon/
-│   │       ├── cognition/runtime/context/
-│   │       │   └── decisions/
-│   │       │       └── API-001.md   # ← Front matter declares node
-│   │       └── graph/
-│   │           ├── graph.json       # API-scoped graph
-│   │           └── manifest.json
-│   │
-│   └── web/
-│       └── .octon/
-│           └── graph/
-│               ├── graph.json       # Web-scoped graph
+│       ├── schema/
+│       │   ├── schema.json          # Shared node/edge JSON Schema
+│       │   └── types.ts             # Shared TypeScript types
+│       ├── root/
+│       │   ├── graph.json           # Root graph (decisions, repo-wide entities)
+│       │   ├── manifest.json        # Source file hashes for staleness
+│       │   └── domains.json         # Registry of domain graph slices
+│       └── domains/
+│           ├── api/
+│           │   ├── graph.json       # API-scoped graph slice
+│           │   └── manifest.json
+│           └── web/
+│               ├── graph.json       # Web-scoped graph slice
 │               └── manifest.json
+│
+├── .octon/
+│   └── cognition/runtime/decisions/
+│       ├── root/
+│       │   └── D001.md
+│       ├── api/
+│       │   └── API-001.md           # ← Front matter declares node
+│       └── web/
+│           └── WEB-001.md
 │
 └── packages/
     └── kit-graph/                   # Graph infrastructure kit
@@ -94,7 +73,7 @@ octon/
 Source files declare graph nodes via YAML front matter:
 
 ```markdown
-<!-- apps/api/.octon/cognition/runtime/decisions/001-octon-shared-foundation.md -->
+<!-- .octon/cognition/runtime/decisions/api/API-001.md -->
 ---
 # Graph Identity (required for graph inclusion)
 graph:
@@ -104,7 +83,7 @@ graph:
 # Relationships (edges)
 references:
   - root:decision:D001        # Cross-graph ref to root workspace
-  - api:task:T003             # Local ref within API workspace
+  - api:task:T003             # Local ref within API domain
 depends_on: []
 blocked_by: []
 
@@ -126,8 +105,8 @@ We chose REST for the public API because...
 {workspace}:{type}:{id}
 
 Examples:
-  root:decision:D001      # Root workspace
-  api:decision:API-001    # apps/api workspace
+  root:decision:D001      # Root graph
+  api:decision:API-001    # API domain slice
   web:component:Header    # apps/web workspace
   flowkit:skill:run       # packages/flowkit workspace
 ```
@@ -146,7 +125,7 @@ Examples:
 
 ## 4. Graph JSON Structure
 
-### Local Graph (`apps/api/.octon/graph/graph.json`)
+### Domain Graph (`.octon/graph/domains/api/graph.json`)
 
 ```json
 {
@@ -193,7 +172,7 @@ Examples:
 }
 ```
 
-### Root Graph with Subgraph Registry (`.octon/graph/graph.json`)
+### Root Graph with Domain Registry (`.octon/graph/root/graph.json`)
 
 ```json
 {
@@ -219,14 +198,14 @@ Examples:
   },
   "edges": [],
   "subgraphs": [
-    { "workspace": "api", "path": "apps/api/.octon/graph/graph.json" },
-    { "workspace": "web", "path": "apps/web/.octon/graph/graph.json" },
-    { "workspace": "flowkit", "path": "packages/flowkit/.octon/graph/graph.json" }
+    { "workspace": "api", "path": ".octon/graph/domains/api/graph.json" },
+    { "workspace": "web", "path": ".octon/graph/domains/web/graph.json" },
+    { "workspace": "flowkit", "path": ".octon/graph/domains/flowkit/graph.json" }
   ]
 }
 ```
 
-### Manifest for Staleness Detection (`.octon/graph/manifest.json`)
+### Manifest for Staleness Detection (`.octon/graph/root/manifest.json`)
 
 ```json
 {
@@ -324,16 +303,16 @@ export interface QueryPattern {
 ## 6. CLI Commands
 
 ```bash
-# Rebuild single workspace graph from front matter
+# Rebuild repo-root or single domain graph from front matter
 pnpm octon graph:rebuild .octon
-pnpm octon graph:rebuild apps/api/.octon
+pnpm octon graph:rebuild --domain api
 
 # Rebuild all graphs in monorepo
 pnpm octon graph:rebuild-all
 
 # Check if graph is stale (fast, uses manifest hashes)
 pnpm octon graph:status
-pnpm octon graph:status apps/api/.octon
+pnpm octon graph:status --domain api
 
 # Validate all cross-references resolve
 pnpm octon graph:validate
@@ -481,7 +460,7 @@ if pnpm octon graph:status --quiet; then
 else
   echo "Rebuilding stale graph..."
   pnpm octon graph:rebuild-all
-  git add .octon/graph/ apps/*/.octon/graph/
+  git add .octon/graph/
 fi
 ```
 
@@ -491,19 +470,18 @@ fi
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
-| Shared schema | `.octon/graph/` | Types, JSON Schema |
-| Root graph | `.octon/graph/` | Repo-wide nodes + subgraph index |
-| Domain graphs | `apps/*/.octon/graph/` | Domain-specific nodes |
+| Shared schema | `.octon/graph/schema/` | Types, JSON Schema |
+| Root graph | `.octon/graph/root/` | Repo-wide nodes + domain index |
+| Domain graphs | `.octon/graph/domains/<domain>/` | Domain-specific nodes |
 | Infrastructure | `packages/kit-graph/` | Query engine, CLI, rebuild |
 | Source of truth | YAML front matter in `.md` files | Nodes declared inline |
-| Derived cache | `graph.json` per workspace | Fast load, queryable |
+| Derived cache | `graph.json` per domain slice | Fast load, queryable |
 
 **Key Principles:**
 1. **Locality** — Graphs live where content lives
-2. **Inheritance** — Follows root `.octon/` → domain `.octon/` pattern
-3. **Derived, not authoritative** — Front matter is source; graph is cache
-4. **Federated** — Each workspace owns its graph; root indexes all
-5. **Optional** — Enhances workspace pattern without replacing it
+2. **Derived, not authoritative** — Front matter is source; graph is cache
+3. **Federated** — Each domain slice owns its graph; root indexes all
+4. **Optional** — Enhances the repo-root harness without replacing the canonical topology
 
 ---
 

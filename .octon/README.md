@@ -1,10 +1,10 @@
-# .octon: Shared Harness Foundation
+# .octon: Repo-Root Harness
 
 ## Purpose
 
 Octon is a portable harness that turns any repository into a governed autonomous engineering environment.
 
-`.octon/` provides **reusable infrastructure** for agent harnesses across the repository:
+`.octon/` provides the **repo-root infrastructure** for agent execution in this repository:
 
 - Generic agents, assistants, teams, workflows, commands, prompts
 - Harness templates for scaffolding
@@ -109,23 +109,20 @@ Subsystem expansion specs:
 
 **Portability:** This directory is designed to be copied to other repositories. See [Adopting in Other Repos](#adopting-in-other-repos) below.
 
-## Inheritance Model
+## Single-Root Model
 
 ```
-.octon/            <- Shared foundation (generic, domain-agnostic)
-    |
-    v inherits
-.octon/            <- Single root (all content organized by cognitive function)
+.octon/            <- Single repo-root harness
 ```
 
-All content now lives under `.octon/`, organized by cognitive function.
+All content now lives under one repo-root `.octon/`, organized by cognitive function. Sibling repositories may each have their own repo-root harness, but each repository path may contain only one `.octon/`.
 
-## Override Priority
+## Canonical Locations
 
-When resolving a resource, agents check local first, then shared:
+Each resource resolves from its canonical repo-root path:
 
-| Resource | Search Order |
-|----------|--------------|
+| Resource | Canonical Path |
+|----------|----------------|
 | Agency Manifest | `.octon/agency/manifest.yml` |
 | Agents | `.octon/agency/runtime/agents/` |
 | Assistants | `.octon/agency/runtime/assistants/` |

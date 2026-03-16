@@ -378,7 +378,7 @@ When creating a new skill, replace all `{{placeholder}}` values with actual cont
 ## See Also
 
 - [Design Conventions](../../practices/design-conventions.md) — Log structure, checkpoints, and cross-cutting patterns
-- [Architecture](./architecture.md) — Hierarchical harness model and scope authority
+- [Architecture](./architecture.md) — Single-root harness model and scope authority
 - [Discovery](./discovery.md) — Path declaration and scope validation rules
 - [Reference Artifacts](./reference-artifacts.md) — The `safety.md` and `validation.md` files
 - [Invocation](./invocation.md) — How execution is triggered

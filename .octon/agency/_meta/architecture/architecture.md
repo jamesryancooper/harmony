@@ -186,7 +186,7 @@ Operationally required controls:
 | Legacy docs/config continue to reference `subagents/` | Routing confusion | Clean-break banlist + explicit deprecation lint |
 | Teams become redundant with workflows | Modeling drift | Define team as composition only; workflow remains procedure source of truth |
 | Skills start orchestrating actors | Circular complexity | Policy gate: no actor orchestration from skills without explicit delegator exemption |
-| Multiple local harness roots create routing ambiguity | Misrouting | Keep a single repo-root harness and validate against it |
+| Ancestor-chain `.octon/` nesting creates routing ambiguity | Misrouting | Allow exactly one repo-root harness per ancestor chain; sibling repositories may each keep their own root harness |
 
 ## Rollout Architecture
 

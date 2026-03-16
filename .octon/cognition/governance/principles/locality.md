@@ -15,9 +15,9 @@ Locality is an information architecture principle: knowledge, configuration, and
 Normative facts are declared once authoritatively; local copies are projections/derivations that must link to the source and must not restate norms.
 
 This principle shapes Octon's harness architecture:
-- Domain-specific `.octon/` directories contain domain-specific guidance
+- Domain-specific guidance lives under repo-root `.octon/` paths
 - Skills live near the code they operate on
-- Configuration inherits from parent to child, not scattered globally
+- Configuration stays in canonical repo-root files, not parent/child harness chains
 - Agents load only the context relevant to their current location
 
 ## Why It Matters
@@ -66,19 +66,26 @@ Octon implements locality through a single `.octon/` directory organized by capa
 
 Portability is declared via `octon.yml` metadata — it specifies which paths are reusable framework assets vs. project-specific state.
 
-### Hierarchical Harness Model
+### Single-Root Harness Topology
 
-Harnesses can nest at any level of the repository:
+Each repository gets one repo-root harness. Sibling repositories or workspaces may each have their own repo-root harness, but each ancestor chain may contain only one `.octon/`.
+
+```
+workspace/
+├── api-repo/
+│   └── .octon/
+└── web-repo/
+    └── .octon/
+```
+
+Unsupported:
 
 ```
 repo/
-├── .octon/              # Root harness
-├── packages/
-│   └── auth/
-│       └── .octon/      # Auth-specific harness
-└── apps/
-    └── web/
-        └── .octon/      # Web app harness
+├── .octon/
+└── packages/
+    └── auth/
+        └── .octon/
 ```
 
 ### Scope Authority
@@ -151,7 +158,7 @@ import { billingContext } from '../../billing/.octon/cognition/runtime/context';
 import { billingContext } from '../../../.octon/cognition/runtime/context/billing-glossary.md';
 ```
 
-**Don't duplicate shared content in multiple local harness roots:**
+**Don't duplicate shared content across multiple repo-root files:**
 
 ```
 # Bad: Same content copied everywhere
@@ -200,9 +207,10 @@ The root harness tracks progress for the repository and its domains:
 ├── log.md         # Repository session log
 └── tasks.json     # Repository task list
 
-packages/billing/.octon/continuity/
-├── log.md         # Billing-specific session log
-└── tasks.json     # Billing-specific task list
+.octon/orchestration/runtime/missions/billing-hardening/
+└── continuity/
+    ├── log.md     # Mission-specific session log
+    └── tasks.json # Mission-specific task list
 ```
 
 This enables parallel workstreams without pollution.
@@ -226,26 +234,25 @@ Missions inherit locality principles:
 | Principle | Relationship |
 |-----------|--------------|
 | Progressive Disclosure | Locality scopes what's disclosed; disclosure layers what's loaded |
-| Single Source of Truth | Local harnesses reference shared sources, not duplicate them |
+| Single Source of Truth | Repo-root domain files reference shared sources, not duplicate them |
 | Complexity Calibration | Locality reduces complexity by scoping context proportionally to actual work |
 | Deny-by-Default | Scope boundaries enforce access control |
 
-## When to Create a Harness
+## When to Create a Separate Harness
 
 Use the decision heuristic:
 
-> *"Will an agent work here across multiple sessions?"*
+> *"Is this a separate repository or sibling workspace that needs its own repo-root harness?"*
 
-**Create a harness when:**
-- Domain has unique conventions or terminology
-- Multiple missions will operate in this area
-- Domain experts need to capture institutional knowledge
-- Different checklists or workflows apply
+**Create a separate harness when:**
+- The work lives in a separate sibling repository or standalone workspace
+- That sibling workspace needs its own governance, continuity, and operational state
+- Teams need a clear repo boundary rather than a subdirectory-local convention
 
-**Don't create a harness when:**
-- One-off work in an area
-- No domain-specific guidance needed
-- Parent harness context is sufficient
+**Don't create a separate harness when:**
+- The work is in a descendant directory of an existing repo-root harness
+- One-off work in an area can use domain-specific repo-root files
+- The current repo-root harness already covers the needed guidance
 
 ## Anti-Pattern: Global Soup
 
@@ -258,9 +265,9 @@ Signs of global soup:
 - "Which conventions apply here?" confusion
 
 Prevention:
-- Create domain harnesses for distinct areas
-- Keep harnesses focused (~2,000 tokens target)
-- Use inheritance instead of duplication
+- Create domain-specific files and missions inside the repo-root harness
+- Keep the repo-root harness focused (~2,000 tokens target per loaded slice)
+- Use namespaced files instead of duplication or multiple `.octon/` directories on one repo path
 
 ## Related Documentation
 

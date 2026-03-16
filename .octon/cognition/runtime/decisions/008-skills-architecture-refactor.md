@@ -1,6 +1,6 @@
 ---
 title: "ADR-008: Skills Architecture Refactor"
-status: accepted
+status: superseded
 date: 2026-01-15
 mutability: append-only
 ---
@@ -9,7 +9,7 @@ mutability: append-only
 
 ## Status
 
-Accepted
+Superseded
 
 ## Context
 
@@ -32,7 +32,7 @@ Refactor the skills architecture to align with agentskills.io spec and implement
 | D027 | Skill naming convention | Verb-noun pattern (e.g., `refine-prompt`, `synthesize-research`) |
 | D028 | Progressive disclosure | Three-tier model: SKILL.md (core) + references/ (details) + assets/ (resources) |
 | D029 | Reference file structure | Standard files: phases.md, io-contract.md, safety.md, examples.md, validation.md |
-| D030 | Hierarchical workspace authority | Workspaces can write DOWN (descendants), not UP (ancestors) or SIDEWAYS (siblings) |
+| D030 | Workspace authority model | Superseded. Current policy allows exactly one repo-root `.octon/` per ancestor chain |
 | D031 | Output permission tiers | Tier 1 (default outputs/), Tier 2 (.workspace/**), Tier 3 (workspace root/**) |
 | D032 | Documentation split | Monolithic skills.md split into 10 focused documents |
 
@@ -61,23 +61,15 @@ The verb-noun pattern follows agentskills.io convention and reads more naturally
 └── assets/               # Static resources (optional)
 ```
 
-### Hierarchical Workspace Model
+### Superseded Workspace Model
 
-```
-repo/                              ← Root workspace (scope: repo/**)
-├── .workspace/
-├── docs/                          ← Docs workspace (scope: docs/**)
-│   ├── .workspace/
-│   └── guides/
-└── packages/
-    └── flowkit/                   ← FlowKit workspace (scope: flowkit/**)
-        └── .workspace/
-```
+This ADR originally introduced descendant workspace authority rules. That model no longer applies.
 
-**Authority rules:**
-- DOWN: Can write into lower-level workspace paths
-- UP: Cannot write into ancestor workspaces
-- SIDEWAYS: Cannot write into sibling workspaces
+Current rule:
+
+- Resolve exactly one repo-root `.octon/` on the active ancestor chain
+- Allow writes only within that repository root and declared output paths
+- Permit sibling repositories to keep their own repo-root harnesses outside the active ancestor chain
 
 ### Documentation Split
 

@@ -2,7 +2,7 @@
 title: "ADR-001: Shared .octon/ Foundation"
 description: Extract generic components from .workspace/ to shared .octon/ directory.
 date: 2026-01-13
-status: accepted
+status: superseded
 mutability: append-only
 ---
 
@@ -10,7 +10,7 @@ mutability: append-only
 
 ## Status
 
-Accepted
+Superseded
 
 ## Context
 
@@ -22,16 +22,13 @@ The root `.workspace/` contained both generic, reusable components (assistants, 
 
 ## Decision
 
-Introduce a **two-layer architecture** with a shared `.octon/` foundation:
+This ADR captured the initial migration from `.workspace/` toward `.octon/`. Its original layered override model is superseded.
 
-```
-.octon/            <- Shared foundation (generic, domain-agnostic)
-    |
-    v inherits
-.workspace/          <- Project-specific (progress, missions, domain context)
-```
+Current rule:
 
-**Resolution rule**: Local `.workspace/` overrides shared `.octon/`. Agents check local first.
+- Use one repo-root `.octon/` per repository
+- Keep domain-specific guidance under repo-root `.octon/` paths
+- Do not use additional `.octon/` directories on the same ancestor chain
 
 ## Components Moved to `.octon/`
 
@@ -105,5 +102,5 @@ Cursor commands updated to reference `.octon/` for shared workflows:
 - `.cursor/commands/*.md` (12 files) - Updated paths
 - `.cursor/rules/*.md` (3 files) - Updated globs and template paths
 - `.octon/START.md` - Added inheritance section
-- `docs/architecture/workspaces/README.md` - Added two-layer architecture docs
+- `docs/architecture/workspaces/README.md` - Added initial migration docs for the old workspace model
 - `.octon/capabilities/skills/scripts/setup-harness-links.sh` - Updated to check both locations

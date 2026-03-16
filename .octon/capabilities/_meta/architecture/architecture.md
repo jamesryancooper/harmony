@@ -13,6 +13,8 @@ This document describes the architectural design of the skills system, including
 
 A `.octon/` directory designates its **parent directory** as the repository harness root.
 
+Exactly one `.octon/` directory may exist on a repository ancestor chain. Sibling repositories may each have their own repo-root harness.
+
 ```markdown
 repo/                              ← Root harness (scope: repo/**)
 ├── .octon/
@@ -250,12 +252,13 @@ VALIDATE_PATH(declared_path, harness_root):
 ### Invalid Path Examples
 
 ```yaml
-# In apps/docs-site/.octon/capabilities/runtime/skills/registry.yml (scope: apps/docs-site/**)
+# In repo/.octon/capabilities/runtime/skills/registry.yml
 skills:
   generate-guide:
     io:
       outputs:
         - path: "../README.md"           # ✗ REJECTED: escapes repo root
+        - path: "../other-repo/x.md"     # ✗ REJECTED: sibling workspace outside repo root
         - path: "/tmp/x.md"              # ✗ REJECTED: outside repo root
         - path: "guides/quickstart.md"   # ✓ Valid: within scope
 ```
