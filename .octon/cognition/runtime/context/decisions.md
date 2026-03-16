@@ -16,14 +16,14 @@ Do not edit manually. Update ADR files and `runtime/decisions/index.yml` instead
 
 | ADR | Status | Date | Title | Path |
 |---|---|---|---|---|
-| ADR-001 | accepted | 2026-01-13 | ADR-001: Shared .octon/ Foundation | `../decisions/001-octon-shared-foundation.md` |
+| ADR-001 | superseded | 2026-01-13 | ADR-001: Shared .octon/ Foundation | `../decisions/001-octon-shared-foundation.md` |
 | ADR-002 | accepted | 2026-01-13 | ADR-002: Consolidated .scratchpad/ Human-Led Zone | `../decisions/002-consolidated-scratchpad-zone.md` |
 | ADR-003 | accepted | 2026-01-14 | ADR-003: Projects Elevation and Idea Funnel | `../decisions/003-projects-elevation-and-funnel.md` |
 | ADR-004 | accepted | 2026-01-14 | ADR-004: Refactor Workflow and Universal Commands | `../decisions/004-refactor-workflow.md` |
 | ADR-005 | accepted | 2026-01-14 | ADR-005: Workflow Meta-Architecture and Gap Remediation | `../decisions/005-workflow-meta-architecture.md` |
 | ADR-006 | accepted | 2026-01-14 | ADR-006: Prompt Refiner Skill | `../decisions/006-prompt-refiner-skill.md` |
 | ADR-007 | accepted | 2026-01-14 | ADR-007: Primitives Documentation | `../decisions/007-primitives-documentation.md` |
-| ADR-008 | accepted | 2026-01-15 | ADR-008: Skills Architecture Refactor | `../decisions/008-skills-architecture-refactor.md` |
+| ADR-008 | superseded | 2026-01-15 | ADR-008: Skills Architecture Refactor | `../decisions/008-skills-architecture-refactor.md` |
 | ADR-009 | accepted | 2026-01-17 | ADR-009: Manifest-Based Discovery and Validation Tooling | `../decisions/009-manifest-discovery-and-validation.md` |
 | ADR-010 | accepted | 2026-02-07 | ADR-010: Single-Root Capability-Organized Structure | `../decisions/010-single-root-capability-structure.md` |
 | ADR-011 | accepted | 2026-02-11 | ADR-011: Agency Subsystem Finalization | `../decisions/011-agency-subsystem-finalization.md` |
