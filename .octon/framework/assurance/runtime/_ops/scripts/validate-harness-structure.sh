@@ -94,12 +94,7 @@ require_dir "$OCTON_DIR/state/evidence/validation"
 require_dir "$OCTON_DIR/state/evidence/migration"
 
 require_dir "$OCTON_DIR/generated/effective"
-require_dir "$OCTON_DIR/generated/effective/extensions"
-require_file "$OCTON_DIR/generated/effective/extensions/catalog.effective.yml"
-require_file "$OCTON_DIR/generated/effective/extensions/artifact-map.yml"
-require_file "$OCTON_DIR/generated/effective/extensions/generation.lock.yml"
 require_dir "$OCTON_DIR/generated/proposals"
-require_file "$OCTON_DIR/generated/proposals/registry.yml"
 
 if [[ -e "$OCTON_DIR/continuity" ]]; then
   fail "legacy continuity root still exists: .octon/continuity"

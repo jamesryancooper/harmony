@@ -142,27 +142,6 @@ main() {
     fail "zones.human_led declarations missing"
   fi
 
-  if yq -e '.policies.required_generated[] | select(. == "generated/proposals/registry.yml")' "$MANIFEST_FILE" >/dev/null 2>&1; then
-    pass "required generated proposal registry declared"
-  else
-    fail "policies.required_generated must include generated/proposals/registry.yml"
-  fi
-  if yq -e '.policies.required_generated[] | select(. == "generated/effective/extensions/catalog.effective.yml")' "$MANIFEST_FILE" >/dev/null 2>&1; then
-    pass "required generated effective extension catalog declared"
-  else
-    fail "policies.required_generated must include generated/effective/extensions/catalog.effective.yml"
-  fi
-  if yq -e '.policies.required_generated[] | select(. == "generated/effective/extensions/artifact-map.yml")' "$MANIFEST_FILE" >/dev/null 2>&1; then
-    pass "required generated extension artifact map declared"
-  else
-    fail "policies.required_generated must include generated/effective/extensions/artifact-map.yml"
-  fi
-  if yq -e '.policies.required_generated[] | select(. == "generated/effective/extensions/generation.lock.yml")' "$MANIFEST_FILE" >/dev/null 2>&1; then
-    pass "required generated extension generation lock declared"
-  else
-    fail "policies.required_generated must include generated/effective/extensions/generation.lock.yml"
-  fi
-
   echo "Validation summary: errors=$errors"
   if [[ $errors -gt 0 ]]; then
     exit 1

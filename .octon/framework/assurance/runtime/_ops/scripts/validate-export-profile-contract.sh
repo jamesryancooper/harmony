@@ -52,6 +52,14 @@ main() {
   fi
 
   if OCTON_DIR_OVERRIDE="$OCTON_DIR" OCTON_ROOT_DIR="$ROOT_DIR" \
+    bash "$OCTON_DIR/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh" >/dev/null
+  then
+    pass "extension publication state refresh succeeds"
+  else
+    fail "extension publication state refresh must succeed before export"
+  fi
+
+  if OCTON_DIR_OVERRIDE="$OCTON_DIR" OCTON_ROOT_DIR="$ROOT_DIR" \
     bash "$EXT_PUBLICATION_VALIDATOR" >/dev/null
   then
     pass "extension publication state is current"

@@ -57,11 +57,6 @@ profiles:
 policies:
   raw_input_dependency: "fail-closed"
   generated_staleness: "fail-closed"
-  required_generated:
-    - "generated/proposals/registry.yml"
-    - "generated/effective/extensions/catalog.effective.yml"
-    - "generated/effective/extensions/artifact-map.yml"
-    - "generated/effective/extensions/generation.lock.yml"
 
 zones:
   human_led:
