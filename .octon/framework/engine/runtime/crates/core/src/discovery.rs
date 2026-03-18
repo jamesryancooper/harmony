@@ -12,6 +12,7 @@ pub struct ServiceDiscovery;
 impl ServiceDiscovery {
     pub fn discover(octon_dir: &Path, schemas: &SchemaStore) -> Result<ServiceRegistry> {
         let services_root = octon_dir
+            .join("framework")
             .join("capabilities")
             .join("runtime")
             .join("services");

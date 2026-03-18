@@ -11,6 +11,7 @@ pub struct SchemaStore {
 impl SchemaStore {
     pub fn load(octon_dir: &Path) -> Result<Self> {
         let schema_path = octon_dir
+            .join("framework")
             .join("engine")
             .join("runtime")
             .join("spec")

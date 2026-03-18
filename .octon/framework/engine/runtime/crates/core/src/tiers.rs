@@ -51,6 +51,7 @@ pub fn validate_runtime_discovery_tiers(
     discovered: &ServiceRegistry,
 ) -> Result<Option<RuntimeTierValidation>> {
     let services_dir = octon_dir
+        .join("framework")
         .join("capabilities")
         .join("runtime")
         .join("services");

@@ -3,17 +3,20 @@
 
 set -o pipefail
 
-OCTON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../../" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICES_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+FRAMEWORK_DIR="$(cd "$SERVICES_DIR/../../.." && pwd)"
+OCTON_DIR="$(cd "$FRAMEWORK_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$OCTON_DIR/.." && pwd)"
-SERVICE_DIR_SNAPSHOT="$OCTON_DIR/capabilities/runtime/services/interfaces/filesystem-snapshot"
-SERVICE_DIR_DISCOVERY="$OCTON_DIR/capabilities/runtime/services/interfaces/filesystem-discovery"
-SERVICE_DIR_WATCH="$OCTON_DIR/capabilities/runtime/services/interfaces/filesystem-watch"
-COMMANDS_MANIFEST="$OCTON_DIR/capabilities/runtime/commands/manifest.yml"
-COMMANDS_DIR="$OCTON_DIR/capabilities/runtime/commands"
-SERVICES_MANIFEST="$OCTON_DIR/capabilities/runtime/services/manifest.yml"
-SERVICES_REGISTRY="$OCTON_DIR/capabilities/runtime/services/registry.yml"
-CONTEXT_INDEX="$OCTON_DIR/cognition/runtime/context/index.yml"
-RUNTIME_RUN="$OCTON_DIR/engine/runtime/run"
+SERVICE_DIR_SNAPSHOT="$SERVICES_DIR/interfaces/filesystem-snapshot"
+SERVICE_DIR_DISCOVERY="$SERVICES_DIR/interfaces/filesystem-discovery"
+SERVICE_DIR_WATCH="$SERVICES_DIR/interfaces/filesystem-watch"
+COMMANDS_MANIFEST="$FRAMEWORK_DIR/capabilities/runtime/commands/manifest.yml"
+COMMANDS_DIR="$FRAMEWORK_DIR/capabilities/runtime/commands"
+SERVICES_MANIFEST="$FRAMEWORK_DIR/capabilities/runtime/services/manifest.yml"
+SERVICES_REGISTRY="$FRAMEWORK_DIR/capabilities/runtime/services/registry.yml"
+CONTEXT_INDEX="$OCTON_DIR/instance/cognition/context/index.yml"
+RUNTIME_RUN="$OCTON_DIR/framework/engine/runtime/run"
 export OCTON_RUNTIME_PREFER_SOURCE="${OCTON_RUNTIME_PREFER_SOURCE:-1}"
 SMOKE_ROOT=".octon/framework/capabilities/runtime/services/interfaces"
 
@@ -84,12 +87,12 @@ required_files=(
   "$SERVICE_DIR_WATCH/contracts/invariants.md"
   "$SERVICE_DIR_WATCH/contracts/errors.yml"
   "$SERVICE_DIR_WATCH/fixtures/valid-watch-poll.json"
-  "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/build-filesystem-interfaces-benchmark-fixture.sh"
-  "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/download-filesystem-interfaces-slo-history.sh"
-  "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-integration.sh"
-  "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-slo.sh"
-  "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-perf-regression.sh"
-  "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/tune-filesystem-interfaces-slo-budgets.sh"
+  "$SERVICES_DIR/_ops/scripts/build-filesystem-interfaces-benchmark-fixture.sh"
+  "$SERVICES_DIR/_ops/scripts/download-filesystem-interfaces-slo-history.sh"
+  "$SERVICES_DIR/_ops/scripts/test-filesystem-interfaces-integration.sh"
+  "$SERVICES_DIR/_ops/scripts/test-filesystem-interfaces-slo.sh"
+  "$SERVICES_DIR/_ops/scripts/test-filesystem-interfaces-perf-regression.sh"
+  "$SERVICES_DIR/_ops/scripts/tune-filesystem-interfaces-slo-budgets.sh"
   "$REPO_ROOT/.github/workflows/filesystem-interfaces-perf-regression.yml"
 )
 
@@ -186,13 +189,13 @@ if ! has_payload_match '"cursor"[[:space:]]*:[[:space:]]*"watch-[a-f0-9]{16}"' "
 fi
 
 # Determinism and runtime-state exclusion regression check.
-if ! bash "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-determinism.sh" >/dev/null 2>&1; then
+if ! bash "$SERVICES_DIR/_ops/scripts/test-filesystem-interfaces-determinism.sh" >/dev/null 2>&1; then
   echo "ERROR: filesystem interfaces determinism regression"
   errors=$((errors + 1))
 fi
 
 # Runtime integration regression check.
-if ! bash "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-integration.sh" >/dev/null 2>&1; then
+if ! bash "$SERVICES_DIR/_ops/scripts/test-filesystem-interfaces-integration.sh" >/dev/null 2>&1; then
   echo "ERROR: filesystem interfaces integration regression"
   errors=$((errors + 1))
 fi
@@ -203,7 +206,7 @@ if [[ "$validate_slo" == "1" ]]; then
   mkdir -p "$VALIDATE_TMP_ROOT"
   slo_ok=0
   for attempt in 1 2; do
-    if bash "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-slo.sh" \
+    if bash "$SERVICES_DIR/_ops/scripts/test-filesystem-interfaces-slo.sh" \
         --profile ci \
         --no-report \
         --raw-out "$VALIDATE_TMP_ROOT/slo.raw.tsv" \
@@ -225,7 +228,7 @@ if [[ "$validate_perf" == "1" ]]; then
   mkdir -p "$VALIDATE_TMP_ROOT"
   perf_ok=0
   for attempt in 1 2; do
-    if bash "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/test-filesystem-interfaces-perf-regression.sh" \
+    if bash "$SERVICES_DIR/_ops/scripts/test-filesystem-interfaces-perf-regression.sh" \
         --profile ci \
         --no-report \
         --raw-out "$VALIDATE_TMP_ROOT/perf.raw.tsv" \

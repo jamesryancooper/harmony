@@ -3,15 +3,24 @@
 
 set -o pipefail
 
-OCTON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../../" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICES_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+FRAMEWORK_DIR="$(cd "$SERVICES_DIR/../../.." && pwd)"
+OCTON_DIR="$(cd "$FRAMEWORK_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$OCTON_DIR/.." && pwd)"
-RUNTIME_RUN="$OCTON_DIR/engine/runtime/run"
+RUNTIME_RUN="$OCTON_DIR/framework/engine/runtime/run"
 export OCTON_RUNTIME_PREFER_SOURCE="${OCTON_RUNTIME_PREFER_SOURCE:-1}"
-STATE_DIR=".octon/framework/engine/_ops/state/snapshots"
+STATE_DIR_BASE=".octon/framework/engine/_ops/state/snapshots"
+STATE_DIR="${FILESYSTEM_INTERFACES_STATE_DIR:-$STATE_DIR_BASE/integration-$$}"
 SNAPSHOT_ROOT=".octon/framework/capabilities/runtime/services/interfaces"
 TARGET_NODE="file:.octon/framework/capabilities/runtime/services/interfaces/filesystem-snapshot/SERVICE.md"
 TARGET_DIR_NODE="dir:.octon/framework/capabilities/runtime/services/interfaces/filesystem-snapshot"
 HAS_RG=false
+
+cleanup() {
+  rm -rf "$REPO_ROOT/$STATE_DIR"
+}
+trap cleanup EXIT
 
 if command -v rg >/dev/null 2>&1; then
   HAS_RG=true
@@ -73,7 +82,7 @@ run_op() {
   "$RUNTIME_RUN" tool "$service" "$op" --json "$payload"
 }
 
-BUILD_OUT="$(run_op snapshot.build '{"root":".octon/framework/capabilities/runtime/services/interfaces","state_dir":".octon/framework/engine/_ops/state/snapshots","set_current":true}')"
+BUILD_OUT="$(run_op snapshot.build "$(printf '{"root":"%s","state_dir":"%s","set_current":false}' "$SNAPSHOT_ROOT" "$STATE_DIR")")"
 assert_contains "$BUILD_OUT" '"snapshot_id"[[:space:]]*:[[:space:]]*"snap-[a-f0-9]{8,64}"' "snapshot.build missing valid snapshot_id"
 SNAPSHOT_ID="$(extract_json_string_field "$BUILD_OUT" "snapshot_id")"
 if [[ -z "$SNAPSHOT_ID" ]]; then
@@ -140,7 +149,7 @@ assert_contains "$BADFMT_OUT" '"code"[[:space:]]*:[[:space:]]*"ERR_FILESYSTEM_IN
 
 NOW_MS="$(($(date +%s) * 1000))"
 printf 'created_ms=%s\ncreated_at=%s\n' "$NOW_MS" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$LOCK_FILE"
-LOCKED_OUT="$(run_op snapshot.build '{"root":".octon/framework/capabilities/runtime/services/interfaces","state_dir":".octon/framework/engine/_ops/state/snapshots","set_current":false}')"
+LOCKED_OUT="$(run_op snapshot.build "$(printf '{"root":"%s","state_dir":"%s","set_current":false}' "$SNAPSHOT_ROOT" "$STATE_DIR")")"
 assert_contains "$LOCKED_OUT" '"code"[[:space:]]*:[[:space:]]*"ERR_FILESYSTEM_INTERFACES_LOCKED"' "pre-existing build lock should return ERR_FILESYSTEM_INTERFACES_LOCKED"
 rm -f "$LOCK_FILE"
 
@@ -148,7 +157,7 @@ mkdir -p "$STAGING_DIR"
 printf 'staging-junk\n' > "$STAGING_DIR/junk.txt"
 mkdir -p "$INCOMPLETE_DIR"
 printf 'started_at=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$INCOMPLETE_DIR/.building"
-CLEANUP_OUT="$(run_op snapshot.build '{"root":".octon/framework/capabilities/runtime/services/interfaces","state_dir":".octon/framework/engine/_ops/state/snapshots","set_current":false}')"
+CLEANUP_OUT="$(run_op snapshot.build "$(printf '{"root":"%s","state_dir":"%s","set_current":false}' "$SNAPSHOT_ROOT" "$STATE_DIR")")"
 assert_contains "$CLEANUP_OUT" '"ok"[[:space:]]*:[[:space:]]*true' "snapshot.build should succeed while cleaning stale transients"
 if [[ -d "$STAGING_DIR" ]]; then
   echo "ERROR: stale staging directory was not cleaned: $STAGING_DIR"
@@ -159,7 +168,7 @@ if [[ -d "$INCOMPLETE_DIR" ]]; then
   exit 1
 fi
 
-LIMIT_OUT="$(run_op snapshot.build '{"root":".octon/framework/capabilities/runtime/services/interfaces","state_dir":".octon/framework/engine/_ops/state/snapshots","set_current":false,"max_files":1}')"
+LIMIT_OUT="$(run_op snapshot.build "$(printf '{"root":"%s","state_dir":"%s","set_current":false,"max_files":1}' "$SNAPSHOT_ROOT" "$STATE_DIR")")"
 assert_contains "$LIMIT_OUT" '"code"[[:space:]]*:[[:space:]]*"ERR_FILESYSTEM_INTERFACES_LIMIT_EXCEEDED"' "snapshot.build max_files cap should trigger ERR_FILESYSTEM_INTERFACES_LIMIT_EXCEEDED"
 
 WATCH_OUT="$(run_op watch.poll '{"root":".octon/framework/capabilities/runtime/services/interfaces","state_key":"filesystem-watch:integration","max_events":30,"max_files":100000}')"

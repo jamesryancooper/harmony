@@ -3,12 +3,21 @@
 
 set -o pipefail
 
-OCTON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../../" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICES_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+FRAMEWORK_DIR="$(cd "$SERVICES_DIR/../../.." && pwd)"
+OCTON_DIR="$(cd "$FRAMEWORK_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$OCTON_DIR/.." && pwd)"
-RUNTIME_RUN="$OCTON_DIR/engine/runtime/run"
+RUNTIME_RUN="$OCTON_DIR/framework/engine/runtime/run"
 export OCTON_RUNTIME_PREFER_SOURCE="${OCTON_RUNTIME_PREFER_SOURCE:-1}"
-STATE_DIR=".octon/framework/engine/_ops/state/snapshots"
+STATE_DIR_BASE=".octon/framework/engine/_ops/state/snapshots"
+STATE_DIR="${FILESYSTEM_INTERFACES_STATE_DIR:-$STATE_DIR_BASE/determinism-$$}"
 HAS_RG=false
+
+cleanup() {
+  rm -rf "$REPO_ROOT/$STATE_DIR"
+}
+trap cleanup EXIT
 
 if command -v rg >/dev/null 2>&1; then
   HAS_RG=true
@@ -56,7 +65,9 @@ if [[ ! -x "$RUNTIME_RUN" ]]; then
 fi
 
 build_snapshot() {
-  "$RUNTIME_RUN" tool interfaces/filesystem-snapshot snapshot.build --json '{"root":".octon/framework/capabilities/runtime/services/interfaces","state_dir":".octon/framework/engine/_ops/state/snapshots","set_current":false}'
+  local payload
+  payload="$(printf '{"root":".octon/framework/capabilities/runtime/services/interfaces","state_dir":"%s","set_current":false}' "$STATE_DIR")"
+  "$RUNTIME_RUN" tool interfaces/filesystem-snapshot snapshot.build --json "$payload"
 }
 
 extract_json_string_field() {

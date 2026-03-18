@@ -39,7 +39,11 @@ impl ConfigLoader {
             .ok_or_else(|| KernelError::new(ErrorCode::Internal, ".octon has no parent directory"))?
             .to_path_buf();
 
-        let state_dir = octon_dir.join("engine").join("_ops").join("state");
+        let state_dir = octon_dir
+            .join("framework")
+            .join("engine")
+            .join("_ops")
+            .join("state");
 
         let policy_path = Self::resolve_policy_path(&octon_dir)?;
         let policy = if let Some(path) = policy_path {
@@ -49,6 +53,7 @@ impl ConfigLoader {
         };
 
         let cache_config_path = octon_dir
+            .join("framework")
             .join("engine")
             .join("runtime")
             .join("config")
@@ -93,13 +98,14 @@ impl ConfigLoader {
         }
 
         let default = octon_dir
+            .join("framework")
             .join("engine")
             .join("runtime")
             .join("config")
             .join("policy.yml");
         if default.is_file() {
             // Return relative path to keep later joins consistent.
-            let rel = PathBuf::from("engine/runtime/config/policy.yml");
+            let rel = PathBuf::from("framework/engine/runtime/config/policy.yml");
             return Ok(Some(rel));
         }
 
