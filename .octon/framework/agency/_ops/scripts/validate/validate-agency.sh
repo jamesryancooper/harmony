@@ -3,15 +3,17 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 AGENCY_DIR="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
-ROOT_DIR="$(cd -- "$AGENCY_DIR/.." && pwd)"
-REPO_ROOT="$(cd -- "$ROOT_DIR/.." && pwd)"
+FRAMEWORK_DIR="$(cd -- "$AGENCY_DIR/.." && pwd)"
+OCTON_DIR="$(cd -- "$FRAMEWORK_DIR/.." && pwd)"
+ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
 
 MANIFEST="$AGENCY_DIR/manifest.yml"
 AGENTS_REG="$AGENCY_DIR/runtime/agents/registry.yml"
 ASSISTANTS_REG="$AGENCY_DIR/runtime/assistants/registry.yml"
 TEAMS_REG="$AGENCY_DIR/runtime/teams/registry.yml"
-CANONICAL_AGENTS_FILE="$ROOT_DIR/AGENTS.md"
-ROOT_AGENTS_FILE="$REPO_ROOT/AGENTS.md"
+CANONICAL_AGENTS_FILE="$OCTON_DIR/AGENTS.md"
+INSTANCE_AGENTS_FILE="$OCTON_DIR/instance/ingress/AGENTS.md"
+ROOT_AGENTS_FILE="$ROOT_DIR/AGENTS.md"
 CONSTITUTION_FILE="$AGENCY_DIR/governance/CONSTITUTION.md"
 DELEGATION_FILE="$AGENCY_DIR/governance/DELEGATION.md"
 MEMORY_FILE="$AGENCY_DIR/governance/MEMORY.md"
@@ -292,10 +294,16 @@ check_execution_profile_governance_contract() {
     pass "found file: ${CANONICAL_AGENTS_FILE#$ROOT_DIR/}"
   fi
 
+  if [[ ! -f "$INSTANCE_AGENTS_FILE" ]]; then
+    fail "missing file: $INSTANCE_AGENTS_FILE"
+  else
+    pass "found file: ${INSTANCE_AGENTS_FILE#$ROOT_DIR/}"
+  fi
+
   if [[ ! -f "$ROOT_AGENTS_FILE" && ! -L "$ROOT_AGENTS_FILE" ]]; then
     fail "missing file: $ROOT_AGENTS_FILE"
   else
-    pass "found file: ${ROOT_AGENTS_FILE#$REPO_ROOT/}"
+    pass "found file: ${ROOT_AGENTS_FILE#$ROOT_DIR/}"
   fi
 
   if [[ -L "$ROOT_AGENTS_FILE" ]]; then
@@ -308,36 +316,22 @@ check_execution_profile_governance_contract() {
     fi
   elif cmp -s "$CANONICAL_AGENTS_FILE" "$ROOT_AGENTS_FILE"; then
     pass "root AGENTS.md matches .octon/AGENTS.md"
+  elif grep -Fq '.octon/AGENTS.md' "$ROOT_AGENTS_FILE"; then
+    pass "root AGENTS.md is a thin adapter to .octon/AGENTS.md"
   else
     fail "root AGENTS.md diverges from .octon/AGENTS.md"
   fi
 
-  if ! grep -q '^## Execution Profile Governance (Required)' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing '## Execution Profile Governance (Required)' section"
+  if ! grep -Fq '.octon/instance/ingress/AGENTS.md' "$CANONICAL_AGENTS_FILE"; then
+    fail ".octon/AGENTS.md must point to .octon/instance/ingress/AGENTS.md"
+  else
+    pass ".octon/AGENTS.md forwards to instance ingress"
   fi
-  if ! grep -Fq 'change_profile' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing change_profile governance key"
-  fi
-  if ! grep -Fq 'release_state' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing release_state governance key"
-  fi
-  if ! grep -Fq 'transitional_exception_note' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing transitional_exception_note governance key"
-  fi
-  if ! grep -Fq 'Profile Selection Receipt' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing required section: Profile Selection Receipt"
-  fi
-  if ! grep -Fq 'Implementation Plan' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing required section: Implementation Plan"
-  fi
-  if ! grep -Fq 'Impact Map (code, tests, docs, contracts)' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing required section: Impact Map (code, tests, docs, contracts)"
-  fi
-  if ! grep -Fq 'Compliance Receipt' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing required section: Compliance Receipt"
-  fi
-  if ! grep -Fq 'Exceptions/Escalations' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md missing required section: Exceptions/Escalations"
+
+  if ! grep -q '^## Execution Profile Governance' "$INSTANCE_AGENTS_FILE"; then
+    fail "instance ingress AGENTS.md missing execution profile governance section"
+  else
+    pass "instance ingress AGENTS.md includes execution profile governance section"
   fi
 
   if ! grep -q '^## Execution Profile Governance' "$CONSTITUTION_FILE"; then
@@ -635,52 +629,52 @@ check_deprecations() {
     pass "deprecated subagents path removed"
   fi
 
-  if grep -q 'agency/subagents/' "$ROOT_DIR/octon.yml"; then
+  if grep -q 'agency/subagents/' "$OCTON_DIR/octon.yml"; then
     fail "octon.yml still exports deprecated agency/subagents path"
   else
-    pass "octon.yml portable paths do not include deprecated subagents"
+    pass "octon.yml does not include deprecated agency/subagents path"
   fi
 
-  if grep -q 'agency/actors/' "$ROOT_DIR/octon.yml"; then
+  if grep -q 'agency/actors/' "$OCTON_DIR/octon.yml"; then
     fail "octon.yml still exports deprecated agency/actors path"
   else
-    pass "octon.yml portable paths do not include deprecated agency/actors path"
+    pass "octon.yml does not include deprecated agency/actors path"
   fi
 
-  if grep -q 'agency/agents/' "$ROOT_DIR/octon.yml"; then
+  if grep -q 'agency/agents/' "$OCTON_DIR/octon.yml"; then
     fail "octon.yml still exports deprecated agency/agents path"
   else
-    pass "octon.yml portable paths do not include deprecated agency/agents path"
+    pass "octon.yml does not include deprecated agency/agents path"
   fi
 
-  if grep -q 'agency/assistants/' "$ROOT_DIR/octon.yml"; then
+  if grep -q 'agency/assistants/' "$OCTON_DIR/octon.yml"; then
     fail "octon.yml still exports deprecated agency/assistants path"
   else
-    pass "octon.yml portable paths do not include deprecated agency/assistants path"
+    pass "octon.yml does not include deprecated agency/assistants path"
   fi
 
-  if grep -q 'agency/teams/' "$ROOT_DIR/octon.yml"; then
+  if grep -q 'agency/teams/' "$OCTON_DIR/octon.yml"; then
     fail "octon.yml still exports deprecated agency/teams path"
   else
-    pass "octon.yml portable paths do not include deprecated agency/teams path"
+    pass "octon.yml does not include deprecated agency/teams path"
   fi
 
-  if grep -q 'agency/CONSTITUTION.md' "$ROOT_DIR/octon.yml"; then
+  if grep -q 'agency/CONSTITUTION.md' "$OCTON_DIR/octon.yml"; then
     fail "octon.yml still exports deprecated agency/CONSTITUTION.md path"
   else
-    pass "octon.yml portable paths do not include deprecated agency/CONSTITUTION.md path"
+    pass "octon.yml does not include deprecated agency/CONSTITUTION.md path"
   fi
 
-  if grep -q 'agency/DELEGATION.md' "$ROOT_DIR/octon.yml"; then
+  if grep -q 'agency/DELEGATION.md' "$OCTON_DIR/octon.yml"; then
     fail "octon.yml still exports deprecated agency/DELEGATION.md path"
   else
-    pass "octon.yml portable paths do not include deprecated agency/DELEGATION.md path"
+    pass "octon.yml does not include deprecated agency/DELEGATION.md path"
   fi
 
-  if grep -q 'agency/MEMORY.md' "$ROOT_DIR/octon.yml"; then
+  if grep -q 'agency/MEMORY.md' "$OCTON_DIR/octon.yml"; then
     fail "octon.yml still exports deprecated agency/MEMORY.md path"
   else
-    pass "octon.yml portable paths do not include deprecated agency/MEMORY.md path"
+    pass "octon.yml does not include deprecated agency/MEMORY.md path"
   fi
 }
 

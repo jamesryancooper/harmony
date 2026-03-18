@@ -187,4 +187,4 @@ This keeps individual edits fast while retaining repository-level safety.
 - [Arbitration and Precedence](./arbitration-and-precedence.md)
 - [Skills Specification](../../../capabilities/_meta/architecture/specification.md)
 - [Runtime Policy](../../_meta/architecture/runtime-policy.md)
-- [ADR 019](../../runtime/decisions/019-deny-by-default-uniform-enforcement-and-agent-only-operation.md)
+- [ADR 019](../../../../instance/cognition/decisions/019-deny-by-default-uniform-enforcement-and-agent-only-operation.md)

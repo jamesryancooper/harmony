@@ -4518,6 +4518,7 @@ mod tests {
             .and_then(Path::parent)
             .and_then(Path::parent)
             .and_then(Path::parent)
+            .and_then(Path::parent)
             .expect("assurance_tools should be under <repo>/.octon/framework/engine/runtime/crates/")
             .to_path_buf()
     }
