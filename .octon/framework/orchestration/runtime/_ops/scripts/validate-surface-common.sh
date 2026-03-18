@@ -7,13 +7,14 @@ surface_common_init() {
   if [[ -n "${OCTON_DIR_OVERRIDE:-}" ]]; then
     OCTON_DIR="$OCTON_DIR_OVERRIDE"
     ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
-    RUNTIME_DIR="$OCTON_DIR/orchestration/runtime"
+    RUNTIME_DIR="$OCTON_DIR/framework/orchestration/runtime"
     SURFACE_DIR="$RUNTIME_DIR/$SURFACE_LABEL"
   else
     SURFACE_DIR="$(cd -- "$SURFACE_SCRIPT_DIR/../.." && pwd)"
     RUNTIME_DIR="$(cd -- "$SURFACE_DIR/.." && pwd)"
     ORCHESTRATION_DIR="$(cd -- "$RUNTIME_DIR/.." && pwd)"
-    OCTON_DIR="$(cd -- "$ORCHESTRATION_DIR/.." && pwd)"
+    FRAMEWORK_DIR="$(cd -- "$ORCHESTRATION_DIR/.." && pwd)"
+    OCTON_DIR="$(cd -- "$FRAMEWORK_DIR/.." && pwd)"
     ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
   fi
   errors=0

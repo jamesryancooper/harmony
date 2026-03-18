@@ -5,7 +5,8 @@ orchestration_runtime_init() {
   ORCH_COMMON_SCRIPT_DIR="$(cd -- "$(dirname -- "$caller_script")" && pwd)"
   ORCH_RUNTIME_DIR="$(cd -- "$ORCH_COMMON_SCRIPT_DIR/../.." && pwd)"
   ORCHESTRATION_DIR="$(cd -- "$ORCH_RUNTIME_DIR/.." && pwd)"
-  TOOL_OCTON_DIR="$(cd -- "$ORCHESTRATION_DIR/.." && pwd)"
+  FRAMEWORK_DIR="$(cd -- "$ORCHESTRATION_DIR/.." && pwd)"
+  TOOL_OCTON_DIR="$(cd -- "$FRAMEWORK_DIR/.." && pwd)"
   if [[ -n "${OCTON_DIR_OVERRIDE:-}" ]]; then
     OCTON_DIR="$OCTON_DIR_OVERRIDE"
     ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
@@ -14,17 +15,16 @@ orchestration_runtime_init() {
     ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
   fi
 
-  RUNTIME_DIR="$OCTON_DIR/orchestration/runtime"
-  CONTINUITY_DIR="$OCTON_DIR/continuity"
-  DECISIONS_DIR="$CONTINUITY_DIR/decisions"
-  CONTINUITY_RUNS_DIR="$CONTINUITY_DIR/runs"
+  RUNTIME_DIR="$OCTON_DIR/framework/orchestration/runtime"
+  DECISIONS_DIR="$OCTON_DIR/state/evidence/decisions/repo"
+  CONTINUITY_RUNS_DIR="$OCTON_DIR/state/evidence/runs"
   RUNTIME_RUNS_DIR="$RUNTIME_DIR/runs"
   QUEUE_DIR="$RUNTIME_DIR/queue"
   WORKFLOWS_DIR="$RUNTIME_DIR/workflows"
   MISSIONS_DIR="$RUNTIME_DIR/missions"
   COORDINATION_DIR="$RUNTIME_DIR/_coordination"
   LOCKS_DIR="$COORDINATION_DIR/locks"
-  OCTON_KERNEL_RUNNER="$TOOL_OCTON_DIR/engine/runtime/run"
+  OCTON_KERNEL_RUNNER="$OCTON_DIR/framework/engine/runtime/run"
 }
 
 require_tools() {

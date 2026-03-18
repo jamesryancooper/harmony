@@ -5,7 +5,8 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 OPS_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 RUNTIME_DIR="$(cd -- "$OPS_DIR/.." && pwd)"
 ORCHESTRATION_DIR="$(cd -- "$RUNTIME_DIR/.." && pwd)"
-OCTON_DIR="$(cd -- "$ORCHESTRATION_DIR/.." && pwd)"
+FRAMEWORK_DIR="$(cd -- "$ORCHESTRATION_DIR/.." && pwd)"
+OCTON_DIR="$(cd -- "$FRAMEWORK_DIR/.." && pwd)"
 REPO_ROOT="$(cd -- "$OCTON_DIR/.." && pwd)"
 
 DISCOVERY_SCRIPT=".octon/framework/orchestration/runtime/_ops/scripts/load-orchestration-discovery.sh"
@@ -53,13 +54,21 @@ create_fixture() {
   cleanup_paths+=("$fixture_root")
 
   mkdir -p "$fixture_root/.octon/framework/orchestration/runtime"
+  mkdir -p "$fixture_root/.octon/framework/orchestration/practices"
   mkdir -p "$fixture_root/.octon/state/evidence/decisions/repo"
   mkdir -p "$fixture_root/.octon/state/evidence/runs"
+  mkdir -p "$fixture_root/.octon/instance/cognition/context/shared"
 
   cp -R "$REPO_ROOT/.octon/framework/orchestration/runtime" "$fixture_root/.octon/framework/orchestration/"
+  cp "$REPO_ROOT/.octon/framework/orchestration/practices/workflow-authoring-standards.md" \
+    "$fixture_root/.octon/framework/orchestration/practices/workflow-authoring-standards.md"
   cp "$REPO_ROOT/.octon/state/evidence/decisions/repo/README.md" "$fixture_root/.octon/state/evidence/decisions/repo/README.md"
   cp "$REPO_ROOT/.octon/state/evidence/decisions/repo/retention.json" "$fixture_root/.octon/state/evidence/decisions/repo/retention.json"
   cp "$REPO_ROOT/.octon/state/evidence/runs/README.md" "$fixture_root/.octon/state/evidence/runs/README.md"
+  cp "$REPO_ROOT/.octon/instance/cognition/context/shared/workflow-quality.md" \
+    "$fixture_root/.octon/instance/cognition/context/shared/workflow-quality.md"
+  cp "$REPO_ROOT/.octon/instance/cognition/context/shared/workflow-gaps.md" \
+    "$fixture_root/.octon/instance/cognition/context/shared/workflow-gaps.md"
 
   printf '%s\n' "$fixture_root"
 }

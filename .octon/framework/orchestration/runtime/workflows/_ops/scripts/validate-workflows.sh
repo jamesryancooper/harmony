@@ -534,18 +534,18 @@ check_runtime_pipeline_references_absent() {
   local targets=(
     "$OCTON_DIR/AGENTS.md"
     "$OCTON_DIR/START.md"
-    "$OCTON_DIR/orchestration/runtime/workflows/manifest.yml"
-    "$OCTON_DIR/orchestration/runtime/workflows/registry.yml"
-    "$OCTON_DIR/orchestration/runtime/workflows/README.md"
-    "$OCTON_DIR/engine/runtime/crates/kernel/src/main.rs"
-    "$OCTON_DIR/engine/runtime/crates/kernel/src/pipeline.rs"
-    "$OCTON_DIR/engine/runtime/crates/kernel/src/workflow.rs"
-    "$OCTON_DIR/engine/runtime/run"
-    "$OCTON_DIR/engine/runtime/run.cmd"
-    "$OCTON_DIR/assurance/runtime/_ops/scripts/alignment-check.sh"
-    "$OCTON_DIR/assurance/runtime/_ops/scripts/validate-audit-design-proposal-workflow.sh"
-    "$OCTON_DIR/assurance/runtime/_ops/scripts/validate-create-design-proposal-workflow.sh"
-    "$OCTON_DIR/capabilities/runtime/commands"
+    "$OCTON_DIR/framework/orchestration/runtime/workflows/manifest.yml"
+    "$OCTON_DIR/framework/orchestration/runtime/workflows/registry.yml"
+    "$OCTON_DIR/framework/orchestration/runtime/workflows/README.md"
+    "$OCTON_DIR/framework/engine/runtime/crates/kernel/src/main.rs"
+    "$OCTON_DIR/framework/engine/runtime/crates/kernel/src/pipeline.rs"
+    "$OCTON_DIR/framework/engine/runtime/crates/kernel/src/workflow.rs"
+    "$OCTON_DIR/framework/engine/runtime/run"
+    "$OCTON_DIR/framework/engine/runtime/run.cmd"
+    "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/alignment-check.sh"
+    "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/validate-audit-design-proposal-workflow.sh"
+    "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/validate-create-design-proposal-workflow.sh"
+    "$OCTON_DIR/framework/capabilities/runtime/commands"
   )
   if rg -n "runtime/pipelines|pipeline\\.yml|projection\\.pipeline_" "${targets[@]}" \
     --glob '!**/target/**' --glob '!**/output/**' >/dev/null 2>&1; then
@@ -557,11 +557,11 @@ check_runtime_pipeline_references_absent() {
 
 check_legacy_workflow_authoring_references_absent() {
   local targets=(
-    "$OCTON_DIR/orchestration/practices/workflow-authoring-standards.md"
-    "$OCTON_DIR/orchestration/runtime/workflows/meta/create-workflow/stages/02-analyze-requirements.md"
-    "$OCTON_DIR/orchestration/runtime/workflows/meta/create-workflow/stages/03-select-template.md"
-    "$OCTON_DIR/orchestration/runtime/workflows/meta/create-workflow/stages/06-integrate-gap-fixes.md"
-    "$OCTON_DIR/orchestration/runtime/workflows/meta/create-workflow/stages/08-verify.md"
+    "$OCTON_DIR/framework/orchestration/practices/workflow-authoring-standards.md"
+    "$OCTON_DIR/framework/orchestration/runtime/workflows/meta/create-workflow/stages/02-analyze-requirements.md"
+    "$OCTON_DIR/framework/orchestration/runtime/workflows/meta/create-workflow/stages/03-select-template.md"
+    "$OCTON_DIR/framework/orchestration/runtime/workflows/meta/create-workflow/stages/06-integrate-gap-fixes.md"
+    "$OCTON_DIR/framework/orchestration/runtime/workflows/meta/create-workflow/stages/08-verify.md"
     "$OCTON_DIR/instance/cognition/context/shared/workflow-quality.md"
     "$OCTON_DIR/instance/cognition/context/shared/workflow-gaps.md"
   )
