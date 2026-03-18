@@ -5,7 +5,8 @@ set -o pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVICES_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-OCTON_DIR="$(cd "$SERVICES_DIR/../../.." && pwd)"
+FRAMEWORK_DIR="$(cd "$SERVICES_DIR/../../.." && pwd)"
+OCTON_DIR="$(cd "$FRAMEWORK_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$OCTON_DIR/.." && pwd)"
 AGENT_PLATFORM_DIR="$SERVICES_DIR/interfaces/agent-platform"
 ADAPTERS_DIR="$AGENT_PLATFORM_DIR/adapters"
@@ -286,11 +287,11 @@ run_platform_core_checks() {
   fi
 
   local targets=(
-    "$OCTON_DIR/cognition/runtime/context/agent-platform-interop.md"
-    "$OCTON_DIR/cognition/runtime/decisions/012-agent-platform-interop-native-first.md"
-    "$OCTON_DIR/capabilities/runtime/commands/context-budget.md"
-    "$OCTON_DIR/capabilities/runtime/commands/validate-session-policy.md"
-    "$OCTON_DIR/capabilities/runtime/commands/validate-platform-interop.md"
+    "$OCTON_DIR/instance/cognition/context/shared/agent-platform-interop.md"
+    "$OCTON_DIR/instance/cognition/decisions/012-agent-platform-interop-native-first.md"
+    "$OCTON_DIR/framework/capabilities/runtime/commands/context-budget.md"
+    "$OCTON_DIR/framework/capabilities/runtime/commands/validate-session-policy.md"
+    "$OCTON_DIR/framework/capabilities/runtime/commands/validate-platform-interop.md"
     "$AGENT_PLATFORM_DIR/README.md"
     "$AGENT_PLATFORM_DIR/contract.md"
     "$AGENT_PLATFORM_DIR/SERVICE.md"
