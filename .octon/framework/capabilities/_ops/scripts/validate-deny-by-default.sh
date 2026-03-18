@@ -203,7 +203,7 @@ collect_changed_targets() {
     fi
 
     case "$changed_file" in
-      .octon/framework/capabilities/_ops/state/deny-by-default-exceptions.yml|\
+      .octon/state/control/capabilities/deny-by-default-exceptions.yml|\
       .octon/framework/capabilities/governance/policy/agent-only-governance.yml|\
       .octon/framework/capabilities/_ops/scripts/*|\
       .octon/framework/capabilities/runtime/services/_ops/scripts/*|\

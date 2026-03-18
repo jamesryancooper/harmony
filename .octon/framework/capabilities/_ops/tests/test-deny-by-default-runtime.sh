@@ -82,11 +82,11 @@ run_split_parser_regression_test() {
     "split parser keeps scoped tokens under errexit" \
     bash -euo pipefail -c "
       source '$ENFORCER_SCRIPT'
-      mapfile -t tokens < <(octon_ddb_split_allowed_tools 'Read Bash(bash) Write(../../_ops/state/runs/*)')
+      mapfile -t tokens < <(octon_ddb_split_allowed_tools 'Read Bash(bash) Write(/.octon/state/control/skills/checkpoints/*)')
       [[ \${#tokens[@]} -eq 3 ]]
       [[ \"\${tokens[0]}\" == 'Read' ]]
       [[ \"\${tokens[1]}\" == 'Bash(bash)' ]]
-      [[ \"\${tokens[2]}\" == 'Write(../../_ops/state/runs/*)' ]]
+      [[ \"\${tokens[2]}\" == 'Write(/.octon/state/control/skills/checkpoints/*)' ]]
     "
 
   assert_success \
@@ -307,8 +307,8 @@ run_acp_gate_tests() {
   assert_success \
     "acp guard temp files are cleaned by default" \
     bash -euo pipefail -c "
-      request_file='.octon/framework/capabilities/_ops/state/.tmp/acp/$receipt_run_id-guard-request.json'
-      decision_file='.octon/framework/capabilities/_ops/state/.tmp/acp/$receipt_run_id-guard-decision.json'
+      request_file='.octon/generated/.tmp/capabilities/policy/acp/$receipt_run_id-guard-request.json'
+      decision_file='.octon/generated/.tmp/capabilities/policy/acp/$receipt_run_id-guard-decision.json'
       [[ ! -e \"\$request_file\" ]]
       [[ ! -e \"\$decision_file\" ]]
     "
@@ -341,7 +341,7 @@ run_acp_gate_tests() {
   assert_success \
     "acp receipts append decision log" \
     bash -euo pipefail -c "
-      [[ -s '.octon/framework/capabilities/_ops/state/logs/acp-decisions.jsonl' ]]
+      [[ -s '.octon/state/evidence/decisions/repo/capabilities/acp-decisions.jsonl' ]]
     "
 
   assert_failure_contains \
@@ -378,8 +378,8 @@ run_acp_gate_tests() {
       [[ -f \"\$digest\" ]]
       grep -F -- 'Effective ACP:' \"\$digest\" >/dev/null
       grep -F -- 'ACP-4' \"\$digest\" >/dev/null
-      grep -F -- 'RA_BREAK_GLASS_REQUIRED' '.octon/framework/capabilities/_ops/state/logs/acp-decisions.jsonl' >/dev/null
-      grep -F -- '\"run_id\":\"$acp4_deny_run_id\"' '.octon/framework/capabilities/_ops/state/logs/acp-decisions.jsonl' >/dev/null
+      grep -F -- 'RA_BREAK_GLASS_REQUIRED' '.octon/state/evidence/decisions/repo/capabilities/acp-decisions.jsonl' >/dev/null
+      grep -F -- '\"run_id\":\"$acp4_deny_run_id\"' '.octon/state/evidence/decisions/repo/capabilities/acp-decisions.jsonl' >/dev/null
     "
 }
 
@@ -571,9 +571,9 @@ run_direct_acp_enforce_emit_receipt_tests() {
       }
       jq -e --arg run_id \"\$run_id\" '
         select(.run_id == \$run_id) | .run_id
-      ' '.octon/framework/capabilities/_ops/state/logs/acp-decisions.jsonl' >/dev/null || {
+      ' '.octon/state/evidence/decisions/repo/capabilities/acp-decisions.jsonl' >/dev/null || {
         echo 'run_id missing from acp decision log'
-        tail -n 20 '.octon/framework/capabilities/_ops/state/logs/acp-decisions.jsonl'
+        tail -n 20 '.octon/state/evidence/decisions/repo/capabilities/acp-decisions.jsonl'
         exit 1
       }
     "

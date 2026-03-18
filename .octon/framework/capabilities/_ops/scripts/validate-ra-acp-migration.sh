@@ -141,7 +141,8 @@ check_active_surface_legacy_terms() {
         --glob '!**/.octon/generated/**' \
         --glob '!**/.octon/inputs/exploratory/ideation/**' \
         --glob '!**/.octon/state/evidence/runs/**' \
-        --glob '!**/.octon/framework/capabilities/_ops/state/**' \
+        --glob '!**/.octon/state/control/capabilities/**' \
+        --glob '!**/.octon/generated/.tmp/capabilities/**' \
         --glob '!**/.octon/framework/capabilities/_ops/tests/**' \
         --glob '!**/.octon/framework/cognition/_ops/principles/scripts/lint-principles-governance.sh' \
         --glob '!**/.octon/framework/cognition/_ops/principles/scripts/test-principles-governance-lint-fixtures.sh' \
@@ -152,7 +153,7 @@ check_active_surface_legacy_terms() {
       grep -RInEi --binary-files=without-match \
         "$pattern" \
         "$REPO_ROOT/.octon" 2>/dev/null \
-        | grep -Ev '/\.octon/generated/|/\.octon/inputs/exploratory/ideation/|/\.octon/state/evidence/runs/|/\.octon/framework/capabilities/_ops/state/|/\.octon/framework/capabilities/_ops/tests/|/\.octon/framework/cognition/_ops/principles/scripts/lint-principles-governance\.sh|/\.octon/framework/cognition/_ops/principles/scripts/test-principles-governance-lint-fixtures\.sh|/validate-ra-acp-migration\.sh' || true
+        | grep -Ev '/\.octon/generated/|/\.octon/inputs/exploratory/ideation/|/\.octon/state/evidence/runs/|/\.octon/state/control/capabilities/|/\.octon/generated/\.tmp/capabilities/|/\.octon/framework/capabilities/_ops/tests/|/\.octon/framework/cognition/_ops/principles/scripts/lint-principles-governance\.sh|/\.octon/framework/cognition/_ops/principles/scripts/test-principles-governance-lint-fixtures\.sh|/validate-ra-acp-migration\.sh' || true
     fi
   )"
 
@@ -174,7 +175,7 @@ check_tracked_temp_artifacts() {
 
   tracked="$(git -C "$REPO_ROOT" ls-files \
     '.octon/state/evidence/validation/.tmp' \
-    '.octon/framework/capabilities/_ops/state/.tmp' \
+    '.octon/generated/.tmp/capabilities/policy' \
     2>/dev/null || true)"
 
   if [[ -n "$tracked" ]]; then
