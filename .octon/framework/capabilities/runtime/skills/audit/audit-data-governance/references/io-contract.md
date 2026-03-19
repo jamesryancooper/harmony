@@ -23,7 +23,7 @@ io:
     - name: retention_artifacts_glob
       type: text
       required: false
-      default: "**/assurance/practices/standards/data-handling-and-retention.md,**/agency/governance/MEMORY.md,**/continuity/_meta/architecture/runs-retention.md"
+      default: "**/assurance/practices/standards/data-handling-and-retention.md,**/agency/governance/MEMORY.md,**/cognition/_meta/architecture/state/continuity/runs-retention.md"
       description: "Comma-separated globs selecting retention and deletion policy artifacts"
     - name: lineage_artifacts_glob
       type: text
@@ -43,7 +43,7 @@ io:
     - name: evidence_artifacts_glob
       type: text
       required: false
-      default: "**/cognition/practices/methodology/spec-first-planning.md,**/services/_meta/docs/platform-overview.md,**/continuity/runs/**/evidence/**"
+      default: "**/cognition/practices/methodology/spec-first-planning.md,**/services/_meta/docs/platform-overview.md,**//.octon/state/evidence/runs/**"
       description: "Comma-separated globs selecting governance evidence and run-receipt artifacts"
     - name: severity_threshold
       type: text

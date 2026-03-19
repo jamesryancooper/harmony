@@ -93,6 +93,14 @@ Continuity enables Velocity by reducing re-entry time. You ship faster when deci
 3. Tag traces with decision context for significant operations
 4. Keep runbooks updated when procedures change
 
+### Octon State Routing
+
+- active handoff state belongs in `/.octon/state/continuity/**`
+- retained operational evidence belongs in `/.octon/state/evidence/**`
+- actual mutable publication and quarantine truth belongs in
+  `/.octon/state/control/**`
+- durable architecture decisions remain in `/.octon/instance/cognition/decisions/**`
+
 ### Octon Enforcement
 
 | Mechanism | Description | Priority |

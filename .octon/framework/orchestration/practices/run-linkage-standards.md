@@ -27,4 +27,4 @@ linkage.
 ## Boundary
 
 - `runtime/runs/` owns orchestration-facing state and lookup projections.
-- `continuity/runs/` owns durable receipts, digests, and evidence bundles.
+- `state/evidence/runs/` owns durable receipts, digests, and evidence bundles.

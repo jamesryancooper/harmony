@@ -66,7 +66,7 @@ flags), the wrapper executes a single mandatory path:
 - ensure `instruction_layers` is present on the request (inject defaults when
   absent),
 - emit an instruction-layer manifest artifact under
-  `continuity/runs/<run_id>/instruction-layer-manifest.json`,
+  `state/evidence/runs/<run_id>/instruction-layer-manifest.json`,
 - fail closed if manifest emission cannot be completed.
 
 ## Receipt And Digest Contracts

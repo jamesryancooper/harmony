@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.dev/schemas/locality-quarantine-state.schema.json",
+  "title": "Octon Locality Quarantine State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "updated_at",
+    "records"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-locality-quarantine-state-v1"
+    },
+    "updated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "scope_id",
+          "manifest_path",
+          "reason_code"
+        ],
+        "properties": {
+          "scope_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "manifest_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason_code": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

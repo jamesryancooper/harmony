@@ -19,7 +19,7 @@ Immediate steps to take. Items here are typically derived from project findings 
   capability-map linkage:
   `bash .octon/framework/orchestration/runtime/workflows/_ops/scripts/validate-workflows.sh`.
 - `test-harness`: Execute an end-to-end agent session using the root harness
-  and capture validation outcomes in `continuity/log.md`.
+  and capture validation outcomes in `state/continuity/repo/log.md`.
 
 ## Backlog
 

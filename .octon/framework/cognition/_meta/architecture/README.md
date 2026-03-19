@@ -497,7 +497,7 @@ current class-root topology:
 | `agents/`, `assistants/`, `teams/` | `framework/agency/runtime/` |
 | `commands/`, `skills/`, `tools/`, `services/` | `framework/capabilities/runtime/` |
 | `context/` | `instance/cognition/context/` |
-| `progress/` | `state/continuity/repo/` |
+| `progress/` | `state/continuity/{repo/,scopes/<scope-id>/}` |
 | `checklists/` | `framework/assurance/practices/` |
 | `workflows/` | `framework/orchestration/runtime/workflows/` |
 | `missions/` | `instance/orchestration/missions/` |
@@ -556,7 +556,7 @@ Not every directory needs a `.octon`. Use this guide to decide.
 |----------|-------------------|
 | **Locality** | Guidance for X lives next to X---no hunting through centralized docs |
 | **Scoped context** | Agent loads only relevant context, not the entire repo |
-| **Continuity** | `/.octon/state/continuity/repo/log.md` + `tasks.json` survive context resets |
+| **Continuity** | `/.octon/state/continuity/{repo/,scopes/<scope-id>/}` survives context resets |
 | **Explicit boundaries** | `scope.md` prevents scope creep; agent knows when to stop |
 | **Quality gates** | `assurance/practices/complete.md` checklist prevents premature completion |
 | **Separation** | Agent-facing vs human-led is explicit (`ideation/` directory) |
@@ -603,6 +603,7 @@ Domain-specific context should live under repo-root harness paths such as:
 - `.octon/instance/cognition/context/shared/`
 - `.octon/framework/orchestration/runtime/workflows/`
 - `.octon/state/continuity/repo/`
+- `.octon/state/continuity/scopes/<scope-id>/`
 
 ---
 

@@ -13,6 +13,5 @@ home for durable scope-local context.
 
 - each child directory must match a declared locality `scope_id`
 - durable authored context belongs here under `instance/**`
-- mutable scope continuity belongs under `state/continuity/scopes/**` only
-  after Packet 7 lands
+- mutable scope continuity belongs under `state/continuity/scopes/**`
 - generated cognition summaries do not belong here

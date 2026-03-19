@@ -8,7 +8,8 @@ The roadmap is optimized for a solo developer/tiny team building the minimum via
 
 - Decide repo layout (create directories + starter README).
 - Create `content/_meta/` files: `locales.yaml`, `surfaces.yaml`, `taxonomy.yaml`.
-- Ensure `/.octon/state/continuity/repo/` canonical continuity artifacts exist per continuity contract.
+- Ensure `/.octon/state/continuity/**` canonical continuity artifacts exist per
+  continuity contract, including scope continuity for any declared live scope.
 - Define initial content type list (product, pricing, page, doc, adr/decision).
 
 ## Phase 1: Core compiler (1–2 weeks)

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.dev/schemas/extension-active-state.schema.json",
+  "title": "Octon Extension Active State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "desired_config_revision",
+    "resolved_active_packs",
+    "dependency_closure",
+    "generation_id",
+    "published_effective_catalog",
+    "published_artifact_map",
+    "published_generation_lock",
+    "validation_timestamp",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-extension-active-state-v1"
+    },
+    "desired_config_revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "resolved_active_packs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "dependency_closure": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_effective_catalog": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_artifact_map": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_generation_lock": {
+      "type": "string",
+      "minLength": 1
+    },
+    "validation_timestamp": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "published"
+      ]
+    }
+  }
+}

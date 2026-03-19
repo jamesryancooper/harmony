@@ -5,9 +5,14 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../../../" && pwd)"
 ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
 
-TASKS_FILE="$OCTON_DIR/state/continuity/repo/tasks.json"
-ENTITIES_FILE="$OCTON_DIR/state/continuity/repo/entities.json"
-NEXT_FILE="$OCTON_DIR/state/continuity/repo/next.md"
+REPO_CONTINUITY_DIR="$OCTON_DIR/state/continuity/repo"
+SCOPE_CONTINUITY_ROOT="$OCTON_DIR/state/continuity/scopes"
+LOCALITY_REGISTRY="$OCTON_DIR/instance/locality/registry.yml"
+LOCALITY_QUARANTINE_STATE="$OCTON_DIR/state/control/locality/quarantine.yml"
+TASKS_FILE="$REPO_CONTINUITY_DIR/tasks.json"
+ENTITIES_FILE="$REPO_CONTINUITY_DIR/entities.json"
+NEXT_FILE="$REPO_CONTINUITY_DIR/next.md"
+CONTINUITY_TARGET_LABEL="/.octon/state/continuity/repo"
 DECISIONS_DIR="$OCTON_DIR/state/evidence/decisions/repo"
 DECISIONS_POLICY_FILE="$DECISIONS_DIR/retention.json"
 DECISION_SCHEMA_FILE="$OCTON_DIR/framework/cognition/_meta/architecture/state/continuity/schemas/decision-record.schema.json"
@@ -57,6 +62,14 @@ check_jq_available() {
   fi
 }
 
+check_yq_available() {
+  if command -v yq >/dev/null 2>&1; then
+    pass "yq is available"
+  else
+    fail "yq is required for scope continuity validation"
+  fi
+}
+
 validate_json_file() {
   local file="$1"
   if jq empty "$file" >/dev/null 2>&1; then
@@ -66,8 +79,31 @@ validate_json_file() {
   fi
 }
 
+validate_continuity_set() {
+  local label="$1"
+  local dir="$2"
+  local prev_tasks="$TASKS_FILE"
+  local prev_entities="$ENTITIES_FILE"
+  local prev_next="$NEXT_FILE"
+  local prev_label="$CONTINUITY_TARGET_LABEL"
+
+  TASKS_FILE="$dir/tasks.json"
+  ENTITIES_FILE="$dir/entities.json"
+  NEXT_FILE="$dir/next.md"
+  CONTINUITY_TARGET_LABEL="$label"
+
+  validate_tasks_contract || true
+  validate_entities_contract || true
+  validate_next_contract || true
+
+  TASKS_FILE="$prev_tasks"
+  ENTITIES_FILE="$prev_entities"
+  NEXT_FILE="$prev_next"
+  CONTINUITY_TARGET_LABEL="$prev_label"
+}
+
 validate_tasks_contract() {
-  echo "== Validate /.octon/state/continuity/repo/tasks.json =="
+  echo "== Validate ${CONTINUITY_TARGET_LABEL}/tasks.json =="
   require_file "$TASKS_FILE" || return
   validate_json_file "$TASKS_FILE"
 
@@ -284,7 +320,7 @@ validate_tasks_contract() {
 }
 
 validate_entities_contract() {
-  echo "== Validate /.octon/state/continuity/repo/entities.json =="
+  echo "== Validate ${CONTINUITY_TARGET_LABEL}/entities.json =="
   require_file "$ENTITIES_FILE" || return
   validate_json_file "$ENTITIES_FILE"
 
@@ -434,7 +470,7 @@ validate_entities_contract() {
 }
 
 validate_next_contract() {
-  echo "== Validate /.octon/state/continuity/repo/next.md coherence =="
+  echo "== Validate ${CONTINUITY_TARGET_LABEL}/next.md coherence =="
   require_file "$NEXT_FILE" || return
 
   local current_section
@@ -487,8 +523,44 @@ validate_next_contract() {
   pass "next.md Current section references active unblocked tasks"
 }
 
+validate_scope_continuity_contracts() {
+  echo "== Validate /.octon/state/continuity/scopes =="
+  require_dir "$SCOPE_CONTINUITY_ROOT" || return
+  require_file "$LOCALITY_REGISTRY" || return
+  require_file "$LOCALITY_QUARANTINE_STATE" || return
+
+  declare -A declared_scope_ids=()
+  local scope_id scope_dir
+
+  while IFS= read -r scope_id; do
+    [[ -z "$scope_id" ]] && continue
+    declared_scope_ids["$scope_id"]=1
+  done < <(yq -r '.scopes[]?.scope_id // ""' "$LOCALITY_REGISTRY" 2>/dev/null | awk 'NF' || true)
+
+  while IFS= read -r scope_dir; do
+    [[ -z "$scope_dir" ]] && continue
+    scope_id="$(basename "$scope_dir")"
+    if [[ -z "${declared_scope_ids[$scope_id]+x}" ]]; then
+      fail "undeclared scope continuity directory present: ${scope_dir#$ROOT_DIR/}"
+    fi
+  done < <(find "$SCOPE_CONTINUITY_ROOT" -mindepth 1 -maxdepth 1 -type d | sort)
+  pass "scope continuity directories do not introduce undeclared scope ids"
+
+  for scope_id in "${!declared_scope_ids[@]}"; do
+    scope_dir="$SCOPE_CONTINUITY_ROOT/$scope_id"
+    require_dir "$scope_dir" || continue
+
+    if yq -e ".records[]? | select(.scope_id == \"$scope_id\")" "$LOCALITY_QUARANTINE_STATE" >/dev/null 2>&1; then
+      fail "scope continuity is invalid for quarantined scope: $scope_id"
+      continue
+    fi
+
+    validate_continuity_set "/.octon/state/continuity/scopes/$scope_id" "$scope_dir" || true
+  done
+}
+
 validate_decisions_retention_contract() {
-  echo "== Validate continuity/decisions retention and records =="
+  echo "== Validate /.octon/state/evidence/decisions/repo retention and records =="
   require_dir "$DECISIONS_DIR" || return
   require_file "$DECISIONS_POLICY_FILE" || return
   require_file "$DECISIONS_DIR/README.md" || return
@@ -744,7 +816,7 @@ validate_decisions_retention_contract() {
 }
 
 validate_runs_retention_contract() {
-  echo "== Validate continuity/runs retention contract =="
+  echo "== Validate /.octon/state/evidence/runs retention contract =="
   require_dir "$RUNS_DIR" || return
   require_file "$RUNS_POLICY_FILE" || return
   require_file "$RUNS_DIR/README.md" || return
@@ -849,11 +921,11 @@ main() {
   echo "== Validate Continuity Memory =="
 
   check_jq_available
-  validate_tasks_contract
-  validate_entities_contract
-  validate_next_contract
-  validate_decisions_retention_contract
-  validate_runs_retention_contract
+  check_yq_available
+  validate_continuity_set "/.octon/state/continuity/repo" "$REPO_CONTINUITY_DIR" || true
+  validate_scope_continuity_contracts || true
+  validate_decisions_retention_contract || true
+  validate_runs_retention_contract || true
 
   echo
   echo "Continuity memory validation summary: errors=$errors warnings=$warnings"

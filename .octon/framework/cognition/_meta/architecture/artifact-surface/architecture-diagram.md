@@ -34,7 +34,8 @@ flowchart TB
   ART --> KNO
 ```
 
-See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete cross-plane architecture.
+See [Foundational Planes Integration](../state/continuity/three-planes-integration.md)
+for complete cross-plane architecture.
 
 ---
 
@@ -44,7 +45,7 @@ See [Foundational Planes Integration](../../../../continuity/_meta/architecture/
 flowchart TB
   subgraph Source["Source Layer (git-tracked)"]
     A1["content/** (public/internal/agent)"]
-    A2[".octon/state/continuity/repo/** (continuity artifacts)"]
+    A2[".octon/state/continuity/** (repo + scope continuity artifacts)"]
     A3["assets/** (static assets)"]
     A4["content/_schemas/** (Zod schemas + migrations)"]
     A5["content/_meta/** (governance + taxonomy + locales)"]
@@ -86,7 +87,7 @@ When boundary conditions are crossed (see [boundary-conditions.md](./boundary-co
 flowchart TB
   subgraph Canonical["Canonical Layer (git)"]
     G1["content/** (canonical content)"]
-    G2[".octon/state/continuity/repo/** (continuity artifacts)"]
+    G2[".octon/state/continuity/** (repo + scope continuity artifacts)"]
   end
 
   subgraph Compiled["Compiled Layer (HAG)"]
@@ -171,12 +172,12 @@ flowchart TB
       CC3["Compositions: pages, emails, packs"]
     end
 
-    subgraph Continuity["Continuity Plane Artifacts (.octon/state/continuity/repo/)"]
+    subgraph Continuity["Continuity Plane Artifacts (.octon/state/continuity/**)"]
       CA1["Tasks (tasks.json)"]
       CA2["Entities (entities.json)"]
       CA3["Next actions (next.md)"]
       CA4["Log (append-first)"]
-      CA5["Run evidence (runs/)"]
+      CA5["Repo + scope continuity homes"]
       CA6["See: Continuity Plane docs"]
     end
 

@@ -90,7 +90,7 @@ ops_mutation_policy:
     - ../../../framework/cognition/_ops
     - ../../../framework/assurance/runtime/_ops
     - ../../../generated
-    - ../../../state/continuity/repo
+    - ../../../state/continuity
     - ../../../state/evidence
   immutable_targets:
     - ../../../framework/cognition/governance/principles/principles.md

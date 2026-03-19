@@ -16,6 +16,7 @@ SCOPES_EFFECTIVE_FILE="$EFFECTIVE_DIR/scopes.effective.yml"
 ARTIFACT_MAP_FILE="$EFFECTIVE_DIR/artifact-map.yml"
 GENERATION_LOCK_FILE="$EFFECTIVE_DIR/generation.lock.yml"
 SCOPE_SCHEMA_FILE="$OCTON_DIR/framework/cognition/_meta/architecture/instance/locality/schemas/scope.schema.json"
+SCOPE_CONTINUITY_ROOT="$OCTON_DIR/state/continuity/scopes"
 
 declare -A SCOPE_MANIFEST_PATHS=()
 declare -A SCOPE_MANIFEST_DIGESTS=()
@@ -289,8 +290,67 @@ write_quarantine_file() {
   } >"$output_file"
 }
 
+ensure_scope_continuity_scaffold() {
+  local scope_id="$1"
+  local scope_dir="$SCOPE_CONTINUITY_ROOT/$scope_id"
+
+  mkdir -p "$scope_dir"
+
+  if [[ ! -f "$scope_dir/log.md" ]]; then
+    cat >"$scope_dir/log.md" <<EOF
+---
+title: Scope Progress Log
+description: Chronological record of scope-local session work and decisions.
+mutability: append-only
+scope_id: "$scope_id"
+---
+
+# Scope Progress Log
+EOF
+  fi
+
+  if [[ ! -f "$scope_dir/tasks.json" ]]; then
+    cat >"$scope_dir/tasks.json" <<EOF
+{
+  "schema_version": "1.2",
+  "goal": "Track active work that is primarily owned by the $scope_id scope.",
+  "tasks": []
+}
+EOF
+  fi
+
+  if [[ ! -f "$scope_dir/entities.json" ]]; then
+    cat >"$scope_dir/entities.json" <<EOF
+{
+  "schema_version": "1.1",
+  "description": "Tracks state of scope-local entities relevant to $scope_id continuity planning",
+  "entities": {}
+}
+EOF
+  fi
+
+  if [[ ! -f "$scope_dir/next.md" ]]; then
+    cat >"$scope_dir/next.md" <<EOF
+---
+title: Scope Next Actions
+description: Immediate actionable steps for the $scope_id scope.
+scope_id: "$scope_id"
+---
+
+# Scope Next Actions
+
+Immediate scope-local steps to take when work is primarily owned by the
+$scope_id scope.
+
+## Current
+
+## Backlog
+EOF
+  fi
+}
+
 main() {
-  mkdir -p "$EFFECTIVE_DIR" "$(dirname "$QUARANTINE_STATE")"
+  mkdir -p "$EFFECTIVE_DIR" "$(dirname "$QUARANTINE_STATE")" "$SCOPE_CONTINUITY_ROOT"
   PUBLISHED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
   if [[ ! -f "$INSTANCE_MANIFEST" || ! -f "$LOCALITY_MANIFEST" || ! -f "$LOCALITY_REGISTRY" ]]; then
@@ -375,6 +435,11 @@ main() {
     echo "[ERROR] locality publication blocked; quarantined invalid scope state" >&2
     exit 1
   fi
+
+  local scope_id
+  for scope_id in "${DECLARED_SCOPE_IDS[@]}"; do
+    ensure_scope_continuity_scaffold "$scope_id"
+  done
 
   local manifest_sha registry_sha quarantine_sha input_digest
   manifest_sha="$(hash_file "$LOCALITY_MANIFEST")"

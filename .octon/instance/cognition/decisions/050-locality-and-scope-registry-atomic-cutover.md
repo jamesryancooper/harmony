@@ -68,3 +68,8 @@ Rules:
    manifests and compiled effective locality outputs.
 3. Packet 14 can treat locality quarantine and stale effective locality views
    as first-class fail-closed rules.
+
+## Addendum 2026-03-19
+
+Packet 7 has now landed. Scope continuity is no longer gated off; it is part
+of the canonical live state model under `state/continuity/scopes/**`.

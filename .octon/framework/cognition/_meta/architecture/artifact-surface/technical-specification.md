@@ -11,7 +11,8 @@
 - **IR**: Intermediate Representation—destination-neutral JSON form compiled from documents.
 - **HAG**: Octon Artifact Graph—compiled indexes + dependency graph.
 - **Canonical Content**: content stored in `content/` as the authoritative source of truth—git-tracked, schema-validated.
-- **Continuity Artifacts**: state stored in `.octon/state/continuity/repo/` with continuity lifecycle rules (append-first log + structured mutable state).
+- **Continuity Artifacts**: state stored in `.octon/state/continuity/**` with
+  continuity lifecycle rules (append-first logs + structured mutable state).
 - **Runtime Artifacts**: dynamic data that overlays canonical content at request time (see [runtime-artifact-layer.md](./runtime-artifact-layer.md) for complete specification).
 
 ---
@@ -21,7 +22,8 @@
 HAS MUST treat the following as **artifact roots**:
 
 - `content/` — canonical content (public/internal/agent).
-- `.octon/state/continuity/repo/` — continuity artifacts (internal/agent-facing), validated and indexed.
+- `.octon/state/continuity/**` — continuity artifacts (internal/agent-facing),
+  validated and indexed.
 - `assets/` — static assets and asset manifests.
 
 ### 5.2.1 Directory tree
@@ -98,8 +100,15 @@ content/
   tasks.json
   entities.json
   next.md
-  runs/
-    retention.json
+
+.octon/state/continuity/scopes/<scope-id>/
+  log.md
+  tasks.json
+  entities.json
+  next.md
+
+.octon/state/evidence/runs/
+  retention.json
 
 assets/
   manifest.yaml
@@ -267,9 +276,15 @@ The "envelope + blocks" approach is the explicit resolution of v2/v3 convergence
 
 ### Continuity Plane Integration
 
-> **Note**: `/.octon/state/continuity/repo/` is the canonical storage location for the **Continuity Plane**. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for full specification.
+> **Note**: `/.octon/state/continuity/**` is the canonical storage location for
+> the **Continuity Plane**. See
+> [Continuity Plane](../state/continuity/continuity-plane.md) for full
+> specification.
 
-HAS MUST treat `/.octon/state/continuity/repo/` as a **first-class artifact root**, even though it is owned by the Continuity Plane. The Artifact Surface build pipeline validates and indexes Continuity artifacts alongside canonical content.
+HAS MUST treat `/.octon/state/continuity/**` as a **first-class artifact
+root**, even though it is owned by the Continuity Plane. The Artifact Surface
+build pipeline validates and indexes repo and scope continuity artifacts
+alongside canonical content.
 
 **Artifacts indexed from Continuity Plane:**
 
@@ -279,6 +294,10 @@ HAS MUST treat `/.octon/state/continuity/repo/` as a **first-class artifact root
 | Active tasks | `.octon/state/continuity/repo/tasks.json` | Yes (canonical schema) |
 | Entity ledger | `.octon/state/continuity/repo/entities.json` | Yes (canonical schema) |
 | Next actions | `.octon/state/continuity/repo/next.md` | Yes (coherence contract with tasks) |
+| Scope-local log | `.octon/state/continuity/scopes/<scope-id>/log.md` | Yes (append-first markdown contract) |
+| Scope-local tasks | `.octon/state/continuity/scopes/<scope-id>/tasks.json` | Yes (canonical schema) |
+| Scope-local entity ledger | `.octon/state/continuity/scopes/<scope-id>/entities.json` | Yes (canonical schema) |
+| Scope-local next actions | `.octon/state/continuity/scopes/<scope-id>/next.md` | Yes (coherence contract with tasks) |
 | Run receipts/evidence | `.octon/state/evidence/runs/**` | Yes (retention-class contract) |
 
 **Format guidance**: YAML/JSON for state, Markdown for narrative, logs append-only.
@@ -306,7 +325,7 @@ ADRs may appear in two locations with different purposes:
 
 The **Knowledge Plane owns durable decisions** (rationale, context, alternatives). Artifact Surface may publish ADR documentation for internal reference. Continuity links active work to decision IDs for execution traceability.
 
-See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete boundary definitions.
+See [Foundational Planes Integration](../state/continuity/three-planes-integration.md) for complete boundary definitions.
 
 ---
 
@@ -643,7 +662,7 @@ WHERE d.kind IN ('adr', 'decision')
 ```
 
 **4) Find Knowledge Plane modules affected by a decision**:
-(Cross-plane join; see [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md))
+(Cross-plane join; see [Foundational Planes Integration](../state/continuity/three-planes-integration.md))
 
 ```sql
 SELECT cpr.dst_id as module_path, d.title as decision_title
@@ -666,7 +685,7 @@ WHERE cpr.src_plane = 'knowledge'
 
 ### Agent coordination roles (Continuity + Knowledge aligned)
 
-HAS SHOULD assume four roles aligned with the [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) and [Knowledge Plane](../../../runtime/knowledge/knowledge.md):
+HAS SHOULD assume four roles aligned with the [Continuity Plane](../state/continuity/continuity-plane.md) and [Knowledge Plane](../../../runtime/knowledge/knowledge.md):
 
 | Role | Artifact Surface Responsibilities | Continuity Responsibilities | Knowledge Responsibilities |
 |------|-------------------------------|---------------------------|----------------------------|
@@ -675,7 +694,10 @@ HAS SHOULD assume four roles aligned with the [Continuity Plane](../../../../con
 | **Archivist** | Updates published internal documentation | Maintains coherent handoff-ready continuity artifacts | Maintains durable decision/evidence indexes |
 | **Verifier** | Runs validation and confirms acceptance criteria | Records verification status transitions | Records evidence links for traceability queries |
 
-Continuity artifacts and templates exist under `.octon/state/continuity/repo/` and MUST be validated alongside Artifact Surface artifacts. See [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) for session lifecycle and handoff protocols.
+Continuity artifacts and templates exist under `.octon/state/continuity/**`
+and MUST be validated alongside Artifact Surface artifacts. See
+[Continuity Plane](../state/continuity/continuity-plane.md) for session
+lifecycle and handoff protocols.
 
 ### Leasing (advisory locks)
 

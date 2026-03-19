@@ -22,11 +22,12 @@ HAS implements the Artifact Plane in Octon's canonical model:
 | Capability | What atomic execution units exist? | `.octon/framework/capabilities/runtime/skills/` |
 | Orchestration | How are missions sequenced? | `.octon/framework/orchestration/runtime/workflows/` |
 | Assurance | What must pass before completion? | `.octon/framework/assurance/{runtime,practices}/` |
-| Continuity | What is active and next? | `.octon/state/continuity/repo/{log.md,tasks.json,entities.json,next.md}` |
+| Continuity | What is active and next? | `.octon/state/continuity/{repo/,scopes/<scope-id>/}{log.md,tasks.json,entities.json,next.md}` |
 | Knowledge | What durable context/decisions/evidence exist? | `.octon/framework/cognition/runtime/{context,decisions,evidence,evaluations,projections,knowledge-plane}/` |
 | **Artifact (HAS)** | What durable outputs/evidence are produced? | `.octon/generated/` + this architecture surface |
 
-See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for cross-plane architecture.
+See [Foundational Planes Integration](../state/continuity/three-planes-integration.md)
+for cross-plane architecture.
 
 ---
 
@@ -76,7 +77,7 @@ When boundary conditions are crossed (see [boundary-conditions.md](./boundary-co
 
 | Layer | Storage | Mutability | Purpose |
 |-------|---------|------------|---------|
-| **Canonical** | `content/` + `.octon/state/continuity/repo/` in git | Immutable at runtime; changed via PR | Source of truth |
+| **Canonical** | `content/` + `.octon/state/continuity/**` in git | Immutable at runtime; changed via PR | Source of truth |
 | **Compiled** | `.octon/content/` (HAG) | Regenerated each build | Query layer |
 | **Runtime Read** | SQLite at edge (Turso/D1/LiteFS) | Read-only replica | Fast global reads |
 | **Runtime Write** | Server DB (Postgres/Supabase) | Mutable | Live overrides, personalization |

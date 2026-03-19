@@ -33,6 +33,12 @@ explicit.
 - `state/` is mutable operational truth and retained evidence.
 - `generated/` is rebuildable output only.
 
+Within `state/**`:
+
+- `state/continuity/**` owns active repo and scope handoff state
+- `state/evidence/**` owns retained operational trace and receipts
+- `state/control/**` owns mutable publication and quarantine truth
+
 Canonical repo-instance authority includes these instance-native surfaces:
 
 - `instance/manifest.yml`
@@ -61,6 +67,11 @@ Canonical locality inputs and outputs are:
 - authored locality control metadata: `instance/locality/{manifest.yml,registry.yml}`
 - authored per-scope manifests: `instance/locality/scopes/<scope-id>/scope.yml`
 - durable scope-local context: `instance/cognition/context/scopes/<scope-id>/**`
+- mutable scope-local continuity: `state/continuity/scopes/<scope-id>/**`
+- mutable repo continuity: `state/continuity/repo/**`
+- retained operational evidence: `state/evidence/**`
+- mutable extension actual/quarantine state:
+  `state/control/extensions/{active.yml,quarantine.yml}`
 - mutable locality quarantine: `state/control/locality/quarantine.yml`
 - compiled effective locality outputs: `generated/effective/locality/**`
 
