@@ -280,8 +280,6 @@ delegation boundaries, capability-map gating, and alignment drift checks.
 
 - None
 
----
-
 ## 2026-01-14
 
 **Session focus:** Elevate projects to workspace level and introduce idea funnel
@@ -642,6 +640,39 @@ Prompt quality significantly impacts AI output quality. The 10-phase pipeline ad
 - Test `/refine-prompt` command on actual prompts
 - Consider adding more persona templates for common task types
 - Evaluate if pipeline can be shortened for simple tasks
+
+**Blockers:**
+
+- None
+
+## 2026-03-19
+
+**Session focus:** Packet 5 overlay and ingress model atomic cutover
+
+**Completed:**
+
+- Hardened the Packet 5 overlay contract across `.octon/README.md`,
+  bootstrap guidance, and the canonical architecture references so they now
+  enumerate instance-native versus overlay-capable surfaces, the four ratified
+  overlay points, merge modes, precedence, and adapter rules
+- Tightened ingress enforcement so `AGENTS.md` and `CLAUDE.md` must match the
+  projected ingress surface at `/.octon/AGENTS.md`, and aligned the canonical
+  bootstrap assets plus projected copies to that rule
+- Extended overlay and repo-instance validators to fail closed on disabled
+  overlay roots with real content and on ad hoc overlay-like paths outside the
+  four ratified roots
+- Added focused fixture coverage for overlay placement drift and ingress
+  adapter thinness, then passed the full Packet 5 gate stack including
+  `alignment-check.sh --profile harness`
+- Completed the cognition runtime-artifact path migration needed to keep the
+  generated decisions, evidence, evaluations, receipts, and knowledge graph
+  surfaces on the live `instance/**` and `generated/**` paths
+- Recorded ADR 049 and the Packet 5 migration evidence bundle under
+  `state/evidence/migration/2026-03-19-overlay-and-ingress-model-cutover/`
+
+**Next:**
+
+- None
 
 **Blockers:**
 

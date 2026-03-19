@@ -1,24 +1,31 @@
 projection_id: cognition-runtime-surface-map
 schema_version: "1.0"
-generated_at: "2026-02-22T00:00:00Z"
+generated_at: "2026-03-19T18:19:11Z"
 generated_from:
   - ../definitions/cognition-runtime-surface-map.yml
-  - ../../index.yml
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
 
 runtime_surfaces:
   - id: context
-    index: ../../context/index.yml
+    index: 
   - id: decisions
-    index: ../../decisions/index.yml
+    index: 
   - id: migrations
-    index: ../../migrations/index.yml
+    index: 
   - id: analyses
-    index: ../../analyses/index.yml
+    index: 
   - id: knowledge
-    index: ../../knowledge/index.yml
+    index: 
   - id: evidence
-    index: ../../evidence/index.yml
+    index: 
   - id: evaluations
-    index: ../../evaluations/index.yml
+    index: 
   - id: projections
-    index: ../../projections/index.yml
+    index: 

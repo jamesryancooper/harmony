@@ -17,13 +17,44 @@ Only `framework/**` and `instance/**` are authored authority. Raw
 `inputs/**` never participate directly in runtime or policy decisions.
 `framework/**` must not contain repo-local authority, mutable operational
 truth, retained evidence, or generated outputs.
-`instance/**` is the canonical repo-owned authority layer for ingress,
-bootstrap, locality, durable context, ADRs, repo-native capabilities,
-missions, desired extension configuration, and enabled overlay-capable
-instance surfaces only.
+`instance/**` is the canonical repo-owned authority layer. Most of
+`instance/**` is instance-native; only declared enabled overlay points may
+carry overlay-capable repo authority.
+
+## Instance Authority
+
+### Instance-Native Surfaces
+
+- `instance/manifest.yml`
+- `instance/ingress/**`
+- `instance/bootstrap/**`
+- `instance/locality/**`
+- `instance/cognition/context/**`
+- `instance/cognition/decisions/**`
+- `instance/capabilities/runtime/**`
+- `instance/orchestration/missions/**`
+- `instance/extensions.yml`
+
+### Overlay-Capable Surfaces
+
+Overlay-capable repo authority is legal only when
+`framework/overlay-points/registry.yml` declares the point and
+`instance/manifest.yml#enabled_overlay_points` enables it.
+
+| Overlay point | Instance path | Merge mode | Precedence |
+| --- | --- | --- | ---: |
+| `instance-governance-policies` | `instance/governance/policies/**` | `replace_by_path` | 10 |
+| `instance-governance-contracts` | `instance/governance/contracts/**` | `replace_by_path` | 20 |
+| `instance-agency-runtime` | `instance/agency/runtime/**` | `merge_by_id` | 30 |
+| `instance-assurance-runtime` | `instance/assurance/runtime/**` | `append_only` | 40 |
+
+No other `instance/**` subtree is overlay-capable in v1.
 
 ## Canonical Bootstrap And Ingress
 
+- Canonical overlay registry: `/.octon/framework/overlay-points/registry.yml`
+- Repo-side overlay enablement: `/.octon/instance/manifest.yml#enabled_overlay_points`
+- Projected ingress surface: `/.octon/AGENTS.md`
 - Canonical ingress: `/.octon/instance/ingress/AGENTS.md`
 - Canonical bootstrap docs: `/.octon/instance/bootstrap/`
 - Canonical locality authority: `/.octon/instance/locality/`
@@ -33,6 +64,10 @@ instance surfaces only.
 - Export workflow: `/.octon/framework/orchestration/runtime/workflows/meta/export-harness/`
 - Canonical architecture contract:
   `/.octon/framework/cognition/_meta/architecture/specification.md`
+
+Repo-root `AGENTS.md` and `CLAUDE.md` are thin adapters to `/.octon/AGENTS.md`
+only. They must be a symlink to `/.octon/AGENTS.md` or a byte-for-byte parity
+copy and may not add runtime or policy text.
 
 ## Portability
 

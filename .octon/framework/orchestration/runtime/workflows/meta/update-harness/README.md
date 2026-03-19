@@ -1,6 +1,6 @@
 ---
 name: "update-harness"
-description: "Align an existing harness with the canonical class-root contracts by auditing root-manifest, repo-instance, and boundary gaps, planning updates, and executing bounded remediations while preserving repo-owned `instance/**` authority unless an explicit migration contract applies."
+description: "Align an existing harness with the canonical class-root, overlay, and ingress contracts by auditing root-manifest, repo-instance, adapter, and boundary gaps, planning updates, and executing bounded remediations while preserving repo-owned `instance/**` authority unless an explicit migration contract applies."
 steps:
   - id: "audit-state"
     file: "stages/01-audit-state.md"
@@ -31,7 +31,7 @@ _Generated README from canonical workflow `update-harness`._
 
 ## Purpose
 
-Align an existing harness with the canonical class-root contracts by auditing root-manifest, repo-instance, and boundary gaps, planning updates, and executing bounded remediations while preserving repo-owned `instance/**` authority unless an explicit migration contract applies.
+Align an existing harness with the canonical class-root, overlay, and ingress contracts by auditing root-manifest, repo-instance, adapter, and boundary gaps, planning updates, and executing bounded remediations while preserving repo-owned `instance/**` authority unless an explicit migration contract applies.
 
 ## Target
 
@@ -69,4 +69,4 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 | Version | Changes |
 |---------|---------|
-| 1.2.0 | Generated from canonical workflow `update-harness` |
+| 1.3.0 | Generated from canonical workflow `update-harness` |

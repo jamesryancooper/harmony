@@ -42,10 +42,10 @@
   },
   "contents": {
     "README.md": "Super-root overview",
-    "AGENTS.md": "Ingress adapter to instance ingress",
+    "AGENTS.md": "Projected ingress surface; repo-root adapters must point to this file only",
     "octon.yml": "Root super-root manifest",
     "framework/manifest.yml": "Portable framework manifest",
-    "instance/manifest.yml": "Repo instance manifest",
+    "instance/manifest.yml": "Repo instance manifest plus enabled overlay points",
     "instance/bootstrap/START.md": "Boot sequence and orientation",
     "instance/bootstrap/OBJECTIVE.md": "Workspace objective",
     "instance/bootstrap/scope.md": "Boundaries and responsibilities",

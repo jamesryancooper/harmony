@@ -75,10 +75,10 @@ validate_ingress_adapter() {
   fi
 
   if [[ -f "$file_path" ]]; then
-    if rg -n -F "$EXPECTED_INGRESS_TARGET" "$file_path" >/dev/null 2>&1; then
-      pass "$label adapter points to $EXPECTED_INGRESS_TARGET"
+    if cmp -s "$CANONICAL_AGENTS_FILE" "$file_path"; then
+      pass "$label matches canonical projected ingress"
     else
-      fail "$label adapter does not point to $EXPECTED_INGRESS_TARGET"
+      fail "$label must be a symlink to $EXPECTED_INGRESS_TARGET or a byte-for-byte parity copy"
     fi
     return
   fi
@@ -121,6 +121,12 @@ main() {
     pass ".octon/AGENTS.md points to canonical internal ingress"
   else
     fail ".octon/AGENTS.md must point to canonical internal ingress"
+  fi
+
+  if rg -n -F 'Repo-root `AGENTS.md` and `CLAUDE.md` are thin adapters to this file.' "$CANONICAL_AGENTS_FILE" >/dev/null 2>&1; then
+    pass ".octon/AGENTS.md declares the thin-adapter rule"
+  else
+    fail ".octon/AGENTS.md must declare the thin-adapter rule"
   fi
 
   validate_ingress_adapter "$ROOT_AGENTS_FILE" "AGENTS.md"

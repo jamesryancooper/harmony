@@ -7,6 +7,62 @@ if [[ -n "${COGNITION_DIR_OVERRIDE:-}" ]]; then
 else
   COGNITION_DIR="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
 fi
+STANDALONE_FIXTURE_MODE=0
+if [[ -n "${COGNITION_DIR_OVERRIDE:-}" ]] && [[ -d "$COGNITION_DIR/runtime" ]] && [[ ! -d "$COGNITION_DIR/../../instance/cognition" ]]; then
+  STANDALONE_FIXTURE_MODE=1
+fi
+
+if [[ "$STANDALONE_FIXTURE_MODE" -eq 1 ]]; then
+  OCTON_DIR="$COGNITION_DIR"
+  ROOT_DIR="$(cd -- "$COGNITION_DIR/.." && pwd)"
+  INSTANCE_COGNITION_DIR="$COGNITION_DIR/runtime"
+  INSTANCE_COGNITION_SHARED_DIR="$COGNITION_DIR/runtime"
+  GENERATED_COGNITION_DIR="$COGNITION_DIR/runtime"
+else
+  OCTON_DIR="$(cd -- "$COGNITION_DIR/../.." && pwd)"
+  ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
+  INSTANCE_COGNITION_DIR="$OCTON_DIR/instance/cognition"
+  INSTANCE_COGNITION_SHARED_DIR="$INSTANCE_COGNITION_DIR/context/shared"
+  GENERATED_COGNITION_DIR="$OCTON_DIR/generated/cognition"
+fi
+
+if [[ "$STANDALONE_FIXTURE_MODE" -eq 1 ]]; then
+  CONTEXT_INDEX_PATH="$COGNITION_DIR/runtime/context/index.yml"
+  DECISIONS_INDEX_PATH="$COGNITION_DIR/runtime/decisions/index.yml"
+  DECISIONS_SUMMARY_PATH="$COGNITION_DIR/runtime/context/decisions.md"
+  MIGRATIONS_INDEX_PATH="$COGNITION_DIR/runtime/migrations/index.yml"
+  ANALYSES_INDEX_PATH="$COGNITION_DIR/runtime/analyses/index.yml"
+  KNOWLEDGE_INDEX_PATH="$COGNITION_DIR/runtime/knowledge/index.yml"
+  EVIDENCE_INDEX_PATH="$COGNITION_DIR/runtime/evidence/index.yml"
+  EVALUATIONS_INDEX_PATH="$COGNITION_DIR/runtime/evaluations/index.yml"
+  DIGESTS_INDEX_PATH="$COGNITION_DIR/runtime/evaluations/digests/index.yml"
+  DIGESTS_DIR="$COGNITION_DIR/runtime/evaluations/digests"
+  OPEN_ACTIONS_PATH="$COGNITION_DIR/runtime/evaluations/actions/open-actions.yml"
+  PROJECTION_DEFINITION_PATH="$COGNITION_DIR/runtime/projections/definitions/cognition-runtime-surface-map.yml"
+  PROJECTION_MATERIALIZED_PATH="$COGNITION_DIR/runtime/projections/materialized/cognition-runtime-surface-map.latest.yml"
+  PROJECTIONS_INDEX_PATH="$COGNITION_DIR/runtime/projections/index.yml"
+  GRAPH_NODES_PATH="$COGNITION_DIR/runtime/knowledge/graph/nodes.yml"
+  GRAPH_EDGES_PATH="$COGNITION_DIR/runtime/knowledge/graph/edges.yml"
+  INGESTION_RECEIPTS_PATH="$COGNITION_DIR/runtime/knowledge/sources/ingestion-receipts.yml"
+else
+  CONTEXT_INDEX_PATH="$INSTANCE_COGNITION_DIR/context/index.yml"
+  DECISIONS_INDEX_PATH="$INSTANCE_COGNITION_DIR/decisions/index.yml"
+  DECISIONS_SUMMARY_PATH="$INSTANCE_COGNITION_SHARED_DIR/decisions.md"
+  MIGRATIONS_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/migrations/index.yml"
+  ANALYSES_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/analyses/index.yml"
+  KNOWLEDGE_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/knowledge/index.yml"
+  EVIDENCE_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/evidence/index.yml"
+  EVALUATIONS_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/evaluations/index.yml"
+  DIGESTS_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/evaluations/digests/index.yml"
+  DIGESTS_DIR="$INSTANCE_COGNITION_SHARED_DIR/evaluations/digests"
+  OPEN_ACTIONS_PATH="$INSTANCE_COGNITION_SHARED_DIR/evaluations/actions/open-actions.yml"
+  PROJECTION_DEFINITION_PATH="$GENERATED_COGNITION_DIR/projections/definitions/cognition-runtime-surface-map.yml"
+  PROJECTION_MATERIALIZED_PATH="$GENERATED_COGNITION_DIR/projections/materialized/cognition-runtime-surface-map.latest.yml"
+  PROJECTIONS_INDEX_PATH="$GENERATED_COGNITION_DIR/projections/index.yml"
+  GRAPH_NODES_PATH="$GENERATED_COGNITION_DIR/graph/nodes.yml"
+  GRAPH_EDGES_PATH="$GENERATED_COGNITION_DIR/graph/edges.yml"
+  INGESTION_RECEIPTS_PATH="$INSTANCE_COGNITION_SHARED_DIR/knowledge/sources/ingestion-receipts.yml"
+fi
 RUNTIME_DIR="$COGNITION_DIR/runtime"
 if [[ -n "${OUTPUT_DIR_OVERRIDE:-}" ]]; then
   EVIDENCE_DIR="$(cd -- "$OUTPUT_DIR_OVERRIDE/state/evidence" && pwd)"
@@ -22,14 +78,14 @@ usage() {
 Usage: sync-runtime-artifacts.sh [--check] [--target <name> ...]
 
 Generates deterministic cognition runtime derived artifacts:
-- runtime/context/decisions.md
-- runtime/projections/materialized/cognition-runtime-surface-map.latest.yml
-- runtime/evidence/index.yml
-- runtime/evaluations/digests/index.yml
-- runtime/evaluations/actions/open-actions.yml
-- runtime/knowledge/graph/nodes.yml
-- runtime/knowledge/graph/edges.yml
-- runtime/knowledge/sources/ingestion-receipts.yml
+- instance/cognition/context/shared/decisions.md
+- generated/cognition/projections/materialized/cognition-runtime-surface-map.latest.yml
+- instance/cognition/context/shared/evidence/index.yml
+- instance/cognition/context/shared/evaluations/digests/index.yml
+- instance/cognition/context/shared/evaluations/actions/open-actions.yml
+- generated/cognition/graph/nodes.yml
+- generated/cognition/graph/edges.yml
+- instance/cognition/context/shared/knowledge/sources/ingestion-receipts.yml
 
 Options:
   --check   Validate generated artifacts are up to date without writing files.
@@ -122,7 +178,14 @@ markdown_escape() {
 
 stage_path_for_target() {
   local target="$1"
-  local rel="${target#$COGNITION_DIR/}"
+  local rel=""
+  if [[ "$target" == "$COGNITION_DIR/"* ]]; then
+    rel="${target#$COGNITION_DIR/}"
+  elif [[ "$target" == "$ROOT_DIR/"* ]]; then
+    rel="${target#$ROOT_DIR/}"
+  else
+    rel="${target#/}"
+  fi
   printf '%s/%s' "$STAGE_DIR" "$rel"
 }
 
@@ -214,6 +277,17 @@ resolve_cognition_source() {
     printf '%s' "$staged"
   else
     printf '%s/%s' "$COGNITION_DIR" "$rel"
+  fi
+}
+
+resolve_target_source() {
+  local target="$1"
+  local staged
+  staged="$(stage_path_for_target "$target")"
+  if [[ -f "$staged" ]]; then
+    printf '%s' "$staged"
+  else
+    printf '%s' "$target"
   fi
 }
 
@@ -572,8 +646,8 @@ generate_decisions_context() {
   local target
   local raw
 
-  index_file="$(resolve_cognition_source "runtime/decisions/index.yml")"
-  target="$RUNTIME_DIR/context/decisions.md"
+  index_file="$DECISIONS_INDEX_PATH"
+  target="$DECISIONS_SUMMARY_PATH"
   raw="$(mktemp "$TMP_ROOT/decisions.XXXX")"
 
   {
@@ -590,7 +664,7 @@ generated_from:
 # Decisions
 
 This file is generated by `/.octon/framework/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh`.
-Do not edit manually. Update ADR files and `runtime/decisions/index.yml` instead.
+Do not edit manually. Update ADR files and `/.octon/instance/cognition/decisions/index.yml` instead.
 
 ## ADR Catalog
 
@@ -606,7 +680,7 @@ HEADER
       local status
       local date
 
-      adr_file="$RUNTIME_DIR/decisions/$record_path"
+      adr_file="$(dirname "$DECISIONS_INDEX_PATH")/$record_path"
       adr_number="${record_id%%-*}"
 
       if [[ -f "$adr_file" ]]; then
@@ -644,12 +718,10 @@ FOOTER
 }
 
 generate_projection_materialized() {
-  local definition_file
   local target
   local raw
 
-  definition_file="$(resolve_cognition_source "runtime/projections/definitions/cognition-runtime-surface-map.yml")"
-  target="$RUNTIME_DIR/projections/materialized/cognition-runtime-surface-map.latest.yml"
+  target="$PROJECTION_MATERIALIZED_PATH"
   raw="$(mktemp "$TMP_ROOT/projection.XXXX")"
 
   {
@@ -659,28 +731,48 @@ schema_version: "1.0"
 generated_at: "__GENERATED_AT__"
 generated_from:
   - ../definitions/cognition-runtime-surface-map.yml
-  - ../../index.yml
+  - __CONTEXT_INDEX__
+  - __DECISIONS_INDEX__
+  - __MIGRATIONS_INDEX__
+  - __ANALYSES_INDEX__
+  - __KNOWLEDGE_INDEX__
+  - __EVIDENCE_INDEX__
+  - __EVALUATIONS_INDEX__
+  - __PROJECTIONS_INDEX__
 
 runtime_surfaces:
 HEADER
 
-    awk '
-      /^[[:space:]]+-[[:space:]]+\.\.\/\.\.\/[a-z0-9_-]+\/index\.yml[[:space:]]*$/ {
-        line=$0
-        sub(/^[[:space:]]+-[[:space:]]+/, "", line)
-        gsub(/[[:space:]]+$/, "", line)
-        print line
-      }
-    ' "$definition_file" | while IFS= read -r source_path; do
-      [[ -z "$source_path" ]] && continue
-      if [[ "$source_path" =~ ^\.\./\.\./([^/]+)/index\.yml$ ]]; then
-        local surface_id
-        surface_id="${BASH_REMATCH[1]}"
-        printf '  - id: %s\n' "$surface_id"
-        printf '    index: %s\n' "$source_path"
-      fi
-    done
+    cat <<'SURFACES'
+  - id: context
+    index: __CONTEXT_INDEX__
+  - id: decisions
+    index: __DECISIONS_INDEX__
+  - id: migrations
+    index: __MIGRATIONS_INDEX__
+  - id: analyses
+    index: __ANALYSES_INDEX__
+  - id: knowledge
+    index: __KNOWLEDGE_INDEX__
+  - id: evidence
+    index: __EVIDENCE_INDEX__
+  - id: evaluations
+    index: __EVALUATIONS_INDEX__
+  - id: projections
+    index: __PROJECTIONS_INDEX__
+SURFACES
   } > "$raw"
+
+  perl -0pi -e '
+    s#__CONTEXT_INDEX__#$ENV{CONTEXT_INDEX_PATH}#g;
+    s#__DECISIONS_INDEX__#$ENV{DECISIONS_INDEX_PATH}#g;
+    s#__MIGRATIONS_INDEX__#$ENV{MIGRATIONS_INDEX_PATH}#g;
+    s#__ANALYSES_INDEX__#$ENV{ANALYSES_INDEX_PATH}#g;
+    s#__KNOWLEDGE_INDEX__#$ENV{KNOWLEDGE_INDEX_PATH}#g;
+    s#__EVIDENCE_INDEX__#$ENV{EVIDENCE_INDEX_PATH}#g;
+    s#__EVALUATIONS_INDEX__#$ENV{EVALUATIONS_INDEX_PATH}#g;
+    s#__PROJECTIONS_INDEX__#$ENV{PROJECTIONS_INDEX_PATH}#g;
+  ' "$raw"
 
   finalize_candidate "$target" "$raw" "generated_at" "timestamp"
 }
@@ -692,23 +784,23 @@ generate_evidence_index() {
   local audits_index
   local records
 
-  target="$RUNTIME_DIR/evidence/index.yml"
+  target="$EVIDENCE_INDEX_PATH"
   raw="$(mktemp "$TMP_ROOT/evidence.XXXX")"
   records="$(mktemp "$TMP_ROOT/evidence-records.XXXX")"
-  migrations_index="$(resolve_cognition_source "runtime/migrations/index.yml")"
-  audits_index="$(resolve_cognition_source "runtime/audits/index.yml")"
+  migrations_index="$(resolve_target_source "$MIGRATIONS_INDEX_PATH")"
+  audits_index="$(resolve_target_source "$INSTANCE_COGNITION_SHARED_DIR/audits/index.yml")"
 
   : > "$records"
 
   while IFS=$'\t' read -r migration_id _plan_path _adr_path _evidence_path; do
     [[ -z "$migration_id" ]] && continue
-    printf '%s\tmigration\t/.octon/state/evidence/migration/%s/evidence.md\t../migrations/index.yml\n' "$migration_id" "$migration_id" >> "$records"
+    printf '%s\tmigration\t/.octon/state/evidence/migration/%s/evidence.md\t%s\n' "$migration_id" "$migration_id" "$MIGRATIONS_INDEX_PATH" >> "$records"
   done < <(extract_migration_records "$migrations_index")
 
   if [[ -f "$audits_index" ]]; then
     while IFS=$'\t' read -r audit_id _audit_path; do
       [[ -z "$audit_id" ]] && continue
-      printf '%s\taudit\t/.octon/state/evidence/validation/audits/%s/evidence.md\t../audits/index.yml\n' "$audit_id" "$audit_id" >> "$records"
+      printf '%s\taudit\t/.octon/state/evidence/validation/audits/%s/evidence.md\t%s\n' "$audit_id" "$audit_id" "$INSTANCE_COGNITION_SHARED_DIR/audits/index.yml" >> "$records"
     done < <(extract_index_id_path "$audits_index")
   fi
 
@@ -718,7 +810,7 @@ generate_evidence_index() {
       local bundle_id
       bundle_id="$(basename "$bundle_dir")"
       if [[ -f "$bundle_dir/evidence.md" ]]; then
-        printf '%s\tdecision\t/.octon/state/evidence/decisions/repo/reports/%s/evidence.md\t../decisions/index.yml\n' "$bundle_id" "$bundle_id" >> "$records"
+        printf '%s\tdecision\t/.octon/state/evidence/decisions/repo/reports/%s/evidence.md\t%s\n' "$bundle_id" "$bundle_id" "$DECISIONS_INDEX_PATH" >> "$records"
       fi
     done < <(find "$EVIDENCE_DIR/decisions/repo/reports" -mindepth 1 -maxdepth 1 -type d -name '[0-9][0-9][0-9]-*' | sort)
   fi
@@ -772,10 +864,10 @@ generate_evaluations_digests_index() {
   local records
   local digests_dir
 
-  target="$RUNTIME_DIR/evaluations/digests/index.yml"
+  target="$DIGESTS_INDEX_PATH"
   raw="$(mktemp "$TMP_ROOT/digest-index.XXXX")"
   records="$(mktemp "$TMP_ROOT/digest-records.XXXX")"
-  digests_dir="$RUNTIME_DIR/evaluations/digests"
+  digests_dir="$DIGESTS_DIR"
 
   : > "$records"
 
@@ -842,10 +934,10 @@ generate_evaluations_open_actions() {
   local records
   local digests_dir
 
-  target="$RUNTIME_DIR/evaluations/actions/open-actions.yml"
+  target="$OPEN_ACTIONS_PATH"
   raw="$(mktemp "$TMP_ROOT/open-actions.XXXX")"
   records="$(mktemp "$TMP_ROOT/action-records.XXXX")"
-  digests_dir="$RUNTIME_DIR/evaluations/digests"
+  digests_dir="$DIGESTS_DIR"
 
   : > "$records"
 
@@ -921,21 +1013,21 @@ generate_knowledge_nodes() {
   local digests_index
   local actions_ledger
 
-  target="$RUNTIME_DIR/knowledge/graph/nodes.yml"
+  target="$GRAPH_NODES_PATH"
   raw="$(mktemp "$TMP_ROOT/nodes.XXXX")"
   records="$(mktemp "$TMP_ROOT/node-records.XXXX")"
 
-  projection_file="$(resolve_cognition_source "runtime/projections/materialized/cognition-runtime-surface-map.latest.yml")"
-  decisions_index="$(resolve_cognition_source "runtime/decisions/index.yml")"
-  migrations_index="$(resolve_cognition_source "runtime/migrations/index.yml")"
-  audits_index="$(resolve_cognition_source "runtime/audits/index.yml")"
-  evidence_index="$(resolve_cognition_source "runtime/evidence/index.yml")"
-  digests_index="$(resolve_cognition_source "runtime/evaluations/digests/index.yml")"
-  actions_ledger="$(resolve_cognition_source "runtime/evaluations/actions/open-actions.yml")"
+  projection_file="$(resolve_target_source "$PROJECTION_MATERIALIZED_PATH")"
+  decisions_index="$(resolve_target_source "$DECISIONS_INDEX_PATH")"
+  migrations_index="$(resolve_target_source "$MIGRATIONS_INDEX_PATH")"
+  audits_index="$(resolve_target_source "$INSTANCE_COGNITION_SHARED_DIR/audits/index.yml")"
+  evidence_index="$(resolve_target_source "$EVIDENCE_INDEX_PATH")"
+  digests_index="$(resolve_target_source "$DIGESTS_INDEX_PATH")"
+  actions_ledger="$(resolve_target_source "$OPEN_ACTIONS_PATH")"
 
   : > "$records"
 
-  printf 'projection:cognition-runtime-surface-map\tprojection\tcognition-runtime-surface-map\t../../projections/materialized/cognition-runtime-surface-map.latest.yml\n' >> "$records"
+  printf 'projection:cognition-runtime-surface-map\tprojection\tcognition-runtime-surface-map\t%s\n' "$PROJECTION_MATERIALIZED_PATH" >> "$records"
 
   while IFS=$'\t' read -r surface_id surface_index; do
     [[ -z "$surface_id" ]] && continue
@@ -944,18 +1036,18 @@ generate_knowledge_nodes() {
 
   while IFS=$'\t' read -r decision_id decision_path; do
     [[ -z "$decision_id" ]] && continue
-    printf 'adr:%s\tdecision-adr\t%s\t../../decisions/%s\n' "$decision_id" "$decision_id" "$decision_path" >> "$records"
+    printf 'adr:%s\tdecision-adr\t%s\t%s/%s\n' "$decision_id" "$decision_id" "$(dirname "$DECISIONS_INDEX_PATH")" "$decision_path" >> "$records"
   done < <(extract_index_id_path "$decisions_index")
 
   while IFS=$'\t' read -r migration_id migration_path _adr_path _evidence_path; do
     [[ -z "$migration_id" ]] && continue
-    printf 'migration:%s\tmigration-record\t%s\t../../migrations/%s\n' "$migration_id" "$migration_id" "$migration_path" >> "$records"
+    printf 'migration:%s\tmigration-record\t%s\t%s/%s\n' "$migration_id" "$migration_id" "$(dirname "$MIGRATIONS_INDEX_PATH")" "$migration_path" >> "$records"
   done < <(extract_migration_records "$migrations_index")
 
   if [[ -f "$audits_index" ]]; then
     while IFS=$'\t' read -r audit_id audit_path; do
       [[ -z "$audit_id" ]] && continue
-      printf 'audit:%s\taudit-record\t%s\t../../audits/%s\n' "$audit_id" "$audit_id" "$audit_path" >> "$records"
+      printf 'audit:%s\taudit-record\t%s\t%s/%s\n' "$audit_id" "$audit_id" "$(dirname "$audits_index")" "$audit_path" >> "$records"
     done < <(extract_index_id_path "$audits_index")
   fi
 
@@ -966,12 +1058,12 @@ generate_knowledge_nodes() {
 
   while IFS=$'\t' read -r digest_id digest_path; do
     [[ -z "$digest_id" || -z "$digest_path" ]] && continue
-    printf 'digest:%s\tevaluation-digest\t%s\t../../evaluations/digests/%s\n' "$digest_id" "$digest_id" "$digest_path" >> "$records"
+    printf 'digest:%s\tevaluation-digest\t%s\t%s/%s\n' "$digest_id" "$digest_id" "$(dirname "$DIGESTS_INDEX_PATH")" "$digest_path" >> "$records"
   done < <(extract_digest_records "$digests_index")
 
   while IFS=$'\t' read -r action_id _source_digest _owner _due _status _summary _evidence; do
     [[ -z "$action_id" ]] && continue
-    printf 'action:%s\tevaluation-action\t%s\t../../evaluations/actions/open-actions.yml\n' "$action_id" "$action_id" >> "$records"
+    printf 'action:%s\tevaluation-action\t%s\t%s\n' "$action_id" "$action_id" "$OPEN_ACTIONS_PATH" >> "$records"
   done < <(extract_actions_from_ledger "$actions_ledger")
 
   {
@@ -1008,21 +1100,21 @@ generate_knowledge_edges() {
   local evidence_index
   local actions_ledger
 
-  target="$RUNTIME_DIR/knowledge/graph/edges.yml"
+  target="$GRAPH_EDGES_PATH"
   raw="$(mktemp "$TMP_ROOT/edges.XXXX")"
   records="$(mktemp "$TMP_ROOT/edge-records.XXXX")"
 
-  projection_file="$(resolve_cognition_source "runtime/projections/materialized/cognition-runtime-surface-map.latest.yml")"
-  migrations_index="$(resolve_cognition_source "runtime/migrations/index.yml")"
-  audits_index="$(resolve_cognition_source "runtime/audits/index.yml")"
-  evidence_index="$(resolve_cognition_source "runtime/evidence/index.yml")"
-  actions_ledger="$(resolve_cognition_source "runtime/evaluations/actions/open-actions.yml")"
+  projection_file="$(resolve_target_source "$PROJECTION_MATERIALIZED_PATH")"
+  migrations_index="$(resolve_target_source "$MIGRATIONS_INDEX_PATH")"
+  audits_index="$(resolve_target_source "$INSTANCE_COGNITION_SHARED_DIR/audits/index.yml")"
+  evidence_index="$(resolve_target_source "$EVIDENCE_INDEX_PATH")"
+  actions_ledger="$(resolve_target_source "$OPEN_ACTIONS_PATH")"
 
   : > "$records"
 
   while IFS=$'\t' read -r surface_id _surface_index; do
     [[ -z "$surface_id" ]] && continue
-    printf 'projection:cognition-runtime-surface-map->surface:%s\tprojects-surface\tprojection:cognition-runtime-surface-map\tsurface:%s\t../../projections/materialized/cognition-runtime-surface-map.latest.yml\n' "$surface_id" "$surface_id" >> "$records"
+    printf 'projection:cognition-runtime-surface-map->surface:%s\tprojects-surface\tprojection:cognition-runtime-surface-map\tsurface:%s\t%s\n' "$surface_id" "$surface_id" "$PROJECTION_MATERIALIZED_PATH" >> "$records"
   done < <(extract_runtime_surface_records "$projection_file")
 
   while IFS=$'\t' read -r migration_id migration_path adr_path evidence_path; do
@@ -1031,14 +1123,14 @@ generate_knowledge_edges() {
     adr_id="$(basename "$adr_path")"
     adr_id="${adr_id%.md}"
 
-    printf 'migration:%s->adr:%s\treferences-adr\tmigration:%s\tadr:%s\t../../migrations/%s\n' "$migration_id" "$adr_id" "$migration_id" "$adr_id" "$migration_path" >> "$records"
+    printf 'migration:%s->adr:%s\treferences-adr\tmigration:%s\tadr:%s\t%s/%s\n' "$migration_id" "$adr_id" "$migration_id" "$adr_id" "$(dirname "$MIGRATIONS_INDEX_PATH")" "$migration_path" >> "$records"
     printf 'migration:%s->evidence:%s\thas-evidence\tmigration:%s\tevidence:%s\t%s\n' "$migration_id" "$migration_id" "$migration_id" "$migration_id" "$evidence_path" >> "$records"
   done < <(extract_migration_records "$migrations_index")
 
   if [[ -f "$audits_index" ]]; then
     while IFS=$'\t' read -r audit_id audit_path; do
       [[ -z "$audit_id" ]] && continue
-      printf 'audit:%s->evidence:%s\thas-evidence\taudit:%s\tevidence:%s\t../../audits/%s\n' "$audit_id" "$audit_id" "$audit_id" "$audit_id" "$audit_path" >> "$records"
+      printf 'audit:%s->evidence:%s\thas-evidence\taudit:%s\tevidence:%s\t%s/%s\n' "$audit_id" "$audit_id" "$audit_id" "$audit_id" "$(dirname "$audits_index")" "$audit_path" >> "$records"
     done < <(extract_index_id_path "$audits_index")
   fi
 
@@ -1051,7 +1143,7 @@ generate_knowledge_edges() {
 
   while IFS=$'\t' read -r action_id source_digest _owner _due _status _summary _evidence; do
     [[ -z "$action_id" || -z "$source_digest" ]] && continue
-    printf 'action:%s->digest:%s\toriginates-from-digest\taction:%s\tdigest:%s\t../../evaluations/actions/open-actions.yml\n' "$action_id" "$source_digest" "$action_id" "$source_digest" >> "$records"
+    printf 'action:%s->digest:%s\toriginates-from-digest\taction:%s\tdigest:%s\t%s\n' "$action_id" "$source_digest" "$action_id" "$source_digest" "$OPEN_ACTIONS_PATH" >> "$records"
   done < <(extract_actions_from_ledger "$actions_ledger")
 
   {
@@ -1084,7 +1176,7 @@ generate_knowledge_receipts() {
   local target
   local raw
 
-  target="$RUNTIME_DIR/knowledge/sources/ingestion-receipts.yml"
+  target="$INGESTION_RECEIPTS_PATH"
   raw="$(mktemp "$TMP_ROOT/receipts.XXXX")"
 
   {
@@ -1101,48 +1193,62 @@ updated: "__UPDATED__"
 # - status
 receipts:
   - id: "decisions-summary-materialization"
-    source: "runtime/decisions/index.yml"
+    source: "__DECISIONS_INDEX__"
     source_type: "internal-generator"
-    artifact: "../context/decisions.md"
+    artifact: "__DECISIONS_SUMMARY__"
     ingested_at: "__UPDATED__"
     status: "success"
 
   - id: "projection-materialization"
-    source: "runtime/projections/definitions/cognition-runtime-surface-map.yml"
+    source: "__PROJECTION_DEFINITION__"
     source_type: "internal-generator"
-    artifact: "../projections/materialized/cognition-runtime-surface-map.latest.yml"
+    artifact: "__PROJECTION_MATERIALIZED__"
     ingested_at: "__UPDATED__"
     status: "success"
 
   - id: "evidence-map-materialization"
-    source: "runtime/migrations/index.yml,runtime/audits/index.yml"
+    source: "__MIGRATIONS_INDEX__,__AUDITS_INDEX__"
     source_type: "internal-generator"
-    artifact: "../evidence/index.yml"
+    artifact: "__EVIDENCE_INDEX__"
     ingested_at: "__UPDATED__"
     status: "success"
 
   - id: "evaluations-materialization"
-    source: "runtime/evaluations/digests/*.md"
+    source: "__DIGESTS_DIR__/*.md"
     source_type: "internal-generator"
-    artifact: "../evaluations/actions/open-actions.yml"
+    artifact: "__OPEN_ACTIONS__"
     ingested_at: "__UPDATED__"
     status: "success"
 
   - id: "knowledge-graph-materialization"
-    source: "runtime/index.yml"
+    source: "__PROJECTION_MATERIALIZED__"
     source_type: "internal-generator"
-    artifact: "../knowledge/graph/nodes.yml"
+    artifact: "__GRAPH_NODES__"
     ingested_at: "__UPDATED__"
     status: "success"
 
   - id: "knowledge-graph-edge-materialization"
-    source: "runtime/index.yml"
+    source: "__PROJECTION_MATERIALIZED__"
     source_type: "internal-generator"
-    artifact: "../knowledge/graph/edges.yml"
+    artifact: "__GRAPH_EDGES__"
     ingested_at: "__UPDATED__"
     status: "success"
 HEADER
   } > "$raw"
+
+  perl -0pi -e '
+    s#__DECISIONS_INDEX__#$ENV{DECISIONS_INDEX_PATH}#g;
+    s#__DECISIONS_SUMMARY__#$ENV{DECISIONS_SUMMARY_PATH}#g;
+    s#__PROJECTION_DEFINITION__#$ENV{PROJECTION_DEFINITION_PATH}#g;
+    s#__PROJECTION_MATERIALIZED__#$ENV{PROJECTION_MATERIALIZED_PATH}#g;
+    s#__MIGRATIONS_INDEX__#$ENV{MIGRATIONS_INDEX_PATH}#g;
+    s#__AUDITS_INDEX__#$ENV{INSTANCE_COGNITION_SHARED_DIR}/audits/index.yml#g;
+    s#__EVIDENCE_INDEX__#$ENV{EVIDENCE_INDEX_PATH}#g;
+    s#__DIGESTS_DIR__#$ENV{DIGESTS_DIR}#g;
+    s#__OPEN_ACTIONS__#$ENV{OPEN_ACTIONS_PATH}#g;
+    s#__GRAPH_NODES__#$ENV{GRAPH_NODES_PATH}#g;
+    s#__GRAPH_EDGES__#$ENV{GRAPH_EDGES_PATH}#g;
+  ' "$raw"
 
   finalize_candidate "$target" "$raw" "updated" "date"
 }
@@ -1154,15 +1260,19 @@ reconcile_outputs() {
     local stage_file
     local rel
     stage_file="$(stage_path_for_target "$target")"
-    rel="${target#$COGNITION_DIR/}"
+    if [[ "$target" == "$ROOT_DIR/"* ]]; then
+      rel="${target#$ROOT_DIR/}"
+    else
+      rel="${target#$COGNITION_DIR/}"
+    fi
 
     if [[ ! -f "$target" ]] || ! cmp -s "$stage_file" "$target"; then
       if [[ "$MODE" == "apply" ]]; then
         mkdir -p "$(dirname -- "$target")"
         cp "$stage_file" "$target"
-        echo "[UPDATED] .octon/framework/cognition/$rel"
+        echo "[UPDATED] $rel"
       else
-        echo "[DRIFT] .octon/framework/cognition/$rel"
+        echo "[DRIFT] $rel"
         drift=$((drift + 1))
       fi
     fi

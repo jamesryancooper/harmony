@@ -14,6 +14,7 @@ TEAMS_REG="$AGENCY_DIR/runtime/teams/registry.yml"
 CANONICAL_AGENTS_FILE="$OCTON_DIR/AGENTS.md"
 INSTANCE_AGENTS_FILE="$OCTON_DIR/instance/ingress/AGENTS.md"
 ROOT_AGENTS_FILE="$ROOT_DIR/AGENTS.md"
+ROOT_CLAUDE_FILE="$ROOT_DIR/CLAUDE.md"
 CONSTITUTION_FILE="$AGENCY_DIR/governance/CONSTITUTION.md"
 DELEGATION_FILE="$AGENCY_DIR/governance/DELEGATION.md"
 MEMORY_FILE="$AGENCY_DIR/governance/MEMORY.md"
@@ -44,6 +45,35 @@ require_file() {
     fail "missing file: $file"
   else
     pass "found file: ${file#$ROOT_DIR/}"
+  fi
+}
+
+validate_root_ingress_adapter() {
+  local file_path="$1"
+  local label="$2"
+  local target=""
+
+  if [[ ! -f "$file_path" && ! -L "$file_path" ]]; then
+    fail "missing file: $file_path"
+    return
+  fi
+
+  pass "found file: ${file_path#$ROOT_DIR/}"
+
+  if [[ -L "$file_path" ]]; then
+    target="$(readlink "$file_path")"
+    if [[ "$target" == ".octon/AGENTS.md" ]]; then
+      pass "$label symlink points to .octon/AGENTS.md"
+    else
+      fail "$label symlink target mismatch: $target"
+    fi
+    return
+  fi
+
+  if cmp -s "$CANONICAL_AGENTS_FILE" "$file_path"; then
+    pass "$label matches .octon/AGENTS.md"
+  else
+    fail "$label must be a symlink to .octon/AGENTS.md or a byte-for-byte parity copy"
   fi
 }
 
@@ -300,27 +330,8 @@ check_execution_profile_governance_contract() {
     pass "found file: ${INSTANCE_AGENTS_FILE#$ROOT_DIR/}"
   fi
 
-  if [[ ! -f "$ROOT_AGENTS_FILE" && ! -L "$ROOT_AGENTS_FILE" ]]; then
-    fail "missing file: $ROOT_AGENTS_FILE"
-  else
-    pass "found file: ${ROOT_AGENTS_FILE#$ROOT_DIR/}"
-  fi
-
-  if [[ -L "$ROOT_AGENTS_FILE" ]]; then
-    local target
-    target="$(readlink "$ROOT_AGENTS_FILE")"
-    if [[ "$target" == ".octon/AGENTS.md" ]]; then
-      pass "root AGENTS.md symlink points to .octon/AGENTS.md"
-    else
-      fail "root AGENTS.md symlink target mismatch: $target"
-    fi
-  elif cmp -s "$CANONICAL_AGENTS_FILE" "$ROOT_AGENTS_FILE"; then
-    pass "root AGENTS.md matches .octon/AGENTS.md"
-  elif grep -Fq '.octon/AGENTS.md' "$ROOT_AGENTS_FILE"; then
-    pass "root AGENTS.md is a thin adapter to .octon/AGENTS.md"
-  else
-    fail "root AGENTS.md diverges from .octon/AGENTS.md"
-  fi
+  validate_root_ingress_adapter "$ROOT_AGENTS_FILE" "root AGENTS.md"
+  validate_root_ingress_adapter "$ROOT_CLAUDE_FILE" "root CLAUDE.md"
 
   if ! grep -Fq '.octon/instance/ingress/AGENTS.md' "$CANONICAL_AGENTS_FILE"; then
     fail ".octon/AGENTS.md must point to .octon/instance/ingress/AGENTS.md"

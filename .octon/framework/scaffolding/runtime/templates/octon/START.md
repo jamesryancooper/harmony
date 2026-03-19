@@ -27,6 +27,7 @@ Enable reliable agent execution that is deterministic enough to trust, observabl
 
 Canonical repo-instance authority lives under:
 
+- `instance/manifest.yml`
 - `instance/ingress/`
 - `instance/bootstrap/`
 - `instance/locality/`
@@ -34,6 +35,18 @@ Canonical repo-instance authority lives under:
 - `instance/capabilities/runtime/`
 - `instance/orchestration/missions/`
 - `instance/extensions.yml`
+
+Overlay-capable repo authority is limited to declared enabled overlay points:
+
+| Overlay point | Instance path | Merge mode | Precedence |
+| --- | --- | --- | ---: |
+| `instance-governance-policies` | `instance/governance/policies/**` | `replace_by_path` | 10 |
+| `instance-governance-contracts` | `instance/governance/contracts/**` | `replace_by_path` | 20 |
+| `instance-agency-runtime` | `instance/agency/runtime/**` | `merge_by_id` | 30 |
+| `instance-assurance-runtime` | `instance/assurance/runtime/**` | `append_only` | 40 |
+
+Root `AGENTS.md` and `CLAUDE.md` are thin adapters to `.octon/AGENTS.md`
+only. They must be symlinks or byte-for-byte parity copies.
 
 ## Boot Sequence
 
@@ -46,8 +59,8 @@ Canonical repo-instance authority lives under:
 6. **Scan `.octon/instance/bootstrap/catalog.md`** → Available operations
 7. **Read `.octon/state/continuity/repo/log.md`** → Know what's been done
 8. **Read `.octon/state/continuity/repo/tasks.json`** → Know current priorities and goal
-8. **Begin** highest-priority unblocked task
-9. **Before finishing:** Complete `.octon/framework/assurance/practices/session-exit.md`, verify against `.octon/framework/assurance/practices/complete.md`
+9. **Begin** highest-priority unblocked task
+10. **Before finishing:** Complete `.octon/framework/assurance/practices/session-exit.md`, verify against `.octon/framework/assurance/practices/complete.md`
 
 ## Visibility & Autonomy Rules
 

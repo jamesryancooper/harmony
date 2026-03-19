@@ -99,6 +99,27 @@ Canonical root-harness structure:
 | `state/` | Operational truth | Mutable continuity, evidence, and control state |
 | `generated/` | Derived only | Rebuildable effective views, summaries, graphs, and registries |
 
+### Packet 5 Overlay And Ingress Model
+
+- `framework/overlay-points/registry.yml` declares all legal repo-instance
+  overlay points.
+- `instance/manifest.yml#enabled_overlay_points` enables the declared points
+  for this repo instance.
+- `instance/ingress/AGENTS.md` is the canonical internal ingress surface.
+- `/.octon/AGENTS.md` is the projected ingress surface.
+- Root `AGENTS.md` and `CLAUDE.md` are thin adapters only and must be a
+  symlink to `/.octon/AGENTS.md` or a byte-for-byte parity copy.
+
+| Overlay point | Instance path | Merge mode | Precedence |
+| --- | --- | --- | ---: |
+| `instance-governance-policies` | `instance/governance/policies/**` | `replace_by_path` | 10 |
+| `instance-governance-contracts` | `instance/governance/contracts/**` | `replace_by_path` | 20 |
+| `instance-agency-runtime` | `instance/agency/runtime/**` | `merge_by_id` | 30 |
+| `instance-assurance-runtime` | `instance/assurance/runtime/**` | `append_only` | 40 |
+
+All other `instance/**` surfaces remain instance-native rather than
+overlay-capable.
+
 **Portability:** `octon.yml` no longer declares a broad path allowlist. It
 defines install/export profiles, class-root bindings, version compatibility,
 human-led zones, and fail-closed policies. `bootstrap_core` is the install

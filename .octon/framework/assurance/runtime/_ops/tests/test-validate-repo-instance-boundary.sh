@@ -233,10 +233,26 @@ EOF
   ! run_validator "$fixture_root"
 }
 
+case_ad_hoc_overlay_path_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet4_runtime_scripts "$fixture_root"
+  write_valid_packet4_fixture "$fixture_root"
+
+  mkdir -p "$fixture_root/.octon/instance/agency/custom"
+  cat >"$fixture_root/.octon/instance/agency/custom/README.md" <<'EOF'
+# Custom
+EOF
+
+  ! run_validator "$fixture_root"
+}
+
 main() {
   assert_success "repo-instance validator accepts valid packet-4 fixture" case_valid_fixture_passes
   assert_success "repo-instance validator rejects missing mission registry" case_missing_missions_registry_fails
   assert_success "repo-instance validator rejects legacy mixed-path references" case_legacy_context_reference_fails
+  assert_success "repo-instance validator rejects ad hoc overlay-like paths" case_ad_hoc_overlay_path_fails
 
   echo
   echo "Passed: $pass_count"

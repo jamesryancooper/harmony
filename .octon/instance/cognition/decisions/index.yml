@@ -99,3 +99,5 @@ records:
     path: 047-self-contained-bootstrap-and-ingress-adapters.md
   - id: 048-repo-instance-architecture-atomic-cutover
     path: 048-repo-instance-architecture-atomic-cutover.md
+  - id: 049-overlay-and-ingress-model-atomic-cutover
+    path: 049-overlay-and-ingress-model-atomic-cutover.md
