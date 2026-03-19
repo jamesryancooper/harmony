@@ -1,6 +1,6 @@
 ---
 name: "update-harness"
-description: "Align an existing harness with the canonical class-root contracts by auditing root-manifest, repo-instance, and boundary gaps, planning updates, and executing bounded remediations."
+description: "Align an existing harness with the canonical class-root contracts by auditing root-manifest, repo-instance, and boundary gaps, planning updates, and executing bounded remediations while preserving repo-owned `instance/**` authority unless an explicit migration contract applies."
 steps:
   - id: "audit-state"
     file: "stages/01-audit-state.md"
