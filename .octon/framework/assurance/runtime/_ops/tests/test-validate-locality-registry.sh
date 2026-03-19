@@ -165,6 +165,43 @@ EOF
   ! run_validator "$fixture_root"
 }
 
+case_missing_scope_id_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  cat >"$fixture_root/.octon/instance/locality/registry.yml" <<'EOF'
+schema_version: "octon-locality-registry-v1"
+scopes:
+  - manifest_path: ".octon/instance/locality/scopes/octon-harness/scope.yml"
+EOF
+
+  ! run_validator "$fixture_root"
+}
+
+case_noncanonical_manifest_path_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  mkdir -p "$fixture_root/.octon/instance/locality/misc"
+  cp "$fixture_root/.octon/instance/locality/scopes/octon-harness/scope.yml" \
+    "$fixture_root/.octon/instance/locality/misc/octon-harness.yml"
+
+  cat >"$fixture_root/.octon/instance/locality/registry.yml" <<'EOF'
+schema_version: "octon-locality-registry-v1"
+scopes:
+  - scope_id: "octon-harness"
+    manifest_path: ".octon/instance/locality/misc/octon-harness.yml"
+EOF
+
+  ! run_validator "$fixture_root"
+}
+
 main() {
   assert_success "valid locality registry fixture passes" case_valid_fixture_passes
   assert_success "duplicate scope ids fail locality validation" case_duplicate_scope_id_fails
@@ -172,6 +209,8 @@ main() {
   assert_success "overlapping active scopes fail locality validation" case_overlapping_active_scopes_fail
   assert_success "escaped include glob fails locality validation" case_escaped_include_glob_fails
   assert_success "safe but out-of-root glob fails locality validation" case_safe_but_outside_root_glob_fails
+  assert_success "missing scope id fails locality validation" case_missing_scope_id_fails
+  assert_success "noncanonical manifest path fails locality validation" case_noncanonical_manifest_path_fails
 
   echo
   echo "Passed: $pass_count"

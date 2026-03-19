@@ -140,11 +140,49 @@ EOF
     "$fixture_root/.octon/state/control/locality/quarantine.yml" >/dev/null
 }
 
+case_publish_blocks_missing_scope_id() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  cat >"$fixture_root/.octon/instance/locality/registry.yml" <<'EOF'
+schema_version: "octon-locality-registry-v1"
+scopes:
+  - manifest_path: ".octon/instance/locality/scopes/octon-harness/scope.yml"
+EOF
+
+  ! OCTON_DIR_OVERRIDE="$fixture_root/.octon" OCTON_ROOT_DIR="$fixture_root" \
+    bash "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/publish-locality-state.sh" >/dev/null
+
+  yq -e '.records[]? | select(.reason_code == "missing-scope-id")' \
+    "$fixture_root/.octon/state/control/locality/quarantine.yml" >/dev/null
+}
+
+case_generation_id_stable_for_noop_republish() {
+  local fixture_root first_id second_id
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  first_id="$(yq -r '.generation_id // ""' "$fixture_root/.octon/generated/effective/locality/generation.lock.yml")"
+  sleep 1
+  OCTON_DIR_OVERRIDE="$fixture_root/.octon" OCTON_ROOT_DIR="$fixture_root" \
+    bash "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/publish-locality-state.sh" >/dev/null
+  second_id="$(yq -r '.generation_id // ""' "$fixture_root/.octon/generated/effective/locality/generation.lock.yml")"
+
+  [[ -n "$first_id" && "$first_id" == "$second_id" ]]
+}
+
 main() {
   assert_success "valid locality publication state passes" case_valid_fixture_passes
   assert_success "stale locality generation lock fails validation" case_stale_generation_lock_fails
   assert_success "invalid overlap blocks publish and records quarantine" case_publish_blocks_invalid_overlap_and_records_quarantine
   assert_success "safe but out-of-root glob blocks publish" case_publish_blocks_safe_but_outside_root_glob
+  assert_success "missing scope id blocks publish" case_publish_blocks_missing_scope_id
+  assert_success "generation id remains stable across noop republishes" case_generation_id_stable_for_noop_republish
 
   echo
   echo "Passed: $pass_count"

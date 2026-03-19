@@ -98,6 +98,12 @@ glob_subordinate_to_root() {
   path_contains "$root_path" "$anchor"
 }
 
+is_canonical_scope_manifest_path() {
+  local scope_id="$1"
+  local manifest_path="$2"
+  [[ "$manifest_path" == ".octon/instance/locality/scopes/$scope_id/scope.yml" ]]
+}
+
 require_yaml_file() {
   local file="$1"
   if [[ ! -f "$file" ]]; then
@@ -116,6 +122,16 @@ validate_scope_manifest() {
   local scope_id="$1"
   local manifest_path="$2"
   local manifest_file="$ROOT_DIR/$manifest_path"
+
+  if ! is_safe_relative_pattern "$manifest_path"; then
+    fail "scope '$scope_id' manifest_path must stay inside the repo root: $manifest_path"
+    return
+  fi
+
+  if ! is_canonical_scope_manifest_path "$scope_id" "$manifest_path"; then
+    fail "scope '$scope_id' manifest_path must be .octon/instance/locality/scopes/$scope_id/scope.yml"
+    return
+  fi
 
   if [[ ! -f "$manifest_file" ]]; then
     fail "registry scope '$scope_id' manifest missing: $manifest_path"
@@ -280,16 +296,22 @@ main() {
   fi
 
   local declared_count=0
-  local scope_id manifest_path
-  while IFS=$'\t' read -r scope_id manifest_path; do
-    [[ -z "$scope_id" ]] && continue
+  local entry_index scope_id manifest_path
+  while IFS='|' read -r entry_index scope_id manifest_path; do
+    if [[ -z "$scope_id" ]]; then
+      fail "registry scope entry $entry_index missing scope_id"
+      continue
+    fi
     declared_count=$((declared_count + 1))
     if [[ -z "$manifest_path" ]]; then
       fail "registry scope '$scope_id' missing manifest_path"
       continue
     fi
     validate_scope_manifest "$scope_id" "$manifest_path"
-  done < <(yq -r '.scopes[]? | [.scope_id // "", .manifest_path // ""] | @tsv' "$LOCALITY_REGISTRY")
+  done < <(
+    yq -o=json '.scopes' "$LOCALITY_REGISTRY" 2>/dev/null \
+      | jq -r 'to_entries[]? | [.key, (.value.scope_id // ""), (.value.manifest_path // "")] | join("|")'
+  )
 
   if [[ "$declared_count" -eq 0 ]]; then
     pass "locality registry may be empty, but current repo should prefer at least one live scope"

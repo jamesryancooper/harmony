@@ -108,6 +108,12 @@ glob_subordinate_to_root() {
   path_contains "$root_path" "$anchor"
 }
 
+is_canonical_scope_manifest_path() {
+  local scope_id="$1"
+  local manifest_path="$2"
+  [[ "$manifest_path" == ".octon/instance/locality/scopes/$scope_id/scope.yml" ]]
+}
+
 append_quarantine_record() {
   local scope_id="$1"
   local manifest_path="$2"
@@ -139,6 +145,16 @@ collect_scope() {
   local scope_id="$1"
   local manifest_path="$2"
   local manifest_file="$ROOT_DIR/$manifest_path"
+
+  if ! is_safe_relative_pattern "$manifest_path"; then
+    append_quarantine_record "$scope_id" "$manifest_path" "invalid-manifest-path"
+    return
+  fi
+
+  if ! is_canonical_scope_manifest_path "$scope_id" "$manifest_path"; then
+    append_quarantine_record "$scope_id" "$manifest_path" "noncanonical-manifest-path"
+    return
+  fi
 
   if [[ ! -f "$manifest_file" ]]; then
     append_quarantine_record "$scope_id" "$manifest_path" "missing-scope-manifest"
@@ -311,11 +327,17 @@ main() {
   if ! yq -e '.scopes | type == "!!seq"' "$LOCALITY_REGISTRY" >/dev/null 2>&1; then
     append_quarantine_record "repo-locality" ".octon/instance/locality/registry.yml" "invalid-registry-scopes"
   else
-    local scope_id manifest_path
-    while IFS=$'\t' read -r scope_id manifest_path; do
-      [[ -z "$scope_id" ]] && continue
+    local entry_index scope_id manifest_path
+    while IFS='|' read -r entry_index scope_id manifest_path; do
+      if [[ -z "$scope_id" ]]; then
+        append_quarantine_record "registry-entry-$entry_index" ".octon/instance/locality/registry.yml" "missing-scope-id"
+        continue
+      fi
       collect_scope "$scope_id" "$manifest_path"
-    done < <(yq -r '.scopes[]? | [.scope_id // "", .manifest_path // ""] | @tsv' "$LOCALITY_REGISTRY")
+    done < <(
+      yq -o=json '.scopes' "$LOCALITY_REGISTRY" 2>/dev/null \
+        | jq -r 'to_entries[]? | [.key, (.value.scope_id // ""), (.value.manifest_path // "")] | join("|")'
+    )
   fi
 
   local unique_count
@@ -359,9 +381,9 @@ main() {
   registry_sha="$(hash_file "$LOCALITY_REGISTRY")"
   quarantine_sha="$(hash_file "$quarantine_tmp")"
   if command -v shasum >/dev/null 2>&1; then
-    input_digest="$(printf '%s\n%s\n%s\n' "$manifest_sha" "$registry_sha" "$quarantine_sha" | shasum -a 256 | awk '{print $1}')"
+    input_digest="$(printf '%s\n%s\n' "$manifest_sha" "$registry_sha" | shasum -a 256 | awk '{print $1}')"
   else
-    input_digest="$(printf '%s\n%s\n%s\n' "$manifest_sha" "$registry_sha" "$quarantine_sha" | sha256sum | awk '{print $1}')"
+    input_digest="$(printf '%s\n%s\n' "$manifest_sha" "$registry_sha" | sha256sum | awk '{print $1}')"
   fi
   GENERATION_ID="locality-${input_digest:0:12}"
 

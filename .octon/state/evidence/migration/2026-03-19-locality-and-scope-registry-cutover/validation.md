@@ -2,8 +2,8 @@
 
 ## Gate Results
 
-- `test-validate-locality-registry.sh`: PASS (`Passed: 6`, `Failed: 0`)
-- `test-validate-locality-publication-state.sh`: PASS (`Passed: 4`, `Failed: 0`)
+- `test-validate-locality-registry.sh`: PASS (`Passed: 8`, `Failed: 0`)
+- `test-validate-locality-publication-state.sh`: PASS (`Passed: 6`, `Failed: 0`)
 - `test-validate-repo-instance-boundary.sh`: PASS (`Passed: 4`, `Failed: 0`)
 - `validate-locality-registry.sh`: PASS (`errors=0`)
 - `validate-locality-publication-state.sh`: PASS (`errors=0`)
@@ -28,6 +28,12 @@
   JSON.
 - `include_globs` and `exclude_globs` are now enforced as subordinate to the
   declared `root_path`, not merely as safe relative patterns.
+- Registry entries that omit `scope_id` now fail closed instead of silently
+  disappearing from published locality state.
+- Registry `manifest_path` values are constrained to the canonical
+  `instance/locality/scopes/<scope-id>/scope.yml` authority surface.
+- Locality `generation_id` is now stable across no-op republishes because it no
+  longer depends on timestamped quarantine metadata.
 - The framework-core boundary validator now ignores non-canonical proposal
   workspaces so historical proposal resource references do not masquerade as
   live contract drift during harness alignment.
