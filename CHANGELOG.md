@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/jamesryancooper/octon/compare/octon-v0.4.16...octon-v0.5.0) (2026-03-19)
+
+
+### Features
+
+* **locality:** implement scope registry cutover ([#174](https://github.com/jamesryancooper/octon/issues/174)) ([9d43d53](https://github.com/jamesryancooper/octon/commit/9d43d5380fecf068ac22c536ca0955576e979c12))
+
 ## [0.4.16](https://github.com/jamesryancooper/octon/compare/octon-v0.4.15...octon-v0.4.16) (2026-03-18)
 
 
