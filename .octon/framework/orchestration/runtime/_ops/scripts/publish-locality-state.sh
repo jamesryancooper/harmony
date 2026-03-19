@@ -344,7 +344,7 @@ main() {
 
   local tmpdir quarantine_tmp
   tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/octon-locality-publish.XXXXXX")"
-  trap "rm -rf '$tmpdir'" EXIT
+  trap '[[ -n "${tmpdir:-}" ]] && rm -r -f -- "$tmpdir"' EXIT
   quarantine_tmp="$tmpdir/quarantine.yml"
   write_quarantine_file "$quarantine_tmp"
 
