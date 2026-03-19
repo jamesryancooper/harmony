@@ -33,12 +33,24 @@ super-root cutover.
 11. `repo_snapshot` is behaviorally complete and includes enabled-pack
     dependency closure.
 12. `full_fidelity` is advisory only and is not a synthetic export payload.
-13. Canonical internal ingress lives under `instance/ingress/**`; repo-root
-    ingress files are thin adapters only.
-14. Repo-owned bootstrap, locality, context, ADRs, repo-native capabilities,
-    missions, and desired extension configuration belong in `instance/**`.
-15. Overlay-capable instance surfaces are legal only at framework-declared
+13. `framework/overlay-points/registry.yml` is the canonical framework-authored
+    overlay declaration surface.
+14. `instance/manifest.yml#enabled_overlay_points` is the canonical repo-side
+    overlay enablement surface.
+15. Canonical internal ingress lives under `instance/ingress/**`;
+    `/.octon/AGENTS.md` is the projected ingress surface; repo-root ingress
+    files are thin adapters only.
+16. Repo-root ingress files are valid only as a symlink to `/.octon/AGENTS.md`
+    or a byte-for-byte parity copy.
+17. Overlay-capable instance surfaces are legal only at framework-declared
     overlay points enabled by `instance/manifest.yml`.
+18. Allowed v1 overlay merge modes are `replace_by_path`, `merge_by_id`, and
+    `append_only`.
+19. Overlay-capable artifacts may not target closed framework domains such as
+    `framework/engine/runtime/**`.
+20. Undeclared or disabled overlay artifacts fail closed.
+21. Repo-owned bootstrap, locality, context, ADRs, repo-native capabilities,
+    missions, and desired extension configuration belong in `instance/**`.
 
 ## Precedence
 
@@ -47,6 +59,16 @@ super-root cutover.
 3. `state/**` operational truth
 4. `generated/**` derived support artifacts
 5. `inputs/**` non-authoritative raw input
+
+Within a declared overlay point:
+
+- `replace_by_path`: instance content replaces the framework artifact at the
+  overlay point
+- `merge_by_id`: instance content merges into keyed framework sets
+- `append_only`: instance content appends to the framework register
+
+Outside declared overlay points, framework wins and instance overlay content is
+invalid.
 
 ## Contract Markers
 
@@ -71,6 +93,9 @@ for runtime, governance, and practices.
 ## Canonical References
 
 - root manifest: `/.octon/octon.yml`
+- overlay registry: `/.octon/framework/overlay-points/registry.yml`
+- overlay enablement: `/.octon/instance/manifest.yml#enabled_overlay_points`
+- projected ingress: `/.octon/AGENTS.md`
 - desired extension config: `/.octon/instance/extensions.yml`
 - ingress: `/.octon/instance/ingress/AGENTS.md`
 - bootstrap docs: `/.octon/instance/bootstrap/`
@@ -81,10 +106,53 @@ for runtime, governance, and practices.
 - framework architecture: `/.octon/framework/cognition/_meta/architecture/`
 - generated proposal registry: `/.octon/generated/proposals/registry.yml`
 
+## Overlay And Ingress Contract
+
+### Instance-Native Surfaces
+
+- `instance/manifest.yml`
+- `instance/ingress/**`
+- `instance/bootstrap/**`
+- `instance/locality/**`
+- `instance/cognition/context/**`
+- `instance/cognition/decisions/**`
+- `instance/capabilities/runtime/**`
+- `instance/orchestration/missions/**`
+- `instance/extensions.yml`
+
+### Overlay-Capable Surfaces
+
+| Overlay point | Instance path | Merge mode | Precedence |
+| --- | --- | --- | ---: |
+| `instance-governance-policies` | `.octon/instance/governance/policies/**` | `replace_by_path` | 10 |
+| `instance-governance-contracts` | `.octon/instance/governance/contracts/**` | `replace_by_path` | 20 |
+| `instance-agency-runtime` | `.octon/instance/agency/runtime/**` | `merge_by_id` | 30 |
+| `instance-assurance-runtime` | `.octon/instance/assurance/runtime/**` | `append_only` | 40 |
+
+No blanket shadow-tree model exists for `instance/**`. Any future
+overlay-capable surface must be declared in the framework overlay registry
+before it becomes legal.
+
+### Overlay Resolution Order
+
+1. Load `framework/manifest.yml`.
+2. Load `framework/overlay-points/registry.yml`.
+3. Load `instance/manifest.yml`.
+4. Verify `enabled_overlay_points` are a subset of declared overlay points.
+5. Collect instance overlay artifacts only from the declared `instance_glob`
+   paths.
+6. Apply the validator and merge mode for each enabled overlay point.
+7. Publish the resolved authoritative overlay result into the active runtime
+   view.
+
 ## Fail-Closed Rules
 
 - Missing required manifests block runtime.
 - Wrong-class placement blocks runtime.
+- Invalid overlay registries, undeclared enablement, unsupported merge modes,
+  or overlay artifacts outside enabled declared roots block runtime.
+- Repo-root ingress files that diverge from the projected ingress surface block
+  runtime.
 - Framework-local `_ops/state/**` paths block runtime.
 - Stale required generated outputs block runtime.
 - Direct reads from raw `inputs/**` by runtime or policy code block runtime.

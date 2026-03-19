@@ -13,4 +13,6 @@ Read in this order:
 3. `/.octon/instance/cognition/context/shared/intent.contract.yml`
 4. `/.octon/instance/bootstrap/START.md`
 
-Repo-root `AGENTS.md` and `CLAUDE.md` are thin adapters to this file.
+Repo-root `AGENTS.md` and `CLAUDE.md` are thin adapters to this file. They
+must be a symlink to `/.octon/AGENTS.md` or a byte-for-byte parity copy and
+must not add runtime or policy text.

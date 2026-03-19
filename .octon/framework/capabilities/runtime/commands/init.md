@@ -49,7 +49,9 @@ Run:
 Behavior:
 
 1. Treat the adopted `bootstrap_core` profile as the install surface and render canonical `/.octon/AGENTS.md` from `.octon/framework/scaffolding/runtime/bootstrap/AGENTS.md`.
-2. Refresh repo-root `AGENTS.md` and `CLAUDE.md` ingress adapters to `/.octon/AGENTS.md`.
+2. Refresh repo-root `AGENTS.md` and `CLAUDE.md` as thin ingress adapters to
+   `/.octon/AGENTS.md`, using a symlink when possible and otherwise a
+   byte-for-byte parity copy.
 3. Resolve a common objective from `.octon/framework/scaffolding/runtime/bootstrap/objectives/` and generate `/.octon/instance/bootstrap/OBJECTIVE.md` plus `.octon/instance/cognition/context/shared/intent.contract.yml`.
 4. Use `.octon/framework/agency/manifest.yml` `default_agent` for contract paths.
 5. Enforce developer-context policy limits for the generated AGENTS contract content before writing ingress adapters.
@@ -61,7 +63,7 @@ Behavior:
 ## Output
 
 - `.octon/AGENTS.md` (generated or skipped)
-- root `AGENTS.md` ingress adapter (created, refreshed, or skipped)
+- root `AGENTS.md` ingress adapter to `/.octon/AGENTS.md` (created, refreshed, or skipped)
 - `.octon/instance/bootstrap/OBJECTIVE.md` (generated or skipped)
 - `.octon/instance/cognition/context/shared/intent.contract.yml` (generated or skipped)
 - `BOOT.md` and `BOOTSTRAP.md` (optional; generated or skipped)

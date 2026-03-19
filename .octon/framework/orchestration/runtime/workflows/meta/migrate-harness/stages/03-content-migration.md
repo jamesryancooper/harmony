@@ -14,8 +14,13 @@ export-profile contracts.
 4. Rewrite active repo-instance references so ingress, bootstrap, locality,
    durable context, ADRs, missions, and repo continuity resolve to their
    canonical `instance/**` and `state/**` homes.
-5. Update command, workflow, and catalog surfaces so the new export path and
-   repo-instance authority model are discoverable.
+5. Rewrite active overlay and ingress references so
+   `framework/overlay-points/registry.yml`,
+   `instance/manifest.yml#enabled_overlay_points`,
+   `/.octon/AGENTS.md`, and `instance/ingress/AGENTS.md` are described
+   consistently.
+6. Update command, workflow, and catalog surfaces so the new export path,
+   overlay contract, and repo-instance authority model are discoverable.
 
 ## Output
 

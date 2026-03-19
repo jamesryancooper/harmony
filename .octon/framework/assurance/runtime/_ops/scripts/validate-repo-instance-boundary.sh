@@ -75,6 +75,51 @@ check_enabled_overlay_roots() {
   done < <(yq -r '.enabled_overlay_points[]? // ""' "$INSTANCE_MANIFEST" 2>/dev/null || true)
 }
 
+check_overlay_domain_shape() {
+  local stray_paths=""
+
+  if [[ -d "$INSTANCE_DIR/governance" ]]; then
+    stray_paths="$(find "$INSTANCE_DIR/governance" -mindepth 1 \
+      ! -path "$INSTANCE_DIR/governance/policies" \
+      ! -path "$INSTANCE_DIR/governance/policies/*" \
+      ! -path "$INSTANCE_DIR/governance/contracts" \
+      ! -path "$INSTANCE_DIR/governance/contracts/*" \
+      -print | sort || true)"
+    if [[ -n "$stray_paths" ]]; then
+      fail "ad hoc governance overlay content exists outside ratified roots"
+      printf '%s\n' "$stray_paths" | sed "s|$ROOT_DIR/||"
+    else
+      pass "governance overlay content stays inside ratified roots"
+    fi
+  fi
+
+  if [[ -d "$INSTANCE_DIR/agency" ]]; then
+    stray_paths="$(find "$INSTANCE_DIR/agency" -mindepth 1 \
+      ! -path "$INSTANCE_DIR/agency/runtime" \
+      ! -path "$INSTANCE_DIR/agency/runtime/*" \
+      -print | sort || true)"
+    if [[ -n "$stray_paths" ]]; then
+      fail "ad hoc agency overlay content exists outside ratified roots"
+      printf '%s\n' "$stray_paths" | sed "s|$ROOT_DIR/||"
+    else
+      pass "agency overlay content stays inside ratified roots"
+    fi
+  fi
+
+  if [[ -d "$INSTANCE_DIR/assurance" ]]; then
+    stray_paths="$(find "$INSTANCE_DIR/assurance" -mindepth 1 \
+      ! -path "$INSTANCE_DIR/assurance/runtime" \
+      ! -path "$INSTANCE_DIR/assurance/runtime/*" \
+      -print | sort || true)"
+    if [[ -n "$stray_paths" ]]; then
+      fail "ad hoc assurance overlay content exists outside ratified roots"
+      printf '%s\n' "$stray_paths" | sed "s|$ROOT_DIR/||"
+    else
+      pass "assurance overlay content stays inside ratified roots"
+    fi
+  fi
+}
+
 check_wrong_class_placements() {
   local wrong_dirs
   wrong_dirs="$(find "$INSTANCE_DIR" -type d \( -name state -o -name control -o -name generated -o -name inputs \) -print | sort || true)"
@@ -189,6 +234,7 @@ main() {
 
   check_required_structure
   check_enabled_overlay_roots
+  check_overlay_domain_shape
   check_wrong_class_placements
   check_active_reference_drift
   check_native_collision_risk

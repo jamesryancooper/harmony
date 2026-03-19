@@ -109,6 +109,41 @@ Subsystem expansion specs:
 Only `framework/**` and `instance/**` are authored authority. Raw
 `inputs/**` remain non-authoritative even when a profile exports them.
 
+## Overlay And Ingress Model
+
+Canonical ingress resolves through this chain:
+
+1. repo-root `AGENTS.md` or `CLAUDE.md`
+2. `/.octon/AGENTS.md`
+3. `/.octon/instance/ingress/AGENTS.md`
+
+Root `AGENTS.md` and `CLAUDE.md` are thin adapters only. They must be a
+symlink to `/.octon/AGENTS.md` or a byte-for-byte parity copy and may not add
+runtime or policy text.
+
+Instance-native repo authority lives at:
+
+- `instance/manifest.yml`
+- `instance/ingress/**`
+- `instance/bootstrap/**`
+- `instance/locality/**`
+- `instance/cognition/context/**`
+- `instance/cognition/decisions/**`
+- `instance/capabilities/runtime/**`
+- `instance/orchestration/missions/**`
+- `instance/extensions.yml`
+
+Overlay-capable repo authority is limited to these declared enabled points:
+
+| Overlay point | Instance path | Merge mode | Precedence |
+| --- | --- | --- | ---: |
+| `instance-governance-policies` | `instance/governance/policies/**` | `replace_by_path` | 10 |
+| `instance-governance-contracts` | `instance/governance/contracts/**` | `replace_by_path` | 20 |
+| `instance-agency-runtime` | `instance/agency/runtime/**` | `merge_by_id` | 30 |
+| `instance-assurance-runtime` | `instance/assurance/runtime/**` | `append_only` | 40 |
+
+No other `instance/**` subtree is overlay-capable in v1.
+
 ## Naming Convention
 
 Use plain directory names for structural units (domains, subsystems, components). Use underscore-prefixed namespaces for non-structural support material:
@@ -146,8 +181,10 @@ Flow:
 1. Bootstrap
    - If root `AGENTS.md`, `/.octon/AGENTS.md`, or `/.octon/instance/bootstrap/OBJECTIVE.md` is missing, run `/init` (or
      `.octon/framework/scaffolding/runtime/_ops/scripts/init-project.sh`) first.
-   - Read `/AGENTS.md`, `/.octon/instance/bootstrap/OBJECTIVE.md`, `scope.md`, `conventions.md`,
-     `cognition/_meta/architecture/specification.md`, and
+   - Read `/AGENTS.md` as the repo-root adapter to `/.octon/AGENTS.md`, then
+     continue into `/.octon/instance/ingress/AGENTS.md`.
+   - Read `/.octon/instance/bootstrap/OBJECTIVE.md`, `scope.md`,
+     `conventions.md`, `cognition/_meta/architecture/specification.md`, and
      `cognition/governance/principles/README.md`.
 2. Execute
    - Read `state/continuity/repo/log.md` and `state/continuity/repo/tasks.json`.

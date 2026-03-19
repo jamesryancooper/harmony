@@ -35,6 +35,42 @@ require_yaml_file() {
   return 1
 }
 
+check_overlay_root_contents() {
+  local overlay_id instance_glob root_path root_abs real_files enabled_ids
+  enabled_ids="$(yq -r '.enabled_overlay_points[]? // ""' "$INSTANCE_MANIFEST" 2>/dev/null || true)"
+
+  while IFS= read -r overlay_id; do
+    [[ -n "$overlay_id" ]] || continue
+    instance_glob="$(yq -r ".overlay_points[]? | select(.overlay_point_id == \"$overlay_id\") | .instance_glob // \"\"" "$REGISTRY_FILE" 2>/dev/null || true)"
+    [[ -n "$instance_glob" ]] || continue
+
+    if [[ "$instance_glob" != *"/**" ]]; then
+      fail "overlay point '$overlay_id' instance_glob must end with /** (got: $instance_glob)"
+      continue
+    fi
+
+    root_path="${instance_glob%/**}"
+    root_abs="$ROOT_DIR/$root_path"
+
+    if [[ ! -d "$root_abs" ]]; then
+      continue
+    fi
+
+    real_files="$(find "$root_abs" \( -type f -o -type l \) ! -name 'README.md' ! -name '.gitkeep' -print | sort || true)"
+    if printf '%s\n' "$enabled_ids" | grep -Fxq "$overlay_id"; then
+      pass "enabled overlay root stays inside declared boundary: $root_path"
+      continue
+    fi
+
+    if [[ -n "$real_files" ]]; then
+      fail "disabled overlay point '$overlay_id' may contain only reserved README/.gitkeep stubs"
+      printf '%s\n' "$real_files" | sed "s|$ROOT_DIR/||"
+    else
+      pass "disabled overlay root '$overlay_id' is empty or stub-only"
+    fi
+  done < <(printf '%s\n' "$ids")
+}
+
 main() {
   echo "== Overlay Points Validation =="
 
@@ -117,6 +153,8 @@ main() {
       fail "instance manifest enables undeclared overlay point '$enabled'"
     fi
   done < <(yq -r '.enabled_overlay_points[]? // ""' "$INSTANCE_MANIFEST" 2>/dev/null || true)
+
+  check_overlay_root_contents
 
   if [[ "$errors" -gt 0 ]]; then
     echo "Validation summary: errors=$errors"

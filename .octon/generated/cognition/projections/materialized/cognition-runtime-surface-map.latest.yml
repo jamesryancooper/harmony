@@ -1,24 +1,31 @@
 projection_id: cognition-runtime-surface-map
 schema_version: "1.0"
-generated_at: "2026-02-22T00:00:00Z"
+generated_at: "2026-03-19T17:22:11Z"
 generated_from:
   - ../definitions/cognition-runtime-surface-map.yml
-  - ../../index.yml
+  - /.octon/instance/cognition/context/index.yml
+  - /.octon/instance/cognition/decisions/index.yml
+  - /.octon/instance/cognition/context/shared/migrations/index.yml
+  - /.octon/instance/cognition/context/shared/analyses/index.yml
+  - /.octon/instance/cognition/context/shared/knowledge/index.yml
+  - /.octon/instance/cognition/context/shared/evidence/index.yml
+  - /.octon/instance/cognition/context/shared/evaluations/index.yml
+  - /.octon/generated/cognition/projections/index.yml
 
 runtime_surfaces:
   - id: context
-    index: ../../context/index.yml
+    index: /.octon/instance/cognition/context/index.yml
   - id: decisions
-    index: ../../decisions/index.yml
+    index: /.octon/instance/cognition/decisions/index.yml
   - id: migrations
-    index: ../../migrations/index.yml
+    index: /.octon/instance/cognition/context/shared/migrations/index.yml
   - id: analyses
-    index: ../../analyses/index.yml
+    index: /.octon/instance/cognition/context/shared/analyses/index.yml
   - id: knowledge
-    index: ../../knowledge/index.yml
+    index: /.octon/instance/cognition/context/shared/knowledge/index.yml
   - id: evidence
-    index: ../../evidence/index.yml
+    index: /.octon/instance/cognition/context/shared/evidence/index.yml
   - id: evaluations
-    index: ../../evaluations/index.yml
+    index: /.octon/instance/cognition/context/shared/evaluations/index.yml
   - id: projections
-    index: ../../projections/index.yml
+    index: /.octon/generated/cognition/projections/index.yml

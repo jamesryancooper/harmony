@@ -33,15 +33,28 @@ explicit.
 - `state/` is mutable operational truth and retained evidence.
 - `generated/` is rebuildable output only.
 
-Canonical repo-instance authority includes:
+Canonical repo-instance authority includes these instance-native surfaces:
 
+- `instance/manifest.yml`
 - `instance/ingress/**`
 - `instance/bootstrap/**`
 - `instance/locality/**`
-- `instance/cognition/**`
+- `instance/cognition/context/**`
+- `instance/cognition/decisions/**`
 - `instance/capabilities/runtime/**`
 - `instance/orchestration/missions/**`
 - `instance/extensions.yml`
+
+Overlay-capable repo-instance authority is a bounded subset of `instance/**`
+and is legal only when the framework overlay registry declares the point and
+the instance manifest enables it:
+
+| Overlay point | Instance path | Merge mode | Precedence |
+| --- | --- | --- | ---: |
+| `instance-governance-policies` | `instance/governance/policies/**` | `replace_by_path` | 10 |
+| `instance-governance-contracts` | `instance/governance/contracts/**` | `replace_by_path` | 20 |
+| `instance-agency-runtime` | `instance/agency/runtime/**` | `merge_by_id` | 30 |
+| `instance-assurance-runtime` | `instance/assurance/runtime/**` | `append_only` | 40 |
 
 ## Portability
 
@@ -59,10 +72,17 @@ tree as the default bootstrap model.
 
 - `framework/**` must not contain repo-local mutable state, retained evidence,
   or generated outputs.
+- `framework/overlay-points/registry.yml` is the canonical overlay registry.
+- `instance/manifest.yml#enabled_overlay_points` is the only repo-side
+  overlay enablement surface.
 - repo-root ingress adapters are projections only; canonical authored ingress
-  lives under `instance/ingress/**`
+  lives under `instance/ingress/**`, `/.octon/AGENTS.md` is the projected
+  ingress surface, and root `AGENTS.md` / `CLAUDE.md` must be symlinks or
+  byte-for-byte parity copies only.
 - framework updates preserve repo-owned `instance/**` content unless an
   explicit migration contract says otherwise
+- undeclared or disabled overlay artifacts fail closed; there is no blanket
+  `instance/**` shadow-tree model
 - Raw `inputs/**` paths must never become direct runtime or policy
   dependencies.
 - Human-led ideation is part of `inputs/exploratory/ideation/**`.

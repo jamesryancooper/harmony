@@ -8,8 +8,13 @@ After user approval:
 4. Preserve repo-owned `instance/**` ingress, bootstrap, locality, context,
    decisions, missions, repo-native capabilities, and desired extension
    configuration unless an explicit migration contract says otherwise
-5. Route export requests to `/export-harness`
-6. Update `state/continuity/repo/log.md` with changes made
+5. Preserve and repair `instance/manifest.yml#enabled_overlay_points`,
+   canonical `instance/ingress/**`, and the root adapter chain to
+   `/.octon/AGENTS.md`
+6. Remove or quarantine ad hoc overlay-like paths that fall outside the four
+   ratified overlay roots
+7. Route export requests to `/export-harness`
+8. Update `state/continuity/repo/log.md` with changes made
 
 ## Output format
 
