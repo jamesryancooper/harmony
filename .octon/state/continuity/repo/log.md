@@ -31,6 +31,112 @@ mutability: append-only
 
 - None
 
+## 2026-03-19
+
+**Session focus:** Remediate Packet 7 post-cutover review findings.
+
+**Completed:**
+
+- Fixed `validate-context-overhead-budget.sh` so it resolves the live
+  `.octon` root, reads the deny-by-default policy from
+  `framework/capabilities/governance/policy/deny-by-default.v2.yml`, and
+  validates live run receipts under `state/evidence/runs/**`
+- Updated the canonical context index at
+  `.octon/instance/cognition/context/index.yml` so
+  `ops_mutation_policy.allow_write_roots` now includes `state/continuity/**`
+  instead of the repo-only continuity path
+- Removed the remaining live `continuity/runs/**/evidence/**` discovery globs
+  from the active skill registry and audit skill IO contracts so runtime skill
+  metadata no longer points at legacy Packet 7 evidence paths
+- Re-ran the direct validator and the full harness alignment profile after the
+  fixes:
+  `validate-context-overhead-budget.sh` PASS and
+  `alignment-check.sh --profile harness` PASS
+- Updated the Packet 7 migration evidence bundle so the retained commands,
+  validation, and inventory records include the review-remediation changes
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-19
+
+**Session focus:** Packet 7 state, evidence, and continuity atomic cutover
+
+**Completed:**
+
+- Promoted the Packet 7 class-root contract into the live `.octon` docs and
+  specs, including explicit `state/{continuity,evidence,control}` semantics,
+  scope continuity legality, retained-evidence routing, and runtime-vs-ops
+  mutation-policy alignment
+- Added Packet 7 state architecture indexes, control-state schema contracts,
+  state-root readmes, scope decision-evidence root guidance, and a live
+  `octon-harness` scope continuity scaffold under
+  `state/continuity/scopes/octon-harness/`
+- Cut validators and publication flows over atomically: locality publication
+  now bootstraps scope continuity, locality validation now enforces declared
+  scope continuity scaffolds, continuity validation now checks repo and scope
+  continuity, and the new state-surface alignment guard is wired into the
+  harness profile
+- Updated scaffolding, checklists, ingress/bootstrap/operator guidance, and
+  selected runtime/practice docs so active continuity remains in
+  `state/continuity/**`, retained evidence remains in `state/evidence/**`, and
+  control truth remains in `state/control/**`
+- Recorded ADR 051, the Packet 7 migration plan, and the retained migration
+  evidence bundle under
+  `state/evidence/migration/2026-03-19-state-evidence-continuity-cutover/`
+- Passed the Packet 7 gate stack, including:
+  `test-validate-locality-registry.sh`,
+  `test-validate-continuity-memory.sh`,
+  `validate-locality-registry.sh`,
+  `validate-continuity-memory.sh`,
+  `validate-locality-publication-state.sh`,
+  `validate-extension-publication-state.sh`,
+  `validate-harness-structure.sh`,
+  `validate-framework-core-boundary.sh`, and
+  `alignment-check.sh --profile harness`
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-19
+
+**Session focus:** Draft Packet 7 state, evidence, and continuity proposal
+package.
+
+**Completed:**
+
+- Created the Packet 7 proposal scaffold under
+  `.octon/inputs/exploratory/proposals/architecture/7-state-evidence-continuity/`
+  with proposal metadata, navigation docs, target architecture, acceptance
+  criteria, and implementation plan
+- Grounded the proposal in the ratified design packet and blueprint while
+  explicitly aligning it to the live repo's current `state/**`, `instance/**`,
+  and `generated/**` surfaces
+- Added the new proposal package to
+  `.octon/generated/proposals/registry.yml` for discovery alongside the other
+  active architecture proposals
+- Recorded completion of the proposal-drafting task in
+  `.octon/state/continuity/repo/tasks.json`
+
+**Next:**
+
+- Review the Packet 7 proposal package for wording and promotion-target
+  completeness before using it as the basis for durable architecture updates
+
+**Blockers:**
+
+- None
+
 ## 2026-03-10
 
 **Session focus:** Rename the architecture validation design package from

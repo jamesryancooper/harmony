@@ -1,0 +1,5 @@
+{
+  "schema_version": "1.2",
+  "goal": "{{SCOPE_GOAL or 'Track active work that is primarily owned by this scope.'}}",
+  "tasks": []
+}

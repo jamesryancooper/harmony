@@ -63,8 +63,9 @@ integration and ownership boundaries.
 - Material outcomes SHOULD be appended to `log.md`.
 - Active and blocked work MUST be represented in `tasks.json` and reflected in `next.md`.
 - Material routing and authority decisions SHOULD be stored in
-  `continuity/decisions/` following retention policy.
-- Run receipts/digests SHOULD be stored in `continuity/runs/` following retention policy.
+  `state/evidence/decisions/**` following retention policy.
+- Run receipts/digests SHOULD be stored in `state/evidence/runs/` following
+  retention policy.
 
 ### Knowledge <-> Continuity
 

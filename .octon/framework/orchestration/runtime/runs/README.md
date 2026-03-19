@@ -4,12 +4,12 @@ Orchestration-facing run state, indexes, and reverse-lookup projections.
 
 ## Authority Order
 
-`README.md -> index.yml -> <run-id>.yml -> by-surface/ -> continuity/runs/`
+`README.md -> index.yml -> <run-id>.yml -> by-surface/ -> state/evidence/runs/`
 
 `<run-id>.yml` is the canonical orchestration-facing run object and mutable
 status record.
 
-`continuity/runs/<run-id>/` remains the durable evidence authority.
+`state/evidence/runs/<run-id>/` remains the durable evidence authority.
 
 ## Layout
 

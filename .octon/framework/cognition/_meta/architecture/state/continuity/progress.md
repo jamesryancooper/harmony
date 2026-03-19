@@ -5,7 +5,8 @@ description: Session continuity via log, tasks, entities, and next-action cohere
 
 # Harness Progress Tracking
 
-The `continuity/` directory maintains session-to-session operational memory.
+The `state/continuity/` surfaces maintain session-to-session operational
+memory.
 
 ## Location
 
@@ -100,9 +101,9 @@ Rules:
 - Current list items SHOULD reference task IDs from `tasks.json`.
 - Placeholder-only content is invalid when actionable work exists.
 
-## Runs Evidence
+## Retained Run Evidence
 
-`continuity/runs/` contains append-oriented run evidence.
+`state/evidence/runs/` contains append-oriented run evidence.
 
 - Retention policy: `/.octon/state/evidence/runs/retention.json`
 - Lifecycle contract: `runs-retention.md`
@@ -114,7 +115,9 @@ Canonical continuity validation is enforced by:
 
 - `bash .octon/framework/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`
 
-This validator enforces schema shape, status/field invariants, cross-file coherence (`tasks`/`entities`/`next`), and `runs/` retention policy conformance.
+This validator enforces schema shape, status/field invariants, cross-file
+coherence (`tasks`/`entities`/`next`), scope-continuity alignment, and run
+evidence retention policy conformance.
 
 ## Boot Sequence Integration
 
@@ -123,3 +126,5 @@ In `START.md`, continuity loading is:
 1. Read `/.octon/state/continuity/repo/log.md` for recent history.
 2. Read `/.octon/state/continuity/repo/tasks.json` for priorities/blockers.
 3. Read `/.octon/state/continuity/repo/next.md` for immediate execution order.
+4. Read `/.octon/state/continuity/scopes/<scope-id>/` when the work is
+   primarily owned by a declared scope.

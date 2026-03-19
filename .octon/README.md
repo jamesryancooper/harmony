@@ -21,6 +21,12 @@ truth, retained evidence, or generated outputs.
 `instance/**` is instance-native; only declared enabled overlay points may
 carry overlay-capable repo authority.
 
+`state/**` is class-organized into three lifecycle subdomains:
+
+- `state/continuity/**` for active resumable work state
+- `state/evidence/**` for retained operational trace and receipts
+- `state/control/**` for mutable current-state publication and quarantine truth
+
 ## Instance Authority
 
 ### Instance-Native Surfaces
@@ -63,8 +69,18 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/instance/cognition/context/scopes/<scope-id>/`
 - Canonical locality quarantine:
   `/.octon/state/control/locality/quarantine.yml`
+- Canonical extension actual/quarantine state:
+  `/.octon/state/control/extensions/{active.yml,quarantine.yml}`
+- Canonical repo continuity:
+  `/.octon/state/continuity/repo/`
+- Canonical scope continuity:
+  `/.octon/state/continuity/scopes/<scope-id>/`
+- Canonical retained operational evidence:
+  `/.octon/state/evidence/`
 - Canonical effective locality outputs:
   `/.octon/generated/effective/locality/`
+- Canonical effective extension outputs:
+  `/.octon/generated/effective/extensions/`
 - Canonical repo context and ADRs: `/.octon/instance/cognition/`
 - Canonical repo missions: `/.octon/instance/orchestration/missions/`
 - Root manifest: `/.octon/octon.yml`
@@ -87,6 +103,10 @@ descendant `.octon/` roots, sidecars, or ancestor-chain lookup. In v1:
 - missions may reference scopes, but they do not define scope identity
 - runtime-facing locality consumers use
   `generated/effective/locality/**`, which is compiled and non-authoritative
+
+When work is primarily owned by one declared scope, active continuity belongs
+under `state/continuity/scopes/<scope-id>/**`. Repo-wide and cross-scope work
+remains under `state/continuity/repo/**`.
 
 ## Portability
 

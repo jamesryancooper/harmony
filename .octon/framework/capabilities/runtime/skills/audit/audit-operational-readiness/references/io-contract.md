@@ -38,7 +38,7 @@ io:
     - name: evidence_artifacts_glob
       type: text
       required: false
-      default: "**/continuity/runs/**/evidence/**,**//.octon/state/evidence/validation/analysis/**"
+      default: "**//.octon/state/evidence/runs/**,**//.octon/state/evidence/validation/analysis/**"
       description: "Comma-separated globs selecting operational evidence and run-receipt artifacts"
     - name: severity_threshold
       type: text

@@ -60,7 +60,7 @@ these mutable targets:
 - `/.octon/generated/.tmp/**`
 - `/.octon/state/control/**`
 - `/.octon/state/evidence/**`
-- `/.octon/state/continuity/repo/**`
+- `/.octon/state/continuity/**`
 - domain-specific generated artifacts that are explicitly declared in the
   contract registry and linked to enforcement checks
 

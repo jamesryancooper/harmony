@@ -23,9 +23,15 @@
 
 **Continuity through Institutional Memory**:
 
-- `/.octon/state/continuity/repo/` artifacts are owned by the [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) but indexed by Artifact Surface build pipeline.
-- Provenance captured in envelopes; decisions become queryable documents across planes.
-- See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for cross-plane relationships.
+- `/.octon/state/continuity/**` artifacts are owned by the
+  [Continuity Plane](../state/continuity/continuity-plane.md) but indexed by
+  the Artifact Surface build pipeline.
+- Repo-wide and cross-scope work stays under `repo/`; stable single-scope work
+  stays under `scopes/<scope-id>/`.
+- Provenance captured in envelopes; decisions become queryable documents
+  across planes.
+- See [Foundational Planes Integration](../state/continuity/three-planes-integration.md)
+  for cross-plane relationships.
 
 **Insight through Structured Learning**:
 

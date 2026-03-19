@@ -103,3 +103,5 @@ records:
     path: 049-overlay-and-ingress-model-atomic-cutover.md
   - id: 050-locality-and-scope-registry-atomic-cutover
     path: 050-locality-and-scope-registry-atomic-cutover.md
+  - id: 051-state-evidence-continuity-atomic-cutover
+    path: 051-state-evidence-continuity-atomic-cutover.md

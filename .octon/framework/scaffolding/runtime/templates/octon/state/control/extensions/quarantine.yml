@@ -1,0 +1,6 @@
+schema_version: "octon-extension-quarantine-state-v1"
+updated_at: "{{UPDATED_AT or '1970-01-01T00:00:00Z'}}"
+blocked_packs: []
+affected_dependents: []
+reason_codes: []
+acknowledgements: []

@@ -1,6 +1,6 @@
 # Migration Reports
 
-Generated migration evidence bundles live here.
+Retained migration evidence bundles live here.
 
 ## Contract
 
@@ -16,3 +16,6 @@ Generated migration evidence bundles live here.
   - `/.octon/instance/cognition/context/shared/migrations/`
 - Migration policy doctrine/banlist/exceptions live in:
   - `/.octon/framework/cognition/practices/methodology/migrations/`
+
+These bundles are retained operational evidence. They must not be treated as
+rebuildable generated output.

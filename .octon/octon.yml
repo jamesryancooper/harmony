@@ -70,4 +70,4 @@ resolution:
     - "generated"
   runtime_inputs:
     proposals_registry: ".octon/generated/proposals/registry.yml"
-    continuity: ".octon/state/continuity/repo/"
+    continuity: ".octon/state/continuity/"

@@ -61,7 +61,7 @@ Octon implements locality through a single `.octon/` directory organized by capa
 | -------- | ---- | ------- |
 | Cognition | `instance/cognition/context/shared/` | Decisions, lessons, glossary, dependencies |
 | Scoped Cognition | `instance/cognition/context/scopes/<scope-id>/` | Durable scope-local context bound to a declared scope |
-| Continuity | `state/continuity/repo/` | Progress log, tasks, entities, next actions |
+| Continuity | `state/continuity/{repo/,scopes/<scope-id>/}` | Repo-wide plus scope-local progress log, tasks, entities, and next actions |
 | Quality | `framework/assurance/` | Completion checklists, session-exit |
 | Orchestration | `framework/orchestration/runtime/workflows/` plus `instance/orchestration/missions/` | Shared workflows plus repo-owned missions |
 | Capabilities | `framework/capabilities/` and `instance/capabilities/runtime/` | Portable capabilities plus repo-native runtime capability surfaces |
@@ -237,7 +237,15 @@ The root harness tracks progress for the repository and its domains:
 ```
 .octon/state/continuity/repo/
 ├── log.md         # Repository session log
-└── tasks.json     # Repository task list
+├── tasks.json     # Repository task list
+├── entities.json  # Repository entity state
+└── next.md        # Repository next actions
+
+.octon/state/continuity/scopes/<scope-id>/
+├── log.md         # Scope-local session log
+├── tasks.json     # Scope-local task list
+├── entities.json  # Scope-local entity state
+└── next.md        # Scope-local next actions
 
 .octon/instance/orchestration/missions/billing-hardening/
 ├── mission.yml    # Mission authority object

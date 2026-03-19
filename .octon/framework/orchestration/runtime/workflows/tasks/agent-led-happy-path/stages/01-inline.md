@@ -19,6 +19,7 @@ Legacy onboarding variants are hard-deprecated for new runs.
    - Confirm canonical cross-subsystem rules in `.octon/framework/cognition/_meta/architecture/specification.md`.
 2. Execute
    - Read `.octon/state/continuity/repo/log.md` and `.octon/state/continuity/repo/tasks.json`.
+   - Read `.octon/state/continuity/scopes/<scope-id>/{log.md,tasks.json,next.md}` when a declared scope is the primary continuity home.
    - Pick the highest-priority unblocked task and execute a bounded plan.
 3. Assure
    - Run `bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness`.
@@ -26,6 +27,7 @@ Legacy onboarding variants are hard-deprecated for new runs.
 4. Continuity
    - Append session results in `.octon/state/continuity/repo/log.md`.
    - Update `.octon/state/continuity/repo/tasks.json` status.
+   - Update `.octon/state/continuity/scopes/<scope-id>/**` when the work is primarily scope-bound.
    - Complete `.octon/framework/assurance/practices/session-exit.md` before handoff.
 
 ## Required Outcome

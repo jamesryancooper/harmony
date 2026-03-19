@@ -1036,7 +1036,7 @@ skills:
       - name: evidence_artifacts_glob
         type: text
         required: false
-        default: "**/engine/_meta/evidence/*.md,**/continuity/runs/**/evidence/**"
+        default: "**/engine/_meta/evidence/*.md,**//.octon/state/evidence/runs/**"
         description: "Comma-separated globs selecting compliance evidence and run receipts"
       - name: severity_threshold
         type: text
@@ -1120,7 +1120,7 @@ skills:
       - name: retention_artifacts_glob
         type: text
         required: false
-        default: "**/assurance/practices/standards/data-handling-and-retention.md,**/agency/governance/MEMORY.md,**/continuity/_meta/architecture/runs-retention.md"
+        default: "**/assurance/practices/standards/data-handling-and-retention.md,**/agency/governance/MEMORY.md,**/cognition/_meta/architecture/state/continuity/runs-retention.md"
         description: "Comma-separated globs selecting retention and deletion policy artifacts"
       - name: lineage_artifacts_glob
         type: text
@@ -1140,7 +1140,7 @@ skills:
       - name: evidence_artifacts_glob
         type: text
         required: false
-        default: "**/cognition/practices/methodology/spec-first-planning.md,**/services/_meta/docs/platform-overview.md,**/continuity/runs/**/evidence/**"
+        default: "**/cognition/practices/methodology/spec-first-planning.md,**/services/_meta/docs/platform-overview.md,**//.octon/state/evidence/runs/**"
         description: "Comma-separated globs selecting governance evidence and run-receipt artifacts"
       - name: severity_threshold
         type: text
@@ -1239,7 +1239,7 @@ skills:
       - name: evidence_artifacts_glob
         type: text
         required: false
-        default: "**/continuity/runs/**/evidence/**,**//.octon/state/evidence/validation/analysis/**quality**"
+        default: "**//.octon/state/evidence/runs/**,**//.octon/state/evidence/validation/analysis/**quality**"
         description: "Comma-separated globs selecting quality evidence and run-receipt artifacts"
       - name: severity_threshold
         type: text
@@ -1338,7 +1338,7 @@ skills:
       - name: evidence_artifacts_glob
         type: text
         required: false
-        default: "**/continuity/runs/**/evidence/**,**//.octon/state/evidence/validation/analysis/**"
+        default: "**//.octon/state/evidence/runs/**,**//.octon/state/evidence/validation/analysis/**"
         description: "Comma-separated globs selecting operational evidence and run-receipt artifacts"
       - name: severity_threshold
         type: text
@@ -1437,7 +1437,7 @@ skills:
       - name: evidence_artifacts_glob
         type: text
         required: false
-        default: "**/continuity/runs/**/evidence/**,**//.octon/state/evidence/validation/analysis/**"
+        default: "**//.octon/state/evidence/runs/**,**//.octon/state/evidence/validation/analysis/**"
         description: "Comma-separated globs selecting release evidence and run-receipt artifacts"
       - name: severity_threshold
         type: text
@@ -1536,7 +1536,7 @@ skills:
       - name: evidence_artifacts_glob
         type: text
         required: false
-        default: "**/continuity/runs/**/evidence/**,**//.octon/state/evidence/validation/analysis/**"
+        default: "**//.octon/state/evidence/runs/**,**//.octon/state/evidence/validation/analysis/**"
         description: "Comma-separated globs selecting API governance evidence and run-receipt artifacts"
       - name: severity_threshold
         type: text

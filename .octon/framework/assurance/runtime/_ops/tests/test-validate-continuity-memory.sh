@@ -70,7 +70,10 @@ create_fixture_repo() {
   mkdir -p \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts" \
     "$fixture_root/.octon/framework/cognition/_meta/architecture/state/continuity/schemas" \
+    "$fixture_root/.octon/instance/locality" \
+    "$fixture_root/.octon/state/control/locality" \
     "$fixture_root/.octon/state/continuity/repo" \
+    "$fixture_root/.octon/state/continuity/scopes/octon-harness" \
     "$fixture_root/.octon/state/evidence/decisions/repo/dec-20260308-weekly-freshness-audit-allow-01" \
     "$fixture_root/.octon/state/evidence/runs"
 
@@ -150,6 +153,60 @@ EOF
 ## Current
 
 - continuity-check: verify the continuity validator passes.
+EOF
+
+  cat > "$fixture_root/.octon/instance/locality/registry.yml" <<'EOF'
+schema_version: "octon-locality-registry-v1"
+scopes:
+  - scope_id: "octon-harness"
+    manifest_path: ".octon/instance/locality/scopes/octon-harness/scope.yml"
+EOF
+
+  cat > "$fixture_root/.octon/state/control/locality/quarantine.yml" <<'EOF'
+schema_version: "octon-locality-quarantine-state-v1"
+updated_at: "2026-03-19T00:00:00Z"
+records: []
+EOF
+
+  cat > "$fixture_root/.octon/state/continuity/scopes/octon-harness/tasks.json" <<'EOF'
+{
+  "schema_version": "1.2",
+  "goal": "Track scope-local work for the octon-harness scope.",
+  "tasks": []
+}
+EOF
+
+  cat > "$fixture_root/.octon/state/continuity/scopes/octon-harness/entities.json" <<'EOF'
+{
+  "schema_version": "1.1",
+  "description": "Tracks state of scope-local entities relevant to octon-harness continuity planning",
+  "entities": {}
+}
+EOF
+
+  cat > "$fixture_root/.octon/state/continuity/scopes/octon-harness/next.md" <<'EOF'
+---
+title: Scope Next Actions
+description: Immediate actionable steps for the octon-harness scope.
+scope_id: "octon-harness"
+---
+
+# Scope Next Actions
+
+## Current
+
+## Backlog
+EOF
+
+  cat > "$fixture_root/.octon/state/continuity/scopes/octon-harness/log.md" <<'EOF'
+---
+title: Scope Progress Log
+description: Chronological record of scope-local session work and decisions.
+mutability: append-only
+scope_id: "octon-harness"
+---
+
+# Scope Progress Log
 EOF
 
   cat > "$fixture_root/.octon/state/evidence/decisions/repo/README.md" <<'EOF'
@@ -303,6 +360,61 @@ case_stray_file_fails() {
   run_validator_in_fixture "$fixture_root"
 }
 
+case_undeclared_scope_continuity_fails() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  mkdir -p "$fixture_root/.octon/state/continuity/scopes/rogue"
+  cat > "$fixture_root/.octon/state/continuity/scopes/rogue/tasks.json" <<'EOF'
+{
+  "schema_version": "1.2",
+  "goal": "rogue",
+  "tasks": []
+}
+EOF
+  cat > "$fixture_root/.octon/state/continuity/scopes/rogue/entities.json" <<'EOF'
+{
+  "schema_version": "1.1",
+  "description": "rogue",
+  "entities": {}
+}
+EOF
+  cat > "$fixture_root/.octon/state/continuity/scopes/rogue/next.md" <<'EOF'
+# Next
+
+## Current
+EOF
+  cat > "$fixture_root/.octon/state/continuity/scopes/rogue/log.md" <<'EOF'
+# Log
+EOF
+  run_validator_in_fixture "$fixture_root"
+}
+
+case_malformed_scope_continuity_fails() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  jq '.schema_version = "1.0"' \
+    "$fixture_root/.octon/state/continuity/scopes/octon-harness/tasks.json" \
+    > "$fixture_root/.octon/state/continuity/scopes/octon-harness/tasks.tmp"
+  mv \
+    "$fixture_root/.octon/state/continuity/scopes/octon-harness/tasks.tmp" \
+    "$fixture_root/.octon/state/continuity/scopes/octon-harness/tasks.json"
+  run_validator_in_fixture "$fixture_root"
+}
+
+case_quarantined_scope_continuity_fails() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  cat > "$fixture_root/.octon/state/control/locality/quarantine.yml" <<'EOF'
+schema_version: "octon-locality-quarantine-state-v1"
+updated_at: "2026-03-19T00:00:00Z"
+records:
+  - scope_id: "octon-harness"
+    manifest_path: ".octon/instance/locality/scopes/octon-harness/scope.yml"
+    reason_code: "fixture-quarantine"
+EOF
+  run_validator_in_fixture "$fixture_root"
+}
+
 main() {
   assert_success \
     "continuity validator accepts a valid decision evidence fixture" \
@@ -327,6 +439,21 @@ main() {
     "continuity validator rejects stray files in decision directories" \
     "decision directory contains unsupported files" \
     case_stray_file_fails
+
+  assert_failure_contains \
+    "continuity validator rejects undeclared scope continuity" \
+    "undeclared scope continuity directory present" \
+    case_undeclared_scope_continuity_fails
+
+  assert_failure_contains \
+    "continuity validator rejects malformed scope continuity tasks" \
+    "tasks.json root contract mismatch" \
+    case_malformed_scope_continuity_fails
+
+  assert_failure_contains \
+    "continuity validator rejects quarantined scope continuity" \
+    "scope continuity is invalid for quarantined scope" \
+    case_quarantined_scope_continuity_fails
 
   echo
   echo "Passed: $pass_count"

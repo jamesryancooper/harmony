@@ -14,6 +14,8 @@ description: Assurance criteria and completion checklist for harness tasks.
 - [ ] Native-first rule preserved (core behavior works with zero adapters)
 - [ ] Updated `/.octon/state/continuity/repo/log.md` with session summary
 - [ ] Updated `/.octon/state/continuity/repo/tasks.json` status
+- [ ] Updated `/.octon/state/continuity/scopes/<scope-id>/**` when a declared
+  scope is the primary continuity home for the work
 - [ ] `validate-continuity-memory.sh` passes when continuity/memory artifacts changed
 - [ ] `validate-developer-context-policy.sh` passes when developer context policy surfaces change
 - [ ] `validate-context-overhead-budget.sh` passes when runtime telemetry/receipt policy surfaces change

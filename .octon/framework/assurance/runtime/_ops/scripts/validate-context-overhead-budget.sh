@@ -2,11 +2,10 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-ASSURANCE_DIR="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
-OCTON_DIR="$(cd -- "$ASSURANCE_DIR/.." && pwd)"
+OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../../../" && pwd)"
 
-POLICY_FILE="$OCTON_DIR/capabilities/governance/policy/deny-by-default.v2.yml"
-RUNS_DIR="$OCTON_DIR/continuity/runs"
+POLICY_FILE="$OCTON_DIR/framework/capabilities/governance/policy/deny-by-default.v2.yml"
+RUNS_DIR="$OCTON_DIR/state/evidence/runs"
 CLEAN_BREAK_CUTOFF="${OCTON_CONTEXT_GOV_CUTOVER_AT:-2026-02-25T00:00:00Z}"
 errors=0
 warnings=0

@@ -39,6 +39,10 @@ Canonical repo-instance authority lives under:
 Compiled locality publication and control surfaces live under:
 
 - `state/control/locality/quarantine.yml`
+- `state/control/extensions/active.yml`
+- `state/control/extensions/quarantine.yml`
+- `state/continuity/scopes/<scope-id>/`
+- `state/evidence/`
 - `generated/effective/locality/scopes.effective.yml`
 - `generated/effective/locality/artifact-map.yml`
 - `generated/effective/locality/generation.lock.yml`
@@ -66,8 +70,9 @@ only. They must be symlinks or byte-for-byte parity copies.
 6. **Scan `.octon/instance/bootstrap/catalog.md`** → Available operations
 7. **Read `.octon/state/continuity/repo/log.md`** → Know what's been done
 8. **Read `.octon/state/continuity/repo/tasks.json`** → Know current priorities and goal
-9. **Begin** highest-priority unblocked task
-10. **Before finishing:** Complete `.octon/framework/assurance/practices/session-exit.md`, verify against `.octon/framework/assurance/practices/complete.md`
+9. **Read `.octon/state/continuity/scopes/<scope-id>/`** → When work is primarily owned by one declared scope
+10. **Begin** highest-priority unblocked task
+11. **Before finishing:** Complete `.octon/framework/assurance/practices/session-exit.md`, verify against `.octon/framework/assurance/practices/complete.md`
 
 ## Visibility & Autonomy Rules
 
@@ -82,6 +87,7 @@ Subdirectories: `inbox/` (staging), `archive/` (deprecated).
 ## When Stuck
 
 - Check `state/continuity/repo/tasks.json` for blocked items
+- Check `state/continuity/scopes/<scope-id>/tasks.json` when the work is primarily scope-bound
 - Check `instance/cognition/context/shared/lessons.md` for anti-patterns to avoid
 - Check `instance/cognition/context/shared/decisions.md` for relevant past decisions
 - Review repo-root context and adjacent domain docs for patterns

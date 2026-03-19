@@ -22,44 +22,55 @@ super-root cutover.
    outputs are forbidden there.
 5. `state/**` is authoritative only as operational truth and retained
    evidence.
-6. `generated/**` is never source of truth.
-7. Raw `inputs/**` paths must never become direct runtime or policy
+6. `state/**` is class-organized into `state/continuity/**`,
+   `state/evidence/**`, and `state/control/**`.
+7. `generated/**` is never source of truth.
+8. Raw `inputs/**` paths must never become direct runtime or policy
    dependencies.
-8. Human-led ideation lives under `inputs/exploratory/ideation/**`.
-9. Retired legacy roots from the mixed-tree topology must not be
+9. Human-led ideation lives under `inputs/exploratory/ideation/**`.
+10. Retired legacy roots from the mixed-tree topology must not be
    reintroduced.
-10. `/.octon/octon.yml` is the authoritative root manifest for topology,
-   versioning, profiles, and fail-closed policy hooks.
-11. `repo_snapshot` is behaviorally complete and includes enabled-pack
+11. `/.octon/octon.yml` is the authoritative root manifest for topology,
+    versioning, profiles, and fail-closed policy hooks.
+12. `repo_snapshot` is behaviorally complete and includes enabled-pack
     dependency closure.
-12. `full_fidelity` is advisory only and is not a synthetic export payload.
-13. `framework/overlay-points/registry.yml` is the canonical framework-authored
+13. `full_fidelity` is advisory only and is not a synthetic export payload.
+14. `framework/overlay-points/registry.yml` is the canonical framework-authored
     overlay declaration surface.
-14. `instance/manifest.yml#enabled_overlay_points` is the canonical repo-side
+15. `instance/manifest.yml#enabled_overlay_points` is the canonical repo-side
     overlay enablement surface.
-15. Canonical internal ingress lives under `instance/ingress/**`;
+16. Canonical internal ingress lives under `instance/ingress/**`;
     `/.octon/AGENTS.md` is the projected ingress surface; repo-root ingress
     files are thin adapters only.
-16. Repo-root ingress files are valid only as a symlink to `/.octon/AGENTS.md`
+17. Repo-root ingress files are valid only as a symlink to `/.octon/AGENTS.md`
     or a byte-for-byte parity copy.
-17. Overlay-capable instance surfaces are legal only at framework-declared
+18. Overlay-capable instance surfaces are legal only at framework-declared
     overlay points enabled by `instance/manifest.yml`.
-18. Allowed v1 overlay merge modes are `replace_by_path`, `merge_by_id`, and
+19. Allowed v1 overlay merge modes are `replace_by_path`, `merge_by_id`, and
     `append_only`.
-19. Overlay-capable artifacts may not target closed framework domains such as
+20. Overlay-capable artifacts may not target closed framework domains such as
     `framework/engine/runtime/**`.
-20. Undeclared or disabled overlay artifacts fail closed.
-21. Repo-owned bootstrap, locality, context, ADRs, repo-native capabilities,
+21. Undeclared or disabled overlay artifacts fail closed.
+22. Repo-owned bootstrap, locality, context, ADRs, repo-native capabilities,
     missions, and desired extension configuration belong in `instance/**`.
-22. `instance/locality/manifest.yml`, `instance/locality/registry.yml`, and
+23. `instance/locality/manifest.yml`, `instance/locality/registry.yml`, and
     `instance/locality/scopes/<scope-id>/scope.yml` are the only authored
     locality authority surfaces.
-23. In v1, each `scope_id` declares exactly one `root_path`.
-24. In v1, locality resolution yields zero or one active scope per target
+24. In v1, each `scope_id` declares exactly one `root_path`.
+25. In v1, locality resolution yields zero or one active scope per target
     path.
-25. Descendant `.octon/` roots, hierarchical scope inheritance, and
+26. Descendant `.octon/` roots, hierarchical scope inheritance, and
     ancestor-chain scope composition are invalid locality models.
-26. `state/control/locality/quarantine.yml` is mutable operational control
+27. `state/continuity/repo/**` is the canonical repo-wide and cross-scope
+    continuity surface.
+28. `state/continuity/scopes/<scope-id>/**` is legal only for declared,
+    non-quarantined scopes.
+29. `state/evidence/**` is retained evidence and must not be treated as
+    rebuildable generated output.
+30. `state/control/extensions/active.yml` and
+    `generated/effective/extensions/**` form the canonical actual/compiled
+    extension publication pair.
+31. `state/control/locality/quarantine.yml` is mutable operational control
     truth; `generated/effective/locality/**` is non-authoritative compiled
     locality state.
 
@@ -114,8 +125,14 @@ for runtime, governance, and practices.
 - scope schema contract:
   `/.octon/framework/cognition/_meta/architecture/instance/locality/schemas/scope.schema.json`
 - scope-local durable context: `/.octon/instance/cognition/context/scopes/`
+- repo continuity: `/.octon/state/continuity/repo/`
+- scope continuity: `/.octon/state/continuity/scopes/`
+- retained evidence: `/.octon/state/evidence/`
+- extension actual state: `/.octon/state/control/extensions/active.yml`
+- extension quarantine state: `/.octon/state/control/extensions/quarantine.yml`
 - locality quarantine: `/.octon/state/control/locality/quarantine.yml`
 - effective locality outputs: `/.octon/generated/effective/locality/`
+- effective extension outputs: `/.octon/generated/effective/extensions/`
 - repo context and ADRs: `/.octon/instance/cognition/`
 - repo missions: `/.octon/instance/orchestration/missions/`
 - export runner: `/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh`
@@ -155,6 +172,8 @@ before it becomes legal.
 - each scope is authored once at `instance/locality/scopes/<scope-id>/scope.yml`
 - `include_globs` and `exclude_globs` refine a single rooted subtree and may
   not redefine scope authority into multiple roots
+- mutable scope continuity belongs under `state/continuity/scopes/<scope-id>/**`
+  and must not exist for undeclared or quarantined scopes
 - missions may reference scopes, but they do not define locality
 - runtime-facing locality consumers use compiled
   `generated/effective/locality/**`

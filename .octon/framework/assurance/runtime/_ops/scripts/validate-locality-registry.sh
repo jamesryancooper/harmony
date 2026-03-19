@@ -10,12 +10,13 @@ LOCALITY_MANIFEST="$OCTON_DIR/instance/locality/manifest.yml"
 LOCALITY_REGISTRY="$OCTON_DIR/instance/locality/registry.yml"
 SCOPES_DIR="$OCTON_DIR/instance/locality/scopes"
 SCOPE_CONTEXT_DIR="$OCTON_DIR/instance/cognition/context/scopes"
-BLOCKED_SCOPE_CONTINUITY_DIR="$OCTON_DIR/state/continuity/scopes"
+SCOPE_CONTINUITY_DIR="$OCTON_DIR/state/continuity/scopes"
 SCOPE_SCHEMA_DIR="$OCTON_DIR/framework/cognition/_meta/architecture/instance/locality/schemas"
 SCOPE_SCHEMA_README="$SCOPE_SCHEMA_DIR/README.md"
 SCOPE_SCHEMA_FILE="$SCOPE_SCHEMA_DIR/scope.schema.json"
 
 declare -A ACTIVE_ROOTS=()
+declare -A DECLARED_SCOPE_IDS=()
 errors=0
 
 fail() {
@@ -116,6 +117,27 @@ require_yaml_file() {
   else
     fail "${file#$ROOT_DIR/} must parse as YAML"
   fi
+}
+
+require_scope_continuity_scaffold() {
+  local scope_id="$1"
+  local scope_dir="$SCOPE_CONTINUITY_DIR/$scope_id"
+
+  if [[ -d "$scope_dir" ]]; then
+    pass "scope '$scope_id' continuity directory exists"
+  else
+    fail "scope '$scope_id' continuity directory missing: ${scope_dir#$ROOT_DIR/}"
+    return
+  fi
+
+  local file
+  for file in log.md tasks.json entities.json next.md; do
+    if [[ -f "$scope_dir/$file" ]]; then
+      pass "scope '$scope_id' continuity file exists: ${scope_dir#$ROOT_DIR/}/$file"
+    else
+      fail "scope '$scope_id' continuity file missing: ${scope_dir#$ROOT_DIR/}/$file"
+    fi
+  done
 }
 
 validate_scope_manifest() {
@@ -223,6 +245,8 @@ validate_scope_manifest() {
   else
     fail "scope '$scope_id' durable context directory missing: ${SCOPE_CONTEXT_DIR#$ROOT_DIR/}/$scope_id"
   fi
+
+  require_scope_continuity_scaffold "$scope_id" || true
 }
 
 main() {
@@ -259,10 +283,10 @@ main() {
     fail "missing directory: ${SCOPE_CONTEXT_DIR#$ROOT_DIR/}"
   fi
 
-  if [[ -d "$BLOCKED_SCOPE_CONTINUITY_DIR" ]]; then
-    fail "scope continuity is not legal before Packet 7: ${BLOCKED_SCOPE_CONTINUITY_DIR#$ROOT_DIR/}"
+  if [[ -d "$SCOPE_CONTINUITY_DIR" ]]; then
+    pass "found directory: ${SCOPE_CONTINUITY_DIR#$ROOT_DIR/}"
   else
-    pass "scope continuity remains gated off until Packet 7"
+    fail "missing directory: ${SCOPE_CONTINUITY_DIR#$ROOT_DIR/}"
   fi
 
   [[ "$(yq -r '.schema_version // ""' "$LOCALITY_MANIFEST")" == "octon-locality-manifest-v1" ]] \
@@ -297,17 +321,18 @@ main() {
 
   local declared_count=0
   local entry_index scope_id manifest_path
-  while IFS='|' read -r entry_index scope_id manifest_path; do
-    if [[ -z "$scope_id" ]]; then
-      fail "registry scope entry $entry_index missing scope_id"
-      continue
-    fi
-    declared_count=$((declared_count + 1))
-    if [[ -z "$manifest_path" ]]; then
-      fail "registry scope '$scope_id' missing manifest_path"
-      continue
-    fi
-    validate_scope_manifest "$scope_id" "$manifest_path"
+    while IFS='|' read -r entry_index scope_id manifest_path; do
+      if [[ -z "$scope_id" ]]; then
+        fail "registry scope entry $entry_index missing scope_id"
+        continue
+      fi
+      declared_count=$((declared_count + 1))
+      DECLARED_SCOPE_IDS["$scope_id"]=1
+      if [[ -z "$manifest_path" ]]; then
+        fail "registry scope '$scope_id' missing manifest_path"
+        continue
+      fi
+      validate_scope_manifest "$scope_id" "$manifest_path" || true
   done < <(
     yq -o=json '.scopes' "$LOCALITY_REGISTRY" 2>/dev/null \
       | jq -r 'to_entries[]? | [.key, (.value.scope_id // ""), (.value.manifest_path // "")] | join("|")'
@@ -327,6 +352,16 @@ main() {
   else
     pass "registry scope_ids are unique"
   fi
+
+  while IFS= read -r continuity_dir; do
+    [[ -z "$continuity_dir" ]] && continue
+    local scope_id
+    scope_id="$(basename "$continuity_dir")"
+    if [[ -z "${DECLARED_SCOPE_IDS[$scope_id]+x}" ]]; then
+      fail "undeclared scope continuity directory present: ${continuity_dir#$ROOT_DIR/}"
+    fi
+  done < <(find "$SCOPE_CONTINUITY_DIR" -mindepth 1 -maxdepth 1 -type d | sort)
+  pass "scope continuity directories align to declared scope ids"
 
   local ids=("${!ACTIVE_ROOTS[@]}")
   local i j left_id right_id left_root right_root

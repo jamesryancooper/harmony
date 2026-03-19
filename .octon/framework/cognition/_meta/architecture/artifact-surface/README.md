@@ -33,14 +33,14 @@ Ingress -> Orchestration -> Capability -> Service -> Execution Kernel
 ```
 
 **Related Foundational Surfaces:**
-- [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) — Cross-plane contract
+- [Foundational Planes Integration](../state/continuity/three-planes-integration.md) — Cross-plane contract
 - [Execution Kernel](../../../../engine/runtime/) — Runtime dispatch entrypoint
 - [Services](../../../../capabilities/runtime/services/) — Typed runtime interfaces
 - [Commands (Ingress)](../../../../capabilities/runtime/commands/) — Human intent intake
 - [Skills (Capability)](../../../../capabilities/runtime/skills/) — Atomic execution units
 - [Workflows (Orchestration)](../../../../orchestration/runtime/workflows/) — Multi-step sequencing
 - [Assurance](../../../../assurance/runtime/) — Gate and validation profiles
-- [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) — Active operational memory
+- [Continuity Plane](../state/continuity/continuity-plane.md) — Active operational memory
 - [Knowledge Plane](../../../runtime/knowledge/knowledge.md) — Durable context/decision/evidence indexing
 
 ---
@@ -89,10 +89,14 @@ Ingress -> Orchestration -> Capability -> Service -> Execution Kernel
 | Type | Location | Owner Surface | Description |
 |------|----------|---------------|-------------|
 | **Canonical Content** | `content/` | Artifact surface | Source of truth: public, internal, and agent-facing content |
-| **Continuity Artifacts** | `.octon/state/continuity/repo/` | [Continuity Plane](../../../../continuity/_meta/architecture/continuity-plane.md) | Active tasks, entities, handoff-ready next actions, and progress history |
+| **Continuity Artifacts** | `.octon/state/continuity/**` | [Continuity Plane](../state/continuity/continuity-plane.md) | Active repo and scope continuity, handoff-ready next actions, and progress history |
 | **Runtime Artifacts** | Server DB (optional) | Artifact runtime extension | Live overrides, personalization, session state |
 
-> **Note**: Continuity artifacts (`.octon/state/continuity/repo/`) are managed by the Continuity Plane with specialized lifecycle rules. Durable decision records are managed by the Knowledge Plane under `/.octon/instance/cognition/decisions/`.
+> **Note**: Continuity artifacts (`.octon/state/continuity/**`) are managed by
+> the Continuity Plane with specialized lifecycle rules. Repo-wide and
+> cross-scope work lives under `repo/`; stable single-scope work lives under
+> `scopes/<scope-id>/`. Durable decision records are managed by the Knowledge
+> Plane under `/.octon/instance/cognition/decisions/`.
 
 ## Sources & Influences (non-normative)
 

@@ -125,10 +125,14 @@ description: Atomic clean-break migration plan for promoting Packet 6 locality a
 
 ## Exceptions/Escalations
 
-- Current exceptions: scope continuity remains intentionally gated off until
-  Packet 7
+- Current exceptions: none
 - Escalations raised: none
 - Risk acceptance owner: Octon maintainers
+
+## Addendum 2026-03-19
+
+- Packet 7 landed and removed the temporary scope-continuity gate.
+- `state/continuity/scopes/**` is now part of the canonical live state model.
 
 ## Verification Evidence
 
