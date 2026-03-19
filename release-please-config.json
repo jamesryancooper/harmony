@@ -8,7 +8,19 @@
   "packages": {
     ".": {
       "package-name": "octon",
-      "changelog-path": "CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        {
+          "type": "yaml",
+          "path": ".octon/octon.yml",
+          "jsonpath": "$.versioning.harness.release_version"
+        },
+        {
+          "type": "yaml",
+          "path": ".octon/framework/manifest.yml",
+          "jsonpath": "$.release_version"
+        }
+      ]
     }
   }
 }
