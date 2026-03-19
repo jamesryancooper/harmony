@@ -12,6 +12,8 @@ Complete before ending a session, context reset, or handoff.
 - [ ] **Update `state/continuity/repo/log.md`** with session summary
 - [ ] **Update `state/continuity/repo/tasks.json`** status
 - [ ] **Update `state/continuity/repo/entities.json`** if applicable
+- [ ] **Update `state/continuity/scopes/<scope-id>/**`** when a declared scope
+  is the primary continuity home
 - [ ] **Document in-flight state** if mid-task
 
 ## Conditional Steps

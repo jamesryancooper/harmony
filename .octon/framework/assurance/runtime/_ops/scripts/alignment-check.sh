@@ -128,6 +128,10 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-continuity-memory.sh"
 
   run_step \
+    "Validate Packet 7 state-surface wording alignment" \
+    bash "$SCRIPT_DIR/validate-state-surface-alignment.sh"
+
+  run_step \
     "Validate audit-subsystem-health drift alignment" \
     bash "$SCRIPT_DIR/validate-audit-subsystem-health-alignment.sh"
 

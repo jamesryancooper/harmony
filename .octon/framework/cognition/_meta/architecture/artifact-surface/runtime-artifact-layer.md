@@ -31,7 +31,7 @@ ingress, capability, orchestration, assurance, continuity, or knowledge planes.
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-See [Foundational Planes Integration](../../../../continuity/_meta/architecture/three-planes-integration.md) for complete architecture overview.
+See [Foundational Planes Integration](../state/continuity/three-planes-integration.md) for complete architecture overview.
 
 ---
 
@@ -42,7 +42,7 @@ See [Foundational Planes Integration](../../../../continuity/_meta/architecture/
 | Term | Plane | Definition |
 |------|-------|------------|
 | **Canonical Content** | Artifact Plane (HAS) | Content stored in `content/` as authoritative source of truth. Git-tracked, schema-validated, and compiled into the Octon Artifact Graph (HAG). |
-| **Continuity Artifacts** | [Continuity](../../../../continuity/_meta/architecture/continuity-plane.md) | State stored in `.octon/state/continuity/repo/` with continuity lifecycle rules (append-first log, structured tasks/entities, handoff-ready next state). |
+| **Continuity Artifacts** | [Continuity](../state/continuity/continuity-plane.md) | State stored in `.octon/state/continuity/**` with continuity lifecycle rules (append-first log, structured tasks/entities, handoff-ready next state). |
 | **Runtime Artifacts** | Artifact runtime extension | Dynamic data that overlays canonical content at request time. May include live overrides, personalization, time-sensitive updates, or data fetched from external systems. |
 
 ### Artifact roots summary
@@ -52,7 +52,7 @@ HAS treats the following as **artifact roots** (indexing content from multiple p
 | Root | Plane | Type | Description |
 |------|-------|------|-------------|
 | `content/` | Artifact Plane (HAS) | Canonical content | Public, internal, and agent-facing content organized by surface |
-| `.octon/state/continuity/repo/` | [Continuity](../../../../continuity/_meta/architecture/continuity-plane.md) | Continuity artifacts | Active tasks, entities, chronological log, and next actions |
+| `.octon/state/continuity/**` | [Continuity](../state/continuity/continuity-plane.md) | Continuity artifacts | Active repo/scope tasks, entities, chronological logs, and next actions |
 | `.octon/content/` | Artifact Plane (HAS) | Compiled artifacts | SQLite indexes, JSON exports, dependency graphs (generated, not source) |
 
 ### The distinction
@@ -124,7 +124,7 @@ The Artifact Surface design already accommodates runtime extension:
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                     CANONICAL LAYER                              │
-│   content/ + .octon/state/continuity/repo/ → git (source of truth)       │
+│   content/ + .octon/state/continuity/** → git (source of truth)           │
 │   Versioned, schema-validated, auditable                        │
 └─────────────────────────────────────────────────────────────────┘
                               │

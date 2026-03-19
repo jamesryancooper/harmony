@@ -1,10 +1,10 @@
-# Continuity Decisions
+# Operational Decision Evidence
 
 Routing, authority, and prerequisite decision evidence.
 
 ## Purpose
 
-`continuity/decisions/` stores append-oriented decision records for material
+`state/evidence/decisions/repo/` stores append-oriented decision records for material
 orchestration actions.
 
 This surface exists so operators and validators can answer:
@@ -13,7 +13,7 @@ This surface exists so operators and validators can answer:
 - why work was blocked
 - why escalation was required
 
-It is continuity-owned evidence, not active task state.
+It is retained operational evidence, not active task state.
 
 ## Canonical Policy
 
@@ -54,9 +54,10 @@ decisions/
 ## Forward-Only Rollout
 
 Historical run bundles may still contain legacy `acp-decision.json` artifacts
-inside `continuity/runs/`. Those remain historical run-bundled evidence.
+inside `state/evidence/runs/`. Those remain historical run-bundled evidence.
 
-New canonical orchestration decision evidence belongs in `continuity/decisions/`.
+New canonical orchestration decision evidence belongs in
+`state/evidence/decisions/repo/`.
 
 ## Safety Rules
 

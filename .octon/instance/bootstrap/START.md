@@ -109,6 +109,12 @@ Subsystem expansion specs:
 Only `framework/**` and `instance/**` are authored authority. Raw
 `inputs/**` remain non-authoritative even when a profile exports them.
 
+`state/**` has three required lifecycle subdomains:
+
+- `state/continuity/**` for active repo and scope handoff state
+- `state/evidence/**` for retained operational receipts and traceability
+- `state/control/**` for mutable publication and quarantine truth
+
 ## Overlay And Ingress Model
 
 Canonical ingress resolves through this chain:
@@ -139,6 +145,7 @@ Canonical locality resolution and publication surfaces are:
 - `instance/locality/registry.yml`
 - `instance/locality/scopes/<scope-id>/scope.yml`
 - `instance/cognition/context/scopes/<scope-id>/**`
+- `state/continuity/scopes/<scope-id>/**`
 - `state/control/locality/quarantine.yml`
 - `generated/effective/locality/scopes.effective.yml`
 - `generated/effective/locality/artifact-map.yml`
@@ -203,12 +210,16 @@ Flow:
      `cognition/governance/principles/README.md`.
 2. Execute
    - Read `state/continuity/repo/log.md` and `state/continuity/repo/tasks.json`.
+   - If work is stably owned by one declared scope, also read
+     `state/continuity/scopes/<scope-id>/{log.md,tasks.json,next.md}`.
    - Execute the highest-priority unblocked task.
 3. Assure
    - Run `bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness`.
    - Run additional surface-specific validators for changed domains.
 4. Continuity
    - Update `state/continuity/repo/log.md` and `state/continuity/repo/tasks.json`.
+   - Update `state/continuity/scopes/<scope-id>/**` when the work's primary
+     home is a declared scope rather than repo-wide continuity.
    - Complete `assurance/practices/session-exit.md` and verify
      `assurance/practices/complete.md`.
 

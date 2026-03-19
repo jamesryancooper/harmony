@@ -53,7 +53,7 @@
       "blockers": [],
       "acceptance_criteria": [
         "Execute at least one end-to-end agent session using the root harness",
-        "Record findings and required adjustments in continuity/log.md"
+        "Record findings and required adjustments in state/continuity/repo/log.md"
       ],
       "knowledge_links": {
         "specs": [
@@ -157,6 +157,24 @@
       "risk_tier": "T1",
       "required_approvals": [],
       "note": "Final promotion gate."
+    },
+    {
+      "id": "draft-packet-7-state-evidence-continuity-proposal",
+      "description": "Draft the architecture proposal package for Packet 7 state, evidence, and continuity",
+      "status": "completed",
+      "completed_at": "2026-03-19"
+    },
+    {
+      "id": "packet-7-state-evidence-continuity-atomic-cutover",
+      "description": "Implement the Packet 7 state, evidence, and continuity atomic cutover",
+      "status": "completed",
+      "completed_at": "2026-03-19"
+    },
+    {
+      "id": "packet-7-cutover-review-remediation",
+      "description": "Remediate post-cutover review findings for the Packet 7 state, evidence, and continuity implementation",
+      "status": "completed",
+      "completed_at": "2026-03-19"
     }
   ]
 }

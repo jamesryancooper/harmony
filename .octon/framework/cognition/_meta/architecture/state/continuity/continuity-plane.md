@@ -19,14 +19,12 @@ What happened, what is active now, and what should happen next?
 ├── log.md
 ├── tasks.json
 ├── entities.json
-├── next.md
-├── decisions/
-└── runs/
+└── next.md
 ```
 
 The four top-level files are the authoritative handoff contract for active
-continuity state. `decisions/` and `runs/` are authoritative append-oriented
-evidence surfaces.
+continuity state. Retained operational evidence is authoritative under
+`.octon/state/evidence/**`.
 
 ## File Responsibilities
 
@@ -55,7 +53,7 @@ evidence surfaces.
 - Must reference active unblocked task IDs from `tasks.json`.
 - Purpose: fast handoff surface for the next execution session.
 
-### `.octon/state/evidence/decisions/repo/`
+### `.octon/state/evidence/decisions/{repo,scopes/<scope-id>}/`
 
 - Append-oriented routing, authority, and prerequisite decision evidence.
 - Canonical home for orchestration `allow`, `block`, and `escalate` records.
@@ -87,6 +85,8 @@ evidence surfaces.
 - Cognition provides durable context and decisions consumed during planning.
 - Orchestration workflows update continuity state while executing tasks.
 - Quality gates validate changes while continuity artifacts preserve execution traceability.
+- Scope-local work may use `state/continuity/scopes/<scope-id>/**` when the
+  declared scope is the primary continuity home.
 
 ## Operational Expectations
 
@@ -94,14 +94,16 @@ evidence surfaces.
 - `tasks.json` and `next.md` must be coherent: `next.md` should point to active, unblocked items.
 - `entities.json` should reflect ownership and lifecycle before handoff.
 - Continuity JSON artifacts must satisfy canonical schema contracts under `_meta/architecture/schemas/`.
-- Decision evidence directories under `decisions/` must map to a declared retention class.
-- Run evidence directories under `runs/` must map to a declared retention class.
+- Decision evidence directories under `state/evidence/decisions/**` must map
+  to a declared retention class.
+- Run evidence directories under `state/evidence/runs/**` must map to a
+  declared retention class.
 - Post-cutover run evidence should support context-overhead classification (`within-target`, `warn`, `soft-fail`, `hard-fail`).
 
 ## Anti-Patterns
 
 - Storing active work state outside the canonical four-file contract.
-- Treating `decisions/` or `runs/` as mutable task state.
+- Treating retained evidence as mutable task state.
 - Letting `next.md` diverge from `tasks.json`.
 - Backfilling large historical edits into `log.md` without clear correction notes.
 - Using legacy task fields such as `blocked_by` instead of canonical `blockers`.

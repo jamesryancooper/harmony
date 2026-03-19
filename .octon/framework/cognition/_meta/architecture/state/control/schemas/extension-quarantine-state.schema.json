@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.dev/schemas/extension-quarantine-state.schema.json",
+  "title": "Octon Extension Quarantine State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "updated_at",
+    "blocked_packs",
+    "affected_dependents",
+    "reason_codes",
+    "acknowledgements"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-extension-quarantine-state-v1"
+    },
+    "updated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "blocked_packs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "affected_dependents": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "acknowledgements": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

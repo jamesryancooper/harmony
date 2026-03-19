@@ -391,6 +391,15 @@ Session continuity in `state/continuity/repo/`:
 | [entities.json](/.octon/state/continuity/repo/entities.json) | Entity state tracking |
 | [next.md](/.octon/state/continuity/repo/next.md) | Immediate actionable steps (promoted from `ideation/scratchpad/`) |
 
+Scope continuity in `state/continuity/scopes/<scope-id>/`:
+
+| File | Description |
+|------|-------------|
+| [log.md](/.octon/state/continuity/scopes/octon-harness/log.md) | Append-only scope session history |
+| [tasks.json](/.octon/state/continuity/scopes/octon-harness/tasks.json) | Structured scope task list with goal |
+| [entities.json](/.octon/state/continuity/scopes/octon-harness/entities.json) | Scope entity state tracking |
+| [next.md](/.octon/state/continuity/scopes/octon-harness/next.md) | Immediate scope-local actionable steps |
+
 ---
 
 ## Templates

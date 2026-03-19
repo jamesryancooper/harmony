@@ -13,7 +13,9 @@ When build-time-only delivery is insufficient (e.g., content must update without
 - **Explicit references** (`ref:<type>:<id>[@locale]`) + build-time resolution; no magical string-grep workflows.
 - **Build-time indexes** (SQLite + JSON + dependency graph) enable semantic querying and blast-radius/impact analysis without runtime CMS infrastructure.
 - **Three content surfaces** (public, internal, agent-facing) share the same infrastructure; "surface" is a **metadata concern** and also optionally represented in folder layout for clarity.
-- **Continuity artifacts are first-class**: `/.octon/state/continuity/repo/` artifacts (`log.md`, `tasks.json`, `entities.json`, `next.md`, `runs/`) are validated, indexed, referenced, and exported to agent context.
+- **Continuity artifacts are first-class**: `/.octon/state/continuity/**`
+  artifacts (`repo/` plus `scopes/<scope-id>/`) are validated, indexed,
+  referenced, and exported to agent context.
 - **Runtime layer is optional**: when boundary conditions are crossed, a tiered runtime layer (edge read → central read → write) can extend canonical content without replacing the source of truth.
 
 ## Top things this enables

@@ -25,6 +25,8 @@ super-rooted Octon harness.
 6. `.octon/framework/cognition/governance/principles/README.md`
 7. `.octon/state/continuity/repo/log.md`
 8. `.octon/state/continuity/repo/tasks.json`
+9. `.octon/state/continuity/scopes/<scope-id>/{log.md,tasks.json}` when the
+   current work is primarily owned by a declared scope
 
 ## Super-Root Topology
 

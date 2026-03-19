@@ -202,6 +202,40 @@ EOF
   ! run_validator "$fixture_root"
 }
 
+case_undeclared_scope_continuity_dir_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  mkdir -p "$fixture_root/.octon/state/continuity/scopes/rogue"
+  cat >"$fixture_root/.octon/state/continuity/scopes/rogue/tasks.json" <<'EOF'
+{
+  "schema_version": "1.2",
+  "goal": "rogue",
+  "tasks": []
+}
+EOF
+  cat >"$fixture_root/.octon/state/continuity/scopes/rogue/entities.json" <<'EOF'
+{
+  "schema_version": "1.1",
+  "description": "rogue",
+  "entities": {}
+}
+EOF
+  cat >"$fixture_root/.octon/state/continuity/scopes/rogue/next.md" <<'EOF'
+# Next
+
+## Current
+EOF
+  cat >"$fixture_root/.octon/state/continuity/scopes/rogue/log.md" <<'EOF'
+# Log
+EOF
+
+  ! run_validator "$fixture_root"
+}
+
 main() {
   assert_success "valid locality registry fixture passes" case_valid_fixture_passes
   assert_success "duplicate scope ids fail locality validation" case_duplicate_scope_id_fails
@@ -211,6 +245,7 @@ main() {
   assert_success "safe but out-of-root glob fails locality validation" case_safe_but_outside_root_glob_fails
   assert_success "missing scope id fails locality validation" case_missing_scope_id_fails
   assert_success "noncanonical manifest path fails locality validation" case_noncanonical_manifest_path_fails
+  assert_success "undeclared scope continuity directory fails locality validation" case_undeclared_scope_continuity_dir_fails
 
   echo
   echo "Passed: $pass_count"

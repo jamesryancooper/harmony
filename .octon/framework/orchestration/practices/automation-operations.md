@@ -17,7 +17,7 @@ Applies to pause, resume, replay, retry, and routine automation operations.
    - Replaying the same event or schedule window without changed context is an
      idempotency violation.
 4. Treat `state/last-run.json` and `state/counters.json` as projections.
-   - Run truth remains in `runtime/runs/` and `continuity/runs/`.
+   - Run truth remains in `runtime/runs/` and `state/evidence/runs/`.
 5. Investigate repeated terminal failures before forcing retries.
    - Prefer incident linkage or pause when the same failure class repeats.
 

@@ -38,7 +38,7 @@ io:
     - name: evidence_artifacts_glob
       type: text
       required: false
-      default: "**/engine/_meta/evidence/*.md,**/continuity/runs/**/evidence/**"
+      default: "**/engine/_meta/evidence/*.md,**//.octon/state/evidence/runs/**"
       description: "Comma-separated globs selecting compliance evidence and run receipts"
     - name: severity_threshold
       type: text

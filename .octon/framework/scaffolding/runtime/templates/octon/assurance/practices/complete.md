@@ -7,6 +7,8 @@
 - [ ] Follows `conventions.md` style rules
 - [ ] Updated `state/continuity/repo/log.md` with session summary
 - [ ] Updated `state/continuity/repo/tasks.json` status
+- [ ] Updated `state/continuity/scopes/<scope-id>/**` when a declared scope is
+  the primary continuity home
 
 ## Quality Criteria
 

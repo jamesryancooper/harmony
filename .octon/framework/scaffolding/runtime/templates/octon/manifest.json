@@ -38,6 +38,11 @@
         "instance/agency/runtime",
         "instance/assurance/runtime",
         "state/continuity/repo",
+        "state/continuity/scopes",
+        "state/evidence",
+        "state/evidence/decisions/scopes",
+        "state/control",
+        "state/control/extensions",
         "state/control/locality",
         "generated/effective/locality",
         "generated/proposals"
@@ -63,7 +68,13 @@
     "instance/capabilities/runtime/commands/README.md": "Repo-native command capability surface",
     "instance/orchestration/missions/registry.yml": "Repo-native mission registry",
     "instance/ingress/AGENTS.md": "Canonical internal ingress",
+    "state/continuity/README.md": "Canonical continuity subdomain overview",
     "state/control/locality/quarantine.yml": "Mutable locality quarantine state",
+    "state/control/extensions/active.yml": "Actual active extension publication state",
+    "state/control/extensions/quarantine.yml": "Extension quarantine state",
+    "state/control/README.md": "Canonical control-state overview",
+    "state/evidence/README.md": "Canonical retained evidence overview",
+    "state/evidence/decisions/scopes/README.md": "Canonical scope decision-evidence root",
     "generated/effective/locality/scopes.effective.yml": "Compiled effective scope map",
     "generated/effective/locality/artifact-map.yml": "Compiled locality artifact provenance map",
     "generated/effective/locality/generation.lock.yml": "Compiled locality freshness receipt",
@@ -71,6 +82,7 @@
     "state/continuity/repo/tasks.json": "Structured task list with goal",
     "state/continuity/repo/entities.json": "Entity state tracking",
     "state/continuity/repo/next.md": "Immediate actionable steps",
+    "state/continuity/scopes/README.md": "Scope continuity root; declared scopes get continuity scaffolds during locality publication",
     "generated/proposals/registry.yml": "Generated proposal registry"
   }
 }

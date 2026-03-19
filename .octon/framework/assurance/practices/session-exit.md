@@ -38,6 +38,11 @@ Complete before ending a session, context reset, or handoff.
   - Record state of any artifacts being actively modified
   - Note in-flight changes that aren't committed
 
+- [ ] **Update `/.octon/state/continuity/scopes/<scope-id>/**`** when the
+  work's primary home is a declared scope
+  - Keep scope-local log, tasks, entities, and next-state aligned to the repo
+    continuity handoff contract
+
 - [ ] **Document in-flight state**
   - If mid-task, describe current position in `/.octon/state/continuity/repo/log.md`
   - Include any uncommitted reasoning or partial work
