@@ -77,16 +77,16 @@ struct ScoreArgs {
     #[arg(long)]
     out_dir: Option<PathBuf>,
 
-    #[arg(long, default_value = ".octon/generated/effective/assurance")]
+    #[arg(long, default_value = ".octon/state/evidence/validation/assurance/effective")]
     effective_dir: PathBuf,
 
-    #[arg(long, default_value = ".octon/generated/assurance/results")]
+    #[arg(long, default_value = ".octon/state/evidence/validation/assurance/results")]
     results_dir: PathBuf,
 
-    #[arg(long, default_value = ".octon/generated/assurance/policy/deviations")]
+    #[arg(long, default_value = ".octon/state/evidence/validation/assurance/policy/deviations")]
     deviations_dir: PathBuf,
 
-    #[arg(long, default_value = ".octon/generated/effective/assurance")]
+    #[arg(long, default_value = ".octon/state/evidence/validation/assurance/effective")]
     lock_dir: PathBuf,
 }
 
@@ -4451,7 +4451,7 @@ fn chrono_like_now() -> TimestampMeta {
 fn default_out_dir(now: &TimestampMeta) -> PathBuf {
     let day = now.iso.get(0..10).unwrap_or("1970-01-01");
     PathBuf::from(format!(
-        ".octon/generated/assurance/scorecards/{}/{}",
+        ".octon/state/evidence/validation/assurance/scorecards/{}/{}",
         day, now.run_id
     ))
 }

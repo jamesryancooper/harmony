@@ -8,7 +8,10 @@ contracts.
 ## Contents
 
 - `_ops/scripts/` - assurance engine and alignment validation entrypoints.
-- `/.octon/generated/effective/assurance/` - generated lock artifacts used by assurance execution.
+- `/.octon/state/evidence/validation/assurance/` - retained assurance receipts,
+  scorecards, effective-weight snapshots, and deviation reports.
+- `/.octon/generated/.tmp/assurance/` - ephemeral rebuild intermediates used by
+  assurance execution.
 - `trust/` - trust artifact runtime surfaces (`attestations/`, `evidence/`,
   `audits/`).
 

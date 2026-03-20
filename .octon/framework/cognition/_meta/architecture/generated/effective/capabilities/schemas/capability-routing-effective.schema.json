@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Effective Capability Routing",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generator_version",
+    "generation_id",
+    "published_at",
+    "publication_status",
+    "source",
+    "routing_candidates"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-capability-routing-effective-v1"
+    },
+    "generator_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publication_status": {
+      "const": "published"
+    },
+    "routing_candidates": {
+      "type": "array"
+    }
+  }
+}

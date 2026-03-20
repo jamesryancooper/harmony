@@ -205,6 +205,18 @@
       "description": "Archive completed Packet 1/2/3/4/5/6/7/8/9 architecture proposals after verifying cutover evidence",
       "status": "completed",
       "completed_at": "2026-03-20"
+    },
+    {
+      "id": "draft-packet-10-generated-effective-cognition-registry-proposal",
+      "description": "Draft the architecture proposal package for Packet 10 generated/effective/cognition/registry",
+      "status": "completed",
+      "completed_at": "2026-03-20"
+    },
+    {
+      "id": "packet-10-generated-effective-cognition-registry-atomic-cutover",
+      "description": "Implement the Packet 10 generated/effective/cognition/registry atomic clear-break cutover",
+      "status": "completed",
+      "completed_at": "2026-03-20"
     }
   ]
 }

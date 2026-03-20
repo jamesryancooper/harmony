@@ -71,12 +71,34 @@ require_file "$OCTON_DIR/framework/cognition/_meta/architecture/state/control/sc
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/state/control/schemas/extension-active-state.schema.json"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/state/control/schemas/extension-quarantine-state.schema.json"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/state/control/schemas/locality-quarantine-state.schema.json"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/README.md"
+require_dir "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/locality"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/locality/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/locality/schemas/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/locality/schemas/locality-effective-scopes.schema.json"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/locality/schemas/locality-artifact-map.schema.json"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/locality/schemas/locality-generation-lock.schema.json"
+require_dir "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/capabilities"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/capabilities/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/capabilities/schemas/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/capabilities/schemas/capability-routing-effective.schema.json"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/capabilities/schemas/capability-routing-artifact-map.schema.json"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/capabilities/schemas/capability-routing-generation-lock.schema.json"
 require_dir "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/extensions"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/extensions/README.md"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/extensions/schemas/README.md"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/extensions/schemas/extension-effective-catalog.schema.json"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/extensions/schemas/extension-artifact-map.schema.json"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/effective/extensions/schemas/extension-generation-lock.schema.json"
+require_dir "$OCTON_DIR/framework/cognition/_meta/architecture/generated/cognition"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/cognition/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/cognition/projections/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/cognition/summaries/README.md"
+require_dir "$OCTON_DIR/framework/cognition/_meta/architecture/generated/proposals"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/proposals/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/proposals/schemas/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/generated/proposals/schemas/proposal-registry.schema.json"
 require_dir "$OCTON_DIR/framework/engine"
 require_dir "$OCTON_DIR/framework/engine/governance/extensions"
 require_file "$OCTON_DIR/framework/engine/governance/extensions/README.md"
@@ -158,12 +180,19 @@ require_dir "$OCTON_DIR/state/evidence/runs/skills"
 require_dir "$OCTON_DIR/state/evidence/runs/services"
 require_dir "$OCTON_DIR/state/evidence/runs/engine"
 require_dir "$OCTON_DIR/state/evidence/validation"
+require_dir "$OCTON_DIR/state/evidence/validation/assurance"
+require_file "$OCTON_DIR/state/evidence/validation/assurance/README.md"
+require_dir "$OCTON_DIR/state/evidence/validation/assurance/effective"
+require_dir "$OCTON_DIR/state/evidence/validation/assurance/results"
+require_dir "$OCTON_DIR/state/evidence/validation/assurance/scorecards"
 require_dir "$OCTON_DIR/state/evidence/migration"
 
 require_dir "$OCTON_DIR/generated/effective"
-require_dir "$OCTON_DIR/generated/effective/assurance"
 require_dir "$OCTON_DIR/generated/effective/capabilities"
 require_dir "$OCTON_DIR/generated/effective/capabilities/filesystem-snapshots"
+require_file "$OCTON_DIR/generated/effective/capabilities/routing.effective.yml"
+require_file "$OCTON_DIR/generated/effective/capabilities/artifact-map.yml"
+require_file "$OCTON_DIR/generated/effective/capabilities/generation.lock.yml"
 require_dir "$OCTON_DIR/generated/effective/extensions"
 require_file "$OCTON_DIR/generated/effective/extensions/catalog.effective.yml"
 require_file "$OCTON_DIR/generated/effective/extensions/artifact-map.yml"
@@ -172,7 +201,9 @@ require_dir "$OCTON_DIR/generated/effective/locality"
 require_file "$OCTON_DIR/generated/effective/locality/scopes.effective.yml"
 require_file "$OCTON_DIR/generated/effective/locality/artifact-map.yml"
 require_file "$OCTON_DIR/generated/effective/locality/generation.lock.yml"
+require_dir "$OCTON_DIR/generated/cognition"
 require_dir "$OCTON_DIR/generated/proposals"
+require_file "$OCTON_DIR/generated/proposals/registry.yml"
 
 unexpected_octon_entries=()
 while IFS= read -r entry; do
@@ -222,6 +253,24 @@ if [[ -e "$OCTON_DIR/output" ]]; then
   fail "legacy output root still exists: .octon/output"
 else
   pass "legacy output root removed"
+fi
+
+if [[ -e "$OCTON_DIR/generated/artifacts" ]]; then
+  fail "legacy generated artifacts bucket still exists: .octon/generated/artifacts"
+else
+  pass "legacy generated artifacts bucket removed"
+fi
+
+if [[ -e "$OCTON_DIR/generated/assurance" ]]; then
+  fail "legacy generated assurance bucket still exists: .octon/generated/assurance"
+else
+  pass "legacy generated assurance bucket removed"
+fi
+
+if [[ -e "$OCTON_DIR/generated/effective/assurance" ]]; then
+  fail "legacy generated effective assurance surface still exists: .octon/generated/effective/assurance"
+else
+  pass "legacy generated effective assurance surface removed"
 fi
 
 if [[ -e "$OCTON_DIR/ideation" ]]; then

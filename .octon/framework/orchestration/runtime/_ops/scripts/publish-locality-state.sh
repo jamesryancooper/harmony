@@ -527,6 +527,10 @@ main() {
     printf 'locality_manifest_sha256: "%s"\n' "$manifest_sha"
     printf 'locality_registry_sha256: "%s"\n' "$registry_sha"
     printf 'quarantine_sha256: "%s"\n' "$quarantine_sha"
+    printf 'published_files:\n'
+    printf '  - path: ".octon/generated/effective/locality/scopes.effective.yml"\n'
+    printf '  - path: ".octon/generated/effective/locality/artifact-map.yml"\n'
+    printf '  - path: ".octon/generated/effective/locality/generation.lock.yml"\n'
     if [[ "${#DECLARED_SCOPE_IDS[@]}" -eq 0 ]]; then
       printf 'scope_manifest_digests: []\n'
     else

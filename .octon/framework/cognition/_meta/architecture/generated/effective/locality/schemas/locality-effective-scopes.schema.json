@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Effective Locality Scopes",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generator_version",
+    "generation_id",
+    "published_at",
+    "source"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-locality-effective-scopes-v1"
+    },
+    "generator_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "locality_manifest_path",
+        "locality_manifest_sha256",
+        "locality_registry_path",
+        "locality_registry_sha256"
+      ]
+    }
+  }
+}

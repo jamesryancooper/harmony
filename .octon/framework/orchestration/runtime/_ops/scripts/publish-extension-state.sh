@@ -8,6 +8,7 @@ extensions_common_init "${BASH_SOURCE[0]}"
 
 PUBLISHED_AT=""
 GENERATION_ID=""
+GENERATOR_VERSION=""
 declare -a PUBLISHED_SELECTED_KEYS=()
 
 write_content_roots() {
@@ -59,6 +60,7 @@ write_effective_files() {
 
   {
     printf 'schema_version: "octon-extension-effective-catalog-v2"\n'
+    printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
     printf 'publication_status: "%s"\n' "$status"
@@ -94,6 +96,7 @@ write_effective_files() {
 
   {
     printf 'schema_version: "octon-extension-artifact-map-v2"\n'
+    printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
     if [[ "${#EXT_PUBLISHED_KEYS[@]}" -eq 0 ]]; then
@@ -121,10 +124,15 @@ write_effective_files() {
 
   {
     printf 'schema_version: "octon-extension-generation-lock-v2"\n'
+    printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
     printf 'desired_config_sha256: "%s"\n' "$desired_sha"
     printf 'root_manifest_sha256: "%s"\n' "$root_sha"
+    printf 'published_files:\n'
+    printf '  - path: ".octon/generated/effective/extensions/catalog.effective.yml"\n'
+    printf '  - path: ".octon/generated/effective/extensions/artifact-map.yml"\n'
+    printf '  - path: ".octon/generated/effective/extensions/generation.lock.yml"\n'
     if [[ "${#EXT_PUBLISHED_KEYS[@]}" -eq 0 ]]; then
       printf 'pack_payload_digests: []\n'
     else
@@ -172,6 +180,7 @@ main() {
   PUBLISHED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   desired_sha="$(ext_hash_file "$EXTENSIONS_MANIFEST")"
   root_sha="$(ext_hash_file "$ROOT_MANIFEST")"
+  GENERATOR_VERSION="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST")"
   GENERATION_ID="extensions-$(printf '%s' "$desired_sha" | cut -c1-12)"
 
   ext_load_selected_keys_from_manifest

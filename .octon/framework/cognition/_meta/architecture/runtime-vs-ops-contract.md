@@ -107,7 +107,10 @@ Use this decision sequence:
     `/.octon/generated/**`.
 - Assurance:
   - Runtime-local `_ops/` under `runtime/` hosts assurance engine entrypoints.
-  - assurance lock artifacts live under `/.octon/generated/effective/assurance/`.
+  - retained assurance and validation receipts live under
+    `/.octon/state/evidence/validation/assurance/**`.
+  - ephemeral assurance rebuild intermediates may live under
+    `/.octon/generated/.tmp/assurance/**`.
 
 ## Non-Goals
 

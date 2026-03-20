@@ -89,6 +89,7 @@ check_sorted_and_unique() {
 
 check_decisions_summary_contract() {
   local summary="$INSTANCE_COGNITION_SHARED_DIR/decisions.md"
+  local generated_summary="$OCTON_DIR/generated/cognition/summaries/decisions.md"
   if [[ ! -f "$summary" ]]; then
     fail "missing generated decisions summary: .octon/instance/cognition/context/shared/decisions.md"
     return
@@ -104,6 +105,23 @@ check_decisions_summary_contract() {
     pass "decisions summary generated_from contract present"
   else
     fail "decisions summary missing generated_from contract"
+  fi
+
+  if [[ ! -f "$generated_summary" ]]; then
+    fail "missing generated cognition decisions summary: .octon/generated/cognition/summaries/decisions.md"
+    return
+  fi
+
+  if matches_pattern '^generated_at:' "$generated_summary"; then
+    pass "generated cognition decisions summary generated_at present"
+  else
+    fail "generated cognition decisions summary missing generated_at"
+  fi
+
+  if matches_pattern '^generator_version:' "$generated_summary"; then
+    pass "generated cognition decisions summary generator_version present"
+  else
+    fail "generated cognition decisions summary missing generator_version"
   fi
 }
 

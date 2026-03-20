@@ -99,8 +99,13 @@ profiles:
 policies:
   raw_input_dependency: "fail-closed"
   generated_staleness: "fail-closed"
-  required_generated:
-    - "generated/proposals/registry.yml"
+  generated_commit_defaults:
+    "generated/effective/**": "commit"
+    "generated/proposals/registry.yml": "commit"
+    "generated/cognition/summaries/**": "commit"
+    "generated/cognition/projections/definitions/**": "commit"
+    "generated/cognition/graph/**": "rebuild"
+    "generated/cognition/projections/materialized/**": "rebuild"
 zones:
   human_led:
     - "inputs/exploratory/ideation/**"

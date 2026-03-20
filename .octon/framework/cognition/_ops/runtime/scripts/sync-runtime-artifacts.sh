@@ -30,6 +30,7 @@ if [[ "$STANDALONE_FIXTURE_MODE" -eq 1 ]]; then
   CONTEXT_INDEX_PATH="$COGNITION_DIR/runtime/context/index.yml"
   DECISIONS_INDEX_PATH="$COGNITION_DIR/runtime/decisions/index.yml"
   DECISIONS_SUMMARY_PATH="$COGNITION_DIR/runtime/context/decisions.md"
+  GENERATED_DECISIONS_SUMMARY_PATH="$COGNITION_DIR/runtime/summaries/decisions.md"
   MIGRATIONS_INDEX_PATH="$COGNITION_DIR/runtime/migrations/index.yml"
   ANALYSES_INDEX_PATH="$COGNITION_DIR/runtime/analyses/index.yml"
   KNOWLEDGE_INDEX_PATH="$COGNITION_DIR/runtime/knowledge/index.yml"
@@ -48,6 +49,7 @@ else
   CONTEXT_INDEX_PATH="$INSTANCE_COGNITION_DIR/context/index.yml"
   DECISIONS_INDEX_PATH="$INSTANCE_COGNITION_DIR/decisions/index.yml"
   DECISIONS_SUMMARY_PATH="$INSTANCE_COGNITION_SHARED_DIR/decisions.md"
+  GENERATED_DECISIONS_SUMMARY_PATH="$GENERATED_COGNITION_DIR/summaries/decisions.md"
   MIGRATIONS_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/migrations/index.yml"
   ANALYSES_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/analyses/index.yml"
   KNOWLEDGE_INDEX_PATH="$INSTANCE_COGNITION_SHARED_DIR/knowledge/index.yml"
@@ -69,6 +71,15 @@ if [[ -n "${OUTPUT_DIR_OVERRIDE:-}" ]]; then
 else
   EVIDENCE_DIR="$(cd -- "$COGNITION_DIR/../../state/evidence" && pwd)"
 fi
+ROOT_MANIFEST_PATH="$OCTON_DIR/octon.yml"
+GENERATOR_VERSION="${GENERATOR_VERSION_OVERRIDE:-}"
+if [[ -z "$GENERATOR_VERSION" ]]; then
+  if [[ -f "$ROOT_MANIFEST_PATH" ]]; then
+    GENERATOR_VERSION="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST_PATH" 2>/dev/null || true)"
+  else
+    GENERATOR_VERSION="fixture"
+  fi
+fi
 
 MODE="apply"
 declare -a REQUESTED_TARGETS=()
@@ -79,6 +90,7 @@ Usage: sync-runtime-artifacts.sh [--check] [--target <name> ...]
 
 Generates deterministic cognition runtime derived artifacts:
 - instance/cognition/context/shared/decisions.md
+- generated/cognition/summaries/decisions.md
 - generated/cognition/projections/materialized/cognition-runtime-surface-map.latest.yml
 - instance/cognition/context/shared/evidence/index.yml
 - instance/cognition/context/shared/evaluations/digests/index.yml
@@ -657,8 +669,10 @@ title: Decisions
 description: Generated ADR summary for cognition runtime decision discovery.
 mutability: generated
 generated_from:
-  - ../decisions/index.yml
-  - ../decisions/*.md
+  - /.octon/instance/cognition/decisions/index.yml
+  - /.octon/instance/cognition/decisions/*.md
+generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
 ---
 
 # Decisions
@@ -714,7 +728,9 @@ HEADER
 FOOTER
   } > "$raw"
 
-  finalize_candidate "$target" "$raw"
+  perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw"
+  finalize_candidate "$target" "$raw" "generated_at" "timestamp"
+  finalize_candidate "$GENERATED_DECISIONS_SUMMARY_PATH" "$raw" "generated_at" "timestamp"
 }
 
 generate_projection_materialized() {
@@ -729,6 +745,7 @@ generate_projection_materialized() {
 projection_id: cognition-runtime-surface-map
 schema_version: "1.0"
 generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
 generated_from:
   - ../definitions/cognition-runtime-surface-map.yml
   - __CONTEXT_INDEX__
@@ -763,17 +780,9 @@ HEADER
 SURFACES
   } > "$raw"
 
-  perl -0pi -e '
-    s#__CONTEXT_INDEX__#$ENV{CONTEXT_INDEX_PATH}#g;
-    s#__DECISIONS_INDEX__#$ENV{DECISIONS_INDEX_PATH}#g;
-    s#__MIGRATIONS_INDEX__#$ENV{MIGRATIONS_INDEX_PATH}#g;
-    s#__ANALYSES_INDEX__#$ENV{ANALYSES_INDEX_PATH}#g;
-    s#__KNOWLEDGE_INDEX__#$ENV{KNOWLEDGE_INDEX_PATH}#g;
-    s#__EVIDENCE_INDEX__#$ENV{EVIDENCE_INDEX_PATH}#g;
-    s#__EVALUATIONS_INDEX__#$ENV{EVALUATIONS_INDEX_PATH}#g;
-    s#__PROJECTIONS_INDEX__#$ENV{PROJECTIONS_INDEX_PATH}#g;
-  ' "$raw"
+  perl -0pi -e 's#__CONTEXT_INDEX__#'"$CONTEXT_INDEX_PATH"'#g; s#__DECISIONS_INDEX__#'"$DECISIONS_INDEX_PATH"'#g; s#__MIGRATIONS_INDEX__#'"$MIGRATIONS_INDEX_PATH"'#g; s#__ANALYSES_INDEX__#'"$ANALYSES_INDEX_PATH"'#g; s#__KNOWLEDGE_INDEX__#'"$KNOWLEDGE_INDEX_PATH"'#g; s#__EVIDENCE_INDEX__#'"$EVIDENCE_INDEX_PATH"'#g; s#__EVALUATIONS_INDEX__#'"$EVALUATIONS_INDEX_PATH"'#g; s#__PROJECTIONS_INDEX__#'"$PROJECTIONS_INDEX_PATH"'#g;' "$raw"
 
+  perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw"
   finalize_candidate "$target" "$raw" "generated_at" "timestamp"
 }
 
@@ -1069,7 +1078,8 @@ generate_knowledge_nodes() {
   {
     cat <<'HEADER'
 schema_version: "1.0"
-updated: "__UPDATED__"
+generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
 
 # Node records are materialized from canonical runtime surfaces.
 nodes:
@@ -1087,7 +1097,8 @@ HEADER
     fi
   } > "$raw"
 
-  finalize_candidate "$target" "$raw" "updated" "date"
+  perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw"
+  finalize_candidate "$target" "$raw" "generated_at" "timestamp"
 }
 
 generate_knowledge_edges() {
@@ -1149,7 +1160,8 @@ generate_knowledge_edges() {
   {
     cat <<'HEADER'
 schema_version: "1.0"
-updated: "__UPDATED__"
+generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
 
 # Edge records are materialized from canonical contracts.
 # Expected fields per entry: id, type, from, to, evidence.
@@ -1169,7 +1181,8 @@ HEADER
     fi
   } > "$raw"
 
-  finalize_candidate "$target" "$raw" "updated" "date"
+  perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw"
+  finalize_candidate "$target" "$raw" "generated_at" "timestamp"
 }
 
 generate_knowledge_receipts() {

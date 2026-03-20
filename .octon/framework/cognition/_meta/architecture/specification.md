@@ -74,15 +74,24 @@ super-root cutover.
 31. `state/control/locality/quarantine.yml` is mutable operational control
     truth; `generated/effective/locality/**` is non-authoritative compiled
     locality state.
-32. Raw exploratory proposals live only under
+32. `generated/effective/capabilities/**` is the only runtime-facing
+    capability-routing surface and must publish
+    `routing.effective.yml`, `artifact-map.yml`, and `generation.lock.yml`.
+33. `generated/cognition/**` contains derived cognition summaries, graph
+    datasets, and projections only; it never becomes memory or ADR authority.
+34. Retained assurance and validation receipts belong under
+    `state/evidence/validation/**`, not under `generated/**`.
+35. Raw exploratory proposals live only under
     `inputs/exploratory/proposals/<kind>/<proposal_id>/**`; archived proposal
     packages live only under
     `inputs/exploratory/proposals/.archive/<kind>/<proposal_id>/**`.
-33. `generated/proposals/registry.yml` is the only generated proposal
+36. `generated/proposals/registry.yml` is the only generated proposal
     discovery surface and remains non-authoritative.
-34. Proposals are excluded from runtime resolution, policy resolution,
+37. `octon.yml#policies.generated_commit_defaults` is the binding default
+    commit-versus-rebuild policy for generated outputs.
+38. Proposals are excluded from runtime resolution, policy resolution,
     `bootstrap_core`, and `repo_snapshot`.
-35. No descendant-local or scope-local proposal workspace exists in v1.
+39. No descendant-local or scope-local proposal workspace exists in v1.
 
 ## Precedence
 
@@ -146,7 +155,10 @@ for runtime, governance, and practices.
 - extension quarantine state: `/.octon/state/control/extensions/quarantine.yml`
 - locality quarantine: `/.octon/state/control/locality/quarantine.yml`
 - effective locality outputs: `/.octon/generated/effective/locality/`
+- effective capability-routing outputs:
+  `/.octon/generated/effective/capabilities/`
 - effective extension outputs: `/.octon/generated/effective/extensions/`
+- derived cognition outputs: `/.octon/generated/cognition/`
 - repo context and ADRs: `/.octon/instance/cognition/`
 - repo missions: `/.octon/instance/orchestration/missions/`
 - export runner: `/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh`
@@ -216,6 +228,7 @@ before it becomes legal.
   runtime.
 - Framework-local `_ops/state/**` paths block runtime.
 - Stale required generated outputs block runtime.
+- Stale required effective publication families block runtime and policy use.
 - Direct reads from raw `inputs/**` by runtime or policy code block runtime.
 - Direct reads from raw exploratory proposal paths by runtime or policy code
   are always invalid raw-input dependencies.

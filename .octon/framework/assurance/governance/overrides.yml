@@ -27,7 +27,7 @@ deviations:
       - "payments-platform-owner"
       - "payments-security-owner"
     evidence:
-      - ".octon/generated/assurance/results/repo-payments-repo__run-mode-ci__maturity-prod__profile-regulated.md"
+      - ".octon/state/evidence/validation/assurance/results/repo-payments-repo__run-mode-ci__maturity-prod__profile-regulated.md"
       - ".github/workflows/assurance-weight-gates.yml"
 
   - id: "dev-docs-scaffolding-usability-001"
@@ -49,4 +49,4 @@ deviations:
     approved_by:
       - "docs-owner"
     evidence:
-      - ".octon/generated/effective/assurance/repo-docs-repo__run-mode-local__maturity-alpha__profile-local-devex.md"
+      - ".octon/state/evidence/validation/assurance/effective/repo-docs-repo__run-mode-local__maturity-alpha__profile-local-devex.md"

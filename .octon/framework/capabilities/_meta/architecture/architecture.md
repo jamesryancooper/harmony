@@ -54,6 +54,21 @@ registry fallback.
 - invalid models: descendant `.octon/` roots, hierarchical scope inheritance,
   ancestor-chain composition
 
+## Generated Routing Surface
+
+Capability publication is compiled and root-owned.
+
+- canonical runtime-facing routing output:
+  `/.octon/generated/effective/capabilities/routing.effective.yml`
+- canonical provenance map:
+  `/.octon/generated/effective/capabilities/artifact-map.yml`
+- canonical freshness receipt:
+  `/.octon/generated/effective/capabilities/generation.lock.yml`
+- support snapshots stay under
+  `/.octon/generated/effective/capabilities/filesystem-snapshots/**`
+  and remain non-authoritative support data only
+- raw `inputs/**` paths must never appear as runtime-facing routing sources
+
 ### Example: Who Can Write `flowkit/src/generated.ts`
 
 | Harness   | Permission | Reason |

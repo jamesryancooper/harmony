@@ -117,6 +117,13 @@ main() {
   [[ "$(yq -r '.quarantine_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$quarantine_sha" ]] \
     && pass "generation lock quarantine hash current" \
     || fail "generation lock quarantine hash stale"
+  local published_files
+  published_files="$(yq -r '.published_files[]?.path // ""' "$GENERATION_LOCK_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
+  if [[ "$published_files" == $'.octon/generated/effective/locality/artifact-map.yml\n.octon/generated/effective/locality/generation.lock.yml\n.octon/generated/effective/locality/scopes.effective.yml' ]]; then
+    pass "generation lock published_files set valid"
+  else
+    fail "generation lock published_files set invalid"
+  fi
 
   if yq -e '.records | length == 0' "$QUARANTINE_STATE" >/dev/null 2>&1; then
     pass "published locality generation has no quarantined scopes"

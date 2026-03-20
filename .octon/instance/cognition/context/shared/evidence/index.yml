@@ -124,8 +124,33 @@ records:
     path: /.octon/state/evidence/migration/2026-03-18-repo-instance-architecture-cutover/evidence.md
     source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
 
+  - id: 2026-03-19-locality-and-scope-registry-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-19-locality-and-scope-registry-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
   - id: 2026-03-19-overlay-and-ingress-model-cutover
     kind: migration
     path: /.octon/state/evidence/migration/2026-03-19-overlay-and-ingress-model-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
+  - id: 2026-03-19-state-evidence-continuity-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-19-state-evidence-continuity-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
+  - id: 2026-03-20-inputs-additive-extensions-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-20-inputs-additive-extensions-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
+  - id: 2026-03-20-inputs-exploratory-proposals-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-20-inputs-exploratory-proposals-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
+  - id: 2026-03-20-root-manifest-profiles-and-export-semantics-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-20-root-manifest-profiles-and-export-semantics-cutover/evidence.md
     source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
 

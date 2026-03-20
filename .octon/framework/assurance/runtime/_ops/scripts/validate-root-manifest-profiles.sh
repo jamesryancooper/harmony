@@ -92,6 +92,12 @@ main() {
   check_scalar '.versioning.extensions.api_version' '1.0' "versioning.extensions.api_version declared"
   check_scalar '.policies.raw_input_dependency' 'fail-closed' "raw_input_dependency policy is fail-closed"
   check_scalar '.policies.generated_staleness' 'fail-closed' "generated_staleness policy is fail-closed"
+  check_scalar '.policies.generated_commit_defaults."generated/effective/**"' 'commit' "generated/effective default commit policy declared"
+  check_scalar '.policies.generated_commit_defaults."generated/proposals/registry.yml"' 'commit' "generated proposal registry default commit policy declared"
+  check_scalar '.policies.generated_commit_defaults."generated/cognition/summaries/**"' 'commit' "generated cognition summaries default commit policy declared"
+  check_scalar '.policies.generated_commit_defaults."generated/cognition/projections/definitions/**"' 'commit' "generated cognition projection definitions default commit policy declared"
+  check_scalar '.policies.generated_commit_defaults."generated/cognition/graph/**"' 'rebuild' "generated cognition graph default rebuild policy declared"
+  check_scalar '.policies.generated_commit_defaults."generated/cognition/projections/materialized/**"' 'rebuild' "generated cognition materialized projection default rebuild policy declared"
 
   check_absent 'has("class_roots") and .class_roots != null' "legacy top-level class_roots key removed"
   check_absent 'has("extensions") and .extensions != null' "legacy top-level extensions key removed"
