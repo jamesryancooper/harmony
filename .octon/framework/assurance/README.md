@@ -42,7 +42,8 @@ The local resolver and gate tooling is the authoritative assurance engine:
 - execution entrypoints:
   `runtime/_ops/scripts/compute-assurance-score.sh` and
   `runtime/_ops/scripts/assurance-gate.sh`
-- generated evidence: `.octon/generated/assurance/`
+- retained evidence: `.octon/state/evidence/validation/assurance/`
+- ephemeral rebuild intermediates: `.octon/generated/.tmp/assurance/`
 
 ## Charter-Driven Flow
 
@@ -51,8 +52,9 @@ The local resolver and gate tooling is the authoritative assurance engine:
 3. `governance/scores/scores.yml` defines measured subsystem scores.
 4. `runtime/_ops/scripts/compute-assurance-score.sh` resolves effective policy.
 5. `runtime/_ops/scripts/assurance-gate.sh` enforces gates and drift checks.
-6. Generated assurance outputs are written under `.octon/generated/assurance/`,
-   with validation evidence retained under `.octon/state/evidence/validation/`.
+6. Retained assurance outputs are written under
+   `.octon/state/evidence/validation/assurance/`, with temporary rebuild
+   intermediates under `.octon/generated/.tmp/assurance/`.
 
 Active umbrella chain:
 

@@ -81,8 +81,12 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/state/evidence/`
 - Canonical effective locality outputs:
   `/.octon/generated/effective/locality/`
+- Canonical effective capability-routing outputs:
+  `/.octon/generated/effective/capabilities/`
 - Canonical effective extension outputs:
   `/.octon/generated/effective/extensions/`
+- Canonical derived cognition outputs:
+  `/.octon/generated/cognition/`
 - Canonical raw exploratory proposal inputs:
   `/.octon/inputs/exploratory/proposals/<kind>/<proposal_id>/`
 - Canonical archived proposal inputs:
@@ -111,6 +115,11 @@ descendant `.octon/` roots, sidecars, or ancestor-chain lookup. In v1:
 - missions may reference scopes, but they do not define scope identity
 - runtime-facing locality consumers use
   `generated/effective/locality/**`, which is compiled and non-authoritative
+- runtime-facing capability consumers use
+  `generated/effective/capabilities/**`, which is compiled and
+  non-authoritative
+- derived cognition summaries, graphs, and projections live under
+  `generated/cognition/**` and remain rebuildable only
 
 When work is primarily owned by one declared scope, active continuity belongs
 under `state/continuity/scopes/<scope-id>/**`. Repo-wide and cross-scope work
@@ -126,6 +135,9 @@ exports selected packs plus dependency closure only; `full_fidelity` is
 advisory only and uses a normal Git clone. `inputs/exploratory/**`,
 `state/**`, and `generated/**` stay out of clean bootstrap and repo snapshots.
 
+`octon.yml#policies.generated_commit_defaults` defines which generated families
+are committed for reviewability versus rebuilt locally by default.
+
 ## Proposal Workspace
 
 Proposal packages live only under
@@ -137,6 +149,18 @@ authority order is `proposal.yml`, subtype manifest,
 Runtime and policy consumers must never read proposal paths directly.
 Proposal discovery lives only in `/.octon/generated/proposals/registry.yml`,
 which is committed by default but remains non-authoritative.
+
+## Generated Contract
+
+Generated outputs are class-rooted, rebuildable, and never source-of-truth.
+
+- runtime-facing published outputs live only under `generated/effective/**`
+- derived cognition outputs live only under `generated/cognition/**`
+- proposal discovery lives only under `generated/proposals/registry.yml`
+- retained validation and assurance receipts live under `state/evidence/**`,
+  not under `generated/**`
+- `generated/artifacts/**`, `generated/assurance/**`, and
+  `generated/effective/assurance/**` are not canonical Packet 10 families
 
 ## Human-Led Zone
 

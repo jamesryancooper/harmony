@@ -5,4 +5,8 @@ published_at: "1970-01-01T00:00:00Z"
 locality_manifest_sha256: ""
 locality_registry_sha256: ""
 quarantine_sha256: ""
+published_files:
+  - path: ".octon/generated/effective/locality/scopes.effective.yml"
+  - path: ".octon/generated/effective/locality/artifact-map.yml"
+  - path: ".octon/generated/effective/locality/generation.lock.yml"
 scope_manifest_digests: []

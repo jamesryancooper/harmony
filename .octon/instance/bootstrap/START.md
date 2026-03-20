@@ -156,6 +156,9 @@ Canonical locality resolution and publication surfaces are:
 - `generated/effective/locality/scopes.effective.yml`
 - `generated/effective/locality/artifact-map.yml`
 - `generated/effective/locality/generation.lock.yml`
+- `generated/effective/capabilities/routing.effective.yml`
+- `generated/effective/capabilities/artifact-map.yml`
+- `generated/effective/capabilities/generation.lock.yml`
 
 Packet 6 locality remains root-owned. Descendant `.octon/` roots,
 nearest-registry fallback, hierarchical scope inheritance, and ancestor-chain
@@ -167,6 +170,8 @@ Extension activation uses one desired/actual/quarantine/compiled model:
 - actual active state: `state/control/extensions/active.yml`
 - quarantine state: `state/control/extensions/quarantine.yml`
 - runtime-facing compiled outputs: `generated/effective/extensions/**`
+- runtime-facing capability routing: `generated/effective/capabilities/**`
+- derived cognition read models: `generated/cognition/**`
 
 Proposal authority uses one manifest-governed exploratory model:
 
@@ -178,6 +183,14 @@ Proposal authority uses one manifest-governed exploratory model:
 - lifecycle authority order:
   `proposal.yml` > subtype manifest > `generated/proposals/registry.yml` >
   `README.md`
+
+Generated-family rules in v1:
+
+- runtime-facing publication lives only under `generated/effective/**`
+- derived cognition outputs live only under `generated/cognition/**`
+- retained validation and assurance evidence lives under `state/evidence/**`
+- `generated/artifacts/**`, `generated/assurance/**`, and
+  `generated/effective/assurance/**` are not canonical Packet 10 families
 
 No descendant-local or scope-local proposal workspace exists in v1.
 

@@ -81,7 +81,7 @@ Complete before ending a session, context reset, or handoff.
 
 - [ ] Run `bash .octon/framework/assurance/runtime/_ops/scripts/compute-assurance-score.sh --weights .octon/framework/assurance/governance/weights/weights.yml --scores .octon/framework/assurance/governance/scores/scores.yml`
 - [ ] Run `bash .octon/framework/assurance/runtime/_ops/scripts/assurance-gate.sh --scorecard <generated-scorecard.yml> --weights .octon/framework/assurance/governance/weights/weights.yml --scores .octon/framework/assurance/governance/scores/scores.yml`
-- [ ] Verify `.octon/generated/effective/assurance/<context>.md` and `.octon/generated/assurance/results/<context>.md` were generated
+- [ ] Verify `.octon/state/evidence/validation/assurance/effective/<context>.md` and `.octon/state/evidence/validation/assurance/results/<context>.md` were generated
 - [ ] Attach scorecard path and gate outcome in `/.octon/state/continuity/repo/log.md`
 
 ### If something failed

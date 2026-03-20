@@ -144,6 +144,14 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-capability-engine-consistency.sh"
 
   run_step \
+    "Publish capability routing state" \
+    bash "$OCTON_DIR/framework/capabilities/_ops/scripts/publish-capability-routing.sh"
+
+  run_step \
+    "Validate capability publication state" \
+    bash "$SCRIPT_DIR/validate-capability-publication-state.sh"
+
+  run_step \
     "Validate developer context policy contract" \
     bash "$SCRIPT_DIR/validate-developer-context-policy.sh"
 

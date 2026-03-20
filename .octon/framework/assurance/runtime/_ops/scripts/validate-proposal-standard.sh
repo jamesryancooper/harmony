@@ -264,7 +264,7 @@ validate_registry_section_against_schema() {
 
 validate_registry_schema() {
   local registry="$ROOT_DIR/.octon/generated/proposals/registry.yml"
-  local schema="$ROOT_DIR/.octon/framework/scaffolding/runtime/templates/proposal-registry.schema.json"
+  local schema="$ROOT_DIR/.octon/framework/cognition/_meta/architecture/generated/proposals/schemas/proposal-registry.schema.json"
 
   if [[ "$registry_schema_validated" -eq 1 ]]; then
     return 0

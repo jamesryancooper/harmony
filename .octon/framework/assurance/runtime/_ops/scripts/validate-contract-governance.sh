@@ -11,7 +11,7 @@ RUNTIME_OPS_CONTRACT="$OCTON_DIR/framework/cognition/_meta/architecture/runtime-
 ASSURANCE_PRECEDENCE="$OCTON_DIR/framework/assurance/governance/precedence.md"
 ENGINE_GOVERNANCE="$OCTON_DIR/framework/engine/governance/README.md"
 
-REPORT_DIR="$OCTON_DIR/generated/assurance/results"
+REPORT_DIR="$OCTON_DIR/state/evidence/validation/assurance/results"
 REPORT_FILE="$REPORT_DIR/contract-coverage-latest.md"
 
 errors=0

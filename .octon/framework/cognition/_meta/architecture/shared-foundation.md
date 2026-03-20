@@ -79,7 +79,11 @@ Canonical locality inputs and outputs are:
   `inputs/exploratory/proposals/.archive/<kind>/<proposal_id>/**`
 - mutable locality quarantine: `state/control/locality/quarantine.yml`
 - compiled effective locality outputs: `generated/effective/locality/**`
+- compiled effective capability-routing outputs:
+  `generated/effective/capabilities/**`
 - compiled effective extension outputs: `generated/effective/extensions/**`
+- derived cognition summaries, graphs, and projections:
+  `generated/cognition/**`
 - generated proposal discovery:
   `generated/proposals/registry.yml`
 
@@ -117,6 +121,8 @@ tree as the default bootstrap model.
 - Proposal packages are integrated raw exploratory input only; they remain
   non-canonical and are discovered through `generated/proposals/registry.yml`
   without making that registry authoritative.
+- Retained validation and assurance receipts belong under
+  `state/evidence/validation/**`; generated outputs remain rebuildable only.
 - Human-led ideation is part of `inputs/exploratory/ideation/**`.
 - Legacy mixed roots are not canonical and must not be reintroduced.
 - Locality is root-owned; descendant `.octon/` roots, hierarchical scope

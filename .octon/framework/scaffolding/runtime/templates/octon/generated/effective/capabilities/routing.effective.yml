@@ -1,0 +1,11 @@
+schema_version: "octon-capability-routing-effective-v1"
+generator_version: ""
+generation_id: "capabilities-bootstrap-placeholder"
+published_at: "1970-01-01T00:00:00Z"
+publication_status: "published"
+source:
+  root_manifest_path: ".octon/octon.yml"
+  root_manifest_sha256: ""
+  extensions_catalog_path: ".octon/generated/effective/extensions/catalog.effective.yml"
+  extensions_catalog_sha256: ""
+routing_candidates: []

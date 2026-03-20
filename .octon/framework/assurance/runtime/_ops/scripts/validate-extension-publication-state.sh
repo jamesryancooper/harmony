@@ -53,6 +53,12 @@ main() {
   [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v2" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
   [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v2" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
   [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v2" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
+  local expected_generator_version
+  expected_generator_version="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST" 2>/dev/null || true)"
+  [[ -n "$expected_generator_version" ]] && pass "root manifest generator version available" || fail "root manifest missing versioning.harness.release_version"
+  [[ "$(yq -r '.generator_version // ""' "$CATALOG_FILE")" == "$expected_generator_version" ]] && pass "effective catalog generator_version current" || fail "effective catalog generator_version missing or stale"
+  [[ "$(yq -r '.generator_version // ""' "$ARTIFACT_MAP_FILE")" == "$expected_generator_version" ]] && pass "artifact map generator_version current" || fail "artifact map generator_version missing or stale"
+  [[ "$(yq -r '.generator_version // ""' "$GENERATION_LOCK_FILE")" == "$expected_generator_version" ]] && pass "generation lock generator_version current" || fail "generation lock generator_version missing or stale"
 
   generation_id="$(yq -r '.generation_id // ""' "$ACTIVE_STATE")"
   status="$(yq -r '.status // ""' "$ACTIVE_STATE")"
@@ -124,6 +130,13 @@ main() {
   artifact_paths_from_map="$(yq -r '.artifacts[]?.source_path' "$ARTIFACT_MAP_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
   artifact_paths_from_lock="$(yq -r '.pack_payload_digests[]?.files[]?.path' "$GENERATION_LOCK_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
   [[ "$artifact_paths_from_map" == "$artifact_paths_from_lock" ]] && pass "artifact map paths match generation lock files" || fail "artifact map paths do not match generation lock files"
+  local published_files
+  published_files="$(yq -r '.published_files[]?.path // ""' "$GENERATION_LOCK_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
+  if [[ "$published_files" == $'.octon/generated/effective/extensions/artifact-map.yml\n.octon/generated/effective/extensions/catalog.effective.yml\n.octon/generated/effective/extensions/generation.lock.yml' ]]; then
+    pass "generation lock published_files set valid"
+  else
+    fail "generation lock published_files set invalid"
+  fi
 
   local source_path sha pack_payload_sha computed_payload_sha
   while IFS=$'\t' read -r source_path sha; do

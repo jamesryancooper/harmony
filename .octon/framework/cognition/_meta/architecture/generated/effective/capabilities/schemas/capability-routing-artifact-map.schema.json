@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Effective Capability Routing Artifact Map",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generator_version",
+    "generation_id",
+    "published_at",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-capability-routing-artifact-map-v1"
+    },
+    "generator_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifacts": {
+      "type": "array"
+    }
+  }
+}

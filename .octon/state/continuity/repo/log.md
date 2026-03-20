@@ -218,6 +218,73 @@ package.
 - Recorded completion of the proposal-drafting task in
   `.octon/state/continuity/repo/tasks.json`
 
+## 2026-03-20
+
+**Session focus:** Draft Packet 10 generated/effective/cognition/registry
+proposal package
+
+**Completed:**
+
+- Created the Packet 10 proposal package under
+  `.octon/inputs/exploratory/proposals/architecture/generated-effective-cognition-registry/`
+  with proposal metadata, navigation docs, target architecture, acceptance
+  criteria, and implementation plan
+- Grounded the proposal in the ratified design packet and blueprint while
+  explicitly aligning it to the live repo's current generated surfaces,
+  including `generated/artifacts/**`, `generated/assurance/**`,
+  `generated/effective/assurance/**`, current capability generated outputs,
+  runtime-facing locality and extension publication, and the generated
+  proposal registry
+- Added the active Packet 10 proposal entry to
+  `.octon/generated/proposals/registry.yml`
+- Recorded completion of the proposal-drafting task in
+  `.octon/state/continuity/repo/tasks.json`
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-20
+
+**Session focus:** Packet 10 generated/effective/cognition/registry atomic
+cutover
+
+**Completed:**
+
+- Normalized the live generated contract around the Packet 10 families:
+  `generated/effective/**`, `generated/cognition/**`, and
+  `generated/proposals/**`, including the new capability-routing publication
+  triple at `generated/effective/capabilities/{routing.effective.yml,artifact-map.yml,generation.lock.yml}`
+- Rehomed retained assurance outputs out of generated placement into
+  `state/evidence/validation/assurance/**`, updated the assurance engine
+  defaults and live assurance consumers to the new retained-evidence paths,
+  and removed the legacy `generated/assurance/**`,
+  `generated/effective/assurance/**`, and `generated/artifacts/**` surfaces
+- Added canonical generated architecture docs and schema homes under
+  `framework/cognition/_meta/architecture/generated/**`, updated the root
+  manifest with the generated commit-policy matrix, refreshed bootstrap and
+  template surfaces, and hardened harness structure plus publication
+  validators around the Packet 10 contract
+- Updated cognition generation so `generated/cognition/summaries/decisions.md`
+  is published as a derived committed summary, graph/projection outputs carry
+  explicit freshness metadata, and rebuild-local cognition outputs are removed
+  from Git tracking by policy
+- Added Packet 10 regression coverage for capability publication and generated
+  tracking, regenerated the committed effective outputs, and finished with the
+  focused validators plus `alignment-check.sh --profile harness` passing
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
 **Next:**
 
 - Review the Packet 7 proposal package for wording and promotion-target

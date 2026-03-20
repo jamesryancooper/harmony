@@ -64,7 +64,7 @@ description: Assurance criteria and completion checklist for harness tasks.
 - [ ] `bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness` passes
 - [ ] `bash .octon/framework/assurance/runtime/_ops/scripts/validate-framing-alignment.sh` passes
 - [ ] `audit-pre-release` workflow executed (or explicit rationale recorded for not running it)
-- [ ] Contract coverage report exists at `.octon/generated/assurance/results/contract-coverage-latest.md`
+- [ ] Contract coverage report exists at `.octon/state/evidence/validation/assurance/results/contract-coverage-latest.md`
 - [ ] Material run evidence includes instruction-layer manifest and context-acquisition telemetry fields
 
 ### For Commit/PR Standards Changes
@@ -75,7 +75,7 @@ description: Assurance criteria and completion checklist for harness tasks.
 
 - [ ] `bash .octon/framework/assurance/runtime/_ops/scripts/compute-assurance-score.sh --weights .octon/framework/assurance/governance/weights/weights.yml --scores .octon/framework/assurance/governance/scores/scores.yml` runs successfully
 - [ ] `bash .octon/framework/assurance/runtime/_ops/scripts/assurance-gate.sh --scorecard <generated-scorecard.yml> --weights .octon/framework/assurance/governance/weights/weights.yml --scores .octon/framework/assurance/governance/scores/scores.yml` passes (or warning rationale is recorded)
-- [ ] Resolver generated `.octon/generated/effective/assurance/<context>.md` and `.octon/generated/assurance/results/<context>.md`
+- [ ] Resolver generated `.octon/state/evidence/validation/assurance/effective/<context>.md` and `.octon/state/evidence/validation/assurance/results/<context>.md`
 
 ## Common Failure Modes
 
