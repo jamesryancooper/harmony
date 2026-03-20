@@ -37,9 +37,12 @@ bash .octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh --pro
 Behavior:
 
 1. Validate the v2 root manifest and companion manifests.
-2. Resolve selected packs from either `instance/extensions.yml.selection.enabled` (`repo_snapshot`) or `--pack-ids` (`pack_bundle`).
-3. Compute the full transitive dependency closure from `inputs/additive/extensions/<pack-id>/pack.yml`.
-4. Fail closed on missing payloads, dependency cycles, conflicts, or compatibility mismatch.
+2. For `repo_snapshot`, refresh extension publication and require clean
+   `published` extension state before exporting.
+3. For `pack_bundle`, resolve selected packs from `--pack-ids` and compute the
+   full transitive dependency closure from `inputs/additive/extensions/<pack-id>/pack.yml`.
+4. Fail closed on missing payloads, dependency cycles, conflicts,
+   compatibility mismatch, or quarantined repo snapshot state.
 5. Materialize the export to `<output-dir>/.octon/`.
 6. Write `<output-dir>/export.receipt.yml`.
 

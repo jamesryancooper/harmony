@@ -7,45 +7,59 @@
   "required": [
     "schema_version",
     "updated_at",
-    "blocked_packs",
-    "affected_dependents",
-    "reason_codes",
-    "acknowledgements"
+    "records"
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-extension-quarantine-state-v1"
+      "const": "octon-extension-quarantine-state-v2"
     },
     "updated_at": {
       "type": "string",
       "minLength": 1
     },
-    "blocked_packs": {
+    "records": {
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 1
-      }
-    },
-    "affected_dependents": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
-    },
-    "reason_codes": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
-    },
-    "acknowledgements": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pack_id",
+          "source_id",
+          "reason_code",
+          "affected_dependents",
+          "timestamp"
+        ],
+        "properties": {
+          "pack_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "source_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "reason_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "affected_dependents": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "minLength": 1
+          },
+          "acknowledgement_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
       }
     }
   }

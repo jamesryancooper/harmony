@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.dev/schemas/instance-extensions.schema.json",
+  "title": "Octon Desired Extension Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "selection",
+    "sources",
+    "trust",
+    "acknowledgements"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-instance-extensions-v2"
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "disabled"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/selectionEntry"
+          }
+        },
+        "disabled": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/disabledEntry"
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalog"
+      ],
+      "properties": {
+        "catalog": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/sourceCatalogEntry"
+          }
+        }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_actions",
+        "source_overrides",
+        "pack_overrides"
+      ],
+      "properties": {
+        "default_actions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "first_party_bundled",
+            "first_party_external",
+            "third_party"
+          ],
+          "properties": {
+            "first_party_bundled": {
+              "$ref": "#/$defs/trustAction"
+            },
+            "first_party_external": {
+              "$ref": "#/$defs/trustAction"
+            },
+            "third_party": {
+              "$ref": "#/$defs/trustAction"
+            }
+          }
+        },
+        "source_overrides": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/trustAction"
+          }
+        },
+        "pack_overrides": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/trustAction"
+          }
+        }
+      }
+    },
+    "acknowledgements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/acknowledgement"
+      }
+    }
+  },
+  "$defs": {
+    "selectionEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pack_id",
+        "source_id"
+      ],
+      "properties": {
+        "pack_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "version_pin": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "disabledEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pack_id",
+        "source_id",
+        "reason"
+      ],
+      "properties": {
+        "pack_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sourceCatalogEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "root",
+        "allowed_origin_classes"
+      ],
+      "properties": {
+        "source_type": {
+          "type": "string",
+          "const": "internalized"
+        },
+        "root": {
+          "type": "string",
+          "const": ".octon/inputs/additive/extensions"
+        },
+        "allowed_origin_classes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "first_party_bundled",
+              "first_party_external",
+              "third_party"
+            ]
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "trustAction": {
+      "type": "string",
+      "enum": [
+        "allow",
+        "require_acknowledgement",
+        "deny"
+      ]
+    },
+    "acknowledgement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acknowledgement_id",
+        "pack_id",
+        "source_id",
+        "action"
+      ],
+      "properties": {
+        "acknowledgement_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pack_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "action": {
+          "$ref": "#/$defs/trustAction"
+        },
+        "reason_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

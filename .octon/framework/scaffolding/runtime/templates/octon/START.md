@@ -41,11 +41,18 @@ Compiled locality publication and control surfaces live under:
 - `state/control/locality/quarantine.yml`
 - `state/control/extensions/active.yml`
 - `state/control/extensions/quarantine.yml`
+- `generated/effective/extensions/catalog.effective.yml`
+- `generated/effective/extensions/artifact-map.yml`
+- `generated/effective/extensions/generation.lock.yml`
 - `state/continuity/scopes/<scope-id>/`
 - `state/evidence/`
 - `generated/effective/locality/scopes.effective.yml`
 - `generated/effective/locality/artifact-map.yml`
 - `generated/effective/locality/generation.lock.yml`
+
+Raw additive extension inputs live only under:
+
+- `inputs/additive/extensions/<pack-id>/`
 
 Overlay-capable repo authority is limited to declared enabled overlay points:
 

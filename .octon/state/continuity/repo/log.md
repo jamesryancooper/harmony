@@ -238,6 +238,71 @@ delegation boundaries, capability-map gating, and alignment drift checks.
 
 - None currently; pending full gate convergence checks.
 
+## 2026-03-19
+
+**Session focus:** Draft Packet 8 inputs/additive/extensions proposal package.
+
+**Completed:**
+
+- Created the Packet 8 proposal scaffold under
+  `.octon/inputs/exploratory/proposals/architecture/8-inputs-additive-extensions/`
+  with proposal metadata, navigation docs, target architecture, acceptance
+  criteria, and implementation plan
+- Grounded the proposal in the ratified Packet 8 design packet and ratified
+  super-root blueprint while explicitly aligning it to the live repo's current
+  extension surfaces under `instance/`, `state/control/`, `generated/effective/`,
+  and the `repo_snapshot` profile in `.octon/octon.yml`
+- Recorded the proposal in `.octon/generated/proposals/registry.yml` so it is
+  discoverable alongside the other active architecture packets
+
+**Next:**
+
+- Review the Packet 8 proposal package for promotion-target completeness
+  before using it as the basis for durable extension contract updates and raw
+  pack internalization
+
+**Blockers:**
+
+- None
+
+## 2026-03-19
+
+**Session focus:** Packet 8 inputs/additive/extensions atomic clear-break cutover
+
+**Completed:**
+
+- Promoted the Packet 8 extension-input contract into the live `.octon`
+  architecture, governance, state-control, generated-output, and scaffold
+  surfaces with a clear-break v2 desired-config, pack-manifest, quarantine,
+  and effective-publication model
+- Seeded the integrated raw additive extension surface under
+  `.octon/inputs/additive/extensions/{docs,nextjs,node-ts}/` as disabled
+  first-party bundled packs and rewired the live repo to publish extension
+  state only through the generated effective outputs
+- Refactored extension publication and export onto a shared resolution library,
+  added pack-contract validation, hardened the publication/export validators,
+  updated the fixture and scaffold payloads, and archived the superseded
+  `extensions-sidecar-pack-system` proposal out of the active architecture set
+- Passed the targeted Packet 8 test stack and the full harness alignment
+  profile, including:
+  `test-validate-extension-pack-contract.sh`,
+  `test-validate-extension-publication-state.sh`,
+  `test-export-harness.sh`,
+  `test-validate-companion-manifests.sh`,
+  `test-validate-export-profile-contract.sh`,
+  `test-validate-raw-input-dependency-ban.sh`,
+  `test-packet8-template-scaffold.sh`, and
+  `alignment-check.sh --profile harness`
+
+**Next:**
+
+- Use the Packet 8 runtime-facing effective outputs as the dependency surface
+  for future Packet 12 capability-routing and host-integration cutovers
+
+**Blockers:**
+
+- None
+
 ## 2025-12-10 (session 2)
 
 **Session focus:** Evaluate and refine .workspace structure

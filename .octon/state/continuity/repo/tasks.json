@@ -175,6 +175,18 @@
       "description": "Remediate post-cutover review findings for the Packet 7 state, evidence, and continuity implementation",
       "status": "completed",
       "completed_at": "2026-03-19"
+    },
+    {
+      "id": "draft-packet-8-inputs-additive-extensions-proposal",
+      "description": "Draft the architecture proposal package for Packet 8 inputs/additive/extensions",
+      "status": "completed",
+      "completed_at": "2026-03-19"
+    },
+    {
+      "id": "packet-8-inputs-additive-extensions-atomic-cutover",
+      "description": "Implement the Packet 8 inputs/additive/extensions atomic clear-break cutover",
+      "status": "completed",
+      "completed_at": "2026-03-19"
     }
   ]
 }

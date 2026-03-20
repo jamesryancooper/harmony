@@ -1,6 +1,6 @@
 ---
 name: "export-harness"
-description: "Materialize repo_snapshot or pack_bundle exports from the v2 root-manifest profile contract and fail closed on incomplete enabled-pack closure."
+description: "Materialize repo_snapshot or pack_bundle exports from the v2 root-manifest profile contract and fail closed unless repo_snapshot has a clean published enabled-pack closure."
 steps:
   - id: "validate-request"
     file: "stages/01-validate-request.md"
@@ -28,7 +28,7 @@ _Generated README from canonical workflow `export-harness`._
 
 ## Purpose
 
-Materialize repo_snapshot or pack_bundle exports from the v2 root-manifest profile contract and fail closed on incomplete enabled-pack closure.
+Materialize repo_snapshot or pack_bundle exports from the v2 root-manifest profile contract and fail closed unless repo_snapshot has a clean published enabled-pack closure.
 
 ## Target
 
@@ -67,7 +67,7 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 - [ ] export root exists at <output_dir>/.octon/
 - [ ] export.receipt.yml exists at <output_dir>/
-- [ ] repo_snapshot exports octon.yml, framework/**, instance/**, and enabled-pack dependency closure only
+- [ ] repo_snapshot exports octon.yml, framework/**, instance/**, and the clean published enabled-pack dependency closure only
 - [ ] pack_bundle exports only selected packs plus dependency closure
 
 ## References

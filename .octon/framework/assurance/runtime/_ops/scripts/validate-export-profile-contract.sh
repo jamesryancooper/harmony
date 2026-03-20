@@ -8,6 +8,7 @@ ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 MANIFEST_FILE="$OCTON_DIR/octon.yml"
 EXPORT_SCRIPT="$OCTON_DIR/framework/orchestration/runtime/_ops/scripts/export-harness.sh"
 EXT_PUBLICATION_VALIDATOR="$OCTON_DIR/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh"
+EXT_PACK_VALIDATOR="$OCTON_DIR/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh"
 
 errors=0
 
@@ -40,6 +41,11 @@ main() {
   else
     pass "extension publication validator is executable"
   fi
+  if [[ ! -x "$EXT_PACK_VALIDATOR" ]]; then
+    fail "extension pack validator missing or not executable: ${EXT_PACK_VALIDATOR#$ROOT_DIR/}"
+  else
+    pass "extension pack validator is executable"
+  fi
 
   [[ "$(yq -r '.profiles.pack_bundle.selector // ""' "$MANIFEST_FILE")" == "inputs/additive/extensions/<selected>/**" ]] && pass "pack_bundle selector is declared" || fail "pack_bundle selector must match Packet 2 contract"
   [[ "$(yq -r '.profiles.pack_bundle.include_dependency_closure // ""' "$MANIFEST_FILE")" == "true" ]] && pass "pack_bundle closure flag declared" || fail "pack_bundle.include_dependency_closure must be true"
@@ -49,6 +55,14 @@ main() {
     fail "full_fidelity must not define an include payload"
   else
     pass "full_fidelity does not define an include payload"
+  fi
+
+  if OCTON_DIR_OVERRIDE="$OCTON_DIR" OCTON_ROOT_DIR="$ROOT_DIR" \
+    bash "$EXT_PACK_VALIDATOR" >/dev/null
+  then
+    pass "extension pack contract validation succeeds"
+  else
+    fail "extension pack contract validation must succeed before export"
   fi
 
   if OCTON_DIR_OVERRIDE="$OCTON_DIR" OCTON_ROOT_DIR="$ROOT_DIR" \

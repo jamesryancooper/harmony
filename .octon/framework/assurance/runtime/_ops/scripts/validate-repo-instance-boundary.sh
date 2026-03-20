@@ -211,7 +211,7 @@ check_native_collision_risk() {
 
   while IFS= read -r pack_id; do
     [[ -n "$pack_id" ]] && enabled_packs+=("$pack_id")
-  done < <(yq -r '.selection.enabled[]? // ""' "$EXTENSIONS_MANIFEST" 2>/dev/null || true)
+  done < <(yq -r '.selection.enabled[]?.pack_id // ""' "$EXTENSIONS_MANIFEST" 2>/dev/null || true)
 
   while IFS= read -r command_path; do
     command_id="$(basename "${command_path%.md}")"

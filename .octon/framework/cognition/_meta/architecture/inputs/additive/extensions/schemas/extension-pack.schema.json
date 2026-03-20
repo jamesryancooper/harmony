@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.dev/schemas/extension-pack.schema.json",
+  "title": "Octon Additive Extension Pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "pack_id",
+    "version",
+    "origin_class",
+    "compatibility",
+    "dependencies",
+    "provenance",
+    "trust_hints",
+    "content_entrypoints"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-extension-pack-v2"
+    },
+    "pack_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "origin_class": {
+      "type": "string",
+      "enum": [
+        "first_party_bundled",
+        "first_party_external",
+        "third_party"
+      ]
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "octon_version",
+        "extensions_api_version"
+      ],
+      "properties": {
+        "octon_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extensions_api_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires",
+        "conflicts"
+      ],
+      "properties": {
+        "requires": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dependencyRef"
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dependencyRef"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "imported_from"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "imported_from": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "trust_hints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "suggested_action"
+      ],
+      "properties": {
+        "suggested_action": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "require_acknowledgement",
+            "deny"
+          ]
+        }
+      }
+    },
+    "content_entrypoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "skills",
+        "commands",
+        "templates",
+        "prompts",
+        "context",
+        "validation"
+      ],
+      "properties": {
+        "skills": {
+          "$ref": "#/$defs/entrypoint"
+        },
+        "commands": {
+          "$ref": "#/$defs/entrypoint"
+        },
+        "templates": {
+          "$ref": "#/$defs/entrypoint"
+        },
+        "prompts": {
+          "$ref": "#/$defs/entrypoint"
+        },
+        "context": {
+          "$ref": "#/$defs/entrypoint"
+        },
+        "validation": {
+          "$ref": "#/$defs/entrypoint"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "dependencyRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pack_id",
+        "version_range"
+      ],
+      "properties": {
+        "pack_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "version_range": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entrypoint": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z][a-z0-9-]*/$"
+    }
+  }
+}

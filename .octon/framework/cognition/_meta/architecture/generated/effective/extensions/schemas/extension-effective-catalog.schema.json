@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.dev/schemas/extension-effective-catalog.schema.json",
+  "title": "Octon Extension Effective Catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generation_id",
+    "published_at",
+    "publication_status",
+    "desired_selected_packs",
+    "published_active_packs",
+    "dependency_closure",
+    "packs",
+    "source"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-extension-effective-catalog-v2"
+    },
+    "generation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "published_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publication_status": {
+      "type": "string",
+      "enum": [
+        "published",
+        "published_with_quarantine",
+        "withdrawn"
+      ]
+    },
+    "desired_selected_packs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/packRef"
+      }
+    },
+    "published_active_packs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/packRef"
+      }
+    },
+    "dependency_closure": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/closureEntry"
+      }
+    },
+    "packs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/catalogPack"
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "desired_config_path",
+        "desired_config_sha256",
+        "root_manifest_path",
+        "root_manifest_sha256"
+      ],
+      "properties": {
+        "desired_config_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "desired_config_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "root_manifest_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root_manifest_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "packRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pack_id",
+        "source_id"
+      ],
+      "properties": {
+        "pack_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "source_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        }
+      }
+    },
+    "closureEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/packRef"
+        },
+        {
+          "type": "object",
+          "required": [
+            "version",
+            "origin_class",
+            "manifest_path"
+          ],
+          "properties": {
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+            },
+            "origin_class": {
+              "type": "string",
+              "enum": [
+                "first_party_bundled",
+                "first_party_external",
+                "third_party"
+              ]
+            },
+            "manifest_path": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "catalogPack": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/closureEntry"
+        },
+        {
+          "type": "object",
+          "required": [
+            "trust_decision",
+            "publication_status",
+            "content_roots"
+          ],
+          "properties": {
+            "trust_decision": {
+              "type": "string",
+              "enum": [
+                "allow",
+                "require_acknowledgement",
+                "deny"
+              ]
+            },
+            "publication_status": {
+              "type": "string",
+              "enum": [
+                "published",
+                "published_with_quarantine",
+                "withdrawn"
+              ]
+            },
+            "content_roots": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "skills",
+                "commands",
+                "templates",
+                "prompts",
+                "context",
+                "validation"
+              ],
+              "properties": {
+                "skills": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "commands": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "templates": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "prompts": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "context": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "validation": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

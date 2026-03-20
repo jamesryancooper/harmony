@@ -1,0 +1,6 @@
+schema_version: "extensions-templates-catalog-fragment-v1"
+templates:
+  - id: docs-documentation-area
+    display_name: Docs Documentation Area
+    path: docs-documentation-area/
+    summary: "Example template capturing the former docs scoped-template customization."

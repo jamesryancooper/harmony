@@ -21,10 +21,13 @@ main() {
 
   local targets=(
     "$OCTON_DIR/framework/engine/governance"
-    "$OCTON_DIR/framework/engine/runtime/policy"
+    "$OCTON_DIR/framework/engine/runtime"
     "$OCTON_DIR/framework/assurance/governance"
     "$OCTON_DIR/framework/capabilities/governance"
     "$OCTON_DIR/framework/cognition/governance"
+    "$OCTON_DIR/framework/capabilities/runtime/services"
+    "$OCTON_DIR/framework/capabilities/runtime/skills"
+    "$OCTON_DIR/framework/capabilities/runtime/tools"
   )
 
   local matches
@@ -37,7 +40,7 @@ main() {
   matches="$(
     rg -n \
       -g '*.md' -g '*.yml' -g '*.yaml' -g '*.json' -g '*.sh' \
-      '(\.octon/inputs/(additive|exploratory)/|inputs/(additive|exploratory)/)' \
+      '(\.octon/inputs/additive/extensions/|inputs/additive/extensions/)' \
       "${existing_targets[@]}" || true
   )"
 
@@ -46,7 +49,13 @@ main() {
   else
     while IFS= read -r line; do
       [[ -z "$line" ]] && continue
-      fail "raw input dependency detected: ${line#$ROOT_DIR/}"
+      case "$line" in
+        *"publish-extension-state.sh"*|*"export-harness.sh"*|*"validate-extension-pack-contract.sh"*|*"validate-extension-publication-state.sh"*|*".octon/framework/engine/governance/extensions/"*)
+          ;;
+        *)
+          fail "raw input dependency detected: ${line#$ROOT_DIR/}"
+          ;;
+      esac
     done <<< "$matches"
   fi
 
