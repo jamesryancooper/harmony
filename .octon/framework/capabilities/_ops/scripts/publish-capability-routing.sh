@@ -144,6 +144,19 @@ skill_registry_entry_json() {
   yq -o=json ".skills.\"$skill_id\" // {}" "$SKILLS_REGISTRY"
 }
 
+active_locality_scopes_json() {
+  yq -o=json '.' "$LOCALITY_SCOPES_FILE" | jq -c '
+    . as $doc
+    | ($doc.scopes // []) as $scopes
+    | if ($doc | has("active_scope_ids")) then
+        ($doc.active_scope_ids // []) as $active
+        | $scopes | map(. as $scope | select($active | index($scope.scope_id)))
+      else
+        $scopes | map(select((.status // "active") == "active"))
+      end
+  '
+}
+
 scope_relevance_json() {
   local domain="$1"
   local capability_kind="$2"
@@ -634,7 +647,7 @@ main() {
 
   mkdir -p "$EFFECTIVE_DIR"
   generator_version="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST")"
-  LOCALITY_SCOPES_JSON="$(yq -o=json '.scopes // []' "$LOCALITY_SCOPES_FILE")"
+  LOCALITY_SCOPES_JSON="$(active_locality_scopes_json)"
   root_sha="$(hash_file "$ROOT_MANIFEST")"
   commands_sha="$(framework_commands_digest)"
   skills_sha="$(framework_skills_manifest_digest)"

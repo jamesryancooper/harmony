@@ -40,6 +40,8 @@ write_fixture() {
   mkdir -p \
     "$root/.octon/generated/effective/capabilities" \
     "$root/.octon/generated/effective/extensions" \
+    "$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands" \
+    "$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill" \
     "$root/.octon/framework/capabilities/runtime/commands" \
     "$root/.octon/framework/capabilities/runtime/skills/demo" \
     "$root/.octon/inputs/additive/extensions/demo-ext/commands" \
@@ -64,6 +66,15 @@ EOF
 EOF
 
   cat >"$root/.octon/inputs/additive/extensions/demo-ext/skills/demo-ext-skill/SKILL.md" <<'EOF'
+# Demo Ext Skill
+allowed-tools: Read
+EOF
+
+  cat >"$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands/demo-ext-command.md" <<'EOF'
+# Demo Ext Command
+EOF
+
+  cat >"$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill/SKILL.md" <<'EOF'
 # Demo Ext Skill
 allowed-tools: Read
 EOF
@@ -103,7 +114,7 @@ packs:
           path: "demo-ext-command.md"
           access: "agent"
           manifest_fragment_path: ".octon/inputs/additive/extensions/demo-ext/commands/manifest.fragment.yml"
-          projection_source_path: ".octon/inputs/additive/extensions/demo-ext/commands/demo-ext-command.md"
+          projection_source_path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands/demo-ext-command.md"
           host_adapters: [claude, cursor, codex]
           selectors:
             include: ["**"]
@@ -118,7 +129,7 @@ packs:
           status: "active"
           path: "demo-ext-skill/"
           manifest_fragment_path: ".octon/inputs/additive/extensions/demo-ext/skills/manifest.fragment.yml"
-          projection_source_path: ".octon/inputs/additive/extensions/demo-ext/skills/demo-ext-skill"
+          projection_source_path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill"
           host_adapters: [claude, cursor, codex]
           selectors:
             include: ["**"]

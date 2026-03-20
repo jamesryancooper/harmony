@@ -185,6 +185,27 @@ main() {
     fi
   done
 
+  local active_scope_ids_json inactive_scope_hits
+  active_scope_ids_json="$(yq -o=json '.' "$LOCALITY_SCOPES" | jq -c 'if has("active_scope_ids") then (.active_scope_ids // []) else ((.scopes // []) | map(select((.status // "active") == "active") | .scope_id)) end')"
+  inactive_scope_hits="$(yq -o=json '.' "$ROUTING_FILE" | jq -r --argjson active "$active_scope_ids_json" '
+    [
+      .routing_candidates[]?
+      | .effective_id as $effective_id
+      | (
+          (.scope_relevance.matching_scope_ids // [])
+          + (.scope_relevance.preferred_domain_match_scope_ids // [])
+          + (.scope_relevance.preferred_kind_match_scope_ids // [])
+        )[]?
+      | select($active | index(.) | not)
+      | "\($effective_id)\t\(.)"
+    ] | unique[]?
+  ')"
+  if [[ -z "$inactive_scope_hits" ]]; then
+    pass "routing scope relevance limited to active scopes"
+  else
+    fail "routing scope relevance references inactive scopes: $inactive_scope_hits"
+  fi
+
   if rg -n 'inputs/additive|inputs/exploratory' "$ROUTING_FILE" "$ARTIFACT_MAP_FILE" "$GENERATION_LOCK_FILE" >/dev/null 2>&1; then
     fail "capability publication must not embed raw inputs/** paths"
   else

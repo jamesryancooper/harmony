@@ -10,6 +10,7 @@ ROUTING_FILE="$OCTON_DIR/generated/effective/capabilities/routing.effective.yml"
 ARTIFACT_MAP_FILE="$OCTON_DIR/generated/effective/capabilities/artifact-map.yml"
 EXTENSIONS_CATALOG="$OCTON_DIR/generated/effective/extensions/catalog.effective.yml"
 HOSTS=(claude cursor codex)
+EXTENSION_PUBLISHED_PREFIX=".octon/generated/effective/extensions/published/"
 errors=0
 
 fail() {
@@ -50,6 +51,17 @@ extension_projection_source_path() {
   yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .routing_exports.${kind}s[]? | select(.capability_id == \"$capability_id\") | .projection_source_path // \"\"" "$EXTENSIONS_CATALOG" | head -n 1
 }
 
+verify_compiled_extension_projection_path() {
+  local effective_id="$1"
+  local source_rel="$2"
+  if [[ "$source_rel" == ${EXTENSION_PUBLISHED_PREFIX}* ]]; then
+    return 0
+  else
+    fail "extension projection source must resolve to compiled publication output for $effective_id"
+    return 1
+  fi
+}
+
 projection_source_path() {
   local effective_id="$1"
   local kind="$2"
@@ -60,7 +72,9 @@ projection_source_path() {
     pack_id="$(artifact_field_for_effective_id "$effective_id" '.extension_pack_id')"
     source_id="$(artifact_field_for_effective_id "$effective_id" '.extension_source_id')"
     capability_id="$(artifact_field_for_effective_id "$effective_id" '.capability_id')"
-    extension_projection_source_path "$pack_id" "$source_id" "$kind" "$capability_id"
+    source_path="$(extension_projection_source_path "$pack_id" "$source_id" "$kind" "$capability_id")"
+    verify_compiled_extension_projection_path "$effective_id" "$source_path" || return 1
+    printf '%s\n' "$source_path"
   elif [[ "$kind" == "skill" ]]; then
     dirname "$source_path"
   else

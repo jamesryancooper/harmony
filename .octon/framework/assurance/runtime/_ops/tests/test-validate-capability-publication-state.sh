@@ -43,6 +43,8 @@ write_fixture() {
     "$root/.octon/framework/capabilities/runtime/services/demo" \
     "$root/.octon/framework/capabilities/runtime/tools" \
     "$root/.octon/generated/effective/extensions" \
+    "$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands" \
+    "$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill" \
     "$root/.octon/generated/effective/locality" \
     "$root/.octon/generated/effective/capabilities/filesystem-snapshots" \
     "$root/.octon/instance/capabilities/runtime/commands" \
@@ -151,6 +153,15 @@ EOF
 ---
 fail_closed: true
 ---
+allowed-tools: Read
+EOF
+
+  cat >"$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands/demo-ext-command.md" <<'EOF'
+# Demo Ext Command
+EOF
+
+  cat >"$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill/SKILL.md" <<'EOF'
+# Demo Ext Skill
 allowed-tools: Read
 EOF
 
@@ -266,7 +277,7 @@ packs:
           path: "demo-ext-command.md"
           access: "agent"
           manifest_fragment_path: ".octon/inputs/additive/extensions/demo-ext/commands/manifest.fragment.yml"
-          projection_source_path: ".octon/inputs/additive/extensions/demo-ext/commands/demo-ext-command.md"
+          projection_source_path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands/demo-ext-command.md"
           host_adapters: [claude, cursor, codex]
           selectors:
             include: ["**"]
@@ -281,7 +292,7 @@ packs:
           status: "active"
           path: "demo-ext-skill/"
           manifest_fragment_path: ".octon/inputs/additive/extensions/demo-ext/skills/manifest.fragment.yml"
-          projection_source_path: ".octon/inputs/additive/extensions/demo-ext/skills/demo-ext-skill"
+          projection_source_path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill"
           host_adapters: [claude, cursor, codex]
           selectors:
             include: ["**"]
@@ -307,6 +318,14 @@ published_files:
   - path: ".octon/generated/effective/extensions/catalog.effective.yml"
   - path: ".octon/generated/effective/extensions/artifact-map.yml"
   - path: ".octon/generated/effective/extensions/generation.lock.yml"
+  - path: ".octon/generated/effective/extensions/published"
+  - path: ".octon/generated/effective/extensions/published/demo-ext"
+  - path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party"
+  - path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands"
+  - path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands/demo-ext-command.md"
+  - path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills"
+  - path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill"
+  - path: ".octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill/SKILL.md"
 pack_payload_digests: []
 EOF
 }
@@ -395,6 +414,31 @@ case_mutable_instance_inputs_do_not_rotate_digest() {
   [[ "$first_id" == "$second_id" ]]
 }
 
+case_inactive_scopes_do_not_affect_scope_relevance() {
+  local fixture preferred_scope_hits scope_score
+  fixture="$(create_fixture)"
+  CLEANUP_DIRS+=("$fixture")
+  write_fixture "$fixture"
+  cat >>"$fixture/.octon/generated/effective/locality/scopes.effective.yml" <<'EOF'
+  - scope_id: "dormant-command-scope"
+    manifest_path: ".octon/instance/locality/scopes/dormant-command-scope/scope.yml"
+    display_name: "Dormant Command Scope"
+    root_path: ".octon"
+    owner: "Fixture Maintainers"
+    status: "inactive"
+    tech_tags: []
+    language_tags: []
+    include_globs: []
+    exclude_globs: []
+    routing_hints:
+      preferred_capability_domains: ["command"]
+EOF
+  run_publish "$fixture"
+  preferred_scope_hits="$(yq -r '.routing_candidates[] | select(.effective_id == "framework.command.demo-command") | .scope_relevance.preferred_domain_match_scope_ids[]? // ""' "$fixture/.octon/generated/effective/capabilities/routing.effective.yml" | awk 'NF')"
+  scope_score="$(yq -r '.routing_candidates[] | select(.effective_id == "framework.command.demo-command") | .scope_relevance.score // -1' "$fixture/.octon/generated/effective/capabilities/routing.effective.yml")"
+  [[ -z "$preferred_scope_hits" && "$scope_score" == "0" ]]
+}
+
 main() {
   assert_success "capability publication validates for a fresh published fixture" case_publish_and_validate_passes
   assert_success "capability publication includes extension-contributed commands and skills" case_extension_capabilities_are_published
@@ -403,6 +447,7 @@ main() {
   assert_success "capability publication validator fails on stale extension linkage" case_stale_extension_generation_fails
   assert_success "capability publication validator rejects raw inputs references" case_raw_inputs_reference_fails
   assert_success "mutable instance skill inputs do not rotate capability generation" case_mutable_instance_inputs_do_not_rotate_digest
+  assert_success "inactive scopes do not influence routing scope relevance" case_inactive_scopes_do_not_affect_scope_relevance
 
   echo
   echo "Passed: $pass_count"
