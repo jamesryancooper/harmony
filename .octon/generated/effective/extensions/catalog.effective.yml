@@ -1,8 +1,15 @@
-schema_version: "octon-extension-effective-catalog-v3"
+schema_version: "octon-extension-effective-catalog-v4"
 generator_version: "0.5.1"
 generation_id: "extensions-d81e117f4c8a"
-published_at: "2026-03-20T20:37:09Z"
+published_at: "2026-03-20T23:08:26Z"
 publication_status: "published"
+publication_receipt_path: ".octon/state/evidence/validation/publication/extensions/2026-03-20T23-08-26Z-extensions-d81e117f4c8a.yml"
+invalidation_conditions:
+  - "desired-config-sha-changed"
+  - "root-manifest-sha-changed"
+  - "pack-manifest-or-payload-changed"
+  - "published-pack-set-changed"
+  - "quarantine-state-changed"
 desired_selected_packs: []
 published_active_packs: []
 dependency_closure: []
