@@ -5,6 +5,7 @@ version: "1.0.0"
 entry_mode: "human"
 execution_profile: "core"
 side_effect_class: "mutating"
+# Packet 13 keeps the workflow contract and generated README in lockstep.
 execution_controls:
   cancel_safe: false
 coordination_key_strategy:
