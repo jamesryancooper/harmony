@@ -31,8 +31,12 @@ copy_packet2_runtime_scripts() {
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-locality-publication-state.sh"
   cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh"
+  cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh" \
+    "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh"
   cp "$REPO_ROOT/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh" \
     "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh"
+  cp "$REPO_ROOT/.octon/framework/orchestration/runtime/_ops/scripts/extensions-common.sh" \
+    "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/extensions-common.sh"
   cp "$REPO_ROOT/.octon/framework/orchestration/runtime/_ops/scripts/publish-locality-state.sh" \
     "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/publish-locality-state.sh"
   cp "$REPO_ROOT/.octon/framework/cognition/_meta/architecture/instance/locality/schemas/README.md" \
@@ -51,9 +55,68 @@ copy_packet2_runtime_scripts() {
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-locality-registry.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-locality-publication-state.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh" \
+    "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh" \
     "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh" \
+    "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/extensions-common.sh" \
     "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/publish-locality-state.sh" \
     "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh"
+}
+
+write_packet8_pack() {
+  local fixture_root="$1"
+  local pack_id="$2"
+  local source_id="$3"
+  local origin_class="$4"
+  local suggested_action="$5"
+  local requires_block="$6"
+  local conflicts_block="$7"
+  local content_root="${8:-}"
+  local templates_entry="null"
+
+  mkdir -p "$fixture_root/.octon/inputs/additive/extensions/$pack_id"
+  if [[ -n "$content_root" ]]; then
+    templates_entry="\"$content_root/\""
+    mkdir -p "$fixture_root/.octon/inputs/additive/extensions/$pack_id/$content_root"
+    cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/$content_root/README.md" <<EOF
+# ${pack_id} ${content_root}
+EOF
+  fi
+  cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/README.md" <<EOF
+# $pack_id
+EOF
+  cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/pack.yml" <<EOF
+schema_version: "octon-extension-pack-v2"
+pack_id: "$pack_id"
+version: "1.0.0"
+origin_class: "$origin_class"
+compatibility:
+  octon_version: "^0.5.0"
+  extensions_api_version: "1.0"
+dependencies:
+  requires:
+$requires_block
+  conflicts:
+$conflicts_block
+provenance:
+  source_id: "$source_id"
+  imported_from: null
+trust_hints:
+  suggested_action: "$suggested_action"
+content_entrypoints:
+  skills: null
+  commands: null
+  templates: $templates_entry
+  prompts: null
+  context: null
+  validation: null
+EOF
+}
+
+write_packet8_seed_packs() {
+  local fixture_root="$1"
+  write_packet8_pack "$fixture_root" "docs" "bundled-first-party" "first_party_bundled" "allow" "    []" "    []" "templates"
+  write_packet8_pack "$fixture_root" "nextjs" "bundled-first-party" "first_party_bundled" "allow" "    []" "    []" "templates"
+  write_packet8_pack "$fixture_root" "node-ts" "bundled-first-party" "first_party_bundled" "allow" "    []" "    []" "templates"
 }
 
 write_valid_packet2_fixture() {
@@ -72,7 +135,7 @@ write_valid_packet2_fixture() {
     "$fixture_root/.octon/instance/locality" \
     "$fixture_root/.octon/instance/locality/scopes/octon-harness" \
     "$fixture_root/.octon/instance/cognition/context/scopes/octon-harness" \
-    "$fixture_root/.octon/inputs/additive/extensions" \
+    "$fixture_root/.octon/inputs/additive/extensions/.archive" \
     "$fixture_root/.octon/state/control/locality" \
     "$fixture_root/.octon/generated/effective/locality" \
     "$fixture_root/.octon/generated/proposals"
@@ -197,11 +260,43 @@ feature_toggles:
 EOF
 
   cat >"$fixture_root/.octon/instance/extensions.yml" <<'EOF'
-schema_version: "octon-instance-extensions-v1"
+schema_version: "octon-instance-extensions-v2"
 selection:
   enabled: []
-sources: {}
-trust: {}
+  disabled:
+    - pack_id: "docs"
+      source_id: "bundled-first-party"
+      reason: "seeded-off-by-default"
+    - pack_id: "nextjs"
+      source_id: "bundled-first-party"
+      reason: "seeded-off-by-default"
+    - pack_id: "node-ts"
+      source_id: "bundled-first-party"
+      reason: "seeded-off-by-default"
+sources:
+  catalog:
+    bundled-first-party:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_bundled"
+    first-party-imported:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_external"
+    third-party-imported:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "third_party"
+trust:
+  default_actions:
+    first_party_bundled: "allow"
+    first_party_external: "require_acknowledgement"
+    third_party: "deny"
+  source_overrides: {}
+  pack_overrides: {}
 acknowledgements: []
 EOF
 
@@ -257,6 +352,8 @@ EOF
 
   OCTON_DIR_OVERRIDE="$fixture_root/.octon" OCTON_ROOT_DIR="$fixture_root" \
     bash "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/publish-locality-state.sh" >/dev/null
+
+  write_packet8_seed_packs "$fixture_root"
 
   OCTON_DIR_OVERRIDE="$fixture_root/.octon" OCTON_ROOT_DIR="$fixture_root" \
     bash "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh" >/dev/null

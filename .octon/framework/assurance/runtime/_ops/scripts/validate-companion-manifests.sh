@@ -137,27 +137,59 @@ main() {
     fail "instance manifest must declare feature_toggles as a map"
   fi
 
-  [[ "$(yq -r '.schema_version // ""' "$EXTENSIONS_MANIFEST")" == "octon-instance-extensions-v1" ]] && pass "instance extensions schema version valid" || fail "instance/extensions.yml must use schema_version octon-instance-extensions-v1"
+  [[ "$(yq -r '.schema_version // ""' "$EXTENSIONS_MANIFEST")" == "octon-instance-extensions-v2" ]] && pass "instance extensions schema version valid" || fail "instance/extensions.yml must use schema_version octon-instance-extensions-v2"
   if yq -e '.selection.enabled | tag == "!!seq"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
     pass "instance extension selection.enabled list declared"
   else
     fail "instance/extensions.yml must declare selection.enabled as a list"
+  fi
+  if yq -e '.selection.disabled | tag == "!!seq"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
+    pass "instance extension selection.disabled list declared"
+  else
+    fail "instance/extensions.yml must declare selection.disabled as a list"
   fi
   if yq -e '.sources | tag == "!!map"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
     pass "instance extension sources map declared"
   else
     fail "instance/extensions.yml must declare sources as a map"
   fi
+  if yq -e '.sources.catalog | tag == "!!map"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
+    pass "instance extension sources.catalog map declared"
+  else
+    fail "instance/extensions.yml must declare sources.catalog as a map"
+  fi
   if yq -e '.trust | tag == "!!map"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
     pass "instance extension trust map declared"
   else
     fail "instance/extensions.yml must declare trust as a map"
+  fi
+  if yq -e '.trust.default_actions | tag == "!!map"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
+    pass "instance extension trust.default_actions map declared"
+  else
+    fail "instance/extensions.yml must declare trust.default_actions as a map"
+  fi
+  if yq -e '.trust.source_overrides | tag == "!!map"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
+    pass "instance extension trust.source_overrides map declared"
+  else
+    fail "instance/extensions.yml must declare trust.source_overrides as a map"
+  fi
+  if yq -e '.trust.pack_overrides | tag == "!!map"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
+    pass "instance extension trust.pack_overrides map declared"
+  else
+    fail "instance/extensions.yml must declare trust.pack_overrides as a map"
   fi
   if yq -e '.acknowledgements | tag == "!!seq"' "$EXTENSIONS_MANIFEST" >/dev/null 2>&1; then
     pass "instance extension acknowledgements list declared"
   else
     fail "instance/extensions.yml must declare acknowledgements as a list"
   fi
+
+  while IFS=$'\t' read -r source_id source_type root allowed_count; do
+    [[ -z "$source_id" ]] && continue
+    [[ "$source_type" == "internalized" ]] && pass "source_type valid for $source_id" || fail "source_type must be internalized for $source_id"
+    [[ "$root" == ".octon/inputs/additive/extensions" ]] && pass "source root valid for $source_id" || fail "source root must be .octon/inputs/additive/extensions for $source_id"
+    [[ "$allowed_count" != "0" ]] && pass "allowed_origin_classes declared for $source_id" || fail "allowed_origin_classes missing for $source_id"
+  done < <(yq -r '.sources.catalog | to_entries[]? | [.key, .value.source_type, .value.root, (.value.allowed_origin_classes | length)] | @tsv' "$EXTENSIONS_MANIFEST" 2>/dev/null || true)
 
   echo "Validation summary: errors=$errors"
   if [[ $errors -gt 0 ]]; then

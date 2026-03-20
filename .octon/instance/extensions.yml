@@ -1,6 +1,38 @@
-schema_version: "octon-instance-extensions-v1"
+schema_version: "octon-instance-extensions-v2"
 selection:
   enabled: []
-sources: {}
-trust: {}
+  disabled:
+    - pack_id: "docs"
+      source_id: "bundled-first-party"
+      reason: "seeded-off-by-default"
+    - pack_id: "nextjs"
+      source_id: "bundled-first-party"
+      reason: "seeded-off-by-default"
+    - pack_id: "node-ts"
+      source_id: "bundled-first-party"
+      reason: "seeded-off-by-default"
+sources:
+  catalog:
+    bundled-first-party:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_bundled"
+    first-party-imported:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_external"
+    third-party-imported:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "third_party"
+trust:
+  default_actions:
+    first_party_bundled: "allow"
+    first_party_external: "require_acknowledgement"
+    third_party: "deny"
+  source_overrides: {}
+  pack_overrides: {}
 acknowledgements: []

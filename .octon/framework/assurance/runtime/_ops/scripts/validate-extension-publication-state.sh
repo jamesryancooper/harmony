@@ -2,16 +2,9 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../../../" && pwd)"
-ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
+source "$SCRIPT_DIR/../../../../orchestration/runtime/_ops/scripts/extensions-common.sh"
 
-ROOT_MANIFEST="$OCTON_DIR/octon.yml"
-EXTENSIONS_MANIFEST="$OCTON_DIR/instance/extensions.yml"
-ACTIVE_STATE="$OCTON_DIR/state/control/extensions/active.yml"
-QUARANTINE_STATE="$OCTON_DIR/state/control/extensions/quarantine.yml"
-CATALOG_FILE="$OCTON_DIR/generated/effective/extensions/catalog.effective.yml"
-ARTIFACT_MAP_FILE="$OCTON_DIR/generated/effective/extensions/artifact-map.yml"
-GENERATION_LOCK_FILE="$OCTON_DIR/generated/effective/extensions/generation.lock.yml"
+extensions_common_init "${BASH_SOURCE[0]}"
 
 errors=0
 
@@ -24,28 +17,18 @@ pass() {
   echo "[OK] $1"
 }
 
-hash_file() {
-  local file="$1"
-  if command -v shasum >/dev/null 2>&1; then
-    shasum -a 256 "$file" | awk '{print $1}'
-  else
-    sha256sum "$file" | awk '{print $1}'
-  fi
+sorted_pack_refs_from_query() {
+  local file="$1" query="$2"
+  yq -r "$query[]? | [.pack_id, .source_id] | @tsv" "$file" 2>/dev/null \
+    | awk 'NF' \
+    | LC_ALL=C sort
 }
 
-list_equals() {
-  local file="$1"
-  local query="$2"
-  shift 2
-  local expected=("$@")
-  mapfile -t actual < <(yq -r "$query[]?" "$file" 2>/dev/null || true)
-  if [[ "${#actual[@]}" -ne "${#expected[@]}" ]]; then
-    return 1
-  fi
-  local i
-  for i in "${!expected[@]}"; do
-    [[ "${actual[$i]}" == "${expected[$i]}" ]] || return 1
-  done
+sorted_closure_from_query() {
+  local file="$1" query="$2"
+  yq -r "$query[]? | [.pack_id, .source_id, .version, .origin_class, .manifest_path] | @tsv" "$file" 2>/dev/null \
+    | awk 'NF' \
+    | LC_ALL=C sort
 }
 
 main() {
@@ -61,22 +44,30 @@ main() {
     fi
   done
 
-  local desired_sha root_sha generation_id
-  desired_sha="$(hash_file "$EXTENSIONS_MANIFEST")"
-  root_sha="$(hash_file "$ROOT_MANIFEST")"
+  local desired_sha root_sha generation_id status
+  desired_sha="$(ext_hash_file "$EXTENSIONS_MANIFEST")"
+  root_sha="$(ext_hash_file "$ROOT_MANIFEST")"
 
-  [[ "$(yq -r '.schema_version // ""' "$ACTIVE_STATE")" == "octon-extension-active-state-v1" ]] && pass "active state schema version valid" || fail "active state schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$QUARANTINE_STATE")" == "octon-extension-quarantine-state-v1" ]] && pass "quarantine state schema version valid" || fail "quarantine state schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v1" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v1" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v1" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$ACTIVE_STATE")" == "octon-extension-active-state-v2" ]] && pass "active state schema version valid" || fail "active state schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$QUARANTINE_STATE")" == "octon-extension-quarantine-state-v2" ]] && pass "quarantine state schema version valid" || fail "quarantine state schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v2" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v2" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v2" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
 
   generation_id="$(yq -r '.generation_id // ""' "$ACTIVE_STATE")"
+  status="$(yq -r '.status // ""' "$ACTIVE_STATE")"
   [[ -n "$generation_id" ]] && pass "active state generation_id declared" || fail "active state missing generation_id"
+  case "$status" in
+    published|published_with_quarantine|withdrawn)
+      pass "active state status valid"
+      ;;
+    *)
+      fail "active state status invalid"
+      ;;
+  esac
 
   [[ "$(yq -r '.desired_config_revision.path // ""' "$ACTIVE_STATE")" == ".octon/instance/extensions.yml" ]] && pass "active state desired config path valid" || fail "active state desired config path invalid"
   [[ "$(yq -r '.desired_config_revision.sha256 // ""' "$ACTIVE_STATE")" == "$desired_sha" ]] && pass "active state desired config hash current" || fail "active state desired config hash stale"
-  [[ "$(yq -r '.status // ""' "$ACTIVE_STATE")" == "published" ]] && pass "active state status is published" || fail "active state status must be published"
   [[ "$(yq -r '.published_effective_catalog // ""' "$ACTIVE_STATE")" == ".octon/generated/effective/extensions/catalog.effective.yml" ]] && pass "active state catalog reference valid" || fail "active state catalog reference invalid"
   [[ "$(yq -r '.published_artifact_map // ""' "$ACTIVE_STATE")" == ".octon/generated/effective/extensions/artifact-map.yml" ]] && pass "active state artifact map reference valid" || fail "active state artifact map reference invalid"
   [[ "$(yq -r '.published_generation_lock // ""' "$ACTIVE_STATE")" == ".octon/generated/effective/extensions/generation.lock.yml" ]] && pass "active state generation lock reference valid" || fail "active state generation lock reference invalid"
@@ -84,58 +75,78 @@ main() {
   [[ "$(yq -r '.generation_id // ""' "$CATALOG_FILE")" == "$generation_id" ]] && pass "effective catalog generation_id matches active state" || fail "effective catalog generation_id mismatch"
   [[ "$(yq -r '.generation_id // ""' "$ARTIFACT_MAP_FILE")" == "$generation_id" ]] && pass "artifact map generation_id matches active state" || fail "artifact map generation_id mismatch"
   [[ "$(yq -r '.generation_id // ""' "$GENERATION_LOCK_FILE")" == "$generation_id" ]] && pass "generation lock generation_id matches active state" || fail "generation lock generation_id mismatch"
+  [[ "$(yq -r '.publication_status // ""' "$CATALOG_FILE")" == "$status" ]] && pass "effective catalog status matches active state" || fail "effective catalog status mismatch"
 
   [[ "$(yq -r '.source.desired_config_sha256 // ""' "$CATALOG_FILE")" == "$desired_sha" ]] && pass "effective catalog desired config hash current" || fail "effective catalog desired config hash stale"
   [[ "$(yq -r '.desired_config_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$desired_sha" ]] && pass "generation lock desired config hash current" || fail "generation lock desired config hash stale"
   [[ "$(yq -r '.source.root_manifest_sha256 // ""' "$CATALOG_FILE")" == "$root_sha" ]] && pass "effective catalog root manifest hash current" || fail "effective catalog root manifest hash stale"
   [[ "$(yq -r '.root_manifest_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$root_sha" ]] && pass "generation lock root manifest hash current" || fail "generation lock root manifest hash stale"
 
-  mapfile -t desired_enabled < <(yq -r '.selection.enabled[]?' "$EXTENSIONS_MANIFEST" 2>/dev/null || true)
-  mapfile -t active_packs < <(yq -r '.resolved_active_packs[]?' "$ACTIVE_STATE" 2>/dev/null || true)
-  mapfile -t closure < <(yq -r '.dependency_closure[]?' "$ACTIVE_STATE" 2>/dev/null || true)
-  mapfile -t catalog_active < <(yq -r '.active_packs[]?' "$CATALOG_FILE" 2>/dev/null || true)
-  mapfile -t catalog_closure < <(yq -r '.dependency_closure[]?' "$CATALOG_FILE" 2>/dev/null || true)
+  local desired_enabled active_desired catalog_desired active_published catalog_published active_closure catalog_closure
+  desired_enabled="$(yq -r '.selection.enabled[]? | [.pack_id, .source_id] | @tsv' "$EXTENSIONS_MANIFEST" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
+  active_desired="$(sorted_pack_refs_from_query "$ACTIVE_STATE" '.desired_selected_packs')"
+  catalog_desired="$(sorted_pack_refs_from_query "$CATALOG_FILE" '.desired_selected_packs')"
+  active_published="$(sorted_pack_refs_from_query "$ACTIVE_STATE" '.published_active_packs')"
+  catalog_published="$(sorted_pack_refs_from_query "$CATALOG_FILE" '.published_active_packs')"
+  active_closure="$(sorted_closure_from_query "$ACTIVE_STATE" '.dependency_closure')"
+  catalog_closure="$(sorted_closure_from_query "$CATALOG_FILE" '.dependency_closure')"
 
-  if [[ "$(printf '%s\n' "${desired_enabled[@]}" | awk 'NF' | sort -u)" == "$(printf '%s\n' "${active_packs[@]}" | awk 'NF' | sort -u)" ]]; then
-    pass "active state resolved_active_packs match desired selection"
+  [[ "$desired_enabled" == "$active_desired" ]] && pass "active state desired_selected_packs match desired selection" || fail "active state desired_selected_packs do not match desired selection"
+  [[ "$desired_enabled" == "$catalog_desired" ]] && pass "effective catalog desired_selected_packs match desired selection" || fail "effective catalog desired_selected_packs do not match desired selection"
+  [[ "$active_published" == "$catalog_published" ]] && pass "effective catalog published_active_packs match active state" || fail "effective catalog published_active_packs mismatch"
+  [[ "$active_closure" == "$catalog_closure" ]] && pass "effective catalog dependency_closure matches active state" || fail "effective catalog dependency_closure mismatch"
+
+  local quarantine_count
+  quarantine_count="$(yq -r '.records | length' "$QUARANTINE_STATE" 2>/dev/null || printf '0')"
+  case "$status" in
+    published)
+      [[ "$quarantine_count" == "0" ]] && pass "quarantine empty for published generation" || fail "quarantine must be empty when status=published"
+      ;;
+    published_with_quarantine)
+      [[ "$quarantine_count" != "0" ]] && pass "quarantine present for published_with_quarantine" || fail "quarantine must be non-empty when status=published_with_quarantine"
+      [[ -n "$active_published" ]] && pass "published_with_quarantine retains published_active_packs" || fail "published_with_quarantine must retain published_active_packs"
+      ;;
+    withdrawn)
+      [[ "$quarantine_count" != "0" ]] && pass "quarantine present for withdrawn generation" || fail "withdrawn generation must record quarantine"
+      [[ -z "$active_published" ]] && pass "withdrawn generation has no published_active_packs" || fail "withdrawn generation must have no published_active_packs"
+      ;;
+  esac
+
+  local lock_closure
+  lock_closure="$(yq -r '.pack_payload_digests[]? | [.pack_id, .source_id, .version, .origin_class, .manifest_path] | @tsv' "$GENERATION_LOCK_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
+  if [[ "$lock_closure" == "$active_closure" ]]; then
+    pass "generation lock pack payload records match dependency closure"
   else
-    fail "active state resolved_active_packs do not match desired selection"
+    fail "generation lock pack payload records do not match dependency closure"
   fi
 
-  if [[ "$(printf '%s\n' "${closure[@]}" | awk 'NF' | sort -u)" == "$(printf '%s\n' "${catalog_closure[@]}" | awk 'NF' | sort -u)" ]]; then
-    pass "effective catalog dependency_closure matches active state"
-  else
-    fail "effective catalog dependency_closure does not match active state"
-  fi
+  local artifact_paths_from_map artifact_paths_from_lock
+  artifact_paths_from_map="$(yq -r '.artifacts[]?.source_path' "$ARTIFACT_MAP_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
+  artifact_paths_from_lock="$(yq -r '.pack_payload_digests[]?.files[]?.path' "$GENERATION_LOCK_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
+  [[ "$artifact_paths_from_map" == "$artifact_paths_from_lock" ]] && pass "artifact map paths match generation lock files" || fail "artifact map paths do not match generation lock files"
 
-  if [[ "$(printf '%s\n' "${active_packs[@]}" | awk 'NF' | sort -u)" == "$(printf '%s\n' "${catalog_active[@]}" | awk 'NF' | sort -u)" ]]; then
-    pass "effective catalog active_packs match active state"
-  else
-    fail "effective catalog active_packs do not match active state"
-  fi
-
-  if yq -e '.blocked_packs | length == 0' "$QUARANTINE_STATE" >/dev/null 2>&1; then
-    pass "quarantine has no blocked packs for published generation"
-  else
-    fail "quarantine must be empty for the published generation"
-  fi
-
-  mapfile -t lock_pack_ids < <(yq -r '.pack_manifest_digests[]?.pack_id' "$GENERATION_LOCK_FILE" 2>/dev/null || true)
-  if [[ "$(printf '%s\n' "${lock_pack_ids[@]}" | awk 'NF' | sort -u)" == "$(printf '%s\n' "${closure[@]}" | awk 'NF' | sort -u)" ]]; then
-    pass "generation lock pack ids match dependency closure"
-  else
-    fail "generation lock pack ids do not match dependency closure"
-  fi
-
-  while IFS=$'\t' read -r pack_id manifest_path sha256; do
-    [[ -z "$pack_id" ]] && continue
-    local abs_manifest="$ROOT_DIR/$manifest_path"
-    if [[ ! -f "$abs_manifest" ]]; then
-      fail "generation lock manifest path missing: $manifest_path"
+  local source_path sha pack_payload_sha computed_payload_sha
+  while IFS=$'\t' read -r source_path sha; do
+    [[ -z "$source_path" ]] && continue
+    if [[ ! -f "$ROOT_DIR/$source_path" ]]; then
+      fail "artifact path missing: $source_path"
       continue
     fi
-    [[ "$(hash_file "$abs_manifest")" == "$sha256" ]] && pass "generation lock digest current for $pack_id" || fail "generation lock digest stale for $pack_id"
-  done < <(yq -r '.pack_manifest_digests[]? | [.pack_id, .manifest_path, .sha256] | @tsv' "$GENERATION_LOCK_FILE")
+    [[ "$(ext_hash_file "$ROOT_DIR/$source_path")" == "$sha" ]] && pass "artifact digest current for $source_path" || fail "artifact digest stale for $source_path"
+  done < <(yq -r '.artifacts[]? | [.source_path, .sha256] | @tsv' "$ARTIFACT_MAP_FILE" 2>/dev/null || true)
+
+  local pack_id source_id payload_lines manifest_path version
+  while IFS=$'\t' read -r pack_id source_id manifest_path version pack_payload_sha; do
+    [[ -z "$pack_id" ]] && continue
+    payload_lines=""
+    while IFS=$'\t' read -r source_path sha; do
+      [[ -z "$source_path" ]] && continue
+      payload_lines+="${sha} ${source_path}"$'\n'
+    done < <(yq -r ".pack_payload_digests[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .files[]? | [.path, .sha256] | @tsv" "$GENERATION_LOCK_FILE")
+    computed_payload_sha="$(printf '%s' "$payload_lines" | ext_hash_text)"
+    [[ "$computed_payload_sha" == "$pack_payload_sha" ]] && pass "payload digest current for $pack_id" || fail "payload digest stale for $pack_id"
+    [[ -f "$ROOT_DIR/$manifest_path" ]] && pass "manifest path resolves for $pack_id" || fail "manifest path missing for $pack_id"
+  done < <(yq -r '.pack_payload_digests[]? | [.pack_id, .source_id, .manifest_path, .version, .payload_sha256] | @tsv' "$GENERATION_LOCK_FILE" 2>/dev/null || true)
 
   echo "Validation summary: errors=$errors"
   if [[ $errors -gt 0 ]]; then

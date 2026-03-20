@@ -71,6 +71,8 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/state/control/locality/quarantine.yml`
 - Canonical extension actual/quarantine state:
   `/.octon/state/control/extensions/{active.yml,quarantine.yml}`
+- Canonical raw additive extension inputs:
+  `/.octon/inputs/additive/extensions/<pack-id>/`
 - Canonical repo continuity:
   `/.octon/state/continuity/repo/`
 - Canonical scope continuity:
@@ -113,7 +115,7 @@ remains under `state/continuity/repo/**`.
 Portability is profile-driven through `octon.yml`, not a raw copy of the whole
 tree. `bootstrap_core` is the install contract completed by `/init`;
 `repo_snapshot` exports `octon.yml`, `framework/**`, `instance/**`, and the
-enabled-pack dependency closure through `/export-harness`; `pack_bundle`
+clean published enabled-pack dependency closure through `/export-harness`; `pack_bundle`
 exports selected packs plus dependency closure only; `full_fidelity` is
 advisory only and uses a normal Git clone. `state/**` and `generated/**` stay
 out of clean bootstrap and repo snapshots.

@@ -67,7 +67,7 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 - [ ] export root exists at <output_dir>/.octon/
 - [ ] export.receipt.yml exists at <output_dir>/
-- [ ] repo_snapshot exports octon.yml, framework/**, instance/**, and enabled-pack dependency closure only
+- [ ] repo_snapshot exports octon.yml, framework/**, instance/**, and the clean published enabled-pack dependency closure only
 - [ ] pack_bundle exports only selected packs plus dependency closure
 
 ## References

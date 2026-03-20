@@ -6,8 +6,8 @@
 
 | Path | Purpose |
 | --- | --- |
-| `state/control/extensions/active.yml` | Actual active extension publication state |
-| `state/control/extensions/quarantine.yml` | Extension quarantine and withdrawal state |
+| `state/control/extensions/active.yml` | Actual active extension publication state, including desired versus published truth |
+| `state/control/extensions/quarantine.yml` | Extension quarantine and withdrawal records |
 | `state/control/locality/quarantine.yml` | Locality quarantine state |
 
 Desired authored configuration remains under `instance/**`. Runtime-facing

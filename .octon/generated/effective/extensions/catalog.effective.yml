@@ -1,10 +1,13 @@
-schema_version: "octon-extension-effective-catalog-v1"
-generation_id: "extensions-8a94d7441e41"
-published_at: "2026-03-19T22:30:02Z"
-active_packs: []
+schema_version: "octon-extension-effective-catalog-v2"
+generation_id: "extensions-d81e117f4c8a"
+published_at: "2026-03-20T00:46:08Z"
+publication_status: "published"
+desired_selected_packs: []
+published_active_packs: []
 dependency_closure: []
+packs: []
 source:
   desired_config_path: ".octon/instance/extensions.yml"
-  desired_config_sha256: "8a94d7441e41e446ee053598b4f2c0a2c2c52197e26c0a46cb8be97f8d3b79ad"
+  desired_config_sha256: "d81e117f4c8a5a1b552a77708a62ae299ac86143f3eacd414a03c85bb07c7785"
   root_manifest_path: ".octon/octon.yml"
   root_manifest_sha256: "ef6e9dae605a7d74ed9df0eda23c8a874e9459f8b177f2a1a54ab64572142751"

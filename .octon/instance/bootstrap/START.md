@@ -38,7 +38,7 @@ versioning, install/export profiles, and fail-closed policy hooks.
 | Profile | Operator Surface | Behavior |
 |-----------|----------------|----------|
 | `bootstrap_core` | `/init` | Complete bootstrap after adopting the framework bundle and minimal instance metadata |
-| `repo_snapshot` | `/export-harness --profile repo_snapshot` | Export `octon.yml`, `framework/**`, `instance/**`, and enabled-pack dependency closure |
+| `repo_snapshot` | `/export-harness --profile repo_snapshot` | Export `octon.yml`, `framework/**`, `instance/**`, and the clean published enabled-pack dependency closure |
 | `pack_bundle` | `/export-harness --profile pack_bundle --pack-ids <csv>` | Export only selected additive packs plus dependency closure |
 | `full_fidelity` | Git clone | Advisory only; not a synthetic export payload |
 
@@ -138,6 +138,7 @@ Instance-native repo authority lives at:
 - `instance/capabilities/runtime/**`
 - `instance/orchestration/missions/**`
 - `instance/extensions.yml`
+- `inputs/additive/extensions/<pack-id>/**`
 
 Canonical locality resolution and publication surfaces are:
 
@@ -154,6 +155,13 @@ Canonical locality resolution and publication surfaces are:
 Packet 6 locality remains root-owned. Descendant `.octon/` roots,
 nearest-registry fallback, hierarchical scope inheritance, and ancestor-chain
 scope composition are invalid in v1.
+
+Extension activation uses one desired/actual/quarantine/compiled model:
+
+- desired config: `instance/extensions.yml`
+- actual active state: `state/control/extensions/active.yml`
+- quarantine state: `state/control/extensions/quarantine.yml`
+- runtime-facing compiled outputs: `generated/effective/extensions/**`
 
 Overlay-capable repo authority is limited to these declared enabled points:
 

@@ -1,0 +1,6 @@
+schema_version: "extensions-templates-catalog-fragment-v1"
+templates:
+  - id: node-ts-package-surface
+    display_name: Node Ts Package Surface
+    path: node-ts-package-surface/
+    summary: "Example template capturing the former Node.js/TypeScript scoped-template customization."

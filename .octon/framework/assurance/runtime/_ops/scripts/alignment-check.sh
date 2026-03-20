@@ -104,6 +104,10 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-locality-publication-state.sh"
 
   run_step \
+    "Validate additive extension pack contract" \
+    bash "$SCRIPT_DIR/validate-extension-pack-contract.sh"
+
+  run_step \
     "Validate extension desired/actual/compiled publication state" \
     bash "$SCRIPT_DIR/validate-extension-publication-state.sh"
 

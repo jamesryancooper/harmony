@@ -72,8 +72,10 @@ Canonical locality inputs and outputs are:
 - retained operational evidence: `state/evidence/**`
 - mutable extension actual/quarantine state:
   `state/control/extensions/{active.yml,quarantine.yml}`
+- raw additive extension packs: `inputs/additive/extensions/<pack-id>/**`
 - mutable locality quarantine: `state/control/locality/quarantine.yml`
 - compiled effective locality outputs: `generated/effective/locality/**`
+- compiled effective extension outputs: `generated/effective/extensions/**`
 
 ## Portability
 
@@ -83,7 +85,7 @@ tree as the default bootstrap model.
 - `bootstrap_core` installs `octon.yml`, `framework/**`, and
   `instance/manifest.yml`; `/init` completes repo-local bootstrap projections.
 - `repo_snapshot` exports `octon.yml`, `framework/**`, `instance/**`, and the
-  enabled-pack dependency closure through `/export-harness`.
+  clean published enabled-pack dependency closure through `/export-harness`.
 - `pack_bundle` exports selected additive packs plus dependency closure only.
 - `full_fidelity` is advisory only and uses a normal Git clone.
 

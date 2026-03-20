@@ -7,8 +7,8 @@ active `.octon/` harness.
 
 | Path | Purpose |
 | --- | --- |
-| `.octon/state/control/extensions/active.yml` | Actual validated active extension publication state |
-| `.octon/state/control/extensions/quarantine.yml` | Blocked extension packs, dependents, and reason codes |
+| `.octon/state/control/extensions/active.yml` | Actual validated extension publication state, including desired versus published pack truth |
+| `.octon/state/control/extensions/quarantine.yml` | Extension quarantine records with blocked packs, affected dependents, and reason codes |
 | `.octon/state/control/locality/quarantine.yml` | Quarantined scopes and locality validation outcomes |
 
 Other domain-owned control-state records may exist under `state/control/**`

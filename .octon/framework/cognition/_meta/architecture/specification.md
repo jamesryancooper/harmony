@@ -67,9 +67,10 @@ super-root cutover.
     non-quarantined scopes.
 29. `state/evidence/**` is retained evidence and must not be treated as
     rebuildable generated output.
-30. `state/control/extensions/active.yml` and
-    `generated/effective/extensions/**` form the canonical actual/compiled
-    extension publication pair.
+30. `instance/extensions.yml`, `state/control/extensions/active.yml`,
+    `state/control/extensions/quarantine.yml`, and
+    `generated/effective/extensions/**` form the canonical desired/actual/
+    quarantine/compiled extension publication model.
 31. `state/control/locality/quarantine.yml` is mutable operational control
     truth; `generated/effective/locality/**` is non-authoritative compiled
     locality state.
@@ -119,6 +120,7 @@ for runtime, governance, and practices.
 - overlay enablement: `/.octon/instance/manifest.yml#enabled_overlay_points`
 - projected ingress: `/.octon/AGENTS.md`
 - desired extension config: `/.octon/instance/extensions.yml`
+- raw additive extension packs: `/.octon/inputs/additive/extensions/`
 - ingress: `/.octon/instance/ingress/AGENTS.md`
 - bootstrap docs: `/.octon/instance/bootstrap/`
 - locality: `/.octon/instance/locality/`

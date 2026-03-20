@@ -1,8 +1,9 @@
-schema_version: "octon-extension-active-state-v1"
+schema_version: "octon-extension-active-state-v2"
 desired_config_revision:
   path: ".octon/instance/extensions.yml"
   sha256: "{{EXTENSIONS_DESIRED_SHA256 or 'pending'}}"
-resolved_active_packs: []
+desired_selected_packs: []
+published_active_packs: []
 dependency_closure: []
 generation_id: "{{EXTENSIONS_GENERATION_ID or 'extensions-pending'}}"
 published_effective_catalog: ".octon/generated/effective/extensions/catalog.effective.yml"

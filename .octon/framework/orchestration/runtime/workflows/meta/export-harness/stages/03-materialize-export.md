@@ -11,7 +11,9 @@
 2. Write the export root to `<output_dir>/.octon/`.
 3. Write `export.receipt.yml` to `<output_dir>/`.
 4. Do not include `inputs/exploratory/**`, `state/**`, or `generated/**` in `repo_snapshot`.
-5. Do not include framework or instance authority in `pack_bundle`.
+5. Materialize only the published extension dependency closure for
+   `repo_snapshot`, never desired-but-quarantined selections.
+6. Do not include framework or instance authority in `pack_bundle`.
 
 ## Output
 
