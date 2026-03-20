@@ -144,6 +144,15 @@ check_wrong_class_placements() {
   fi
 }
 
+check_retired_generated_summary_absent() {
+  local retired_summary="$INSTANCE_DIR/cognition/context/shared/decisions.md"
+  if [[ -e "$retired_summary" ]]; then
+    fail "retired generated decisions summary still exists under instance/**"
+  else
+    pass "retired generated decisions summary absent from instance/**"
+  fi
+}
+
 check_locality_scope_contract() {
   local scope_manifest_count
   scope_manifest_count="$(find "$INSTANCE_DIR/locality/scopes" -type f -name 'scope.yml' ! -path '*/_scaffold/*' | wc -l | tr -d ' ')"
@@ -192,7 +201,7 @@ check_active_reference_drift() {
   drift="$(
     rg -n -P --no-heading \
       --glob '!**/migrations/**' \
-      '(?<!framework/)(?<!instance/)cognition/runtime/context/|(?<!framework/)(?<!instance/)cognition/runtime/decisions/|(?<!state/)continuity/(log\.md|tasks\.json|entities\.json|next\.md)|(?<!framework/)(?<!instance/)orchestration/runtime/missions/' \
+      '(?<!framework/)(?<!instance/)cognition/runtime/context/|(?<!framework/)(?<!instance/)cognition/runtime/decisions/|(?<!state/)continuity/(log\.md|tasks\.json|entities\.json|next\.md)|(?<!framework/)(?<!instance/)orchestration/runtime/missions/|instance/cognition/context/shared/decisions\.md' \
       "${existing[@]}" 2>/dev/null || true
   )"
 
@@ -250,6 +259,7 @@ main() {
   check_enabled_overlay_roots
   check_overlay_domain_shape
   check_wrong_class_placements
+  check_retired_generated_summary_absent
   check_locality_scope_contract
   check_active_reference_drift
   check_native_collision_risk
