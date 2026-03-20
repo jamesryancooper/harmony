@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/jamesryancooper/octon/compare/octon-v0.5.0...octon-v0.5.1) (2026-03-20)
+
+
+### Features
+
+* **extensions:** internalize additive extension pack cutover ([#177](https://github.com/jamesryancooper/octon/issues/177)) ([59f3905](https://github.com/jamesryancooper/octon/commit/59f39052849098798b34fdd85d4a52039a4508e8))
+
 ## [0.5.0](https://github.com/jamesryancooper/octon/compare/octon-v0.4.16...octon-v0.5.0) (2026-03-19)
 
 
