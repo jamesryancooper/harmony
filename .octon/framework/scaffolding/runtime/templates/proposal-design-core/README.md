@@ -24,11 +24,11 @@ documentation, policy, or contract authority.
 
 1. `proposal.yml`
 2. `design-proposal.yml`
-3. `/.octon/generated/proposals/registry.yml`
-4. `navigation/source-of-truth-map.md`
-5. `implementation/README.md`
-6. class-specific `normative/` docs
-7. optional module docs listed in the source-of-truth map
+3. `navigation/source-of-truth-map.md`
+4. `implementation/README.md`
+5. class-specific `normative/` docs
+6. optional module docs listed in the source-of-truth map
+7. `/.octon/generated/proposals/registry.yml`
 
 ## Exit Path
 
@@ -36,6 +36,7 @@ documentation, policy, or contract authority.
 
 ## Registry
 
-Add or update the matching entry in `/.octon/generated/proposals/registry.yml` when this
-proposal is created, archived, or materially reclassified. The registry is a
-committed projection for discovery, not proposal lifecycle authority.
+Add or update the matching entry in `/.octon/generated/proposals/registry.yml`
+when this proposal is created, archived, or materially reclassified. The
+registry is a committed discovery projection only and does not outrank the
+proposal-local normative docs.
