@@ -86,7 +86,7 @@ copy_command_projection() {
     echo "[ERROR] missing command projection source: $source_rel" >&2
     exit 1
   }
-  rm -rf "$dest_file"
+  rm -r -f "$dest_file"
   cp "$source_abs" "$dest_file"
 }
 
@@ -98,7 +98,7 @@ copy_skill_projection() {
     echo "[ERROR] missing skill projection source dir: $source_rel" >&2
     exit 1
   }
-  rm -rf "$dest_dir"
+  rm -r -f "$dest_dir"
   cp -R "$source_abs" "$dest_dir"
 }
 
@@ -119,7 +119,7 @@ prune_unexpected_entries() {
       fi
     done
     if [[ $keep -eq 0 ]]; then
-      rm -rf "$entry"
+      rm -r -f "$entry"
     fi
   done < <(find "$dir" -mindepth 1 -maxdepth 1 -print | sort)
 }
