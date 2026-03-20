@@ -136,9 +136,14 @@ Portability is profile-driven through `octon.yml`, not a raw copy of the whole
 tree. `bootstrap_core` is the install contract completed by `/init`;
 `repo_snapshot` exports `octon.yml`, `framework/**`, `instance/**`, and the
 clean published enabled-pack dependency closure through `/export-harness`; `pack_bundle`
-exports selected packs plus dependency closure only; `full_fidelity` is
-advisory only and uses a normal Git clone. `inputs/exploratory/**`,
+exports selected packs plus dependency closure only and does not apply repo
+trust activation policy; `full_fidelity` is advisory only and uses a normal
+Git clone. `inputs/exploratory/**`,
 `state/**`, and `generated/**` stay out of clean bootstrap and repo snapshots.
+
+Raw additive pack compatibility and provenance travel with
+`inputs/additive/extensions/<pack-id>/pack.yml`.
+Repo trust stays authored in `instance/extensions.yml`.
 
 `octon.yml#policies.generated_commit_defaults` defines which generated families
 are committed for reviewability versus rebuilt locally by default.

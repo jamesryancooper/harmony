@@ -38,8 +38,8 @@ versioning, install/export profiles, and fail-closed policy hooks.
 | Profile | Operator Surface | Behavior |
 |-----------|----------------|----------|
 | `bootstrap_core` | `/init` | Complete bootstrap after adopting the framework bundle and minimal instance metadata; raw `inputs/**`, `state/**`, and `generated/**` stay excluded |
-| `repo_snapshot` | `/export-harness --profile repo_snapshot` | Export `octon.yml`, `framework/**`, `instance/**`, and the clean published enabled-pack dependency closure while excluding `inputs/exploratory/**`, `state/**`, and `generated/**` |
-| `pack_bundle` | `/export-harness --profile pack_bundle --pack-ids <csv>` | Export only selected additive packs plus dependency closure |
+| `repo_snapshot` | `/export-harness --profile repo_snapshot` | Export `octon.yml`, `framework/**`, `instance/**`, and the clean published enabled-pack dependency closure while excluding `inputs/exploratory/**`, `state/**`, and `generated/**`; fail closed when enabled-pack state is incompatible, quarantined, or incomplete |
+| `pack_bundle` | `/export-harness --profile pack_bundle --pack-ids <csv>` | Export only selected additive packs plus dependency closure; do not apply repo trust activation policy |
 | `full_fidelity` | Git clone | Advisory only; not a synthetic export payload |
 
 ---
@@ -172,6 +172,10 @@ Extension activation uses one desired/actual/quarantine/compiled model:
 - runtime-facing compiled outputs: `generated/effective/extensions/**`
 - runtime-facing capability routing: `generated/effective/capabilities/**`
 - derived cognition read models: `generated/cognition/**`
+
+Raw additive packs carry compatibility and provenance in
+`inputs/additive/extensions/<pack-id>/pack.yml`.
+Repo trust decisions stay in `instance/extensions.yml`.
 
 Proposal authority uses one manifest-governed exploratory model:
 

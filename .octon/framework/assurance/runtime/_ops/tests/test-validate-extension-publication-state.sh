@@ -105,6 +105,61 @@ EOF
   run_validator "$fixture_root"
 }
 
+case_acknowledged_first_party_external_pack_publishes_cleanly() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  write_packet8_pack "$fixture_root" "external-pack" "first-party-imported" "first_party_external" "allow" "    []" "    []" "templates"
+
+  cat >"$fixture_root/.octon/instance/extensions.yml" <<'EOF'
+schema_version: "octon-instance-extensions-v2"
+selection:
+  enabled:
+    - pack_id: "external-pack"
+      source_id: "first-party-imported"
+  disabled: []
+sources:
+  catalog:
+    bundled-first-party:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_bundled"
+    first-party-imported:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_external"
+    third-party-imported:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "third_party"
+trust:
+  default_actions:
+    first_party_bundled: "allow"
+    first_party_external: "require_acknowledgement"
+    third_party: "deny"
+  source_overrides: {}
+  pack_overrides: {}
+acknowledgements:
+  - acknowledgement_id: "ack-ext-pack"
+    pack_id: "external-pack"
+    source_id: "first-party-imported"
+    action: "allow"
+    reason_code: "operator-reviewed"
+EOF
+
+  publish_state "$fixture_root"
+  [[ "$(yq -r '.status // ""' "$fixture_root/.octon/state/control/extensions/active.yml")" == "published" ]]
+  [[ "$(yq -r '.published_active_packs[0].pack_id // ""' "$fixture_root/.octon/state/control/extensions/active.yml")" == "external-pack" ]]
+  [[ "$(yq -r '.records | length' "$fixture_root/.octon/state/control/extensions/quarantine.yml")" == "0" ]]
+  run_validator "$fixture_root"
+}
+
 case_fully_invalid_selection_withdraws_extensions() {
   local fixture_root
   fixture_root="$(create_packet2_fixture_repo)"
@@ -252,6 +307,7 @@ EOF
 main() {
   assert_success "empty desired selection publishes a clean empty generation" case_empty_selection_publishes_clean_empty_generation
   assert_success "one valid and one denied selected pack publishes with quarantine" case_partial_surviving_set_publishes_with_quarantine
+  assert_success "acknowledged first-party external pack publishes cleanly" case_acknowledged_first_party_external_pack_publishes_cleanly
   assert_success "fully invalid selected set withdraws extension contributions" case_fully_invalid_selection_withdraws_extensions
   assert_success "non-manifest payload changes invalidate the generation lock" case_non_manifest_payload_change_invalidates_generation_lock
   assert_success "dependency root-cause quarantine records carry affected dependents" case_dependency_root_cause_records_affected_dependents

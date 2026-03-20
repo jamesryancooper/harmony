@@ -92,6 +92,12 @@ super-root cutover.
 38. Proposals are excluded from runtime resolution, policy resolution,
     `bootstrap_core`, and `repo_snapshot`.
 39. No descendant-local or scope-local proposal workspace exists in v1.
+40. Raw extension packs use `octon-extension-pack-v3` and must carry
+    `compatibility.required_contracts` plus pack-authored provenance fields.
+41. Repo trust decisions remain in `instance/extensions.yml`; pack provenance
+    remains in `pack.yml`.
+42. `pack_bundle` is a trust-agnostic raw additive transfer profile and does
+    not imply pack activation or publication.
 
 ## Precedence
 
@@ -235,3 +241,5 @@ before it becomes legal.
 - Direct reads from raw exploratory proposal paths by runtime or policy code
   are always invalid raw-input dependencies.
 - Incomplete enabled-pack closure blocks `repo_snapshot` export.
+- Missing required pack provenance or unsupported `required_contracts` blocks
+  pack publication and any `repo_snapshot` that depends on the pack.

@@ -95,11 +95,16 @@ tree as the default bootstrap model.
 - `bootstrap_core` installs `octon.yml`, `framework/**`, and
   `instance/manifest.yml`; `/init` completes repo-local bootstrap projections.
 - `repo_snapshot` exports `octon.yml`, `framework/**`, `instance/**`, and the
-  clean published enabled-pack dependency closure through `/export-harness`.
-- `pack_bundle` exports selected additive packs plus dependency closure only.
+  clean published enabled-pack dependency closure through `/export-harness`
+  and fails closed on incompatible, missing, or unclean enabled-pack state.
+- `pack_bundle` exports selected additive packs plus dependency closure only
+  and does not apply repo trust activation policy.
 - `full_fidelity` is advisory only and uses a normal Git clone.
 - `inputs/exploratory/**`, `state/**`, and `generated/**` stay out of
   `bootstrap_core` and `repo_snapshot`.
+
+Raw pack compatibility and provenance travel with `inputs/additive/extensions/<pack-id>/pack.yml`.
+Repo trust remains in `instance/extensions.yml`.
 
 ## Boundaries
 

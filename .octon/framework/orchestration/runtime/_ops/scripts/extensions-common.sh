@@ -205,6 +205,104 @@ ext_source_allows_origin() {
     | grep -Fx "$origin_class" >/dev/null 2>&1
 }
 
+ext_supported_contract_schema_version() {
+  case "$1" in
+    root-manifest) printf 'octon-root-manifest-v2' ;;
+    framework-manifest) printf 'octon-framework-manifest-v2' ;;
+    instance-manifest) printf 'octon-instance-manifest-v1' ;;
+    instance-extensions) printf 'octon-instance-extensions-v2' ;;
+    extension-active-state) printf 'octon-extension-active-state-v2' ;;
+    extension-quarantine-state) printf 'octon-extension-quarantine-state-v2' ;;
+    extension-effective-catalog) printf 'octon-extension-effective-catalog-v3' ;;
+    extension-artifact-map) printf 'octon-extension-artifact-map-v3' ;;
+    extension-generation-lock) printf 'octon-extension-generation-lock-v3' ;;
+    *) return 1 ;;
+  esac
+}
+
+ext_validate_required_contracts() {
+  local manifest="$1" contract_id schema_version supported_version
+  declare -A seen_contract_ids=()
+
+  yq -e '.compatibility.required_contracts | tag == "!!seq"' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="missing-required-contracts"
+    return 1
+  }
+
+  while IFS=$'\t' read -r contract_id schema_version; do
+    [[ -n "$contract_id" ]] || continue
+    if [[ -n "${seen_contract_ids["$contract_id"]:-}" ]]; then
+      EXT_LAST_ERROR_REASON="duplicate-required-contract:$contract_id"
+      return 1
+    fi
+    seen_contract_ids["$contract_id"]="1"
+    supported_version="$(ext_supported_contract_schema_version "$contract_id" 2>/dev/null || true)"
+    if [[ -z "$supported_version" ]]; then
+      EXT_LAST_ERROR_REASON="unsupported-required-contract:$contract_id"
+      return 1
+    fi
+    if [[ "$schema_version" != "$supported_version" ]]; then
+      EXT_LAST_ERROR_REASON="required-contract-version-mismatch:$contract_id"
+      return 1
+    fi
+  done < <(yq -r '.compatibility.required_contracts[]? | [.contract_id, .schema_version] | @tsv' "$manifest" 2>/dev/null || true)
+}
+
+ext_validate_provenance_contract() {
+  local manifest="$1" origin_class="$2"
+  local imported_from origin_uri digest_sha256
+
+  yq -e '.provenance | tag == "!!map"' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="missing-provenance"
+    return 1
+  }
+  yq -e '.provenance | has("source_id")' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="missing-provenance-source-id"
+    return 1
+  }
+  yq -e '.provenance | has("imported_from")' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="missing-imported-from"
+    return 1
+  }
+  yq -e '.provenance | has("origin_uri")' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="missing-origin-uri"
+    return 1
+  }
+  yq -e '.provenance | has("digest_sha256")' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="missing-digest-sha256"
+    return 1
+  }
+  yq -e '.provenance | has("attestation_refs")' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="missing-attestation-refs"
+    return 1
+  }
+  yq -e '.provenance.attestation_refs | tag == "!!seq"' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="invalid-attestation-refs"
+    return 1
+  }
+
+  imported_from="$(yq -r '.provenance.imported_from // ""' "$manifest")"
+  origin_uri="$(yq -r '.provenance.origin_uri // ""' "$manifest")"
+  digest_sha256="$(yq -r '.provenance.digest_sha256 // ""' "$manifest")"
+
+  if [[ -n "$digest_sha256" && ! "$digest_sha256" =~ ^[a-f0-9]{64}$ ]]; then
+    EXT_LAST_ERROR_REASON="invalid-digest-sha256"
+    return 1
+  fi
+
+  case "$origin_class" in
+    first_party_bundled)
+      return 0
+      ;;
+    first_party_external|third_party)
+      if [[ -z "$imported_from" && -z "$origin_uri" && -z "$digest_sha256" ]]; then
+        EXT_LAST_ERROR_REASON="external-provenance-required"
+        return 1
+      fi
+      ;;
+  esac
+}
+
 ext_manifest_source_id() {
   local manifest="$1"
   yq -r '.provenance.source_id // ""' "$manifest"
@@ -295,7 +393,7 @@ ext_validate_pack_contract() {
   }
   pack_root="$(ext_pack_root_abs "$pack_id")"
 
-  [[ "$(yq -r '.schema_version // ""' "$manifest")" == "octon-extension-pack-v2" ]] || {
+  [[ "$(yq -r '.schema_version // ""' "$manifest")" == "octon-extension-pack-v3" ]] || {
     EXT_LAST_ERROR_REASON="invalid-schema-version"
     return 1
   }
@@ -331,6 +429,7 @@ ext_validate_pack_contract() {
     EXT_LAST_ERROR_REASON="missing-extensions-api"
     return 1
   }
+  ext_validate_required_contracts "$manifest" || return 1
   [[ "$ext_api" == "$(yq -r '.versioning.extensions.api_version // ""' "$ROOT_MANIFEST")" ]] || {
     EXT_LAST_ERROR_REASON="extensions-api-mismatch"
     return 1
@@ -361,6 +460,7 @@ ext_validate_pack_contract() {
     EXT_LAST_ERROR_REASON="source-root-mismatch"
     return 1
   }
+  ext_validate_provenance_contract "$manifest" "$origin_class" || return 1
   [[ "$manifest_source_id" == "$source_id" ]] || {
     EXT_LAST_ERROR_REASON="provenance-source-mismatch"
     return 1

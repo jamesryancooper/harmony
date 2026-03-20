@@ -59,6 +59,19 @@ EOF
   ! run_validator "$fixture_root"
 }
 
+case_supported_required_contracts_pass() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  perl -0pi -e 's/required_contracts: \[\]/required_contracts:\n    - contract_id: "extension-effective-catalog"\n      schema_version: "octon-extension-effective-catalog-v3"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  run_validator "$fixture_root"
+}
+
 case_unexpected_top_level_bucket_fails() {
   local fixture_root
   fixture_root="$(create_packet2_fixture_repo)"
@@ -74,6 +87,19 @@ EOF
   ! run_validator "$fixture_root"
 }
 
+case_missing_required_provenance_fields_fail() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  perl -0pi -e 's/\n  origin_uri: null\n  digest_sha256: null\n  attestation_refs: \[\]//' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
 case_provenance_source_mismatch_fails() {
   local fixture_root
   fixture_root="$(create_packet2_fixture_repo)"
@@ -81,23 +107,48 @@ case_provenance_source_mismatch_fails() {
   copy_packet2_runtime_scripts "$fixture_root"
   write_valid_packet2_fixture "$fixture_root"
 
-  python3 - "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml" <<'PY'
-from pathlib import Path
-import yaml
-path = Path(__import__("sys").argv[1])
-doc = yaml.safe_load(path.read_text())
-doc["provenance"]["source_id"] = "third-party-imported"
-path.write_text(yaml.safe_dump(doc, sort_keys=False))
-PY
+  perl -0pi -e 's/source_id: "bundled-first-party"/source_id: "third-party-imported"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
+case_external_pack_requires_external_provenance() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  write_packet8_pack "$fixture_root" "external-pack" "first-party-imported" "first_party_external" "allow" "    []" "    []" "templates"
+  perl -0pi -e 's/imported_from: "https:\/\/example.com\/external-pack.git"/imported_from: null/' \
+    "$fixture_root/.octon/inputs/additive/extensions/external-pack/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
+case_unsupported_required_contract_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  perl -0pi -e 's/required_contracts: \[\]/required_contracts:\n    - contract_id: "unsupported-contract"\n      schema_version: "contract-v1"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
 
   ! run_validator "$fixture_root"
 }
 
 main() {
   assert_success "seeded packet-8 packs satisfy the pack contract" case_valid_seeded_packs_pass
+  assert_success "supported required_contracts entries are accepted" case_supported_required_contracts_pass
   assert_success "pack validator rejects legacy pack manifest shape" case_invalid_pack_schema_fails
   assert_success "pack validator rejects disallowed top-level pack buckets" case_unexpected_top_level_bucket_fails
+  assert_success "pack validator rejects missing required provenance fields" case_missing_required_provenance_fields_fail
   assert_success "pack validator rejects provenance/source mismatches" case_provenance_source_mismatch_fails
+  assert_success "external packs require external provenance" case_external_pack_requires_external_provenance
+  assert_success "unsupported required_contracts entries are rejected" case_unsupported_required_contract_fails
 
   echo
   echo "Passed: $pass_count"

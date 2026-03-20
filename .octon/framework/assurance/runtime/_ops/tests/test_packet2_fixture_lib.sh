@@ -72,6 +72,11 @@ write_packet8_pack() {
   local conflicts_block="$7"
   local content_root="${8:-}"
   local templates_entry="null"
+  local imported_from="null"
+
+  if [[ "$origin_class" != "first_party_bundled" ]]; then
+    imported_from="\"https://example.com/${pack_id}.git\""
+  fi
 
   mkdir -p "$fixture_root/.octon/inputs/additive/extensions/$pack_id"
   if [[ -n "$content_root" ]]; then
@@ -85,13 +90,14 @@ EOF
 # $pack_id
 EOF
   cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/pack.yml" <<EOF
-schema_version: "octon-extension-pack-v2"
+schema_version: "octon-extension-pack-v3"
 pack_id: "$pack_id"
 version: "1.0.0"
 origin_class: "$origin_class"
 compatibility:
   octon_version: "^0.5.0"
   extensions_api_version: "1.0"
+  required_contracts: []
 dependencies:
   requires:
 $requires_block
@@ -99,7 +105,10 @@ $requires_block
 $conflicts_block
 provenance:
   source_id: "$source_id"
-  imported_from: null
+  imported_from: $imported_from
+  origin_uri: null
+  digest_sha256: null
+  attestation_refs: []
 trust_hints:
   suggested_action: "$suggested_action"
 content_entrypoints:
