@@ -115,3 +115,5 @@ records:
     path: 055-memory-routing-and-decision-surfaces-atomic-cutover.md
   - id: 056-capability-routing-and-host-integration-atomic-cutover
     path: 056-capability-routing-and-host-integration-atomic-cutover.md
+  - id: 057-portability-compatibility-trust-provenance-atomic-cutover
+    path: 057-portability-compatibility-trust-provenance-atomic-cutover.md

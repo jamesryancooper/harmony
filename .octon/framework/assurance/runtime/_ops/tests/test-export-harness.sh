@@ -43,19 +43,25 @@ write_pack() {
   local origin_class="${4:-first_party_bundled}"
   local requires_block="${5:-    []}"
   local conflicts_block="${6:-    []}"
+  local imported_from="null"
+
+  if [[ "$origin_class" != "first_party_bundled" ]]; then
+    imported_from="\"https://example.com/${pack_id}.git\""
+  fi
 
   mkdir -p "$fixture_root/.octon/inputs/additive/extensions/$pack_id"
   cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/README.md" <<EOF
 # $pack_id
 EOF
   cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/pack.yml" <<EOF
-schema_version: "octon-extension-pack-v2"
+schema_version: "octon-extension-pack-v3"
 pack_id: "$pack_id"
 version: "1.0.0"
 origin_class: "$origin_class"
 compatibility:
   octon_version: "0.5.0"
   extensions_api_version: "1.0"
+  required_contracts: []
 dependencies:
   requires:
 $requires_block
@@ -63,7 +69,10 @@ $requires_block
 $conflicts_block
 provenance:
   source_id: "$source_id"
-  imported_from: null
+  imported_from: $imported_from
+  origin_uri: null
+  digest_sha256: null
+  attestation_refs: []
 trust_hints:
   suggested_action: "allow"
 content_entrypoints:
@@ -105,6 +114,118 @@ schema_version: "octon-instance-extensions-v2"
 selection:
   enabled:
     - pack_id: "missing-pack"
+      source_id: "bundled-first-party"
+  disabled: []
+sources:
+  catalog:
+    bundled-first-party:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_bundled"
+trust:
+  default_actions:
+    first_party_bundled: "allow"
+    first_party_external: "require_acknowledgement"
+    third_party: "deny"
+  source_overrides: {}
+  pack_overrides: {}
+acknowledgements: []
+EOF
+
+  ! run_export "$fixture_root" --profile repo_snapshot --output-dir "$fixture_root/out" >/dev/null 2>&1
+}
+
+case_repo_snapshot_acknowledgement_required_pack_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  write_pack "$fixture_root" "external-pack" "first-party-imported" "first_party_external" "    []" "    []"
+  perl -0pi -e 's/imported_from: null/imported_from: "https:\/\/example.com\/external-pack.git"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/external-pack/pack.yml"
+
+  cat >"$fixture_root/.octon/instance/extensions.yml" <<'EOF'
+schema_version: "octon-instance-extensions-v2"
+selection:
+  enabled:
+    - pack_id: "external-pack"
+      source_id: "first-party-imported"
+  disabled: []
+sources:
+  catalog:
+    bundled-first-party:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_bundled"
+    first-party-imported:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "first_party_external"
+    third-party-imported:
+      source_type: "internalized"
+      root: ".octon/inputs/additive/extensions"
+      allowed_origin_classes:
+        - "third_party"
+trust:
+  default_actions:
+    first_party_bundled: "allow"
+    first_party_external: "require_acknowledgement"
+    third_party: "deny"
+  source_overrides: {}
+  pack_overrides: {}
+acknowledgements: []
+EOF
+
+  ! run_export "$fixture_root" --profile repo_snapshot --output-dir "$fixture_root/out" >/dev/null 2>&1
+}
+
+case_repo_snapshot_incompatible_selected_pack_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  mkdir -p "$fixture_root/.octon/inputs/additive/extensions/incompatible"
+  cat >"$fixture_root/.octon/inputs/additive/extensions/incompatible/pack.yml" <<'EOF'
+schema_version: "octon-extension-pack-v3"
+pack_id: "incompatible"
+version: "1.0.0"
+origin_class: "first_party_bundled"
+compatibility:
+  octon_version: "^9.0.0"
+  extensions_api_version: "1.0"
+  required_contracts: []
+dependencies:
+  requires: []
+  conflicts: []
+provenance:
+  source_id: "bundled-first-party"
+  imported_from: null
+  origin_uri: null
+  digest_sha256: null
+  attestation_refs: []
+trust_hints:
+  suggested_action: "allow"
+content_entrypoints:
+  skills: null
+  commands: null
+  templates: null
+  prompts: null
+  context: null
+  validation: null
+EOF
+
+  cat >"$fixture_root/.octon/instance/extensions.yml" <<'EOF'
+schema_version: "octon-instance-extensions-v2"
+selection:
+  enabled:
+    - pack_id: "incompatible"
       source_id: "bundled-first-party"
   disabled: []
 sources:
@@ -193,19 +314,23 @@ case_pack_bundle_compatibility_mismatch_fails() {
 
   mkdir -p "$fixture_root/.octon/inputs/additive/extensions/a"
   cat >"$fixture_root/.octon/inputs/additive/extensions/a/pack.yml" <<'EOF'
-schema_version: "octon-extension-pack-v2"
+schema_version: "octon-extension-pack-v3"
 pack_id: "a"
 version: "1.0.0"
 origin_class: "first_party_bundled"
 compatibility:
   octon_version: "^9.0.0"
   extensions_api_version: "1.0"
+  required_contracts: []
 dependencies:
   requires: []
   conflicts: []
 provenance:
   source_id: "bundled-first-party"
   imported_from: null
+  origin_uri: null
+  digest_sha256: null
+  attestation_refs: []
 trust_hints:
   suggested_action: "allow"
 content_entrypoints:
@@ -238,6 +363,8 @@ case_pack_bundle_ignores_repo_trust_denial() {
 main() {
   assert_success "repo_snapshot with empty enabled set exports only core payload" case_repo_snapshot_empty_enabled_exports_core_only
   assert_success "repo_snapshot fails when an enabled pack payload is missing" case_repo_snapshot_missing_enabled_pack_fails
+  assert_success "repo_snapshot fails when an enabled pack requires acknowledgement" case_repo_snapshot_acknowledgement_required_pack_fails
+  assert_success "repo_snapshot fails when an enabled pack is incompatible" case_repo_snapshot_incompatible_selected_pack_fails
   assert_success "pack_bundle exports selected packs plus dependency closure only" case_pack_bundle_includes_dependency_closure_only
   assert_success "pack_bundle exports raw packs even when repo trust would deny activation" case_pack_bundle_ignores_repo_trust_denial
   assert_success "full_fidelity export is rejected" case_full_fidelity_rejected

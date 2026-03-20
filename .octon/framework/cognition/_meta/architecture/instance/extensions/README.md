@@ -6,6 +6,8 @@ configuration surface for additive extension activation.
 ## Rules
 
 - This file is desired configuration only.
+- Trust allow/deny/acknowledgement policy lives here and remains repo-authored.
+- Pack provenance stays with `inputs/additive/extensions/<pack-id>/pack.yml`.
 - Actual active state belongs under `state/control/extensions/active.yml`.
 - Quarantine and withdrawal truth belongs under
   `state/control/extensions/quarantine.yml`.

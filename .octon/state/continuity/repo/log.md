@@ -33,6 +33,36 @@ mutability: append-only
 
 ## 2026-03-20
 
+**Session focus:** Implement Packet 13 portability, compatibility, trust, and
+provenance atomic cutover
+
+**Completed:**
+
+- Upgraded the additive pack contract to `octon-extension-pack-v3` across the
+  canonical schema, seeded packs, and shell-test fixtures
+- Hardened the shared extension validator to enforce
+  `compatibility.required_contracts`, expanded provenance fields, and the
+  external-provenance requirement for non-bundled packs
+- Added focused Packet 13 regressions for missing provenance, unsupported
+  required contracts, acknowledgement-gated activation, incompatible enabled
+  packs, and trust-agnostic `pack_bundle` exports
+- Updated the canonical portability, extension-governance, and
+  `export-harness` documentation surfaces to match the Packet 13 contract
+- Refreshed generated extension and capability publication outputs during the
+  harness alignment gate
+- Recorded the Packet 13 migration plan, evidence bundle, and ADR, then
+  archived the implemented proposal package in `.archive/**`
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-20
+
 **Session focus:** Archive the implemented Packet 10 proposal package
 
 **Completed:**

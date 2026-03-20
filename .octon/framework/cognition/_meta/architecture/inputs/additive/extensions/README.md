@@ -28,3 +28,12 @@ inputs/additive/extensions/<pack-id>/
 ## Schema Contracts
 
 - `schemas/extension-pack.schema.json`
+
+## Packet Contract
+
+- `pack.yml` uses `octon-extension-pack-v3`.
+- `compatibility.required_contracts` is required, even when empty.
+- `provenance` is pack-authored and carries origin metadata, digests, and
+  attestation references.
+- Repo trust remains in `instance/extensions.yml`; it does not move into raw
+  pack payloads.

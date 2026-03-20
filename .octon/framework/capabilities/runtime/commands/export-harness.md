@@ -41,10 +41,14 @@ Behavior:
    `published` extension state before exporting.
 3. For `pack_bundle`, resolve selected packs from `--pack-ids` and compute the
    full transitive dependency closure from `inputs/additive/extensions/<pack-id>/pack.yml`.
-4. Fail closed on missing payloads, dependency cycles, conflicts,
-   compatibility mismatch, or quarantined repo snapshot state.
-5. Materialize the export to `<output-dir>/.octon/`.
-6. Write `<output-dir>/export.receipt.yml`.
+   This profile exports raw additive payloads and remains trust-agnostic.
+4. Require `octon-extension-pack-v3` manifests with Packet 13 compatibility
+   and provenance fields before either profile may export pack payloads.
+5. Fail closed on missing payloads, dependency cycles, conflicts,
+   compatibility mismatch, unsupported required contracts, missing required
+   provenance, or quarantined repo snapshot state.
+6. Materialize the export to `<output-dir>/.octon/`.
+7. Write `<output-dir>/export.receipt.yml`.
 
 `full_fidelity` is advisory only and must use a normal Git clone.
 

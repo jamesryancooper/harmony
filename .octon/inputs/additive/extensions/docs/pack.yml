@@ -1,16 +1,20 @@
-schema_version: "octon-extension-pack-v2"
+schema_version: "octon-extension-pack-v3"
 pack_id: "docs"
 version: "1.0.0"
 origin_class: "first_party_bundled"
 compatibility:
   octon_version: "^0.5.0"
   extensions_api_version: "1.0"
+  required_contracts: []
 dependencies:
   requires: []
   conflicts: []
 provenance:
   source_id: "bundled-first-party"
   imported_from: null
+  origin_uri: null
+  digest_sha256: null
+  attestation_refs: []
 trust_hints:
   suggested_action: "allow"
 content_entrypoints:

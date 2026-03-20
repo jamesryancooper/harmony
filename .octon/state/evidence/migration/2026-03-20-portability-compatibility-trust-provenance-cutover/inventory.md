@@ -1,0 +1,26 @@
+# Inventory
+
+- Pack contract and validation:
+  - `.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/extension-pack.schema.json`
+  - `.octon/framework/orchestration/runtime/_ops/scripts/extensions-common.sh`
+  - `.octon/inputs/additive/extensions/{docs,nextjs,node-ts}/pack.yml`
+- Regression coverage:
+  - `.octon/framework/assurance/runtime/_ops/tests/test_packet2_fixture_lib.sh`
+  - `.octon/framework/assurance/runtime/_ops/tests/test-validate-extension-pack-contract.sh`
+  - `.octon/framework/assurance/runtime/_ops/tests/test-export-harness.sh`
+  - `.octon/framework/assurance/runtime/_ops/tests/test-validate-extension-publication-state.sh`
+- Canonical docs and workflows:
+  - `.octon/README.md`
+  - `.octon/instance/bootstrap/START.md`
+  - `.octon/framework/cognition/_meta/architecture/{shared-foundation.md,specification.md}`
+  - `.octon/framework/engine/governance/extensions/trust-and-compatibility.md`
+  - `.octon/framework/capabilities/runtime/commands/export-harness.md`
+  - `.octon/framework/orchestration/runtime/workflows/meta/export-harness/README.md`
+- Generated refresh:
+  - `.octon/generated/effective/extensions/**`
+  - `.octon/generated/effective/capabilities/**`
+  - `.octon/state/control/extensions/{active.yml,quarantine.yml}`
+- Closeout:
+  - `.octon/instance/cognition/decisions/057-portability-compatibility-trust-provenance-atomic-cutover.md`
+  - `.octon/generated/proposals/registry.yml`
+  - `.octon/inputs/exploratory/proposals/.archive/architecture/portability-compatibility-trust-provenance/`
