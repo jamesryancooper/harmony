@@ -138,7 +138,7 @@ The `create-skill` skill executes these phases:
 | **Initialize** | Update placeholders with skill name, display name, description |
 | **Update Manifest** | Add entry to `manifest.yml` (Tier 1 discovery) |
 | **Update Registry** | Add entry to `registry.yml` (extended metadata) |
-| **Refresh Links** | Run shared link setup for host adapter directories if needed |
+| **Publish Projections** | Regenerate host adapter projections from the generated routing view when needed |
 | **Report** | Confirm success and show next steps |
 
 ---
@@ -159,7 +159,7 @@ A new skill directory following the agentskills.io spec:
 ├── scripts/              # Executable code (optional)
 └── [additional files as needed]
 
-# Host adapter links are refreshed via setup-harness-links.sh when needed.
+# Host adapter projections are regenerated from generated routing when needed.
 ```
 
 ---
@@ -244,6 +244,18 @@ Add extended metadata to `.octon/framework/capabilities/runtime/skills/registry.
 skills:
   your-skill-name:
     version: "1.0.0"
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    routing:
+      selectors:
+        include:
+          - "**"
+        exclude: []
+      fingerprints:
+        tech_tags: []
+        language_tags: []
     commands:
       - /your-skill-name
     requires:
@@ -284,18 +296,13 @@ skills:
 
 **Placeholder Syntax:** Use `{{snake_case}}` for path placeholders (e.g., `{{timestamp}}`, `{{project}}`). See [Placeholder Resolution](./execution.md#placeholder-resolution) for details.
 
-### 6. Refresh Links
+### 6. Publish Host Projections
 
-Run the setup script or create symlinks manually:
+After the new skill is registered and routing metadata is present:
 
 ```bash
-# Using setup script
-.octon/framework/capabilities/runtime/skills/_ops/scripts/setup-harness-links.sh
-
-# Or manually
-ln -s ../../.octon/framework/capabilities/runtime/skills/audit/your-skill-name .claude/skills/your-skill-name
-ln -s ../../.octon/framework/capabilities/runtime/skills/audit/your-skill-name .cursor/skills/your-skill-name
-ln -s ../../.octon/framework/capabilities/runtime/skills/audit/your-skill-name .codex/skills/your-skill-name
+bash .octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh
+bash .octon/framework/capabilities/_ops/scripts/publish-host-projections.sh
 ```
 
 ### 7. Test

@@ -50,9 +50,9 @@ main() {
 
   [[ "$(yq -r '.schema_version // ""' "$ACTIVE_STATE")" == "octon-extension-active-state-v2" ]] && pass "active state schema version valid" || fail "active state schema_version invalid"
   [[ "$(yq -r '.schema_version // ""' "$QUARANTINE_STATE")" == "octon-extension-quarantine-state-v2" ]] && pass "quarantine state schema version valid" || fail "quarantine state schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v2" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v2" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v2" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v3" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v3" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v3" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
   local expected_generator_version
   expected_generator_version="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST" 2>/dev/null || true)"
   [[ -n "$expected_generator_version" ]] && pass "root manifest generator version available" || fail "root manifest missing versioning.harness.release_version"
@@ -101,6 +101,17 @@ main() {
   [[ "$desired_enabled" == "$catalog_desired" ]] && pass "effective catalog desired_selected_packs match desired selection" || fail "effective catalog desired_selected_packs do not match desired selection"
   [[ "$active_published" == "$catalog_published" ]] && pass "effective catalog published_active_packs match active state" || fail "effective catalog published_active_packs mismatch"
   [[ "$active_closure" == "$catalog_closure" ]] && pass "effective catalog dependency_closure matches active state" || fail "effective catalog dependency_closure mismatch"
+
+  local pack_id source_id
+  while IFS=$'\t' read -r pack_id source_id; do
+    [[ -z "$pack_id" ]] && continue
+    yq -e ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .routing_exports.commands | type == \"!!seq\"" "$CATALOG_FILE" >/dev/null 2>&1 \
+      && pass "routing_exports.commands valid for $pack_id" \
+      || fail "routing_exports.commands invalid for $pack_id"
+    yq -e ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .routing_exports.skills | type == \"!!seq\"" "$CATALOG_FILE" >/dev/null 2>&1 \
+      && pass "routing_exports.skills valid for $pack_id" \
+      || fail "routing_exports.skills invalid for $pack_id"
+  done < <(yq -r '.packs[]? | [.pack_id, .source_id] | @tsv' "$CATALOG_FILE" 2>/dev/null || true)
 
   local quarantine_count
   quarantine_count="$(yq -r '.records | length' "$QUARANTINE_STATE" 2>/dev/null || printf '0')"

@@ -127,3 +127,7 @@ records:
     path: 2026-03-20-memory-routing-and-decision-surfaces-cutover/plan.md
     adr: ../decisions/055-memory-routing-and-decision-surfaces-atomic-cutover.md
     evidence: /.octon/state/evidence/migration/2026-03-20-memory-routing-and-decision-surfaces-cutover/evidence.md
+  - id: 2026-03-20-capability-routing-host-integration-cutover
+    path: 2026-03-20-capability-routing-host-integration-cutover/plan.md
+    adr: ../decisions/056-capability-routing-and-host-integration-atomic-cutover.md
+    evidence: /.octon/state/evidence/migration/2026-03-20-capability-routing-host-integration-cutover/evidence.md

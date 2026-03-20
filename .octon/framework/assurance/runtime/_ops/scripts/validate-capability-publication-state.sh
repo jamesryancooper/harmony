@@ -8,17 +8,20 @@ ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 
 ROOT_MANIFEST="$OCTON_DIR/octon.yml"
 EXTENSIONS_CATALOG="$OCTON_DIR/generated/effective/extensions/catalog.effective.yml"
+EXTENSIONS_LOCK="$OCTON_DIR/generated/effective/extensions/generation.lock.yml"
+LOCALITY_SCOPES="$OCTON_DIR/generated/effective/locality/scopes.effective.yml"
+LOCALITY_LOCK="$OCTON_DIR/generated/effective/locality/generation.lock.yml"
 COMMANDS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/commands/manifest.yml"
 SKILLS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/skills/manifest.yml"
+SKILLS_REGISTRY="$OCTON_DIR/framework/capabilities/runtime/skills/registry.yml"
 SERVICES_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/services/manifest.yml"
 TOOLS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/tools/manifest.yml"
-INSTANCE_CAPABILITIES_DIR="$OCTON_DIR/instance/capabilities/runtime"
+INSTANCE_COMMANDS_MANIFEST="$OCTON_DIR/instance/capabilities/runtime/commands/manifest.yml"
+INSTANCE_SKILLS_MANIFEST="$OCTON_DIR/instance/capabilities/runtime/skills/manifest.yml"
 EFFECTIVE_DIR="$OCTON_DIR/generated/effective/capabilities"
 ROUTING_FILE="$EFFECTIVE_DIR/routing.effective.yml"
 ARTIFACT_MAP_FILE="$EFFECTIVE_DIR/artifact-map.yml"
 GENERATION_LOCK_FILE="$EFFECTIVE_DIR/generation.lock.yml"
-LEGACY_SERVICE_POLICY="$EFFECTIVE_DIR/deny-by-default-policy.catalog.yml"
-LEGACY_SKILL_POLICY="$EFFECTIVE_DIR/skills-deny-by-default-policy.catalog.yml"
 
 errors=0
 
@@ -37,59 +40,6 @@ hash_file() {
     shasum -a 256 "$file" | awk '{print $1}'
   else
     sha256sum "$file" | awk '{print $1}'
-  fi
-}
-
-hash_directory_payload() {
-  local dir="$1"
-  local include_pattern="${2:-}"
-  local payload=""
-  local file rel sha
-  while IFS= read -r file; do
-    [[ -n "$file" ]] || continue
-    rel="${file#$ROOT_DIR/}"
-    sha="$(hash_file "$file")"
-    payload+="${rel} ${sha}"$'\n'
-  done < <(
-    if [[ -n "$include_pattern" ]]; then
-      find "$dir" -type f ! -name '.gitkeep' $include_pattern | sort
-    else
-      find "$dir" -type f ! -name '.gitkeep' | sort
-    fi
-  )
-  if command -v shasum >/dev/null 2>&1; then
-    printf '%s' "$payload" | shasum -a 256 | awk '{print $1}'
-  else
-    printf '%s' "$payload" | sha256sum | awk '{print $1}'
-  fi
-}
-
-hash_extension_capability_inputs() {
-  local payload=""
-  local commands_root skills_root file rel sha
-  while IFS=$'\t' read -r commands_root skills_root; do
-    [[ -n "$commands_root$skills_root" ]] || continue
-    if [[ -n "$commands_root" && "$commands_root" != "null" && -d "$ROOT_DIR/$commands_root" ]]; then
-      while IFS= read -r file; do
-        [[ -n "$file" ]] || continue
-        rel="${file#$ROOT_DIR/}"
-        sha="$(hash_file "$file")"
-        payload+="${rel} ${sha}"$'\n'
-      done < <(find "$ROOT_DIR/$commands_root" -type f | sort)
-    fi
-    if [[ -n "$skills_root" && "$skills_root" != "null" && -d "$ROOT_DIR/$skills_root" ]]; then
-      while IFS= read -r file; do
-        [[ -n "$file" ]] || continue
-        rel="${file#$ROOT_DIR/}"
-        sha="$(hash_file "$file")"
-        payload+="${rel} ${sha}"$'\n'
-      done < <(find "$ROOT_DIR/$skills_root" -type f | sort)
-    fi
-  done < <(yq -r '.packs[]? | [.content_roots.commands // "", .content_roots.skills // ""] | @tsv' "$EXTENSIONS_CATALOG" 2>/dev/null || true)
-  if command -v shasum >/dev/null 2>&1; then
-    printf '%s' "$payload" | shasum -a 256 | awk '{print $1}'
-  else
-    printf '%s' "$payload" | sha256sum | awk '{print $1}'
   fi
 }
 
@@ -112,16 +62,16 @@ main() {
 
   require_yaml_file "$ROOT_MANIFEST"
   require_yaml_file "$EXTENSIONS_CATALOG"
+  require_yaml_file "$EXTENSIONS_LOCK"
+  require_yaml_file "$LOCALITY_SCOPES"
+  require_yaml_file "$LOCALITY_LOCK"
   require_yaml_file "$ROUTING_FILE"
   require_yaml_file "$ARTIFACT_MAP_FILE"
   require_yaml_file "$GENERATION_LOCK_FILE"
 
-  [[ ! -e "$LEGACY_SERVICE_POLICY" ]] && pass "legacy service policy catalog removed from runtime-facing capability surface" || fail "legacy service policy catalog still exists in generated/effective/capabilities"
-  [[ ! -e "$LEGACY_SKILL_POLICY" ]] && pass "legacy skill policy catalog removed from runtime-facing capability surface" || fail "legacy skill policy catalog still exists in generated/effective/capabilities"
-
-  [[ "$(yq -r '.schema_version // ""' "$ROUTING_FILE")" == "octon-capability-routing-effective-v1" ]] && pass "routing schema version valid" || fail "routing schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-capability-routing-artifact-map-v1" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-capability-routing-generation-lock-v1" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$ROUTING_FILE")" == "octon-capability-routing-effective-v2" ]] && pass "routing schema version valid" || fail "routing schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-capability-routing-artifact-map-v2" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-capability-routing-generation-lock-v2" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
 
   local expected_generator_version
   expected_generator_version="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST")"
@@ -137,46 +87,69 @@ main() {
   [[ "$(yq -r '.generation_id // ""' "$GENERATION_LOCK_FILE")" == "$generation_id" ]] && pass "generation lock generation_id matches routing" || fail "generation lock generation_id mismatch"
   [[ "$(yq -r '.publication_status // ""' "$ROUTING_FILE")" == "published" ]] && pass "routing publication_status valid" || fail "routing publication_status invalid"
 
-  local root_sha extensions_sha
-  local commands_sha skills_sha services_sha tools_sha instance_sha extension_inputs_sha
+  local root_sha commands_sha skills_sha skills_registry_sha services_sha tools_sha instance_commands_sha instance_skills_sha locality_scopes_sha locality_lock_sha locality_generation_id extensions_sha extensions_lock_sha extensions_generation_id
   root_sha="$(hash_file "$ROOT_MANIFEST")"
-  extensions_sha="$(hash_file "$EXTENSIONS_CATALOG")"
   commands_sha="$(hash_file "$COMMANDS_MANIFEST")"
   skills_sha="$(hash_file "$SKILLS_MANIFEST")"
+  skills_registry_sha="$(hash_file "$SKILLS_REGISTRY")"
   services_sha="$(hash_file "$SERVICES_MANIFEST")"
   tools_sha="$(hash_file "$TOOLS_MANIFEST")"
-  instance_sha="$(
-    {
-      find "$INSTANCE_CAPABILITIES_DIR/commands" -type f -name '*.md' ! -name 'README.md' 2>/dev/null
-      find "$INSTANCE_CAPABILITIES_DIR/skills" -type f -name 'SKILL.md' 2>/dev/null
-    } | sort | while IFS= read -r file; do
-      rel="${file#$ROOT_DIR/}"
-      sha="$(hash_file "$file")"
-      printf '%s %s\n' "$rel" "$sha"
-    done | if command -v shasum >/dev/null 2>&1; then shasum -a 256 | awk '{print $1}'; else sha256sum | awk '{print $1}'; fi
-  )"
-  extension_inputs_sha="$(hash_extension_capability_inputs)"
+  instance_commands_sha="$(hash_file "$INSTANCE_COMMANDS_MANIFEST")"
+  instance_skills_sha="$(hash_file "$INSTANCE_SKILLS_MANIFEST")"
+  locality_scopes_sha="$(hash_file "$LOCALITY_SCOPES")"
+  locality_lock_sha="$(hash_file "$LOCALITY_LOCK")"
+  locality_generation_id="$(yq -r '.generation_id // ""' "$LOCALITY_LOCK")"
+  extensions_sha="$(hash_file "$EXTENSIONS_CATALOG")"
+  extensions_lock_sha="$(hash_file "$EXTENSIONS_LOCK")"
+  extensions_generation_id="$(yq -r '.generation_id // ""' "$EXTENSIONS_LOCK")"
+
   [[ "$(yq -r '.source.root_manifest_sha256 // ""' "$ROUTING_FILE")" == "$root_sha" ]] && pass "routing root manifest hash current" || fail "routing root manifest hash stale"
   [[ "$(yq -r '.root_manifest_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$root_sha" ]] && pass "generation lock root manifest hash current" || fail "generation lock root manifest hash stale"
-  [[ "$(yq -r '.source.extensions_catalog_sha256 // ""' "$ROUTING_FILE")" == "$extensions_sha" ]] && pass "routing extensions catalog hash current" || fail "routing extensions catalog hash stale"
-  [[ "$(yq -r '.extensions_catalog_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$extensions_sha" ]] && pass "generation lock extensions catalog hash current" || fail "generation lock extensions catalog hash stale"
   [[ "$(yq -r '.source.framework_commands_manifest_sha256 // ""' "$ROUTING_FILE")" == "$commands_sha" ]] && pass "routing commands manifest hash current" || fail "routing commands manifest hash stale"
   [[ "$(yq -r '.framework_commands_manifest_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$commands_sha" ]] && pass "generation lock commands manifest hash current" || fail "generation lock commands manifest hash stale"
   [[ "$(yq -r '.source.framework_skills_manifest_sha256 // ""' "$ROUTING_FILE")" == "$skills_sha" ]] && pass "routing skills manifest hash current" || fail "routing skills manifest hash stale"
   [[ "$(yq -r '.framework_skills_manifest_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$skills_sha" ]] && pass "generation lock skills manifest hash current" || fail "generation lock skills manifest hash stale"
+  [[ "$(yq -r '.source.framework_skills_registry_sha256 // ""' "$ROUTING_FILE")" == "$skills_registry_sha" ]] && pass "routing skills registry hash current" || fail "routing skills registry hash stale"
+  [[ "$(yq -r '.framework_skills_registry_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$skills_registry_sha" ]] && pass "generation lock skills registry hash current" || fail "generation lock skills registry hash stale"
   [[ "$(yq -r '.source.framework_services_manifest_sha256 // ""' "$ROUTING_FILE")" == "$services_sha" ]] && pass "routing services manifest hash current" || fail "routing services manifest hash stale"
   [[ "$(yq -r '.framework_services_manifest_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$services_sha" ]] && pass "generation lock services manifest hash current" || fail "generation lock services manifest hash stale"
   [[ "$(yq -r '.source.framework_tools_manifest_sha256 // ""' "$ROUTING_FILE")" == "$tools_sha" ]] && pass "routing tools manifest hash current" || fail "routing tools manifest hash stale"
   [[ "$(yq -r '.framework_tools_manifest_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$tools_sha" ]] && pass "generation lock tools manifest hash current" || fail "generation lock tools manifest hash stale"
-  [[ "$(yq -r '.source.instance_capabilities_sha256 // ""' "$ROUTING_FILE")" == "$instance_sha" ]] && pass "routing instance capabilities digest current" || fail "routing instance capabilities digest stale"
-  [[ "$(yq -r '.instance_capabilities_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$instance_sha" ]] && pass "generation lock instance capabilities digest current" || fail "generation lock instance capabilities digest stale"
-  [[ "$(yq -r '.source.extensions_capability_inputs_sha256 // ""' "$ROUTING_FILE")" == "$extension_inputs_sha" ]] && pass "routing extension capability input digest current" || fail "routing extension capability input digest stale"
-  [[ "$(yq -r '.extensions_capability_inputs_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$extension_inputs_sha" ]] && pass "generation lock extension capability input digest current" || fail "generation lock extension capability input digest stale"
+  [[ "$(yq -r '.source.instance_commands_manifest_sha256 // ""' "$ROUTING_FILE")" == "$instance_commands_sha" ]] && pass "routing instance commands manifest hash current" || fail "routing instance commands manifest hash stale"
+  [[ "$(yq -r '.instance_commands_manifest_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$instance_commands_sha" ]] && pass "generation lock instance commands manifest hash current" || fail "generation lock instance commands manifest hash stale"
+  [[ "$(yq -r '.source.instance_skills_manifest_sha256 // ""' "$ROUTING_FILE")" == "$instance_skills_sha" ]] && pass "routing instance skills manifest hash current" || fail "routing instance skills manifest hash stale"
+  [[ "$(yq -r '.instance_skills_manifest_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$instance_skills_sha" ]] && pass "generation lock instance skills manifest hash current" || fail "generation lock instance skills manifest hash stale"
+  [[ "$(yq -r '.source.locality_scopes_effective_sha256 // ""' "$ROUTING_FILE")" == "$locality_scopes_sha" ]] && pass "routing locality scopes hash current" || fail "routing locality scopes hash stale"
+  [[ "$(yq -r '.locality_scopes_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$locality_scopes_sha" ]] && pass "generation lock locality scopes hash current" || fail "generation lock locality scopes hash stale"
+  [[ "$(yq -r '.source.locality_generation_lock_sha256 // ""' "$ROUTING_FILE")" == "$locality_lock_sha" ]] && pass "routing locality lock hash current" || fail "routing locality lock hash stale"
+  [[ "$(yq -r '.locality_generation_lock_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$locality_lock_sha" ]] && pass "generation lock locality lock hash current" || fail "generation lock locality lock hash stale"
+  [[ "$(yq -r '.routing_context.locality_generation_id // ""' "$ROUTING_FILE")" == "$locality_generation_id" ]] && pass "routing locality generation id current" || fail "routing locality generation id stale"
+  [[ "$(yq -r '.locality_generation_id // ""' "$GENERATION_LOCK_FILE")" == "$locality_generation_id" ]] && pass "generation lock locality generation id current" || fail "generation lock locality generation id stale"
+  [[ "$(yq -r '.source.extensions_catalog_sha256 // ""' "$ROUTING_FILE")" == "$extensions_sha" ]] && pass "routing extensions catalog hash current" || fail "routing extensions catalog hash stale"
+  [[ "$(yq -r '.extensions_catalog_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$extensions_sha" ]] && pass "generation lock extensions catalog hash current" || fail "generation lock extensions catalog hash stale"
+  [[ "$(yq -r '.source.extensions_generation_lock_sha256 // ""' "$ROUTING_FILE")" == "$extensions_lock_sha" ]] && pass "routing extensions lock hash current" || fail "routing extensions lock hash stale"
+  [[ "$(yq -r '.extensions_generation_lock_sha256 // ""' "$GENERATION_LOCK_FILE")" == "$extensions_lock_sha" ]] && pass "generation lock extensions lock hash current" || fail "generation lock extensions lock hash stale"
+  [[ "$(yq -r '.routing_context.extension_generation_id // ""' "$ROUTING_FILE")" == "$extensions_generation_id" ]] && pass "routing extensions generation id current" || fail "routing extensions generation id stale"
+  [[ "$(yq -r '.extensions_generation_id // ""' "$GENERATION_LOCK_FILE")" == "$extensions_generation_id" ]] && pass "generation lock extensions generation id current" || fail "generation lock extensions generation id stale"
 
-  local artifact_ids_from_routing artifact_ids_from_map
+  [[ "$(yq -r '.routing_context.selector_schema_version // ""' "$ROUTING_FILE")" == "octon-capability-routing-selectors-v1" ]] && pass "routing selector schema version valid" || fail "routing selector schema version invalid"
+  [[ "$(yq -r '.routing_context.host_projection_mode // ""' "$ROUTING_FILE")" == "materialized-copy-v1" ]] && pass "routing host projection mode valid" || fail "routing host projection mode invalid"
+
+  local candidate_count artifact_count resolution_count
+  candidate_count="$(yq -r '.routing_candidates | length' "$ROUTING_FILE")"
+  artifact_count="$(yq -r '.artifacts | length' "$ARTIFACT_MAP_FILE")"
+  resolution_count="$(yq -r '.resolution_order | length' "$ROUTING_FILE")"
+  [[ "$candidate_count" == "$artifact_count" ]] && pass "artifact map count matches routing candidates" || fail "artifact map count mismatch"
+  [[ "$candidate_count" == "$resolution_count" ]] && pass "resolution order count matches routing candidates" || fail "resolution order count mismatch"
+
+  local artifact_ids_from_routing artifact_ids_from_map resolution_from_candidates resolution_order
   artifact_ids_from_routing="$(yq -r '.routing_candidates[]?.artifact_map_id // ""' "$ROUTING_FILE" | awk 'NF' | LC_ALL=C sort)"
   artifact_ids_from_map="$(yq -r '.artifacts[]?.artifact_map_id // ""' "$ARTIFACT_MAP_FILE" | awk 'NF' | LC_ALL=C sort)"
   [[ "$artifact_ids_from_routing" == "$artifact_ids_from_map" ]] && pass "artifact map ids match published routing candidates" || fail "artifact map ids do not match published routing candidates"
+
+  resolution_from_candidates="$(yq -r '.routing_candidates[]?.effective_id // ""' "$ROUTING_FILE" | awk 'NF')"
+  resolution_order="$(yq -r '.resolution_order[]? // ""' "$ROUTING_FILE" | awk 'NF')"
+  [[ "$resolution_from_candidates" == "$resolution_order" ]] && pass "resolution order matches routing candidate order" || fail "resolution order mismatch"
 
   local file_set
   file_set="$(yq -r '.published_files[]?.path // ""' "$GENERATION_LOCK_FILE" | awk 'NF' | LC_ALL=C sort)"
@@ -195,6 +168,22 @@ main() {
     fi
     [[ "$(hash_file "$ROOT_DIR/$source_path")" == "$source_sha" ]] && pass "capability source digest current for $source_path" || fail "capability source digest stale for $source_path"
   done < <(yq -r '.artifacts[]? | [.source_path, .source_sha256] | @tsv' "$ARTIFACT_MAP_FILE" 2>/dev/null || true)
+
+  local field_query
+  for field_query in \
+    '.routing_candidates[]?.host_adapters' \
+    '.routing_candidates[]?.selectors' \
+    '.routing_candidates[]?.fingerprints' \
+    '.routing_candidates[]?.scope_relevance' \
+    '.routing_candidates[]?.precedence_tier' \
+    '.routing_candidates[]?.stable_sort_key'
+  do
+    if yq -e "$field_query" "$ROUTING_FILE" >/dev/null 2>&1; then
+      pass "routing candidate field present for query: $field_query"
+    else
+      fail "routing candidate field missing for query: $field_query"
+    fi
+  done
 
   if rg -n 'inputs/additive|inputs/exploratory' "$ROUTING_FILE" "$ARTIFACT_MAP_FILE" "$GENERATION_LOCK_FILE" >/dev/null 2>&1; then
     fail "capability publication must not embed raw inputs/** paths"

@@ -33,6 +33,60 @@ mutability: append-only
 
 ## 2026-03-20
 
+**Session focus:** Archive the implemented Packet 10 proposal package
+
+**Completed:**
+
+- Moved the implemented Packet 10 proposal package to
+  `.octon/inputs/exploratory/proposals/.archive/architecture/generated-effective-cognition-registry/`
+- Added archive metadata so the proposal now records an `implemented`
+  disposition and original active path
+- Moved the generated proposal registry entry from `active` to `archived` so
+  proposal discovery matches the already-landed Packet 10 cutover state
+- Recorded the archive closeout task in `.octon/state/continuity/repo/tasks.json`
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-20
+
+**Session focus:** Packet 12 capability routing and host integration atomic
+cutover
+
+**Completed:**
+
+- Upgraded capability routing publication to `v2`, linked it to locality and
+  extension generations, and moved framework/runtime capability metadata to
+  explicit `routing` plus `host_adapters` fields
+- Upgraded extension publication to `v3` with `routing_exports`, tightened the
+  locality scope schema to `octon-locality-scope-v2`, and added repo-native
+  command and skill manifests under `instance/capabilities/runtime/**`
+- Replaced the old symlink-era host-link flow with
+  `publish-host-projections.sh`, regenerated the `.claude/.cursor/.codex`
+  command and skill surfaces as materialized copies, and added
+  `validate-host-projections.sh`
+- Updated active capability docs, create-skill guidance, generated/effective
+  readmes, and scaffold templates to the Packet 12 contract
+- Added ADR 056 plus the Packet 12 migration plan and evidence bundle under
+  `.octon/state/evidence/migration/2026-03-20-capability-routing-host-integration-cutover/`
+- Passed the targeted Packet 12 test stack, `validate-harness-structure.sh`,
+  and `alignment-check.sh --profile harness`
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-20
+
 **Session focus:** Archive completed Packet 1/2/3/4/5/6/7/8/9 proposals
 
 **Completed:**
@@ -51,6 +105,29 @@ mutability: append-only
   transitions are backed by explicit cutover evidence
 - Left `studio-graph-ux-design-package` active because it has not been
   completed and should not be archived yet
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-20
+
+**Session focus:** Archive the implemented Packet 12 proposal package
+
+**Completed:**
+
+- Moved the implemented Packet 12 proposal package to
+  `.octon/inputs/exploratory/proposals/.archive/architecture/capability-routing-host-integration/`
+- Added the standard archive metadata and promotion evidence to the Packet 12
+  `proposal.yml`
+- Moved the generated proposal registry entry from `active` to `archived`
+  with an `implemented` disposition so proposal discovery now matches the
+  cutover state
+- Recorded the archive closeout task in `.octon/state/continuity/repo/tasks.json`
 
 **Next:**
 
@@ -997,6 +1074,34 @@ Prompt quality significantly impacts AI output quality. The 10-phase pipeline ad
   surfaces on the live `instance/**` and `generated/**` paths
 - Recorded ADR 049 and the Packet 5 migration evidence bundle under
   `state/evidence/migration/2026-03-19-overlay-and-ingress-model-cutover/`
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-20
+
+**Session focus:** Draft Packet 12 capability routing and host integration
+proposal package
+
+**Completed:**
+
+- Created the Packet 12 proposal scaffold under
+  `.octon/inputs/exploratory/proposals/architecture/capability-routing-host-integration/`
+  with proposal metadata, navigation docs, target architecture, acceptance
+  criteria, and implementation plan
+- Grounded the proposal in the ratified packet and blueprint while mapping the
+  live generated routing publication, current scope-hint schema, extension
+  publication linkage, and legacy single-location skills plus host-link
+  documentation that still needs normalization
+- Added the proposal to `.octon/generated/proposals/registry.yml` for
+  discovery alongside the other active proposal packages
+- Recorded completion of the proposal-drafting task in
+  `.octon/state/continuity/repo/tasks.json`
 
 **Next:**
 

@@ -11,6 +11,170 @@ GENERATION_ID=""
 GENERATOR_VERSION=""
 declare -a PUBLISHED_SELECTED_KEYS=()
 
+write_string_array_yaml() {
+  local indent="$1"
+  shift
+  if [[ "$#" -eq 0 ]]; then
+    printf '%s[]\n' "$indent"
+    return
+  fi
+  local value
+  for value in "$@"; do
+    printf '%s- "%s"\n' "$indent" "$value"
+  done
+}
+
+write_fragment_host_adapters() {
+  local fragment_file="$1" item_query="$2"
+  local adapters=()
+  while IFS= read -r adapter; do
+    [[ -n "$adapter" ]] || continue
+    adapters+=("$adapter")
+  done < <(yq -r "$item_query.host_adapters[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+
+  if [[ "${#adapters[@]}" -eq 0 ]]; then
+    adapters=(claude cursor codex)
+  fi
+
+  printf '        host_adapters:\n'
+  write_string_array_yaml '          ' "${adapters[@]}"
+}
+
+write_fragment_selectors() {
+  local fragment_file="$1" item_query="$2"
+  local include=()
+  local exclude=()
+  while IFS= read -r value; do
+    [[ -n "$value" ]] || continue
+    include+=("$value")
+  done < <(yq -r "$item_query.routing.selectors.include[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+  while IFS= read -r value; do
+    [[ -n "$value" ]] || continue
+    exclude+=("$value")
+  done < <(yq -r "$item_query.routing.selectors.exclude[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+
+  if [[ "${#include[@]}" -eq 0 ]]; then
+    include=('**')
+  fi
+
+  printf '        selectors:\n'
+  printf '          include:\n'
+  write_string_array_yaml '            ' "${include[@]}"
+  printf '          exclude:\n'
+  write_string_array_yaml '            ' "${exclude[@]}"
+}
+
+write_fragment_fingerprints() {
+  local fragment_file="$1" item_query="$2"
+  local tech_tags=()
+  local language_tags=()
+  while IFS= read -r value; do
+    [[ -n "$value" ]] || continue
+    tech_tags+=("$value")
+  done < <(yq -r "$item_query.routing.fingerprints.tech_tags[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+  while IFS= read -r value; do
+    [[ -n "$value" ]] || continue
+    language_tags+=("$value")
+  done < <(yq -r "$item_query.routing.fingerprints.language_tags[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+
+  printf '        fingerprints:\n'
+  printf '          tech_tags:\n'
+  write_string_array_yaml '            ' "${tech_tags[@]}"
+  printf '          language_tags:\n'
+  write_string_array_yaml '            ' "${language_tags[@]}"
+}
+
+write_pack_command_routing_exports() {
+  local pack_id="$1" manifest_abs="$2" commands_root_rel fragment_file item_query path source_path
+  commands_root_rel="$(yq -r '.content_entrypoints.commands // ""' "$manifest_abs")"
+  if [[ -z "$commands_root_rel" || "$commands_root_rel" == "null" ]]; then
+    printf '      commands: []\n'
+    return
+  fi
+  fragment_file="$(ext_pack_root_abs "$pack_id")/${commands_root_rel%/}/manifest.fragment.yml"
+  if [[ ! -f "$fragment_file" ]]; then
+    printf '      commands: []\n'
+    return
+  fi
+  if [[ "$(yq -r '.commands | length' "$fragment_file" 2>/dev/null || echo 0)" == "0" ]]; then
+    printf '      commands: []\n'
+    return
+  fi
+
+  printf '      commands:\n'
+  local index
+  index=0
+  while true; do
+    if ! yq -e ".commands[$index]" "$fragment_file" >/dev/null 2>&1; then
+      break
+    fi
+    item_query=".commands[$index]"
+    path="$(yq -r "$item_query.path // \"\"" "$fragment_file")"
+    source_path=".octon/inputs/additive/extensions/$pack_id/${commands_root_rel%/}/$path"
+    printf '        - capability_id: "%s"\n' "$(yq -r "$item_query.id // \"\"" "$fragment_file")"
+    printf '          display_name: "%s"\n' "$(yq -r "$item_query.display_name // \"\"" "$fragment_file")"
+    printf '          summary: "%s"\n' "$(yq -r "$item_query.summary // \"\"" "$fragment_file")"
+    printf '          status: "active"\n'
+    printf '          path: "%s"\n' "$path"
+    printf '          access: "%s"\n' "$(yq -r "$item_query.access // \"agent\"" "$fragment_file")"
+    printf '          manifest_fragment_path: ".octon/inputs/additive/extensions/%s/%s/manifest.fragment.yml"\n' "$pack_id" "${commands_root_rel%/}"
+    printf '          projection_source_path: "%s"\n' "$source_path"
+    write_fragment_host_adapters "$fragment_file" "$item_query"
+    write_fragment_selectors "$fragment_file" "$item_query"
+    write_fragment_fingerprints "$fragment_file" "$item_query"
+    index=$((index + 1))
+  done
+}
+
+write_pack_skill_routing_exports() {
+  local pack_id="$1" manifest_abs="$2" skills_root_rel fragment_file item_query path source_path
+  skills_root_rel="$(yq -r '.content_entrypoints.skills // ""' "$manifest_abs")"
+  if [[ -z "$skills_root_rel" || "$skills_root_rel" == "null" ]]; then
+    printf '      skills: []\n'
+    return
+  fi
+  fragment_file="$(ext_pack_root_abs "$pack_id")/${skills_root_rel%/}/manifest.fragment.yml"
+  if [[ ! -f "$fragment_file" ]]; then
+    printf '      skills: []\n'
+    return
+  fi
+  if [[ "$(yq -r '.skills | length' "$fragment_file" 2>/dev/null || echo 0)" == "0" ]]; then
+    printf '      skills: []\n'
+    return
+  fi
+
+  printf '      skills:\n'
+  local index
+  index=0
+  while true; do
+    if ! yq -e ".skills[$index]" "$fragment_file" >/dev/null 2>&1; then
+      break
+    fi
+    item_query=".skills[$index]"
+    path="$(yq -r "$item_query.path // \"\"" "$fragment_file")"
+    path="${path%/}"
+    source_path=".octon/inputs/additive/extensions/$pack_id/${skills_root_rel%/}/$path"
+    printf '        - capability_id: "%s"\n' "$(yq -r "$item_query.id // \"\"" "$fragment_file")"
+    printf '          display_name: "%s"\n' "$(yq -r "$item_query.display_name // \"\"" "$fragment_file")"
+    printf '          summary: "%s"\n' "$(yq -r "$item_query.summary // \"\"" "$fragment_file")"
+    printf '          status: "%s"\n' "$(yq -r "$item_query.status // \"active\"" "$fragment_file")"
+    printf '          path: "%s"\n' "${path}/"
+    printf '          manifest_fragment_path: ".octon/inputs/additive/extensions/%s/%s/manifest.fragment.yml"\n' "$pack_id" "${skills_root_rel%/}"
+    printf '          projection_source_path: "%s"\n' "$source_path"
+    write_fragment_host_adapters "$fragment_file" "$item_query"
+    write_fragment_selectors "$fragment_file" "$item_query"
+    write_fragment_fingerprints "$fragment_file" "$item_query"
+    index=$((index + 1))
+  done
+}
+
+write_routing_exports() {
+  local pack_id="$1" manifest_abs="$2"
+  printf '    routing_exports:\n'
+  write_pack_command_routing_exports "$pack_id" "$manifest_abs"
+  write_pack_skill_routing_exports "$pack_id" "$manifest_abs"
+}
+
 write_content_roots() {
   local manifest="$1" pack_id="$2" bucket rel
   printf '    content_roots:\n'
@@ -59,7 +223,7 @@ write_effective_files() {
   } >"$quarantine_tmp"
 
   {
-    printf 'schema_version: "octon-extension-effective-catalog-v2"\n'
+    printf 'schema_version: "octon-extension-effective-catalog-v3"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
@@ -85,6 +249,7 @@ write_effective_files() {
         printf '    trust_decision: "%s"\n' "$trust_decision"
         printf '    publication_status: "%s"\n' "$status"
         write_content_roots "$manifest_abs" "$pack_id"
+        write_routing_exports "$pack_id" "$manifest_abs"
       done
     fi
     printf 'source:\n'
@@ -95,7 +260,7 @@ write_effective_files() {
   } >"$catalog_tmp"
 
   {
-    printf 'schema_version: "octon-extension-artifact-map-v2"\n'
+    printf 'schema_version: "octon-extension-artifact-map-v3"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
@@ -123,7 +288,7 @@ write_effective_files() {
   } >"$artifact_map_tmp"
 
   {
-    printf 'schema_version: "octon-extension-generation-lock-v2"\n'
+    printf 'schema_version: "octon-extension-generation-lock-v3"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"

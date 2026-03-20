@@ -11,7 +11,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-capability-routing-artifact-map-v1"
+      "const": "octon-capability-routing-artifact-map-v2"
     },
     "generator_version": {
       "type": "string",
@@ -26,7 +26,22 @@
       "minLength": 1
     },
     "artifacts": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "artifact_map_id",
+          "effective_id",
+          "origin_class",
+          "capability_kind",
+          "capability_id",
+          "source_kind",
+          "source_manifest_path",
+          "source_manifest_sha256",
+          "source_path",
+          "source_sha256"
+        ]
+      }
     }
   }
 }

@@ -152,6 +152,14 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-capability-publication-state.sh"
 
   run_step \
+    "Publish host capability projections" \
+    bash "$OCTON_DIR/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+
+  run_step \
+    "Validate host capability projections" \
+    bash "$SCRIPT_DIR/validate-host-projections.sh"
+
+  run_step \
     "Validate developer context policy contract" \
     bash "$SCRIPT_DIR/validate-developer-context-policy.sh"
 

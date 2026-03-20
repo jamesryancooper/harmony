@@ -1,184 +1,439 @@
-schema_version: "1.0"
-
-# Goal alignment: Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
-
+schema_version: '1.0'
 services:
-  - id: guard
-    display_name: Guard
-    path: governance/guard/
-    summary: "Harness-native content safety checks for injection, hallucination, secrets, and PII."
-    status: active
-    interface_type: shell
-    tags: [safety, regex, detection]
-    category: guard
-    stateful: false
-
-  - id: prompt
-    display_name: Prompt
-    path: modeling/prompt/
-    summary: "Harness-native prompt compilation and hashing service."
-    status: active
-    interface_type: shell
-    tags: [prompt, template, tokens]
-    category: prompt
-    stateful: false
-
-  - id: cost
-    display_name: Cost
-    path: operations/cost/
-    summary: "Harness-native budget estimation and usage recording service."
-    status: active
-    interface_type: shell
-    tags: [budget, cost, tracking]
-    category: cost
-    stateful: true
-
-  - id: flow
-    display_name: Flow
-    path: execution/flow/
-    summary: "Harness-native flow execution orchestrator with native runtime default and optional external adapters."
-    status: active
-    interface_type: mcp
-    tags: [execution, workflow, orchestration, native-runtime]
-    category: flow
-    stateful: false
-
-  - id: spec
-    display_name: Spec
-    path: planning/spec/
-    summary: "Native planning specification lifecycle service."
-    status: active
-    interface_type: shell
-    tags: [planning, spec, contracts]
-    category: spec
-    stateful: false
-
-  - id: plan
-    display_name: Plan
-    path: planning/plan/
-    summary: "Native planning synthesis service emitting canonical plan.json outputs."
-    status: active
-    interface_type: shell
-    tags: [planning, bmad, orchestration]
-    category: plan
-    stateful: false
-
-  - id: playbook
-    display_name: Playbook
-    path: planning/playbook/
-    summary: "Native reusable playbook expansion and validation service."
-    status: active
-    interface_type: shell
-    tags: [planning, template, runbook]
-    category: playbook
-    stateful: false
-
-  - id: critic
-    display_name: Critic
-    path: planning/critic/
-    summary: "Deterministic planning graph quality and risk scoring."
-    status: active
-    interface_type: shell
-    tags: [planning, dependency, graph]
-    category: planning
-    stateful: false
-
-  - id: replan
-    display_name: Replan
-    path: planning/replan/
-    summary: "Deterministic replanning transforms for blocked or failed steps."
-    status: active
-    interface_type: shell
-    tags: [planning, recovery, scheduling]
-    category: planning
-    stateful: false
-
-  - id: scheduler
-    display_name: Scheduler
-    path: planning/scheduler/
-    summary: "Deterministic planning scheduler with dependency-aware ordering."
-    status: active
-    interface_type: shell
-    tags: [planning, dag, scheduler]
-    category: planning
-    stateful: false
-
-  - id: capability-bind
-    display_name: Capability Bind
-    path: planning/capability-bind/
-    summary: "Deterministic capability matching for plan execution requirements."
-    status: active
-    interface_type: shell
-    tags: [planning, capability, adapter]
-    category: planning
-    stateful: false
-
-  - id: contingency
-    display_name: Contingency
-    path: planning/contingency/
-    summary: "Deterministic generation of fallback plans for failed paths."
-    status: active
-    interface_type: shell
-    tags: [planning, fallback, recovery]
-    category: planning
-    stateful: false
-
-  - id: agent
-    display_name: Agent
-    path: execution/agent/
-    summary: "Native plan-driven agent execution service with checkpoint and resume semantics."
-    status: active
-    interface_type: shell
-    tags: [execution, agent, orchestration]
-    category: agent
-    stateful: true
-
-  - id: agent-platform
-    display_name: Agent Platform
-    path: interfaces/agent-platform/
-    summary: "Native-first interop service for session policy, context budgets, compaction policy, and adapter capability negotiation."
-    status: active
-    interface_type: shell
-    tags: [interop, native-first, governance]
-    category: agent-platform
-    stateful: false
-
-  - id: query
-    display_name: Query
-    path: retrieval/query/
-    summary: "Hybrid retrieval and answering with chunk-level citations and evidence packs."
-    status: active
-    interface_type: shell
-    tags: [retrieval, hybrid, citations, evidence]
-    category: retrieval
-    stateful: false
-
-  - id: filesystem-snapshot
-    display_name: Filesystem Snapshot
-    path: interfaces/filesystem-snapshot/
-    summary: "Writer plane for deterministic snapshot lifecycle and bounded filesystem operations."
-    status: active
-    interface_type: library
-    tags: [filesystem, snapshot, deterministic, writer]
-    category: interfaces
-    stateful: true
-
-  - id: filesystem-discovery
-    display_name: Filesystem Discovery
-    path: interfaces/filesystem-discovery/
-    summary: "Query plane for graph traversal and progressive discovery over snapshots."
-    status: active
-    interface_type: library
-    tags: [graph, discovery, traversal, provenance]
-    category: interfaces
-    stateful: true
-
-  - id: filesystem-watch
-    display_name: Filesystem Watch
-    path: interfaces/filesystem-watch/
-    summary: "OS-agnostic polling watcher hints for filesystem change detection."
-    status: active
-    interface_type: library
-    tags: [watch, polling, filesystem, change-detection]
-    category: interfaces
-    stateful: true
+- id: guard
+  display_name: Guard
+  path: governance/guard/
+  summary: Harness-native content safety checks for injection, hallucination, secrets, and PII.
+  status: active
+  interface_type: shell
+  tags:
+  - safety
+  - regex
+  - detection
+  category: guard
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: prompt
+  display_name: Prompt
+  path: modeling/prompt/
+  summary: Harness-native prompt compilation and hashing service.
+  status: active
+  interface_type: shell
+  tags:
+  - prompt
+  - template
+  - tokens
+  category: prompt
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: cost
+  display_name: Cost
+  path: operations/cost/
+  summary: Harness-native budget estimation and usage recording service.
+  status: active
+  interface_type: shell
+  tags:
+  - budget
+  - cost
+  - tracking
+  category: cost
+  stateful: true
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: flow
+  display_name: Flow
+  path: execution/flow/
+  summary: Harness-native flow execution orchestrator with native runtime default and optional external adapters.
+  status: active
+  interface_type: mcp
+  tags:
+  - execution
+  - workflow
+  - orchestration
+  - native-runtime
+  category: flow
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: spec
+  display_name: Spec
+  path: planning/spec/
+  summary: Native planning specification lifecycle service.
+  status: active
+  interface_type: shell
+  tags:
+  - planning
+  - spec
+  - contracts
+  category: spec
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: plan
+  display_name: Plan
+  path: planning/plan/
+  summary: Native planning synthesis service emitting canonical plan.json outputs.
+  status: active
+  interface_type: shell
+  tags:
+  - planning
+  - bmad
+  - orchestration
+  category: plan
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: playbook
+  display_name: Playbook
+  path: planning/playbook/
+  summary: Native reusable playbook expansion and validation service.
+  status: active
+  interface_type: shell
+  tags:
+  - planning
+  - template
+  - runbook
+  category: playbook
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: critic
+  display_name: Critic
+  path: planning/critic/
+  summary: Deterministic planning graph quality and risk scoring.
+  status: active
+  interface_type: shell
+  tags:
+  - planning
+  - dependency
+  - graph
+  category: planning
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: replan
+  display_name: Replan
+  path: planning/replan/
+  summary: Deterministic replanning transforms for blocked or failed steps.
+  status: active
+  interface_type: shell
+  tags:
+  - planning
+  - recovery
+  - scheduling
+  category: planning
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: scheduler
+  display_name: Scheduler
+  path: planning/scheduler/
+  summary: Deterministic planning scheduler with dependency-aware ordering.
+  status: active
+  interface_type: shell
+  tags:
+  - planning
+  - dag
+  - scheduler
+  category: planning
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: capability-bind
+  display_name: Capability Bind
+  path: planning/capability-bind/
+  summary: Deterministic capability matching for plan execution requirements.
+  status: active
+  interface_type: shell
+  tags:
+  - planning
+  - capability
+  - adapter
+  category: planning
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: contingency
+  display_name: Contingency
+  path: planning/contingency/
+  summary: Deterministic generation of fallback plans for failed paths.
+  status: active
+  interface_type: shell
+  tags:
+  - planning
+  - fallback
+  - recovery
+  category: planning
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: agent
+  display_name: Agent
+  path: execution/agent/
+  summary: Native plan-driven agent execution service with checkpoint and resume semantics.
+  status: active
+  interface_type: shell
+  tags:
+  - execution
+  - agent
+  - orchestration
+  category: agent
+  stateful: true
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: agent-platform
+  display_name: Agent Platform
+  path: interfaces/agent-platform/
+  summary: Native-first interop service for session policy, context budgets, compaction policy, and adapter capability negotiation.
+  status: active
+  interface_type: shell
+  tags:
+  - interop
+  - native-first
+  - governance
+  category: agent-platform
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: query
+  display_name: Query
+  path: retrieval/query/
+  summary: Hybrid retrieval and answering with chunk-level citations and evidence packs.
+  status: active
+  interface_type: shell
+  tags:
+  - retrieval
+  - hybrid
+  - citations
+  - evidence
+  category: retrieval
+  stateful: false
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: filesystem-snapshot
+  display_name: Filesystem Snapshot
+  path: interfaces/filesystem-snapshot/
+  summary: Writer plane for deterministic snapshot lifecycle and bounded filesystem operations.
+  status: active
+  interface_type: library
+  tags:
+  - filesystem
+  - snapshot
+  - deterministic
+  - writer
+  category: interfaces
+  stateful: true
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: filesystem-discovery
+  display_name: Filesystem Discovery
+  path: interfaces/filesystem-discovery/
+  summary: Query plane for graph traversal and progressive discovery over snapshots.
+  status: active
+  interface_type: library
+  tags:
+  - graph
+  - discovery
+  - traversal
+  - provenance
+  category: interfaces
+  stateful: true
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: filesystem-watch
+  display_name: Filesystem Watch
+  path: interfaces/filesystem-watch/
+  summary: OS-agnostic polling watcher hints for filesystem change detection.
+  status: active
+  interface_type: library
+  tags:
+  - watch
+  - polling
+  - filesystem
+  - change-detection
+  category: interfaces
+  stateful: true
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex

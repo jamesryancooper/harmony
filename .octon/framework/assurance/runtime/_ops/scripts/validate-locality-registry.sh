@@ -119,6 +119,84 @@ require_yaml_file() {
   fi
 }
 
+validate_scope_routing_hints() {
+  local scope_id="$1"
+  local manifest_file="$2"
+  local key kind
+
+  if ! yq -e 'has("routing_hints")' "$manifest_file" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if yq -e '.routing_hints | type == "!!map"' "$manifest_file" >/dev/null 2>&1; then
+    pass "scope '$scope_id' routing_hints map valid"
+  else
+    fail "scope '$scope_id' routing_hints must be a map"
+    return 0
+  fi
+
+  while IFS= read -r key; do
+    [[ -z "$key" ]] && continue
+    case "$key" in
+      preferred_capability_domains|preferred_pack_tags|ranking_hints)
+        pass "scope '$scope_id' routing_hints key allowed: $key"
+        ;;
+      *)
+        fail "scope '$scope_id' routing_hints key not allowed: $key"
+        ;;
+    esac
+  done < <(yq -r '.routing_hints | keys[]?' "$manifest_file" 2>/dev/null || true)
+
+  if yq -e '.routing_hints.preferred_capability_domains' "$manifest_file" >/dev/null 2>&1; then
+    yq -e '.routing_hints.preferred_capability_domains | type == "!!seq"' "$manifest_file" >/dev/null 2>&1 \
+      && pass "scope '$scope_id' preferred_capability_domains list valid" \
+      || fail "scope '$scope_id' preferred_capability_domains must be a list"
+  fi
+
+  if yq -e '.routing_hints.preferred_pack_tags' "$manifest_file" >/dev/null 2>&1; then
+    yq -e '.routing_hints.preferred_pack_tags | type == "!!seq"' "$manifest_file" >/dev/null 2>&1 \
+      && pass "scope '$scope_id' preferred_pack_tags list valid" \
+      || fail "scope '$scope_id' preferred_pack_tags must be a list"
+  fi
+
+  if yq -e '.routing_hints.ranking_hints' "$manifest_file" >/dev/null 2>&1; then
+    if yq -e '.routing_hints.ranking_hints | type == "!!map"' "$manifest_file" >/dev/null 2>&1; then
+      pass "scope '$scope_id' ranking_hints map valid"
+    else
+      fail "scope '$scope_id' ranking_hints must be a map"
+      return 0
+    fi
+
+    while IFS= read -r key; do
+      [[ -z "$key" ]] && continue
+      if [[ "$key" == "preferred_capability_kinds" ]]; then
+        pass "scope '$scope_id' ranking_hints key allowed: $key"
+      else
+        fail "scope '$scope_id' ranking_hints key not allowed: $key"
+      fi
+    done < <(yq -r '.routing_hints.ranking_hints | keys[]?' "$manifest_file" 2>/dev/null || true)
+
+    if yq -e '.routing_hints.ranking_hints.preferred_capability_kinds' "$manifest_file" >/dev/null 2>&1; then
+      if yq -e '.routing_hints.ranking_hints.preferred_capability_kinds | type == "!!seq"' "$manifest_file" >/dev/null 2>&1; then
+        pass "scope '$scope_id' preferred_capability_kinds list valid"
+      else
+        fail "scope '$scope_id' preferred_capability_kinds must be a list"
+      fi
+      while IFS= read -r kind; do
+        [[ -z "$kind" ]] && continue
+        case "$kind" in
+          command|skill|service|tool)
+            pass "scope '$scope_id' preferred_capability_kinds entry valid: $kind"
+            ;;
+          *)
+            fail "scope '$scope_id' preferred_capability_kinds entry invalid: $kind"
+            ;;
+        esac
+      done < <(yq -r '.routing_hints.ranking_hints.preferred_capability_kinds[]?' "$manifest_file" 2>/dev/null || true)
+    fi
+  fi
+}
+
 require_scope_continuity_scaffold() {
   local scope_id="$1"
   local scope_dir="$SCOPE_CONTINUITY_DIR/$scope_id"
@@ -165,9 +243,9 @@ validate_scope_manifest() {
     return
   fi
 
-  [[ "$(yq -r '.schema_version // ""' "$manifest_file")" == "octon-locality-scope-v1" ]] \
+  [[ "$(yq -r '.schema_version // ""' "$manifest_file")" == "octon-locality-scope-v2" ]] \
     && pass "scope '$scope_id' schema version valid" \
-    || fail "scope '$scope_id' schema_version must be octon-locality-scope-v1"
+    || fail "scope '$scope_id' schema_version must be octon-locality-scope-v2"
 
   local manifest_scope_id
   manifest_scope_id="$(yq -r '.scope_id // ""' "$manifest_file")"
@@ -228,11 +306,7 @@ validate_scope_manifest() {
     fi
   done
 
-  if yq -e 'has("routing_hints")' "$manifest_file" >/dev/null 2>&1; then
-    yq -e '.routing_hints | type == "!!map"' "$manifest_file" >/dev/null 2>&1 \
-      && pass "scope '$scope_id' routing_hints map valid" \
-      || fail "scope '$scope_id' routing_hints must be a map"
-  fi
+  validate_scope_routing_hints "$scope_id" "$manifest_file"
 
   if yq -e 'has("mission_defaults")' "$manifest_file" >/dev/null 2>&1; then
     yq -e '.mission_defaults | type == "!!map"' "$manifest_file" >/dev/null 2>&1 \

@@ -13,14 +13,20 @@ fi
 ROOT_MANIFEST="$OCTON_DIR/octon.yml"
 COMMANDS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/commands/manifest.yml"
 SKILLS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/skills/manifest.yml"
+SKILLS_REGISTRY="$OCTON_DIR/framework/capabilities/runtime/skills/registry.yml"
 SERVICES_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/services/manifest.yml"
 TOOLS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/tools/manifest.yml"
+INSTANCE_COMMANDS_MANIFEST="$OCTON_DIR/instance/capabilities/runtime/commands/manifest.yml"
+INSTANCE_SKILLS_MANIFEST="$OCTON_DIR/instance/capabilities/runtime/skills/manifest.yml"
+LOCALITY_SCOPES_FILE="$OCTON_DIR/generated/effective/locality/scopes.effective.yml"
+LOCALITY_LOCK_FILE="$OCTON_DIR/generated/effective/locality/generation.lock.yml"
 EXTENSIONS_CATALOG="$OCTON_DIR/generated/effective/extensions/catalog.effective.yml"
-INSTANCE_CAPABILITIES_DIR="$OCTON_DIR/instance/capabilities/runtime"
+EXTENSIONS_LOCK_FILE="$OCTON_DIR/generated/effective/extensions/generation.lock.yml"
 EFFECTIVE_DIR="$OCTON_DIR/generated/effective/capabilities"
 ROUTING_FILE="$EFFECTIVE_DIR/routing.effective.yml"
 ARTIFACT_MAP_FILE="$EFFECTIVE_DIR/artifact-map.yml"
 GENERATION_LOCK_FILE="$EFFECTIVE_DIR/generation.lock.yml"
+LOCALITY_SCOPES_JSON='[]'
 
 hash_file() {
   local file="$1"
@@ -39,17 +45,559 @@ hash_text() {
   fi
 }
 
-yaml_escape() {
-  printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
-}
-
-trim_trailing_slash() {
+normalize_path() {
   local value="$1"
+  value="${value#./}"
   value="${value%/}"
-  printf '%s' "$value"
+  if [[ -z "$value" ]]; then
+    value="."
+  fi
+  printf '%s\n' "$value"
 }
 
-normalized_payload() {
+glob_anchor_path() {
+  local pattern="$1"
+  local prefix=""
+  local segment
+  local IFS='/'
+  read -r -a segments <<<"$pattern"
+  for segment in "${segments[@]}"; do
+    if [[ "$segment" == *'*'* || "$segment" == *'?'* || "$segment" == *'['* || "$segment" == *']'* || "$segment" == *'{'* || "$segment" == *'}'* ]]; then
+      break
+    fi
+    [[ -n "$segment" ]] || continue
+    if [[ -z "$prefix" ]]; then
+      prefix="$segment"
+    else
+      prefix="$prefix/$segment"
+    fi
+  done
+  if [[ -z "$prefix" ]]; then
+    printf '.\n'
+  else
+    printf '%s\n' "$prefix"
+  fi
+}
+
+path_depth() {
+  local path="$1"
+  path="$(normalize_path "$path")"
+  if [[ "$path" == "." ]]; then
+    printf '0\n'
+  else
+    awk -F'/' '{print NF}' <<<"$path"
+  fi
+}
+
+selector_specificity() {
+  local selectors_json="$1"
+  local total=0
+  local pattern anchor depth
+  while IFS= read -r pattern; do
+    [[ -n "$pattern" ]] || continue
+    anchor="$(glob_anchor_path "$pattern")"
+    depth="$(path_depth "$anchor")"
+    total=$((total + depth))
+  done < <(jq -r '(.include // [])[]?, (.exclude // [])[]?' <<<"$selectors_json")
+  printf '%s\n' "$total"
+}
+
+origin_rank() {
+  case "$1" in
+    instance) printf '0\n' ;;
+    framework) printf '1\n' ;;
+    extension) printf '2\n' ;;
+    *) printf '9\n' ;;
+  esac
+}
+
+source_kind_for_origin() {
+  case "$1" in
+    framework) printf 'framework-native\n' ;;
+    instance) printf 'instance-native\n' ;;
+    extension) printf 'extension-export\n' ;;
+    *) printf 'unknown\n' ;;
+  esac
+}
+
+precedence_tier_for_origin() {
+  case "$1" in
+    extension) printf 'additive-extension\n' ;;
+    *) printf 'native-authority\n' ;;
+  esac
+}
+
+json_string() {
+  jq -r "$2 // \"\"" "$1"
+}
+
+json_compact() {
+  jq -c "$2" "$1"
+}
+
+json_value_from_text() {
+  jq -cn --argjson value "$1" '$value'
+}
+
+skill_registry_entry_json() {
+  local skill_id="$1"
+  yq -o=json ".skills.\"$skill_id\" // {}" "$SKILLS_REGISTRY"
+}
+
+scope_relevance_json() {
+  local domain="$1"
+  local capability_kind="$2"
+  local fingerprints_json="$3"
+  jq -cn \
+    --arg domain "$domain" \
+    --arg capability_kind "$capability_kind" \
+    --argjson fingerprints "$fingerprints_json" \
+    --argjson scopes "$LOCALITY_SCOPES_JSON" '
+      $scopes as $allScopes
+      | reduce $allScopes[] as $scope (
+          {
+            matching_scope_ids: [],
+            tech_tag_matches: [],
+            language_tag_matches: [],
+            preferred_domain_match_scope_ids: [],
+            preferred_kind_match_scope_ids: [],
+            score: 0
+          };
+          ($scope.tech_tags // []) as $scopeTech
+          | ($scope.language_tags // []) as $scopeLang
+          | ($scope.routing_hints.preferred_capability_domains // []) as $preferredDomains
+          | ($scope.routing_hints.ranking_hints.preferred_capability_kinds // []) as $preferredKinds
+          | (($fingerprints.tech_tags // []) | map(select($scopeTech | index(.)))) as $techMatches
+          | (($fingerprints.language_tags // []) | map(select($scopeLang | index(.)))) as $languageMatches
+          | (($preferredDomains | index($domain)) != null and ($domain | length > 0)) as $domainMatch
+          | (($preferredKinds | index($capability_kind)) != null) as $kindMatch
+          | if ($techMatches | length) > 0 or ($languageMatches | length) > 0 or $domainMatch or $kindMatch then
+              .matching_scope_ids += [$scope.scope_id]
+              | .tech_tag_matches += $techMatches
+              | .language_tag_matches += $languageMatches
+              | if $domainMatch then .preferred_domain_match_scope_ids += [$scope.scope_id] else . end
+              | if $kindMatch then .preferred_kind_match_scope_ids += [$scope.scope_id] else . end
+              | .score += (($techMatches | length) + ($languageMatches | length) + (if $domainMatch then 1 else 0 end) + (if $kindMatch then 1 else 0 end))
+            else
+              .
+            end
+        )
+    '
+}
+
+framework_commands_digest() { hash_file "$COMMANDS_MANIFEST"; }
+framework_skills_manifest_digest() { hash_file "$SKILLS_MANIFEST"; }
+framework_skills_registry_digest() { hash_file "$SKILLS_REGISTRY"; }
+framework_services_digest() { hash_file "$SERVICES_MANIFEST"; }
+framework_tools_digest() { hash_file "$TOOLS_MANIFEST"; }
+instance_commands_manifest_digest() { hash_file "$INSTANCE_COMMANDS_MANIFEST"; }
+instance_skills_manifest_digest() { hash_file "$INSTANCE_SKILLS_MANIFEST"; }
+locality_scopes_digest() { hash_file "$LOCALITY_SCOPES_FILE"; }
+locality_lock_digest() { hash_file "$LOCALITY_LOCK_FILE"; }
+extensions_catalog_digest() { hash_file "$EXTENSIONS_CATALOG"; }
+extensions_lock_digest() { hash_file "$EXTENSIONS_LOCK_FILE"; }
+
+native_entry_routing_json() {
+  local entry_json="$1"
+  jq -c '
+    (.routing // {}) as $routing
+    | {
+        selectors: {
+          include: ($routing.selectors.include // ["**"]),
+          exclude: ($routing.selectors.exclude // [])
+        },
+        fingerprints: {
+          tech_tags: ($routing.fingerprints.tech_tags // []),
+          language_tags: ($routing.fingerprints.language_tags // [])
+        }
+      }
+  ' <<<"$entry_json"
+}
+
+native_host_adapters_json() {
+  local entry_json="$1"
+  jq -c '(.host_adapters // [])' <<<"$entry_json"
+}
+
+emit_candidate() {
+  local output_file="$1"
+  local effective_id="$2"
+  local artifact_map_id="$3"
+  local origin_class="$4"
+  local capability_kind="$5"
+  local capability_id="$6"
+  local display_name="$7"
+  local summary="$8"
+  local status="$9"
+  local source_manifest="${10}"
+  local interface_type="${11}"
+  local domain="${12}"
+  local host_adapters_json="${13}"
+  local selectors_json="${14}"
+  local fingerprints_json="${15}"
+  local scope_relevance_json="${16}"
+  local precedence_tier="${17}"
+  local stable_sort_key="${18}"
+  local projection_name="${19}"
+
+  jq -cn \
+    --arg effective_id "$effective_id" \
+    --arg artifact_map_id "$artifact_map_id" \
+    --arg origin_class "$origin_class" \
+    --arg capability_kind "$capability_kind" \
+    --arg capability_id "$capability_id" \
+    --arg display_name "$display_name" \
+    --arg summary "$summary" \
+    --arg status "$status" \
+    --arg source_manifest "$source_manifest" \
+    --arg interface_type "$interface_type" \
+    --arg capability_domain "$domain" \
+    --arg precedence_tier "$precedence_tier" \
+    --arg stable_sort_key "$stable_sort_key" \
+    --arg projection_name "$projection_name" \
+    --argjson host_adapters "$host_adapters_json" \
+    --argjson selectors "$selectors_json" \
+    --argjson fingerprints "$fingerprints_json" \
+    --argjson scope_relevance "$scope_relevance_json" \
+    '
+      {
+        effective_id: $effective_id,
+        artifact_map_id: $artifact_map_id,
+        origin_class: $origin_class,
+        capability_kind: $capability_kind,
+        capability_id: $capability_id,
+        display_name: $display_name,
+        summary: $summary,
+        status: $status,
+        source_manifest: $source_manifest,
+        capability_domain: $capability_domain,
+        host_adapters: $host_adapters,
+        selectors: $selectors,
+        fingerprints: $fingerprints,
+        scope_relevance: $scope_relevance,
+        precedence_tier: $precedence_tier,
+        stable_sort_key: $stable_sort_key,
+        projection_name: $projection_name
+      }
+      | if ($interface_type | length) > 0 then .interface_type = $interface_type else . end
+    ' >>"$output_file"
+  printf '\n' >>"$output_file"
+}
+
+emit_artifact() {
+  local output_file="$1"
+  local artifact_map_id="$2"
+  local effective_id="$3"
+  local origin_class="$4"
+  local capability_kind="$5"
+  local capability_id="$6"
+  local display_name="$7"
+  local source_manifest_path="$8"
+  local source_manifest_sha256="$9"
+  local source_path="${10}"
+  local source_sha256="${11}"
+  local source_kind="${12}"
+  local extension_pack_id="${13}"
+  local extension_source_id="${14}"
+  local extension_export_kind="${15}"
+  local extension_export_id="${16}"
+
+  jq -cn \
+    --arg artifact_map_id "$artifact_map_id" \
+    --arg effective_id "$effective_id" \
+    --arg origin_class "$origin_class" \
+    --arg capability_kind "$capability_kind" \
+    --arg capability_id "$capability_id" \
+    --arg display_name "$display_name" \
+    --arg source_manifest_path "$source_manifest_path" \
+    --arg source_manifest_sha256 "$source_manifest_sha256" \
+    --arg source_path "$source_path" \
+    --arg source_sha256 "$source_sha256" \
+    --arg source_kind "$source_kind" \
+    --arg extension_pack_id "$extension_pack_id" \
+    --arg extension_source_id "$extension_source_id" \
+    --arg extension_export_kind "$extension_export_kind" \
+    --arg extension_export_id "$extension_export_id" \
+    '
+      {
+        artifact_map_id: $artifact_map_id,
+        effective_id: $effective_id,
+        origin_class: $origin_class,
+        capability_kind: $capability_kind,
+        capability_id: $capability_id,
+        display_name: $display_name,
+        source_kind: $source_kind,
+        source_manifest_path: $source_manifest_path,
+        source_manifest_sha256: $source_manifest_sha256,
+        source_path: $source_path,
+        source_sha256: $source_sha256
+      }
+      | if ($extension_pack_id | length) > 0 then
+          .extension_pack_id = $extension_pack_id
+          | .extension_source_id = $extension_source_id
+          | .extension_export_kind = $extension_export_kind
+          | .extension_export_id = $extension_export_id
+        else
+          .
+        end
+    ' >>"$output_file"
+  printf '\n' >>"$output_file"
+}
+
+stable_sort_key_for_candidate() {
+  local selectors_json="$1"
+  local scope_relevance_json="$2"
+  local origin_class="$3"
+  local capability_kind="$4"
+  local effective_id="$5"
+  local specificity scope_score rank
+  specificity="$(selector_specificity "$selectors_json")"
+  scope_score="$(jq -r '.score // 0' <<<"$scope_relevance_json")"
+  rank="$(origin_rank "$origin_class")"
+  printf '%04d-%04d-%01d-%s-%s\n' \
+    $((9999 - specificity)) \
+    $((9999 - scope_score)) \
+    "$rank" \
+    "$capability_kind" \
+    "$effective_id"
+}
+
+framework_command_source_path() {
+  printf '.octon/framework/capabilities/runtime/commands/%s\n' "$1"
+}
+
+framework_skill_source_path() {
+  printf '.octon/framework/capabilities/runtime/skills/%s/SKILL.md\n' "${1%/}"
+}
+
+framework_service_source_path() {
+  printf '.octon/framework/capabilities/runtime/services/%s/SERVICE.md\n' "${1%/}"
+}
+
+framework_tool_source_path() {
+  printf '.octon/framework/capabilities/runtime/tools/manifest.yml\n'
+}
+
+instance_command_source_path() {
+  printf '.octon/instance/capabilities/runtime/commands/%s\n' "$1"
+}
+
+instance_skill_source_path() {
+  printf '.octon/instance/capabilities/runtime/skills/%s/SKILL.md\n' "${1%/}"
+}
+
+collect_framework_commands() {
+  local candidates_file="$1" artifacts_file="$2"
+  local manifest_sha entry_json capability_id capability_path display_name summary status source_path source_sha routing_json selectors_json fingerprints_json host_adapters_json scope_json stable_sort_key
+  manifest_sha="$(framework_commands_digest)"
+  while IFS= read -r entry_json; do
+    [[ -n "$entry_json" ]] || continue
+    capability_id="$(jq -r '.id' <<<"$entry_json")"
+    capability_path="$(jq -r '.path' <<<"$entry_json")"
+    display_name="$(jq -r '.display_name' <<<"$entry_json")"
+    summary="$(jq -r '.summary' <<<"$entry_json")"
+    status="active"
+    source_path="$(framework_command_source_path "$capability_path")"
+    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
+    routing_json="$(native_entry_routing_json "$entry_json")"
+    selectors_json="$(jq -c '.selectors' <<<"$routing_json")"
+    fingerprints_json="$(jq -c '.fingerprints' <<<"$routing_json")"
+    host_adapters_json="$(native_host_adapters_json "$entry_json")"
+    scope_json="$(scope_relevance_json "command" "command" "$fingerprints_json")"
+    stable_sort_key="$(stable_sort_key_for_candidate "$selectors_json" "$scope_json" framework command "framework.command.$capability_id")"
+    emit_candidate "$candidates_file" "framework.command.$capability_id" "framework-command-$capability_id" framework command "$capability_id" "$display_name" "$summary" "$status" ".octon/framework/capabilities/runtime/commands/manifest.yml" "" "command" "$host_adapters_json" "$selectors_json" "$fingerprints_json" "$scope_json" "$(precedence_tier_for_origin framework)" "$stable_sort_key" "$capability_id"
+    emit_artifact "$artifacts_file" "framework-command-$capability_id" "framework.command.$capability_id" framework command "$capability_id" "$display_name" ".octon/framework/capabilities/runtime/commands/manifest.yml" "$manifest_sha" "$source_path" "$source_sha" "$(source_kind_for_origin framework)" "" "" "" ""
+  done < <(yq -o=json '.commands[]?' "$COMMANDS_MANIFEST" | jq -c '.')
+}
+
+collect_framework_skills() {
+  local candidates_file="$1" artifacts_file="$2"
+  local manifest_sha registry_sha manifest_json registry_json capability_id skill_path display_name summary status source_path source_sha routing_json selectors_json fingerprints_json host_adapters_json scope_json stable_sort_key skill_group
+  manifest_sha="$(framework_skills_manifest_digest)"
+  registry_sha="$(framework_skills_registry_digest)"
+  while IFS= read -r manifest_json; do
+    [[ -n "$manifest_json" ]] || continue
+    capability_id="$(jq -r '.id' <<<"$manifest_json")"
+    skill_path="$(jq -r '.path' <<<"$manifest_json")"
+    display_name="$(jq -r '.display_name' <<<"$manifest_json")"
+    summary="$(jq -r '.summary' <<<"$manifest_json")"
+    status="$(jq -r '.status // "active"' <<<"$manifest_json")"
+    skill_group="$(jq -r '.group // ""' <<<"$manifest_json")"
+    source_path="$(framework_skill_source_path "$skill_path")"
+    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
+    registry_json="$(skill_registry_entry_json "$capability_id")"
+    routing_json="$(native_entry_routing_json "$registry_json")"
+    selectors_json="$(jq -c '.selectors' <<<"$routing_json")"
+    fingerprints_json="$(jq -c '.fingerprints' <<<"$routing_json")"
+    host_adapters_json="$(native_host_adapters_json "$registry_json")"
+    scope_json="$(scope_relevance_json "$skill_group" skill "$fingerprints_json")"
+    stable_sort_key="$(stable_sort_key_for_candidate "$selectors_json" "$scope_json" framework skill "framework.skill.$capability_id")"
+    emit_candidate "$candidates_file" "framework.skill.$capability_id" "framework-skill-$capability_id" framework skill "$capability_id" "$display_name" "$summary" "$status" ".octon/framework/capabilities/runtime/skills/manifest.yml" "" "$skill_group" "$host_adapters_json" "$selectors_json" "$fingerprints_json" "$scope_json" "$(precedence_tier_for_origin framework)" "$stable_sort_key" "$capability_id"
+    emit_artifact "$artifacts_file" "framework-skill-$capability_id" "framework.skill.$capability_id" framework skill "$capability_id" "$display_name" ".octon/framework/capabilities/runtime/skills/registry.yml" "$registry_sha" "$source_path" "$source_sha" "$(source_kind_for_origin framework)" "" "" "" ""
+  done < <(yq -o=json '.skills[]?' "$SKILLS_MANIFEST" | jq -c '.')
+}
+
+collect_framework_services() {
+  local candidates_file="$1" artifacts_file="$2"
+  local manifest_sha entry_json capability_id service_path display_name summary status interface_type source_path source_sha routing_json selectors_json fingerprints_json host_adapters_json scope_json stable_sort_key category
+  manifest_sha="$(framework_services_digest)"
+  while IFS= read -r entry_json; do
+    [[ -n "$entry_json" ]] || continue
+    capability_id="$(jq -r '.id' <<<"$entry_json")"
+    service_path="$(jq -r '.path' <<<"$entry_json")"
+    display_name="$(jq -r '.display_name' <<<"$entry_json")"
+    summary="$(jq -r '.summary' <<<"$entry_json")"
+    status="$(jq -r '.status // "active"' <<<"$entry_json")"
+    interface_type="$(jq -r '.interface_type // ""' <<<"$entry_json")"
+    category="$(jq -r '.category // ""' <<<"$entry_json")"
+    source_path="$(framework_service_source_path "$service_path")"
+    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
+    routing_json="$(native_entry_routing_json "$entry_json")"
+    selectors_json="$(jq -c '.selectors' <<<"$routing_json")"
+    fingerprints_json="$(jq -c '.fingerprints' <<<"$routing_json")"
+    host_adapters_json="$(native_host_adapters_json "$entry_json")"
+    scope_json="$(scope_relevance_json "$category" service "$fingerprints_json")"
+    stable_sort_key="$(stable_sort_key_for_candidate "$selectors_json" "$scope_json" framework service "framework.service.$capability_id")"
+    emit_candidate "$candidates_file" "framework.service.$capability_id" "framework-service-$capability_id" framework service "$capability_id" "$display_name" "$summary" "$status" ".octon/framework/capabilities/runtime/services/manifest.yml" "$interface_type" "$category" "$host_adapters_json" "$selectors_json" "$fingerprints_json" "$scope_json" "$(precedence_tier_for_origin framework)" "$stable_sort_key" "$capability_id"
+    emit_artifact "$artifacts_file" "framework-service-$capability_id" "framework.service.$capability_id" framework service "$capability_id" "$display_name" ".octon/framework/capabilities/runtime/services/manifest.yml" "$manifest_sha" "$source_path" "$source_sha" "$(source_kind_for_origin framework)" "" "" "" ""
+  done < <(yq -o=json '.services[]?' "$SERVICES_MANIFEST" | jq -c '.')
+}
+
+collect_framework_tools() {
+  local candidates_file="$1" artifacts_file="$2"
+  local manifest_sha entry_json capability_id display_name summary status source_path source_sha routing_json selectors_json fingerprints_json host_adapters_json scope_json stable_sort_key
+  manifest_sha="$(framework_tools_digest)"
+  while IFS= read -r entry_json; do
+    [[ -n "$entry_json" ]] || continue
+    capability_id="$(jq -r '.id' <<<"$entry_json")"
+    display_name="$(jq -r '.display_name' <<<"$entry_json")"
+    summary="$(jq -r '.summary' <<<"$entry_json")"
+    status="active"
+    source_path="$(framework_tool_source_path)"
+    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
+    routing_json="$(native_entry_routing_json "$entry_json")"
+    selectors_json="$(jq -c '.selectors' <<<"$routing_json")"
+    fingerprints_json="$(jq -c '.fingerprints' <<<"$routing_json")"
+    host_adapters_json="$(native_host_adapters_json "$entry_json")"
+    scope_json="$(scope_relevance_json "tools" tool "$fingerprints_json")"
+    stable_sort_key="$(stable_sort_key_for_candidate "$selectors_json" "$scope_json" framework tool "framework.tool.$capability_id")"
+    emit_candidate "$candidates_file" "framework.tool.$capability_id" "framework-tool-$capability_id" framework tool "$capability_id" "$display_name" "$summary" "$status" ".octon/framework/capabilities/runtime/tools/manifest.yml" "" "tools" "$host_adapters_json" "$selectors_json" "$fingerprints_json" "$scope_json" "$(precedence_tier_for_origin framework)" "$stable_sort_key" "$capability_id"
+    emit_artifact "$artifacts_file" "framework-tool-$capability_id" "framework.tool.$capability_id" framework tool "$capability_id" "$display_name" ".octon/framework/capabilities/runtime/tools/manifest.yml" "$manifest_sha" "$source_path" "$source_sha" "$(source_kind_for_origin framework)" "" "" "" ""
+  done < <(yq -o=json '.packs[]?' "$TOOLS_MANIFEST" | jq -c '.')
+}
+
+collect_instance_commands() {
+  local candidates_file="$1" artifacts_file="$2"
+  local manifest_sha entry_json capability_id command_path display_name summary status source_path source_sha routing_json selectors_json fingerprints_json host_adapters_json scope_json stable_sort_key
+  manifest_sha="$(instance_commands_manifest_digest)"
+  while IFS= read -r entry_json; do
+    [[ -n "$entry_json" ]] || continue
+    capability_id="$(jq -r '.id' <<<"$entry_json")"
+    command_path="$(jq -r '.path // (.id + ".md")' <<<"$entry_json")"
+    display_name="$(jq -r '.display_name // .id' <<<"$entry_json")"
+    summary="$(jq -r '.summary // "Repo-native command capability."' <<<"$entry_json")"
+    status="$(jq -r '.status // "active"' <<<"$entry_json")"
+    source_path="$(instance_command_source_path "$command_path")"
+    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
+    routing_json="$(native_entry_routing_json "$entry_json")"
+    selectors_json="$(jq -c '.selectors' <<<"$routing_json")"
+    fingerprints_json="$(jq -c '.fingerprints' <<<"$routing_json")"
+    host_adapters_json="$(native_host_adapters_json "$entry_json")"
+    scope_json="$(scope_relevance_json "command" command "$fingerprints_json")"
+    stable_sort_key="$(stable_sort_key_for_candidate "$selectors_json" "$scope_json" instance command "instance.command.$capability_id")"
+    emit_candidate "$candidates_file" "instance.command.$capability_id" "instance-command-$capability_id" instance command "$capability_id" "$display_name" "$summary" "$status" ".octon/instance/capabilities/runtime/commands/manifest.yml" "" "command" "$host_adapters_json" "$selectors_json" "$fingerprints_json" "$scope_json" "$(precedence_tier_for_origin instance)" "$stable_sort_key" "$capability_id"
+    emit_artifact "$artifacts_file" "instance-command-$capability_id" "instance.command.$capability_id" instance command "$capability_id" "$display_name" ".octon/instance/capabilities/runtime/commands/manifest.yml" "$manifest_sha" "$source_path" "$source_sha" "$(source_kind_for_origin instance)" "" "" "" ""
+  done < <(yq -o=json '.commands[]?' "$INSTANCE_COMMANDS_MANIFEST" | jq -c '.')
+}
+
+collect_instance_skills() {
+  local candidates_file="$1" artifacts_file="$2"
+  local manifest_sha entry_json capability_id skill_path display_name summary status source_path source_sha routing_json selectors_json fingerprints_json host_adapters_json scope_json stable_sort_key domain
+  manifest_sha="$(instance_skills_manifest_digest)"
+  while IFS= read -r entry_json; do
+    [[ -n "$entry_json" ]] || continue
+    capability_id="$(jq -r '.id' <<<"$entry_json")"
+    skill_path="$(jq -r '.path // .id' <<<"$entry_json")"
+    skill_path="${skill_path%/}"
+    display_name="$(jq -r '.display_name // .id' <<<"$entry_json")"
+    summary="$(jq -r '.summary // "Repo-native skill capability."' <<<"$entry_json")"
+    status="$(jq -r '.status // "active"' <<<"$entry_json")"
+    domain="$(jq -r '.group // ""' <<<"$entry_json")"
+    source_path="$(instance_skill_source_path "$skill_path")"
+    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
+    routing_json="$(native_entry_routing_json "$entry_json")"
+    selectors_json="$(jq -c '.selectors' <<<"$routing_json")"
+    fingerprints_json="$(jq -c '.fingerprints' <<<"$routing_json")"
+    host_adapters_json="$(native_host_adapters_json "$entry_json")"
+    scope_json="$(scope_relevance_json "$domain" skill "$fingerprints_json")"
+    stable_sort_key="$(stable_sort_key_for_candidate "$selectors_json" "$scope_json" instance skill "instance.skill.$capability_id")"
+    emit_candidate "$candidates_file" "instance.skill.$capability_id" "instance-skill-$capability_id" instance skill "$capability_id" "$display_name" "$summary" "$status" ".octon/instance/capabilities/runtime/skills/manifest.yml" "" "$domain" "$host_adapters_json" "$selectors_json" "$fingerprints_json" "$scope_json" "$(precedence_tier_for_origin instance)" "$stable_sort_key" "$capability_id"
+    emit_artifact "$artifacts_file" "instance-skill-$capability_id" "instance.skill.$capability_id" instance skill "$capability_id" "$display_name" ".octon/instance/capabilities/runtime/skills/manifest.yml" "$manifest_sha" "$source_path" "$source_sha" "$(source_kind_for_origin instance)" "" "" "" ""
+  done < <(yq -o=json '.skills[]?' "$INSTANCE_SKILLS_MANIFEST" | jq -c '.')
+}
+
+collect_extension_exports() {
+  local candidates_file="$1" artifacts_file="$2"
+  local catalog_sha pack_json pack_id source_id command_json skill_json capability_id display_name summary status routing_json selectors_json fingerprints_json host_adapters_json scope_json stable_sort_key projection_source_path path
+  catalog_sha="$(extensions_catalog_digest)"
+  while IFS= read -r pack_json; do
+    [[ -n "$pack_json" ]] || continue
+    pack_id="$(jq -r '.pack_id' <<<"$pack_json")"
+    source_id="$(jq -r '.source_id' <<<"$pack_json")"
+
+    while IFS= read -r command_json; do
+      [[ -n "$command_json" ]] || continue
+      capability_id="$(jq -r '.capability_id' <<<"$command_json")"
+      display_name="$(jq -r '.display_name' <<<"$command_json")"
+      summary="$(jq -r '.summary' <<<"$command_json")"
+      status="$(jq -r '.status // "active"' <<<"$command_json")"
+      routing_json="$(jq -c '{selectors: .selectors, fingerprints: .fingerprints}' <<<"$command_json")"
+      selectors_json="$(jq -c '.selectors' <<<"$routing_json")"
+      fingerprints_json="$(jq -c '.fingerprints' <<<"$routing_json")"
+      host_adapters_json="$(jq -c '.host_adapters // []' <<<"$command_json")"
+      scope_json="$(scope_relevance_json "extension" command "$fingerprints_json")"
+      stable_sort_key="$(stable_sort_key_for_candidate "$selectors_json" "$scope_json" extension command "extension.command.$pack_id.$capability_id")"
+      emit_candidate "$candidates_file" "extension.command.$pack_id.$capability_id" "extension-command-$pack_id-$capability_id" extension command "$capability_id" "$display_name" "$summary" "$status" ".octon/generated/effective/extensions/catalog.effective.yml" "" "extension" "$host_adapters_json" "$selectors_json" "$fingerprints_json" "$scope_json" "$(precedence_tier_for_origin extension)" "$stable_sort_key" "$capability_id"
+      emit_artifact "$artifacts_file" "extension-command-$pack_id-$capability_id" "extension.command.$pack_id.$capability_id" extension command "$capability_id" "$display_name" ".octon/generated/effective/extensions/catalog.effective.yml" "$catalog_sha" ".octon/generated/effective/extensions/catalog.effective.yml" "$catalog_sha" "$(source_kind_for_origin extension)" "$pack_id" "$source_id" command "$capability_id"
+    done < <(jq -c '.routing_exports.commands[]?' <<<"$pack_json")
+
+    while IFS= read -r skill_json; do
+      [[ -n "$skill_json" ]] || continue
+      capability_id="$(jq -r '.capability_id' <<<"$skill_json")"
+      display_name="$(jq -r '.display_name' <<<"$skill_json")"
+      summary="$(jq -r '.summary' <<<"$skill_json")"
+      status="$(jq -r '.status // "active"' <<<"$skill_json")"
+      routing_json="$(jq -c '{selectors: .selectors, fingerprints: .fingerprints}' <<<"$skill_json")"
+      selectors_json="$(jq -c '.selectors' <<<"$routing_json")"
+      fingerprints_json="$(jq -c '.fingerprints' <<<"$routing_json")"
+      host_adapters_json="$(jq -c '.host_adapters // []' <<<"$skill_json")"
+      scope_json="$(scope_relevance_json "extension" skill "$fingerprints_json")"
+      stable_sort_key="$(stable_sort_key_for_candidate "$selectors_json" "$scope_json" extension skill "extension.skill.$pack_id.$capability_id")"
+      emit_candidate "$candidates_file" "extension.skill.$pack_id.$capability_id" "extension-skill-$pack_id-$capability_id" extension skill "$capability_id" "$display_name" "$summary" "$status" ".octon/generated/effective/extensions/catalog.effective.yml" "" "extension" "$host_adapters_json" "$selectors_json" "$fingerprints_json" "$scope_json" "$(precedence_tier_for_origin extension)" "$stable_sort_key" "$capability_id"
+      emit_artifact "$artifacts_file" "extension-skill-$pack_id-$capability_id" "extension.skill.$pack_id.$capability_id" extension skill "$capability_id" "$display_name" ".octon/generated/effective/extensions/catalog.effective.yml" "$catalog_sha" ".octon/generated/effective/extensions/catalog.effective.yml" "$catalog_sha" "$(source_kind_for_origin extension)" "$pack_id" "$source_id" skill "$capability_id"
+    done < <(jq -c '.routing_exports.skills[]?' <<<"$pack_json")
+  done < <(yq -o=json '.packs[]?' "$EXTENSIONS_CATALOG" | jq -c '.')
+}
+
+sort_candidates() {
+  local input_file="$1"
+  local output_file="$2"
+  jq -cs 'sort_by(.stable_sort_key)' "$input_file" | jq -c '.[]' >"$output_file"
+}
+
+assert_unique_field() {
+  local file="$1"
+  local field="$2"
+  local description="$3"
+  local duplicates
+  duplicates="$(jq -r "$field" "$file" 2>/dev/null | awk 'NF' | LC_ALL=C sort | uniq -d)"
+  if [[ -n "$duplicates" ]]; then
+    echo "[ERROR] duplicate $description detected: $duplicates" >&2
+    exit 1
+  fi
+}
+
+normalize_payload() {
   sed -E 's/^published_at: "[^"]*"/published_at: "__PUBLISHED_AT__"/'
 }
 
@@ -71,338 +619,219 @@ maybe_reuse_published_at() {
     return 0
   fi
 
-  if [[ "$(normalized_payload < "$candidate_routing")" == "$(normalized_payload < "$ROUTING_FILE")" ]] \
-    && [[ "$(normalized_payload < "$candidate_map")" == "$(normalized_payload < "$ARTIFACT_MAP_FILE")" ]] \
-    && [[ "$(normalized_payload < "$candidate_lock")" == "$(normalized_payload < "$GENERATION_LOCK_FILE")" ]]; then
+  if [[ "$(normalize_payload < "$candidate_routing")" == "$(normalize_payload < "$ROUTING_FILE")" ]] \
+    && [[ "$(normalize_payload < "$candidate_map")" == "$(normalize_payload < "$ARTIFACT_MAP_FILE")" ]] \
+    && [[ "$(normalize_payload < "$candidate_lock")" == "$(normalize_payload < "$GENERATION_LOCK_FILE")" ]]; then
     printf '%s\n' "$current_published_at"
   else
     printf '%s\n' "$fallback"
   fi
 }
 
-instance_capabilities_digest() {
-  local payload=""
-  local file rel sha
-  while IFS= read -r file; do
-    [[ -n "$file" ]] || continue
-    rel="${file#$ROOT_DIR/}"
-    sha="$(hash_file "$file")"
-    payload+="${rel} ${sha}"$'\n'
-  done < <(instance_definition_files)
-  printf '%s' "$payload" | hash_text
-}
-
-instance_definition_files() {
-  {
-    find "$OCTON_DIR/instance/capabilities/runtime/commands" -type f -name '*.md' ! -name 'README.md'
-    find "$OCTON_DIR/instance/capabilities/runtime/skills" -type f -name 'SKILL.md'
-  } 2>/dev/null | sort
-}
-
-extension_capability_input_digest() {
-  local payload=""
-  local commands_root skills_root file rel sha
-  while IFS=$'\t' read -r commands_root skills_root; do
-    [[ -n "$commands_root$skills_root" ]] || continue
-    if [[ -n "$commands_root" && "$commands_root" != "null" && -d "$ROOT_DIR/$commands_root" ]]; then
-      while IFS= read -r file; do
-        [[ -n "$file" ]] || continue
-        rel="${file#$ROOT_DIR/}"
-        sha="$(hash_file "$file")"
-        payload+="${rel} ${sha}"$'\n'
-      done < <(find "$ROOT_DIR/$commands_root" -type f | sort)
-    fi
-    if [[ -n "$skills_root" && "$skills_root" != "null" && -d "$ROOT_DIR/$skills_root" ]]; then
-      while IFS= read -r file; do
-        [[ -n "$file" ]] || continue
-        rel="${file#$ROOT_DIR/}"
-        sha="$(hash_file "$file")"
-        payload+="${rel} ${sha}"$'\n'
-      done < <(find "$ROOT_DIR/$skills_root" -type f | sort)
-    fi
-  done < <(yq -r '.packs[]? | [.content_roots.commands // "", .content_roots.skills // ""] | @tsv' "$EXTENSIONS_CATALOG" 2>/dev/null || true)
-  printf '%s' "$payload" | hash_text
-}
-
-write_candidates() {
-  local outfile="$1"
-  local tsv="$2"
-
-  if [[ ! -s "$tsv" ]]; then
-    printf 'routing_candidates: []\n' >>"$outfile"
-    return
-  fi
-
-  printf 'routing_candidates:\n' >>"$outfile"
-  while IFS=$'\t' read -r effective_id artifact_map_id origin_class capability_kind capability_id display_name summary status source_manifest interface_type; do
-    printf '  - effective_id: "%s"\n' "$(yaml_escape "$effective_id")" >>"$outfile"
-    printf '    artifact_map_id: "%s"\n' "$(yaml_escape "$artifact_map_id")" >>"$outfile"
-    printf '    origin_class: "%s"\n' "$(yaml_escape "$origin_class")" >>"$outfile"
-    printf '    capability_kind: "%s"\n' "$(yaml_escape "$capability_kind")" >>"$outfile"
-    printf '    capability_id: "%s"\n' "$(yaml_escape "$capability_id")" >>"$outfile"
-    printf '    display_name: "%s"\n' "$(yaml_escape "$display_name")" >>"$outfile"
-    printf '    summary: "%s"\n' "$(yaml_escape "$summary")" >>"$outfile"
-    printf '    status: "%s"\n' "$(yaml_escape "$status")" >>"$outfile"
-    printf '    source_manifest: "%s"\n' "$(yaml_escape "$source_manifest")" >>"$outfile"
-    if [[ -n "$interface_type" ]]; then
-      printf '    interface_type: "%s"\n' "$(yaml_escape "$interface_type")" >>"$outfile"
-    fi
-  done <"$tsv"
-}
-
-write_artifact_map() {
-  local outfile="$1"
-  local tsv="$2"
-
-  if [[ ! -s "$tsv" ]]; then
-    printf 'artifacts: []\n' >>"$outfile"
-    return
-  fi
-
-  printf 'artifacts:\n' >>"$outfile"
-  while IFS=$'\t' read -r effective_id artifact_map_id origin_class capability_kind capability_id display_name summary status source_manifest source_path source_manifest_sha256 source_sha256 extension_pack_id extension_source_id extension_entry_path; do
-    printf '  - artifact_map_id: "%s"\n' "$(yaml_escape "$artifact_map_id")" >>"$outfile"
-    printf '    effective_id: "%s"\n' "$(yaml_escape "$effective_id")" >>"$outfile"
-    printf '    origin_class: "%s"\n' "$(yaml_escape "$origin_class")" >>"$outfile"
-    printf '    capability_kind: "%s"\n' "$(yaml_escape "$capability_kind")" >>"$outfile"
-    printf '    capability_id: "%s"\n' "$(yaml_escape "$capability_id")" >>"$outfile"
-    printf '    display_name: "%s"\n' "$(yaml_escape "$display_name")" >>"$outfile"
-    printf '    source_manifest_path: "%s"\n' "$(yaml_escape "$source_manifest")" >>"$outfile"
-    printf '    source_manifest_sha256: "%s"\n' "$source_manifest_sha256" >>"$outfile"
-    printf '    source_path: "%s"\n' "$(yaml_escape "$source_path")" >>"$outfile"
-    printf '    source_sha256: "%s"\n' "$source_sha256" >>"$outfile"
-    if [[ -n "$extension_pack_id" ]]; then
-      printf '    extension_pack_id: "%s"\n' "$(yaml_escape "$extension_pack_id")" >>"$outfile"
-      printf '    extension_source_id: "%s"\n' "$(yaml_escape "$extension_source_id")" >>"$outfile"
-      printf '    extension_entry_path: "%s"\n' "$(yaml_escape "$extension_entry_path")" >>"$outfile"
-    fi
-  done <"$tsv"
-}
-
 main() {
-  local tmpdir="" routing_tmp artifact_tmp lock_tmp candidates_tmp artifacts_tmp
-  local root_sha commands_sha skills_sha services_sha tools_sha extensions_sha instance_sha extension_inputs_sha
-  local generator_version generation_seed generation_sha generation_id published_at
-  local default_published_at source_path source_sha manifest_rel manifest_sha capability_path display_name summary access status interface_type effective_id artifact_map_id capability_id
+  local generator_version root_sha commands_sha skills_sha skills_registry_sha services_sha tools_sha instance_commands_sha instance_skills_sha locality_scopes_sha locality_lock_sha locality_generation_id extensions_sha extensions_lock_sha extensions_generation_id
+  local tmpdir candidates_raw candidates_sorted artifacts_raw routing_tmp artifact_tmp lock_tmp generation_seed generation_sha generation_id default_published_at published_at routing_context_json resolution_order_json
 
   mkdir -p "$EFFECTIVE_DIR"
+  generator_version="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST")"
+  LOCALITY_SCOPES_JSON="$(yq -o=json '.scopes // []' "$LOCALITY_SCOPES_FILE")"
+  root_sha="$(hash_file "$ROOT_MANIFEST")"
+  commands_sha="$(framework_commands_digest)"
+  skills_sha="$(framework_skills_manifest_digest)"
+  skills_registry_sha="$(framework_skills_registry_digest)"
+  services_sha="$(framework_services_digest)"
+  tools_sha="$(framework_tools_digest)"
+  instance_commands_sha="$(instance_commands_manifest_digest)"
+  instance_skills_sha="$(instance_skills_manifest_digest)"
+  locality_scopes_sha="$(locality_scopes_digest)"
+  locality_lock_sha="$(locality_lock_digest)"
+  locality_generation_id="$(yq -r '.generation_id // ""' "$LOCALITY_LOCK_FILE")"
+  extensions_sha="$(extensions_catalog_digest)"
+  extensions_lock_sha="$(extensions_lock_digest)"
+  extensions_generation_id="$(yq -r '.generation_id // ""' "$EXTENSIONS_LOCK_FILE")"
+
   tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/octon-capabilities.XXXXXX")"
   trap '[[ -n "${tmpdir:-}" ]] && rm -rf "$tmpdir"' EXIT
+  candidates_raw="$tmpdir/candidates.raw.ndjson"
+  candidates_sorted="$tmpdir/candidates.sorted.ndjson"
+  artifacts_raw="$tmpdir/artifacts.raw.ndjson"
   routing_tmp="$tmpdir/routing.effective.yml"
   artifact_tmp="$tmpdir/artifact-map.yml"
   lock_tmp="$tmpdir/generation.lock.yml"
-  candidates_tmp="$tmpdir/candidates.tsv"
-  artifacts_tmp="$tmpdir/artifacts.tsv"
 
-  generator_version="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST")"
-  root_sha="$(hash_file "$ROOT_MANIFEST")"
-  commands_sha="$(hash_file "$COMMANDS_MANIFEST")"
-  skills_sha="$(hash_file "$SKILLS_MANIFEST")"
-  services_sha="$(hash_file "$SERVICES_MANIFEST")"
-  tools_sha="$(hash_file "$TOOLS_MANIFEST")"
-  extensions_sha="$(hash_file "$EXTENSIONS_CATALOG")"
-  instance_sha="$(instance_capabilities_digest)"
-  extension_inputs_sha="$(extension_capability_input_digest)"
+  : >"$candidates_raw"
+  : >"$artifacts_raw"
 
-  : >"$candidates_tmp"
-  : >"$artifacts_tmp"
+  collect_framework_commands "$candidates_raw" "$artifacts_raw"
+  collect_framework_skills "$candidates_raw" "$artifacts_raw"
+  collect_framework_services "$candidates_raw" "$artifacts_raw"
+  collect_framework_tools "$candidates_raw" "$artifacts_raw"
+  collect_instance_commands "$candidates_raw" "$artifacts_raw"
+  collect_instance_skills "$candidates_raw" "$artifacts_raw"
+  collect_extension_exports "$candidates_raw" "$artifacts_raw"
 
-  while IFS=$'\t' read -r capability_id capability_path display_name summary access; do
-    source_path=".octon/framework/capabilities/runtime/commands/${capability_path}"
-    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
-    manifest_rel=".octon/framework/capabilities/runtime/commands/manifest.yml"
-    manifest_sha="$commands_sha"
-    effective_id="framework.command.${capability_id}"
-    artifact_map_id="framework-command-${capability_id}"
-    printf '%s\t%s\tframework\tcommand\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "active" "$manifest_rel" "" >>"$candidates_tmp"
-    printf '%s\t%s\tframework\tcommand\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "active" "$manifest_rel" "$source_path" "$manifest_sha" "$source_sha" >>"$artifacts_tmp"
-  done < <(yq -r '.commands[]? | [.id, .path, .display_name, .summary, .access] | @tsv' "$COMMANDS_MANIFEST")
-
-  while IFS=$'\t' read -r capability_id capability_path display_name summary status; do
-    capability_path="$(trim_trailing_slash "$capability_path")"
-    source_path=".octon/framework/capabilities/runtime/skills/${capability_path}/SKILL.md"
-    if [[ ! -f "$ROOT_DIR/$source_path" ]]; then
-      source_path=".octon/framework/capabilities/runtime/skills/manifest.yml"
-    fi
-    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
-    manifest_rel=".octon/framework/capabilities/runtime/skills/manifest.yml"
-    manifest_sha="$skills_sha"
-    effective_id="framework.skill.${capability_id}"
-    artifact_map_id="framework-skill-${capability_id}"
-    printf '%s\t%s\tframework\tskill\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$status" "$manifest_rel" "" >>"$candidates_tmp"
-    printf '%s\t%s\tframework\tskill\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$status" "$manifest_rel" "$source_path" "$manifest_sha" "$source_sha" >>"$artifacts_tmp"
-  done < <(yq -r '.skills[]? | [.id, .path, .display_name, .summary, .status] | @tsv' "$SKILLS_MANIFEST")
-
-  while IFS=$'\t' read -r capability_id capability_path display_name summary status interface_type; do
-    capability_path="$(trim_trailing_slash "$capability_path")"
-    source_path=".octon/framework/capabilities/runtime/services/${capability_path}/SERVICE.md"
-    if [[ ! -f "$ROOT_DIR/$source_path" ]]; then
-      source_path=".octon/framework/capabilities/runtime/services/manifest.yml"
-    fi
-    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
-    manifest_rel=".octon/framework/capabilities/runtime/services/manifest.yml"
-    manifest_sha="$services_sha"
-    effective_id="framework.service.${capability_id}"
-    artifact_map_id="framework-service-${capability_id}"
-    printf '%s\t%s\tframework\tservice\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$status" "$manifest_rel" "$interface_type" >>"$candidates_tmp"
-    printf '%s\t%s\tframework\tservice\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$status" "$manifest_rel" "$source_path" "$manifest_sha" "$source_sha" >>"$artifacts_tmp"
-  done < <(yq -r '.services[]? | [.id, .path, .display_name, .summary, .status, .interface_type] | @tsv' "$SERVICES_MANIFEST")
-
-  while IFS=$'\t' read -r capability_id display_name summary; do
-    source_path=".octon/framework/capabilities/runtime/tools/manifest.yml"
-    source_sha="$tools_sha"
-    manifest_rel=".octon/framework/capabilities/runtime/tools/manifest.yml"
-    manifest_sha="$tools_sha"
-    effective_id="framework.tool-pack.${capability_id}"
-    artifact_map_id="framework-tool-pack-${capability_id}"
-    printf '%s\t%s\tframework\ttool-pack\t%s\t%s\t%s\tactive\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$manifest_rel" "" >>"$candidates_tmp"
-    printf '%s\t%s\tframework\ttool-pack\t%s\t%s\t%s\tactive\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$manifest_rel" "$source_path" "$manifest_sha" "$source_sha" >>"$artifacts_tmp"
-  done < <(yq -r '.packs[]? | [.id, .display_name, .summary] | @tsv' "$TOOLS_MANIFEST")
-
-  while IFS= read -r source_path; do
-    [[ -n "$source_path" ]] || continue
-    capability_id="$(basename "$source_path" .md)"
-    display_name="$capability_id"
-    summary="Repo-native command capability."
-    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
-    manifest_rel=".octon/instance/capabilities/runtime/commands/README.md"
-    manifest_sha="$instance_sha"
-    effective_id="instance.command.${capability_id}"
-    artifact_map_id="instance-command-${capability_id}"
-    printf '%s\t%s\tinstance\tcommand\t%s\t%s\t%s\tactive\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$manifest_rel" "" >>"$candidates_tmp"
-    printf '%s\t%s\tinstance\tcommand\t%s\t%s\t%s\tactive\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$manifest_rel" "$source_path" "$manifest_sha" "$source_sha" >>"$artifacts_tmp"
-  done < <(find "$OCTON_DIR/instance/capabilities/runtime/commands" -type f -name '*.md' ! -name 'README.md' | sort | sed "s#^$ROOT_DIR/##")
-
-  while IFS= read -r source_path; do
-    [[ -n "$source_path" ]] || continue
-    capability_id="$(basename "$(dirname "$source_path")")"
-    display_name="$capability_id"
-    summary="Repo-native skill capability."
-    source_sha="$(hash_file "$ROOT_DIR/$source_path")"
-    manifest_rel=".octon/instance/capabilities/runtime/skills/README.md"
-    manifest_sha="$instance_sha"
-    effective_id="instance.skill.${capability_id}"
-    artifact_map_id="instance-skill-${capability_id}"
-    printf '%s\t%s\tinstance\tskill\t%s\t%s\t%s\tactive\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$manifest_rel" "" >>"$candidates_tmp"
-    printf '%s\t%s\tinstance\tskill\t%s\t%s\t%s\tactive\t%s\t%s\t%s\t%s\n' \
-      "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$manifest_rel" "$source_path" "$manifest_sha" "$source_sha" >>"$artifacts_tmp"
-  done < <(find "$OCTON_DIR/instance/capabilities/runtime/skills" -type f -name 'SKILL.md' | sort | sed "s#^$ROOT_DIR/##")
-
-  while IFS=$'\t' read -r pack_id source_id commands_root; do
-    [[ -n "$commands_root" && "$commands_root" != "null" ]] || continue
-    [[ -f "$ROOT_DIR/$commands_root/manifest.fragment.yml" ]] || continue
-    while IFS=$'\t' read -r capability_id capability_path display_name summary access; do
-      [[ -n "$capability_id" ]] || continue
-      source_path=".octon/generated/effective/extensions/catalog.effective.yml"
-      source_sha="$extensions_sha"
-      manifest_rel=".octon/generated/effective/extensions/catalog.effective.yml"
-      manifest_sha="$extensions_sha"
-      effective_id="extension.command.${pack_id}.${capability_id}"
-      artifact_map_id="extension-command-${pack_id}-${capability_id}"
-      printf '%s\t%s\textension\tcommand\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-        "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "active" "$manifest_rel" "" >>"$candidates_tmp"
-      printf '%s\t%s\textension\tcommand\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-        "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "active" "$manifest_rel" "$source_path" "$manifest_sha" "$source_sha" "$pack_id" "$source_id" "commands/${capability_path}" >>"$artifacts_tmp"
-    done < <(yq -r '.commands[]? | [.id, .path, .display_name, .summary, .access] | @tsv' "$ROOT_DIR/$commands_root/manifest.fragment.yml")
-  done < <(yq -r '.packs[]? | [.pack_id, .source_id, .content_roots.commands // ""] | @tsv' "$EXTENSIONS_CATALOG" 2>/dev/null || true)
-
-  while IFS=$'\t' read -r pack_id source_id skills_root; do
-    [[ -n "$skills_root" && "$skills_root" != "null" ]] || continue
-    [[ -f "$ROOT_DIR/$skills_root/manifest.fragment.yml" ]] || continue
-    while IFS=$'\t' read -r capability_id capability_path display_name summary status; do
-      [[ -n "$capability_id" ]] || continue
-      source_path=".octon/generated/effective/extensions/catalog.effective.yml"
-      source_sha="$extensions_sha"
-      manifest_rel=".octon/generated/effective/extensions/catalog.effective.yml"
-      manifest_sha="$extensions_sha"
-      effective_id="extension.skill.${pack_id}.${capability_id}"
-      artifact_map_id="extension-skill-${pack_id}-${capability_id}"
-      printf '%s\t%s\textension\tskill\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-        "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$status" "$manifest_rel" "" >>"$candidates_tmp"
-      printf '%s\t%s\textension\tskill\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-        "$effective_id" "$artifact_map_id" "$capability_id" "$display_name" "$summary" "$status" "$manifest_rel" "$source_path" "$manifest_sha" "$source_sha" "$pack_id" "$source_id" "skills/${capability_path}SKILL.md" >>"$artifacts_tmp"
-    done < <(yq -r '.skills[]? | [.id, .path, .display_name, .summary, .status] | @tsv' "$ROOT_DIR/$skills_root/manifest.fragment.yml")
-  done < <(yq -r '.packs[]? | [.pack_id, .source_id, .content_roots.skills // ""] | @tsv' "$EXTENSIONS_CATALOG" 2>/dev/null || true)
-
-  LC_ALL=C sort "$candidates_tmp" -o "$candidates_tmp"
-  LC_ALL=C sort "$artifacts_tmp" -o "$artifacts_tmp"
+  sort_candidates "$candidates_raw" "$candidates_sorted"
+  assert_unique_field "$candidates_sorted" '.effective_id' "effective_id"
+  assert_unique_field "$artifacts_raw" '.artifact_map_id' "artifact_map_id"
 
   generation_seed="$(
-    printf 'root %s\ncommands %s\nskills %s\nservices %s\ntools %s\ninstance %s\nextensions %s\n' \
-      "$root_sha" "$commands_sha" "$skills_sha" "$services_sha" "$tools_sha" "$instance_sha" "$extensions_sha" "$extension_inputs_sha"
+    printf 'root %s\ncommands %s\nskills %s\nskills-registry %s\nservices %s\ntools %s\ninstance-commands %s\ninstance-skills %s\nlocality-scopes %s\nlocality-lock %s\nextensions %s\nextensions-lock %s\n' \
+      "$root_sha" "$commands_sha" "$skills_sha" "$skills_registry_sha" "$services_sha" "$tools_sha" "$instance_commands_sha" "$instance_skills_sha" "$locality_scopes_sha" "$locality_lock_sha" "$extensions_sha" "$extensions_lock_sha"
   )"
   generation_sha="$(printf '%s' "$generation_seed" | hash_text)"
   generation_id="capabilities-${generation_sha:0:12}"
   default_published_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-  {
-    printf 'schema_version: "octon-capability-routing-effective-v1"\n'
-    printf 'generator_version: "__GENERATOR_VERSION__"\n'
-    printf 'generation_id: "%s"\n' "$generation_id"
-    printf 'published_at: "__PUBLISHED_AT__"\n'
-    printf 'publication_status: "published"\n'
-    printf 'source:\n'
-    printf '  root_manifest_path: ".octon/octon.yml"\n'
-    printf '  root_manifest_sha256: "%s"\n' "$root_sha"
-    printf '  framework_commands_manifest_path: ".octon/framework/capabilities/runtime/commands/manifest.yml"\n'
-    printf '  framework_commands_manifest_sha256: "%s"\n' "$commands_sha"
-    printf '  framework_skills_manifest_path: ".octon/framework/capabilities/runtime/skills/manifest.yml"\n'
-    printf '  framework_skills_manifest_sha256: "%s"\n' "$skills_sha"
-    printf '  framework_services_manifest_path: ".octon/framework/capabilities/runtime/services/manifest.yml"\n'
-    printf '  framework_services_manifest_sha256: "%s"\n' "$services_sha"
-    printf '  framework_tools_manifest_path: ".octon/framework/capabilities/runtime/tools/manifest.yml"\n'
-    printf '  framework_tools_manifest_sha256: "%s"\n' "$tools_sha"
-    printf '  instance_capabilities_path: ".octon/instance/capabilities/runtime"\n'
-    printf '  instance_capabilities_sha256: "%s"\n' "$instance_sha"
-    printf '  extensions_catalog_path: ".octon/generated/effective/extensions/catalog.effective.yml"\n'
-    printf '  extensions_catalog_sha256: "%s"\n' "$extensions_sha"
-    printf '  extensions_capability_inputs_sha256: "%s"\n' "$extension_inputs_sha"
-    write_candidates "$routing_tmp" "$candidates_tmp"
-  } >"$routing_tmp"
+  routing_context_json="$(jq -cn \
+    --arg selector_schema_version "octon-capability-routing-selectors-v1" \
+    --arg locality_generation_id "$locality_generation_id" \
+    --arg extension_generation_id "$extensions_generation_id" \
+    --arg host_projection_mode "materialized-copy-v1" \
+    --arg resolution_mode "$(yq -r '.resolution_mode // "single-active-scope"' "$LOCALITY_SCOPES_FILE")" \
+    '
+      {
+        selector_schema_version: $selector_schema_version,
+        locality_generation_id: $locality_generation_id,
+        extension_generation_id: $extension_generation_id,
+        host_projection_mode: $host_projection_mode,
+        scope_resolution_mode: $resolution_mode
+      }
+    ')"
+  resolution_order_json="$(jq -cs '[.[] | .effective_id]' "$candidates_sorted")"
 
-  {
-    printf 'schema_version: "octon-capability-routing-artifact-map-v1"\n'
-    printf 'generator_version: "__GENERATOR_VERSION__"\n'
-    printf 'generation_id: "%s"\n' "$generation_id"
-    printf 'published_at: "__PUBLISHED_AT__"\n'
-    write_artifact_map "$artifact_tmp" "$artifacts_tmp"
-  } >"$artifact_tmp"
+  jq -n \
+    --arg schema_version "octon-capability-routing-effective-v2" \
+    --arg generator_version "$generator_version" \
+    --arg generation_id "$generation_id" \
+    --arg published_at "__PUBLISHED_AT__" \
+    --arg publication_status "published" \
+    --arg root_sha "$root_sha" \
+    --arg commands_sha "$commands_sha" \
+    --arg skills_sha "$skills_sha" \
+    --arg skills_registry_sha "$skills_registry_sha" \
+    --arg services_sha "$services_sha" \
+    --arg tools_sha "$tools_sha" \
+    --arg instance_commands_sha "$instance_commands_sha" \
+    --arg instance_skills_sha "$instance_skills_sha" \
+    --arg locality_scopes_sha "$locality_scopes_sha" \
+    --arg locality_lock_sha "$locality_lock_sha" \
+    --arg locality_generation_id "$locality_generation_id" \
+    --arg extensions_sha "$extensions_sha" \
+    --arg extensions_lock_sha "$extensions_lock_sha" \
+    --arg extensions_generation_id "$extensions_generation_id" \
+    --argjson routing_context "$routing_context_json" \
+    --argjson routing_candidates "$(jq -cs '.' "$candidates_sorted")" \
+    --argjson resolution_order "$resolution_order_json" \
+    '
+      {
+        schema_version: $schema_version,
+        generator_version: $generator_version,
+        generation_id: $generation_id,
+        published_at: $published_at,
+        publication_status: $publication_status,
+        source: {
+          root_manifest_path: ".octon/octon.yml",
+          root_manifest_sha256: $root_sha,
+          framework_commands_manifest_path: ".octon/framework/capabilities/runtime/commands/manifest.yml",
+          framework_commands_manifest_sha256: $commands_sha,
+          framework_skills_manifest_path: ".octon/framework/capabilities/runtime/skills/manifest.yml",
+          framework_skills_manifest_sha256: $skills_sha,
+          framework_skills_registry_path: ".octon/framework/capabilities/runtime/skills/registry.yml",
+          framework_skills_registry_sha256: $skills_registry_sha,
+          framework_services_manifest_path: ".octon/framework/capabilities/runtime/services/manifest.yml",
+          framework_services_manifest_sha256: $services_sha,
+          framework_tools_manifest_path: ".octon/framework/capabilities/runtime/tools/manifest.yml",
+          framework_tools_manifest_sha256: $tools_sha,
+          instance_commands_manifest_path: ".octon/instance/capabilities/runtime/commands/manifest.yml",
+          instance_commands_manifest_sha256: $instance_commands_sha,
+          instance_skills_manifest_path: ".octon/instance/capabilities/runtime/skills/manifest.yml",
+          instance_skills_manifest_sha256: $instance_skills_sha,
+          locality_scopes_effective_path: ".octon/generated/effective/locality/scopes.effective.yml",
+          locality_scopes_effective_sha256: $locality_scopes_sha,
+          locality_generation_lock_path: ".octon/generated/effective/locality/generation.lock.yml",
+          locality_generation_lock_sha256: $locality_lock_sha,
+          locality_generation_id: $locality_generation_id,
+          extensions_catalog_path: ".octon/generated/effective/extensions/catalog.effective.yml",
+          extensions_catalog_sha256: $extensions_sha,
+          extensions_generation_lock_path: ".octon/generated/effective/extensions/generation.lock.yml",
+          extensions_generation_lock_sha256: $extensions_lock_sha,
+          extensions_generation_id: $extensions_generation_id
+        },
+        routing_context: $routing_context,
+        routing_candidates: $routing_candidates,
+        resolution_order: $resolution_order
+      }
+    ' | yq -P - >"$routing_tmp"
 
-  {
-    printf 'schema_version: "octon-capability-routing-generation-lock-v1"\n'
-    printf 'generator_version: "__GENERATOR_VERSION__"\n'
-    printf 'generation_id: "%s"\n' "$generation_id"
-    printf 'published_at: "__PUBLISHED_AT__"\n'
-    printf 'root_manifest_sha256: "%s"\n' "$root_sha"
-    printf 'framework_commands_manifest_sha256: "%s"\n' "$commands_sha"
-    printf 'framework_skills_manifest_sha256: "%s"\n' "$skills_sha"
-    printf 'framework_services_manifest_sha256: "%s"\n' "$services_sha"
-    printf 'framework_tools_manifest_sha256: "%s"\n' "$tools_sha"
-    printf 'instance_capabilities_sha256: "%s"\n' "$instance_sha"
-    printf 'extensions_catalog_sha256: "%s"\n' "$extensions_sha"
-    printf 'extensions_capability_inputs_sha256: "%s"\n' "$extension_inputs_sha"
-    printf 'published_files:\n'
-    printf '  - path: ".octon/generated/effective/capabilities/routing.effective.yml"\n'
-    printf '  - path: ".octon/generated/effective/capabilities/artifact-map.yml"\n'
-    printf '  - path: ".octon/generated/effective/capabilities/generation.lock.yml"\n'
-  } >"$lock_tmp"
+  jq -n \
+    --arg schema_version "octon-capability-routing-artifact-map-v2" \
+    --arg generator_version "$generator_version" \
+    --arg generation_id "$generation_id" \
+    --arg published_at "__PUBLISHED_AT__" \
+    --argjson artifacts "$(jq -cs 'sort_by(.artifact_map_id)' "$artifacts_raw")" \
+    '
+      {
+        schema_version: $schema_version,
+        generator_version: $generator_version,
+        generation_id: $generation_id,
+        published_at: $published_at,
+        artifacts: $artifacts
+      }
+    ' | yq -P - >"$artifact_tmp"
+
+  jq -n \
+    --arg schema_version "octon-capability-routing-generation-lock-v2" \
+    --arg generator_version "$generator_version" \
+    --arg generation_id "$generation_id" \
+    --arg published_at "__PUBLISHED_AT__" \
+    --arg root_sha "$root_sha" \
+    --arg commands_sha "$commands_sha" \
+    --arg skills_sha "$skills_sha" \
+    --arg skills_registry_sha "$skills_registry_sha" \
+    --arg services_sha "$services_sha" \
+    --arg tools_sha "$tools_sha" \
+    --arg instance_commands_sha "$instance_commands_sha" \
+    --arg instance_skills_sha "$instance_skills_sha" \
+    --arg locality_scopes_sha "$locality_scopes_sha" \
+    --arg locality_lock_sha "$locality_lock_sha" \
+    --arg locality_generation_id "$locality_generation_id" \
+    --arg extensions_sha "$extensions_sha" \
+    --arg extensions_lock_sha "$extensions_lock_sha" \
+    --arg extensions_generation_id "$extensions_generation_id" \
+    '
+      {
+        schema_version: $schema_version,
+        generator_version: $generator_version,
+        generation_id: $generation_id,
+        published_at: $published_at,
+        root_manifest_sha256: $root_sha,
+        framework_commands_manifest_sha256: $commands_sha,
+        framework_skills_manifest_sha256: $skills_sha,
+        framework_skills_registry_sha256: $skills_registry_sha,
+        framework_services_manifest_sha256: $services_sha,
+        framework_tools_manifest_sha256: $tools_sha,
+        instance_commands_manifest_sha256: $instance_commands_sha,
+        instance_skills_manifest_sha256: $instance_skills_sha,
+        locality_scopes_sha256: $locality_scopes_sha,
+        locality_generation_lock_sha256: $locality_lock_sha,
+        locality_generation_id: $locality_generation_id,
+        extensions_catalog_sha256: $extensions_sha,
+        extensions_generation_lock_sha256: $extensions_lock_sha,
+        extensions_generation_id: $extensions_generation_id,
+        published_files: [
+          {path: ".octon/generated/effective/capabilities/routing.effective.yml"},
+          {path: ".octon/generated/effective/capabilities/artifact-map.yml"},
+          {path: ".octon/generated/effective/capabilities/generation.lock.yml"}
+        ]
+      }
+    ' | yq -P - >"$lock_tmp"
 
   published_at="$(maybe_reuse_published_at "$routing_tmp" "$artifact_tmp" "$lock_tmp" "$default_published_at")"
+  perl -0pi -e 's/__PUBLISHED_AT__/'"$published_at"'/g' "$routing_tmp" "$artifact_tmp" "$lock_tmp"
 
-  sed -e "s|__GENERATOR_VERSION__|$generator_version|" -e "s|__PUBLISHED_AT__|$published_at|" "$routing_tmp" >"$ROUTING_FILE"
-  sed -e "s|__GENERATOR_VERSION__|$generator_version|" -e "s|__PUBLISHED_AT__|$published_at|" "$artifact_tmp" >"$ARTIFACT_MAP_FILE"
-  sed -e "s|__GENERATOR_VERSION__|$generator_version|" -e "s|__PUBLISHED_AT__|$published_at|" "$lock_tmp" >"$GENERATION_LOCK_FILE"
+  mv "$routing_tmp" "$ROUTING_FILE"
+  mv "$artifact_tmp" "$ARTIFACT_MAP_FILE"
+  mv "$lock_tmp" "$GENERATION_LOCK_FILE"
 
   echo "[OK] published capability routing: $generation_id"
 }

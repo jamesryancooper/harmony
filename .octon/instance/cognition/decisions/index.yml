@@ -113,3 +113,5 @@ records:
     path: 054-inputs-additive-extensions-atomic-cutover.md
   - id: 055-memory-routing-and-decision-surfaces-atomic-cutover
     path: 055-memory-routing-and-decision-surfaces-atomic-cutover.md
+  - id: 056-capability-routing-and-host-integration-atomic-cutover
+    path: 056-capability-routing-and-host-integration-atomic-cutover.md

@@ -17,7 +17,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-extension-effective-catalog-v2"
+      "const": "octon-extension-effective-catalog-v3"
     },
     "generation_id": {
       "type": "string",
@@ -150,7 +150,8 @@
           "required": [
             "trust_decision",
             "publication_status",
-            "content_roots"
+            "content_roots",
+            "routing_exports"
           ],
           "properties": {
             "trust_decision": {
@@ -218,6 +219,177 @@
                   ]
                 }
               }
+            },
+            "routing_exports": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "commands",
+                "skills"
+              ],
+              "properties": {
+                "commands": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/routingExportCommand"
+                  }
+                },
+                "skills": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/routingExportSkill"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "selectors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "include",
+        "exclude"
+      ],
+      "properties": {
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "fingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tech_tags",
+        "language_tags"
+      ],
+      "properties": {
+        "tech_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "language_tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "routingExportBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_id",
+        "display_name",
+        "summary",
+        "status",
+        "manifest_fragment_path",
+        "projection_source_path",
+        "host_adapters",
+        "selectors",
+        "fingerprints"
+      ],
+      "properties": {
+        "capability_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifest_fragment_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projection_source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "host_adapters": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "claude",
+              "cursor",
+              "codex"
+            ]
+          }
+        },
+        "selectors": {
+          "$ref": "#/$defs/selectors"
+        },
+        "fingerprints": {
+          "$ref": "#/$defs/fingerprints"
+        }
+      }
+    },
+    "routingExportCommand": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/routingExportBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "path",
+            "access"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "access": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "routingExportSkill": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/routingExportBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "path"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
             }
           }
         }

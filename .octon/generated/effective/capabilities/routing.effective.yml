@@ -1,994 +1,3249 @@
-schema_version: "octon-capability-routing-effective-v1"
-generator_version: "0.5.1"
-generation_id: "capabilities-a524dfadc47b"
-published_at: "2026-03-20T14:33:08Z"
-publication_status: "published"
+schema_version: octon-capability-routing-effective-v2
+generator_version: 0.5.1
+generation_id: capabilities-616640104918
+published_at: 2026-03-20T18:52:18Z
+publication_status: published
 source:
-  root_manifest_path: ".octon/octon.yml"
-  root_manifest_sha256: "b16e1eb53797a92b6d8e4ad8ac48d0a1b944591c08432d19f5fddb4425808e99"
-  framework_commands_manifest_path: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  framework_commands_manifest_sha256: "1296281583143bdff0e9b0222ddad0dd0e955052f51f16d59f213c857fa05c8d"
-  framework_skills_manifest_path: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  framework_skills_manifest_sha256: "5adf62d75c4f6d58e76760e6c2474c50ec4aef4773de847a567987f4a28f8e50"
-  framework_services_manifest_path: ".octon/framework/capabilities/runtime/services/manifest.yml"
-  framework_services_manifest_sha256: "139dbc69bb585e87a147c942444608253167ab98a06ca75919323bc1bcf35f29"
-  framework_tools_manifest_path: ".octon/framework/capabilities/runtime/tools/manifest.yml"
-  framework_tools_manifest_sha256: "e8c9c5e20908f07ff17b4739698a4b6d2c50c5851807f6d806d878e5feee7234"
-  instance_capabilities_path: ".octon/instance/capabilities/runtime"
-  instance_capabilities_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  extensions_catalog_path: ".octon/generated/effective/extensions/catalog.effective.yml"
-  extensions_catalog_sha256: "40bc45bf0908fd5e8afc49541eac2a5796a6ae48f478870991d65622b90ac639"
-  extensions_capability_inputs_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  root_manifest_path: .octon/octon.yml
+  root_manifest_sha256: b16e1eb53797a92b6d8e4ad8ac48d0a1b944591c08432d19f5fddb4425808e99
+  framework_commands_manifest_path: .octon/framework/capabilities/runtime/commands/manifest.yml
+  framework_commands_manifest_sha256: d413d4a317ae39f4cff58892a3f555c09c02a1b42dd83cc1acde667d7200bb4d
+  framework_skills_manifest_path: .octon/framework/capabilities/runtime/skills/manifest.yml
+  framework_skills_manifest_sha256: 5adf62d75c4f6d58e76760e6c2474c50ec4aef4773de847a567987f4a28f8e50
+  framework_skills_registry_path: .octon/framework/capabilities/runtime/skills/registry.yml
+  framework_skills_registry_sha256: d6966ea1decb8dd0ae1c1a3b0049d0b44503075dbd7926f946a60488b398b9a9
+  framework_services_manifest_path: .octon/framework/capabilities/runtime/services/manifest.yml
+  framework_services_manifest_sha256: ea57989879070329d20570ceffa0d21e1023b9c19f0f95b29edc5220ec72e069
+  framework_tools_manifest_path: .octon/framework/capabilities/runtime/tools/manifest.yml
+  framework_tools_manifest_sha256: 839a0f38d9d3a511c2c54a7fb854a8cbcbc1ab7e5f75d75fe3565d5781710509
+  instance_commands_manifest_path: .octon/instance/capabilities/runtime/commands/manifest.yml
+  instance_commands_manifest_sha256: 31ef86ddc3e04a021ac56e6f731d0d28ae29f4a163a32dc4965ee34c6d2177bc
+  instance_skills_manifest_path: .octon/instance/capabilities/runtime/skills/manifest.yml
+  instance_skills_manifest_sha256: e5b6c935f1c2d451eb5c59cdb0c3e99a508204d17c7e4ae03ca9f4c7d1305c7c
+  locality_scopes_effective_path: .octon/generated/effective/locality/scopes.effective.yml
+  locality_scopes_effective_sha256: d7f7ac294ffc72785b7985891dfdf85ab1cc06c6e2a8334227164abc65daf690
+  locality_generation_lock_path: .octon/generated/effective/locality/generation.lock.yml
+  locality_generation_lock_sha256: ada4208686edfa0260f063686041715d8ce3d5d8f92a6440b193eeb9d6983965
+  locality_generation_id: locality-34239636e33c
+  extensions_catalog_path: .octon/generated/effective/extensions/catalog.effective.yml
+  extensions_catalog_sha256: 95a66bd0987581a7b13117fffcc165b599cd7dfde99bbd0f32b9285f158a74c5
+  extensions_generation_lock_path: .octon/generated/effective/extensions/generation.lock.yml
+  extensions_generation_lock_sha256: 58d0b8cdb04ca0aa524be7faea8e803edb8821627cac347225c8fe7bd2b9f925
+  extensions_generation_id: extensions-d81e117f4c8a
+routing_context:
+  selector_schema_version: octon-capability-routing-selectors-v1
+  locality_generation_id: locality-34239636e33c
+  extension_generation_id: extensions-d81e117f4c8a
+  host_projection_mode: materialized-copy-v1
+  scope_resolution_mode: single-active-scope
 routing_candidates:
-  - effective_id: "framework.command.alignment-check"
-    artifact_map_id: "framework-command-alignment-check"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "alignment-check"
-    display_name: "Alignment Check"
-    summary: "Run profile-based harness alignment validations through a single command."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.audit-skills-system-expansion"
-    artifact_map_id: "framework-command-audit-skills-system-expansion"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "audit-skills-system-expansion"
-    display_name: "Audit Skills System Expansion"
-    summary: "Invoke the skills-system expansion evaluation prompt through a slash-style command wrapper."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.context-budget"
-    artifact_map_id: "framework-command-context-budget"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "context-budget"
-    display_name: "Context Budget"
-    summary: "Emit deterministic native context budget state and threshold classification."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.create-workflow"
-    artifact_map_id: "framework-command-create-workflow"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "create-workflow"
-    display_name: "Create Workflow"
-    summary: "Scaffold a new workflow with gap-aware structure."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.discover-expand"
-    artifact_map_id: "framework-command-discover-expand"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "discover-expand"
-    display_name: "Discover Expand"
-    summary: "Expand discovery frontier via filesystem-discovery graph traversal."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.discover-explain"
-    artifact_map_id: "framework-command-discover-explain"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "discover-explain"
-    display_name: "Discover Explain"
-    summary: "Explain candidate relevance/provenance via filesystem-discovery."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.discover-resolve"
-    artifact_map_id: "framework-command-discover-resolve"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "discover-resolve"
-    display_name: "Discover Resolve"
-    summary: "Resolve a discovered node back to file path via filesystem-discovery."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.discover-start"
-    artifact_map_id: "framework-command-discover-start"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "discover-start"
-    display_name: "Discover Start"
-    summary: "Start progressive discovery via filesystem-discovery."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.evaluate-workflow"
-    artifact_map_id: "framework-command-evaluate-workflow"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "evaluate-workflow"
-    display_name: "Evaluate Workflow"
-    summary: "Assess a workflow against quality criteria and gap coverage."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.export-harness"
-    artifact_map_id: "framework-command-export-harness"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "export-harness"
-    display_name: "Export Harness"
-    summary: "Materialize repo_snapshot or pack_bundle exports from the root-manifest profile contract."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.init"
-    artifact_map_id: "framework-command-init"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "init"
-    display_name: "Initialize Project"
-    summary: "Generate canonical .octon bootstrap files plus root ingress adapters and objective-contract artifacts."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.query-ask"
-    artifact_map_id: "framework-command-query-ask"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "query-ask"
-    display_name: "Query Ask"
-    summary: "Run query service in ask mode and return grounded answer output."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.query-explain"
-    artifact_map_id: "framework-command-query-explain"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "query-explain"
-    display_name: "Query Explain"
-    summary: "Run query service in explain mode and return ranking rationale."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.query-retrieve"
-    artifact_map_id: "framework-command-query-retrieve"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "query-retrieve"
-    display_name: "Query Retrieve"
-    summary: "Run query service in retrieve mode and return ranked candidates."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.recover"
-    artifact_map_id: "framework-command-recover"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "recover"
-    display_name: "Recover from Errors"
-    summary: "Recovery procedures for common agent failure modes."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.refactor"
-    artifact_map_id: "framework-command-refactor"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "refactor"
-    display_name: "Refactor"
-    summary: "Execute a verified codebase refactor with exhaustive audit and mandatory verification."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.snapshot-build"
-    artifact_map_id: "framework-command-snapshot-build"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "snapshot-build"
-    display_name: "Snapshot Build"
-    summary: "Build deterministic snapshot artifacts via filesystem-snapshot."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.snapshot-diff"
-    artifact_map_id: "framework-command-snapshot-diff"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "snapshot-diff"
-    display_name: "Snapshot Diff"
-    summary: "Compare two filesystem-snapshot artifacts."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.studio"
-    artifact_map_id: "framework-command-studio"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "studio"
-    display_name: "Launch Studio"
-    summary: "Launch Octon Studio for workflow graph design, inspection, and safe staged edits."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.update-workflow"
-    artifact_map_id: "framework-command-update-workflow"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "update-workflow"
-    display_name: "Update Workflow"
-    summary: "Modify an existing workflow to add features or fix gaps."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.validate-frontmatter"
-    artifact_map_id: "framework-command-validate-frontmatter"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "validate-frontmatter"
-    display_name: "Validate Frontmatter"
-    summary: "Validate YAML frontmatter in markdown files."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.validate-platform-interop"
-    artifact_map_id: "framework-command-validate-platform-interop"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "validate-platform-interop"
-    display_name: "Validate Platform Interop"
-    summary: "Run native-first interop checks across core independence, adapter conformance, and degradation behavior."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.validate-session-policy"
-    artifact_map_id: "framework-command-validate-session-policy"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "validate-session-policy"
-    display_name: "Validate Session Policy"
-    summary: "Validate a session policy JSON file against native interop semantics."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.command.watch-poll"
-    artifact_map_id: "framework-command-watch-poll"
-    origin_class: "framework"
-    capability_kind: "command"
-    capability_id: "watch-poll"
-    display_name: "Watch Poll"
-    summary: "Run filesystem-watch polling change detection for the current workspace."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/commands/manifest.yml"
-  - effective_id: "framework.service.agent"
-    artifact_map_id: "framework-service-agent"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "agent"
-    display_name: "Agent"
-    summary: "Native plan-driven agent execution service with checkpoint and resume semantics."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.agent-platform"
-    artifact_map_id: "framework-service-agent-platform"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "agent-platform"
-    display_name: "Agent Platform"
-    summary: "Native-first interop service for session policy, context budgets, compaction policy, and adapter capability negotiation."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.capability-bind"
-    artifact_map_id: "framework-service-capability-bind"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "capability-bind"
-    display_name: "Capability Bind"
-    summary: "Deterministic capability matching for plan execution requirements."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.contingency"
-    artifact_map_id: "framework-service-contingency"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "contingency"
-    display_name: "Contingency"
-    summary: "Deterministic generation of fallback plans for failed paths."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.cost"
-    artifact_map_id: "framework-service-cost"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "cost"
-    display_name: "Cost"
-    summary: "Harness-native budget estimation and usage recording service."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.critic"
-    artifact_map_id: "framework-service-critic"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "critic"
-    display_name: "Critic"
-    summary: "Deterministic planning graph quality and risk scoring."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.filesystem-discovery"
-    artifact_map_id: "framework-service-filesystem-discovery"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "filesystem-discovery"
-    display_name: "Filesystem Discovery"
-    summary: "Query plane for graph traversal and progressive discovery over snapshots."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "library"
-  - effective_id: "framework.service.filesystem-snapshot"
-    artifact_map_id: "framework-service-filesystem-snapshot"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "filesystem-snapshot"
-    display_name: "Filesystem Snapshot"
-    summary: "Writer plane for deterministic snapshot lifecycle and bounded filesystem operations."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "library"
-  - effective_id: "framework.service.filesystem-watch"
-    artifact_map_id: "framework-service-filesystem-watch"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "filesystem-watch"
-    display_name: "Filesystem Watch"
-    summary: "OS-agnostic polling watcher hints for filesystem change detection."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "library"
-  - effective_id: "framework.service.flow"
-    artifact_map_id: "framework-service-flow"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "flow"
-    display_name: "Flow"
-    summary: "Harness-native flow execution orchestrator with native runtime default and optional external adapters."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "mcp"
-  - effective_id: "framework.service.guard"
-    artifact_map_id: "framework-service-guard"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "guard"
-    display_name: "Guard"
-    summary: "Harness-native content safety checks for injection, hallucination, secrets, and PII."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.plan"
-    artifact_map_id: "framework-service-plan"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "plan"
-    display_name: "Plan"
-    summary: "Native planning synthesis service emitting canonical plan.json outputs."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.playbook"
-    artifact_map_id: "framework-service-playbook"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "playbook"
-    display_name: "Playbook"
-    summary: "Native reusable playbook expansion and validation service."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.prompt"
-    artifact_map_id: "framework-service-prompt"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "prompt"
-    display_name: "Prompt"
-    summary: "Harness-native prompt compilation and hashing service."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.query"
-    artifact_map_id: "framework-service-query"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "query"
-    display_name: "Query"
-    summary: "Hybrid retrieval and answering with chunk-level citations and evidence packs."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.replan"
-    artifact_map_id: "framework-service-replan"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "replan"
-    display_name: "Replan"
-    summary: "Deterministic replanning transforms for blocked or failed steps."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.scheduler"
-    artifact_map_id: "framework-service-scheduler"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "scheduler"
-    display_name: "Scheduler"
-    summary: "Deterministic planning scheduler with dependency-aware ordering."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.service.spec"
-    artifact_map_id: "framework-service-spec"
-    origin_class: "framework"
-    capability_kind: "service"
-    capability_id: "spec"
-    display_name: "Spec"
-    summary: "Native planning specification lifecycle service."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/services/manifest.yml"
-    interface_type: "shell"
-  - effective_id: "framework.skill.audit-api-contract"
-    artifact_map_id: "framework-skill-audit-api-contract"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-api-contract"
-    display_name: "Audit Api Contract"
-    summary: "Bounded API-contract audit that verifies contract coverage, implementation conformance, compatibility/versioning safeguards, and evidence readiness."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-architecture-readiness"
-    artifact_map_id: "framework-skill-audit-architecture-readiness"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-architecture-readiness"
-    display_name: "Audit Architecture Readiness"
-    summary: "Bounded architecture-readiness audit for Octon whole-harness and bounded-surface domain targets."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-charter"
-    artifact_map_id: "framework-skill-audit-charter"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-charter"
-    display_name: "Audit Charter"
-    summary: "Closed-book charter audit for internal alignment, enforceability, authority clarity, and standalone governance quality."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-ci-latency"
-    artifact_map_id: "framework-skill-audit-ci-latency"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-ci-latency"
-    display_name: "Audit Ci Latency"
-    summary: "Report-only audit of recent GitHub Actions latency, required-path performance, slow steps, and duplicate workflow work."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-cross-subsystem-coherence"
-    artifact_map_id: "framework-skill-audit-cross-subsystem-coherence"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-cross-subsystem-coherence"
-    display_name: "Audit Cross Subsystem Coherence"
-    summary: "Bounded cross-subsystem coherence audit that validates alignment across .octon subsystem manifests, registries, architecture docs, and quality gates."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-data-governance"
-    artifact_map_id: "framework-skill-audit-data-governance"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-data-governance"
-    display_name: "Audit Data Governance"
-    summary: "Bounded data governance audit that verifies classification, retention, lineage, privacy safeguards, and evidence readiness."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-documentation-standards"
-    artifact_map_id: "framework-skill-audit-documentation-standards"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-documentation-standards"
-    display_name: "Audit Documentation Standards"
-    summary: "Bounded docs-as-code audit against Octon policy and template standards."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-domain-architecture"
-    artifact_map_id: "framework-skill-audit-domain-architecture"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-domain-architecture"
-    display_name: "Audit Domain Architecture"
-    summary: "Independent architecture critique for existing or planned Octon domains using external robustness criteria."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-freshness-and-supersession"
-    artifact_map_id: "framework-skill-audit-freshness-and-supersession"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-freshness-and-supersession"
-    display_name: "Audit Freshness And Supersession"
-    summary: "Bounded staleness audit that checks freshness and supersession integrity for .octon operational artifacts."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-migration"
-    artifact_map_id: "framework-skill-audit-migration"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-migration"
-    display_name: "Audit Migration"
-    summary: "Bounded post-migration audit with grep sweeps and cross-reference validation."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-observability-coverage"
-    artifact_map_id: "framework-skill-audit-observability-coverage"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-observability-coverage"
-    display_name: "Audit Observability Coverage"
-    summary: "Bounded observability coverage audit that verifies telemetry contracts, SLO and alert coverage, and runbook/dashboard readiness."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-operational-readiness"
-    artifact_map_id: "framework-skill-audit-operational-readiness"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-operational-readiness"
-    display_name: "Audit Operational Readiness"
-    summary: "Bounded operational-readiness audit that verifies ownership/reliability objectives, runbook and incident preparedness, resilience safeguards, and evidence readiness."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-release-readiness"
-    artifact_map_id: "framework-skill-audit-release-readiness"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-release-readiness"
-    display_name: "Audit Release Readiness"
-    summary: "Bounded release-readiness audit that verifies release criteria, deployment/rollback safeguards, operational readiness, and gate evidence."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-security-compliance"
-    artifact_map_id: "framework-skill-audit-security-compliance"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-security-compliance"
-    display_name: "Audit Security Compliance"
-    summary: "Bounded security and compliance audit that verifies policy-control coverage, secrets and access safeguards, and evidence readiness."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-subsystem-health"
-    artifact_map_id: "framework-skill-audit-subsystem-health"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-subsystem-health"
-    display_name: "Audit Subsystem Health"
-    summary: "Bounded subsystem coherence audit with config consistency, schema conformance, and semantic quality checks."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-surface-architecture"
-    artifact_map_id: "framework-skill-audit-surface-architecture"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-surface-architecture"
-    display_name: "Audit Surface Architecture"
-    summary: "Bounded architecture audit for one durable Octon surface or surface unit."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-test-quality"
-    artifact_map_id: "framework-skill-audit-test-quality"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-test-quality"
-    display_name: "Audit Test Quality"
-    summary: "Bounded test quality audit that verifies strategy coverage, contract/integration assurance, determinism controls, and evidence readiness."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.audit-ui"
-    artifact_map_id: "framework-skill-audit-ui"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "audit-ui"
-    display_name: "Audit UI"
-    summary: "Audit UI files against live external design guidelines."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.build-mcp-server"
-    artifact_map_id: "framework-skill-build-mcp-server"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "build-mcp-server"
-    display_name: "Build MCP Server"
-    summary: "Scaffold, implement, and validate a Model Context Protocol server with typed tools and guardrails."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.ci-gate-triage"
-    artifact_map_id: "framework-skill-ci-gate-triage"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "ci-gate-triage"
-    display_name: "CI Gate Triage"
-    summary: "Triage contract, security, and quality gate failures into prioritized remediation steps."
-    status: "draft"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.create-skill"
-    artifact_map_id: "framework-skill-create-skill"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "create-skill"
-    display_name: "Create Skill"
-    summary: "Scaffold a new skill from template with registry entry."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.deploy-status"
-    artifact_map_id: "framework-skill-deploy-status"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "deploy-status"
-    display_name: "Deploy Status"
-    summary: "Check Vercel deployment readiness."
-    status: "draft"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.incident-response"
-    artifact_map_id: "framework-skill-incident-response"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "incident-response"
-    display_name: "Incident Response"
-    summary: "Run a bounded incident response workflow with mitigation decisioning and evidence receipts."
-    status: "draft"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.plan-charter-alignment"
-    artifact_map_id: "framework-skill-plan-charter-alignment"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "plan-charter-alignment"
-    display_name: "Plan Charter Alignment"
-    summary: "Turn charter audit findings into a profile-governed alignment plan with rewrite bundles and acceptance criteria."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.postgres"
-    artifact_map_id: "framework-skill-postgres"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "postgres"
-    display_name: "Postgres"
-    summary: "Foundation skill set for PostgreSQL application and schema guidance."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.postgres-best-practices"
-    artifact_map_id: "framework-skill-postgres-best-practices"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "postgres-best-practices"
-    display_name: "Postgres Best Practices"
-    summary: "Apply 35+ PostgreSQL performance and correctness rules across 7 categories."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.provider-github-gates"
-    artifact_map_id: "framework-skill-provider-github-gates"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "provider-github-gates"
-    display_name: "Provider GitHub Gates"
-    summary: "Provider-specific GitHub gate mapping for required checks and branch-protection evidence."
-    status: "draft"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.provider-nextjs-astro-runtime"
-    artifact_map_id: "framework-skill-provider-nextjs-astro-runtime"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "provider-nextjs-astro-runtime"
-    display_name: "Provider Nextjs Astro Runtime"
-    summary: "Framework/runtime adapter for Next.js and Astro provider-specific operational guidance."
-    status: "draft"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.provider-preview-smoke"
-    artifact_map_id: "framework-skill-provider-preview-smoke"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "provider-preview-smoke"
-    display_name: "Provider Preview Smoke"
-    summary: "Provider-specific preview smoke adapter that emits gate-ready readiness evidence."
-    status: "draft"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.provider-vercel-delivery"
-    artifact_map_id: "framework-skill-provider-vercel-delivery"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "provider-vercel-delivery"
-    display_name: "Provider Vercel Delivery"
-    summary: "Provider-specific Vercel delivery adapter for preview/promote/rollback evidence workflows."
-    status: "draft"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.python-api"
-    artifact_map_id: "framework-skill-python-api"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "python-api"
-    display_name: "Python Api"
-    summary: "Foundation skill set for Python API services."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.python-contract-first-api"
-    artifact_map_id: "framework-skill-python-contract-first-api"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "python-contract-first-api"
-    display_name: "Python Contract First Api"
-    summary: "Generate OpenAPI spec, Pydantic models, contract tests, and JSON fixtures from a domain description."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.python-contributor-guide"
-    artifact_map_id: "framework-skill-python-contributor-guide"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "python-contributor-guide"
-    display_name: "Python Contributor Guide"
-    summary: "Generate AGENT.md, CONTRIBUTING.md, PR template, and CI workflow from project state."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.python-dev-toolchain"
-    artifact_map_id: "framework-skill-python-dev-toolchain"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "python-dev-toolchain"
-    display_name: "Python Dev Toolchain"
-    summary: "Configure justfile, pre-commit hooks, ruff/mypy, .gitignore, and .env.local.example."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.python-infra-manifest"
-    artifact_map_id: "framework-skill-python-infra-manifest"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "python-infra-manifest"
-    display_name: "Python Infra Manifest"
-    summary: "Generate docker-compose.local.yml and Alembic migration setup for declared infrastructure."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.python-scaffold-package"
-    artifact_map_id: "framework-skill-python-scaffold-package"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "python-scaffold-package"
-    display_name: "Python Scaffold Package"
-    summary: "Scaffold a Python API package with pyproject.toml, typed config, and health endpoints."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.python-test-harness"
-    artifact_map_id: "framework-skill-python-test-harness"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "python-test-harness"
-    display_name: "Python Test Harness"
-    summary: "Generate testing infrastructure aligned with contracts and package structure."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.react"
-    artifact_map_id: "framework-skill-react"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "react"
-    display_name: "React"
-    summary: "Foundation skill set for React and Next.js applications."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.react-best-practices"
-    artifact_map_id: "framework-skill-react-best-practices"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "react-best-practices"
-    display_name: "React Best Practices"
-    summary: "Apply 57 React/Next.js performance rules across 8 categories."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.react-composition-patterns"
-    artifact_map_id: "framework-skill-react-composition-patterns"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "react-composition-patterns"
-    display_name: "React Composition Patterns"
-    summary: "Apply React composition patterns: compound components, state lifting, explicit variants."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.react-native"
-    artifact_map_id: "framework-skill-react-native"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "react-native"
-    display_name: "React Native"
-    summary: "Foundation skill set for React Native and Expo applications."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.react-native-best-practices"
-    artifact_map_id: "framework-skill-react-native-best-practices"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "react-native-best-practices"
-    display_name: "React Native Best Practices"
-    summary: "Apply 35+ React Native and Expo performance rules across 14 categories."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.refactor"
-    artifact_map_id: "framework-skill-refactor"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "refactor"
-    display_name: "Refactor"
-    summary: "Execute verified codebase refactor with exhaustive audit."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.refine-prompt"
-    artifact_map_id: "framework-skill-refine-prompt"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "refine-prompt"
-    display_name: "Refine Prompt"
-    summary: "Prompt refinement with codebase context awareness and persona assignment."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.resolve-pr-comments"
-    artifact_map_id: "framework-skill-resolve-pr-comments"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "resolve-pr-comments"
-    display_name: "Resolve PR Comments"
-    summary: "Systematic resolution of pull request review comments."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.spec-to-implementation"
-    artifact_map_id: "framework-skill-spec-to-implementation"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "spec-to-implementation"
-    display_name: "Spec to Implementation"
-    summary: "Transform a product spec into staged implementation plans with explicit change-profile receipts and compliance sections."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.swift-cli-interface"
-    artifact_map_id: "framework-skill-swift-cli-interface"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "swift-cli-interface"
-    display_name: "Swift Cli Interface"
-    summary: "Generate CLI with swift-argument-parser: subcommands, typed options, shell completions."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.swift-contributor-guide"
-    artifact_map_id: "framework-skill-swift-contributor-guide"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "swift-contributor-guide"
-    display_name: "Swift Contributor Guide"
-    summary: "Generate CLAUDE.md, CONTRIBUTING.md, architecture overview, PR template, and CI config."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.swift-daemon-service"
-    artifact_map_id: "framework-skill-swift-daemon-service"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "swift-daemon-service"
-    display_name: "Swift Daemon Service"
-    summary: "Generate background daemon with actor isolation, intent queue, FSEvents watcher, LaunchAgent plist."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.swift-data-layer"
-    artifact_map_id: "framework-skill-swift-data-layer"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "swift-data-layer"
-    display_name: "Swift Data Layer"
-    summary: "Generate SQLite persistence layer with GRDB.swift: database actor, migrations, record types."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.swift-macos-app"
-    artifact_map_id: "framework-skill-swift-macos-app"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "swift-macos-app"
-    display_name: "Swift Macos App"
-    summary: "Foundation skill set for Swift macOS applications."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.swift-scaffold-package"
-    artifact_map_id: "framework-skill-swift-scaffold-package"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "swift-scaffold-package"
-    display_name: "Swift Scaffold Package"
-    summary: "Scaffold a Swift macOS package with Package.swift, source targets, typed config, and logging."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.swift-test-harness"
-    artifact_map_id: "framework-skill-swift-test-harness"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "swift-test-harness"
-    display_name: "Swift Test Harness"
-    summary: "Generate XCTest suites, in-memory database fixtures, mock actors, and CI workflow."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.synthesize-research"
-    artifact_map_id: "framework-skill-synthesize-research"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "synthesize-research"
-    display_name: "Synthesize Research"
-    summary: "Synthesize scattered research notes into coherent findings."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.triage-ci-failure"
-    artifact_map_id: "framework-skill-triage-ci-failure"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "triage-ci-failure"
-    display_name: "Triage CI Failure"
-    summary: "Diagnose and repair CI pipeline failures."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.turborepo-taskgraph"
-    artifact_map_id: "framework-skill-turborepo-taskgraph"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "turborepo-taskgraph"
-    display_name: "Turborepo Taskgraph"
-    summary: "Platform skill for Turborepo task graph and cache diagnostics with bounded evidence output."
-    status: "draft"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.vercel"
-    artifact_map_id: "framework-skill-vercel"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "vercel"
-    display_name: "Vercel"
-    summary: "Platform skill set for Vercel deployments."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.skill.vercel-deploy"
-    artifact_map_id: "framework-skill-vercel-deploy"
-    origin_class: "framework"
-    capability_kind: "skill"
-    capability_id: "vercel-deploy"
-    display_name: "Vercel Deploy"
-    summary: "Package and deploy the project to Vercel using the CLI."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/skills/manifest.yml"
-  - effective_id: "framework.tool-pack.ci-integration"
-    artifact_map_id: "framework-tool-pack-ci-integration"
-    origin_class: "framework"
-    capability_kind: "tool-pack"
-    capability_id: "ci-integration"
-    display_name: "CI Integration"
-    summary: "GitHub and CI/CD integration tools."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/tools/manifest.yml"
-  - effective_id: "framework.tool-pack.file-ops"
-    artifact_map_id: "framework-tool-pack-file-ops"
-    origin_class: "framework"
-    capability_kind: "tool-pack"
-    capability_id: "file-ops"
-    display_name: "File Operations"
-    summary: "Full file read/write access tools."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/tools/manifest.yml"
-  - effective_id: "framework.tool-pack.full-edit"
-    artifact_map_id: "framework-tool-pack-full-edit"
-    origin_class: "framework"
-    capability_kind: "tool-pack"
-    capability_id: "full-edit"
-    display_name: "Full Edit"
-    summary: "Complete file editing toolkit."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/tools/manifest.yml"
-  - effective_id: "framework.tool-pack.read-only"
-    artifact_map_id: "framework-tool-pack-read-only"
-    origin_class: "framework"
-    capability_kind: "tool-pack"
-    capability_id: "read-only"
-    display_name: "Read Only"
-    summary: "Read-only file access tools."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/tools/manifest.yml"
-  - effective_id: "framework.tool-pack.shell-safe"
-    artifact_map_id: "framework-tool-pack-shell-safe"
-    origin_class: "framework"
-    capability_kind: "tool-pack"
-    capability_id: "shell-safe"
-    display_name: "Shell Safe"
-    summary: "Limited shell access for safe operations."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/tools/manifest.yml"
-  - effective_id: "framework.tool-pack.web-access"
-    artifact_map_id: "framework-tool-pack-web-access"
-    origin_class: "framework"
-    capability_kind: "tool-pack"
-    capability_id: "web-access"
-    display_name: "Web Access"
-    summary: "Web fetching and search tools."
-    status: "active"
-    source_manifest: ".octon/framework/capabilities/runtime/tools/manifest.yml"
+  - effective_id: framework.command.alignment-check
+    artifact_map_id: framework-command-alignment-check
+    origin_class: framework
+    capability_kind: command
+    capability_id: alignment-check
+    display_name: Alignment Check
+    summary: Run profile-based harness alignment validations through a single command.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters:
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.alignment-check
+    projection_name: alignment-check
+  - effective_id: framework.command.audit-skills-system-expansion
+    artifact_map_id: framework-command-audit-skills-system-expansion
+    origin_class: framework
+    capability_kind: command
+    capability_id: audit-skills-system-expansion
+    display_name: Audit Skills System Expansion
+    summary: Invoke the skills-system expansion evaluation prompt through a slash-style command wrapper.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.audit-skills-system-expansion
+    projection_name: audit-skills-system-expansion
+  - effective_id: framework.command.context-budget
+    artifact_map_id: framework-command-context-budget
+    origin_class: framework
+    capability_kind: command
+    capability_id: context-budget
+    display_name: Context Budget
+    summary: Emit deterministic native context budget state and threshold classification.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.context-budget
+    projection_name: context-budget
+  - effective_id: framework.command.create-workflow
+    artifact_map_id: framework-command-create-workflow
+    origin_class: framework
+    capability_kind: command
+    capability_id: create-workflow
+    display_name: Create Workflow
+    summary: Scaffold a new workflow with gap-aware structure.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.create-workflow
+    projection_name: create-workflow
+  - effective_id: framework.command.discover-expand
+    artifact_map_id: framework-command-discover-expand
+    origin_class: framework
+    capability_kind: command
+    capability_id: discover-expand
+    display_name: Discover Expand
+    summary: Expand discovery frontier via filesystem-discovery graph traversal.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.discover-expand
+    projection_name: discover-expand
+  - effective_id: framework.command.discover-explain
+    artifact_map_id: framework-command-discover-explain
+    origin_class: framework
+    capability_kind: command
+    capability_id: discover-explain
+    display_name: Discover Explain
+    summary: Explain candidate relevance/provenance via filesystem-discovery.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.discover-explain
+    projection_name: discover-explain
+  - effective_id: framework.command.discover-resolve
+    artifact_map_id: framework-command-discover-resolve
+    origin_class: framework
+    capability_kind: command
+    capability_id: discover-resolve
+    display_name: Discover Resolve
+    summary: Resolve a discovered node back to file path via filesystem-discovery.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.discover-resolve
+    projection_name: discover-resolve
+  - effective_id: framework.command.discover-start
+    artifact_map_id: framework-command-discover-start
+    origin_class: framework
+    capability_kind: command
+    capability_id: discover-start
+    display_name: Discover Start
+    summary: Start progressive discovery via filesystem-discovery.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.discover-start
+    projection_name: discover-start
+  - effective_id: framework.command.evaluate-workflow
+    artifact_map_id: framework-command-evaluate-workflow
+    origin_class: framework
+    capability_kind: command
+    capability_id: evaluate-workflow
+    display_name: Evaluate Workflow
+    summary: Assess a workflow against quality criteria and gap coverage.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.evaluate-workflow
+    projection_name: evaluate-workflow
+  - effective_id: framework.command.export-harness
+    artifact_map_id: framework-command-export-harness
+    origin_class: framework
+    capability_kind: command
+    capability_id: export-harness
+    display_name: Export Harness
+    summary: Materialize repo_snapshot or pack_bundle exports from the root-manifest profile contract.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.export-harness
+    projection_name: export-harness
+  - effective_id: framework.command.init
+    artifact_map_id: framework-command-init
+    origin_class: framework
+    capability_kind: command
+    capability_id: init
+    display_name: Initialize Project
+    summary: Generate canonical .octon bootstrap files plus root ingress adapters and objective-contract artifacts.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.init
+    projection_name: init
+  - effective_id: framework.command.query-ask
+    artifact_map_id: framework-command-query-ask
+    origin_class: framework
+    capability_kind: command
+    capability_id: query-ask
+    display_name: Query Ask
+    summary: Run query service in ask mode and return grounded answer output.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.query-ask
+    projection_name: query-ask
+  - effective_id: framework.command.query-explain
+    artifact_map_id: framework-command-query-explain
+    origin_class: framework
+    capability_kind: command
+    capability_id: query-explain
+    display_name: Query Explain
+    summary: Run query service in explain mode and return ranking rationale.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.query-explain
+    projection_name: query-explain
+  - effective_id: framework.command.query-retrieve
+    artifact_map_id: framework-command-query-retrieve
+    origin_class: framework
+    capability_kind: command
+    capability_id: query-retrieve
+    display_name: Query Retrieve
+    summary: Run query service in retrieve mode and return ranked candidates.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.query-retrieve
+    projection_name: query-retrieve
+  - effective_id: framework.command.recover
+    artifact_map_id: framework-command-recover
+    origin_class: framework
+    capability_kind: command
+    capability_id: recover
+    display_name: Recover from Errors
+    summary: Recovery procedures for common agent failure modes.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters:
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.recover
+    projection_name: recover
+  - effective_id: framework.command.refactor
+    artifact_map_id: framework-command-refactor
+    origin_class: framework
+    capability_kind: command
+    capability_id: refactor
+    display_name: Refactor
+    summary: Execute a verified codebase refactor with exhaustive audit and mandatory verification.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.refactor
+    projection_name: refactor
+  - effective_id: framework.command.snapshot-build
+    artifact_map_id: framework-command-snapshot-build
+    origin_class: framework
+    capability_kind: command
+    capability_id: snapshot-build
+    display_name: Snapshot Build
+    summary: Build deterministic snapshot artifacts via filesystem-snapshot.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.snapshot-build
+    projection_name: snapshot-build
+  - effective_id: framework.command.snapshot-diff
+    artifact_map_id: framework-command-snapshot-diff
+    origin_class: framework
+    capability_kind: command
+    capability_id: snapshot-diff
+    display_name: Snapshot Diff
+    summary: Compare two filesystem-snapshot artifacts.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.snapshot-diff
+    projection_name: snapshot-diff
+  - effective_id: framework.command.studio
+    artifact_map_id: framework-command-studio
+    origin_class: framework
+    capability_kind: command
+    capability_id: studio
+    display_name: Launch Studio
+    summary: Launch Octon Studio for workflow graph design, inspection, and safe staged edits.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.studio
+    projection_name: studio
+  - effective_id: framework.command.update-workflow
+    artifact_map_id: framework-command-update-workflow
+    origin_class: framework
+    capability_kind: command
+    capability_id: update-workflow
+    display_name: Update Workflow
+    summary: Modify an existing workflow to add features or fix gaps.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.update-workflow
+    projection_name: update-workflow
+  - effective_id: framework.command.validate-frontmatter
+    artifact_map_id: framework-command-validate-frontmatter
+    origin_class: framework
+    capability_kind: command
+    capability_id: validate-frontmatter
+    display_name: Validate Frontmatter
+    summary: Validate YAML frontmatter in markdown files.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters:
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.validate-frontmatter
+    projection_name: validate-frontmatter
+  - effective_id: framework.command.validate-platform-interop
+    artifact_map_id: framework-command-validate-platform-interop
+    origin_class: framework
+    capability_kind: command
+    capability_id: validate-platform-interop
+    display_name: Validate Platform Interop
+    summary: Run native-first interop checks across core independence, adapter conformance, and degradation behavior.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.validate-platform-interop
+    projection_name: validate-platform-interop
+  - effective_id: framework.command.validate-session-policy
+    artifact_map_id: framework-command-validate-session-policy
+    origin_class: framework
+    capability_kind: command
+    capability_id: validate-session-policy
+    display_name: Validate Session Policy
+    summary: Validate a session policy JSON file against native interop semantics.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.validate-session-policy
+    projection_name: validate-session-policy
+  - effective_id: framework.command.watch-poll
+    artifact_map_id: framework-command-watch-poll
+    origin_class: framework
+    capability_kind: command
+    capability_id: watch-poll
+    display_name: Watch Poll
+    summary: Run filesystem-watch polling change detection for the current workspace.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/commands/manifest.yml
+    capability_domain: command
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-command-framework.command.watch-poll
+    projection_name: watch-poll
+  - effective_id: framework.service.agent
+    artifact_map_id: framework-service-agent
+    origin_class: framework
+    capability_kind: service
+    capability_id: agent
+    display_name: Agent
+    summary: Native plan-driven agent execution service with checkpoint and resume semantics.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: agent
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.agent
+    projection_name: agent
+    interface_type: shell
+  - effective_id: framework.service.agent-platform
+    artifact_map_id: framework-service-agent-platform
+    origin_class: framework
+    capability_kind: service
+    capability_id: agent-platform
+    display_name: Agent Platform
+    summary: Native-first interop service for session policy, context budgets, compaction policy, and adapter capability negotiation.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: agent-platform
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.agent-platform
+    projection_name: agent-platform
+    interface_type: shell
+  - effective_id: framework.service.capability-bind
+    artifact_map_id: framework-service-capability-bind
+    origin_class: framework
+    capability_kind: service
+    capability_id: capability-bind
+    display_name: Capability Bind
+    summary: Deterministic capability matching for plan execution requirements.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: planning
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.capability-bind
+    projection_name: capability-bind
+    interface_type: shell
+  - effective_id: framework.service.contingency
+    artifact_map_id: framework-service-contingency
+    origin_class: framework
+    capability_kind: service
+    capability_id: contingency
+    display_name: Contingency
+    summary: Deterministic generation of fallback plans for failed paths.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: planning
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.contingency
+    projection_name: contingency
+    interface_type: shell
+  - effective_id: framework.service.cost
+    artifact_map_id: framework-service-cost
+    origin_class: framework
+    capability_kind: service
+    capability_id: cost
+    display_name: Cost
+    summary: Harness-native budget estimation and usage recording service.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: cost
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.cost
+    projection_name: cost
+    interface_type: shell
+  - effective_id: framework.service.critic
+    artifact_map_id: framework-service-critic
+    origin_class: framework
+    capability_kind: service
+    capability_id: critic
+    display_name: Critic
+    summary: Deterministic planning graph quality and risk scoring.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: planning
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.critic
+    projection_name: critic
+    interface_type: shell
+  - effective_id: framework.service.filesystem-discovery
+    artifact_map_id: framework-service-filesystem-discovery
+    origin_class: framework
+    capability_kind: service
+    capability_id: filesystem-discovery
+    display_name: Filesystem Discovery
+    summary: Query plane for graph traversal and progressive discovery over snapshots.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: interfaces
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.filesystem-discovery
+    projection_name: filesystem-discovery
+    interface_type: library
+  - effective_id: framework.service.filesystem-snapshot
+    artifact_map_id: framework-service-filesystem-snapshot
+    origin_class: framework
+    capability_kind: service
+    capability_id: filesystem-snapshot
+    display_name: Filesystem Snapshot
+    summary: Writer plane for deterministic snapshot lifecycle and bounded filesystem operations.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: interfaces
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.filesystem-snapshot
+    projection_name: filesystem-snapshot
+    interface_type: library
+  - effective_id: framework.service.filesystem-watch
+    artifact_map_id: framework-service-filesystem-watch
+    origin_class: framework
+    capability_kind: service
+    capability_id: filesystem-watch
+    display_name: Filesystem Watch
+    summary: OS-agnostic polling watcher hints for filesystem change detection.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: interfaces
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.filesystem-watch
+    projection_name: filesystem-watch
+    interface_type: library
+  - effective_id: framework.service.flow
+    artifact_map_id: framework-service-flow
+    origin_class: framework
+    capability_kind: service
+    capability_id: flow
+    display_name: Flow
+    summary: Harness-native flow execution orchestrator with native runtime default and optional external adapters.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: flow
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.flow
+    projection_name: flow
+    interface_type: mcp
+  - effective_id: framework.service.guard
+    artifact_map_id: framework-service-guard
+    origin_class: framework
+    capability_kind: service
+    capability_id: guard
+    display_name: Guard
+    summary: Harness-native content safety checks for injection, hallucination, secrets, and PII.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: guard
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.guard
+    projection_name: guard
+    interface_type: shell
+  - effective_id: framework.service.plan
+    artifact_map_id: framework-service-plan
+    origin_class: framework
+    capability_kind: service
+    capability_id: plan
+    display_name: Plan
+    summary: Native planning synthesis service emitting canonical plan.json outputs.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: plan
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.plan
+    projection_name: plan
+    interface_type: shell
+  - effective_id: framework.service.playbook
+    artifact_map_id: framework-service-playbook
+    origin_class: framework
+    capability_kind: service
+    capability_id: playbook
+    display_name: Playbook
+    summary: Native reusable playbook expansion and validation service.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: playbook
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.playbook
+    projection_name: playbook
+    interface_type: shell
+  - effective_id: framework.service.prompt
+    artifact_map_id: framework-service-prompt
+    origin_class: framework
+    capability_kind: service
+    capability_id: prompt
+    display_name: Prompt
+    summary: Harness-native prompt compilation and hashing service.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: prompt
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.prompt
+    projection_name: prompt
+    interface_type: shell
+  - effective_id: framework.service.query
+    artifact_map_id: framework-service-query
+    origin_class: framework
+    capability_kind: service
+    capability_id: query
+    display_name: Query
+    summary: Hybrid retrieval and answering with chunk-level citations and evidence packs.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: retrieval
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.query
+    projection_name: query
+    interface_type: shell
+  - effective_id: framework.service.replan
+    artifact_map_id: framework-service-replan
+    origin_class: framework
+    capability_kind: service
+    capability_id: replan
+    display_name: Replan
+    summary: Deterministic replanning transforms for blocked or failed steps.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: planning
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.replan
+    projection_name: replan
+    interface_type: shell
+  - effective_id: framework.service.scheduler
+    artifact_map_id: framework-service-scheduler
+    origin_class: framework
+    capability_kind: service
+    capability_id: scheduler
+    display_name: Scheduler
+    summary: Deterministic planning scheduler with dependency-aware ordering.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: planning
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.scheduler
+    projection_name: scheduler
+    interface_type: shell
+  - effective_id: framework.service.spec
+    artifact_map_id: framework-service-spec
+    origin_class: framework
+    capability_kind: service
+    capability_id: spec
+    display_name: Spec
+    summary: Native planning specification lifecycle service.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/services/manifest.yml
+    capability_domain: spec
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-service-framework.service.spec
+    projection_name: spec
+    interface_type: shell
+  - effective_id: framework.skill.audit-api-contract
+    artifact_map_id: framework-skill-audit-api-contract
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-api-contract
+    display_name: Audit Api Contract
+    summary: Bounded API-contract audit that verifies contract coverage, implementation conformance, compatibility/versioning safeguards, and evidence readiness.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-api-contract
+    projection_name: audit-api-contract
+  - effective_id: framework.skill.audit-architecture-readiness
+    artifact_map_id: framework-skill-audit-architecture-readiness
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-architecture-readiness
+    display_name: Audit Architecture Readiness
+    summary: Bounded architecture-readiness audit for Octon whole-harness and bounded-surface domain targets.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-architecture-readiness
+    projection_name: audit-architecture-readiness
+  - effective_id: framework.skill.audit-charter
+    artifact_map_id: framework-skill-audit-charter
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-charter
+    display_name: Audit Charter
+    summary: Closed-book charter audit for internal alignment, enforceability, authority clarity, and standalone governance quality.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-charter
+    projection_name: audit-charter
+  - effective_id: framework.skill.audit-ci-latency
+    artifact_map_id: framework-skill-audit-ci-latency
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-ci-latency
+    display_name: Audit Ci Latency
+    summary: Report-only audit of recent GitHub Actions latency, required-path performance, slow steps, and duplicate workflow work.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-ci-latency
+    projection_name: audit-ci-latency
+  - effective_id: framework.skill.audit-cross-subsystem-coherence
+    artifact_map_id: framework-skill-audit-cross-subsystem-coherence
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-cross-subsystem-coherence
+    display_name: Audit Cross Subsystem Coherence
+    summary: Bounded cross-subsystem coherence audit that validates alignment across .octon subsystem manifests, registries, architecture docs, and quality gates.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-cross-subsystem-coherence
+    projection_name: audit-cross-subsystem-coherence
+  - effective_id: framework.skill.audit-data-governance
+    artifact_map_id: framework-skill-audit-data-governance
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-data-governance
+    display_name: Audit Data Governance
+    summary: Bounded data governance audit that verifies classification, retention, lineage, privacy safeguards, and evidence readiness.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-data-governance
+    projection_name: audit-data-governance
+  - effective_id: framework.skill.audit-documentation-standards
+    artifact_map_id: framework-skill-audit-documentation-standards
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-documentation-standards
+    display_name: Audit Documentation Standards
+    summary: Bounded docs-as-code audit against Octon policy and template standards.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-documentation-standards
+    projection_name: audit-documentation-standards
+  - effective_id: framework.skill.audit-domain-architecture
+    artifact_map_id: framework-skill-audit-domain-architecture
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-domain-architecture
+    display_name: Audit Domain Architecture
+    summary: Independent architecture critique for existing or planned Octon domains using external robustness criteria.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-domain-architecture
+    projection_name: audit-domain-architecture
+  - effective_id: framework.skill.audit-freshness-and-supersession
+    artifact_map_id: framework-skill-audit-freshness-and-supersession
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-freshness-and-supersession
+    display_name: Audit Freshness And Supersession
+    summary: Bounded staleness audit that checks freshness and supersession integrity for .octon operational artifacts.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-freshness-and-supersession
+    projection_name: audit-freshness-and-supersession
+  - effective_id: framework.skill.audit-migration
+    artifact_map_id: framework-skill-audit-migration
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-migration
+    display_name: Audit Migration
+    summary: Bounded post-migration audit with grep sweeps and cross-reference validation.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-migration
+    projection_name: audit-migration
+  - effective_id: framework.skill.audit-observability-coverage
+    artifact_map_id: framework-skill-audit-observability-coverage
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-observability-coverage
+    display_name: Audit Observability Coverage
+    summary: Bounded observability coverage audit that verifies telemetry contracts, SLO and alert coverage, and runbook/dashboard readiness.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-observability-coverage
+    projection_name: audit-observability-coverage
+  - effective_id: framework.skill.audit-operational-readiness
+    artifact_map_id: framework-skill-audit-operational-readiness
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-operational-readiness
+    display_name: Audit Operational Readiness
+    summary: Bounded operational-readiness audit that verifies ownership/reliability objectives, runbook and incident preparedness, resilience safeguards, and evidence readiness.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-operational-readiness
+    projection_name: audit-operational-readiness
+  - effective_id: framework.skill.audit-release-readiness
+    artifact_map_id: framework-skill-audit-release-readiness
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-release-readiness
+    display_name: Audit Release Readiness
+    summary: Bounded release-readiness audit that verifies release criteria, deployment/rollback safeguards, operational readiness, and gate evidence.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-release-readiness
+    projection_name: audit-release-readiness
+  - effective_id: framework.skill.audit-security-compliance
+    artifact_map_id: framework-skill-audit-security-compliance
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-security-compliance
+    display_name: Audit Security Compliance
+    summary: Bounded security and compliance audit that verifies policy-control coverage, secrets and access safeguards, and evidence readiness.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-security-compliance
+    projection_name: audit-security-compliance
+  - effective_id: framework.skill.audit-subsystem-health
+    artifact_map_id: framework-skill-audit-subsystem-health
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-subsystem-health
+    display_name: Audit Subsystem Health
+    summary: Bounded subsystem coherence audit with config consistency, schema conformance, and semantic quality checks.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-subsystem-health
+    projection_name: audit-subsystem-health
+  - effective_id: framework.skill.audit-surface-architecture
+    artifact_map_id: framework-skill-audit-surface-architecture
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-surface-architecture
+    display_name: Audit Surface Architecture
+    summary: Bounded architecture audit for one durable Octon surface or surface unit.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-surface-architecture
+    projection_name: audit-surface-architecture
+  - effective_id: framework.skill.audit-test-quality
+    artifact_map_id: framework-skill-audit-test-quality
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-test-quality
+    display_name: Audit Test Quality
+    summary: Bounded test quality audit that verifies strategy coverage, contract/integration assurance, determinism controls, and evidence readiness.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-test-quality
+    projection_name: audit-test-quality
+  - effective_id: framework.skill.audit-ui
+    artifact_map_id: framework-skill-audit-ui
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-ui
+    display_name: Audit UI
+    summary: Audit UI files against live external design guidelines.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: audit
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.audit-ui
+    projection_name: audit-ui
+  - effective_id: framework.skill.build-mcp-server
+    artifact_map_id: framework-skill-build-mcp-server
+    origin_class: framework
+    capability_kind: skill
+    capability_id: build-mcp-server
+    display_name: Build MCP Server
+    summary: Scaffold, implement, and validate a Model Context Protocol server with typed tools and guardrails.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: meta
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.build-mcp-server
+    projection_name: build-mcp-server
+  - effective_id: framework.skill.ci-gate-triage
+    artifact_map_id: framework-skill-ci-gate-triage
+    origin_class: framework
+    capability_kind: skill
+    capability_id: ci-gate-triage
+    display_name: CI Gate Triage
+    summary: Triage contract, security, and quality gate failures into prioritized remediation steps.
+    status: draft
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: remediation
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.ci-gate-triage
+    projection_name: ci-gate-triage
+  - effective_id: framework.skill.create-skill
+    artifact_map_id: framework-skill-create-skill
+    origin_class: framework
+    capability_kind: skill
+    capability_id: create-skill
+    display_name: Create Skill
+    summary: Scaffold a new skill from template with registry entry.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: meta
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.create-skill
+    projection_name: create-skill
+  - effective_id: framework.skill.deploy-status
+    artifact_map_id: framework-skill-deploy-status
+    origin_class: framework
+    capability_kind: skill
+    capability_id: deploy-status
+    display_name: Deploy Status
+    summary: Check Vercel deployment readiness.
+    status: draft
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: platforms
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.deploy-status
+    projection_name: deploy-status
+  - effective_id: framework.skill.incident-response
+    artifact_map_id: framework-skill-incident-response
+    origin_class: framework
+    capability_kind: skill
+    capability_id: incident-response
+    display_name: Incident Response
+    summary: Run a bounded incident response workflow with mitigation decisioning and evidence receipts.
+    status: draft
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: operations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.incident-response
+    projection_name: incident-response
+  - effective_id: framework.skill.plan-charter-alignment
+    artifact_map_id: framework-skill-plan-charter-alignment
+    origin_class: framework
+    capability_kind: skill
+    capability_id: plan-charter-alignment
+    display_name: Plan Charter Alignment
+    summary: Turn charter audit findings into a profile-governed alignment plan with rewrite bundles and acceptance criteria.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: synthesis
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.plan-charter-alignment
+    projection_name: plan-charter-alignment
+  - effective_id: framework.skill.postgres
+    artifact_map_id: framework-skill-postgres
+    origin_class: framework
+    capability_kind: skill
+    capability_id: postgres
+    display_name: Postgres
+    summary: Foundation skill set for PostgreSQL application and schema guidance.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.postgres
+    projection_name: postgres
+  - effective_id: framework.skill.postgres-best-practices
+    artifact_map_id: framework-skill-postgres-best-practices
+    origin_class: framework
+    capability_kind: skill
+    capability_id: postgres-best-practices
+    display_name: Postgres Best Practices
+    summary: Apply 35+ PostgreSQL performance and correctness rules across 7 categories.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.postgres-best-practices
+    projection_name: postgres-best-practices
+  - effective_id: framework.skill.provider-github-gates
+    artifact_map_id: framework-skill-provider-github-gates
+    origin_class: framework
+    capability_kind: skill
+    capability_id: provider-github-gates
+    display_name: Provider GitHub Gates
+    summary: Provider-specific GitHub gate mapping for required checks and branch-protection evidence.
+    status: draft
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: platforms
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.provider-github-gates
+    projection_name: provider-github-gates
+  - effective_id: framework.skill.provider-nextjs-astro-runtime
+    artifact_map_id: framework-skill-provider-nextjs-astro-runtime
+    origin_class: framework
+    capability_kind: skill
+    capability_id: provider-nextjs-astro-runtime
+    display_name: Provider Nextjs Astro Runtime
+    summary: Framework/runtime adapter for Next.js and Astro provider-specific operational guidance.
+    status: draft
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: platforms
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.provider-nextjs-astro-runtime
+    projection_name: provider-nextjs-astro-runtime
+  - effective_id: framework.skill.provider-preview-smoke
+    artifact_map_id: framework-skill-provider-preview-smoke
+    origin_class: framework
+    capability_kind: skill
+    capability_id: provider-preview-smoke
+    display_name: Provider Preview Smoke
+    summary: Provider-specific preview smoke adapter that emits gate-ready readiness evidence.
+    status: draft
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: platforms
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.provider-preview-smoke
+    projection_name: provider-preview-smoke
+  - effective_id: framework.skill.provider-vercel-delivery
+    artifact_map_id: framework-skill-provider-vercel-delivery
+    origin_class: framework
+    capability_kind: skill
+    capability_id: provider-vercel-delivery
+    display_name: Provider Vercel Delivery
+    summary: Provider-specific Vercel delivery adapter for preview/promote/rollback evidence workflows.
+    status: draft
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: platforms
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.provider-vercel-delivery
+    projection_name: provider-vercel-delivery
+  - effective_id: framework.skill.python-api
+    artifact_map_id: framework-skill-python-api
+    origin_class: framework
+    capability_kind: skill
+    capability_id: python-api
+    display_name: Python Api
+    summary: Foundation skill set for Python API services.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.python-api
+    projection_name: python-api
+  - effective_id: framework.skill.python-contract-first-api
+    artifact_map_id: framework-skill-python-contract-first-api
+    origin_class: framework
+    capability_kind: skill
+    capability_id: python-contract-first-api
+    display_name: Python Contract First Api
+    summary: Generate OpenAPI spec, Pydantic models, contract tests, and JSON fixtures from a domain description.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.python-contract-first-api
+    projection_name: python-contract-first-api
+  - effective_id: framework.skill.python-contributor-guide
+    artifact_map_id: framework-skill-python-contributor-guide
+    origin_class: framework
+    capability_kind: skill
+    capability_id: python-contributor-guide
+    display_name: Python Contributor Guide
+    summary: Generate AGENT.md, CONTRIBUTING.md, PR template, and CI workflow from project state.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.python-contributor-guide
+    projection_name: python-contributor-guide
+  - effective_id: framework.skill.python-dev-toolchain
+    artifact_map_id: framework-skill-python-dev-toolchain
+    origin_class: framework
+    capability_kind: skill
+    capability_id: python-dev-toolchain
+    display_name: Python Dev Toolchain
+    summary: Configure justfile, pre-commit hooks, ruff/mypy, .gitignore, and .env.local.example.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.python-dev-toolchain
+    projection_name: python-dev-toolchain
+  - effective_id: framework.skill.python-infra-manifest
+    artifact_map_id: framework-skill-python-infra-manifest
+    origin_class: framework
+    capability_kind: skill
+    capability_id: python-infra-manifest
+    display_name: Python Infra Manifest
+    summary: Generate docker-compose.local.yml and Alembic migration setup for declared infrastructure.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.python-infra-manifest
+    projection_name: python-infra-manifest
+  - effective_id: framework.skill.python-scaffold-package
+    artifact_map_id: framework-skill-python-scaffold-package
+    origin_class: framework
+    capability_kind: skill
+    capability_id: python-scaffold-package
+    display_name: Python Scaffold Package
+    summary: Scaffold a Python API package with pyproject.toml, typed config, and health endpoints.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.python-scaffold-package
+    projection_name: python-scaffold-package
+  - effective_id: framework.skill.python-test-harness
+    artifact_map_id: framework-skill-python-test-harness
+    origin_class: framework
+    capability_kind: skill
+    capability_id: python-test-harness
+    display_name: Python Test Harness
+    summary: Generate testing infrastructure aligned with contracts and package structure.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.python-test-harness
+    projection_name: python-test-harness
+  - effective_id: framework.skill.react
+    artifact_map_id: framework-skill-react
+    origin_class: framework
+    capability_kind: skill
+    capability_id: react
+    display_name: React
+    summary: Foundation skill set for React and Next.js applications.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.react
+    projection_name: react
+  - effective_id: framework.skill.react-best-practices
+    artifact_map_id: framework-skill-react-best-practices
+    origin_class: framework
+    capability_kind: skill
+    capability_id: react-best-practices
+    display_name: React Best Practices
+    summary: Apply 57 React/Next.js performance rules across 8 categories.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.react-best-practices
+    projection_name: react-best-practices
+  - effective_id: framework.skill.react-composition-patterns
+    artifact_map_id: framework-skill-react-composition-patterns
+    origin_class: framework
+    capability_kind: skill
+    capability_id: react-composition-patterns
+    display_name: React Composition Patterns
+    summary: 'Apply React composition patterns: compound components, state lifting, explicit variants.'
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.react-composition-patterns
+    projection_name: react-composition-patterns
+  - effective_id: framework.skill.react-native
+    artifact_map_id: framework-skill-react-native
+    origin_class: framework
+    capability_kind: skill
+    capability_id: react-native
+    display_name: React Native
+    summary: Foundation skill set for React Native and Expo applications.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.react-native
+    projection_name: react-native
+  - effective_id: framework.skill.react-native-best-practices
+    artifact_map_id: framework-skill-react-native-best-practices
+    origin_class: framework
+    capability_kind: skill
+    capability_id: react-native-best-practices
+    display_name: React Native Best Practices
+    summary: Apply 35+ React Native and Expo performance rules across 14 categories.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.react-native-best-practices
+    projection_name: react-native-best-practices
+  - effective_id: framework.skill.refactor
+    artifact_map_id: framework-skill-refactor
+    origin_class: framework
+    capability_kind: skill
+    capability_id: refactor
+    display_name: Refactor
+    summary: Execute verified codebase refactor with exhaustive audit.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: refactor
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.refactor
+    projection_name: refactor
+  - effective_id: framework.skill.refine-prompt
+    artifact_map_id: framework-skill-refine-prompt
+    origin_class: framework
+    capability_kind: skill
+    capability_id: refine-prompt
+    display_name: Refine Prompt
+    summary: Prompt refinement with codebase context awareness and persona assignment.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: synthesis
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.refine-prompt
+    projection_name: refine-prompt
+  - effective_id: framework.skill.resolve-pr-comments
+    artifact_map_id: framework-skill-resolve-pr-comments
+    origin_class: framework
+    capability_kind: skill
+    capability_id: resolve-pr-comments
+    display_name: Resolve PR Comments
+    summary: Systematic resolution of pull request review comments.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: remediation
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.resolve-pr-comments
+    projection_name: resolve-pr-comments
+  - effective_id: framework.skill.spec-to-implementation
+    artifact_map_id: framework-skill-spec-to-implementation
+    origin_class: framework
+    capability_kind: skill
+    capability_id: spec-to-implementation
+    display_name: Spec to Implementation
+    summary: Transform a product spec into staged implementation plans with explicit change-profile receipts and compliance sections.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: synthesis
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.spec-to-implementation
+    projection_name: spec-to-implementation
+  - effective_id: framework.skill.swift-cli-interface
+    artifact_map_id: framework-skill-swift-cli-interface
+    origin_class: framework
+    capability_kind: skill
+    capability_id: swift-cli-interface
+    display_name: Swift Cli Interface
+    summary: 'Generate CLI with swift-argument-parser: subcommands, typed options, shell completions.'
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.swift-cli-interface
+    projection_name: swift-cli-interface
+  - effective_id: framework.skill.swift-contributor-guide
+    artifact_map_id: framework-skill-swift-contributor-guide
+    origin_class: framework
+    capability_kind: skill
+    capability_id: swift-contributor-guide
+    display_name: Swift Contributor Guide
+    summary: Generate CLAUDE.md, CONTRIBUTING.md, architecture overview, PR template, and CI config.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.swift-contributor-guide
+    projection_name: swift-contributor-guide
+  - effective_id: framework.skill.swift-daemon-service
+    artifact_map_id: framework-skill-swift-daemon-service
+    origin_class: framework
+    capability_kind: skill
+    capability_id: swift-daemon-service
+    display_name: Swift Daemon Service
+    summary: Generate background daemon with actor isolation, intent queue, FSEvents watcher, LaunchAgent plist.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.swift-daemon-service
+    projection_name: swift-daemon-service
+  - effective_id: framework.skill.swift-data-layer
+    artifact_map_id: framework-skill-swift-data-layer
+    origin_class: framework
+    capability_kind: skill
+    capability_id: swift-data-layer
+    display_name: Swift Data Layer
+    summary: 'Generate SQLite persistence layer with GRDB.swift: database actor, migrations, record types.'
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.swift-data-layer
+    projection_name: swift-data-layer
+  - effective_id: framework.skill.swift-macos-app
+    artifact_map_id: framework-skill-swift-macos-app
+    origin_class: framework
+    capability_kind: skill
+    capability_id: swift-macos-app
+    display_name: Swift Macos App
+    summary: Foundation skill set for Swift macOS applications.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.swift-macos-app
+    projection_name: swift-macos-app
+  - effective_id: framework.skill.swift-scaffold-package
+    artifact_map_id: framework-skill-swift-scaffold-package
+    origin_class: framework
+    capability_kind: skill
+    capability_id: swift-scaffold-package
+    display_name: Swift Scaffold Package
+    summary: Scaffold a Swift macOS package with Package.swift, source targets, typed config, and logging.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.swift-scaffold-package
+    projection_name: swift-scaffold-package
+  - effective_id: framework.skill.swift-test-harness
+    artifact_map_id: framework-skill-swift-test-harness
+    origin_class: framework
+    capability_kind: skill
+    capability_id: swift-test-harness
+    display_name: Swift Test Harness
+    summary: Generate XCTest suites, in-memory database fixtures, mock actors, and CI workflow.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.swift-test-harness
+    projection_name: swift-test-harness
+  - effective_id: framework.skill.synthesize-research
+    artifact_map_id: framework-skill-synthesize-research
+    origin_class: framework
+    capability_kind: skill
+    capability_id: synthesize-research
+    display_name: Synthesize Research
+    summary: Synthesize scattered research notes into coherent findings.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: synthesis
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.synthesize-research
+    projection_name: synthesize-research
+  - effective_id: framework.skill.triage-ci-failure
+    artifact_map_id: framework-skill-triage-ci-failure
+    origin_class: framework
+    capability_kind: skill
+    capability_id: triage-ci-failure
+    display_name: Triage CI Failure
+    summary: Diagnose and repair CI pipeline failures.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: remediation
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.triage-ci-failure
+    projection_name: triage-ci-failure
+  - effective_id: framework.skill.turborepo-taskgraph
+    artifact_map_id: framework-skill-turborepo-taskgraph
+    origin_class: framework
+    capability_kind: skill
+    capability_id: turborepo-taskgraph
+    display_name: Turborepo Taskgraph
+    summary: Platform skill for Turborepo task graph and cache diagnostics with bounded evidence output.
+    status: draft
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: platforms
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.turborepo-taskgraph
+    projection_name: turborepo-taskgraph
+  - effective_id: framework.skill.vercel
+    artifact_map_id: framework-skill-vercel
+    origin_class: framework
+    capability_kind: skill
+    capability_id: vercel
+    display_name: Vercel
+    summary: Platform skill set for Vercel deployments.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: platforms
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.vercel
+    projection_name: vercel
+  - effective_id: framework.skill.vercel-deploy
+    artifact_map_id: framework-skill-vercel-deploy
+    origin_class: framework
+    capability_kind: skill
+    capability_id: vercel-deploy
+    display_name: Vercel Deploy
+    summary: Package and deploy the project to Vercel using the CLI.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: platforms
+    host_adapters: []
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-skill-framework.skill.vercel-deploy
+    projection_name: vercel-deploy
+  - effective_id: framework.tool.ci-integration
+    artifact_map_id: framework-tool-ci-integration
+    origin_class: framework
+    capability_kind: tool
+    capability_id: ci-integration
+    display_name: CI Integration
+    summary: GitHub and CI/CD integration tools.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/tools/manifest.yml
+    capability_domain: tools
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-tool-framework.tool.ci-integration
+    projection_name: ci-integration
+  - effective_id: framework.tool.file-ops
+    artifact_map_id: framework-tool-file-ops
+    origin_class: framework
+    capability_kind: tool
+    capability_id: file-ops
+    display_name: File Operations
+    summary: Full file read/write access tools.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/tools/manifest.yml
+    capability_domain: tools
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-tool-framework.tool.file-ops
+    projection_name: file-ops
+  - effective_id: framework.tool.full-edit
+    artifact_map_id: framework-tool-full-edit
+    origin_class: framework
+    capability_kind: tool
+    capability_id: full-edit
+    display_name: Full Edit
+    summary: Complete file editing toolkit.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/tools/manifest.yml
+    capability_domain: tools
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-tool-framework.tool.full-edit
+    projection_name: full-edit
+  - effective_id: framework.tool.read-only
+    artifact_map_id: framework-tool-read-only
+    origin_class: framework
+    capability_kind: tool
+    capability_id: read-only
+    display_name: Read Only
+    summary: Read-only file access tools.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/tools/manifest.yml
+    capability_domain: tools
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-tool-framework.tool.read-only
+    projection_name: read-only
+  - effective_id: framework.tool.shell-safe
+    artifact_map_id: framework-tool-shell-safe
+    origin_class: framework
+    capability_kind: tool
+    capability_id: shell-safe
+    display_name: Shell Safe
+    summary: Limited shell access for safe operations.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/tools/manifest.yml
+    capability_domain: tools
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-tool-framework.tool.shell-safe
+    projection_name: shell-safe
+  - effective_id: framework.tool.web-access
+    artifact_map_id: framework-tool-web-access
+    origin_class: framework
+    capability_kind: tool
+    capability_id: web-access
+    display_name: Web Access
+    summary: Web fetching and search tools.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/tools/manifest.yml
+    capability_domain: tools
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9999-1-tool-framework.tool.web-access
+    projection_name: web-access
+resolution_order:
+  - framework.command.alignment-check
+  - framework.command.audit-skills-system-expansion
+  - framework.command.context-budget
+  - framework.command.create-workflow
+  - framework.command.discover-expand
+  - framework.command.discover-explain
+  - framework.command.discover-resolve
+  - framework.command.discover-start
+  - framework.command.evaluate-workflow
+  - framework.command.export-harness
+  - framework.command.init
+  - framework.command.query-ask
+  - framework.command.query-explain
+  - framework.command.query-retrieve
+  - framework.command.recover
+  - framework.command.refactor
+  - framework.command.snapshot-build
+  - framework.command.snapshot-diff
+  - framework.command.studio
+  - framework.command.update-workflow
+  - framework.command.validate-frontmatter
+  - framework.command.validate-platform-interop
+  - framework.command.validate-session-policy
+  - framework.command.watch-poll
+  - framework.service.agent
+  - framework.service.agent-platform
+  - framework.service.capability-bind
+  - framework.service.contingency
+  - framework.service.cost
+  - framework.service.critic
+  - framework.service.filesystem-discovery
+  - framework.service.filesystem-snapshot
+  - framework.service.filesystem-watch
+  - framework.service.flow
+  - framework.service.guard
+  - framework.service.plan
+  - framework.service.playbook
+  - framework.service.prompt
+  - framework.service.query
+  - framework.service.replan
+  - framework.service.scheduler
+  - framework.service.spec
+  - framework.skill.audit-api-contract
+  - framework.skill.audit-architecture-readiness
+  - framework.skill.audit-charter
+  - framework.skill.audit-ci-latency
+  - framework.skill.audit-cross-subsystem-coherence
+  - framework.skill.audit-data-governance
+  - framework.skill.audit-documentation-standards
+  - framework.skill.audit-domain-architecture
+  - framework.skill.audit-freshness-and-supersession
+  - framework.skill.audit-migration
+  - framework.skill.audit-observability-coverage
+  - framework.skill.audit-operational-readiness
+  - framework.skill.audit-release-readiness
+  - framework.skill.audit-security-compliance
+  - framework.skill.audit-subsystem-health
+  - framework.skill.audit-surface-architecture
+  - framework.skill.audit-test-quality
+  - framework.skill.audit-ui
+  - framework.skill.build-mcp-server
+  - framework.skill.ci-gate-triage
+  - framework.skill.create-skill
+  - framework.skill.deploy-status
+  - framework.skill.incident-response
+  - framework.skill.plan-charter-alignment
+  - framework.skill.postgres
+  - framework.skill.postgres-best-practices
+  - framework.skill.provider-github-gates
+  - framework.skill.provider-nextjs-astro-runtime
+  - framework.skill.provider-preview-smoke
+  - framework.skill.provider-vercel-delivery
+  - framework.skill.python-api
+  - framework.skill.python-contract-first-api
+  - framework.skill.python-contributor-guide
+  - framework.skill.python-dev-toolchain
+  - framework.skill.python-infra-manifest
+  - framework.skill.python-scaffold-package
+  - framework.skill.python-test-harness
+  - framework.skill.react
+  - framework.skill.react-best-practices
+  - framework.skill.react-composition-patterns
+  - framework.skill.react-native
+  - framework.skill.react-native-best-practices
+  - framework.skill.refactor
+  - framework.skill.refine-prompt
+  - framework.skill.resolve-pr-comments
+  - framework.skill.spec-to-implementation
+  - framework.skill.swift-cli-interface
+  - framework.skill.swift-contributor-guide
+  - framework.skill.swift-daemon-service
+  - framework.skill.swift-data-layer
+  - framework.skill.swift-macos-app
+  - framework.skill.swift-scaffold-package
+  - framework.skill.swift-test-harness
+  - framework.skill.synthesize-research
+  - framework.skill.triage-ci-failure
+  - framework.skill.turborepo-taskgraph
+  - framework.skill.vercel
+  - framework.skill.vercel-deploy
+  - framework.tool.ci-integration
+  - framework.tool.file-ops
+  - framework.tool.full-edit
+  - framework.tool.read-only
+  - framework.tool.shell-safe
+  - framework.tool.web-access

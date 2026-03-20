@@ -13,6 +13,9 @@ surface.
 
 - Effective outputs are rebuildable and non-authoritative.
 - Runtime and policy consumers read only these outputs.
+- `catalog.effective.yml` carries `routing_exports` for command and skill
+  contributions so capability routing does not have to rediscover raw pack
+  content roots.
 - Stale extension effective outputs fail closed.
 - Publication is valid only when these outputs agree with
   `state/control/extensions/{active.yml,quarantine.yml}`.

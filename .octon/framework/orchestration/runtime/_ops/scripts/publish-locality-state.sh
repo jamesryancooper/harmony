@@ -136,6 +136,71 @@ json_compact_or_default() {
   fi
 }
 
+validate_scope_routing_hints_for_publish() {
+  local scope_id="$1"
+  local manifest_path="$2"
+  local manifest_file="$3"
+  local key kind
+
+  if ! yq -e 'has("routing_hints")' "$manifest_file" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if ! yq -e '.routing_hints | type == "!!map"' "$manifest_file" >/dev/null 2>&1; then
+    append_quarantine_record "$scope_id" "$manifest_path" "invalid-routing-hints"
+    return 0
+  fi
+
+  while IFS= read -r key; do
+    [[ -z "$key" ]] && continue
+    case "$key" in
+      preferred_capability_domains|preferred_pack_tags|ranking_hints)
+        ;;
+      *)
+        append_quarantine_record "$scope_id" "$manifest_path" "invalid-routing-hints-key"
+        ;;
+    esac
+  done < <(yq -r '.routing_hints | keys[]?' "$manifest_file" 2>/dev/null || true)
+
+  if yq -e '.routing_hints.preferred_capability_domains' "$manifest_file" >/dev/null 2>&1 \
+    && ! yq -e '.routing_hints.preferred_capability_domains | type == "!!seq"' "$manifest_file" >/dev/null 2>&1; then
+    append_quarantine_record "$scope_id" "$manifest_path" "invalid-preferred-capability-domains"
+  fi
+
+  if yq -e '.routing_hints.preferred_pack_tags' "$manifest_file" >/dev/null 2>&1 \
+    && ! yq -e '.routing_hints.preferred_pack_tags | type == "!!seq"' "$manifest_file" >/dev/null 2>&1; then
+    append_quarantine_record "$scope_id" "$manifest_path" "invalid-preferred-pack-tags"
+  fi
+
+  if yq -e '.routing_hints.ranking_hints' "$manifest_file" >/dev/null 2>&1; then
+    if ! yq -e '.routing_hints.ranking_hints | type == "!!map"' "$manifest_file" >/dev/null 2>&1; then
+      append_quarantine_record "$scope_id" "$manifest_path" "invalid-ranking-hints"
+      return 0
+    fi
+    while IFS= read -r key; do
+      [[ -z "$key" ]] && continue
+      if [[ "$key" != "preferred_capability_kinds" ]]; then
+        append_quarantine_record "$scope_id" "$manifest_path" "invalid-ranking-hints-key"
+      fi
+    done < <(yq -r '.routing_hints.ranking_hints | keys[]?' "$manifest_file" 2>/dev/null || true)
+    if yq -e '.routing_hints.ranking_hints.preferred_capability_kinds' "$manifest_file" >/dev/null 2>&1; then
+      if ! yq -e '.routing_hints.ranking_hints.preferred_capability_kinds | type == "!!seq"' "$manifest_file" >/dev/null 2>&1; then
+        append_quarantine_record "$scope_id" "$manifest_path" "invalid-preferred-capability-kinds"
+      else
+        while IFS= read -r kind; do
+          [[ -z "$kind" ]] && continue
+          case "$kind" in
+            command|skill|service|tool) ;;
+            *)
+              append_quarantine_record "$scope_id" "$manifest_path" "invalid-preferred-capability-kind"
+              ;;
+          esac
+        done < <(yq -r '.routing_hints.ranking_hints.preferred_capability_kinds[]?' "$manifest_file" 2>/dev/null || true)
+      fi
+    fi
+  fi
+}
+
 yaml_string_list() {
   local query="$1"
   local file="$2"
@@ -167,7 +232,7 @@ collect_scope() {
     return
   fi
 
-  if [[ "$(yq -r '.schema_version // ""' "$manifest_file")" != "octon-locality-scope-v1" ]]; then
+  if [[ "$(yq -r '.schema_version // ""' "$manifest_file")" != "octon-locality-scope-v2" ]]; then
     append_quarantine_record "$scope_id" "$manifest_path" "invalid-scope-schema-version"
   fi
 
@@ -234,11 +299,7 @@ collect_scope() {
     fi
   fi
 
-  if yq -e 'has("routing_hints")' "$manifest_file" >/dev/null 2>&1; then
-    if ! yq -e '.routing_hints | type == "!!map"' "$manifest_file" >/dev/null 2>&1; then
-      append_quarantine_record "$scope_id" "$manifest_path" "invalid-routing-hints"
-    fi
-  fi
+  validate_scope_routing_hints_for_publish "$scope_id" "$manifest_path" "$manifest_file"
 
   if yq -e 'has("mission_defaults")' "$manifest_file" >/dev/null 2>&1; then
     if ! yq -e '.mission_defaults | type == "!!map"' "$manifest_file" >/dev/null 2>&1; then
