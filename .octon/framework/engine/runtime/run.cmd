@@ -7,9 +7,10 @@ REM Remove trailing backslash.
 if "%RUNTIME_DIR:~-1%"=="\" set RUNTIME_DIR=%RUNTIME_DIR:~0,-1%
 
 for %%I in ("%RUNTIME_DIR%\..") do set ENGINE_DIR=%%~fI
-for %%I in ("%ENGINE_DIR%\..") do set OCTON_DIR=%%~fI
+for %%I in ("%ENGINE_DIR%\..") do set FRAMEWORK_DIR=%%~fI
+for %%I in ("%FRAMEWORK_DIR%\..") do set OCTON_DIR=%%~fI
 set RUNTIME_OPS_DIR=%ENGINE_DIR%\_ops
-set RUNTIME_STATE_DIR=%RUNTIME_OPS_DIR%\state
+set ENGINE_BUILD_DIR=%OCTON_DIR%\generated\.tmp\engine\build\runtime-crates-target
 
 REM Detect architecture robustly (handles WOW64).
 set ARCH=%PROCESSOR_ARCHITECTURE%
@@ -31,7 +32,7 @@ if exist "%BIN%" (
 
 REM Development fallback: run from source.
 REM Requires Rust + cargo on PATH.
-if not exist "%RUNTIME_STATE_DIR%\build\runtime-crates-target" mkdir "%RUNTIME_STATE_DIR%\build\runtime-crates-target"
-set CARGO_TARGET_DIR=%RUNTIME_STATE_DIR%\build\runtime-crates-target
+if not exist "%ENGINE_BUILD_DIR%" mkdir "%ENGINE_BUILD_DIR%"
+set CARGO_TARGET_DIR=%ENGINE_BUILD_DIR%
 cargo run -q --manifest-path "%RUNTIME_DIR%\crates\Cargo.toml" -p octon_kernel -- %*
 exit /b %ERRORLEVEL%

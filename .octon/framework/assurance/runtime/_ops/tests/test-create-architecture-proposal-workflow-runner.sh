@@ -5,10 +5,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 RUNTIME_DIR="$(cd "$OPS_DIR/.." && pwd)"
 ASSURANCE_DIR="$(cd "$RUNTIME_DIR/.." && pwd)"
-OCTON_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
+FRAMEWORK_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
+OCTON_DIR="$(cd "$FRAMEWORK_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$OCTON_DIR/.." && pwd)"
-RUNNER="$OCTON_DIR/engine/runtime/run"
-TMP_ROOT="$ROOT_DIR/.octon/generated/.tmp/assurance-workflow-tests"
+RUNNER="$FRAMEWORK_DIR/engine/runtime/run"
+TMP_ROOT="${TMPDIR:-/tmp}/assurance-workflow-tests"
 
 pass_count=0
 fail_count=0

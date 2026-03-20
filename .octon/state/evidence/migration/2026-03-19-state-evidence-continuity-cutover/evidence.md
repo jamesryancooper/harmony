@@ -30,7 +30,7 @@ Single-promotion atomic migration implementing Packet 7
 ## Receipts And Evidence
 
 - Proposal:
-  `/.octon/inputs/exploratory/proposals/architecture/7-state-evidence-continuity/`
+  `/.octon/inputs/exploratory/proposals/architecture/state-evidence-continuity/`
 - Validation receipts: `validation.md`
 - Command log: `commands.md`
 - Change inventory: `inventory.md`

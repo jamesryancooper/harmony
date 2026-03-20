@@ -353,10 +353,9 @@ fn cmd_studio() -> anyhow::Result<()> {
     let runtime_dir = octon_dir.join("framework").join("engine").join("runtime");
     let manifest_path = runtime_dir.join("crates").join("Cargo.toml");
     let target_dir = octon_dir
-        .join("framework")
+        .join("generated")
+        .join(".tmp")
         .join("engine")
-        .join("_ops")
-        .join("state")
         .join("build")
         .join("runtime-crates-target");
 

@@ -5,10 +5,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 RUNTIME_DIR="$(cd "$OPS_DIR/.." && pwd)"
 ASSURANCE_DIR="$(cd "$RUNTIME_DIR/.." && pwd)"
-OCTON_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
+FRAMEWORK_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
+OCTON_DIR="$(cd "$FRAMEWORK_DIR/.." && pwd)"
 ROOT_DIR="$(cd "$OCTON_DIR/.." && pwd)"
-RUNNER="$OCTON_DIR/engine/runtime/run"
-TMP_ROOT="$ROOT_DIR/.octon/generated/.tmp/assurance-workflow-tests"
+RUNNER="$FRAMEWORK_DIR/engine/runtime/run"
+TMP_ROOT="${TMPDIR:-/tmp}/assurance-workflow-tests"
 
 pass_count=0
 fail_count=0
@@ -34,9 +35,11 @@ new_fixture_proposal() {
   CLEANUP_PATHS+=("$fixture_root")
   proposal_root="$fixture_root/.octon/inputs/exploratory/proposals/policy/fixture-proposal"
   mkdir -p "$proposal_root/navigation" "$proposal_root/policy"
-  mkdir -p "$fixture_root/.octon/framework/assurance/runtime/_ops"
+  mkdir -p "$fixture_root/.octon/framework/assurance/runtime/_ops" "$fixture_root/.octon/framework/scaffolding/runtime/templates"
   cp -R "$ROOT_DIR/.octon/framework/assurance/runtime/_ops/scripts" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/"
+  cp "$ROOT_DIR/.octon/framework/scaffolding/runtime/templates/proposal-registry.schema.json" \
+    "$fixture_root/.octon/framework/scaffolding/runtime/templates/proposal-registry.schema.json"
   cat >"$proposal_root/README.md" <<'EOF'
 # Fixture Policy Proposal
 EOF
@@ -75,7 +78,7 @@ EOF
   cat >"$proposal_root/policy/enforcement-plan.md" <<'EOF'
 # Enforcement Plan
 EOF
-  mkdir -p "$fixture_root/.octon"
+  mkdir -p "$fixture_root/.octon/generated/proposals"
   cat >"$fixture_root/.octon/generated/proposals/registry.yml" <<'EOF'
 schema_version: "proposal-registry-v1"
 active:
@@ -89,7 +92,6 @@ active:
       - ".octon/example.md"
 archived: []
 EOF
-  mkdir -p "$fixture_root/.octon"
   printf '%s\n' "$fixture_root"
 }
 

@@ -7,6 +7,11 @@ description: Required files and policy-specific constraints for v1 policy propos
 
 Policy proposals extend `proposal-standard.md`.
 
+Canonical path:
+
+- `/.octon/inputs/exploratory/proposals/policy/<proposal_id>/`
+- the final directory name must equal `proposal_id` with no numeric prefix
+
 Required files:
 
 - `policy-proposal.yml`

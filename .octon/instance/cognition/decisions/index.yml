@@ -105,3 +105,9 @@ records:
     path: 050-locality-and-scope-registry-atomic-cutover.md
   - id: 051-state-evidence-continuity-atomic-cutover
     path: 051-state-evidence-continuity-atomic-cutover.md
+  - id: 052-inputs-exploratory-proposals-atomic-cutover
+    path: 052-inputs-exploratory-proposals-atomic-cutover.md
+  - id: 053-root-manifest-profiles-and-export-semantics-atomic-cutover
+    path: 053-root-manifest-profiles-and-export-semantics-atomic-cutover.md
+  - id: 054-inputs-additive-extensions-atomic-cutover
+    path: 054-inputs-additive-extensions-atomic-cutover.md

@@ -5,7 +5,8 @@ REM Engine-owned launcher for octon-policy.
 set RUNTIME_DIR=%~dp0
 if "%RUNTIME_DIR:~-1%"=="\" set RUNTIME_DIR=%RUNTIME_DIR:~0,-1%
 for %%I in ("%RUNTIME_DIR%\..") do set ENGINE_DIR=%%~fI
-for %%I in ("%ENGINE_DIR%\..") do set OCTON_DIR=%%~fI
+for %%I in ("%ENGINE_DIR%\..") do set FRAMEWORK_DIR=%%~fI
+for %%I in ("%FRAMEWORK_DIR%\..") do set OCTON_DIR=%%~fI
 
 if defined OCTON_POLICY_BIN (
   if exist "%OCTON_POLICY_BIN%" (
@@ -14,7 +15,7 @@ if defined OCTON_POLICY_BIN (
   )
 )
 
-set TARGET_DIR=%ENGINE_DIR%\_ops\state\build\runtime-crates-target
+set TARGET_DIR=%OCTON_DIR%\generated\.tmp\engine\build\runtime-crates-target
 set BIN=%TARGET_DIR%\debug\octon-policy.exe
 
 if not exist "%BIN%" (

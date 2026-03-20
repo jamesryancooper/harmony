@@ -4,7 +4,7 @@
 - Status: Accepted
 - Deciders: Octon maintainers
 - Related:
-  - `/.octon/inputs/exploratory/proposals/architecture/5-overlay-and-ingress-model/`
+  - `/.octon/inputs/exploratory/proposals/architecture/overlay-and-ingress-model/`
   - `/.octon/instance/cognition/context/shared/migrations/2026-03-19-overlay-and-ingress-model-cutover/plan.md`
   - `/.octon/framework/cognition/_meta/architecture/specification.md`
 

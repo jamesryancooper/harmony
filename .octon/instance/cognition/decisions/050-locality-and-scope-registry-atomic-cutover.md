@@ -4,7 +4,7 @@
 - Status: Accepted
 - Deciders: Octon maintainers
 - Related:
-  - `/.octon/inputs/exploratory/proposals/architecture/6-locality-and-scope-registry/`
+  - `/.octon/inputs/exploratory/proposals/architecture/locality-and-scope-registry/`
   - `/.octon/instance/cognition/context/shared/migrations/2026-03-19-locality-and-scope-registry-cutover/plan.md`
   - `/.octon/framework/cognition/_meta/architecture/specification.md`
 

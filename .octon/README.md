@@ -83,6 +83,12 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/generated/effective/locality/`
 - Canonical effective extension outputs:
   `/.octon/generated/effective/extensions/`
+- Canonical raw exploratory proposal inputs:
+  `/.octon/inputs/exploratory/proposals/<kind>/<proposal_id>/`
+- Canonical archived proposal inputs:
+  `/.octon/inputs/exploratory/proposals/.archive/<kind>/<proposal_id>/`
+- Canonical generated proposal discovery:
+  `/.octon/generated/proposals/registry.yml`
 - Canonical repo context and ADRs: `/.octon/instance/cognition/`
 - Canonical repo missions: `/.octon/instance/orchestration/missions/`
 - Root manifest: `/.octon/octon.yml`
@@ -117,8 +123,20 @@ tree. `bootstrap_core` is the install contract completed by `/init`;
 `repo_snapshot` exports `octon.yml`, `framework/**`, `instance/**`, and the
 clean published enabled-pack dependency closure through `/export-harness`; `pack_bundle`
 exports selected packs plus dependency closure only; `full_fidelity` is
-advisory only and uses a normal Git clone. `state/**` and `generated/**` stay
-out of clean bootstrap and repo snapshots.
+advisory only and uses a normal Git clone. `inputs/exploratory/**`,
+`state/**`, and `generated/**` stay out of clean bootstrap and repo snapshots.
+
+## Proposal Workspace
+
+Proposal packages live only under
+`/.octon/inputs/exploratory/proposals/<kind>/<proposal_id>/` and remain
+non-canonical even while they live inside the super-root. Their lifecycle
+authority order is `proposal.yml`, subtype manifest,
+`/.octon/generated/proposals/registry.yml`, then `README.md`.
+
+Runtime and policy consumers must never read proposal paths directly.
+Proposal discovery lives only in `/.octon/generated/proposals/registry.yml`,
+which is committed by default but remains non-authoritative.
 
 ## Human-Led Zone
 

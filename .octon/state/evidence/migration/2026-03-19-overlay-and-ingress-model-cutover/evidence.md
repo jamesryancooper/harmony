@@ -33,7 +33,7 @@ Single-promotion atomic migration implementing Packet 5
 ## Receipts and Evidence
 
 - Proposal:
-  `/.octon/inputs/exploratory/proposals/architecture/5-overlay-and-ingress-model/`
+  `/.octon/inputs/exploratory/proposals/architecture/overlay-and-ingress-model/`
 - Validation receipts: `validation.md`
 - Command log: `commands.md`
 - Change inventory: `inventory.md`

@@ -4,7 +4,7 @@
 - Status: Accepted
 - Deciders: Octon maintainers
 - Related:
-  - `/.octon/inputs/exploratory/proposals/architecture/7-state-evidence-continuity/`
+  - `/.octon/inputs/exploratory/proposals/architecture/state-evidence-continuity/`
   - `/.octon/instance/cognition/context/shared/migrations/2026-03-19-state-evidence-continuity-cutover/plan.md`
   - `/.octon/framework/cognition/_meta/architecture/specification.md`
 

@@ -73,9 +73,15 @@ Canonical locality inputs and outputs are:
 - mutable extension actual/quarantine state:
   `state/control/extensions/{active.yml,quarantine.yml}`
 - raw additive extension packs: `inputs/additive/extensions/<pack-id>/**`
+- raw exploratory proposals:
+  `inputs/exploratory/proposals/<kind>/<proposal_id>/**`
+- archived exploratory proposals:
+  `inputs/exploratory/proposals/.archive/<kind>/<proposal_id>/**`
 - mutable locality quarantine: `state/control/locality/quarantine.yml`
 - compiled effective locality outputs: `generated/effective/locality/**`
 - compiled effective extension outputs: `generated/effective/extensions/**`
+- generated proposal discovery:
+  `generated/proposals/registry.yml`
 
 ## Portability
 
@@ -88,6 +94,8 @@ tree as the default bootstrap model.
   clean published enabled-pack dependency closure through `/export-harness`.
 - `pack_bundle` exports selected additive packs plus dependency closure only.
 - `full_fidelity` is advisory only and uses a normal Git clone.
+- `inputs/exploratory/**`, `state/**`, and `generated/**` stay out of
+  `bootstrap_core` and `repo_snapshot`.
 
 ## Boundaries
 
@@ -106,7 +114,11 @@ tree as the default bootstrap model.
   `instance/**` shadow-tree model
 - Raw `inputs/**` paths must never become direct runtime or policy
   dependencies.
+- Proposal packages are integrated raw exploratory input only; they remain
+  non-canonical and are discovered through `generated/proposals/registry.yml`
+  without making that registry authoritative.
 - Human-led ideation is part of `inputs/exploratory/ideation/**`.
 - Legacy mixed roots are not canonical and must not be reintroduced.
 - Locality is root-owned; descendant `.octon/` roots, hierarchical scope
   inheritance, and ancestor-chain scope composition are invalid in v1.
+- Descendant-local or scope-local proposal workspaces are invalid in v1.

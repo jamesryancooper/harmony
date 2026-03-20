@@ -5,7 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OPS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 RUNTIME_DIR="$(cd "$OPS_DIR/.." && pwd)"
 ASSURANCE_DIR="$(cd "$RUNTIME_DIR/.." && pwd)"
-OCTON_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
+FRAMEWORK_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
+OCTON_DIR="$(cd "$FRAMEWORK_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$OCTON_DIR/.." && pwd)"
 VALIDATE_SCRIPT=".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh"
 
@@ -39,15 +40,19 @@ create_fixture_repo() {
   fixture_root="$(mktemp -d "${TMPDIR:-/tmp}/proposal-standard.XXXXXX")"
   CLEANUP_DIRS+=("$fixture_root")
   mkdir -p "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts"
+  mkdir -p "$fixture_root/.octon/framework/scaffolding/runtime/templates"
   cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh"
+  cp "$REPO_ROOT/.octon/framework/scaffolding/runtime/templates/proposal-registry.schema.json" \
+    "$fixture_root/.octon/framework/scaffolding/runtime/templates/proposal-registry.schema.json"
   printf '%s\n' "$fixture_root"
 }
 
 create_shared_id_registry_fixture() {
   local fixture_root="$1"
   local proposal_dir="$fixture_root/.octon/inputs/exploratory/proposals/policy/shared-id"
-  mkdir -p "$proposal_dir"
+  mkdir -p "$proposal_dir/navigation"
+  mkdir -p "$fixture_root/.octon/generated/proposals"
 
   cat >"$proposal_dir/proposal.yml" <<'EOF'
 schema_version: "proposal-v1"
@@ -63,6 +68,24 @@ lifecycle:
   temporary: true
   exit_expectation: "Promote and archive."
 related_proposals: []
+EOF
+
+  cat >"$proposal_dir/policy-proposal.yml" <<'EOF'
+schema_version: "policy-proposal-v1"
+policy_area: "proposal-governance"
+change_type: "policy-update"
+EOF
+
+  cat >"$proposal_dir/README.md" <<'EOF'
+# Shared Policy
+EOF
+
+  cat >"$proposal_dir/navigation/artifact-catalog.md" <<'EOF'
+# Catalog
+EOF
+
+  cat >"$proposal_dir/navigation/source-of-truth-map.md" <<'EOF'
+# Sources
 EOF
 
   cat >"$fixture_root/.octon/generated/proposals/registry.yml" <<'EOF'
@@ -104,10 +127,20 @@ case_registry_lookup_uses_kind_and_id() {
   run_validator_in_fixture "$fixture_root" ".octon/inputs/exploratory/proposals/policy/shared-id"
 }
 
+case_absolute_package_path_passes() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  create_shared_id_registry_fixture "$fixture_root"
+  run_validator_in_fixture "$fixture_root" "$fixture_root/.octon/inputs/exploratory/proposals/policy/shared-id"
+}
+
 main() {
   assert_success \
     "proposal standard validator resolves registry entries by kind and id" \
     case_registry_lookup_uses_kind_and_id
+  assert_success \
+    "proposal standard validator accepts absolute package paths" \
+    case_absolute_package_path_passes
 
   echo
   echo "Passed: $pass_count"

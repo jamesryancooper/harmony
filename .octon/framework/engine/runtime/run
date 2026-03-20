@@ -7,7 +7,7 @@ ENGINE_DIR="$(CDPATH= cd -- "$RUNTIME_DIR/.." && pwd)"
 FRAMEWORK_DIR="$(CDPATH= cd -- "$ENGINE_DIR/.." && pwd)"
 OCTON_DIR="$(CDPATH= cd -- "$FRAMEWORK_DIR/.." && pwd)"
 RUNTIME_OPS_DIR="$ENGINE_DIR/_ops"
-RUNTIME_STATE_DIR="$RUNTIME_OPS_DIR/state"
+ENGINE_BUILD_DIR="$OCTON_DIR/generated/.tmp/engine/build/runtime-crates-target"
 
 OS="$(uname -s 2>/dev/null || echo unknown)"
 ARCH="$(uname -m 2>/dev/null || echo unknown)"
@@ -49,6 +49,6 @@ fi
 
 # Development fallback: run from source.
 # This keeps the launcher usable before platform binaries are produced.
-mkdir -p "$RUNTIME_STATE_DIR/build/runtime-crates-target"
-export CARGO_TARGET_DIR="$RUNTIME_STATE_DIR/build/runtime-crates-target"
+mkdir -p "$ENGINE_BUILD_DIR"
+export CARGO_TARGET_DIR="$ENGINE_BUILD_DIR"
 exec cargo run -q --manifest-path "$RUNTIME_DIR/crates/Cargo.toml" -p octon_kernel -- "$@"

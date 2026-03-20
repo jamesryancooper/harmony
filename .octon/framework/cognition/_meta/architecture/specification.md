@@ -74,6 +74,15 @@ super-root cutover.
 31. `state/control/locality/quarantine.yml` is mutable operational control
     truth; `generated/effective/locality/**` is non-authoritative compiled
     locality state.
+32. Raw exploratory proposals live only under
+    `inputs/exploratory/proposals/<kind>/<proposal_id>/**`; archived proposal
+    packages live only under
+    `inputs/exploratory/proposals/.archive/<kind>/<proposal_id>/**`.
+33. `generated/proposals/registry.yml` is the only generated proposal
+    discovery surface and remains non-authoritative.
+34. Proposals are excluded from runtime resolution, policy resolution,
+    `bootstrap_core`, and `repo_snapshot`.
+35. No descendant-local or scope-local proposal workspace exists in v1.
 
 ## Precedence
 
@@ -121,6 +130,9 @@ for runtime, governance, and practices.
 - projected ingress: `/.octon/AGENTS.md`
 - desired extension config: `/.octon/instance/extensions.yml`
 - raw additive extension packs: `/.octon/inputs/additive/extensions/`
+- raw exploratory proposals: `/.octon/inputs/exploratory/proposals/`
+- archived exploratory proposals:
+  `/.octon/inputs/exploratory/proposals/.archive/`
 - ingress: `/.octon/instance/ingress/AGENTS.md`
 - bootstrap docs: `/.octon/instance/bootstrap/`
 - locality: `/.octon/instance/locality/`
@@ -205,4 +217,6 @@ before it becomes legal.
 - Framework-local `_ops/state/**` paths block runtime.
 - Stale required generated outputs block runtime.
 - Direct reads from raw `inputs/**` by runtime or policy code block runtime.
+- Direct reads from raw exploratory proposal paths by runtime or policy code
+  are always invalid raw-input dependencies.
 - Incomplete enabled-pack closure blocks `repo_snapshot` export.
