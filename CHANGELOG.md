@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/jamesryancooper/octon/compare/octon-v0.5.1...octon-v0.5.2) (2026-03-20)
+
+
+### Features
+
+* **octon:** implement packet 13 portability cutover ([#183](https://github.com/jamesryancooper/octon/issues/183)) ([00bc819](https://github.com/jamesryancooper/octon/commit/00bc819624ee6a74ba59edd0ad21ad98c782f2d6))
+
 ## [0.5.1](https://github.com/jamesryancooper/octon/compare/octon-v0.5.0...octon-v0.5.1) (2026-03-20)
 
 
