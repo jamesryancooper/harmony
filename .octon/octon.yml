@@ -1,73 +1,74 @@
-schema_version: "octon-root-manifest-v2"
-
+schema_version: octon-root-manifest-v2
 topology:
-  super_root: ".octon/"
+  super_root: .octon/
   class_roots:
-    framework: "framework/"
-    instance: "instance/"
-    inputs: "inputs/"
-    state: "state/"
-    generated: "generated/"
-
+    framework: framework/
+    instance: instance/
+    inputs: inputs/
+    state: state/
+    generated: generated/
 versioning:
   harness:
-    release_version: "0.5.0"
+    release_version: 0.5.1
     supported_schema_versions:
-      - "octon-root-manifest-v2"
-      - "octon-framework-manifest-v2"
-      - "octon-instance-manifest-v1"
-    rejection_mode: "fail-closed"
-    migration_workflow: "framework/orchestration/runtime/workflows/meta/migrate-harness/README.md"
-    migration_overview: "framework/orchestration/runtime/workflows/meta/migrate-harness/00-overview.md"
+      - octon-root-manifest-v2
+      - octon-framework-manifest-v2
+      - octon-instance-manifest-v1
+    rejection_mode: fail-closed
+    migration_workflow: framework/orchestration/runtime/workflows/meta/migrate-harness/README.md
+    migration_overview: >-
+      framework/orchestration/runtime/workflows/meta/migrate-harness/00-overview.md
     deterministic_upgrade_instructions:
-      - "Upgrade the root manifest to octon-root-manifest-v2 and remove legacy top-level portability keys."
-      - "Upgrade framework/manifest.yml to octon-framework-manifest-v2 and add bundled policy-set references."
-      - "Add instance/extensions.yml, materialize inputs/additive/extensions/, and re-run harness alignment before promotion."
+      - >-
+        Upgrade the root manifest to octon-root-manifest-v2 and remove legacy
+        top-level portability keys.
+      - >-
+        Upgrade framework/manifest.yml to octon-framework-manifest-v2 and add
+        bundled policy-set references.
+      - >-
+        Add instance/extensions.yml, materialize inputs/additive/extensions/,
+        and re-run harness alignment before promotion.
   extensions:
-    api_version: "1.0"
-
+    api_version: '1.0'
 profiles:
   bootstrap_core:
     include:
-      - "octon.yml"
-      - "framework/**"
-      - "instance/manifest.yml"
+      - octon.yml
+      - framework/**
+      - instance/manifest.yml
   repo_snapshot:
     include:
-      - "octon.yml"
-      - "framework/**"
-      - "instance/**"
-      - "inputs/additive/extensions/<enabled-and-dependent>/**"
+      - octon.yml
+      - framework/**
+      - instance/**
+      - inputs/additive/extensions/<enabled-and-dependent>/**
     exclude:
-      - "inputs/exploratory/**"
-      - "state/**"
-      - "generated/**"
+      - inputs/exploratory/**
+      - state/**
+      - generated/**
   pack_bundle:
-    selector: "inputs/additive/extensions/<selected>/**"
+    selector: inputs/additive/extensions/<selected>/**
     include_dependency_closure: true
     exclude:
-      - "framework/**"
-      - "instance/**"
-      - "inputs/exploratory/**"
-      - "state/**"
-      - "generated/**"
+      - framework/**
+      - instance/**
+      - inputs/exploratory/**
+      - state/**
+      - generated/**
   full_fidelity:
-    advisory: "Use a normal Git clone for exact repository reproduction."
-
+    advisory: Use a normal Git clone for exact repository reproduction.
 policies:
-  raw_input_dependency: "fail-closed"
-  generated_staleness: "fail-closed"
-
+  raw_input_dependency: fail-closed
+  generated_staleness: fail-closed
 zones:
   human_led:
-    - "inputs/exploratory/ideation/**"
-
+    - inputs/exploratory/ideation/**
 resolution:
   authority_order:
-    - "framework"
-    - "instance"
-    - "state"
-    - "generated"
+    - framework
+    - instance
+    - state
+    - generated
   runtime_inputs:
-    proposals_registry: ".octon/generated/proposals/registry.yml"
-    continuity: ".octon/state/continuity/"
+    proposals_registry: .octon/generated/proposals/registry.yml
+    continuity: .octon/state/continuity/
