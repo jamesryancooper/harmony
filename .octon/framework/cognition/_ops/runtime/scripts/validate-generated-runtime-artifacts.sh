@@ -92,8 +92,29 @@ check_decisions_summary_contract() {
   local retired_summary="$INSTANCE_COGNITION_SHARED_DIR/decisions.md"
   if [[ -e "$retired_summary" ]]; then
     fail "retired generated decisions summary must not exist: .octon/instance/cognition/context/shared/decisions.md"
-  else
-    pass "retired instance-local generated decisions summary is absent"
+  fi
+
+  local offending_summaries=""
+  offending_summaries="$(
+    find "$INSTANCE_COGNITION_DIR" -type f -name '*.md' -print0 | while IFS= read -r -d '' file; do
+      if [[ "$file" == "$retired_summary" ]]; then
+        continue
+      fi
+      if matches_pattern '^title:[[:space:]]*Decisions$' "$file" \
+        && matches_pattern '^mutability:[[:space:]]*generated$' "$file" \
+        && matches_pattern '/\.octon/instance/cognition/decisions/index\.yml|/\.octon/instance/cognition/decisions/\*\.md' "$file"; then
+        printf '%s\n' "$file"
+      fi
+    done | sort
+  )"
+
+  if [[ -n "$offending_summaries" ]]; then
+    fail "generated decisions summary must not exist anywhere under instance/**"
+    printf '%s\n' "$offending_summaries" | sed "s|$OCTON_DIR/|.octon/|"
+  fi
+
+  if [[ ! -e "$retired_summary" && -z "$offending_summaries" ]]; then
+    pass "generated decisions summary absent from instance/**"
   fi
 
   if [[ ! -f "$generated_summary" ]]; then

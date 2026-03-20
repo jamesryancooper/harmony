@@ -58,7 +58,7 @@ cognition summaries:
 
 | File | Description |
 |------|-------------|
-| [decisions.md](/.octon/generated/cognition/summaries/decisions.md) | Agent-readable generated decision summaries. |
+| [decisions/README.md](/.octon/instance/cognition/decisions/README.md) | ADR authority and discovery guidance. |
 | [lessons.md](/.octon/instance/cognition/context/shared/lessons.md) | Anti-patterns and failures to avoid. |
 | [glossary.md](/.octon/instance/cognition/context/shared/glossary.md) | Domain-specific terminology. |
 | [dependencies.md](/.octon/instance/cognition/context/shared/dependencies.md) | External systems and references. |

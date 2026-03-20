@@ -148,8 +148,29 @@ check_retired_generated_summary_absent() {
   local retired_summary="$INSTANCE_DIR/cognition/context/shared/decisions.md"
   if [[ -e "$retired_summary" ]]; then
     fail "retired generated decisions summary still exists under instance/**"
-  else
-    pass "retired generated decisions summary absent from instance/**"
+  fi
+
+  local generated_decision_summaries=""
+  generated_decision_summaries="$(
+    find "$INSTANCE_DIR" -type f -name '*.md' -print0 | while IFS= read -r -d '' file; do
+      if [[ "$file" == "$retired_summary" ]]; then
+        continue
+      fi
+      if grep -Eq '^title:[[:space:]]*Decisions$' "$file" \
+        && grep -Eq '^mutability:[[:space:]]*generated$' "$file" \
+        && grep -Eq '/\.octon/instance/cognition/decisions/index\.yml|/\.octon/instance/cognition/decisions/\*\.md' "$file"; then
+        printf '%s\n' "$file"
+      fi
+    done | sort
+  )"
+
+  if [[ -n "$generated_decision_summaries" ]]; then
+    fail "generated decisions summary must not exist anywhere under instance/**"
+    printf '%s\n' "$generated_decision_summaries" | sed "s|$ROOT_DIR/||"
+  fi
+
+  if [[ ! -e "$retired_summary" && -z "$generated_decision_summaries" ]]; then
+    pass "generated decisions summary absent from instance/**"
   fi
 }
 

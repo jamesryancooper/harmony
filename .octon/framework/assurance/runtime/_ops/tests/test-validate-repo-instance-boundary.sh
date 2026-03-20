@@ -281,6 +281,27 @@ EOF
   ! run_validator "$fixture_root"
 }
 
+case_generated_summary_anywhere_under_instance_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet4_runtime_scripts "$fixture_root"
+  write_valid_packet4_fixture "$fixture_root"
+
+  mkdir -p "$fixture_root/.octon/instance/cognition/decisions"
+  cat >"$fixture_root/.octon/instance/cognition/decisions/summary.md" <<'EOF'
+---
+title: Decisions
+mutability: generated
+generated_from:
+  - /.octon/instance/cognition/decisions/index.yml
+  - /.octon/instance/cognition/decisions/*.md
+---
+EOF
+
+  ! run_validator "$fixture_root"
+}
+
 main() {
   assert_success "repo-instance validator accepts valid packet-4 fixture" case_valid_fixture_passes
   assert_success "repo-instance validator rejects missing mission registry" case_missing_missions_registry_fails
@@ -288,6 +309,7 @@ main() {
   assert_success "repo-instance validator rejects ad hoc overlay-like paths" case_ad_hoc_overlay_path_fails
   assert_success "repo-instance validator rejects retired decisions-summary references" case_retired_generated_summary_reference_fails
   assert_success "repo-instance validator rejects retired decisions-summary files under instance" case_retired_generated_summary_file_fails
+  assert_success "repo-instance validator rejects generated decisions summaries anywhere under instance" case_generated_summary_anywhere_under_instance_fails
 
   echo
   echo "Passed: $pass_count"

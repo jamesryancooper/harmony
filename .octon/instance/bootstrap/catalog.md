@@ -355,12 +355,12 @@ Will humans frequently trigger this directly?
 
 ## Context
 
-Background knowledge in `instance/cognition/context/shared/` and generated
-cognition summaries:
+Background knowledge in `instance/cognition/context/shared/` and ADR discovery
+surfaces:
 
 | File | Description |
 |------|-------------|
-| [decisions.md](/.octon/generated/cognition/summaries/decisions.md) | Agent-readable generated decision summaries. |
+| [decisions/README.md](/.octon/instance/cognition/decisions/README.md) | ADR authority and discovery guidance. |
 | [lessons.md](/.octon/instance/cognition/context/shared/lessons.md) | Anti-patterns and failures to avoid. |
 | [glossary.md](/.octon/instance/cognition/context/shared/glossary.md) | Domain-specific terminology. |
 | [dependencies.md](/.octon/instance/cognition/context/shared/dependencies.md) | External systems and references. |

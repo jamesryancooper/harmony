@@ -454,7 +454,7 @@ their durable harness surfaces without a separate promotion step.
 
 | Content Type | Destination |
 |--------------|-------------|
-| Design decisions | `/.octon/instance/cognition/decisions/` (generated summary in `/.octon/generated/cognition/summaries/decisions.md`) |
+| Design decisions | `/.octon/instance/cognition/decisions/` (local full repos may also generate `/.octon/generated/cognition/summaries/decisions.md`) |
 | Anti-patterns | `/.octon/instance/cognition/context/shared/lessons.md` |
 | New terminology | `/.octon/instance/cognition/context/shared/glossary.md` |
 | Actionable work | Create mission in `instance/orchestration/missions/` |
