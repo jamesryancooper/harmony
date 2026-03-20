@@ -13,7 +13,15 @@ promotion_targets:
   - ".octon/framework/scaffolding/"
   - ".octon/framework/orchestration/runtime/workflows/"
   - ".octon/octon.yml"
-status: "draft"
+status: "archived"
+archive:
+  archived_at: "2026-03-19"
+  archived_from_status: "draft"
+  disposition: "superseded"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/extensions-sidecar-pack-system"
+  promotion_evidence:
+    - ".octon/inputs/exploratory/proposals/architecture/inputs-additive-extensions/proposal.yml"
+    - ".octon/generated/proposals/registry.yml"
 lifecycle:
   temporary: true
   exit_expectation: "Promote the extension boundary, loader rules, validator stack, effective-index compiler, scaffolds, and operator workflows into durable `.octon/` authority surfaces. Do not leave runtime or governance truth in the proposal."

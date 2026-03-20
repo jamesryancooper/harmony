@@ -21,9 +21,18 @@ promote into durable Octon or repo-local authority surfaces.
 
 ## Layout
 
-- active proposals live at `/.octon/inputs/exploratory/proposals/<kind>/<proposal_id>/`
-- archived proposals live at `/.octon/inputs/exploratory/proposals/.archive/<kind>/<proposal_id>/`
+- active proposals live at
+  `/.octon/inputs/exploratory/proposals/<kind>/<proposal_id>/`
+- archived proposals live at
+  `/.octon/inputs/exploratory/proposals/.archive/<kind>/<proposal_id>/`
 - `/.octon/generated/proposals/registry.yml` is the projection registry
+
+Path rules:
+
+- the final directory name must equal `proposal_id`
+- packet numbering or other ordering prefixes are not part of the canonical
+  proposal path
+- no descendant-local or scope-local proposal workspace model exists in v1
 
 Allowed `kind` values in v1:
 
@@ -50,8 +59,10 @@ Every proposal must contain:
 
 - `README.md`
 - `proposal.yml`
+- exactly one subtype manifest
 - `navigation/artifact-catalog.md`
 - `navigation/source-of-truth-map.md`
+- optional `support/`
 
 ## Base Manifest Contract
 
@@ -83,11 +94,14 @@ Allowed values:
   `rejected` | `archived`
 - `archive.archived_from_status`: `draft` | `in-review` | `accepted` |
   `implemented` | `rejected` | `legacy-unknown`
-- `archive.disposition`: `implemented` | `rejected` | `historical`
+- `archive.disposition`: `implemented` | `rejected` | `historical` |
+  `superseded`
 
 Rules:
 
 - `proposal_id` must match the final directory name.
+- active and archived proposal package paths must use the exact
+  `<kind>/<proposal_id>` layout with no numeric prefix in the directory name.
 - `promotion_targets` must contain one or more repo-relative durable targets.
 - `promotion_scope=octon-internal` requires every `promotion_target` to be
   under `.octon/`.
@@ -100,6 +114,8 @@ Rules:
   active state without normalization.
 - `archive.*` fields are required when `status=archived` and forbidden
   otherwise.
+- proposals in an archive path must use `status=archived`.
+- proposals in an active path must not use `status=archived`.
 - `archive.promotion_evidence` must be non-empty when
   `archive.disposition=implemented`.
 - `lifecycle.temporary` must remain `true`.
@@ -142,6 +158,9 @@ Rules:
   `archive.disposition=implemented`.
 - After promotion, canonical targets must stand on their own without
   dependencies on `/.octon/inputs/exploratory/proposals/` paths.
+- Proposal validation failures block proposal workflows and proposal-registry
+  generation only; they do not block runtime unless a runtime surface illegally
+  depends on proposal paths.
 
 ## Registry Contract
 
@@ -185,3 +204,5 @@ Implications:
 - proposals may be archived or removed after promotion or rejection
 - durable outputs must point to long-lived `/.octon/` or repo-native surfaces
 - canonical targets must not retain dependencies on `/.octon/inputs/exploratory/proposals/` paths
+- proposals are excluded from runtime resolution and policy resolution
+- proposals are excluded from `bootstrap_core` and `repo_snapshot`

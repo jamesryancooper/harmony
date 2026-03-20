@@ -7,6 +7,11 @@ description: Required files and architecture-specific constraints for v1 archite
 
 Architecture proposals extend `proposal-standard.md`.
 
+Canonical path:
+
+- `/.octon/inputs/exploratory/proposals/architecture/<proposal_id>/`
+- the final directory name must equal `proposal_id` with no numeric prefix
+
 Required files:
 
 - `architecture-proposal.yml`

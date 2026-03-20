@@ -37,8 +37,8 @@ versioning, install/export profiles, and fail-closed policy hooks.
 
 | Profile | Operator Surface | Behavior |
 |-----------|----------------|----------|
-| `bootstrap_core` | `/init` | Complete bootstrap after adopting the framework bundle and minimal instance metadata |
-| `repo_snapshot` | `/export-harness --profile repo_snapshot` | Export `octon.yml`, `framework/**`, `instance/**`, and the clean published enabled-pack dependency closure |
+| `bootstrap_core` | `/init` | Complete bootstrap after adopting the framework bundle and minimal instance metadata; raw `inputs/**`, `state/**`, and `generated/**` stay excluded |
+| `repo_snapshot` | `/export-harness --profile repo_snapshot` | Export `octon.yml`, `framework/**`, `instance/**`, and the clean published enabled-pack dependency closure while excluding `inputs/exploratory/**`, `state/**`, and `generated/**` |
 | `pack_bundle` | `/export-harness --profile pack_bundle --pack-ids <csv>` | Export only selected additive packs plus dependency closure |
 | `full_fidelity` | Git clone | Advisory only; not a synthetic export payload |
 
@@ -115,6 +115,11 @@ Only `framework/**` and `instance/**` are authored authority. Raw
 - `state/evidence/**` for retained operational receipts and traceability
 - `state/control/**` for mutable publication and quarantine truth
 
+`inputs/exploratory/proposals/**` is the canonical raw proposal workspace.
+Proposal packages remain non-authoritative, are excluded from
+`bootstrap_core` and `repo_snapshot`, and are discoverable only through the
+generated projection at `generated/proposals/registry.yml`.
+
 ## Overlay And Ingress Model
 
 Canonical ingress resolves through this chain:
@@ -162,6 +167,19 @@ Extension activation uses one desired/actual/quarantine/compiled model:
 - actual active state: `state/control/extensions/active.yml`
 - quarantine state: `state/control/extensions/quarantine.yml`
 - runtime-facing compiled outputs: `generated/effective/extensions/**`
+
+Proposal authority uses one manifest-governed exploratory model:
+
+- active proposal inputs:
+  `inputs/exploratory/proposals/<kind>/<proposal_id>/**`
+- archived proposal inputs:
+  `inputs/exploratory/proposals/.archive/<kind>/<proposal_id>/**`
+- generated proposal discovery: `generated/proposals/registry.yml`
+- lifecycle authority order:
+  `proposal.yml` > subtype manifest > `generated/proposals/registry.yml` >
+  `README.md`
+
+No descendant-local or scope-local proposal workspace exists in v1.
 
 Overlay-capable repo authority is limited to these declared enabled points:
 

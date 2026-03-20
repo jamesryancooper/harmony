@@ -1,4 +1,4 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, ensure, Context, Result};
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -2591,9 +2591,13 @@ fn build_source_of_truth_map(
     };
     let optional_docs = build_optional_module_docs(selected_modules);
     format!(
-        "# Proposal Reading And Precedence Map\n\n## Purpose\n\nThis file defines the proposal-local reading order and document precedence for implementers using this temporary design proposal. It does not make the proposal a canonical repository authority.\n\n## External Authorities\n\nRepository-wide governance and durable runtime/documentation surfaces remain higher-precedence than this temporary proposal.\n\n## Primary Proposal Inputs\n\n### Core\n\n- `proposal.yml`\n- `design-proposal.yml`\n- `implementation/README.md`\n- `implementation/minimal-implementation-blueprint.md`\n- `implementation/first-implementation-plan.md`\n\n### Class-Specific Normative Docs\n\n{}\n\n### Optional Modules\n\n{}\n\n## Conflict Resolution\n\n1. repository-wide governance and durable authorities\n2. `proposal.yml`\n3. `design-proposal.yml`\n4. class-specific normative docs\n5. optional module docs\n6. reference and history material\n",
+        "# Proposal Reading And Precedence Map\n\n## Purpose\n\nThis file defines the proposal-local reading order and document precedence for implementers using this temporary design proposal. It does not make the proposal a canonical repository authority.\n\n## External Authorities\n\nRepository-wide governance and durable runtime/documentation surfaces remain higher-precedence than this temporary proposal.\n\n## Primary Proposal Inputs\n\n### Core\n\n- `proposal.yml`\n- `design-proposal.yml`\n- `implementation/README.md`\n- `implementation/minimal-implementation-blueprint.md`\n- `implementation/first-implementation-plan.md`\n\n### Class-Specific Normative Docs\n\n{}\n\n### Optional Modules\n\n{}\n\n### Discovery Projection\n\n- `/.octon/generated/proposals/registry.yml`\n\n## Conflict Resolution\n\n1. repository-wide governance and durable authorities\n2. `proposal.yml`\n3. `design-proposal.yml`\n4. class-specific normative docs\n5. optional module docs\n6. `implementation/README.md`\n7. `implementation/minimal-implementation-blueprint.md`\n8. `implementation/first-implementation-plan.md`\n9. `/.octon/generated/proposals/registry.yml`\n10. reference and history material\n",
         primary_docs, optional_docs
     )
+}
+
+fn expected_active_proposal_rel(proposal_kind: &str, proposal_id: &str) -> String {
+    format!("{PROPOSALS_ROOT_REL}/{proposal_kind}/{proposal_id}")
 }
 
 fn build_artifact_catalog(
@@ -2772,6 +2776,13 @@ fn upsert_proposal_registry(
     promotion_targets: &[String],
     status: &str,
 ) -> Result<()> {
+    ensure!(
+        proposal_rel == expected_active_proposal_rel(proposal_kind, proposal_id),
+        "proposal registry entry path must match the canonical proposal_id-based layout: expected '{}', got '{}'",
+        expected_active_proposal_rel(proposal_kind, proposal_id),
+        proposal_rel
+    );
+
     let registry_path = repo_root.join(".octon/generated/proposals/registry.yml");
     let mut registry = if registry_path.is_file() {
         let contents = fs::read_to_string(&registry_path)

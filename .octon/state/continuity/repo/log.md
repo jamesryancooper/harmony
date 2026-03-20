@@ -31,6 +31,35 @@ mutability: append-only
 
 - None
 
+## 2026-03-20
+
+**Session focus:** Archive completed Packet 1/2/3/4/5/6/7/8/9 proposals
+
+**Completed:**
+
+- Archived the completed architecture proposal packages for Packet 1
+  super-root semantics, Packet 2 root manifest and profiles, Packet 3
+  framework core, Packet 4 repo-instance, Packet 5 overlay and ingress,
+  Packet 6 locality and scope registry, Packet 7 state/evidence/continuity,
+  Packet 8 additive extensions, and Packet 9 exploratory proposals under
+  `.octon/inputs/exploratory/proposals/.archive/architecture/`
+- Rewrote `.octon/generated/proposals/registry.yml` so those completed
+  proposals now appear only in the archived registry set with implemented
+  disposition metadata
+- Added retrospective closeout ADRs and migration bundles for Packet 2 root
+  manifest/profile semantics and Packet 8 additive extensions so their archive
+  transitions are backed by explicit cutover evidence
+- Left `studio-graph-ux-design-package` active because it has not been
+  completed and should not be archived yet
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
 ## 2026-03-19
 
 **Session focus:** Packet 7 scaffold merge-blocker remediation
@@ -50,6 +79,43 @@ mutability: append-only
 **Next:**
 
 - Push the scaffold fix and resolve the blocking PR conversation
+
+**Blockers:**
+
+- None
+
+## 2026-03-20
+
+**Session focus:** Packet 9 inputs/exploratory/proposals atomic cutover
+
+**Completed:**
+
+- Renamed the full architecture proposal packet tree from numbered packet
+  prefixes to unnumbered `proposal_id`-matched directories and rewrote the
+  generated registry plus repo-authored historical references to those new
+  paths
+- Hardened the Packet 9 proposal workspace contract across the live proposal
+  README, root/bootstrap architecture docs, proposal standards, scaffold
+  templates, and registry schema so they all encode the same authority-order,
+  archive, runtime-isolation, and snapshot-exclusion rules
+- Upgraded the baseline proposal validator to enforce common file presence,
+  exactly-one-subtype semantics, archive-state consistency, and schema-driven
+  proposal-registry checks, then normalized the subtype validators to accept
+  repo-root-relative and absolute package paths consistently
+- Fixed the proposal workflow runner test harnesses and engine runtime
+  launchers so source-build cache output now goes to
+  `generated/.tmp/engine/build/runtime-crates-target` instead of recreating
+  forbidden framework-local `_ops/state` build state
+- Refreshed the locality publication outputs, passed the Packet 9 proposal
+  validator stack plus create/audit proposal workflow runner tests, passed the
+  live-independence and queue validators, and ended with
+  `alignment-check.sh --profile harness` PASS
+- Recorded ADR 052 and the Packet 9 migration evidence bundle under
+  `state/evidence/migration/2026-03-20-inputs-exploratory-proposals-cutover/`
+
+**Next:**
+
+- None
 
 **Blockers:**
 
@@ -140,7 +206,7 @@ package.
 **Completed:**
 
 - Created the Packet 7 proposal scaffold under
-  `.octon/inputs/exploratory/proposals/architecture/7-state-evidence-continuity/`
+  `.octon/inputs/exploratory/proposals/architecture/state-evidence-continuity/`
   with proposal metadata, navigation docs, target architecture, acceptance
   criteria, and implementation plan
 - Grounded the proposal in the ratified design packet and blueprint while
@@ -245,7 +311,7 @@ delegation boundaries, capability-map gating, and alignment drift checks.
 **Completed:**
 
 - Created the Packet 8 proposal scaffold under
-  `.octon/inputs/exploratory/proposals/architecture/8-inputs-additive-extensions/`
+  `.octon/inputs/exploratory/proposals/architecture/inputs-additive-extensions/`
   with proposal metadata, navigation docs, target architecture, acceptance
   criteria, and implementation plan
 - Grounded the proposal in the ratified Packet 8 design packet and ratified

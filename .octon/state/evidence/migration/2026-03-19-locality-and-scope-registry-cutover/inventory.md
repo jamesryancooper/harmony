@@ -40,7 +40,7 @@
   - `.octon/framework/scaffolding/runtime/templates/octon/{agency/manifest.yml,instance/orchestration/missions/_scaffold/template/mission.yml}`
   - `.github/workflows/{harness-self-containment.yml,smoke.yml,main-push-safety.yml}`
 - Packet 6 proposal and migration discovery indexes:
-  - `.octon/inputs/exploratory/proposals/architecture/6-locality-and-scope-registry/{README.md,proposal.yml}`
+  - `.octon/inputs/exploratory/proposals/architecture/locality-and-scope-registry/{README.md,proposal.yml}`
   - `.octon/generated/proposals/registry.yml`
   - `.octon/instance/cognition/decisions/index.yml`
   - `.octon/instance/cognition/context/shared/migrations/index.yml`

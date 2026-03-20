@@ -187,6 +187,24 @@
       "description": "Implement the Packet 8 inputs/additive/extensions atomic clear-break cutover",
       "status": "completed",
       "completed_at": "2026-03-19"
+    },
+    {
+      "id": "draft-packet-9-inputs-exploratory-proposals-proposal",
+      "description": "Draft the architecture proposal package for Packet 9 inputs/exploratory/proposals",
+      "status": "completed",
+      "completed_at": "2026-03-20"
+    },
+    {
+      "id": "packet-9-inputs-exploratory-proposals-atomic-cutover",
+      "description": "Implement the Packet 9 inputs/exploratory/proposals atomic clear-break cutover",
+      "status": "completed",
+      "completed_at": "2026-03-20"
+    },
+    {
+      "id": "archive-completed-architecture-proposals",
+      "description": "Archive completed Packet 1/2/3/4/5/6/7/8/9 architecture proposals after verifying cutover evidence",
+      "status": "completed",
+      "completed_at": "2026-03-20"
     }
   ]
 }

@@ -18,8 +18,9 @@ policy, or contract authority.
 
 1. `proposal.yml`
 2. subtype manifest
-3. `navigation/source-of-truth-map.md`
-4. subtype-specific documents
+3. `/.octon/generated/proposals/registry.yml`
+4. `navigation/source-of-truth-map.md`
+5. subtype-specific documents
 
 ## Exit Path
 
@@ -28,4 +29,6 @@ policy, or contract authority.
 ## Registry
 
 Add or update the matching entry in `/.octon/generated/proposals/registry.yml` when this
-proposal is created, archived, rejected, or materially reclassified.
+proposal is created, archived, rejected, or materially reclassified. The
+registry is a committed discovery projection only; it does not outrank
+`proposal.yml` or the subtype manifest.

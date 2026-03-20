@@ -28,7 +28,7 @@ Single-promotion atomic migration implementing Packet 6
 ## Receipts and Evidence
 
 - Proposal:
-  `/.octon/inputs/exploratory/proposals/architecture/6-locality-and-scope-registry/`
+  `/.octon/inputs/exploratory/proposals/architecture/locality-and-scope-registry/`
 - Validation receipts: `validation.md`
 - Command log: `commands.md`
 - Change inventory: `inventory.md`

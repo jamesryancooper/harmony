@@ -7,6 +7,11 @@ description: Required files and migration-specific constraints for v1 migration 
 
 Migration proposals extend `proposal-standard.md`.
 
+Canonical path:
+
+- `/.octon/inputs/exploratory/proposals/migration/<proposal_id>/`
+- the final directory name must equal `proposal_id` with no numeric prefix
+
 Required files:
 
 - `migration-proposal.yml`

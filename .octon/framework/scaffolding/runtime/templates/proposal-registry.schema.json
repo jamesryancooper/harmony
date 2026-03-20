@@ -103,7 +103,7 @@
           },
           "disposition": {
             "type": "string",
-            "enum": ["implemented", "rejected", "historical"]
+            "enum": ["implemented", "rejected", "historical", "superseded"]
           },
           "archived_at": {
             "type": "string",

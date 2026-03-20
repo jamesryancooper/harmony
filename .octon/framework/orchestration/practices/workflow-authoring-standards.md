@@ -33,10 +33,10 @@ that authors or evaluates workflows.
    - `README.md` is derived from `workflow.yml + stages/`.
    - README drift is a validation failure.
 7. Keep temporary material non-canonical.
-   - `/.octon/inputs/exploratory/proposals/design/` may inform work, but must never be a live dependency
+   - `/.octon/inputs/exploratory/proposals/` may inform work, but must never be a live dependency
      of canonical workflows, generated READMEs, or validators.
    - Exception: workflows whose explicit purpose is to scaffold, validate, or
-     harden design proposals may target `/.octon/inputs/exploratory/proposals/design/` directly, but that
+     harden manifest-governed proposals may target `/.octon/inputs/exploratory/proposals/` directly, but that
      allowance does not extend to unrelated runtime workflows.
 8. Keep the workflow boundary honest.
    - Use a workflow when the unit needs explicit multi-stage orchestration,

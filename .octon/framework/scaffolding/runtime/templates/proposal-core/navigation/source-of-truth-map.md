@@ -15,6 +15,7 @@ higher-precedence than this temporary proposal.
 
 - `proposal.yml`
 - subtype manifest
+- `/.octon/generated/proposals/registry.yml`
 - subtype-specific implementation documents
 
 ## Conflict Resolution
@@ -22,4 +23,5 @@ higher-precedence than this temporary proposal.
 1. repository-wide governance and durable authorities
 2. `proposal.yml`
 3. subtype manifest
-4. subtype-specific proposal docs
+4. `/.octon/generated/proposals/registry.yml`
+5. subtype-specific proposal docs

@@ -3,7 +3,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ASSURANCE_DIR="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
-OCTON_DIR="$(cd -- "$ASSURANCE_DIR/.." && pwd)"
+FRAMEWORK_DIR="$(cd -- "$ASSURANCE_DIR/.." && pwd)"
+OCTON_DIR="$(cd -- "$FRAMEWORK_DIR/.." && pwd)"
 ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
 PROPOSAL_PATH="${2:-}"
 [[ "${1:-}" == "--package" && -n "$PROPOSAL_PATH" ]] || { echo "usage: validate-policy-proposal.sh --package <path>" >&2; exit 2; }

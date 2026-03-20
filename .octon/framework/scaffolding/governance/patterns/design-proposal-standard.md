@@ -18,6 +18,11 @@ This standard applies only to proposals that opt in with a root
 
 Design proposals also project into `/.octon/generated/proposals/registry.yml`.
 
+Canonical path:
+
+- `/.octon/inputs/exploratory/proposals/design/<proposal_id>/`
+- the final directory name must equal `proposal_id` with no numeric prefix
+
 ## Package Classes
 
 Supported `package_class` values in v1:
