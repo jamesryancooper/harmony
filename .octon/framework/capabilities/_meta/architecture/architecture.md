@@ -96,7 +96,7 @@ Capability publication is compiled and root-owned.
 │  └── /.octon/state/evidence/runs/skills/                     Execution logs with indexes      │
 └─────────────────────────────────────────────────────────────────┘
                                  │
-                                 │ exposed via symlinks
+                                 │ projected from generated routing
                                  ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │  Host Adapters                 Agent Access                     │
@@ -292,59 +292,47 @@ skills:
 
 ---
 
-## Host Adapters (Symlinks)
+## Host Projections
 
-Symlinks expose shared skills to different agent hosts:
+Host adapter surfaces are generated from:
 
-```bash
-.claude/skills/refine-prompt -> ../../.octon/framework/capabilities/runtime/skills/synthesis/refine-prompt
-.cursor/skills/refine-prompt -> ../../.octon/framework/capabilities/runtime/skills/synthesis/refine-prompt
-.codex/skills/refine-prompt  -> ../../.octon/framework/capabilities/runtime/skills/synthesis/refine-prompt
+```text
+.octon/generated/effective/capabilities/routing.effective.yml
 ```
 
-**Why symlinks?** Agent products discover skills in their own directories (`.claude/skills/`, `.cursor/skills/`, etc.). Symlinks allow multiple agents to share the same canonical skill definition while maintaining expected directory structures.
+Projected host-visible surfaces are materialized copies, not symlinks:
 
-### Setup
+- `.claude/skills/`
+- `.cursor/skills/`
+- `.codex/skills/`
+- `.claude/commands/`
+- `.cursor/commands/`
+- `.codex/commands/`
 
-**Automatic (recommended):**
-
-```bash
-# Create symlinks for all skills
-.octon/framework/capabilities/runtime/skills/_ops/scripts/setup-harness-links.sh
-
-# Create symlinks for a specific skill
-.octon/framework/capabilities/runtime/skills/_ops/scripts/setup-harness-links.sh refine-prompt
-```
-
-**Manual:**
+### Publish
 
 ```bash
-# Create directories
-mkdir -p .claude/skills .cursor/skills .codex/skills
-
-# Link a skill to all harnesses
-ln -s ../../.octon/framework/capabilities/runtime/skills/synthesis/refine-prompt .claude/skills/refine-prompt
-ln -s ../../.octon/framework/capabilities/runtime/skills/synthesis/refine-prompt .cursor/skills/refine-prompt
-ln -s ../../.octon/framework/capabilities/runtime/skills/synthesis/refine-prompt .codex/skills/refine-prompt
+.octon/framework/capabilities/_ops/scripts/publish-host-projections.sh
 ```
+
+This reads the generated routing publication, resolves the authoritative or
+compiled source for each projected command and skill, materializes the host
+files/directories, and prunes stale entries.
 
 ### Verification
 
 ```bash
-# Check symlink status
-ls -la .claude/skills/
-ls -la .cursor/skills/
-ls -la .codex/skills/
+bash .octon/framework/assurance/runtime/_ops/scripts/validate-host-projections.sh
 ```
 
 ### Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| Symlinks not working on Windows | Enable Developer Mode or run as Administrator |
-| Agent can't find skill | Run `setup-harness-links.sh` to recreate links |
-| Broken symlinks after moving files | Delete and recreate symlinks |
-| Permission errors | Check filesystem permissions on `.octon/framework/capabilities/runtime/skills/` |
+| Host adapter surface missing a command or skill | Regenerate routing first, then rerun `publish-host-projections.sh` |
+| Stale host entry still present | Run `publish-host-projections.sh` to prune unexpected entries |
+| Projection validation fails | Check `routing.effective.yml`, `artifact-map.yml`, and extension `routing_exports` |
+| Permission errors | Check filesystem permissions on the repo-local host directories |
 
 ---
 

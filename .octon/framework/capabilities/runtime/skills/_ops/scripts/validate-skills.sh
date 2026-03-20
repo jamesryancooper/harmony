@@ -524,35 +524,12 @@ get_registry_parameter_types() {
 
 get_registry_parameter_names() {
     local skill_id="$1"
-    awk -v skill="$skill_id" '
-        /^skills:/ {in_skills=1; next}
-        in_skills && $0 ~ "^  "skill":" {found=1; next}
-        found && /^  [a-z0-9][a-z0-9-]*:/ && $0 !~ "^  "skill":" {exit}
-        found && /parameters:/ {in_params=1; next}
-        found && in_params && /^      - name:/ {
-            gsub(/^      - name:[[:space:]]*/, "")
-            gsub(/["'"'"']/, "")
-            print
-        }
-        found && in_params && /^    [a-z]/ && !/^      / {exit}
-    ' "$REGISTRY"
+    yq -r ".skills.\"$skill_id\".parameters[]?.name // \"\"" "$REGISTRY" 2>/dev/null || true
 }
 
 get_registry_command_count() {
     local skill_id="$1"
-    awk -v skill="$skill_id" '
-        /^skills:/ {in_skills=1; next}
-        in_skills && $0 ~ "^  "skill":" {found=1; next}
-        found && /^  [a-z0-9][a-z0-9-]*:/ && $0 !~ "^  "skill":" {exit}
-        found && /commands:/ {in_commands=1; next}
-        found && in_commands && /^      - / {count++; next}
-        found && in_commands && /^    [a-z]/ && !/^      / {print count + 0; printed=1; exit}
-        END {
-            if (found && !printed) {
-                print count + 0
-            }
-        }
-    ' "$REGISTRY"
+    yq -r ".skills.\"$skill_id\".commands | length" "$REGISTRY" 2>/dev/null || echo 0
 }
 
 # Validate parameter.type values in strict mode
@@ -1594,19 +1571,7 @@ validate_skill_placeholders() {
 
     # Get all paths (inputs and outputs) for this skill
     local paths
-    paths=$(awk -v skill="$skill_id" '
-        /^skills:/ {in_skills=1; next}
-        in_skills && $0 ~ "^  "skill":" {in_skill=1; next}
-        in_skill && /^  [a-z0-9][a-z0-9-]*:/ && $0 !~ "^  "skill":" {exit}
-        in_skill && /^    io:/ {in_io=1; next}
-        in_skill && in_io && /^    [a-z]/ && !/^    io:/ {in_io=0}
-        in_skill && in_io && /path:/ {
-            line = $0
-            sub(/.*path:[[:space:]]*["'"'"']?/, "", line)
-            sub(/["'"'"']?[[:space:]]*$/, "", line)
-            print line
-        }
-    ' "$SKILLS_REGISTRY")
+    paths="$(yq -r ".skills.\"$skill_id\".io.inputs[]?.path // \"\", .skills.\"$skill_id\".io.outputs[]?.path // \"\"" "$SKILLS_REGISTRY" 2>/dev/null || true)"
 
     while IFS= read -r path; do
         if [[ -n "$path" ]]; then

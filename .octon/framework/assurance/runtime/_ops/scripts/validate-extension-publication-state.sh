@@ -7,6 +7,7 @@ source "$SCRIPT_DIR/../../../../orchestration/runtime/_ops/scripts/extensions-co
 extensions_common_init "${BASH_SOURCE[0]}"
 
 errors=0
+PUBLISHED_EXTENSION_PREFIX=".octon/generated/effective/extensions/published/"
 
 fail() {
   echo "[ERROR] $1"
@@ -31,6 +32,18 @@ sorted_closure_from_query() {
     | LC_ALL=C sort
 }
 
+sorted_published_files() {
+  yq -r '.published_files[]?.path // ""' "$GENERATION_LOCK_FILE" 2>/dev/null \
+    | awk 'NF' \
+    | LC_ALL=C sort
+}
+
+sorted_projection_source_paths() {
+  yq -r '.packs[]? | .routing_exports.commands[]?.projection_source_path, .routing_exports.skills[]?.projection_source_path // ""' "$CATALOG_FILE" 2>/dev/null \
+    | awk 'NF' \
+    | LC_ALL=C sort
+}
+
 main() {
   echo "== Extension Publication State Validation =="
 
@@ -50,9 +63,9 @@ main() {
 
   [[ "$(yq -r '.schema_version // ""' "$ACTIVE_STATE")" == "octon-extension-active-state-v2" ]] && pass "active state schema version valid" || fail "active state schema_version invalid"
   [[ "$(yq -r '.schema_version // ""' "$QUARANTINE_STATE")" == "octon-extension-quarantine-state-v2" ]] && pass "quarantine state schema version valid" || fail "quarantine state schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v2" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v2" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v2" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v3" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v3" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v3" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
   local expected_generator_version
   expected_generator_version="$(yq -r '.versioning.harness.release_version // ""' "$ROOT_MANIFEST" 2>/dev/null || true)"
   [[ -n "$expected_generator_version" ]] && pass "root manifest generator version available" || fail "root manifest missing versioning.harness.release_version"
@@ -102,6 +115,17 @@ main() {
   [[ "$active_published" == "$catalog_published" ]] && pass "effective catalog published_active_packs match active state" || fail "effective catalog published_active_packs mismatch"
   [[ "$active_closure" == "$catalog_closure" ]] && pass "effective catalog dependency_closure matches active state" || fail "effective catalog dependency_closure mismatch"
 
+  local pack_id source_id
+  while IFS=$'\t' read -r pack_id source_id; do
+    [[ -z "$pack_id" ]] && continue
+    yq -e ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .routing_exports.commands | type == \"!!seq\"" "$CATALOG_FILE" >/dev/null 2>&1 \
+      && pass "routing_exports.commands valid for $pack_id" \
+      || fail "routing_exports.commands invalid for $pack_id"
+    yq -e ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .routing_exports.skills | type == \"!!seq\"" "$CATALOG_FILE" >/dev/null 2>&1 \
+      && pass "routing_exports.skills valid for $pack_id" \
+      || fail "routing_exports.skills invalid for $pack_id"
+  done < <(yq -r '.packs[]? | [.pack_id, .source_id] | @tsv' "$CATALOG_FILE" 2>/dev/null || true)
+
   local quarantine_count
   quarantine_count="$(yq -r '.records | length' "$QUARANTINE_STATE" 2>/dev/null || printf '0')"
   case "$status" in
@@ -130,13 +154,35 @@ main() {
   artifact_paths_from_map="$(yq -r '.artifacts[]?.source_path' "$ARTIFACT_MAP_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
   artifact_paths_from_lock="$(yq -r '.pack_payload_digests[]?.files[]?.path' "$GENERATION_LOCK_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
   [[ "$artifact_paths_from_map" == "$artifact_paths_from_lock" ]] && pass "artifact map paths match generation lock files" || fail "artifact map paths do not match generation lock files"
-  local published_files
-  published_files="$(yq -r '.published_files[]?.path // ""' "$GENERATION_LOCK_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
-  if [[ "$published_files" == $'.octon/generated/effective/extensions/artifact-map.yml\n.octon/generated/effective/extensions/catalog.effective.yml\n.octon/generated/effective/extensions/generation.lock.yml' ]]; then
+  local published_files core_published_files
+  published_files="$(sorted_published_files)"
+  core_published_files="$(printf '%s\n' "$published_files" | grep -v "^${PUBLISHED_EXTENSION_PREFIX}" || true)"
+  if [[ "$core_published_files" == $'.octon/generated/effective/extensions/artifact-map.yml\n.octon/generated/effective/extensions/catalog.effective.yml\n.octon/generated/effective/extensions/generation.lock.yml' ]]; then
     pass "generation lock published_files set valid"
   else
     fail "generation lock published_files set invalid"
   fi
+
+  local projection_source_path
+  while IFS= read -r projection_source_path; do
+    [[ -n "$projection_source_path" ]] || continue
+    if [[ "$projection_source_path" == ${PUBLISHED_EXTENSION_PREFIX}* ]]; then
+      pass "projection source path published under generated/effective/extensions: $projection_source_path"
+    else
+      fail "projection source path must stay behind compiled publication: $projection_source_path"
+      continue
+    fi
+    if [[ -e "$ROOT_DIR/$projection_source_path" ]]; then
+      pass "projection source path exists: $projection_source_path"
+    else
+      fail "projection source path missing: $projection_source_path"
+    fi
+    if grep -Fx "$projection_source_path" <<<"$published_files" >/dev/null 2>&1; then
+      pass "projection source path recorded in generation lock: $projection_source_path"
+    else
+      fail "projection source path missing from generation lock: $projection_source_path"
+    fi
+  done < <(sorted_projection_source_paths)
 
   local source_path sha pack_payload_sha computed_payload_sha
   while IFS=$'\t' read -r source_path sha; do

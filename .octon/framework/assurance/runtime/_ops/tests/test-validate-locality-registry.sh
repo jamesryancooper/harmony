@@ -87,7 +87,7 @@ case_overlapping_active_scopes_fail() {
     "$fixture_root/.octon/instance/cognition/context/scopes/overlap"
 
   cat >"$fixture_root/.octon/instance/locality/scopes/overlap/scope.yml" <<'EOF'
-schema_version: "octon-locality-scope-v1"
+schema_version: "octon-locality-scope-v2"
 scope_id: "overlap"
 display_name: "Overlap"
 root_path: ".octon/framework"
@@ -123,7 +123,7 @@ case_escaped_include_glob_fails() {
   write_valid_packet2_fixture "$fixture_root"
 
   cat >"$fixture_root/.octon/instance/locality/scopes/octon-harness/scope.yml" <<'EOF'
-schema_version: "octon-locality-scope-v1"
+schema_version: "octon-locality-scope-v2"
 scope_id: "octon-harness"
 display_name: "Octon Harness"
 root_path: ".octon"
@@ -148,7 +148,7 @@ case_safe_but_outside_root_glob_fails() {
   write_valid_packet2_fixture "$fixture_root"
 
   cat >"$fixture_root/.octon/instance/locality/scopes/octon-harness/scope.yml" <<'EOF'
-schema_version: "octon-locality-scope-v1"
+schema_version: "octon-locality-scope-v2"
 scope_id: "octon-harness"
 display_name: "Octon Harness"
 root_path: ".octon/framework"

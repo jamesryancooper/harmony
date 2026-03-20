@@ -9,11 +9,16 @@
     "published_at",
     "root_manifest_sha256",
     "extensions_catalog_sha256",
+    "extensions_generation_lock_sha256",
+    "extensions_generation_id",
+    "locality_scopes_sha256",
+    "locality_generation_lock_sha256",
+    "locality_generation_id",
     "published_files"
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-capability-routing-generation-lock-v1"
+      "const": "octon-capability-routing-generation-lock-v2"
     },
     "generator_version": {
       "type": "string",

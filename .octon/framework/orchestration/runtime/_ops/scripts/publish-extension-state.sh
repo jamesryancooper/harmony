@@ -11,6 +11,260 @@ GENERATION_ID=""
 GENERATOR_VERSION=""
 declare -a PUBLISHED_SELECTED_KEYS=()
 
+write_string_array_yaml() {
+  local indent="$1"
+  shift
+  if [[ "$#" -eq 0 ]]; then
+    printf '%s[]\n' "$indent"
+    return
+  fi
+  local value
+  for value in "$@"; do
+    printf '%s- "%s"\n' "$indent" "$value"
+  done
+}
+
+write_fragment_host_adapters() {
+  local fragment_file="$1" item_query="$2"
+  local adapters=()
+  while IFS= read -r adapter; do
+    [[ -n "$adapter" ]] || continue
+    adapters+=("$adapter")
+  done < <(yq -r "$item_query.host_adapters[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+
+  if [[ "${#adapters[@]}" -eq 0 ]]; then
+    adapters=(claude cursor codex)
+  fi
+
+  printf '        host_adapters:\n'
+  write_string_array_yaml '          ' "${adapters[@]}"
+}
+
+write_fragment_selectors() {
+  local fragment_file="$1" item_query="$2"
+  local include=()
+  local exclude=()
+  while IFS= read -r value; do
+    [[ -n "$value" ]] || continue
+    include+=("$value")
+  done < <(yq -r "$item_query.routing.selectors.include[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+  while IFS= read -r value; do
+    [[ -n "$value" ]] || continue
+    exclude+=("$value")
+  done < <(yq -r "$item_query.routing.selectors.exclude[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+
+  if [[ "${#include[@]}" -eq 0 ]]; then
+    include=('**')
+  fi
+
+  printf '        selectors:\n'
+  printf '          include:\n'
+  write_string_array_yaml '            ' "${include[@]}"
+  printf '          exclude:\n'
+  write_string_array_yaml '            ' "${exclude[@]}"
+}
+
+write_fragment_fingerprints() {
+  local fragment_file="$1" item_query="$2"
+  local tech_tags=()
+  local language_tags=()
+  while IFS= read -r value; do
+    [[ -n "$value" ]] || continue
+    tech_tags+=("$value")
+  done < <(yq -r "$item_query.routing.fingerprints.tech_tags[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+  while IFS= read -r value; do
+    [[ -n "$value" ]] || continue
+    language_tags+=("$value")
+  done < <(yq -r "$item_query.routing.fingerprints.language_tags[]? // \"\"" "$fragment_file" 2>/dev/null || true)
+
+  printf '        fingerprints:\n'
+  printf '          tech_tags:\n'
+  write_string_array_yaml '            ' "${tech_tags[@]}"
+  printf '          language_tags:\n'
+  write_string_array_yaml '            ' "${language_tags[@]}"
+}
+
+copy_projection_file() {
+  local source_abs="$1" dest_abs="$2"
+  mkdir -p "$(dirname "$dest_abs")"
+  cp "$source_abs" "$dest_abs"
+}
+
+copy_projection_dir() {
+  local source_abs="$1" dest_abs="$2"
+  mkdir -p "$(dirname "$dest_abs")"
+  rm -r -f "$dest_abs"
+  cp -R "$source_abs" "$dest_abs"
+}
+
+stage_pack_command_projections() {
+  local pack_id="$1" source_id="$2" manifest_abs="$3" published_root_abs="$4"
+  local commands_root_rel fragment_file item_query path source_abs dest_abs
+
+  commands_root_rel="$(yq -r '.content_entrypoints.commands // ""' "$manifest_abs")"
+  if [[ -z "$commands_root_rel" || "$commands_root_rel" == "null" ]]; then
+    return 0
+  fi
+
+  fragment_file="$(ext_pack_root_abs "$pack_id")/${commands_root_rel%/}/manifest.fragment.yml"
+  [[ -f "$fragment_file" ]] || return 0
+
+  local index
+  index=0
+  while true; do
+    if ! yq -e ".commands[$index]" "$fragment_file" >/dev/null 2>&1; then
+      break
+    fi
+    item_query=".commands[$index]"
+    path="$(yq -r "$item_query.path // \"\"" "$fragment_file")"
+    [[ -n "$path" ]] || {
+      index=$((index + 1))
+      continue
+    }
+    source_abs="$(ext_pack_root_abs "$pack_id")/${commands_root_rel%/}/$path"
+    dest_abs="$published_root_abs/commands/$path"
+    [[ -f "$source_abs" ]] || {
+      index=$((index + 1))
+      continue
+    }
+    copy_projection_file "$source_abs" "$dest_abs"
+    index=$((index + 1))
+  done
+}
+
+stage_pack_skill_projections() {
+  local pack_id="$1" source_id="$2" manifest_abs="$3" published_root_abs="$4"
+  local skills_root_rel fragment_file item_query path source_abs dest_abs
+
+  skills_root_rel="$(yq -r '.content_entrypoints.skills // ""' "$manifest_abs")"
+  if [[ -z "$skills_root_rel" || "$skills_root_rel" == "null" ]]; then
+    return 0
+  fi
+
+  fragment_file="$(ext_pack_root_abs "$pack_id")/${skills_root_rel%/}/manifest.fragment.yml"
+  [[ -f "$fragment_file" ]] || return 0
+
+  local index
+  index=0
+  while true; do
+    if ! yq -e ".skills[$index]" "$fragment_file" >/dev/null 2>&1; then
+      break
+    fi
+    item_query=".skills[$index]"
+    path="$(yq -r "$item_query.path // \"\"" "$fragment_file")"
+    path="${path%/}"
+    [[ -n "$path" ]] || {
+      index=$((index + 1))
+      continue
+    }
+    source_abs="$(ext_pack_root_abs "$pack_id")/${skills_root_rel%/}/$path"
+    dest_abs="$published_root_abs/skills/$path"
+    [[ -d "$source_abs" ]] || {
+      index=$((index + 1))
+      continue
+    }
+    copy_projection_dir "$source_abs" "$dest_abs"
+    index=$((index + 1))
+  done
+}
+
+stage_pack_projection_exports() {
+  local pack_id="$1" source_id="$2" manifest_abs="$3" published_root_abs="$4"
+  stage_pack_command_projections "$pack_id" "$source_id" "$manifest_abs" "$published_root_abs"
+  stage_pack_skill_projections "$pack_id" "$source_id" "$manifest_abs" "$published_root_abs"
+}
+
+write_pack_command_routing_exports() {
+  local pack_id="$1" source_id="$2" manifest_abs="$3" commands_root_rel fragment_file item_query path projection_source_path
+  commands_root_rel="$(yq -r '.content_entrypoints.commands // ""' "$manifest_abs")"
+  if [[ -z "$commands_root_rel" || "$commands_root_rel" == "null" ]]; then
+    printf '      commands: []\n'
+    return
+  fi
+  fragment_file="$(ext_pack_root_abs "$pack_id")/${commands_root_rel%/}/manifest.fragment.yml"
+  if [[ ! -f "$fragment_file" ]]; then
+    printf '      commands: []\n'
+    return
+  fi
+  if [[ "$(yq -r '.commands | length' "$fragment_file" 2>/dev/null || echo 0)" == "0" ]]; then
+    printf '      commands: []\n'
+    return
+  fi
+
+  printf '      commands:\n'
+  local index
+  index=0
+  while true; do
+    if ! yq -e ".commands[$index]" "$fragment_file" >/dev/null 2>&1; then
+      break
+    fi
+    item_query=".commands[$index]"
+    path="$(yq -r "$item_query.path // \"\"" "$fragment_file")"
+    projection_source_path="$(ext_published_command_projection_rel "$pack_id" "$source_id" "$path")"
+    printf '        - capability_id: "%s"\n' "$(yq -r "$item_query.id // \"\"" "$fragment_file")"
+    printf '          display_name: "%s"\n' "$(yq -r "$item_query.display_name // \"\"" "$fragment_file")"
+    printf '          summary: "%s"\n' "$(yq -r "$item_query.summary // \"\"" "$fragment_file")"
+    printf '          status: "active"\n'
+    printf '          path: "%s"\n' "$path"
+    printf '          access: "%s"\n' "$(yq -r "$item_query.access // \"agent\"" "$fragment_file")"
+    printf '          manifest_fragment_path: ".octon/inputs/additive/extensions/%s/%s/manifest.fragment.yml"\n' "$pack_id" "${commands_root_rel%/}"
+    printf '          projection_source_path: "%s"\n' "$projection_source_path"
+    write_fragment_host_adapters "$fragment_file" "$item_query"
+    write_fragment_selectors "$fragment_file" "$item_query"
+    write_fragment_fingerprints "$fragment_file" "$item_query"
+    index=$((index + 1))
+  done
+}
+
+write_pack_skill_routing_exports() {
+  local pack_id="$1" source_id="$2" manifest_abs="$3" skills_root_rel fragment_file item_query path projection_source_path
+  skills_root_rel="$(yq -r '.content_entrypoints.skills // ""' "$manifest_abs")"
+  if [[ -z "$skills_root_rel" || "$skills_root_rel" == "null" ]]; then
+    printf '      skills: []\n'
+    return
+  fi
+  fragment_file="$(ext_pack_root_abs "$pack_id")/${skills_root_rel%/}/manifest.fragment.yml"
+  if [[ ! -f "$fragment_file" ]]; then
+    printf '      skills: []\n'
+    return
+  fi
+  if [[ "$(yq -r '.skills | length' "$fragment_file" 2>/dev/null || echo 0)" == "0" ]]; then
+    printf '      skills: []\n'
+    return
+  fi
+
+  printf '      skills:\n'
+  local index
+  index=0
+  while true; do
+    if ! yq -e ".skills[$index]" "$fragment_file" >/dev/null 2>&1; then
+      break
+    fi
+    item_query=".skills[$index]"
+    path="$(yq -r "$item_query.path // \"\"" "$fragment_file")"
+    path="${path%/}"
+    projection_source_path="$(ext_published_skill_projection_rel "$pack_id" "$source_id" "$path")"
+    printf '        - capability_id: "%s"\n' "$(yq -r "$item_query.id // \"\"" "$fragment_file")"
+    printf '          display_name: "%s"\n' "$(yq -r "$item_query.display_name // \"\"" "$fragment_file")"
+    printf '          summary: "%s"\n' "$(yq -r "$item_query.summary // \"\"" "$fragment_file")"
+    printf '          status: "%s"\n' "$(yq -r "$item_query.status // \"active\"" "$fragment_file")"
+    printf '          path: "%s"\n' "${path}/"
+    printf '          manifest_fragment_path: ".octon/inputs/additive/extensions/%s/%s/manifest.fragment.yml"\n' "$pack_id" "${skills_root_rel%/}"
+    printf '          projection_source_path: "%s"\n' "$projection_source_path"
+    write_fragment_host_adapters "$fragment_file" "$item_query"
+    write_fragment_selectors "$fragment_file" "$item_query"
+    write_fragment_fingerprints "$fragment_file" "$item_query"
+    index=$((index + 1))
+  done
+}
+
+write_routing_exports() {
+  local pack_id="$1" source_id="$2" manifest_abs="$3"
+  printf '    routing_exports:\n'
+  write_pack_command_routing_exports "$pack_id" "$source_id" "$manifest_abs"
+  write_pack_skill_routing_exports "$pack_id" "$source_id" "$manifest_abs"
+}
+
 write_content_roots() {
   local manifest="$1" pack_id="$2" bucket rel
   printf '    content_roots:\n'
@@ -26,7 +280,7 @@ write_content_roots() {
 
 write_effective_files() {
   local desired_sha="$1" root_sha="$2" tmpdir="$3" status="$4"
-  local active_tmp quarantine_tmp catalog_tmp artifact_map_tmp lock_tmp
+  local active_tmp quarantine_tmp catalog_tmp artifact_map_tmp lock_tmp published_tmp
   local key pack_id source_id manifest_abs manifest_rel trust_decision ack_id
   local rel_path bucket abs_path sha payload_lines payload_sha
 
@@ -35,6 +289,16 @@ write_effective_files() {
   catalog_tmp="$tmpdir/catalog.effective.yml"
   artifact_map_tmp="$tmpdir/artifact-map.yml"
   lock_tmp="$tmpdir/generation.lock.yml"
+  published_tmp="$tmpdir/published"
+
+  mkdir -p "$published_tmp"
+
+  for key in "${EXT_PUBLISHED_KEYS[@]}"; do
+    pack_id="$(ext_key_pack_id "$key")"
+    source_id="$(ext_key_source_id "$key")"
+    manifest_abs="$ROOT_DIR/${EXT_PUBLISHED_MANIFEST_REL["$key"]}"
+    stage_pack_projection_exports "$pack_id" "$source_id" "$manifest_abs" "$published_tmp/$pack_id/$source_id"
+  done
 
   {
     printf 'schema_version: "octon-extension-active-state-v2"\n'
@@ -59,7 +323,7 @@ write_effective_files() {
   } >"$quarantine_tmp"
 
   {
-    printf 'schema_version: "octon-extension-effective-catalog-v2"\n'
+    printf 'schema_version: "octon-extension-effective-catalog-v3"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
@@ -85,6 +349,7 @@ write_effective_files() {
         printf '    trust_decision: "%s"\n' "$trust_decision"
         printf '    publication_status: "%s"\n' "$status"
         write_content_roots "$manifest_abs" "$pack_id"
+        write_routing_exports "$pack_id" "$source_id" "$manifest_abs"
       done
     fi
     printf 'source:\n'
@@ -95,7 +360,7 @@ write_effective_files() {
   } >"$catalog_tmp"
 
   {
-    printf 'schema_version: "octon-extension-artifact-map-v2"\n'
+    printf 'schema_version: "octon-extension-artifact-map-v3"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
@@ -123,7 +388,7 @@ write_effective_files() {
   } >"$artifact_map_tmp"
 
   {
-    printf 'schema_version: "octon-extension-generation-lock-v2"\n'
+    printf 'schema_version: "octon-extension-generation-lock-v3"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
@@ -133,6 +398,11 @@ write_effective_files() {
     printf '  - path: ".octon/generated/effective/extensions/catalog.effective.yml"\n'
     printf '  - path: ".octon/generated/effective/extensions/artifact-map.yml"\n'
     printf '  - path: ".octon/generated/effective/extensions/generation.lock.yml"\n'
+    while IFS= read -r abs_path; do
+      [[ -n "$abs_path" ]] || continue
+      rel_path="${abs_path#${tmpdir}/}"
+      printf '  - path: ".octon/generated/effective/extensions/%s"\n' "$rel_path"
+    done < <(find "$published_tmp" \( -type f -o -type d \) ! -path "$published_tmp" | sort)
     if [[ "${#EXT_PUBLISHED_KEYS[@]}" -eq 0 ]]; then
       printf 'pack_payload_digests: []\n'
     else
@@ -167,6 +437,8 @@ write_effective_files() {
   } >"$lock_tmp"
 
   mkdir -p "$(dirname "$ACTIVE_STATE")" "$EFFECTIVE_DIR"
+  rm -r -f "$PUBLISHED_PROJECTIONS_DIR"
+  mv "$published_tmp" "$PUBLISHED_PROJECTIONS_DIR"
   mv "$catalog_tmp" "$CATALOG_FILE"
   mv "$artifact_map_tmp" "$ARTIFACT_MAP_FILE"
   mv "$lock_tmp" "$GENERATION_LOCK_FILE"

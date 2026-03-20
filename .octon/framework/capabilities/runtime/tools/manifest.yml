@@ -1,34 +1,120 @@
-schema_version: "1.0"
-
+schema_version: '1.0'
 packs:
-  - id: read-only
-    display_name: Read Only
-    summary: "Read-only file access tools."
-    tools: [Read, Glob, Grep]
-
-  - id: file-ops
-    display_name: File Operations
-    summary: "Full file read/write access tools."
-    tools: [Read, Write, Glob, Grep]
-
-  - id: full-edit
-    display_name: Full Edit
-    summary: "Complete file editing toolkit."
-    tools: [Read, Write, Edit, Glob, Grep]
-
-  - id: web-access
-    display_name: Web Access
-    summary: "Web fetching and search tools."
-    tools: [WebFetch, WebSearch]
-
-  - id: shell-safe
-    display_name: Shell Safe
-    summary: "Limited shell access for safe operations."
-    tools: ["Bash(mkdir)", "Bash(cp)", "Bash(mv)", "Bash(ln)"]
-
-  - id: ci-integration
-    display_name: CI Integration
-    summary: "GitHub and CI/CD integration tools."
-    tools: ["Bash(gh)", "Bash(npm)", "Bash(npx)"]
-
+- id: read-only
+  display_name: Read Only
+  summary: Read-only file access tools.
+  tools:
+  - Read
+  - Glob
+  - Grep
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: file-ops
+  display_name: File Operations
+  summary: Full file read/write access tools.
+  tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: full-edit
+  display_name: Full Edit
+  summary: Complete file editing toolkit.
+  tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: web-access
+  display_name: Web Access
+  summary: Web fetching and search tools.
+  tools:
+  - WebFetch
+  - WebSearch
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: shell-safe
+  display_name: Shell Safe
+  summary: Limited shell access for safe operations.
+  tools:
+  - Bash(mkdir)
+  - Bash(cp)
+  - Bash(mv)
+  - Bash(ln)
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
+- id: ci-integration
+  display_name: CI Integration
+  summary: GitHub and CI/CD integration tools.
+  tools:
+  - Bash(gh)
+  - Bash(npm)
+  - Bash(npx)
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
 tools: []

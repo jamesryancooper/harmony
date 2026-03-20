@@ -12,7 +12,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-extension-artifact-map-v2"
+      "const": "octon-extension-artifact-map-v3"
     },
     "generation_id": {
       "type": "string",

@@ -9,11 +9,13 @@
     "published_at",
     "publication_status",
     "source",
-    "routing_candidates"
+    "routing_context",
+    "routing_candidates",
+    "resolution_order"
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-capability-routing-effective-v1"
+      "const": "octon-capability-routing-effective-v2"
     },
     "generator_version": {
       "type": "string",
@@ -30,8 +32,41 @@
     "publication_status": {
       "const": "published"
     },
+    "routing_context": {
+      "type": "object",
+      "required": [
+        "selector_schema_version",
+        "locality_generation_id",
+        "extension_generation_id",
+        "host_projection_mode"
+      ]
+    },
     "routing_candidates": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "effective_id",
+          "artifact_map_id",
+          "origin_class",
+          "capability_kind",
+          "capability_id",
+          "status",
+          "host_adapters",
+          "selectors",
+          "fingerprints",
+          "scope_relevance",
+          "precedence_tier",
+          "stable_sort_key"
+        ]
+      }
+    },
+    "resolution_order": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   }
 }

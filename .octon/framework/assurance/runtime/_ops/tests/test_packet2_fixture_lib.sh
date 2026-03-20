@@ -320,7 +320,7 @@ scopes:
 EOF
 
   cat >"$fixture_root/.octon/instance/locality/scopes/octon-harness/scope.yml" <<'EOF'
-schema_version: "octon-locality-scope-v1"
+schema_version: "octon-locality-scope-v2"
 scope_id: "octon-harness"
 display_name: "Octon Harness"
 root_path: ".octon"

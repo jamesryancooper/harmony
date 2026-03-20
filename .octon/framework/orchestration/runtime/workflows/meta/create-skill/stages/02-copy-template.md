@@ -30,10 +30,8 @@ description: Copy skill template to new skill directory with spec-compliant stru
    - .octon/framework/capabilities/runtime/skills/<group>/<skill-name>/scripts/
    - .octon/framework/capabilities/runtime/skills/<group>/<skill-name>/assets/
 
-5. Create symlinks in harness folders:
-   - .claude/skills/<skill-name> -> ../../.octon/framework/capabilities/runtime/skills/<group>/<skill-name>
-   - .cursor/skills/<skill-name> -> ../../.octon/framework/capabilities/runtime/skills/<group>/<skill-name>
-   - .codex/skills/<skill-name> -> ../../.octon/framework/capabilities/runtime/skills/<group>/<skill-name>
+5. Do not edit host-facing skill directories directly.
+   Host projections are regenerated later from the published routing view.
 ```
 
 ## Directory Structure
@@ -59,7 +57,7 @@ Creates agentskills.io spec-compliant structure:
 - File `.octon/framework/capabilities/runtime/skills/<group>/<skill-name>/SKILL.md` exists
 - All reference files exist in `.octon/framework/capabilities/runtime/skills/<group>/<skill-name>/references/`
 - Empty directories created (`scripts/`, `assets/`)
-- Symlinks exist in harness directories
+- Host projection regeneration is deferred until routing publication
 
 ## Idempotency
 
@@ -67,7 +65,7 @@ Creates agentskills.io spec-compliant structure:
 - [ ] Directory `.octon/framework/capabilities/runtime/skills/<group>/<skill-name>/` exists
 - [ ] File `.octon/framework/capabilities/runtime/skills/<group>/<skill-name>/SKILL.md` exists
 - [ ] All reference files exist
-- [ ] Symlinks exist in harness directories
+- [ ] Host projection regeneration is handled in the post-registration phase
 
 **If Already Complete:**
 - Verify directory structure is complete

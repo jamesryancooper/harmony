@@ -14,7 +14,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-extension-generation-lock-v2"
+      "const": "octon-extension-generation-lock-v3"
     },
     "generation_id": {
       "type": "string",

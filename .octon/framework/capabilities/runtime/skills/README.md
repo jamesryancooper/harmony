@@ -314,65 +314,38 @@ Section requirements depend on skill class:
 | **Foundation context** (`skill_class: context`) | Stack Assumptions, Child Skills, When Not to Suggest | `python-api`, `swift-macos-app` |
 | **Specialist ruleset** (`skill_class: ruleset`) | Categories, Rules/Patterns, Boundaries | `react-best-practices`, `postgres-best-practices` |
 
-## Host Adapter Symlinks
+## Host Projections
 
-Skills are exposed to different AI agents (Claude, Cursor, Codex) via symlinks from their respective skills directories to the shared `.octon/framework/capabilities/runtime/skills/` definitions. This allows multiple agents to share the same canonical skill definitions.
+Skills are projected to host-facing directories from the generated routing
+publication rather than discovered through symlinks.
 
-### Why Symlinks
+Projected host skill surfaces:
 
-Agent products discover skills in their own directories:
+- `.claude/skills/`
+- `.cursor/skills/`
+- `.codex/skills/`
 
-- `.claude/skills/` — Claude Code
-- `.cursor/skills/` — Cursor
-- `.codex/skills/` — Codex
-
-Symlinks allow all agents to share the same skill definition without duplication.
-
-### Setup
-
-**Automatic setup (recommended):**
+### Publish
 
 ```bash
-./_ops/scripts/setup-harness-links.sh
-```
-
-This creates symlinks for all skills in `.octon/framework/capabilities/runtime/skills/` to each agent's skills directory.
-
-**Manual setup:**
-
-```bash
-# Create directories
-mkdir -p .claude/skills .cursor/skills .codex/skills
-
-# Link a specific skill
-ln -s ../../.octon/framework/capabilities/runtime/skills/refine-prompt .claude/skills/refine-prompt
-ln -s ../../.octon/framework/capabilities/runtime/skills/refine-prompt .cursor/skills/refine-prompt
-ln -s ../../.octon/framework/capabilities/runtime/skills/refine-prompt .codex/skills/refine-prompt
-```
-
-**Link a single skill:**
-
-```bash
-./_ops/scripts/setup-harness-links.sh refine-prompt
+bash .octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh
+bash .octon/framework/capabilities/_ops/scripts/publish-host-projections.sh
 ```
 
 ### Troubleshooting
 
 | Issue                 | Solution                                                         |
 |-----------------------|------------------------------------------------------------------|
-| Symlinks not working  | Ensure your filesystem supports symlinks (Windows may need admin)|
-| Agent can't find skill| Run `setup-harness-links.sh` to recreate links                   |
-| Wrong skill version   | Delete the symlink and recreate it                               |
-| Permission denied     | Check file permissions on `.octon/framework/capabilities/runtime/skills/`                     |
+| Agent can't find skill| Regenerate routing and rerun `publish-host-projections.sh` |
+| Wrong skill version   | Republish host projections from the current routing view |
+| Permission denied     | Check file permissions on repo-local host projection directories |
 
 ### Verification
 
-Check current symlinks:
+Check projected host skill directories:
 
 ```bash
-ls -la .claude/skills/
-ls -la .cursor/skills/
-ls -la .codex/skills/
+bash .octon/framework/assurance/runtime/_ops/scripts/validate-host-projections.sh
 ```
 
 ## Octon Extensions

@@ -16,6 +16,7 @@ extensions_common_init() {
   ACTIVE_STATE="$OCTON_DIR/state/control/extensions/active.yml"
   QUARANTINE_STATE="$OCTON_DIR/state/control/extensions/quarantine.yml"
   EFFECTIVE_DIR="$OCTON_DIR/generated/effective/extensions"
+  PUBLISHED_PROJECTIONS_DIR="$EFFECTIVE_DIR/published"
   CATALOG_FILE="$EFFECTIVE_DIR/catalog.effective.yml"
   ARTIFACT_MAP_FILE="$EFFECTIVE_DIR/artifact-map.yml"
   GENERATION_LOCK_FILE="$EFFECTIVE_DIR/generation.lock.yml"
@@ -96,6 +97,22 @@ ext_pack_root_rel() {
 
 ext_pack_root_abs() {
   printf '%s/inputs/additive/extensions/%s' "$OCTON_DIR" "$1"
+}
+
+ext_published_projection_root_rel() {
+  printf '.octon/generated/effective/extensions/published/%s/%s' "$1" "$2"
+}
+
+ext_published_projection_root_abs() {
+  printf '%s/generated/effective/extensions/published/%s/%s' "$OCTON_DIR" "$1" "$2"
+}
+
+ext_published_command_projection_rel() {
+  printf '%s/commands/%s' "$(ext_published_projection_root_rel "$1" "$2")" "$3"
+}
+
+ext_published_skill_projection_rel() {
+  printf '%s/skills/%s' "$(ext_published_projection_root_rel "$1" "$2")" "$3"
 }
 
 ext_bucket_for_relative_path() {

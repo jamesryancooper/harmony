@@ -15,6 +15,9 @@ routing publication family.
 - Published routing is rebuildable and non-authoritative.
 - Runtime and host integrations consume the routing triple, not raw capability
   inputs and not policy compiler intermediates.
+- `routing.effective.yml` carries `routing_context`, deterministic
+  `resolution_order`, selector metadata, fingerprint metadata, host adapter
+  metadata, and scope relevance metadata for each candidate.
 - `filesystem-snapshots/**` is support data only and not the canonical routing
   publication surface.
 - Stale or invalid routing publication fails closed.

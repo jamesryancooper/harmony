@@ -217,6 +217,30 @@
       "description": "Implement the Packet 10 generated/effective/cognition/registry atomic clear-break cutover",
       "status": "completed",
       "completed_at": "2026-03-20"
+    },
+    {
+      "id": "draft-packet-12-capability-routing-host-integration-proposal",
+      "description": "Draft the architecture proposal package for Packet 12 capability routing and host integration",
+      "status": "completed",
+      "completed_at": "2026-03-20"
+    },
+    {
+      "id": "packet-12-capability-routing-host-integration-atomic-cutover",
+      "description": "Implement the Packet 12 capability routing and host integration atomic clear-break cutover",
+      "status": "completed",
+      "completed_at": "2026-03-20"
+    },
+    {
+      "id": "archive-packet-12-capability-routing-host-integration-proposal",
+      "description": "Archive the implemented Packet 12 capability routing and host integration proposal package",
+      "status": "completed",
+      "completed_at": "2026-03-20"
+    },
+    {
+      "id": "archive-packet-10-generated-effective-cognition-registry-proposal",
+      "description": "Archive the implemented Packet 10 generated/effective/cognition/registry proposal package",
+      "status": "completed",
+      "completed_at": "2026-03-20"
     }
   ]
 }
