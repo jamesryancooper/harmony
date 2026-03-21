@@ -6,6 +6,11 @@ source "$SCRIPT_DIR/extensions-common.sh"
 
 extensions_common_init "${BASH_SOURCE[0]}"
 
+FRAMEWORK_COMMANDS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/commands/manifest.yml"
+FRAMEWORK_SKILLS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/skills/manifest.yml"
+INSTANCE_COMMANDS_MANIFEST="$OCTON_DIR/instance/capabilities/runtime/commands/manifest.yml"
+INSTANCE_SKILLS_MANIFEST="$OCTON_DIR/instance/capabilities/runtime/skills/manifest.yml"
+
 PUBLISHED_AT=""
 GENERATION_ID=""
 GENERATOR_VERSION=""
@@ -134,6 +139,117 @@ write_extension_publication_receipt() {
       printf '  - "%s"\n' "$record"
     done
   } >"$output_file"
+}
+
+remove_key_from_pack_refs() {
+  local remove_key="$1"
+  local value
+  local retained=()
+  for value in "$@"; do
+    [[ "$value" == "$remove_key" ]] && continue
+    retained+=("$value")
+  done
+  printf '%s\n' "${retained[@]}"
+}
+
+drop_published_key() {
+  local key="$1"
+  mapfile -t EXT_PUBLISHED_KEYS < <(remove_key_from_pack_refs "$key" "${EXT_PUBLISHED_KEYS[@]}" | awk 'NF')
+  mapfile -t PUBLISHED_SELECTED_KEYS < <(remove_key_from_pack_refs "$key" "${PUBLISHED_SELECTED_KEYS[@]}" | awk 'NF')
+  unset 'EXT_PUBLISHED_VERSION[$key]'
+  unset 'EXT_PUBLISHED_ORIGIN_CLASS[$key]'
+  unset 'EXT_PUBLISHED_MANIFEST_REL[$key]'
+  unset 'EXT_PUBLISHED_TRUST_DECISION[$key]'
+  unset 'EXT_PUBLISHED_ACKNOWLEDGEMENT_ID[$key]'
+  unset 'EXT_PUBLISHED_SOURCE_ID[$key]'
+}
+
+native_capability_ids() {
+  local kind="$1"
+  if [[ "$kind" == "command" ]]; then
+    {
+      yq -r '.commands[]?.id // ""' "$FRAMEWORK_COMMANDS_MANIFEST" 2>/dev/null || true
+      yq -r '.commands[]?.id // ""' "$INSTANCE_COMMANDS_MANIFEST" 2>/dev/null || true
+    } | awk 'NF' | LC_ALL=C sort -u
+  else
+    {
+      yq -r '.skills[]?.id // ""' "$FRAMEWORK_SKILLS_MANIFEST" 2>/dev/null || true
+      yq -r '.skills[]?.id // ""' "$INSTANCE_SKILLS_MANIFEST" 2>/dev/null || true
+    } | awk 'NF' | LC_ALL=C sort -u
+  fi
+}
+
+enforce_native_capability_collision_quarantine() {
+  local native_commands native_skills key pack_id source_id manifest_abs commands_root_rel skills_root_rel fragment_file capability_id
+  local collided_keys=()
+  native_commands="$(native_capability_ids command)"
+  native_skills="$(native_capability_ids skill)"
+
+  for key in "${EXT_PUBLISHED_KEYS[@]}"; do
+    pack_id="$(ext_key_pack_id "$key")"
+    source_id="$(ext_key_source_id "$key")"
+    manifest_abs="$ROOT_DIR/${EXT_PUBLISHED_MANIFEST_REL["$key"]}"
+
+    commands_root_rel="$(yq -r '.content_entrypoints.commands // ""' "$manifest_abs")"
+    if [[ -n "$commands_root_rel" && "$commands_root_rel" != "null" ]]; then
+      fragment_file="$(ext_pack_root_abs "$pack_id")/${commands_root_rel%/}/manifest.fragment.yml"
+      while IFS= read -r capability_id; do
+        [[ -n "$capability_id" ]] || continue
+        if grep -Fx "$capability_id" <<<"$native_commands" >/dev/null 2>&1; then
+          ext_record_quarantine "$pack_id" "$source_id" "native-capability-collision:command:$capability_id" "$pack_id" ""
+          collided_keys+=("$key")
+          break
+        fi
+      done < <(yq -r '.commands[]?.id // ""' "$fragment_file" 2>/dev/null || true)
+    fi
+
+    skills_root_rel="$(yq -r '.content_entrypoints.skills // ""' "$manifest_abs")"
+    if [[ -n "$skills_root_rel" && "$skills_root_rel" != "null" ]]; then
+      fragment_file="$(ext_pack_root_abs "$pack_id")/${skills_root_rel%/}/manifest.fragment.yml"
+      while IFS= read -r capability_id; do
+        [[ -n "$capability_id" ]] || continue
+        if grep -Fx "$capability_id" <<<"$native_skills" >/dev/null 2>&1; then
+          ext_record_quarantine "$pack_id" "$source_id" "native-capability-collision:skill:$capability_id" "$pack_id" ""
+          collided_keys+=("$key")
+          break
+        fi
+      done < <(yq -r '.skills[]?.id // ""' "$fragment_file" 2>/dev/null || true)
+    fi
+  done
+
+  if [[ "${#collided_keys[@]}" -eq 0 ]]; then
+    return 0
+  fi
+
+  mapfile -t collided_keys < <(printf '%s\n' "${collided_keys[@]}" | awk 'NF' | LC_ALL=C sort -u)
+  for key in "${collided_keys[@]}"; do
+    drop_published_key "$key"
+  done
+}
+
+prune_unsatisfied_dependents() {
+  local changed=1 key pack_id source_id manifest_abs dep_pack_id dep_source dep_key
+  local remove_key
+  while [[ "$changed" -eq 1 ]]; do
+    changed=0
+    for key in "${EXT_PUBLISHED_KEYS[@]}"; do
+      pack_id="$(ext_key_pack_id "$key")"
+      source_id="$(ext_key_source_id "$key")"
+      manifest_abs="$ROOT_DIR/${EXT_PUBLISHED_MANIFEST_REL["$key"]}"
+      while IFS=$'\t' read -r dep_pack_id dep_range; do
+        [[ -n "$dep_pack_id" ]] || continue
+        dep_source="$(ext_detect_pack_source_id "$dep_pack_id" 2>/dev/null || true)"
+        [[ -n "$dep_source" ]] || dep_source="$source_id"
+        dep_key="$(ext_pack_key "$dep_pack_id" "$dep_source")"
+        if [[ -z "${EXT_PUBLISHED_VERSION["$dep_key"]:-}" ]]; then
+          ext_record_quarantine "$pack_id" "$source_id" "dependency-unavailable:$dep_pack_id" "$pack_id" ""
+          drop_published_key "$key"
+          changed=1
+          break
+        fi
+      done < <(yq -r '.dependencies.requires[]? | [.pack_id, .version_range] | @tsv' "$manifest_abs" 2>/dev/null || true)
+    done
+  done
 }
 
 write_fragment_host_adapters() {
@@ -615,6 +731,9 @@ main() {
   mapfile -t EXT_PUBLISHED_KEYS < <(ext_pack_key_sort "${EXT_PUBLISHED_KEYS[@]}")
   mapfile -t PUBLISHED_SELECTED_KEYS < <(ext_pack_key_sort "${PUBLISHED_SELECTED_KEYS[@]}")
   mapfile -t EXT_QUARANTINE_KEYS < <(ext_pack_key_sort "${EXT_QUARANTINE_KEYS[@]}")
+
+  enforce_native_capability_collision_quarantine
+  prune_unsatisfied_dependents
 
   if [[ "${#EXT_SELECTED_KEYS[@]}" -eq 0 ]]; then
     status="published"
