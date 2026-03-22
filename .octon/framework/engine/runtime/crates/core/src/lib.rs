@@ -6,6 +6,7 @@
 pub mod config;
 pub mod discovery;
 pub mod errors;
+pub mod execution_integrity;
 pub mod jsonlines;
 pub mod limits;
 pub mod orchestration;

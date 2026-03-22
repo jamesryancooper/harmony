@@ -4198,6 +4198,7 @@ dependencies = [
  "parking_lot",
  "serde",
  "serde_json",
+ "time",
  "wasmtime",
  "wasmtime-wasi",
  "wit-bindgen 0.26.0",

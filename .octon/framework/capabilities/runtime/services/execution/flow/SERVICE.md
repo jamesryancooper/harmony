@@ -50,4 +50,4 @@ allowed-tools: Read Glob Grep Write(/.octon/state/evidence/runs/services/flow/*)
 Native-first runtime service that validates manifest/prompt inputs, executes
 workflow steps deterministically, writes stable run records, and optionally
 forwards to an external LangGraph-compatible `/flows/run` endpoint when the
-`langgraph-http` adapter is selected.
+`langgraph-http` adapter is selected under repo-owned network-egress policy.

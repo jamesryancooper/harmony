@@ -1,0 +1,25 @@
+# Inventory
+
+- Engine runtime root and trace cutover:
+  - `.octon/framework/engine/runtime/crates/core/{config,policy,trace,execution_integrity}.rs`
+  - `.octon/framework/engine/runtime/crates/kernel/{authorization,main,pipeline,stdio,workflow}.rs`
+  - `.octon/framework/engine/runtime/crates/wasm_host/{invoke,host_api,kv_store,state}.rs`
+- Repo-owned execution policy surfaces:
+  - `.octon/instance/governance/policies/{network-egress,execution-budgets}.yml`
+  - `.octon/state/control/execution/{budget-state,exception-leases}.yml`
+- Architecture and runtime contract docs:
+  - `.octon/framework/cognition/_meta/architecture/{specification,runtime-vs-ops-contract,contract-registry}.yml`
+  - `.octon/framework/engine/{README.md,runtime/config/policy.yml,runtime/config/policy-interface.yml}`
+  - `.octon/framework/engine/runtime/spec/{execution-authorization-v1,execution-grant-v1.schema,execution-receipt-v1.schema,policy-interface-v1,policy-receipt-v1.schema}.md`
+  - `.octon/instance/bootstrap/START.md`
+- Assurance and CI:
+  - `.octon/framework/assurance/runtime/_ops/scripts/{validate-architecture-conformance,validate-framework-core-boundary,validate-harness-structure,validate-runtime-effective-state}.sh`
+  - `.octon/framework/assurance/runtime/_ops/tests/{test-validate-architecture-conformance,test_packet2_fixture_lib,test-validate-runtime-effective-state}.sh`
+  - `.github/workflows/architecture-conformance.yml`
+- Generated / retained outputs refreshed during cutover:
+  - `.octon/generated/effective/capabilities/{routing.effective.yml,artifact-map.yml,generation.lock.yml}`
+  - `.octon/generated/effective/extensions/{catalog.effective.yml,artifact-map.yml,generation.lock.yml}`
+  - `.octon/state/evidence/validation/publication/{capabilities,extensions}/`
+- Proposal lifecycle closeout:
+  - `.octon/inputs/exploratory/proposals/.archive/architecture/harness-integrity-tightening/`
+  - `.octon/generated/proposals/registry.yml`

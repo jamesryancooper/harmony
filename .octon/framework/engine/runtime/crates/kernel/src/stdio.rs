@@ -5,6 +5,7 @@ use crate::authorization::{
 };
 use crate::context::KernelContext;
 use octon_core::errors::{ErrorCode, KernelError};
+use octon_core::execution_integrity::service_capability_profile;
 use octon_core::jsonlines::{read_json_line, write_json_line};
 use octon_core::registry::ServiceKey;
 use octon_core::trace::TraceWriter;
@@ -156,8 +157,6 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                 let inflight = inflight.clone();
 
                 let worker = std::thread::spawn(move || {
-                    let trace = TraceWriter::new(&ctx.cfg.state_dir, trace_id).ok();
-
                     // Register a cancel handle as soon as one becomes available.
                     let (handle_tx, handle_rx) = mpsc::channel::<CancelHandle>();
                     let inflight_reg = inflight.clone();
@@ -193,16 +192,22 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                         let _ = inflight.lock().unwrap().remove(&id);
                         return;
                     };
+                    let service_profile = service_capability_profile(
+                        &service.key.id(),
+                        &input,
+                        &service.manifest.capabilities_required,
+                    );
 
                     let request = ExecutionRequest {
                         request_id: format!("stdio-{id}"),
                         caller_path: "service".to_string(),
                         action_type: "invoke_service".to_string(),
                         target_id: format!("{}::{op}", service.key.id()),
-                        requested_capabilities: service.manifest.capabilities_required.clone(),
+                        requested_capabilities: service_profile.requested_capabilities.clone(),
                         side_effect_flags: SideEffectFlags {
                             write_evidence: true,
                             state_mutation: true,
+                            network: service_profile.network_target_url.is_some(),
                             ..SideEffectFlags::default()
                         },
                         risk_tier: "medium".to_string(),
@@ -219,7 +224,7 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                         },
                         policy_mode_requested: None,
                         environment_hint: None,
-                        metadata: std::collections::BTreeMap::new(),
+                        metadata: service_profile.metadata.clone(),
                     };
                     let grant = match authorize_execution(&ctx.cfg, &ctx.policy, &request, Some(&service)) {
                         Ok(grant) => grant,
@@ -262,6 +267,13 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                         }
                     };
                     let grants = GrantSet::new(grant.granted_capabilities.clone());
+                    let run_root = ctx.cfg.repo_root.join(&grant.run_root);
+                    if let Err(error) = ctx.cfg.ensure_execution_write_path(&run_root) {
+                        let _ = out_tx.send(response_error(&id, error));
+                        let _ = inflight.lock().unwrap().remove(&id);
+                        return;
+                    }
+                    let trace = TraceWriter::new(&run_root, trace_id).ok();
 
                     let result = ctx.invoker.invoke(
                         &service,
@@ -269,6 +281,8 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                         &op,
                         input,
                         trace.as_ref(),
+                        &run_root,
+                        service_profile.adapter_id.as_deref(),
                         deadline_ms,
                         Some(handle_tx),
                     );

@@ -1,0 +1,34 @@
+name: Architecture Conformance
+
+on:
+  pull_request:
+    paths:
+      - ".octon/framework/engine/**"
+      - ".octon/framework/assurance/runtime/**"
+      - ".octon/framework/cognition/_meta/architecture/**"
+      - ".octon/instance/governance/policies/**"
+      - ".octon/instance/bootstrap/**"
+      - ".github/workflows/architecture-conformance.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - ".octon/framework/engine/**"
+      - ".octon/framework/assurance/runtime/**"
+      - ".octon/framework/cognition/_meta/architecture/**"
+      - ".octon/instance/governance/policies/**"
+      - ".octon/instance/bootstrap/**"
+      - ".github/workflows/architecture-conformance.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
+
+      - name: Validate architecture conformance
+        run: bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh

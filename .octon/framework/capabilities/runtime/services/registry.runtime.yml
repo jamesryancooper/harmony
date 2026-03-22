@@ -58,7 +58,7 @@ services:
       writes: human_if_outside_scope
     depends_on: []
     io:
-      state_dir: .octon/state/control/engine/kv
+      state_dir: .octon/state/control/execution/kv
     notes:
       - Values are UTF-8 strings in v1.
       - Keys are case-sensitive.

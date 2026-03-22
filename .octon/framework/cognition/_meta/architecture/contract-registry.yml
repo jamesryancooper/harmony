@@ -1,0 +1,25 @@
+schema_version: "architecture-contract-registry-v1"
+execution:
+  write_roots:
+    run_evidence_root: ".octon/state/evidence/runs"
+    execution_control_root: ".octon/state/control/execution"
+    execution_tmp_root: ".octon/generated/.tmp/execution"
+  policy_roots:
+    network_egress: ".octon/instance/governance/policies/network-egress.yml"
+    execution_budgets: ".octon/instance/governance/policies/execution-budgets.yml"
+  control_state:
+    budget_state: ".octon/state/control/execution/budget-state.yml"
+    exception_leases: ".octon/state/control/execution/exception-leases.yml"
+  forbidden_write_prefixes:
+    - ".octon/framework/engine/_ops/state"
+  required_doc_surfaces:
+    - ".octon/framework/cognition/_meta/architecture/specification.md"
+    - ".octon/framework/cognition/_meta/architecture/runtime-vs-ops-contract.md"
+    - ".octon/instance/bootstrap/START.md"
+    - ".octon/framework/engine/README.md"
+    - ".octon/framework/engine/runtime/spec/policy-interface-v1.md"
+    - ".octon/framework/engine/runtime/spec/policy-receipt-v1.schema.json"
+  blocking_checks:
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
+    - ".github/workflows/architecture-conformance.yml"

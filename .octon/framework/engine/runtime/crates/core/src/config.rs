@@ -8,7 +8,9 @@ use std::path::{Path, PathBuf};
 pub struct RuntimeConfig {
     pub octon_dir: PathBuf,
     pub repo_root: PathBuf,
-    pub state_dir: PathBuf,
+    pub run_evidence_root: PathBuf,
+    pub execution_control_root: PathBuf,
+    pub execution_tmp_root: PathBuf,
 
     pub policy: PolicyConfig,
     pub policy_path: Option<PathBuf>,
@@ -177,11 +179,12 @@ impl ConfigLoader {
             .ok_or_else(|| KernelError::new(ErrorCode::Internal, ".octon has no parent directory"))?
             .to_path_buf();
 
-        let state_dir = octon_dir
-            .join("framework")
-            .join("engine")
-            .join("_ops")
-            .join("state");
+        let run_evidence_root = octon_dir.join("state").join("evidence").join("runs");
+        let execution_control_root = octon_dir.join("state").join("control").join("execution");
+        let execution_tmp_root = octon_dir
+            .join("generated")
+            .join(".tmp")
+            .join("execution");
 
         let root_manifest = Self::load_root_manifest(&octon_dir)?;
 
@@ -209,7 +212,9 @@ impl ConfigLoader {
         Ok(RuntimeConfig {
             octon_dir,
             repo_root,
-            state_dir,
+            run_evidence_root,
+            execution_control_root,
+            execution_tmp_root,
             policy,
             policy_path,
             execution_governance,
@@ -434,6 +439,39 @@ impl ConfigLoader {
         }
 
         Ok(cfg)
+    }
+}
+
+impl RuntimeConfig {
+    pub fn run_root(&self, request_id: &str) -> PathBuf {
+        self.run_evidence_root.join(request_id)
+    }
+
+    pub fn ensure_execution_write_path(&self, path: &Path) -> Result<()> {
+        if path.starts_with(self.octon_dir.join("framework")) {
+            return Err(KernelError::new(
+                ErrorCode::CapabilityDenied,
+                format!(
+                    "execution write target must not resolve under framework/**: {}",
+                    path.display()
+                ),
+            ));
+        }
+
+        if path.starts_with(&self.run_evidence_root)
+            || path.starts_with(&self.execution_control_root)
+            || path.starts_with(&self.execution_tmp_root)
+        {
+            return Ok(());
+        }
+
+        Err(KernelError::new(
+            ErrorCode::CapabilityDenied,
+            format!(
+                "execution write target falls outside declared execution roots: {}",
+                path.display()
+            ),
+        ))
     }
 }
 

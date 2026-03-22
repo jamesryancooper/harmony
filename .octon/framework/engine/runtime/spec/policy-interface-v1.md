@@ -23,6 +23,10 @@ These launchers are the canonical invocation boundary for policy operations.
   build paths.
 - Launcher behavior defaults are runtime-configured in:
   - `engine/runtime/config/policy-interface.yml`
+- Repo-owned network egress authorization is declared in:
+  - `/.octon/instance/governance/policies/network-egress.yml`
+- Repo-owned execution budget governance is declared in:
+  - `/.octon/instance/governance/policies/execution-budgets.yml`
 
 ## Supported Command Surface (v1)
 
@@ -83,6 +87,15 @@ Decision outputs for `ALLOW`, `STAGE_ONLY`, and `DENY` must include:
 
 - machine-readable `reason_codes`
 - human-readable `remediation` guidance
+- budget metadata when execution-budget policy participates in the decision
+
+Material execution that requests outbound HTTP or model-backed execution MUST
+also satisfy:
+
+- destination-scoped repo-owned network egress policy for `net.http`
+- repo-owned execution budget policy for billable or model-backed paths
+- retained run evidence under `state/evidence/runs/<run_id>/**` for any
+  resulting egress or cost artifacts
 
 ## Instruction-Layer Manifest Contract
 

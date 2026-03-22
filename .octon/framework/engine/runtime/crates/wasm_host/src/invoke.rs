@@ -6,12 +6,16 @@ use crate::state::HostState;
 
 use octon_core::config::RuntimeConfig;
 use octon_core::errors::{ErrorCode, KernelError, Result};
+use octon_core::execution_integrity::{
+    load_execution_exception_leases, load_network_egress_policy,
+};
 use octon_core::limits::ConcurrencyManager;
 use octon_core::registry::ServiceDescriptor;
 use octon_core::schema::SchemaStore;
 use octon_core::trace::TraceWriter;
 
 use serde_json::json;
+use std::path::Path;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc,
@@ -42,6 +46,8 @@ impl Invoker {
         op: &str,
         input: serde_json::Value,
         trace: Option<&TraceWriter>,
+        run_root: &Path,
+        adapter_id: Option<&str>,
         deadline_ms: Option<u64>,
         cancel_tx: Option<std::sync::mpsc::Sender<crate::cancel::CancelHandle>>,
     ) -> Result<serde_json::Value> {
@@ -118,7 +124,9 @@ impl Invoker {
         let wasi_ctx = wasmtime_wasi::WasiCtxBuilder::new().build();
         let table = wasmtime_wasi::ResourceTable::new();
 
-        let kv = KvStore::open(self.cfg.state_dir.join("kv")).map_err(|e| {
+        let kv_root = self.cfg.execution_control_root.join("kv");
+        self.cfg.ensure_execution_write_path(&kv_root)?;
+        let kv = KvStore::open(kv_root).map_err(|e| {
             KernelError::new(
                 ErrorCode::Internal,
                 format!("failed to open kv store: {e}"),
@@ -139,12 +147,21 @@ impl Invoker {
             (tx, flag)
         });
 
+        let network_policy = load_network_egress_policy(&self.cfg.repo_root)?;
+        let exception_leases = load_execution_exception_leases(&self.cfg.repo_root)?;
+
         let state = HostState {
             wasi_ctx,
             table,
             grants,
             kv,
             fs,
+            run_root: run_root.to_path_buf(),
+            trace: trace.cloned(),
+            service_id: service_id.clone(),
+            adapter_id: adapter_id.map(ToOwned::to_owned),
+            network_policy,
+            exception_leases,
         };
 
         // Call Wasm.

@@ -228,6 +228,9 @@ main() {
         $req[0].operation.target.capability_classification //
         "agent-ready"
       ),
+      budget_rule_id: ($req[0].budget_rule_id // null),
+      budget_reason_codes: ($req[0].budget_reason_codes // []),
+      cost_evidence_path: ($req[0].cost_evidence_path // null),
       operation: ($req[0].operation // {}),
       phase: ($req[0].phase // ""),
       material_side_effect: (

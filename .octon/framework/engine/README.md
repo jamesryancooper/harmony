@@ -13,7 +13,7 @@ semantics.
 | `runtime/` | Executable authority | launchers, crates, runtime contracts, runtime config |
 | `governance/` | Normative runtime policy | protocol versioning, compatibility policy, release gates |
 | `practices/` | Operating standards | release runbook, incident ops, local validation |
-| `_ops/` | Mutable operational assets | binaries and runtime state |
+| `_ops/` | Portable operational assets | helper binaries and portable support scripts |
 | `_meta/` | Architecture/evidence docs | architecture contracts and verification evidence |
 
 ## Convention Authority
@@ -27,4 +27,7 @@ semantics.
 - `engine/runtime/` is the only executable authority surface.
 - `engine/governance/` is the only normative policy surface for engine behavior.
 - `engine/practices/` is the only operating standards surface for engine work.
+- retained execution evidence belongs under `/.octon/state/evidence/runs/**`
+  and mutable execution control truth belongs under
+  `/.octon/state/control/execution/**`, not under `engine/_ops/**`
 - Legacy top-level `/.octon/runtime/` paths are prohibited.

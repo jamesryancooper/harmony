@@ -219,7 +219,7 @@ No other `instance/**` subtree is overlay-capable in v1.
 Use plain directory names for structural units (domains, subsystems, components). Use underscore-prefixed namespaces for non-structural support material:
 
 - `_meta/` — docs-as-code governance and architecture reference modules.
-- `_ops/` — operational assets such as scripts and mutable state.
+- `_ops/` — portable operational support such as scripts and helper assets.
 - `_scaffold/` — templates and scaffolding material.
 
 Canonical SSOT for `runtime/` vs `_ops/` semantics:

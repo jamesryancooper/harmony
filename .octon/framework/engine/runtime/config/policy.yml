@@ -42,14 +42,14 @@ services:
       - storage.local
       - log.write
 
-  # execution/flow defaults to native-octon execution. We grant net.http so
-  # langgraph-http remains available as an opt-in adapter path.
+  # execution/flow defaults to native-octon execution. External HTTP forwarding
+  # is granted only through repo-owned network-egress policy at authorization
+  # time and is not part of the ambient service baseline.
   execution/flow:
     allow:
       - log.write
       - fs.read
       - fs.write
-      - net.http
 
 # Routing metadata mirrored for runtime/operator visibility.
 # Policy enforcement still resolves through capabilities/governance policy.

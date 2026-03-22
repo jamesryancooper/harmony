@@ -35,6 +35,9 @@ This document applies to any Octon domain that exposes both `runtime/` and
 3. Mutable repo-specific operational state, retained evidence, and generated
    outputs MUST NOT live under `framework/**/_ops/**`; they belong under
    `state/**` or `generated/**` according to class ownership.
+   Execution-specific mutable control truth belongs under
+   `/.octon/state/control/execution/**`; execution scratch belongs under
+   `/.octon/generated/.tmp/execution/**`.
 4. `_ops/` MUST NOT become a parallel canonical runtime artifact surface.
 5. Discovery metadata for runtime artifact classes (for example manifests and
    registries) MUST resolve to canonical runtime surfaces.
@@ -58,7 +61,9 @@ these mutable targets:
 
 - `/.octon/generated/**`
 - `/.octon/generated/.tmp/**`
+- `/.octon/generated/.tmp/execution/**`
 - `/.octon/state/control/**`
+- `/.octon/state/control/execution/**`
 - `/.octon/state/evidence/**`
 - `/.octon/state/continuity/**`
 - domain-specific generated artifacts that are explicitly declared in the
@@ -105,6 +110,9 @@ Use this decision sequence:
   - `_ops/` hosts portable runtime helper scripts only.
   - mutable runtime state and traces live under `/.octon/state/**` or
     `/.octon/generated/**`.
+  - mutable execution control truth lives under
+    `/.octon/state/control/execution/**`.
+  - execution scratch lives under `/.octon/generated/.tmp/execution/**`.
   - execution requests, grants, receipts, and executor-profile contracts live
     under `engine/runtime/spec/**`; retained runtime execution evidence lives
     under `/.octon/state/evidence/runs/**`.
