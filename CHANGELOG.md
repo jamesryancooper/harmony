@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.5](https://github.com/jamesryancooper/octon/compare/octon-v0.5.4...octon-v0.5.5) (2026-03-22)
+
+
+### Bug Fixes
+
+* **assurance:** decouple publication versions from releases ([#191](https://github.com/jamesryancooper/octon/issues/191)) ([65a49ba](https://github.com/jamesryancooper/octon/commit/65a49ba556f33dacfcb0fd3cb9eb187a2d0319aa))
+
 ## [0.5.4](https://github.com/jamesryancooper/octon/compare/octon-v0.5.3...octon-v0.5.4) (2026-03-22)
 
 
