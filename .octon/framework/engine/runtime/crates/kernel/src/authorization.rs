@@ -881,6 +881,9 @@ fn compose_policy_receipt(
         .map(PathBuf::from)
         .unwrap_or_else(|_| cfg.repo_root.join(".octon/framework/engine/runtime/policy"));
     let mut policy_file = resolve_acp_policy_path(cfg);
+    let mut receipt_writer = cfg
+        .repo_root
+        .join(".octon/framework/capabilities/_ops/scripts/policy-receipt-write.sh");
     if cfg!(test) {
         let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("../../../../../..")
@@ -892,11 +895,20 @@ fn compose_policy_receipt(
         if !policy_file.is_file() {
             policy_file = source_root.join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml");
         }
+        if !receipt_writer.is_file() {
+            receipt_writer = source_root.join(".octon/framework/capabilities/_ops/scripts/policy-receipt-write.sh");
+        }
     }
     if !policy_runner.is_file() {
         return Err(KernelError::new(
             ErrorCode::Internal,
             format!("execution authorization requires ACP runner: {}", policy_runner.display()),
+        ));
+    }
+    if !receipt_writer.is_file() {
+        return Err(KernelError::new(
+            ErrorCode::Internal,
+            format!("execution authorization requires ACP receipt writer: {}", receipt_writer.display()),
         ));
     }
     if !policy_file.is_file() {
@@ -907,10 +919,13 @@ fn compose_policy_receipt(
     }
 
     let request_path = unique_temp_file(&format!("policy-request-{}", request.request_id), "json");
+    let decision_path = unique_temp_file(&format!("policy-decision-{}", request.request_id), "json");
     let run_root = cfg
         .repo_root
         .join(".octon/state/evidence/runs")
         .join(&request.request_id);
+    let execution_request_path = run_root.join("execution-request.json");
+    let policy_decision_path = run_root.join("policy-decision.json");
     let receipt_path = run_root.join("receipt.latest.json");
     let digest_path = run_root.join("digest.latest.md");
     let instruction_manifest_path = run_root.join("instruction-layer-manifest.json");
@@ -923,26 +938,31 @@ fn compose_policy_receipt(
         effective_policy_mode,
     )?;
 
+    fs::create_dir_all(&run_root)
+        .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to create ACP run root: {e}")))?;
     fs::write(
         &request_path,
         serde_json::to_vec_pretty(&request_json)
-            .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize policy request: {e}")))?,
+            .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize policy request temp file: {e}")))?,
     )
-        .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to write policy request temp file: {e}")))?;
-    let receipt_output = Command::new(&policy_runner)
+    .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to write policy request temp file: {e}")))?;
+    fs::write(
+        &execution_request_path,
+        serde_json::to_vec_pretty(&request_json)
+            .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize execution request artifact: {e}")))?,
+    )
+    .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to write execution request artifact: {e}")))?;
+    let acp_output = Command::new("bash")
+        .arg(&policy_runner)
         .arg("acp-enforce")
         .arg("--policy")
         .arg(&policy_file)
         .arg("--request")
-        .arg(&request_path)
-        .arg("--emit-receipt")
-        .arg("--run-id")
-        .arg(&request.request_id)
+        .arg(&execution_request_path)
         .current_dir(&cfg.repo_root)
         .output()
         .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to spawn ACP execution flow: {e}")))?;
-    fs::remove_file(&request_path).ok();
-    let stdout = String::from_utf8_lossy(&receipt_output.stdout).to_string();
+    let stdout = String::from_utf8_lossy(&acp_output.stdout).to_string();
     let decision_json: serde_json::Value = serde_json::from_str(stdout.trim()).map_err(|e| {
         KernelError::new(
             ErrorCode::Internal,
@@ -959,11 +979,52 @@ fn compose_policy_receipt(
         "ESCALATE" => ExecutionDecision::Escalate,
         _ => ExecutionDecision::Deny,
     };
-    if !receipt_output.status.success() && !matches!(decision, ExecutionDecision::Deny | ExecutionDecision::StageOnly | ExecutionDecision::Escalate) {
+    if !acp_output.status.success() && !matches!(decision, ExecutionDecision::Deny | ExecutionDecision::StageOnly | ExecutionDecision::Escalate) {
         return Err(KernelError::new(
             ErrorCode::Internal,
             format!(
                 "ACP execution flow failed: {}",
+                String::from_utf8_lossy(&acp_output.stderr)
+            ),
+        ));
+    }
+    fs::write(
+        &decision_path,
+        serde_json::to_vec_pretty(&decision_json)
+            .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize ACP decision: {e}")))?,
+    )
+    .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to write ACP decision temp file: {e}")))?;
+    fs::write(
+        &policy_decision_path,
+        serde_json::to_vec_pretty(&decision_json)
+            .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize policy decision artifact: {e}")))?,
+    )
+    .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to write policy decision artifact: {e}")))?;
+    write_instruction_manifest(
+        &instruction_manifest_path,
+        request_json
+            .get("instruction_layers")
+            .cloned()
+            .unwrap_or_else(|| json!([])),
+    )?;
+    let receipt_output = Command::new("bash")
+        .arg(&receipt_writer)
+        .arg("--policy")
+        .arg(&policy_file)
+        .arg("--request")
+        .arg(&request_path)
+        .arg("--decision")
+        .arg(&decision_path)
+        .current_dir(&cfg.repo_root)
+        .output()
+        .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to emit ACP receipt: {e}")))?;
+    fs::remove_file(&request_path).ok();
+    fs::remove_file(&decision_path).ok();
+    if !receipt_output.status.success() {
+        return Err(KernelError::new(
+            ErrorCode::Internal,
+            format!(
+                "ACP receipt emission failed: {}",
                 String::from_utf8_lossy(&receipt_output.stderr)
             ),
         ));
@@ -973,6 +1034,25 @@ fn compose_policy_receipt(
         return Err(KernelError::new(
             ErrorCode::Internal,
             "policy receipt writer did not emit receipt.latest.json",
+        ));
+    }
+    let validate_output = Command::new("bash")
+        .arg(&policy_runner)
+        .arg("receipt-validate")
+        .arg("--policy")
+        .arg(&policy_file)
+        .arg("--receipt")
+        .arg(&receipt_path)
+        .current_dir(&cfg.repo_root)
+        .output()
+        .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to validate ACP receipt: {e}")))?;
+    if !validate_output.status.success() {
+        return Err(KernelError::new(
+            ErrorCode::Internal,
+            format!(
+                "ACP receipt validation failed: {}",
+                String::from_utf8_lossy(&validate_output.stderr)
+            ),
         ));
     }
 
@@ -1013,7 +1093,10 @@ fn resolve_acp_policy_path(cfg: &RuntimeConfig) -> PathBuf {
         } else {
             cfg.octon_dir.join(path)
         };
-        if absolute.is_file() {
+        let default_runtime_policy = cfg
+            .octon_dir
+            .join("framework/engine/runtime/config/policy.yml");
+        if absolute.is_file() && absolute != default_runtime_policy {
             return absolute;
         }
     }
@@ -1030,6 +1113,13 @@ fn build_policy_request_json(
 ) -> CoreResult<serde_json::Value> {
     let request_json = serde_json::to_vec(request)
         .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize execution request: {e}")))?;
+    let service_mode = request.caller_path == "service";
+    let operation_class = if service_mode {
+        "service.execute"
+    } else {
+        "execution.authorize"
+    };
+    let phase = if service_mode { "promote" } else { "stage" };
     let instruction_layers = json!([
         {
             "layer_id": "provider",
@@ -1068,16 +1158,21 @@ fn build_policy_request_json(
             "type": actor_ref.kind
         },
         "profile": policy_profile_for_request(request),
-        "phase": "stage",
+        "phase": phase,
         "intent": format!("execution authorization for {}", request.target_id),
         "boundaries": request.caller_path,
         "operation": {
-            "class": "execution.authorize",
+            "class": operation_class,
             "target": {
                 "material_side_effect": material_side_effect(request),
                 "telemetry_profile": if effective_policy_mode == "hard-enforce" { "full" } else { "minimal" },
                 "workflow_mode": "autonomous",
-                "capability_classification": "agent-ready"
+                "capability_classification": "agent-ready",
+                "boundary_route": if service_mode {
+                    serde_json::Value::String("allow".to_string())
+                } else {
+                    serde_json::Value::Null
+                }
             },
             "targets": [request.target_id],
             "resources": request.scope_constraints.write
@@ -1096,12 +1191,33 @@ fn build_policy_request_json(
             "rollback_handle": format!("rollback-{}", request.request_id),
             "recovery_window": "P14D"
         },
-        "evidence": [
-            {
-                "type": "diff",
-                "ref": format!(".octon/state/evidence/runs/{}/execution-request.json", request.request_id)
-            }
-        ],
+        "evidence": if service_mode {
+            json!([
+                {
+                    "type": "diff",
+                    "ref": format!(".octon/state/evidence/runs/{}/execution-request.json", request.request_id)
+                },
+                {
+                    "type": "docs.spec",
+                    "ref": ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
+                },
+                {
+                    "type": "docs.adr",
+                    "ref": ".octon/instance/cognition/decisions/060-runtime-execution-governance-hardening-atomic-cutover.md"
+                },
+                {
+                    "type": "docs.runbook",
+                    "ref": ".octon/framework/assurance/runtime/_ops/scripts/validate-execution-governance.sh"
+                }
+            ])
+        } else {
+            json!([
+                {
+                    "type": "diff",
+                    "ref": format!(".octon/state/evidence/runs/{}/execution-request.json", request.request_id)
+                }
+            ])
+        },
         "instruction_layers": instruction_layers,
         "context_acquisition": {
             "file_reads": 0,
@@ -1117,11 +1233,34 @@ fn build_policy_request_json(
 fn policy_profile_for_request(request: &ExecutionRequest) -> &'static str {
     if request.side_effect_flags.publication || request.action_type == "release_publication" {
         "release-readiness"
-    } else if request.side_effect_flags.write_repo || request.side_effect_flags.shell {
+    } else if request.side_effect_flags.write_repo
+        || request.side_effect_flags.shell
+        || request.side_effect_flags.state_mutation
+    {
         "refactor"
     } else {
         "docs"
     }
+}
+
+fn write_instruction_manifest(path: &Path, layers: serde_json::Value) -> CoreResult<()> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)
+            .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to create instruction manifest directory: {e}")))?;
+    }
+    fs::write(
+        path,
+        serde_json::to_vec_pretty(&json!({
+            "schema_version": "instruction-layer-manifest-v1",
+            "generated_at": time::OffsetDateTime::now_utc()
+                .format(&time::format_description::well_known::Rfc3339)
+                .unwrap_or_else(|_| "1970-01-01T00:00:00Z".to_string()),
+            "layers": layers,
+        }))
+        .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize instruction manifest: {e}")))?,
+    )
+    .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to write instruction manifest: {e}")))?;
+    Ok(())
 }
 
 fn material_side_effect(request: &ExecutionRequest) -> bool {
