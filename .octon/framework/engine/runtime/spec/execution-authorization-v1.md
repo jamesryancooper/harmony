@@ -17,12 +17,17 @@ that can produce durable side effects.
 ## Required Guarantees
 
 - No material side effect may occur before a valid `GrantBundle` exists.
+- The authorization boundary binds the canonical retained run root under
+  `state/evidence/runs/<run_id>/` before retained execution artifacts are
+  emitted.
 - Protected execution must fail closed unless the effective mode is
   `hard-enforce`.
 - Denials must emit machine-readable reason codes.
 - Receipt emission is mandatory for every material execution attempt.
 - Executor launches must use named executor profiles and wrapper-enforced flag
   filtering.
+- Outbound HTTP and model-backed execution must satisfy repo-owned network
+  egress and execution-budget policy before the material path proceeds.
 
 ## Related Contracts
 

@@ -36,6 +36,8 @@ copy_packet2_runtime_scripts() {
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh"
   cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
+  cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh" \
+    "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh"
   cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-capability-publication-state.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-capability-publication-state.sh"
   cp "$REPO_ROOT/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh" \
@@ -53,6 +55,12 @@ copy_packet2_runtime_scripts() {
   cp "$REPO_ROOT/.octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh" \
     "$fixture_root/.octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh"
 
+  cat >"$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-execution-governance.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 0
+EOF
+
   chmod +x \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-harness-version-contract.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-root-manifest-profiles.sh" \
@@ -64,6 +72,8 @@ copy_packet2_runtime_scripts() {
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh" \
+    "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh" \
+    "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-execution-governance.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-capability-publication-state.sh" \
     "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh" \
     "$fixture_root/.octon/framework/orchestration/runtime/_ops/scripts/extensions-common.sh" \
@@ -143,6 +153,12 @@ write_valid_packet2_fixture() {
 
   mkdir -p \
     "$fixture_root/.octon/framework/overlay-points" \
+    "$fixture_root/.octon/framework/cognition/_meta/architecture" \
+    "$fixture_root/.octon/framework/engine/runtime/crates/core/src" \
+    "$fixture_root/.octon/framework/engine/runtime/crates/kernel/src" \
+    "$fixture_root/.octon/framework/engine/runtime/crates/wasm_host/src" \
+    "$fixture_root/.octon/framework/engine/runtime/spec" \
+    "$fixture_root/.octon/framework/engine/runtime/config" \
     "$fixture_root/.octon/framework/capabilities/runtime/commands" \
     "$fixture_root/.octon/framework/capabilities/runtime/skills" \
     "$fixture_root/.octon/framework/capabilities/runtime/skills/native-skill" \
@@ -159,10 +175,13 @@ write_valid_packet2_fixture() {
     "$fixture_root/.octon/instance/locality" \
     "$fixture_root/.octon/instance/locality/scopes/octon-harness" \
     "$fixture_root/.octon/instance/cognition/context/scopes/octon-harness" \
+    "$fixture_root/.octon/instance/bootstrap" \
     "$fixture_root/.octon/instance/capabilities/runtime/commands" \
     "$fixture_root/.octon/instance/capabilities/runtime/skills" \
+    "$fixture_root/.octon/instance/governance/policies" \
     "$fixture_root/.octon/inputs/additive/extensions/.archive" \
     "$fixture_root/.octon/state/control/locality" \
+    "$fixture_root/.octon/state/control/execution" \
     "$fixture_root/.octon/generated/effective/locality" \
     "$fixture_root/.octon/generated/effective/capabilities" \
     "$fixture_root/.octon/generated/proposals"
@@ -262,9 +281,119 @@ bundled_policy_sets:
   - ".octon/framework/scaffolding/governance/"
 EOF
 
+  cat >"$fixture_root/.octon/framework/cognition/_meta/architecture/contract-registry.yml" <<'EOF'
+schema_version: "architecture-contract-registry-v1"
+execution:
+  write_roots:
+    run_evidence_root: ".octon/state/evidence/runs"
+    execution_control_root: ".octon/state/control/execution"
+    execution_tmp_root: ".octon/generated/.tmp/execution"
+  policy_roots:
+    network_egress: ".octon/instance/governance/policies/network-egress.yml"
+    execution_budgets: ".octon/instance/governance/policies/execution-budgets.yml"
+  control_state:
+    budget_state: ".octon/state/control/execution/budget-state.yml"
+    exception_leases: ".octon/state/control/execution/exception-leases.yml"
+  forbidden_write_prefixes:
+    - ".octon/framework/engine/_ops/state"
+  required_doc_surfaces:
+    - ".octon/framework/cognition/_meta/architecture/specification.md"
+    - ".octon/framework/cognition/_meta/architecture/runtime-vs-ops-contract.md"
+    - ".octon/instance/bootstrap/START.md"
+    - ".octon/framework/engine/README.md"
+    - ".octon/framework/engine/runtime/spec/policy-interface-v1.md"
+    - ".octon/framework/engine/runtime/spec/policy-receipt-v1.schema.json"
+  blocking_checks:
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
+    - ".github/workflows/architecture-conformance.yml"
+EOF
+
+  cat >"$fixture_root/.octon/framework/cognition/_meta/architecture/specification.md" <<'EOF'
+# Spec
+
+state roots:
+- .octon/state/control/execution
+- .octon/generated/.tmp/execution
+- .octon/instance/governance/policies/network-egress.yml
+- .octon/instance/governance/policies/execution-budgets.yml
+EOF
+
+  cat >"$fixture_root/.octon/framework/cognition/_meta/architecture/runtime-vs-ops-contract.md" <<'EOF'
+# Runtime vs Ops
+
+- .octon/state/control/execution/**
+- .octon/generated/.tmp/execution/**
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/README.md" <<'EOF'
+# Engine
+
+| `_ops/` | Portable operational assets | helper binaries and portable support scripts |
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/runtime/spec/policy-interface-v1.md" <<'EOF'
+# Policy Interface
+
+- .octon/instance/governance/policies/network-egress.yml
+- .octon/instance/governance/policies/execution-budgets.yml
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/runtime/spec/policy-receipt-v1.schema.json" <<'EOF'
+{
+  "properties": {
+    "budget_rule_id": { "type": "string" }
+  }
+}
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/runtime/config/policy.yml" <<'EOF'
+format_version: policy-v1
+default:
+  allow: []
+services:
+  execution/flow:
+    allow:
+      - log.write
+      - fs.read
+      - fs.write
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/runtime/crates/core/src/config.rs" <<'EOF'
+pub struct RuntimeConfig {
+    pub run_evidence_root: String,
+    pub execution_control_root: String,
+    pub execution_tmp_root: String,
+}
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/runtime/crates/core/src/trace.rs" <<'EOF'
+fn trace_path() -> &'static str {
+    "trace.ndjson"
+}
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/runtime/crates/kernel/src/main.rs" <<'EOF'
+fn main() {}
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/runtime/crates/kernel/src/stdio.rs" <<'EOF'
+pub fn serve_stdio() {}
+EOF
+
+  cat >"$fixture_root/.octon/framework/engine/runtime/crates/wasm_host/src/invoke.rs" <<'EOF'
+pub fn invoke() {}
+EOF
+
   cat >"$fixture_root/.octon/framework/overlay-points/registry.yml" <<'EOF'
 schema_version: "octon-overlay-points-registry-v1"
 overlay_points: []
+EOF
+
+  cat >"$fixture_root/.octon/instance/bootstrap/START.md" <<'EOF'
+# START
+
+- _ops is portable operational support
 EOF
 
   cat >"$fixture_root/.octon/framework/orchestration/runtime/workflows/meta/migrate-harness/README.md" <<'EOF'
@@ -412,6 +541,26 @@ trust:
 acknowledgements: []
 EOF
 
+  cat >"$fixture_root/.octon/instance/governance/policies/network-egress.yml" <<'EOF'
+schema_version: "network-egress-policy-v1"
+rules:
+  - id: "langgraph-http-local-runner"
+    services: ["execution/flow"]
+    adapters: ["langgraph-http"]
+    methods: ["POST"]
+    schemes: ["http"]
+    hosts: ["127.0.0.1", "localhost"]
+    ports: [8410]
+    path_prefixes: ["/flows/run"]
+    reason: "Allow explicit local LangGraph flow forwarding when the external HTTP adapter is selected."
+EOF
+
+  cat >"$fixture_root/.octon/instance/governance/policies/execution-budgets.yml" <<'EOF'
+schema_version: "execution-budgets-v1"
+missing_cost_evidence_action: "stage_only"
+rules: []
+EOF
+
   cat >"$fixture_root/.octon/instance/locality/manifest.yml" <<'EOF'
 schema_version: "octon-locality-manifest-v1"
 registry_path: ".octon/instance/locality/registry.yml"
@@ -460,6 +609,17 @@ EOF
 schema_version: "octon-locality-quarantine-state-v2"
 updated_at: "2026-03-19T00:00:00Z"
 records: []
+EOF
+
+  cat >"$fixture_root/.octon/state/control/execution/budget-state.yml" <<'EOF'
+schema_version: "execution-budget-state-v1"
+updated_at: "2026-03-22T00:00:00Z"
+rules: {}
+EOF
+
+  cat >"$fixture_root/.octon/state/control/execution/exception-leases.yml" <<'EOF'
+schema_version: "execution-exception-leases-v1"
+leases: []
 EOF
 
   OCTON_DIR_OVERRIDE="$fixture_root/.octon" OCTON_ROOT_DIR="$fixture_root" \

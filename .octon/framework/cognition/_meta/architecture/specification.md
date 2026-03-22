@@ -107,6 +107,16 @@ super-root cutover.
 46. Workflow contracts use `workflow-contract-v2` and declare stage-level
     authorization metadata.
 47. Runtime execution evidence belongs under `state/evidence/runs/**`.
+48. Canonical mutable execution control truth belongs under
+    `state/control/execution/**`.
+49. Canonical ephemeral execution scratch belongs under
+    `generated/.tmp/execution/**`.
+50. Repo-owned network egress policy lives at
+    `instance/governance/policies/network-egress.yml`.
+51. Repo-owned execution budget policy lives at
+    `instance/governance/policies/execution-budgets.yml`.
+52. The machine-readable execution path and policy invariant registry lives at
+    `framework/cognition/_meta/architecture/contract-registry.yml`.
 
 ## Precedence
 
@@ -171,10 +181,14 @@ for runtime, governance, and practices.
 - extension actual state: `/.octon/state/control/extensions/active.yml`
 - extension quarantine state: `/.octon/state/control/extensions/quarantine.yml`
 - locality quarantine: `/.octon/state/control/locality/quarantine.yml`
+- execution budget state: `/.octon/state/control/execution/budget-state.yml`
+- execution exception leases:
+  `/.octon/state/control/execution/exception-leases.yml`
 - effective locality outputs: `/.octon/generated/effective/locality/`
 - effective capability-routing outputs:
   `/.octon/generated/effective/capabilities/`
 - effective extension outputs: `/.octon/generated/effective/extensions/`
+- execution scratch root: `/.octon/generated/.tmp/execution/`
 - derived cognition outputs: `/.octon/generated/cognition/`
 - readable decision summary:
   `/.octon/generated/cognition/summaries/decisions.md`
@@ -182,6 +196,12 @@ for runtime, governance, and practices.
 - repo missions: `/.octon/instance/orchestration/missions/`
 - export runner: `/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh`
 - framework architecture: `/.octon/framework/cognition/_meta/architecture/`
+- execution contract registry:
+  `/.octon/framework/cognition/_meta/architecture/contract-registry.yml`
+- repo-owned network egress policy:
+  `/.octon/instance/governance/policies/network-egress.yml`
+- repo-owned execution budget policy:
+  `/.octon/instance/governance/policies/execution-budgets.yml`
 - generated proposal registry: `/.octon/generated/proposals/registry.yml`
 
 ## Overlay And Ingress Contract

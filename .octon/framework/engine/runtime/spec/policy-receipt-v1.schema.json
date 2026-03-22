@@ -118,6 +118,21 @@
         "human-only"
       ]
     },
+    "budget_rule_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "budget_reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "cost_evidence_path": {
+      "type": "string",
+      "minLength": 1
+    },
     "instruction_layers": {
       "type": "array",
       "minItems": 1,

@@ -13,10 +13,10 @@ Every time AI runs a workflow (spec, plan, code, test), it uses tokens and incur
 
 ### 1. Budgets Are Set
 
-Your team has budgets (usually monthly). AI automatically:
-- Tracks spending against the budget
-- Uses cheaper models when appropriate
-- Alerts when approaching limits
+Your team has repo-owned execution budgets. Octon now:
+- Evaluates model-backed execution against authored budget rules
+- Records mutable budget state under `.octon/state/control/execution/budget-state.yml`
+- Emits retained per-run cost evidence under `.octon/state/evidence/runs/<run_id>/cost.json`
 
 ### 2. Model Selection Is Automatic
 
@@ -62,9 +62,9 @@ When budget thresholds are crossed:
 ```
 
 **What to do:**
-- **Warning (70-90%)**: Be mindful, but continue working
-- **Critical (90%+)**: Prioritize important work, defer experiments
-- **Exceeded**: Contact team lead; may need budget adjustment
+- **Warning**: Review the estimate and continue if appropriate
+- **Stage-only**: Narrow scope or split the work before retrying
+- **Denied**: Update the repo-owned budget policy or reduce the requested spend
 
 ## Commands
 
@@ -120,7 +120,9 @@ octon cost alerts
 
 ### Q: What if I exceed the budget?
 
-By default, work can continue but you'll get alerts. The budget is a guideline, not a hard stop. If you're regularly exceeding, talk to your team about adjusting the budget.
+Budget policy may warn, stage, or deny execution depending on the matched rule.
+If you're regularly hitting stage or deny thresholds, update the repo-owned
+budget policy rather than relying on informal overrides.
 
 ### Q: How accurate are estimates?
 
@@ -132,7 +134,9 @@ No — tier determines model selection for quality reasons. If you think a task 
 
 ### Q: Where does cost data go?
 
-Stored locally in `.octon/cost-data.json`. Costs are not sent anywhere external.
+Stored locally in `.octon/state/control/execution/budget-state.yml` for mutable
+budget truth and `.octon/state/evidence/runs/<run_id>/cost.json` for retained
+per-run evidence.
 
 ### Q: How often is pricing updated?
 
@@ -142,4 +146,3 @@ Model pricing in the system is updated when providers announce changes. Check th
 
 - [Risk Tiers](./risk-tiers.md) — How tiers affect model selection
 - [AI Guardrails](../../governance/principles/guardrails.md) — How AI operations are controlled
-

@@ -1,6 +1,12 @@
 use anyhow::Context;
 use octon_core::config::{ExecutorProfileConfig, RuntimeConfig};
 use octon_core::errors::{ErrorCode, KernelError, Result as CoreResult};
+use octon_core::execution_integrity::{
+    evaluate_execution_budget, evaluate_network_egress, infer_provider_from_model,
+    load_execution_budget_policy, load_execution_exception_leases, load_network_egress_policy,
+    record_budget_consumption, write_execution_cost_evidence, BudgetCheckContext, BudgetDecision,
+    NetworkEgressContext,
+};
 use octon_core::policy::PolicyEngine;
 use octon_core::registry::ServiceDescriptor;
 use serde::{Deserialize, Serialize};
@@ -122,6 +128,23 @@ impl ExecutionEnvironment {
     }
 }
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct BudgetMetadata {
+    pub rule_id: String,
+    #[serde(default)]
+    pub reason_codes: Vec<String>,
+    #[serde(default)]
+    pub provider: Option<String>,
+    #[serde(default)]
+    pub model: Option<String>,
+    #[serde(default)]
+    pub estimated_cost_usd: Option<f64>,
+    #[serde(default)]
+    pub actual_cost_usd: Option<f64>,
+    #[serde(default)]
+    pub evidence_path: Option<String>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GrantBundle {
     pub grant_id: String,
@@ -142,12 +165,15 @@ pub struct GrantBundle {
     pub environment_class: ExecutionEnvironment,
     pub intent_ref: IntentRef,
     pub actor_ref: ActorRef,
+    pub run_root: String,
     #[serde(default)]
     pub policy_receipt_path: Option<String>,
     #[serde(default)]
     pub policy_digest_path: Option<String>,
     #[serde(default)]
     pub instruction_manifest_path: Option<String>,
+    #[serde(default)]
+    pub budget: Option<BudgetMetadata>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -206,6 +232,8 @@ pub struct ExecutionReceipt {
     pub autonomy_policy_enforced: bool,
     #[serde(default)]
     pub evidence_links: BTreeMap<String, String>,
+    #[serde(default)]
+    pub budget: Option<BudgetMetadata>,
     pub timestamps: ReceiptTimestamps,
 }
 
@@ -526,12 +554,23 @@ pub fn authorize_execution(
         );
     }
 
-    let granted_capabilities = if let Some(service) = service {
-        policy.decide_allow(service)?
+    let run_root = cfg.run_root(&request.request_id);
+    let run_root_rel = path_tail(&cfg.repo_root, &run_root);
+
+    let requested_capabilities = dedupe_strings(&request.requested_capabilities);
+    let requested_network = requested_capabilities.iter().any(|value| value == "net.http");
+    let requested_without_network = requested_capabilities
+        .iter()
+        .filter(|value| value.as_str() != "net.http")
+        .cloned()
+        .collect::<Vec<_>>();
+
+    let mut granted_capabilities = if let Some(service) = service {
+        policy.decide_allow(service, &requested_without_network)?
     } else {
-        dedupe_strings(&request.requested_capabilities)
+        requested_without_network.clone()
     };
-    if granted_capabilities.is_empty() {
+    if granted_capabilities.is_empty() && !requested_network {
         return Err(
             KernelError::new(
                 ErrorCode::CapabilityDenied,
@@ -559,12 +598,32 @@ pub fn authorize_execution(
         }
     }
 
+    if requested_network {
+        let matched_rule = authorize_network_egress(
+            cfg,
+            request,
+            executor_profile.map(|profile| profile.name.as_str()),
+        )?;
+        granted_capabilities.push("net.http".to_string());
+        review_metadata.insert("network_egress_rule".to_string(), matched_rule);
+    }
+
+    let budget_preview_decision = preview_execution_budget(
+        cfg,
+        request,
+        executor_profile.map(|profile| profile.name.as_str()),
+    )?;
+    let budget_preview = budget_preview_decision
+        .as_ref()
+        .map(|decision| budget_metadata_from_decision(&cfg.repo_root, &run_root, decision));
+
     let policy_artifacts = compose_policy_receipt(
         cfg,
         request,
         &intent_ref,
         &actor_ref,
         &effective_policy_mode,
+        budget_preview.as_ref(),
     )?;
     if !policy_artifacts.allow {
         return Err(
@@ -586,6 +645,12 @@ pub fn authorize_execution(
             })),
         );
     }
+
+    let budget = finalize_execution_budget(
+        cfg,
+        budget_preview_decision,
+        &run_root,
+    )?;
 
     Ok(GrantBundle {
         grant_id: format!("grant-{}", request.request_id),
@@ -612,9 +677,11 @@ pub fn authorize_execution(
         environment_class: environment,
         intent_ref,
         actor_ref,
+        run_root: run_root_rel,
         policy_receipt_path: policy_artifacts.receipt_path,
         policy_digest_path: policy_artifacts.digest_path,
         instruction_manifest_path: policy_artifacts.instruction_manifest_path,
+        budget,
     })
 }
 
@@ -701,6 +768,7 @@ pub fn finalize_execution(
         autonomy_policy_enforced: env_bool("AUTONOMY_POLICY_ENFORCE")
             || env_bool("OCTON_AUTONOMY_POLICY_ENFORCE"),
         evidence_links: evidence_links(paths, grant),
+        budget: grant.budget.clone(),
         timestamps: ReceiptTimestamps {
             started_at: started_at.to_string(),
             completed_at: outcome.completed_at.clone(),
@@ -799,6 +867,21 @@ fn evidence_links(paths: &ExecutionArtifactPaths, grant: &GrantBundle) -> BTreeM
     if let Some(path) = &grant.instruction_manifest_path {
         links.insert("instruction_manifest".to_string(), path.clone());
     }
+    links.insert(
+        "run_root".to_string(),
+        grant.run_root.clone(),
+    );
+    if let Some(budget) = &grant.budget {
+        if let Some(path) = &budget.evidence_path {
+            links.insert("cost".to_string(), path.clone());
+        }
+    }
+    if grant.granted_capabilities.iter().any(|value| value == "net.http") {
+        links.insert(
+            "network_egress".to_string(),
+            format!("{}/network-egress.ndjson", grant.run_root),
+        );
+    }
     links
 }
 
@@ -866,6 +949,7 @@ fn compose_policy_receipt(
     intent_ref: &IntentRef,
     actor_ref: &ActorRef,
     effective_policy_mode: &str,
+    budget_preview: Option<&BudgetMetadata>,
 ) -> CoreResult<PolicyArtifacts> {
     let _test_guard = if cfg!(test) {
         Some(
@@ -936,6 +1020,7 @@ fn compose_policy_receipt(
         intent_ref,
         actor_ref,
         effective_policy_mode,
+        budget_preview,
     )?;
 
     fs::create_dir_all(&run_root)
@@ -1110,6 +1195,7 @@ fn build_policy_request_json(
     intent_ref: &IntentRef,
     actor_ref: &ActorRef,
     effective_policy_mode: &str,
+    budget_preview: Option<&BudgetMetadata>,
 ) -> CoreResult<serde_json::Value> {
     let request_json = serde_json::to_vec(request)
         .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize execution request: {e}")))?;
@@ -1226,7 +1312,12 @@ fn build_policy_request_json(
             "subagent_spawns": 0,
             "duration_ms": 0
         },
-        "context_overhead_ratio": 0
+        "context_overhead_ratio": 0,
+        "budget_rule_id": budget_preview.map(|metadata| metadata.rule_id.clone()),
+        "budget_reason_codes": budget_preview
+            .map(|metadata| metadata.reason_codes.clone())
+            .unwrap_or_default(),
+        "cost_evidence_path": budget_preview.and_then(|metadata| metadata.evidence_path.clone())
     }))
 }
 
@@ -1271,6 +1362,190 @@ fn material_side_effect(request: &ExecutionRequest) -> bool {
         || request.side_effect_flags.state_mutation
         || request.side_effect_flags.publication
         || request.side_effect_flags.branch_mutation
+}
+
+fn authorize_network_egress(
+    cfg: &RuntimeConfig,
+    request: &ExecutionRequest,
+    executor_profile: Option<&str>,
+) -> CoreResult<String> {
+    let service_id = request
+        .metadata
+        .get("network_egress_service")
+        .map(|value| value.as_str())
+        .unwrap_or("service");
+    let method = request
+        .metadata
+        .get("network_egress_method")
+        .map(|value| value.as_str())
+        .unwrap_or("GET");
+    let url = request
+        .metadata
+        .get("network_egress_url")
+        .ok_or_else(|| {
+            KernelError::new(
+                ErrorCode::CapabilityDenied,
+                "network-capable execution request missing network target metadata",
+            )
+            .with_details(json!({"reason_codes":["NETWORK_EGRESS_CONTEXT_MISSING"]}))
+        })?;
+    let policy = load_network_egress_policy(&cfg.repo_root)?;
+    let leases = load_execution_exception_leases(&cfg.repo_root)?;
+    let decision = evaluate_network_egress(
+        &policy,
+        &leases,
+        &NetworkEgressContext {
+            service_id,
+            adapter_id: request
+                .metadata
+                .get("network_egress_adapter")
+                .map(|value| value.as_str()),
+            executor_profile,
+            method,
+        },
+        url,
+    )?;
+    Ok(decision.matched_rule_id)
+}
+
+fn preview_execution_budget(
+    cfg: &RuntimeConfig,
+    request: &ExecutionRequest,
+    executor_profile: Option<&str>,
+) -> CoreResult<Option<BudgetDecision>> {
+    if !request.side_effect_flags.model_invoke {
+        return Ok(None);
+    }
+
+    let policy = load_execution_budget_policy(&cfg.repo_root)?;
+    let provider = request
+        .metadata
+        .get("budget_provider")
+        .cloned()
+        .or_else(|| {
+            infer_provider_from_model(
+                request.metadata.get("budget_model").map(|value| value.as_str()),
+                request.metadata.get("executor_kind").map(|value| value.as_str()),
+            )
+        });
+    let prompt_bytes = request
+        .metadata
+        .get("prompt_bytes")
+        .and_then(|value| value.parse::<u64>().ok());
+
+    let decision = evaluate_execution_budget(
+        &policy,
+        &BudgetCheckContext {
+            request_id: &request.request_id,
+            path_type: &request.caller_path,
+            action_type: &request.action_type,
+            executor_profile,
+            provider: provider.as_deref(),
+            model: request.metadata.get("budget_model").map(|value| value.as_str()),
+            prompt_bytes,
+        },
+    );
+
+    match decision {
+        BudgetDecision::Skip => Ok(None),
+        other => Ok(Some(other)),
+    }
+}
+
+fn finalize_execution_budget(
+    cfg: &RuntimeConfig,
+    decision: Option<BudgetDecision>,
+    run_root: &Path,
+) -> CoreResult<Option<BudgetMetadata>> {
+    let Some(decision) = decision else {
+        return Ok(None);
+    };
+
+    match decision {
+        BudgetDecision::Allow {
+            rule_id,
+            reason_codes,
+            evidence,
+        } => {
+            let evidence_path = write_execution_cost_evidence(run_root, &evidence)?;
+            let _ = record_budget_consumption(&cfg.execution_control_root, &rule_id, &evidence)?;
+            Ok(Some(BudgetMetadata {
+                rule_id,
+                reason_codes,
+                provider: evidence.provider.clone(),
+                model: evidence.model.clone(),
+                estimated_cost_usd: evidence.estimated_cost_usd,
+                actual_cost_usd: evidence.actual_cost_usd,
+                evidence_path: Some(path_tail(&cfg.repo_root, &evidence_path)),
+            }))
+        }
+        BudgetDecision::StageOnly {
+            rule_id,
+            reason_codes,
+            message,
+            evidence,
+        } => {
+            let evidence_path = write_execution_cost_evidence(run_root, &evidence)?;
+            Err(
+                KernelError::new(ErrorCode::CapabilityDenied, message).with_details(json!({
+                    "reason_codes": reason_codes,
+                    "budget_rule_id": rule_id,
+                    "cost_evidence_path": path_tail(&cfg.repo_root, &evidence_path),
+                })),
+            )
+        }
+        BudgetDecision::Deny {
+            rule_id,
+            reason_codes,
+            message,
+            evidence,
+        } => {
+            let evidence_path = write_execution_cost_evidence(run_root, &evidence)?;
+            Err(
+                KernelError::new(ErrorCode::CapabilityDenied, message).with_details(json!({
+                    "reason_codes": reason_codes,
+                    "budget_rule_id": rule_id,
+                    "cost_evidence_path": path_tail(&cfg.repo_root, &evidence_path),
+                })),
+            )
+        }
+        BudgetDecision::Skip => Ok(None),
+    }
+}
+
+fn budget_metadata_from_decision(
+    repo_root: &Path,
+    run_root: &Path,
+    decision: &BudgetDecision,
+) -> BudgetMetadata {
+    match decision {
+        BudgetDecision::Allow {
+            rule_id,
+            reason_codes,
+            evidence,
+        }
+        | BudgetDecision::StageOnly {
+            rule_id,
+            reason_codes,
+            evidence,
+            ..
+        }
+        | BudgetDecision::Deny {
+            rule_id,
+            reason_codes,
+            evidence,
+            ..
+        } => BudgetMetadata {
+            rule_id: rule_id.clone(),
+            reason_codes: reason_codes.clone(),
+            provider: evidence.provider.clone(),
+            model: evidence.model.clone(),
+            estimated_cost_usd: evidence.estimated_cost_usd,
+            actual_cost_usd: evidence.actual_cost_usd,
+            evidence_path: Some(path_tail(repo_root, &run_root.join("cost.json"))),
+        },
+        BudgetDecision::Skip => BudgetMetadata::default(),
+    }
 }
 
 fn unique_temp_file(stem: &str, extension: &str) -> PathBuf {
@@ -1340,7 +1615,9 @@ mod tests {
         RuntimeConfig {
             octon_dir: base.join(".octon"),
             repo_root: base,
-            state_dir: std::env::temp_dir().join("octon-auth-state"),
+            run_evidence_root: std::env::temp_dir().join("octon-auth-state").join("runs"),
+            execution_control_root: std::env::temp_dir().join("octon-auth-state").join("control"),
+            execution_tmp_root: std::env::temp_dir().join("octon-auth-state").join("tmp"),
             policy: PolicyConfig::default(),
             policy_path: Some(PathBuf::from("framework/capabilities/governance/policy/deny-by-default.v2.yml")),
             execution_governance: ExecutionGovernanceConfig {

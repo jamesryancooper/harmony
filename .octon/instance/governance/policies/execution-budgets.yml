@@ -1,0 +1,37 @@
+schema_version: "execution-budgets-v1"
+missing_cost_evidence_action: "stage_only"
+rules:
+  - id: "workflow-stage-openai"
+    path_types:
+      - "workflow-stage"
+    executor_profiles:
+      - "read_only_analysis"
+      - "scoped_repo_mutation"
+      - "patch_generation_only"
+    providers:
+      - "openai"
+    require_cost_evidence: true
+    reason: "Apply estimated spend guardrails to OpenAI-backed workflow stages."
+    thresholds:
+      warn_estimated_cost_usd: 0.10
+      stage_estimated_cost_usd: 1.00
+      deny_estimated_cost_usd: 5.00
+      max_prompt_bytes: 400000
+      max_estimated_input_tokens: 100000
+  - id: "workflow-stage-anthropic"
+    path_types:
+      - "workflow-stage"
+    executor_profiles:
+      - "read_only_analysis"
+      - "scoped_repo_mutation"
+      - "patch_generation_only"
+    providers:
+      - "anthropic"
+    require_cost_evidence: true
+    reason: "Apply estimated spend guardrails to Anthropic-backed workflow stages."
+    thresholds:
+      warn_estimated_cost_usd: 0.10
+      stage_estimated_cost_usd: 1.25
+      deny_estimated_cost_usd: 6.00
+      max_prompt_bytes: 400000
+      max_estimated_input_tokens: 100000

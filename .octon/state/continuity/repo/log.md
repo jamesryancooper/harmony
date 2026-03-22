@@ -31,6 +31,30 @@ mutability: append-only
 
 - None
 
+## 2026-03-22
+
+**Session focus:** Close the remaining harness-integrity-tightening completeness gaps
+
+**Completed:**
+
+- Refactored the execution-budget path into a pre-ACP preview plus post-ACP
+  finalize step so ACP request/receipt materialization can carry
+  `budget_rule_id`, `budget_reason_codes`, and `cost_evidence_path`
+- Updated `policy-receipt-write.sh` to emit the new budget metadata fields and
+  added a focused shell regression that validates those fields are present in
+  `policy-receipt-v1`
+- Marked the governed migration plan’s final compliance and verification
+  checklist items complete so the plan state now matches the implemented and
+  verified cutover
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
 ## 2026-03-20
 
 **Session focus:** Packet 14 validation, fail-closed, quarantine, and
@@ -1166,6 +1190,60 @@ proposal package
   discovery alongside the other active proposal packages
 - Recorded completion of the proposal-drafting task in
   `.octon/state/continuity/repo/tasks.json`
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
+## 2026-03-22
+
+**Session focus:** Plan the harness-integrity-tightening atomic cutover
+
+**Completed:**
+
+- Rewrote the active `harness-integrity-tightening` proposal implementation
+  plan so it now specifies one big-bang, clear-break, atomic promotion with
+  explicit write-root, egress, spend-governance, assurance, CI, and closeout
+  sequencing
+- Added the governed migration plan at
+  `.octon/instance/cognition/context/shared/migrations/2026-03-22-harness-integrity-tightening-cutover/plan.md`
+  with the required profile-selection receipt, impact map, compliance receipt,
+  verification gates, and rollback contract
+- Grounded the plan in the current live drifts: `RuntimeConfig.state_dir`,
+  `TraceWriter`, ambient `execution/flow` `net.http`, and the missing
+  machine-readable architecture contract registry
+
+**Next:**
+
+- Implement the atomic cutover and materialize its ADR plus migration evidence
+  bundle
+
+**Blockers:**
+
+- None
+
+## 2026-03-22
+
+**Session focus:** Implement the harness-integrity-tightening atomic cutover
+
+**Completed:**
+
+- Replaced the engine-local `state_dir` model with explicit retained-run,
+  execution-control, and execution scratch roots, then re-rooted trace output,
+  KV state, service capability requests, and model-budget metadata around that
+  contract
+- Added repo-owned `network-egress.yml`, `execution-budgets.yml`,
+  `state/control/execution/**`, and the machine-readable
+  `contract-registry.yml`, then wired runtime authorization plus host-side HTTP
+  enforcement to use those surfaces
+- Added the blocking architecture-conformance validator and CI workflow,
+  refreshed capability publication artifacts, updated the relevant
+  architecture/runtime/bootstrap docs, recorded ADR 061, wrote the migration
+  evidence bundle, and archived the implemented proposal package
 
 **Next:**
 

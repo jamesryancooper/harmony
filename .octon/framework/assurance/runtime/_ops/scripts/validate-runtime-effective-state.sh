@@ -71,6 +71,9 @@ main() {
     "capability publication state is current and coherent" \
     "$SCRIPT_DIR/validate-capability-publication-state.sh"
   run_validator \
+    "architecture contract registry and execution conformance are current" \
+    "$SCRIPT_DIR/validate-architecture-conformance.sh"
+  run_validator \
     "execution governance contracts and protected CI posture are current" \
     "$SCRIPT_DIR/validate-execution-governance.sh"
 

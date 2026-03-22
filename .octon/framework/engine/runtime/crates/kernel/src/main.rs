@@ -13,6 +13,7 @@ use crate::authorization::{
 };
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use octon_core::errors::{ErrorCode, KernelError};
+use octon_core::execution_integrity::service_capability_profile;
 use octon_core::tiers::validate_runtime_discovery_tiers;
 use octon_core::trace::TraceWriter;
 use octon_wasm_host::policy::GrantSet;
@@ -278,7 +279,12 @@ fn cmd_info() -> anyhow::Result<()> {
     println!("octon kernel v{}", env!("CARGO_PKG_VERSION"));
     println!("repo_root: {}", ctx.cfg.repo_root.display());
     println!("octon_dir: {}", ctx.cfg.octon_dir.display());
-    println!("state_dir: {}", ctx.cfg.state_dir.display());
+    println!("run_evidence_root: {}", ctx.cfg.run_evidence_root.display());
+    println!(
+        "execution_control_root: {}",
+        ctx.cfg.execution_control_root.display()
+    );
+    println!("execution_tmp_root: {}", ctx.cfg.execution_tmp_root.display());
     println!("os: {}", std::env::consts::OS);
     println!("arch: {}", std::env::consts::ARCH);
     println!("services: {}", ctx.registry.list().len());
@@ -335,16 +341,19 @@ fn cmd_tool(service_id_or_name: &str, op: &str, input_json: Option<&str>) -> any
         })?,
         None => serde_json::json!({}),
     };
+    let service_profile =
+        service_capability_profile(&svc.key.id(), &input, &svc.manifest.capabilities_required);
 
     let request = ExecutionRequest {
         request_id: new_request_id("tool"),
         caller_path: "service".to_string(),
         action_type: "invoke_service".to_string(),
         target_id: format!("{}::{op}", svc.key.id()),
-        requested_capabilities: svc.manifest.capabilities_required.clone(),
+        requested_capabilities: service_profile.requested_capabilities.clone(),
         side_effect_flags: SideEffectFlags {
             write_evidence: true,
             state_mutation: true,
+            network: service_profile.network_target_url.is_some(),
             ..SideEffectFlags::default()
         },
         risk_tier: "medium".to_string(),
@@ -361,7 +370,7 @@ fn cmd_tool(service_id_or_name: &str, op: &str, input_json: Option<&str>) -> any
         },
         policy_mode_requested: None,
         environment_hint: None,
-        metadata: std::collections::BTreeMap::new(),
+        metadata: service_profile.metadata.clone(),
     };
     let grant = authorize_execution(&ctx.cfg, &ctx.policy, &request, Some(svc))?;
     let artifacts = write_execution_start(
@@ -375,10 +384,22 @@ fn cmd_tool(service_id_or_name: &str, op: &str, input_json: Option<&str>) -> any
     )?;
     let started_at = now_rfc3339()?;
     let grants = GrantSet::new(grant.granted_capabilities.clone());
-    let trace = TraceWriter::new(&ctx.cfg.state_dir, None).ok();
+    let run_root = ctx.cfg.repo_root.join(&grant.run_root);
+    ctx.cfg.ensure_execution_write_path(&run_root)?;
+    let trace = TraceWriter::new(&run_root, None).ok();
     let out = ctx
         .invoker
-        .invoke(svc, grants, op, input, trace.as_ref(), None, None)?;
+        .invoke(
+            svc,
+            grants,
+            op,
+            input,
+            trace.as_ref(),
+            &run_root,
+            service_profile.adapter_id.as_deref(),
+            None,
+            None,
+        )?;
     finalize_execution(
         &artifacts,
         &request,

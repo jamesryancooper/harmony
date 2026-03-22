@@ -1,7 +1,7 @@
 schema_version: octon-capability-routing-artifact-map-v3
 generator_version: 0.5.2
-generation_id: capabilities-fff93a7b78cb
-published_at: 2026-03-21T23:20:42Z
+generation_id: capabilities-2ccf8bc15d26
+published_at: 2026-03-22T20:06:13Z
 artifacts:
   - artifact_map_id: framework-command-alignment-check
     effective_id: framework.command.alignment-check
@@ -376,7 +376,7 @@ artifacts:
     source_manifest_path: .octon/framework/capabilities/runtime/services/manifest.yml
     source_manifest_sha256: ea57989879070329d20570ceffa0d21e1023b9c19f0f95b29edc5220ec72e069
     source_path: .octon/framework/capabilities/runtime/services/execution/flow/SERVICE.md
-    source_sha256: 846a75ebeb3c7596b33242094bf3489c66ebb5759bb69dde41f172a0c1d20765
+    source_sha256: e3569c3178ff684d1a9931ab8156c5c731c91c254c3e4b3ed06385929c9eee9d
   - artifact_map_id: framework-service-guard
     effective_id: framework.service.guard
     origin_class: framework

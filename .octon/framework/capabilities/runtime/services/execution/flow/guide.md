@@ -32,7 +32,9 @@ HTTP runtime when explicitly configured.
 
 - Core flow execution does not depend on Python.
 - Native adapter is default and is deterministic for identical inputs.
-- External runtime use is optional and capability-gated (`net.http`).
+- External runtime use is optional and requires repo-owned
+  `instance/governance/policies/network-egress.yml` authorization plus
+  retained run evidence.
 - Context-acquisition telemetry fields are mandatory in flow run output.
 
 ## Operation

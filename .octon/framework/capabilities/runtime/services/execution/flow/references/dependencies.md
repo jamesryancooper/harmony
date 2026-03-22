@@ -12,8 +12,10 @@ capabilities (`fs.read`, `fs.write`, `log.write`).
 
 ## Optional External Path
 
-When adapter `langgraph-http` is selected, Flow additionally uses `net.http` and
-calls a LangGraph-compatible endpoint.
+When adapter `langgraph-http` is selected, Flow additionally requests
+`net.http`, and the kernel grants it only when
+`.octon/instance/governance/policies/network-egress.yml` authorizes the target
+endpoint.
 
 Expected endpoint contract:
 

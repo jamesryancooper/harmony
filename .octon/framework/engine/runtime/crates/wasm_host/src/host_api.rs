@@ -1,5 +1,9 @@
 use crate::bindings::{clock, fs, http, kv, log};
 use crate::state::HostState;
+use octon_core::execution_integrity::{
+    evaluate_network_egress, parse_network_target, write_network_egress_event,
+    NetworkEgressContext, NetworkEgressDecision, NetworkEgressEvent,
+};
 use std::io::{Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::time::Duration;
@@ -149,6 +153,63 @@ impl http::Host for HostState {
         self.grants.require("net.http")?;
 
         let method = normalize_method(&req.method)?;
+        let network_decision = evaluate_network_egress(
+            &self.network_policy,
+            &self.exception_leases,
+            &NetworkEgressContext {
+                service_id: &self.service_id,
+                adapter_id: self.adapter_id.as_deref(),
+                executor_profile: None,
+                method: &method,
+            },
+            &req.url,
+        )
+        .map_err(|e| {
+            let _ = record_network_event(
+                &self.run_root,
+                &self.service_id,
+                self.adapter_id.as_deref(),
+                &method,
+                &req.url,
+                NetworkEgressDecision {
+                    allowed: false,
+                    matched_rule_id: "deny".to_string(),
+                    reason: e.to_string(),
+                },
+            );
+            if let Some(trace) = &self.trace {
+                let _ = trace.event(
+                    "network.egress.denied",
+                    serde_json::json!({
+                        "service": self.service_id,
+                        "adapter": self.adapter_id,
+                        "method": method,
+                        "url": req.url,
+                    }),
+                );
+            }
+            anyhow::anyhow!("CAPABILITY_DENIED: {e}")
+        })?;
+        let _ = record_network_event(
+            &self.run_root,
+            &self.service_id,
+            self.adapter_id.as_deref(),
+            &method,
+            &req.url,
+            network_decision.clone(),
+        );
+        if let Some(trace) = &self.trace {
+            let _ = trace.event(
+                "network.egress.allowed",
+                serde_json::json!({
+                    "service": self.service_id,
+                    "adapter": self.adapter_id,
+                    "method": method,
+                    "url": req.url,
+                    "rule_id": network_decision.matched_rule_id,
+                }),
+            );
+        }
         let url = parse_http_url(&req.url)?;
         let timeout = Duration::from_millis(req.timeout_ms.unwrap_or(30_000).max(1));
 
@@ -187,6 +248,37 @@ impl http::Host for HostState {
             body,
         })
     }
+}
+
+fn record_network_event(
+    run_root: &std::path::Path,
+    service_id: &str,
+    adapter_id: Option<&str>,
+    method: &str,
+    url: &str,
+    decision: NetworkEgressDecision,
+) -> wasmtime::Result<()> {
+    let target = parse_network_target(url)
+        .map_err(|e| anyhow::anyhow!("HTTP_ERROR: {}", e))?;
+    let event = NetworkEgressEvent {
+        schema_version: "network-egress-event-v1".to_string(),
+        request_id: run_root
+            .file_name()
+            .map(|value| value.to_string_lossy().to_string())
+            .unwrap_or_else(|| "unknown".to_string()),
+        service_id: service_id.to_string(),
+        adapter_id: adapter_id.map(ToOwned::to_owned),
+        method: method.to_string(),
+        url: url.to_string(),
+        target,
+        decision,
+        recorded_at: time::OffsetDateTime::now_utc()
+            .format(&time::format_description::well_known::Rfc3339)
+            .unwrap_or_else(|_| "1970-01-01T00:00:00Z".to_string()),
+    };
+    write_network_egress_event(run_root, &event)
+        .map(|_| ())
+        .map_err(|e| anyhow::anyhow!("HTTP_ERROR: {}", e).into())
 }
 
 const MAX_RESPONSE_BYTES: usize = 8 * 1024 * 1024;

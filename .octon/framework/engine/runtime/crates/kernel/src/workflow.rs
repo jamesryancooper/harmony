@@ -2148,7 +2148,13 @@ impl Runner {
         }
     }
 
-    fn stage_request(&self, stage: &StageDefinition) -> ExecutionRequest {
+    fn stage_request(
+        &self,
+        stage: &StageDefinition,
+        mut metadata: BTreeMap<String, String>,
+    ) -> ExecutionRequest {
+        metadata.insert("workflow_id".to_string(), WORKFLOW_ID.to_string());
+        metadata.insert("stage_id".to_string(), stage.id.to_string());
         ExecutionRequest {
             request_id: format!("{}-stage-{}", self.slug, stage.id),
             caller_path: "workflow-stage".to_string(),
@@ -2205,10 +2211,7 @@ impl Runner {
             },
             policy_mode_requested: None,
             environment_hint: None,
-            metadata: BTreeMap::from([
-                ("workflow_id".to_string(), WORKFLOW_ID.to_string()),
-                ("stage_id".to_string(), stage.id.to_string()),
-            ]),
+            metadata,
         }
     }
 
@@ -2281,7 +2284,23 @@ impl Runner {
                 stage.id,
                 trim_md_suffix(stage.report_file)
             ));
-            let stage_request = self.stage_request(stage);
+            let executor_metadata = if self.options.executor == ExecutorKind::Mock {
+                BTreeMap::new()
+            } else {
+                execution_budget_metadata(
+                    &resolve_executor(self.options.executor, self.options.executor_bin.as_deref())
+                        .map_err(|error| {
+                            RunFailure::new(
+                                FailureClass::ExecutorEnvironment,
+                                Some(stage.id),
+                                error.to_string(),
+                            )
+                        })?,
+                    self.options.model.as_deref(),
+                    prompt_markdown.as_bytes().len(),
+                )
+            };
+            let stage_request = self.stage_request(stage, executor_metadata);
             let stage_grant = authorize_execution(&self.runtime_cfg, &policy, &stage_request, None)
                 .map_err(|error| {
                     RunFailure::new(
@@ -3157,6 +3176,28 @@ fn infer_auto_executor_from_path(path: &Path) -> Result<ResolvedExecutor> {
             path.display()
         )
     }
+}
+
+fn execution_budget_metadata(
+    executor: &ResolvedExecutor,
+    model: Option<&str>,
+    prompt_bytes: usize,
+) -> BTreeMap<String, String> {
+    let (executor_kind, provider) = match executor {
+        ResolvedExecutor::Claude(_) => ("claude", "anthropic"),
+        ResolvedExecutor::Codex(_) => ("codex", "openai"),
+        ResolvedExecutor::Mock => ("mock", "unknown"),
+    };
+
+    let mut metadata = BTreeMap::from([
+        ("executor_kind".to_string(), executor_kind.to_string()),
+        ("budget_provider".to_string(), provider.to_string()),
+        ("prompt_bytes".to_string(), prompt_bytes.to_string()),
+    ]);
+    if let Some(model) = model {
+        metadata.insert("budget_model".to_string(), model.to_string());
+    }
+    metadata
 }
 
 fn find_binary(name: &str) -> Option<PathBuf> {

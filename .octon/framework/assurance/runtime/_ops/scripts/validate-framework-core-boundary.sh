@@ -97,8 +97,10 @@ main() {
         --glob '!.octon/instance/cognition/context/shared/migrations/**' \
         --glob '!.octon/framework/cognition/practices/methodology/migrations/legacy-banlist.md' \
         --glob '!.octon/framework/cognition/_meta/architecture/bounded-surfaces-contract.md' \
+        --glob '!.octon/framework/cognition/_meta/architecture/contract-registry.yml' \
         --glob '!.octon/framework/assurance/runtime/_ops/scripts/validate-harness-structure.sh' \
         --glob '!.octon/framework/assurance/runtime/_ops/scripts/validate-framework-core-boundary.sh' \
+        --glob '!.octon/framework/assurance/runtime/_ops/tests/**' \
         'framework/capabilities/_ops/state|framework/engine/_ops/state|runtime/skills/_ops/state|runtime/services/_ops/state|assurance/runtime/_ops/state|\.octon/engine/|framework/continuity/|\.octon/continuity|\.octon/ideation' \
         .octon \
         .github \

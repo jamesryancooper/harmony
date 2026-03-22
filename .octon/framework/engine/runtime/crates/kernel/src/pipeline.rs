@@ -641,6 +641,16 @@ fn run_generic_pipeline(
             .allowed_executor_profiles
             .first()
             .cloned();
+        let executor_metadata = if options.executor == ExecutorKind::Mock {
+            BTreeMap::new()
+        } else {
+            execution_budget_metadata(
+                options.executor,
+                options.executor_bin.as_deref(),
+                options.model.as_deref(),
+                rendered.as_bytes().len(),
+            )?
+        };
         let stage_request = ExecutionRequest {
             request_id: format!("{}-stage-{}", workflow_request.request_id, stage.id),
             caller_path: "workflow-stage".to_string(),
@@ -679,10 +689,12 @@ fn run_generic_pipeline(
             },
             policy_mode_requested: None,
             environment_hint: None,
-            metadata: BTreeMap::from([
-                ("workflow_id".to_string(), entry.id.clone()),
-                ("stage_id".to_string(), stage.id.clone()),
-            ]),
+            metadata: {
+                let mut metadata = executor_metadata;
+                metadata.insert("workflow_id".to_string(), entry.id.clone());
+                metadata.insert("stage_id".to_string(), stage.id.clone());
+                metadata
+            },
         };
         let stage_grant = authorize_execution(&runtime_cfg, &policy, &stage_request, None)?;
         let stage_artifacts =
@@ -1057,6 +1069,43 @@ fn find_binary(name: &str) -> Option<PathBuf> {
         }
     }
     None
+}
+
+fn execution_budget_metadata(
+    executor: ExecutorKind,
+    executor_bin: Option<&Path>,
+    model: Option<&str>,
+    prompt_bytes: usize,
+) -> Result<BTreeMap<String, String>> {
+    let resolved_kind = match executor {
+        ExecutorKind::Claude => "claude",
+        ExecutorKind::Codex => "codex",
+        ExecutorKind::Mock => "mock",
+        ExecutorKind::Auto => {
+            let binary = resolve_executor_binary(executor, executor_bin)?;
+            if binary.ends_with("claude") {
+                "claude"
+            } else {
+                "codex"
+            }
+        }
+    };
+
+    let provider = match resolved_kind {
+        "claude" => "anthropic",
+        "codex" => "openai",
+        _ => "unknown",
+    };
+
+    let mut metadata = BTreeMap::from([
+        ("executor_kind".to_string(), resolved_kind.to_string()),
+        ("budget_provider".to_string(), provider.to_string()),
+        ("prompt_bytes".to_string(), prompt_bytes.to_string()),
+    ]);
+    if let Some(model) = model {
+        metadata.insert("budget_model".to_string(), model.to_string());
+    }
+    Ok(metadata)
 }
 
 struct ExecOutput {

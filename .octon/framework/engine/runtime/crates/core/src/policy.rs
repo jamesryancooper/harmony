@@ -19,7 +19,11 @@ impl PolicyEngine {
         Self { cfg }
     }
 
-    pub fn decide(&self, service: &ServiceDescriptor) -> PolicyDecision {
+    pub fn decide(
+        &self,
+        service: &ServiceDescriptor,
+        requested_capabilities: &[String],
+    ) -> PolicyDecision {
         // Deny-by-default.
         let service_id = service.key.id();
 
@@ -35,9 +39,41 @@ impl PolicyEngine {
             allowed.extend(svc_allow.iter().cloned());
         }
 
-        // Required capabilities declared by the service manifest.
+        let declared = service
+            .manifest
+            .capabilities_required
+            .iter()
+            .cloned()
+            .collect::<BTreeSet<_>>();
+
+        let requested = requested_capabilities
+            .iter()
+            .cloned()
+            .collect::<BTreeSet<_>>();
+
+        let mut undeclared = Vec::new();
+        for cap in &requested {
+            if !declared.contains(cap) {
+                undeclared.push(cap.clone());
+            }
+        }
+
+        if !undeclared.is_empty() {
+            return PolicyDecision::Deny {
+                error: KernelError::new(
+                    ErrorCode::CapabilityDenied,
+                    format!("requested capabilities exceed service manifest for {service_id}"),
+                )
+                .with_details(json!({
+                    "service": service_id,
+                    "undeclared": undeclared,
+                })),
+            };
+        }
+
+        // Requested capabilities must be allowed by policy.
         let mut missing = Vec::new();
-        for cap in &service.manifest.capabilities_required {
+        for cap in &requested {
             if !allowed.contains(cap) {
                 missing.push(cap.clone());
             }
@@ -56,14 +92,18 @@ impl PolicyEngine {
             };
         }
 
-        // Grant only what the service declares (capability least privilege).
+        // Grant only the requested capability subset (capability least privilege).
         PolicyDecision::Allow {
-            granted: service.manifest.capabilities_required.clone(),
+            granted: requested.into_iter().collect(),
         }
     }
 
-    pub fn decide_allow(&self, service: &ServiceDescriptor) -> Result<Vec<String>> {
-        match self.decide(service) {
+    pub fn decide_allow(
+        &self,
+        service: &ServiceDescriptor,
+        requested_capabilities: &[String],
+    ) -> Result<Vec<String>> {
+        match self.decide(service, requested_capabilities) {
             PolicyDecision::Allow { granted } => Ok(granted),
             PolicyDecision::Deny { error } => Err(error),
         }
