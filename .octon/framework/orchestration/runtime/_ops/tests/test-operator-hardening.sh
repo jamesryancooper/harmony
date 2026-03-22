@@ -87,7 +87,11 @@ create_fixture() {
     "$fixture_root/.octon/state/evidence/decisions/repo/dec-001" \
     "$fixture_root/.octon/state/evidence/runs/run-001" \
     "$fixture_root/.octon/framework/orchestration/governance" \
-    "$fixture_root/.octon/generated/reports"
+    "$fixture_root/.octon/generated/reports" \
+    "$fixture_root/.octon/framework/engine/runtime/spec"
+
+  cp "$REPO_ROOT/.octon/framework/engine/runtime/spec/service-manifest-v1.schema.json" \
+    "$fixture_root/.octon/framework/engine/runtime/spec/service-manifest-v1.schema.json"
 
   cat > "$fixture_root/.octon/framework/orchestration/runtime/queue/registry.yml" <<'EOF'
 schema_version: "orchestration-queue-registry-v1"
