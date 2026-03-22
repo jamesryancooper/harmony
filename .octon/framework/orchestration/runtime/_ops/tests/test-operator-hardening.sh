@@ -87,7 +87,11 @@ create_fixture() {
     "$fixture_root/.octon/state/evidence/decisions/repo/dec-001" \
     "$fixture_root/.octon/state/evidence/runs/run-001" \
     "$fixture_root/.octon/framework/orchestration/governance" \
-    "$fixture_root/.octon/generated/reports"
+    "$fixture_root/.octon/generated/reports" \
+    "$fixture_root/.octon/framework/engine/runtime/spec"
+
+  cp "$REPO_ROOT/.octon/framework/engine/runtime/spec/service-manifest-v1.schema.json" \
+    "$fixture_root/.octon/framework/engine/runtime/spec/service-manifest-v1.schema.json"
 
   cat > "$fixture_root/.octon/framework/orchestration/runtime/queue/registry.yml" <<'EOF'
 schema_version: "orchestration-queue-registry-v1"
@@ -254,7 +258,7 @@ Closed with evidence.
 - Remediation Ref: `run:run-001`
 EOF
   cat > "$fixture_root/.octon/framework/orchestration/runtime/workflows/example/sample/workflow.yml" <<'EOF'
-schema_version: "workflow-contract-v1"
+schema_version: "workflow-contract-v2"
 name: "sample"
 description: "Example workflow."
 version: "1.0.0"
