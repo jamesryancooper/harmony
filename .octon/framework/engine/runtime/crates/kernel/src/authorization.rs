@@ -441,7 +441,7 @@ pub fn authorize_execution(
                 .with_details(json!({"reason_codes":["ELEVATED_EXECUTOR_REQUIRES_HARD_ENFORCE"]})),
             );
         }
-        if profile.require_human_review || request.review_requirements.human_approval {
+        if profile.require_human_review {
             let approved = std::env::var("OCTON_EXECUTION_HUMAN_APPROVED")
                 .unwrap_or_default()
                 .eq_ignore_ascii_case("true");
@@ -455,21 +455,7 @@ pub fn authorize_execution(
                 );
             }
         }
-        if request.review_requirements.quorum {
-            let has_quorum = std::env::var("OCTON_EXECUTION_QUORUM_TOKEN")
-                .map(|value| !value.trim().is_empty())
-                .unwrap_or(false);
-            if !has_quorum {
-                return Err(
-                    KernelError::new(
-                        ErrorCode::CapabilityDenied,
-                        "quorum evidence is required for this execution",
-                    )
-                    .with_details(json!({"reason_codes":["QUORUM_EVIDENCE_REQUIRED"]})),
-                );
-            }
-        }
-        if profile.require_rollback_metadata || request.review_requirements.rollback_metadata {
+        if profile.require_rollback_metadata {
             let has_rollback = std::env::var("OCTON_EXECUTION_ROLLBACK_REF")
                 .map(|value| !value.trim().is_empty())
                 .unwrap_or(false);
@@ -482,6 +468,49 @@ pub fn authorize_execution(
                     .with_details(json!({"reason_codes":["ROLLBACK_METADATA_REQUIRED"]})),
                 );
             }
+        }
+    }
+
+    if request.review_requirements.human_approval {
+        let approved = std::env::var("OCTON_EXECUTION_HUMAN_APPROVED")
+            .unwrap_or_default()
+            .eq_ignore_ascii_case("true");
+        if !approved {
+            return Err(
+                KernelError::new(
+                    ErrorCode::CapabilityDenied,
+                    "human approval is required for this execution",
+                )
+                .with_details(json!({"reason_codes":["HUMAN_APPROVAL_REQUIRED"]})),
+            );
+        }
+    }
+    if request.review_requirements.quorum {
+        let has_quorum = std::env::var("OCTON_EXECUTION_QUORUM_TOKEN")
+            .map(|value| !value.trim().is_empty())
+            .unwrap_or(false);
+        if !has_quorum {
+            return Err(
+                KernelError::new(
+                    ErrorCode::CapabilityDenied,
+                    "quorum evidence is required for this execution",
+                )
+                .with_details(json!({"reason_codes":["QUORUM_EVIDENCE_REQUIRED"]})),
+            );
+        }
+    }
+    if request.review_requirements.rollback_metadata {
+        let has_rollback = std::env::var("OCTON_EXECUTION_ROLLBACK_REF")
+            .map(|value| !value.trim().is_empty())
+            .unwrap_or(false);
+        if !has_rollback {
+            return Err(
+                KernelError::new(
+                    ErrorCode::CapabilityDenied,
+                    "rollback metadata is required for this execution",
+                )
+                .with_details(json!({"reason_codes":["ROLLBACK_METADATA_REQUIRED"]})),
+            );
         }
     }
 
@@ -1245,6 +1274,19 @@ mod tests {
         request.scope_constraints.write = vec!["repo-scope".to_string()];
         let err = authorize_execution(&cfg, &policy, &request, None)
             .expect_err("critical action should deny outside hard-enforce");
+        assert_eq!(err.code, ErrorCode::CapabilityDenied);
+    }
+
+    #[test]
+    fn request_level_human_approval_applies_without_executor_profile() {
+        let cfg = temp_runtime_config();
+        let policy = PolicyEngine::new(cfg.clone());
+        let mut request = minimal_request();
+        request.scope_constraints.executor_profile = None;
+        request.side_effect_flags.shell = false;
+        request.review_requirements.human_approval = true;
+        let err = authorize_execution(&cfg, &policy, &request, None)
+            .expect_err("request-level approval should deny without env approval");
         assert_eq!(err.code, ErrorCode::CapabilityDenied);
     }
 
