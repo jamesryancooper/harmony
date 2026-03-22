@@ -10,6 +10,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::{Mutex, OnceLock};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IntentRef {
@@ -837,20 +838,43 @@ fn compose_policy_receipt(
     actor_ref: &ActorRef,
     effective_policy_mode: &str,
 ) -> CoreResult<PolicyArtifacts> {
-    let policy_runner = cfg.repo_root.join(".octon/framework/engine/runtime/policy");
-    let policy_file = cfg
-        .repo_root
-        .join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml");
-    if !policy_runner.is_file() || !policy_file.is_file() {
-        return Ok(PolicyArtifacts {
-            allow: true,
-            decision: ExecutionDecision::Allow,
-            reason_codes: vec!["EXECUTION_AUTHORIZED".to_string()],
-            remediation: None,
-            receipt_path: None,
-            digest_path: None,
-            instruction_manifest_path: None,
-        });
+    let _test_guard = if cfg!(test) {
+        Some(
+            ACP_TEST_LOCK
+                .get_or_init(|| Mutex::new(()))
+                .lock()
+                .map_err(|_| KernelError::new(ErrorCode::Internal, "failed to acquire ACP test lock"))?,
+        )
+    } else {
+        None
+    };
+    let mut policy_runner = std::env::var("OCTON_POLICY_RUNNER_OVERRIDE")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| cfg.repo_root.join(".octon/framework/engine/runtime/policy"));
+    let mut policy_file = resolve_acp_policy_path(cfg);
+    if cfg!(test) {
+        let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../../../..")
+            .canonicalize()
+            .unwrap_or_else(|_| PathBuf::from(env!("CARGO_MANIFEST_DIR")));
+        if !policy_runner.is_file() {
+            policy_runner = source_root.join(".octon/framework/engine/runtime/policy");
+        }
+        if !policy_file.is_file() {
+            policy_file = source_root.join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml");
+        }
+    }
+    if !policy_runner.is_file() {
+        return Err(KernelError::new(
+            ErrorCode::Internal,
+            format!("execution authorization requires ACP runner: {}", policy_runner.display()),
+        ));
+    }
+    if !policy_file.is_file() {
+        return Err(KernelError::new(
+            ErrorCode::Internal,
+            format!("execution authorization requires ACP policy file: {}", policy_file.display()),
+        ));
     }
 
     let request_path = unique_temp_file(&format!("policy-request-{}", request.request_id), "json");
@@ -885,6 +909,7 @@ fn compose_policy_receipt(
         .arg("--emit-receipt")
         .arg("--run-id")
         .arg(&request.request_id)
+        .current_dir(&cfg.repo_root)
         .output()
         .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to spawn ACP execution flow: {e}")))?;
     fs::remove_file(&request_path).ok();
@@ -948,12 +973,23 @@ fn compose_policy_receipt(
         } else {
             None
         },
-        instruction_manifest_path: if instruction_manifest_path.is_file() {
-            Some(path_tail(&cfg.repo_root, &instruction_manifest_path))
-        } else {
-            None
-        },
+        instruction_manifest_path: Some(path_tail(&cfg.repo_root, &instruction_manifest_path)),
     })
+}
+
+fn resolve_acp_policy_path(cfg: &RuntimeConfig) -> PathBuf {
+    if let Some(path) = &cfg.policy_path {
+        let absolute = if path.is_absolute() {
+            path.clone()
+        } else {
+            cfg.octon_dir.join(path)
+        };
+        if absolute.is_file() {
+            return absolute;
+        }
+    }
+    cfg.repo_root
+        .join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml")
 }
 
 fn build_policy_request_json(
@@ -1081,6 +1117,8 @@ fn zero_sha256() -> String {
     "0".repeat(64)
 }
 
+static ACP_TEST_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+
 fn sha256_file(path: &Path) -> String {
     fs::read(path)
         .map(|bytes| sha256_bytes(&bytes))
@@ -1101,6 +1139,7 @@ mod tests {
     use octon_core::config::{ExecutionGovernanceConfig, PolicyConfig, ReceiptRootsConfig, RuntimeConfig};
     use std::fs;
     use std::time::{SystemTime, UNIX_EPOCH};
+    use std::path::PathBuf;
 
     fn temp_runtime_config() -> RuntimeConfig {
         let stamp = SystemTime::now()
@@ -1114,16 +1153,28 @@ mod tests {
         let _ = fs::remove_dir_all(&base);
         fs::create_dir_all(base.join(".octon/instance/cognition/context/shared"))
             .expect("create intent dir");
+        fs::create_dir_all(base.join(".octon/framework/capabilities/governance/policy"))
+            .expect("create ACP policy dir");
         fs::write(
             base.join(".octon/instance/cognition/context/shared/intent.contract.yml"),
             "intent_id: intent://test/example\nversion: 1.0.0\n",
         )
         .expect("write intent contract");
+        let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../../../..")
+            .canonicalize()
+            .expect("source repo root should resolve");
+        fs::copy(
+            source_root.join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml"),
+            base.join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml"),
+        )
+        .expect("copy ACP policy");
         RuntimeConfig {
             octon_dir: base.join(".octon"),
             repo_root: base,
             state_dir: std::env::temp_dir().join("octon-auth-state"),
             policy: PolicyConfig::default(),
+            policy_path: Some(PathBuf::from("framework/capabilities/governance/policy/deny-by-default.v2.yml")),
             execution_governance: ExecutionGovernanceConfig {
                 receipt_roots: ReceiptRootsConfig::default(),
                 ..ExecutionGovernanceConfig::default()

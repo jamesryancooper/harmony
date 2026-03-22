@@ -4293,6 +4293,18 @@ mod tests {
         root
     }
 
+    fn seed_policy_runtime_env() {
+        let source_root = source_repo_root();
+        std::env::set_var(
+            "OCTON_POLICY_RUNNER_OVERRIDE",
+            source_root.join(".octon/framework/engine/runtime/policy"),
+        );
+        std::env::set_var(
+            "OCTON_POLICY_BIN",
+            source_root.join(".octon/generated/.tmp/engine/build/runtime-crates-target/debug/octon-policy"),
+        );
+    }
+
     fn write_file(path: &Path, contents: &str) {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).expect("parent directory should exist");
@@ -4301,6 +4313,7 @@ mod tests {
     }
 
     fn seed_pipeline_fixture(root: &Path) -> (PathBuf, PathBuf) {
+        seed_policy_runtime_env();
         let octon_dir = root.join(".octon");
         fs::create_dir_all(&octon_dir).expect(".octon dir should exist");
         fs::create_dir_all(octon_dir.join("instance/cognition/context/shared"))
@@ -4309,6 +4322,17 @@ mod tests {
             &octon_dir.join("instance/cognition/context/shared/intent.contract.yml"),
             "intent_id: \"intent://test/design-workflow\"\nversion: \"1.0.0\"\n",
         );
+        fs::create_dir_all(octon_dir.join("framework/capabilities/governance/policy"))
+            .expect("policy root should exist");
+        write_file(
+            &octon_dir.join("octon.yml"),
+            "engine:\n  runtime:\n    policy_file: framework/capabilities/governance/policy/deny-by-default.v2.yml\n",
+        );
+        fs::copy(
+            source_repo_root().join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml"),
+            octon_dir.join("framework/capabilities/governance/policy/deny-by-default.v2.yml"),
+        )
+        .expect("copy ACP policy");
 
         let target_package = root.join(".design-packages").join("target-package");
         fs::create_dir_all(&target_package).expect("target package should exist");
@@ -4387,6 +4411,7 @@ mod tests {
     }
 
     fn seed_create_design_package_fixture(root: &Path) -> PathBuf {
+        seed_policy_runtime_env();
         let octon_dir = root.join(".octon");
         fs::create_dir_all(&octon_dir).expect(".octon dir should exist");
         fs::create_dir_all(octon_dir.join("instance/cognition/context/shared"))
@@ -4395,6 +4420,17 @@ mod tests {
             &octon_dir.join("instance/cognition/context/shared/intent.contract.yml"),
             "intent_id: \"intent://test/create-design-package\"\nversion: \"1.0.0\"\n",
         );
+        fs::create_dir_all(octon_dir.join("framework/capabilities/governance/policy"))
+            .expect("policy root should exist");
+        write_file(
+            &octon_dir.join("octon.yml"),
+            "engine:\n  runtime:\n    policy_file: framework/capabilities/governance/policy/deny-by-default.v2.yml\n",
+        );
+        fs::copy(
+            source_repo_root().join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml"),
+            octon_dir.join("framework/capabilities/governance/policy/deny-by-default.v2.yml"),
+        )
+        .expect("copy ACP policy");
 
         let source_root = source_repo_root();
         copy_tree(

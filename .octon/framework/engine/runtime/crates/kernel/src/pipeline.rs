@@ -1205,6 +1205,26 @@ fn slugify(input: &str) -> String {
 mod tests {
     use super::*;
     use std::collections::HashMap;
+    use std::path::PathBuf;
+
+    fn source_repo_root() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../../../..")
+            .canonicalize()
+            .expect("source repo root should resolve")
+    }
+
+    fn seed_policy_runtime_env() {
+        let source_root = source_repo_root();
+        std::env::set_var(
+            "OCTON_POLICY_RUNNER_OVERRIDE",
+            source_root.join(".octon/framework/engine/runtime/policy"),
+        );
+        std::env::set_var(
+            "OCTON_POLICY_BIN",
+            source_root.join(".octon/generated/.tmp/engine/build/runtime-crates-target/debug/octon-policy"),
+        );
+    }
 
     fn make_temp_root(label: &str) -> PathBuf {
         let root = std::env::temp_dir().join(format!(
@@ -1218,11 +1238,31 @@ mod tests {
     }
 
     fn seed_generic_workflow_fixture(root: &Path) -> PathBuf {
+        seed_policy_runtime_env();
         let octon_dir = root.join(".octon");
         let workflows_dir = octon_dir.join("orchestration/runtime/workflows/test/sample-workflow");
         fs::create_dir_all(workflows_dir.join("stages")).expect("create workflow stages");
         fs::create_dir_all(octon_dir.join("state/evidence/validation/analysis"))
             .expect("create evidence root");
+        fs::create_dir_all(octon_dir.join("instance/cognition/context/shared"))
+            .expect("create intent contract root");
+        fs::create_dir_all(octon_dir.join("framework/capabilities/governance/policy"))
+            .expect("create policy root");
+        fs::write(
+            octon_dir.join("instance/cognition/context/shared/intent.contract.yml"),
+            "intent_id: \"intent://test/sample-workflow\"\nversion: \"1.0.0\"\n",
+        )
+        .expect("write intent contract");
+        fs::write(
+            octon_dir.join("octon.yml"),
+            "engine:\n  runtime:\n    policy_file: framework/capabilities/governance/policy/deny-by-default.v2.yml\n",
+        )
+        .expect("write root manifest");
+        fs::copy(
+            source_repo_root().join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml"),
+            octon_dir.join("framework/capabilities/governance/policy/deny-by-default.v2.yml"),
+        )
+        .expect("copy ACP policy");
 
         fs::write(
             octon_dir.join("orchestration/runtime/workflows/manifest.yml"),

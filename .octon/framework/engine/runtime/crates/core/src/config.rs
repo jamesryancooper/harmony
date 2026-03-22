@@ -11,6 +11,7 @@ pub struct RuntimeConfig {
     pub state_dir: PathBuf,
 
     pub policy: PolicyConfig,
+    pub policy_path: Option<PathBuf>,
     pub execution_governance: ExecutionGovernanceConfig,
 
     /// NDJSON stdio max line length (bytes). Default: 1 MiB.
@@ -185,8 +186,8 @@ impl ConfigLoader {
         let root_manifest = Self::load_root_manifest(&octon_dir)?;
 
         let policy_path = Self::resolve_policy_path(&octon_dir, root_manifest.as_ref())?;
-        let policy = if let Some(path) = policy_path {
-            Self::load_policy_file(&octon_dir, &path)?
+        let policy = if let Some(ref path) = policy_path {
+            Self::load_policy_file(&octon_dir, path)?
         } else {
             PolicyConfig::default()
         };
@@ -210,6 +211,7 @@ impl ConfigLoader {
             repo_root,
             state_dir,
             policy,
+            policy_path,
             execution_governance,
             ndjson_max_line_bytes: 1024 * 1024,
             wasmtime_cache_config,
