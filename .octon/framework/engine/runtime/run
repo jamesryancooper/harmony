@@ -95,11 +95,15 @@ TARGET_ARCH="$(normalize_arch "$ARCH")"
 TARGET_BINARY=""
 LOCAL_LAUNCHABLE=""
 SHIPPABLE_RELEASE=""
+TARGET_DECLARED=0
 
 if [ -f "$TARGETS_FILE" ]; then
   TARGET_BINARY="$(resolve_target_field "$TARGET_OS" "$TARGET_ARCH" "binary_name")"
   LOCAL_LAUNCHABLE="$(resolve_target_field "$TARGET_OS" "$TARGET_ARCH" "local_launchable")"
   SHIPPABLE_RELEASE="$(resolve_target_field "$TARGET_OS" "$TARGET_ARCH" "shippable_release")"
+  if [ -n "$TARGET_BINARY" ] || [ -n "$LOCAL_LAUNCHABLE" ] || [ -n "$SHIPPABLE_RELEASE" ]; then
+    TARGET_DECLARED=1
+  fi
 fi
 
 case "${1:-}" in
@@ -118,7 +122,7 @@ if [ -n "$BIN" ] && [ -x "$BIN" ]; then
   fi
 fi
 
-if [ "$FORCE_SOURCE_ONLY" != "1" ] && [ "$LOCAL_LAUNCHABLE" != "true" ]; then
+if [ "$FORCE_SOURCE_ONLY" != "1" ] && [ "$TARGET_DECLARED" = "1" ] && [ "$LOCAL_LAUNCHABLE" != "true" ]; then
   echo "No local launchable runtime target is declared for ${TARGET_OS}/${TARGET_ARCH} in $TARGETS_FILE." >&2
   exit 1
 fi
@@ -126,6 +130,8 @@ fi
 if [ "$FORCE_SOURCE_ONLY" != "1" ] && [ "$STRICT_PACKAGING" = "1" ]; then
   if [ "$SHIPPABLE_RELEASE" = "true" ] && [ -n "$BIN" ]; then
     echo "Strict packaging requires packaged runtime binary at $BIN." >&2
+  elif [ "$TARGET_DECLARED" != "1" ]; then
+    echo "Strict packaging disallows source fallback for undeclared target ${TARGET_OS}/${TARGET_ARCH}." >&2
   else
     echo "Strict packaging disallows source fallback for ${TARGET_OS}/${TARGET_ARCH}." >&2
   fi

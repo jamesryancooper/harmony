@@ -77,10 +77,46 @@ EOF
   [[ "$strict_exit" -ne 0 && "$strict_exit" -ne 99 && "$fallback_exit" -eq 99 ]]
 }
 
+case_undeclared_target_still_allows_fallback() {
+  local fixture_root fake_bin run_file targets_file
+  fixture_root="$(mktemp -d)"
+  CLEANUP_DIRS+=("$fixture_root")
+
+  mkdir -p "$fixture_root/.octon/framework/engine/runtime" "$fixture_root/bin"
+  run_file="$fixture_root/.octon/framework/engine/runtime/run"
+  targets_file="$fixture_root/.octon/framework/engine/runtime/release-targets.yml"
+  fake_bin="$fixture_root/bin/cargo"
+
+  cp "$REPO_ROOT/.octon/framework/engine/runtime/run" "$run_file"
+  cp "$REPO_ROOT/.octon/framework/engine/runtime/release-targets.yml" "$targets_file"
+  chmod +x "$run_file"
+
+  awk '
+    /^  - id: macos-arm64$/ { skip = 1; next }
+    skip && /^  - id:/ { skip = 0 }
+    !skip { print }
+  ' "$targets_file" >"$targets_file.tmp" && mv "$targets_file.tmp" "$targets_file"
+
+  cat >"$fake_bin" <<'EOF'
+#!/usr/bin/env bash
+exit 99
+EOF
+  chmod +x "$fake_bin"
+
+  local fallback_exit
+  set +e
+  PATH="$fixture_root/bin:$PATH" OCTON_RUNTIME_PREFER_SOURCE=1 "$run_file" tool noop >/dev/null 2>&1
+  fallback_exit=$?
+  set -e
+
+  [[ "$fallback_exit" -eq 99 ]]
+}
+
 main() {
   assert_success "runtime target parity validator passes on live repo" case_live_repo_passes
   assert_success "runtime target parity validator fails on hardcoded workflow targets" case_hardcoded_workflow_target_fails
   assert_success "strict packaging blocks source fallback while local mode still falls back" case_strict_packaging_blocks_source_fallback
+  assert_success "undeclared targets still allow local source fallback when strict mode is off" case_undeclared_target_still_allows_fallback
 
   echo
   echo "Passed: $pass_count"

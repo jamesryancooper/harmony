@@ -26,10 +26,14 @@ if /I "%ARCH%"=="ARM64" set TARGET_ARCH=arm64
 set TARGET_BINARY=
 set LOCAL_LAUNCHABLE=
 set SHIPPABLE_RELEASE=
+set TARGET_DECLARED=0
 set BIN=
 set FORCE_SOURCE_ONLY=0
 
 call :load_target_fields "%TARGETS_FILE%" "%TARGET_OS%" "%TARGET_ARCH%"
+if defined TARGET_BINARY set TARGET_DECLARED=1
+if defined LOCAL_LAUNCHABLE set TARGET_DECLARED=1
+if defined SHIPPABLE_RELEASE set TARGET_DECLARED=1
 
 if /I "%~1"=="studio" set FORCE_SOURCE_ONLY=1
 if /I "%~1"=="workflow" set FORCE_SOURCE_ONLY=1
@@ -45,13 +49,17 @@ if defined BIN if exist "%BIN%" (
   if not "%OCTON_RUNTIME_PREFER_SOURCE%"=="1" goto exec_bin
 )
 
-if "%FORCE_SOURCE_ONLY%"=="0" if /I not "%LOCAL_LAUNCHABLE%"=="true" (
+if "%FORCE_SOURCE_ONLY%"=="0" if "%TARGET_DECLARED%"=="1" if /I not "%LOCAL_LAUNCHABLE%"=="true" (
   echo No local launchable runtime target is declared for %TARGET_OS%/%TARGET_ARCH% in "%TARGETS_FILE%".
   exit /b 1
 )
 
 if "%FORCE_SOURCE_ONLY%"=="0" if "%STRICT_PACKAGING%"=="1" (
-  echo Strict packaging requires packaged runtime binary at "%BIN%".
+  if "%TARGET_DECLARED%"=="0" (
+    echo Strict packaging disallows source fallback for undeclared target %TARGET_OS%/%TARGET_ARCH%.
+  ) else (
+    echo Strict packaging requires packaged runtime binary at "%BIN%".
+  )
   exit /b 1
 )
 

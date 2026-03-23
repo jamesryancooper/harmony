@@ -40,6 +40,7 @@ documentation:
         - ".octon/framework/engine/README.md"
         - ".octon/framework/engine/runtime/spec/policy-interface-v1.md"
         - ".octon/framework/agency/practices/pull-request-standards.md"
+        - ".octon/instance/cognition/decisions/[0-9][0-9][0-9]-*.md"
         - ".github/PULL_REQUEST_TEMPLATE.md"
         - ".github/PULL_REQUEST_TEMPLATE/kaizen.md"
     - id: "operational-guide"
