@@ -1,0 +1,139 @@
+schema_version: "alignment-profiles-v1"
+profiles:
+  - id: "commit-pr"
+    label: "Commit and PR standards alignment checks"
+    entrypoint: "run_commit_pr"
+    required_paths:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-commit-pr-alignment.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "harness"
+    label: ".octon architecture and drift guardrail checks"
+    entrypoint: "run_harness"
+    required_paths:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-harness-structure.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-harness-version-contract.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-root-manifest-profiles.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-companion-manifests.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-overlay-points.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-framework-core-boundary.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-repo-instance-boundary.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-locality-registry.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-export-profile-contract.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-contract-governance.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-ssot-precedence-drift.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-continuity-memory.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-state-surface-alignment.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-capability-engine-consistency.sh"
+      - ".octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-execution-governance.sh"
+      - ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-host-projections.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-developer-context-policy.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-bootstrap-ingress.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-bootstrap-projections.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-context-overhead-budget.sh"
+      - ".octon/framework/cognition/practices/methodology/migrations/legacy-banlist.md"
+      - ".octon/framework/cognition/practices/methodology/migrations/ci-gates.md"
+      - ".octon/framework/cognition/practices/methodology/migrations/README.md"
+      - ".octon/framework/cognition/practices/methodology/migrations/doctrine.md"
+      - ".octon/framework/scaffolding/runtime/templates/migrations/template.clean-break-migration.md"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-tier-downgrade-policy.sh"
+      - ".octon/framework/agency/practices/pull-request-standards.md"
+      - ".github/PULL_REQUEST_TEMPLATE.md"
+      - ".github/PULL_REQUEST_TEMPLATE/kaizen.md"
+      - ".octon/framework/orchestration/runtime/workflows/README.md"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-convergence-contract.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-framing-alignment.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-authoritative-doc-triggers.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-github-action-pins.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "framing"
+    label: "Canonical framing drift checks"
+    entrypoint: "run_framing"
+    required_paths:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-framing-alignment.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "intent-layer"
+    label: "Intent contract, boundary, capability-map, and mode-gate checks"
+    entrypoint: "run_intent_layer"
+    required_paths:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-intent-layer.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "agency"
+    label: "Agency contract and registry checks"
+    entrypoint: "run_agency"
+    required_paths:
+      - ".octon/framework/agency/_ops/scripts/validate/validate-agency.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "workflows"
+    label: "Workflow manifest/registry/path contract checks"
+    entrypoint: "run_workflows"
+    required_paths:
+      - ".octon/framework/orchestration/runtime/workflows/_ops/scripts/validate-workflows.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-design-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-create-design-proposal-workflow.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "skills"
+    label: "Skill contract and drift checks (strict mode)"
+    entrypoint: "run_skills"
+    required_paths:
+      - ".octon/framework/capabilities/runtime/skills/_ops/scripts/validate-skills.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "services"
+    label: "Services contract and interop boundary checks"
+    entrypoint: "run_services"
+    required_paths:
+      - ".octon/framework/capabilities/runtime/services/_ops/scripts/validate-services.sh"
+      - ".octon/framework/capabilities/runtime/services/_ops/scripts/validate-service-independence.sh"
+      - ".octon/framework/capabilities/runtime/services/_ops/scripts/validate-filesystem-interfaces.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "weights"
+    label: "Weighted assurance score and gate checks"
+    entrypoint: "run_weights"
+    required_paths:
+      - ".octon/framework/assurance/runtime/_ops/scripts/compute-assurance-score.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/assurance-gate.sh"
+      - ".octon/framework/assurance/governance/weights/weights.yml"
+      - ".octon/framework/assurance/governance/scores/scores.yml"
+      - ".octon/framework/assurance/governance/CHARTER.md"
+      - ".octon/framework/assurance/governance/weights/inputs/context.yml"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "all"
+    label: "Run all profiles above in sequence"
+    entrypoint: "run_all"
+    required_paths: []
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"

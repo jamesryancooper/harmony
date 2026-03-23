@@ -23,3 +23,40 @@ execution:
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
     - ".github/workflows/architecture-conformance.yml"
+documentation:
+  class_precedence:
+    - "authoritative-doc"
+    - "operational-guide"
+    - "narrative-doc"
+  safety_trigger_classes:
+    - "authoritative-doc"
+  classes:
+    - id: "authoritative-doc"
+      description: "Markdown documents that define architecture, governance, bootstrap, or review-receipt behavior."
+      match_globs:
+        - ".octon/framework/cognition/_meta/architecture/specification.md"
+        - ".octon/framework/cognition/_meta/architecture/runtime-vs-ops-contract.md"
+        - ".octon/instance/bootstrap/START.md"
+        - ".octon/framework/engine/README.md"
+        - ".octon/framework/engine/runtime/spec/policy-interface-v1.md"
+        - ".octon/framework/agency/practices/pull-request-standards.md"
+        - ".github/PULL_REQUEST_TEMPLATE.md"
+        - ".github/PULL_REQUEST_TEMPLATE/kaizen.md"
+    - id: "operational-guide"
+      description: "Markdown guidance that shapes operator behavior but does not define authoritative contract boundaries."
+      match_globs:
+        - ".octon/framework/**/README.md"
+        - ".octon/framework/**/guide.md"
+        - ".octon/framework/**/guides/**/*.md"
+        - ".octon/framework/**/references/**/*.md"
+        - ".octon/framework/**/practices/*.md"
+        - ".octon/framework/**/practices/**/*.md"
+        - ".octon/instance/bootstrap/scope.md"
+        - ".octon/instance/bootstrap/conventions.md"
+        - ".octon/instance/bootstrap/catalog.md"
+        - ".octon/framework/engine/runtime/README.md"
+        - ".octon/framework/engine/practices/**/*.md"
+    - id: "narrative-doc"
+      description: "Markdown content that remains non-authoritative and may stay on the cheaper safety path."
+      match_globs:
+        - "**/*.md"

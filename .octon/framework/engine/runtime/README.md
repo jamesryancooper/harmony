@@ -6,10 +6,21 @@
 
 - `run` / `run.cmd`: launcher entrypoints
 - `policy` / `policy.cmd`: policy-engine launcher interface
+- `release-targets.yml`: canonical runtime target matrix for launchers and
+  release automation
 - `crates/`: runtime implementations
 - `config/`: runtime-local configuration (including `policy-interface.yml`)
 - `spec/`: runtime schema/protocol contracts
 - `wit/`: canonical WIT contracts
+
+## Packaging Contract
+
+- `release-targets.yml` is the single source of truth for runtime target ids,
+  binary names, artifact names, and shippable-release expectations.
+- `OCTON_RUNTIME_STRICT_PACKAGING=1` disables source fallback for declared
+  runtime targets and fails when a required packaged binary is absent.
+- `OCTON_RUNTIME_PREFER_SOURCE=1` still allows local source-first execution
+  only when strict packaging mode is disabled.
 
 ## Operator Surfaces
 

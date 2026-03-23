@@ -125,3 +125,5 @@ records:
     path: 060-runtime-execution-governance-hardening-atomic-cutover.md
   - id: 061-harness-integrity-tightening-atomic-cutover
     path: 061-harness-integrity-tightening-atomic-cutover.md
+  - id: 062-self-audit-and-release-hardening-atomic-cutover
+    path: 062-self-audit-and-release-hardening-atomic-cutover.md

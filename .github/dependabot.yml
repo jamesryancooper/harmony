@@ -23,3 +23,26 @@ updates:
       - dependency-name: "*"
         update-types:
           - version-update:semver-major
+  - package-ecosystem: cargo
+    directory: /.octon/framework/engine/runtime/crates
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Chicago
+    labels:
+      - bot:dependabot
+      - type:chore
+      - area:runtime
+    open-pull-requests-limit: 5
+    groups:
+      runtime-cargo-safe:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major

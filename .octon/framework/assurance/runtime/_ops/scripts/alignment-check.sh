@@ -3,6 +3,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../../../" && pwd)"
+ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
+ALIGNMENT_REGISTRY="$OCTON_DIR/framework/assurance/runtime/contracts/alignment-profiles.yml"
 
 PROFILE_CSV=""
 LIST_PROFILES=0
@@ -24,20 +26,34 @@ Examples:
 USAGE
 }
 
+require_registry() {
+  if [[ ! -f "$ALIGNMENT_REGISTRY" ]]; then
+    echo "[ERROR] missing alignment profile registry: $ALIGNMENT_REGISTRY" >&2
+    exit 1
+  fi
+
+  if ! command -v yq >/dev/null 2>&1; then
+    echo "[ERROR] yq is required to read alignment profiles" >&2
+    exit 1
+  fi
+}
+
 list_profiles() {
-  cat <<'PROFILES'
-Profiles:
-  commit-pr   Commit and PR standards alignment checks
-  harness     .octon architecture and drift guardrail checks
-  framing     Canonical framing drift checks
-  intent-layer Intent contract, boundary, capability-map, and mode-gate checks
-  agency      Agency contract and registry checks
-  workflows   Workflow manifest/registry/path contract checks
-  skills      Skill contract and drift checks (strict mode)
-  services    Services contract and interop boundary checks
-  weights     Weighted assurance score and gate checks
-  all         Run all profiles above in sequence
-PROFILES
+  require_registry
+  echo "Profiles:"
+  while IFS=$'\t' read -r profile_id label; do
+    printf '  %-12s %s\n' "$profile_id" "$label"
+  done < <(yq -r '.profiles[] | [.id, .label] | @tsv' "$ALIGNMENT_REGISTRY")
+}
+
+profile_exists() {
+  local profile="$1"
+  yq -e ".profiles[] | select(.id == \"$profile\")" "$ALIGNMENT_REGISTRY" >/dev/null 2>&1
+}
+
+profile_entrypoint() {
+  local profile="$1"
+  yq -r ".profiles[] | select(.id == \"$profile\") | .entrypoint // \"\"" "$ALIGNMENT_REGISTRY"
 }
 
 run_step() {
@@ -110,6 +126,18 @@ run_harness() {
   run_step \
     "Validate contract governance coverage and _ops boundaries" \
     bash "$SCRIPT_DIR/validate-contract-governance.sh"
+
+  run_step \
+    "Validate authoritative-doc trigger contract" \
+    bash "$SCRIPT_DIR/validate-authoritative-doc-triggers.sh"
+
+  run_step \
+    "Validate GitHub Action pin policy contract" \
+    bash "$SCRIPT_DIR/validate-github-action-pins.sh"
+
+  run_step \
+    "Validate runtime target parity contract" \
+    bash "$SCRIPT_DIR/validate-runtime-target-parity.sh"
 
   run_step \
     "Validate SSOT precedence drift contract" \
@@ -225,13 +253,13 @@ run_intent_layer() {
 run_agency() {
   run_step \
     "Validate agency contracts" \
-    bash "$OCTON_DIR/agency/_ops/scripts/validate/validate-agency.sh"
+    bash "$OCTON_DIR/framework/agency/_ops/scripts/validate/validate-agency.sh"
 }
 
 run_workflows() {
   run_step \
     "Validate workflow contracts" \
-    bash "$OCTON_DIR/orchestration/runtime/workflows/_ops/scripts/validate-workflows.sh"
+    bash "$OCTON_DIR/framework/orchestration/runtime/workflows/_ops/scripts/validate-workflows.sh"
 
   run_step \
     "Validate architecture validation workflow package" \
@@ -245,32 +273,32 @@ run_workflows() {
 run_skills() {
   run_step \
     "Validate skill contracts (strict)" \
-    bash "$OCTON_DIR/capabilities/runtime/skills/_ops/scripts/validate-skills.sh" --strict
+    bash "$OCTON_DIR/framework/capabilities/runtime/skills/_ops/scripts/validate-skills.sh" --strict
 }
 
 run_services() {
   run_step \
     "Validate service contracts" \
-    bash "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/validate-services.sh"
+    bash "$OCTON_DIR/framework/capabilities/runtime/services/_ops/scripts/validate-services.sh"
 
   run_step \
     "Validate service independence boundaries" \
-    bash "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/validate-service-independence.sh" --mode all
+    bash "$OCTON_DIR/framework/capabilities/runtime/services/_ops/scripts/validate-service-independence.sh" --mode all
 
   run_step \
     "Validate filesystem interface contracts" \
-    bash "$OCTON_DIR/capabilities/runtime/services/_ops/scripts/validate-filesystem-interfaces.sh"
+    bash "$OCTON_DIR/framework/capabilities/runtime/services/_ops/scripts/validate-filesystem-interfaces.sh"
 }
 
 run_weights() {
   local out_dir="$OCTON_DIR/generated/.tmp/assurance/engine-alignment"
   run_step \
     "Compute assurance engine scorecard" \
-    bash "$OCTON_DIR/assurance/runtime/_ops/scripts/compute-assurance-score.sh" \
-      --weights "$OCTON_DIR/assurance/governance/weights/weights.yml" \
-      --scores "$OCTON_DIR/assurance/governance/scores/scores.yml" \
-      --charter "$OCTON_DIR/assurance/governance/CHARTER.md" \
-      --context "$OCTON_DIR/assurance/governance/weights/inputs/context.yml" \
+    bash "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/compute-assurance-score.sh" \
+      --weights "$OCTON_DIR/framework/assurance/governance/weights/weights.yml" \
+      --scores "$OCTON_DIR/framework/assurance/governance/scores/scores.yml" \
+      --charter "$OCTON_DIR/framework/assurance/governance/CHARTER.md" \
+      --context "$OCTON_DIR/framework/assurance/governance/weights/inputs/context.yml" \
       --profile ci-reliability \
       --run-mode ci \
       --maturity beta \
@@ -279,46 +307,46 @@ run_weights() {
 
   run_step \
     "Run assurance engine gate" \
-    bash "$OCTON_DIR/assurance/runtime/_ops/scripts/assurance-gate.sh" \
+    bash "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/assurance-gate.sh" \
       --scorecard "$out_dir/scorecard.yml" \
-      --weights "$OCTON_DIR/assurance/governance/weights/weights.yml" \
-      --scores "$OCTON_DIR/assurance/governance/scores/scores.yml" \
-      --charter "$OCTON_DIR/assurance/governance/CHARTER.md" \
-      --baseline-weights "$OCTON_DIR/assurance/governance/weights/weights.yml" \
-      --baseline-scores "$OCTON_DIR/assurance/governance/scores/scores.yml" \
-      --baseline-charter "$OCTON_DIR/assurance/governance/CHARTER.md" \
+      --weights "$OCTON_DIR/framework/assurance/governance/weights/weights.yml" \
+      --scores "$OCTON_DIR/framework/assurance/governance/scores/scores.yml" \
+      --charter "$OCTON_DIR/framework/assurance/governance/CHARTER.md" \
+      --baseline-weights "$OCTON_DIR/framework/assurance/governance/weights/weights.yml" \
+      --baseline-scores "$OCTON_DIR/framework/assurance/governance/scores/scores.yml" \
+      --baseline-charter "$OCTON_DIR/framework/assurance/governance/CHARTER.md" \
       --mode ci \
       --summary-out "$out_dir/gate-summary.md"
 }
 
+run_all() {
+  local profile
+  while IFS= read -r profile; do
+    [[ -n "$profile" ]] || continue
+    [[ "$profile" == "all" ]] && continue
+    run_profile "$profile"
+  done < <(yq -r '.profiles[] | .id' "$ALIGNMENT_REGISTRY")
+}
+
 run_profile() {
   local profile="$1"
-  case "$profile" in
-    commit-pr) run_commit_pr ;;
-    harness) run_harness ;;
-    framing) run_framing ;;
-    intent-layer) run_intent_layer ;;
-    agency) run_agency ;;
-    workflows) run_workflows ;;
-    skills) run_skills ;;
-    services) run_services ;;
-    weights) run_weights ;;
-    all)
-      run_commit_pr
-      run_harness
-      run_intent_layer
-      run_agency
-      run_workflows
-      run_skills
-      run_services
-      run_weights
-      ;;
-    *)
-      echo "[ERROR] unknown profile: $profile" >&2
-      echo "Use --list-profiles to see available options." >&2
-      errors=$((errors + 1))
-      ;;
-  esac
+  local entrypoint=""
+
+  if ! profile_exists "$profile"; then
+    echo "[ERROR] unknown profile: $profile" >&2
+    echo "Use --list-profiles to see available options." >&2
+    errors=$((errors + 1))
+    return 0
+  fi
+
+  entrypoint="$(profile_entrypoint "$profile")"
+  if [[ -z "$entrypoint" ]] || ! declare -F "$entrypoint" >/dev/null 2>&1; then
+    echo "[ERROR] missing entrypoint '$entrypoint' for profile: $profile" >&2
+    errors=$((errors + 1))
+    return 0
+  fi
+
+  "$entrypoint"
 }
 
 while [[ $# -gt 0 ]]; do
@@ -356,6 +384,11 @@ if [[ -z "$PROFILE_CSV" ]]; then
   echo "[ERROR] --profile is required unless --list-profiles is set" >&2
   usage >&2
   exit 2
+fi
+
+require_registry
+if ! bash "$SCRIPT_DIR/validate-alignment-profile-registry.sh"; then
+  exit 1
 fi
 
 echo "== Alignment Check =="

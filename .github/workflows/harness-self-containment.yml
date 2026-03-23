@@ -7,11 +7,29 @@ on:
     paths:
       - '.octon/inputs/exploratory/proposals/.archive/design/orchestration-domain-design-package/**'
       - '.octon/**'
+      - '.github/dependabot.yml'
+      - '.github/workflows/ai-review-gate.yml'
+      - '.github/workflows/alignment-check.yml'
+      - '.github/workflows/dependency-review.yml'
+      - '.github/workflows/main-pr-first-guard.yml'
+      - '.github/workflows/main-push-safety.yml'
+      - '.github/workflows/pr-autonomy-policy.yml'
+      - '.github/workflows/release-please.yml'
+      - '.github/workflows/runtime-binaries.yml'
       - '.github/workflows/harness-self-containment.yml'
   pull_request:
     paths:
       - '.octon/inputs/exploratory/proposals/.archive/design/orchestration-domain-design-package/**'
       - '.octon/**'
+      - '.github/dependabot.yml'
+      - '.github/workflows/ai-review-gate.yml'
+      - '.github/workflows/alignment-check.yml'
+      - '.github/workflows/dependency-review.yml'
+      - '.github/workflows/main-pr-first-guard.yml'
+      - '.github/workflows/main-push-safety.yml'
+      - '.github/workflows/pr-autonomy-policy.yml'
+      - '.github/workflows/release-please.yml'
+      - '.github/workflows/runtime-binaries.yml'
       - '.github/workflows/harness-self-containment.yml'
 
 permissions:
@@ -28,13 +46,13 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 2
 
       - id: scope
         name: Detect impacted validation scopes
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
         with:
           filters: |
             orchestration:
@@ -109,6 +127,28 @@ jobs:
         run: |
           chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-audit-convergence-contract.sh
           .octon/framework/assurance/runtime/_ops/scripts/validate-audit-convergence-contract.sh
+
+      - name: Validate alignment profile registry
+        run: |
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-alignment-profile-registry.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-alignment-profile-registry.sh
+
+      - name: Validate authoritative-doc triggers
+        run: |
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-authoritative-doc-triggers.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-authoritative-doc-triggers.sh
+
+      - name: Validate GitHub Action pin policy
+        run: |
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-github-action-pins.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-github-action-pins.sh
+
+      - name: Validate runtime target parity
+        env:
+          OCTON_RUNTIME_STRICT_PACKAGING: "1"
+        run: |
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh
 
       - name: Test bounded-audit convergence validator
         run: |

@@ -28,13 +28,13 @@ jobs:
       provider_trigger: ${{ steps.provider_trigger.outputs.provider_trigger }}
     steps:
       - name: Checkout PR merge commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
 
       - id: filter
         name: Detect risky changed paths
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
         with:
           filters: |
             risk:
@@ -77,7 +77,7 @@ jobs:
           - anthropic
     steps:
       - name: Checkout PR merge commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: refs/pull/${{ github.event.pull_request.number }}/merge
 
@@ -136,7 +136,7 @@ jobs:
           ' "${file}" >/dev/null
 
       - name: Upload findings artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ai-gate-findings-${{ matrix.provider }}
           path: .octon/generated/.tmp/ai-gate/findings-${{ matrix.provider }}.json
@@ -160,7 +160,7 @@ jobs:
       PROVIDER_FINDINGS_RESULT: ${{ needs.provider-findings.result }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Assert protected execution posture
         run: |
@@ -174,7 +174,7 @@ jobs:
           .octon/framework/assurance/runtime/_ops/scripts/assert-protected-execution-posture.sh
 
       - name: Download provider findings artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         continue-on-error: true
         with:
           pattern: ai-gate-findings-*
@@ -279,7 +279,7 @@ jobs:
 
       - name: Upload AI gate decision artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ai-gate-decision
           path: .octon/generated/.tmp/ai-gate/decision.json
@@ -288,7 +288,7 @@ jobs:
 
       - name: Upload protected execution receipt
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ai-review-gate-protected-execution-receipt
           path: .octon/state/evidence/runs/ci/ai-review-gate-*

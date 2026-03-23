@@ -29,7 +29,7 @@ jobs:
       AUTONOMY_POLICY_ENFORCE: ${{ vars.AUTONOMY_POLICY_ENFORCE || 'true' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Assert protected execution posture
         run: |
@@ -43,7 +43,7 @@ jobs:
           .octon/framework/assurance/runtime/_ops/scripts/assert-protected-execution-posture.sh
 
       - name: Validate autonomy policy
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const owner = context.repo.owner;
@@ -121,8 +121,7 @@ jobs:
 
             async function readStandards() {
               const candidates = [
-                ".octon/framework/agency/practices/standards/commit-pr-standards.json",
-                ".octon/agency/practices/standards/commit-pr-standards.json"
+                ".octon/framework/agency/practices/standards/commit-pr-standards.json"
               ];
               for (const path of candidates) {
                 try {
@@ -262,7 +261,7 @@ jobs:
 
       - name: Upload protected execution receipt
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: pr-autonomy-policy-protected-execution-receipt
           path: .octon/state/evidence/runs/ci/pr-autonomy-policy-*
