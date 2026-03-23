@@ -21,6 +21,26 @@ pass() {
   echo "[OK] $1"
 }
 
+has_pattern() {
+  local pattern="$1"
+  local file="$2"
+  if command -v rg >/dev/null 2>&1; then
+    rg -q "$pattern" "$file"
+  else
+    grep -Eq "$pattern" "$file"
+  fi
+}
+
+has_text() {
+  local text="$1"
+  local file="$2"
+  if command -v rg >/dev/null 2>&1; then
+    rg -Fq "$text" "$file"
+  else
+    grep -Fq "$text" "$file"
+  fi
+}
+
 require_file() {
   local file="$1"
   if [[ -f "$file" ]]; then
@@ -34,25 +54,25 @@ check_runner_contract() {
   local file="$1"
   local label="$2"
 
-  if rg -Fq 'release-targets.yml' "$file"; then
+  if has_text 'release-targets.yml' "$file"; then
     pass "$label references the canonical release target matrix"
   else
     fail "$label must reference release-targets.yml"
   fi
 
-  if rg -Fq 'OCTON_RUNTIME_STRICT_PACKAGING' "$file"; then
+  if has_text 'OCTON_RUNTIME_STRICT_PACKAGING' "$file"; then
     pass "$label exposes strict packaging mode"
   else
     fail "$label must expose OCTON_RUNTIME_STRICT_PACKAGING"
   fi
 
-  if rg -Fq 'local_launchable' "$file" && rg -Fq 'shippable_release' "$file"; then
+  if has_text 'local_launchable' "$file" && has_text 'shippable_release' "$file"; then
     pass "$label consumes local_launchable and shippable_release metadata"
   else
     fail "$label must consume local_launchable and shippable_release metadata"
   fi
 
-  if rg -n 'octon-(linux|macos|windows)-(x64|arm64)' "$file" >/dev/null 2>&1; then
+  if has_pattern 'octon-(linux|macos|windows)-(x64|arm64)' "$file"; then
     fail "$label must not hardcode packaged binary names"
   else
     pass "$label no longer hardcodes packaged binary names"
@@ -115,15 +135,15 @@ main() {
   check_runner_contract "$RUNNER_FILE" "runtime/run"
   check_runner_contract "$RUNNER_CMD_FILE" "runtime/run.cmd"
 
-  if rg -Fq '.octon/framework/engine/runtime/release-targets.yml' "$WORKFLOW_FILE" \
-    && rg -Fq 'fromJSON(needs.plan_matrix.outputs.build_matrix)' "$WORKFLOW_FILE" \
-    && rg -Fq 'publish_files' "$WORKFLOW_FILE"; then
+  if has_text '.octon/framework/engine/runtime/release-targets.yml' "$WORKFLOW_FILE" \
+    && has_text 'fromJSON(needs.plan_matrix.outputs.build_matrix)' "$WORKFLOW_FILE" \
+    && has_text 'publish_files' "$WORKFLOW_FILE"; then
     pass "runtime-binaries workflow derives its matrix and publish list from release-targets.yml"
   else
     fail "runtime-binaries workflow must derive build and publish state from release-targets.yml"
   fi
 
-  if rg -n 'octon-(linux|macos|windows)-(x64|arm64)' "$WORKFLOW_FILE" >/dev/null 2>&1; then
+  if has_pattern 'octon-(linux|macos|windows)-(x64|arm64)' "$WORKFLOW_FILE"; then
     fail "runtime-binaries workflow must not hardcode packaged binary names"
   else
     pass "runtime-binaries workflow no longer hardcodes packaged binary names"
