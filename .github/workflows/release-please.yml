@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Assert protected execution posture
         run: |
@@ -36,7 +36,7 @@ jobs:
       - name: Create or update release PR / tags (attempt 1)
         id: release_attempt_1
         continue-on-error: true
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4
         with:
           token: ${{ secrets.AUTONOMY_PAT || secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
@@ -49,7 +49,7 @@ jobs:
       - name: Create or update release PR / tags (attempt 2)
         id: release_attempt_2
         if: steps.release_attempt_1.outcome == 'failure'
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4
         with:
           token: ${{ secrets.AUTONOMY_PAT || secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
@@ -86,7 +86,7 @@ jobs:
 
       - name: Upload protected execution receipt
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: release-please-protected-execution-receipt
           path: .octon/state/evidence/runs/ci/release-please-*

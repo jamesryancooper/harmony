@@ -1,0 +1,47 @@
+schema_version: runtime-release-targets-v1
+targets:
+  - id: linux-x64
+    os: linux
+    arch: x86_64
+    runner_label: ubuntu-latest
+    source_binary: octon
+    binary_name: octon-linux-x64
+    artifact_name: runtime-linux-x64
+    local_launchable: true
+    shippable_release: true
+  - id: linux-arm64
+    os: linux
+    arch: arm64
+    runner_label: ubuntu-24.04-arm
+    source_binary: octon
+    binary_name: octon-linux-arm64
+    artifact_name: runtime-linux-arm64
+    local_launchable: true
+    shippable_release: true
+  - id: windows-x64
+    os: windows
+    arch: x86_64
+    runner_label: windows-latest
+    source_binary: octon.exe
+    binary_name: octon-windows-x64.exe
+    artifact_name: runtime-windows-x64
+    local_launchable: true
+    shippable_release: true
+  - id: macos-x64
+    os: macos
+    arch: x86_64
+    runner_label: macos-15-intel
+    source_binary: octon
+    binary_name: octon-macos-x64
+    artifact_name: runtime-macos-x64
+    local_launchable: true
+    shippable_release: true
+  - id: macos-arm64
+    os: macos
+    arch: arm64
+    runner_label: macos-15
+    source_binary: octon
+    binary_name: octon-macos-arm64
+    artifact_name: runtime-macos-arm64
+    local_launchable: true
+    shippable_release: true

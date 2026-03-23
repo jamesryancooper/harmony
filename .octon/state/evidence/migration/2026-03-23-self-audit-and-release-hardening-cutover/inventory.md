@@ -1,0 +1,29 @@
+# Inventory
+
+- Assurance runtime contracts and validators:
+  - `.octon/framework/assurance/runtime/contracts/{README,alignment-profiles,github-action-pin-policy}.yml`
+  - `.octon/framework/assurance/runtime/_ops/scripts/{alignment-check,validate-alignment-profile-registry,classify-authoritative-doc-change,validate-authoritative-doc-triggers,validate-github-action-pins,validate-runtime-target-parity,validate-harness-structure}.sh`
+  - `.octon/framework/assurance/runtime/_ops/tests/{test-alignment-profile-registry,test-validate-authoritative-doc-triggers,test-validate-github-action-pins,test-validate-runtime-target-parity}.sh`
+- Workflow and dependency hardening:
+  - `.github/dependabot.yml`
+  - `.github/workflows/{ai-review-gate,alignment-check,dependency-review,harness-self-containment,main-pr-first-guard,main-push-safety,pr-autonomy-policy,release-please,runtime-binaries}.yml`
+  - `.github/workflows/commit-and-branch-standards.yml`
+- Runtime target parity:
+  - `.octon/framework/engine/runtime/{README,release-targets,run,run.cmd}.yml`
+  - `.octon/framework/engine/practices/{local-dev-validation,release-runbook}.md`
+  - `.octon/framework/capabilities/runtime/commands/alignment-check.md`
+- Bootstrap and host projection updates:
+  - `.octon/framework/scaffolding/runtime/bootstrap/alignment-check`
+  - `.octon/framework/scaffolding/runtime/templates/octon/**/bootstrap/alignment-check`
+  - `.cursor/commands/alignment-check.md`
+  - `.codex/commands/alignment-check.md`
+- Generated/effective refresh during validation:
+  - `.octon/generated/effective/capabilities/{routing.effective.yml,artifact-map.yml,generation.lock.yml}`
+  - `.octon/generated/effective/extensions/{catalog.effective.yml,artifact-map.yml,generation.lock.yml}`
+  - `.octon/state/control/extensions/{active,quarantine}.yml`
+  - `.octon/state/evidence/validation/publication/{capabilities,extensions}/2026-03-23T*.yml`
+- Proposal lifecycle closeout:
+  - `.gitignore`
+  - `.octon/inputs/exploratory/proposals/.archive/architecture/self-audit-and-release-hardening/`
+  - `.octon/generated/proposals/registry.yml`
+  - `.octon/instance/cognition/decisions/{062-self-audit-and-release-hardening-atomic-cutover.md,index.yml}`

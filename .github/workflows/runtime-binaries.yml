@@ -11,32 +11,79 @@ permissions:
   contents: read
 
 jobs:
+  plan_matrix:
+    name: plan-runtime-target-matrix
+    runs-on: ubuntu-latest
+    outputs:
+      build_matrix: ${{ steps.matrix.outputs.build_matrix }}
+      publish_files: ${{ steps.matrix.outputs.publish_files }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - id: matrix
+        name: Derive build and publish state from release target matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          targets_file=".octon/framework/engine/runtime/release-targets.yml"
+
+          build_matrix="$(yq -o=json '
+            .targets
+            | map(select(.shippable_release == true)
+              | {
+                  id: .id,
+                  runs_on: .runner_label,
+                  source_binary: .source_binary,
+                  target_binary: .binary_name,
+                  artifact_name: .artifact_name
+                })
+            | { include: . }
+          ' "${targets_file}" | jq -c '.')"
+
+          publish_files="$(yq -r '
+            .targets[]
+            | select(.shippable_release == true)
+            | "dist/" + .binary_name
+          ' "${targets_file}")"
+
+          {
+            echo "build_matrix=${build_matrix}"
+            echo "publish_files<<EOF"
+            printf '%s\n' "${publish_files}"
+            echo "EOF"
+          } >> "${GITHUB_OUTPUT}"
+
   build:
-    name: build-${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: build-${{ matrix.id }}
+    needs:
+      - plan_matrix
+    runs-on: ${{ matrix.runs_on }}
+    env:
+      OCTON_RUNTIME_STRICT_PACKAGING: "1"
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            source_binary: octon
-            target_binary: octon-linux-x64
-            artifact_name: runtime-linux-x64
-          - os: windows-latest
-            source_binary: octon.exe
-            target_binary: octon-windows-x64.exe
-            artifact_name: runtime-windows-x64
+      matrix: ${{ fromJSON(needs.plan_matrix.outputs.build_matrix) }}
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@631a55b12751854ce901bb631d5902ceb48146f7 # stable
 
       - name: Build octon runtime (release)
+        shell: bash
         working-directory: .octon/framework/engine/runtime/crates
         run: cargo build -p octon_kernel --release
+
+      - name: Validate runtime target parity (strict mode)
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh
 
       - name: Package runtime binary
         shell: bash
@@ -48,7 +95,7 @@ jobs:
             "dist/${{ matrix.target_binary }}"
 
       - name: Upload runtime artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ matrix.artifact_name }}
           path: dist/${{ matrix.target_binary }}
@@ -57,28 +104,25 @@ jobs:
   publish:
     name: publish-release-assets
     if: startsWith(github.ref, 'refs/tags/')
-    needs: build
+    needs:
+      - plan_matrix
+      - build
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      OCTON_RUNTIME_STRICT_PACKAGING: "1"
 
     steps:
-      - name: Download Linux artifact
-        uses: actions/download-artifact@v4
+      - name: Download shippable runtime artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: runtime-linux-x64
+          pattern: runtime-*
           path: dist
-
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: runtime-windows-x64
-          path: dist
+          merge-multiple: true
 
       - name: Publish runtime binaries to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2
         with:
-          files: |
-            dist/octon-linux-x64
-            dist/octon-windows-x64.exe
+          files: ${{ needs.plan_matrix.outputs.publish_files }}
           fail_on_unmatched_files: true

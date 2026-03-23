@@ -1,0 +1,6 @@
+kind: migration-evidence-bundle
+id: 2026-03-23-self-audit-and-release-hardening-cutover
+evidence: evidence.md
+commands: commands.md
+validation: validation.md
+inventory: inventory.md

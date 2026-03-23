@@ -5,7 +5,6 @@ on:
     branches:
       - main
     paths-ignore:
-      - "**/*.md"
       - ".octon/generated/**"
   workflow_dispatch:
 
@@ -17,21 +16,97 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  classify:
+    name: classify-main-push-changes
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.classify.outputs.should_run }}
+      classified_paths: ${{ steps.classify.outputs.classified_paths }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+
+      - id: classify
+        name: Classify changed files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            {
+              echo "authoritative_doc_changed=false"
+              echo "operational_guide_changed=false"
+              echo "narrative_doc_changed=false"
+              echo "non_doc_changed=true"
+              echo "should_run=true"
+              echo "classified_paths<<EOF"
+              echo "manual-dispatch	.github/workflows/main-push-safety.yml"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          before="${{ github.event.before }}"
+          if [[ "$before" == "0000000000000000000000000000000000000000" ]]; then
+            before="$(git rev-list --max-parents=0 HEAD | tail -n1)"
+          elif ! git cat-file -e "${before}^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "${before}"
+          fi
+
+          git cat-file -e "${before}^{commit}" >/dev/null 2>&1
+          mapfile -t changed_files < <(git diff --name-only "$before" "${{ github.sha }}")
+
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/classify-authoritative-doc-change.sh
+          if [[ "${#changed_files[@]}" -eq 0 ]]; then
+            .octon/framework/assurance/runtime/_ops/scripts/classify-authoritative-doc-change.sh \
+              --github-output "$GITHUB_OUTPUT"
+          else
+            .octon/framework/assurance/runtime/_ops/scripts/classify-authoritative-doc-change.sh \
+              --github-output "$GITHUB_OUTPUT" \
+              "${changed_files[@]}"
+          fi
+
+      - name: Report classification
+        shell: bash
+        run: |
+          echo "should_run=${{ steps.classify.outputs.should_run }}"
+          printf '%s\n' "${{ steps.classify.outputs.classified_paths }}"
+
   harness-checks:
     name: Harness Structural Checks
+    needs:
+      - classify
+    if: needs.classify.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Set up Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@631a55b12751854ce901bb631d5902ceb48146f7 # stable
 
       - name: Restore Rust cache
-        uses: swatinem/rust-cache@v2
+        uses: swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
         with:
           cache-bin: true
+
+      - name: Validate alignment profile registry
+        run: |
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-alignment-profile-registry.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-alignment-profile-registry.sh
+
+      - name: Validate authoritative-doc triggers
+        run: |
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-authoritative-doc-triggers.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-authoritative-doc-triggers.sh
+
+      - name: Validate GitHub Action pin policy
+        run: |
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-github-action-pins.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-github-action-pins.sh
 
       - name: Validate harness structure
         run: |
@@ -98,7 +173,25 @@ jobs:
           chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-capability-engine-consistency.sh
           .octon/framework/assurance/runtime/_ops/scripts/validate-capability-engine-consistency.sh
 
+      - name: Validate runtime target parity
+        env:
+          OCTON_RUNTIME_STRICT_PACKAGING: "1"
+        run: |
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh
+
       - name: Validate agency contracts
         run: |
           chmod +x .octon/framework/agency/_ops/scripts/validate/validate-agency.sh
           .octon/framework/agency/_ops/scripts/validate/validate-agency.sh
+
+  docs-only-skip:
+    name: Narrative Markdown Skip
+    needs:
+      - classify
+    if: needs.classify.outputs.should_run != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report skip
+        run: |
+          echo "Only non-authoritative Markdown changed; heavy main-push safety checks were skipped."

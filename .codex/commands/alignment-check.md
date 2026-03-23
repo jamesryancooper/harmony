@@ -8,6 +8,8 @@ argument-hint: "--profile <aspect>[,<aspect>...] [--dry-run] [--list-profiles]"
 # Alignment Check `/alignment-check`
 
 Run repeatable alignment checks by profile.
+Profile ids are registry-backed by
+`.octon/framework/assurance/runtime/contracts/alignment-profiles.yml`.
 
 ## Usage
 

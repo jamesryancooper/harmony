@@ -8,47 +8,139 @@ FRAMEWORK_DIR="$(CDPATH= cd -- "$ENGINE_DIR/.." && pwd)"
 OCTON_DIR="$(CDPATH= cd -- "$FRAMEWORK_DIR/.." && pwd)"
 RUNTIME_OPS_DIR="$ENGINE_DIR/_ops"
 ENGINE_BUILD_DIR="$OCTON_DIR/generated/.tmp/engine/build/runtime-crates-target"
+TARGETS_FILE="$RUNTIME_DIR/release-targets.yml"
 
 OS="$(uname -s 2>/dev/null || echo unknown)"
 ARCH="$(uname -m 2>/dev/null || echo unknown)"
+STRICT_PACKAGING="${OCTON_RUNTIME_STRICT_PACKAGING:-0}"
 
 BIN_DIR="$RUNTIME_OPS_DIR/bin"
+BIN=""
+FORCE_SOURCE_ONLY=0
 
-# Map OS/arch -> expected binary name.
-case "$OS" in
-  Darwin)
-    case "$ARCH" in
-      arm64) BIN="$BIN_DIR/octon-macos-arm64" ;;
-      x86_64) BIN="$BIN_DIR/octon-macos-x64" ;;
-      *) BIN="" ;;
-    esac
-    ;;
-  Linux)
-    case "$ARCH" in
-      x86_64) BIN="$BIN_DIR/octon-linux-x64" ;;
-      aarch64|arm64) BIN="$BIN_DIR/octon-linux-arm64" ;;
-      *) BIN="" ;;
-    esac
-    ;;
-  *)
-    BIN=""
-    ;;
-esac
+normalize_os() {
+  case "$1" in
+    Darwin) printf 'macos' ;;
+    Linux) printf 'linux' ;;
+    CYGWIN*|MINGW*|MSYS*) printf 'windows' ;;
+    *) printf 'unknown' ;;
+  esac
+}
+
+normalize_arch() {
+  case "$1" in
+    x86_64|amd64) printf 'x86_64' ;;
+    arm64|aarch64) printf 'arm64' ;;
+    *) printf 'unknown' ;;
+  esac
+}
+
+resolve_target_field() {
+  local match_os="$1"
+  local match_arch="$2"
+  local field="$3"
+
+  awk -v match_os="$match_os" -v match_arch="$match_arch" -v field="$field" '
+    function trim(value) {
+      gsub(/^[[:space:]]+/, "", value)
+      gsub(/[[:space:]]+$/, "", value)
+      gsub(/^"/, "", value)
+      gsub(/"$/, "", value)
+      return value
+    }
+
+    function flush() {
+      if (current_os == match_os && current_arch == match_arch && target[field] != "") {
+        print target[field]
+        found = 1
+        exit
+      }
+      delete target
+      current_os = ""
+      current_arch = ""
+    }
+
+    /^  - id:/ {
+      flush()
+      in_targets = 1
+      next
+    }
+
+    in_targets && /^    / {
+      line = $0
+      key = line
+      sub(/^    /, "", key)
+      sub(/:.*/, "", key)
+
+      value = line
+      sub(/^[^:]+:[[:space:]]*/, "", value)
+      value = trim(value)
+
+      target[key] = value
+      if (key == "os") current_os = value
+      if (key == "arch") current_arch = value
+      next
+    }
+
+    END {
+      if (!found && current_os == match_os && current_arch == match_arch && target[field] != "") {
+        print target[field]
+      }
+    }
+  ' "$TARGETS_FILE" | head -n 1
+}
+
+TARGET_OS="$(normalize_os "$OS")"
+TARGET_ARCH="$(normalize_arch "$ARCH")"
+TARGET_BINARY=""
+LOCAL_LAUNCHABLE=""
+SHIPPABLE_RELEASE=""
+TARGET_DECLARED=0
+
+if [ -f "$TARGETS_FILE" ]; then
+  TARGET_BINARY="$(resolve_target_field "$TARGET_OS" "$TARGET_ARCH" "binary_name")"
+  LOCAL_LAUNCHABLE="$(resolve_target_field "$TARGET_OS" "$TARGET_ARCH" "local_launchable")"
+  SHIPPABLE_RELEASE="$(resolve_target_field "$TARGET_OS" "$TARGET_ARCH" "shippable_release")"
+  if [ -n "$TARGET_BINARY" ] || [ -n "$LOCAL_LAUNCHABLE" ] || [ -n "$SHIPPABLE_RELEASE" ]; then
+    TARGET_DECLARED=1
+  fi
+fi
 
 case "${1:-}" in
   ""|studio|workflow|-h|--help|help)
-    BIN=""
+    FORCE_SOURCE_ONLY=1
     ;;
 esac
 
-if [ -n "${BIN:-}" ] && [ -x "$BIN" ]; then
-  if [ "${OCTON_RUNTIME_PREFER_SOURCE:-0}" != "1" ]; then
+if [ "$FORCE_SOURCE_ONLY" != "1" ] && [ "$LOCAL_LAUNCHABLE" = "true" ] && [ -n "$TARGET_BINARY" ]; then
+  BIN="$BIN_DIR/$TARGET_BINARY"
+fi
+
+if [ -n "$BIN" ] && [ -x "$BIN" ]; then
+  if [ "$STRICT_PACKAGING" = "1" ] || [ "${OCTON_RUNTIME_PREFER_SOURCE:-0}" != "1" ]; then
     exec "$BIN" "$@"
   fi
 fi
 
+if [ "$FORCE_SOURCE_ONLY" != "1" ] && [ "$TARGET_DECLARED" = "1" ] && [ "$LOCAL_LAUNCHABLE" != "true" ]; then
+  echo "No local launchable runtime target is declared for ${TARGET_OS}/${TARGET_ARCH} in $TARGETS_FILE." >&2
+  exit 1
+fi
+
+if [ "$FORCE_SOURCE_ONLY" != "1" ] && [ "$STRICT_PACKAGING" = "1" ]; then
+  if [ "$SHIPPABLE_RELEASE" = "true" ] && [ -n "$BIN" ]; then
+    echo "Strict packaging requires packaged runtime binary at $BIN." >&2
+  elif [ "$TARGET_DECLARED" != "1" ]; then
+    echo "Strict packaging disallows source fallback for undeclared target ${TARGET_OS}/${TARGET_ARCH}." >&2
+  else
+    echo "Strict packaging disallows source fallback for ${TARGET_OS}/${TARGET_ARCH}." >&2
+  fi
+  exit 1
+fi
+
 # Development fallback: run from source.
-# This keeps the launcher usable before platform binaries are produced.
+# This keeps the launcher usable before platform binaries are produced when the
+# target matrix explicitly permits local source-first execution.
 mkdir -p "$ENGINE_BUILD_DIR"
 export CARGO_TARGET_DIR="$ENGINE_BUILD_DIR"
 exec cargo run -q --manifest-path "$RUNTIME_DIR/crates/Cargo.toml" -p octon_kernel -- "$@"

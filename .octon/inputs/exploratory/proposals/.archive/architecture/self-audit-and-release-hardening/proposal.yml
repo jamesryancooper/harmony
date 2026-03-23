@@ -1,0 +1,51 @@
+schema_version: "proposal-v1"
+proposal_id: "self-audit-and-release-hardening"
+title: "Self-Audit And Release Hardening"
+summary: >
+  Realign Octon's self-checks and release chain with the five-class super-root by
+  eliminating validator path drift, classifying authoritative Markdown as
+  safety-significant input, extending dependency/update hygiene beyond GitHub
+  Actions, requiring immutable action pins for high-trust workflows, and making
+  runtime target support explicit and machine-validated.
+proposal_kind: "architecture"
+promotion_scope: "octon-internal"
+promotion_targets:
+  - ".octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh"
+  - ".octon/framework/assurance/runtime/_ops/scripts/"
+  - ".octon/framework/assurance/runtime/_ops/tests/"
+  - ".octon/framework/assurance/runtime/contracts/"
+  - ".octon/framework/cognition/_meta/architecture/contract-registry.yml"
+  - ".github/workflows/main-push-safety.yml"
+  - ".github/workflows/alignment-check.yml"
+  - ".github/workflows/harness-self-containment.yml"
+  - ".github/workflows/ai-review-gate.yml"
+  - ".github/workflows/release-please.yml"
+  - ".github/workflows/runtime-binaries.yml"
+  - ".github/workflows/dependency-review.yml"
+  - ".github/dependabot.yml"
+  - ".octon/framework/engine/runtime/run"
+  - ".octon/framework/engine/runtime/run.cmd"
+  - ".octon/framework/engine/runtime/release-targets.yml"
+status: "archived"
+archive:
+  archived_at: "2026-03-23"
+  archived_from_status: "proposed"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/self-audit-and-release-hardening"
+  promotion_evidence:
+    - ".octon/framework/assurance/runtime/contracts/alignment-profiles.yml"
+    - ".octon/framework/assurance/runtime/contracts/github-action-pin-policy.yml"
+    - ".octon/framework/engine/runtime/release-targets.yml"
+    - ".octon/state/evidence/migration/2026-03-23-self-audit-and-release-hardening-cutover/evidence.md"
+lifecycle:
+  temporary: true
+  exit_expectation: >
+    Promote topology-correct self-audit dispatch, authoritative-doc trigger
+    classification, multi-ecosystem dependency hygiene, immutable GitHub Action
+    pinning, and runtime target parity validation into durable scripts,
+    workflows, and runtime manifests; then archive this proposal once CI and
+    release surfaces enforce those guarantees without proposal-local guidance.
+related_proposals:
+  - "migration-rollout"
+  - "portability-compatibility-trust-provenance"
+  - "validation-fail-closed-quarantine-staleness"

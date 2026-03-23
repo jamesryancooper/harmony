@@ -55,6 +55,32 @@ mutability: append-only
 
 - None
 
+## 2026-03-23
+
+**Session focus:** Implement the self-audit and release hardening atomic
+cutover
+
+**Completed:**
+
+- Added the alignment profile registry, authoritative-doc classifier,
+  GitHub-Action pin policy, runtime target matrix, and their blocking
+  validators plus shell regressions
+- Reworked the main-push safety, alignment-check, dependency review, release,
+  host self-containment, and Tier 1 protected workflows to use the new
+  contract surfaces and immutable Action SHAs
+- Expanded the shipped runtime target set to Linux x64/arm64, Windows x64, and
+  macOS x64/arm64, refreshed effective publication and host projection
+  artifacts, recorded ADR 062 and the migration evidence bundle, and archived
+  the implemented proposal package
+
+**Next:**
+
+- None
+
+**Blockers:**
+
+- None
+
 ## 2026-03-20
 
 **Session focus:** Packet 14 validation, fail-closed, quarantine, and
