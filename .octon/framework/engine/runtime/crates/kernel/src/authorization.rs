@@ -1929,7 +1929,7 @@ fn build_policy_request_json(
                 .as_ref()
                 .and_then(|state| state.reversibility_primitive.clone())
                 .map(serde_json::Value::String)
-                .unwrap_or(serde_json::Value::Null),
+                .unwrap_or_else(|| serde_json::Value::String("git.revert_commit".to_string())),
             "rollback_handle": autonomy_state
                 .as_ref()
                 .and_then(|state| state.rollback_handle.clone())

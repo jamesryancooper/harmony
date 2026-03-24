@@ -33,6 +33,16 @@ main() {
   has_pattern 'generate_mission_autonomy_views' "$SYNC_SCRIPT" && pass "sync-runtime-artifacts includes mission generator" || fail "sync-runtime-artifacts missing mission generator"
   has_pattern 'missions' "$SYNC_SCRIPT" && pass "sync-runtime-artifacts advertises missions target" || fail "sync-runtime-artifacts missing missions target"
 
+  if [[ -x "$SYNC_SCRIPT" ]]; then
+    if bash "$SYNC_SCRIPT" --target missions >/dev/null 2>&1; then
+      pass "sync-runtime-artifacts regenerates mission projections"
+    else
+      fail "sync-runtime-artifacts failed to regenerate mission projections"
+    fi
+  else
+    fail "sync-runtime-artifacts is not executable"
+  fi
+
   while IFS= read -r mission_id; do
     [[ -n "$mission_id" ]] || continue
     for file in now.md next.md recent.md recover.md; do
