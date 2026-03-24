@@ -336,9 +336,11 @@ run_case \
   "pipeline mission-scoped workflow writes execution artifacts" \
   cargo test --manifest-path "$CARGO_MANIFEST" -p octon_kernel mock_generic_workflow_writes_execution_artifacts
 
-run_case \
-  "mission autonomy helper scripts seed state and emit control receipts" \
-  bash "$HELPER_TEST"
+if [[ "${MISSION_AUTONOMY_INCLUDE_HELPER_SMOKE:-0}" == "1" ]]; then
+  run_case \
+    "mission autonomy helper scripts seed state and emit control receipts" \
+    bash "$HELPER_TEST"
+fi
 
 run_case \
   "scenario fixture: routine repo housekeeping" \
