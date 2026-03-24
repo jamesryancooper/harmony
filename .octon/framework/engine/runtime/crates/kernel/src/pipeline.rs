@@ -482,6 +482,11 @@ fn run_generic_pipeline(
         .context("failed to canonicalize repository root")?;
 
     let reports_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
+    let workflow_mode = if options.mission_id.is_some() {
+        "autonomous".to_string()
+    } else {
+        "human-only".to_string()
+    };
     let workflow_autonomy_context = options
         .mission_id
         .as_deref()
@@ -521,7 +526,7 @@ fn run_generic_pipeline(
         } else {
             "medium".to_string()
         },
-        workflow_mode: "autonomous".to_string(),
+        workflow_mode: workflow_mode.clone(),
         locality_scope: None,
         intent_ref: None,
         autonomy_context: workflow_autonomy_context.clone(),
@@ -669,6 +674,36 @@ fn run_generic_pipeline(
                 rendered.as_bytes().len(),
             )?
         };
+        let stage_autonomy_context = options
+            .mission_id
+            .as_deref()
+            .map(|mission_id| {
+                default_autonomy_context(
+                    &runtime_cfg,
+                    mission_id,
+                    &stage.id,
+                    &format!("workflow-stage:{}", stage.id),
+                    if stage.authorization.review_requirements.human_approval {
+                        "approval_required"
+                    } else if stage.authorization.side_effects.write_repo
+                        || stage.authorization.side_effects.publication
+                        || stage.authorization.side_effects.state_mutation
+                    {
+                        "feedback_window"
+                    } else {
+                        "notify"
+                    },
+                    "continuous",
+                    if stage.authorization.side_effects.publication
+                        || stage.authorization.side_effects.branch_mutation
+                    {
+                        "compensable"
+                    } else {
+                        "reversible"
+                    },
+                )
+            })
+            .transpose()?;
         let stage_request = ExecutionRequest {
             request_id: format!("{}-stage-{}", workflow_request.request_id, stage.id),
             caller_path: "workflow-stage".to_string(),
@@ -686,39 +721,10 @@ fn run_generic_pipeline(
                 branch_mutation: stage.authorization.side_effects.branch_mutation,
             },
             risk_tier: stage.authorization.risk_tier.clone(),
-            workflow_mode: "autonomous".to_string(),
+            workflow_mode: workflow_mode.clone(),
             locality_scope: None,
             intent_ref: None,
-            autonomy_context: options
-                .mission_id
-                .as_deref()
-                .map(|mission_id| {
-                    default_autonomy_context(
-                        &runtime_cfg,
-                        mission_id,
-                        &stage.id,
-                        &format!("workflow-stage:{}", stage.id),
-                        if stage.authorization.review_requirements.human_approval {
-                            "approval_required"
-                        } else if stage.authorization.side_effects.write_repo
-                            || stage.authorization.side_effects.publication
-                            || stage.authorization.side_effects.state_mutation
-                        {
-                            "feedback_window"
-                        } else {
-                            "notify"
-                        },
-                        "continuous",
-                        if stage.authorization.side_effects.publication
-                            || stage.authorization.side_effects.branch_mutation
-                        {
-                            "compensable"
-                        } else {
-                            "reversible"
-                        },
-                    )
-                })
-                .transpose()?,
+            autonomy_context: stage_autonomy_context,
             actor_ref: None,
             parent_run_ref: Some(workflow_request.request_id.clone()),
             review_requirements: ReviewRequirements {
@@ -1592,6 +1598,37 @@ stages:
         assert!(result.bundle_root.join("reports/02-report.md").is_file());
         assert!(result.bundle_root.join("stage-inputs/01-packet.md").is_file());
         assert!(result.bundle_root.join("stage-logs/01-executor.log").is_file());
+
+        fs::remove_dir_all(root).ok();
+    }
+
+    #[test]
+    fn generic_workflow_without_mission_id_stays_human_only() {
+        let root = make_temp_root("human-only");
+        let octon_dir = seed_generic_workflow_fixture(&root);
+
+        let result = run_pipeline_from_octon_dir(
+            &octon_dir,
+            RunPipelineOptions {
+                pipeline_id: "sample-workflow".to_string(),
+                mission_id: None,
+                executor: ExecutorKind::Mock,
+                executor_bin: None,
+                output_slug: Some("human-only".to_string()),
+                model: None,
+                prepare_only: false,
+                input_overrides: HashMap::new(),
+            },
+        )
+        .expect("workflow without mission id should still run in human-only mode");
+
+        let workflow_receipt: serde_json::Value = serde_json::from_str(
+            &fs::read_to_string(result.bundle_root.join("workflow-execution/execution-receipt.json"))
+                .expect("workflow receipt should exist"),
+        )
+        .expect("workflow receipt should parse");
+        assert_eq!(workflow_receipt["workflow_mode"], "human-only");
+        assert!(workflow_receipt["mission_ref"].is_null());
 
         fs::remove_dir_all(root).ok();
     }

@@ -433,6 +433,14 @@ struct MissionAutonomyBudgetRecord {
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
+struct MissionModeStateRecord {
+    #[serde(default)]
+    oversight_mode: String,
+    #[serde(default)]
+    execution_posture: String,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
 struct MissionCircuitBreakersRecord {
     #[serde(default)]
     state: Option<String>,
@@ -517,13 +525,13 @@ fn resolve_autonomy_state(
         ));
     }
 
-    let mission_id = &context.mission_ref.id;
+    let mission_id = context.mission_ref.id.clone();
     let mission_dir = cfg
         .octon_dir
         .join("instance")
         .join("orchestration")
         .join("missions")
-        .join(mission_id);
+        .join(&mission_id);
     let charter_path = mission_dir.join("mission.yml");
     let policy_path = cfg
         .octon_dir
@@ -537,7 +545,7 @@ fn resolve_autonomy_state(
         .join("governance")
         .join("ownership")
         .join("registry.yml");
-    let control_dir = cfg.execution_control_root.join("missions").join(mission_id);
+    let control_dir = cfg.execution_control_root.join("missions").join(&mission_id);
     let lease_path = control_dir.join("lease.yml");
     let mode_state_path = control_dir.join("mode-state.yml");
     let intent_register_path = control_dir.join("intent-register.yml");
@@ -564,7 +572,7 @@ fn resolve_autonomy_state(
     }
 
     let charter: MissionCharterRecord = read_yaml_file(&charter_path)?;
-    if charter.mission_id != *mission_id {
+    if charter.mission_id != mission_id {
         return Err(mission_denial(
             "mission charter id does not match autonomy_context mission_ref",
             vec!["MISSION_CHARTER_ID_MISMATCH"],
@@ -601,11 +609,20 @@ fn resolve_autonomy_state(
     }
 
     let autonomy_budget: MissionAutonomyBudgetRecord = read_yaml_file(&autonomy_budget_path)?;
+    let mode_state: MissionModeStateRecord = read_yaml_file(&mode_state_path)?;
     let breaker_record: MissionCircuitBreakersRecord = read_yaml_file(&circuit_breakers_path)?;
     let breaker_state = breaker_record
         .state
         .clone()
         .unwrap_or_else(|| if breaker_record.tripped_breakers.is_empty() { "healthy".to_string() } else { "tripped".to_string() });
+
+    let mut context = context;
+    if !mode_state.oversight_mode.trim().is_empty() {
+        context.oversight_mode = mode_state.oversight_mode;
+    }
+    if !mode_state.execution_posture.trim().is_empty() {
+        context.execution_posture = mode_state.execution_posture;
+    }
 
     if context.oversight_mode == "approval_required"
         && !std::env::var("OCTON_EXECUTION_HUMAN_APPROVED")
@@ -2115,6 +2132,14 @@ mod tests {
     }
 
     fn mission_request(cfg: &RuntimeConfig, mission_id: &str, oversight_mode: &str, reversibility_class: &str) -> ExecutionRequest {
+        let control_dir = cfg.execution_control_root.join("missions").join(mission_id);
+        fs::write(
+            control_dir.join("mode-state.yml"),
+            format!(
+                "schema_version: \"mode-state-v1\"\nmission_id: \"{mission_id}\"\noversight_mode: \"{oversight_mode}\"\nexecution_posture: \"continuous\"\nsafety_state: \"active\"\nphase: \"planning\"\nautonomy_budget_state: \"healthy\"\nbreaker_state: \"healthy\"\n"
+            ),
+        )
+        .expect("rewrite mode state");
         let mut request = minimal_request();
         request.workflow_mode = "autonomous".to_string();
         request.autonomy_context = Some(
