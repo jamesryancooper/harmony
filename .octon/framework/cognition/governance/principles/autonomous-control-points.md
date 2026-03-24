@@ -16,6 +16,8 @@ Autonomous Control Points (ACPs) are Octon’s primary mechanism for governing c
 Under reversible autonomy:
 
 - Agents may execute long runs without requiring humans to guide or authorize.
+- Long-running agents operate inside Mission-Scoped Reversible Autonomy
+  mission charters, continuation leases, and explicit live mode beacons.
 - Material changes are governed by **policy gates**: reversibility requirements,
   evidence requirements, budgets, kill-switches, and (for high-risk ops) a
   **multi-agent quorum**.
@@ -56,6 +58,8 @@ handles. This does not require standing human authorizations.
 
 - Promotion and finalize semantics (including `contraction` alias): this document.
 - Capability attempt authorization: [Deny by Default](./deny-by-default.md).
+- Long-running autonomy operating model:
+  [Mission-Scoped Reversible Autonomy](./mission-scoped-reversible-autonomy.md).
 - Replay and provenance semantics: [Determinism and Provenance](./determinism-and-provenance.md).
 - Promotion input minimums and receipt requirements: RA/ACP Promotion Inputs Matrix (canonical).
 - Shared terminology: [RA/ACP Glossary](../controls/ra-acp-glossary.md).
@@ -215,6 +219,8 @@ Profile deviations must use the canonical waiver taxonomy:
 Every ACP gate emits an append-only **Change Receipt**:
 
 - intent and boundaries
+- mission, slice, oversight, and execution-posture context when the run is
+  autonomous
 - diff / staged artifacts
 - evidence bundle references
 - ACP level and policy decision

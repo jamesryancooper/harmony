@@ -76,6 +76,16 @@ run_step() {
   fi
 }
 
+publish_or_validate_host_projections() {
+  if bash "$SCRIPT_DIR/validate-host-projections.sh" >/dev/null 2>&1; then
+    echo "[OK] host projections already current"
+    return 0
+  fi
+
+  bash "$OCTON_DIR/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+  bash "$SCRIPT_DIR/validate-host-projections.sh"
+}
+
 run_commit_pr() {
   run_step \
     "Validate commit/PR standards alignment" \
@@ -172,12 +182,8 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-execution-governance.sh"
 
   run_step \
-    "Publish host capability projections" \
-    bash "$OCTON_DIR/framework/capabilities/_ops/scripts/publish-host-projections.sh"
-
-  run_step \
-    "Validate host capability projections" \
-    bash "$SCRIPT_DIR/validate-host-projections.sh"
+    "Refresh and validate host capability projections" \
+    publish_or_validate_host_projections
 
   run_step \
     "Validate developer context policy contract" \
@@ -317,6 +323,40 @@ run_weights() {
       --baseline-charter "$OCTON_DIR/framework/assurance/governance/CHARTER.md" \
       --mode ci \
       --summary-out "$out_dir/gate-summary.md"
+}
+
+run_mission_autonomy() {
+  run_step \
+    "Validate mission proposal package" \
+    bash "$SCRIPT_DIR/validate-mission-proposal-package.sh"
+
+  run_step \
+    "Validate mission authority and policy surfaces" \
+    bash "$SCRIPT_DIR/validate-mission-authority.sh"
+
+  run_step \
+    "Validate mission runtime contracts and kernel enforcement" \
+    bash "$SCRIPT_DIR/validate-mission-runtime-contracts.sh"
+
+  run_step \
+    "Validate mission control state surfaces" \
+    bash "$SCRIPT_DIR/validate-mission-control-state.sh"
+
+  run_step \
+    "Validate mission control evidence surfaces" \
+    bash "$SCRIPT_DIR/validate-mission-control-evidence.sh"
+
+  run_step \
+    "Validate generated mission and operator summaries" \
+    bash "$SCRIPT_DIR/validate-mission-generated-summaries.sh"
+
+  run_step \
+    "Validate mission source-of-truth and no-shadow-surface rules" \
+    bash "$SCRIPT_DIR/validate-mission-source-of-truth.sh"
+
+  run_step \
+    "Run mission autonomy scenario tests" \
+    bash "$SCRIPT_DIR/test-mission-autonomy-scenarios.sh"
 }
 
 run_all() {

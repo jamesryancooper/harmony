@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/mission-autonomy-policy-v1.schema.json",
+  "title": "Mission Autonomy Policy v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "mode_defaults",
+    "execution_postures",
+    "preview_defaults",
+    "digest_cadence_defaults",
+    "ownership_routing",
+    "overlap_defaults",
+    "backfill_defaults",
+    "pause_on_failure",
+    "recovery_windows",
+    "proceed_on_silence",
+    "safe_interrupt_boundaries",
+    "autonomy_burn",
+    "circuit_breakers",
+    "quorum",
+    "safing_defaults"
+  ],
+  "properties": {
+    "schema_version": { "const": "mission-autonomy-policy-v1" },
+    "mode_defaults": { "type": "object" },
+    "execution_postures": { "type": "object" },
+    "preview_defaults": { "type": "object" },
+    "digest_cadence_defaults": { "type": "object" },
+    "ownership_routing": { "type": "object" },
+    "overlap_defaults": { "type": "object" },
+    "backfill_defaults": { "type": "object" },
+    "pause_on_failure": { "type": "object" },
+    "recovery_windows": { "type": "object" },
+    "proceed_on_silence": { "type": "object" },
+    "safe_interrupt_boundaries": { "type": "object" },
+    "autonomy_burn": { "type": "object" },
+    "circuit_breakers": { "type": "object" },
+    "quorum": { "type": "object" },
+    "safing_defaults": { "type": "object" }
+  }
+}

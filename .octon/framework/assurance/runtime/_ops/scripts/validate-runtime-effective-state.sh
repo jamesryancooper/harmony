@@ -76,6 +76,18 @@ main() {
   run_validator \
     "execution governance contracts and protected CI posture are current" \
     "$SCRIPT_DIR/validate-execution-governance.sh"
+  run_validator \
+    "mission-scoped reversible autonomy contracts and enforcement are current" \
+    "$SCRIPT_DIR/validate-mission-runtime-contracts.sh"
+  run_validator \
+    "mission control state surfaces are current" \
+    "$SCRIPT_DIR/validate-mission-control-state.sh"
+  run_validator \
+    "mission generated summaries are current" \
+    "$SCRIPT_DIR/validate-mission-generated-summaries.sh"
+  run_validator \
+    "mission source-of-truth rules hold" \
+    "$SCRIPT_DIR/validate-mission-source-of-truth.sh"
 
   echo "Validation summary: errors=$errors"
   if [[ $errors -gt 0 ]]; then

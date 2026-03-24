@@ -30,6 +30,29 @@ pub struct ActorRef {
     pub id: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AutonomyRef {
+    pub id: String,
+    #[serde(default)]
+    pub version: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AutonomyContext {
+    pub mission_ref: AutonomyRef,
+    pub slice_ref: AutonomyRef,
+    pub intent_ref: IntentRef,
+    pub mission_class: String,
+    pub oversight_mode: String,
+    pub execution_posture: String,
+    pub reversibility_class: String,
+    pub boundary_id: String,
+    #[serde(default)]
+    pub applied_directive_refs: Vec<String>,
+    #[serde(default)]
+    pub applied_authorize_update_refs: Vec<String>,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SideEffectFlags {
     #[serde(default)]
@@ -83,10 +106,14 @@ pub struct ExecutionRequest {
     #[serde(default)]
     pub side_effect_flags: SideEffectFlags,
     pub risk_tier: String,
+    #[serde(default = "default_workflow_mode")]
+    pub workflow_mode: String,
     #[serde(default)]
     pub locality_scope: Option<String>,
     #[serde(default)]
     pub intent_ref: Option<IntentRef>,
+    #[serde(default)]
+    pub autonomy_context: Option<AutonomyContext>,
     #[serde(default)]
     pub actor_ref: Option<ActorRef>,
     #[serde(default)]
@@ -163,7 +190,10 @@ pub struct GrantBundle {
     #[serde(default)]
     pub receipt_requirements: Vec<String>,
     pub environment_class: ExecutionEnvironment,
+    pub workflow_mode: String,
     pub intent_ref: IntentRef,
+    #[serde(default)]
+    pub autonomy_context: Option<AutonomyContext>,
     pub actor_ref: ActorRef,
     pub run_root: String,
     #[serde(default)]
@@ -174,6 +204,10 @@ pub struct GrantBundle {
     pub instruction_manifest_path: Option<String>,
     #[serde(default)]
     pub budget: Option<BudgetMetadata>,
+    #[serde(default)]
+    pub autonomy_budget_state: Option<String>,
+    #[serde(default)]
+    pub breaker_state: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -212,7 +246,36 @@ pub struct ExecutionReceipt {
     pub action_type: String,
     pub path_type: String,
     pub environment_class: String,
+    pub workflow_mode: String,
     pub intent_ref: IntentRef,
+    #[serde(default)]
+    pub mission_ref: Option<AutonomyRef>,
+    #[serde(default)]
+    pub slice_ref: Option<AutonomyRef>,
+    #[serde(default)]
+    pub mission_class: Option<String>,
+    #[serde(default)]
+    pub oversight_mode: Option<String>,
+    #[serde(default)]
+    pub execution_posture: Option<String>,
+    #[serde(default)]
+    pub reversibility_class: Option<String>,
+    #[serde(default)]
+    pub boundary_id: Option<String>,
+    #[serde(default)]
+    pub rollback_handle: Option<String>,
+    #[serde(default)]
+    pub compensation_handle: Option<String>,
+    #[serde(default)]
+    pub recovery_window: Option<String>,
+    #[serde(default)]
+    pub autonomy_budget_state: Option<String>,
+    #[serde(default)]
+    pub breaker_state: Option<String>,
+    #[serde(default)]
+    pub applied_directive_refs: Vec<String>,
+    #[serde(default)]
+    pub applied_authorize_update_refs: Vec<String>,
     pub actor_ref: ActorRef,
     #[serde(default)]
     pub requested_capabilities: Vec<String>,
@@ -290,6 +353,10 @@ pub fn default_actor_ref() -> ActorRef {
     }
 }
 
+fn default_workflow_mode() -> String {
+    "human-only".to_string()
+}
+
 pub fn default_policy_mode(cfg: &RuntimeConfig) -> String {
     std::env::var("OCTON_POLICY_MODE_OVERRIDE")
         .or_else(|_| std::env::var("OCTON_EFFECTIVE_POLICY_MODE"))
@@ -349,6 +416,276 @@ pub fn resolve_execution_environment(
     ExecutionEnvironment::Development
 }
 
+#[derive(Debug, Clone, Default, Deserialize)]
+struct MissionCharterRecord {
+    mission_id: String,
+    mission_class: String,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+struct MissionLeaseRecord {
+    status: String,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+struct MissionAutonomyBudgetRecord {
+    state: String,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+struct MissionCircuitBreakersRecord {
+    #[serde(default)]
+    state: Option<String>,
+    #[serde(default)]
+    tripped_breakers: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+struct ResolvedAutonomyState {
+    context: AutonomyContext,
+    autonomy_budget_state: String,
+    breaker_state: String,
+    rollback_handle: String,
+    recovery_window: String,
+}
+
+fn mission_denial(message: impl Into<String>, reason_codes: Vec<&str>) -> KernelError {
+    KernelError::new(ErrorCode::CapabilityDenied, message.into()).with_details(json!({
+        "reason_codes": reason_codes,
+        "decision": "DENY"
+    }))
+}
+
+fn mission_stage_only(message: impl Into<String>, reason_codes: Vec<&str>) -> KernelError {
+    KernelError::new(ErrorCode::CapabilityDenied, message.into()).with_details(json!({
+        "reason_codes": reason_codes,
+        "decision": "STAGE_ONLY"
+    }))
+}
+
+fn is_autonomous_request(request: &ExecutionRequest) -> bool {
+    request.workflow_mode == "autonomous"
+}
+
+fn read_yaml_file<T>(path: &Path) -> CoreResult<T>
+where
+    T: for<'de> Deserialize<'de>,
+{
+    let raw = fs::read_to_string(path).map_err(|e| {
+        KernelError::new(
+            ErrorCode::CapabilityDenied,
+            format!("failed to read mission autonomy surface {}: {e}", path.display()),
+        )
+    })?;
+    serde_yaml::from_str::<T>(&raw).map_err(|e| {
+        KernelError::new(
+            ErrorCode::CapabilityDenied,
+            format!("failed to parse mission autonomy surface {}: {e}", path.display()),
+        )
+    })
+}
+
+fn ensure_file_exists(path: &Path, reason_code: &str) -> CoreResult<()> {
+    if path.is_file() {
+        Ok(())
+    } else {
+        Err(mission_denial(
+            format!("required mission autonomy surface missing: {}", path.display()),
+            vec![reason_code],
+        ))
+    }
+}
+
+fn resolve_autonomy_state(
+    cfg: &RuntimeConfig,
+    request: &ExecutionRequest,
+    resolved_intent_ref: &IntentRef,
+) -> CoreResult<Option<ResolvedAutonomyState>> {
+    if !is_autonomous_request(request) {
+        return Ok(None);
+    }
+
+    let context = request
+        .autonomy_context
+        .clone()
+        .ok_or_else(|| mission_denial("autonomous execution requires autonomy_context", vec!["MISSION_AUTONOMY_CONTEXT_MISSING"]))?;
+
+    if context.intent_ref.id != resolved_intent_ref.id || context.intent_ref.version != resolved_intent_ref.version {
+        return Err(mission_denial(
+            "autonomous execution intent binding does not match the resolved active intent",
+            vec!["MISSION_AUTONOMY_INTENT_MISMATCH"],
+        ));
+    }
+
+    let mission_id = &context.mission_ref.id;
+    let mission_dir = cfg
+        .octon_dir
+        .join("instance")
+        .join("orchestration")
+        .join("missions")
+        .join(mission_id);
+    let charter_path = mission_dir.join("mission.yml");
+    let policy_path = cfg
+        .octon_dir
+        .join("instance")
+        .join("governance")
+        .join("policies")
+        .join("mission-autonomy.yml");
+    let ownership_path = cfg
+        .octon_dir
+        .join("instance")
+        .join("governance")
+        .join("ownership")
+        .join("registry.yml");
+    let control_dir = cfg.execution_control_root.join("missions").join(mission_id);
+    let lease_path = control_dir.join("lease.yml");
+    let mode_state_path = control_dir.join("mode-state.yml");
+    let intent_register_path = control_dir.join("intent-register.yml");
+    let directives_path = control_dir.join("directives.yml");
+    let schedule_path = control_dir.join("schedule.yml");
+    let autonomy_budget_path = control_dir.join("autonomy-budget.yml");
+    let circuit_breakers_path = control_dir.join("circuit-breakers.yml");
+    let subscriptions_path = control_dir.join("subscriptions.yml");
+
+    for (path, reason_code) in [
+        (&charter_path, "MISSION_CHARTER_MISSING"),
+        (&policy_path, "MISSION_AUTONOMY_POLICY_MISSING"),
+        (&ownership_path, "OWNERSHIP_REGISTRY_MISSING"),
+        (&lease_path, "MISSION_CONTROL_LEASE_MISSING"),
+        (&mode_state_path, "MISSION_MODE_STATE_MISSING"),
+        (&intent_register_path, "MISSION_INTENT_REGISTER_MISSING"),
+        (&directives_path, "MISSION_DIRECTIVES_MISSING"),
+        (&schedule_path, "MISSION_SCHEDULE_MISSING"),
+        (&autonomy_budget_path, "MISSION_AUTONOMY_BUDGET_MISSING"),
+        (&circuit_breakers_path, "MISSION_CIRCUIT_BREAKERS_MISSING"),
+        (&subscriptions_path, "MISSION_SUBSCRIPTIONS_MISSING")
+    ] {
+        ensure_file_exists(path, reason_code)?;
+    }
+
+    let charter: MissionCharterRecord = read_yaml_file(&charter_path)?;
+    if charter.mission_id != *mission_id {
+        return Err(mission_denial(
+            "mission charter id does not match autonomy_context mission_ref",
+            vec!["MISSION_CHARTER_ID_MISMATCH"],
+        ));
+    }
+    if charter.mission_class != context.mission_class {
+        return Err(mission_denial(
+            "autonomy_context mission_class does not match mission charter",
+            vec!["MISSION_CLASS_MISMATCH"],
+        ));
+    }
+
+    let lease: MissionLeaseRecord = read_yaml_file(&lease_path)?;
+    match lease.status.as_str() {
+        "active" => {}
+        "paused" => {
+            return Err(mission_stage_only(
+                "mission continuation lease is paused",
+                vec!["MISSION_LEASE_PAUSED", "ACP_STAGE_ONLY_REQUIRED"],
+            ));
+        }
+        "revoked" | "expired" => {
+            return Err(mission_denial(
+                "mission continuation lease is not active",
+                vec!["MISSION_LEASE_INACTIVE"],
+            ));
+        }
+        _ => {
+            return Err(mission_denial(
+                "mission continuation lease state is invalid",
+                vec!["MISSION_LEASE_INVALID"],
+            ));
+        }
+    }
+
+    let autonomy_budget: MissionAutonomyBudgetRecord = read_yaml_file(&autonomy_budget_path)?;
+    let breaker_record: MissionCircuitBreakersRecord = read_yaml_file(&circuit_breakers_path)?;
+    let breaker_state = breaker_record
+        .state
+        .clone()
+        .unwrap_or_else(|| if breaker_record.tripped_breakers.is_empty() { "healthy".to_string() } else { "tripped".to_string() });
+
+    if context.oversight_mode == "approval_required"
+        && !std::env::var("OCTON_EXECUTION_HUMAN_APPROVED")
+            .unwrap_or_default()
+            .eq_ignore_ascii_case("true")
+    {
+        return Err(mission_stage_only(
+            "mission slice requires explicit approval before promote",
+            vec!["MISSION_APPROVAL_REQUIRED", "ACP_STAGE_ONLY_REQUIRED"],
+        ));
+    }
+
+    if context.oversight_mode == "proceed_on_silence" {
+        if !matches!(context.reversibility_class.as_str(), "reversible" | "compensable") {
+            return Err(mission_stage_only(
+                "proceed_on_silence is allowed only for reversible or compensable slices",
+                vec!["MISSION_PROCEED_ON_SILENCE_NOT_ALLOWED", "ACP_STAGE_ONLY_REQUIRED"],
+            ));
+        }
+        if autonomy_budget.state != "healthy" || breaker_state != "healthy" {
+            return Err(mission_stage_only(
+                "proceed_on_silence is blocked by autonomy burn or breaker state",
+                vec!["MISSION_PROCEED_ON_SILENCE_BLOCKED", "ACP_STAGE_ONLY_REQUIRED"],
+            ));
+        }
+    }
+
+    Ok(Some(ResolvedAutonomyState {
+        rollback_handle: format!("rollback-{}-{}", mission_id, context.slice_ref.id),
+        recovery_window: "PT72H".to_string(),
+        context,
+        autonomy_budget_state: autonomy_budget.state,
+        breaker_state,
+    }))
+}
+
+pub fn default_autonomy_context(
+    cfg: &RuntimeConfig,
+    mission_id: &str,
+    slice_id: &str,
+    boundary_id: &str,
+    oversight_mode: &str,
+    execution_posture: &str,
+    reversibility_class: &str,
+) -> CoreResult<AutonomyContext> {
+    let intent_ref = active_intent_ref(cfg).ok_or_else(|| {
+        mission_denial(
+            "autonomous execution requires an active intent binding",
+            vec!["INTENT_MISSING"],
+        )
+    })?;
+    let charter_path = cfg
+        .octon_dir
+        .join("instance")
+        .join("orchestration")
+        .join("missions")
+        .join(mission_id)
+        .join("mission.yml");
+    ensure_file_exists(&charter_path, "MISSION_CHARTER_MISSING")?;
+    let charter: MissionCharterRecord = read_yaml_file(&charter_path)?;
+    Ok(AutonomyContext {
+        mission_ref: AutonomyRef {
+            id: mission_id.to_string(),
+            version: Some("v2".to_string()),
+        },
+        slice_ref: AutonomyRef {
+            id: slice_id.to_string(),
+            version: None,
+        },
+        intent_ref,
+        mission_class: charter.mission_class,
+        oversight_mode: oversight_mode.to_string(),
+        execution_posture: execution_posture.to_string(),
+        reversibility_class: reversibility_class.to_string(),
+        boundary_id: boundary_id.to_string(),
+        applied_directive_refs: Vec::new(),
+        applied_authorize_update_refs: Vec::new(),
+    })
+}
+
 pub fn authorize_execution(
     cfg: &RuntimeConfig,
     policy: &PolicyEngine,
@@ -368,6 +705,7 @@ pub fn authorize_execution(
             .with_details(json!({"reason_codes":["INTENT_MISSING"]}))
         })?;
     let actor_ref = request.actor_ref.clone().unwrap_or_else(default_actor_ref);
+    let autonomy_state = resolve_autonomy_state(cfg, request, &intent_ref)?;
 
     let requested_mode = request
         .policy_mode_requested
@@ -624,6 +962,7 @@ pub fn authorize_execution(
         &actor_ref,
         &effective_policy_mode,
         budget_preview.as_ref(),
+        autonomy_state.as_ref(),
     )?;
     if !policy_artifacts.allow {
         return Err(
@@ -675,13 +1014,21 @@ pub fn authorize_execution(
             "execution-receipt.json".to_string(),
         ],
         environment_class: environment,
+        workflow_mode: request.workflow_mode.clone(),
         intent_ref,
+        autonomy_context: autonomy_state.as_ref().map(|state| state.context.clone()),
         actor_ref,
         run_root: run_root_rel,
         policy_receipt_path: policy_artifacts.receipt_path,
         policy_digest_path: policy_artifacts.digest_path,
         instruction_manifest_path: policy_artifacts.instruction_manifest_path,
         budget,
+        autonomy_budget_state: autonomy_state
+            .as_ref()
+            .map(|state| state.autonomy_budget_state.clone()),
+        breaker_state: autonomy_state
+            .as_ref()
+            .map(|state| state.breaker_state.clone()),
     })
 }
 
@@ -700,10 +1047,11 @@ pub fn write_execution_start(
     write_json(
         &paths.request,
         &json!({
-            "schema_version": "execution-request-v1",
+            "schema_version": "execution-request-v2",
             "request": request,
             "resolved_intent_ref": grant.intent_ref,
             "resolved_actor_ref": grant.actor_ref,
+            "resolved_autonomy_context": grant.autonomy_context.clone(),
         }),
     )?;
     write_json(
@@ -742,14 +1090,64 @@ pub fn finalize_execution(
         .map(|value| value != &grant.effective_policy_mode)
         .unwrap_or(false);
     let receipt = ExecutionReceipt {
-        schema_version: "execution-receipt-v1".to_string(),
+        schema_version: "execution-receipt-v2".to_string(),
         request_id: request.request_id.clone(),
         grant_id: grant.grant_id.clone(),
         target_id: request.target_id.clone(),
         action_type: request.action_type.clone(),
         path_type: request.caller_path.clone(),
         environment_class: grant.environment_class.as_str().to_string(),
+        workflow_mode: grant.workflow_mode.clone(),
         intent_ref: grant.intent_ref.clone(),
+        mission_ref: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.mission_ref.clone()),
+        slice_ref: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.slice_ref.clone()),
+        mission_class: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.mission_class.clone()),
+        oversight_mode: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.oversight_mode.clone()),
+        execution_posture: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.execution_posture.clone()),
+        reversibility_class: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.reversibility_class.clone()),
+        boundary_id: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.boundary_id.clone()),
+        rollback_handle: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| format!("rollback-{}-{}", context.mission_ref.id, context.slice_ref.id)),
+        compensation_handle: None,
+        recovery_window: grant
+            .autonomy_context
+            .as_ref()
+            .map(|_| "PT72H".to_string()),
+        autonomy_budget_state: grant.autonomy_budget_state.clone(),
+        breaker_state: grant.breaker_state.clone(),
+        applied_directive_refs: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.applied_directive_refs.clone())
+            .unwrap_or_default(),
+        applied_authorize_update_refs: grant
+            .autonomy_context
+            .as_ref()
+            .map(|context| context.applied_authorize_update_refs.clone())
+            .unwrap_or_default(),
         actor_ref: grant.actor_ref.clone(),
         requested_capabilities: request.requested_capabilities.clone(),
         granted_capabilities: grant.granted_capabilities.clone(),
@@ -950,6 +1348,7 @@ fn compose_policy_receipt(
     actor_ref: &ActorRef,
     effective_policy_mode: &str,
     budget_preview: Option<&BudgetMetadata>,
+    autonomy_state: Option<&ResolvedAutonomyState>,
 ) -> CoreResult<PolicyArtifacts> {
     let _test_guard = if cfg!(test) {
         Some(
@@ -1021,6 +1420,7 @@ fn compose_policy_receipt(
         actor_ref,
         effective_policy_mode,
         budget_preview,
+        autonomy_state,
     )?;
 
     fs::create_dir_all(&run_root)
@@ -1196,6 +1596,7 @@ fn build_policy_request_json(
     actor_ref: &ActorRef,
     effective_policy_mode: &str,
     budget_preview: Option<&BudgetMetadata>,
+    autonomy_state: Option<&ResolvedAutonomyState>,
 ) -> CoreResult<serde_json::Value> {
     let request_json = serde_json::to_vec(request)
         .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to serialize execution request: {e}")))?;
@@ -1252,8 +1653,8 @@ fn build_policy_request_json(
             "target": {
                 "material_side_effect": material_side_effect(request),
                 "telemetry_profile": if effective_policy_mode == "hard-enforce" { "full" } else { "minimal" },
-                "workflow_mode": "autonomous",
-                "capability_classification": "agent-ready",
+                "workflow_mode": request.workflow_mode.clone(),
+                "capability_classification": if request.workflow_mode == "human-only" { "human-only" } else { "agent-ready" },
                 "boundary_route": if service_mode {
                     serde_json::Value::String("allow".to_string())
                 } else {
@@ -1269,13 +1670,21 @@ fn build_policy_request_json(
         },
         "boundary_id": request.caller_path,
         "boundary_set_version": "v1",
-        "workflow_mode": "autonomous",
-        "capability_classification": "agent-ready",
+        "workflow_mode": request.workflow_mode.clone(),
+        "oversight_mode": autonomy_state.as_ref().map(|state| json!(state.context.oversight_mode.clone())).unwrap_or(serde_json::Value::Null),
+        "execution_posture": autonomy_state.as_ref().map(|state| json!(state.context.execution_posture.clone())).unwrap_or(serde_json::Value::Null),
+        "reversibility_class": autonomy_state.as_ref().map(|state| json!(state.context.reversibility_class.clone())).unwrap_or(serde_json::Value::Null),
+        "autonomy_budget_state": autonomy_state.as_ref().map(|state| json!(state.autonomy_budget_state.clone())).unwrap_or(serde_json::Value::Null),
+        "breaker_state": autonomy_state.as_ref().map(|state| json!(state.breaker_state.clone())).unwrap_or(serde_json::Value::Null),
+        "capability_classification": if request.workflow_mode == "human-only" { "human-only" } else { "agent-ready" },
+        "mission_ref": autonomy_state.as_ref().map(|state| json!(state.context.mission_ref.clone())).unwrap_or(serde_json::Value::Null),
+        "slice_ref": autonomy_state.as_ref().map(|state| json!(state.context.slice_ref.clone())).unwrap_or(serde_json::Value::Null),
         "reversibility": {
-            "reversible": true,
+            "reversible": autonomy_state.as_ref().map(|state| state.context.reversibility_class.as_str() != "irreversible").unwrap_or(true),
             "primitive": "git.revert_commit",
-            "rollback_handle": format!("rollback-{}", request.request_id),
-            "recovery_window": "P14D"
+            "rollback_handle": autonomy_state.as_ref().map(|state| state.rollback_handle.clone()).unwrap_or_else(|| format!("rollback-{}", request.request_id)),
+            "compensation_handle": serde_json::Value::Null,
+            "recovery_window": autonomy_state.as_ref().map(|state| state.recovery_window.clone()).unwrap_or_else(|| "P14D".to_string())
         },
         "evidence": if service_mode {
             json!([
@@ -1598,6 +2007,12 @@ mod tests {
             .expect("create intent dir");
         fs::create_dir_all(base.join(".octon/framework/capabilities/governance/policy"))
             .expect("create ACP policy dir");
+        fs::create_dir_all(base.join(".octon/state/evidence/runs"))
+            .expect("create run evidence dir");
+        fs::create_dir_all(base.join(".octon/state/control/execution"))
+            .expect("create execution control dir");
+        fs::create_dir_all(base.join(".octon/generated/.tmp/execution"))
+            .expect("create execution tmp dir");
         fs::write(
             base.join(".octon/instance/cognition/context/shared/intent.contract.yml"),
             "intent_id: intent://test/example\nversion: 1.0.0\n",
@@ -1614,10 +2029,10 @@ mod tests {
         .expect("copy ACP policy");
         RuntimeConfig {
             octon_dir: base.join(".octon"),
-            repo_root: base,
-            run_evidence_root: std::env::temp_dir().join("octon-auth-state").join("runs"),
-            execution_control_root: std::env::temp_dir().join("octon-auth-state").join("control"),
-            execution_tmp_root: std::env::temp_dir().join("octon-auth-state").join("tmp"),
+            repo_root: base.clone(),
+            run_evidence_root: base.join(".octon/state/evidence/runs"),
+            execution_control_root: base.join(".octon/state/control/execution"),
+            execution_tmp_root: base.join(".octon/generated/.tmp/execution"),
             policy: PolicyConfig::default(),
             policy_path: Some(PathBuf::from("framework/capabilities/governance/policy/deny-by-default.v2.yml")),
             execution_governance: ExecutionGovernanceConfig {
@@ -1627,6 +2042,94 @@ mod tests {
             ndjson_max_line_bytes: 1024,
             wasmtime_cache_config: None,
         }
+    }
+
+    fn seed_mission_autonomy_fixture(cfg: &RuntimeConfig, mission_id: &str, budget_state: &str) {
+        let mission_dir = cfg
+            .octon_dir
+            .join("instance/orchestration/missions")
+            .join(mission_id);
+        let control_dir = cfg.execution_control_root.join("missions").join(mission_id);
+        fs::create_dir_all(&mission_dir).expect("create mission dir");
+        fs::create_dir_all(cfg.octon_dir.join("instance/governance/policies"))
+            .expect("create mission policy dir");
+        fs::create_dir_all(cfg.octon_dir.join("instance/governance/ownership"))
+            .expect("create ownership dir");
+        fs::create_dir_all(&control_dir).expect("create control dir");
+        fs::write(
+            cfg.octon_dir.join("instance/orchestration/missions/registry.yml"),
+            format!("schema_version: \"octon-mission-registry-v2\"\nactive:\n  - {mission_id}\narchived: []\n"),
+        )
+        .expect("write mission registry");
+        fs::write(
+            mission_dir.join("mission.yml"),
+            format!(
+                "schema_version: \"octon-mission-v2\"\nmission_id: \"{mission_id}\"\ntitle: \"Test Mission\"\nsummary: \"Fixture mission\"\nstatus: \"active\"\nmission_class: \"maintenance\"\nowner_ref: \"operator://test\"\ncreated_at: \"2026-03-23\"\nrisk_ceiling: \"ACP-2\"\nallowed_action_classes:\n  - \"repo-maintenance\"\ndefault_safing_subset:\n  - \"observe_only\"\n  - \"stage_only\"\ndefault_schedule_hint: \"continuous\"\ndefault_overlap_policy: \"skip\"\nscope_ids: []\nsuccess_criteria:\n  - \"Fixture completes\"\nfailure_conditions: []\n"
+            ),
+        )
+        .expect("write mission charter");
+        fs::write(
+            cfg.octon_dir.join("instance/governance/policies/mission-autonomy.yml"),
+            "schema_version: \"mission-autonomy-policy-v1\"\nmode_defaults: {}\nexecution_postures: {}\npreview_defaults: {}\ndigest_cadence_defaults: {}\nownership_routing: {}\noverlap_defaults: {}\nbackfill_defaults: {}\npause_on_failure: {}\nrecovery_windows: {}\nproceed_on_silence: {}\nsafe_interrupt_boundaries: {}\nautonomy_burn: {}\ncircuit_breakers: {}\nquorum: {}\nsafing_defaults: {}\n",
+        )
+        .expect("write mission autonomy policy");
+        fs::write(
+            cfg.octon_dir.join("instance/governance/ownership/registry.yml"),
+            "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators: []\nassets: []\nservices: []\nsubscriptions: {}\n",
+        )
+        .expect("write ownership registry");
+        fs::write(
+            control_dir.join("lease.yml"),
+            format!("schema_version: \"mission-control-lease-v1\"\nmission_id: \"{mission_id}\"\nlease_id: \"lease-1\"\nstatus: \"active\"\ngranted_by: \"operator://test\"\ngranted_at: \"2026-03-23T00:00:00Z\"\nexpires_at: \"2026-03-24T00:00:00Z\"\nmax_concurrent_runs: 1\nallowed_action_classes:\n  - \"repo-maintenance\"\ndefault_safing_subset:\n  - \"observe_only\"\n  - \"stage_only\"\n"),
+        )
+        .expect("write lease");
+        fs::write(
+            control_dir.join("mode-state.yml"),
+            format!("schema_version: \"mode-state-v1\"\nmission_id: \"{mission_id}\"\noversight_mode: \"feedback_window\"\nexecution_posture: \"continuous\"\nsafety_state: \"active\"\nphase: \"planning\"\nautonomy_budget_state: \"{budget_state}\"\nbreaker_state: \"healthy\"\n"),
+        )
+        .expect("write mode state");
+        fs::write(
+            control_dir.join("intent-register.yml"),
+            format!("schema_version: \"intent-register-v1\"\nmission_id: \"{mission_id}\"\nversion: 1\nentries: []\n"),
+        )
+        .expect("write intent register");
+        fs::write(control_dir.join("directives.yml"), "schema_version: \"control-directives-v1\"\ndirectives: []\n")
+            .expect("write directives");
+        fs::write(
+            control_dir.join("schedule.yml"),
+            format!("schema_version: \"schedule-control-v1\"\nmission_id: \"{mission_id}\"\nfuture_run_status: \"active\"\nactive_run_pause: \"none\"\noverlap_policy: \"skip\"\nbackfill_policy: \"latest_only\"\npause_on_failure:\n  enabled: true\n  triggers: []\n"),
+        )
+        .expect("write schedule");
+        fs::write(
+            control_dir.join("autonomy-budget.yml"),
+            format!("schema_version: \"autonomy-budget-v1\"\nmission_id: \"{mission_id}\"\nstate: \"{budget_state}\"\nupdated_at: \"2026-03-23T00:00:00Z\"\ncounters: {{}}\n"),
+        )
+        .expect("write autonomy budget");
+        fs::write(
+            control_dir.join("circuit-breakers.yml"),
+            format!("schema_version: \"circuit-breaker-v1\"\nmission_id: \"{mission_id}\"\nstate: \"healthy\"\nupdated_at: \"2026-03-23T00:00:00Z\"\ntripped_breakers: []\n"),
+        )
+        .expect("write breakers");
+        fs::write(control_dir.join("subscriptions.yml"), "schema_version: \"mission-subscriptions-v1\"\nsubscriptions: []\n")
+            .expect("write subscriptions");
+    }
+
+    fn mission_request(cfg: &RuntimeConfig, mission_id: &str, oversight_mode: &str, reversibility_class: &str) -> ExecutionRequest {
+        let mut request = minimal_request();
+        request.workflow_mode = "autonomous".to_string();
+        request.autonomy_context = Some(
+            default_autonomy_context(
+                cfg,
+                mission_id,
+                "slice-1",
+                "workflow-stage:test",
+                oversight_mode,
+                "continuous",
+                reversibility_class,
+            )
+            .expect("autonomy context"),
+        );
+        request
     }
 
     fn minimal_request() -> ExecutionRequest {
@@ -1643,8 +2146,10 @@ mod tests {
                 ..SideEffectFlags::default()
             },
             risk_tier: "low".to_string(),
+            workflow_mode: "human-only".to_string(),
             locality_scope: None,
             intent_ref: None,
+            autonomy_context: None,
             actor_ref: Some(default_actor_ref()),
             parent_run_ref: None,
             review_requirements: ReviewRequirements::default(),
@@ -1721,5 +2226,62 @@ mod tests {
         })
         .expect("command should build");
         assert_eq!(blocked, vec!["--full-auto".to_string()]);
+    }
+
+    #[test]
+    fn autonomous_request_requires_mission_context() {
+        let cfg = temp_runtime_config();
+        let policy = PolicyEngine::new(cfg.clone());
+        let mut request = minimal_request();
+        request.workflow_mode = "autonomous".to_string();
+        let err = authorize_execution(&cfg, &policy, &request, None)
+            .expect_err("autonomous request without mission context must deny");
+        assert_eq!(err.code, ErrorCode::CapabilityDenied);
+        assert_eq!(
+            err.details["reason_codes"][0].as_str(),
+            Some("MISSION_AUTONOMY_CONTEXT_MISSING")
+        );
+    }
+
+    #[test]
+    fn autonomous_request_allows_seeded_mission_context() {
+        let cfg = temp_runtime_config();
+        seed_mission_autonomy_fixture(&cfg, "mission-a", "healthy");
+        let policy = PolicyEngine::new(cfg.clone());
+        let request = mission_request(&cfg, "mission-a", "feedback_window", "reversible");
+        let grant = authorize_execution(&cfg, &policy, &request, None)
+            .expect("autonomous request with seeded mission surfaces should authorize");
+        assert_eq!(grant.workflow_mode, "autonomous");
+        assert_eq!(
+            grant.autonomy_context.as_ref().map(|value| value.mission_ref.id.as_str()),
+            Some("mission-a")
+        );
+        assert_eq!(grant.autonomy_budget_state.as_deref(), Some("healthy"));
+    }
+
+    #[test]
+    fn approval_required_autonomous_request_returns_stage_only_without_human_approval() {
+        let cfg = temp_runtime_config();
+        seed_mission_autonomy_fixture(&cfg, "mission-b", "healthy");
+        let policy = PolicyEngine::new(cfg.clone());
+        let request = mission_request(&cfg, "mission-b", "approval_required", "reversible");
+        let err = authorize_execution(&cfg, &policy, &request, None)
+            .expect_err("approval-required autonomous request should stage only without approval");
+        assert_eq!(err.details["decision"].as_str(), Some("STAGE_ONLY"));
+    }
+
+    #[test]
+    fn proceed_on_silence_blocks_when_autonomy_budget_not_healthy() {
+        let cfg = temp_runtime_config();
+        seed_mission_autonomy_fixture(&cfg, "mission-c", "warning");
+        let policy = PolicyEngine::new(cfg.clone());
+        let request = mission_request(&cfg, "mission-c", "proceed_on_silence", "reversible");
+        let err = authorize_execution(&cfg, &policy, &request, None)
+            .expect_err("warning autonomy budget should block proceed-on-silence");
+        assert_eq!(err.details["decision"].as_str(), Some("STAGE_ONLY"));
+        assert_eq!(
+            err.details["reason_codes"][0].as_str(),
+            Some("MISSION_PROCEED_ON_SILENCE_BLOCKED")
+        );
     }
 }

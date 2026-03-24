@@ -6,7 +6,15 @@ on:
       - ".octon/framework/engine/**"
       - ".octon/framework/assurance/runtime/**"
       - ".octon/framework/cognition/_meta/architecture/**"
+      - ".octon/framework/cognition/governance/principles/**"
+      - ".octon/framework/cognition/_ops/runtime/scripts/**"
+      - ".octon/instance/orchestration/missions/**"
       - ".octon/instance/governance/policies/**"
+      - ".octon/instance/governance/ownership/**"
+      - ".octon/state/control/execution/**"
+      - ".octon/state/evidence/control/**"
+      - ".octon/state/continuity/repo/missions/**"
+      - ".octon/generated/cognition/**"
       - ".octon/instance/bootstrap/**"
       - ".github/workflows/architecture-conformance.yml"
   push:
@@ -16,7 +24,15 @@ on:
       - ".octon/framework/engine/**"
       - ".octon/framework/assurance/runtime/**"
       - ".octon/framework/cognition/_meta/architecture/**"
+      - ".octon/framework/cognition/governance/principles/**"
+      - ".octon/framework/cognition/_ops/runtime/scripts/**"
+      - ".octon/instance/orchestration/missions/**"
       - ".octon/instance/governance/policies/**"
+      - ".octon/instance/governance/ownership/**"
+      - ".octon/state/control/execution/**"
+      - ".octon/state/evidence/control/**"
+      - ".octon/state/continuity/repo/missions/**"
+      - ".octon/generated/cognition/**"
       - ".octon/instance/bootstrap/**"
       - ".github/workflows/architecture-conformance.yml"
 
@@ -31,4 +47,6 @@ jobs:
         run: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
 
       - name: Validate architecture conformance
-        run: bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh
+        run: |
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness,mission-autonomy

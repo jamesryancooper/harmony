@@ -10,7 +10,7 @@ use std::process::{Command, Stdio};
 use time::format_description;
 
 use crate::authorization::{
-    authorize_execution, build_executor_command, finalize_execution,
+    authorize_execution, build_executor_command, default_autonomy_context, finalize_execution,
     now_rfc3339 as auth_now_rfc3339, resolve_executor_profile, write_execution_start,
     ExecutionOutcome, ExecutionRequest, ExecutorCommandSpec, ManagedExecutorKind,
     ReviewRequirements, ScopeConstraints, SideEffectFlags, SideEffectSummary,
@@ -26,6 +26,7 @@ const WORKFLOW_REPORTS_ROOT_REL: &str = ".octon/state/evidence/runs/workflows";
 #[derive(Debug, Clone)]
 pub struct RunPipelineOptions {
     pub pipeline_id: String,
+    pub mission_id: Option<String>,
     pub executor: ExecutorKind,
     pub executor_bin: Option<PathBuf>,
     pub output_slug: Option<String>,
@@ -481,6 +482,21 @@ fn run_generic_pipeline(
         .context("failed to canonicalize repository root")?;
 
     let reports_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
+    let workflow_autonomy_context = options
+        .mission_id
+        .as_deref()
+        .map(|mission_id| {
+            default_autonomy_context(
+                &runtime_cfg,
+                mission_id,
+                &entry.id,
+                "workflow",
+                "feedback_window",
+                "continuous",
+                "reversible",
+            )
+        })
+        .transpose()?;
     let workflow_request = ExecutionRequest {
         request_id: new_request_id("workflow"),
         caller_path: "workflow".to_string(),
@@ -505,8 +521,10 @@ fn run_generic_pipeline(
         } else {
             "medium".to_string()
         },
+        workflow_mode: "autonomous".to_string(),
         locality_scope: None,
         intent_ref: None,
+        autonomy_context: workflow_autonomy_context.clone(),
         actor_ref: None,
         parent_run_ref: None,
         review_requirements: ReviewRequirements::default(),
@@ -668,8 +686,39 @@ fn run_generic_pipeline(
                 branch_mutation: stage.authorization.side_effects.branch_mutation,
             },
             risk_tier: stage.authorization.risk_tier.clone(),
+            workflow_mode: "autonomous".to_string(),
             locality_scope: None,
             intent_ref: None,
+            autonomy_context: options
+                .mission_id
+                .as_deref()
+                .map(|mission_id| {
+                    default_autonomy_context(
+                        &runtime_cfg,
+                        mission_id,
+                        &stage.id,
+                        &format!("workflow-stage:{}", stage.id),
+                        if stage.authorization.review_requirements.human_approval {
+                            "approval_required"
+                        } else if stage.authorization.side_effects.write_repo
+                            || stage.authorization.side_effects.publication
+                            || stage.authorization.side_effects.state_mutation
+                        {
+                            "feedback_window"
+                        } else {
+                            "notify"
+                        },
+                        "continuous",
+                        if stage.authorization.side_effects.publication
+                            || stage.authorization.side_effects.branch_mutation
+                        {
+                            "compensable"
+                        } else {
+                            "reversible"
+                        },
+                    )
+                })
+                .transpose()?,
             actor_ref: None,
             parent_run_ref: Some(workflow_request.request_id.clone()),
             review_requirements: ReviewRequirements {
@@ -1412,11 +1461,79 @@ stages:
         .expect("write workflow contract");
         fs::create_dir_all(octon_dir.join("instance/cognition/context/shared"))
             .expect("create intent contract directory");
+        fs::create_dir_all(octon_dir.join("instance/orchestration/missions/sample-mission"))
+            .expect("create mission authority fixture");
+        fs::create_dir_all(octon_dir.join("instance/governance/policies"))
+            .expect("create mission policy fixture");
+        fs::create_dir_all(octon_dir.join("instance/governance/ownership"))
+            .expect("create ownership fixture");
+        fs::create_dir_all(octon_dir.join("state/control/execution/missions/sample-mission"))
+            .expect("create mission control fixture");
         fs::write(
             octon_dir.join("instance/cognition/context/shared/intent.contract.yml"),
             "intent_id: \"intent://test/sample-workflow\"\nversion: \"1.0.0\"\n",
         )
         .expect("write intent contract");
+        fs::write(
+            octon_dir.join("instance/orchestration/missions/registry.yml"),
+            "schema_version: \"octon-mission-registry-v2\"\nactive:\n  - sample-mission\narchived: []\n",
+        )
+        .expect("write mission registry");
+        fs::write(
+            octon_dir.join("instance/orchestration/missions/sample-mission/mission.yml"),
+            "schema_version: \"octon-mission-v2\"\nmission_id: \"sample-mission\"\ntitle: \"Sample Mission\"\nsummary: \"Fixture mission\"\nstatus: \"active\"\nmission_class: \"maintenance\"\nowner_ref: \"operator://fixtures\"\ncreated_at: \"2026-03-23\"\nrisk_ceiling: \"ACP-2\"\nallowed_action_classes:\n  - \"repo-maintenance\"\ndefault_safing_subset:\n  - \"observe_only\"\n  - \"stage_only\"\ndefault_schedule_hint: \"interruptible_scheduled\"\ndefault_overlap_policy: \"skip\"\nscope_ids: []\nsuccess_criteria:\n  - \"Fixture workflow completes\"\nfailure_conditions: []\n",
+        )
+        .expect("write mission charter");
+        fs::write(
+            octon_dir.join("instance/governance/policies/mission-autonomy.yml"),
+            "schema_version: \"mission-autonomy-policy-v1\"\nmode_defaults: {}\nexecution_postures: {}\npreview_defaults: {}\ndigest_cadence_defaults: {}\nownership_routing: {}\noverlap_defaults: {}\nbackfill_defaults: {}\npause_on_failure: {}\nrecovery_windows: {}\nproceed_on_silence: {}\nsafe_interrupt_boundaries: {}\nautonomy_burn: {}\ncircuit_breakers: {}\nquorum: {}\nsafing_defaults: {}\n",
+        )
+        .expect("write mission autonomy policy");
+        fs::write(
+            octon_dir.join("instance/governance/ownership/registry.yml"),
+            "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators: []\nassets: []\nservices: []\nsubscriptions: {}\n",
+        )
+        .expect("write ownership registry");
+        fs::write(
+            octon_dir.join("state/control/execution/missions/sample-mission/lease.yml"),
+            "schema_version: \"mission-control-lease-v1\"\nmission_id: \"sample-mission\"\nlease_id: \"lease-sample\"\nstatus: \"active\"\ngranted_by: \"operator://fixtures\"\ngranted_at: \"2026-03-23T00:00:00Z\"\nexpires_at: \"2026-03-30T00:00:00Z\"\nmax_concurrent_runs: 1\nallowed_action_classes:\n  - \"repo-maintenance\"\ndefault_safing_subset:\n  - \"observe_only\"\n  - \"stage_only\"\n",
+        )
+        .expect("write lease");
+        fs::write(
+            octon_dir.join("state/control/execution/missions/sample-mission/mode-state.yml"),
+            "schema_version: \"mode-state-v1\"\nmission_id: \"sample-mission\"\noversight_mode: \"feedback_window\"\nexecution_posture: \"continuous\"\nsafety_state: \"active\"\nphase: \"planning\"\nautonomy_budget_state: \"healthy\"\nbreaker_state: \"healthy\"\n",
+        )
+        .expect("write mode state");
+        fs::write(
+            octon_dir.join("state/control/execution/missions/sample-mission/intent-register.yml"),
+            "schema_version: \"intent-register-v1\"\nmission_id: \"sample-mission\"\nversion: 1\nentries: []\n",
+        )
+        .expect("write intent register");
+        fs::write(
+            octon_dir.join("state/control/execution/missions/sample-mission/directives.yml"),
+            "schema_version: \"control-directives-v1\"\ndirectives: []\n",
+        )
+        .expect("write directives");
+        fs::write(
+            octon_dir.join("state/control/execution/missions/sample-mission/schedule.yml"),
+            "schema_version: \"schedule-control-v1\"\nmission_id: \"sample-mission\"\nfuture_run_status: \"active\"\nactive_run_pause: \"none\"\noverlap_policy: \"skip\"\nbackfill_policy: \"latest_only\"\npause_on_failure:\n  enabled: true\n  triggers: []\n",
+        )
+        .expect("write schedule");
+        fs::write(
+            octon_dir.join("state/control/execution/missions/sample-mission/autonomy-budget.yml"),
+            "schema_version: \"autonomy-budget-v1\"\nmission_id: \"sample-mission\"\nstate: \"healthy\"\nupdated_at: \"2026-03-23T00:00:00Z\"\ncounters: {}\n",
+        )
+        .expect("write autonomy budget");
+        fs::write(
+            octon_dir.join("state/control/execution/missions/sample-mission/circuit-breakers.yml"),
+            "schema_version: \"circuit-breaker-v1\"\nmission_id: \"sample-mission\"\nstate: \"healthy\"\nupdated_at: \"2026-03-23T00:00:00Z\"\ntripped_breakers: []\n",
+        )
+        .expect("write circuit breakers");
+        fs::write(
+            octon_dir.join("state/control/execution/missions/sample-mission/subscriptions.yml"),
+            "schema_version: \"mission-subscriptions-v1\"\nsubscriptions: []\n",
+        )
+        .expect("write subscriptions");
         fs::write(
             workflows_dir.join("stages/01-analyze.md"),
             "# Analyze\n\nInspect the fixture.\n",
@@ -1439,6 +1556,7 @@ stages:
             &octon_dir,
             RunPipelineOptions {
                 pipeline_id: "sample-workflow".to_string(),
+                mission_id: Some("sample-mission".to_string()),
                 executor: ExecutorKind::Mock,
                 executor_bin: None,
                 output_slug: Some("fixture".to_string()),
@@ -1487,6 +1605,7 @@ stages:
             &octon_dir,
             RunPipelineOptions {
                 pipeline_id: "sample-workflow".to_string(),
+                mission_id: Some("sample-mission".to_string()),
                 executor: ExecutorKind::Auto,
                 executor_bin: None,
                 output_slug: Some("prepare".to_string()),
@@ -1523,6 +1642,7 @@ stages:
             &octon_dir,
             RunPipelineOptions {
                 pipeline_id: "sample-workflow".to_string(),
+                mission_id: Some("sample-mission".to_string()),
                 executor: ExecutorKind::Mock,
                 executor_bin: None,
                 output_slug: Some("artifact-receipts".to_string()),
@@ -1549,7 +1669,8 @@ stages:
                 .expect("stage receipt should exist"),
         )
         .expect("stage receipt should parse");
-        assert_eq!(receipt["schema_version"], "execution-receipt-v1");
+        assert_eq!(receipt["schema_version"], "execution-receipt-v2");
+        assert_eq!(receipt["workflow_mode"], "autonomous");
         assert!(receipt["reason_codes"].as_array().map(|v| !v.is_empty()).unwrap_or(false));
 
         fs::remove_dir_all(root).ok();

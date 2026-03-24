@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/schedule-control-v1.schema.json",
+  "title": "Schedule Control v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "mission_id",
+    "future_run_status",
+    "active_run_pause",
+    "overlap_policy",
+    "backfill_policy",
+    "pause_on_failure"
+  ],
+  "properties": {
+    "schema_version": { "const": "schedule-control-v1" },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "future_run_status": { "type": "string", "minLength": 1 },
+    "active_run_pause": { "type": "string", "minLength": 1 },
+    "overlap_policy": { "type": "string", "minLength": 1 },
+    "backfill_policy": { "type": "string", "minLength": 1 },
+    "pause_on_failure": {
+      "type": "object",
+      "required": ["enabled", "triggers"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "triggers": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "preview_window": { "type": ["object", "null"] }
+  }
+}

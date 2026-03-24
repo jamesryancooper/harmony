@@ -549,7 +549,7 @@ fn receipt_validate_enforces_required_fields() {
     fs::write(
         &receipt_path,
         serde_json::to_vec(&json!({
-            "schema_version":"policy-receipt-v1",
+            "schema_version":"policy-receipt-v2",
             "run_id":"run-x",
             "timestamp":"2026-02-19T00:00:00Z",
             "actor":{"id":"agent.a","type":"agent"},
@@ -612,7 +612,7 @@ fn receipt_validate_fails_when_telemetry_profile_missing_for_acp1_promote() {
     fs::write(
         &receipt_path,
         serde_json::to_vec(&json!({
-            "schema_version":"policy-receipt-v1",
+            "schema_version":"policy-receipt-v2",
             "run_id":"run-telemetry-missing",
             "timestamp":"2026-02-19T00:00:00Z",
             "actor":{"id":"agent.a","type":"agent"},
@@ -664,7 +664,7 @@ fn receipt_validate_fails_when_flag_metadata_invalid_for_flag_change() {
     fs::write(
         &receipt_path,
         serde_json::to_vec(&json!({
-            "schema_version":"policy-receipt-v1",
+            "schema_version":"policy-receipt-v2",
             "run_id":"run-flag-metadata-invalid",
             "timestamp":"2026-02-19T00:00:00Z",
             "actor":{"id":"agent.a","type":"agent"},

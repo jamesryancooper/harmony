@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/mission-charter-v2.schema.json",
+  "title": "Octon Mission Charter v2",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "mission_id",
+    "title",
+    "summary",
+    "status",
+    "mission_class",
+    "owner_ref",
+    "created_at",
+    "risk_ceiling",
+    "allowed_action_classes",
+    "default_safing_subset",
+    "default_schedule_hint",
+    "default_overlap_policy",
+    "scope_ids",
+    "success_criteria",
+    "failure_conditions"
+  ],
+  "properties": {
+    "schema_version": { "const": "octon-mission-v2" },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string" },
+    "status": { "type": "string", "minLength": 1 },
+    "mission_class": {
+      "type": "string",
+      "enum": ["observe", "campaign", "reconcile", "maintenance", "migration", "incident", "destructive"]
+    },
+    "owner_ref": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "minLength": 1 },
+    "risk_ceiling": { "type": "string", "pattern": "^ACP-[0-4]$" },
+    "allowed_action_classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "default_safing_subset": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "default_schedule_hint": { "type": "string", "minLength": 1 },
+    "default_overlap_policy": { "type": "string", "minLength": 1 },
+    "scope_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "success_criteria": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "failure_conditions": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "notes_ref": { "type": "string", "minLength": 1 }
+  }
+}

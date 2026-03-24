@@ -75,10 +75,14 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/inputs/additive/extensions/<pack-id>/`
 - Canonical repo continuity:
   `/.octon/state/continuity/repo/`
+- Canonical mission continuity:
+  `/.octon/state/continuity/repo/missions/`
 - Canonical scope continuity:
   `/.octon/state/continuity/scopes/<scope-id>/`
 - Canonical retained operational evidence:
   `/.octon/state/evidence/`
+- Canonical retained control-plane evidence:
+  `/.octon/state/evidence/control/execution/`
 - Canonical publication validation receipts:
   `/.octon/state/evidence/validation/publication/`
 - Canonical effective locality outputs:
@@ -89,6 +93,10 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/generated/effective/extensions/`
 - Canonical derived cognition outputs:
   `/.octon/generated/cognition/`
+- Canonical mission summaries:
+  `/.octon/generated/cognition/summaries/missions/`
+- Canonical operator digests:
+  `/.octon/generated/cognition/summaries/operators/`
 - Canonical ADR discovery index:
   `/.octon/instance/cognition/decisions/index.yml`
 - Local generated readable decision summary (when generated outputs are
@@ -102,11 +110,18 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/generated/proposals/registry.yml`
 - Canonical repo context and ADRs: `/.octon/instance/cognition/`
 - Canonical repo missions: `/.octon/instance/orchestration/missions/`
+- Canonical mission control truth:
+  `/.octon/state/control/execution/missions/<mission-id>/`
+- Canonical mission autonomy policy:
+  `/.octon/instance/governance/policies/mission-autonomy.yml`
+- Canonical ownership registry:
+  `/.octon/instance/governance/ownership/registry.yml`
 - Root manifest: `/.octon/octon.yml`
 - Execution authorization contracts:
   `/.octon/framework/engine/runtime/spec/execution-authorization-v1.md`,
-  `execution-request-v1.schema.json`, `execution-grant-v1.schema.json`,
-  `execution-receipt-v1.schema.json`, and `executor-profile-v1.schema.json`
+  `execution-request-v2.schema.json`, `execution-grant-v1.schema.json`,
+  `execution-receipt-v2.schema.json`, `policy-receipt-v2.schema.json`,
+  `policy-digest-v2.md`, and `executor-profile-v1.schema.json`
 - Export workflow: `/.octon/framework/orchestration/runtime/workflows/meta/export-harness/`
 - Canonical architecture contract:
   `/.octon/framework/cognition/_meta/architecture/specification.md`
@@ -167,6 +182,26 @@ authority order is `proposal.yml`, subtype manifest,
 Runtime and policy consumers must never read proposal paths directly.
 Proposal discovery lives only in `/.octon/generated/proposals/registry.yml`,
 which is committed by default but remains non-authoritative.
+
+## Mission-Scoped Reversible Autonomy
+
+Mission-Scoped Reversible Autonomy is Octon's canonical operating model for
+long-running and always-running autonomous agents.
+
+- durable mission authority lives under
+  `instance/orchestration/missions/<mission-id>/{mission.yml,mission.md}`
+- mutable mission control truth lives under
+  `state/control/execution/missions/<mission-id>/`
+- retained control-plane mutation evidence lives under
+  `state/evidence/control/execution/**`
+- retained execution evidence remains under `state/evidence/runs/**`
+- mission continuity lives under `state/continuity/repo/missions/<mission-id>/`
+- derived `now / next / recent / recover` views live under
+  `generated/cognition/summaries/missions/<mission-id>/`
+
+No autonomous runtime path may silently fall back to mission-less execution,
+and no external UI, chat transcript, or in-memory state may become a second
+authoritative control plane.
 
 ## Generated Contract
 

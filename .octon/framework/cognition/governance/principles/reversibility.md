@@ -15,6 +15,10 @@ Reversibility is a risk management principle: design routine autonomous changes 
 
 For routine autonomous operations (ACP-1 through ACP-3), promoted changes MUST include a recoverable rollback path and rollback handle. ACP-4 remains break-glass only and is blocked by default in normal runs.
 
+Under Mission-Scoped Reversible Autonomy, rollback or compensation metadata is
+part of the mission slice contract and must remain visible through live mode,
+receipts, and recovery read models for the full recovery window.
+
 Reversibility is not just about having a rollback button — it's about designing changes so that rollback is:
 - **Safe**: Rolling back doesn't cause data loss or corruption
 - **Fast**: Seconds to minutes, not hours
@@ -79,6 +83,8 @@ blocked by default, explicitly audited, and out-of-band from normal autonomous r
 
 - Promotion/contraction mechanics: [Autonomous Control Points](./autonomous-control-points.md)
 - Capability attempt authorization: [Deny by Default](./deny-by-default.md)
+- Long-running mission autonomy:
+  [Mission-Scoped Reversible Autonomy](./mission-scoped-reversible-autonomy.md)
 
 ## Arbitration
 
@@ -92,6 +98,8 @@ Aim for fast, tested rollback (typically seconds to minutes where platform/runti
 
 - Use expand/contract and dual-write/dual-read patterns for state transitions.
 - Keep rollback handles and recovery windows in receipts for each promoted slice.
+- Keep `recover` views and finalize blockers sourced from canonical receipts
+  and mission continuity, not from chat or side logs.
 - Rehearse rollback paths in staging and keep rollback checks in CI for risky changes.
 - Use feature flags and canary rollouts to reduce rollback blast radius.
 

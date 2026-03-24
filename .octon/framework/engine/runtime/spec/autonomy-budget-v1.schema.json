@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/autonomy-budget-v1.schema.json",
+  "title": "Autonomy Budget v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "mission_id", "state", "updated_at", "counters"],
+  "properties": {
+    "schema_version": { "const": "autonomy-budget-v1" },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "state": { "type": "string", "enum": ["healthy", "warning", "exhausted"] },
+    "updated_at": { "type": "string", "minLength": 1 },
+    "counters": { "type": "object" }
+  }
+}

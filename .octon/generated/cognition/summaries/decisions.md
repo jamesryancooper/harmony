@@ -5,8 +5,8 @@ mutability: generated
 generated_from:
   - /.octon/instance/cognition/decisions/index.yml
   - /.octon/instance/cognition/decisions/*.md
-generated_at: "2026-03-20T14:11:16Z"
-generator_version: "0.5.1"
+generated_at: "2026-03-24T01:21:25Z"
+generator_version: "0.6.0"
 ---
 
 # Decisions
@@ -73,6 +73,14 @@ Do not edit manually. Update ADR files and `/.octon/instance/cognition/decisions
 | ADR-053 | Accepted | 2026-03-20 | ADR 053: Root Manifest, Profiles, And Export Semantics Atomic Cutover | `/.octon/instance/cognition/decisions/053-root-manifest-profiles-and-export-semantics-atomic-cutover.md` |
 | ADR-054 | Accepted | 2026-03-20 | ADR 054: Inputs/Additive/Extensions Atomic Cutover | `/.octon/instance/cognition/decisions/054-inputs-additive-extensions-atomic-cutover.md` |
 | ADR-055 | Accepted | 2026-03-20 | ADR 055: Memory Routing And Decision Surfaces Atomic Cutover | `/.octon/instance/cognition/decisions/055-memory-routing-and-decision-surfaces-atomic-cutover.md` |
+| ADR-056 | Accepted | 2026-03-20 | ADR 056: Capability Routing And Host Integration Atomic Cutover | `/.octon/instance/cognition/decisions/056-capability-routing-and-host-integration-atomic-cutover.md` |
+| ADR-057 | Accepted | 2026-03-20 | ADR 057: Portability, Compatibility, Trust, And Provenance Atomic Cutover | `/.octon/instance/cognition/decisions/057-portability-compatibility-trust-provenance-atomic-cutover.md` |
+| ADR-058 | Accepted | 2026-03-20 | ADR 058: Validation, Fail-Closed, Quarantine, And Staleness Atomic Cutover | `/.octon/instance/cognition/decisions/058-validation-fail-closed-quarantine-staleness-atomic-cutover.md` |
+| ADR-059 | Accepted | 2026-03-20 | ADR 059: Migration And Rollout Completion Review | `/.octon/instance/cognition/decisions/059-migration-and-rollout-completion-review.md` |
+| ADR-060 | Accepted | 2026-03-21 | ADR 060: Runtime Execution Governance Hardening Atomic Cutover | `/.octon/instance/cognition/decisions/060-runtime-execution-governance-hardening-atomic-cutover.md` |
+| ADR-061 | Accepted | 2026-03-22 | ADR 061: Harness Integrity Tightening Atomic Cutover | `/.octon/instance/cognition/decisions/061-harness-integrity-tightening-atomic-cutover.md` |
+| ADR-062 | Accepted | 2026-03-23 | ADR 062: Self-Audit And Release Hardening Atomic Cutover | `/.octon/instance/cognition/decisions/062-self-audit-and-release-hardening-atomic-cutover.md` |
+| ADR-063 | Accepted | 2026-03-23 | ADR 063: Mission-Scoped Reversible Autonomy Atomic Cutover | `/.octon/instance/cognition/decisions/063-mission-scoped-reversible-autonomy-atomic-cutover.md` |
 
 ## Update Procedure
 

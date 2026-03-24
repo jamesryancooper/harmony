@@ -2,7 +2,7 @@
 title: Create Mission
 description: Scaffold a new mission from template.
 access: human
-version: "1.1.0"
+version: "1.2.0"
 depends_on: []
 checkpoints:
   enabled: true
@@ -12,7 +12,8 @@ parallel_steps: []
 
 # Create Mission
 
-Scaffold a new mission with isolated progress tracking.
+Scaffold a new mission with `octon-mission-v2` authority plus seeded mission
+control and continuity surfaces.
 
 ## Usage
 
@@ -36,13 +37,20 @@ Scaffold a new mission with isolated progress tracking.
 1. **Validate slug** — Check format and uniqueness
 2. **Copy template** — Copy `missions/_scaffold/template/` to `missions/<slug>/`
 3. **Initialize mission.yml** — Update canonical mission identity, lifecycle,
-   owner, summary, success criteria, and linkage placeholders
+   mission class, owner reference, risk ceiling, allowed action classes,
+   safe subset, schedule hints, success criteria, and failure conditions
 4. **Initialize mission.md** — Keep bounded narrative context subordinate to
    `mission.yml`
 5. **Initialize tasks.json** — Set mission identifier
 6. **Initialize log.md** — Add creation entry with date
-7. **Update registry** — Add mission to `active` list in `registry.yml`
-7. **Confirm** — Report success and next steps
+7. **Seed mission control truth** — Materialize lease, mode, intent,
+   directives, schedule, autonomy-budget, circuit-breakers, and subscriptions
+   under `state/control/execution/missions/<slug>/` by running
+   `framework/orchestration/runtime/_ops/scripts/seed-mission-autonomy-state.sh`
+8. **Seed mission continuity** — Materialize `next-actions.yml` and
+   `handoff.md` under `state/continuity/repo/missions/<slug>/`
+9. **Update registry** — Add mission to `active` list in `registry.yml`
+10. **Confirm** — Report success and next steps
 
 ## Output
 
@@ -60,21 +68,25 @@ missions/<slug>/
 ## Required Outcome
 
 - [ ] `missions/<slug>/` exists with initialized mission artifacts
+- [ ] Mission control state exists and starts paused with healthy autonomy burn
 - [ ] Mission registry is updated
 - [ ] Operator receives the next-step guidance after creation
 
 ## Next Steps After Creation
 
-1. Edit `mission.yml` to define owner, lifecycle state, success criteria, and
-   optional workflow/run linkage
+1. Edit `mission.yml` to confirm mission class, owner reference, allowed action
+   classes, success criteria, and failure conditions
 2. Update `mission.md` with bounded narrative context
-3. Add initial tasks to `tasks.json`
-4. Begin work on the mission
+3. Review seeded mission control files and update schedule/awareness defaults if
+   needed
+4. Add initial tasks to `tasks.json`
+5. Begin work on the mission
 
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | 2026-03-23 | Upgraded to mission charter v2 and seeded mission autonomy control surfaces |
 | 1.1.0 | 2025-01-14 | Added gap remediation fields |
 | 1.0.0 | 2025-01-05 | Initial version |
 

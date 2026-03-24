@@ -62,6 +62,13 @@ else
   GRAPH_NODES_PATH="$GENERATED_COGNITION_DIR/graph/nodes.yml"
   GRAPH_EDGES_PATH="$GENERATED_COGNITION_DIR/graph/edges.yml"
   INGESTION_RECEIPTS_PATH="$INSTANCE_COGNITION_SHARED_DIR/knowledge/sources/ingestion-receipts.yml"
+  MISSION_REGISTRY_PATH="$OCTON_DIR/instance/orchestration/missions/registry.yml"
+  MISSION_AUTHORITY_ROOT="$OCTON_DIR/instance/orchestration/missions"
+  MISSION_CONTROL_ROOT="$OCTON_DIR/state/control/execution/missions"
+  MISSION_CONTINUITY_ROOT="$OCTON_DIR/state/continuity/repo/missions"
+  MISSION_SUMMARIES_ROOT="$GENERATED_COGNITION_DIR/summaries/missions"
+  OPERATOR_DIGESTS_ROOT="$GENERATED_COGNITION_DIR/summaries/operators"
+  MISSION_PROJECTION_ROOT="$GENERATED_COGNITION_DIR/projections/materialized/missions"
 fi
 RUNTIME_DIR="$COGNITION_DIR/runtime"
 if [[ -n "${OUTPUT_DIR_OVERRIDE:-}" ]]; then
@@ -88,7 +95,10 @@ Usage: sync-runtime-artifacts.sh [--check] [--target <name> ...]
 
 Generates deterministic cognition runtime derived artifacts:
 - generated/cognition/summaries/decisions.md
+- generated/cognition/summaries/missions/<mission-id>/{now,next,recent,recover}.md
+- generated/cognition/summaries/operators/<operator-id>/*.md
 - generated/cognition/projections/materialized/cognition-runtime-surface-map.latest.yml
+- generated/cognition/projections/materialized/missions/<mission-id>.json
 - instance/cognition/context/shared/evidence/index.yml
 - instance/cognition/context/shared/evaluations/digests/index.yml
 - instance/cognition/context/shared/evaluations/actions/open-actions.yml
@@ -101,6 +111,7 @@ Options:
   --target  Generate only specific artifact target(s). Repeatable.
             Targets:
               decisions
+              missions
               projections
               evidence
               evaluations-digests
@@ -233,6 +244,29 @@ extract_yaml_scalar() {
       exit
     }
   ' "$file"
+}
+
+extract_active_mission_ids() {
+  local file="$1"
+  awk '
+    /^active:[[:space:]]*\[[[:space:]]*\][[:space:]]*$/ { exit }
+    /^active:[[:space:]]*$/ { in_active=1; next }
+    in_active && /^[^[:space:]]/ { in_active=0 }
+    in_active && /^[[:space:]]*-[[:space:]]*/ {
+      line=$0
+      sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+      gsub(/^"/, "", line)
+      gsub(/"$/, "", line)
+      print line
+    }
+  ' "$file"
+}
+
+operator_slug() {
+  local value="$1"
+  value="${value#operator://}"
+  value="${value#repo://}"
+  printf '%s' "$value" | tr '/:@' '---'
 }
 
 finalize_candidate() {
@@ -780,6 +814,198 @@ SURFACES
   finalize_candidate "$target" "$raw" "generated_at" "timestamp"
 }
 
+generate_mission_autonomy_views() {
+  local mission_id
+  [[ -f "$MISSION_REGISTRY_PATH" ]] || return 0
+
+  while IFS= read -r mission_id; do
+    [[ -n "$mission_id" ]] || continue
+
+    local mission_dir="$MISSION_AUTHORITY_ROOT/$mission_id"
+    local control_dir="$MISSION_CONTROL_ROOT/$mission_id"
+    local continuity_dir="$MISSION_CONTINUITY_ROOT/$mission_id"
+    local mission_file="$mission_dir/mission.yml"
+    local mode_state_file="$control_dir/mode-state.yml"
+    local intent_register_file="$control_dir/intent-register.yml"
+    local autonomy_budget_file="$control_dir/autonomy-budget.yml"
+    local circuit_breakers_file="$control_dir/circuit-breakers.yml"
+    local handoff_file="$continuity_dir/handoff.md"
+    local next_actions_file="$continuity_dir/next-actions.yml"
+
+    local title status mission_class owner_ref oversight_mode execution_posture phase budget_state breaker_state
+    title="$(extract_yaml_scalar "$mission_file" "title")"
+    status="$(extract_yaml_scalar "$mission_file" "status")"
+    mission_class="$(extract_yaml_scalar "$mission_file" "mission_class")"
+    owner_ref="$(extract_yaml_scalar "$mission_file" "owner_ref")"
+    oversight_mode="$(extract_yaml_scalar "$mode_state_file" "oversight_mode")"
+    execution_posture="$(extract_yaml_scalar "$mode_state_file" "execution_posture")"
+    phase="$(extract_yaml_scalar "$mode_state_file" "phase")"
+    budget_state="$(extract_yaml_scalar "$autonomy_budget_file" "state")"
+    breaker_state="$(extract_yaml_scalar "$circuit_breakers_file" "state")"
+
+    [[ -z "$title" ]] && title="$mission_id"
+    [[ -z "$status" ]] && status="unknown"
+    [[ -z "$mission_class" ]] && mission_class="unknown"
+    [[ -z "$owner_ref" ]] && owner_ref="unassigned"
+    [[ -z "$oversight_mode" ]] && oversight_mode="unknown"
+    [[ -z "$execution_posture" ]] && execution_posture="unknown"
+    [[ -z "$phase" ]] && phase="unknown"
+    [[ -z "$budget_state" ]] && budget_state="unknown"
+    [[ -z "$breaker_state" ]] && breaker_state="unknown"
+
+    local raw_now raw_next raw_recent raw_recover raw_projection raw_operator operator_id
+
+    raw_now="$(mktemp "$TMP_ROOT/mission-now.XXXX")"
+    cat > "$raw_now" <<EOF
+---
+title: Mission Now
+description: Generated current-state mission summary.
+mutability: generated
+generated_from:
+  - /.octon/instance/orchestration/missions/${mission_id}/mission.yml
+  - /.octon/state/control/execution/missions/${mission_id}/mode-state.yml
+  - /.octon/state/control/execution/missions/${mission_id}/autonomy-budget.yml
+  - /.octon/state/control/execution/missions/${mission_id}/circuit-breakers.yml
+generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
+---
+
+# Mission Now
+
+- mission_id: \`${mission_id}\`
+- title: \`${title}\`
+- status: \`${status}\`
+- mission_class: \`${mission_class}\`
+- owner_ref: \`${owner_ref}\`
+- oversight_mode: \`${oversight_mode}\`
+- execution_posture: \`${execution_posture}\`
+- phase: \`${phase}\`
+- autonomy_budget_state: \`${budget_state}\`
+- breaker_state: \`${breaker_state}\`
+EOF
+    perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw_now"
+    finalize_candidate "$MISSION_SUMMARIES_ROOT/$mission_id/now.md" "$raw_now" "generated_at" "timestamp"
+
+    raw_next="$(mktemp "$TMP_ROOT/mission-next.XXXX")"
+    cat > "$raw_next" <<EOF
+---
+title: Mission Next
+description: Generated next-step mission summary.
+mutability: generated
+generated_from:
+  - /.octon/state/control/execution/missions/${mission_id}/intent-register.yml
+  - /.octon/state/continuity/repo/missions/${mission_id}/next-actions.yml
+generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
+---
+
+# Mission Next
+
+- mission_id: \`${mission_id}\`
+- intent_register: \`/.octon/state/control/execution/missions/${mission_id}/intent-register.yml\`
+- next_actions: \`/.octon/state/continuity/repo/missions/${mission_id}/next-actions.yml\`
+EOF
+    perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw_next"
+    finalize_candidate "$MISSION_SUMMARIES_ROOT/$mission_id/next.md" "$raw_next" "generated_at" "timestamp"
+
+    raw_recent="$(mktemp "$TMP_ROOT/mission-recent.XXXX")"
+    cat > "$raw_recent" <<EOF
+---
+title: Mission Recent
+description: Generated recent mission evidence summary.
+mutability: generated
+generated_from:
+  - /.octon/state/evidence/runs/**
+  - /.octon/state/evidence/control/execution/**
+  - /.octon/state/continuity/repo/missions/${mission_id}/handoff.md
+generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
+---
+
+# Mission Recent
+
+- mission_id: \`${mission_id}\`
+- retained_run_evidence_root: \`/.octon/state/evidence/runs/\`
+- retained_control_evidence_root: \`/.octon/state/evidence/control/execution/\`
+- handoff: \`/.octon/state/continuity/repo/missions/${mission_id}/handoff.md\`
+EOF
+    perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw_recent"
+    finalize_candidate "$MISSION_SUMMARIES_ROOT/$mission_id/recent.md" "$raw_recent" "generated_at" "timestamp"
+
+    raw_recover="$(mktemp "$TMP_ROOT/mission-recover.XXXX")"
+    cat > "$raw_recover" <<EOF
+---
+title: Mission Recover
+description: Generated mission recovery summary.
+mutability: generated
+generated_from:
+  - /.octon/state/evidence/runs/**
+  - /.octon/state/control/execution/missions/${mission_id}/mode-state.yml
+generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
+---
+
+# Mission Recover
+
+- mission_id: \`${mission_id}\`
+- recovery_source: \`/.octon/state/evidence/runs/\`
+- mode_state: \`/.octon/state/control/execution/missions/${mission_id}/mode-state.yml\`
+EOF
+    perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw_recover"
+    finalize_candidate "$MISSION_SUMMARIES_ROOT/$mission_id/recover.md" "$raw_recover" "generated_at" "timestamp"
+
+    raw_projection="$(mktemp "$TMP_ROOT/mission-projection.XXXX")"
+    cat > "$raw_projection" <<EOF
+{
+  "mission_id": "${mission_id}",
+  "title": "$(printf '%s' "$title" | sed 's/"/\\"/g')",
+  "status": "${status}",
+  "mission_class": "${mission_class}",
+  "owner_ref": "${owner_ref}",
+  "oversight_mode": "${oversight_mode}",
+  "execution_posture": "${execution_posture}",
+  "phase": "${phase}",
+  "autonomy_budget_state": "${budget_state}",
+  "breaker_state": "${breaker_state}",
+  "generated_at": "__GENERATED_AT__",
+  "generated_from": [
+    "/.octon/instance/orchestration/missions/${mission_id}/mission.yml",
+    "/.octon/state/control/execution/missions/${mission_id}/mode-state.yml",
+    "/.octon/state/control/execution/missions/${mission_id}/intent-register.yml",
+    "/.octon/state/continuity/repo/missions/${mission_id}/handoff.md"
+  ]
+}
+EOF
+    finalize_candidate "$MISSION_PROJECTION_ROOT/$mission_id.json" "$raw_projection" "generated_at" "timestamp"
+
+    operator_id="$(operator_slug "$owner_ref")"
+    raw_operator="$(mktemp "$TMP_ROOT/operator-digest.XXXX")"
+    cat > "$raw_operator" <<EOF
+---
+title: Mission Operator Digest
+description: Generated operator digest entry for mission routing.
+mutability: generated
+generated_from:
+  - /.octon/instance/orchestration/missions/${mission_id}/mission.yml
+  - /.octon/state/control/execution/missions/${mission_id}/subscriptions.yml
+generated_at: "__GENERATED_AT__"
+generator_version: "__GENERATOR_VERSION__"
+---
+
+# Operator Mission Digest
+
+- operator_id: \`${operator_id}\`
+- mission_id: \`${mission_id}\`
+- title: \`${title}\`
+- oversight_mode: \`${oversight_mode}\`
+- budget_state: \`${budget_state}\`
+- breaker_state: \`${breaker_state}\`
+EOF
+    perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw_operator"
+    finalize_candidate "$OPERATOR_DIGESTS_ROOT/$operator_id/$mission_id.md" "$raw_operator" "generated_at" "timestamp"
+  done < <(extract_active_mission_ids "$MISSION_REGISTRY_PATH")
+}
+
 generate_evidence_index() {
   local target
   local raw
@@ -1300,6 +1526,7 @@ reconcile_outputs() {
 main() {
   local -a default_generators=(
     "generate_decisions_context"
+    "generate_mission_autonomy_views"
     "generate_projection_materialized"
     "generate_evidence_index"
     "generate_evaluations_digests_index"
@@ -1320,6 +1547,9 @@ main() {
       case "$target" in
         decisions)
           generators+=("generate_decisions_context")
+          ;;
+        missions)
+          generators+=("generate_mission_autonomy_views")
           ;;
         projections)
           generators+=("generate_projection_materialized")

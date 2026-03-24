@@ -1,6 +1,6 @@
 ---
 name: "create-mission"
-description: "Scaffold a new mission artifact set and register it for execution tracking."
+description: "Scaffold a new mission artifact set, register it for execution tracking, and seed mission autonomy control surfaces."
 steps:
   - id: "overview"
     file: "stages/00-overview.md"
@@ -19,7 +19,8 @@ _Generated README from canonical workflow `create-mission`._
 
 ## Purpose
 
-Scaffold a new mission artifact set and register it for execution tracking.
+Scaffold a new mission artifact set, register it for execution tracking, and
+seed mission autonomy control surfaces.
 
 ## Target
 
@@ -53,5 +54,4 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 | Version | Changes |
 |---------|---------|
-| 1.1.0 | Generated from canonical workflow `create-mission` |
-
+| 1.2.0 | Generated from canonical workflow `create-mission` |

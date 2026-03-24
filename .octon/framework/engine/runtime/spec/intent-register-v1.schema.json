@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/intent-register-v1.schema.json",
+  "title": "Intent Register v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "mission_id", "version", "entries"],
+  "properties": {
+    "schema_version": { "const": "intent-register-v1" },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "version": { "type": "integer", "minimum": 1 },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "https://octon.local/engine/runtime/spec/action-slice-v1.schema.json" }
+    }
+  }
+}

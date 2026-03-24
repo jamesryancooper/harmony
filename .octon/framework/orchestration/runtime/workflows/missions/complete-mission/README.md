@@ -1,6 +1,6 @@
 ---
 name: "complete-mission"
-description: "Close and archive an existing mission with final status and continuity handoff updates."
+description: "Close and archive an existing mission with final status, mission control closure, and continuity handoff updates."
 steps:
   - id: "overview"
     file: "stages/00-overview.md"
@@ -19,7 +19,8 @@ _Generated README from canonical workflow `complete-mission`._
 
 ## Purpose
 
-Close and archive an existing mission with final status and continuity handoff updates.
+Close and archive an existing mission with final status, mission control
+closure, and continuity handoff updates.
 
 ## Target
 
@@ -53,5 +54,4 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 | Version | Changes |
 |---------|---------|
-| 1.1.0 | Generated from canonical workflow `complete-mission` |
-
+| 1.2.0 | Generated from canonical workflow `complete-mission` |

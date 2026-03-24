@@ -567,8 +567,10 @@ fn authorize_workflow_stage(
             branch_mutation: false,
         },
         risk_tier: risk_tier.to_string(),
+        workflow_mode: "human-only".to_string(),
         locality_scope: None,
         intent_ref: None,
+        autonomy_context: None,
         actor_ref: None,
         parent_run_ref: Some(workflow_id.to_string()),
         review_requirements: ReviewRequirements::default(),
@@ -689,8 +691,10 @@ pub fn run_create_design_package_from_octon_dir(
                 ..SideEffectFlags::default()
             },
             risk_tier: "medium".to_string(),
+            workflow_mode: "human-only".to_string(),
             locality_scope: None,
             intent_ref: None,
+            autonomy_context: None,
             actor_ref: None,
             parent_run_ref: None,
             review_requirements: ReviewRequirements::default(),
@@ -749,8 +753,10 @@ pub fn run_create_design_package_from_octon_dir(
                 ..SideEffectFlags::default()
             },
             risk_tier: "medium".to_string(),
+            workflow_mode: "human-only".to_string(),
             locality_scope: None,
             intent_ref: None,
+            autonomy_context: None,
             actor_ref: None,
             parent_run_ref: None,
             review_requirements: ReviewRequirements::default(),
@@ -1265,8 +1271,10 @@ pub fn run_create_design_package_from_octon_dir(
                     ..SideEffectFlags::default()
                 },
                 risk_tier: "medium".to_string(),
+                workflow_mode: "human-only".to_string(),
                 locality_scope: None,
                 intent_ref: None,
+                autonomy_context: None,
                 actor_ref: None,
                 parent_run_ref: None,
                 review_requirements: ReviewRequirements::default(),
@@ -1326,8 +1334,10 @@ pub fn run_create_design_package_from_octon_dir(
                 ..SideEffectFlags::default()
             },
             risk_tier: "medium".to_string(),
+            workflow_mode: "human-only".to_string(),
             locality_scope: None,
             intent_ref: None,
+            autonomy_context: None,
             actor_ref: None,
             parent_run_ref: None,
             review_requirements: ReviewRequirements::default(),
@@ -1401,8 +1411,10 @@ pub fn run_create_static_proposal_from_octon_dir(
             ..SideEffectFlags::default()
         },
         risk_tier: "medium".to_string(),
+        workflow_mode: "human-only".to_string(),
         locality_scope: None,
         intent_ref: None,
+        autonomy_context: None,
         actor_ref: None,
         parent_run_ref: None,
         review_requirements: ReviewRequirements::default(),
@@ -1729,8 +1741,10 @@ pub fn run_audit_static_proposal_from_octon_dir(
             ..SideEffectFlags::default()
         },
         risk_tier: "low".to_string(),
+        workflow_mode: "human-only".to_string(),
         locality_scope: None,
         intent_ref: None,
+        autonomy_context: None,
         actor_ref: None,
         parent_run_ref: None,
         review_requirements: ReviewRequirements::default(),
@@ -2187,8 +2201,10 @@ impl Runner {
             } else {
                 "low".to_string()
             },
+            workflow_mode: "human-only".to_string(),
             locality_scope: None,
             intent_ref: None,
+            autonomy_context: None,
             actor_ref: None,
             parent_run_ref: Some(self.slug.clone()),
             review_requirements: ReviewRequirements {
