@@ -2365,10 +2365,14 @@ pub fn run_promote_proposal_from_octon_dir(
         Some("scoped_repo_mutation"),
     )?;
     let promote_result: Result<()> = (|| {
+        let original_manifest = manifest.clone();
         ensure_promotion_targets_ready(&repo_root, &manifest, &proposal_root)?;
         manifest.status = "implemented".to_string();
         write_proposal_manifest(&proposal_root, &manifest)?;
-        regenerate_proposal_registry(&repo_root, true)?;
+        if let Err(error) = regenerate_proposal_registry(&repo_root, true) {
+            write_proposal_manifest(&proposal_root, &original_manifest)?;
+            return Err(error);
+        }
         Ok(())
     })();
     if let Err(error) = promote_result {
@@ -5117,8 +5121,18 @@ fn validate_repo_relative_paths(repo_root: &Path, paths: &[String], label: &str)
             label,
             path
         );
+        let canonical = repo_root
+            .join(path)
+            .canonicalize()
+            .with_context(|| format!("resolve {} path {}", label, path))?;
         ensure!(
-            repo_root.join(path).exists(),
+            canonical.starts_with(repo_root),
+            "{} path must stay inside the repository root: {}",
+            label,
+            path
+        );
+        ensure!(
+            canonical.exists(),
             "{} path must exist: {}",
             label,
             path

@@ -328,10 +328,7 @@ validate_promotion_targets() {
     else
       local found=""
       if command -v rg >/dev/null 2>&1; then
-        found="$(rg -n --fixed-strings ".octon/inputs/exploratory/proposals/${proposal_id}" "$target_abs" 2>/dev/null || true)"
-        if [[ -z "$found" ]]; then
-          found="$(rg -n --fixed-strings ".octon/inputs/exploratory/proposals/.archive/" "$target_abs" 2>/dev/null | rg "${proposal_id}" || true)"
-        fi
+        found="$(rg -n -e "\\.octon/inputs/exploratory/proposals/(\\.archive/)?[a-z0-9-]+/${proposal_id}" "$target_abs" 2>/dev/null || true)"
       else
         found="$(grep -R -n -E "\\.octon/inputs/exploratory/proposals/(\\.archive/)?[a-z0-9-]+/${proposal_id}" "$target_abs" 2>/dev/null || true)"
       fi
