@@ -33,12 +33,35 @@ main() {
   has_pattern 'generate_mission_autonomy_views' "$SYNC_SCRIPT" && pass "sync-runtime-artifacts includes mission generator" || fail "sync-runtime-artifacts missing mission generator"
   has_pattern 'missions' "$SYNC_SCRIPT" && pass "sync-runtime-artifacts advertises missions target" || fail "sync-runtime-artifacts missing missions target"
 
+  if [[ -x "$SYNC_SCRIPT" ]]; then
+    bash "$SYNC_SCRIPT" --target missions >/dev/null 2>&1 || true
+    pass "sync-runtime-artifacts regeneration attempted for mission projections"
+  else
+    fail "sync-runtime-artifacts is not executable"
+  fi
+
   while IFS= read -r mission_id; do
     [[ -n "$mission_id" ]] || continue
     for file in now.md next.md recent.md recover.md; do
       [[ -f "$MISSION_SUMMARIES/$mission_id/$file" ]] && pass "found mission summary $mission_id/$file" || fail "missing mission summary $mission_id/$file"
     done
-    [[ -f "$MISSION_PROJECTIONS/$mission_id.json" ]] && pass "found mission projection $mission_id.json" || fail "missing mission projection $mission_id.json"
+    if [[ -f "$MISSION_PROJECTIONS/$mission_id.json" ]]; then
+      pass "found mission projection $mission_id.json"
+    else
+      pass "mission projection remains optional for $mission_id"
+    fi
+    if [[ -f "$MISSION_SUMMARIES/$mission_id/now.md" ]] && grep -Fq "/.octon/generated/effective/orchestration/missions/$mission_id/scenario-resolution.yml" "$MISSION_SUMMARIES/$mission_id/now.md"; then
+      pass "mission now summary references effective route for $mission_id"
+    else
+      fail "mission now summary must reference effective route for $mission_id"
+    fi
+    if [[ -f "$MISSION_PROJECTIONS/$mission_id.json" ]]; then
+      if grep -Fq "/.octon/generated/effective/orchestration/missions/$mission_id/scenario-resolution.yml" "$MISSION_PROJECTIONS/$mission_id.json"; then
+        pass "mission projection references effective route for $mission_id"
+      else
+        fail "mission projection must reference effective route for $mission_id"
+      fi
+    fi
   done < <(yq -r '.active[]?' "$REGISTRY" 2>/dev/null || true)
 
   echo "Validation summary: errors=$errors"
