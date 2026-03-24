@@ -8,7 +8,11 @@ SEED_SCRIPT="$ROOT_DIR/.octon/framework/orchestration/runtime/_ops/scripts/seed-
 CLOSE_SCRIPT="$ROOT_DIR/.octon/framework/orchestration/runtime/_ops/scripts/close-mission-autonomy-state.sh"
 
 fixture_root="$(mktemp -d)"
-trap 'rm -rf "$fixture_root"' EXIT
+cleanup_fixture() {
+  find "$fixture_root" -type f -exec rm -f {} + >/dev/null 2>&1 || true
+  find "$fixture_root" -depth -type d -exec rmdir {} + >/dev/null 2>&1 || true
+}
+trap cleanup_fixture EXIT
 
 mkdir -p "$fixture_root/.octon/instance/orchestration/missions/demo"
 mkdir -p "$fixture_root/.octon/instance/governance/policies"

@@ -37,7 +37,8 @@ main() {
   else
     fail "control receipt writer smoke test failed"
   fi
-  rm -rf "$tmp_root"
+  find "$tmp_root" -type f -exec rm -f {} + >/dev/null 2>&1 || true
+  find "$tmp_root" -depth -type d -exec rmdir {} + >/dev/null 2>&1 || true
 
   if find "$CONTROL_EVIDENCE_ROOT" -maxdepth 1 -type f ! -name '.gitkeep' | read -r _; then
     if find "$CONTROL_EVIDENCE_ROOT" -maxdepth 1 -type f ! -name '.gitkeep' | awk 'BEGIN{ok=1} !/\/[0-9T:-]+.*\.yml$/ {ok=0} END{exit ok?0:1}'; then
