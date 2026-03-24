@@ -28,14 +28,25 @@ Run fail-closed validation for any manifest-governed proposal and verify that th
 
 This README summarizes the canonical workflow unit at `.octon/framework/orchestration/runtime/workflows/meta/validate-proposal`.
 
+## Prerequisites
+
+- Required workflow inputs are available.
+- Canonical workflow contract exists at `.octon/framework/orchestration/runtime/workflows/meta/validate-proposal/workflow.yml`.
+
 ## Parameters
 
 - `proposal_path` (folder, required=true): Root proposal directory to validate
 
+## Failure Conditions
+
+- Required inputs are missing or invalid.
+- The canonical workflow contract or stage assets are missing.
+- Verification criteria are not satisfied.
+
 ## Outputs
 
-- `validate_proposal_workflow_summary` -> `/.octon/state/evidence/validation/analysis/{{date}}-validate-proposal.md`
-- `validate_proposal_workflow_bundle` -> `/.octon/state/evidence/runs/workflows/{{date}}-validate-proposal-{{slug}}/`
+- `validate_proposal_workflow_summary` -> `/.octon/state/evidence/validation/analysis/{{date}}-validate-proposal.md`: Top-level workflow summary for proposal validation
+- `validate_proposal_workflow_bundle` -> `/.octon/state/evidence/runs/workflows/{{date}}-validate-proposal-{{slug}}/`: Workflow bundle containing proposal validation metadata and outputs
 
 ## Steps
 
@@ -49,3 +60,14 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 - [ ] base and subtype proposal validators pass
 - [ ] generated proposal registry matches the manifest projection
 - [ ] final validation verdict is explicit
+
+## References
+
+- Canonical contract: `.octon/framework/orchestration/runtime/workflows/meta/validate-proposal/workflow.yml`
+- Canonical stages: `.octon/framework/orchestration/runtime/workflows/meta/validate-proposal/stages/`
+
+## Version History
+
+| Version | Changes |
+|---------|---------|
+| 1.0.0 | Generated from canonical workflow `validate-proposal` |
