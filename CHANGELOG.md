@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.7](https://github.com/jamesryancooper/octon/compare/octon-v0.5.6...octon-v0.5.7) (2026-03-24)
+## [0.6.0](https://github.com/jamesryancooper/octon/compare/octon-v0.5.6...octon-v0.6.0) (2026-03-24)
 
 
 ### Features
