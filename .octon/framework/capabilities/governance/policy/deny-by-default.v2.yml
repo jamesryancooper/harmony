@@ -507,6 +507,26 @@ acp:
         budget_set: budgets.repo-small
         circuit_breaker_set: circuit_breakers.repo-stage
       on_missing_requirements: STAGE_ONLY
+    - id: acp-service-execute-human
+      match:
+        class: service.execute
+        phase: [promote]
+        target:
+          workflow_mode: [human-only]
+          capability_classification: [human-only]
+          boundary_route: [allow]
+      require:
+        acp: ACP-1
+        phase: promote
+        reversibility:
+          required: true
+          primitive: git.revert_commit
+          rollback_proof_required: false
+          recovery_window_default: P14D
+        evidence_required: [diff]
+        budget_set: budgets.repo-small
+        circuit_breaker_set: circuit_breakers.repo-stage
+      on_missing_requirements: STAGE_ONLY
     - id: acp-service-execute-boundary-escalate
       match:
         class: service.execute
