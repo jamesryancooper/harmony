@@ -6,7 +6,7 @@ description: Canonical principles index and thresholds that translate Octon pill
 # Octon Principles
 
 Status: Active (Production)
-Last updated: 2026-03-04
+Last updated: 2026-03-23
 
 Principles are Octon's operational translation layer between philosophy and execution.
 
@@ -65,6 +65,7 @@ Machine-readable mapping from charter principles (`P1..P10`) to operational guid
 | Quality and operational readiness | [Observability as a Contract](./observability-as-a-contract.md), [Reversibility](./reversibility.md), [Small Diffs, Trunk-based](./small-diffs-trunk-based.md) |
 | Security and privacy | [Security and Privacy Baseline](./security-and-privacy-baseline.md), [Deny by Default](./deny-by-default.md), [Guardrails](./guardrails.md) |
 | Exceptions and governance | [Arbitration and Precedence](./arbitration-and-precedence.md), [Autonomous Control Points](./autonomous-control-points.md), [Waivers and Exceptions](../exceptions/waivers-and-exceptions.md) |
+| Long-running autonomous mission control | [Mission-Scoped Reversible Autonomy](./mission-scoped-reversible-autonomy.md), [Autonomous Control Points](./autonomous-control-points.md), [Ownership and Boundaries](./ownership-and-boundaries.md), [Reversibility](./reversibility.md) |
 | RA/ACP control contracts | [RA/ACP Glossary](../controls/ra-acp-glossary.md), [RA/ACP Promotion Inputs Matrix](../controls/ra-acp-promotion-inputs-matrix.md), [Flag Metadata Contract](../controls/flag-metadata-contract.md), [Promotable Slice Decomposition](../controls/promotable-slice-decomposition.md) |
 | Convivial impact contract | [Convivial Impact Minimums](../controls/convivial-impact-minimums.md), [Convivial Impact Minimums (YAML)](../controls/convivial-impact-minimums.yml) |
 
@@ -151,10 +152,12 @@ Recording requirement:
 | Agentic | Idempotency | Make mutating operations safe under retries and partial failures. | Trust, Velocity | [Guide](./idempotency.md) |
 | Agentic | Guardrails | Apply policy/eval/security gates fail-closed across agent loops. | Trust | [Guide](./guardrails.md) |
 | Agentic | Autonomous Control Points | Use policy-gated ACPs for consequential promotions with stage-only fallback and receipts. | Direction, Trust | [Guide](./autonomous-control-points.md) |
+| Agentic | Mission-Scoped Reversible Autonomy | Run long-lived autonomy inside mission authority, explicit mode, reversible slices, and supervisory control receipts. | Direction, Trust, Continuity | [Guide](./mission-scoped-reversible-autonomy.md) |
 
 ### Agentic Principles
 
 - [Autonomous Control Points](./autonomous-control-points.md)
+- [Mission-Scoped Reversible Autonomy](./mission-scoped-reversible-autonomy.md)
 - [No Silent Apply](./no-silent-apply.md)
 - [Determinism and Provenance](./determinism-and-provenance.md)
 - [Idempotency](./idempotency.md)

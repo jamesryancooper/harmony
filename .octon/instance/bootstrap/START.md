@@ -176,6 +176,24 @@ Extension activation uses one desired/actual/quarantine/compiled model:
 - runtime-facing capability routing: `generated/effective/capabilities/**`
 - derived cognition read models: `generated/cognition/**`
 
+Mission-scoped reversible autonomy uses one authored/control/evidence/read-model
+split:
+
+- durable mission authority:
+  `instance/orchestration/missions/<mission-id>/{mission.yml,mission.md}`
+- repo-owned mission autonomy defaults:
+  `instance/governance/policies/mission-autonomy.yml`
+- repo-owned non-path ownership authority:
+  `instance/governance/ownership/registry.yml`
+- mutable mission control truth:
+  `state/control/execution/missions/<mission-id>/**`
+- retained control-plane evidence:
+  `state/evidence/control/execution/**`
+- mission continuity:
+  `state/continuity/repo/missions/<mission-id>/**`
+- derived mission/operator read models:
+  `generated/cognition/summaries/{missions,operators}/**`
+
 Raw additive packs carry compatibility and provenance in
 `inputs/additive/extensions/<pack-id>/pack.yml`.
 Repo trust decisions stay in `instance/extensions.yml`.

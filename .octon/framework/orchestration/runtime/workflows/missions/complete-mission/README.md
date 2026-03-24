@@ -53,5 +53,4 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 | Version | Changes |
 |---------|---------|
-| 1.1.0 | Generated from canonical workflow `complete-mission` |
-
+| 1.2.0 | Generated from canonical workflow `complete-mission` |

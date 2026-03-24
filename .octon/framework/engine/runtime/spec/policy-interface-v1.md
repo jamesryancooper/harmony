@@ -27,6 +27,10 @@ These launchers are the canonical invocation boundary for policy operations.
   - `/.octon/instance/governance/policies/network-egress.yml`
 - Repo-owned execution budget governance is declared in:
   - `/.octon/instance/governance/policies/execution-budgets.yml`
+- Repo-owned mission autonomy defaults are declared in:
+  - `/.octon/instance/governance/policies/mission-autonomy.yml`
+- Repo-owned non-path ownership authority is declared in:
+  - `/.octon/instance/governance/ownership/registry.yml`
 
 ## Supported Command Surface (v1)
 
@@ -64,6 +68,20 @@ Fail-closed behavior:
 - Autonomous run for non-`agent-ready` classification: deny with reason code
   `MODE_VIOLATION_AUTONOMY_NOT_ALLOWED`
 
+Autonomous execution requests that operate under Mission-Scoped Reversible
+Autonomy MUST also provide `autonomy_context` with:
+
+- `mission_ref`
+- `slice_ref`
+- `intent_ref`
+- `mission_class`
+- `oversight_mode`
+- `execution_posture`
+- `reversibility_class`
+- `boundary_id`
+
+Missing mission autonomy context is a fail-closed denial for autonomous runs.
+
 For material ACP runs (`phase=promote|finalize` or explicit material side-effect
 flags), the wrapper executes a single mandatory path:
 
@@ -78,8 +96,8 @@ flags), the wrapper executes a single mandatory path:
 ACP receipt/digest artifacts emitted by wrapper-assisted `acp-enforce`
 evaluations must follow:
 
-- Receipt schema: `engine/runtime/spec/policy-receipt-v1.schema.json`
-- Digest format: `engine/runtime/spec/policy-digest-v1.md`
+- Receipt schema: `engine/runtime/spec/policy-receipt-v2.schema.json`
+- Digest format: `engine/runtime/spec/policy-digest-v2.md`
 - Instruction-layer manifest schema:
   `engine/runtime/spec/instruction-layer-manifest-v1.schema.json`
 

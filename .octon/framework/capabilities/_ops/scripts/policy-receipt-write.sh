@@ -66,6 +66,7 @@ render_digest() {
   local output_path="$2"
   local run_id timestamp decision effective_acp operation_class phase reason_codes rollback_handle recovery_window telemetry_profile material_side_effect remediation
   local intent_ref boundary_id boundary_set_version workflow_mode capability_classification instruction_layers reason_details
+  local mission_id slice_id oversight_mode execution_posture reversibility_class autonomy_budget_state breaker_state compensation_handle
 
   run_id="$(jq -r '.run_id // ""' "$receipt_path")"
   timestamp="$(jq -r '.timestamp // ""' "$receipt_path")"
@@ -83,14 +84,22 @@ render_digest() {
   boundary_set_version="$(jq -r '.boundary_set_version // ""' "$receipt_path")"
   workflow_mode="$(jq -r '.workflow_mode // ""' "$receipt_path")"
   capability_classification="$(jq -r '.capability_classification // ""' "$receipt_path")"
+  mission_id="$(jq -r '.mission_ref.id // ""' "$receipt_path")"
+  slice_id="$(jq -r '.slice_ref.id // ""' "$receipt_path")"
+  oversight_mode="$(jq -r '.oversight_mode // ""' "$receipt_path")"
+  execution_posture="$(jq -r '.execution_posture // ""' "$receipt_path")"
+  reversibility_class="$(jq -r '.reversibility_class // ""' "$receipt_path")"
+  compensation_handle="$(jq -r '.compensation_handle // ""' "$receipt_path")"
+  autonomy_budget_state="$(jq -r '.autonomy_budget_state // ""' "$receipt_path")"
+  breaker_state="$(jq -r '.breaker_state // ""' "$receipt_path")"
   remediation="$(jq -r '.remediation // ""' "$receipt_path")"
   instruction_layers="$(jq -r '(.instruction_layers // []) | map("\(.layer_id):\(.source):\(.visibility):\(.bytes):\(.sha256)") | join(",")' "$receipt_path")"
   reason_details="$(jq -r '(.reason_details // [])[]? | "- `" + (.code // "") + "`: " + (.remediation // "")' "$receipt_path")"
 
   {
-    echo "# ACP Decision Digest (v1)"
+    echo "# ACP Decision Digest (v2)"
     echo
-    echo "- Digest Format: \`policy-digest-v1\`"
+    echo "- Digest Format: \`policy-digest-v2\`"
     echo "- Run ID: \`$run_id\`"
     echo "- Timestamp: \`$timestamp\`"
     echo "- Decision: \`$decision\`"
@@ -105,9 +114,17 @@ render_digest() {
     echo "- Boundary Set Version: \`$boundary_set_version\`"
     echo "- Workflow Mode: \`$workflow_mode\`"
     echo "- Capability Classification: \`$capability_classification\`"
+    echo "- Mission ID: \`$mission_id\`"
+    echo "- Slice ID: \`$slice_id\`"
+    echo "- Oversight Mode: \`$oversight_mode\`"
+    echo "- Execution Posture: \`$execution_posture\`"
+    echo "- Reversibility Class: \`$reversibility_class\`"
     echo "- Instruction Layers: \`$instruction_layers\`"
     echo "- Rollback Handle: \`$rollback_handle\`"
+    echo "- Compensation Handle: \`$compensation_handle\`"
     echo "- Recovery Window: \`$recovery_window\`"
+    echo "- Autonomy Budget State: \`$autonomy_budget_state\`"
+    echo "- Breaker State: \`$breaker_state\`"
     echo "- Remediation Summary: $remediation"
     echo
     echo "## Reason Detail"
@@ -174,7 +191,7 @@ main() {
     --slurpfile req "$request_file" \
     --slurpfile dec "$decision_file" '
     {
-      schema_version: "policy-receipt-v1",
+      schema_version: "policy-receipt-v2",
       run_id: ($req[0].run_id),
       timestamp: $timestamp,
       actor: ($req[0].actor // {}),
@@ -223,6 +240,21 @@ main() {
         $req[0].operation.target.workflow_mode //
         "autonomous"
       ),
+      mission_ref: ($req[0].mission_ref // null),
+      slice_ref: ($req[0].slice_ref // null),
+      oversight_mode: ($req[0].oversight_mode // null),
+      execution_posture: ($req[0].execution_posture // null),
+      reversibility_class: (
+        $req[0].reversibility_class //
+        $req[0].reversibility.class //
+        null
+      ),
+      compensation_handle: (
+        $req[0].reversibility.compensation_handle //
+        null
+      ),
+      autonomy_budget_state: ($req[0].autonomy_budget_state // null),
+      breaker_state: ($req[0].breaker_state // null),
       capability_classification: (
         $req[0].capability_classification //
         $req[0].operation.target.capability_classification //

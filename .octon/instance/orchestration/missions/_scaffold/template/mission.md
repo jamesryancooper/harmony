@@ -4,9 +4,31 @@
 
 Define the bounded outcome for this mission.
 
+## Mission Class
+
+- describe the mission class and why its default control posture is correct
+
+## Owner
+
+- identify the accountable mission owner and any additional asset owners
+
 ## Scope
 
 - list the repo areas this mission may change
+- list the allowed action classes
+- list any explicit exclusions
+
+## Risk And Safing
+
+- state the risk ceiling
+- state the safe subset the mission may contract down to
+- state what must never proceed on silence
+
+## Schedule Intent
+
+- describe whether this mission is one-shot, continuous, or interruptible on a
+  schedule
+- describe expected preview and digest posture
 
 ## Notes
 

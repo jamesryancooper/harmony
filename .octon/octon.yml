@@ -9,7 +9,7 @@ topology:
     generated: generated/
 versioning:
   harness:
-    release_version: 0.5.5
+    release_version: 0.6.0
     supported_schema_versions:
       - octon-root-manifest-v2
       - octon-framework-manifest-v2
@@ -79,6 +79,10 @@ resolution:
   runtime_inputs:
     proposals_registry: .octon/generated/proposals/registry.yml
     continuity: .octon/state/continuity/
+    missions_registry: .octon/instance/orchestration/missions/registry.yml
+    mission_control_root: .octon/state/control/execution/missions
+    ownership_registry: .octon/instance/governance/ownership/registry.yml
+    mission_autonomy_policy: .octon/instance/governance/policies/mission-autonomy.yml
 execution_governance:
   policy_mode:
     default: hard-enforce

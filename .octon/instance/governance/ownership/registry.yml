@@ -1,0 +1,19 @@
+schema_version: "ownership-registry-v1"
+directive_precedence:
+  - "break_glass_or_kill_switch"
+  - "mission_owner"
+  - "ownership_registry"
+  - "codeowners"
+  - "subscribers"
+operators:
+  - operator_id: "octon-maintainers"
+    display_name: "Octon Maintainers"
+    contact: "repo://maintainers"
+assets: []
+services: []
+subscriptions:
+  default_routes:
+    - "mission_owner"
+    - "ownership_registry"
+    - "codeowners"
+    - "subscribers"

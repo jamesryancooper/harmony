@@ -222,3 +222,11 @@ files:
     path: autonomous-control-points.md
     summary: Principle defining ACP staging, promotion, and evidence controls.
     when: When designing promotion governance and high-impact decision flows.
+
+  - id: principle-mission-scoped-reversible-autonomy
+    classification: guide
+    family: agentic
+    lifecycle: active
+    path: mission-scoped-reversible-autonomy.md
+    summary: Canonical operating model for mission-scoped continuous autonomy with reversible slices, supervisory control, and retained recovery evidence.
+    when: When designing long-running or always-running autonomous mission control.

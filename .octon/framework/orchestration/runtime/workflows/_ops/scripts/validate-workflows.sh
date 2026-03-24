@@ -508,7 +508,13 @@ check_guide_drift() {
   local tmp_root
   tmp_root="$(mktemp -d "${TMPDIR:-/tmp}/octon-workflow-guides.XXXXXX")"
 
-  local generator_cmd=(bash "$GUIDE_GENERATOR" --output-root "$tmp_root")
+  local generator_cmd=(
+    env
+    "OCTON_DIR_OVERRIDE=$OCTON_DIR"
+    "OCTON_ROOT_DIR=$ROOT_DIR"
+    bash "$GUIDE_GENERATOR"
+    --output-root "$tmp_root"
+  )
   if [[ -n "$FILTER_WORKFLOW_ID" ]]; then
     generator_cmd+=(--workflow-id "$FILTER_WORKFLOW_ID")
   fi

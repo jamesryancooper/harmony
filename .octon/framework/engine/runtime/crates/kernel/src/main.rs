@@ -114,6 +114,9 @@ enum WorkflowCmd {
     Run {
         /// Canonical workflow id.
         workflow_id: String,
+        /// Mission id required for autonomous workflow execution.
+        #[arg(long = "mission-id")]
+        mission_id: Option<String>,
         /// Input override in the form key=value. Repeatable.
         #[arg(long = "set")]
         set: Vec<String>,
@@ -357,8 +360,10 @@ fn cmd_tool(service_id_or_name: &str, op: &str, input_json: Option<&str>) -> any
             ..SideEffectFlags::default()
         },
         risk_tier: "medium".to_string(),
+        workflow_mode: "human-only".to_string(),
         locality_scope: None,
         intent_ref: None,
+        autonomy_context: None,
         actor_ref: None,
         parent_run_ref: None,
         review_requirements: ReviewRequirements::default(),
@@ -456,8 +461,10 @@ fn cmd_studio() -> anyhow::Result<()> {
             ..SideEffectFlags::default()
         },
         risk_tier: "medium".to_string(),
+        workflow_mode: "human-only".to_string(),
         locality_scope: None,
         intent_ref: None,
+        autonomy_context: None,
         actor_ref: None,
         parent_run_ref: None,
         review_requirements: ReviewRequirements {
@@ -562,8 +569,10 @@ fn cmd_service(cmd: ServiceCmd) -> anyhow::Result<()> {
                     ..SideEffectFlags::default()
                 },
                 risk_tier: "medium".to_string(),
+                workflow_mode: "human-only".to_string(),
                 locality_scope: None,
                 intent_ref: None,
+                autonomy_context: None,
                 actor_ref: None,
                 parent_run_ref: None,
                 review_requirements: ReviewRequirements {
@@ -647,8 +656,10 @@ fn cmd_service(cmd: ServiceCmd) -> anyhow::Result<()> {
                     ..SideEffectFlags::default()
                 },
                 risk_tier: "medium".to_string(),
+                workflow_mode: "human-only".to_string(),
                 locality_scope: None,
                 intent_ref: None,
+                autonomy_context: None,
                 actor_ref: None,
                 parent_run_ref: None,
                 review_requirements: ReviewRequirements {
@@ -721,6 +732,7 @@ fn cmd_workflow(cmd: WorkflowCmd) -> anyhow::Result<()> {
         }
         WorkflowCmd::Run {
             workflow_id,
+            mission_id,
             set,
             executor,
             executor_bin,
@@ -733,6 +745,7 @@ fn cmd_workflow(cmd: WorkflowCmd) -> anyhow::Result<()> {
                 &octon_dir,
                 RunPipelineOptions {
                     pipeline_id: workflow_id,
+                    mission_id,
                     executor,
                     executor_bin: executor_bin.map(Into::into),
                     output_slug,
@@ -783,8 +796,10 @@ fn cmd_orchestration(cmd: OrchestrationCmd) -> anyhow::Result<()> {
                         ..SideEffectFlags::default()
                     },
                     risk_tier: "low".to_string(),
+                    workflow_mode: "human-only".to_string(),
                     locality_scope: None,
                     intent_ref: None,
+                    autonomy_context: None,
                     actor_ref: None,
                     parent_run_ref: None,
                     review_requirements: ReviewRequirements::default(),
@@ -850,8 +865,10 @@ fn cmd_orchestration(cmd: OrchestrationCmd) -> anyhow::Result<()> {
                         ..SideEffectFlags::default()
                     },
                     risk_tier: "low".to_string(),
+                    workflow_mode: "human-only".to_string(),
                     locality_scope: None,
                     intent_ref: None,
+                    autonomy_context: None,
                     actor_ref: None,
                     parent_run_ref: None,
                     review_requirements: ReviewRequirements::default(),
@@ -918,8 +935,10 @@ fn cmd_orchestration(cmd: OrchestrationCmd) -> anyhow::Result<()> {
                             ..SideEffectFlags::default()
                         },
                         risk_tier: "low".to_string(),
+                        workflow_mode: "human-only".to_string(),
                         locality_scope: None,
                         intent_ref: None,
+                        autonomy_context: None,
                         actor_ref: None,
                         parent_run_ref: None,
                         review_requirements: ReviewRequirements::default(),

@@ -15,6 +15,10 @@ Octon requires explicit ownership for code surfaces and enforceable module bound
 
 Owner identity should be explicit in repository governance metadata (for example `CODEOWNERS`, service owner records, or designated owning teams).
 
+Under Mission-Scoped Reversible Autonomy, authoritative non-path ownership is
+declared in `/.octon/instance/governance/ownership/registry.yml`, and mission
+owner signals are evaluated separately from subscribers and watchers.
+
 ## Owner Attestation
 
 For boundary exceptions, "owner" means the accountable owner of the impacted
@@ -52,6 +56,13 @@ If required attestation is missing, runtime behavior is deterministic and bounde
 
 This precedence ensures deterministic behavior even when optional metadata
 sources are unavailable.
+
+Directive precedence for mission control is stricter:
+1. break-glass or kill-switch authority
+2. mission owner from `mission.yml`
+3. ownership registry entry for the affected asset or service
+4. `CODEOWNERS` for affected repo paths
+5. subscribers and watchers (advisory only)
 
 ## Arbitration
 
@@ -116,6 +127,8 @@ from billing._private.retries import force_retry_all
 ## Canonical References
 
 - Promotion/contraction and quorum mechanics: [Autonomous Control Points](./autonomous-control-points.md)
+- Long-running mission autonomy:
+  [Mission-Scoped Reversible Autonomy](./mission-scoped-reversible-autonomy.md)
 - Capability attempt authorization: [Deny by Default](./deny-by-default.md)
 - Promotion evidence/receipt minimums: [RA/ACP Promotion Inputs Matrix](../controls/ra-acp-promotion-inputs-matrix.md)
 - Shared terminology: [RA/ACP Glossary](../controls/ra-acp-glossary.md)

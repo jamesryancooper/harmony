@@ -1,0 +1,165 @@
+schema_version: "mission-autonomy-policy-v1"
+mode_defaults:
+  observe: "notify"
+  campaign: "feedback_window"
+  reconcile: "proceed_on_silence"
+  maintenance: "notify"
+  migration: "feedback_window"
+  incident: "notify"
+  destructive: "approval_required"
+execution_postures:
+  observe: "continuous"
+  campaign: "continuous"
+  reconcile: "interruptible_scheduled"
+  maintenance: "interruptible_scheduled"
+  migration: "interruptible_scheduled"
+  incident: "continuous"
+  destructive: "one_shot"
+preview_defaults:
+  interval_gte_24h:
+    preview_lead: "PT24H"
+    feedback_deadline_offset: "PT1H"
+  interval_gte_1h_lt_24h:
+    preview_lead_percent: 10
+    preview_lead_floor: "PT15M"
+    preview_lead_cap: "PT2H"
+    feedback_deadline_percent_of_preview: 25
+  interval_lt_1h:
+    push_preview_default: false
+digest_cadence_defaults:
+  observe:
+    route: "digest_plus_threshold_alert"
+    cadence: "P1D"
+  campaign:
+    route: "start_finish_plus_progress_digest"
+    cadence: "PT12H"
+  reconcile:
+    route: "watch_plus_digest"
+    cadence: "PT6H"
+  maintenance:
+    route: "preview_plus_closure_digest"
+    cadence: "per_run"
+  migration:
+    route: "preview_watch_plus_checkpoint_digest"
+    cadence: "phase_and_checkpoint"
+  incident:
+    route: "immediate_alert"
+    cadence: "immediate"
+  destructive:
+    route: "explicit_approval_request"
+    cadence: "no_batching"
+ownership_routing:
+  precedence:
+    - "break_glass_or_kill_switch"
+    - "mission_owner"
+    - "ownership_registry"
+    - "codeowners"
+    - "subscribers"
+overlap_defaults:
+  observe: "allow_concurrent"
+  campaign: "skip"
+  reconcile: "queue_latest"
+  maintenance: "skip"
+  migration: "skip"
+  incident: "cancel_older_at_boundary"
+  destructive: "skip"
+backfill_defaults:
+  observe: "none"
+  campaign: "latest_only"
+  reconcile: "bounded_catchup"
+  maintenance: "latest_only"
+  migration: "none"
+  incident: "none"
+  destructive: "none"
+pause_on_failure:
+  default_triggers:
+    - "rollback_path_failure"
+    - "breaker_trip"
+    - "missing_observability_on_risky_work"
+    - "repeated_promote_denials_same_slice_class"
+    - "out_of_blast_radius_side_effect"
+    - "control_surface_corruption"
+recovery_windows:
+  local_reversible_repo_change: "PT72H"
+  stateful_reversible_rollout: "PT24H"
+  soft_destructive_archive: "P14D"
+  migration_chunk: "PT72H"
+  migration_finalize: "P7D"
+  compensable_external_sync: "PT24H"
+  public_sample_batch: "PT2H"
+proceed_on_silence:
+  allowed_reversibility_classes:
+    - "reversible"
+    - "compensable"
+  denied_burn_states:
+    - "warning"
+    - "exhausted"
+  forbidden_action_classes:
+    - "public_release"
+    - "financial_commitment"
+    - "legal_commitment"
+    - "credential_change"
+    - "identity_change"
+safe_interrupt_boundaries:
+  coding: "task_boundary"
+  repo_housekeeping: "batch_boundary"
+  reconcile: "batch_boundary"
+  infra_drift: "rollout_boundary"
+  migration: "checkpoint_boundary"
+  monitoring: "immediate"
+  external_sync: "batch_boundary"
+  destructive: "stage_boundary"
+autonomy_burn:
+  states:
+    - "healthy"
+    - "warning"
+    - "exhausted"
+  warning_thresholds:
+    breaker_trips: 1
+    rollbacks: 2
+    veto_or_denied_promotes: 3
+    window: "PT24H"
+  exhausted_thresholds:
+    breaker_trips: 2
+    rollback_path_failures: 1
+    out_of_blast_radius_side_effects: 1
+    high_severity_incidents: 1
+    window: "PT24H"
+circuit_breakers:
+  trip_conditions:
+    - "autonomy_burn_exhausted"
+    - "rollback_declared_but_unavailable"
+    - "missing_observability_on_risky_work"
+    - "repeated_boundary_violations"
+    - "kill_switch_active"
+    - "mission_class_incident_threshold_crossed"
+  actions:
+    - "downgrade_silent_to_notify"
+    - "downgrade_proceed_on_silence_to_feedback_window"
+    - "force_stage_only"
+    - "suspend_future_runs"
+    - "pause_at_safe_boundary"
+    - "enter_safing"
+    - "require_operator_reset"
+quorum:
+  ACP-2:
+    required: 2
+    rules:
+      - "execution_agent_plus_independent_verifier_or_deterministic_validator"
+  ACP-3:
+    required: 3
+    rules:
+      - "execution_agent_plus_independent_verifier_plus_deterministic_validator"
+      - "require_owner_attestation_for_public_externality_or_boundary_exception"
+  ACP-4:
+    required: "human_or_break_glass"
+    rules:
+      - "machine_quorum_may_advise_only"
+safing_defaults:
+  default_subset:
+    - "observe_only"
+    - "stage_only"
+  incident_subset:
+    - "observe_only"
+    - "stage_only"
+    - "bounded_containment"

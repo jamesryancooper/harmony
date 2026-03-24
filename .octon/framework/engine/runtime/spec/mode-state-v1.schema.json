@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/mode-state-v1.schema.json",
+  "title": "Mode State v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "mission_id",
+    "oversight_mode",
+    "execution_posture",
+    "safety_state",
+    "phase",
+    "autonomy_budget_state",
+    "breaker_state"
+  ],
+  "properties": {
+    "schema_version": { "const": "mode-state-v1" },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "oversight_mode": { "type": "string", "enum": ["silent", "notify", "feedback_window", "proceed_on_silence", "approval_required"] },
+    "execution_posture": { "type": "string", "enum": ["one_shot", "continuous", "interruptible_scheduled"] },
+    "safety_state": { "type": "string", "enum": ["active", "paused", "degraded", "safe", "break_glass"] },
+    "phase": { "type": "string", "enum": ["planning", "staging", "promoting", "running", "recovering", "finalizing", "closed"] },
+    "active_run_id": { "type": ["string", "null"] },
+    "current_slice_id": { "type": ["string", "null"] },
+    "next_safe_interrupt_boundary": { "type": ["string", "null"] },
+    "autonomy_budget_state": { "type": "string", "enum": ["healthy", "warning", "exhausted"] },
+    "breaker_state": { "type": "string", "minLength": 1 }
+  }
+}

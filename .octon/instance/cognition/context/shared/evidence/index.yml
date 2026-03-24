@@ -139,6 +139,11 @@ records:
     path: /.octon/state/evidence/migration/2026-03-19-state-evidence-continuity-cutover/evidence.md
     source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
 
+  - id: 2026-03-20-capability-routing-host-integration-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-20-capability-routing-host-integration-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
   - id: 2026-03-20-inputs-additive-extensions-cutover
     kind: migration
     path: /.octon/state/evidence/migration/2026-03-20-inputs-additive-extensions-cutover/evidence.md
@@ -154,8 +159,28 @@ records:
     path: /.octon/state/evidence/migration/2026-03-20-memory-routing-and-decision-surfaces-cutover/evidence.md
     source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
 
+  - id: 2026-03-20-migration-rollout-review
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-20-migration-rollout-review/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
+  - id: 2026-03-20-portability-compatibility-trust-provenance-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-20-portability-compatibility-trust-provenance-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
   - id: 2026-03-20-root-manifest-profiles-and-export-semantics-cutover
     kind: migration
     path: /.octon/state/evidence/migration/2026-03-20-root-manifest-profiles-and-export-semantics-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
+  - id: 2026-03-20-validation-fail-closed-quarantine-staleness-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-20-validation-fail-closed-quarantine-staleness-cutover/evidence.md
+    source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
+
+  - id: 2026-03-23-mission-scoped-reversible-autonomy-cutover
+    kind: migration
+    path: /.octon/state/evidence/migration/2026-03-23-mission-scoped-reversible-autonomy-cutover/evidence.md
     source_record: /Users/jamesryancooper/Projects/octon/.octon/instance/cognition/context/shared/migrations/index.yml
 

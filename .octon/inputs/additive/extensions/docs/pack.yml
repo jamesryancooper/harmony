@@ -3,7 +3,7 @@ pack_id: "docs"
 version: "1.0.0"
 origin_class: "first_party_bundled"
 compatibility:
-  octon_version: "^0.5.0"
+  octon_version: "^0.6.0"
   extensions_api_version: "1.0"
   required_contracts: []
 dependencies:

@@ -211,8 +211,10 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                             ..SideEffectFlags::default()
                         },
                         risk_tier: "medium".to_string(),
+                        workflow_mode: "human-only".to_string(),
                         locality_scope: None,
                         intent_ref: None,
+                        autonomy_context: None,
                         actor_ref: None,
                         parent_run_ref: None,
                         review_requirements: ReviewRequirements::default(),

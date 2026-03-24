@@ -28,12 +28,17 @@ active:
       - ".octon/framework/cognition/_meta/architecture/runtime-vs-ops-contract.md"
       - ".octon/README.md"
       - ".octon/instance/bootstrap/START.md"
+archived:
   - id: "mission-scoped-reversible-autonomy"
     kind: "architecture"
     scope: "octon-internal"
-    path: ".octon/inputs/exploratory/proposals/architecture/mission-scoped-reversible-autonomy"
+    path: ".octon/inputs/exploratory/proposals/.archive/architecture/mission-scoped-reversible-autonomy"
     title: "Mission-Scoped Reversible Autonomy Operating Model Cutover"
-    status: "accepted"
+    status: "archived"
+    disposition: "implemented"
+    archived_at: "2026-03-23"
+    archived_from_status: "accepted"
+    original_path: ".octon/inputs/exploratory/proposals/architecture/mission-scoped-reversible-autonomy"
     promotion_targets:
       - ".octon/octon.yml"
       - ".octon/README.md"
@@ -59,7 +64,6 @@ active:
       - ".octon/state/evidence/runs/"
       - ".octon/state/continuity/repo/"
       - ".octon/generated/cognition/"
-archived:
   - id: "self-audit-and-release-hardening"
     kind: "architecture"
     scope: "octon-internal"

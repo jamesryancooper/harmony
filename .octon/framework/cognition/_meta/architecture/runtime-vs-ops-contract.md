@@ -53,6 +53,9 @@ This document applies to any Octon domain that exposes both `runtime/` and
    decisions and out-of-policy write attempts.
 11. `_ops/` automation MUST NOT mutate immutable governance targets without a
     time-boxed, explicitly recorded exception lease.
+12. Mission-control helper automation MUST materialize binding state only into
+    canonical mission control, retained control evidence, mission continuity,
+    or generated mission/operator read-model surfaces.
 
 ## Default Mutation Allowlist (Fail-Closed)
 
@@ -64,8 +67,14 @@ these mutable targets:
 - `/.octon/generated/.tmp/execution/**`
 - `/.octon/state/control/**`
 - `/.octon/state/control/execution/**`
+- `/.octon/state/control/execution/missions/**`
 - `/.octon/state/evidence/**`
+- `/.octon/state/evidence/control/execution/**`
 - `/.octon/state/continuity/**`
+- `/.octon/state/continuity/repo/missions/**`
+- `/.octon/generated/cognition/summaries/missions/**`
+- `/.octon/generated/cognition/summaries/operators/**`
+- `/.octon/generated/cognition/projections/materialized/missions/**`
 - domain-specific generated artifacts that are explicitly declared in the
   contract registry and linked to enforcement checks
 
@@ -112,6 +121,10 @@ Use this decision sequence:
     `/.octon/generated/**`.
   - mutable execution control truth lives under
     `/.octon/state/control/execution/**`.
+  - mission-scoped execution control truth lives under
+    `/.octon/state/control/execution/missions/**`.
+  - retained control-plane evidence lives under
+    `/.octon/state/evidence/control/execution/**`.
   - execution scratch lives under `/.octon/generated/.tmp/execution/**`.
   - execution requests, grants, receipts, and executor-profile contracts live
     under `engine/runtime/spec/**`; retained runtime execution evidence lives

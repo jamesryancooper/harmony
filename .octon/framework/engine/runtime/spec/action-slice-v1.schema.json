@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/action-slice-v1.schema.json",
+  "title": "Action Slice v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "slice_id",
+    "title",
+    "status",
+    "predicted_acp",
+    "reversibility_class",
+    "boundary_id",
+    "boundary_class",
+    "blast_radius",
+    "earliest_start",
+    "feedback_deadline"
+  ],
+  "properties": {
+    "slice_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "predicted_acp": { "type": "string", "pattern": "^ACP-[0-4]$" },
+    "reversibility_class": { "type": "string", "enum": ["reversible", "compensable", "irreversible"] },
+    "boundary_id": { "type": "string", "minLength": 1 },
+    "boundary_class": { "type": "string", "minLength": 1 },
+    "blast_radius": { "type": "string", "minLength": 1 },
+    "earliest_start": { "type": "string", "minLength": 1 },
+    "feedback_deadline": { "type": "string", "minLength": 1 },
+    "default_on_silence": { "type": "string", "minLength": 1 },
+    "evidence_plan": { "type": "object" }
+  }
+}

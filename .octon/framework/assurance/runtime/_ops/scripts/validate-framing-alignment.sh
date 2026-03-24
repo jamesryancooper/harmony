@@ -38,6 +38,51 @@ pass() {
   echo "[OK] $1"
 }
 
+has_match() {
+  local pattern="$1"
+  local file="$2"
+  if command -v rg >/dev/null 2>&1; then
+    rg -n -m 1 "$pattern" "$file" >/dev/null 2>&1
+  else
+    grep -Enm 1 -- "$pattern" "$file" >/dev/null 2>&1
+  fi
+}
+
+has_literal() {
+  local text="$1"
+  local file="$2"
+  if command -v rg >/dev/null 2>&1; then
+    rg -n -F -m 1 "$text" "$file" >/dev/null 2>&1
+  else
+    grep -Fnm 1 -- "$text" "$file" >/dev/null 2>&1
+  fi
+}
+
+search_tree() {
+  local pattern="$1"
+  if command -v rg >/dev/null 2>&1; then
+    rg -n --hidden \
+      --glob '!.git' \
+      --glob '!.octon/inputs/exploratory/plans/**' \
+      --glob '!.octon/framework/assurance/runtime/_ops/scripts/validate-framing-alignment.sh' \
+      --glob '!.octon/framework/assurance/runtime/_ops/scripts/validate-ssot-precedence-drift.sh' \
+      "$pattern" "$ROOT_DIR" || true
+  else
+    local -a candidate_files=()
+    mapfile -t candidate_files < <(
+      find "$ROOT_DIR" \
+        \( -path '*/.git/*' -o -path "$ROOT_DIR/.octon/inputs/exploratory/plans/*" \) -prune \
+        -o -type f \
+        ! -name 'validate-framing-alignment.sh' \
+        ! -name 'validate-ssot-precedence-drift.sh' \
+        -print
+    )
+    if ((${#candidate_files[@]} > 0)); then
+      grep -En -- "$pattern" "${candidate_files[@]}" 2>/dev/null || true
+    fi
+  fi
+}
+
 normalize_rel() {
   local path="$1"
   if [[ "$path" == "$ROOT_DIR/"* ]]; then
@@ -52,7 +97,7 @@ require_contains() {
   local pattern="$2"
   local message="$3"
 
-  if rg -n -m 1 "$pattern" "$file" >/dev/null 2>&1; then
+  if has_match "$pattern" "$file"; then
     pass "$message"
   else
     fail "$message"
@@ -64,7 +109,7 @@ require_contains_literal() {
   local text="$2"
   local message="$3"
 
-  if rg -n -F -m 1 "$text" "$file" >/dev/null 2>&1; then
+  if has_literal "$text" "$file"; then
     pass "$message"
   else
     fail "$message"
@@ -101,14 +146,7 @@ validate_deprecated_tokens() {
   local snippet
   local rel
 
-  matches="$(
-    rg -n --hidden \
-      --glob '!.git' \
-      --glob '!.octon/inputs/exploratory/plans/**' \
-      --glob '!.octon/framework/assurance/runtime/_ops/scripts/validate-framing-alignment.sh' \
-      --glob '!.octon/framework/assurance/runtime/_ops/scripts/validate-ssot-precedence-drift.sh' \
-      "$DEPRECATED_PATTERN" "$ROOT_DIR" || true
-  )"
+  matches="$(search_tree "$DEPRECATED_PATTERN")"
   if [[ -z "$matches" ]]; then
     pass "no deprecated framing tokens detected"
     return
@@ -123,7 +161,7 @@ validate_deprecated_tokens() {
     rel="$(normalize_rel "$file")"
 
     if [[ "$file" == "$ALLOWLIST_ADR_009" ]] && [[ "$snippet" == *"$ALLOWLIST_TOKEN_009"* ]]; then
-      if rg -n -F "$ALLOWLIST_SUPERSEDES" "$ALLOWLIST_ADR_009" >/dev/null 2>&1; then
+      if has_literal "$ALLOWLIST_SUPERSEDES" "$ALLOWLIST_ADR_009"; then
         warn "allowlisted historical token retained with superseding annotation: $rel:$line_no"
         continue
       fi
@@ -132,7 +170,7 @@ validate_deprecated_tokens() {
     fi
 
     if [[ "$file" == "$ALLOWLIST_ADR_017" ]] && [[ "$snippet" == *"$ALLOWLIST_TOKEN_017"* ]]; then
-      if rg -n -F "$ALLOWLIST_SUPERSEDES" "$ALLOWLIST_ADR_017" >/dev/null 2>&1; then
+      if has_literal "$ALLOWLIST_SUPERSEDES" "$ALLOWLIST_ADR_017"; then
         warn "allowlisted historical token retained with superseding annotation: $rel:$line_no"
         continue
       fi
@@ -148,7 +186,11 @@ validate_active_wording_drift() {
   local purpose_file="$OCTON_DIR/framework/cognition/governance/purpose/convivial-purpose.md"
   local matches
 
-  matches="$(rg -n -i "five pillars|the five pillars" "$purpose_file" || true)"
+  if command -v rg >/dev/null 2>&1; then
+    matches="$(rg -n -i "five pillars|the five pillars" "$purpose_file" || true)"
+  else
+    matches="$(grep -Ein "five pillars|the five pillars" "$purpose_file" || true)"
+  fi
   if [[ -z "$matches" ]]; then
     pass "no active five-pillar wording drift in convivial-purpose.md"
   else

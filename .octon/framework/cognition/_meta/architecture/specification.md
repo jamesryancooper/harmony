@@ -117,6 +117,22 @@ super-root cutover.
     `instance/governance/policies/execution-budgets.yml`.
 52. The machine-readable execution path and policy invariant registry lives at
     `framework/cognition/_meta/architecture/contract-registry.yml`.
+53. Mission authority discovery lives only under
+    `instance/orchestration/missions/**`; active mission charters use
+    `octon-mission-v2`.
+54. Mission-scoped mutable execution control truth lives only under
+    `state/control/execution/missions/<mission-id>/**`.
+55. Retained control-plane mutation evidence lives only under
+    `state/evidence/control/execution/**`.
+56. Mission continuity and handoff state lives only under
+    `state/continuity/repo/missions/<mission-id>/**`.
+57. Mission/operator read models under
+    `generated/cognition/summaries/{missions,operators}/**` are derived only
+    from canonical authority, control, evidence, and continuity surfaces.
+58. No autonomous runtime path may silently fall back to mission-less
+    execution after the mission-scoped reversible autonomy cutover.
+59. External UI, chat, or in-memory session state may not become a second
+    authoritative mission control plane.
 
 ## Precedence
 
@@ -184,16 +200,28 @@ for runtime, governance, and practices.
 - execution budget state: `/.octon/state/control/execution/budget-state.yml`
 - execution exception leases:
   `/.octon/state/control/execution/exception-leases.yml`
+- mission control root:
+  `/.octon/state/control/execution/missions/`
+- retained control evidence:
+  `/.octon/state/evidence/control/execution/`
 - effective locality outputs: `/.octon/generated/effective/locality/`
 - effective capability-routing outputs:
   `/.octon/generated/effective/capabilities/`
 - effective extension outputs: `/.octon/generated/effective/extensions/`
 - execution scratch root: `/.octon/generated/.tmp/execution/`
 - derived cognition outputs: `/.octon/generated/cognition/`
+- mission summaries:
+  `/.octon/generated/cognition/summaries/missions/`
+- operator digests:
+  `/.octon/generated/cognition/summaries/operators/`
 - readable decision summary:
   `/.octon/generated/cognition/summaries/decisions.md`
 - repo context and ADRs: `/.octon/instance/cognition/`
 - repo missions: `/.octon/instance/orchestration/missions/`
+- mission autonomy policy:
+  `/.octon/instance/governance/policies/mission-autonomy.yml`
+- ownership registry:
+  `/.octon/instance/governance/ownership/registry.yml`
 - export runner: `/.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh`
 - framework architecture: `/.octon/framework/cognition/_meta/architecture/`
 - execution contract registry:

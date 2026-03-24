@@ -1,3 +1,6 @@
-schema_version: "octon-mission-registry-v1"
+schema_version: "octon-mission-registry-v2"
+control_root: ".octon/state/control/execution/missions"
+continuity_root: ".octon/state/continuity/repo/missions"
+summary_root: ".octon/generated/cognition/summaries/missions"
 active: []
 archived: []

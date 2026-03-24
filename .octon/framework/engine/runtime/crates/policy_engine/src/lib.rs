@@ -3614,6 +3614,15 @@ pub fn validate_receipt(request: &ReceiptValidateRequest) -> Result<ReceiptValid
         errors.push("receipt must be a JSON object".to_string());
     }
 
+    match receipt
+        .get("schema_version")
+        .and_then(Value::as_str)
+    {
+        Some("policy-receipt-v1") | Some("policy-receipt-v2") => {}
+        Some(other) => errors.push(format!("unsupported receipt schema_version '{other}'")),
+        None => errors.push("missing required receipt field 'schema_version'".to_string()),
+    }
+
     for field in &policy.receipts.required_fields {
         if receipt_field_missing(&receipt, field) {
             errors.push(format!("missing required receipt field '{field}'"));

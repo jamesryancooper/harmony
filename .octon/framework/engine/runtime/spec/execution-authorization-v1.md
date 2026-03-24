@@ -31,9 +31,10 @@ that can produce durable side effects.
 
 ## Related Contracts
 
-- `execution-request-v1.schema.json`
+- `execution-request-v2.schema.json`
 - `execution-grant-v1.schema.json`
-- `execution-receipt-v1.schema.json`
+- `execution-receipt-v2.schema.json`
 - `executor-profile-v1.schema.json`
 - `policy-interface-v1.md`
-- `policy-receipt-v1.schema.json`
+- `policy-receipt-v2.schema.json`
+- `policy-digest-v2.md`

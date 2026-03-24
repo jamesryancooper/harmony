@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/circuit-breaker-v1.schema.json",
+  "title": "Circuit Breaker v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "mission_id", "state", "updated_at", "tripped_breakers"],
+  "properties": {
+    "schema_version": { "const": "circuit-breaker-v1" },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "state": { "type": "string", "minLength": 1 },
+    "updated_at": { "type": "string", "minLength": 1 },
+    "tripped_breakers": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

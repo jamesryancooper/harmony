@@ -18,6 +18,11 @@ files:
     summary: Targeted generator for materialized projection artifacts.
     when: When only projection materialization needs refresh.
 
+  - id: runtime-generate-missions
+    path: scripts/sync-runtime-artifacts.sh
+    summary: Generator for mission summaries, operator digests, and mission projections.
+    when: When mission authority, mission control, or mission continuity changes.
+
   - id: runtime-generate-evidence
     path: scripts/generate-runtime-evidence.sh
     summary: Targeted generator for runtime evidence map index.
@@ -42,4 +47,3 @@ files:
     path: scripts/test-sync-runtime-artifacts-fixtures.sh
     summary: Fixture tests for target-selective generation and digest-action parsing.
     when: When changing sync-runtime-artifacts parsing or target selectors.
-

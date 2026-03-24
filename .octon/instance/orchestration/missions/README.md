@@ -35,8 +35,16 @@ for durable mission definitions and mission-scoped orchestration artifacts.
 ## Boundary Rules
 
 - mission authority lives here under `instance/**`
+- active mission charters use `octon-mission-v2`
 - missions may reference scope ids, but scope identity still lives under
   `instance/locality/**`
-- mission-local mutable execution evidence belongs under `state/**`
+- mission-local mutable execution control truth belongs under
+  `state/control/execution/missions/<mission-id>/**`
+- mission-local retained control evidence belongs under
+  `state/evidence/control/execution/**`
+- mission-local retained execution evidence belongs under
+  `state/evidence/runs/**`
+- mission-local continuity belongs under
+  `state/continuity/repo/missions/<mission-id>/**`
 - framework workflows may create or complete missions, but they are not the
   authority surface for mission definitions
