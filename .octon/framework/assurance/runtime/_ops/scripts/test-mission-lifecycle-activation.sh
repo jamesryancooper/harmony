@@ -11,7 +11,14 @@ fixture_root() {
 }
 
 cleanup_root() {
-  rm -rf "$1"
+  local root="$1"
+  local tmp_root="${TMPDIR:-/tmp}"
+  tmp_root="${tmp_root%/}"
+  [[ -n "$root" ]] || return 0
+  case "$root" in
+    "$tmp_root"/*|/tmp/*) rm -fr -- "$root" ;;
+    *) echo "refusing to remove non-temp fixture root: $root" >&2; return 1 ;;
+  esac
 }
 
 seed_fixture() {
