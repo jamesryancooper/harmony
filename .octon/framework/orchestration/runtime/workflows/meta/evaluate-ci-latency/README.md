@@ -70,4 +70,3 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 | Version | Changes |
 |---------|---------|
 | 0.1.0 | Generated from canonical workflow `evaluate-ci-latency` |
-

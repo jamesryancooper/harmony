@@ -42,6 +42,13 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 - Required workflow inputs are available.
 - Canonical workflow contract exists at `.octon/framework/orchestration/runtime/workflows/missions/create-mission/workflow.yml`.
 
+## Parameters
+
+- `mission_id` (text, required=true): Kebab-case mission slug and directory name under .octon/instance/orchestration/missions/
+- `mission_title` (text, required=true): Human-readable mission title written into mission.yml
+- `mission_class` (text, required=true): Canonical mission class (observe, campaign, reconcile, maintenance, migration, incident, destructive)
+- `owner_ref` (text, required=true): Canonical mission owner reference, for example operator://octon-maintainers
+
 ## Failure Conditions
 
 - Required inputs are missing or invalid.
@@ -58,6 +65,10 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 ## Verification Gate
 
+- [ ] mission authority scaffold exists under .octon/instance/orchestration/missions/
+- [ ] mission control state exists under .octon/state/control/execution/missions/
+- [ ] mission continuity state exists under .octon/state/continuity/repo/missions/
+- [ ] mission route, summaries, digests, and mission-view exist
 - [ ] verification stage passes
 
 ## References

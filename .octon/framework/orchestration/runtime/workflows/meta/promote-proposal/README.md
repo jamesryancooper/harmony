@@ -60,12 +60,14 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 ## Verification Gate
 
-- [ ] base and subtype proposal validators pass before promotion
-- [ ] promotion starts from an active `accepted` proposal
-- [ ] promotion targets exist and are proposal-independent
+- [ ] `summary.md`, `commands.md`, `inventory.md`, `bundle.yml`, and `validation.md` exist
+- [ ] `stage-inputs/` and `stage-logs/` exist for the workflow bundle
+- [ ] the source proposal validates before promotion
+- [ ] the source proposal starts from the active path with `status: accepted`
+- [ ] every promotion target exists and contains no proposal-path backreferences
 - [ ] `proposal.yml` is rewritten to `status: implemented`
-- [ ] generated proposal registry is regenerated from manifests
-- [ ] workflow bundle receipts are complete
+- [ ] generated/proposals/registry.yml matches the deterministic manifest projection after promotion
+- [ ] final promotion verdict is explicit
 
 ## References
 
