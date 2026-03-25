@@ -2,8 +2,13 @@
 
 - `.octon/framework/assurance/runtime/_ops/scripts/generate-proposal-registry.sh`
 - `.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh`
+- `.octon/framework/assurance/runtime/_ops/scripts/validate-validate-proposal-workflow.sh`
+- `.octon/framework/assurance/runtime/_ops/scripts/validate-promote-proposal-workflow.sh`
+- `.octon/framework/assurance/runtime/_ops/scripts/validate-archive-proposal-workflow.sh`
+- `.octon/framework/assurance/runtime/_ops/tests/test-generate-proposal-registry.sh`
+- `.octon/framework/assurance/runtime/_ops/tests/test-proposal-operation-workflow-runners.sh`
+- `.octon/framework/assurance/runtime/_ops/tests/test-validate-proposal-operation-workflows.sh`
 - `.octon/framework/engine/runtime/crates/kernel/src/workflow.rs`
-- `.octon/framework/engine/runtime/crates/kernel/src/pipeline.rs`
 - `.octon/framework/orchestration/runtime/workflows/meta/validate-proposal/`
 - `.octon/framework/orchestration/runtime/workflows/meta/promote-proposal/`
 - `.octon/framework/orchestration/runtime/workflows/meta/archive-proposal/`
@@ -12,3 +17,4 @@
 - `.octon/generated/proposals/registry.yml`
 - `.octon/inputs/exploratory/proposals/.archive/architecture/`
 - `.octon/inputs/exploratory/proposals/.archive/architecture/proposal-system-integrity-and-archive-normalization/`
+- `.octon/inputs/exploratory/proposals/.archive/architecture/proposal-system-integrity-and-archive-normalization/resources/audit-results.md`

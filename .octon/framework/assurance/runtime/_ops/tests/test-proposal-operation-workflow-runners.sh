@@ -8,7 +8,7 @@ ASSURANCE_DIR="$(cd "$RUNTIME_DIR/.." && pwd)"
 FRAMEWORK_DIR="$(cd "$ASSURANCE_DIR/.." && pwd)"
 OCTON_DIR="$(cd "$FRAMEWORK_DIR/.." && pwd)"
 REPO_ROOT="$(cd "$OCTON_DIR/.." && pwd)"
-RUNNER="$FRAMEWORK_DIR/engine/runtime/run"
+RUNNER_REL=".octon/framework/engine/runtime/run"
 TMP_ROOT="${TMPDIR:-/tmp}/assurance-workflow-tests"
 
 pass_count=0
@@ -37,7 +37,7 @@ new_fixture_repo() {
   mkdir -p \
     "$fixture_root/.octon/framework/assurance/runtime/_ops" \
     "$fixture_root/.octon/framework/cognition/_meta/architecture/generated/proposals/schemas" \
-    "$fixture_root/.octon/framework/engine" \
+    "$fixture_root/.octon/framework/engine/runtime" \
     "$fixture_root/.octon/framework/capabilities/governance" \
     "$fixture_root/.octon/framework/capabilities/_ops" \
     "$fixture_root/.octon/generated/.tmp/engine/build/runtime-crates-target/debug" \
@@ -45,7 +45,9 @@ new_fixture_repo() {
     "$fixture_root/.octon/instance/cognition/context/shared"
   cp -R "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/"
-  cp -R "$REPO_ROOT/.octon/framework/engine/runtime" "$fixture_root/.octon/framework/engine/"
+  rsync -a --exclude 'crates/target' \
+    "$REPO_ROOT/.octon/framework/engine/runtime/" \
+    "$fixture_root/.octon/framework/engine/runtime/"
   cp -R "$REPO_ROOT/.octon/framework/capabilities/governance/policy" "$fixture_root/.octon/framework/capabilities/governance/"
   cp -R "$REPO_ROOT/.octon/framework/capabilities/_ops/scripts" "$fixture_root/.octon/framework/capabilities/_ops/"
   cp "$REPO_ROOT/.octon/framework/cognition/_meta/architecture/generated/proposals/schemas/proposal-registry.schema.json" \
@@ -140,6 +142,7 @@ write_registry_for_active_status() {
   local status="$2"
   write_file "$root/.octon/generated/proposals/registry.yml" <<EOF
 schema_version: "proposal-registry-v1"
+
 active:
   - id: "fixture-proposal"
     kind: "architecture"
@@ -158,7 +161,7 @@ run_workflow() {
   shift
   (
     cd "$fixture_root"
-    "$RUNNER" workflow run "$@"
+    "$fixture_root/$RUNNER_REL" workflow run "$@"
   )
 }
 

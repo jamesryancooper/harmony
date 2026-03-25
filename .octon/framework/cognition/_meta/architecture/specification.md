@@ -241,7 +241,9 @@ for runtime, governance, and practices.
 Proposal lifecycle authority stays in `proposal.yml` and the subtype manifest.
 `navigation/source-of-truth-map.md` is the manual proposal-local precedence
 map, `navigation/artifact-catalog.md` is generated inventory, and the proposal
-registry is discovery-only.
+registry is discovery-only. Archived design imports with
+`archive.archived_from_status=legacy-unknown` stay off the main registry
+projection until normalized into the standard packet contract.
 
 ## Overlay And Ingress Contract
 

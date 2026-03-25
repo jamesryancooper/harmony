@@ -41,3 +41,9 @@ Rules:
   target architecture has landed.
 - `architecture/implementation-plan.md` must translate the target architecture
   into implementable workstreams.
+- `navigation/source-of-truth-map.md` must identify the durable authorities,
+  proposal-local authorities, derived projections, retained evidence surfaces,
+  and boundary rules that govern the architecture change.
+- `implemented` means the promoted architecture surfaces exist outside the
+  proposal workspace, proposal-path dependencies have been removed from those
+  durable targets, and retained promotion evidence exists.

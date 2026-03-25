@@ -216,6 +216,63 @@ EOF
 EOF
 }
 
+write_archived_legacy_design_import() {
+  local root="$1"
+  local proposal_dir="$root/.octon/inputs/exploratory/proposals/.archive/design/legacy-design-import"
+  mkdir -p "$proposal_dir/navigation" "$proposal_dir/implementation"
+
+  write_file "$proposal_dir/proposal.yml" <<'EOF'
+schema_version: "proposal-v1"
+proposal_id: "legacy-design-import"
+title: "Legacy Design Import"
+summary: "Historical design import."
+proposal_kind: "design"
+promotion_scope: "octon-internal"
+promotion_targets:
+  - ".octon/README.md"
+status: "archived"
+archive:
+  archived_at: "2026-03-24"
+  archived_from_status: "legacy-unknown"
+  disposition: "historical"
+  original_path: ".octon/inputs/exploratory/proposals/.archive/.design-packages/legacy-design-import"
+  promotion_evidence: []
+lifecycle:
+  temporary: true
+  exit_expectation: "Retain historical lineage only."
+related_proposals: []
+EOF
+
+  write_file "$proposal_dir/design-proposal.yml" <<'EOF'
+schema_version: "design-proposal-v1"
+design_class: "domain-runtime"
+selected_modules: []
+validation:
+  default_audit_mode: "rigorous"
+  design_validator_path: null
+  conformance_validator_path: null
+EOF
+
+  write_file "$proposal_dir/README.md" <<'EOF'
+# Legacy Design Import
+EOF
+  write_file "$proposal_dir/navigation/source-of-truth-map.md" <<'EOF'
+# Sources
+EOF
+  write_file "$proposal_dir/navigation/artifact-catalog.md" <<'EOF'
+# Artifact Catalog
+EOF
+  write_file "$proposal_dir/implementation/README.md" <<'EOF'
+# Implementation
+EOF
+  write_file "$proposal_dir/implementation/minimal-implementation-blueprint.md" <<'EOF'
+# Blueprint
+EOF
+  write_file "$proposal_dir/implementation/first-implementation-plan.md" <<'EOF'
+# Plan
+EOF
+}
+
 run_generator_in_fixture() {
   local fixture_root="$1"
   shift
@@ -264,6 +321,17 @@ case_check_fails_on_archive_path_status_mismatch() {
   run_generator_in_fixture "$fixture_root" --check
 }
 
+case_write_excludes_legacy_unknown_design_imports() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  mkdir -p "$fixture_root/.octon/generated"
+  touch "$fixture_root/.octon/README.md"
+  write_active_architecture_proposal "$fixture_root"
+  write_archived_legacy_design_import "$fixture_root"
+  run_generator_in_fixture "$fixture_root" --write >/dev/null
+  ! grep -Fq 'legacy-design-import' "$fixture_root/.octon/generated/proposals/registry.yml"
+}
+
 main() {
   assert_success \
     "proposal registry generator reproduces a valid committed projection" \
@@ -280,6 +348,9 @@ main() {
     "proposal registry generator rejects archive path and status mismatches" \
     "active proposals stay in active paths" \
     case_check_fails_on_archive_path_status_mismatch
+  assert_success \
+    "proposal registry generator excludes legacy-unknown design imports from the main projection" \
+    case_write_excludes_legacy_unknown_design_imports
 
   echo
   echo "Passed: $pass_count"
