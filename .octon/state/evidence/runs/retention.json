@@ -8,11 +8,18 @@
       "match_prefixes": [
         "acp-",
         "audit",
+        "archive-proposal-",
+        "create-architecture-proposal-",
+        "create-design-proposal-",
+        "create-migration-proposal-",
+        "create-policy-proposal-",
         "docs-gate-",
+        "promote-proposal-",
         "runtime-acp",
         "runtime-soft-delete-",
         "runtime-agent-quorum-",
-        "snippet-emit-"
+        "snippet-emit-",
+        "validate-proposal-"
       ],
       "retention_days": 365,
       "action_after_retention": "archive"

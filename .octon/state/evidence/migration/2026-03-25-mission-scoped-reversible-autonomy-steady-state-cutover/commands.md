@@ -1,0 +1,22 @@
+# Commands
+
+- `bash .octon/framework/orchestration/runtime/_ops/scripts/seed-mission-autonomy-state.sh --mission-id mission-autonomy-live-validation --issued-by operator://octon-maintainers`
+- `bash .octon/framework/orchestration/runtime/_ops/scripts/publish-mission-effective-route.sh --mission-id mission-autonomy-live-validation`
+- `bash .octon/framework/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh --target missions`
+- `bash .octon/framework/orchestration/runtime/_ops/scripts/write-mission-control-receipt.sh --mission-id mission-autonomy-live-validation ...`
+- `bash .octon/framework/orchestration/runtime/_ops/scripts/apply-mission-authorize-update.sh ...`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-version-parity.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-control-state.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-effective-routes.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-generated-summaries.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-control-evidence.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-source-of-truth.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-runtime-contracts.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/test-mission-autonomy-scenarios.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh`
+- `bash .octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh`
+- `bash .octon/framework/orchestration/runtime/_ops/scripts/publish-locality-state.sh`
+- `bash .octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh`
+- `bash .octon/framework/assurance/runtime/_ops/tests/test-mission-autonomy-helpers.sh`
+- `bash .octon/framework/assurance/runtime/_ops/tests/test-validate-runtime-effective-state.sh`

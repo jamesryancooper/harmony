@@ -3,17 +3,21 @@ name: Architecture Conformance
 on:
   pull_request:
     paths:
+      - "version.txt"
+      - ".octon/octon.yml"
       - ".octon/framework/engine/**"
       - ".octon/framework/assurance/runtime/**"
       - ".octon/framework/cognition/_meta/architecture/**"
       - ".octon/framework/cognition/governance/principles/**"
       - ".octon/framework/cognition/_ops/runtime/scripts/**"
+      - ".octon/framework/orchestration/runtime/**"
       - ".octon/instance/orchestration/missions/**"
       - ".octon/instance/governance/policies/**"
       - ".octon/instance/governance/ownership/**"
       - ".octon/state/control/execution/**"
       - ".octon/state/evidence/control/**"
       - ".octon/state/continuity/repo/missions/**"
+      - ".octon/generated/effective/**"
       - ".octon/generated/cognition/**"
       - ".octon/instance/bootstrap/**"
       - ".github/workflows/architecture-conformance.yml"
@@ -21,23 +25,30 @@ on:
     branches:
       - main
     paths:
+      - "version.txt"
+      - ".octon/octon.yml"
       - ".octon/framework/engine/**"
       - ".octon/framework/assurance/runtime/**"
       - ".octon/framework/cognition/_meta/architecture/**"
       - ".octon/framework/cognition/governance/principles/**"
       - ".octon/framework/cognition/_ops/runtime/scripts/**"
+      - ".octon/framework/orchestration/runtime/**"
       - ".octon/instance/orchestration/missions/**"
       - ".octon/instance/governance/policies/**"
       - ".octon/instance/governance/ownership/**"
       - ".octon/state/control/execution/**"
       - ".octon/state/evidence/control/**"
       - ".octon/state/continuity/repo/missions/**"
+      - ".octon/generated/effective/**"
       - ".octon/generated/cognition/**"
       - ".octon/instance/bootstrap/**"
       - ".github/workflows/architecture-conformance.yml"
 
+permissions:
+  contents: read
+
 jobs:
-  validate:
+  architecture:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,7 +57,60 @@ jobs:
       - name: Install yq
         run: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
 
-      - name: Validate architecture conformance
+      - name: Validate version and architecture
         run: |
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-version-parity.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness,mission-autonomy
+
+  mission-runtime-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
+
+      - name: Validate mission runtime contracts
+        run: |
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-runtime-contracts.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-source-of-truth.sh
+
+  runtime-effective-state:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
+
+      - name: Validate runtime effective state
+        run: bash .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh
+
+  mission-autonomy-scenarios:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
+
+      - name: Run mission autonomy scenarios
+        run: bash .octon/framework/assurance/runtime/_ops/scripts/test-mission-autonomy-scenarios.sh
+
+  mission-generated-views-and-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
+
+      - name: Validate generated mission views and control evidence
+        run: |
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-generated-summaries.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-control-evidence.sh

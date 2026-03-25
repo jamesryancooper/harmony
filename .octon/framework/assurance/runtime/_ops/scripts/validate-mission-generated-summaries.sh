@@ -42,25 +42,28 @@ main() {
 
   while IFS= read -r mission_id; do
     [[ -n "$mission_id" ]] || continue
+    local subscriptions_file="$OCTON_DIR/state/control/execution/missions/$mission_id/subscriptions.yml"
     for file in now.md next.md recent.md recover.md; do
       [[ -f "$MISSION_SUMMARIES/$mission_id/$file" ]] && pass "found mission summary $mission_id/$file" || fail "missing mission summary $mission_id/$file"
     done
-    if [[ -f "$MISSION_PROJECTIONS/$mission_id.json" ]]; then
-      pass "found mission projection $mission_id.json"
-    else
-      pass "mission projection remains optional for $mission_id"
-    fi
+    [[ -f "$MISSION_PROJECTIONS/$mission_id/mission-view.yml" ]] && pass "found mission projection $mission_id/mission-view.yml" || fail "missing mission projection $mission_id/mission-view.yml"
     if [[ -f "$MISSION_SUMMARIES/$mission_id/now.md" ]] && grep -Fq "/.octon/generated/effective/orchestration/missions/$mission_id/scenario-resolution.yml" "$MISSION_SUMMARIES/$mission_id/now.md"; then
       pass "mission now summary references effective route for $mission_id"
     else
       fail "mission now summary must reference effective route for $mission_id"
     fi
-    if [[ -f "$MISSION_PROJECTIONS/$mission_id.json" ]]; then
-      if grep -Fq "/.octon/generated/effective/orchestration/missions/$mission_id/scenario-resolution.yml" "$MISSION_PROJECTIONS/$mission_id.json"; then
-        pass "mission projection references effective route for $mission_id"
-      else
-        fail "mission projection must reference effective route for $mission_id"
-      fi
+    if grep -Fq "/.octon/generated/effective/orchestration/missions/$mission_id/scenario-resolution.yml" "$MISSION_PROJECTIONS/$mission_id/mission-view.yml"; then
+      pass "mission projection references effective route for $mission_id"
+    else
+      fail "mission projection must reference effective route for $mission_id"
+    fi
+    if [[ -f "$subscriptions_file" ]]; then
+      while IFS= read -r recipient; do
+        [[ -n "$recipient" ]] || continue
+        local slug
+        slug="$(printf '%s' "${recipient#operator://}" | tr '/:@' '---')"
+        [[ -f "$OPERATOR_DIGESTS/$slug/$mission_id.md" ]] && pass "found operator digest $slug/$mission_id.md" || fail "missing operator digest $slug/$mission_id.md"
+      done < <(yq -r '.owners[]?, .watchers[]?, .digest_recipients[]?, .alert_recipients[]?' "$subscriptions_file" | awk 'NF' | sort -u)
     fi
   done < <(yq -r '.active[]?' "$REGISTRY" 2>/dev/null || true)
 

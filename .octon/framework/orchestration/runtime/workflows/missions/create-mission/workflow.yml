@@ -1,8 +1,8 @@
 ---
 schema_version: workflow-contract-v2
 name: create-mission
-description: Scaffold a new mission artifact set and register it for execution tracking.
-version: 1.2.0
+description: Scaffold a new mission, seed its full autonomy control family, and register it for execution tracking.
+version: 1.4.0
 entry_mode: human
 execution_profile: core
 side_effect_class: mutating
@@ -15,7 +15,23 @@ coordination_key_strategy:
   - workflow_id
   format: workflow:{workflow_group}/{workflow_id}
 executor_interface_version: workflow-executor-v1
-inputs: []
+inputs:
+- name: mission_id
+  type: text
+  required: true
+  description: Kebab-case mission slug and directory name under .octon/instance/orchestration/missions/
+- name: mission_title
+  type: text
+  required: true
+  description: Human-readable mission title written into mission.yml
+- name: mission_class
+  type: text
+  required: true
+  description: Canonical mission class (observe, campaign, reconcile, maintenance, migration, incident, destructive)
+- name: owner_ref
+  type: text
+  required: true
+  description: Canonical mission owner reference, for example operator://octon-maintainers
 stages:
 - id: overview
   asset: stages/00-overview.md
@@ -50,9 +66,151 @@ stages:
       rollback_metadata: false
     allowed_executor_profiles:
     - read_only_analysis
+- id: validate-request
+  asset: stages/01-validate-request.md
+  kind: analysis
+  consumes:
+  - stage:overview
+  produces:
+  - stage:validate-request
+  mutation_scope: []
+  authorization:
+    action_type: execute_stage
+    requested_capabilities:
+    - workflow.stage.execute
+    - evidence.write
+    side_effects:
+      write_repo: false
+      write_evidence: true
+      shell: true
+      network: false
+      model_invoke: true
+      state_mutation: false
+      publication: false
+      branch_mutation: false
+    risk_tier: low
+    scope:
+      read:
+      - workflow-scope
+      write:
+      - workflow-evidence
+    review_requirements:
+      human_approval: false
+      quorum: false
+      rollback_metadata: false
+    allowed_executor_profiles:
+    - read_only_analysis
+- id: scaffold-authority
+  asset: stages/02-scaffold-authority.md
+  kind: mutation
+  consumes:
+  - stage:validate-request
+  produces:
+  - stage:scaffold-authority
+  mutation_scope: &1
+  - workflow-scope
+  authorization:
+    action_type: execute_stage
+    requested_capabilities:
+    - workflow.stage.execute
+    - repo.write
+    - evidence.write
+    side_effects:
+      write_repo: true
+      write_evidence: true
+      shell: true
+      network: false
+      model_invoke: true
+      state_mutation: true
+      publication: false
+      branch_mutation: false
+    risk_tier: medium
+    scope:
+      read:
+      - workflow-scope
+      write: *1
+    review_requirements:
+      human_approval: false
+      quorum: false
+      rollback_metadata: true
+    allowed_executor_profiles:
+    - scoped_repo_mutation
+- id: seed-and-register
+  asset: stages/03-seed-control-and-register.md
+  kind: mutation
+  consumes:
+  - stage:scaffold-authority
+  produces:
+  - stage:seed-and-register
+  mutation_scope: &2
+  - workflow-scope
+  authorization:
+    action_type: execute_stage
+    requested_capabilities:
+    - workflow.stage.execute
+    - repo.write
+    - evidence.write
+    side_effects:
+      write_repo: true
+      write_evidence: true
+      shell: true
+      network: false
+      model_invoke: true
+      state_mutation: true
+      publication: false
+      branch_mutation: false
+    risk_tier: medium
+    scope:
+      read:
+      - workflow-scope
+      write: *2
+    review_requirements:
+      human_approval: false
+      quorum: false
+      rollback_metadata: true
+    allowed_executor_profiles:
+    - scoped_repo_mutation
+- id: report
+  asset: stages/04-report.md
+  kind: projection
+  consumes:
+  - stage:seed-and-register
+  produces:
+  - stage:report
+  mutation_scope: []
+  authorization:
+    action_type: execute_stage
+    requested_capabilities:
+    - workflow.stage.execute
+    - evidence.write
+    side_effects:
+      write_repo: false
+      write_evidence: true
+      shell: true
+      network: false
+      model_invoke: true
+      state_mutation: false
+      publication: false
+      branch_mutation: false
+    risk_tier: low
+    scope:
+      read:
+      - workflow-scope
+      write:
+      - workflow-evidence
+    review_requirements:
+      human_approval: false
+      quorum: false
+      rollback_metadata: false
+    allowed_executor_profiles:
+    - read_only_analysis
 artifacts: []
 done_gate:
   checks:
+  - mission authority scaffold exists under .octon/instance/orchestration/missions/
+  - mission control state exists under .octon/state/control/execution/missions/
+  - mission continuity state exists under .octon/state/continuity/repo/missions/
+  - mission route, summaries, digests, and mission-view exist
   - verification stage passes
 constraints:
   fail_closed: true

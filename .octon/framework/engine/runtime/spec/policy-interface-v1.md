@@ -31,6 +31,12 @@ These launchers are the canonical invocation boundary for policy operations.
   - `/.octon/instance/governance/policies/mission-autonomy.yml`
 - Repo-owned non-path ownership authority is declared in:
   - `/.octon/instance/governance/ownership/registry.yml`
+- Generated mission summaries are published under:
+  - `/.octon/generated/cognition/summaries/missions/`
+- Generated operator digests are published under:
+  - `/.octon/generated/cognition/summaries/operators/`
+- Generated machine-readable mission views are published under:
+  - `/.octon/generated/cognition/projections/materialized/missions/`
 
 ## Supported Command Surface (v1)
 

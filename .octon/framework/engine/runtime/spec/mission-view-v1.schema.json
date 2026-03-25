@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/mission-view-v1.schema.json",
+  "title": "Mission View v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "mission_id",
+    "mission",
+    "mode_state",
+    "effective_route",
+    "current_slice_ref",
+    "next_slice_ref",
+    "budget_breaker_summary",
+    "active_directives",
+    "active_authorize_updates",
+    "recovery_finalize_summary",
+    "summary_refs",
+    "continuity_refs",
+    "source_refs",
+    "last_refresh_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "mission-view-v1" },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "mission": { "type": "object" },
+    "mode_state": { "type": "object" },
+    "effective_route": { "type": "object" },
+    "current_slice_ref": { "type": ["string", "null"] },
+    "next_slice_ref": { "type": ["string", "null"] },
+    "budget_breaker_summary": { "type": "object" },
+    "active_directives": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "active_authorize_updates": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "recovery_finalize_summary": { "type": "object" },
+    "summary_refs": { "type": "object" },
+    "continuity_refs": { "type": "object" },
+    "source_refs": { "type": "object" },
+    "last_refresh_at": { "type": "string", "minLength": 1 }
+  }
+}

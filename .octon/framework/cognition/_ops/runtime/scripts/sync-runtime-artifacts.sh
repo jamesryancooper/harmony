@@ -100,7 +100,7 @@ Generates deterministic cognition runtime derived artifacts:
 - generated/cognition/summaries/missions/<mission-id>/{now,next,recent,recover}.md
 - generated/cognition/summaries/operators/<operator-id>/*.md
 - generated/cognition/projections/materialized/cognition-runtime-surface-map.latest.yml
-- generated/cognition/projections/materialized/missions/<mission-id>.json
+- generated/cognition/projections/materialized/missions/<mission-id>/mission-view.yml
 - instance/cognition/context/shared/evidence/index.yml
 - instance/cognition/context/shared/evaluations/digests/index.yml
 - instance/cognition/context/shared/evaluations/actions/open-actions.yml
@@ -196,6 +196,13 @@ yaml_escape() {
 
 markdown_escape() {
   printf '%s' "$1" | sed -e 's/|/\\|/g'
+}
+
+yaml_quote() {
+  local value="$1"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  printf '"%s"' "$value"
 }
 
 stage_path_for_target() {
@@ -832,6 +839,7 @@ generate_mission_autonomy_views() {
     local intent_register_file="$control_dir/intent-register.yml"
     local autonomy_budget_file="$control_dir/autonomy-budget.yml"
     local circuit_breakers_file="$control_dir/circuit-breakers.yml"
+    local subscriptions_file="$control_dir/subscriptions.yml"
     local handoff_file="$continuity_dir/handoff.md"
     local next_actions_file="$continuity_dir/next-actions.yml"
 
@@ -843,34 +851,46 @@ generate_mission_autonomy_views() {
       return 1
     }
 
-    local title status mission_class owner_ref oversight_mode execution_posture phase budget_state breaker_state
-    local route_family route_boundary_class route_digest_route route_recovery_window route_generated_at route_fresh_until
+    local title status mission_class owner_ref oversight_mode execution_posture phase budget_state breaker_state safety_state
+    local route_family route_boundary_class route_digest_route route_recovery_window route_generated_at route_fresh_until route_action_class
+    local route_ref current_slice_ref next_slice_ref active_directives active_authorize_updates
     title="$(extract_yaml_scalar "$mission_file" "title")"
     status="$(extract_yaml_scalar "$mission_file" "status")"
     mission_class="$(extract_yaml_scalar "$mission_file" "mission_class")"
     owner_ref="$(extract_yaml_scalar "$mission_file" "owner_ref")"
+    safety_state="$(extract_yaml_scalar "$mode_state_file" "safety_state")"
     oversight_mode="$(yq -r '.effective.oversight_mode // ""' "$scenario_route_file" 2>/dev/null || true)"
     execution_posture="$(yq -r '.effective.execution_posture // ""' "$scenario_route_file" 2>/dev/null || true)"
     phase="$(extract_yaml_scalar "$mode_state_file" "phase")"
     budget_state="$(extract_yaml_scalar "$autonomy_budget_file" "state")"
     breaker_state="$(extract_yaml_scalar "$circuit_breakers_file" "state")"
-    route_family="$(yq -r '.effective.scenario_family // ""' "$scenario_route_file" 2>/dev/null || true)"
+    route_family="$(yq -r '.effective.effective_scenario_family // .effective.scenario_family // ""' "$scenario_route_file" 2>/dev/null || true)"
+    route_action_class="$(yq -r '.effective.effective_action_class // .effective.recovery_profile.action_class // ""' "$scenario_route_file" 2>/dev/null || true)"
     route_boundary_class="$(yq -r '.effective.safe_interrupt_boundary_class // ""' "$scenario_route_file" 2>/dev/null || true)"
     route_digest_route="$(yq -r '.effective.digest_route // ""' "$scenario_route_file" 2>/dev/null || true)"
     route_recovery_window="$(yq -r '.effective.recovery_profile.recovery_window // ""' "$scenario_route_file" 2>/dev/null || true)"
     route_generated_at="$(yq -r '.generated_at // ""' "$scenario_route_file" 2>/dev/null || true)"
     route_fresh_until="$(yq -r '.fresh_until // ""' "$scenario_route_file" 2>/dev/null || true)"
+    route_ref="$(yq -r '.effective_scenario_resolution_ref // ""' "$mode_state_file" 2>/dev/null || true)"
+    current_slice_ref="$(yq -r '.current_slice_ref.path // .current_slice_ref // ""' "$mode_state_file" 2>/dev/null || true)"
+    next_slice_ref="$(yq -r '.entries[]? | select((.state // .status) == "active" or (.state // .status) == "queued" or (.state // .status) == "published") | .action_slice_ref // .slice_ref.path // .slice_ref.id // ""' "$intent_register_file" 2>/dev/null | awk 'NF {print; exit}')"
+    if [[ -n "$next_slice_ref" && "$next_slice_ref" != .octon/* && "$next_slice_ref" != */*.yml ]]; then
+      next_slice_ref="/.octon/state/control/execution/missions/${mission_id}/action-slices/${next_slice_ref}.yml"
+    fi
+    active_directives="$(yq -r '.directives[]? | select(((.state // .status) == "pending") or ((.state // .status) == "applied") or ((.state // .status) == "accepted")) | (.type // .kind // "")' "$control_dir/directives.yml" 2>/dev/null | paste -sd ',' -)"
+    active_authorize_updates="$(yq -r '.authorize_updates[]? | select(((.state // .status) == "pending") or ((.state // .status) == "applied")) | .type' "$control_dir/authorize-updates.yml" 2>/dev/null | paste -sd ',' -)"
 
     [[ -z "$title" ]] && title="$mission_id"
     [[ -z "$status" ]] && status="unknown"
     [[ -z "$mission_class" ]] && mission_class="unknown"
-    [[ -n "$route_family" ]] && mission_class="$route_family"
     [[ -z "$owner_ref" ]] && owner_ref="unassigned"
     [[ -z "$oversight_mode" ]] && oversight_mode="unknown"
     [[ -z "$execution_posture" ]] && execution_posture="unknown"
     [[ -z "$phase" ]] && phase="unknown"
+    [[ -z "$safety_state" ]] && safety_state="unknown"
     [[ -z "$budget_state" ]] && budget_state="unknown"
     [[ -z "$breaker_state" ]] && breaker_state="unknown"
+    [[ -z "$route_ref" ]] && route_ref="/.octon/generated/effective/orchestration/missions/${mission_id}/scenario-resolution.yml"
 
     local raw_now raw_next raw_recent raw_recover raw_projection raw_operator operator_id
 
@@ -896,9 +916,12 @@ generator_version: "__GENERATOR_VERSION__"
 - title: \`${title}\`
 - status: \`${status}\`
 - mission_class: \`${mission_class}\`
+- effective_scenario_family: \`${route_family}\`
+- effective_action_class: \`${route_action_class}\`
 - owner_ref: \`${owner_ref}\`
 - oversight_mode: \`${oversight_mode}\`
 - execution_posture: \`${execution_posture}\`
+- safety_state: \`${safety_state}\`
 - safe_interrupt_boundary_class: \`${route_boundary_class}\`
 - phase: \`${phase}\`
 - autonomy_budget_state: \`${budget_state}\`
@@ -929,6 +952,8 @@ generator_version: "__GENERATOR_VERSION__"
 - mission_id: \`${mission_id}\`
 - digest_route: \`${route_digest_route}\`
 - recovery_window: \`${route_recovery_window}\`
+- current_slice_ref: \`${current_slice_ref}\`
+- next_slice_ref: \`${next_slice_ref}\`
 - intent_register: \`/.octon/state/control/execution/missions/${mission_id}/intent-register.yml\`
 - next_actions: \`/.octon/state/continuity/repo/missions/${mission_id}/next-actions.yml\`
 EOF
@@ -956,6 +981,8 @@ generator_version: "__GENERATOR_VERSION__"
 - route_fresh_until: \`${route_fresh_until}\`
 - retained_run_evidence_root: \`/.octon/state/evidence/runs/\`
 - retained_control_evidence_root: \`/.octon/state/evidence/control/execution/\`
+- active_directives: \`${active_directives}\`
+- active_authorize_updates: \`${active_authorize_updates}\`
 - handoff: \`/.octon/state/continuity/repo/missions/${mission_id}/handoff.md\`
 EOF
     perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw_recent"
@@ -979,6 +1006,7 @@ generator_version: "__GENERATOR_VERSION__"
 
 - mission_id: \`${mission_id}\`
 - recovery_window: \`${route_recovery_window}\`
+- route_ref: \`${route_ref}\`
 - recovery_source: \`/.octon/state/evidence/runs/\`
 - mode_state: \`/.octon/state/control/execution/missions/${mission_id}/mode-state.yml\`
 EOF
@@ -987,32 +1015,62 @@ EOF
 
     raw_projection="$(mktemp "$TMP_ROOT/mission-projection.XXXX")"
     cat > "$raw_projection" <<EOF
-{
-  "mission_id": "${mission_id}",
-  "title": "$(printf '%s' "$title" | sed 's/"/\\"/g')",
-  "status": "${status}",
-  "mission_class": "${mission_class}",
-  "owner_ref": "${owner_ref}",
-  "oversight_mode": "${oversight_mode}",
-  "execution_posture": "${execution_posture}",
-  "phase": "${phase}",
-  "autonomy_budget_state": "${budget_state}",
-  "breaker_state": "${breaker_state}",
-  "generated_at": "__GENERATED_AT__",
-  "generated_from": [
-    "/.octon/instance/orchestration/missions/${mission_id}/mission.yml",
-    "/.octon/generated/effective/orchestration/missions/${mission_id}/scenario-resolution.yml",
-    "/.octon/state/control/execution/missions/${mission_id}/mode-state.yml",
-    "/.octon/state/control/execution/missions/${mission_id}/intent-register.yml",
-    "/.octon/state/continuity/repo/missions/${mission_id}/handoff.md"
-  ]
-}
+schema_version: "mission-view-v1"
+mission_id: "$mission_id"
+mission:
+  title: $(yaml_quote "$title")
+  status: $(yaml_quote "$status")
+  mission_class: $(yaml_quote "$mission_class")
+  owner_ref: $(yaml_quote "$owner_ref")
+mode_state:
+  oversight_mode: $(yaml_quote "$oversight_mode")
+  execution_posture: $(yaml_quote "$execution_posture")
+  safety_state: $(yaml_quote "$safety_state")
+  phase: $(yaml_quote "$phase")
+  route_ref: $(yaml_quote "$route_ref")
+effective_route:
+  mission_class: $(yaml_quote "$mission_class")
+  effective_scenario_family: $(yaml_quote "$route_family")
+  effective_action_class: $(yaml_quote "$route_action_class")
+  safe_interrupt_boundary_class: $(yaml_quote "$route_boundary_class")
+  digest_route: $(yaml_quote "$route_digest_route")
+  route_generated_at: $(yaml_quote "$route_generated_at")
+  route_fresh_until: $(yaml_quote "$route_fresh_until")
+current_slice_ref: $( [[ -n "$current_slice_ref" ]] && yaml_quote "$current_slice_ref" || printf 'null' )
+next_slice_ref: $( [[ -n "$next_slice_ref" ]] && yaml_quote "$next_slice_ref" || printf 'null' )
+budget_breaker_summary:
+  autonomy_budget_state: $(yaml_quote "$budget_state")
+  breaker_state: $(yaml_quote "$breaker_state")
+active_directives:
+$(printf '%s\n' "$active_directives" | tr ',' '\n' | awk 'NF {count++; printf "  - \"%s\"\n", $0} END {if (count == 0) printf "  []\n"}')
+active_authorize_updates:
+$(printf '%s\n' "$active_authorize_updates" | tr ',' '\n' | awk 'NF {count++; printf "  - \"%s\"\n", $0} END {if (count == 0) printf "  []\n"}')
+recovery_finalize_summary:
+  recovery_window: $(yaml_quote "$route_recovery_window")
+  block_finalize: $(yq -r '.effective.finalize_policy.block_finalize // false' "$scenario_route_file" 2>/dev/null || printf 'false')
+summary_refs:
+  now: "/.octon/generated/cognition/summaries/missions/${mission_id}/now.md"
+  next: "/.octon/generated/cognition/summaries/missions/${mission_id}/next.md"
+  recent: "/.octon/generated/cognition/summaries/missions/${mission_id}/recent.md"
+  recover: "/.octon/generated/cognition/summaries/missions/${mission_id}/recover.md"
+continuity_refs:
+  handoff: "/.octon/state/continuity/repo/missions/${mission_id}/handoff.md"
+  next_actions: "/.octon/state/continuity/repo/missions/${mission_id}/next-actions.yml"
+source_refs:
+  mission: "/.octon/instance/orchestration/missions/${mission_id}/mission.yml"
+  route: "/.octon/generated/effective/orchestration/missions/${mission_id}/scenario-resolution.yml"
+  mode_state: "/.octon/state/control/execution/missions/${mission_id}/mode-state.yml"
+  intent_register: "/.octon/state/control/execution/missions/${mission_id}/intent-register.yml"
+  continuity: "/.octon/state/continuity/repo/missions/${mission_id}/handoff.md"
+last_refresh_at: "__LAST_REFRESH_AT__"
 EOF
-    finalize_candidate "$MISSION_PROJECTION_ROOT/$mission_id.json" "$raw_projection" "generated_at" "timestamp"
+    finalize_candidate "$MISSION_PROJECTION_ROOT/$mission_id/mission-view.yml" "$raw_projection" "last_refresh_at" "timestamp"
 
-    operator_id="$(operator_slug "$owner_ref")"
-    raw_operator="$(mktemp "$TMP_ROOT/operator-digest.XXXX")"
-    cat > "$raw_operator" <<EOF
+    while IFS= read -r operator_ref; do
+      [[ -n "$operator_ref" ]] || continue
+      operator_id="$(operator_slug "$operator_ref")"
+      raw_operator="$(mktemp "$TMP_ROOT/operator-digest.XXXX")"
+      cat > "$raw_operator" <<EOF
 ---
 title: Mission Operator Digest
 description: Generated operator digest entry for mission routing.
@@ -1034,9 +1092,12 @@ generator_version: "__GENERATOR_VERSION__"
 - digest_route: \`${route_digest_route}\`
 - budget_state: \`${budget_state}\`
 - breaker_state: \`${breaker_state}\`
+- route_fresh_until: \`${route_fresh_until}\`
+- attention_required: \`$( [[ "$breaker_state" != "clear" || "$active_authorize_updates" == *approve* ]] && printf 'yes' || printf 'no' )\`
 EOF
-    perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw_operator"
-    finalize_candidate "$OPERATOR_DIGESTS_ROOT/$operator_id/$mission_id.md" "$raw_operator" "generated_at" "timestamp"
+      perl -0pi -e 's#__GENERATOR_VERSION__#'"$GENERATOR_VERSION"'#g' "$raw_operator"
+      finalize_candidate "$OPERATOR_DIGESTS_ROOT/$operator_id/$mission_id.md" "$raw_operator" "generated_at" "timestamp"
+    done < <(yq -r '.owners[]?, .watchers[]?, .digest_recipients[]?, .alert_recipients[]?' "$subscriptions_file" 2>/dev/null | awk 'NF' | sort -u)
   done < <(extract_active_mission_ids "$MISSION_REGISTRY_PATH")
 }
 

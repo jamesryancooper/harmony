@@ -16,6 +16,9 @@ paths:
   mission_control_root: ".octon/state/control/execution/missions"
   control_receipt_root: ".octon/state/evidence/control/execution"
   mission_effective_route_root: ".octon/generated/effective/orchestration/missions"
+  mission_summary_root: ".octon/generated/cognition/summaries/missions"
+  operator_digest_root: ".octon/generated/cognition/summaries/operators"
+  mission_projection_root: ".octon/generated/cognition/projections/materialized/missions"
 
 exit_codes:
   allow: 0

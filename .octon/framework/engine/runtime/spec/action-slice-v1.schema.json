@@ -5,48 +5,66 @@
   "type": "object",
   "additionalProperties": true,
   "required": [
-    "slice_ref",
-    "intent_ref",
+    "schema_version",
+    "slice_id",
+    "mission_id",
+    "title",
     "action_class",
-    "target_ref",
-    "rationale",
-    "status",
+    "scope_ids",
     "predicted_acp",
-    "planned_reversibility_class",
-    "safe_interrupt_boundary_id",
-    "boundary_class",
+    "reversibility_class",
+    "safe_interrupt_boundary_class",
     "expected_blast_radius",
-    "expected_budget_impact",
-    "required_authorize_updates",
-    "rollback_plan_ref",
-    "compensation_plan_ref",
-    "finalize_policy_ref",
-    "earliest_start_at",
-    "feedback_deadline_at",
-    "default_on_silence"
+    "expected_externality_class",
+    "executor_profile",
+    "approval_required",
+    "owner_attestation_required",
+    "rationale",
+    "created_at",
+    "updated_at"
+  ],
+  "anyOf": [
+    { "required": ["rollback_primitive"] },
+    { "required": ["compensation_primitive"] }
   ],
   "properties": {
-    "slice_ref": { "type": "object" },
-    "intent_ref": { "type": "object" },
+    "schema_version": { "const": "action-slice-v1" },
+    "slice_id": { "type": "string", "minLength": 1 },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
     "action_class": { "type": "string", "minLength": 1 },
-    "target_ref": { "type": "object" },
-    "rationale": { "type": "string", "minLength": 1 },
-    "status": { "type": "string", "minLength": 1 },
-    "predicted_acp": { "type": "string", "pattern": "^ACP-[0-4]$" },
-    "planned_reversibility_class": { "type": "string", "enum": ["reversible", "compensable", "irreversible"] },
-    "safe_interrupt_boundary_id": { "type": "string", "minLength": 1 },
-    "boundary_class": { "type": "string", "minLength": 1 },
-    "expected_blast_radius": { "type": "string", "minLength": 1 },
-    "expected_budget_impact": { "type": "object" },
-    "required_authorize_updates": {
+    "scope_ids": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
     },
-    "rollback_plan_ref": { "type": ["string", "null"] },
-    "compensation_plan_ref": { "type": ["string", "null"] },
-    "finalize_policy_ref": { "type": ["string", "null"] },
-    "earliest_start_at": { "type": "string", "minLength": 1 },
-    "feedback_deadline_at": { "type": "string", "minLength": 1 },
-    "default_on_silence": { "type": "string", "minLength": 1 }
+    "predicted_acp": { "type": "string", "pattern": "^ACP-[0-4]$" },
+    "reversibility_class": {
+      "type": "string",
+      "enum": ["reversible", "compensable", "irreversible"]
+    },
+    "rollback_primitive": { "type": ["string", "null"], "minLength": 1 },
+    "compensation_primitive": { "type": ["string", "null"], "minLength": 1 },
+    "safe_interrupt_boundary_class": {
+      "type": "string",
+      "enum": [
+        "immediate",
+        "task_boundary",
+        "batch_boundary",
+        "checkpoint_boundary",
+        "rollout_boundary",
+        "stage_boundary",
+        "finalize_boundary"
+      ]
+    },
+    "expected_blast_radius": { "type": "string", "minLength": 1 },
+    "expected_externality_class": { "type": "string", "minLength": 1 },
+    "executor_profile": { "type": "string", "minLength": 1 },
+    "approval_required": { "type": "boolean" },
+    "owner_attestation_required": { "type": "boolean" },
+    "rationale": { "type": "string", "minLength": 1 },
+    "earliest_start": { "type": "string", "minLength": 1 },
+    "feedback_deadline": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "minLength": 1 },
+    "updated_at": { "type": "string", "minLength": 1 }
   }
 }

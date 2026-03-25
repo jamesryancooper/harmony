@@ -20,4 +20,4 @@ preview_lead: null
 feedback_window_default: null
 quiet_hours: null
 digest_route_override: null
-last_schedule_mutation_ref: null
+last_schedule_mutation_ref: ".octon/state/evidence/control/execution/20260325T155958Z-schedule-mutation.yml"

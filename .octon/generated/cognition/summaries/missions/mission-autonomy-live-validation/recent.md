@@ -7,14 +7,16 @@ generated_from:
   - /.octon/state/evidence/runs/**
   - /.octon/state/evidence/control/execution/**
   - /.octon/state/continuity/repo/missions/mission-autonomy-live-validation/handoff.md
-generated_at: "2026-03-24T16:49:34Z"
-generator_version: "0.6.0"
+generated_at: "2026-03-25T16:20:58Z"
+generator_version: "0.6.1"
 ---
 
 # Mission Recent
 
 - mission_id: `mission-autonomy-live-validation`
-- route_fresh_until: `2026-03-24T17:04:34Z`
+- route_fresh_until: `2026-03-25T16:35:58Z`
 - retained_run_evidence_root: `/.octon/state/evidence/runs/`
 - retained_control_evidence_root: `/.octon/state/evidence/control/execution/`
+- active_directives: ``
+- active_authorize_updates: ``
 - handoff: `/.octon/state/continuity/repo/missions/mission-autonomy-live-validation/handoff.md`

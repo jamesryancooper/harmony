@@ -3,4 +3,23 @@ mission_id: "mission-autonomy-live-validation"
 revision: 1
 generated_from:
   - "framework/orchestration/runtime/_ops/scripts/seed-mission-autonomy-state.sh"
-entries: []
+  - "manual-live-validation-slice-seeding"
+entries:
+  - intent_id: "steady-state-housekeeping-1"
+    sequence: 1
+    action_slice_ref: ".octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/steady-state-housekeeping.yml"
+    intent_ref:
+      id: "intent://octon/msraom/live-validation/steady-state-housekeeping"
+      version: "1.0.0"
+    action_class: "git.commit"
+    predicted_acp: "ACP-1"
+    reversibility_class: "reversible"
+    earliest_start: "2026-03-25T03:30:00Z"
+    feedback_deadline: null
+    default_on_silence: "notify"
+    operator_options:
+      - "inspect"
+      - "pause_at_boundary"
+      - "approve_if_promoted"
+    expected_externality_class: "repo_local"
+    state: "queued"

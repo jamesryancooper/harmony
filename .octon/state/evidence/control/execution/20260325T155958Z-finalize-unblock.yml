@@ -1,0 +1,25 @@
+schema_version: "control-receipt-v1"
+receipt_id: "20260325T155958Z-finalize-unblock"
+mission_id: "mission-autonomy-live-validation"
+control_mutation_class: "finalize_unblock"
+source_ref: ".octon/state/control/execution/missions/mission-autonomy-live-validation/directives.yml"
+applied_to_ref: ".octon/state/control/execution/missions/mission-autonomy-live-validation/directives.yml"
+issuer_ref: "operator://octon-maintainers"
+timestamp: "2026-03-25T15:59:58Z"
+result: "applied"
+prior_state_ref: null
+new_state_ref: null
+reason: "Validation coverage receipt for finalize_unblock"
+reason_codes:
+  - "VALIDATION_COVERAGE"
+affected_paths:
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/directives.yml"
+policy_refs:
+  []
+linked_run_id: null
+linked_directive_refs:
+  []
+linked_authorize_update_refs:
+  []
+superseded_receipt_ref: null
+supersedes_receipt_id: null

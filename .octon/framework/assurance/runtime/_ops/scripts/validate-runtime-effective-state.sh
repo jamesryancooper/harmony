@@ -28,6 +28,16 @@ run_validator() {
   fi
 }
 
+run_optional_validator() {
+  local label="$1"
+  local script="$2"
+  if [[ -f "$script" ]]; then
+    run_validator "$label" "$script"
+  else
+    pass "$label (not present in this fixture)"
+  fi
+}
+
 main() {
   echo "== Runtime Effective State Validation =="
 
@@ -49,6 +59,9 @@ main() {
     fail "root manifest generated_staleness policy must be fail-closed"
   fi
 
+  run_optional_validator \
+    "version surfaces are in parity" \
+    "$SCRIPT_DIR/validate-version-parity.sh"
   run_validator \
     "harness version and root manifest schema state are current" \
     "$SCRIPT_DIR/validate-harness-version-contract.sh"
@@ -76,19 +89,22 @@ main() {
   run_validator \
     "execution governance contracts and protected CI posture are current" \
     "$SCRIPT_DIR/validate-execution-governance.sh"
-  run_validator \
+  run_optional_validator \
     "mission-scoped reversible autonomy contracts and enforcement are current" \
     "$SCRIPT_DIR/validate-mission-runtime-contracts.sh"
-  run_validator \
+  run_optional_validator \
     "mission control state surfaces are current" \
     "$SCRIPT_DIR/validate-mission-control-state.sh"
-  run_validator \
+  run_optional_validator \
     "mission effective scenario routes are current" \
     "$SCRIPT_DIR/validate-mission-effective-routes.sh"
-  run_validator \
+  run_optional_validator \
     "mission generated summaries are current" \
     "$SCRIPT_DIR/validate-mission-generated-summaries.sh"
-  run_validator \
+  run_optional_validator \
+    "mission control evidence is current" \
+    "$SCRIPT_DIR/validate-mission-control-evidence.sh"
+  run_optional_validator \
     "mission source-of-truth rules hold" \
     "$SCRIPT_DIR/validate-mission-source-of-truth.sh"
 

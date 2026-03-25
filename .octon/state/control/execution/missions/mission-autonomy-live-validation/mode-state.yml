@@ -5,9 +5,12 @@ execution_posture: "interruptible_scheduled"
 safety_state: "paused"
 phase: "planning"
 active_run_ref: null
-current_slice_ref: null
-next_safe_interrupt_boundary_id: null
-effective_scenario_resolution_ref: null
+current_slice_ref:
+  id: steady-state-housekeeping
+  path: .octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/steady-state-housekeeping.yml
+next_safe_interrupt_boundary_id: task_boundary
+effective_scenario_resolution_ref: .octon/generated/effective/orchestration/missions/mission-autonomy-live-validation/scenario-resolution.yml
 autonomy_burn_state: "healthy"
-breaker_state: "healthy"
-updated_at: "2026-03-24T16:49:15Z"
+breaker_state: "clear"
+break_glass_expires_at: null
+updated_at: "2026-03-25T16:20:58Z"

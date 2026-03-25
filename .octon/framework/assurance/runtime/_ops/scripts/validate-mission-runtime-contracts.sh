@@ -44,6 +44,7 @@ main() {
     intent-register-v1.schema.json \
     mode-state-v1.schema.json \
     control-directive-v1.schema.json \
+    authorize-update-v1.schema.json \
     schedule-control-v1.schema.json \
     autonomy-budget-v1.schema.json \
     circuit-breaker-v1.schema.json \
@@ -53,7 +54,8 @@ main() {
     policy-receipt-v2.schema.json \
     policy-digest-v2.md \
     control-receipt-v1.schema.json \
-    scenario-resolution-v1.schema.json
+    scenario-resolution-v1.schema.json \
+    mission-view-v1.schema.json
   do
     [[ -f "$SPEC_DIR/$file" ]] && pass "found spec $file" || fail "missing spec $file"
   done
@@ -62,10 +64,14 @@ main() {
   has_pattern 'mission_control_root' "$CONFIG_FILE" && pass "policy interface exposes mission control root" || fail "policy interface missing mission_control_root path"
   has_pattern 'control_receipt_root' "$CONFIG_FILE" && pass "policy interface exposes control receipt root" || fail "policy interface missing control_receipt_root path"
   has_pattern 'mission_effective_route_root' "$CONFIG_FILE" && pass "policy interface exposes mission effective route root" || fail "policy interface missing mission_effective_route_root path"
+  has_pattern 'mission_summary_root' "$CONFIG_FILE" && pass "policy interface exposes mission summary root" || fail "policy interface missing mission_summary_root path"
+  has_pattern 'operator_digest_root' "$CONFIG_FILE" && pass "policy interface exposes operator digest root" || fail "policy interface missing operator_digest_root path"
+  has_pattern 'mission_projection_root' "$CONFIG_FILE" && pass "policy interface exposes mission projection root" || fail "policy interface missing mission_projection_root path"
   has_pattern 'policy-receipt-v2' "$OCTON_DIR/framework/capabilities/_ops/scripts/policy-receipt-write.sh" && pass "shared policy receipt writer emits v2 schema" || fail "shared policy receipt writer still emits v1 schema"
   has_pattern 'policy-digest-v2' "$OCTON_DIR/framework/capabilities/_ops/scripts/policy-receipt-write.sh" && pass "shared policy receipt writer emits v2 digest format" || fail "shared policy receipt writer still emits v1 digest format"
   has_pattern 'autonomy_context' "$OCTON_DIR/framework/engine/runtime/crates/kernel/src/authorization.rs" && pass "kernel authorization uses autonomy_context" || fail "kernel authorization missing autonomy_context"
   has_pattern 'workflow_mode' "$OCTON_DIR/framework/engine/runtime/crates/kernel/src/pipeline.rs" && pass "pipeline emits workflow_mode" || fail "pipeline missing workflow_mode"
+  has_pattern 'effective_scenario_resolution_ref' "$OCTON_DIR/framework/engine/runtime/crates/kernel/src/authorization.rs" && pass "kernel authorization reads route linkage" || fail "kernel authorization missing route linkage handling"
 
   run_test \
     "authorization denies autonomous execution without mission context" \
@@ -85,6 +91,9 @@ main() {
   run_test \
     "authorization stage-onlys when mission scenario resolution is stale" \
     cargo test --manifest-path "$CARGO_MANIFEST" -p octon_kernel stale_scenario_resolution_returns_stage_only
+  run_test \
+    "authorization stage-onlys when mission scenario resolution omits action class" \
+    cargo test --manifest-path "$CARGO_MANIFEST" -p octon_kernel missing_scenario_action_class_returns_stage_only
 
   echo "Validation summary: errors=$errors"
   [[ $errors -eq 0 ]]

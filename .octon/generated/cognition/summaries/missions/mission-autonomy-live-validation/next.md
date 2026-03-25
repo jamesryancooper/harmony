@@ -6,14 +6,16 @@ generated_from:
   - /.octon/generated/effective/orchestration/missions/mission-autonomy-live-validation/scenario-resolution.yml
   - /.octon/state/control/execution/missions/mission-autonomy-live-validation/intent-register.yml
   - /.octon/state/continuity/repo/missions/mission-autonomy-live-validation/next-actions.yml
-generated_at: "2026-03-24T16:49:15Z"
-generator_version: "0.6.0"
+generated_at: "2026-03-25T03:26:09Z"
+generator_version: "0.6.1"
 ---
 
 # Mission Next
 
 - mission_id: `mission-autonomy-live-validation`
 - digest_route: `preview_plus_closure_digest`
-- recovery_window: `P14D`
+- recovery_window: `P30D`
+- current_slice_ref: `.octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/steady-state-housekeeping.yml`
+- next_slice_ref: `.octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/steady-state-housekeeping.yml`
 - intent_register: `/.octon/state/control/execution/missions/mission-autonomy-live-validation/intent-register.yml`
 - next_actions: `/.octon/state/continuity/repo/missions/mission-autonomy-live-validation/next-actions.yml`

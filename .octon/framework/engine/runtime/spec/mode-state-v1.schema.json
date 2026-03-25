@@ -27,11 +27,28 @@
     "safety_state": { "type": "string", "enum": ["active", "paused", "degraded", "safe", "break_glass"] },
     "phase": { "type": "string", "enum": ["planning", "staging", "promoting", "running", "recovering", "finalizing", "closed"] },
     "active_run_ref": { "type": ["object", "null"] },
-    "current_slice_ref": { "type": ["object", "null"] },
+    "current_slice_ref": { "type": ["object", "string", "null"] },
     "next_safe_interrupt_boundary_id": { "type": ["string", "null"] },
     "effective_scenario_resolution_ref": { "type": ["string", "null"] },
     "autonomy_burn_state": { "type": "string", "enum": ["healthy", "warning", "exhausted"] },
-    "breaker_state": { "type": "string", "minLength": 1 },
+    "breaker_state": { "type": "string", "enum": ["clear", "tripped", "latched", "reset_pending"] },
+    "break_glass_expires_at": { "type": ["string", "null"] },
     "updated_at": { "type": "string", "minLength": 1 }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "phase": {
+            "enum": ["planning", "staging", "promoting", "running", "recovering", "finalizing"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "effective_scenario_resolution_ref": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  ]
 }
