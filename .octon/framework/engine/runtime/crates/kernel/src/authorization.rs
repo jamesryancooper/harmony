@@ -816,7 +816,10 @@ fn resolve_autonomy_state(
         .trim()
         .is_empty()
     {
-        "service.execute".to_string()
+        return Err(mission_stage_only(
+            "mission route could not derive an action class for material work",
+            vec!["MISSION_ACTION_CLASS_MISSING", "ACP_STAGE_ONLY_REQUIRED"],
+        ));
     } else {
         scenario_resolution.effective.recovery_profile.action_class.clone()
     };
@@ -2628,6 +2631,30 @@ mod tests {
         assert_eq!(
             err.details["reason_codes"][0].as_str(),
             Some("MISSION_SCENARIO_RESOLUTION_STALE")
+        );
+    }
+
+    #[test]
+    fn missing_scenario_action_class_returns_stage_only() {
+        let cfg = temp_runtime_config();
+        seed_mission_autonomy_fixture(&cfg, "mission-f", "healthy");
+        let policy = PolicyEngine::new(cfg.clone());
+        let request = mission_request(&cfg, "mission-f", "feedback_window", "reversible");
+        let effective_path = cfg
+            .octon_dir
+            .join("generated/effective/orchestration/missions/mission-f/scenario-resolution.yml");
+        let route = fs::read_to_string(&effective_path).expect("read route");
+        fs::write(
+            &effective_path,
+            route.replace("    action_class: \"service.execute\"\n", "    action_class: \"\"\n"),
+        )
+        .expect("rewrite route without action class");
+        let err = authorize_execution(&cfg, &policy, &request, None)
+            .expect_err("missing route action class must fail closed");
+        assert_eq!(err.details["decision"].as_str(), Some("STAGE_ONLY"));
+        assert_eq!(
+            err.details["reason_codes"][0].as_str(),
+            Some("MISSION_ACTION_CLASS_MISSING")
         );
     }
 }

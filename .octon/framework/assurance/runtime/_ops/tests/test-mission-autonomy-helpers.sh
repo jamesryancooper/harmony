@@ -101,11 +101,13 @@ OCTON_DIR_OVERRIDE="$fixture_root/.octon" OCTON_ROOT_DIR="$fixture_root" bash "$
 test -f "$fixture_root/.octon/state/control/execution/missions/demo/lease.yml"
 test -f "$fixture_root/.octon/state/control/execution/missions/demo/mode-state.yml"
 test -f "$fixture_root/.octon/state/control/execution/missions/demo/intent-register.yml"
+test -f "$fixture_root/.octon/state/control/execution/missions/demo/authorize-updates.yml"
 test -f "$fixture_root/.octon/state/control/execution/missions/demo/directives.yml"
 test -f "$fixture_root/.octon/state/control/execution/missions/demo/schedule.yml"
 test -f "$fixture_root/.octon/state/control/execution/missions/demo/autonomy-budget.yml"
 test -f "$fixture_root/.octon/state/control/execution/missions/demo/circuit-breakers.yml"
 test -f "$fixture_root/.octon/state/control/execution/missions/demo/subscriptions.yml"
+test -d "$fixture_root/.octon/state/control/execution/missions/demo/action-slices"
 test -f "$fixture_root/.octon/state/continuity/repo/missions/demo/next-actions.yml"
 test -f "$fixture_root/.octon/state/continuity/repo/missions/demo/handoff.md"
 test -f "$fixture_root/.octon/generated/effective/orchestration/missions/demo/scenario-resolution.yml"
@@ -115,3 +117,4 @@ OCTON_DIR_OVERRIDE="$fixture_root/.octon" OCTON_ROOT_DIR="$fixture_root" bash "$
 
 grep -q 'state: "revoked"' "$fixture_root/.octon/state/control/execution/missions/demo/lease.yml"
 grep -q 'phase: "closed"' "$fixture_root/.octon/state/control/execution/missions/demo/mode-state.yml"
+grep -q 'breaker_state: "clear"' "$fixture_root/.octon/state/control/execution/missions/demo/mode-state.yml"

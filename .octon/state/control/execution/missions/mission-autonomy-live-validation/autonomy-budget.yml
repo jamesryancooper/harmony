@@ -3,7 +3,10 @@ mission_id: "mission-autonomy-live-validation"
 state: "healthy"
 window: "PT24H"
 threshold_profile_ref: "mission-autonomy.default"
-last_state_change_at: "2026-03-24T16:49:15Z"
-applied_mode_adjustments: []
-updated_at: "2026-03-24T16:49:15Z"
+last_state_change_at: "2026-03-25T03:19:17Z"
+applied_mode_adjustments:
+  - "validation-coverage:raise_budget"
+updated_at: "2026-03-25T03:19:17Z"
+last_recomputed_at: "2026-03-25T03:19:17Z"
+last_recomputation_receipt_ref: ".octon/state/evidence/control/execution/20260325T155958Z-budget-transition.yml"
 counters: {}

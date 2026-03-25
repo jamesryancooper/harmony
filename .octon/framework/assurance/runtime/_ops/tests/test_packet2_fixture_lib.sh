@@ -186,6 +186,8 @@ write_valid_packet2_fixture() {
     "$fixture_root/.octon/generated/effective/capabilities" \
     "$fixture_root/.octon/generated/proposals"
 
+  printf '0.5.0\n' >"$fixture_root/version.txt"
+
   cat >"$fixture_root/.octon/octon.yml" <<'EOF'
 schema_version: "octon-root-manifest-v2"
 topology:

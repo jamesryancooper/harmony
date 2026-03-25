@@ -61,12 +61,15 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 ## Verification Gate
 
-- [ ] base and subtype proposal validators pass before archival
-- [ ] archive starts from the active path and a non-archived proposal
-- [ ] archive metadata matches the chosen disposition
-- [ ] the proposal moves into the canonical archive path
-- [ ] generated proposal registry is regenerated from manifests
-- [ ] workflow bundle receipts are complete
+- [ ] `summary.md`, `commands.md`, `inventory.md`, `bundle.yml`, and `validation.md` exist
+- [ ] `stage-inputs/` and `stage-logs/` exist for the workflow bundle
+- [ ] the source proposal validates before archival
+- [ ] the source proposal starts from the active path and is not already archived
+- [ ] archive metadata is coherent for the chosen disposition
+- [ ] the proposal moves to `.archive/<kind>/<proposal_id>/`
+- [ ] `proposal.yml` is rewritten to `status: archived` with archive metadata
+- [ ] generated/proposals/registry.yml matches the deterministic manifest projection after archival
+- [ ] final archival verdict is explicit
 
 ## References
 

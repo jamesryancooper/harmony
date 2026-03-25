@@ -40,6 +40,12 @@ main() {
     pass "generated mission summaries do not depend on proposal inputs"
   fi
 
+  if find "$OCTON_DIR/generated/cognition/projections/materialized/missions" -type f -name '*.json' | grep -q .; then
+    fail "mission projections must use mission-view.yml rather than legacy .json outputs"
+  else
+    pass "legacy .json mission projections are absent"
+  fi
+
   if find "$OCTON_DIR/generated" -type f \( -name '*journal*' -o -name '*activity-log*' \) | grep -q .; then
     fail "generated mission surfaces must not introduce a second journal"
   else

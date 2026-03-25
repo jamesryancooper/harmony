@@ -46,6 +46,36 @@ main() {
     else
       fail "control evidence files must use timestamped .yml receipt names"
     fi
+    if find "$CONTROL_EVIDENCE_ROOT" -maxdepth 1 -type f ! -name '.gitkeep' -exec grep -L -E 'control_mutation_class:|control_event_kind:' {} + | grep -q .; then
+      fail "control evidence receipts must declare a mutation/event class"
+    else
+      pass "control evidence receipts declare a mutation/event class"
+    fi
+    local required_class
+    for required_class in \
+      mission_seed \
+      directive_add \
+      directive_apply \
+      directive_expire \
+      authorize_update_add \
+      authorize_update_apply \
+      schedule_mutation \
+      budget_transition \
+      breaker_trip \
+      breaker_reset \
+      safing_enter \
+      safing_exit \
+      break_glass_enter \
+      break_glass_exit \
+      finalize_block \
+      finalize_unblock
+    do
+      if grep -R -q "control_mutation_class: \"$required_class\"" "$CONTROL_EVIDENCE_ROOT"; then
+        pass "control evidence includes $required_class coverage"
+      else
+        fail "control evidence missing $required_class coverage"
+      fi
+    done
   else
     pass "no repo-retained control receipts emitted yet; emission path is implemented"
   fi

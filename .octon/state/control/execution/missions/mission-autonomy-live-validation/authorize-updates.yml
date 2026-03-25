@@ -1,0 +1,31 @@
+schema_version: "authorize-update-v1"
+mission_id: "mission-autonomy-live-validation"
+revision: 4
+authorize_updates:
+  - update_id: "upd-coverage-raise-budget"
+    type: "raise_budget"
+    state: "expired"
+    issuer_ref: "operator://octon-maintainers"
+    issued_at: "2026-03-25T15:59:58Z"
+    expires_at: null
+    payload:
+      target_state: "healthy"
+    applied_by_receipt_ref: ".octon/state/evidence/control/execution/20260325T155958Z-authorize-update-apply.yml"
+  - update_id: "upd-coverage-reset-breaker"
+    type: "reset_breaker"
+    state: "expired"
+    issuer_ref: "operator://octon-maintainers"
+    issued_at: "2026-03-25T15:59:58Z"
+    expires_at: null
+    payload:
+      target_state: "clear"
+    applied_by_receipt_ref: ".octon/state/evidence/control/execution/20260325T155958Z-breaker-reset.yml"
+  - update_id: "upd-coverage-enter-break-glass"
+    type: "enter_break_glass"
+    state: "expired"
+    issuer_ref: "operator://octon-maintainers"
+    issued_at: "2026-03-25T15:59:58Z"
+    expires_at: "2026-03-25T15:59:58Z"
+    payload:
+      ttl: "PT0S"
+    applied_by_receipt_ref: null

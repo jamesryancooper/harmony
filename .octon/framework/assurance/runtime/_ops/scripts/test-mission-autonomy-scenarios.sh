@@ -220,6 +220,90 @@ case_schedule_suspension_blocks_new_runs() {
   cleanup_root "$root"
 }
 
+case_directive_suspend_future_runs_blocks_new_runs() {
+  local root
+  root="$(fixture_root)"
+  seed_fixture_base "$root" "maintenance"
+  activate_fixture_mission "$root"
+  write_published_slice "$root" "service.execute" "reversible" "ACP-1"
+  write_directives "$root" '  - directive_id: "dir-suspend"
+    kind: "suspend_future_runs"
+    target_scope: {}
+    submitted_by: "operator://demo-owner"
+    precedence_source: "mission_owner"
+    submitted_at: "2026-03-24T00:00:00Z"
+    effective_at: "immediate"
+    status: "accepted"
+    rationale: "suspend future runs"'
+  local json
+  json="$(evaluate_fixture "$root")"
+  assert_json "$json" '.allow_new_run == false and .suspend_future_runs_directive == true and (.reasons | index("future_runs_suspended_by_directive"))'
+  cleanup_root "$root"
+}
+
+case_reprioritize_pauses_material_work() {
+  local root
+  root="$(fixture_root)"
+  seed_fixture_base "$root" "maintenance"
+  activate_fixture_mission "$root"
+  write_published_slice "$root" "service.execute" "reversible" "ACP-1"
+  write_directives "$root" '  - directive_id: "dir-reprioritize"
+    kind: "reprioritize"
+    target_scope: {}
+    submitted_by: "operator://demo-owner"
+    precedence_source: "mission_owner"
+    submitted_at: "2026-03-24T00:00:00Z"
+    effective_at: "immediate"
+    status: "accepted"
+    rationale: "reprioritize"'
+  local json
+  json="$(evaluate_fixture "$root")"
+  assert_json "$json" '.allow_new_run == false and .pause_active_run == true and .reprioritize_pending == true and (.reasons | index("reprioritize_pending"))'
+  cleanup_root "$root"
+}
+
+case_scope_narrowing_blocks_material_work() {
+  local root
+  root="$(fixture_root)"
+  seed_fixture_base "$root" "maintenance"
+  activate_fixture_mission "$root"
+  write_published_slice "$root" "service.execute" "reversible" "ACP-1"
+  write_directives "$root" '  - directive_id: "dir-narrow-scope"
+    kind: "narrow_scope"
+    target_scope: {}
+    submitted_by: "operator://demo-owner"
+    precedence_source: "mission_owner"
+    submitted_at: "2026-03-24T00:00:00Z"
+    effective_at: "immediate"
+    status: "accepted"
+    rationale: "narrow scope"'
+  local json
+  json="$(evaluate_fixture "$root")"
+  assert_json "$json" '.allow_new_run == false and .pause_active_run == true and .scope_narrowing_active == true and (.reasons | index("scope_narrowing_active"))'
+  cleanup_root "$root"
+}
+
+case_exclude_target_blocks_material_work() {
+  local root
+  root="$(fixture_root)"
+  seed_fixture_base "$root" "maintenance"
+  activate_fixture_mission "$root"
+  write_published_slice "$root" "service.execute" "reversible" "ACP-1"
+  write_directives "$root" '  - directive_id: "dir-exclude-target"
+    kind: "exclude_target"
+    target_scope: {}
+    submitted_by: "operator://demo-owner"
+    precedence_source: "mission_owner"
+    submitted_at: "2026-03-24T00:00:00Z"
+    effective_at: "immediate"
+    status: "accepted"
+    rationale: "exclude target"'
+  local json
+  json="$(evaluate_fixture "$root")"
+  assert_json "$json" '.allow_new_run == false and .exclude_target_active == true and (.reasons | index("target_excluded_by_directive"))'
+  cleanup_root "$root"
+}
+
 case_conflicting_human_input_blocks_finalize_and_pauses() {
   local root
   root="$(fixture_root)"
@@ -355,6 +439,22 @@ if [[ "$INCLUDE_FIXTURE_SCENARIOS" == "1" ]]; then
   run_case \
     "scenario fixture: future-run suspension blocks new runs" \
     case_schedule_suspension_blocks_new_runs
+
+  run_case \
+    "scenario fixture: suspend-future-runs directive blocks new runs" \
+    case_directive_suspend_future_runs_blocks_new_runs
+
+  run_case \
+    "scenario fixture: reprioritize pauses material work" \
+    case_reprioritize_pauses_material_work
+
+  run_case \
+    "scenario fixture: narrow-scope blocks material work" \
+    case_scope_narrowing_blocks_material_work
+
+  run_case \
+    "scenario fixture: exclude-target blocks material work" \
+    case_exclude_target_blocks_material_work
 
   run_case \
     "scenario fixture: conflicting human input pauses and blocks finalize" \

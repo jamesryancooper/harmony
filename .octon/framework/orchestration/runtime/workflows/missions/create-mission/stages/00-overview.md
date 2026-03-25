@@ -1,8 +1,8 @@
 ---
 title: Create Mission
-description: Scaffold a new mission from template.
+description: Scaffold a new mission from template and seed its full autonomy state.
 access: human
-version: "1.2.0"
+version: "1.3.0"
 depends_on: []
 checkpoints:
   enabled: true
@@ -44,31 +44,42 @@ control and continuity surfaces.
 5. **Initialize tasks.json** — Set mission identifier
 6. **Initialize log.md** — Add creation entry with date
 7. **Seed mission control truth** — Materialize lease, mode, intent,
-   directives, schedule, autonomy-budget, circuit-breakers, and subscriptions
-   under `state/control/execution/missions/<slug>/` by running
+   action-slices, directives, authorize-updates, schedule, autonomy-budget,
+   circuit-breakers, and subscriptions under
+   `state/control/execution/missions/<slug>/` by running
    `framework/orchestration/runtime/_ops/scripts/seed-mission-autonomy-state.sh`
-8. **Seed mission continuity** — Materialize `next-actions.yml` and
+8. **Generate mission awareness views** — Materialize
+   `now.md`, `next.md`, `recent.md`, `recover.md`, operator digests, and
+   `mission-view.yml`
+9. **Seed mission continuity** — Materialize `next-actions.yml` and
    `handoff.md` under `state/continuity/repo/missions/<slug>/`
-9. **Update registry** — Add mission to `active` list in `registry.yml`
-10. **Confirm** — Report success and next steps
+10. **Update registry** — Add mission to `active` list in `registry.yml`
+11. **Confirm** — Report success and next steps
 
 ## Output
 
-A new mission directory ready for work:
+A new mission authority root plus seeded control/continuity/generated state:
 
 ```text
 missions/<slug>/
 ├── mission.yml    # Canonical mission object
 ├── mission.md     # Narrative context subordinate to mission.yml
 ├── tasks.json     # Empty task list
-├── log.md         # Creation entry logged
-└── context/       # Mission-local context
+└── log.md         # Creation entry logged
+
+state/control/execution/missions/<slug>/
+state/continuity/repo/missions/<slug>/
+generated/effective/orchestration/missions/<slug>/
+generated/cognition/summaries/missions/<slug>/
+generated/cognition/projections/materialized/missions/<slug>/
 ```
 
 ## Required Outcome
 
 - [ ] `missions/<slug>/` exists with initialized mission artifacts
 - [ ] Mission control state exists and starts paused with healthy autonomy burn
+- [ ] Route linkage and generated mission/operator views exist immediately after
+      creation
 - [ ] Mission registry is updated
 - [ ] Operator receives the next-step guidance after creation
 
@@ -86,6 +97,7 @@ missions/<slug>/
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3.0 | 2026-03-24 | Added authorize-updates, action-slices, route linkage, and generated mission views to the create-mission outcome |
 | 1.2.0 | 2026-03-23 | Upgraded to mission charter v2 and seeded mission autonomy control surfaces |
 | 1.1.0 | 2025-01-14 | Added gap remediation fields |
 | 1.0.0 | 2025-01-05 | Initial version |

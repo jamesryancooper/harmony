@@ -1342,7 +1342,7 @@ workflows:
       - workflow: evaluate-harness
         condition: "optional but recommended to run first"
   create-mission:
-    version: "1.2.0"
+    version: "1.4.0"
     commands: ["/create-mission"]
     access: human
     depends_on: []

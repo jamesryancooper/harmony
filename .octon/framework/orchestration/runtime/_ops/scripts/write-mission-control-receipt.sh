@@ -53,6 +53,16 @@ timestamp_slug() {
   date -u +"%Y%m%dT%H%M%SZ"
 }
 
+derive_result() {
+  case "$1" in
+    mission_seed) printf 'seeded' ;;
+    mission_close) printf 'closed' ;;
+    *_reject) printf 'rejected' ;;
+    *_expire) printf 'expired' ;;
+    *) printf 'applied' ;;
+  esac
+}
+
 main() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -82,24 +92,26 @@ main() {
 
   mkdir -p "$OUTPUT_ROOT"
 
-  local ts ts_slug slug file receipt_id primary_path
+  local ts ts_slug slug file receipt_id primary_path applied_to_ref result
   ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   ts_slug="$(timestamp_slug)"
   slug="$(printf '%s' "$RECEIPT_TYPE" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-')"
   receipt_id="${ts_slug}-${slug}"
   file="$OUTPUT_ROOT/${receipt_id}.yml"
   primary_path="${AFFECTED_PATHS[0]}"
+  applied_to_ref="${NEW_STATE_REF:-$primary_path}"
+  result="$(derive_result "$RECEIPT_TYPE")"
 
   {
     printf 'schema_version: "control-receipt-v1"\n'
     printf 'receipt_id: %s\n' "$(yaml_quote "$receipt_id")"
     printf 'mission_id: %s\n' "$(yaml_quote "$MISSION_ID")"
-    printf 'control_event_kind: %s\n' "$(yaml_quote "$RECEIPT_TYPE")"
-    printf 'subject_ref:\n'
-    printf '  kind: %s\n' "$(yaml_quote "$RECEIPT_TYPE")"
-    printf '  path: %s\n' "$(yaml_quote "$primary_path")"
-    printf 'applied_by: %s\n' "$(yaml_quote "$ISSUED_BY")"
-    printf 'applied_at: %s\n' "$(yaml_quote "$ts")"
+    printf 'control_mutation_class: %s\n' "$(yaml_quote "$RECEIPT_TYPE")"
+    printf 'source_ref: %s\n' "$(yaml_quote "$primary_path")"
+    printf 'applied_to_ref: %s\n' "$(yaml_quote "$applied_to_ref")"
+    printf 'issuer_ref: %s\n' "$(yaml_quote "$ISSUED_BY")"
+    printf 'timestamp: %s\n' "$(yaml_quote "$ts")"
+    printf 'result: %s\n' "$(yaml_quote "$result")"
     if [[ -n "$PRIOR_STATE_REF" ]]; then
       printf 'prior_state_ref: %s\n' "$(yaml_quote "$PRIOR_STATE_REF")"
     else
@@ -108,7 +120,7 @@ main() {
     if [[ -n "$NEW_STATE_REF" ]]; then
       printf 'new_state_ref: %s\n' "$(yaml_quote "$NEW_STATE_REF")"
     else
-      printf 'new_state_ref: %s\n' "$(yaml_quote "$primary_path")"
+      printf 'new_state_ref: null\n'
     fi
     if [[ -n "$REASON" ]]; then
       printf 'reason: %s\n' "$(yaml_quote "$REASON")"
@@ -123,6 +135,10 @@ main() {
         printf '  - %s\n' "$(yaml_quote "$code")"
       done
     fi
+    printf 'affected_paths:\n'
+    for path in "${AFFECTED_PATHS[@]}"; do
+      printf '  - %s\n' "$(yaml_quote "$path")"
+    done
     printf 'policy_refs:\n'
     if [[ "${#POLICY_REFS[@]}" -eq 0 ]]; then
       printf '  []\n'
@@ -131,10 +147,6 @@ main() {
         printf '  - %s\n' "$(yaml_quote "$ref")"
       done
     fi
-    printf 'affected_paths:\n'
-    for path in "${AFFECTED_PATHS[@]}"; do
-      printf '  - %s\n' "$(yaml_quote "$path")"
-    done
     if [[ -n "$LINKED_RUN_ID" ]]; then
       printf 'linked_run_id: %s\n' "$(yaml_quote "$LINKED_RUN_ID")"
     else
@@ -157,8 +169,10 @@ main() {
       done
     fi
     if [[ -n "$SUPERSEDES_RECEIPT_ID" ]]; then
+      printf 'superseded_receipt_ref: %s\n' "$(yaml_quote "$SUPERSEDES_RECEIPT_ID")"
       printf 'supersedes_receipt_id: %s\n' "$(yaml_quote "$SUPERSEDES_RECEIPT_ID")"
     else
+      printf 'superseded_receipt_ref: null\n'
       printf 'supersedes_receipt_id: null\n'
     fi
   } > "$file"

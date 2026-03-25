@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/authorize-update-v1.schema.json",
+  "title": "Authorize Update v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "mission_id", "revision", "authorize_updates"],
+  "properties": {
+    "schema_version": { "const": "authorize-update-v1" },
+    "mission_id": { "type": "string", "minLength": 1 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "authorize_updates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "update_id",
+          "type",
+          "state",
+          "issuer_ref",
+          "issued_at",
+          "payload",
+          "applied_by_receipt_ref"
+        ],
+        "properties": {
+          "update_id": { "type": "string", "minLength": 1 },
+          "type": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "extend_lease",
+              "revoke_lease",
+              "raise_budget",
+              "grant_exception",
+              "reset_breaker",
+              "enter_break_glass",
+              "exit_break_glass"
+            ]
+          },
+          "state": { "type": "string", "enum": ["pending", "applied", "rejected", "expired"] },
+          "issuer_ref": { "type": "string", "minLength": 1 },
+          "issued_at": { "type": "string", "minLength": 1 },
+          "expires_at": { "type": ["string", "null"] },
+          "payload": { "type": "object" },
+          "applied_by_receipt_ref": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+schema_version: "control-receipt-v1"
+receipt_id: "20260325T031918Z-mission-seed"
+mission_id: "mission-autonomy-live-validation"
+control_mutation_class: "mission_seed"
+source_ref: ".octon/state/control/execution/missions/mission-autonomy-live-validation/lease.yml"
+applied_to_ref: ".octon/state/control/execution/missions/mission-autonomy-live-validation/lease.yml"
+issuer_ref: "operator://octon-maintainers"
+timestamp: "2026-03-25T03:19:18Z"
+result: "seeded"
+prior_state_ref: null
+new_state_ref: ".octon/state/control/execution/missions/mission-autonomy-live-validation/lease.yml"
+reason: "Seed mission autonomy control, continuity, and generated awareness state"
+reason_codes:
+  - "MISSION_CONTROL_SEEDED"
+affected_paths:
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/lease.yml"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/mode-state.yml"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/intent-register.yml"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/.gitkeep"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/directives.yml"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/authorize-updates.yml"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/schedule.yml"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/autonomy-budget.yml"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/circuit-breakers.yml"
+  - ".octon/state/control/execution/missions/mission-autonomy-live-validation/subscriptions.yml"
+  - ".octon/state/continuity/repo/missions/mission-autonomy-live-validation/next-actions.yml"
+  - ".octon/state/continuity/repo/missions/mission-autonomy-live-validation/handoff.md"
+  - ".octon/generated/effective/orchestration/missions/mission-autonomy-live-validation/scenario-resolution.yml"
+  - ".octon/generated/cognition/summaries/missions/mission-autonomy-live-validation/now.md"
+  - ".octon/generated/cognition/projections/materialized/missions/mission-autonomy-live-validation/mission-view.yml"
+policy_refs:
+  - ".octon/instance/governance/policies/mission-autonomy.yml"
+  - ".octon/instance/governance/ownership/registry.yml"
+linked_run_id: null
+linked_directive_refs:
+  []
+linked_authorize_update_refs:
+  []
+superseded_receipt_ref: null
+supersedes_receipt_id: null

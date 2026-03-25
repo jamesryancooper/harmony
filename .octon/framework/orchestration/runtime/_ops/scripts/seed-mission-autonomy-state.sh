@@ -7,6 +7,7 @@ OCTON_DIR="${OCTON_DIR_OVERRIDE:-$DEFAULT_OCTON_DIR}"
 ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 RECEIPT_WRITER="$SCRIPT_DIR/write-mission-control-receipt.sh"
 ROUTE_PUBLISHER="$SCRIPT_DIR/publish-mission-effective-route.sh"
+SYNC_RUNTIME_ARTIFACTS="$OCTON_DIR/framework/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh"
 
 MISSION_ID=""
 ISSUED_BY=""
@@ -41,6 +42,7 @@ main() {
   local policy_file="$OCTON_DIR/instance/governance/policies/mission-autonomy.yml"
   local control_dir="$OCTON_DIR/state/control/execution/missions/$MISSION_ID"
   local continuity_dir="$OCTON_DIR/state/continuity/repo/missions/$MISSION_ID"
+  local route_file="$OCTON_DIR/generated/effective/orchestration/missions/$MISSION_ID/scenario-resolution.yml"
   [[ -f "$mission_file" ]] || { echo "missing mission charter: ${mission_file#$ROOT_DIR/}" >&2; exit 1; }
   [[ -f "$policy_file" ]] || { echo "missing mission autonomy policy: ${policy_file#$ROOT_DIR/}" >&2; exit 1; }
 
@@ -56,7 +58,7 @@ main() {
   overlap_policy="$(yq -r ".overlap_defaults.\"$mission_class\" // .default_overlap_policy // \"skip\"" "$policy_file")"
   backfill_policy="$(yq -r ".backfill_defaults.\"$mission_class\" // \"none\"" "$policy_file")"
 
-  mkdir -p "$control_dir" "$continuity_dir"
+  mkdir -p "$control_dir/action-slices" "$continuity_dir"
 
   local ts
   ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
@@ -100,7 +102,8 @@ current_slice_ref: null
 next_safe_interrupt_boundary_id: null
 effective_scenario_resolution_ref: null
 autonomy_burn_state: "healthy"
-breaker_state: "healthy"
+breaker_state: "clear"
+break_glass_expires_at: null
 updated_at: "$ts"
 EOF
 
@@ -113,11 +116,20 @@ generated_from:
 entries: []
 EOF
 
+  : > "$control_dir/action-slices/.gitkeep"
+
   cat > "$control_dir/directives.yml" <<EOF
 schema_version: "control-directive-v1"
 mission_id: "$MISSION_ID"
 revision: 1
 directives: []
+EOF
+
+  cat > "$control_dir/authorize-updates.yml" <<EOF
+schema_version: "authorize-update-v1"
+mission_id: "$MISSION_ID"
+revision: 1
+authorize_updates: []
 EOF
 
   cat > "$control_dir/schedule.yml" <<EOF
@@ -155,6 +167,8 @@ threshold_profile_ref: "mission-autonomy.default"
 last_state_change_at: "$ts"
 applied_mode_adjustments: []
 updated_at: "$ts"
+last_recomputed_at: "$ts"
+last_recomputation_receipt_ref: null
 counters: {}
 EOF
 
@@ -168,6 +182,7 @@ applied_actions: []
 tripped_at: null
 reset_requirements: []
 reset_ref: null
+reset_receipt_ref: null
 updated_at: "$ts"
 tripped_breakers: []
 EOF
@@ -197,16 +212,19 @@ EOF
 
 - mission_id: \`$MISSION_ID\`
 - status: \`seeded\`
-- next_safe_action: \`review mission charter and resume the paused lease intentionally\`
+- next_safe_action: \`review mission charter, add or confirm the first action slice, and resume intentionally\`
 EOF
 
   bash "$ROUTE_PUBLISHER" --mission-id "$MISSION_ID" >/dev/null
+  if [[ -x "$SYNC_RUNTIME_ARTIFACTS" ]]; then
+    bash "$SYNC_RUNTIME_ARTIFACTS" --target missions >/dev/null
+  fi
 
   bash "$RECEIPT_WRITER" \
     --mission-id "$MISSION_ID" \
-    --receipt-type "mission-seed" \
+    --receipt-type "mission_seed" \
     --issued-by "$ISSUED_BY" \
-    --reason "Seed mission autonomy control and continuity state" \
+    --reason "Seed mission autonomy control, continuity, and generated awareness state" \
     --new-state-ref ".octon/state/control/execution/missions/$MISSION_ID/lease.yml" \
     --reason-code "MISSION_CONTROL_SEEDED" \
     --policy-ref ".octon/instance/governance/policies/mission-autonomy.yml" \
@@ -214,7 +232,9 @@ EOF
     --affected-path ".octon/state/control/execution/missions/$MISSION_ID/lease.yml" \
     --affected-path ".octon/state/control/execution/missions/$MISSION_ID/mode-state.yml" \
     --affected-path ".octon/state/control/execution/missions/$MISSION_ID/intent-register.yml" \
+    --affected-path ".octon/state/control/execution/missions/$MISSION_ID/action-slices/.gitkeep" \
     --affected-path ".octon/state/control/execution/missions/$MISSION_ID/directives.yml" \
+    --affected-path ".octon/state/control/execution/missions/$MISSION_ID/authorize-updates.yml" \
     --affected-path ".octon/state/control/execution/missions/$MISSION_ID/schedule.yml" \
     --affected-path ".octon/state/control/execution/missions/$MISSION_ID/autonomy-budget.yml" \
     --affected-path ".octon/state/control/execution/missions/$MISSION_ID/circuit-breakers.yml" \
@@ -222,6 +242,8 @@ EOF
     --affected-path ".octon/state/continuity/repo/missions/$MISSION_ID/next-actions.yml" \
     --affected-path ".octon/state/continuity/repo/missions/$MISSION_ID/handoff.md" \
     --affected-path ".octon/generated/effective/orchestration/missions/$MISSION_ID/scenario-resolution.yml" \
+    --affected-path ".octon/generated/cognition/summaries/missions/$MISSION_ID/now.md" \
+    --affected-path ".octon/generated/cognition/projections/materialized/missions/$MISSION_ID/mission-view.yml" \
     >/dev/null
 }
 

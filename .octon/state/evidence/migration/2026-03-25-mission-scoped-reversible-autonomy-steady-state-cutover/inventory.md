@@ -1,0 +1,26 @@
+# Inventory
+
+- `version.txt`
+- `/.octon/octon.yml`
+- `/.octon/README.md`
+- `/.octon/framework/cognition/_meta/architecture/contract-registry.yml`
+- `/.octon/framework/engine/runtime/config/policy-interface.yml`
+- `/.octon/framework/engine/runtime/spec/authorize-update-v1.schema.json`
+- `/.octon/framework/engine/runtime/spec/mission-view-v1.schema.json`
+- `/.octon/framework/orchestration/runtime/_ops/scripts/seed-mission-autonomy-state.sh`
+- `/.octon/framework/orchestration/runtime/_ops/scripts/publish-mission-effective-route.sh`
+- `/.octon/framework/orchestration/runtime/_ops/scripts/apply-mission-authorize-update.sh`
+- `/.octon/framework/orchestration/runtime/_ops/scripts/evaluate-mission-control-state.sh`
+- `/.octon/framework/orchestration/runtime/_ops/scripts/write-mission-control-receipt.sh`
+- `/.octon/framework/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh`
+- `/.octon/framework/assurance/runtime/_ops/scripts/validate-version-parity.sh`
+- `/.octon/framework/assurance/runtime/_ops/scripts/validate-mission-control-evidence.sh`
+- `/.octon/framework/orchestration/runtime/workflows/missions/create-mission/`
+- `/.github/workflows/architecture-conformance.yml`
+- `/.octon/instance/orchestration/missions/mission-autonomy-live-validation/`
+- `/.octon/state/control/execution/missions/mission-autonomy-live-validation/`
+- `/.octon/state/evidence/control/execution/`
+- `/.octon/generated/effective/orchestration/missions/mission-autonomy-live-validation/scenario-resolution.yml`
+- `/.octon/generated/cognition/projections/materialized/missions/mission-autonomy-live-validation/mission-view.yml`
+- `/.octon/generated/cognition/summaries/missions/mission-autonomy-live-validation/`
+- `/.octon/generated/cognition/summaries/operators/octon-maintainers/mission-autonomy-live-validation.md`

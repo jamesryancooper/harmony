@@ -7,6 +7,7 @@ OCTON_DIR="${OCTON_DIR_OVERRIDE:-$DEFAULT_OCTON_DIR}"
 ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 RECEIPT_WRITER="$SCRIPT_DIR/write-mission-control-receipt.sh"
 ROUTE_PUBLISHER="$SCRIPT_DIR/publish-mission-effective-route.sh"
+SYNC_RUNTIME_ARTIFACTS="$OCTON_DIR/framework/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh"
 
 MISSION_ID=""
 ISSUED_BY=""
@@ -75,7 +76,8 @@ current_slice_ref: null
 next_safe_interrupt_boundary_id: null
 effective_scenario_resolution_ref: null
 autonomy_burn_state: "healthy"
-breaker_state: "healthy"
+breaker_state: "clear"
+break_glass_expires_at: null
 updated_at: "$ts"
 EOF
 
@@ -95,10 +97,13 @@ EOF
 EOF
 
   bash "$ROUTE_PUBLISHER" --mission-id "$MISSION_ID" >/dev/null
+  if [[ -x "$SYNC_RUNTIME_ARTIFACTS" ]]; then
+    bash "$SYNC_RUNTIME_ARTIFACTS" --target missions >/dev/null
+  fi
 
   bash "$RECEIPT_WRITER" \
     --mission-id "$MISSION_ID" \
-    --receipt-type "mission-close" \
+    --receipt-type "mission_close" \
     --issued-by "$ISSUED_BY" \
     --reason "Close mission autonomy control and continuity state" \
     --new-state-ref ".octon/state/control/execution/missions/$MISSION_ID/lease.yml" \

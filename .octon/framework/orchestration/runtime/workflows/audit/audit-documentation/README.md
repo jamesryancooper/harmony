@@ -87,4 +87,3 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 | Version | Changes |
 |---------|---------|
 | 3.0.0 | Generated from canonical workflow `audit-documentation` |
-

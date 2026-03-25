@@ -35,9 +35,11 @@ execution:
     - ".octon/framework/engine/runtime/spec/policy-receipt-v2.schema.json"
     - ".octon/framework/engine/runtime/spec/policy-digest-v2.md"
   blocking_checks:
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-version-parity.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-runtime-contracts.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-control-evidence.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-source-of-truth.sh"
     - ".github/workflows/architecture-conformance.yml"
 mission_autonomy:

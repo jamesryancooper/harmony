@@ -57,9 +57,9 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 
 - [ ] `summary.md`, `commands.md`, `inventory.md`, `bundle.yml`, and `validation.md` exist
 - [ ] `stage-inputs/` and `stage-logs/` exist for the workflow bundle
-- [ ] base and subtype proposal validators pass
-- [ ] generated proposal registry matches the manifest projection
-- [ ] final validation verdict is explicit
+- [ ] validate-proposal-standard.sh and the subtype validator pass for the target proposal
+- [ ] generated/proposals/registry.yml matches the deterministic manifest projection
+- [ ] Final validation verdict is explicit
 
 ## References
 
