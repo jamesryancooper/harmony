@@ -38,24 +38,46 @@ proposal a canonical repository authority.
 
 - `/.octon/generated/proposals/registry.yml`
 
+## Proposal-Local Authority Roles
+
+| Artifact | Role | Authority level |
+| --- | --- | --- |
+| `proposal.yml` | Base identity, scope, targets, lifecycle, and exit contract | Highest proposal-local |
+| `design-proposal.yml` | Design subtype class, module, and validation contract | Secondary proposal-local |
+| Class-specific normative docs | The design-spec authority that implementation and review rely on | Primary working design surface |
+| `implementation/*.md` | Implementation framing and first-slice guidance | Supporting implementation guidance |
+| Optional module docs | Supporting reference, history, contracts, conformance, and canonicalization material | Supporting, not authoritative over manifests |
+| `navigation/source-of-truth-map.md` | Manual proposal-local precedence, authority, and evidence map | Explanatory support |
+| `navigation/artifact-catalog.md` | Generated file inventory for the current package shape | Low-authority generated inventory |
+| `/.octon/generated/proposals/registry.yml` | Discovery projection rebuilt from proposal manifests | Projection only |
+| `README.md` | Human entry point and reading guidance | Explanatory only |
+
+## Derived Or Projection-Only Surfaces
+
+| Surface | Status | Rule |
+| --- | --- | --- |
+| `/.octon/generated/proposals/registry.yml` | Committed projection | Must be regenerated from manifests or fail-closed validated; never authoritative over manifests |
+| `navigation/artifact-catalog.md` | Generated inventory | Reflects the current package shape but does not define lifecycle truth |
+| Workflow bundles under `state/evidence/runs/workflows/**` | Retained evidence | Evidence of proposal operations, not lifecycle authority |
+
 ## Conflict Resolution
 
 1. Repository-wide governance and durable authorities
 2. `proposal.yml`
 3. `design-proposal.yml`
-4. class-specific normative docs
+4. Class-specific normative docs
 5. `implementation/README.md`
 6. `implementation/minimal-implementation-blueprint.md`
 7. `implementation/first-implementation-plan.md`
-8. optional module docs
-9. `/.octon/generated/proposals/registry.yml`
+8. Optional module docs
+9. `navigation/source-of-truth-map.md`
+10. `navigation/artifact-catalog.md`
+11. `/.octon/generated/proposals/registry.yml`
+12. `README.md`
 
 ## Boundary Rules
 
-- This proposal remains temporary and non-canonical at every lifecycle stage.
-- Durable runtime, documentation, policy, and contract outputs must be
-  promoted outside `/.octon/inputs/exploratory/proposals/`.
-- Proposal discovery is allowed through the committed registry projection, but
-  lifecycle truth stays in `proposal.yml` and `design-proposal.yml`.
-- Proposal operation evidence belongs under `state/evidence/**`, not inside
-  the proposal package or under `generated/**`.
+- This proposal remains temporary and non-canonical even when its content is implementation-ready.
+- Durable runtime, documentation, policy, and contract outputs must be promoted outside `/.octon/inputs/exploratory/proposals/`.
+- Proposal discovery is allowed through the committed registry projection, but lifecycle truth stays in `proposal.yml` and `design-proposal.yml`.
+- Proposal operation evidence belongs under `state/evidence/**`, not inside the proposal package or under `generated/**`.

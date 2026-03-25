@@ -215,7 +215,8 @@ Proposal authority uses one manifest-governed exploratory model:
   `README.md`
 - proposal registry behavior:
   `generated/proposals/registry.yml` is a deterministically rebuilt discovery
-  projection and never lifecycle authority
+  projection and never lifecycle authority; legacy-unknown archived design
+  imports stay outside the main projection until normalized
 
 Generated-family rules in v1:
 

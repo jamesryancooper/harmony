@@ -110,10 +110,15 @@ validate_package() {
   local proposal_dir="$1"
   local proposal_rel="$2"
   local manifest="$proposal_dir/proposal.yml"
-  local kind validator
+  local kind status archived_from_status validator
 
   kind="$(yaml_string "$manifest" '.proposal_kind')"
-  if [[ "$kind" == "design" && "$(yaml_string "$manifest" '.archive.archived_from_status')" == "legacy-unknown" ]]; then
+  status="$(yaml_string "$manifest" '.status')"
+  archived_from_status="$(yaml_string "$manifest" '.archive.archived_from_status')"
+  if [[ "$kind" == "design" \
+    && "$status" == "archived" \
+    && "$proposal_rel" == .octon/inputs/exploratory/proposals/.archive/design/* \
+    && "$archived_from_status" == "legacy-unknown" ]]; then
     pass "legacy-unknown design import excluded from main registry projection: $proposal_rel"
     return 0
   fi
@@ -199,7 +204,16 @@ main() {
     scope="$(yaml_string "$manifest" '.promotion_scope')"
     title="$(yaml_string "$manifest" '.title')"
     status="$(yaml_string "$manifest" '.status')"
+    archived_from_status="$(yaml_string "$manifest" '.archive.archived_from_status')"
     key="${kind}:${proposal_id}"
+
+    if [[ "$kind" == "design" \
+      && "$status" == "archived" \
+      && "$proposal_rel" == .octon/inputs/exploratory/proposals/.archive/design/* \
+      && "$archived_from_status" == "legacy-unknown" ]]; then
+      pass "legacy-unknown design import excluded from main registry projection: $proposal_rel"
+      continue
+    fi
 
     if [[ -n "${seen[$key]:-}" ]]; then
       fail "duplicate proposal key '${key}' across ${seen[$key]} and $proposal_rel"
@@ -210,7 +224,6 @@ main() {
     if [[ "$status" == "archived" ]]; then
       fragment="$tmp_dir/archived/${kind}__${proposal_id}.yml"
       archived_at="$(yaml_string "$manifest" '.archive.archived_at')"
-      archived_from_status="$(yaml_string "$manifest" '.archive.archived_from_status')"
       disposition="$(yaml_string "$manifest" '.archive.disposition')"
       original_path="$(yaml_string "$manifest" '.archive.original_path')"
       {

@@ -8,7 +8,10 @@ Single-promotion atomic migration implementing
 - align proposal standards, templates, schemas, and validators
 - rebuild the proposal registry deterministically from manifests
 - add explicit validate/promote/archive proposal lifecycle operations
-- normalize broken archived proposal packets so fail-closed projection passes
+- exclude legacy-unknown archived design imports from the main projection until
+  they are normalized
+- tighten source-of-truth-map contract guidance across standards, scaffolds,
+  and runtime-generated proposal packets
 - archive the implemented proposal package and refresh proposal discovery
 
 ## Cutover Assertions
@@ -21,8 +24,11 @@ Single-promotion atomic migration implementing
   registry instead of editing it directly.
 - Proposal navigation inventory is generated from the on-disk package shape,
   while source-of-truth maps remain manual proposal-local precedence guides.
-- The live architecture archive no longer contains the previously broken
-  lifecycle/status/artifact-catalog cases that blocked fail-closed projection.
+- Legacy-unknown archived design imports stay on disk for historical lineage
+  but are excluded from the main generated proposal registry.
+- The archived `proposal-system-integrity-and-archive-normalization` packet now
+  carries the final audit-backed proposal docs and audit results resource that
+  justify the cutover closeout.
 
 ## Receipts And Evidence
 

@@ -26,6 +26,26 @@ proposal a canonical repository authority.
 7. `navigation/artifact-catalog.md`
 8. `/.octon/generated/proposals/registry.yml`
 
+## Proposal-Local Authority Roles
+
+| Artifact | Role | Authority level |
+| --- | --- | --- |
+| `proposal.yml` | Base identity, scope, targets, lifecycle, and exit contract | Highest proposal-local |
+| `policy-proposal.yml` | Subtype-specific structured contract | Secondary proposal-local |
+| Primary subtype docs | The proposal's working design/architecture/policy surface | Primary working surface |
+| `navigation/source-of-truth-map.md` | Manual proposal-local precedence, authority, and evidence map | Explanatory support |
+| `navigation/artifact-catalog.md` | Generated file inventory for the current package shape | Low-authority generated inventory |
+| `/.octon/generated/proposals/registry.yml` | Discovery projection rebuilt from proposal manifests | Projection only |
+| `README.md` | Human entry point and reading guidance | Explanatory only |
+
+## Derived Or Projection-Only Surfaces
+
+| Surface | Status | Rule |
+| --- | --- | --- |
+| `/.octon/generated/proposals/registry.yml` | Committed projection | Must be regenerated from manifests or fail-closed validated; never authoritative over manifests |
+| `navigation/artifact-catalog.md` | Generated inventory | Reflects the current package shape but does not define lifecycle truth |
+| Workflow bundles under `state/evidence/runs/workflows/**` | Retained evidence | Evidence of proposal operations, not lifecycle authority |
+
 ## Conflict Resolution
 
 1. Repository-wide governance and durable authorities
