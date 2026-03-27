@@ -103,6 +103,8 @@ case_primitives_round_trip() {
     --executor-id executor-test-01 \
     --lease-seconds 300)"
   [[ -f "$run_path" ]]
+  [[ -f "$fixture_root/.octon/state/control/execution/runs/run-test-001/run-contract.yml" ]]
+  [[ -f "$fixture_root/.octon/state/control/execution/runs/run-test-001/stage-attempts/initial.yml" ]]
 
   lock_output="$(env "${envs[@]}" bash "$REPO_ROOT/$LOCK_SCRIPT" acquire \
     --coordination-key workflow:meta/evaluate-harness \
@@ -141,7 +143,51 @@ case_primitives_round_trip() {
     bash "$REPO_ROOT/$RUNTIME_VALIDATE" >/dev/null
 }
 
+case_terminal_run_contract_status_is_stable() {
+  local fixture_root
+  fixture_root="$(create_fixture)"
+
+  local envs=("OCTON_DIR_OVERRIDE=$fixture_root/.octon" "OCTON_ROOT_DIR=$fixture_root")
+
+  env "${envs[@]}" bash "$REPO_ROOT/$DECISION_SCRIPT" \
+    --decision-id dec-test-002 \
+    --outcome allow \
+    --surface workflows \
+    --action launch-workflow \
+    --actor evaluate-harness \
+    --workflow-group meta \
+    --workflow-id evaluate-harness \
+    --reason-code target-resolved \
+    --summary 'Evaluate harness workflow admitted for execution.' >/dev/null
+
+  env "${envs[@]}" bash "$REPO_ROOT/$RUN_SCRIPT" create \
+    --run-id run-test-002 \
+    --decision-id dec-test-002 \
+    --summary 'Evaluate harness run started.' \
+    --workflow-group meta \
+    --workflow-id evaluate-harness \
+    --executor-id executor-test-02 \
+    --lease-seconds 300 >/dev/null
+
+  env "${envs[@]}" bash "$REPO_ROOT/$RUN_SCRIPT" complete \
+    --run-id run-test-002 \
+    --status succeeded \
+    --summary 'Evaluate harness run completed.' >/dev/null
+
+  env "${envs[@]}" bash "$REPO_ROOT/$RUN_SCRIPT" heartbeat \
+    --run-id run-test-002 \
+    --lease-seconds 300 >/dev/null
+  env "${envs[@]}" bash "$REPO_ROOT/$RUN_SCRIPT" recovery \
+    --run-id run-test-002 \
+    --recovery-status recovery_pending \
+    --recovery-reason delayed-heartbeat >/dev/null
+
+  [[ "$(yq -r '.status // ""' "$fixture_root/.octon/state/control/execution/runs/run-test-002/run-contract.yml")" == "completed" ]]
+  [[ "$(yq -r '.status // ""' "$fixture_root/.octon/state/control/execution/runs/run-test-002/stage-attempts/initial.yml")" == "succeeded" ]]
+}
+
 assert_success "shared runtime primitives round-trip" case_primitives_round_trip
+assert_success "terminal run contract status remains stable" case_terminal_run_contract_status_is_stable
 
 if (( fail_count > 0 )); then
   echo "FAILURES: $fail_count" >&2
