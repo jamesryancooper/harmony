@@ -205,6 +205,27 @@ collect_requested_capabilities_json() {
   printf '%s\n' "${capabilities[@]}" | awk '!seen[$0]++' | jq -R . | jq -s .
 }
 
+yaml_json_or_default() {
+  local file="$1"
+  local query="${2:-.}"
+  local fallback="${3-}"
+  if [[ -z "$fallback" ]]; then
+    fallback='{}'
+  fi
+  if [[ -f "$file" ]]; then
+    yq -o=json "$query" "$file" 2>/dev/null || printf '%s' "$fallback"
+  else
+    printf '%s' "$fallback"
+  fi
+}
+
+merge_string_arrays_json() {
+  local base_json="$1"
+  local extra_json="$2"
+  printf '%s\n%s\n' "$base_json" "$extra_json" \
+    | jq -cs 'add | map(select(type == "string" and length > 0)) | unique'
+}
+
 write_runtime_state_file() {
   local run_id="$1"
   local status="$2"
@@ -213,6 +234,24 @@ write_runtime_state_file() {
   local mission_id="$5"
   local parent_run_id="$6"
   local last_receipt_ref="${7:-}"
+  local runtime_state_file existing_created_at existing_last_receipt_ref existing_last_checkpoint_ref
+  local resolved_created_at resolved_last_receipt_ref resolved_last_checkpoint_ref
+  runtime_state_file="$(runtime_state_path "$run_id")"
+  existing_created_at="$( [[ -f "$runtime_state_file" ]] && yq -r '.created_at // ""' "$runtime_state_file" 2>/dev/null || printf '' )"
+  existing_last_receipt_ref="$( [[ -f "$runtime_state_file" ]] && yq -r '.last_receipt_ref // ""' "$runtime_state_file" 2>/dev/null || printf '' )"
+  existing_last_checkpoint_ref="$( [[ -f "$runtime_state_file" ]] && yq -r '.last_checkpoint_ref // ""' "$runtime_state_file" 2>/dev/null || printf '' )"
+  resolved_created_at="$created_at"
+  resolved_last_receipt_ref="$last_receipt_ref"
+  resolved_last_checkpoint_ref="$(control_checkpoint_relpath "$run_id")"
+  if [[ -n "$existing_created_at" && "$existing_created_at" != "null" ]]; then
+    resolved_created_at="$existing_created_at"
+  fi
+  if [[ -z "$resolved_last_receipt_ref" && -n "$existing_last_receipt_ref" && "$existing_last_receipt_ref" != "null" ]]; then
+    resolved_last_receipt_ref="$existing_last_receipt_ref"
+  fi
+  if [[ -n "$existing_last_checkpoint_ref" && "$existing_last_checkpoint_ref" != "null" ]]; then
+    resolved_last_checkpoint_ref="$existing_last_checkpoint_ref"
+  fi
 
   jq -n \
     --arg run_id "$run_id" \
@@ -224,11 +263,11 @@ write_runtime_state_file() {
     --arg checkpoint_root "$(checkpoint_dir_relpath "$run_id")" \
     --arg evidence_root "$(run_evidence_relpath "$run_id")" \
     --arg receipt_root "$(receipt_dir_relpath "$run_id")" \
-    --arg control_checkpoint_ref "$(control_checkpoint_relpath "$run_id")" \
-    --arg last_receipt_ref "$last_receipt_ref" \
+    --arg control_checkpoint_ref "$resolved_last_checkpoint_ref" \
+    --arg last_receipt_ref "$resolved_last_receipt_ref" \
     --arg mission_id "$mission_id" \
     --arg parent_run_ref "$( [[ -n "$parent_run_id" ]] && printf '.octon/state/control/execution/runs/%s/run-contract.yml' "$parent_run_id" || printf '' )" \
-    --arg created_at "$created_at" \
+    --arg created_at "$resolved_created_at" \
     --arg updated_at "$updated_at" '
       {
         schema_version: "run-runtime-state-v1",
@@ -249,7 +288,7 @@ write_runtime_state_file() {
       + (if $last_receipt_ref != "" then {last_receipt_ref: $last_receipt_ref} else {} end)
       + (if $mission_id != "" then {mission_id: $mission_id} else {} end)
       + (if $parent_run_ref != "" then {parent_run_ref: $parent_run_ref} else {} end)
-    ' | yq -P -p=json '.' > "$(runtime_state_path "$run_id")"
+    ' | yq -P -p=json '.' > "$runtime_state_file"
 }
 
 write_orchestration_receipt_file() {
@@ -276,21 +315,35 @@ write_orchestration_receipt_file() {
 write_rollback_posture_file() {
   local run_id="$1"
   local updated_at="$2"
+  local rollback_file existing_json
+  local reversibility_class rollback_strategy contamination_state hard_reset_required posture_source
+  rollback_file="$(rollback_posture_path "$run_id")"
+  existing_json="$(yaml_json_or_default "$rollback_file" '.' '{}')"
+  reversibility_class="$(jq -r '.reversibility_class // "reversible"' <<<"$existing_json")"
+  rollback_strategy="$(jq -r '.rollback_strategy // "rollback"' <<<"$existing_json")"
+  contamination_state="$(jq -r '.contamination_state // "clean"' <<<"$existing_json")"
+  hard_reset_required="$(jq -r '.hard_reset_required // false' <<<"$existing_json")"
+  posture_source="$(jq -r '.posture_source // "orchestration-runtime"' <<<"$existing_json")"
 
   jq -n \
     --arg run_id "$run_id" \
+    --arg reversibility_class "$reversibility_class" \
+    --arg rollback_strategy "$rollback_strategy" \
+    --arg contamination_state "$contamination_state" \
+    --arg posture_source "$posture_source" \
+    --argjson hard_reset_required "$hard_reset_required" \
     --arg updated_at "$updated_at" '
       {
         schema_version: "run-rollback-posture-v1",
         run_id: $run_id,
-        reversibility_class: "reversible",
-        rollback_strategy: "rollback",
-        contamination_state: "clean",
-        hard_reset_required: false,
-        posture_source: "orchestration-runtime",
+        reversibility_class: $reversibility_class,
+        rollback_strategy: $rollback_strategy,
+        contamination_state: $contamination_state,
+        hard_reset_required: $hard_reset_required,
+        posture_source: $posture_source,
         updated_at: $updated_at
       }
-    ' | yq -P -p=json '.' > "$(rollback_posture_path "$run_id")"
+    ' | yq -P -p=json '.' > "$rollback_file"
 }
 
 write_bound_checkpoint_files() {
@@ -342,47 +395,69 @@ write_bound_checkpoint_files() {
 write_replay_pointer_file() {
   local run_id="$1"
   local updated_at="$2"
+  local replay_file existing_receipts_json existing_checkpoints_json existing_trace_json existing_external_json
+  local new_receipts_json new_checkpoints_json merged_receipts_json merged_checkpoints_json merged_trace_json merged_external_json
+  replay_file="$(replay_pointers_path "$run_id")"
   local receipt_ref=""
   if [[ -f "$(receipt_dir "$run_id")/orchestration-lifecycle.yml" ]]; then
     receipt_ref="$(orchestration_receipt_relpath "$run_id")"
   fi
+  existing_receipts_json="$(yaml_json_or_default "$replay_file" '.receipt_refs // []' '[]')"
+  existing_checkpoints_json="$(yaml_json_or_default "$replay_file" '.checkpoint_refs // []' '[]')"
+  existing_trace_json="$(yaml_json_or_default "$replay_file" '.trace_refs // []' '[]')"
+  existing_external_json="$(yaml_json_or_default "$replay_file" '.external_replay_refs // []' '[]')"
+  new_receipts_json="$(jq -cn --arg receipt_ref "$receipt_ref" 'if $receipt_ref != "" then [$receipt_ref] else [] end')"
+  new_checkpoints_json="$(jq -cn --arg checkpoint_ref "$(evidence_checkpoint_relpath "$run_id")" '[$checkpoint_ref]')"
+  merged_receipts_json="$(merge_string_arrays_json "$existing_receipts_json" "$new_receipts_json")"
+  merged_checkpoints_json="$(merge_string_arrays_json "$existing_checkpoints_json" "$new_checkpoints_json")"
+  merged_trace_json="$(merge_string_arrays_json "$existing_trace_json" '[]')"
+  merged_external_json="$(merge_string_arrays_json "$existing_external_json" '[]')"
   jq -n \
     --arg run_id "$run_id" \
-    --arg checkpoint_ref "$(evidence_checkpoint_relpath "$run_id")" \
-    --arg receipt_ref "$receipt_ref" \
+    --argjson receipt_refs "$merged_receipts_json" \
+    --argjson checkpoint_refs "$merged_checkpoints_json" \
+    --argjson trace_refs "$merged_trace_json" \
+    --argjson external_replay_refs "$merged_external_json" \
     --arg updated_at "$updated_at" '
       {
         schema_version: "run-replay-pointers-v1",
         run_id: $run_id,
-        receipt_refs: (if $receipt_ref != "" then [$receipt_ref] else [] end),
-        checkpoint_refs: [$checkpoint_ref],
-        trace_refs: [],
-        external_replay_refs: [],
+        receipt_refs: $receipt_refs,
+        checkpoint_refs: $checkpoint_refs,
+        trace_refs: $trace_refs,
+        external_replay_refs: $external_replay_refs,
         updated_at: $updated_at
       }
-    ' | yq -P -p=json '.' > "$(replay_pointers_path "$run_id")"
+    ' | yq -P -p=json '.' > "$replay_file"
 }
 
 write_trace_pointer_file() {
   local run_id="$1"
   local updated_at="$2"
+  local trace_file existing_trace_json merged_trace_json
+  trace_file="$(trace_pointers_path "$run_id")"
+  existing_trace_json="$(yaml_json_or_default "$trace_file" '.trace_refs // []' '[]')"
+  merged_trace_json="$(merge_string_arrays_json "$existing_trace_json" '[]')"
   jq -n \
     --arg run_id "$run_id" \
+    --argjson trace_refs "$merged_trace_json" \
     --arg updated_at "$updated_at" '
       {
         schema_version: "run-trace-pointers-v1",
         run_id: $run_id,
-        trace_refs: [],
+        trace_refs: $trace_refs,
         updated_at: $updated_at
       }
-    ' | yq -P -p=json '.' > "$(trace_pointers_path "$run_id")"
+    ' | yq -P -p=json '.' > "$trace_file"
 }
 
 write_retained_evidence_file() {
   local run_id="$1"
   local updated_at="$2"
-  jq -n \
-    --arg run_id "$run_id" \
+  local retained_file existing_map_json new_map_json merged_map_json
+  retained_file="$(retained_evidence_path "$run_id")"
+  existing_map_json="$(yaml_json_or_default "$retained_file" '.evidence_refs // {}' '{}')"
+  new_map_json="$(jq -n \
     --arg run_contract "$(run_contract_relpath "$run_id")" \
     --arg runtime_state "$(runtime_state_relpath "$run_id")" \
     --arg rollback_posture "$(rollback_posture_relpath "$run_id")" \
@@ -391,23 +466,28 @@ write_retained_evidence_file() {
     --arg orchestration_receipt "$(orchestration_receipt_relpath "$run_id")" \
     --arg replay_pointers "$(replay_pointers_relpath "$run_id")" \
     --arg trace_pointers "$(trace_pointers_relpath "$run_id")" \
+    '{
+      run_contract: $run_contract,
+      runtime_state: $runtime_state,
+      rollback_posture: $rollback_posture,
+      control_checkpoint: $control_checkpoint,
+      evidence_checkpoint: $evidence_checkpoint,
+      orchestration_receipt: $orchestration_receipt,
+      replay_pointers: $replay_pointers,
+      trace_pointers: $trace_pointers
+    }')"
+  merged_map_json="$(printf '%s\n%s\n' "$existing_map_json" "$new_map_json" | jq -s '.[0] * .[1]')"
+  jq -n \
+    --arg run_id "$run_id" \
+    --argjson evidence_refs "$merged_map_json" \
     --arg updated_at "$updated_at" '
       {
         schema_version: "retained-run-evidence-v1",
         run_id: $run_id,
-        evidence_refs: {
-          run_contract: $run_contract,
-          runtime_state: $runtime_state,
-          rollback_posture: $rollback_posture,
-          control_checkpoint: $control_checkpoint,
-          evidence_checkpoint: $evidence_checkpoint,
-          orchestration_receipt: $orchestration_receipt,
-          replay_pointers: $replay_pointers,
-          trace_pointers: $trace_pointers
-        },
+        evidence_refs: $evidence_refs,
         updated_at: $updated_at
       }
-    ' | yq -P -p=json '.' > "$(retained_evidence_path "$run_id")"
+    ' | yq -P -p=json '.' > "$retained_file"
 }
 
 ensure_run_lifecycle_roots() {
@@ -590,7 +670,10 @@ update_run_contract_status() {
   local summary=""
   summary="$( [[ -f "$RUNTIME_RUNS_DIR/$run_id.yml" ]] && yq -r '.summary // ""' "$RUNTIME_RUNS_DIR/$run_id.yml" 2>/dev/null || printf '' )"
   write_orchestration_receipt_file "$run_id" "$projection_status" "$summary" "$updated_at"
-  write_runtime_state_file "$run_id" "$projection_status" "${updated_at}" "$updated_at" "$mission_id" "$parent_run_id" "$(orchestration_receipt_relpath "$run_id")"
+  local created_at=""
+  created_at="$( [[ -f "$(runtime_state_path "$run_id")" ]] && yq -r '.created_at // ""' "$(runtime_state_path "$run_id")" 2>/dev/null || printf '' )"
+  [[ -n "$created_at" ]] || created_at="$updated_at"
+  write_runtime_state_file "$run_id" "$projection_status" "$created_at" "$updated_at" "$mission_id" "$parent_run_id" "$(orchestration_receipt_relpath "$run_id")"
   write_rollback_posture_file "$run_id" "$updated_at"
   write_replay_pointer_file "$run_id" "$updated_at"
   write_trace_pointer_file "$run_id" "$updated_at"
