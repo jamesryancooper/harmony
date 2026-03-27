@@ -82,6 +82,15 @@ main() {
   require_file "$ROOT_DIR/$exception_leases"
 
   require_contains \
+    "$OCTON_DIR/README.md" \
+    ".octon/framework/constitution/CHARTER.md" \
+    "super-root README references constitutional kernel"
+  require_contains \
+    "$OCTON_DIR/instance/ingress/AGENTS.md" \
+    ".octon/framework/constitution/CHARTER.md" \
+    "instance ingress references constitutional kernel"
+
+  require_contains \
     "$OCTON_DIR/framework/engine/runtime/crates/core/src/config.rs" \
     "run_evidence_root" \
     "RuntimeConfig exposes explicit retained run evidence root"
@@ -170,6 +179,10 @@ main() {
     "umbrella specification references canonical execution control root"
   require_contains \
     "$OCTON_DIR/framework/cognition/_meta/architecture/specification.md" \
+    ".octon/framework/constitution/CHARTER.md" \
+    "umbrella specification references constitutional kernel"
+  require_contains \
+    "$OCTON_DIR/framework/cognition/_meta/architecture/specification.md" \
     "$execution_tmp_root" \
     "umbrella specification references canonical execution scratch root"
   require_contains \
@@ -194,6 +207,10 @@ main() {
     "$OCTON_DIR/instance/bootstrap/START.md" \
     "portable operational support" \
     "bootstrap START describes ops as portable operational support"
+  require_contains \
+    "$OCTON_DIR/instance/bootstrap/START.md" \
+    ".octon/framework/constitution/CHARTER.md" \
+    "bootstrap START references constitutional kernel"
   require_contains \
     "$OCTON_DIR/framework/engine/README.md" \
     "Portable operational assets | helper binaries and portable support scripts" \

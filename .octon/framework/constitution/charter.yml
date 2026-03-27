@@ -1,0 +1,54 @@
+schema_version: "octon-constitution-charter-v1"
+charter_id: "octon-harness-charter"
+version: "1.0.0-wave0"
+owner: "Octon governance"
+purpose: >-
+  Provide one explicit repo-local constitutional kernel for the Octon
+  super-root so consequential autonomous work stays scoped, fail-closed,
+  evidence-backed, and reviewable.
+non_goals:
+  - "Make raw inputs authoritative for runtime or policy."
+  - "Allow host UI state, chat transcripts, or generated projections to become control-plane authority."
+  - "Treat continuity notes or generated summaries as substitutes for durable authority and evidence."
+non_negotiables:
+  - id: "NK-001"
+    rule: "Preserve the five-class super-root: framework, instance, inputs, state, and generated."
+  - id: "NK-002"
+    rule: "Keep authored authority in framework/** and instance/** only."
+  - id: "NK-003"
+    rule: "Keep generated/** derived-only and raw inputs/** non-authoritative."
+  - id: "NK-004"
+    rule: "Fail closed on missing ownership, missing required evidence, unsupported support claims, or unresolved policy conflicts."
+  - id: "NK-005"
+    rule: "Require explicit authority routing before material side effects."
+  - id: "NK-006"
+    rule: "Prohibit hidden human intervention and silent authority widening."
+  - id: "NK-007"
+    rule: "Require mission-backed authority for long-horizon or recurring autonomy."
+  - id: "NK-008"
+    rule: "Require every compensating mechanism to carry an owner, removal review, and retirement trigger."
+fail_closed_rules_ref: ".octon/framework/constitution/obligations/fail-closed.yml"
+evidence_obligations_ref: ".octon/framework/constitution/obligations/evidence.yml"
+normative_precedence_ref: ".octon/framework/constitution/precedence/normative.yml"
+epistemic_precedence_ref: ".octon/framework/constitution/precedence/epistemic.yml"
+support_targets_ref:
+  schema: ".octon/framework/constitution/support-targets.schema.json"
+  authoritative_declaration: ".octon/instance/governance/support-targets.yml"
+  declaration_status: "reserved-until-published"
+amendment_policy:
+  change_control: "explicit constitutional amendment workflow"
+  human_approval_required: true
+  required_artifacts:
+    - "aligned doc updates"
+    - "validator updates"
+    - "documented rationale"
+    - "documented rollback posture"
+review_cadence: "quarterly and on each material constitutional change"
+adoption_state:
+  wave: 0
+  change_profile: "transitional"
+  staged_cutovers:
+    run_contract_requirement: "wave-1"
+    authority_artifact_normalization: "wave-2"
+    disclosure_families: "wave-4"
+    support_target_declarations: "wave-5"

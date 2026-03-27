@@ -1,0 +1,42 @@
+schema_version: "octon-constitution-evidence-obligations-v1"
+retained_evidence_roots:
+  - ".octon/state/evidence/runs/**"
+  - ".octon/state/evidence/control/execution/**"
+  - ".octon/state/evidence/validation/publication/**"
+obligations:
+  - id: "EVI-001"
+    requirement: "Consequential execution retains runtime evidence under state/evidence/runs/**."
+    adoption_status: "active"
+  - id: "EVI-002"
+    requirement: "Control-plane mutations retain durable evidence under state/evidence/control/execution/**."
+    adoption_status: "active"
+  - id: "EVI-003"
+    requirement: >-
+      Profile-governed work records change_profile, release_state,
+      profile-selection facts, rationale, and transitional_exception_note when required.
+    adoption_status: "active"
+  - id: "EVI-004"
+    requirement: >-
+      Publication of runtime-facing effective outputs retains publication
+      receipts under state/evidence/validation/publication/**.
+    adoption_status: "active"
+  - id: "EVI-005"
+    requirement: "Hidden human intervention is prohibited; material intervention must be durably disclosed."
+    adoption_status: "active"
+  - id: "EVI-006"
+    requirement: "Every consequential run emits disclosure artifacts such as RunCard outputs."
+    adoption_status: "staged"
+    activation_wave: 4
+  - id: "EVI-007"
+    requirement: "System-level support claims emit support-target-backed disclosure artifacts such as HarnessCard outputs."
+    adoption_status: "staged"
+    activation_wave: 4
+  - id: "EVI-008"
+    requirement: "Runtime-versus-doc mismatches emit drift evidence or block publication until reconciled."
+    adoption_status: "active"
+  - id: "EVI-009"
+    requirement: >-
+      Support claims and autonomy envelopes must cite explicit support-target
+      declarations once the support-target matrix is published.
+    adoption_status: "staged"
+    activation_wave: 5

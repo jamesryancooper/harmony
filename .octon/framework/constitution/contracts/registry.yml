@@ -1,0 +1,70 @@
+schema_version: "octon-constitution-contract-registry-v1"
+kernel_surfaces:
+  charter:
+    markdown: ".octon/framework/constitution/CHARTER.md"
+    machine: ".octon/framework/constitution/charter.yml"
+    status: "active"
+  precedence:
+    normative: ".octon/framework/constitution/precedence/normative.yml"
+    epistemic: ".octon/framework/constitution/precedence/epistemic.yml"
+    status: "active"
+  obligations:
+    fail_closed: ".octon/framework/constitution/obligations/fail-closed.yml"
+    evidence: ".octon/framework/constitution/obligations/evidence.yml"
+    status: "active"
+  ownership:
+    roles: ".octon/framework/constitution/ownership/roles.yml"
+    status: "active"
+  support_targets:
+    schema: ".octon/framework/constitution/support-targets.schema.json"
+    authoritative_declaration: ".octon/instance/governance/support-targets.yml"
+    status: "schema-only"
+families:
+  - family_id: "objective"
+    path: ".octon/framework/constitution/contracts/objective/**"
+    activation_wave: 1
+    status: "reserved"
+    description: "Workspace, mission, and run objective contracts."
+  - family_id: "authority"
+    path: ".octon/framework/constitution/contracts/authority/**"
+    activation_wave: 2
+    status: "reserved"
+    description: "Approval, exception, revocation, and grant-bundle contracts."
+  - family_id: "runtime"
+    path: ".octon/framework/constitution/contracts/runtime/**"
+    activation_wave: 3
+    status: "reserved"
+    description: "Run-lifecycle, checkpoint, and execution-state contracts."
+  - family_id: "assurance"
+    path: ".octon/framework/constitution/contracts/assurance/**"
+    activation_wave: 4
+    status: "reserved"
+    description: "Proof-plane and assurance gating contracts."
+  - family_id: "disclosure"
+    path: ".octon/framework/constitution/contracts/disclosure/**"
+    activation_wave: 4
+    status: "reserved"
+    description: "RunCard and HarnessCard disclosure contracts."
+  - family_id: "retention"
+    path: ".octon/framework/constitution/contracts/retention/**"
+    activation_wave: 4
+    status: "reserved"
+    description: "Retention, replay, and evidence lifecycle contracts."
+integration_surfaces:
+  workspace_charter_pair:
+    narrative: ".octon/instance/bootstrap/OBJECTIVE.md"
+    machine: ".octon/instance/cognition/context/shared/intent.contract.yml"
+    status: "active-transitional"
+  mission_authority:
+    path: ".octon/instance/orchestration/missions/**"
+    status: "active-transitional"
+  repo_policy_inputs:
+    - ".octon/instance/governance/policies/**"
+    - ".octon/instance/governance/ownership/registry.yml"
+  retained_evidence_roots:
+    - ".octon/state/evidence/runs/**"
+    - ".octon/state/evidence/control/execution/**"
+    - ".octon/state/evidence/validation/publication/**"
+notes:
+  - "Wave 0 establishes the constitutional kernel and registry without cutting over reserved contract families."
+  - "Current mission-first execution remains active until the run-contract cutover lands."

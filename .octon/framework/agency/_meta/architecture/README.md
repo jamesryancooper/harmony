@@ -7,6 +7,11 @@ description: Canonical entrypoint for actor taxonomy, contracts, architecture, a
 
 This is the canonical documentation entrypoint for the `.octon/framework/agency` subsystem.
 
+Repo-local constitutional supremacy lives under
+`/.octon/framework/constitution/**`. Agency governance files below are
+subordinate subsystem application contracts, not the top-level constitutional
+kernel.
+
 ## Canonical Set
 
 - `.octon/framework/agency/_meta/architecture/specification.md`
@@ -31,6 +36,8 @@ This is the canonical documentation entrypoint for the `.octon/framework/agency`
 
 ## Source-of-Truth Files
 
+- `.octon/framework/constitution/CHARTER.md`
+- `.octon/framework/constitution/charter.yml`
 - `.octon/framework/agency/manifest.yml`
 - `.octon/framework/agency/governance/CONSTITUTION.md`
 - `.octon/framework/agency/governance/DELEGATION.md`

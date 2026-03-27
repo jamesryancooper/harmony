@@ -1,0 +1,58 @@
+schema_version: "octon-constitution-precedence-v1"
+precedence_type: "epistemic"
+summary: "Factual grounding order for runtime state, drift, and evidence disputes."
+layers:
+  - rank: 1
+    source: "live-runtime-observations-and-validated-receipts"
+    surfaces:
+      - ".octon/state/evidence/**"
+      - "live runtime observations"
+    decision_rule: "Validated runtime evidence wins for factual state."
+  - rank: 2
+    source: "deterministic-validator-outputs-and-measurements"
+    surfaces:
+      - "validator outputs"
+      - "measurement records"
+    decision_rule: "Deterministic checks outrank prose when asserting current facts."
+  - rank: 3
+    source: "current-repo-and-worktree-state"
+    surfaces:
+      - "checked-out files"
+      - "current worktree"
+    decision_rule: "The present repository state outranks stale summaries."
+  - rank: 4
+    source: "mutable-control-truth"
+    surfaces:
+      - ".octon/state/control/**"
+    decision_rule: "Current control truth outranks derived projections for live status."
+  - rank: 5
+    source: "fresh-generated-effective-outputs"
+    surfaces:
+      - ".octon/generated/effective/**"
+    decision_rule: "Freshness-valid generated effective outputs may describe live routing state."
+  - rank: 6
+    source: "provenance-backed-continuity-artifacts"
+    surfaces:
+      - ".octon/state/continuity/**"
+    decision_rule: "Continuity artifacts inform resumption but do not outrank live evidence."
+  - rank: 7
+    source: "authored-docs-and-charters"
+    surfaces:
+      - ".octon/framework/constitution/**"
+      - ".octon/framework/cognition/_meta/architecture/**"
+      - ".octon/instance/bootstrap/**"
+    decision_rule: "Authored docs define intent and rules, but not live facts when receipts disagree."
+  - rank: 8
+    source: "conversation-history-and-operator-comments"
+    surfaces:
+      - "chat history"
+      - "operator comments"
+    decision_rule: "Conversation is advisory unless materialized into authority or evidence surfaces."
+  - rank: 9
+    source: "model-priors"
+    surfaces:
+      - "model recall"
+    decision_rule: "Model priors are the weakest epistemic source."
+conflict_rule: >-
+  If runtime evidence conflicts with docs, runtime evidence wins for factual
+  state and the mismatch becomes a drift incident or alignment failure.

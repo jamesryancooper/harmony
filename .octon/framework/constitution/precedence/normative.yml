@@ -1,0 +1,105 @@
+schema_version: "octon-constitution-precedence-v1"
+precedence_type: "normative"
+summary: "Normative authority order for repo-local control decisions."
+repo_class_root_fallback_order:
+  - "framework"
+  - "instance"
+  - "state"
+  - "generated"
+  - "inputs"
+layers:
+  - rank: 1
+    authority: "non-waivable-external-obligations"
+    surfaces:
+      - "external obligations"
+      - "break-glass directives"
+      - "live revocations"
+    decision_rule: "These outrank all repo-local authority."
+    adoption_status: "active"
+  - rank: 2
+    authority: "constitutional-kernel"
+    surfaces:
+      - ".octon/framework/constitution/CHARTER.md"
+      - ".octon/framework/constitution/charter.yml"
+      - ".octon/framework/constitution/obligations/fail-closed.yml"
+      - ".octon/framework/constitution/obligations/evidence.yml"
+    decision_rule: "The constitutional kernel is the supreme repo-local control regime."
+    adoption_status: "active"
+  - rank: 3
+    authority: "repo-governance-declarations"
+    surfaces:
+      - ".octon/instance/governance/support-targets.yml"
+      - ".octon/instance/governance/policies/**"
+      - ".octon/instance/governance/contracts/**"
+    decision_rule: >-
+      Published repo-owned policy families and support-target declarations apply
+      beneath the kernel.
+    adoption_status: "partial"
+    notes:
+      - "Repo policy families are active."
+      - "Support-target declarations are reserved until their publication wave lands."
+  - rank: 4
+    authority: "run-specific-authority-artifacts"
+    surfaces:
+      - ".octon/state/control/execution/approvals/**"
+      - ".octon/state/control/execution/exceptions/**"
+      - ".octon/state/control/execution/revocations/**"
+    decision_rule: >-
+      Approval, exception, and revocation artifacts govern the current run when
+      their normalization cutover is complete.
+    adoption_status: "staged"
+    activation_wave: 2
+  - rank: 5
+    authority: "workspace-charter-pair"
+    surfaces:
+      - ".octon/instance/bootstrap/OBJECTIVE.md"
+      - ".octon/instance/cognition/context/shared/intent.contract.yml"
+    decision_rule: "Workspace-wide objective authority applies beneath the kernel and repo policy."
+    adoption_status: "active"
+  - rank: 6
+    authority: "mission-charter"
+    surfaces:
+      - ".octon/instance/orchestration/missions/**"
+    decision_rule: "Mission authority governs continuity, ownership, overlap, and long-horizon autonomy."
+    adoption_status: "active"
+  - rank: 7
+    authority: "run-contract"
+    surfaces:
+      - ".octon/state/control/execution/runs/<run-id>/run.yml"
+    decision_rule: "Run contracts become the atomic execution authority when their cutover lands."
+    adoption_status: "staged"
+    activation_wave: 1
+  - rank: 8
+    authority: "capability-tool-and-adapter-contracts"
+    surfaces:
+      - ".octon/framework/capabilities/**"
+      - ".octon/framework/engine/runtime/adapters/**"
+    decision_rule: "Capability and adapter contracts may narrow execution but may not widen authority."
+    adoption_status: "partial"
+    notes:
+      - "Capability contracts are active."
+      - "Generalized model and host adapter contracts remain staged."
+  - rank: 9
+    authority: "structural-architecture-and-placement-specs"
+    surfaces:
+      - ".octon/framework/cognition/_meta/architecture/specification.md"
+      - ".octon/framework/cognition/_meta/architecture/contract-registry.yml"
+      - ".octon/README.md"
+      - ".octon/instance/bootstrap/START.md"
+    decision_rule: >-
+      Structural architecture and placement specs remain authoritative for
+      topology and placement, but they may not override higher constitutional
+      layers.
+    adoption_status: "active"
+  - rank: 10
+    authority: "informative-context"
+    surfaces:
+      - "informative docs"
+      - "generated summaries"
+      - "chat history"
+      - "model priors"
+    decision_rule: "Informative context may guide interpretation but never mint authority."
+    adoption_status: "active"
+conflict_rule: >-
+  When two applicable surfaces occupy the same layer, resolve by declared
+  overlay rules and class-root fallback order without overriding higher layers.

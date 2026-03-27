@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/support-targets.schema.json",
+  "title": "Octon Support Target Matrix",
+  "description": "Schema for .octon/instance/governance/support-targets.yml. Wave 0 publishes the schema before the authoritative declaration is populated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "owner",
+    "default_route",
+    "tiers",
+    "compatibility_matrix"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-support-targets-v1"
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "default_route": {
+      "type": "string",
+      "enum": ["deny", "stage_only", "escalate"]
+    },
+    "review_cadence": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "workload",
+        "language_resource",
+        "locale"
+      ],
+      "properties": {
+        "model": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/model_tier"
+          }
+        },
+        "workload": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/workload_tier"
+          }
+        },
+        "language_resource": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/language_resource_tier"
+          }
+        },
+        "locale": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/locale_tier"
+          }
+        }
+      }
+    },
+    "compatibility_matrix": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/matrix_entry"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "model_tier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "default_autonomy", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": ["MT-A", "MT-B", "MT-C"]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "default_autonomy": {
+          "type": "string",
+          "enum": ["full", "bounded", "read_only", "stage_only"]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "workload_tier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "default_route", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": ["WT-1", "WT-2", "WT-3", "WT-4"]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "default_route": {
+          "type": "string",
+          "enum": ["allow", "stage_only", "escalate", "deny"]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "language_resource_tier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": ["LT-REF", "LT-EXT", "LT-EXP"]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "locale_tier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": ["LOC-EN", "LOC-MX", "LOC-EXP"]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "matrix_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_tier",
+        "workload_tier",
+        "language_resource_tier",
+        "locale_tier",
+        "support_status",
+        "default_route"
+      ],
+      "properties": {
+        "model_tier": {
+          "type": "string",
+          "enum": ["MT-A", "MT-B", "MT-C"]
+        },
+        "workload_tier": {
+          "type": "string",
+          "enum": ["WT-1", "WT-2", "WT-3", "WT-4"]
+        },
+        "language_resource_tier": {
+          "type": "string",
+          "enum": ["LT-REF", "LT-EXT", "LT-EXP"]
+        },
+        "locale_tier": {
+          "type": "string",
+          "enum": ["LOC-EN", "LOC-MX", "LOC-EXP"]
+        },
+        "support_status": {
+          "type": "string",
+          "enum": ["supported", "reduced", "experimental", "unsupported"]
+        },
+        "default_route": {
+          "type": "string",
+          "enum": ["allow", "stage_only", "escalate", "deny"]
+        },
+        "requires_mission": {
+          "type": "boolean"
+        },
+        "allowed_capability_packs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required_evidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

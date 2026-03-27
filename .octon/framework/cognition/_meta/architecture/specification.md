@@ -11,6 +11,24 @@ status: Active
 Define the authoritative cross-subsystem contract for `/.octon/` after the
 super-root cutover.
 
+## Constitutional Authority
+
+The repo-local supreme control regime for `/.octon/` lives under
+`framework/constitution/**`:
+
+- `/.octon/framework/constitution/CHARTER.md`
+- `/.octon/framework/constitution/charter.yml`
+- `/.octon/framework/constitution/precedence/{normative.yml,epistemic.yml}`
+- `/.octon/framework/constitution/obligations/{fail-closed.yml,evidence.yml}`
+- `/.octon/framework/constitution/ownership/roles.yml`
+- `/.octon/framework/constitution/contracts/registry.yml`
+- `/.octon/framework/constitution/support-targets.schema.json`
+
+This umbrella specification remains the canonical cross-subsystem topology,
+placement, and structural SSOT surface. It is subordinate to the
+constitutional kernel and must not restate competing repo-local constitutional
+authority.
+
 ## Root Invariants
 
 1. `/.octon/` is the single authoritative super-root.
@@ -143,7 +161,11 @@ super-root cutover.
     plan under `instance/cognition/context/shared/migrations/**`; proposal
     packets remain historical lineage only.
 
-## Precedence
+## Class-Root Authority Order
+
+The order below is the structural class-root resolution order for placement and
+source-of-truth family conflicts. Normative and epistemic precedence live under
+`framework/constitution/precedence/**`.
 
 1. `framework/**` base contracts and runtime authority
 2. `instance/**` repo-specific authored authority
@@ -165,15 +187,17 @@ invalid.
 
 ### OCTON-SPEC-015
 
-The umbrella specification is the canonical cross-subsystem contract registry
-surface for super-root authority, placement, and fail-closed behavior.
+The umbrella specification is the canonical cross-subsystem topology and
+placement registry surface for the super-root. It must align with, and never
+outrank, the constitutional kernel.
 
 ### OCTON-SPEC-016
 
-The umbrella specification owns the cross-subsystem SSOT precedence contract
-for runtime, governance, and practices.
+The umbrella specification owns the structural SSOT matrix for runtime,
+governance, and practices. Normative and epistemic precedence belong to the
+constitutional kernel.
 
-## SSOT Precedence Matrix (Runtime, Governance, Practices)
+## Structural SSOT Matrix (Runtime, Governance, Practices)
 
 | Authority slice | Canonical surface | Rule |
 | --- | --- | --- |
@@ -183,6 +207,21 @@ for runtime, governance, and practices.
 
 ## Canonical References
 
+- constitutional charter: `/.octon/framework/constitution/CHARTER.md`
+- constitutional manifest: `/.octon/framework/constitution/charter.yml`
+- normative precedence:
+  `/.octon/framework/constitution/precedence/normative.yml`
+- epistemic precedence:
+  `/.octon/framework/constitution/precedence/epistemic.yml`
+- fail-closed obligations:
+  `/.octon/framework/constitution/obligations/fail-closed.yml`
+- evidence obligations:
+  `/.octon/framework/constitution/obligations/evidence.yml`
+- ownership roles: `/.octon/framework/constitution/ownership/roles.yml`
+- constitutional contract registry:
+  `/.octon/framework/constitution/contracts/registry.yml`
+- support-target schema:
+  `/.octon/framework/constitution/support-targets.schema.json`
 - root manifest: `/.octon/octon.yml`
 - overlay registry: `/.octon/framework/overlay-points/registry.yml`
 - overlay enablement: `/.octon/instance/manifest.yml#enabled_overlay_points`

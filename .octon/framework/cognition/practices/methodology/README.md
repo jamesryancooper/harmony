@@ -7,6 +7,7 @@ scope: methodology-governance
 last_reviewed: 2026-03-05
 canonical_links:
   - "/AGENTS.md"
+  - "/.octon/framework/constitution/CHARTER.md"
   - "/.octon/framework/agency/governance/CONSTITUTION.md"
   - "/.octon/framework/agency/governance/DELEGATION.md"
   - "/.octon/framework/agency/governance/MEMORY.md"

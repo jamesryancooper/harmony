@@ -7,6 +7,8 @@ scope: methodology-governance
 last_reviewed: 2026-03-05
 canonical_links:
   - "/AGENTS.md"
+  - "/.octon/framework/constitution/CHARTER.md"
+  - "/.octon/framework/constitution/precedence/normative.yml"
   - "/.octon/framework/agency/governance/CONSTITUTION.md"
   - "/.octon/framework/agency/governance/DELEGATION.md"
   - "/.octon/framework/agency/governance/MEMORY.md"
@@ -75,8 +77,11 @@ Methodology policy checks should run in CI using existing assurance surfaces rat
 
 ## Source of Truth Hierarchy
 
-1. **Repository and agency execution contracts (binding precedence)**
+1. **Repository constitutional and agency execution contracts (binding precedence)**
    - `/AGENTS.md`
+   - `/.octon/framework/constitution/CHARTER.md`
+   - `/.octon/framework/constitution/obligations/fail-closed.yml`
+   - `/.octon/framework/constitution/precedence/normative.yml`
    - `/.octon/framework/agency/governance/CONSTITUTION.md`
    - `/.octon/framework/agency/governance/DELEGATION.md`
    - `/.octon/framework/agency/governance/MEMORY.md`
