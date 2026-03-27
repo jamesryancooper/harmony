@@ -1574,6 +1574,8 @@ stages:
             .expect("create mission policy fixture");
         fs::create_dir_all(octon_dir.join("instance/governance/ownership"))
             .expect("create ownership fixture");
+        fs::create_dir_all(octon_dir.join("instance/governance"))
+            .expect("create governance fixture");
         fs::create_dir_all(octon_dir.join("state/control/execution/missions/sample-mission"))
             .expect("create mission control fixture");
         fs::create_dir_all(octon_dir.join("generated/effective/orchestration/missions/sample-mission"))
@@ -1600,9 +1602,14 @@ stages:
         .expect("write mission autonomy policy");
         fs::write(
             octon_dir.join("instance/governance/ownership/registry.yml"),
-            "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators: []\nassets: []\nservices: []\nsubscriptions: {}\n",
+            "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators:\n  - operator_id: \"fixtures\"\n    display_name: \"Fixtures\"\n    contact: \"repo://fixtures\"\ndefaults:\n  operator_id: \"fixtures\"\n  support_tier: \"repo-local-transitional\"\nassets:\n  - asset_id: \"workflow-scope\"\n    path_globs:\n      - \"workflow-scope\"\n    owners:\n      - \"fixtures\"\nservices: []\nsubscriptions: {}\n",
         )
         .expect("write ownership registry");
+        fs::write(
+            octon_dir.join("instance/governance/support-targets.yml"),
+            "schema_version: \"octon-support-targets-v1\"\nowner: \"fixtures\"\ndefault_route: \"deny\"\ntiers:\n  model:\n    - id: \"MT-B\"\n      label: \"repo-local-governed\"\n      default_autonomy: \"bounded\"\n      description: \"fixture\"\n  workload:\n    - id: \"WT-2\"\n      label: \"repo-local-transitional\"\n      default_route: \"allow\"\n      description: \"fixture\"\n  language_resource:\n    - id: \"LT-REF\"\n      label: \"reference-owned\"\n      description: \"fixture\"\n  locale:\n    - id: \"LOC-EN\"\n      label: \"english-primary\"\n      description: \"fixture\"\ncompatibility_matrix:\n  - model_tier: \"MT-B\"\n    workload_tier: \"WT-2\"\n    language_resource_tier: \"LT-REF\"\n    locale_tier: \"LOC-EN\"\n    support_status: \"supported\"\n    default_route: \"allow\"\n",
+        )
+        .expect("write support targets");
         fs::write(
             octon_dir.join("state/control/execution/missions/sample-mission/lease.yml"),
             "schema_version: \"mission-control-lease-v1\"\nmission_id: \"sample-mission\"\nlease_id: \"lease-sample\"\nstate: \"active\"\nissued_by: \"operator://fixtures\"\nissued_at: \"2026-03-23T00:00:00Z\"\nexpires_at: \"2099-03-30T00:00:00Z\"\ncontinuation_scope:\n  summary: \"Fixture continuation\"\n  allowed_execution_postures:\n    - \"continuous\"\n  max_concurrent_runs: 1\n  allowed_action_classes:\n    - \"repo-maintenance\"\n  default_safing_subset:\n    - \"observe_only\"\n    - \"stage_only\"\nrevocation_reason: null\nlast_reviewed_at: \"2026-03-23T00:00:00Z\"\n",
