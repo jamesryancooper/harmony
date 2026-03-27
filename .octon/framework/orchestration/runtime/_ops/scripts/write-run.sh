@@ -32,12 +32,20 @@ validate_risk_class() {
 validate_support_tier() {
   local support_tier="$1"
   local support_targets_file="$OCTON_DIR/instance/governance/support-targets.yml"
+  local declared_tiers=""
   if [[ ! -f "$support_targets_file" ]]; then
     echo "support-target declaration missing: $support_targets_file" >&2
     exit 1
   fi
 
-  if yq -e --arg support_tier "$support_tier" '.tiers.workload[]? | select(.label == $support_tier or .id == $support_tier)' "$support_targets_file" >/dev/null 2>&1; then
+  declared_tiers="$(
+    {
+      yq -r '.tiers.workload[]?.label' "$support_targets_file"
+      yq -r '.tiers.workload[]?.id' "$support_targets_file"
+    } 2>/dev/null || true
+  )"
+
+  if printf '%s\n' "$declared_tiers" | grep -Fxq -- "$support_tier"; then
     return 0
   fi
 

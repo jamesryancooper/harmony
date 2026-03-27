@@ -55,6 +55,7 @@ create_fixture() {
 
   mkdir -p "$fixture_root/.octon/framework/orchestration/runtime"
   mkdir -p "$fixture_root/.octon/framework/orchestration/practices"
+  mkdir -p "$fixture_root/.octon/instance/governance"
   mkdir -p "$fixture_root/.octon/state/evidence/decisions/repo"
   mkdir -p "$fixture_root/.octon/state/evidence/runs"
   mkdir -p "$fixture_root/.octon/instance/cognition/context/shared"
@@ -65,6 +66,8 @@ create_fixture() {
   cp "$REPO_ROOT/.octon/state/evidence/decisions/repo/README.md" "$fixture_root/.octon/state/evidence/decisions/repo/README.md"
   cp "$REPO_ROOT/.octon/state/evidence/decisions/repo/retention.json" "$fixture_root/.octon/state/evidence/decisions/repo/retention.json"
   cp "$REPO_ROOT/.octon/state/evidence/runs/README.md" "$fixture_root/.octon/state/evidence/runs/README.md"
+  cp "$REPO_ROOT/.octon/instance/governance/support-targets.yml" \
+    "$fixture_root/.octon/instance/governance/support-targets.yml"
   cp "$REPO_ROOT/.octon/instance/cognition/context/shared/workflow-quality.md" \
     "$fixture_root/.octon/instance/cognition/context/shared/workflow-quality.md"
   cp "$REPO_ROOT/.octon/instance/cognition/context/shared/workflow-gaps.md" \
@@ -74,10 +77,11 @@ create_fixture() {
   # committed live run projections from the source repo.
   find "$fixture_root/.octon/framework/orchestration/runtime/runs" \
     -mindepth 1 \
+    -maxdepth 1 \
     ! -name 'README.md' \
     ! -name 'index.yml' \
     ! -name '.gitkeep' \
-    -delete
+    -exec rm -rf {} +
   mkdir -p "$fixture_root/.octon/framework/orchestration/runtime/runs/by-surface/workflows"
   mkdir -p "$fixture_root/.octon/framework/orchestration/runtime/runs/by-surface/missions"
   mkdir -p "$fixture_root/.octon/framework/orchestration/runtime/runs/by-surface/automations"
