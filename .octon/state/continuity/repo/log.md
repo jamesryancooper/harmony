@@ -31,6 +31,83 @@ mutability: append-only
 
 - None
 
+## 2026-03-27
+
+**Session focus:** Record explicit Wave 4 completion status
+
+**Completed:**
+
+- Verified the Wave 4 remediation through the passing targeted validator stack
+  and a full `alignment-check.sh --profile harness` rerun
+- Updated the Wave 4 migration evidence so the repo now records Wave 4 as
+  complete rather than only remediated
+
+**Next:**
+
+- Proceed to the next constitutional wave; no open Wave 4 implementation gaps
+  remain in the canonical run-root model
+
+**Blockers:**
+
+- None
+
+## 2026-03-27
+
+**Session focus:** Remediate the remaining Wave 4 assurance, benchmark, and
+evaluator gaps
+
+**Completed:**
+
+- Added the maintainability proof plane, evaluator-routing contracts, a
+  reusable evaluator-review writer, a reusable HarnessCard writer, and a lab
+  catalog for scenario and benchmark disclosure assets
+- Added a generic `write-run.sh backfill-wave4` path, backfilled the
+  `run-wave3-runtime-bridge-20260327` run bundle to include maintainability
+  proof, and seeded a second normalized consequential benchmark run:
+  `run-wave4-benchmark-evaluator-20260327`
+- Added retained benchmark measurements, benchmark scenario proof, approved
+  evaluator review, and a benchmark HarnessCard, then passed the targeted
+  Wave 4 validators and a full `alignment-check.sh --profile harness` rerun
+
+**Next:**
+
+- Only pursue human-guided historical reconstruction if older evidence-only
+  run directories ever need full run-contract-era disclosure
+- Continue the next constitutional wave beyond Wave 4 remediation
+
+**Blockers:**
+
+- None
+
+## 2026-03-27
+
+**Session focus:** Implement Wave 4 assurance, lab, observability, and
+disclosure expansion
+
+**Completed:**
+
+- Promoted the constitutional assurance and disclosure contract families,
+  recorded the transitional Wave 4 profile-selection receipt, and updated the
+  kernel, root-manifest, bootstrap, and architecture docs to reference the
+  new Wave 4 surfaces
+- Added first-class functional, behavioral, recovery, and evaluator proof
+  planes plus top-level `framework/lab/**` and
+  `framework/observability/**` surfaces, then extended the retained sample run
+  bundle with replay, proof-plane, measurement, intervention, and RunCard
+  artifacts
+- Seeded retained lab scenario proof and a support-target-backed HarnessCard,
+  added the dedicated Wave 4 validator, and passed the targeted validator
+  stack plus `alignment-check.sh --profile harness`
+
+**Next:**
+
+- Broaden lab scenarios and evaluator workflows beyond the initial Wave 4 seed
+- Continue Wave 5 adapter hardening and support-target disclosure follow-on
+
+**Blockers:**
+
+- None
+
 ## 2026-03-22
 
 **Session focus:** Close the remaining harness-integrity-tightening completeness gaps

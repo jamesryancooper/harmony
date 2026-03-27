@@ -1,6 +1,7 @@
 schema_version: "octon-constitution-evidence-obligations-v1"
 retained_evidence_roots:
   - ".octon/state/evidence/runs/**"
+  - ".octon/state/evidence/lab/**"
   - ".octon/state/evidence/control/execution/**"
   - ".octon/state/evidence/validation/publication/**"
 obligations:
@@ -25,11 +26,11 @@ obligations:
     adoption_status: "active"
   - id: "EVI-006"
     requirement: "Every consequential run emits disclosure artifacts such as RunCard outputs."
-    adoption_status: "staged"
+    adoption_status: "active-transitional"
     activation_wave: 4
   - id: "EVI-007"
     requirement: "System-level support claims emit support-target-backed disclosure artifacts such as HarnessCard outputs."
-    adoption_status: "staged"
+    adoption_status: "active-transitional"
     activation_wave: 4
   - id: "EVI-008"
     requirement: "Runtime-versus-doc mismatches emit drift evidence or block publication until reconciled."
@@ -40,3 +41,9 @@ obligations:
       declarations once the support-target matrix is published.
     adoption_status: "active-transitional"
     activation_wave: 2
+  - id: "EVI-010"
+    requirement: >-
+      Behavioral claims cite retained lab, replay, scenario, or shadow-run
+      evidence before they can pass consequential disclosure gates.
+    adoption_status: "active-transitional"
+    activation_wave: 4

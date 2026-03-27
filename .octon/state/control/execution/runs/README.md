@@ -11,6 +11,8 @@ the transitional coexistence window:
 - stage attempts belong under `stage-attempts/**` beneath the bound run root
 - checkpoints, runtime-state, and rollback-posture belong under the same run
   control root
+- assurance, measurement, intervention, replay, and disclosure evidence belong
+  under the matching retained run evidence root
 - mission remains the continuity and long-horizon autonomy container, but it
   consumes run evidence instead of substituting for it
 

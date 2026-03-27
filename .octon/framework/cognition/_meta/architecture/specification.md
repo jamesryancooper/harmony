@@ -24,6 +24,8 @@ The repo-local supreme control regime for `/.octon/` lives under
 - `/.octon/framework/constitution/contracts/registry.yml`
 - `/.octon/framework/constitution/contracts/authority/**`
 - `/.octon/framework/constitution/contracts/runtime/**`
+- `/.octon/framework/constitution/contracts/assurance/**`
+- `/.octon/framework/constitution/contracts/disclosure/**`
 - `/.octon/framework/constitution/support-targets.schema.json`
 
 This umbrella specification remains the canonical cross-subsystem topology,
@@ -38,7 +40,8 @@ authority.
    `state/`, and `generated/`.
 3. Only `framework/**` and `instance/**` are authored authority.
 4. `framework/**` is limited to portable authored core and portable helper
-   assets only; repo-local mutable state, retained evidence, and generated
+   assets only, including assurance, lab, and observability contract
+   surfaces; repo-local mutable state, retained evidence, and generated
    outputs are forbidden there.
 5. `state/**` is authoritative only as operational truth and retained
    evidence.
@@ -86,7 +89,8 @@ authority.
 28. `state/continuity/scopes/<scope-id>/**` is legal only for declared,
     non-quarantined scopes.
 29. `state/evidence/**` is retained evidence and must not be treated as
-    rebuildable generated output.
+    rebuildable generated output, including run-local proof/disclosure
+    families and lab evidence.
 30. `instance/extensions.yml`, `state/control/extensions/active.yml`,
     `state/control/extensions/quarantine.yml`, and
     `generated/effective/extensions/**` form the canonical desired/actual/
@@ -127,53 +131,56 @@ authority.
 45. Protected execution is legal only under `hard-enforce`.
 46. Workflow contracts use `workflow-contract-v2` and declare stage-level
     authorization metadata.
-47. Runtime execution evidence, receipts, checkpoints, replay pointers, and
-    retained run evidence belong under `state/evidence/runs/**`.
-48. Canonical mutable execution control truth belongs under
+47. Runtime execution evidence, receipts, checkpoints, replay manifests and
+    pointers, retained run evidence, assurance reports, measurements,
+    interventions, and RunCards belong under `state/evidence/runs/**`.
+48. Lab scenario proof bundles, benchmark measurements, evaluator reviews, and
+    HarnessCards belong under `state/evidence/lab/**`.
+49. Canonical mutable execution control truth belongs under
     `state/control/execution/**`; per-run lifecycle control roots live under
     `state/control/execution/runs/<run-id>/**`.
-49. Canonical approval, exception, and revocation control truth live only under
+50. Canonical approval, exception, and revocation control truth live only under
     `state/control/execution/{approvals,exceptions,revocations}/**`.
-50. Canonical ephemeral execution scratch belongs under
+51. Canonical ephemeral execution scratch belongs under
     `generated/.tmp/execution/**`.
-51. Repo-owned network egress policy lives at
+52. Repo-owned network egress policy lives at
     `instance/governance/policies/network-egress.yml`.
-52. Repo-owned execution budget policy lives at
+53. Repo-owned execution budget policy lives at
     `instance/governance/policies/execution-budgets.yml`.
-53. Repo-owned support-target declarations live at
+54. Repo-owned support-target declarations live at
     `instance/governance/support-targets.yml`.
-54. The machine-readable execution path and policy invariant registry lives at
+55. The machine-readable execution path and policy invariant registry lives at
     `framework/cognition/_meta/architecture/contract-registry.yml`.
-55. Mission authority discovery lives only under
+56. Mission authority discovery lives only under
     `instance/orchestration/missions/**`; active mission charters use
     `octon-mission-v2` and remain continuity containers rather than the
     atomic execution unit.
-56. Mission-scoped mutable execution control truth lives only under
+57. Mission-scoped mutable execution control truth lives only under
     `state/control/execution/missions/<mission-id>/**`.
-57. Consequential run contracts live only under
+58. Consequential run contracts live only under
     `state/control/execution/runs/<run-id>/run-contract.yml`.
-58. Runtime-state, rollback-posture, and control checkpoints for consequential
+59. Runtime-state, rollback-posture, and control checkpoints for consequential
     runs live only under `state/control/execution/runs/<run-id>/**`.
-59. Retained control-plane mutation evidence and authority decision evidence
+60. Retained control-plane mutation evidence and authority decision evidence
     live only under
     `state/evidence/control/execution/**`.
-60. Mission continuity and handoff state lives only under
+61. Mission continuity and handoff state lives only under
     `state/continuity/repo/missions/<mission-id>/**`.
-61. Mission/operator read models under
+62. Mission/operator read models under
     `generated/cognition/summaries/{missions,operators}/**` are derived only
     from canonical authority, control, evidence, and continuity surfaces and
     consume per-run run evidence when runs are bound.
-62. Mission effective scenario resolution lives only under
+63. Mission effective scenario resolution lives only under
     `generated/effective/orchestration/missions/<mission-id>/scenario-resolution.yml`
     and remains derived-only, freshness-bounded runtime input.
-63. No autonomous runtime path may silently fall back to mission-less
+64. No autonomous runtime path may silently fall back to mission-less
     execution after the mission-scoped reversible autonomy cutover.
-64. External UI, chat, or in-memory session state may not become a second
+65. External UI, chat, or in-memory session state may not become a second
     authoritative mission control plane.
-65. Labels, comments, checks, and similar host affordances are projection-only
+66. Labels, comments, checks, and similar host affordances are projection-only
     until runtime materializes canonical authority artifacts under
     `state/control/execution/**`.
-66. For Mission-Scoped Reversible Autonomy, runtime closeout records under
+67. For Mission-Scoped Reversible Autonomy, runtime closeout records under
     `instance/cognition/decisions/067-*.md`; proposal-lineage closeout records
     under `instance/cognition/decisions/068-*.md` plus the matching migration
     plan under `instance/cognition/context/shared/migrations/**`; proposal
@@ -242,6 +249,10 @@ constitutional kernel.
   `/.octon/framework/constitution/contracts/authority/**`
 - constitutional runtime contracts:
   `/.octon/framework/constitution/contracts/runtime/**`
+- constitutional assurance contracts:
+  `/.octon/framework/constitution/contracts/assurance/**`
+- constitutional disclosure contracts:
+  `/.octon/framework/constitution/contracts/disclosure/**`
 - constitutional contract registry:
   `/.octon/framework/constitution/contracts/registry.yml`
 - support-target schema:
@@ -254,6 +265,10 @@ constitutional kernel.
 - projected ingress: `/.octon/AGENTS.md`
 - desired extension config: `/.octon/instance/extensions.yml`
 - raw additive extension packs: `/.octon/inputs/additive/extensions/`
+- lab framework root: `/.octon/framework/lab/`
+- observability framework root: `/.octon/framework/observability/`
+- maintainability proof plane: `/.octon/framework/assurance/maintainability/`
+- retained lab evidence root: `/.octon/state/evidence/lab/`
 - raw exploratory proposals: `/.octon/inputs/exploratory/proposals/`
 - archived exploratory proposals:
   `/.octon/inputs/exploratory/proposals/.archive/`

@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/disclosure/run-card-v1.schema.json",
+  "title": "Octon RunCard v1",
+  "description": "Normalized disclosure artifact for one consequential run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "status",
+    "summary",
+    "support_tier",
+    "support_target_ref",
+    "authority_refs",
+    "proof_plane_refs",
+    "measurement_ref",
+    "intervention_ref",
+    "replay_ref",
+    "known_limits",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "run-card-v1"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "running",
+        "succeeded",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "support_tier": {
+      "type": "string",
+      "minLength": 1
+    },
+    "support_target_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_contract",
+        "decision_artifact",
+        "retained_run_evidence"
+      ],
+      "properties": {
+        "run_contract": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_artifact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grant_bundle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retained_run_evidence": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "proof_plane_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "functional",
+        "behavioral",
+        "maintainability",
+        "recovery",
+        "evaluator"
+      ],
+      "properties": {
+        "structural_gate_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "governance_gate_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "functional": {
+          "type": "string",
+          "minLength": 1
+        },
+        "behavioral": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maintainability": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recovery": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluator": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "measurement_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intervention_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "replay_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "known_limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -38,12 +38,12 @@ families:
   - family_id: "assurance"
     path: ".octon/framework/constitution/contracts/assurance/**"
     activation_wave: 4
-    status: "reserved"
+    status: "active-transitional"
     description: "Proof-plane and assurance gating contracts."
   - family_id: "disclosure"
     path: ".octon/framework/constitution/contracts/disclosure/**"
     activation_wave: 4
-    status: "reserved"
+    status: "active-transitional"
     description: "RunCard and HarnessCard disclosure contracts."
   - family_id: "retention"
     path: ".octon/framework/constitution/contracts/retention/**"
@@ -60,6 +60,12 @@ integration_surfaces:
   runtime_contract_family:
     root: ".octon/framework/constitution/contracts/runtime/**"
     status: "active-transitional"
+  assurance_contract_family:
+    root: ".octon/framework/constitution/contracts/assurance/**"
+    status: "active-transitional"
+  disclosure_contract_family:
+    root: ".octon/framework/constitution/contracts/disclosure/**"
+    status: "active-transitional"
   workspace_charter_pair:
     narrative: ".octon/instance/bootstrap/OBJECTIVE.md"
     machine: ".octon/instance/cognition/context/shared/intent.contract.yml"
@@ -75,6 +81,9 @@ integration_surfaces:
   run_evidence_root:
     path: ".octon/state/evidence/runs/**"
     status: "active-transitional"
+  lab_evidence_root:
+    path: ".octon/state/evidence/lab/**"
+    status: "active-transitional"
   authority_control_roots:
     approvals: ".octon/state/control/execution/approvals/**"
     exceptions: ".octon/state/control/execution/exceptions/**"
@@ -86,6 +95,7 @@ integration_surfaces:
     - ".octon/instance/governance/support-targets.yml"
   retained_evidence_roots:
     - ".octon/state/evidence/runs/**"
+    - ".octon/state/evidence/lab/**"
     - ".octon/state/evidence/control/execution/**"
     - ".octon/state/evidence/validation/publication/**"
 notes:
@@ -93,3 +103,5 @@ notes:
   - "Wave 1 promotes the workspace objective pair, defines run-contract and stage-attempt schemas, and publishes the canonical run-control root."
   - "Wave 2 activates the authority contract family, publishes support-target declarations for routing, and normalizes approval, exception, revocation, and decision evidence roots."
   - "Wave 3 activates the runtime contract family, makes run roots the primary execution-time unit of truth, and bridges mission continuity plus generated read models onto per-run evidence."
+  - "Wave 4 activates the assurance and disclosure contract families, promotes lab and observability surfaces, and extends retained run evidence with proof-plane, measurement, intervention, and disclosure families."
+  - "Wave 4 remediation adds the maintainability proof plane, reusable evaluator and HarnessCard writers, benchmark-backed lab catalogs, and a generic run evidence backfill path."

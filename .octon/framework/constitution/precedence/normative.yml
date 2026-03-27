@@ -83,8 +83,13 @@ layers:
       - ".octon/state/control/execution/runs/<run-id>/runtime-state.yml"
       - ".octon/state/control/execution/runs/<run-id>/rollback-posture.yml"
       - ".octon/state/control/execution/runs/<run-id>/checkpoints/**"
-      - ".octon/state/evidence/runs/<run-id>/{receipts/**,checkpoints/**,replay-pointers.yml,trace-pointers.yml}"
-    decision_rule: "Bound run lifecycle files govern execution-time status, rollback posture, durable checkpoints, and replay pointers beneath the bound run contract."
+      - ".octon/state/evidence/runs/<run-id>/{receipts/**,checkpoints/**,replay/**,assurance/**,measurements/**,interventions/**,disclosure/**,replay-pointers.yml,trace-pointers.yml}"
+    decision_rule: >-
+      Bound run lifecycle files govern execution-time status, rollback
+      posture, durable checkpoints, replay manifests and pointers, proof-plane
+      evidence, observability evidence, and RunCard disclosure beneath the
+      bound run contract. These artifacts summarize authority and evidence but
+      may not widen authority.
     adoption_status: "active-transitional"
     activation_wave: 3
   - rank: 10

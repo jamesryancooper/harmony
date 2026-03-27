@@ -1,0 +1,55 @@
+schema_version: "octon-constitutional-disclosure-family-v1"
+family_id: "disclosure"
+status: "active-transitional"
+activation_wave: 4
+release_state: "pre-1.0"
+change_profile: "transitional"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-27-wave4-gap-remediation-cutover/plan.md"
+transitional_exception_note:
+  rationale: >-
+    Wave 4 must make consequential runs and support claims interpretable
+    without allowing disclosure outputs to become a second authority plane.
+  risks:
+    - "RunCards could drift from retained evidence if they are emitted without canonical refs."
+    - "HarnessCards could overstate support if they are not tied back to the support-target matrix."
+    - "Human-readable markdown could diverge from machine-readable card content if validators do not keep them aligned."
+  owner: "Octon governance"
+  target_removal_date: "2026-06-30"
+authority_rules:
+  subordinate_to:
+    - ".octon/state/control/execution/runs/<run-id>/run-contract.yml"
+    - ".octon/state/control/execution/approvals/**"
+    - ".octon/instance/governance/support-targets.yml"
+  rule: >-
+    Disclosure artifacts summarize authority and evidence; they do not mint,
+    widen, revoke, or replace durable authority.
+run_card:
+  schema_ref: ".octon/framework/constitution/contracts/disclosure/run-card-v1.schema.json"
+  evidence_root: ".octon/state/evidence/runs"
+  canonical_file: "disclosure/run-card.yml"
+  projection_file: "disclosure/run-card.md"
+  required_refs:
+    - "run-contract"
+    - "decision-artifact"
+    - "retained-run-evidence"
+    - "measurements"
+    - "interventions"
+    - "proof-planes"
+    - "replay"
+harness_card:
+  schema_ref: ".octon/framework/constitution/contracts/disclosure/harness-card-v1.schema.json"
+  evidence_root: ".octon/state/evidence/lab/harness-cards"
+  canonical_file_pattern: "<card-id>.yml"
+  projection_file_pattern: "<card-id>.md"
+  required_refs:
+    - "support-target-declaration"
+    - "lab-scenario-or-benchmark"
+    - "proof-bundle"
+    - "known-limits"
+gating:
+  behavioral_claims_require_any:
+    - "lab-scenario"
+    - "replay"
+    - "scenario"
+    - "shadow-run"
+  support_claims_require_support_target_ref: true

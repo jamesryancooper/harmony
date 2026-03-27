@@ -44,6 +44,8 @@ Core kernel artifacts:
 - `/.octon/framework/constitution/contracts/objective/**`
 - `/.octon/framework/constitution/contracts/authority/**`
 - `/.octon/framework/constitution/contracts/runtime/**`
+- `/.octon/framework/constitution/contracts/assurance/**`
+- `/.octon/framework/constitution/contracts/disclosure/**`
 - `/.octon/framework/constitution/support-targets.schema.json`
 
 `/.octon/framework/cognition/_meta/architecture/specification.md` remains the
@@ -129,6 +131,12 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/state/evidence/control/execution/`
 - Canonical publication validation receipts:
   `/.octon/state/evidence/validation/publication/`
+- Canonical lab-authored scenario and replay surfaces:
+  `/.octon/framework/lab/`
+- Canonical observability-authored measurement and intervention surfaces:
+  `/.octon/framework/observability/`
+- Canonical retained lab evidence:
+  `/.octon/state/evidence/lab/`
 - Canonical effective locality outputs:
   `/.octon/generated/effective/locality/`
 - Canonical effective capability-routing outputs:

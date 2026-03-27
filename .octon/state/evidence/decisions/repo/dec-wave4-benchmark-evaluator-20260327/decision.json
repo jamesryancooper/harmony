@@ -1,0 +1,18 @@
+{
+  "decision_id": "dec-wave4-benchmark-evaluator-20260327",
+  "outcome": "allow",
+  "surface": "missions",
+  "action": "capture_wave4_benchmark_evidence",
+  "actor": "operator://octon-maintainers",
+  "decided_at": "2026-03-27T22:46:27Z",
+  "reason_codes": [
+    "WAVE4_BENCHMARK_EVALUATOR"
+  ],
+  "summary": "Bind a higher-scrutiny Wave 4 benchmark run so evaluator-backed benchmark disclosure is retained under canonical run roots.",
+  "workflow_ref": {
+    "workflow_group": "meta",
+    "workflow_id": "evaluate-harness"
+  },
+  "mission_id": "mission-autonomy-live-validation",
+  "run_id": "run-wave4-benchmark-evaluator-20260327"
+}

@@ -8,6 +8,7 @@
 | Evidence class | Canonical path | Purpose |
 | --- | --- | --- |
 | Run evidence | `.octon/state/evidence/runs/**` | Receipts, digests, and execution trace artifacts |
+| Lab evidence | `.octon/state/evidence/lab/**` | Scenario proof, benchmark measurements, evaluator reviews, and HarnessCard disclosure artifacts |
 | Operational decision evidence | `.octon/state/evidence/decisions/**` | Allow/block/escalate and related operational decision records |
 | Validation evidence | `.octon/state/evidence/validation/**` | Validation receipts and enforcement evidence |
 | Migration evidence | `.octon/state/evidence/migration/**` | Migration provenance, rollback traceability, and cutover receipts |

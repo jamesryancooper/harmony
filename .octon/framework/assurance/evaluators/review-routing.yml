@@ -1,0 +1,20 @@
+schema_version: "evaluator-review-routing-v1"
+default_run_disposition: "not_required"
+default_harness_claim_disposition: "approved"
+run_requirements:
+  support_tiers_require_approved_review:
+    - "release-and-boundary-sensitive"
+    - "external-or-irreversible"
+  risk_classes_require_approved_review:
+    - "high"
+    - "critical"
+  notes:
+    - "Repo-local-transitional runs may resolve to not_required when deterministic proof is sufficient."
+harness_claim_requirements:
+  benchmark: "approved"
+  release: "approved"
+  support:
+    supported: "approved"
+    reduced: "approved"
+    experimental: "approved"
+    unsupported: "blocked"

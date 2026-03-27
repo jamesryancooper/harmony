@@ -1,0 +1,18 @@
+schema_version: measurement-summary-v1
+subject_kind: harness
+subject_ref: .octon/state/evidence/lab/harness-cards/hc-wave4-benchmark-disclosure-20260327.yml
+metrics:
+  - metric_id: disclosure-parity
+    label: RunCard to HarnessCard evidence parity
+    value: 1
+    unit: ratio
+  - metric_id: proof-coverage
+    label: Proof bundle coverage
+    value: 4
+    unit: count
+  - metric_id: evaluator-required
+    label: Independent evaluator approval requirement
+    value: 1
+    unit: boolean
+summary: Benchmark claim retains measurement proof that its disclosure bundle covers replay, maintainability, evaluator review, and benchmark evidence.
+recorded_at: "2026-03-27T22:45:00Z"

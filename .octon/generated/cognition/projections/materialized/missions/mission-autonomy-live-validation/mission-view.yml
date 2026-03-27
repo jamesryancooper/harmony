@@ -20,8 +20,8 @@ effective_route:
   boundary_source: "action_slice.safe_interrupt_boundary_class"
   recovery_source: "action_slice.rollback_primitive"
   digest_route: "preview_plus_closure_digest"
-  route_generated_at: "2026-03-27T20:31:21Z"
-  route_fresh_until: "2026-03-27T20:46:21Z"
+  route_generated_at: "2026-03-27T23:01:06Z"
+  route_fresh_until: "2026-03-27T23:16:06Z"
 current_slice_ref: ".octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/steady-state-housekeeping.yml"
 next_slice_ref: ".octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/steady-state-housekeeping.yml"
 budget_breaker_summary:
@@ -38,22 +38,31 @@ recovery_finalize_summary:
 run_evidence_refs:
   active_run_ids:
     - "run-wave3-runtime-bridge-20260327"
+    - "run-wave4-benchmark-evaluator-20260327"
   run_contracts:
     - "/.octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/run-contract.yml"
+    - "/.octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/run-contract.yml"
   runtime_states:
     - "/.octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/runtime-state.yml"
+    - "/.octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/runtime-state.yml"
   rollback_postures:
     - "/.octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/rollback-posture.yml"
+    - "/.octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/rollback-posture.yml"
   checkpoints:
     - "/.octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/checkpoints/bound.yml"
+    - "/.octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/checkpoints/bound.yml"
   receipts:
     - "/.octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/receipts/orchestration-lifecycle.yml"
+    - "/.octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/receipts/orchestration-lifecycle.yml"
   replay_pointers:
     - "/.octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/replay-pointers.yml"
+    - "/.octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/replay-pointers.yml"
   retained_evidence:
     - "/.octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/retained-run-evidence.yml"
+    - "/.octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/retained-run-evidence.yml"
   trace_pointers:
     - "/.octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/trace-pointers.yml"
+    - "/.octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/trace-pointers.yml"
 summary_refs:
   now: "/.octon/generated/cognition/summaries/missions/mission-autonomy-live-validation/now.md"
   next: "/.octon/generated/cognition/summaries/missions/mission-autonomy-live-validation/next.md"
@@ -72,4 +81,4 @@ source_refs:
   continuity: "/.octon/state/continuity/repo/missions/mission-autonomy-live-validation/handoff.md"
   control_evidence_root: "/.octon/state/evidence/control/execution/"
   run_evidence_root: "/.octon/state/evidence/runs/"
-last_refresh_at: "2026-03-27T20:31:21Z"
+last_refresh_at: "2026-03-27T23:01:07Z"

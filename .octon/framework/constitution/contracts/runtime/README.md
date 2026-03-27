@@ -17,6 +17,9 @@ coexistence window.
   `/.octon/state/control/execution/runs/<run-id>/checkpoints/**`
 - canonical retained run receipts live under:
   `/.octon/state/evidence/runs/<run-id>/receipts/**`
+- canonical retained run assurance reports, measurements, interventions, and
+  disclosure outputs live under:
+  `/.octon/state/evidence/runs/<run-id>/{assurance/**,measurements/**,interventions/**,disclosure/**}`
 - canonical replay and trace pointers live under:
   `/.octon/state/evidence/runs/<run-id>/{replay-pointers.yml,trace-pointers.yml}`
 

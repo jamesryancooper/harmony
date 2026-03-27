@@ -24,6 +24,8 @@ This harness uses one repo-root `.octon/` per repository.
 | Commands | `.octon/framework/capabilities/runtime/commands/` |
 | Tools | `.octon/framework/capabilities/runtime/tools/` |
 | Services | `.octon/framework/capabilities/runtime/services/` |
+| Lab | `.octon/framework/lab/` |
+| Observability | `.octon/framework/observability/` |
 | Prompts | `.octon/framework/scaffolding/practices/prompts/` |
 | Context | `.octon/instance/cognition/context/shared/` |
 | Checklists | `.octon/framework/assurance/` |
@@ -60,6 +62,8 @@ Repo-local supreme control authority lives under `framework/constitution/**`.
 | Contract registry | `.octon/framework/constitution/contracts/registry.yml` |
 | Objective contracts | `.octon/framework/constitution/contracts/objective/` |
 | Authority contracts | `.octon/framework/constitution/contracts/authority/` |
+| Assurance contracts | `.octon/framework/constitution/contracts/assurance/` |
+| Disclosure contracts | `.octon/framework/constitution/contracts/disclosure/` |
 | Support-target schema | `.octon/framework/constitution/support-targets.schema.json` |
 
 Prompts, ingress adapters, workflows, and generated projections may project
@@ -100,6 +104,8 @@ Subsystem expansion specs:
 │   ├── capabilities/
 │   ├── cognition/
 │   ├── engine/
+│   ├── lab/
+│   ├── observability/
 │   ├── orchestration/
 │   └── scaffolding/
 ├── instance/
@@ -233,6 +239,13 @@ split:
   `state/evidence/control/execution/**`
 - retained run receipts and replay pointers:
   `state/evidence/runs/<run-id>/{receipts/**,checkpoints/**,replay-pointers.yml,trace-pointers.yml}`
+- retained proof-plane, measurement, intervention, and disclosure evidence:
+  `state/evidence/runs/<run-id>/{assurance/**,measurements/**,interventions/**,disclosure/**}`
+- retained lab evidence:
+  `/.octon/state/evidence/lab`
+  `state/evidence/lab/`
+  retained subfamilies:
+  `state/evidence/lab/**`
 - mission continuity:
   `state/continuity/repo/missions/<mission-id>/**`
 - freshness-bounded effective mission routing:

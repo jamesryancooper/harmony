@@ -1,0 +1,27 @@
+run_id: run-wave4-benchmark-evaluator-20260327
+status: succeeded
+started_at: "2026-03-27T22:46:32Z"
+decision_id: dec-wave4-benchmark-evaluator-20260327
+continuity_run_path: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/
+run_contract_path: .octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/run-contract.yml
+stage_attempt_root: .octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/stage-attempts
+runtime_state_path: .octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/runtime-state.yml
+rollback_posture_path: .octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/rollback-posture.yml
+receipt_root: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/receipts
+assurance_root: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance
+measurements_root: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/measurements
+interventions_root: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/interventions
+run_card_path: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/disclosure/run-card.yml
+replay_pointers_path: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/replay-pointers.yml
+trace_pointers_path: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/trace-pointers.yml
+summary: Wave 4 benchmark evidence run completed with maintainability proof and approved evaluator review for benchmark disclosure.
+executor_id: operator://octon-maintainers
+executor_acknowledged_at: "2026-03-27T22:46:32Z"
+last_heartbeat_at: "2026-03-27T22:46:32Z"
+lease_expires_at: "2026-03-27T22:47:32Z"
+recovery_status: healthy
+workflow_ref:
+  workflow_group: meta
+  workflow_id: evaluate-harness
+mission_id: mission-autonomy-live-validation
+completed_at: "2026-03-27T22:46:36Z"

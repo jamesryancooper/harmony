@@ -192,6 +192,10 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-execution-governance.sh"
 
   run_step \
+    "Validate Wave 4 assurance, lab, observability, and disclosure expansion" \
+    bash "$SCRIPT_DIR/validate-assurance-disclosure-expansion.sh"
+
+  run_step \
     "Refresh and validate host capability projections" \
     publish_or_validate_host_projections
 

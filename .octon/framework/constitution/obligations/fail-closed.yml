@@ -66,3 +66,12 @@ rules:
     condition: "A compensating mechanism lacks an owner or retirement trigger."
     route: "DENY"
     adoption_status: "active"
+  - id: "FCR-013"
+    condition: "A behavioral or support claim lacks the required lab, replay, scenario, shadow-run, or support-target-backed disclosure evidence."
+    route: "STAGE_ONLY"
+    adoption_status: "active-transitional"
+    activation_wave: 4
+    transitional_behavior: >-
+      Wave 4 promotes the new proof-plane and disclosure families while
+      preserving the current structural and governance gates as the blocking
+      baseline.

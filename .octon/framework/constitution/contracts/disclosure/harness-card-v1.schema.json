@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/disclosure/harness-card-v1.schema.json",
+  "title": "Octon HarnessCard v1",
+  "description": "Normalized disclosure artifact for one support, benchmark, or release claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "card_id",
+    "claim_kind",
+    "claim_summary",
+    "support_target_ref",
+    "compatibility_tuple",
+    "proof_bundle_refs",
+    "known_limits",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "harness-card-v1"
+    },
+    "card_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claim_kind": {
+      "type": "string",
+      "enum": [
+        "support",
+        "benchmark",
+        "release"
+      ]
+    },
+    "claim_summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "support_target_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "compatibility_tuple": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_tier",
+        "workload_tier",
+        "language_resource_tier",
+        "locale_tier",
+        "support_status"
+      ],
+      "properties": {
+        "model_tier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workload_tier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language_resource_tier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locale_tier": {
+          "type": "string",
+          "minLength": 1
+        },
+        "support_status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "reduced",
+            "experimental",
+            "unsupported"
+          ]
+        }
+      }
+    },
+    "proof_bundle_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "evaluator_review_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "known_limits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
