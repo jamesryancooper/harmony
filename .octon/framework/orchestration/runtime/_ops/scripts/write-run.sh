@@ -31,6 +31,51 @@ stage_attempt_dir() {
   printf '%s/%s/stage-attempts' "$RUN_CONTROL_ROOT" "$run_id"
 }
 
+checkpoint_dir() {
+  local run_id="$1"
+  printf '%s/%s/checkpoints' "$RUN_CONTROL_ROOT" "$run_id"
+}
+
+runtime_state_path() {
+  local run_id="$1"
+  printf '%s/%s/runtime-state.yml' "$RUN_CONTROL_ROOT" "$run_id"
+}
+
+rollback_posture_path() {
+  local run_id="$1"
+  printf '%s/%s/rollback-posture.yml' "$RUN_CONTROL_ROOT" "$run_id"
+}
+
+run_evidence_dir() {
+  local run_id="$1"
+  printf '%s/%s' "$CONTINUITY_RUNS_DIR" "$run_id"
+}
+
+receipt_dir() {
+  local run_id="$1"
+  printf '%s/%s/receipts' "$CONTINUITY_RUNS_DIR" "$run_id"
+}
+
+evidence_checkpoint_dir() {
+  local run_id="$1"
+  printf '%s/%s/checkpoints' "$CONTINUITY_RUNS_DIR" "$run_id"
+}
+
+replay_pointers_path() {
+  local run_id="$1"
+  printf '%s/%s/replay-pointers.yml' "$CONTINUITY_RUNS_DIR" "$run_id"
+}
+
+trace_pointers_path() {
+  local run_id="$1"
+  printf '%s/%s/trace-pointers.yml' "$CONTINUITY_RUNS_DIR" "$run_id"
+}
+
+retained_evidence_path() {
+  local run_id="$1"
+  printf '%s/%s/retained-run-evidence.yml' "$CONTINUITY_RUNS_DIR" "$run_id"
+}
+
 run_contract_relpath() {
   local run_id="$1"
   printf '.octon/state/control/execution/runs/%s/run-contract.yml' "$run_id"
@@ -39,6 +84,61 @@ run_contract_relpath() {
 stage_attempt_dir_relpath() {
   local run_id="$1"
   printf '.octon/state/control/execution/runs/%s/stage-attempts' "$run_id"
+}
+
+checkpoint_dir_relpath() {
+  local run_id="$1"
+  printf '.octon/state/control/execution/runs/%s/checkpoints' "$run_id"
+}
+
+runtime_state_relpath() {
+  local run_id="$1"
+  printf '.octon/state/control/execution/runs/%s/runtime-state.yml' "$run_id"
+}
+
+rollback_posture_relpath() {
+  local run_id="$1"
+  printf '.octon/state/control/execution/runs/%s/rollback-posture.yml' "$run_id"
+}
+
+run_evidence_relpath() {
+  local run_id="$1"
+  printf '.octon/state/evidence/runs/%s' "$run_id"
+}
+
+receipt_dir_relpath() {
+  local run_id="$1"
+  printf '.octon/state/evidence/runs/%s/receipts' "$run_id"
+}
+
+orchestration_receipt_relpath() {
+  local run_id="$1"
+  printf '.octon/state/evidence/runs/%s/receipts/orchestration-lifecycle.yml' "$run_id"
+}
+
+evidence_checkpoint_relpath() {
+  local run_id="$1"
+  printf '.octon/state/evidence/runs/%s/checkpoints/bound.yml' "$run_id"
+}
+
+control_checkpoint_relpath() {
+  local run_id="$1"
+  printf '.octon/state/control/execution/runs/%s/checkpoints/bound.yml' "$run_id"
+}
+
+replay_pointers_relpath() {
+  local run_id="$1"
+  printf '.octon/state/evidence/runs/%s/replay-pointers.yml' "$run_id"
+}
+
+trace_pointers_relpath() {
+  local run_id="$1"
+  printf '.octon/state/evidence/runs/%s/trace-pointers.yml' "$run_id"
+}
+
+retained_evidence_relpath() {
+  local run_id="$1"
+  printf '.octon/state/evidence/runs/%s/retained-run-evidence.yml' "$run_id"
 }
 
 contract_status_from_projection() {
@@ -105,6 +205,222 @@ collect_requested_capabilities_json() {
   printf '%s\n' "${capabilities[@]}" | awk '!seen[$0]++' | jq -R . | jq -s .
 }
 
+write_runtime_state_file() {
+  local run_id="$1"
+  local status="$2"
+  local created_at="$3"
+  local updated_at="$4"
+  local mission_id="$5"
+  local parent_run_id="$6"
+  local last_receipt_ref="${7:-}"
+
+  jq -n \
+    --arg run_id "$run_id" \
+    --arg status "$status" \
+    --arg workflow_mode "$( [[ -n "$mission_id" ]] && printf 'autonomous' || printf 'human-only' )" \
+    --arg decision_state "$( [[ "$status" == "failed" || "$status" == "cancelled" ]] && printf 'deny' || printf 'allow' )" \
+    --arg run_contract_ref "$(run_contract_relpath "$run_id")" \
+    --arg stage_attempt_root "$(stage_attempt_dir_relpath "$run_id")" \
+    --arg checkpoint_root "$(checkpoint_dir_relpath "$run_id")" \
+    --arg evidence_root "$(run_evidence_relpath "$run_id")" \
+    --arg receipt_root "$(receipt_dir_relpath "$run_id")" \
+    --arg control_checkpoint_ref "$(control_checkpoint_relpath "$run_id")" \
+    --arg last_receipt_ref "$last_receipt_ref" \
+    --arg mission_id "$mission_id" \
+    --arg parent_run_ref "$( [[ -n "$parent_run_id" ]] && printf '.octon/state/control/execution/runs/%s/run-contract.yml' "$parent_run_id" || printf '' )" \
+    --arg created_at "$created_at" \
+    --arg updated_at "$updated_at" '
+      {
+        schema_version: "run-runtime-state-v1",
+        run_id: $run_id,
+        status: $status,
+        workflow_mode: $workflow_mode,
+        decision_state: $decision_state,
+        run_contract_ref: $run_contract_ref,
+        stage_attempt_root: $stage_attempt_root,
+        control_checkpoint_root: $checkpoint_root,
+        evidence_root: $evidence_root,
+        receipt_root: $receipt_root,
+        current_stage_attempt_id: "initial",
+        last_checkpoint_ref: $control_checkpoint_ref,
+        created_at: $created_at,
+        updated_at: $updated_at
+      }
+      + (if $last_receipt_ref != "" then {last_receipt_ref: $last_receipt_ref} else {} end)
+      + (if $mission_id != "" then {mission_id: $mission_id} else {} end)
+      + (if $parent_run_ref != "" then {parent_run_ref: $parent_run_ref} else {} end)
+    ' | yq -P -p=json '.' > "$(runtime_state_path "$run_id")"
+}
+
+write_orchestration_receipt_file() {
+  local run_id="$1"
+  local status="$2"
+  local summary="$3"
+  local recorded_at="$4"
+
+  jq -n \
+    --arg run_id "$run_id" \
+    --arg status "$status" \
+    --arg summary "$summary" \
+    --arg recorded_at "$recorded_at" '
+      {
+        schema_version: "orchestration-run-lifecycle-receipt-v1",
+        run_id: $run_id,
+        status: $status,
+        summary: $summary,
+        recorded_at: $recorded_at
+      }
+    ' | yq -P -p=json '.' > "$(receipt_dir "$run_id")/orchestration-lifecycle.yml"
+}
+
+write_rollback_posture_file() {
+  local run_id="$1"
+  local updated_at="$2"
+
+  jq -n \
+    --arg run_id "$run_id" \
+    --arg updated_at "$updated_at" '
+      {
+        schema_version: "run-rollback-posture-v1",
+        run_id: $run_id,
+        reversibility_class: "reversible",
+        rollback_strategy: "rollback",
+        contamination_state: "clean",
+        hard_reset_required: false,
+        posture_source: "orchestration-runtime",
+        updated_at: $updated_at
+      }
+    ' | yq -P -p=json '.' > "$(rollback_posture_path "$run_id")"
+}
+
+write_bound_checkpoint_files() {
+  local run_id="$1"
+  local created_at="$2"
+  local control_path evidence_path
+  control_path="$(checkpoint_dir "$run_id")/bound.yml"
+  evidence_path="$(evidence_checkpoint_dir "$run_id")/bound.yml"
+  jq -n \
+    --arg run_id "$run_id" \
+    --arg created_at "$created_at" \
+    --arg control_ref "$(control_checkpoint_relpath "$run_id")" \
+    --arg evidence_ref "$(evidence_checkpoint_relpath "$run_id")" '
+      {
+        schema_version: "run-checkpoint-v1",
+        run_id: $run_id,
+        checkpoint_id: "bound",
+        stage_attempt_id: "initial",
+        checkpoint_kind: "binding",
+        status: "materialized",
+        control_ref: $control_ref,
+        evidence_ref: $evidence_ref,
+        notes: "Canonical run root bound for orchestration-managed execution.",
+        created_at: $created_at,
+        updated_at: $created_at
+      }
+    ' | yq -P -p=json '.' > "$control_path"
+  jq -n \
+    --arg run_id "$run_id" \
+    --arg created_at "$created_at" \
+    --arg control_ref "$(control_checkpoint_relpath "$run_id")" \
+    --arg evidence_ref "$(evidence_checkpoint_relpath "$run_id")" '
+      {
+        schema_version: "run-checkpoint-v1",
+        run_id: $run_id,
+        checkpoint_id: "bound",
+        stage_attempt_id: "initial",
+        checkpoint_kind: "binding",
+        status: "materialized",
+        control_ref: $control_ref,
+        evidence_ref: $evidence_ref,
+        notes: "Canonical run root bound for orchestration-managed execution.",
+        created_at: $created_at,
+        updated_at: $created_at
+      }
+    ' | yq -P -p=json '.' > "$evidence_path"
+}
+
+write_replay_pointer_file() {
+  local run_id="$1"
+  local updated_at="$2"
+  local receipt_ref=""
+  if [[ -f "$(receipt_dir "$run_id")/orchestration-lifecycle.yml" ]]; then
+    receipt_ref="$(orchestration_receipt_relpath "$run_id")"
+  fi
+  jq -n \
+    --arg run_id "$run_id" \
+    --arg checkpoint_ref "$(evidence_checkpoint_relpath "$run_id")" \
+    --arg receipt_ref "$receipt_ref" \
+    --arg updated_at "$updated_at" '
+      {
+        schema_version: "run-replay-pointers-v1",
+        run_id: $run_id,
+        receipt_refs: (if $receipt_ref != "" then [$receipt_ref] else [] end),
+        checkpoint_refs: [$checkpoint_ref],
+        trace_refs: [],
+        external_replay_refs: [],
+        updated_at: $updated_at
+      }
+    ' | yq -P -p=json '.' > "$(replay_pointers_path "$run_id")"
+}
+
+write_trace_pointer_file() {
+  local run_id="$1"
+  local updated_at="$2"
+  jq -n \
+    --arg run_id "$run_id" \
+    --arg updated_at "$updated_at" '
+      {
+        schema_version: "run-trace-pointers-v1",
+        run_id: $run_id,
+        trace_refs: [],
+        updated_at: $updated_at
+      }
+    ' | yq -P -p=json '.' > "$(trace_pointers_path "$run_id")"
+}
+
+write_retained_evidence_file() {
+  local run_id="$1"
+  local updated_at="$2"
+  jq -n \
+    --arg run_id "$run_id" \
+    --arg run_contract "$(run_contract_relpath "$run_id")" \
+    --arg runtime_state "$(runtime_state_relpath "$run_id")" \
+    --arg rollback_posture "$(rollback_posture_relpath "$run_id")" \
+    --arg control_checkpoint "$(control_checkpoint_relpath "$run_id")" \
+    --arg evidence_checkpoint "$(evidence_checkpoint_relpath "$run_id")" \
+    --arg orchestration_receipt "$(orchestration_receipt_relpath "$run_id")" \
+    --arg replay_pointers "$(replay_pointers_relpath "$run_id")" \
+    --arg trace_pointers "$(trace_pointers_relpath "$run_id")" \
+    --arg updated_at "$updated_at" '
+      {
+        schema_version: "retained-run-evidence-v1",
+        run_id: $run_id,
+        evidence_refs: {
+          run_contract: $run_contract,
+          runtime_state: $runtime_state,
+          rollback_posture: $rollback_posture,
+          control_checkpoint: $control_checkpoint,
+          evidence_checkpoint: $evidence_checkpoint,
+          orchestration_receipt: $orchestration_receipt,
+          replay_pointers: $replay_pointers,
+          trace_pointers: $trace_pointers
+        },
+        updated_at: $updated_at
+      }
+    ' | yq -P -p=json '.' > "$(retained_evidence_path "$run_id")"
+}
+
+ensure_run_lifecycle_roots() {
+  local run_id="$1"
+  ensure_dir "$(run_control_dir "$run_id")"
+  ensure_dir "$(stage_attempt_dir "$run_id")"
+  ensure_dir "$(checkpoint_dir "$run_id")"
+  ensure_dir "$(run_evidence_dir "$run_id")"
+  ensure_dir "$(receipt_dir "$run_id")"
+  ensure_dir "$(evidence_checkpoint_dir "$run_id")"
+  ensure_dir "$(run_evidence_dir "$run_id")/replay"
+}
+
 upsert_run_contract() {
   local run_id="$1"
   local status="$2"
@@ -120,8 +436,7 @@ upsert_run_contract() {
   run_dir="$(run_control_dir "$run_id")"
   contract_file="$(run_contract_path "$run_id")"
   stage_dir="$(stage_attempt_dir "$run_id")"
-  ensure_dir "$run_dir"
-  ensure_dir "$stage_dir"
+  ensure_run_lifecycle_roots "$run_id"
 
   scope_in_json="$(collect_scope_in_json "$workflow_group" "$workflow_id" "$mission_id" "$automation_id" "$incident_id")"
   requested_capabilities_json="$(collect_requested_capabilities_json "$workflow_group" "$workflow_id" "$mission_id" "$automation_id")"
@@ -139,6 +454,12 @@ upsert_run_contract() {
     --arg mission_id "$mission_id" \
     --arg mission_ref "$mission_ref" \
     --arg stage_attempt_root "$(stage_attempt_dir_relpath "$run_id")" \
+    --arg control_checkpoint_root "$(checkpoint_dir_relpath "$run_id")" \
+    --arg runtime_state_ref "$(runtime_state_relpath "$run_id")" \
+    --arg rollback_posture_ref "$(rollback_posture_relpath "$run_id")" \
+    --arg evidence_root "$(run_evidence_relpath "$run_id")" \
+    --arg receipt_root "$(receipt_dir_relpath "$run_id")" \
+    --arg replay_pointers_ref "$(replay_pointers_relpath "$run_id")" \
     --arg notes_ref ".octon/framework/orchestration/runtime/runs/$run_id.yml" \
     --argjson scope_in "$scope_in_json" \
     --argjson requested_capabilities "$requested_capabilities_json" \
@@ -160,13 +481,22 @@ upsert_run_contract() {
         required_evidence: [
           "decision-artifact",
           "run-evidence-root",
-          "orchestration-run-projection"
+          "orchestration-run-projection",
+          "policy-receipt",
+          "replay-pointers",
+          "trace-pointers"
         ],
         closure_conditions: [
           "Run reaches a terminal projection status.",
           "Decision and retained run evidence remain linked."
         ],
         stage_attempt_root: $stage_attempt_root,
+        control_checkpoint_root: $control_checkpoint_root,
+        runtime_state_ref: $runtime_state_ref,
+        rollback_posture_ref: $rollback_posture_ref,
+        evidence_root: $evidence_root,
+        receipt_root: $receipt_root,
+        replay_pointers_ref: $replay_pointers_ref,
         rollback_or_compensation_expectation: "Rollback or compensation posture is handled by downstream runtime lifecycle waves; Wave 1 records the execution contract and initial attempt root.",
         status: $status,
         created_at: $created_at,
@@ -208,6 +538,14 @@ upsert_run_contract() {
         }
       ' | yq -P -p=json '.' > "$initial_attempt"
   fi
+
+  write_orchestration_receipt_file "$run_id" "$status" "$summary" "$created_at"
+  write_runtime_state_file "$run_id" "$status" "$created_at" "$created_at" "$mission_id" "" "$(orchestration_receipt_relpath "$run_id")"
+  write_rollback_posture_file "$run_id" "$created_at"
+  write_bound_checkpoint_files "$run_id" "$created_at"
+  write_replay_pointer_file "$run_id" "$created_at"
+  write_trace_pointer_file "$run_id" "$created_at"
+  write_retained_evidence_file "$run_id" "$created_at"
 }
 
 update_run_contract_status() {
@@ -245,6 +583,18 @@ update_run_contract_status() {
     yq -o=json '.' "$initial_attempt" | jq --arg status "$attempt_status" --arg updated_at "$updated_at" '.status=$status | .updated_at=$updated_at' | yq -P -p=json '.' > "$initial_attempt.tmp"
     mv "$initial_attempt.tmp" "$initial_attempt"
   fi
+
+  local mission_id parent_run_id
+  mission_id="$( [[ -f "$RUNTIME_RUNS_DIR/$run_id.yml" ]] && yq -r '.mission_id // ""' "$RUNTIME_RUNS_DIR/$run_id.yml" 2>/dev/null || printf '' )"
+  parent_run_id="$( [[ -f "$RUNTIME_RUNS_DIR/$run_id.yml" ]] && yq -r '.parent_run_id // ""' "$RUNTIME_RUNS_DIR/$run_id.yml" 2>/dev/null || printf '' )"
+  local summary=""
+  summary="$( [[ -f "$RUNTIME_RUNS_DIR/$run_id.yml" ]] && yq -r '.summary // ""' "$RUNTIME_RUNS_DIR/$run_id.yml" 2>/dev/null || printf '' )"
+  write_orchestration_receipt_file "$run_id" "$projection_status" "$summary" "$updated_at"
+  write_runtime_state_file "$run_id" "$projection_status" "${updated_at}" "$updated_at" "$mission_id" "$parent_run_id" "$(orchestration_receipt_relpath "$run_id")"
+  write_rollback_posture_file "$run_id" "$updated_at"
+  write_replay_pointer_file "$run_id" "$updated_at"
+  write_trace_pointer_file "$run_id" "$updated_at"
+  write_retained_evidence_file "$run_id" "$updated_at"
 }
 
 ensure_run_surface() {
@@ -405,8 +755,8 @@ PY
     [[ -n "$executor_acknowledged_at" ]] || executor_acknowledged_at="$started_at"
     [[ -n "$last_heartbeat_at" ]] || last_heartbeat_at="$executor_acknowledged_at"
 
-    continuity_run_path=".octon/state/evidence/runs/$run_id/"
-    ensure_dir "$CONTINUITY_RUNS_DIR/$run_id"
+    continuity_run_path="$(run_evidence_relpath "$run_id")/"
+    ensure_run_lifecycle_roots "$run_id"
     run_file="$RUNTIME_RUNS_DIR/$run_id.yml"
     [[ ! -f "$run_file" ]] || { echo "run already exists: $run_id" >&2; exit 1; }
 
@@ -436,6 +786,11 @@ PY
         --arg continuity_run_path "$continuity_run_path" \
         --arg run_contract_path "$(run_contract_relpath "$run_id")" \
         --arg stage_attempt_root "$(stage_attempt_dir_relpath "$run_id")" \
+        --arg runtime_state_path "$(runtime_state_relpath "$run_id")" \
+        --arg rollback_posture_path "$(rollback_posture_relpath "$run_id")" \
+        --arg receipt_root "$(receipt_dir_relpath "$run_id")" \
+        --arg replay_pointers_path "$(replay_pointers_relpath "$run_id")" \
+        --arg trace_pointers_path "$(trace_pointers_relpath "$run_id")" \
         --arg summary "$summary" '
           {
             run_id: $run_id,
@@ -445,6 +800,11 @@ PY
             continuity_run_path: $continuity_run_path,
             run_contract_path: $run_contract_path,
             stage_attempt_root: $stage_attempt_root,
+            runtime_state_path: $runtime_state_path,
+            rollback_posture_path: $rollback_posture_path,
+            receipt_root: $receipt_root,
+            replay_pointers_path: $replay_pointers_path,
+            trace_pointers_path: $trace_pointers_path,
             summary: $summary,
             executor_id: $executor_id,
             executor_acknowledged_at: $executor_acknowledged_at,
