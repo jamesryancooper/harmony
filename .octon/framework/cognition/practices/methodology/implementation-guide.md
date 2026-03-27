@@ -193,6 +193,8 @@ awk '/^[[:space:]]*path:[[:space:]]*/{print $2}' .octon/framework/cognition/prac
 ## Canonical References
 
 - `AGENTS.md`
+- `/.octon/framework/constitution/CHARTER.md`
+- `/.octon/framework/constitution/precedence/normative.yml`
 - `/.octon/framework/agency/governance/CONSTITUTION.md`
 - `/.octon/framework/agency/governance/DELEGATION.md`
 - `/.octon/framework/agency/governance/MEMORY.md`

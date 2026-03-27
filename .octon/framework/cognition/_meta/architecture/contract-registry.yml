@@ -24,6 +24,10 @@ execution:
   forbidden_write_prefixes:
     - ".octon/framework/engine/_ops/state"
   required_doc_surfaces:
+    - ".octon/framework/constitution/CHARTER.md"
+    - ".octon/README.md"
+    - ".octon/instance/ingress/AGENTS.md"
+    - ".octon/framework/agency/governance/CONSTITUTION.md"
     - ".octon/framework/cognition/_meta/architecture/specification.md"
     - ".octon/framework/cognition/_meta/architecture/runtime-vs-ops-contract.md"
     - ".octon/framework/cognition/governance/principles/mission-scoped-reversible-autonomy.md"
@@ -69,6 +73,10 @@ documentation:
     - id: "authoritative-doc"
       description: "Markdown documents that define architecture, governance, bootstrap, or review-receipt behavior."
       match_globs:
+        - ".octon/framework/constitution/CHARTER.md"
+        - ".octon/README.md"
+        - ".octon/instance/ingress/AGENTS.md"
+        - ".octon/framework/agency/governance/CONSTITUTION.md"
         - ".octon/framework/cognition/_meta/architecture/specification.md"
         - ".octon/framework/cognition/_meta/architecture/runtime-vs-ops-contract.md"
         - ".octon/framework/cognition/governance/principles/mission-scoped-reversible-autonomy.md"

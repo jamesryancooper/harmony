@@ -27,6 +27,27 @@ carry overlay-capable repo authority.
 - `state/evidence/**` for retained operational trace and receipts
 - `state/control/**` for mutable current-state publication and quarantine truth
 
+## Constitutional Kernel
+
+`/.octon/framework/constitution/**` is the supreme repo-local control regime
+beneath non-waivable external obligations, break-glass controls, and live
+revocations.
+
+Core kernel artifacts:
+
+- `/.octon/framework/constitution/CHARTER.md`
+- `/.octon/framework/constitution/charter.yml`
+- `/.octon/framework/constitution/precedence/{normative.yml,epistemic.yml}`
+- `/.octon/framework/constitution/obligations/{fail-closed.yml,evidence.yml}`
+- `/.octon/framework/constitution/ownership/roles.yml`
+- `/.octon/framework/constitution/contracts/registry.yml`
+- `/.octon/framework/constitution/support-targets.schema.json`
+
+`/.octon/framework/cognition/_meta/architecture/specification.md` remains the
+canonical cross-subsystem topology and placement contract, but it is
+subordinate to the constitutional kernel and must not restate competing
+constitutional authority.
+
 ## Instance Authority
 
 ### Instance-Native Surfaces
@@ -58,6 +79,18 @@ No other `instance/**` subtree is overlay-capable in v1.
 
 ## Canonical Bootstrap And Ingress
 
+- Canonical constitutional kernel: `/.octon/framework/constitution/`
+- Supreme repo-local charter: `/.octon/framework/constitution/CHARTER.md`
+- Canonical constitutional manifest:
+  `/.octon/framework/constitution/charter.yml`
+- Canonical normative authority precedence:
+  `/.octon/framework/constitution/precedence/normative.yml`
+- Canonical epistemic grounding precedence:
+  `/.octon/framework/constitution/precedence/epistemic.yml`
+- Canonical fail-closed obligations:
+  `/.octon/framework/constitution/obligations/fail-closed.yml`
+- Canonical evidence obligations:
+  `/.octon/framework/constitution/obligations/evidence.yml`
 - Canonical overlay registry: `/.octon/framework/overlay-points/registry.yml`
 - Repo-side overlay enablement: `/.octon/instance/manifest.yml#enabled_overlay_points`
 - Projected ingress surface: `/.octon/AGENTS.md`
@@ -123,7 +156,7 @@ No other `instance/**` subtree is overlay-capable in v1.
   `execution-receipt-v2.schema.json`, `policy-receipt-v2.schema.json`,
   `policy-digest-v2.md`, and `executor-profile-v1.schema.json`
 - Export workflow: `/.octon/framework/orchestration/runtime/workflows/meta/export-harness/`
-- Canonical architecture contract:
+- Canonical structural architecture contract:
   `/.octon/framework/cognition/_meta/architecture/specification.md`
 
 Repo-root `AGENTS.md` and `CLAUDE.md` are thin adapters to `/.octon/AGENTS.md`

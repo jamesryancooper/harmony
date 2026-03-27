@@ -1,0 +1,67 @@
+schema_version: "octon-constitution-fail-closed-v1"
+default_route: "DENY"
+route_options:
+  - "DENY"
+  - "STAGE_ONLY"
+  - "ESCALATE"
+rules:
+  - id: "FCR-001"
+    condition: "Raw inputs become a direct runtime or policy dependency."
+    route: "DENY"
+    adoption_status: "active"
+  - id: "FCR-002"
+    condition: "A generated artifact is treated as source-of-truth or as a second control plane."
+    route: "DENY"
+    adoption_status: "active"
+  - id: "FCR-003"
+    condition: "A host surface, UI state, or chat transcript is used as the authority source."
+    route: "DENY"
+    adoption_status: "active"
+  - id: "FCR-004"
+    condition: "Ownership is ambiguous or unresolved."
+    route: "ESCALATE"
+    adoption_status: "active"
+    notes:
+      - "Material execution remains blocked until ownership is resolved."
+  - id: "FCR-005"
+    condition: "A policy conflict exists without explicit precedence."
+    route: "ESCALATE"
+    adoption_status: "active"
+  - id: "FCR-006"
+    condition: "Required approval evidence or grant material is missing for a material side effect."
+    route: "STAGE_ONLY"
+    adoption_status: "active"
+    notes:
+      - "Escalate to DENY when policy does not allow preview-only handling."
+  - id: "FCR-007"
+    condition: "Required instruction-layer manifests or freshness receipts are missing or stale."
+    route: "DENY"
+    adoption_status: "active"
+  - id: "FCR-008"
+    condition: "Required mission context is missing for recurring, overlapping, or long-horizon autonomy."
+    route: "DENY"
+    adoption_status: "active"
+  - id: "FCR-009"
+    condition: "A valid support-target tier or adapter behavior declaration is missing."
+    route: "DENY"
+    adoption_status: "staged"
+    activation_wave: 5
+    transitional_behavior: >-
+      Current repo policy, locality, and capability boundaries remain the live
+      guardrails until support-target declarations are published.
+  - id: "FCR-010"
+    condition: "A bound run contract is missing or invalid for consequential execution."
+    route: "STAGE_ONLY"
+    adoption_status: "staged"
+    activation_wave: 1
+    transitional_behavior: >-
+      Current mission-first authorization and execution contracts remain the
+      active enforcement path until the run-contract cutover lands.
+  - id: "FCR-011"
+    condition: "Mandatory evidence from prior step transitions is missing."
+    route: "STAGE_ONLY"
+    adoption_status: "active"
+  - id: "FCR-012"
+    condition: "A compensating mechanism lacks an owner or retirement trigger."
+    route: "DENY"
+    adoption_status: "active"

@@ -84,8 +84,8 @@ normalize_rel() {
 check_matrix_contract() {
   require_text \
     "$SPEC_FILE" \
-    "## SSOT Precedence Matrix (Runtime, Governance, Practices)" \
-    "spec declares SSOT precedence matrix section"
+    "## Structural SSOT Matrix (Runtime, Governance, Practices)" \
+    "spec declares structural SSOT matrix section"
 
   require_text \
     "$SPEC_FILE" \

@@ -7,6 +7,8 @@ scope: methodology-governance
 last_reviewed: 2026-03-05
 canonical_links:
   - "/AGENTS.md"
+  - "/.octon/framework/constitution/CHARTER.md"
+  - "/.octon/framework/constitution/precedence/normative.yml"
   - "/.octon/framework/agency/governance/CONSTITUTION.md"
   - "/.octon/framework/agency/governance/DELEGATION.md"
   - "/.octon/framework/agency/governance/MEMORY.md"
@@ -23,11 +25,14 @@ This crosswalk defines how methodology artifacts under `/.octon/framework/cognit
 When instructions conflict, methodology policy follows repository precedence:
 
 1. `AGENTS.md`
-2. `/.octon/framework/agency/governance/CONSTITUTION.md`
-3. `/.octon/framework/agency/governance/DELEGATION.md`
-4. `/.octon/framework/agency/governance/MEMORY.md`
-5. `/.octon/framework/agency/runtime/agents/architect/AGENT.md`
-6. `/.octon/framework/agency/runtime/agents/architect/SOUL.md`
+2. `/.octon/framework/constitution/CHARTER.md`
+3. `/.octon/framework/constitution/obligations/fail-closed.yml`
+4. `/.octon/framework/constitution/precedence/normative.yml`
+5. `/.octon/framework/agency/governance/CONSTITUTION.md`
+6. `/.octon/framework/agency/governance/DELEGATION.md`
+7. `/.octon/framework/agency/governance/MEMORY.md`
+8. `/.octon/framework/agency/runtime/agents/architect/AGENT.md`
+9. `/.octon/framework/agency/runtime/agents/architect/SOUL.md`
 
 This precedence is authoritative for execution contracts, profile governance, escalation behavior, and implementation receipts.
 

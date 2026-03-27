@@ -9,7 +9,8 @@ description: Cross-agent delegation authority, handoff protocol, and escalation 
 
 - This file defines how work is delegated across agents, assistants, teams, and skills.
 - This file applies to all delegated tasks in `.octon/framework/agency/`.
-- This file is subordinate only to `AGENTS.md` and `CONSTITUTION.md`.
+- This file is subordinate to `AGENTS.md`, the constitutional kernel under
+  `/.octon/framework/constitution/**`, and `CONSTITUTION.md`.
 
 ## Delegation Principles
 

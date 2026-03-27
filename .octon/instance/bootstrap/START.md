@@ -44,11 +44,35 @@ versioning, install/export profiles, and fail-closed policy hooks.
 
 ---
 
+## Constitutional Kernel
+
+Repo-local supreme control authority lives under `framework/constitution/**`.
+
+| Artifact Family | Canonical Path |
+|-----------|----------------|
+| Charter | `.octon/framework/constitution/CHARTER.md` |
+| Charter manifest | `.octon/framework/constitution/charter.yml` |
+| Normative precedence | `.octon/framework/constitution/precedence/normative.yml` |
+| Epistemic precedence | `.octon/framework/constitution/precedence/epistemic.yml` |
+| Fail-closed obligations | `.octon/framework/constitution/obligations/fail-closed.yml` |
+| Evidence obligations | `.octon/framework/constitution/obligations/evidence.yml` |
+| Ownership roles | `.octon/framework/constitution/ownership/roles.yml` |
+| Contract registry | `.octon/framework/constitution/contracts/registry.yml` |
+| Support-target schema | `.octon/framework/constitution/support-targets.schema.json` |
+
+Prompts, ingress adapters, workflows, and generated projections may project
+this kernel, but they may not redefine it.
+
+---
+
 ## Canonical Specification
 
-The cross-subsystem canonical contract for this harness is:
+The cross-subsystem structural architecture contract for this harness is:
 
 - `cognition/_meta/architecture/specification.md`
+
+It remains subordinate to the constitutional kernel above and must not restate
+competing repo-local constitutional authority.
 
 Subsystem expansion specs:
 
@@ -68,6 +92,7 @@ Subsystem expansion specs:
 ├── octon.yml
 ├── framework/
 │   ├── manifest.yml
+│   ├── constitution/
 │   ├── agency/
 │   ├── assurance/
 │   ├── capabilities/
@@ -131,6 +156,9 @@ Canonical ingress resolves through this chain:
 Root `AGENTS.md` and `CLAUDE.md` are thin adapters only. They must be a
 symlink to `/.octon/AGENTS.md` or a byte-for-byte parity copy and may not add
 runtime or policy text.
+
+Ingress and prompt surfaces may project the constitutional kernel, but
+`framework/constitution/**` remains the supreme repo-local control regime.
 
 Instance-native repo authority lives at:
 

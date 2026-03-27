@@ -1,0 +1,80 @@
+schema_version: "octon-constitution-ownership-roles-v1"
+ambiguity_policy: "ESCALATE_OR_DENY"
+role_classes:
+  - class_id: "human"
+    display_name: "Human Governance"
+    owns:
+      - "charter changes"
+      - "support-target changes"
+      - "policy changes"
+      - "ownership rules"
+      - "one-way-door approvals"
+      - "exception leases"
+      - "revocations"
+      - "public or external commitments"
+      - "HarnessCard release sign-off"
+    must_not:
+      - "mint authority through undeclared host adapters"
+      - "delegate irreversible authorization to the model"
+    subroles:
+      - role_id: "governance_owner"
+        authority_source: ".octon/instance/governance/ownership/registry.yml"
+        responsibilities:
+          - "Approve constitutional and policy changes."
+          - "Approve support-target publication and support widening."
+      - role_id: "mission_owner"
+        authority_source: ".octon/instance/orchestration/missions/**"
+        responsibilities:
+          - "Own mission continuity, overlap policy, autonomy posture, and recovery defaults."
+      - role_id: "break_glass_authority"
+        authority_source: ".octon/instance/governance/policies/**"
+        responsibilities:
+          - "Issue emergency overrides and revocations under explicit evidence."
+  - class_id: "harness"
+    display_name: "Harness Enforcement"
+    owns:
+      - "route evaluation"
+      - "fail-closed enforcement"
+      - "grant and receipt validation"
+      - "run-state integrity"
+      - "intervention logging"
+      - "replay integrity"
+      - "disclosure assembly"
+      - "gating execution against proof and freshness rules"
+    must_not:
+      - "mint human authority"
+      - "silently widen objective scope or support tier"
+      - "treat generated summaries as authority"
+    subroles:
+      - role_id: "authority_engine"
+        responsibilities:
+          - "Resolve ALLOW, STAGE_ONLY, ESCALATE, or DENY."
+      - role_id: "validator_plane"
+        responsibilities:
+          - "Check structural, architectural, and publication conformance."
+      - role_id: "disclosure_assembler"
+        responsibilities:
+          - "Build human-readable disclosures from retained evidence."
+  - class_id: "model"
+    display_name: "Model Planning and Execution"
+    owns:
+      - "bounded planning"
+      - "run-contract drafts"
+      - "capability invocation strategy within granted scope"
+      - "local deterministic self-checks"
+      - "low-risk retries that stay within policy"
+    must_not:
+      - "approve, revoke, or grant exceptions"
+      - "widen support tiers"
+      - "authorize irreversible actions"
+      - "perform final consequential acceptance"
+    subroles:
+      - role_id: "planner"
+        responsibilities:
+          - "Draft bounded work and identify required approvals or evidence."
+      - role_id: "executor"
+        responsibilities:
+          - "Operate only within granted scope and declared capability boundaries."
+current_repo_owner_seed:
+  operator_id: "octon-maintainers"
+  authority_ref: ".octon/instance/governance/ownership/registry.yml"

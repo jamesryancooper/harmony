@@ -51,6 +51,20 @@ require_dir "$OCTON_DIR/state"
 require_dir "$OCTON_DIR/generated"
 
 require_file "$OCTON_DIR/framework/manifest.yml"
+require_dir "$OCTON_DIR/framework/constitution"
+require_file "$OCTON_DIR/framework/constitution/CHARTER.md"
+require_file "$OCTON_DIR/framework/constitution/charter.yml"
+require_dir "$OCTON_DIR/framework/constitution/precedence"
+require_file "$OCTON_DIR/framework/constitution/precedence/normative.yml"
+require_file "$OCTON_DIR/framework/constitution/precedence/epistemic.yml"
+require_dir "$OCTON_DIR/framework/constitution/obligations"
+require_file "$OCTON_DIR/framework/constitution/obligations/fail-closed.yml"
+require_file "$OCTON_DIR/framework/constitution/obligations/evidence.yml"
+require_dir "$OCTON_DIR/framework/constitution/ownership"
+require_file "$OCTON_DIR/framework/constitution/ownership/roles.yml"
+require_dir "$OCTON_DIR/framework/constitution/contracts"
+require_file "$OCTON_DIR/framework/constitution/contracts/registry.yml"
+require_file "$OCTON_DIR/framework/constitution/support-targets.schema.json"
 require_file "$OCTON_DIR/framework/overlay-points/registry.yml"
 require_dir "$OCTON_DIR/framework/agency"
 require_dir "$OCTON_DIR/framework/assurance"
@@ -263,7 +277,7 @@ unexpected_framework_entries=()
 while IFS= read -r entry; do
   rel="${entry#$OCTON_DIR/framework/}"
   case "$rel" in
-    manifest.yml|overlay-points|agency|assurance|capabilities|cognition|engine|orchestration|scaffolding)
+    manifest.yml|overlay-points|agency|assurance|capabilities|cognition|constitution|engine|orchestration|scaffolding)
       ;;
     *)
       unexpected_framework_entries+=("framework/$rel")

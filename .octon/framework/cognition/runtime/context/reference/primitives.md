@@ -71,6 +71,8 @@ The primitives form a hierarchical multi-agent system:
 
 **Location:** `.octon/framework/agency/runtime/agents/<agent-name>/AGENT.md` + `.octon/framework/agency/runtime/agents/<agent-name>/SOUL.md`
 
+**Repo-local constitutional kernel:** `.octon/framework/constitution/CHARTER.md`, `.octon/framework/constitution/precedence/normative.yml`
+
 **Cross-agent overlays:** `.octon/framework/agency/governance/CONSTITUTION.md`, `.octon/framework/agency/governance/DELEGATION.md`, `.octon/framework/agency/governance/MEMORY.md`
 
 **Registry:** `.octon/framework/agency/runtime/agents/registry.yml`

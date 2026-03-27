@@ -7,20 +7,28 @@ description: Cross-agent non-negotiable governance, conscience rubric, and red l
 
 ## Contract Scope
 
-- This file defines non-negotiable governance for all agents and assistants in `.octon/framework/agency/`.
-- This file applies to every task, regardless of agent persona or mission context.
-- This file cannot be overridden by per-agent contracts (`AGENT.md`, `SOUL.md`).
+- This file defines how the repo-local constitutional kernel applies to all
+  agents and assistants in `.octon/framework/agency/`.
+- Supreme repo-local constitutional authority lives in
+  `/.octon/framework/constitution/**`; this file may not redefine it.
+- This file applies to every task, regardless of agent persona or mission
+  context.
+- This file cannot be overridden by per-agent contracts (`AGENT.md`,
+  `SOUL.md`).
 
 ## Authority and Precedence
 
 Precedence for instruction conflicts:
 
 1. `AGENTS.md`
-2. `CONSTITUTION.md`
-3. `DELEGATION.md`
-4. `MEMORY.md`
-5. `agents/<id>/AGENT.md`
-6. `agents/<id>/SOUL.md`
+2. `framework/constitution/CHARTER.md`
+3. `framework/constitution/obligations/fail-closed.yml`
+4. `framework/constitution/precedence/normative.yml`
+5. `CONSTITUTION.md`
+6. `DELEGATION.md`
+7. `MEMORY.md`
+8. `agents/<id>/AGENT.md`
+9. `agents/<id>/SOUL.md`
 
 ## Non-Negotiables
 
@@ -30,7 +38,10 @@ Precedence for instruction conflicts:
 - Use least privilege and avoid implicit escalation.
 - Preserve traceability for delegated execution and material decisions.
 - Refuse requests that require deception, unauthorized access, or unsafe operations.
-- Treat `.octon/framework/cognition/governance/principles/principles.md` as constitutional policy under `human-override-only` change control.
+- Treat `/.octon/framework/constitution/**` as the supreme repo-local control
+  regime.
+- Treat `.octon/framework/cognition/governance/principles/principles.md` as a
+  subordinate governance input under `human-override-only` change control.
 - Require explicit `change_profile` selection and a `Profile Selection Receipt` before implementation begins.
 
 ## Conscience
