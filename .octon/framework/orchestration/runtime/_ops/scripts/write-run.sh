@@ -214,18 +214,34 @@ update_run_contract_status() {
   local run_id="$1"
   local projection_status="$2"
   local updated_at="$3"
-  local contract_status attempt_status contract_file initial_attempt
+  local contract_status attempt_status current_contract_status current_attempt_status contract_file initial_attempt
   contract_file="$(run_contract_path "$run_id")"
   initial_attempt="$(stage_attempt_dir "$run_id")/initial.yml"
   contract_status="$(contract_status_from_projection "$projection_status")"
   attempt_status="$(attempt_status_from_projection "$projection_status")"
 
   if [[ -f "$contract_file" ]]; then
+    current_contract_status="$(yq -r '.status // ""' "$contract_file")"
+    case "$current_contract_status" in
+      completed|failed|cancelled)
+        if [[ "$contract_status" == "running" ]]; then
+          contract_status="$current_contract_status"
+        fi
+        ;;
+    esac
     yq -o=json '.' "$contract_file" | jq --arg status "$contract_status" --arg updated_at "$updated_at" '.status=$status | .updated_at=$updated_at' | yq -P -p=json '.' > "$contract_file.tmp"
     mv "$contract_file.tmp" "$contract_file"
   fi
 
   if [[ -f "$initial_attempt" ]]; then
+    current_attempt_status="$(yq -r '.status // ""' "$initial_attempt")"
+    case "$current_attempt_status" in
+      succeeded|failed|cancelled)
+        if [[ "$attempt_status" == "running" ]]; then
+          attempt_status="$current_attempt_status"
+        fi
+        ;;
+    esac
     yq -o=json '.' "$initial_attempt" | jq --arg status "$attempt_status" --arg updated_at "$updated_at" '.status=$status | .updated_at=$updated_at' | yq -P -p=json '.' > "$initial_attempt.tmp"
     mv "$initial_attempt.tmp" "$initial_attempt"
   fi
