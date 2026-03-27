@@ -17,6 +17,35 @@ Usage:
 EOF
 }
 
+validate_risk_class() {
+  local risk_class="$1"
+  case "$risk_class" in
+    low|medium|high|critical) ;;
+    *)
+      echo "invalid risk-class: $risk_class" >&2
+      echo "expected one of: low, medium, high, critical" >&2
+      exit 1
+      ;;
+  esac
+}
+
+validate_support_tier() {
+  local support_tier="$1"
+  local support_targets_file="$OCTON_DIR/instance/governance/support-targets.yml"
+  if [[ ! -f "$support_targets_file" ]]; then
+    echo "support-target declaration missing: $support_targets_file" >&2
+    exit 1
+  fi
+
+  if yq -e --arg support_tier "$support_tier" '.tiers.workload[]? | select(.label == $support_tier or .id == $support_tier)' "$support_targets_file" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  echo "invalid support-tier: $support_tier" >&2
+  echo "expected a declared workload tier label or id from $support_targets_file" >&2
+  exit 1
+}
+
 run_control_dir() {
   local run_id="$1"
   printf '%s/%s' "$RUN_CONTROL_ROOT" "$run_id"
@@ -592,6 +621,10 @@ write_retained_evidence_file() {
   local run_id="$1"
   local updated_at="$2"
   local retained_file existing_map_json new_map_json merged_map_json
+  local run_card_ref=""
+  if [[ -f "$(run_card_path "$run_id")" ]]; then
+    run_card_ref="$(run_card_relpath "$run_id")"
+  fi
   retained_file="$(retained_evidence_path "$run_id")"
   existing_map_json="$(yaml_json_or_default "$retained_file" '.evidence_refs // {}' '{}')"
   new_map_json="$(jq -n \
@@ -611,7 +644,7 @@ write_retained_evidence_file() {
     --arg evaluator_review "$(evaluator_review_relpath "$run_id")" \
     --arg measurement_summary "$(measurement_summary_relpath "$run_id")" \
     --arg intervention_log "$(intervention_log_relpath "$run_id")" \
-    --arg run_card "$(run_card_relpath "$run_id")" \
+    --arg run_card "$run_card_ref" \
     '{
       run_contract: $run_contract,
       runtime_state: $runtime_state,
@@ -628,9 +661,9 @@ write_retained_evidence_file() {
       recovery_report: $recovery_report,
       evaluator_review: $evaluator_review,
       measurement_summary: $measurement_summary,
-      intervention_log: $intervention_log,
-      run_card: $run_card
-    }')"
+      intervention_log: $intervention_log
+    }
+    + (if $run_card != "" then {run_card: $run_card} else {} end)')"
   merged_map_json="$(printf '%s\n%s\n' "$existing_map_json" "$new_map_json" | jq -s '.[0] * .[1]')"
   jq -n \
     --arg run_id "$run_id" \
@@ -1289,6 +1322,8 @@ PY
     [[ -n "$lease_expires_at" ]] || { echo "lease-expires-at or lease-seconds is required" >&2; exit 1; }
     [[ -n "$executor_acknowledged_at" ]] || executor_acknowledged_at="$started_at"
     [[ -n "$last_heartbeat_at" ]] || last_heartbeat_at="$executor_acknowledged_at"
+    validate_risk_class "$risk_class"
+    validate_support_tier "$support_tier"
 
     continuity_run_path="$(run_evidence_relpath "$run_id")/"
     ensure_run_lifecycle_roots "$run_id"
