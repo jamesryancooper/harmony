@@ -53,10 +53,13 @@ create_fixture() {
   cleanup_paths+=("$fixture_root")
 
   mkdir -p "$fixture_root/.octon/framework/orchestration/runtime"
+  mkdir -p "$fixture_root/.octon/instance/governance"
   mkdir -p "$fixture_root/.octon/state/evidence/decisions/repo"
   mkdir -p "$fixture_root/.octon/state/evidence/runs"
 
   cp -R "$REPO_ROOT/.octon/framework/orchestration/runtime" "$fixture_root/.octon/framework/orchestration/"
+  cp "$REPO_ROOT/.octon/instance/governance/support-targets.yml" \
+    "$fixture_root/.octon/instance/governance/support-targets.yml"
   cp "$REPO_ROOT/.octon/state/evidence/decisions/repo/README.md" "$fixture_root/.octon/state/evidence/decisions/repo/README.md"
   cp "$REPO_ROOT/.octon/state/evidence/decisions/repo/retention.json" "$fixture_root/.octon/state/evidence/decisions/repo/retention.json"
   cp "$REPO_ROOT/.octon/state/evidence/runs/README.md" "$fixture_root/.octon/state/evidence/runs/README.md"
