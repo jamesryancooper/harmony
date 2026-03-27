@@ -237,7 +237,7 @@ jobs:
             --projection-ref "github://check/AI Review Gate / decision" \
             --output ".octon/generated/.tmp/ai-gate/waiver-authority.json"
           echo "approval_granted=$(jq -r '.approval_granted' .octon/generated/.tmp/ai-gate/waiver-authority.json)" >> "${GITHUB_OUTPUT}"
-          echo "approval_grant_ref=$(jq -r '.approval_grant_ref // \"\"' .octon/generated/.tmp/ai-gate/waiver-authority.json)" >> "${GITHUB_OUTPUT}"
+          echo "approval_grant_ref=$(jq -r '.approval_grant_ref // ""' .octon/generated/.tmp/ai-gate/waiver-authority.json)" >> "${GITHUB_OUTPUT}"
 
       - id: aggregate
         name: Aggregate provider decisions
