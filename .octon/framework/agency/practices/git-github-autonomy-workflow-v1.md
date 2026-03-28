@@ -38,8 +38,8 @@ Default lane (autonomous):
 
 Guarded lane (rare human check-in):
 
-- High-impact governance/control-plane changes require `accept:human`.
-- Dependabot major/unknown version jumps require `accept:human`.
+- High-impact governance/control-plane changes stay in the manual lane.
+- Dependabot major/unknown version jumps stay in the manual lane.
 - `autonomy:no-automerge` is a manual opt-out from autonomous merging.
 - Human check-in is metadata-level; enforcement still runs in CI/rulesets.
 
@@ -52,7 +52,8 @@ Release lane:
 Dependency lane (Dependabot):
 
 - `github-actions` patch/minor updates are grouped and auto-merged when checks pass.
-- Major or unclassified version jumps are escalation-only (`accept:human`).
+- Major or unclassified version jumps are escalation-only and stay in the
+  manual lane.
 
 Steady-state health lane:
 

@@ -3,11 +3,9 @@
 `/.octon/framework/constitution/contracts/objective/**` defines the
 constitutional objective model for governed execution.
 
-## Wave 1 Status
+## Status
 
-Wave 1 promotes the existing workspace objective pair into the constitutional
-kernel and introduces the run-contract control family without breaking the
-current mission-backed operating model.
+The objective family is fully active.
 
 - workspace-charter pair remains:
   `/.octon/instance/bootstrap/OBJECTIVE.md` and
@@ -30,14 +28,13 @@ current mission-backed operating model.
 4. Stage-attempt contract
    - retry, staged execution, and resumption records under the bound run root
 
-## Transitional Rules
+## Final Rules
 
-- Mission remains the continuity container during Wave 1.
-- Run contracts become the defined atomic execution unit during Wave 1.
-- Mission-only execution assumptions are legal only as explicit transitional
-  compatibility and must carry retirement metadata.
-- Wave 3 removes mission-only execution assumptions once run-root lifecycle
-  state becomes the primary execution-time source of truth.
+- Mission remains the continuity container for recurring, overlapping, and
+  long-horizon autonomy.
+- Run contracts are the atomic execution unit for consequential work.
+- Stage attempts, checkpoints, rollback posture, replay pointers, and retained
+  evidence stay subordinate to the bound run root.
 
 ## Canonical Files
 

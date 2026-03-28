@@ -1,11 +1,11 @@
 schema_version: "octon-host-adapter-v1"
 adapter_id: "github-control-plane"
 display_name: "GitHub Control Plane Projection"
-description: "Projects labels, comments, checks, and workflow signals into canonical authority artifacts."
+description: "Projects canonical lane, blocker, and review status into GitHub labels, comments, and checks without minting authority."
 replaceable: true
-authority_mode: "projection_only"
+authority_mode: "non_authoritative"
 runtime_surface:
-  interface_ref: ".octon/framework/agency/_ops/scripts/github/materialize-pr-authority.sh"
+  interface_ref: ".github/workflows/pr-triage.yml"
   integration_class: "host-projection"
 projection_sources:
   - "labels"
@@ -17,5 +17,5 @@ conformance_criteria_refs:
   - "HOST-001"
   - "HOST-003"
 non_authoritative_boundaries:
-  - "GitHub state may request or project authority, but runtime must materialize canonical artifacts before execution."
+  - "GitHub state may mirror lane or blocker status, but runtime resolves authority only from canonical control artifacts."
   - "No GitHub label, comment, or check is authority by itself."

@@ -2,7 +2,6 @@
 set -euo pipefail
 
 PR_NUMBER=""
-ADD_ACCEPT_HUMAN=0
 MARK_READY=1
 REQUEST_AUTOMERGE=1
 ADD_AUTO_LABEL=1
@@ -20,7 +19,6 @@ Usage:
 
 Options:
   --label <name>         Add additional label(s) before shipping (repeatable).
-  --accept-human         Add accept:human label.
   --no-ready             Do not convert draft PR to ready state.
   --no-auto-label        Do not add autonomy:auto-merge.
   --no-automerge         Skip auto-merge request call.
@@ -69,9 +67,6 @@ while [[ $# -gt 0 ]]; do
       else
         LABELS_CSV="${LABELS_CSV},$1"
       fi
-      ;;
-    --accept-human)
-      ADD_ACCEPT_HUMAN=1
       ;;
     --no-ready)
       MARK_READY=0
@@ -155,13 +150,6 @@ fi
 LABELS_TO_ADD=""
 if [[ "$ADD_AUTO_LABEL" -eq 1 ]]; then
   LABELS_TO_ADD="autonomy:auto-merge"
-fi
-if [[ "$ADD_ACCEPT_HUMAN" -eq 1 ]]; then
-  if [[ -z "$LABELS_TO_ADD" ]]; then
-    LABELS_TO_ADD="accept:human"
-  else
-    LABELS_TO_ADD="${LABELS_TO_ADD},accept:human"
-  fi
 fi
 if [[ -n "$LABELS_CSV" ]]; then
   if [[ -z "$LABELS_TO_ADD" ]]; then

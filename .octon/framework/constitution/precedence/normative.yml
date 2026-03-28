@@ -34,7 +34,7 @@ layers:
     decision_rule: >-
       Published repo-owned policy families and support-target declarations apply
       beneath the kernel.
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     notes:
       - "Repo policy families are active."
       - "Support-target declarations are published for Wave 2 routing."
@@ -46,9 +46,10 @@ layers:
       - ".octon/state/control/execution/revocations/**"
     decision_rule: >-
       Approval, exception, and revocation artifacts govern the current run.
-      Labels, comments, checks, and similar host affordances are projections
-      only until runtime materializes canonical authority artifacts here.
-    adoption_status: "active-transitional"
+      Labels, comments, checks, and similar host affordances may mirror
+      status, but they never become authority and are ignored by runtime when
+      canonical control artifacts disagree.
+    adoption_status: "active"
     activation_wave: 2
   - rank: 5
     authority: "workspace-charter-pair"
@@ -68,14 +69,14 @@ layers:
     surfaces:
       - ".octon/state/control/execution/runs/<run-id>/run-contract.yml"
     decision_rule: "Run contracts are the atomic execution authority for consequential runs."
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 1
   - rank: 8
     authority: "stage-attempt-contract"
     surfaces:
       - ".octon/state/control/execution/runs/<run-id>/stage-attempts/**"
     decision_rule: "Stage-attempt contracts govern retries, staged execution, and resumable attempt records beneath the bound run contract."
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 1
   - rank: 9
     authority: "run-lifecycle-control"
@@ -90,7 +91,7 @@ layers:
       evidence, observability evidence, and RunCard disclosure beneath the
       bound run contract. These artifacts summarize authority and evidence but
       may not widen authority.
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 3
   - rank: 10
     authority: "capability-tool-and-adapter-contracts"
@@ -99,7 +100,7 @@ layers:
       - ".octon/framework/constitution/contracts/adapters/**"
       - ".octon/framework/engine/runtime/adapters/**"
     decision_rule: "Capability and adapter contracts may narrow execution but may not widen authority; adapter families remain replaceable and non-authoritative."
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     notes:
       - "Capability contracts are active."
       - "Generalized model and host adapter contracts are active in Wave 5."

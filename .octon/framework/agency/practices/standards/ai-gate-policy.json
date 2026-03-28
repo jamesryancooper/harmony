@@ -6,10 +6,7 @@
     "require_all_providers_available_when_enforced": true
   },
   "waiver": {
-    "required_labels": [
-      "ai-gate:waive",
-      "accept:human"
-    ]
+    "mode": "disabled"
   },
   "providers": [
     {

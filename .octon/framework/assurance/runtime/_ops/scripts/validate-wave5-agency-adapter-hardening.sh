@@ -74,7 +74,7 @@ main() {
   require_file "$SUPPORT_TARGETS"
   require_file "$SUPPORT_SCHEMA"
 
-  require_yq '.families[] | select(.family_id == "adapters" and .status == "active-transitional")' "$CONTRACT_REGISTRY" "constitutional registry activates adapter contract family"
+  require_yq '.families[] | select(.family_id == "adapters" and .status == "active")' "$CONTRACT_REGISTRY" "constitutional registry activates adapter contract family"
   require_yq '.integration_surfaces.adapter_contract_family.root == ".octon/framework/constitution/contracts/adapters/**"' "$CONTRACT_REGISTRY" "constitutional registry exposes adapter contract family root"
   require_yq '.integration_surfaces.runtime_adapter_roots.host == ".octon/framework/engine/runtime/adapters/host/**"' "$CONTRACT_REGISTRY" "constitutional registry exposes host adapter runtime root"
   require_yq '.integration_surfaces.runtime_adapter_roots.model == ".octon/framework/engine/runtime/adapters/model/**"' "$CONTRACT_REGISTRY" "constitutional registry exposes model adapter runtime root"
@@ -91,6 +91,7 @@ main() {
   require_yq '.host_adapters | length > 0' "$SUPPORT_TARGETS" "support-target declarations publish host adapter envelopes"
   require_yq '.model_adapters | length > 0' "$SUPPORT_TARGETS" "support-target declarations publish model adapter envelopes"
   require_yq '.host_adapters[] | select(.adapter_id == "repo-shell" and .replaceable == true)' "$SUPPORT_TARGETS" "repo-shell host adapter is declared as replaceable"
+  require_yq '.host_adapters[] | select(.adapter_id == "github-control-plane" and .authority_mode == "non_authoritative")' "$SUPPORT_TARGETS" "github control-plane host adapter is non-authoritative"
   require_yq '.model_adapters[] | select(.adapter_id == "repo-local-governed" and .replaceable == true)' "$SUPPORT_TARGETS" "repo-local-governed model adapter is declared as replaceable"
 
   require_text '"adapter_conformance_criteria"' "$SUPPORT_SCHEMA" "support-target schema requires adapter conformance criteria"

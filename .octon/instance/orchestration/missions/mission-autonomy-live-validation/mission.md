@@ -62,8 +62,8 @@ external effects.
   run root.
 - Generated mission summaries and mission views consume per-run run evidence
   and do not replace the bound run root.
-- Mission-only execution remains a transitional compatibility path with an
-  explicit retirement gate.
+- This mission stays active as continuity and routing state, but consequential
+  execution still binds the canonical run root.
 
 ## Notes
 

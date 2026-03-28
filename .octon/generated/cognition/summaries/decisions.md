@@ -5,8 +5,8 @@ mutability: generated
 generated_from:
   - /.octon/instance/cognition/decisions/index.yml
   - /.octon/instance/cognition/decisions/*.md
-generated_at: "2026-03-24T01:21:25Z"
-generator_version: "0.6.0"
+generated_at: "2026-03-28T16:52:59Z"
+generator_version: "0.6.7"
 ---
 
 # Decisions
@@ -81,6 +81,17 @@ Do not edit manually. Update ADR files and `/.octon/instance/cognition/decisions
 | ADR-061 | Accepted | 2026-03-22 | ADR 061: Harness Integrity Tightening Atomic Cutover | `/.octon/instance/cognition/decisions/061-harness-integrity-tightening-atomic-cutover.md` |
 | ADR-062 | Accepted | 2026-03-23 | ADR 062: Self-Audit And Release Hardening Atomic Cutover | `/.octon/instance/cognition/decisions/062-self-audit-and-release-hardening-atomic-cutover.md` |
 | ADR-063 | Accepted | 2026-03-23 | ADR 063: Mission-Scoped Reversible Autonomy Atomic Cutover | `/.octon/instance/cognition/decisions/063-mission-scoped-reversible-autonomy-atomic-cutover.md` |
+| ADR-064 | Accepted | 2026-03-24 | ADR 064: Mission-Scoped Reversible Autonomy Completion Cutover | `/.octon/instance/cognition/decisions/064-mission-scoped-reversible-autonomy-completion-cutover.md` |
+| ADR-065 | Accepted | 2026-03-24 | ADR 065: Proposal System Integrity And Archive Normalization Atomic Cutover | `/.octon/instance/cognition/decisions/065-proposal-system-integrity-and-archive-normalization-atomic-cutover.md` |
+| ADR-066 | Accepted | 2026-03-25 | ADR 066: Mission-Scoped Reversible Autonomy Steady-State Cutover | `/.octon/instance/cognition/decisions/066-mission-scoped-reversible-autonomy-steady-state-cutover.md` |
+| ADR-067 | Accepted | 2026-03-25 | ADR 067: Mission-Scoped Reversible Autonomy Final Closeout Cutover | `/.octon/instance/cognition/decisions/067-mission-scoped-reversible-autonomy-final-closeout-cutover.md` |
+| ADR-068 | Accepted | 2026-03-25 | ADR 068: Mission-Scoped Reversible Autonomy Provenance Alignment Closeout | `/.octon/instance/cognition/decisions/068-mission-scoped-reversible-autonomy-provenance-alignment-closeout.md` |
+| ADR-069 | Accepted | 2026-03-26 | ADR 069: Objective Binding Cutover | `/.octon/instance/cognition/decisions/069-objective-binding-cutover.md` |
+| ADR-070 | Accepted | 2026-03-27 | ADR 070: Runtime Lifecycle Normalization Cutover | `/.octon/instance/cognition/decisions/070-runtime-lifecycle-normalization-cutover.md` |
+| ADR-071 | Accepted | 2026-03-27 | ADR 071: Assurance, Lab, And Disclosure Expansion Cutover | `/.octon/instance/cognition/decisions/071-assurance-lab-disclosure-expansion-cutover.md` |
+| ADR-072 | Accepted | 2026-03-27 | ADR 072: Wave 4 Gap Remediation Cutover | `/.octon/instance/cognition/decisions/072-wave4-gap-remediation-cutover.md` |
+| ADR-073 | Accepted | 2026-03-27 | ADR 073: Wave 5 Agency Simplification And Adapter Hardening Cutover | `/.octon/instance/cognition/decisions/073-wave5-agency-simplification-and-adapter-hardening-cutover.md` |
+| ADR-074 | Accepted | 2026-03-28 | ADR 074: Wave 6 Retirement, Cutover, And Closeout | `/.octon/instance/cognition/decisions/074-wave6-retirement-cutover.md` |
 
 ## Update Procedure
 

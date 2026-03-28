@@ -90,9 +90,6 @@ jobs:
               const reasons = [];
               const ageHours = (Date.now() - Date.parse(pr.updated_at)) / (1000 * 60 * 60);
 
-              if (labels.has("accept:human")) {
-                reasons.push("awaiting human acceptance");
-              }
               if (labels.has("autonomy:no-automerge")) {
                 reasons.push("autonomy lane disabled");
               }
@@ -202,7 +199,7 @@ jobs:
                 ...attentionRows.map((row) => `| [#${row.number}](${row.url}) | ${row.ageHours} | ${row.reasons.join("; ")} |`),
                 "",
                 "Action expectations:",
-                "- Resolve manual-lane/blocking conditions promptly (`accept:human`, policy labels, review threads/checks).",
+                "- Resolve manual-lane/blocking conditions promptly (policy labels, review threads/checks).",
                 "- After merge/close, run local cleanup: `.octon/framework/agency/_ops/scripts/git/git-pr-cleanup.sh`.",
                 "- Preferred shipping path: `.octon/framework/agency/_ops/scripts/git/git-pr-ship.sh` (includes cleanup watcher)."
               ];

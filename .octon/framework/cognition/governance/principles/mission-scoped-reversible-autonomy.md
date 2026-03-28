@@ -74,8 +74,8 @@ Before a mission may become active or paused for autonomous runtime, the
 seed-before-active path must materialize the mission control family, mission
 continuity, effective route, generated summaries, and mission view.
 Consequential runs should additionally bind a run contract under
-`state/control/execution/runs/<run-id>/run-contract.yml`; mission-only
-execution remains transitional until later lifecycle normalization lands.
+`state/control/execution/runs/<run-id>/run-contract.yml`; mission authority
+does not replace the bound run root as execution-time truth.
 Generated mission summaries and mission views consume per-run run evidence when
 runs are bound; they do not replace the run root as execution-time truth.
 
@@ -89,9 +89,9 @@ Keep these concerns distinct:
 - **reversibility**: what can still be rolled back or compensated after
   promotion
 
-Approval becomes authoritative only after runtime materializes canonical
-`ApprovalRequest` and `ApprovalGrant` artifacts. Labels, comments, checks, and
-chat state remain projection inputs only.
+Approval becomes authoritative only through canonical `ApprovalRequest` and
+`ApprovalGrant` artifacts. Labels, comments, checks, and chat state remain
+non-authoritative projection inputs only.
 
 Notifications are not approval.
 Silence is not consent.

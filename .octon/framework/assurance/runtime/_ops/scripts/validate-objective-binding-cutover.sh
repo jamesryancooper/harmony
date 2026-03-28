@@ -24,7 +24,7 @@ RUN_LINKAGE_GUIDE="$OCTON_DIR/framework/orchestration/practices/run-linkage-stan
 WRITE_RUN_SCRIPT="$OCTON_DIR/framework/orchestration/runtime/_ops/scripts/write-run.sh"
 ROOT_MANIFEST="$OCTON_DIR/octon.yml"
 POLICY_CONFIG="$OCTON_DIR/framework/engine/runtime/config/policy-interface.yml"
-MIGRATION_PLAN="$OCTON_DIR/instance/cognition/context/shared/migrations/2026-03-26-objective-binding-cutover/plan.md"
+MIGRATION_PLAN="$OCTON_DIR/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 
 errors=0
 
@@ -120,16 +120,16 @@ main() {
   require_file "$POLICY_CONFIG"
   require_file "$MIGRATION_PLAN"
 
-  require_yq '.families[] | select(.family_id == "objective" and .status == "active-transitional")' "$CONTRACT_REGISTRY" "constitutional contract registry activates objective family as transitional"
+  require_yq '.families[] | select(.family_id == "objective" and .status == "active")' "$CONTRACT_REGISTRY" "constitutional contract registry activates objective family"
   require_yq '.integration_surfaces.run_control_root.path == ".octon/state/control/execution/runs/**"' "$CONTRACT_REGISTRY" "constitutional contract registry records canonical run-control root"
 
   require_yq '.schema_version == "octon-constitutional-objective-family-v1"' "$FAMILY_FILE" "objective family schema version is correct"
   require_yq '.release_state == "pre-1.0"' "$FAMILY_FILE" "objective family records release_state"
   require_yq '.change_profile == "transitional"' "$FAMILY_FILE" "objective family records transitional change profile"
-  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-26-objective-binding-cutover/plan.md"' "$FAMILY_FILE" "objective family points to the profile selection receipt"
+  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"' "$FAMILY_FILE" "objective family points to the current profile selection receipt"
   require_yq '.objective_stack.run_contract.control_root == ".octon/state/control/execution/runs"' "$FAMILY_FILE" "objective family binds the run control root"
   require_yq '.objective_stack.stage_attempt_contract.canonical_dir == "stage-attempts"' "$FAMILY_FILE" "objective family defines stage-attempt placement"
-  require_yq '.mission_only_execution.status == "transitional"' "$FAMILY_FILE" "objective family marks mission-only execution as transitional"
+  require_yq 'has("mission_only_execution") | not' "$FAMILY_FILE" "objective family no longer carries mission-only execution shims"
 
   require_yq '.narrative_ref == ".octon/instance/bootstrap/OBJECTIVE.md"' "$WORKSPACE_FILE" "workspace charter pair narrative ref is canonical"
   require_yq '.machine_ref == ".octon/instance/cognition/context/shared/intent.contract.yml"' "$WORKSPACE_FILE" "workspace charter pair machine ref is canonical"
@@ -163,15 +163,15 @@ main() {
   require_yq '.run_control_root == ".octon/state/control/execution/runs"' "$MISSION_REGISTRY" "mission registry records canonical run control root"
   require_yq '.execution_unit == "run-contract"' "$MISSION_REGISTRY" "mission registry records run-contract execution unit"
   require_yq '.mission_role == "continuity-container"' "$MISSION_REGISTRY" "mission registry records continuity-container role"
-  require_yq '.mission_only_execution == "transitional"' "$MISSION_REGISTRY" "mission registry records transitional mission-only execution"
+  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"' "$MISSION_REGISTRY" "mission registry points to the Wave 6 receipt"
+  require_yq 'has("mission_only_execution") | not' "$MISSION_REGISTRY" "mission registry no longer carries mission-only execution state"
 
   for file in "$MISSION_TEMPLATE" "$LIVE_MISSION"; do
     local label="${file#$ROOT_DIR/}"
     require_yq '.objective_binding.execution_unit == "run-contract"' "$file" "$label binds run-contract execution unit"
     require_yq '.objective_binding.run_control_root == ".octon/state/control/execution/runs"' "$file" "$label points to run control root"
     require_yq '.objective_binding.mission_role == "continuity-container"' "$file" "$label records continuity-container role"
-    require_yq '.transitional_execution_model.mission_only_execution == "transitional"' "$file" "$label records transitional mission-only execution"
-    require_yq '.transitional_execution_model.retirement_gate != ""' "$file" "$label records retirement gate"
+    require_yq 'has("transitional_execution_model") | not' "$file" "$label no longer carries transitional execution metadata"
   done
 
   require_yq '.resolution.runtime_inputs.objective_contract_family == ".octon/framework/constitution/contracts/objective"' "$ROOT_MANIFEST" "root manifest exposes objective contract family runtime input"

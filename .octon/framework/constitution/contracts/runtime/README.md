@@ -3,11 +3,9 @@
 `/.octon/framework/constitution/contracts/runtime/**` defines the
 constitutional run-lifecycle model for governed execution.
 
-## Wave 3 Status
+## Status
 
-Wave 3 promotes run roots to the primary execution-time unit of truth while
-preserving the current mission-backed continuity model during the transitional
-coexistence window.
+Run roots are the primary execution-time unit of truth.
 
 - canonical runtime state lives under:
   `/.octon/state/control/execution/runs/<run-id>/runtime-state.yml`
@@ -23,15 +21,13 @@ coexistence window.
 - canonical replay and trace pointers live under:
   `/.octon/state/evidence/runs/<run-id>/{replay-pointers.yml,trace-pointers.yml}`
 
-## Transitional Rules
+## Final Rules
 
 - Mission remains the continuity and long-horizon autonomy container.
 - Consequential stages must bind the run control and evidence roots before
   side effects occur.
 - Mission continuity, summaries, and mission views may consume run evidence,
   but they may not replace the run root as the execution-time source of truth.
-- Compatibility root-level run evidence artifacts remain legal only while the
-  canonical receipts and replay families are being backfilled.
 
 ## Canonical Files
 

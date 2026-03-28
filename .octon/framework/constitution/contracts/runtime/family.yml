@@ -1,21 +1,10 @@
 schema_version: "octon-constitutional-runtime-family-v1"
 family_id: "runtime"
-status: "active-transitional"
+status: "active"
 activation_wave: 3
 release_state: "pre-1.0"
 change_profile: "transitional"
-profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-27-runtime-lifecycle-normalization-cutover/plan.md"
-transitional_exception_note:
-  rationale: >-
-    Wave 3 must normalize run lifecycle state, receipts, checkpoints, and
-    replay posture under per-run roots while preserving current mission-backed
-    continuity and generated read models during the coexistence window.
-  risks:
-    - "Run-root lifecycle writers could drift from older mission-backed projections."
-    - "Generated mission summaries could keep pointing only at generic evidence roots instead of per-run evidence."
-    - "Legacy root-level run evidence artifacts could outlive the canonical runtime families during backfill."
-  owner: "Octon governance"
-  target_removal_date: "2026-06-30"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 run_lifecycle:
   runtime_state:
     schema_ref: ".octon/framework/constitution/contracts/runtime/runtime-state-v1.schema.json"

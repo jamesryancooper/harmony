@@ -17,7 +17,7 @@ WRITE_RUN_SCRIPT="$OCTON_DIR/framework/orchestration/runtime/_ops/scripts/write-
 AUTHORIZATION_RS="$OCTON_DIR/framework/engine/runtime/crates/kernel/src/authorization.rs"
 SYNC_SCRIPT="$OCTON_DIR/framework/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh"
 MISSION_VIEW_SCHEMA="$OCTON_DIR/framework/engine/runtime/spec/mission-view-v1.schema.json"
-MIGRATION_PLAN="$OCTON_DIR/instance/cognition/context/shared/migrations/2026-03-27-runtime-lifecycle-normalization-cutover/plan.md"
+MIGRATION_PLAN="$OCTON_DIR/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 
 errors=0
 fail() { echo "[ERROR] $1"; errors=$((errors + 1)); }
@@ -72,13 +72,13 @@ main() {
   require_file "$AUTHORIZATION_RS"
   require_file "$SYNC_SCRIPT"
 
-  require_yq '.families[] | select(.family_id == "runtime" and .status == "active-transitional")' "$CONTRACT_REGISTRY" "constitutional registry activates runtime contract family"
+  require_yq '.families[] | select(.family_id == "runtime" and .status == "active")' "$CONTRACT_REGISTRY" "constitutional registry activates runtime contract family"
   require_yq '.integration_surfaces.runtime_contract_family.root == ".octon/framework/constitution/contracts/runtime/**"' "$CONTRACT_REGISTRY" "constitutional registry exposes runtime contract family root"
   require_yq '.integration_surfaces.run_evidence_root.path == ".octon/state/evidence/runs/**"' "$CONTRACT_REGISTRY" "constitutional registry exposes canonical run evidence root"
   require_yq '.schema_version == "octon-constitutional-runtime-family-v1"' "$RUNTIME_FAMILY_FILE" "runtime family schema version is correct"
   require_yq '.release_state == "pre-1.0"' "$RUNTIME_FAMILY_FILE" "runtime family records release_state"
   require_yq '.change_profile == "transitional"' "$RUNTIME_FAMILY_FILE" "runtime family records transitional profile"
-  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-27-runtime-lifecycle-normalization-cutover/plan.md"' "$RUNTIME_FAMILY_FILE" "runtime family points to Wave 3 profile receipt"
+  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"' "$RUNTIME_FAMILY_FILE" "runtime family points to the Wave 6 profile receipt"
   require_yq '.run_lifecycle.runtime_state.canonical_file == "runtime-state.yml"' "$RUNTIME_FAMILY_FILE" "runtime family defines runtime-state placement"
   require_yq '.run_lifecycle.rollback_posture.canonical_file == "rollback-posture.yml"' "$RUNTIME_FAMILY_FILE" "runtime family defines rollback-posture placement"
   require_yq '.run_lifecycle.checkpoints.canonical_dir == "checkpoints"' "$RUNTIME_FAMILY_FILE" "runtime family defines checkpoint placement"

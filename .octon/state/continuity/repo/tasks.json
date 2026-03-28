@@ -283,6 +283,24 @@
       "description": "Confirm that Wave 4 exit-gate work is complete in the promoted canonical run-root model",
       "status": "completed",
       "completed_at": "2026-03-27"
+    },
+    {
+      "id": "wave-5-agency-simplification-adapter-hardening-cutover",
+      "description": "Implement Wave 5 agency simplification and adapter hardening for the unified execution constitution",
+      "status": "completed",
+      "completed_at": "2026-03-27"
+    },
+    {
+      "id": "wave-6-retirement-cutover",
+      "description": "Implement Wave 6 retirement, cutover, and closeout so only the final constitutional execution model remains live",
+      "status": "completed",
+      "completed_at": "2026-03-28"
+    },
+    {
+      "id": "fully-unified-execution-constitution-proposal-promoted-to-implemented",
+      "description": "Promote the fully unified execution constitution proposal package to implemented once durable targets no longer depend on the proposal path",
+      "status": "completed",
+      "completed_at": "2026-03-28"
     }
   ]
 }

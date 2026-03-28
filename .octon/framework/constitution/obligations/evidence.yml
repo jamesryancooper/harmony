@@ -26,11 +26,11 @@ obligations:
     adoption_status: "active"
   - id: "EVI-006"
     requirement: "Every consequential run emits disclosure artifacts such as RunCard outputs."
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 4
   - id: "EVI-007"
     requirement: "System-level support claims emit support-target-backed disclosure artifacts such as HarnessCard outputs."
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 4
   - id: "EVI-008"
     requirement: "Runtime-versus-doc mismatches emit drift evidence or block publication until reconciled."
@@ -39,17 +39,17 @@ obligations:
     requirement: >-
       Support claims and autonomy envelopes must cite explicit support-target
       declarations once the support-target matrix is published.
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 2
   - id: "EVI-010"
     requirement: >-
       Behavioral claims cite retained lab, replay, scenario, or shadow-run
       evidence before they can pass consequential disclosure gates.
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 4
   - id: "EVI-011"
     requirement: >-
       Adapter-backed support claims retain explicit adapter ids and
       conformance criteria under bound run evidence or disclosure artifacts.
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 5

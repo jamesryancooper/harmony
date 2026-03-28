@@ -172,10 +172,6 @@ jobs:
               exit 0
             fi
 
-            if has_label "${payload}" "accept:human"; then
-              echo "Skipping: accept:human label present${suffix}."
-              exit 0
-            fi
           }
 
           pr_json=""

@@ -109,7 +109,6 @@ jobs:
               "risk:med": { color: "FBCA04", description: "Medium risk change" },
               "risk:high": { color: "B60205", description: "High impact governance/control-plane change" },
 
-              "accept:human": { color: "000000", description: "Explicit human acceptance for high-impact merge" },
               "autonomy:auto-merge": { color: "1B8835", description: "Eligible for autonomous auto-merge lane" },
               "autonomy:no-automerge": { color: "B60205", description: "Excluded from autonomous auto-merge lane" },
               "bot:dependabot": { color: "0366D6", description: "Dependabot pull request" }
@@ -244,7 +243,6 @@ jobs:
             const isAutoMergeEligible =
               !pr.draft &&
               !headRef.startsWith("exp/") &&
-              !labels.has("accept:human") &&
               !manualNoAuto &&
               !requiresHumanReview;
 
@@ -315,11 +313,11 @@ jobs:
             }
 
             if (highImpactHumanRequired) {
-              core.notice("High-impact change detected. Explicit 'accept:human' is required by autonomy policy before merge.");
+              core.notice("High-impact change detected. PR stays in the manual lane and will not be auto-merged.");
             }
 
             if (dependabotHumanReviewRequired) {
-              core.notice("Dependabot major/unknown update detected. Explicit 'accept:human' is required by autonomy policy before merge.");
+              core.notice("Dependabot major/unknown update detected. PR stays in the manual lane and will not be auto-merged.");
             }
 
             if (isAutoMergeEligible) {

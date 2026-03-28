@@ -110,6 +110,7 @@ policy_default_enforce="$(jq -r '.enforcement.default // false' <<<"${policy_jso
 policy_require_provider_ok="$(jq -r '.enforcement.require_all_providers_available_when_enforced // true' <<<"${policy_json}")"
 policy_blocking_decisions="$(jq -c '.blocking.decisions // ["block"]' <<<"${policy_json}")"
 policy_blocking_severities="$(jq -c '.blocking.severities // ["high", "critical"]' <<<"${policy_json}")"
+waiver_mode="$(jq -r '.waiver.mode // "label-gated"' <<<"${policy_json}")"
 required_waiver_labels="$(jq -c '.waiver.required_labels // []' <<<"${policy_json}")"
 
 if [[ -n "${ENFORCE_VALUE}" ]]; then
@@ -118,7 +119,9 @@ else
   enforce="$(normalize_bool "${policy_default_enforce}")"
 fi
 
-if [[ -n "${WAIVED_BY_AUTHORITY}" ]]; then
+if [[ "${waiver_mode}" == "disabled" ]]; then
+  waived=false
+elif [[ -n "${WAIVED_BY_AUTHORITY}" ]]; then
   waived="$(normalize_bool "${WAIVED_BY_AUTHORITY}")"
 else
   waived=true
@@ -186,7 +189,7 @@ gate_pass=true
 
 if [[ "${waived}" == "true" ]]; then
   decision="waived-pass"
-  reason="waiver labels present; AI gate blockers acknowledged by human acceptance"
+  reason="waiver authority acknowledged the AI gate blockers"
 elif [[ "${enforce}" == "true" && "${policy_require_provider_ok}" == "true" && "${providers_unavailable}" -gt 0 ]]; then
   decision="fail-provider-unavailable"
   reason="enforced mode requires all providers to execute successfully"

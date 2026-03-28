@@ -27,7 +27,6 @@ jobs:
     env:
       # Phase B default: enforce unless explicitly disabled.
       AUTONOMY_POLICY_ENFORCE: ${{ vars.AUTONOMY_POLICY_ENFORCE || 'true' }}
-      PR_LABELS_JSON: ${{ toJson(github.event.pull_request.labels.*.name) }}
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -43,27 +42,8 @@ jobs:
           EXPECT_AUTONOMY_POLICY_ENFORCE="true" \
           .octon/framework/assurance/runtime/_ops/scripts/assert-protected-execution-posture.sh
 
-      - id: authority
-        name: Materialize PR human-accept authority projection
-        run: |
-          set -euo pipefail
-          mkdir -p .octon/generated/.tmp
-          chmod +x .octon/framework/agency/_ops/scripts/github/materialize-pr-authority.sh
-          .octon/framework/agency/_ops/scripts/github/materialize-pr-authority.sh \
-            --pr-number "${{ github.event.pull_request.number }}" \
-            --labels-json "${PR_LABELS_JSON}" \
-            --request-scope "pr-autonomy-merge" \
-            --issued-by "github://pull/${{ github.event.pull_request.number }}" \
-            --required-label "accept:human" \
-            --output ".octon/generated/.tmp/pr-autonomy-authority.json"
-          echo "approval_granted=$(jq -r '.approval_granted' .octon/generated/.tmp/pr-autonomy-authority.json)" >> "${GITHUB_OUTPUT}"
-          echo "approval_request_ref=$(jq -r '.approval_request_ref' .octon/generated/.tmp/pr-autonomy-authority.json)" >> "${GITHUB_OUTPUT}"
-          echo "approval_grant_ref=$(jq -r '.approval_grant_ref // ""' .octon/generated/.tmp/pr-autonomy-authority.json)" >> "${GITHUB_OUTPUT}"
-
       - name: Validate autonomy policy
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        env:
-          PR_APPROVAL_GRANTED: ${{ steps.authority.outputs.approval_granted }}
         with:
           script: |
             const owner = context.repo.owner;
@@ -77,8 +57,6 @@ jobs:
             const headRef = pr.head?.ref || "";
             const author = pr.user?.login || "";
             const labels = new Set((pr.labels || []).map((l) => l.name));
-            const humanApprovalGranted = String(process.env.PR_APPROVAL_GRANTED || "").toLowerCase() === "true";
-
             const isDependabotAuthor = author === "dependabot[bot]";
             const isDependabot = isDependabotAuthor;
             const isAutorelease = headRef.startsWith("release-please--") || [...labels].some((name) => name.startsWith("autorelease:"));
@@ -255,17 +233,15 @@ jobs:
             ];
 
             const isHighImpact = paths.some((path) => highImpactPaths.some((prefix) => path.startsWith(prefix) || path === prefix));
-            if (isHighImpact && !humanApprovalGranted && !isDependabotSafeUpdate) {
-              errors.push("High-impact change requires explicit `accept:human` label before merge.");
-            }
-
-            if (dependabotHumanReviewRequired && !humanApprovalGranted) {
-              errors.push("Dependabot major/unknown updates require explicit `accept:human` label before merge.");
-            }
-
             if (errors.length === 0) {
               if (isDependabotGithubActions) {
                 core.info(`Dependabot github-actions update classified as '${dependabotUpdateType}'.`);
+              }
+              if (isHighImpact && !isDependabotSafeUpdate) {
+                core.notice("High-impact change detected. PR remains manual-lane only; autonomous merge is intentionally disabled.");
+              }
+              if (dependabotHumanReviewRequired) {
+                core.notice("Dependabot major/unknown update detected. PR remains manual-lane only; autonomous merge is intentionally disabled.");
               }
               core.info(`Autonomy policy passed (${enforce ? "enforced" : "advisory"} mode).`);
               return;

@@ -23,7 +23,6 @@ state/evidence/runs/<run-id>/
   retained-run-evidence.yml
 ```
 
-Compatibility root-level run evidence artifacts may remain during the
-transitional backfill, but canonical readers should prefer the receipts,
-checkpoint, replay, proof-plane, measurement, intervention, disclosure, and
-pointer families above.
+Canonical readers must consume the receipts, checkpoint, replay, proof-plane,
+measurement, intervention, disclosure, and pointer families above; deprecated
+root-level compatibility artifacts are retired.
