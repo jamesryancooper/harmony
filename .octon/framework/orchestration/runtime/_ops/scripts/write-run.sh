@@ -59,7 +59,13 @@ adapter_status() {
   local adapter_id="$2"
   local support_targets_file="$OCTON_DIR/instance/governance/support-targets.yml"
   local query=".$adapter_kind[] | select(.adapter_id == \"$adapter_id\") | .support_status // \"unsupported\""
-  yq -r "$query" "$support_targets_file" 2>/dev/null | head -n 1
+  local output=""
+  output="$(yq -r "$query" "$support_targets_file" 2>/dev/null | head -n 1 || true)"
+  if [[ -n "$output" ]]; then
+    printf '%s\n' "$output"
+  else
+    printf 'unsupported\n'
+  fi
 }
 
 adapter_criteria_json() {
