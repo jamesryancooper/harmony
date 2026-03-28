@@ -8,3 +8,11 @@ runs:
       workflow_group: meta
       workflow_id: evaluate-harness
     mission_id: mission-autonomy-live-validation
+  - run_id: run-wave4-benchmark-evaluator-20260327
+    status: succeeded
+    path: run-wave4-benchmark-evaluator-20260327.yml
+    continuity_run_path: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/
+    workflow_ref:
+      workflow_group: meta
+      workflow_id: evaluate-harness
+    mission_id: mission-autonomy-live-validation

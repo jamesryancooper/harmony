@@ -1,0 +1,24 @@
+schema_version: "lab-catalog-v1"
+catalog:
+  scenarios:
+    - scenario_id: "scn-wave4-assurance-disclosure-20260327"
+      class: "support-validation"
+      retained_proof_ref: ".octon/state/evidence/lab/scenarios/scn-wave4-assurance-disclosure-20260327/scenario-proof.yml"
+      supports_claims:
+        - "support"
+    - scenario_id: "scn-wave4-benchmark-disclosure-20260327"
+      class: "benchmark-validation"
+      retained_proof_ref: ".octon/state/evidence/lab/scenarios/scn-wave4-benchmark-disclosure-20260327/scenario-proof.yml"
+      supports_claims:
+        - "benchmark"
+  harness_cards:
+    - card_id: "hc-wave4-assurance-disclosure-20260327"
+      claim_kind: "support"
+      retained_card_ref: ".octon/state/evidence/lab/harness-cards/hc-wave4-assurance-disclosure-20260327.yml"
+    - card_id: "hc-wave4-benchmark-disclosure-20260327"
+      claim_kind: "benchmark"
+      retained_card_ref: ".octon/state/evidence/lab/harness-cards/hc-wave4-benchmark-disclosure-20260327.yml"
+  benchmark_measurements:
+    - benchmark_id: "bmk-wave4-disclosure-parity-20260327"
+      measurement_ref: ".octon/state/evidence/lab/benchmarks/bmk-wave4-disclosure-parity-20260327/summary.yml"
+      evaluator_review_ref: ".octon/state/evidence/lab/evaluator-reviews/evr-wave4-benchmark-disclosure-20260327.yml"

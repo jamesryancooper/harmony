@@ -17,8 +17,9 @@ carry the canonical lifecycle state beneath that run contract.
 over that canonical run root.
 
 `state/evidence/runs/<run-id>/` remains the durable evidence authority,
-including canonical `receipts/**`, `checkpoints/**`, `replay-pointers.yml`,
-and `trace-pointers.yml`.
+including canonical `receipts/**`, `checkpoints/**`, `replay/**`,
+`assurance/**`, `measurements/**`, `interventions/**`, `disclosure/**`,
+`replay-pointers.yml`, and `trace-pointers.yml`.
 
 ## Layout
 

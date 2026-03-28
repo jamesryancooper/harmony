@@ -46,8 +46,8 @@ max_concurrency="$(yq -r '.max_concurrency' "$policy_file")"
 idempotency_kind="$(yq -r '.idempotency_strategy.kind' "$policy_file")"
 existing_active_runs=0
 while IFS= read -r run_file; do
-  [[ "$(yq -r '.automation_id // \"\"' "$run_file")" == "$automation_id" ]] || continue
-  [[ "$(yq -r '.status // \"\"' "$run_file")" == "running" ]] || continue
+  [[ "$(yq -r '.automation_id // ""' "$run_file")" == "$automation_id" ]] || continue
+  [[ "$(yq -r '.status // ""' "$run_file")" == "running" ]] || continue
   existing_active_runs=$((existing_active_runs + 1))
 done < <(find "$RUNTIME_RUNS_DIR" -maxdepth 1 -type f -name '*.yml' ! -name 'index.yml' | sort)
 

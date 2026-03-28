@@ -23,6 +23,11 @@ required_evidence:
   - run-evidence-root
   - orchestration-run-projection
   - policy-receipt
+  - assurance-reports
+  - measurement-summary
+  - intervention-log
+  - run-card
+  - maintainability-report
   - replay-pointers
   - trace-pointers
 closure_conditions:
@@ -34,6 +39,11 @@ runtime_state_ref: .octon/state/control/execution/runs/run-wave3-runtime-bridge-
 rollback_posture_ref: .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/rollback-posture.yml
 evidence_root: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327
 receipt_root: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/receipts
+assurance_root: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance
+measurement_root: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/measurements
+intervention_root: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/interventions
+disclosure_root: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/disclosure
+run_card_ref: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/disclosure/run-card.yml
 replay_pointers_ref: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/replay-pointers.yml
 rollback_or_compensation_expectation: Rollback or compensation posture is handled by downstream runtime lifecycle waves; Wave 1 records the execution contract and initial attempt root.
 status: completed

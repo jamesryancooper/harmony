@@ -1,0 +1,67 @@
+schema_version: "octon-constitutional-assurance-family-v1"
+family_id: "assurance"
+status: "active-transitional"
+activation_wave: 4
+release_state: "pre-1.0"
+change_profile: "transitional"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-27-wave4-gap-remediation-cutover/plan.md"
+transitional_exception_note:
+  rationale: >-
+    Wave 4 must promote proof planes, lab evidence, and consequential proof
+    outputs without weakening the current structural or governance gates while
+    the broader execution constitution remains in staged rollout.
+  risks:
+    - "Behavioral proof could regress to prose if replay and lab evidence are not retained beside the run root."
+    - "System-level support claims could widen beyond the current support-target matrix if disclosure is not kept subordinate to durable authority."
+    - "Older consequential runs may need targeted backfill before every retained run bundle carries the new proof-plane families."
+  owner: "Octon governance"
+  target_removal_date: "2026-06-30"
+proof_planes:
+  structural:
+    root: ".octon/framework/assurance/structural"
+    blocking_status: "active"
+    evidence_mode: "deterministic-validator"
+  governance:
+    root: ".octon/framework/assurance/governance"
+    blocking_status: "active"
+    evidence_mode: "deterministic-validator"
+  functional:
+    root: ".octon/framework/assurance/functional"
+    report_schema_ref: ".octon/framework/constitution/contracts/assurance/proof-plane-report-v1.schema.json"
+    evidence_mode: "deterministic-run-proof"
+  behavioral:
+    root: ".octon/framework/assurance/behavioral"
+    report_schema_ref: ".octon/framework/constitution/contracts/assurance/proof-plane-report-v1.schema.json"
+    required_evidence_classes:
+      - "lab-scenario"
+      - "replay"
+      - "scenario"
+      - "shadow-run"
+  maintainability:
+    root: ".octon/framework/assurance/maintainability"
+    report_schema_ref: ".octon/framework/constitution/contracts/assurance/proof-plane-report-v1.schema.json"
+    evidence_mode: "architecture-health"
+  recovery:
+    root: ".octon/framework/assurance/recovery"
+    report_schema_ref: ".octon/framework/constitution/contracts/assurance/proof-plane-report-v1.schema.json"
+    evidence_mode: "checkpoint-and-rollback-proof"
+  evaluators:
+    root: ".octon/framework/assurance/evaluators"
+    report_schema_ref: ".octon/framework/constitution/contracts/assurance/evaluator-review-v1.schema.json"
+    evidence_mode: "independent-review"
+lab:
+  framework_root: ".octon/framework/lab"
+  evidence_root: ".octon/state/evidence/lab"
+  scenario_schema_ref: ".octon/framework/lab/runtime/contracts/scenario-proof-v1.schema.json"
+  replay_schema_ref: ".octon/framework/lab/runtime/contracts/replay-manifest-v1.schema.json"
+observability:
+  framework_root: ".octon/framework/observability"
+  measurement_schema_ref: ".octon/framework/observability/runtime/contracts/measurement-summary-v1.schema.json"
+  intervention_schema_ref: ".octon/framework/observability/runtime/contracts/intervention-log-v1.schema.json"
+retained_run_extensions:
+  root: ".octon/state/evidence/runs"
+  families:
+    - "assurance/**"
+    - "measurements/**"
+    - "interventions/**"
+    - "disclosure/**"

@@ -141,3 +141,9 @@ records:
     path: 068-mission-scoped-reversible-autonomy-provenance-alignment-closeout.md
   - id: 069-objective-binding-cutover
     path: 069-objective-binding-cutover.md
+  - id: 070-runtime-lifecycle-normalization-cutover
+    path: 070-runtime-lifecycle-normalization-cutover.md
+  - id: 071-assurance-lab-disclosure-expansion-cutover
+    path: 071-assurance-lab-disclosure-expansion-cutover.md
+  - id: 072-wave4-gap-remediation-cutover
+    path: 072-wave4-gap-remediation-cutover.md

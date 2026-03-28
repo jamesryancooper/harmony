@@ -1,6 +1,6 @@
 schema_version: "octon-constitution-charter-v1"
 charter_id: "octon-harness-charter"
-version: "1.0.0-wave2"
+version: "1.0.0-wave4"
 owner: "Octon governance"
 purpose: >-
   Provide one explicit repo-local constitutional kernel for the Octon
@@ -27,6 +27,10 @@ non_negotiables:
     rule: "Require mission-backed authority for long-horizon or recurring autonomy."
   - id: "NK-008"
     rule: "Require every compensating mechanism to carry an owner, removal review, and retirement trigger."
+  - id: "NK-009"
+    rule: "Require behavioral claims to cite retained lab, replay, scenario, or shadow-run evidence."
+  - id: "NK-010"
+    rule: "Keep RunCard and HarnessCard disclosure artifacts subordinate to durable authority and retained evidence."
 fail_closed_rules_ref: ".octon/framework/constitution/obligations/fail-closed.yml"
 evidence_obligations_ref: ".octon/framework/constitution/obligations/evidence.yml"
 normative_precedence_ref: ".octon/framework/constitution/precedence/normative.yml"
@@ -45,10 +49,11 @@ amendment_policy:
     - "documented rollback posture"
 review_cadence: "quarterly and on each material constitutional change"
 adoption_state:
-  wave: 2
+  wave: 4
   change_profile: "transitional"
   staged_cutovers:
     run_contract_requirement: "wave-1"
     authority_artifact_normalization: "wave-2-active-transitional"
-    disclosure_families: "wave-4"
-    support_target_declarations: "wave-2-active-transitional for routing, wave-5 for full disclosure claims"
+    assurance_families: "wave-4-active-transitional"
+    disclosure_families: "wave-4-active-transitional"
+    support_target_declarations: "wave-2-active-transitional for routing, wave-4-active-transitional for disclosure claims"

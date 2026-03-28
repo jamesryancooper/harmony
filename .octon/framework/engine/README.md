@@ -30,6 +30,8 @@ semantics.
 - retained execution evidence belongs under `/.octon/state/evidence/runs/**`
   and mutable execution control truth belongs under
   `/.octon/state/control/execution/**`, not under `engine/_ops/**`
+- retained lab evidence for behavioral and support claims belongs under
+  `/.octon/state/evidence/lab/**`
 - per-run objective binding control roots belong under
   `/.octon/state/control/execution/runs/**`
 - canonical approval, exception, and revocation control roots belong under

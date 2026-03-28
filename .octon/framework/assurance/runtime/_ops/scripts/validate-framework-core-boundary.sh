@@ -44,7 +44,7 @@ main() {
   while IFS= read -r entry; do
     rel="${entry#$OCTON_DIR/framework/}"
     case "$rel" in
-      manifest.yml|overlay-points|agency|assurance|capabilities|cognition|constitution|engine|orchestration|scaffolding)
+      manifest.yml|overlay-points|agency|assurance|capabilities|cognition|constitution|engine|lab|observability|orchestration|scaffolding)
         ;;
       *)
         unexpected_framework_entries+=("framework/$rel")
@@ -53,10 +53,10 @@ main() {
   done < <(find "$OCTON_DIR/framework" -mindepth 1 -maxdepth 1 -print | sort)
 
   if [[ "${#unexpected_framework_entries[@]}" -gt 0 ]]; then
-    fail "unexpected framework top-level entries remain outside the Packet 3 framework bundle"
+    fail "unexpected framework top-level entries remain outside the current framework bundle"
     printf '%s\n' "${unexpected_framework_entries[@]}"
   else
-    pass "framework top-level entries remain inside the Packet 3 bundle boundary"
+    pass "framework top-level entries remain inside the current framework bundle boundary"
   fi
 
   local state_hits

@@ -7,6 +7,7 @@
 | Path | Purpose |
 | --- | --- |
 | `state/evidence/runs/**` | Run receipts, checkpoints, replay pointers, trace pointers, and retained execution evidence |
+| `state/evidence/lab/**` | Retained scenario proof, benchmark measurements, evaluator reviews, and HarnessCard disclosure evidence |
 | `state/evidence/control/execution/**` | Retained authority decisions, grant bundles, and control-plane mutation evidence |
 | `state/evidence/decisions/**` | Operational allow/block/escalate evidence |
 | `state/evidence/validation/**` | Validation receipts and audit evidence |

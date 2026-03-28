@@ -7,12 +7,17 @@ Its mutable control-plane counterpart is `state/control/execution/runs/`,
 which holds bound run contracts, runtime-state, rollback-posture, stage
 attempts, and control checkpoints.
 
-Wave 3 canonicalizes the following evidence families beneath each run root:
+Wave 4 canonicalizes the following evidence families beneath each run root:
 
 ```text
 state/evidence/runs/<run-id>/
   receipts/
   checkpoints/
+  replay/
+  assurance/
+  measurements/
+  interventions/
+  disclosure/
   replay-pointers.yml
   trace-pointers.yml
   retained-run-evidence.yml
@@ -20,4 +25,5 @@ state/evidence/runs/<run-id>/
 
 Compatibility root-level run evidence artifacts may remain during the
 transitional backfill, but canonical readers should prefer the receipts,
-checkpoint, replay, and pointer families above.
+checkpoint, replay, proof-plane, measurement, intervention, disclosure, and
+pointer families above.

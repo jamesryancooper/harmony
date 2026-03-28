@@ -265,6 +265,24 @@
       "description": "Implement the proposal system integrity and archive normalization atomic cutover and archive the implementing proposal package",
       "status": "completed",
       "completed_at": "2026-03-24"
+    },
+    {
+      "id": "wave-4-assurance-lab-disclosure-expansion-cutover",
+      "description": "Implement Wave 4 assurance, lab, observability, and disclosure expansion for the unified execution constitution",
+      "status": "completed",
+      "completed_at": "2026-03-27"
+    },
+    {
+      "id": "wave-4-gap-remediation-cutover",
+      "description": "Address the remaining Wave 4 maintainability, benchmark, evaluator, and backfill gaps",
+      "status": "completed",
+      "completed_at": "2026-03-27"
+    },
+    {
+      "id": "wave-4-complete",
+      "description": "Confirm that Wave 4 exit-gate work is complete in the promoted canonical run-root model",
+      "status": "completed",
+      "completed_at": "2026-03-27"
     }
   ]
 }

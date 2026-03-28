@@ -48,6 +48,10 @@ authorized, fail-closed, observable, and reviewable.
 - require long-horizon or recurring autonomy to remain mission-backed
 - require every compensating mechanism to carry an owner, removal review, and
   retirement trigger
+- require behavioral claims to cite retained lab, replay, scenario, or
+  shadow-run evidence
+- keep RunCard and HarnessCard disclosure artifacts subordinate to durable
+  authority and retained evidence
 - stage run-contract, disclosure, and support-target cutovers explicitly rather
   than silently weakening current fail-closed behavior
 - treat labels, comments, checks, and similar host affordances as projection
@@ -58,8 +62,9 @@ authorized, fail-closed, observable, and reviewable.
 Wave 0 establishes the constitutional kernel and its supremacy. Wave 1
 publishes the run-contract roots, and Wave 2 publishes the authority contract
 family plus the first support-target declaration required for routing.
-Disclosure families and broader support claims remain staged until their
-later wave-specific cutovers land.
+Wave 4 promotes the assurance and disclosure contract families, first-class
+lab and observability surfaces, and bounded RunCard/HarnessCard disclosure
+while keeping support claims subordinate to the durable support-target matrix.
 
 ## Canonical References
 
@@ -77,6 +82,10 @@ later wave-specific cutovers land.
   `/.octon/framework/constitution/contracts/registry.yml`
 - constitutional authority contracts:
   `/.octon/framework/constitution/contracts/authority/**`
+- constitutional assurance contracts:
+  `/.octon/framework/constitution/contracts/assurance/**`
+- constitutional disclosure contracts:
+  `/.octon/framework/constitution/contracts/disclosure/**`
 - support-target schema:
   `/.octon/framework/constitution/support-targets.schema.json`
 - support-target declaration:

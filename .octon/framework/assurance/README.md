@@ -26,6 +26,24 @@ Assurance follows bounded surfaces with three canonical authorities:
 - `practices/` - operating checklists and assurance standards for human/agent
   execution discipline.
 
+## Proof Planes
+
+Wave 4 keeps the existing structural and governance gates intact and adds new
+first-class proof planes:
+
+- `structural/` - blocking topology and placement proof
+- `functional/` - deterministic run-behavior proof
+- `behavioral/` - replay, scenario, and lab-backed behavior proof
+- `maintainability/` - architecture-health and change-safety proof
+- `governance/` - policy, weighting, and override proof
+- `recovery/` - checkpoint, replay, rollback, and resumability proof
+- `evaluators/` - independent review where deterministic proof is insufficient
+
+The lab and observability domains feed assurance, but they do not replace it:
+
+- `/.octon/framework/lab/**` authors scenario and replay contracts
+- `/.octon/framework/observability/**` authors measurement and intervention contracts
+
 ## Convention Authority
 
 - Domain-local naming, authoring, and operating conventions belong in `practices/`.
@@ -70,9 +88,15 @@ Interoperability`) is no longer supported.
 | Path | Purpose |
 |---|---|
 | `runtime/` | Runtime assurance execution surfaces and trust artifacts |
+| `structural/` | Structural proof-plane docs and blocking gate definition |
+| `functional/` | Functional proof-plane guidance and canonical retained outputs |
+| `behavioral/` | Behavioral proof-plane guidance and lab/replay evidence contract |
+| `maintainability/` | Maintainability and architecture-health proof guidance |
 | `runtime/_ops/scripts/` | Assurance engine and alignment validator entrypoints |
 | `runtime/trust/` | Attestations, evidence, and audit artifact surfaces |
 | `governance/` | Charter, doctrine, changelog, precedence, and override contracts |
+| `recovery/` | Recovery proof-plane guidance for checkpoints and rollback proof |
+| `evaluators/` | Independent evaluator review guidance |
 | `governance/weights/` | Policy weights and context contract |
 | `governance/scores/` | Measured score inputs and evidence mapping |
 | `governance/precedence.md` | Canonical precedence and merge-order contract |

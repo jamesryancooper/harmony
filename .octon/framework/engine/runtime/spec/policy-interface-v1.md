@@ -41,10 +41,18 @@ These launchers are the canonical invocation boundary for policy operations.
   - `/.octon/framework/constitution/contracts/authority/`
 - Canonical runtime contracts are published under:
   - `/.octon/framework/constitution/contracts/runtime/`
+- Canonical assurance contracts are published under:
+  - `/.octon/framework/constitution/contracts/assurance/`
+- Canonical disclosure contracts are published under:
+  - `/.octon/framework/constitution/contracts/disclosure/`
 - Canonical run-contract control roots are published under:
   - `/.octon/state/control/execution/runs/`
 - Canonical run lifecycle control files are published under:
   - `/.octon/state/control/execution/runs/<run_id>/{runtime-state.yml,rollback-posture.yml,checkpoints/**}`
+- Canonical lab-authored scenario and replay contracts are published under:
+  - `/.octon/framework/lab/`
+- Canonical observability-authored measurement and intervention contracts are published under:
+  - `/.octon/framework/observability/`
 - Canonical approval control roots are published under:
   - `/.octon/state/control/execution/approvals/requests`
   - `/.octon/state/control/execution/approvals/grants`
@@ -161,8 +169,16 @@ also satisfy:
 - retained run evidence under `state/evidence/runs/<run_id>/**` for any
   resulting egress or cost artifacts
 - canonical run receipts under `state/evidence/runs/<run_id>/receipts/**`
+- canonical run assurance, measurement, intervention, and disclosure families
+  under
+  `state/evidence/runs/<run_id>/{assurance/**,measurements/**,interventions/**,disclosure/**}`
 - canonical replay and trace pointers under
   `state/evidence/runs/<run_id>/{replay-pointers.yml,trace-pointers.yml}`
+- retained lab evidence under `state/evidence/lab/**` for any system-level
+  behavioral or support claims
+- retained lab evidence root:
+  `/.octon/state/evidence/lab`
+  `state/evidence/lab`
 
 Host labels, comments, checks, and similar affordances remain projection-only.
 Runtime may translate them into canonical approval artifacts, but policy

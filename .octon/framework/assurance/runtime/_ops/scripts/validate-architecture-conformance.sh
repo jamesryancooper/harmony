@@ -67,8 +67,9 @@ main() {
   fi
 
   require_file "$REGISTRY_FILE"
-  local run_root execution_control_root execution_tmp_root network_policy budget_policy budget_state exception_leases support_targets approval_requests approval_grants revocations
+  local run_root lab_evidence_root execution_control_root execution_tmp_root network_policy budget_policy budget_state exception_leases support_targets approval_requests approval_grants revocations
   run_root="$(yq -r '.execution.write_roots.run_evidence_root' "$REGISTRY_FILE")"
+  lab_evidence_root="$(yq -r '.execution.write_roots.lab_evidence_root' "$REGISTRY_FILE")"
   execution_control_root="$(yq -r '.execution.write_roots.execution_control_root' "$REGISTRY_FILE")"
   execution_tmp_root="$(yq -r '.execution.write_roots.execution_tmp_root' "$REGISTRY_FILE")"
   network_policy="$(yq -r '.execution.policy_roots.network_egress' "$REGISTRY_FILE")"
@@ -83,6 +84,7 @@ main() {
   require_file "$ROOT_DIR/$network_policy"
   require_file "$ROOT_DIR/$budget_policy"
   require_file "$ROOT_DIR/$support_targets"
+  [[ -d "$ROOT_DIR/$lab_evidence_root" ]] && pass "found ${lab_evidence_root}" || fail "missing ${lab_evidence_root}"
   require_file "$ROOT_DIR/$budget_state"
   require_file "$ROOT_DIR/$exception_leases"
   require_file "$ROOT_DIR/$revocations"
@@ -211,6 +213,22 @@ main() {
     "umbrella specification references repo-owned support-target declarations"
   require_contains \
     "$OCTON_DIR/framework/cognition/_meta/architecture/specification.md" \
+    "$lab_evidence_root" \
+    "umbrella specification references retained lab evidence root"
+  require_contains \
+    "$OCTON_DIR/framework/cognition/_meta/architecture/specification.md" \
+    ".octon/framework/lab/" \
+    "umbrella specification references lab framework root"
+  require_contains \
+    "$OCTON_DIR/framework/cognition/_meta/architecture/specification.md" \
+    ".octon/framework/observability/" \
+    "umbrella specification references observability framework root"
+  require_contains \
+    "$OCTON_DIR/framework/cognition/_meta/architecture/specification.md" \
+    ".octon/framework/assurance/maintainability/" \
+    "umbrella specification references maintainability proof plane"
+  require_contains \
+    "$OCTON_DIR/framework/cognition/_meta/architecture/specification.md" \
     "$approval_requests" \
     "umbrella specification references canonical approval request root"
   require_contains \
@@ -240,6 +258,14 @@ main() {
     ".octon/framework/constitution/CHARTER.md" \
     "bootstrap START references constitutional kernel"
   require_contains \
+    "$OCTON_DIR/instance/bootstrap/START.md" \
+    ".octon/framework/lab/" \
+    "bootstrap START references lab framework root"
+  require_contains \
+    "$OCTON_DIR/instance/bootstrap/START.md" \
+    "$lab_evidence_root" \
+    "bootstrap START references retained lab evidence root"
+  require_contains \
     "$OCTON_DIR/framework/engine/README.md" \
     "Portable operational assets | helper binaries and portable support scripts" \
     "engine README aligns ops semantics with portable support-only contract"
@@ -256,6 +282,18 @@ main() {
     "$OCTON_DIR/framework/engine/runtime/spec/policy-interface-v1.md" \
     "$support_targets" \
     "policy interface spec references repo-owned support-target declarations"
+  require_contains \
+    "$OCTON_DIR/framework/engine/runtime/spec/policy-interface-v1.md" \
+    ".octon/framework/constitution/contracts/assurance/" \
+    "policy interface spec references constitutional assurance contracts"
+  require_contains \
+    "$OCTON_DIR/framework/engine/runtime/spec/policy-interface-v1.md" \
+    ".octon/framework/constitution/contracts/disclosure/" \
+    "policy interface spec references constitutional disclosure contracts"
+  require_contains \
+    "$OCTON_DIR/framework/engine/runtime/spec/policy-interface-v1.md" \
+    "$lab_evidence_root" \
+    "policy interface spec references retained lab evidence root"
   require_contains \
     "$OCTON_DIR/framework/engine/runtime/spec/policy-interface-v1.md" \
     ".octon/framework/constitution/contracts/runtime/" \
