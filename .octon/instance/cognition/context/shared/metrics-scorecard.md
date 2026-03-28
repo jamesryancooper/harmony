@@ -25,12 +25,12 @@ safe, and continuously improvable without introducing dashboard sprawl.
 
 | Metric Area | Owner | Backup | Review Cadence |
 |---|---|---|---|
-| Flow (DORA) | `architect` | `implementer` | Weekly |
-| Reliability (SLO burn) | `verifier` | `architect` | Weekly |
+| Flow (DORA) | `orchestrator` | `implementer` | Weekly |
+| Reliability (SLO burn) | `verifier` | `orchestrator` | Weekly |
 | Quality (tests/contracts) | `implementer` | `verifier` | Weekly |
-| Observability (trace coverage) | `verifier` | `architect` | Weekly |
-| Security (critical exposure) | `architect` | `verifier` | Weekly |
-| Hygiene (docs/waivers) | `architect` | `implementer` | Weekly |
+| Observability (trace coverage) | `verifier` | `orchestrator` | Weekly |
+| Security (critical exposure) | `orchestrator` | `verifier` | Weekly |
+| Hygiene (docs/waivers) | `orchestrator` | `implementer` | Weekly |
 
 ## Scorecard Thresholds
 

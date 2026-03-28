@@ -2,7 +2,7 @@
   "registry_version": "1.0.0",
   "approvers": [
     {
-      "approver_id": "@architect",
+      "approver_id": "@orchestrator",
       "role": "incident-commander",
       "approved_scopes": [
         {

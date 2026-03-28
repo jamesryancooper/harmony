@@ -4,6 +4,8 @@
 - Claim: Wave 4 benchmark disclosure remains reproducible when a higher-scrutiny consequential run carries replay, maintainability, evaluator, and benchmark measurement evidence.
 - Support target ref: .octon/instance/governance/support-targets.yml
 - Compatibility tuple: MT-B / WT-3 / LT-REF / LOC-EN / reduced
+- Adapter support: repo-shell (supported) / repo-local-governed (supported)
+- Conformance criteria: HOST-001, HOST-002, MODEL-001, MODEL-002, MODEL-003
 - Proof bundle refs:
   - .octon/state/evidence/lab/scenarios/scn-wave4-benchmark-disclosure-20260327/scenario-proof.yml
   - .octon/state/evidence/lab/benchmarks/bmk-wave4-disclosure-parity-20260327/summary.yml

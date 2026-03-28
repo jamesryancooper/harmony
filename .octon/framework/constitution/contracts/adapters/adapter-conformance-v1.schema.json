@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/adapters/adapter-conformance-v1.schema.json",
+  "title": "Octon Adapter Conformance Criterion v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "criterion_id",
+    "adapter_kind",
+    "description"
+  ],
+  "properties": {
+    "criterion_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adapter_kind": {
+      "type": "string",
+      "enum": [
+        "host",
+        "model"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

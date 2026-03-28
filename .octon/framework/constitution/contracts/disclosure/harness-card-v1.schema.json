@@ -12,6 +12,7 @@
     "claim_summary",
     "support_target_ref",
     "compatibility_tuple",
+    "adapter_support",
     "proof_bundle_refs",
     "known_limits",
     "generated_at"
@@ -75,6 +76,53 @@
             "experimental",
             "unsupported"
           ]
+        }
+      }
+    },
+    "adapter_support": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host_adapter",
+        "model_adapter",
+        "host_support_status",
+        "model_support_status",
+        "conformance_criteria"
+      ],
+      "properties": {
+        "host_adapter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_adapter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "host_support_status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "reduced",
+            "experimental",
+            "unsupported"
+          ]
+        },
+        "model_support_status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "reduced",
+            "experimental",
+            "unsupported"
+          ]
+        },
+        "conformance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },

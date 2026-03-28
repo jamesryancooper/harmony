@@ -42,6 +42,8 @@ semantics.
   `/.octon/state/evidence/control/execution/**`
 - labels, comments, checks, and similar host affordances are projections only;
   engine runtime materializes canonical authority artifacts before execution
+- host adapters and model adapters remain replaceable, non-authoritative
+  runtime boundaries
 - freshness-bounded effective mission scenario routing belongs under
   `/.octon/generated/effective/orchestration/missions/**`
 - Legacy top-level `/.octon/runtime/` paths are prohibited.

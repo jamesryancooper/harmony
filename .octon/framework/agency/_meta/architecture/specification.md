@@ -65,7 +65,7 @@ References:
 
 | Actor Type | Status | Rationale |
 |---|---|---|
-| `agents` | Keep | Needed for autonomous planning, orchestration, and cross-session ownership. |
+| `agents` | Keep | Needed for one accountable orchestrator plus narrowly justified supporting roles. |
 | `assistants` | Keep | Needed for focused, reusable specialist execution and direct human routing. |
 | `teams` | Keep (as composition artifact) | Needed to declare reusable multi-actor compositions for complex work. |
 | `subagents` | Remove as first-class artifact type | Redundant with assistant behavior; currently ambiguous and duplicative in repository state. |
@@ -74,13 +74,13 @@ References:
 
 #### `agent`
 
-Autonomous supervisor that can:
+Accountable execution role that can:
 
 - reason and plan,
-- own mission lifecycle,
-- delegate to assistants,
+- own final integration,
+- delegate to assistants only when boundary value is real,
 - invoke skills and workflows within policy,
-- maintain cross-session continuity.
+- maintain cross-session continuity where authorized.
 
 #### `assistant`
 
@@ -159,7 +159,7 @@ Not allowed by default:
 │   │   ├── _scaffold/template/SOUL.md
 │   │   └── <id>/
 │   │       ├── AGENT.md
-│   │       └── SOUL.md
+│   │       └── SOUL.md (optional)
 │   ├── assistants/
 │   │   ├── registry.yml
 │   │   ├── _scaffold/template/assistant.md
@@ -182,7 +182,7 @@ Example:
 
 ```yaml
 schema_version: "1.0"
-default_agent: architect
+default_agent: orchestrator
 routing:
   assistant_prefix: "@"
   ambiguity_resolution: "ask"
@@ -202,7 +202,7 @@ Required governance contracts:
 
 Precedence:
 
-`AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> `runtime/agents/<id>/AGENT.md` -> `runtime/agents/<id>/SOUL.md`
+`AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> `runtime/agents/<id>/AGENT.md`
 
 ### `runtime/agents/registry.yml`
 
@@ -211,10 +211,13 @@ Minimum fields:
 - `id`
 - `path`
 - `contract` (default `AGENT.md`)
-- `soul` (default `SOUL.md`)
+- `role_class`
+- `default_execution_role`
+- `boundary_value`
 - `role`
 - `capabilities`
 - `delegates_to.assistants`
+- `activation_criteria` (required for non-default roles)
 - `allowed_skills` (optional allowlist)
 - `allowed_workflows` (optional allowlist)
 
@@ -249,6 +252,7 @@ Must define:
 
 - role and scope,
 - planning/orchestration rules,
+- runtime-backed discipline,
 - delegation rules,
 - mission ownership rules,
 - escalation rules,
@@ -257,7 +261,7 @@ Must define:
 
 ### Agent Identity Contract (`SOUL.md`)
 
-Must define:
+Optional only. If present, it must define:
 
 - philosophy,
 - identity and values,
@@ -357,11 +361,13 @@ Automated checks should enforce:
 - cross-reference integrity (`path` targets exist),
 - required governance contracts (`governance/CONSTITUTION.md`, `governance/DELEGATION.md`, `governance/MEMORY.md`),
 - `CONSTITUTION.md` includes `Conscience` with `Decision Rubric` and `Red Lines`,
-- required `AGENT.md` + `SOUL.md` for every agent path,
-- required `Philosophy` section for every `SOUL.md`,
+- required `AGENT.md` for every agent path,
+- optional `SOUL.md` is explicitly non-authoritative when present,
 - alias uniqueness,
 - actor id uniqueness,
 - capitalization rule (`AGENT.md`, not `agent.md`),
+- exactly one default orchestrator role,
+- non-default roles declare real boundary value and activation criteria,
 - no `subagents/` references after deprecation window,
 - policy constraints for skill delegation from actors.
 

@@ -145,6 +145,143 @@ compatibility_matrix:
     allowed_capability_packs: []
     required_evidence:
       - "escalation-required"
+adapter_conformance_criteria:
+  - criterion_id: "HOST-001"
+    adapter_kind: "host"
+    description: "Host signals remain projection-only until runtime materializes canonical authority artifacts."
+    required_evidence:
+      - "authority-decision-artifact"
+      - "authority-grant-bundle"
+  - criterion_id: "HOST-002"
+    adapter_kind: "host"
+    description: "The default host path remains replaceable and bound to the engine authorization boundary."
+    required_evidence:
+      - "instruction-layer-manifest"
+      - "run-evidence-root"
+  - criterion_id: "HOST-003"
+    adapter_kind: "host"
+    description: "Projected control-plane state never becomes hidden authority outside canonical control roots."
+    required_evidence:
+      - "authority-grant-bundle"
+      - "control-evidence-root"
+  - criterion_id: "MODEL-001"
+    adapter_kind: "model"
+    description: "Model adapter support claims remain bounded by declared support tiers."
+    required_evidence:
+      - "authority-decision-artifact"
+      - "support-target-declaration"
+  - criterion_id: "MODEL-002"
+    adapter_kind: "model"
+    description: "Model adapter execution emits runtime receipts and instruction-layer manifests."
+    required_evidence:
+      - "instruction-layer-manifest"
+      - "run-evidence-root"
+  - criterion_id: "MODEL-003"
+    adapter_kind: "model"
+    description: "Memory discipline stays runtime-backed rather than persona-backed."
+    required_evidence:
+      - "run-evidence-root"
+      - "control-evidence-root"
+host_adapters:
+  - adapter_id: "repo-shell"
+    contract_ref: ".octon/framework/engine/runtime/adapters/host/repo-shell.yml"
+    authority_mode: "non_authoritative"
+    replaceable: true
+    support_status: "supported"
+    default_route: "allow"
+    criteria_refs:
+      - "HOST-001"
+      - "HOST-002"
+    allowed_model_tiers:
+      - "MT-A"
+      - "MT-B"
+      - "MT-C"
+    allowed_workload_tiers:
+      - "WT-1"
+      - "WT-2"
+      - "WT-3"
+    allowed_language_resource_tiers:
+      - "LT-REF"
+      - "LT-EXT"
+    allowed_locale_tiers:
+      - "LOC-EN"
+      - "LOC-MX"
+    required_evidence:
+      - "authority-decision-artifact"
+      - "instruction-layer-manifest"
+  - adapter_id: "github-control-plane"
+    contract_ref: ".octon/framework/engine/runtime/adapters/host/github-control-plane.yml"
+    authority_mode: "projection_only"
+    replaceable: true
+    support_status: "reduced"
+    default_route: "allow"
+    criteria_refs:
+      - "HOST-001"
+      - "HOST-003"
+    allowed_model_tiers:
+      - "MT-B"
+      - "MT-C"
+    allowed_workload_tiers:
+      - "WT-2"
+      - "WT-3"
+    allowed_language_resource_tiers:
+      - "LT-REF"
+    allowed_locale_tiers:
+      - "LOC-EN"
+    required_evidence:
+      - "authority-decision-artifact"
+      - "authority-grant-bundle"
+      - "control-evidence-root"
+model_adapters:
+  - adapter_id: "repo-local-governed"
+    contract_ref: ".octon/framework/engine/runtime/adapters/model/repo-local-governed.yml"
+    authority_mode: "non_authoritative"
+    replaceable: true
+    support_status: "supported"
+    default_route: "allow"
+    criteria_refs:
+      - "MODEL-001"
+      - "MODEL-002"
+      - "MODEL-003"
+    allowed_model_tiers:
+      - "MT-A"
+      - "MT-B"
+    allowed_workload_tiers:
+      - "WT-1"
+      - "WT-2"
+      - "WT-3"
+    allowed_language_resource_tiers:
+      - "LT-REF"
+      - "LT-EXT"
+    allowed_locale_tiers:
+      - "LOC-EN"
+      - "LOC-MX"
+    required_evidence:
+      - "authority-decision-artifact"
+      - "instruction-layer-manifest"
+      - "run-evidence-root"
+  - adapter_id: "experimental-external"
+    contract_ref: ".octon/framework/engine/runtime/adapters/model/experimental-external.yml"
+    authority_mode: "non_authoritative"
+    replaceable: true
+    support_status: "experimental"
+    default_route: "stage_only"
+    criteria_refs:
+      - "MODEL-001"
+      - "MODEL-002"
+    allowed_model_tiers:
+      - "MT-C"
+    allowed_workload_tiers:
+      - "WT-1"
+      - "WT-2"
+    allowed_language_resource_tiers:
+      - "LT-REF"
+    allowed_locale_tiers:
+      - "LOC-EN"
+    required_evidence:
+      - "authority-decision-artifact"
+      - "instruction-layer-manifest"
+      - "lab-followup"
 notes:
   - "Wave 2 expands support-target coverage enough for authority routing across workload, model, context, and locale axes."
-  - "Full support-claim disclosure remains a later wave concern."
+  - "Wave 5 adds bounded adapter envelopes and adapter-conformance criteria for host and model support claims."

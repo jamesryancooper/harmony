@@ -26,6 +26,7 @@ The repo-local supreme control regime for `/.octon/` lives under
 - `/.octon/framework/constitution/contracts/runtime/**`
 - `/.octon/framework/constitution/contracts/assurance/**`
 - `/.octon/framework/constitution/contracts/disclosure/**`
+- `/.octon/framework/constitution/contracts/adapters/**`
 - `/.octon/framework/constitution/support-targets.schema.json`
 
 This umbrella specification remains the canonical cross-subsystem topology,
@@ -149,38 +150,41 @@ authority.
     `instance/governance/policies/execution-budgets.yml`.
 54. Repo-owned support-target declarations live at
     `instance/governance/support-targets.yml`.
-55. The machine-readable execution path and policy invariant registry lives at
+55. Runtime host and model adapter manifests live only under
+    `framework/engine/runtime/adapters/{host,model}/**` and remain
+    replaceable, non-authoritative boundaries.
+56. The machine-readable execution path and policy invariant registry lives at
     `framework/cognition/_meta/architecture/contract-registry.yml`.
-56. Mission authority discovery lives only under
+57. Mission authority discovery lives only under
     `instance/orchestration/missions/**`; active mission charters use
     `octon-mission-v2` and remain continuity containers rather than the
     atomic execution unit.
-57. Mission-scoped mutable execution control truth lives only under
+58. Mission-scoped mutable execution control truth lives only under
     `state/control/execution/missions/<mission-id>/**`.
-58. Consequential run contracts live only under
+59. Consequential run contracts live only under
     `state/control/execution/runs/<run-id>/run-contract.yml`.
-59. Runtime-state, rollback-posture, and control checkpoints for consequential
+60. Runtime-state, rollback-posture, and control checkpoints for consequential
     runs live only under `state/control/execution/runs/<run-id>/**`.
-60. Retained control-plane mutation evidence and authority decision evidence
+61. Retained control-plane mutation evidence and authority decision evidence
     live only under
     `state/evidence/control/execution/**`.
-61. Mission continuity and handoff state lives only under
+62. Mission continuity and handoff state lives only under
     `state/continuity/repo/missions/<mission-id>/**`.
-62. Mission/operator read models under
+63. Mission/operator read models under
     `generated/cognition/summaries/{missions,operators}/**` are derived only
     from canonical authority, control, evidence, and continuity surfaces and
     consume per-run run evidence when runs are bound.
-63. Mission effective scenario resolution lives only under
+64. Mission effective scenario resolution lives only under
     `generated/effective/orchestration/missions/<mission-id>/scenario-resolution.yml`
     and remains derived-only, freshness-bounded runtime input.
-64. No autonomous runtime path may silently fall back to mission-less
+65. No autonomous runtime path may silently fall back to mission-less
     execution after the mission-scoped reversible autonomy cutover.
-65. External UI, chat, or in-memory session state may not become a second
+66. External UI, chat, or in-memory session state may not become a second
     authoritative mission control plane.
-66. Labels, comments, checks, and similar host affordances are projection-only
+67. Labels, comments, checks, and similar host affordances are projection-only
     until runtime materializes canonical authority artifacts under
     `state/control/execution/**`.
-67. For Mission-Scoped Reversible Autonomy, runtime closeout records under
+68. For Mission-Scoped Reversible Autonomy, runtime closeout records under
     `instance/cognition/decisions/067-*.md`; proposal-lineage closeout records
     under `instance/cognition/decisions/068-*.md` plus the matching migration
     plan under `instance/cognition/context/shared/migrations/**`; proposal
@@ -253,6 +257,8 @@ constitutional kernel.
   `/.octon/framework/constitution/contracts/assurance/**`
 - constitutional disclosure contracts:
   `/.octon/framework/constitution/contracts/disclosure/**`
+- constitutional adapter contracts:
+  `/.octon/framework/constitution/contracts/adapters/**`
 - constitutional contract registry:
   `/.octon/framework/constitution/contracts/registry.yml`
 - support-target schema:
@@ -329,6 +335,10 @@ constitutional kernel.
   `/.octon/instance/governance/policies/network-egress.yml`
 - repo-owned execution budget policy:
   `/.octon/instance/governance/policies/execution-budgets.yml`
+- runtime host adapter root:
+  `/.octon/framework/engine/runtime/adapters/host/`
+- runtime model adapter root:
+  `/.octon/framework/engine/runtime/adapters/model/`
 - generated proposal registry: `/.octon/generated/proposals/registry.yml`
 
 Mission-scoped autonomy uses one authority/control/evidence/read-model split:

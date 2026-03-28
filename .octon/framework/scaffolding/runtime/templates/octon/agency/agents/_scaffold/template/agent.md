@@ -1,7 +1,7 @@
 ---
 title: "Agent: [name]"
-description: "[One-line description of the agent's supervisory role]"
-role: "[planner|architect|auditor|coordinator|custom]"
+description: "[One-line description of the agent's accountable role]"
+role: "[orchestrator|verifier|coordinator|custom]"
 ---
 
 # Agent: [name]

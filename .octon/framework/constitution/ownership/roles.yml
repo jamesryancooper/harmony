@@ -66,6 +66,7 @@ role_classes:
     must_not:
       - "approve, revoke, or grant exceptions"
       - "widen support tiers"
+      - "widen support through undeclared model adapters"
       - "authorize irreversible actions"
       - "perform final consequential acceptance"
     subroles:

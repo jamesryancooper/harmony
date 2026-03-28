@@ -20,9 +20,7 @@ super-rooted Octon harness.
 - delegation: `.octon/framework/agency/governance/DELEGATION.md`
 - memory: `.octon/framework/agency/governance/MEMORY.md`
 - subordinate execution profile:
-  `.octon/framework/agency/runtime/agents/architect/AGENT.md`
-- subordinate identity overlay:
-  `.octon/framework/agency/runtime/agents/architect/SOUL.md`
+  `.octon/framework/agency/runtime/agents/orchestrator/AGENT.md`
 - objective brief: `.octon/instance/bootstrap/OBJECTIVE.md`
 - active intent contract:
   `.octon/instance/cognition/context/shared/intent.contract.yml`

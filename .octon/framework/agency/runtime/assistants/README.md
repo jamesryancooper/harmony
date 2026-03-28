@@ -19,7 +19,7 @@ ASSISTANT (Specialist)
 SKILL (Capability)
 ```
 
-Assistants serve agents by handling specialized work that benefits from domain focus. They are stateless, inheriting context from the caller and returning structured output.
+Assistants serve the accountable orchestrator or verifier by handling specialized work that benefits from domain focus. They are stateless, inheriting context from the caller and returning structured output.
 
 ## Available Assistants
 
@@ -31,9 +31,9 @@ Assistants serve agents by handling specialized work that benefits from domain f
 
 ## Assistants vs Agents
 
-| Characteristic | Agent (Supervisor) | Assistant (Specialist) |
+| Characteristic | Agent (Accountable Role) | Assistant (Specialist) |
 |----------------|-------------------|------------------------|
-| **Role** | Supervisor | Specialist |
+| **Role** | Accountable owner | Specialist |
 | **Autonomy** | High — reasons, plans, decides | Focused — executes assigned tasks |
 | **Lifecycle** | Persistent across sessions | Stateless (inherits context) |
 | **Scope** | Broad — orchestrates complex work | Narrow — scoped operations |
@@ -70,6 +70,6 @@ See `registry.yml` for the alias and escalation mapping configuration.
 
 ## See Also
 
-- [Agents](../agents/README.md) — Supervisors that delegate to assistants
+- [Agents](../agents/README.md) — Accountable roles that delegate to assistants
 - [Skills](../../../capabilities/runtime/skills/README.md) — Capabilities that assistants use
 - `.octon/framework/agency/_meta/architecture/assistants.md` — Full assistant documentation

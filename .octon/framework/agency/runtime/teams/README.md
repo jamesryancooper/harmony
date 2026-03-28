@@ -5,7 +5,7 @@ description: Reusable multi-actor compositions that coordinate agents and assist
 
 # Teams
 
-Teams define reusable collaboration topologies across agents and assistants.
+Teams define reusable collaboration topologies across accountable roles and assistants.
 
 A team is a composition artifact, not a separate runtime actor class.
 
@@ -28,7 +28,7 @@ In practice:
 
 - Repeated cross-role execution patterns
 - Consistent handoff policy for high-risk work
-- Standardized actor bundles for common delivery modes
+- Standardized actor bundles for common delivery modes where independent verification or context isolation matters
 
 ## Discovery
 

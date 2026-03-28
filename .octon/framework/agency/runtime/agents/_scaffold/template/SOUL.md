@@ -1,16 +1,16 @@
 ---
 title: "Soul: [name]"
-description: "[Identity contract for the [name] agent.]"
+description: "[Optional non-authoritative identity overlay for the [name] agent.]"
 ---
 
 # Soul: [name]
 
 ## Contract Scope
 
-- This file defines identity, interpersonal stance, and behavior under ambiguity.
+- This file defines optional identity, interpersonal stance, and behavior under ambiguity.
 - Execution policy belongs in [AGENT.md](./AGENT.md).
 - Cross-agent governance overlays: [CONSTITUTION.md](../../../../governance/CONSTITUTION.md), [DELEGATION.md](../../../../governance/DELEGATION.md), [MEMORY.md](../../../../governance/MEMORY.md).
-- This file must not override root safety/process constraints or execution boundaries.
+- This file must not add authority, runtime policy, or execution requirements.
 
 ## Philosophy
 

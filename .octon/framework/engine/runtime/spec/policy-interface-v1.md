@@ -45,6 +45,12 @@ These launchers are the canonical invocation boundary for policy operations.
   - `/.octon/framework/constitution/contracts/assurance/`
 - Canonical disclosure contracts are published under:
   - `/.octon/framework/constitution/contracts/disclosure/`
+- Canonical adapter contracts are published under:
+  - `/.octon/framework/constitution/contracts/adapters/`
+- Runtime host adapter manifests are published under:
+  - `/.octon/framework/engine/runtime/adapters/host/`
+- Runtime model adapter manifests are published under:
+  - `/.octon/framework/engine/runtime/adapters/model/`
 - Canonical run-contract control roots are published under:
   - `/.octon/state/control/execution/runs/`
 - Canonical run lifecycle control files are published under:
@@ -166,6 +172,8 @@ also satisfy:
 - destination-scoped repo-owned network egress policy for `net.http`
 - repo-owned execution budget policy for billable or model-backed paths
 - repo-owned ownership and support-target declarations for consequential work
+- repo-owned host/model adapter declarations and adapter-conformance criteria
+  from `/.octon/instance/governance/support-targets.yml`
 - retained run evidence under `state/evidence/runs/<run_id>/**` for any
   resulting egress or cost artifacts
 - canonical run receipts under `state/evidence/runs/<run_id>/receipts/**`
@@ -184,6 +192,14 @@ Host labels, comments, checks, and similar affordances remain projection-only.
 Runtime may translate them into canonical approval artifacts, but policy
 evaluation must consume the normalized authority artifacts instead of the host
 surface directly.
+
+Adapter metadata keys for runtime requests are:
+
+- `support_host_adapter`
+- `support_model_adapter`
+- `support_model_tier`
+- `support_language_resource_tier`
+- `support_locale_tier`
 
 ## Instruction-Layer Manifest Contract
 

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://octon.local/framework/constitution/support-targets.schema.json",
   "title": "Octon Support Target Matrix",
-  "description": "Schema for .octon/instance/governance/support-targets.yml. Wave 0 publishes the schema before the authoritative declaration is populated.",
+  "description": "Schema for .octon/instance/governance/support-targets.yml with bounded support tiers, adapter declarations, and adapter-conformance criteria.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -10,7 +10,10 @@
     "owner",
     "default_route",
     "tiers",
-    "compatibility_matrix"
+    "compatibility_matrix",
+    "adapter_conformance_criteria",
+    "host_adapters",
+    "model_adapters"
   ],
   "properties": {
     "schema_version": {
@@ -73,6 +76,27 @@
       "minItems": 1,
       "items": {
         "$ref": "#/$defs/matrix_entry"
+      }
+    },
+    "adapter_conformance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/adapter_conformance_criterion"
+      }
+    },
+    "host_adapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/host_adapter_declaration"
+      }
+    },
+    "model_adapters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/model_adapter_declaration"
       }
     },
     "notes": {
@@ -221,14 +245,156 @@
             "type": "string",
             "minLength": 1
           }
+        }
+      }
+    },
+    "adapter_conformance_criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_id",
+        "adapter_kind",
+        "description"
+      ],
+      "properties": {
+        "criterion_id": {
+          "type": "string",
+          "minLength": 1
         },
-        "notes": {
+        "adapter_kind": {
+          "type": "string",
+          "enum": ["host", "model"]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_evidence": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         }
       }
+    },
+    "adapter_support_declaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "adapter_id",
+        "contract_ref",
+        "authority_mode",
+        "replaceable",
+        "support_status",
+        "default_route",
+        "criteria_refs",
+        "allowed_model_tiers",
+        "allowed_workload_tiers",
+        "allowed_language_resource_tiers",
+        "allowed_locale_tiers"
+      ],
+      "properties": {
+        "adapter_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority_mode": {
+          "type": "string",
+          "enum": ["projection_only", "non_authoritative"]
+        },
+        "replaceable": {
+          "const": true
+        },
+        "support_status": {
+          "type": "string",
+          "enum": ["supported", "reduced", "experimental", "unsupported"]
+        },
+        "default_route": {
+          "type": "string",
+          "enum": ["allow", "stage_only", "escalate", "deny"]
+        },
+        "criteria_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allowed_model_tiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["MT-A", "MT-B", "MT-C"]
+          }
+        },
+        "allowed_workload_tiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["WT-1", "WT-2", "WT-3", "WT-4"]
+          }
+        },
+        "allowed_language_resource_tiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["LT-REF", "LT-EXT", "LT-EXP"]
+          }
+        },
+        "allowed_locale_tiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["LOC-EN", "LOC-MX", "LOC-EXP"]
+          }
+        },
+        "required_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "host_adapter_declaration": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/adapter_support_declaration"
+        },
+        {
+          "properties": {
+            "authority_mode": {
+              "type": "string",
+              "enum": ["projection_only", "non_authoritative"]
+            }
+          }
+        }
+      ]
+    },
+    "model_adapter_declaration": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/adapter_support_declaration"
+        },
+        {
+          "properties": {
+            "authority_mode": {
+              "const": "non_authoritative"
+            }
+          }
+        }
+      ]
     }
   }
 }

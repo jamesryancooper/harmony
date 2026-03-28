@@ -453,7 +453,7 @@ item = resp.parsed
 | `packages/kits/flowkit`       | TS       | kit     | **control plane** (flows client) | control plane     |
 | `packages/kits/agentkit`      | TS       | kit     | **control plane** (agents)       | control plane     |
 | `platform/runtimes/flow-runtime` | Py    | runtime | **platform flow runtime (LangGraph-based)** | runtime layer     |
-| `agents/architect/assessment` | Py       | agent   | thin host using AgentKit         | runtime host      |
+| `agents/orchestrator/assessment` | Py    | agent   | thin host using AgentKit         | runtime host      |
 | `contracts`                   | TS/Py    | package | contracts registry               | control plane     |
 | `platform/observability`      | TS       | package | OTel integration                 | platform          |
 

@@ -206,6 +206,16 @@ pub struct SupportTierPosture {
     #[serde(default)]
     pub workload_tier_label: Option<String>,
     #[serde(default)]
+    pub host_adapter_id: Option<String>,
+    #[serde(default)]
+    pub host_adapter_status: Option<String>,
+    #[serde(default)]
+    pub model_adapter_id: Option<String>,
+    #[serde(default)]
+    pub model_adapter_status: Option<String>,
+    #[serde(default)]
+    pub adapter_conformance_criteria: Vec<String>,
+    #[serde(default)]
     pub support_status: String,
     #[serde(default)]
     pub route: String,
@@ -789,6 +799,12 @@ struct SupportTargetsRecord {
     tiers: SupportTierDefinitions,
     #[serde(default)]
     compatibility_matrix: Vec<SupportMatrixEntry>,
+    #[serde(default)]
+    adapter_conformance_criteria: Vec<AdapterConformanceCriterion>,
+    #[serde(default)]
+    host_adapters: Vec<AdapterSupportDeclaration>,
+    #[serde(default)]
+    model_adapters: Vec<AdapterSupportDeclaration>,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -828,6 +844,50 @@ struct SupportMatrixEntry {
     #[serde(default)]
     requires_mission: Option<bool>,
     #[serde(default)]
+    required_evidence: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+struct AdapterConformanceCriterion {
+    criterion_id: String,
+    adapter_kind: String,
+    #[serde(default)]
+    required_evidence: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+struct AdapterSupportDeclaration {
+    adapter_id: String,
+    #[serde(default)]
+    contract_ref: String,
+    #[serde(default)]
+    authority_mode: String,
+    #[serde(default)]
+    replaceable: bool,
+    #[serde(default)]
+    support_status: String,
+    #[serde(default)]
+    default_route: String,
+    #[serde(default)]
+    criteria_refs: Vec<String>,
+    #[serde(default)]
+    allowed_model_tiers: Vec<String>,
+    #[serde(default)]
+    allowed_workload_tiers: Vec<String>,
+    #[serde(default)]
+    allowed_language_resource_tiers: Vec<String>,
+    #[serde(default)]
+    allowed_locale_tiers: Vec<String>,
+    #[serde(default)]
+    required_evidence: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default)]
+struct ResolvedAdapterSupport {
+    adapter_id: String,
+    support_status: String,
+    route: String,
+    criteria_refs: Vec<String>,
     required_evidence: Vec<String>,
 }
 
@@ -2022,6 +2082,186 @@ fn load_support_targets(cfg: &RuntimeConfig) -> CoreResult<SupportTargetsRecord>
     read_yaml_file(&path)
 }
 
+fn route_rank(route: &str) -> u8 {
+    match route {
+        "deny" => 3,
+        "escalate" => 2,
+        "stage_only" => 1,
+        "allow" => 0,
+        _ => 3,
+    }
+}
+
+fn combine_route(routes: &[&str]) -> String {
+    routes
+        .iter()
+        .copied()
+        .max_by_key(|route| route_rank(route))
+        .unwrap_or("deny")
+        .to_string()
+}
+
+fn support_status_rank(status: &str) -> u8 {
+    match status {
+        "unsupported" => 3,
+        "experimental" => 2,
+        "reduced" => 1,
+        "supported" => 0,
+        _ => 3,
+    }
+}
+
+fn combine_support_status(statuses: &[&str]) -> String {
+    statuses
+        .iter()
+        .copied()
+        .max_by_key(|status| support_status_rank(status))
+        .unwrap_or("unsupported")
+        .to_string()
+}
+
+fn merge_required_evidence<'a, I>(inputs: I) -> Vec<String>
+where
+    I: IntoIterator<Item = &'a String>,
+{
+    let mut unique = BTreeSet::new();
+    let mut merged = Vec::new();
+    for value in inputs {
+        if unique.insert(value.clone()) {
+            merged.push(value.clone());
+        }
+    }
+    merged
+}
+
+fn resolve_adapter_support(
+    declaration: &SupportTargetsRecord,
+    adapter_kind: &str,
+    adapter_id: &str,
+    model_tier: &str,
+    workload_tier: &str,
+    language_resource_tier: &str,
+    locale_tier: &str,
+) -> ResolvedAdapterSupport {
+    let declarations = if adapter_kind == "host" {
+        &declaration.host_adapters
+    } else {
+        &declaration.model_adapters
+    };
+
+    let Some(adapter) = declarations
+        .iter()
+        .find(|candidate| candidate.adapter_id == adapter_id)
+    else {
+        return ResolvedAdapterSupport {
+            adapter_id: adapter_id.to_string(),
+            support_status: "unsupported".to_string(),
+            route: "deny".to_string(),
+            ..ResolvedAdapterSupport::default()
+        };
+    };
+
+    if adapter.contract_ref.trim().is_empty()
+        || adapter.authority_mode.trim().is_empty()
+        || !adapter.replaceable
+        || adapter.criteria_refs.is_empty()
+        || adapter.allowed_model_tiers.is_empty()
+        || adapter.allowed_workload_tiers.is_empty()
+        || adapter.allowed_language_resource_tiers.is_empty()
+        || adapter.allowed_locale_tiers.is_empty()
+    {
+        return ResolvedAdapterSupport {
+            adapter_id: adapter.adapter_id.clone(),
+            support_status: "unsupported".to_string(),
+            route: "deny".to_string(),
+            ..ResolvedAdapterSupport::default()
+        };
+    }
+
+    let authority_mode_valid = if adapter_kind == "host" {
+        matches!(adapter.authority_mode.as_str(), "projection_only" | "non_authoritative")
+    } else {
+        adapter.authority_mode == "non_authoritative"
+    };
+    if !authority_mode_valid {
+        return ResolvedAdapterSupport {
+            adapter_id: adapter.adapter_id.clone(),
+            support_status: "unsupported".to_string(),
+            route: "deny".to_string(),
+            ..ResolvedAdapterSupport::default()
+        };
+    }
+
+    let criteria: Vec<_> = adapter
+        .criteria_refs
+        .iter()
+        .filter_map(|criterion_id| {
+            declaration
+                .adapter_conformance_criteria
+                .iter()
+                .find(|criterion| {
+                    criterion.criterion_id == *criterion_id && criterion.adapter_kind == adapter_kind
+                })
+        })
+        .collect();
+
+    if criteria.len() != adapter.criteria_refs.len() {
+        return ResolvedAdapterSupport {
+            adapter_id: adapter.adapter_id.clone(),
+            support_status: "unsupported".to_string(),
+            route: "deny".to_string(),
+            ..ResolvedAdapterSupport::default()
+        };
+    }
+
+    let tier_match = adapter.allowed_model_tiers.iter().any(|value| value == model_tier)
+        && adapter
+            .allowed_workload_tiers
+            .iter()
+            .any(|value| value == workload_tier)
+        && adapter
+            .allowed_language_resource_tiers
+            .iter()
+            .any(|value| value == language_resource_tier)
+        && adapter
+            .allowed_locale_tiers
+            .iter()
+            .any(|value| value == locale_tier);
+
+    let required_evidence = merge_required_evidence(
+        adapter
+            .required_evidence
+            .iter()
+            .chain(criteria.iter().flat_map(|criterion| criterion.required_evidence.iter())),
+    );
+
+    if !tier_match {
+        return ResolvedAdapterSupport {
+            adapter_id: adapter.adapter_id.clone(),
+            support_status: "unsupported".to_string(),
+            route: "deny".to_string(),
+            criteria_refs: adapter.criteria_refs.clone(),
+            required_evidence,
+        };
+    }
+
+    ResolvedAdapterSupport {
+        adapter_id: adapter.adapter_id.clone(),
+        support_status: if adapter.support_status.trim().is_empty() {
+            "unsupported".to_string()
+        } else {
+            adapter.support_status.clone()
+        },
+        route: if adapter.default_route.trim().is_empty() {
+            declaration.default_route.clone()
+        } else {
+            adapter.default_route.clone()
+        },
+        criteria_refs: adapter.criteria_refs.clone(),
+        required_evidence,
+    }
+}
+
 fn resolve_support_tier_posture(
     cfg: &RuntimeConfig,
     request: &ExecutionRequest,
@@ -2035,6 +2275,16 @@ fn resolve_support_tier_posture(
         .get("support_model_tier")
         .cloned()
         .unwrap_or_else(|| "MT-B".to_string());
+    let host_adapter_id = request
+        .metadata
+        .get("support_host_adapter")
+        .cloned()
+        .unwrap_or_else(|| "repo-shell".to_string());
+    let model_adapter_id = request
+        .metadata
+        .get("support_model_adapter")
+        .cloned()
+        .unwrap_or_else(|| "repo-local-governed".to_string());
     let language_resource_tier = request
         .metadata
         .get("support_language_resource_tier")
@@ -2057,6 +2307,8 @@ fn resolve_support_tier_posture(
             model_tier_id: Some(model_tier),
             route: declaration.default_route,
             support_status: "unsupported".to_string(),
+            host_adapter_id: Some(host_adapter_id),
+            model_adapter_id: Some(model_adapter_id),
             declaration_ref: Some(".octon/instance/governance/support-targets.yml".to_string()),
             ..SupportTierPosture::default()
         });
@@ -2088,6 +2340,8 @@ fn resolve_support_tier_posture(
             workload_tier_label: Some(workload.label),
             support_status: "unsupported".to_string(),
             route: declaration.default_route,
+            host_adapter_id: Some(host_adapter_id),
+            model_adapter_id: Some(model_adapter_id),
             declaration_ref: Some(".octon/instance/governance/support-targets.yml".to_string()),
             ..SupportTierPosture::default()
         });
@@ -2103,11 +2357,11 @@ fn resolve_support_tier_posture(
                 && entry.locale_tier == locale_tier
         })
         .cloned();
-    let support_status = matrix_entry
+    let base_support_status = matrix_entry
         .as_ref()
         .map(|entry| entry.support_status.clone())
         .unwrap_or_else(|| "unsupported".to_string());
-    let route = matrix_entry
+    let base_route = matrix_entry
         .as_ref()
         .map(|entry| entry.default_route.clone())
         .unwrap_or_else(|| {
@@ -2121,10 +2375,50 @@ fn resolve_support_tier_posture(
         .as_ref()
         .and_then(|entry| entry.requires_mission)
         .unwrap_or(false);
-    let required_evidence = matrix_entry
+    let base_required_evidence = matrix_entry
         .as_ref()
         .map(|entry| entry.required_evidence.clone())
         .unwrap_or_default();
+    let host_adapter = resolve_adapter_support(
+        &declaration,
+        "host",
+        &host_adapter_id,
+        &model_tier,
+        &workload.id,
+        &language_resource_tier,
+        &locale_tier,
+    );
+    let model_adapter = resolve_adapter_support(
+        &declaration,
+        "model",
+        &model_adapter_id,
+        &model_tier,
+        &workload.id,
+        &language_resource_tier,
+        &locale_tier,
+    );
+    let support_status = combine_support_status(&[
+        base_support_status.as_str(),
+        host_adapter.support_status.as_str(),
+        model_adapter.support_status.as_str(),
+    ]);
+    let route = combine_route(&[
+        base_route.as_str(),
+        host_adapter.route.as_str(),
+        model_adapter.route.as_str(),
+    ]);
+    let adapter_conformance_criteria = merge_required_evidence(
+        host_adapter
+            .criteria_refs
+            .iter()
+            .chain(model_adapter.criteria_refs.iter()),
+    );
+    let required_evidence = merge_required_evidence(
+        base_required_evidence
+            .iter()
+            .chain(host_adapter.required_evidence.iter())
+            .chain(model_adapter.required_evidence.iter()),
+    );
 
     if requires_mission && autonomy_state.is_none() {
         return Ok(SupportTierPosture {
@@ -2134,6 +2428,11 @@ fn resolve_support_tier_posture(
             language_resource_tier_id: Some(language_resource_tier.clone()),
             locale_tier_id: Some(locale_tier.clone()),
             workload_tier_label: Some(workload.label),
+            host_adapter_id: Some(host_adapter.adapter_id),
+            host_adapter_status: Some(host_adapter.support_status),
+            model_adapter_id: Some(model_adapter.adapter_id),
+            model_adapter_status: Some(model_adapter.support_status),
+            adapter_conformance_criteria,
             support_status,
             route: "deny".to_string(),
             requires_mission,
@@ -2149,6 +2448,11 @@ fn resolve_support_tier_posture(
         language_resource_tier_id: Some(language_resource_tier),
         locale_tier_id: Some(locale_tier),
         workload_tier_label: Some(workload.label),
+        host_adapter_id: Some(host_adapter.adapter_id),
+        host_adapter_status: Some(host_adapter.support_status),
+        model_adapter_id: Some(model_adapter.adapter_id),
+        model_adapter_status: Some(model_adapter.support_status),
+        adapter_conformance_criteria,
         support_status,
         route,
         requires_mission,
@@ -2214,6 +2518,8 @@ pub fn with_authority_env_metadata(
 ) -> BTreeMap<String, String> {
     for (env_key, meta_key) in [
         ("OCTON_SUPPORT_TIER", "support_tier"),
+        ("OCTON_SUPPORT_HOST_ADAPTER", "support_host_adapter"),
+        ("OCTON_SUPPORT_MODEL_ADAPTER", "support_model_adapter"),
         ("OCTON_SUPPORT_MODEL_TIER", "support_model_tier"),
         (
             "OCTON_SUPPORT_LANGUAGE_RESOURCE_TIER",
@@ -5027,6 +5333,16 @@ mod tests {
     use std::path::PathBuf;
     use std::time::{SystemTime, UNIX_EPOCH};
 
+    fn support_targets_fixture(
+        workload_id: &str,
+        workload_label: &str,
+        workload_default_route: &str,
+    ) -> String {
+        format!(
+            "schema_version: \"octon-support-targets-v1\"\nowner: \"test\"\ndefault_route: \"deny\"\ntiers:\n  model:\n    - id: \"MT-B\"\n      label: \"repo-local-governed\"\n      default_autonomy: \"bounded\"\n      description: \"fixture\"\n  workload:\n    - id: \"{workload_id}\"\n      label: \"{workload_label}\"\n      default_route: \"{workload_default_route}\"\n      description: \"fixture\"\n  language_resource:\n    - id: \"LT-REF\"\n      label: \"reference-owned\"\n      description: \"fixture\"\n  locale:\n    - id: \"LOC-EN\"\n      label: \"english-primary\"\n      description: \"fixture\"\ncompatibility_matrix:\n  - model_tier: \"MT-B\"\n    workload_tier: \"{workload_id}\"\n    language_resource_tier: \"LT-REF\"\n    locale_tier: \"LOC-EN\"\n    support_status: \"supported\"\n    default_route: \"allow\"\nadapter_conformance_criteria:\n  - criterion_id: \"HOST-001\"\n    adapter_kind: \"host\"\n    description: \"fixture\"\n    required_evidence:\n      - \"authority-decision-artifact\"\n  - criterion_id: \"HOST-002\"\n    adapter_kind: \"host\"\n    description: \"fixture\"\n    required_evidence:\n      - \"instruction-layer-manifest\"\n  - criterion_id: \"MODEL-001\"\n    adapter_kind: \"model\"\n    description: \"fixture\"\n    required_evidence:\n      - \"authority-decision-artifact\"\n  - criterion_id: \"MODEL-002\"\n    adapter_kind: \"model\"\n    description: \"fixture\"\n    required_evidence:\n      - \"instruction-layer-manifest\"\n  - criterion_id: \"MODEL-003\"\n    adapter_kind: \"model\"\n    description: \"fixture\"\n    required_evidence:\n      - \"run-evidence-root\"\nhost_adapters:\n  - adapter_id: \"repo-shell\"\n    contract_ref: \".octon/framework/engine/runtime/adapters/host/repo-shell.yml\"\n    authority_mode: \"non_authoritative\"\n    replaceable: true\n    support_status: \"supported\"\n    default_route: \"allow\"\n    criteria_refs:\n      - \"HOST-001\"\n      - \"HOST-002\"\n    allowed_model_tiers:\n      - \"MT-B\"\n    allowed_workload_tiers:\n      - \"{workload_id}\"\n    allowed_language_resource_tiers:\n      - \"LT-REF\"\n    allowed_locale_tiers:\n      - \"LOC-EN\"\n    required_evidence:\n      - \"instruction-layer-manifest\"\nmodel_adapters:\n  - adapter_id: \"repo-local-governed\"\n    contract_ref: \".octon/framework/engine/runtime/adapters/model/repo-local-governed.yml\"\n    authority_mode: \"non_authoritative\"\n    replaceable: true\n    support_status: \"supported\"\n    default_route: \"allow\"\n    criteria_refs:\n      - \"MODEL-001\"\n      - \"MODEL-002\"\n      - \"MODEL-003\"\n    allowed_model_tiers:\n      - \"MT-B\"\n    allowed_workload_tiers:\n      - \"{workload_id}\"\n    allowed_language_resource_tiers:\n      - \"LT-REF\"\n    allowed_locale_tiers:\n      - \"LOC-EN\"\n    required_evidence:\n      - \"run-evidence-root\"\n"
+        )
+    }
+
     fn temp_runtime_config() -> RuntimeConfig {
         let stamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -5065,7 +5381,7 @@ mod tests {
         .expect("write intent contract");
         fs::write(
             base.join(".octon/instance/governance/support-targets.yml"),
-            "schema_version: \"octon-support-targets-v1\"\nowner: \"test\"\ndefault_route: \"deny\"\ntiers:\n  model:\n    - id: \"MT-B\"\n      label: \"repo-local-governed\"\n      default_autonomy: \"bounded\"\n      description: \"fixture\"\n  workload:\n    - id: \"WT-2\"\n      label: \"repo-local-transitional\"\n      default_route: \"allow\"\n      description: \"fixture\"\n  language_resource:\n    - id: \"LT-REF\"\n      label: \"reference-owned\"\n      description: \"fixture\"\n  locale:\n    - id: \"LOC-EN\"\n      label: \"english-primary\"\n      description: \"fixture\"\ncompatibility_matrix:\n  - model_tier: \"MT-B\"\n    workload_tier: \"WT-2\"\n    language_resource_tier: \"LT-REF\"\n    locale_tier: \"LOC-EN\"\n    support_status: \"supported\"\n    default_route: \"allow\"\n",
+            support_targets_fixture("WT-2", "repo-local-transitional", "allow"),
         )
         .expect("write support targets");
         fs::write(
@@ -5462,11 +5778,28 @@ mod tests {
         let policy = PolicyEngine::new(cfg.clone());
         fs::write(
             cfg.octon_dir.join("instance/governance/support-targets.yml"),
-            "schema_version: \"octon-support-targets-v1\"\nowner: \"test\"\ndefault_route: \"deny\"\ntiers:\n  model:\n    - id: \"MT-B\"\n      label: \"repo-local-governed\"\n      default_autonomy: \"bounded\"\n      description: \"fixture\"\n  workload:\n    - id: \"WT-3\"\n      label: \"not-the-requested-tier\"\n      default_route: \"deny\"\n      description: \"fixture\"\n  language_resource:\n    - id: \"LT-REF\"\n      label: \"reference-owned\"\n      description: \"fixture\"\n  locale:\n    - id: \"LOC-EN\"\n      label: \"english-primary\"\n      description: \"fixture\"\ncompatibility_matrix:\n  - model_tier: \"MT-B\"\n    workload_tier: \"WT-3\"\n    language_resource_tier: \"LT-REF\"\n    locale_tier: \"LOC-EN\"\n    support_status: \"supported\"\n    default_route: \"allow\"\n",
+            support_targets_fixture("WT-3", "not-the-requested-tier", "deny"),
         )
         .expect("rewrite support targets");
         let err = authorize_execution(&cfg, &policy, &minimal_request(), None)
             .expect_err("unsupported support tier should deny");
+        assert_eq!(
+            err.details["reason_codes"][0].as_str(),
+            Some("SUPPORT_TIER_UNSUPPORTED")
+        );
+    }
+
+    #[test]
+    fn undeclared_host_adapter_denies_execution() {
+        let cfg = temp_runtime_config();
+        let policy = PolicyEngine::new(cfg.clone());
+        let mut request = minimal_request();
+        request
+            .metadata
+            .insert("support_host_adapter".to_string(), "missing-host".to_string());
+
+        let err = authorize_execution(&cfg, &policy, &request, None)
+            .expect_err("undeclared host adapter should deny");
         assert_eq!(
             err.details["reason_codes"][0].as_str(),
             Some("SUPPORT_TIER_UNSUPPORTED")

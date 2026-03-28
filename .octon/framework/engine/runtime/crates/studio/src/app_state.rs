@@ -1777,7 +1777,7 @@ mod tests {
             &harness
                 .root
                 .join(".octon/framework/orchestration/runtime/incidents/inc-001/incident.yml"),
-            "incident_id: \"inc-001\"\ntitle: \"Example Incident\"\nseverity: \"sev2\"\nstatus: \"open\"\nowner: \"@architect\"\nsummary: \"Incident summary\"\n",
+            "incident_id: \"inc-001\"\ntitle: \"Example Incident\"\nseverity: \"sev2\"\nstatus: \"open\"\nowner: \"@orchestrator\"\nsummary: \"Incident summary\"\n",
         );
         let _ = fs::remove_file(
             harness
@@ -1849,7 +1849,7 @@ mod tests {
         );
         write_file(
             &root.join(".octon/framework/orchestration/runtime/automations/example/automation.yml"),
-            "automation_id: \"example\"\ntitle: \"Example Automation\"\nworkflow_ref:\n  workflow_group: \"alpha\"\n  workflow_id: \"alpha\"\nowner: \"@architect\"\nstatus: \"active\"\n",
+            "automation_id: \"example\"\ntitle: \"Example Automation\"\nworkflow_ref:\n  workflow_group: \"alpha\"\n  workflow_id: \"alpha\"\nowner: \"@orchestrator\"\nstatus: \"active\"\n",
         );
         write_file(
             &root.join(".octon/framework/orchestration/runtime/automations/example/state/counters.json"),
@@ -1861,7 +1861,7 @@ mod tests {
         );
         write_file(
             &root.join(".octon/framework/orchestration/runtime/watchers/example/watcher.yml"),
-            "watcher_id: \"example\"\ntitle: \"Example Watcher\"\nowner: \"@architect\"\nstatus: \"active\"\n",
+            "watcher_id: \"example\"\ntitle: \"Example Watcher\"\nowner: \"@orchestrator\"\nstatus: \"active\"\n",
         );
         write_file(
             &root.join(".octon/framework/orchestration/runtime/watchers/example/state/health.json"),
@@ -1873,7 +1873,7 @@ mod tests {
         );
         write_file(
             &root.join(".octon/instance/orchestration/missions/example/mission.yml"),
-            "schema_version: \"octon-mission-v2\"\nmission_id: \"example\"\ntitle: \"Example Mission\"\nsummary: \"Example mission.\"\nstatus: \"active\"\nmission_class: \"maintenance\"\nowner_ref: \"operator://architect\"\ncreated_at: \"2026-03-10T00:00:00Z\"\nrisk_ceiling: \"ACP-1\"\nallowed_action_classes:\n  - \"repo-maintenance\"\ndefault_safing_subset:\n  - \"observe_only\"\n  - \"stage_only\"\ndefault_schedule_hint: \"interruptible_scheduled\"\ndefault_overlap_policy: \"skip\"\nscope_ids: []\nsuccess_criteria:\n  - \"Example complete\"\nfailure_conditions: []\nactive_run_ids:\n  - \"run-001\"\n",
+            "schema_version: \"octon-mission-v2\"\nmission_id: \"example\"\ntitle: \"Example Mission\"\nsummary: \"Example mission.\"\nstatus: \"active\"\nmission_class: \"maintenance\"\nowner_ref: \"operator://orchestrator\"\ncreated_at: \"2026-03-10T00:00:00Z\"\nrisk_ceiling: \"ACP-1\"\nallowed_action_classes:\n  - \"repo-maintenance\"\ndefault_safing_subset:\n  - \"observe_only\"\n  - \"stage_only\"\ndefault_schedule_hint: \"interruptible_scheduled\"\ndefault_overlap_policy: \"skip\"\nscope_ids: []\nsuccess_criteria:\n  - \"Example complete\"\nfailure_conditions: []\nactive_run_ids:\n  - \"run-001\"\n",
         );
         write_file(
             &root.join(".octon/instance/orchestration/missions/example/tasks.json"),
@@ -1881,7 +1881,7 @@ mod tests {
         );
         write_file(
             &root.join(".octon/framework/orchestration/runtime/incidents/inc-001/incident.yml"),
-            "incident_id: \"inc-001\"\ntitle: \"Example Incident\"\nseverity: \"sev2\"\nstatus: \"closed\"\nowner: \"@architect\"\nsummary: \"Incident summary\"\nrun_ids:\n  - \"run-001\"\n",
+            "incident_id: \"inc-001\"\ntitle: \"Example Incident\"\nseverity: \"sev2\"\nstatus: \"closed\"\nowner: \"@orchestrator\"\nsummary: \"Incident summary\"\nrun_ids:\n  - \"run-001\"\n",
         );
         write_file(
             &root.join(".octon/framework/orchestration/runtime/incidents/inc-001/timeline.md"),
@@ -1889,7 +1889,7 @@ mod tests {
         );
         write_file(
             &root.join(".octon/framework/orchestration/runtime/incidents/inc-001/closure.md"),
-            "# Incident Closure: inc-001\n\n- Closed At: `2026-03-11T10:30:00Z`\n- Closed By: `@architect`\n- Approval: `appr-001`\n\nClosed with evidence.\n\n## Remediation Evidence\n\n- Remediation Ref: `run:run-001`\n",
+            "# Incident Closure: inc-001\n\n- Closed At: `2026-03-11T10:30:00Z`\n- Closed By: `@orchestrator`\n- Approval: `appr-001`\n\nClosed with evidence.\n\n## Remediation Evidence\n\n- Remediation Ref: `run:run-001`\n",
         );
         write_file(
             &root.join(".octon/framework/orchestration/practices/orchestration-failure-playbooks.md"),

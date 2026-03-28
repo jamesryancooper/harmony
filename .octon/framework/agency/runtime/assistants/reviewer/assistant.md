@@ -54,6 +54,6 @@ Review code changes for quality, style, correctness, and security issues.
 
 ## When to Escalate
 
-- If architectural concerns arise, escalate to Planner agent
+- If scope or architecture decisions exceed bounded review, escalate to the orchestrator
 - If unclear requirements, request human clarification
 - If security issue is severe, flag for immediate human review

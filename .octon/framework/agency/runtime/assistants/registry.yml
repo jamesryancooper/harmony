@@ -10,7 +10,8 @@ assistants:
     path: reviewer/
     aliases: ["@reviewer", "@review", "@rev"]
     description: "Code review specialist for quality, style, and correctness."
-    escalates_to: architect
+    delegation_value: "separation-of-duties and focused review context"
+    escalates_to: orchestrator
     allowed_skills: []
 
   - id: refactor
@@ -18,7 +19,8 @@ assistants:
     path: refactor/
     aliases: ["@refactor", "@ref"]
     description: "Refactoring specialist for code improvements."
-    escalates_to: architect
+    delegation_value: "context isolation for bounded code restructuring"
+    escalates_to: orchestrator
     allowed_skills: []
 
   - id: docs
@@ -26,5 +28,6 @@ assistants:
     path: docs/
     aliases: ["@docs", "@doc"]
     description: "Documentation specialist for clarity and completeness."
-    escalates_to: architect
+    delegation_value: "focused documentation work that can run in parallel with implementation"
+    escalates_to: orchestrator
     allowed_skills: []

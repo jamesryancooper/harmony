@@ -96,12 +96,13 @@ layers:
     authority: "capability-tool-and-adapter-contracts"
     surfaces:
       - ".octon/framework/capabilities/**"
+      - ".octon/framework/constitution/contracts/adapters/**"
       - ".octon/framework/engine/runtime/adapters/**"
-    decision_rule: "Capability and adapter contracts may narrow execution but may not widen authority."
-    adoption_status: "partial"
+    decision_rule: "Capability and adapter contracts may narrow execution but may not widen authority; adapter families remain replaceable and non-authoritative."
+    adoption_status: "active-transitional"
     notes:
       - "Capability contracts are active."
-      - "Generalized model and host adapter contracts remain staged."
+      - "Generalized model and host adapter contracts are active in Wave 5."
   - rank: 11
     authority: "structural-architecture-and-placement-specs"
     surfaces:

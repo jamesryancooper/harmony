@@ -9,6 +9,17 @@ compatibility_tuple:
   language_resource_tier: LT-REF
   locale_tier: LOC-EN
   support_status: supported
+adapter_support:
+  host_adapter: repo-shell
+  model_adapter: repo-local-governed
+  host_support_status: supported
+  model_support_status: supported
+  conformance_criteria:
+    - HOST-001
+    - HOST-002
+    - MODEL-001
+    - MODEL-002
+    - MODEL-003
 proof_bundle_refs:
   - .octon/state/evidence/lab/scenarios/scn-wave4-assurance-disclosure-20260327/scenario-proof.yml
   - .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/disclosure/run-card.yml
@@ -16,5 +27,6 @@ proof_bundle_refs:
 evaluator_review_ref: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/evaluator.yml
 known_limits:
   - Claim is bounded to repo-local-transitional work under the declared support-target tuple.
+  - Adapter provenance remains bounded to the declared repo-shell and repo-local-governed envelopes.
   - External or irreversible work remains outside this disclosure claim.
 generated_at: "2026-03-27T20:30:00Z"

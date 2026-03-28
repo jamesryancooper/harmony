@@ -17,5 +17,4 @@ description: Cross-agent governance contracts and precedence overlays for the ag
 
 Contract precedence is:
 
-`AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> actor `AGENT.md` -> actor `SOUL.md`
-
+`AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> actor `AGENT.md`

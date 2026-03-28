@@ -7,10 +7,10 @@ teams: []
 # Example:
 #   - id: delivery-core
 #     path: delivery-core/
-#     purpose: "Default architecture + implementation + verification composition"
-#     lead_agent: architect
+#     purpose: "Default delivery composition with one accountable owner and optional independent verification"
+#     lead_agent: orchestrator
 #     members:
-#       agents: [architect, auditor]
+#       agents: [orchestrator, verifier]
 #       assistants: [reviewer, refactor, docs]
-#     handoff_policy: "architect-plans -> assistants-execute -> auditor-verifies"
+#     handoff_policy: "orchestrator-owns -> assistants-isolate-bounded-work -> verifier-checks-when-needed"
 #     default_workflow: null

@@ -1,7 +1,7 @@
 ---
 title: "Agent: [name]"
-description: "[One-line description of the agent's supervisory role]"
-role: "[planner|architect|auditor|coordinator|custom]"
+description: "[One-line description of the agent's accountable role]"
+role: "[orchestrator|verifier|coordinator|custom]"
 ---
 
 # Agent: [name]
@@ -9,13 +9,13 @@ role: "[planner|architect|auditor|coordinator|custom]"
 ## Contract Scope
 
 - This file defines execution policy only.
-- Identity and interpersonal style belong in [SOUL.md](./SOUL.md).
+- Optional identity overlay belongs in [SOUL.md](./SOUL.md) when present.
 - Cross-agent governance overlays: [CONSTITUTION.md](../../../../governance/CONSTITUTION.md), [DELEGATION.md](../../../../governance/DELEGATION.md), [MEMORY.md](../../../../governance/MEMORY.md).
-- Contract precedence: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> local `AGENT.md` -> local `SOUL.md`.
+- Contract precedence: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> local `AGENT.md`.
 
 ## Role
 
-[Describe the agent's decision scope and supervisory responsibilities.]
+[Describe the agent's decision scope and why this role has real boundary value.]
 
 ## Capabilities
 
@@ -36,6 +36,11 @@ role: "[planner|architect|auditor|coordinator|custom]"
 ## Mission Ownership
 
 - [mission type and ownership boundaries]
+
+## Runtime Discipline
+
+- [runtime evidence roots that back execution discipline]
+- [how memory discipline is enforced by runtime artifacts]
 
 ## Escalation
 

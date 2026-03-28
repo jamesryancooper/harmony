@@ -2,7 +2,7 @@
 # Canonical routing entrypoint for actor definitions.
 
 schema_version: "1.0"
-default_agent: architect
+default_agent: orchestrator
 
 routing:
   assistant_prefix: "@"
@@ -15,6 +15,12 @@ registries:
   teams: "runtime/teams/registry.yml"
 
 policy:
+  default_execution_model: "single-accountable-orchestrator"
+  additional_roles_require:
+    - "separation-of-duties"
+    - "context-isolation"
+    - "concurrency"
+  identity_overlays: "optional-non-authoritative"
   allow_skill_actor_delegation: false
   mission_owner_types: [agent, human]
   assistant_mission_ownership: false

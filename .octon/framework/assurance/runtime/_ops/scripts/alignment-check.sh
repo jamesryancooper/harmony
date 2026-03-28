@@ -196,6 +196,10 @@ run_harness() {
     bash "$SCRIPT_DIR/validate-assurance-disclosure-expansion.sh"
 
   run_step \
+    "Validate Wave 5 agency simplification and adapter hardening" \
+    bash "$SCRIPT_DIR/validate-wave5-agency-adapter-hardening.sh"
+
+  run_step \
     "Refresh and validate host capability projections" \
     publish_or_validate_host_projections
 

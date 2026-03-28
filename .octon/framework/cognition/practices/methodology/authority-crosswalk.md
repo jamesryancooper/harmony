@@ -31,8 +31,7 @@ When instructions conflict, methodology policy follows repository precedence:
 5. `/.octon/framework/agency/governance/CONSTITUTION.md`
 6. `/.octon/framework/agency/governance/DELEGATION.md`
 7. `/.octon/framework/agency/governance/MEMORY.md`
-8. `/.octon/framework/agency/runtime/agents/architect/AGENT.md`
-9. `/.octon/framework/agency/runtime/agents/architect/SOUL.md`
+8. `/.octon/framework/agency/runtime/agents/orchestrator/AGENT.md`
 
 This precedence is authoritative for execution contracts, profile governance, escalation behavior, and implementation receipts.
 

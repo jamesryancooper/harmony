@@ -56,6 +56,11 @@ authorized, fail-closed, observable, and reviewable.
   than silently weakening current fail-closed behavior
 - treat labels, comments, checks, and similar host affordances as projection
   signals only until canonical authority artifacts exist
+- keep one accountable orchestrator as the default execution role
+- treat host adapters and model adapters as replaceable, non-authoritative
+  boundaries
+- require adapter-backed support claims to remain bounded by explicit
+  support-target declarations and adapter-conformance criteria
 
 ## Transitional Adoption Status
 
@@ -65,6 +70,9 @@ family plus the first support-target declaration required for routing.
 Wave 4 promotes the assurance and disclosure contract families, first-class
 lab and observability surfaces, and bounded RunCard/HarnessCard disclosure
 while keeping support claims subordinate to the durable support-target matrix.
+Wave 5 simplifies the agency kernel around one accountable orchestrator and
+promotes explicit host/model adapter contracts plus bounded adapter support
+declarations.
 
 ## Canonical References
 
@@ -86,6 +94,8 @@ while keeping support claims subordinate to the durable support-target matrix.
   `/.octon/framework/constitution/contracts/assurance/**`
 - constitutional disclosure contracts:
   `/.octon/framework/constitution/contracts/disclosure/**`
+- constitutional adapter contracts:
+  `/.octon/framework/constitution/contracts/adapters/**`
 - support-target schema:
   `/.octon/framework/constitution/support-targets.schema.json`
 - support-target declaration:

@@ -19,8 +19,10 @@ CONSTITUTION_FILE="$AGENCY_DIR/governance/CONSTITUTION.md"
 DELEGATION_FILE="$AGENCY_DIR/governance/DELEGATION.md"
 MEMORY_FILE="$AGENCY_DIR/governance/MEMORY.md"
 BOUNDARY_FILE="$AGENCY_DIR/governance/delegation-boundaries-v1.yml"
-ARCHITECT_AGENT_FILE="$AGENCY_DIR/runtime/agents/architect/AGENT.md"
-ARCHITECT_SOUL_FILE="$AGENCY_DIR/runtime/agents/architect/SOUL.md"
+ORCHESTRATOR_AGENT_FILE="$AGENCY_DIR/runtime/agents/orchestrator/AGENT.md"
+ORCHESTRATOR_SOUL_FILE="$AGENCY_DIR/runtime/agents/orchestrator/SOUL.md"
+VERIFIER_AGENT_FILE="$AGENCY_DIR/runtime/agents/verifier/AGENT.md"
+VERIFIER_SOUL_FILE="$AGENCY_DIR/runtime/agents/verifier/SOUL.md"
 
 errors=0
 warnings=0
@@ -41,10 +43,10 @@ pass() {
 
 require_file() {
   local file="$1"
-  if [[ ! -f "$file" ]]; then
-    fail "missing file: $file"
-  else
+  if [[ -f "$file" ]]; then
     pass "found file: ${file#$ROOT_DIR/}"
+  else
+    fail "missing file: ${file#$ROOT_DIR/}"
   fi
 }
 
@@ -54,7 +56,7 @@ validate_root_ingress_adapter() {
   local target=""
 
   if [[ ! -f "$file_path" && ! -L "$file_path" ]]; then
-    fail "missing file: $file_path"
+    fail "missing file: ${file_path#$ROOT_DIR/}"
     return
   fi
 
@@ -77,9 +79,45 @@ validate_root_ingress_adapter() {
   fi
 }
 
-extract_id_path_pairs() {
+extract_ids() {
   local file="$1"
   awk '
+    /^[[:space:]]*-[[:space:]]+id:[[:space:]]*/ {
+      id=$2
+      sub(/^id:/, "", id)
+      gsub(/"/, "", id)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", id)
+      if (id == "") {
+        id=$3
+        gsub(/"/, "", id)
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", id)
+      }
+      if (id != "") print id
+    }
+  ' "$file"
+}
+
+check_registry_contract_paths() {
+  local registry_file="$1"
+  local runtime_kind="$2"
+  local contract_name="$3"
+  local pair_count=0
+
+  while IFS='|' read -r id relpath; do
+    [[ -z "$id" || -z "$relpath" ]] && continue
+    pair_count=$((pair_count + 1))
+    local actor_dir="$AGENCY_DIR/runtime/$runtime_kind/${relpath%/}"
+    local contract_file="$actor_dir/$contract_name"
+    if [[ ! -d "$actor_dir" ]]; then
+      fail "$runtime_kind registry entry '$id' points to missing directory: ${actor_dir#$ROOT_DIR/}"
+      continue
+    fi
+    if [[ ! -f "$contract_file" ]]; then
+      fail "$runtime_kind registry entry '$id' missing contract file: ${contract_file#$ROOT_DIR/}"
+      continue
+    fi
+    pass "$runtime_kind/$id -> ${contract_file#$ROOT_DIR/}"
+  done < <(awk '
     /^[[:space:]]*-[[:space:]]+id:[[:space:]]*/ {
       id=$2
       sub(/^id:/, "", id)
@@ -101,419 +139,22 @@ extract_id_path_pairs() {
         id=""
       }
     }
-  ' "$file"
-}
-
-extract_ids() {
-  local file="$1"
-  awk '
-    /^[[:space:]]*-[[:space:]]+id:[[:space:]]*/ {
-      id=$2
-      sub(/^id:/, "", id)
-      gsub(/"/, "", id)
-      gsub(/^[[:space:]]+|[[:space:]]+$/, "", id)
-      if (id == "") {
-        id=$3
-        gsub(/"/, "", id)
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", id)
-      }
-      if (id != "") print id
-    }
-  ' "$file"
-}
-
-check_registry_paths() {
-  local registry_file="$1"
-  local kind="$2"
-  local contract_file="$3"
-
-  local pair_count=0
-  while IFS='|' read -r id relpath; do
-    [[ -z "$id" || -z "$relpath" ]] && continue
-    relpath="${relpath%/}"
-    pair_count=$((pair_count + 1))
-
-    local actor_dir="$AGENCY_DIR/runtime/$kind/$relpath"
-    local actor_file="$actor_dir/$contract_file"
-
-    if [[ ! -d "$actor_dir" ]]; then
-      fail "$kind registry entry '$id' points to missing directory: $actor_dir"
-      continue
-    fi
-
-    if [[ ! -f "$actor_file" ]]; then
-      fail "$kind registry entry '$id' missing contract file: $actor_file"
-      continue
-    fi
-
-    pass "$kind/$id -> ${actor_file#$ROOT_DIR/}"
-  done < <(extract_id_path_pairs "$registry_file")
+  ' "$registry_file")
 
   if [[ $pair_count -eq 0 ]]; then
-    warn "$kind registry has no id/path entries"
-  fi
-}
-
-check_agent_filename_capitalization() {
-  local legacy_files
-  legacy_files="$(find "$AGENCY_DIR/runtime/agents" -type f -name 'agent.md' | sort || true)"
-
-  if [[ -n "$legacy_files" ]]; then
-    while IFS= read -r file; do
-      [[ -z "$file" ]] && continue
-      fail "legacy lowercase agent contract filename detected: ${file#$ROOT_DIR/}"
-    done <<< "$legacy_files"
-  else
-    pass "agent contract filenames are capitalized (AGENT.md)"
-  fi
-}
-
-check_agent_contract_layers() {
-  local pair_count=0
-  while IFS='|' read -r id relpath; do
-    [[ -z "$id" || -z "$relpath" ]] && continue
-    relpath="${relpath%/}"
-    pair_count=$((pair_count + 1))
-
-    local agent_dir="$AGENCY_DIR/runtime/agents/$relpath"
-    local agent_file="$agent_dir/AGENT.md"
-    local soul_file="$agent_dir/SOUL.md"
-
-    if [[ ! -f "$agent_file" ]]; then
-      fail "agent '$id' missing AGENT.md: $agent_file"
-      continue
-    fi
-
-    if [[ ! -f "$soul_file" ]]; then
-      fail "agent '$id' missing SOUL.md: $soul_file"
-      continue
-    fi
-
-    if ! grep -q '^## Contract Scope' "$agent_file"; then
-      fail "agent '$id' AGENT.md missing '## Contract Scope' section"
-    fi
-
-    if ! grep -q '^## Contract Scope' "$soul_file"; then
-      fail "agent '$id' SOUL.md missing '## Contract Scope' section"
-    fi
-
-    if ! grep -q '^## Philosophy' "$soul_file"; then
-      fail "agent '$id' SOUL.md missing '## Philosophy' section"
-    fi
-
-    if ! grep -q '\./SOUL\.md' "$agent_file"; then
-      fail "agent '$id' AGENT.md must reference ./SOUL.md"
-    fi
-
-    if ! grep -q '\./AGENT\.md' "$soul_file"; then
-      fail "agent '$id' SOUL.md must reference ./AGENT.md"
-    fi
-
-    if ! grep -q 'CONSTITUTION\.md' "$agent_file"; then
-      fail "agent '$id' AGENT.md must reference CONSTITUTION.md"
-    fi
-
-    if ! grep -q 'DELEGATION\.md' "$agent_file"; then
-      fail "agent '$id' AGENT.md must reference DELEGATION.md"
-    fi
-
-    if ! grep -q 'MEMORY\.md' "$agent_file"; then
-      fail "agent '$id' AGENT.md must reference MEMORY.md"
-    fi
-
-    if ! grep -q 'CONSTITUTION\.md' "$soul_file"; then
-      fail "agent '$id' SOUL.md must reference CONSTITUTION.md"
-    fi
-
-    if ! grep -q 'DELEGATION\.md' "$soul_file"; then
-      fail "agent '$id' SOUL.md must reference DELEGATION.md"
-    fi
-
-    if ! grep -q 'MEMORY\.md' "$soul_file"; then
-      fail "agent '$id' SOUL.md must reference MEMORY.md"
-    fi
-
-    pass "agents/$id contract layering validated (AGENT.md + SOUL.md)"
-  done < <(extract_id_path_pairs "$AGENTS_REG")
-
-  if [[ $pair_count -eq 0 ]]; then
-    warn "agents registry has no id/path entries for contract layering checks"
-  fi
-}
-
-check_cross_agent_contracts() {
-  if ! grep -q '^## Contract Scope' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing '## Contract Scope' section"
-  fi
-  if ! grep -q '^## Authority and Precedence' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing '## Authority and Precedence' section"
-  fi
-  if ! grep -q '^## Non-Negotiables' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing '## Non-Negotiables' section"
-  fi
-  if ! grep -q '^## Conscience' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing '## Conscience' section"
-  fi
-  if ! grep -q '^### Decision Rubric' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing '### Decision Rubric' section"
-  fi
-  if ! grep -q '^### Red Lines' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing '### Red Lines' section"
-  fi
-
-  if ! grep -q '^## Contract Scope' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing '## Contract Scope' section"
-  fi
-  if ! grep -q '^## Delegation Packet Requirements' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing '## Delegation Packet Requirements' section"
-  fi
-  if ! grep -q '^## Authority Boundaries' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing '## Authority Boundaries' section"
-  fi
-  if ! grep -q '^## Escalation Triggers' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing '## Escalation Triggers' section"
-  fi
-
-  if ! grep -q '^## Contract Scope' "$MEMORY_FILE"; then
-    fail "MEMORY.md missing '## Contract Scope' section"
-  fi
-  if ! grep -q '^## Memory Classes' "$MEMORY_FILE"; then
-    fail "MEMORY.md missing '## Memory Classes' section"
-  fi
-  if ! grep -q '^## Retention and Placement' "$MEMORY_FILE"; then
-    fail "MEMORY.md missing '## Retention and Placement' section"
-  fi
-  if ! grep -q '^## Privacy and Safety Constraints' "$MEMORY_FILE"; then
-    fail "MEMORY.md missing '## Privacy and Safety Constraints' section"
-  fi
-
-  pass "cross-agent contracts validated (CONSTITUTION.md + DELEGATION.md + MEMORY.md)"
-}
-
-check_main_branch_deletion_policy() {
-  if grep -q 'No deletion of `main` branch' "$CONSTITUTION_FILE"; then
-    pass "constitution declares non-deletable main branch red line"
-  else
-    fail "CONSTITUTION.md missing non-deletable main branch red line"
-  fi
-
-  if grep -q 'delete protected branch `main`' "$DELEGATION_FILE"; then
-    pass "delegation contract escalates delete-main requests"
-  else
-    fail "DELEGATION.md missing delete-main escalation trigger"
-  fi
-
-  if awk '
-    $0 ~ /boundary_id:[[:space:]]*"DB-005"/ {in_block=1; next}
-    in_block && /^  - boundary_id:/ {in_block=0}
-    in_block && /decision_class:[[:space:]]*"protected-branch-main-deletion"/ {class_ok=1}
-    in_block && /condition:[[:space:]]*"requested action deletes local or remote branch named main"/ {condition_ok=1}
-    in_block && /route:[[:space:]]*"block"/ {route_ok=1}
-    END {exit !(class_ok && condition_ok && route_ok)}
-  ' "$BOUNDARY_FILE"; then
-    pass "delegation boundaries block main-branch deletion requests"
-  else
-    fail "delegation-boundaries-v1.yml missing DB-005 block rule for main-branch deletion"
-  fi
-}
-
-check_execution_profile_governance_contract() {
-  if [[ ! -f "$CANONICAL_AGENTS_FILE" ]]; then
-    fail "missing file: $CANONICAL_AGENTS_FILE"
-  else
-    pass "found file: ${CANONICAL_AGENTS_FILE#$ROOT_DIR/}"
-  fi
-
-  if [[ ! -f "$INSTANCE_AGENTS_FILE" ]]; then
-    fail "missing file: $INSTANCE_AGENTS_FILE"
-  else
-    pass "found file: ${INSTANCE_AGENTS_FILE#$ROOT_DIR/}"
-  fi
-
-  validate_root_ingress_adapter "$ROOT_AGENTS_FILE" "root AGENTS.md"
-  validate_root_ingress_adapter "$ROOT_CLAUDE_FILE" "root CLAUDE.md"
-
-  if ! grep -Fq '.octon/instance/ingress/AGENTS.md' "$CANONICAL_AGENTS_FILE"; then
-    fail ".octon/AGENTS.md must point to .octon/instance/ingress/AGENTS.md"
-  else
-    pass ".octon/AGENTS.md forwards to instance ingress"
-  fi
-
-  if ! grep -q '^## Execution Profile Governance' "$INSTANCE_AGENTS_FILE"; then
-    fail "instance ingress AGENTS.md missing execution profile governance section"
-  else
-    pass "instance ingress AGENTS.md includes execution profile governance section"
-  fi
-
-  if ! grep -q '^## Execution Profile Governance' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing execution profile governance section"
-  fi
-  if ! grep -Fq 'change_profile' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing change_profile rule"
-  fi
-  if ! grep -Fq 'tie-break' "$CONSTITUTION_FILE"; then
-    fail "CONSTITUTION.md missing profile tie-break rule"
-  fi
-
-  if ! grep -Fq 'change_profile' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing change_profile delegation packet requirement"
-  fi
-  if ! grep -Fq 'profile tie-break ambiguity' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing profile tie-break escalation trigger"
-  fi
-  if ! grep -Fq 'Profile Selection Receipt' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing required output section: Profile Selection Receipt"
-  fi
-  if ! grep -Fq 'Impact Map (code, tests, docs, contracts)' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing required output section: Impact Map (code, tests, docs, contracts)"
-  fi
-  if ! grep -Fq 'Compliance Receipt' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing required output section: Compliance Receipt"
-  fi
-  if ! grep -Fq 'Exceptions/Escalations' "$DELEGATION_FILE"; then
-    fail "DELEGATION.md missing required output section: Exceptions/Escalations"
-  fi
-
-  if ! grep -Fq 'change_profile' "$MEMORY_FILE"; then
-    fail "MEMORY.md missing change_profile retention requirement"
-  fi
-  if ! grep -Fq 'release_state' "$MEMORY_FILE"; then
-    fail "MEMORY.md missing release_state retention requirement"
-  fi
-  if ! grep -Fq 'transitional_exception_note' "$MEMORY_FILE"; then
-    fail "MEMORY.md missing transitional_exception_note retention requirement"
-  fi
-
-  if [[ ! -f "$ARCHITECT_AGENT_FILE" ]]; then
-    fail "missing file: $ARCHITECT_AGENT_FILE"
-  else
-    pass "found file: ${ARCHITECT_AGENT_FILE#$ROOT_DIR/}"
-  fi
-  if [[ ! -f "$ARCHITECT_SOUL_FILE" ]]; then
-    fail "missing file: $ARCHITECT_SOUL_FILE"
-  else
-    pass "found file: ${ARCHITECT_SOUL_FILE#$ROOT_DIR/}"
-  fi
-  if ! grep -Fq 'change_profile' "$ARCHITECT_AGENT_FILE"; then
-    fail "architect AGENT.md missing change_profile requirement"
-  fi
-  if ! grep -Fq 'Profile Selection Receipt' "$ARCHITECT_AGENT_FILE"; then
-    fail "architect AGENT.md missing required section: Profile Selection Receipt"
-  fi
-  if ! grep -Fq 'Impact Map (code, tests, docs, contracts)' "$ARCHITECT_AGENT_FILE"; then
-    fail "architect AGENT.md missing required section: Impact Map (code, tests, docs, contracts)"
-  fi
-  if ! grep -Fq 'Compliance Receipt' "$ARCHITECT_AGENT_FILE"; then
-    fail "architect AGENT.md missing required section: Compliance Receipt"
-  fi
-  if ! grep -Fq 'Exceptions/Escalations' "$ARCHITECT_AGENT_FILE"; then
-    fail "architect AGENT.md missing required section: Exceptions/Escalations"
-  fi
-  if ! grep -Fq 'profile-selection tie-break ambiguity' "$ARCHITECT_SOUL_FILE"; then
-    fail "architect SOUL.md missing profile tie-break ambiguity escalation stance"
-  fi
-
-  if ! grep -Fq 'execution-profile-governance' "$AGENTS_REG"; then
-    fail "agents registry missing execution-profile-governance capability flag"
-  fi
-
-  if awk '
-    $0 ~ /boundary_id:[[:space:]]*"DB-006"/ {in_block=1; next}
-    in_block && /^  - boundary_id:/ {in_block=0}
-    in_block && /decision_class:[[:space:]]*"execution-profile-tie-break"/ {class_ok=1}
-    in_block && /condition:/ && /atomic/ && /transitional/ {condition_ok=1}
-    in_block && /route:[[:space:]]*"escalate"/ {route_ok=1}
-    END {exit !(class_ok && condition_ok && route_ok)}
-  ' "$BOUNDARY_FILE"; then
-    pass "delegation boundaries include DB-006 execution-profile tie-break escalation rule"
-  else
-    fail "delegation-boundaries-v1.yml missing DB-006 execution-profile tie-break escalation rule"
-  fi
-
-  pass "execution-profile governance contract validated"
-}
-
-check_agent_registry_contract_fields() {
-  local row_count=0
-  while IFS='|' read -r id contract soul; do
-    [[ -z "$id" ]] && continue
-    row_count=$((row_count + 1))
-
-    if [[ -z "$contract" ]]; then
-      fail "agents registry entry '$id' missing required field: contract"
-      continue
-    fi
-
-    if [[ -z "$soul" ]]; then
-      fail "agents registry entry '$id' missing required field: soul"
-      continue
-    fi
-
-    if [[ "$contract" != "AGENT.md" ]]; then
-      fail "agents registry entry '$id' contract must be AGENT.md (found: $contract)"
-    fi
-
-    if [[ "$soul" != "SOUL.md" ]]; then
-      fail "agents registry entry '$id' soul must be SOUL.md (found: $soul)"
-    fi
-
-    pass "agents/$id registry contract fields validated"
-  done < <(
-    awk '
-      /^[[:space:]]*-[[:space:]]+id:[[:space:]]*/ {
-        if (in_block == 1) {
-          print id "|" contract "|" soul
-        }
-        in_block=1
-        id=$2
-        sub(/^id:/, "", id)
-        gsub(/"/, "", id)
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", id)
-        if (id == "") {
-          id=$3
-          gsub(/"/, "", id)
-          gsub(/^[[:space:]]+|[[:space:]]+$/, "", id)
-        }
-        contract=""
-        soul=""
-        next
-      }
-      in_block == 1 && /^[[:space:]]*contract:[[:space:]]*/ {
-        contract=$2
-        gsub(/"/, "", contract)
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", contract)
-        next
-      }
-      in_block == 1 && /^[[:space:]]*soul:[[:space:]]*/ {
-        soul=$2
-        gsub(/"/, "", soul)
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", soul)
-        next
-      }
-      END {
-        if (in_block == 1) {
-          print id "|" contract "|" soul
-        }
-      }
-    ' "$AGENTS_REG"
-  )
-
-  if [[ $row_count -eq 0 ]]; then
-    warn "agents registry has no entries for contract field validation"
+    warn "$runtime_kind registry has no id/path entries"
   fi
 }
 
 check_unique_ids() {
   local registry_file="$1"
   local label="$2"
-
   local dupes
   dupes="$(extract_ids "$registry_file" | sort | uniq -d || true)"
-
   if [[ -n "$dupes" ]]; then
-    while IFS= read -r d; do
-      [[ -z "$d" ]] && continue
-      fail "$label has duplicate id: $d"
+    while IFS= read -r dup; do
+      [[ -z "$dup" ]] && continue
+      fail "$label has duplicate id: $dup"
     done <<< "$dupes"
   else
     pass "$label IDs are unique"
@@ -529,14 +170,13 @@ check_assistant_aliases() {
       sub(/\].*/, "", line)
       n=split(line, arr, ",")
       for (i=1; i<=n; i++) {
-        a=arr[i]
-        gsub(/"/, "", a)
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", a)
-        if (a != "") print a
+        alias=arr[i]
+        gsub(/"/, "", alias)
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", alias)
+        if (alias != "") print alias
       }
     }
   ' "$ASSISTANTS_REG" | sort | uniq -d || true)"
-
   if [[ -n "$dupes" ]]; then
     while IFS= read -r alias; do
       [[ -z "$alias" ]] && continue
@@ -554,14 +194,13 @@ check_assistant_aliases() {
       sub(/\].*/, "", line)
       n=split(line, arr, ",")
       for (i=1; i<=n; i++) {
-        a=arr[i]
-        gsub(/"/, "", a)
-        gsub(/^[[:space:]]+|[[:space:]]+$/, "", a)
-        if (a != "" && substr(a,1,1) != "@") print a
+        alias=arr[i]
+        gsub(/"/, "", alias)
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", alias)
+        if (alias != "" && substr(alias, 1, 1) != "@") print alias
       }
     }
   ' "$ASSISTANTS_REG" || true)"
-
   if [[ -n "$bad_aliases" ]]; then
     while IFS= read -r alias; do
       [[ -z "$alias" ]] && continue
@@ -572,124 +211,154 @@ check_assistant_aliases() {
   fi
 }
 
-check_manifest_links() {
-  grep -q 'agents:\s*"runtime/agents/registry.yml"' "$MANIFEST" || fail "manifest missing agents registry link"
-  grep -q 'assistants:\s*"runtime/assistants/registry.yml"' "$MANIFEST" || fail "manifest missing assistants registry link"
-  grep -q 'teams:\s*"runtime/teams/registry.yml"' "$MANIFEST" || fail "manifest missing teams registry link"
-  grep -q 'locality:\s*"repo-instance-scope-registry"' "$MANIFEST" || fail "manifest routing.locality must be repo-instance-scope-registry"
+check_manifest_and_roles() {
+  grep -q '^default_agent:[[:space:]]*orchestrator' "$MANIFEST" || fail "manifest default_agent must be orchestrator"
+  grep -q 'default_execution_model:[[:space:]]*"single-accountable-orchestrator"' "$MANIFEST" || fail "manifest must encode single-accountable-orchestrator execution model"
+  grep -q '^default:[[:space:]]*orchestrator' "$AGENTS_REG" || fail "agents registry default must be orchestrator"
 
-  local default_agent
-  default_agent="$(awk '/^default_agent:\s*/ {print $2}' "$MANIFEST" | tr -d '"')"
-  if [[ -z "$default_agent" || "$default_agent" == "null" ]]; then
-    fail "manifest default_agent is not set"
-    return
-  fi
-
-  if ! extract_ids "$AGENTS_REG" | grep -qx "$default_agent"; then
-    fail "manifest default_agent '$default_agent' not found in agents registry"
+  if ! extract_ids "$AGENTS_REG" | grep -qx 'orchestrator'; then
+    fail "agents registry must include orchestrator"
   else
-    pass "manifest default_agent resolves to agents registry"
+    pass "agents registry includes orchestrator"
   fi
 
-  pass "manifest routing.locality uses repo-instance scope registry model"
+  if ! extract_ids "$AGENTS_REG" | grep -qx 'verifier'; then
+    fail "agents registry must include verifier"
+  else
+    pass "agents registry includes verifier"
+  fi
+
+  local default_execution_roles
+  default_execution_roles="$(grep -c 'default_execution_role:[[:space:]]*true' "$AGENTS_REG" || true)"
+  if [[ "$default_execution_roles" -ne 1 ]]; then
+    fail "exactly one default_execution_role must be true in agents registry"
+  else
+    pass "agents registry declares exactly one default execution role"
+  fi
+
+  if ! awk '
+    $0 ~ /- id:[[:space:]]*orchestrator/ {in_block=1; next}
+    in_block && /^  - id:/ {in_block=0}
+    in_block && /default_execution_role:[[:space:]]*true/ {default_ok=1}
+    in_block && /boundary_value:/ {boundary_ok=1}
+    END {exit !(default_ok && boundary_ok)}
+  ' "$AGENTS_REG"; then
+    fail "orchestrator registry block must declare default_execution_role=true and a boundary_value"
+  else
+    pass "orchestrator registry block declares accountable default role"
+  fi
+
+  if ! awk '
+    $0 ~ /- id:[[:space:]]*verifier/ {in_block=1; next}
+    in_block && /^  - id:/ {in_block=0}
+    in_block && /activation_criteria:/ {criteria_block=1}
+    in_block && /boundary_value:/ {boundary_ok=1}
+    in_block && criteria_block && /^[[:space:]]*-[[:space:]]*"?.+/ {criteria_count++}
+    END {exit !(boundary_ok && criteria_count >= 1)}
+  ' "$AGENTS_REG"; then
+    fail "verifier registry block must declare boundary_value and activation_criteria"
+  else
+    pass "verifier registry block declares bounded activation criteria"
+  fi
+
+  if grep -q 'soul:' "$AGENTS_REG"; then
+    warn "agents registry still includes optional soul fields"
+  else
+    pass "agents registry does not treat SOUL.md as required contract metadata"
+  fi
+}
+
+check_governance_and_contracts() {
+  require_file "$CONSTITUTION_FILE"
+  require_file "$DELEGATION_FILE"
+  require_file "$MEMORY_FILE"
+  require_file "$BOUNDARY_FILE"
+  require_file "$ORCHESTRATOR_AGENT_FILE"
+  require_file "$VERIFIER_AGENT_FILE"
+
+  grep -q '^## Execution Profile Governance' "$INSTANCE_AGENTS_FILE" || fail "instance ingress AGENTS.md missing execution profile governance section"
+  grep -q '^## Execution Profile Governance' "$CONSTITUTION_FILE" || fail "CONSTITUTION.md missing execution profile governance section"
+  grep -Fq 'change_profile' "$CONSTITUTION_FILE" || fail "CONSTITUTION.md missing change_profile rule"
+  grep -Fq 'tie-break' "$CONSTITUTION_FILE" || fail "CONSTITUTION.md missing profile tie-break rule"
+
+  grep -Fq 'Profile Selection Receipt' "$DELEGATION_FILE" || fail "DELEGATION.md missing required output section: Profile Selection Receipt"
+  grep -Fq 'Impact Map (code, tests, docs, contracts)' "$DELEGATION_FILE" || fail "DELEGATION.md missing required output section: Impact Map (code, tests, docs, contracts)"
+  grep -Fq 'Compliance Receipt' "$DELEGATION_FILE" || fail "DELEGATION.md missing required output section: Compliance Receipt"
+  grep -Fq 'Exceptions/Escalations' "$DELEGATION_FILE" || fail "DELEGATION.md missing required output section: Exceptions/Escalations"
+
+  grep -Fq 'release_state' "$MEMORY_FILE" || fail "MEMORY.md missing release_state retention rule"
+  grep -Fq 'transitional_exception_note' "$MEMORY_FILE" || fail "MEMORY.md missing transitional_exception_note retention rule"
+  grep -Fq 'state/evidence/runs' "$MEMORY_FILE" || fail "MEMORY.md must keep run evidence runtime-backed"
+
+  grep -Fq 'single accountable default execution role' "$ORCHESTRATOR_AGENT_FILE" || fail "orchestrator AGENT.md must state accountable default role"
+  grep -Fq 'Profile Selection Receipt' "$ORCHESTRATOR_AGENT_FILE" || fail "orchestrator AGENT.md missing Profile Selection Receipt requirement"
+  grep -Fq 'Impact Map (code, tests, docs, contracts)' "$ORCHESTRATOR_AGENT_FILE" || fail "orchestrator AGENT.md missing Impact Map requirement"
+  grep -Fq 'Compliance Receipt' "$ORCHESTRATOR_AGENT_FILE" || fail "orchestrator AGENT.md missing Compliance Receipt requirement"
+  grep -Fq 'Exceptions/Escalations' "$ORCHESTRATOR_AGENT_FILE" || fail "orchestrator AGENT.md missing Exceptions/Escalations requirement"
+  grep -Fq 'host and model adapters' "$ORCHESTRATOR_AGENT_FILE" || fail "orchestrator AGENT.md must describe non-authoritative adapter handling"
+
+  grep -Fq 'separation of duties' "$VERIFIER_AGENT_FILE" || fail "verifier AGENT.md must justify the role through separation of duties"
+  grep -Fq 'not a second default owner' "$VERIFIER_AGENT_FILE" || fail "verifier AGENT.md must reject second-owner behavior"
+
+  if [[ -f "$ORCHESTRATOR_SOUL_FILE" ]]; then
+    grep -Fq 'optional identity overlay only' "$ORCHESTRATOR_SOUL_FILE" || fail "orchestrator SOUL.md must be explicitly non-authoritative"
+  fi
+  if [[ -f "$VERIFIER_SOUL_FILE" ]]; then
+    grep -Fq 'optional identity overlay only' "$VERIFIER_SOUL_FILE" || fail "verifier SOUL.md must be explicitly non-authoritative"
+  fi
+
+  if awk '
+    $0 ~ /boundary_id:[[:space:]]*"DB-006"/ {in_block=1; next}
+    in_block && /^  - boundary_id:/ {in_block=0}
+    in_block && /decision_class:[[:space:]]*"execution-profile-tie-break"/ {class_ok=1}
+    in_block && /route:[[:space:]]*"escalate"/ {route_ok=1}
+    END {exit !(class_ok && route_ok)}
+  ' "$BOUNDARY_FILE"; then
+    pass "delegation boundaries include execution-profile tie-break escalation rule"
+  else
+    fail "delegation-boundaries-v1.yml missing execution-profile tie-break escalation rule"
+  fi
+}
+
+check_assistants_and_teams() {
+  if awk '
+    /^[[:space:]]*escalates_to:[[:space:]]*/ {
+      value=$2
+      gsub(/"/, "", value)
+      if (value != "orchestrator") exit 1
+    }
+  ' "$ASSISTANTS_REG"; then
+    pass "assistants escalate to orchestrator"
+  else
+    fail "all assistants must escalate to orchestrator"
+  fi
+
+  grep -q 'lead_agent:[[:space:]]*orchestrator' "$TEAMS_REG" || fail "teams registry lead_agent must be orchestrator"
+  grep -q 'agents: \[orchestrator, verifier\]' "$TEAMS_REG" || fail "teams registry must keep orchestrator/verifier composition"
+  grep -Fq 'orchestrator-owns' "$TEAMS_REG" || fail "teams registry must encode orchestrator-owned handoff policy"
+
+  check_assistant_aliases
+}
+
+check_instance_ingress() {
+  grep -Fq '.octon/framework/agency/runtime/agents/orchestrator/AGENT.md' "$INSTANCE_AGENTS_FILE" || fail "instance ingress must reference orchestrator execution profile"
+  if grep -Fq 'runtime/agents/orchestrator/SOUL.md' "$INSTANCE_AGENTS_FILE"; then
+    fail "instance ingress must not treat SOUL.md as required authority"
+  else
+    pass "instance ingress does not require a SOUL overlay"
+  fi
 }
 
 check_deprecations() {
-  if [[ -d "$AGENCY_DIR/actors" ]]; then
-    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/actors"
-  else
-    pass "deprecated actors surface removed"
-  fi
-
-  if [[ -d "$AGENCY_DIR/agents" ]]; then
-    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/agents"
-  else
-    pass "deprecated root agency/agents path removed"
-  fi
-
-  if [[ -d "$AGENCY_DIR/assistants" ]]; then
-    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/assistants"
-  else
-    pass "deprecated root agency/assistants path removed"
-  fi
-
-  if [[ -d "$AGENCY_DIR/teams" ]]; then
-    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/teams"
-  else
-    pass "deprecated root agency/teams path removed"
-  fi
-
-  if [[ -f "$AGENCY_DIR/CONSTITUTION.md" ]]; then
-    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/CONSTITUTION.md"
-  else
-    pass "deprecated root governance/CONSTITUTION.md path removed"
-  fi
-
-  if [[ -f "$AGENCY_DIR/DELEGATION.md" ]]; then
-    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/DELEGATION.md"
-  else
-    pass "deprecated root governance/DELEGATION.md path removed"
-  fi
-
-  if [[ -f "$AGENCY_DIR/MEMORY.md" ]]; then
-    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/MEMORY.md"
-  else
-    pass "deprecated root governance/MEMORY.md path removed"
-  fi
-
-  if [[ -d "$AGENCY_DIR/subagents" ]]; then
-    fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/subagents"
-  else
-    pass "deprecated subagents path removed"
-  fi
-
-  if grep -q 'agency/subagents/' "$OCTON_DIR/octon.yml"; then
-    fail "octon.yml still exports deprecated agency/subagents path"
-  else
-    pass "octon.yml does not include deprecated agency/subagents path"
-  fi
-
-  if grep -q 'agency/actors/' "$OCTON_DIR/octon.yml"; then
-    fail "octon.yml still exports deprecated agency/actors path"
-  else
-    pass "octon.yml does not include deprecated agency/actors path"
-  fi
-
-  if grep -q 'agency/agents/' "$OCTON_DIR/octon.yml"; then
-    fail "octon.yml still exports deprecated agency/agents path"
-  else
-    pass "octon.yml does not include deprecated agency/agents path"
-  fi
-
-  if grep -q 'agency/assistants/' "$OCTON_DIR/octon.yml"; then
-    fail "octon.yml still exports deprecated agency/assistants path"
-  else
-    pass "octon.yml does not include deprecated agency/assistants path"
-  fi
-
-  if grep -q 'agency/teams/' "$OCTON_DIR/octon.yml"; then
-    fail "octon.yml still exports deprecated agency/teams path"
-  else
-    pass "octon.yml does not include deprecated agency/teams path"
-  fi
-
-  if grep -q 'agency/CONSTITUTION.md' "$OCTON_DIR/octon.yml"; then
-    fail "octon.yml still exports deprecated agency/CONSTITUTION.md path"
-  else
-    pass "octon.yml does not include deprecated agency/CONSTITUTION.md path"
-  fi
-
-  if grep -q 'agency/DELEGATION.md' "$OCTON_DIR/octon.yml"; then
-    fail "octon.yml still exports deprecated agency/DELEGATION.md path"
-  else
-    pass "octon.yml does not include deprecated agency/DELEGATION.md path"
-  fi
-
-  if grep -q 'agency/MEMORY.md' "$OCTON_DIR/octon.yml"; then
-    fail "octon.yml still exports deprecated agency/MEMORY.md path"
-  else
-    pass "octon.yml does not include deprecated agency/MEMORY.md path"
-  fi
+  [[ ! -d "$AGENCY_DIR/actors" ]] || fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/actors"
+  [[ ! -d "$AGENCY_DIR/agents" ]] || fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/agents"
+  [[ ! -d "$AGENCY_DIR/assistants" ]] || fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/assistants"
+  [[ ! -d "$AGENCY_DIR/teams" ]] || fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/teams"
+  [[ ! -f "$AGENCY_DIR/CONSTITUTION.md" ]] || fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/CONSTITUTION.md"
+  [[ ! -f "$AGENCY_DIR/DELEGATION.md" ]] || fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/DELEGATION.md"
+  [[ ! -f "$AGENCY_DIR/MEMORY.md" ]] || fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/MEMORY.md"
+  [[ ! -d "$AGENCY_DIR/subagents" ]] || fail "deprecated path exists: ${AGENCY_DIR#$ROOT_DIR/}/subagents"
+  pass "deprecated agency surfaces remain removed"
 }
 
 main() {
@@ -699,34 +368,31 @@ main() {
   require_file "$AGENTS_REG"
   require_file "$ASSISTANTS_REG"
   require_file "$TEAMS_REG"
-  require_file "$CONSTITUTION_FILE"
-  require_file "$DELEGATION_FILE"
-  require_file "$MEMORY_FILE"
-  require_file "$BOUNDARY_FILE"
+  require_file "$CANONICAL_AGENTS_FILE"
+  require_file "$INSTANCE_AGENTS_FILE"
 
-  check_manifest_links
-  check_cross_agent_contracts
-  check_main_branch_deletion_policy
-  check_execution_profile_governance_contract
+  validate_root_ingress_adapter "$ROOT_AGENTS_FILE" "repo-root AGENTS.md"
+  if [[ -f "$ROOT_CLAUDE_FILE" || -L "$ROOT_CLAUDE_FILE" ]]; then
+    validate_root_ingress_adapter "$ROOT_CLAUDE_FILE" "repo-root CLAUDE.md"
+  else
+    pass "repo-root CLAUDE.md not present"
+  fi
 
+  check_registry_contract_paths "$AGENTS_REG" "agents" "AGENT.md"
+  check_registry_contract_paths "$ASSISTANTS_REG" "assistants" "assistant.md"
+  check_registry_contract_paths "$TEAMS_REG" "teams" "team.md"
   check_unique_ids "$AGENTS_REG" "agents registry"
   check_unique_ids "$ASSISTANTS_REG" "assistants registry"
   check_unique_ids "$TEAMS_REG" "teams registry"
 
-  check_registry_paths "$AGENTS_REG" "agents" "AGENT.md"
-  check_registry_paths "$ASSISTANTS_REG" "assistants" "assistant.md"
-  check_registry_paths "$TEAMS_REG" "teams" "team.md"
-  check_agent_registry_contract_fields
-  check_agent_filename_capitalization
-  check_agent_contract_layers
-
-  check_assistant_aliases
+  check_manifest_and_roles
+  check_governance_and_contracts
+  check_assistants_and_teams
+  check_instance_ingress
   check_deprecations
 
-  echo ""
   echo "Validation summary: errors=$errors warnings=$warnings"
-
-  if [[ $errors -gt 0 ]]; then
+  if [[ "$errors" -gt 0 ]]; then
     exit 1
   fi
 }

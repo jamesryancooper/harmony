@@ -91,7 +91,7 @@ create_fixture_repo() {
       "id": "continuity-check",
       "description": "Verify continuity files.",
       "status": "in_progress",
-      "owner": "@architect",
+      "owner": "@orchestrator",
       "blockers": [],
       "acceptance_criteria": [
         "Validator passes"
@@ -124,7 +124,7 @@ EOF
       "type": "domain",
       "status": "in_progress",
       "last_modified": "2026-03-08",
-      "owner": "@architect",
+      "owner": "@orchestrator",
       "related_tasks": [
         "continuity-check"
       ],

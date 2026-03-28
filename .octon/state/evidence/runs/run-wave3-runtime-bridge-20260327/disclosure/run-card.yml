@@ -4,6 +4,17 @@ status: succeeded
 summary: Transitional Wave 3 runtime bridge run completed after binding canonical lifecycle state for mission evidence consumers.
 support_tier: repo-local-transitional
 support_target_ref: .octon/instance/governance/support-targets.yml
+adapter_support:
+  host_adapter: repo-shell
+  model_adapter: repo-local-governed
+  host_support_status: supported
+  model_support_status: supported
+  conformance_criteria:
+    - HOST-001
+    - HOST-002
+    - MODEL-001
+    - MODEL-002
+    - MODEL-003
 authority_refs:
   run_contract: .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/run-contract.yml
   decision_artifact: .octon/state/evidence/decisions/repo/dec-wave3-runtime-bridge-20260327/decision.json
@@ -21,5 +32,6 @@ intervention_ref: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/i
 replay_ref: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/replay/manifest.yml
 known_limits:
   - Support posture remains bounded to the repo-local-transitional tier declared in support-targets.yml.
+  - Adapter provenance remains bounded to the declared repo-shell and repo-local-governed envelopes.
   - Disclosure summarizes authority and evidence; it does not replace them.
 generated_at: "2026-03-27T22:47:42Z"

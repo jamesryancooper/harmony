@@ -1,6 +1,6 @@
 watcher_id: "runtime-contract-drift-watcher"
 title: "Runtime Contract Drift Watcher"
-owner: "@architect"
+owner: "@orchestrator"
 status: "active"
 runner:
   kind: "poll"

@@ -54,6 +54,28 @@ validate_support_tier() {
   exit 1
 }
 
+adapter_status() {
+  local adapter_kind="$1"
+  local adapter_id="$2"
+  local support_targets_file="$OCTON_DIR/instance/governance/support-targets.yml"
+  local query=".$adapter_kind[] | select(.adapter_id == \"$adapter_id\") | .support_status // \"unsupported\""
+  yq -r "$query" "$support_targets_file" 2>/dev/null | head -n 1
+}
+
+adapter_criteria_json() {
+  local adapter_kind="$1"
+  local adapter_id="$2"
+  local support_targets_file="$OCTON_DIR/instance/governance/support-targets.yml"
+  local query=".$adapter_kind[] | select(.adapter_id == \"$adapter_id\") | .criteria_refs // []"
+  local output
+  output="$(yq -o=json -I=0 "$query" "$support_targets_file" 2>/dev/null | tail -n 1 || true)"
+  if [[ -n "$output" ]]; then
+    printf '%s\n' "$output"
+  else
+    printf '[]\n'
+  fi
+}
+
 run_control_dir() {
   local run_id="$1"
   printf '%s/%s' "$RUN_CONTROL_ROOT" "$run_id"
@@ -854,8 +876,27 @@ write_run_card_file() {
   local generated_at="$4"
   local decision_id="$5"
   local support_tier="repo-local-transitional"
+  local host_adapter="${OCTON_SUPPORT_HOST_ADAPTER:-repo-shell}"
+  local model_adapter="${OCTON_SUPPORT_MODEL_ADAPTER:-repo-local-governed}"
+  local host_support_status="unsupported"
+  local model_support_status="unsupported"
+  local host_criteria_json='[]'
+  local model_criteria_json='[]'
+  local conformance_criteria_json='[]'
   if [[ -f "$(run_contract_path "$run_id")" ]]; then
     support_tier="$(yq -r '.support_tier // "repo-local-transitional"' "$(run_contract_path "$run_id")" 2>/dev/null || printf 'repo-local-transitional')"
+  fi
+  if [[ -f "$OCTON_DIR/instance/governance/support-targets.yml" ]]; then
+    host_support_status="$(adapter_status "host_adapters" "$host_adapter")"
+    model_support_status="$(adapter_status "model_adapters" "$model_adapter")"
+    host_criteria_json="$(adapter_criteria_json "host_adapters" "$host_adapter")"
+    model_criteria_json="$(adapter_criteria_json "model_adapters" "$model_adapter")"
+    conformance_criteria_json="$(
+      jq -cn \
+        --argjson host "$host_criteria_json" \
+        --argjson model "$model_criteria_json" \
+        '$host + $model | unique'
+    )"
   fi
   jq -n \
     --arg run_id "$run_id" \
@@ -863,7 +904,12 @@ write_run_card_file() {
     --arg summary "$summary" \
     --arg generated_at "$generated_at" \
     --arg decision_artifact ".octon/state/evidence/decisions/repo/$decision_id/decision.json" \
-    --arg support_tier "$support_tier" '
+    --arg support_tier "$support_tier" \
+    --arg host_adapter "$host_adapter" \
+    --arg model_adapter "$model_adapter" \
+    --arg host_support_status "$host_support_status" \
+    --arg model_support_status "$model_support_status" \
+    --argjson conformance_criteria "$conformance_criteria_json" '
       {
         schema_version: "run-card-v1",
         run_id: $run_id,
@@ -871,6 +917,13 @@ write_run_card_file() {
         summary: $summary,
         support_tier: $support_tier,
         support_target_ref: ".octon/instance/governance/support-targets.yml",
+        adapter_support: {
+          host_adapter: $host_adapter,
+          model_adapter: $model_adapter,
+          host_support_status: $host_support_status,
+          model_support_status: $model_support_status,
+          conformance_criteria: $conformance_criteria
+        },
         authority_refs: {
           run_contract: ".octon/state/control/execution/runs/\($run_id)/run-contract.yml",
           decision_artifact: $decision_artifact,
@@ -901,6 +954,9 @@ write_run_card_file() {
 
 - Status: $status
 - Support tier: $support_tier
+- Host adapter: $host_adapter ($host_support_status)
+- Model adapter: $model_adapter ($model_support_status)
+- Conformance criteria: $(printf '%s' "$conformance_criteria_json" | jq -r 'join(", ")')
 - Summary: $summary
 - Authority:
   - Run contract: $(run_contract_relpath "$run_id")

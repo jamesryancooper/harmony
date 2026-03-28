@@ -3,7 +3,7 @@
   "contract_hash": "sha256:872b45e9ad1e1813a30455a776e61c90d97d16fe",
   "fixture_set_hash": "sha256:5fb6b45ed9ff36f0faadf440db24e0a36919741b",
   "rule_set_hash": "sha256:1cacc11bba237fb23ca96d4cdc4b97e67a7126a0",
-  "agent_id": "architect",
+  "agent_id": "orchestrator",
   "agent_version": "2026-02-13",
   "model_id": "gpt-5-codex",
   "prompt_hash": "sha256:faf246d2e9b9946811907f9f3e1c82b94de4e493",

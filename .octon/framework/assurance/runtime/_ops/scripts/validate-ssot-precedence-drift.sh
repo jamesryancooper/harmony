@@ -157,8 +157,7 @@ check_precedence_goal_alignment() {
     "$OCTON_DIR/framework/agency/governance/CONSTITUTION.md"
     "$OCTON_DIR/framework/agency/governance/DELEGATION.md"
     "$OCTON_DIR/framework/agency/governance/MEMORY.md"
-    "$OCTON_DIR/framework/agency/runtime/agents/architect/AGENT.md"
-    "$OCTON_DIR/framework/agency/runtime/agents/architect/SOUL.md"
+    "$OCTON_DIR/framework/agency/runtime/agents/orchestrator/AGENT.md"
   )
   local file
 
