@@ -1,0 +1,43 @@
+schema_version: authority-decision-artifact-v1
+decision_id: decision-run-wave4-benchmark-evaluator-20260327
+request_id: run-wave4-benchmark-evaluator-20260327
+run_id: run-wave4-benchmark-evaluator-20260327
+decision: ALLOW
+reason_codes:
+  - WAVE4_BENCHMARK_EVALUATOR
+  - HISTORICAL_CLOSEOUT_BACKFILL
+ownership:
+  status: resolved
+  source: historical-closeout-backfill
+  owner_refs:
+    - operator://octon-maintainers
+support_tier:
+  support_tier: release-and-boundary-sensitive
+  model_tier_id: MT-B
+  workload_tier_id: WT-3
+  language_resource_tier_id: LT-REF
+  locale_tier_id: LOC-EN
+  host_adapter_id: repo-shell
+  host_adapter_status: supported
+  model_adapter_id: repo-local-governed
+  model_adapter_status: supported
+  adapter_conformance_criteria:
+    - HOST-001
+    - HOST-002
+    - MODEL-001
+    - MODEL-002
+    - MODEL-003
+  support_status: reduced
+reversibility:
+  requested: reversible
+  effective: reversible
+  workflow_mode: autonomous
+budget:
+  route: not-applicable
+egress:
+  route: not-applicable
+approval_request_ref: null
+approval_grant_refs: []
+exception_refs: []
+revocation_refs: []
+generated_at: "2026-03-28T00:00:00Z"

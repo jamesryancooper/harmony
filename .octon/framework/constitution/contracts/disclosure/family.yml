@@ -21,6 +21,7 @@ run_card:
   required_refs:
     - "run-contract"
     - "decision-artifact"
+    - "grant-bundle"
     - "retained-run-evidence"
     - "adapter-support"
     - "measurements"

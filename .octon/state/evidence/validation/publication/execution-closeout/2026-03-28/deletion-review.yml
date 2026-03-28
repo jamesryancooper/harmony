@@ -1,0 +1,5 @@
+schema_version: "closeout-review-evidence-v1"
+review_id: "deletion-review"
+status: "approved"
+summary: "Legacy helper paths and decision-lineage roots were demoted to projection-only or historical-lineage-only status with explicit retirement governance."
+reviewed_at: "2026-03-28T00:00:00Z"

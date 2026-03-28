@@ -6,6 +6,10 @@ release_state: "pre-1.0"
 change_profile: "transitional"
 profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 run_lifecycle:
+  run_continuity:
+    schema_ref: ".octon/framework/constitution/contracts/runtime/run-continuity-v1.schema.json"
+    continuity_root: ".octon/state/continuity/runs"
+    canonical_file: "handoff.yml"
   runtime_state:
     schema_ref: ".octon/framework/constitution/contracts/runtime/runtime-state-v1.schema.json"
     control_root: ".octon/state/control/execution/runs"
@@ -35,6 +39,9 @@ run_lifecycle:
       - "trace-pointers.yml"
       - "retained-run-evidence.yml"
 bridges:
+  run_continuity:
+    source_root: ".octon/state/continuity/runs"
+    rule: "Run continuity carries resumability and handoff state; retained run evidence remains append-oriented evidence only."
   mission_continuity:
     source_root: ".octon/state/continuity/repo/missions"
     rule: "Mission continuity consumes run evidence and lifecycle state; it does not replace them."

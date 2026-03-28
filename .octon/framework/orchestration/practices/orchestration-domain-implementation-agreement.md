@@ -26,8 +26,14 @@ ownership.
    - Canonical runtime, governance, practices, and validator artifacts must
      not depend on temporary proposal paths.
 2. Preserve continuity ownership.
-   - Durable decision evidence stays under `/.octon/state/evidence/decisions/repo/`.
+   - Durable per-run authority evidence stays under
+     `/.octon/state/evidence/control/execution/`.
+   - Historical lineage and capability-local decision logs may remain under
+     `/.octon/state/evidence/decisions/repo/`, but they do not replace
+     canonical per-run authority.
    - Durable run evidence stays under `/.octon/state/evidence/runs/`.
+   - Mutable run resumability and handoff state stays under
+     `/.octon/state/continuity/runs/`.
    - Orchestration runtime projections must not absorb or replace continuity
      evidence authority.
 3. Do not invent architecture.

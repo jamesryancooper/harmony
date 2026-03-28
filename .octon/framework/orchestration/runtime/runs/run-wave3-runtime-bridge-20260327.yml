@@ -2,7 +2,9 @@ run_id: run-wave3-runtime-bridge-20260327
 status: succeeded
 started_at: "2026-03-27T19:52:03Z"
 decision_id: dec-wave3-runtime-bridge-20260327
-continuity_run_path: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/
+authority_decision_ref: .octon/state/evidence/control/execution/authority-decision-run-wave3-runtime-bridge-20260327.yml
+authority_grant_bundle_ref: .octon/state/evidence/control/execution/authority-grant-bundle-run-wave3-runtime-bridge-20260327.yml
+continuity_run_path: .octon/state/continuity/runs/run-wave3-runtime-bridge-20260327/
 run_contract_path: .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/run-contract.yml
 stage_attempt_root: .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/stage-attempts
 runtime_state_path: .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/runtime-state.yml

@@ -10,4 +10,4 @@ evidence_refs:
   - .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/recovery.yml
 known_limits:
   - Independent human review remains available for higher-risk support tiers.
-recorded_at: "2026-03-27T22:47:42Z"
+recorded_at: "2026-03-28T19:57:12Z"

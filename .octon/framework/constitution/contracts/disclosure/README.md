@@ -9,7 +9,8 @@ Wave 4 promotes disclosure into a constitutional family while keeping
 disclosure subordinate to durable authority and retained evidence.
 
 - RunCards summarize one consequential run from bound authority, retained
-  evidence, proof planes, observability, and replay references
+  evidence, structural/governance proof planes, observability, and replay
+  references
 - HarnessCards summarize one system-level support, benchmark, or release claim
   from support-target declarations plus retained proof bundles
 - disclosure never mints authority, widens support, or overrides the bound run

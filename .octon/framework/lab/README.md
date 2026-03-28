@@ -14,4 +14,12 @@ Wave 4 remediation also adds:
 - a lab catalog for reusable scenario and benchmark disclosure assets
 - reusable writers for HarnessCards and evaluator-backed benchmark claims
 
+Wave 6 closes the remaining domain gap by making the authored lab surface
+explicitly cover:
+
+- scenario proof
+- replay and shadow exercises
+- fault rehearsals
+- adversarial experiments
+
 Retained lab evidence lives under `/.octon/state/evidence/lab/**`.

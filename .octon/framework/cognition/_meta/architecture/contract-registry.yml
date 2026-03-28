@@ -1,7 +1,9 @@
 schema_version: "architecture-contract-registry-v1"
 execution:
   write_roots:
+    run_continuity_root: ".octon/state/continuity/runs"
     run_evidence_root: ".octon/state/evidence/runs"
+    external_evidence_index_root: ".octon/state/evidence/external-index"
     lab_evidence_root: ".octon/state/evidence/lab"
     run_control_root: ".octon/state/control/execution/runs"
     run_assurance_root: ".octon/state/evidence/runs/<run-id>/assurance"
@@ -38,6 +40,7 @@ execution:
     workspace_intent_contract: ".octon/instance/cognition/context/shared/intent.contract.yml"
   runtime_binding:
     contract_family_root: ".octon/framework/constitution/contracts/runtime"
+    run_continuity_file: ".octon/state/continuity/runs/<run-id>/handoff.yml"
     runtime_state_file: ".octon/state/control/execution/runs/<run-id>/runtime-state.yml"
     rollback_posture_file: ".octon/state/control/execution/runs/<run-id>/rollback-posture.yml"
     checkpoint_root: ".octon/state/control/execution/runs/<run-id>/checkpoints"
@@ -57,6 +60,13 @@ execution:
     harness_card_root: ".octon/state/evidence/lab/harness-cards"
     benchmark_root: ".octon/state/evidence/lab/benchmarks"
     evaluator_review_root: ".octon/state/evidence/lab/evaluator-reviews"
+  retention_binding:
+    contract_family_root: ".octon/framework/constitution/contracts/retention"
+    external_index_root: ".octon/state/evidence/external-index"
+    replay_storage_classes:
+      - "git-inline"
+      - "pointered"
+      - "external-immutable"
   adapter_binding:
     contract_family_root: ".octon/framework/constitution/contracts/adapters"
     host_adapter_root: ".octon/framework/engine/runtime/adapters/host"
@@ -72,6 +82,7 @@ execution:
     - ".octon/framework/constitution/contracts/assurance/README.md"
     - ".octon/framework/constitution/contracts/authority/README.md"
     - ".octon/framework/constitution/contracts/disclosure/README.md"
+    - ".octon/framework/constitution/contracts/retention/README.md"
     - ".octon/framework/constitution/contracts/adapters/README.md"
     - ".octon/framework/constitution/contracts/objective/README.md"
     - ".octon/framework/constitution/contracts/runtime/README.md"
@@ -98,6 +109,7 @@ execution:
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-objective-binding-cutover.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-lifecycle-normalization.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-assurance-disclosure-expansion.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-execution-constitution-closeout.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-wave5-agency-adapter-hardening.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-runtime-contracts.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-lifecycle-cutover.sh"
@@ -134,6 +146,7 @@ documentation:
         - ".octon/framework/constitution/contracts/assurance/README.md"
         - ".octon/framework/constitution/contracts/authority/README.md"
         - ".octon/framework/constitution/contracts/disclosure/README.md"
+        - ".octon/framework/constitution/contracts/retention/README.md"
         - ".octon/framework/constitution/contracts/adapters/README.md"
         - ".octon/framework/constitution/contracts/objective/README.md"
         - ".octon/framework/constitution/contracts/runtime/README.md"

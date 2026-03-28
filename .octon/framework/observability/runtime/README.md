@@ -7,3 +7,9 @@ Canonical retained outputs live under:
 
 - `/.octon/state/evidence/runs/<run-id>/measurements/**`
 - `/.octon/state/evidence/runs/<run-id>/interventions/**`
+
+Runtime contracts also define:
+
+- failure taxonomy bundles
+- observability report bundles that aggregate measurement, intervention, and
+  failure-class evidence without becoming a control surface

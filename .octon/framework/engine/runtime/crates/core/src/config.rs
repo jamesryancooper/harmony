@@ -9,6 +9,7 @@ pub struct RuntimeConfig {
     pub octon_dir: PathBuf,
     pub repo_root: PathBuf,
     pub run_evidence_root: PathBuf,
+    pub run_continuity_root: PathBuf,
     pub execution_control_root: PathBuf,
     pub execution_tmp_root: PathBuf,
 
@@ -183,6 +184,7 @@ impl ConfigLoader {
             .to_path_buf();
 
         let run_evidence_root = octon_dir.join("state").join("evidence").join("runs");
+        let run_continuity_root = octon_dir.join("state").join("continuity").join("runs");
         let execution_control_root = octon_dir.join("state").join("control").join("execution");
         let execution_tmp_root = octon_dir.join("generated").join(".tmp").join("execution");
 
@@ -212,6 +214,7 @@ impl ConfigLoader {
             octon_dir,
             repo_root,
             run_evidence_root,
+            run_continuity_root,
             execution_control_root,
             execution_tmp_root,
             policy,
@@ -449,6 +452,10 @@ impl RuntimeConfig {
         self.run_evidence_root.join(request_id)
     }
 
+    pub fn run_continuity_path(&self, request_id: &str) -> PathBuf {
+        self.run_continuity_root.join(request_id)
+    }
+
     pub fn run_control_root(&self, request_id: &str) -> PathBuf {
         self.execution_control_root.join("runs").join(request_id)
     }
@@ -465,6 +472,7 @@ impl RuntimeConfig {
         }
 
         if path.starts_with(&self.run_evidence_root)
+            || path.starts_with(&self.run_continuity_root)
             || path.starts_with(&self.execution_control_root)
             || path.starts_with(&self.execution_tmp_root)
         {

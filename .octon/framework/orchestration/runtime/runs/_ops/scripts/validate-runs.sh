@@ -27,7 +27,7 @@ require_dir_rel "by-surface/incidents"
 validate_run_record() {
   local rel_file="$1"
   local run_file="$SURFACE_DIR/$rel_file"
-  local run_id status started_at completed_at decision_id continuity_run_path summary
+  local run_id status started_at completed_at decision_id authority_decision_ref authority_grant_bundle_ref continuity_run_path summary
   local executor_id executor_ack heartbeat lease_expires recovery_status run_contract_path
   local runtime_state_path rollback_posture_path receipt_root assurance_root measurements_root interventions_root run_card_path replay_pointers_path trace_pointers_path
 
@@ -36,6 +36,8 @@ validate_run_record() {
   started_at="$(yq -r '.started_at // ""' "$run_file")"
   completed_at="$(yq -r '.completed_at // ""' "$run_file")"
   decision_id="$(yq -r '.decision_id // ""' "$run_file")"
+  authority_decision_ref="$(yq -r '.authority_decision_ref // ""' "$run_file")"
+  authority_grant_bundle_ref="$(yq -r '.authority_grant_bundle_ref // ""' "$run_file")"
   continuity_run_path="$(yq -r '.continuity_run_path // ""' "$run_file")"
   run_contract_path="$(yq -r '.run_contract_path // ""' "$run_file")"
   runtime_state_path="$(yq -r '.runtime_state_path // ""' "$run_file")"
@@ -60,8 +62,15 @@ validate_run_record() {
     *) fail "run '$run_id' has invalid status '$status'" ;;
   esac
   [[ "$started_at" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T.+$ ]] && pass "run '$run_id' started_at is ISO-like" || fail "run '$run_id' started_at must be ISO timestamp"
-  [[ -n "$decision_id" && -f "$OCTON_DIR/state/evidence/decisions/repo/$decision_id/decision.json" ]] && pass "run '$run_id' decision link resolves" || fail "run '$run_id' decision link missing"
-  [[ -n "$continuity_run_path" && -d "$OCTON_DIR/${continuity_run_path#.octon/}" ]] && pass "run '$run_id' continuity path resolves" || fail "run '$run_id' continuity path missing"
+  if [[ -n "$authority_decision_ref" ]]; then
+    [[ -f "$OCTON_DIR/${authority_decision_ref#.octon/}" ]] && pass "run '$run_id' authority decision resolves" || fail "run '$run_id' authority decision missing"
+  else
+    [[ -n "$decision_id" && -f "$OCTON_DIR/state/evidence/decisions/repo/$decision_id/decision.json" ]] && pass "run '$run_id' legacy decision link resolves" || fail "run '$run_id' decision link missing"
+  fi
+  if [[ -n "$authority_grant_bundle_ref" ]]; then
+    [[ -f "$OCTON_DIR/${authority_grant_bundle_ref#.octon/}" ]] && pass "run '$run_id' authority grant bundle resolves" || fail "run '$run_id' authority grant bundle missing"
+  fi
+  [[ -n "$continuity_run_path" && -d "$OCTON_DIR/${continuity_run_path#.octon/}" && -f "$OCTON_DIR/${continuity_run_path#.octon/}/handoff.yml" ]] && pass "run '$run_id' continuity path resolves" || fail "run '$run_id' continuity path missing"
   [[ -n "$run_contract_path" && -f "$OCTON_DIR/${run_contract_path#.octon/}" ]] && pass "run '$run_id' canonical run contract resolves" || fail "run '$run_id' canonical run contract missing"
   [[ -d "$OCTON_DIR/state/control/execution/runs/$run_id/stage-attempts" ]] && pass "run '$run_id' stage-attempt root exists" || fail "run '$run_id' stage-attempt root missing"
   [[ -n "$runtime_state_path" && -f "$OCTON_DIR/${runtime_state_path#.octon/}" ]] && pass "run '$run_id' runtime-state resolves" || fail "run '$run_id' runtime-state missing"
@@ -73,6 +82,8 @@ validate_run_record() {
   [[ -n "$interventions_root" && -d "$OCTON_DIR/${interventions_root#.octon/}" ]] && pass "run '$run_id' interventions root resolves" || fail "run '$run_id' interventions root missing"
   [[ -f "$OCTON_DIR/state/evidence/runs/$run_id/checkpoints/bound.yml" ]] && pass "run '$run_id' evidence checkpoint exists" || fail "run '$run_id' evidence checkpoint missing"
   [[ -f "$OCTON_DIR/state/evidence/runs/$run_id/replay/manifest.yml" ]] && pass "run '$run_id' replay manifest exists" || fail "run '$run_id' replay manifest missing"
+  [[ -f "$OCTON_DIR/state/evidence/runs/$run_id/assurance/structural.yml" ]] && pass "run '$run_id' structural proof exists" || fail "run '$run_id' structural proof missing"
+  [[ -f "$OCTON_DIR/state/evidence/runs/$run_id/assurance/governance.yml" ]] && pass "run '$run_id' governance proof exists" || fail "run '$run_id' governance proof missing"
   [[ -f "$OCTON_DIR/state/evidence/runs/$run_id/assurance/functional.yml" ]] && pass "run '$run_id' functional proof exists" || fail "run '$run_id' functional proof missing"
   [[ -f "$OCTON_DIR/state/evidence/runs/$run_id/assurance/behavioral.yml" ]] && pass "run '$run_id' behavioral proof exists" || fail "run '$run_id' behavioral proof missing"
   [[ -f "$OCTON_DIR/state/evidence/runs/$run_id/assurance/maintainability.yml" ]] && pass "run '$run_id' maintainability proof exists" || fail "run '$run_id' maintainability proof missing"

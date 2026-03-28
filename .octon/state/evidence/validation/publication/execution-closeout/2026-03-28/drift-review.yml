@@ -1,0 +1,5 @@
+schema_version: "closeout-review-evidence-v1"
+review_id: "drift-review"
+status: "approved"
+summary: "Authoritative docs, runtime surfaces, and retained evidence roots were updated together for the execution closeout cutover."
+reviewed_at: "2026-03-28T00:00:00Z"

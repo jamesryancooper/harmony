@@ -1,0 +1,13 @@
+schema_version: proof-plane-report-v1
+plane: governance
+subject_kind: run
+subject_ref: .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/run-contract.yml
+outcome: pass
+proof_class: deterministic
+summary: Governance proof is retained as durable evidence for authority routing, support-target posture, and repo-owned contract overlays.
+evidence_refs:
+  - .octon/instance/governance/support-targets.yml
+  - .octon/framework/constitution/contracts/authority/README.md
+  - .octon/instance/governance/contracts/README.md
+known_limits: []
+generated_at: "2026-03-28T19:57:12Z"

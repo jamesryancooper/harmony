@@ -9,6 +9,8 @@ Run roots are the primary execution-time unit of truth.
 
 - canonical runtime state lives under:
   `/.octon/state/control/execution/runs/<run-id>/runtime-state.yml`
+- canonical resumability and handoff continuity live under:
+  `/.octon/state/continuity/runs/<run-id>/handoff.yml`
 - canonical rollback and contamination posture lives under:
   `/.octon/state/control/execution/runs/<run-id>/rollback-posture.yml`
 - canonical control checkpoints live under:
@@ -24,6 +26,8 @@ Run roots are the primary execution-time unit of truth.
 ## Final Rules
 
 - Mission remains the continuity and long-horizon autonomy container.
+- Run continuity is first-class operational state and remains distinct from
+  retained run evidence.
 - Consequential stages must bind the run control and evidence roots before
   side effects occur.
 - Mission continuity, summaries, and mission views may consume run evidence,
@@ -33,6 +37,7 @@ Run roots are the primary execution-time unit of truth.
 
 - `family.yml`
 - `runtime-state-v1.schema.json`
+- `run-continuity-v1.schema.json`
 - `rollback-posture-v1.schema.json`
 - `checkpoint-v1.schema.json`
 - `replay-pointers-v1.schema.json`

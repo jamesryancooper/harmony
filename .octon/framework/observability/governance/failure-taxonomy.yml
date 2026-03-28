@@ -1,0 +1,9 @@
+schema_version: "failure-taxonomy-v1"
+taxonomy_id: "octon-runtime-failure-taxonomy"
+classes:
+  - class_id: "authority-routing"
+    description: "Failures caused by approval, support-tier, exception, or revocation posture."
+  - class_id: "run-lifecycle"
+    description: "Failures caused by missing run binding, runtime-state drift, or checkpoint loss."
+  - class_id: "proof-and-disclosure"
+    description: "Failures caused by incomplete proof, replay, or disclosure retention."

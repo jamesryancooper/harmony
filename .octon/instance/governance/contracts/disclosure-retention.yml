@@ -1,0 +1,16 @@
+schema_version: "repo-disclosure-retention-v1"
+policy_id: "execution-disclosure-retention"
+owner: "Octon governance"
+status: "active"
+canonical_disclosure_roots:
+  run_cards: ".octon/state/evidence/runs/<run-id>/disclosure"
+  harness_cards: ".octon/state/evidence/lab/harness-cards"
+  external_replay_index: ".octon/state/evidence/external-index"
+storage_classes:
+  behavioral_replay: "git-inline or external-immutable"
+  run_card: "git-inline"
+  harness_card: "git-inline"
+rules:
+  - "Behavioral claims must cite retained replay, scenario, shadow, or benchmark evidence."
+  - "External replay payloads require a content-addressed index entry."
+  - "Disclosure artifacts stay subordinate to run-contract, authority, and retained evidence roots."

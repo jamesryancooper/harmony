@@ -10,6 +10,8 @@ This root is the primary execution-time unit of truth:
 - stage attempts belong under `stage-attempts/**` beneath the bound run root
 - checkpoints, runtime-state, and rollback-posture belong under the same run
   control root
+- mutable resumability and handoff continuity belongs under the matching
+  `state/continuity/runs/<run-id>/` root
 - assurance, measurement, intervention, replay, and disclosure evidence belong
   under the matching retained run evidence root
 - mission remains the continuity and long-horizon autonomy container, but it

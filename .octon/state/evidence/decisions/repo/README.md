@@ -4,14 +4,15 @@ Routing, authority, and prerequisite decision evidence.
 
 ## Purpose
 
-`state/evidence/decisions/repo/` stores append-oriented decision records for material
-orchestration actions.
+`state/evidence/decisions/repo/` stores append-oriented historical lineage and
+capability-policy decision records.
 
 This surface exists so operators and validators can answer:
 
-- why work was allowed
-- why work was blocked
-- why escalation was required
+- how historical or transitional orchestration decisions were recorded
+- how capability-policy engines logged allow, block, or escalate outcomes
+- which legacy decision bundles remain as lineage after the canonical
+  authority cutover
 
 It is retained operational evidence, not active task state.
 
@@ -39,8 +40,8 @@ decisions/
 
 ## What Belongs Here
 
-- decision records for `allow`, `block`, and `escalate`
-- approval, waiver, and override artifacts for privileged actions
+- historical decision records for `allow`, `block`, and `escalate`
+- capability-policy logs that are not the canonical per-run authority path
 - prerequisite and approval evidence references
 - operator-readable decision digests
 
@@ -56,8 +57,9 @@ decisions/
 Historical run bundles may still contain legacy `acp-decision.json` artifacts
 inside `state/evidence/runs/`. Those remain historical run-bundled evidence.
 
-New canonical orchestration decision evidence belongs in
-`state/evidence/decisions/repo/`.
+Canonical per-run orchestration authority now belongs in
+`state/evidence/control/execution/`. This root remains for lineage, migration
+traceability, and capability-local decision logs only.
 
 ## Safety Rules
 

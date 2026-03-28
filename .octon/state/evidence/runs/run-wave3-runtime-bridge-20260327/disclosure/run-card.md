@@ -8,9 +8,12 @@
 - Summary: Transitional Wave 3 runtime bridge run completed after binding canonical lifecycle state for mission evidence consumers.
 - Authority:
   - Run contract: .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/run-contract.yml
-  - Decision artifact: .octon/state/evidence/decisions/repo/dec-wave3-runtime-bridge-20260327/decision.json
+  - Decision artifact: .octon/state/evidence/control/execution/authority-decision-run-wave3-runtime-bridge-20260327.yml
+  - Grant bundle: .octon/state/evidence/control/execution/authority-grant-bundle-run-wave3-runtime-bridge-20260327.yml
   - Retained evidence: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/retained-run-evidence.yml
 - Proof planes:
+  - Structural: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/structural.yml
+  - Governance: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/governance.yml
   - Functional: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/functional.yml
   - Behavioral: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/behavioral.yml
   - Maintainability: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/maintainability.yml
@@ -20,4 +23,4 @@
   - Measurements: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/measurements/summary.yml
   - Interventions: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/interventions/log.yml
 - Replay: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/replay/manifest.yml
-- Generated at: 2026-03-27T22:47:42Z
+- Generated at: 2026-03-28T19:57:12Z

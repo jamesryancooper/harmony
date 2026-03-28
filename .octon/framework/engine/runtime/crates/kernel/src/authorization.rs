@@ -1033,10 +1033,39 @@ struct RetainedRunEvidenceRecord {
     updated_at: String,
 }
 
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+struct RunContinuityRecord {
+    #[serde(default)]
+    schema_version: String,
+    #[serde(default)]
+    run_id: String,
+    #[serde(default)]
+    status: String,
+    #[serde(default)]
+    run_contract_ref: String,
+    #[serde(default)]
+    retained_evidence_ref: String,
+    #[serde(default)]
+    last_receipt_ref: Option<String>,
+    #[serde(default)]
+    last_checkpoint_ref: String,
+    #[serde(default)]
+    resume_from_stage_attempt_id: Option<String>,
+    #[serde(default)]
+    mission_id: Option<String>,
+    #[serde(default)]
+    parent_run_ref: Option<String>,
+    #[serde(default)]
+    next_action: Option<String>,
+    #[serde(default)]
+    updated_at: String,
+}
+
 #[derive(Debug, Clone)]
 struct BoundRunLifecycle {
     control_root: PathBuf,
     evidence_root: PathBuf,
+    continuity_handoff_path: PathBuf,
     runtime_state_path: PathBuf,
     receipts_root: PathBuf,
     replay_pointers_path: PathBuf,
@@ -1220,6 +1249,10 @@ fn retained_evidence_path(cfg: &RuntimeConfig, request_id: &str) -> PathBuf {
     cfg.run_root(request_id).join("retained-run-evidence.yml")
 }
 
+fn run_continuity_handoff_path(cfg: &RuntimeConfig, request_id: &str) -> PathBuf {
+    cfg.run_continuity_path(request_id).join("handoff.yml")
+}
+
 fn stage_attempt_id_for_request(request: &ExecutionRequest) -> String {
     request
         .metadata
@@ -1258,7 +1291,9 @@ fn bind_run_lifecycle(
     let run_id = request.request_id.as_str();
     let control_root = cfg.run_control_root(run_id);
     let evidence_root = cfg.run_root(run_id);
+    let continuity_root = cfg.run_continuity_path(run_id);
     let run_contract_path = run_contract_path(cfg, run_id);
+    let continuity_handoff_path = run_continuity_handoff_path(cfg, run_id);
     let runtime_state_path = runtime_state_path(cfg, run_id);
     let rollback_posture_path = rollback_posture_path(cfg, run_id);
     let control_checkpoint_path = control_checkpoint_path(cfg, run_id, "bound");
@@ -1281,6 +1316,7 @@ fn bind_run_lifecycle(
         &control_root,
         &stage_attempt_root,
         &control_root.join("checkpoints"),
+        &continuity_root,
         &evidence_root,
         &receipts_root,
         &evidence_root.join("checkpoints"),
@@ -1574,10 +1610,28 @@ fn bind_run_lifecycle(
             ),
         )
     })?;
+    sync_run_continuity(
+        &RunContinuityRecord {
+            schema_version: "run-continuity-v1".to_string(),
+            run_id: run_id.to_string(),
+            status: "authorizing".to_string(),
+            run_contract_ref: run_contract_ref.clone(),
+            retained_evidence_ref: retained_evidence_ref.clone(),
+            last_receipt_ref: None,
+            last_checkpoint_ref: control_checkpoint_ref.clone(),
+            resume_from_stage_attempt_id: Some(stage_attempt_id.clone()),
+            mission_id: mission_id.clone(),
+            parent_run_ref: parent_run_ref.clone(),
+            next_action: next_action_for_run_status("authorizing"),
+            updated_at: now.clone(),
+        },
+        &continuity_handoff_path,
+    )?;
 
     Ok(BoundRunLifecycle {
         control_root,
         evidence_root,
+        continuity_handoff_path,
         runtime_state_path,
         receipts_root,
         replay_pointers_path,
@@ -1643,7 +1697,57 @@ fn update_bound_runtime_state(
             ),
         )
     })?;
+    sync_run_continuity(
+        &RunContinuityRecord {
+            schema_version: "run-continuity-v1".to_string(),
+            run_id: state.run_id.clone(),
+            status: state.status.clone(),
+            run_contract_ref: state.run_contract_ref.clone(),
+            retained_evidence_ref: bound.retained_evidence_ref.clone(),
+            last_receipt_ref: state.last_receipt_ref.clone(),
+            last_checkpoint_ref: state
+                .last_checkpoint_ref
+                .clone()
+                .unwrap_or_else(|| bound.control_checkpoint_ref.clone()),
+            resume_from_stage_attempt_id: state.current_stage_attempt_id.clone(),
+            mission_id: state.mission_id.clone(),
+            parent_run_ref: state.parent_run_ref.clone(),
+            next_action: next_action_for_run_status(&state.status),
+            updated_at: state.updated_at.clone(),
+        },
+        &bound.continuity_handoff_path,
+    )?;
     Ok(())
+}
+
+fn next_action_for_run_status(status: &str) -> Option<String> {
+    match status {
+        "authorizing" => Some(
+            "Complete authority routing before any consequential side effects.".to_string(),
+        ),
+        "authorized" | "running" => Some(
+            "Resume from the current stage attempt using the retained receipt and checkpoint roots."
+                .to_string(),
+        ),
+        "stage_only" => Some(
+            "Supply the required approval or evidence bundle before reauthorizing this run."
+                .to_string(),
+        ),
+        "denied" => Some(
+            "Do not resume this run; open a new request if the authority posture changes."
+                .to_string(),
+        ),
+        _ => None,
+    }
+}
+
+fn sync_run_continuity(record: &RunContinuityRecord, path: &Path) -> CoreResult<()> {
+    write_yaml(path, record).map_err(|e| {
+        KernelError::new(
+            ErrorCode::Internal,
+            format!("failed to write run continuity {}: {e}", path.display()),
+        )
+    })
 }
 
 fn update_stage_attempt_status(
@@ -1880,6 +1984,10 @@ fn bound_run_from_grant(runtime_path: &Path, grant: &GrantBundle) -> Option<Boun
     let control_root_rel = grant.run_control_root.clone()?;
     let control_root = resolve_relative_from_runtime_path(runtime_path, &control_root_rel)?;
     let evidence_root = resolve_relative_from_runtime_path(runtime_path, &grant.run_root)?;
+    let continuity_handoff_path = repo_root
+        .join(".octon/state/continuity/runs")
+        .join(&grant.request_id)
+        .join("handoff.yml");
     let runtime_state_path = control_root.join("runtime-state.yml");
     let control_checkpoint_path = control_root.join("checkpoints").join("bound.yml");
     let receipts_root = if let Some(rel) = &grant.run_receipts_root {
@@ -1915,6 +2023,7 @@ fn bound_run_from_grant(runtime_path: &Path, grant: &GrantBundle) -> Option<Boun
     Some(BoundRunLifecycle {
         control_root: control_root.clone(),
         evidence_root: evidence_root.clone(),
+        continuity_handoff_path: continuity_handoff_path.clone(),
         runtime_state_path: runtime_state_path.clone(),
         receipts_root: receipts_root.clone(),
         replay_pointers_path: replay_pointers_path.clone(),
@@ -2179,7 +2288,10 @@ fn resolve_adapter_support(
     }
 
     let authority_mode_valid = if adapter_kind == "host" {
-        matches!(adapter.authority_mode.as_str(), "projection_only" | "non_authoritative")
+        matches!(
+            adapter.authority_mode.as_str(),
+            "projection_only" | "non_authoritative"
+        )
     } else {
         adapter.authority_mode == "non_authoritative"
     };
@@ -2200,7 +2312,8 @@ fn resolve_adapter_support(
                 .adapter_conformance_criteria
                 .iter()
                 .find(|criterion| {
-                    criterion.criterion_id == *criterion_id && criterion.adapter_kind == adapter_kind
+                    criterion.criterion_id == *criterion_id
+                        && criterion.adapter_kind == adapter_kind
                 })
         })
         .collect();
@@ -2214,7 +2327,10 @@ fn resolve_adapter_support(
         };
     }
 
-    let tier_match = adapter.allowed_model_tiers.iter().any(|value| value == model_tier)
+    let tier_match = adapter
+        .allowed_model_tiers
+        .iter()
+        .any(|value| value == model_tier)
         && adapter
             .allowed_workload_tiers
             .iter()
@@ -2229,10 +2345,11 @@ fn resolve_adapter_support(
             .any(|value| value == locale_tier);
 
     let required_evidence = merge_required_evidence(
-        adapter
-            .required_evidence
-            .iter()
-            .chain(criteria.iter().flat_map(|criterion| criterion.required_evidence.iter())),
+        adapter.required_evidence.iter().chain(
+            criteria
+                .iter()
+                .flat_map(|criterion| criterion.required_evidence.iter()),
+        ),
     );
 
     if !tier_match {
@@ -5288,6 +5405,8 @@ mod tests {
             .expect("create ACP policy dir");
         fs::create_dir_all(base.join(".octon/state/evidence/runs"))
             .expect("create run evidence dir");
+        fs::create_dir_all(base.join(".octon/state/continuity/runs"))
+            .expect("create run continuity dir");
         fs::create_dir_all(base.join(".octon/state/evidence/control/execution"))
             .expect("create control evidence dir");
         fs::create_dir_all(base.join(".octon/state/control/execution"))
@@ -5344,6 +5463,7 @@ mod tests {
             octon_dir: base.join(".octon"),
             repo_root: base.clone(),
             run_evidence_root: base.join(".octon/state/evidence/runs"),
+            run_continuity_root: base.join(".octon/state/continuity/runs"),
             execution_control_root: base.join(".octon/state/control/execution"),
             execution_tmp_root: base.join(".octon/generated/.tmp/execution"),
             policy: PolicyConfig::default(),
@@ -5654,18 +5774,23 @@ mod tests {
         assert!(encoded.contains("ref:"));
         assert!(!encoded.contains("ref_id:"));
 
-        let decoded: AuthorityProjection =
-            serde_yaml::from_str(
-                "kind: github-label\nref: github://pull/214/check/manual-review-requested\n",
-            )
-                .expect("decode canonical projection");
-        assert_eq!(decoded.ref_id, "github://pull/214/check/manual-review-requested");
+        let decoded: AuthorityProjection = serde_yaml::from_str(
+            "kind: github-label\nref: github://pull/214/check/manual-review-requested\n",
+        )
+        .expect("decode canonical projection");
+        assert_eq!(
+            decoded.ref_id,
+            "github://pull/214/check/manual-review-requested"
+        );
 
         let legacy: AuthorityProjection = serde_yaml::from_str(
             "kind: github-label\nref_id: github://pull/214/check/manual-review-requested\n",
         )
         .expect("decode legacy projection");
-        assert_eq!(legacy.ref_id, "github://pull/214/check/manual-review-requested");
+        assert_eq!(
+            legacy.ref_id,
+            "github://pull/214/check/manual-review-requested"
+        );
     }
 
     #[test]
@@ -5693,7 +5818,8 @@ mod tests {
         let cfg = temp_runtime_config();
         let policy = PolicyEngine::new(cfg.clone());
         fs::write(
-            cfg.octon_dir.join("instance/governance/support-targets.yml"),
+            cfg.octon_dir
+                .join("instance/governance/support-targets.yml"),
             support_targets_fixture("WT-3", "not-the-requested-tier", "deny"),
         )
         .expect("rewrite support targets");
@@ -5710,9 +5836,10 @@ mod tests {
         let cfg = temp_runtime_config();
         let policy = PolicyEngine::new(cfg.clone());
         let mut request = minimal_request();
-        request
-            .metadata
-            .insert("support_host_adapter".to_string(), "missing-host".to_string());
+        request.metadata.insert(
+            "support_host_adapter".to_string(),
+            "missing-host".to_string(),
+        );
 
         let err = authorize_execution(&cfg, &policy, &request, None)
             .expect_err("undeclared host adapter should deny");

@@ -64,7 +64,7 @@ Authority order is:
   artifacts are produced.
 - Material execution evidence belongs in `/.octon/state/evidence/runs/`.
 - Material routing and authority decisions belong in
-  `/.octon/state/evidence/decisions/repo/`.
+  `/.octon/state/evidence/control/execution/`.
 - Mission-owned workflow invocations must emit runs carrying `mission_id` and
   linked `decision_id`.
 

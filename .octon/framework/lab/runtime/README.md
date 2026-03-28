@@ -7,3 +7,11 @@ Canonical retained outputs live under `/.octon/state/evidence/lab/**` and
 run-local replay roots under `/.octon/state/evidence/runs/<run-id>/replay/**`.
 
 Reusable disclosure tooling lives under `runtime/_ops/scripts/`.
+
+Active authored runtime contracts cover:
+
+- replay manifests
+- scenario proof
+- shadow-run reports
+- fault-rehearsal reports
+- adversarial experiment reports
