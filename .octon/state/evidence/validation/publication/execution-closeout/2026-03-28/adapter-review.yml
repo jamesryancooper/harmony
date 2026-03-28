@@ -1,0 +1,5 @@
+schema_version: "closeout-review-evidence-v1"
+review_id: "adapter-review"
+status: "approved"
+summary: "Run disclosure and authority artifacts continue to cite repo-shell and repo-local-governed adapters through support-target-backed conformance criteria."
+reviewed_at: "2026-03-28T00:00:00Z"

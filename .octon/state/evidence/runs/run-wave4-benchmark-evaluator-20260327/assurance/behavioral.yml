@@ -9,4 +9,4 @@ evidence_refs:
   - .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/replay/manifest.yml
   - .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/replay-pointers.yml
 known_limits: []
-generated_at: "2026-03-27T22:47:42Z"
+generated_at: "2026-03-28T19:57:12Z"

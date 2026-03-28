@@ -1,0 +1,26 @@
+schema_version: "octon-constitutional-retention-family-v1"
+family_id: "retention"
+status: "active"
+activation_wave: 6
+release_state: "pre-1.0"
+change_profile: "transitional"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
+retention_model:
+  run_continuity_root: ".octon/state/continuity/runs"
+  run_evidence_root: ".octon/state/evidence/runs"
+  control_evidence_root: ".octon/state/evidence/control/execution"
+  external_index_root: ".octon/state/evidence/external-index"
+storage_classes:
+  - class_id: "git-inline"
+    description: "Evidence retained directly under canonical in-repo evidence roots."
+  - class_id: "pointered"
+    description: "Canonical evidence stores a stable in-repo pointer to another retained artifact family."
+  - class_id: "external-immutable"
+    description: "Canonical evidence stores a content-addressed pointer to immutable payloads outside the Git tree."
+schemas:
+  external_replay_index: ".octon/framework/constitution/contracts/retention/external-replay-index-v1.schema.json"
+  replay_storage_class: ".octon/framework/constitution/contracts/retention/replay-storage-class-v1.schema.json"
+rules:
+  - "Run continuity must remain distinct from retained evidence."
+  - "Replay-heavy external payloads require a content-addressed retained index entry."
+  - "Canonical run evidence must declare whether a replay artifact is git-inline, pointered, or external-immutable."

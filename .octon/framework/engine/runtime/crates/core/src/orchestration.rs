@@ -253,6 +253,8 @@ struct RunRecord {
     started_at: Option<String>,
     completed_at: Option<String>,
     decision_id: Option<String>,
+    authority_decision_ref: Option<String>,
+    authority_grant_bundle_ref: Option<String>,
     continuity_run_path: Option<String>,
     recovery_status: Option<String>,
     recovery_reason: Option<String>,
@@ -355,19 +357,30 @@ impl OrchestrationInspector {
         let octon_dir = octon_dir.canonicalize().map_err(|e| {
             KernelError::new(
                 ErrorCode::Internal,
-                format!("failed to canonicalize octon dir {}: {e}", octon_dir.display()),
+                format!(
+                    "failed to canonicalize octon dir {}: {e}",
+                    octon_dir.display()
+                ),
             )
         })?;
         let repo_root = octon_dir
             .parent()
             .ok_or_else(|| KernelError::new(ErrorCode::Internal, ".octon has no repository root"))?
             .to_path_buf();
-        let runtime_dir = octon_dir.join("framework").join("orchestration").join("runtime");
+        let runtime_dir = octon_dir
+            .join("framework")
+            .join("orchestration")
+            .join("runtime");
         let decisions_dir = octon_dir
             .join("state")
             .join("evidence")
             .join("decisions")
             .join("repo");
+        let authority_evidence_dir = octon_dir
+            .join("state")
+            .join("evidence")
+            .join("control")
+            .join("execution");
         let missions_dir = octon_dir
             .join("instance")
             .join("orchestration")
@@ -375,7 +388,7 @@ impl OrchestrationInspector {
 
         Ok(Self {
             runs: load_runs(&repo_root, &runtime_dir)?,
-            decisions: load_decisions(&repo_root, &decisions_dir)?,
+            decisions: load_decisions(&repo_root, &decisions_dir, &authority_evidence_dir)?,
             queue_items: load_queue_items(&repo_root, &runtime_dir)?,
             queue_receipts: load_queue_receipts(&repo_root, &runtime_dir)?,
             watchers: load_watchers(&repo_root, &runtime_dir)?,
@@ -511,12 +524,16 @@ impl OrchestrationInspector {
                 self.expand_from_decision(decision, &mut push_artifact, &mut relations, &mut notes);
             }
             LookupQuery::RunId(run_id) => {
-                let run = self.runs.iter().find(|item| item.run_id == run_id).ok_or_else(|| {
-                    KernelError::new(
-                        ErrorCode::UnknownOperation,
-                        format!("unknown run_id '{}'", query.id()),
-                    )
-                })?;
+                let run = self
+                    .runs
+                    .iter()
+                    .find(|item| item.run_id == run_id)
+                    .ok_or_else(|| {
+                        KernelError::new(
+                            ErrorCode::UnknownOperation,
+                            format!("unknown run_id '{}'", query.id()),
+                        )
+                    })?;
                 push_artifact(self.run_artifact(run));
                 self.expand_from_run(run, &mut push_artifact, &mut relations, &mut notes);
             }
@@ -532,7 +549,12 @@ impl OrchestrationInspector {
                         )
                     })?;
                 push_artifact(self.incident_artifact(incident)?);
-                self.expand_from_incident(incident, &mut push_artifact, &mut relations, &mut notes)?;
+                self.expand_from_incident(
+                    incident,
+                    &mut push_artifact,
+                    &mut relations,
+                    &mut notes,
+                )?;
             }
             LookupQuery::QueueItemId(queue_item_id) => {
                 let queue_item = self
@@ -546,16 +568,34 @@ impl OrchestrationInspector {
                         )
                     })?;
                 push_artifact(self.queue_artifact(queue_item));
-                self.expand_from_queue_item(queue_item, &mut push_artifact, &mut relations, &mut notes);
+                self.expand_from_queue_item(
+                    queue_item,
+                    &mut push_artifact,
+                    &mut relations,
+                    &mut notes,
+                );
             }
             LookupQuery::EventId(event_id) => {
                 let mut found = false;
-                for queue_item in self.queue_items.iter().filter(|item| item.event_id.as_deref() == Some(event_id.as_str())) {
+                for queue_item in self
+                    .queue_items
+                    .iter()
+                    .filter(|item| item.event_id.as_deref() == Some(event_id.as_str()))
+                {
                     found = true;
                     push_artifact(self.queue_artifact(queue_item));
-                    self.expand_from_queue_item(queue_item, &mut push_artifact, &mut relations, &mut notes);
+                    self.expand_from_queue_item(
+                        queue_item,
+                        &mut push_artifact,
+                        &mut relations,
+                        &mut notes,
+                    );
                 }
-                for run in self.runs.iter().filter(|item| item.event_id.as_deref() == Some(event_id.as_str())) {
+                for run in self
+                    .runs
+                    .iter()
+                    .filter(|item| item.event_id.as_deref() == Some(event_id.as_str()))
+                {
                     found = true;
                     push_artifact(self.run_artifact(run));
                     self.expand_from_run(run, &mut push_artifact, &mut relations, &mut notes);
@@ -567,16 +607,24 @@ impl OrchestrationInspector {
                 {
                     found = true;
                     push_artifact(self.decision_artifact(decision));
-                    self.expand_from_decision(decision, &mut push_artifact, &mut relations, &mut notes);
+                    self.expand_from_decision(
+                        decision,
+                        &mut push_artifact,
+                        &mut relations,
+                        &mut notes,
+                    );
                 }
-                for incident in self
-                    .incidents
-                    .iter()
-                    .filter(|item| incident_contains_event(item, event_id.as_str(), &self.repo_root))
-                {
+                for incident in self.incidents.iter().filter(|item| {
+                    incident_contains_event(item, event_id.as_str(), &self.repo_root)
+                }) {
                     found = true;
                     push_artifact(self.incident_artifact(incident)?);
-                    self.expand_from_incident(incident, &mut push_artifact, &mut relations, &mut notes)?;
+                    self.expand_from_incident(
+                        incident,
+                        &mut push_artifact,
+                        &mut relations,
+                        &mut notes,
+                    )?;
                 }
                 if !found {
                     return Err(KernelError::new(
@@ -597,11 +645,9 @@ impl OrchestrationInspector {
                         )
                     })?;
                 push_artifact(self.automation_artifact(automation));
-                for queue_item in self
-                    .queue_items
-                    .iter()
-                    .filter(|item| item.target_automation_id.as_deref() == Some(automation_id.as_str()))
-                {
+                for queue_item in self.queue_items.iter().filter(|item| {
+                    item.target_automation_id.as_deref() == Some(automation_id.as_str())
+                }) {
                     push_artifact(self.queue_artifact(queue_item));
                     relations.push(LookupRelation {
                         from: format!("queue_item:{}", queue_item.queue_item_id),
@@ -609,7 +655,11 @@ impl OrchestrationInspector {
                         relation: "targets".to_string(),
                     });
                 }
-                for run in self.runs.iter().filter(|item| item.automation_id.as_deref() == Some(automation_id.as_str())) {
+                for run in self
+                    .runs
+                    .iter()
+                    .filter(|item| item.automation_id.as_deref() == Some(automation_id.as_str()))
+                {
                     push_artifact(self.run_artifact(run));
                     self.expand_from_run(run, &mut push_artifact, &mut relations, &mut notes);
                 }
@@ -634,9 +684,18 @@ impl OrchestrationInspector {
                         )
                     })?;
                 push_artifact(self.watcher_artifact(watcher));
-                for queue_item in self.queue_items.iter().filter(|item| item.watcher_id.as_deref() == Some(watcher_id.as_str())) {
+                for queue_item in self
+                    .queue_items
+                    .iter()
+                    .filter(|item| item.watcher_id.as_deref() == Some(watcher_id.as_str()))
+                {
                     push_artifact(self.queue_artifact(queue_item));
-                    self.expand_from_queue_item(queue_item, &mut push_artifact, &mut relations, &mut notes);
+                    self.expand_from_queue_item(
+                        queue_item,
+                        &mut push_artifact,
+                        &mut relations,
+                        &mut notes,
+                    );
                 }
             }
             LookupQuery::MissionId(mission_id) => {
@@ -651,19 +710,35 @@ impl OrchestrationInspector {
                         )
                     })?;
                 push_artifact(self.mission_artifact(mission));
-                for run in self.runs.iter().filter(|item| item.mission_id.as_deref() == Some(mission_id.as_str())) {
+                for run in self
+                    .runs
+                    .iter()
+                    .filter(|item| item.mission_id.as_deref() == Some(mission_id.as_str()))
+                {
                     push_artifact(self.run_artifact(run));
                     self.expand_from_run(run, &mut push_artifact, &mut relations, &mut notes);
                 }
-                for incident in self.incidents.iter().filter(|item| incident_contains_mission(item, mission_id.as_str(), &self.repo_root)) {
+                for incident in self.incidents.iter().filter(|item| {
+                    incident_contains_mission(item, mission_id.as_str(), &self.repo_root)
+                }) {
                     push_artifact(self.incident_artifact(incident)?);
-                    self.expand_from_incident(incident, &mut push_artifact, &mut relations, &mut notes)?;
+                    self.expand_from_incident(
+                        incident,
+                        &mut push_artifact,
+                        &mut relations,
+                        &mut notes,
+                    )?;
                 }
             }
         }
 
         artifacts.sort_by(|a, b| a.kind.cmp(&b.kind).then(a.id.cmp(&b.id)));
-        relations.sort_by(|a, b| a.from.cmp(&b.from).then(a.to.cmp(&b.to)).then(a.relation.cmp(&b.relation)));
+        relations.sort_by(|a, b| {
+            a.from
+                .cmp(&b.from)
+                .then(a.to.cmp(&b.to))
+                .then(a.relation.cmp(&b.relation))
+        });
         notes.sort();
         notes.dedup();
 
@@ -689,8 +764,12 @@ impl OrchestrationInspector {
                     health_status: watcher.health_status.clone(),
                     owner: watcher.owner.clone(),
                     last_evaluated_at: watcher.last_evaluated_at.clone(),
-                    last_emitted_event_id: latest_event.as_ref().map(|(event_id, _, _)| event_id.clone()),
-                    last_emitted_at: latest_event.as_ref().and_then(|(_, emitted_at, _)| emitted_at.clone()),
+                    last_emitted_event_id: latest_event
+                        .as_ref()
+                        .map(|(event_id, _, _)| event_id.clone()),
+                    last_emitted_at: latest_event
+                        .as_ref()
+                        .and_then(|(_, emitted_at, _)| emitted_at.clone()),
                     suppressed_count: watcher.suppressed_count,
                     health_reason: watcher.health_reason.clone(),
                 }
@@ -744,7 +823,8 @@ impl OrchestrationInspector {
             }
         }
 
-        let oldest_pending_queue_item_id = oldest_pending.map(|(item, _)| item.queue_item_id.clone());
+        let oldest_pending_queue_item_id =
+            oldest_pending.map(|(item, _)| item.queue_item_id.clone());
         let oldest_pending_age_seconds = oldest_pending
             .and_then(|(_, ts)| ts)
             .map(|ts| (now - ts).whole_seconds());
@@ -774,7 +854,9 @@ impl OrchestrationInspector {
                 let related_runs = self
                     .runs
                     .iter()
-                    .filter(|run| run.automation_id.as_deref() == Some(automation.automation_id.as_str()))
+                    .filter(|run| {
+                        run.automation_id.as_deref() == Some(automation.automation_id.as_str())
+                    })
                     .collect::<Vec<_>>();
                 let last_launch_attempt_at = related_runs
                     .iter()
@@ -785,7 +867,10 @@ impl OrchestrationInspector {
                     .filter(|run| run.status == "succeeded")
                     .max_by_key(|run| run.completed_at.clone().unwrap_or_default())
                     .map(|run| run.run_id.clone());
-                let failure_count = related_runs.iter().filter(|run| run.status == "failed").count();
+                let failure_count = related_runs
+                    .iter()
+                    .filter(|run| run.status == "failed")
+                    .count();
                 let pause_or_error_reason = automation.state_reason.clone().or_else(|| {
                     if matches!(automation.status.as_str(), "paused" | "error") {
                         Some("status requires operator attention".to_string())
@@ -820,7 +905,21 @@ impl OrchestrationInspector {
             .iter()
             .map(|run| {
                 let decision_link_health = match &run.decision_id {
-                    Some(decision_id) if self.decisions.iter().any(|item| item.decision_id == *decision_id) => "healthy".to_string(),
+                    _ if run
+                        .authority_decision_ref
+                        .as_ref()
+                        .is_some_and(|path| self.repo_root.join(path).exists()) =>
+                    {
+                        "healthy".to_string()
+                    }
+                    Some(decision_id)
+                        if self
+                            .decisions
+                            .iter()
+                            .any(|item| item.decision_id == *decision_id) =>
+                    {
+                        "healthy".to_string()
+                    }
                     Some(_) => "missing-decision".to_string(),
                     None => "missing-decision".to_string(),
                 };
@@ -889,7 +988,10 @@ impl OrchestrationInspector {
         Ok(items)
     }
 
-    fn latest_event_for_watcher(&self, watcher_id: &str) -> Option<(String, Option<String>, String)> {
+    fn latest_event_for_watcher(
+        &self,
+        watcher_id: &str,
+    ) -> Option<(String, Option<String>, String)> {
         self.queue_items
             .iter()
             .filter(|item| item.watcher_id.as_deref() == Some(watcher_id))
@@ -899,7 +1001,9 @@ impl OrchestrationInspector {
                     .as_deref()
                     .and_then(|path| read_event_timestamp(&self.repo_root, path).ok().flatten());
                 Some((
-                    item.event_id.clone().unwrap_or_else(|| item.queue_item_id.clone()),
+                    item.event_id
+                        .clone()
+                        .unwrap_or_else(|| item.queue_item_id.clone()),
                     emitted_at,
                     item.path.clone(),
                 ))
@@ -937,12 +1041,23 @@ impl OrchestrationInspector {
         if let Some(recovery_status) = &item.recovery_status {
             details.insert("recovery_status".to_string(), recovery_status.clone());
         }
+        if let Some(authority_grant_bundle_ref) = &item.authority_grant_bundle_ref {
+            details.insert(
+                "authority_grant_bundle_ref".to_string(),
+                authority_grant_bundle_ref.clone(),
+            );
+        }
         details.insert(
             "decision_link_health".to_string(),
             if item
-                .decision_id
+                .authority_decision_ref
                 .as_ref()
-                .is_some_and(|decision_id| self.decisions.iter().any(|entry| entry.decision_id == *decision_id))
+                .is_some_and(|path| self.repo_root.join(path).exists())
+                || item.decision_id.as_ref().is_some_and(|decision_id| {
+                    self.decisions
+                        .iter()
+                        .any(|entry| entry.decision_id == *decision_id)
+                })
             {
                 "healthy".to_string()
             } else {
@@ -1024,7 +1139,10 @@ impl OrchestrationInspector {
             "outstanding_task_count".to_string(),
             item.outstanding_task_count.to_string(),
         );
-        details.insert("blocked_task_count".to_string(), item.blocked_task_count.to_string());
+        details.insert(
+            "blocked_task_count".to_string(),
+            item.blocked_task_count.to_string(),
+        );
         LookupArtifact {
             kind: "mission".to_string(),
             id: item.mission_id.clone(),
@@ -1041,7 +1159,10 @@ impl OrchestrationInspector {
         details.insert("severity".to_string(), item.severity.clone());
         details.insert("closure_ready".to_string(), readiness.ready.to_string());
         if !readiness.blockers.is_empty() {
-            details.insert("closure_blockers".to_string(), readiness.blockers.join("; "));
+            details.insert(
+                "closure_blockers".to_string(),
+                readiness.blockers.join("; "),
+            );
         }
         Ok(LookupArtifact {
             kind: "incident".to_string(),
@@ -1133,7 +1254,11 @@ impl OrchestrationInspector {
             }
         }
         if let Some(mission_id) = &decision.mission_id {
-            if let Some(mission) = self.missions.iter().find(|item| item.mission_id == *mission_id) {
+            if let Some(mission) = self
+                .missions
+                .iter()
+                .find(|item| item.mission_id == *mission_id)
+            {
                 push_artifact(self.mission_artifact(mission));
             }
         }
@@ -1176,7 +1301,10 @@ impl OrchestrationInspector {
                     relation: "authorized_by".to_string(),
                 });
             } else {
-                notes.push(format!("run `{}` references missing decision `{}`", run.run_id, decision_id));
+                notes.push(format!(
+                    "run `{}` references missing decision `{}`",
+                    run.run_id, decision_id
+                ));
             }
         }
         if let Some(queue_item_id) = &run.queue_item_id {
@@ -1214,7 +1342,11 @@ impl OrchestrationInspector {
             push_artifact(self.workflow_artifact(workflow_ref));
         }
         if let Some(mission_id) = &run.mission_id {
-            if let Some(mission) = self.missions.iter().find(|item| item.mission_id == *mission_id) {
+            if let Some(mission) = self
+                .missions
+                .iter()
+                .find(|item| item.mission_id == *mission_id)
+            {
                 push_artifact(self.mission_artifact(mission));
                 relations.push(LookupRelation {
                     from: format!("run:{}", run.run_id),
@@ -1272,7 +1404,11 @@ impl OrchestrationInspector {
             }
         }
         if let Some(watcher_id) = &queue_item.watcher_id {
-            if let Some(watcher) = self.watchers.iter().find(|item| item.watcher_id == *watcher_id) {
+            if let Some(watcher) = self
+                .watchers
+                .iter()
+                .find(|item| item.watcher_id == *watcher_id)
+            {
                 push_artifact(self.watcher_artifact(watcher));
                 relations.push(LookupRelation {
                     from: format!("queue_item:{}", queue_item.queue_item_id),
@@ -1282,7 +1418,11 @@ impl OrchestrationInspector {
             }
         }
         if let Some(event_id) = &queue_item.event_id {
-            for run in self.runs.iter().filter(|item| item.event_id.as_deref() == Some(event_id.as_str())) {
+            for run in self
+                .runs
+                .iter()
+                .filter(|item| item.event_id.as_deref() == Some(event_id.as_str()))
+            {
                 push_artifact(self.run_artifact(run));
                 relations.push(LookupRelation {
                     from: format!("queue_item:{}", queue_item.queue_item_id),
@@ -1301,7 +1441,7 @@ impl OrchestrationInspector {
         relations: &mut Vec<LookupRelation>,
         notes: &mut Vec<String>,
     ) -> Result<()> {
-            let readiness = compute_incident_closure_readiness(&self.repo_root, incident)?;
+        let readiness = compute_incident_closure_readiness(&self.repo_root, incident)?;
         if !readiness.blockers.is_empty() {
             notes.push(format!(
                 "incident `{}` closure blockers: {}",
@@ -1329,10 +1469,16 @@ fn load_runs(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<RunRecord>> {
         return Ok(Vec::new());
     }
     let mut runs = Vec::new();
-    for entry in fs::read_dir(&runs_dir).map_err(|e| io_error("read orchestration runs dir", &runs_dir, e))? {
-        let entry = entry.map_err(|e| io_error("read orchestration runs dir entry", &runs_dir, e))?;
+    for entry in fs::read_dir(&runs_dir)
+        .map_err(|e| io_error("read orchestration runs dir", &runs_dir, e))?
+    {
+        let entry =
+            entry.map_err(|e| io_error("read orchestration runs dir entry", &runs_dir, e))?;
         let path = entry.path();
-        if !path.is_file() || path.file_name().and_then(|v| v.to_str()) == Some("README.md") || path.file_name().and_then(|v| v.to_str()) == Some("index.yml") {
+        if !path.is_file()
+            || path.file_name().and_then(|v| v.to_str()) == Some("README.md")
+            || path.file_name().and_then(|v| v.to_str()) == Some("index.yml")
+        {
             continue;
         }
         if path.extension().and_then(|v| v.to_str()) != Some("yml") {
@@ -1347,6 +1493,8 @@ fn load_runs(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<RunRecord>> {
             started_at: string_field(&value, "started_at"),
             completed_at: string_field(&value, "completed_at"),
             decision_id: string_field(&value, "decision_id"),
+            authority_decision_ref: string_field(&value, "authority_decision_ref"),
+            authority_grant_bundle_ref: string_field(&value, "authority_grant_bundle_ref"),
             continuity_run_path: string_field(&value, "continuity_run_path"),
             recovery_status: string_field(&value, "recovery_status"),
             recovery_reason: string_field(&value, "recovery_reason"),
@@ -1361,35 +1509,79 @@ fn load_runs(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<RunRecord>> {
     Ok(runs)
 }
 
-fn load_decisions(repo_root: &Path, decisions_dir: &Path) -> Result<Vec<DecisionRecord>> {
-    if !decisions_dir.is_dir() {
-        return Ok(Vec::new());
-    }
+fn load_decisions(
+    repo_root: &Path,
+    decisions_dir: &Path,
+    authority_evidence_dir: &Path,
+) -> Result<Vec<DecisionRecord>> {
     let mut decisions = Vec::new();
-    for entry in fs::read_dir(&decisions_dir).map_err(|e| io_error("read decisions dir", &decisions_dir, e))? {
-        let entry = entry.map_err(|e| io_error("read decisions dir entry", &decisions_dir, e))?;
-        let path = entry.path();
-        if !path.is_dir() {
-            continue;
+    if decisions_dir.is_dir() {
+        for entry in fs::read_dir(decisions_dir)
+            .map_err(|e| io_error("read decisions dir", decisions_dir, e))?
+        {
+            let entry =
+                entry.map_err(|e| io_error("read decisions dir entry", decisions_dir, e))?;
+            let path = entry.path();
+            if !path.is_dir() {
+                continue;
+            }
+            let decision_path = path.join("decision.json");
+            if !decision_path.is_file() {
+                continue;
+            }
+            let value = read_json_value(&decision_path)?;
+            decisions.push(DecisionRecord {
+                decision_id: required_string(&value, "decision_id", &decision_path)?,
+                path: rel_path(repo_root, &decision_path),
+                outcome: string_field(&value, "outcome").unwrap_or_else(|| "unknown".to_string()),
+                summary: string_field(&value, "summary"),
+                run_id: string_field(&value, "run_id"),
+                mission_id: string_field(&value, "mission_id"),
+                automation_id: string_field(&value, "automation_id"),
+                incident_id: string_field(&value, "incident_id"),
+                event_id: string_field(&value, "event_id"),
+                queue_item_id: string_field(&value, "queue_item_id"),
+                workflow_ref: workflow_ref_string(&value),
+            });
         }
-        let decision_path = path.join("decision.json");
-        if !decision_path.is_file() {
-            continue;
+    }
+    if authority_evidence_dir.is_dir() {
+        for entry in fs::read_dir(authority_evidence_dir)
+            .map_err(|e| io_error("read authority evidence dir", authority_evidence_dir, e))?
+        {
+            let entry = entry.map_err(|e| {
+                io_error(
+                    "read authority evidence dir entry",
+                    authority_evidence_dir,
+                    e,
+                )
+            })?;
+            let path = entry.path();
+            if !path.is_file()
+                || path.extension().and_then(|value| value.to_str()) != Some("yml")
+                || !path
+                    .file_name()
+                    .and_then(|value| value.to_str())
+                    .unwrap_or_default()
+                    .starts_with("authority-decision-")
+            {
+                continue;
+            }
+            let value = read_yaml_value(&path)?;
+            decisions.push(DecisionRecord {
+                decision_id: required_string(&value, "decision_id", &path)?,
+                path: rel_path(repo_root, &path),
+                outcome: string_field(&value, "decision").unwrap_or_else(|| "unknown".to_string()),
+                summary: None,
+                run_id: string_field(&value, "run_id"),
+                mission_id: None,
+                automation_id: None,
+                incident_id: None,
+                event_id: None,
+                queue_item_id: None,
+                workflow_ref: None,
+            });
         }
-        let value = read_json_value(&decision_path)?;
-        decisions.push(DecisionRecord {
-            decision_id: required_string(&value, "decision_id", &decision_path)?,
-            path: rel_path(repo_root, &decision_path),
-            outcome: string_field(&value, "outcome").unwrap_or_else(|| "unknown".to_string()),
-            summary: string_field(&value, "summary"),
-            run_id: string_field(&value, "run_id"),
-            mission_id: string_field(&value, "mission_id"),
-            automation_id: string_field(&value, "automation_id"),
-            incident_id: string_field(&value, "incident_id"),
-            event_id: string_field(&value, "event_id"),
-            queue_item_id: string_field(&value, "queue_item_id"),
-            workflow_ref: workflow_ref_string(&value),
-        });
     }
     Ok(decisions)
 }
@@ -1405,7 +1597,9 @@ fn load_queue_items(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<QueueIte
         if !lane_dir.is_dir() {
             continue;
         }
-        for entry in fs::read_dir(&lane_dir).map_err(|e| io_error("read queue lane dir", &lane_dir, e))? {
+        for entry in
+            fs::read_dir(&lane_dir).map_err(|e| io_error("read queue lane dir", &lane_dir, e))?
+        {
             let entry = entry.map_err(|e| io_error("read queue lane entry", &lane_dir, e))?;
             let path = entry.path();
             if !path.is_file() || path.extension().and_then(|v| v.to_str()) != Some("json") {
@@ -1436,7 +1630,9 @@ fn load_queue_receipts(_repo_root: &Path, runtime_dir: &Path) -> Result<Vec<Queu
         return Ok(Vec::new());
     }
     let mut items = Vec::new();
-    for entry in fs::read_dir(&receipts_dir).map_err(|e| io_error("read queue receipts dir", &receipts_dir, e))? {
+    for entry in fs::read_dir(&receipts_dir)
+        .map_err(|e| io_error("read queue receipts dir", &receipts_dir, e))?
+    {
         let entry = entry.map_err(|e| io_error("read queue receipt entry", &receipts_dir, e))?;
         let path = entry.path();
         if !path.is_file() || path.extension().and_then(|v| v.to_str()) != Some("json") {
@@ -1456,10 +1652,15 @@ fn load_watchers(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<WatcherReco
         return Ok(Vec::new());
     }
     let mut items = Vec::new();
-    for entry in fs::read_dir(&watchers_dir).map_err(|e| io_error("read watchers dir", &watchers_dir, e))? {
+    for entry in
+        fs::read_dir(&watchers_dir).map_err(|e| io_error("read watchers dir", &watchers_dir, e))?
+    {
         let entry = entry.map_err(|e| io_error("read watchers dir entry", &watchers_dir, e))?;
         let path = entry.path();
-        let rel_name = path.file_name().and_then(|v| v.to_str()).unwrap_or_default();
+        let rel_name = path
+            .file_name()
+            .and_then(|v| v.to_str())
+            .unwrap_or_default();
         if !path.is_dir() || rel_name.starts_with('_') {
             continue;
         }
@@ -1480,13 +1681,20 @@ fn load_watchers(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<WatcherReco
                 .as_ref()
                 .and_then(|value| string_field(value, "status"))
                 .unwrap_or_else(|| "unknown".to_string()),
-            health_reason: health
+            health_reason: health.as_ref().and_then(|value| {
+                string_field(value, "reason").or_else(|| string_field(value, "error_reason"))
+            }),
+            last_evaluated_at: health
                 .as_ref()
-                .and_then(|value| string_field(value, "reason").or_else(|| string_field(value, "error_reason"))),
-            last_evaluated_at: health.as_ref().and_then(|value| string_field(value, "checked_at")),
+                .and_then(|value| string_field(value, "checked_at")),
             suppressed_count: suppressions
                 .as_ref()
-                .and_then(|value| value.get("suppressed").and_then(|v| v.as_array()).map(|v| v.len()))
+                .and_then(|value| {
+                    value
+                        .get("suppressed")
+                        .and_then(|v| v.as_array())
+                        .map(|v| v.len())
+                })
                 .unwrap_or(0),
         });
     }
@@ -1499,10 +1707,16 @@ fn load_automations(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<Automati
         return Ok(Vec::new());
     }
     let mut items = Vec::new();
-    for entry in fs::read_dir(&automations_dir).map_err(|e| io_error("read automations dir", &automations_dir, e))? {
-        let entry = entry.map_err(|e| io_error("read automations dir entry", &automations_dir, e))?;
+    for entry in fs::read_dir(&automations_dir)
+        .map_err(|e| io_error("read automations dir", &automations_dir, e))?
+    {
+        let entry =
+            entry.map_err(|e| io_error("read automations dir entry", &automations_dir, e))?;
         let path = entry.path();
-        let rel_name = path.file_name().and_then(|v| v.to_str()).unwrap_or_default();
+        let rel_name = path
+            .file_name()
+            .and_then(|v| v.to_str())
+            .unwrap_or_default();
         if !path.is_dir() || rel_name.starts_with('_') {
             continue;
         }
@@ -1520,10 +1734,12 @@ fn load_automations(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<Automati
             owner: string_field(&automation, "owner").unwrap_or_else(|| "unknown".to_string()),
             status: string_field(&automation, "status").unwrap_or_else(|| "unknown".to_string()),
             workflow_ref: workflow_ref_string(&automation),
-            state_status: state_status.as_ref().and_then(|value| string_field(value, "status")),
-            state_reason: state_status
+            state_status: state_status
                 .as_ref()
-                .and_then(|value| string_field(value, "reason").or_else(|| string_field(value, "error_reason"))),
+                .and_then(|value| string_field(value, "status")),
+            state_reason: state_status.as_ref().and_then(|value| {
+                string_field(value, "reason").or_else(|| string_field(value, "error_reason"))
+            }),
             counters_blocked: counters
                 .as_ref()
                 .and_then(|value| usize_field(value, "blocked"))
@@ -1538,10 +1754,15 @@ fn load_missions(repo_root: &Path, missions_dir: &Path) -> Result<Vec<MissionRec
         return Ok(Vec::new());
     }
     let mut items = Vec::new();
-    for entry in fs::read_dir(&missions_dir).map_err(|e| io_error("read missions dir", &missions_dir, e))? {
+    for entry in
+        fs::read_dir(&missions_dir).map_err(|e| io_error("read missions dir", &missions_dir, e))?
+    {
         let entry = entry.map_err(|e| io_error("read missions dir entry", &missions_dir, e))?;
         let path = entry.path();
-        let rel_name = path.file_name().and_then(|v| v.to_str()).unwrap_or_default();
+        let rel_name = path
+            .file_name()
+            .and_then(|v| v.to_str())
+            .unwrap_or_default();
         if !path.is_dir() || rel_name.starts_with('_') || rel_name == ".archive" {
             continue;
         }
@@ -1572,10 +1793,15 @@ fn load_incidents(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<IncidentRe
         return Ok(Vec::new());
     }
     let mut items = Vec::new();
-    for entry in fs::read_dir(&incidents_dir).map_err(|e| io_error("read incidents dir", &incidents_dir, e))? {
+    for entry in fs::read_dir(&incidents_dir)
+        .map_err(|e| io_error("read incidents dir", &incidents_dir, e))?
+    {
         let entry = entry.map_err(|e| io_error("read incidents dir entry", &incidents_dir, e))?;
         let path = entry.path();
-        let rel_name = path.file_name().and_then(|v| v.to_str()).unwrap_or_default();
+        let rel_name = path
+            .file_name()
+            .and_then(|v| v.to_str())
+            .unwrap_or_default();
         if !path.is_dir() || rel_name.starts_with('_') {
             continue;
         }
@@ -1600,7 +1826,10 @@ fn load_incidents(repo_root: &Path, runtime_dir: &Path) -> Result<Vec<IncidentRe
     Ok(items)
 }
 
-fn compute_incident_closure_readiness(repo_root: &Path, incident: &IncidentRecord) -> Result<ClosureReadiness> {
+fn compute_incident_closure_readiness(
+    repo_root: &Path,
+    incident: &IncidentRecord,
+) -> Result<ClosureReadiness> {
     let incident_path = repo_root.join(&incident.path);
     let incident_dir = incident_path.parent().unwrap_or_else(|| Path::new("."));
     let closure_path = incident_dir.join("closure.md");
@@ -1675,7 +1904,11 @@ fn extract_closure_summary(text: &str) -> Option<String> {
         if trimmed.starts_with("## Remediation Evidence") {
             break;
         }
-        if !in_summary || trimmed.is_empty() || trimmed.starts_with("- Closed") || trimmed.starts_with("- Approval") {
+        if !in_summary
+            || trimmed.is_empty()
+            || trimmed.starts_with("- Closed")
+            || trimmed.starts_with("- Approval")
+        {
             continue;
         }
         lines.push(trimmed.to_string());
@@ -1735,7 +1968,10 @@ fn count_tasks(tasks: Option<&Value>) -> (usize, usize) {
             outstanding += 1;
             continue;
         }
-        if !matches!(status.to_ascii_lowercase().as_str(), "done" | "completed" | "cancelled") {
+        if !matches!(
+            status.to_ascii_lowercase().as_str(),
+            "done" | "completed" | "cancelled"
+        ) {
             outstanding += 1;
         }
     }
@@ -1778,7 +2014,10 @@ fn read_yaml_value(path: &Path) -> Result<Value> {
     serde_json::to_value(yaml).map_err(|e| {
         KernelError::new(
             ErrorCode::Internal,
-            format!("failed to convert YAML {} to JSON value: {e}", path.display()),
+            format!(
+                "failed to convert YAML {} to JSON value: {e}",
+                path.display()
+            ),
         )
     })
 }
@@ -1810,7 +2049,10 @@ fn required_string(value: &Value, key: &str, path: &Path) -> Result<String> {
 }
 
 fn string_field(value: &Value, key: &str) -> Option<String> {
-    value.get(key).and_then(|item| item.as_str()).map(ToString::to_string)
+    value
+        .get(key)
+        .and_then(|item| item.as_str())
+        .map(ToString::to_string)
 }
 
 fn workflow_ref_string(value: &Value) -> Option<String> {
@@ -1826,14 +2068,19 @@ fn workflow_ref_string(value: &Value) -> Option<String> {
 }
 
 fn usize_field(value: &Value, key: &str) -> Option<usize> {
-    value.get(key).and_then(|item| item.as_u64()).map(|item| item as usize)
+    value
+        .get(key)
+        .and_then(|item| item.as_u64())
+        .map(|item| item as usize)
 }
 
 fn string_array_field(value: &Value, key: &str) -> Vec<String> {
-    value.get(key)
+    value
+        .get(key)
         .and_then(|item| item.as_array())
         .map(|items| {
-            items.iter()
+            items
+                .iter()
                 .filter_map(|item| item.as_str().map(ToString::to_string))
                 .collect::<Vec<_>>()
         })
@@ -1863,9 +2110,12 @@ fn parse_timestamp(raw: &str) -> Option<OffsetDateTime> {
 }
 
 fn now_utc() -> Result<String> {
-    OffsetDateTime::now_utc()
-        .format(&Rfc3339)
-        .map_err(|e| KernelError::new(ErrorCode::Internal, format!("failed to format current timestamp: {e}")))
+    OffsetDateTime::now_utc().format(&Rfc3339).map_err(|e| {
+        KernelError::new(
+            ErrorCode::Internal,
+            format!("failed to format current timestamp: {e}"),
+        )
+    })
 }
 
 fn io_error(action: &str, path: &Path, error: std::io::Error) -> KernelError {
@@ -1881,7 +2131,8 @@ mod tests {
     use std::fs;
 
     fn temp_root(label: &str) -> PathBuf {
-        let root = std::env::temp_dir().join(format!("octon-orch-core-{label}-{}", std::process::id()));
+        let root =
+            std::env::temp_dir().join(format!("octon-orch-core-{label}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&root);
         fs::create_dir_all(&root).expect("create temp root");
         root
@@ -1940,7 +2191,9 @@ mod tests {
         )
         .expect("write health");
         fs::write(
-            root.join(".octon/framework/orchestration/runtime/watchers/example/state/suppressions.json"),
+            root.join(
+                ".octon/framework/orchestration/runtime/watchers/example/state/suppressions.json",
+            ),
             "{\n  \"suppressed\": [\"evt-old\"]\n}\n",
         )
         .expect("write suppressions");
@@ -1950,12 +2203,16 @@ mod tests {
         )
         .expect("write automation");
         fs::write(
-            root.join(".octon/framework/orchestration/runtime/automations/example/state/counters.json"),
+            root.join(
+                ".octon/framework/orchestration/runtime/automations/example/state/counters.json",
+            ),
             "{\n  \"blocked\": 2\n}\n",
         )
         .expect("write counters");
         fs::write(
-            root.join(".octon/framework/orchestration/runtime/automations/example/state/status.json"),
+            root.join(
+                ".octon/framework/orchestration/runtime/automations/example/state/status.json",
+            ),
             "{\n  \"status\": \"active\"\n}\n",
         )
         .expect("write automation status");
@@ -2025,15 +2282,30 @@ mod tests {
         let run_lookup = inspector
             .lookup(LookupQuery::RunId("run-001".to_string()))
             .expect("run lookup should succeed");
-        assert!(run_lookup.artifacts.iter().any(|item| item.kind == "decision" && item.id == "dec-001"));
-        assert!(run_lookup.artifacts.iter().any(|item| item.kind == "queue_item" && item.id == "q-001"));
-        assert!(run_lookup.artifacts.iter().any(|item| item.kind == "continuity_run" && item.id == "run-001"));
+        assert!(run_lookup
+            .artifacts
+            .iter()
+            .any(|item| item.kind == "decision" && item.id == "dec-001"));
+        assert!(run_lookup
+            .artifacts
+            .iter()
+            .any(|item| item.kind == "queue_item" && item.id == "q-001"));
+        assert!(run_lookup
+            .artifacts
+            .iter()
+            .any(|item| item.kind == "continuity_run" && item.id == "run-001"));
 
         let event_lookup = inspector
             .lookup(LookupQuery::EventId("evt-001".to_string()))
             .expect("event lookup should succeed");
-        assert!(event_lookup.artifacts.iter().any(|item| item.kind == "run" && item.id == "run-001"));
-        assert!(event_lookup.artifacts.iter().any(|item| item.kind == "queue_item" && item.id == "q-001"));
+        assert!(event_lookup
+            .artifacts
+            .iter()
+            .any(|item| item.kind == "run" && item.id == "run-001"));
+        assert!(event_lookup
+            .artifacts
+            .iter()
+            .any(|item| item.kind == "queue_item" && item.id == "q-001"));
 
         let _ = fs::remove_file("/tmp/octon-orch-event.json");
         fs::remove_dir_all(root).ok();
@@ -2070,16 +2342,24 @@ mod tests {
             "incident_id: inc-001\ntitle: Example Incident\nseverity: sev2\nstatus: open\nowner: '@orchestrator'\nsummary: Incident summary\n",
         )
         .expect("rewrite incident");
-        fs::remove_file(root.join(".octon/framework/orchestration/runtime/incidents/inc-001/closure.md"))
-            .expect("remove closure");
+        fs::remove_file(
+            root.join(".octon/framework/orchestration/runtime/incidents/inc-001/closure.md"),
+        )
+        .expect("remove closure");
         let inspector = OrchestrationInspector::from_repo_root(&root).expect("load inspector");
         let readiness = inspector
             .incident_closure_readiness("inc-001")
             .expect("closure readiness should succeed");
 
         assert!(!readiness.ready);
-        assert!(readiness.blockers.iter().any(|item| item == "missing linked runs"));
-        assert!(readiness.blockers.iter().any(|item| item == "missing closure.md"));
+        assert!(readiness
+            .blockers
+            .iter()
+            .any(|item| item == "missing linked runs"));
+        assert!(readiness
+            .blockers
+            .iter()
+            .any(|item| item == "missing closure.md"));
 
         let _ = fs::remove_file("/tmp/octon-orch-event.json");
         fs::remove_dir_all(root).ok();

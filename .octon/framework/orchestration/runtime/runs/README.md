@@ -13,6 +13,9 @@ per-run execution contract.
 `state/control/execution/runs/<run-id>/{runtime-state.yml,rollback-posture.yml,checkpoints/**}`
 carry the canonical lifecycle state beneath that run contract.
 
+`state/continuity/runs/<run-id>/handoff.yml` is the canonical mutable
+resumability and handoff state for the bound run.
+
 `<run-id>.yml` is the orchestration-facing projection and mutable operator view
 over that canonical run root.
 
@@ -40,6 +43,8 @@ runs/
 - Store orchestration-facing run projections and lookup indexes here.
 - Store canonical per-run execution contracts under
   `/.octon/state/control/execution/runs/<run-id>/`.
+- Store canonical run continuity under
+  `/.octon/state/continuity/runs/<run-id>/`.
 - Store durable receipts, digests, and evidence bundles in
   `/.octon/state/evidence/runs/`.
 - Do not let `index.yml`, `<run-id>.yml`, or `by-surface/` outrank the

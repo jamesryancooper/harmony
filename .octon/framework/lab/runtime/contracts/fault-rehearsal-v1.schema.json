@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/lab/runtime/contracts/fault-rehearsal-v1.schema.json",
+  "title": "Octon Fault Rehearsal v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "exercise_id", "subject_ref", "recorded_at"],
+  "properties": {
+    "schema_version": { "const": "fault-rehearsal-v1" },
+    "exercise_id": { "type": "string", "minLength": 1 },
+    "subject_ref": { "type": "string", "minLength": 1 },
+    "recorded_at": { "type": "string", "minLength": 1 }
+  }
+}

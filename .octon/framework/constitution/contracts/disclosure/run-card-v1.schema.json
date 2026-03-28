@@ -103,6 +103,7 @@
       "required": [
         "run_contract",
         "decision_artifact",
+        "grant_bundle",
         "retained_run_evidence"
       ],
       "properties": {
@@ -128,6 +129,8 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "structural",
+        "governance",
         "functional",
         "behavioral",
         "maintainability",
@@ -135,11 +138,11 @@
         "evaluator"
       ],
       "properties": {
-        "structural_gate_ref": {
+        "structural": {
           "type": "string",
           "minLength": 1
         },
-        "governance_gate_ref": {
+        "governance": {
           "type": "string",
           "minLength": 1
         },

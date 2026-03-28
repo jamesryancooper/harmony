@@ -3,7 +3,7 @@ runs:
   - run_id: run-wave3-runtime-bridge-20260327
     status: succeeded
     path: run-wave3-runtime-bridge-20260327.yml
-    continuity_run_path: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/
+    continuity_run_path: .octon/state/continuity/runs/run-wave3-runtime-bridge-20260327/
     workflow_ref:
       workflow_group: meta
       workflow_id: evaluate-harness
@@ -11,7 +11,7 @@ runs:
   - run_id: run-wave4-benchmark-evaluator-20260327
     status: succeeded
     path: run-wave4-benchmark-evaluator-20260327.yml
-    continuity_run_path: .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/
+    continuity_run_path: .octon/state/continuity/runs/run-wave4-benchmark-evaluator-20260327/
     workflow_ref:
       workflow_group: meta
       workflow_id: evaluate-harness

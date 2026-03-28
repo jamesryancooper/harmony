@@ -17,6 +17,7 @@ linkage.
 3. `index.yml` and `by-surface/` are subordinate projections.
 4. Every material run projection must link to:
    - `decision_id`
+   - `authority_decision_ref`
    - `continuity_run_path`
    - `run_contract_path`
    - `runtime_state_path`
@@ -33,4 +34,5 @@ linkage.
 
 - `runtime/runs/` owns orchestration-facing state and lookup projections.
 - `state/control/execution/runs/` owns the canonical Wave 1 run contract.
+- `state/continuity/runs/` owns mutable run resumability and handoff state.
 - `state/evidence/runs/` owns durable receipts, digests, and evidence bundles.

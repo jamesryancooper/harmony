@@ -1,0 +1,6 @@
+schema_version: "observability-reporting-v1"
+policy_id: "execution-closeout-reporting"
+requirements:
+  - "Every consequential acceptance run must retain a measurement summary and an intervention log."
+  - "Intervention-free claims must still retain a canonical log that states no hidden intervention occurred."
+  - "Release closeout reports must cite failure-taxonomy classes when summarizing non-happy-path evidence."

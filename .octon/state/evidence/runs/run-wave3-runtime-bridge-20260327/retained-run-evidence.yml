@@ -18,4 +18,8 @@ evidence_refs:
   intervention_log: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/interventions/log.yml
   run_card: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/disclosure/run-card.yml
   maintainability_report: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/maintainability.yml
-updated_at: "2026-03-27T22:47:42Z"
+  structural_report: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/structural.yml
+  governance_report: .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/governance.yml
+  authority_decision: .octon/state/evidence/control/execution/authority-decision-run-wave3-runtime-bridge-20260327.yml
+  authority_grant_bundle: .octon/state/evidence/control/execution/authority-grant-bundle-run-wave3-runtime-bridge-20260327.yml
+updated_at: "2026-03-28T19:57:12Z"

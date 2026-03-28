@@ -9,4 +9,4 @@ trace_refs: []
 reproduction_steps:
   - Read the bound run contract and orchestration receipt.
   - Follow the replay manifest, checkpoints, and RunCard refs to reproduce the consequential path.
-recorded_at: "2026-03-27T22:47:42Z"
+recorded_at: "2026-03-28T19:57:12Z"

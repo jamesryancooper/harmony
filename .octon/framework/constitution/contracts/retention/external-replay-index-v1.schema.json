@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/retention/external-replay-index-v1.schema.json",
+  "title": "Octon External Replay Index v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "entries",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "external-replay-index-v1"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "entry_id",
+          "run_id",
+          "storage_class",
+          "content_digest",
+          "locator",
+          "recorded_at"
+        ],
+        "properties": {
+          "entry_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "run_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "storage_class": {
+            "type": "string",
+            "enum": [
+              "pointered",
+              "external-immutable"
+            ]
+          },
+          "content_digest": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1
+          },
+          "recorded_at": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

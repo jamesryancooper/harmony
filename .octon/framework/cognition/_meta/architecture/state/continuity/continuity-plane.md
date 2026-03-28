@@ -53,10 +53,20 @@ continuity state. Retained operational evidence is authoritative under
 - Must reference active unblocked task IDs from `tasks.json`.
 - Purpose: fast handoff surface for the next execution session.
 
+### `.octon/state/continuity/runs/<run-id>/handoff.yml`
+
+- Mutable resumability and handoff state for a bound run.
+- Canonical home for operator-facing continuation metadata such as the last
+  checkpoint, retained receipt, and next safe action.
+- Must stay derived from, and subordinate to,
+  `/.octon/state/control/execution/runs/<run-id>/**` and
+  `/.octon/state/evidence/runs/<run-id>/**`.
+
 ### `.octon/state/evidence/decisions/{repo,scopes/<scope-id>}/`
 
-- Append-oriented routing, authority, and prerequisite decision evidence.
-- Canonical home for orchestration `allow`, `block`, and `escalate` records.
+- Append-oriented historical lineage and capability-policy decision evidence.
+- No longer the canonical home for per-run authority decisions or grant
+  bundles, which live under `/.octon/state/evidence/control/execution/**`.
 - Lifecycle governed by `/.octon/state/evidence/decisions/repo/retention.json`.
 - Not a source of active task state.
 
@@ -77,7 +87,8 @@ continuity state. Retained operational evidence is authoritative under
 | `tasks.json` | Mutable | Update status/ownership/blockers and knowledge links as work changes. |
 | `entities.json` | Mutable | Keep IDs stable; align owner/related_tasks with task state. |
 | `next.md` | Mutable | Keep concise, executable, and coherent with active unblocked tasks. |
-| `decisions/` | Append-oriented evidence | Apply retention classes and lifecycle actions from `decisions/retention.json`. |
+| `runs/<run-id>/handoff.yml` | Mutable | Keep resumability and handoff fields aligned with the canonical run control and retained evidence roots. |
+| `decisions/` | Append-oriented lineage | Apply retention classes and lifecycle actions from `decisions/retention.json`; do not treat as canonical per-run authority. |
 | `runs/` | Append-oriented evidence | Apply retention classes and lifecycle actions from `runs/retention.json`. |
 
 ## Cross-Subsystem Integration

@@ -191,3 +191,7 @@ records:
     path: 2026-03-28-wave6-retirement-cutover/plan.md
     adr: ../decisions/074-wave6-retirement-cutover.md
     evidence: /.octon/state/evidence/migration/2026-03-28-wave6-retirement-cutover/evidence.md
+  - id: 2026-03-28-execution-constitution-completion-closeout
+    path: 2026-03-28-execution-constitution-completion-closeout/plan.md
+    adr: ../decisions/075-execution-constitution-completion-closeout.md
+    evidence: /.octon/state/evidence/migration/2026-03-28-execution-constitution-completion-closeout/evidence.md
