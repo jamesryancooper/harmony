@@ -41,6 +41,5 @@ continuity artifacts. They do not create new execution authority.
 Consequential execution binds one canonical run control root under
 `/.octon/state/control/execution/runs/<run-id>/` and one canonical evidence
 root under `/.octon/state/evidence/runs/<run-id>/` before side effects occur.
-Runtime writers may keep transitional compatibility artifacts, but canonical
-receipts, checkpoints, replay pointers, and rollback posture must remain under
-the bound run root.
+Canonical receipts, checkpoints, replay pointers, and rollback posture remain
+under the bound run root; deprecated compatibility artifacts are retired.

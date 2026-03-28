@@ -1,21 +1,10 @@
 schema_version: "octon-constitutional-authority-family-v1"
 family_id: "authority"
-status: "active-transitional"
+status: "active"
 activation_wave: 2
 release_state: "pre-1.0"
 change_profile: "transitional"
-profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-27-authority-engine-normalization-cutover/plan.md"
-transitional_exception_note:
-  rationale: >-
-    Wave 2 must normalize approval, exception, revocation, and decision
-    artifacts while preserving the existing host and mission-backed execution
-    entrypoints until all callers consume the generic authority family.
-  risks:
-    - "Legacy host approval projections could drift from canonical approval grants."
-    - "Support-tier declarations could remain narrower than the current runtime envelope."
-    - "Old exception-lease roots could persist longer than intended during coexistence."
-  owner: "Octon governance"
-  target_removal_date: "2026-06-30"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 authority_routing:
   request:
     schema_ref: ".octon/framework/constitution/contracts/authority/approval-request-v1.schema.json"
@@ -37,12 +26,13 @@ authority_routing:
     evidence_root: ".octon/state/evidence/control/execution"
 projection_rules:
   host_affordances:
-    status: "projection-only"
+    status: "non-authoritative"
     surfaces:
       - "labels"
       - "comments"
       - "checks"
       - "workflow env flags"
     rule: >-
-      Host-facing approval affordances may request or project authority, but
-      runtime must materialize canonical authority artifacts before execution.
+      Host-facing approval affordances may mirror status or request attention,
+      but runtime resolves authority only from canonical approval, exception,
+      revocation, decision, and grant-bundle artifacts.

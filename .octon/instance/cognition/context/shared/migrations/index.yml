@@ -175,3 +175,19 @@ records:
     path: 2026-03-27-runtime-lifecycle-normalization-cutover/plan.md
     adr: ../decisions/070-runtime-lifecycle-normalization-cutover.md
     evidence: /.octon/state/evidence/migration/2026-03-27-runtime-lifecycle-normalization-cutover/evidence.md
+  - id: 2026-03-27-assurance-lab-disclosure-expansion-cutover
+    path: 2026-03-27-assurance-lab-disclosure-expansion-cutover/plan.md
+    adr: ../decisions/071-assurance-lab-disclosure-expansion-cutover.md
+    evidence: /.octon/state/evidence/migration/2026-03-27-assurance-lab-disclosure-expansion-cutover/evidence.md
+  - id: 2026-03-27-wave4-gap-remediation-cutover
+    path: 2026-03-27-wave4-gap-remediation-cutover/plan.md
+    adr: ../decisions/072-wave4-gap-remediation-cutover.md
+    evidence: /.octon/state/evidence/migration/2026-03-27-wave4-gap-remediation-cutover/evidence.md
+  - id: 2026-03-27-wave5-agency-simplification-adapter-hardening-cutover
+    path: 2026-03-27-wave5-agency-simplification-adapter-hardening-cutover/plan.md
+    adr: ../decisions/073-wave5-agency-simplification-and-adapter-hardening-cutover.md
+    evidence: /.octon/state/evidence/migration/2026-03-27-wave5-agency-simplification-adapter-hardening-cutover/validation.md
+  - id: 2026-03-28-wave6-retirement-cutover
+    path: 2026-03-28-wave6-retirement-cutover/plan.md
+    adr: ../decisions/074-wave6-retirement-cutover.md
+    evidence: /.octon/state/evidence/migration/2026-03-28-wave6-retirement-cutover/evidence.md

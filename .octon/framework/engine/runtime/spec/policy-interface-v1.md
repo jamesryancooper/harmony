@@ -188,10 +188,9 @@ also satisfy:
   `/.octon/state/evidence/lab`
   `state/evidence/lab`
 
-Host labels, comments, checks, and similar affordances remain projection-only.
-Runtime may translate them into canonical approval artifacts, but policy
-evaluation must consume the normalized authority artifacts instead of the host
-surface directly.
+Host labels, comments, checks, and similar affordances remain
+non-authoritative projections. Policy evaluation consumes only the normalized
+authority artifacts instead of the host surface directly.
 
 Adapter metadata keys for runtime requests are:
 

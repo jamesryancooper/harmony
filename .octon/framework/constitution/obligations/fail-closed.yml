@@ -44,20 +44,13 @@ rules:
   - id: "FCR-009"
     condition: "A valid support-target tier, adapter support declaration, or adapter-conformance criterion is missing."
     route: "DENY"
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 2
-    transitional_behavior: >-
-      Wave 2 publishes the first support-target declaration for routing.
-      Broader support-claim disclosure remains staged for later waves.
   - id: "FCR-010"
     condition: "A bound run contract is missing or invalid for consequential execution."
     route: "STAGE_ONLY"
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 1
-    transitional_behavior: >-
-      Current mission-first authorization and execution contracts remain the
-      live enforcement path while Wave 1 publishes the run-contract family and
-      run-control roots.
   - id: "FCR-011"
     condition: "Mandatory evidence from prior step transitions is missing."
     route: "STAGE_ONLY"
@@ -69,14 +62,10 @@ rules:
   - id: "FCR-013"
     condition: "A behavioral or support claim lacks the required lab, replay, scenario, shadow-run, or support-target-backed disclosure evidence."
     route: "STAGE_ONLY"
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 4
-    transitional_behavior: >-
-      Wave 4 promotes the new proof-plane and disclosure families while
-      preserving the current structural and governance gates as the blocking
-      baseline.
   - id: "FCR-014"
     condition: "A host adapter or model adapter attempts to widen authority or bypass canonical authority artifacts."
     route: "DENY"
-    adoption_status: "active-transitional"
+    adoption_status: "active"
     activation_wave: 5

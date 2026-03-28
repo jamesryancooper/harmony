@@ -1,0 +1,21 @@
+# Command Log
+
+- `rg -n "active-transitional|mission_only_execution|transitional_execution_model|accept:human|ai-gate:waive|materialize-pr-authority|OCTON_EXECUTION_HUMAN_APPROVED" .octon .github -g '!**/inputs/exploratory/**'`
+- `bash .octon/framework/cognition/_ops/runtime/scripts/sync-runtime-artifacts.sh --target decisions --target missions --target projections`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/generate-proposal-registry.sh --write`
+- `bash .octon/framework/agency/_ops/scripts/validate/validate-agency.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-objective-binding-cutover.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-lifecycle-normalization.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-assurance-disclosure-expansion.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-wave5-agency-adapter-hardening.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-execution-governance.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-mission-runtime-contracts.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-harness-structure.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness,mission-autonomy,agency`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-continuity-memory.sh`
+- `bash .octon/framework/assurance/runtime/_ops/tests/test-authority-control-tooling.sh`
+- `cargo test --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml -p octon_kernel authorization::tests::approval_required_autonomous_request_returns_stage_only_without_human_approval -- --exact`
+- `cargo test --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml -p octon_kernel authorization::tests::authority_projection_serializes_ref_and_accepts_legacy_alias -- --exact`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh --package <implementing-wave6-proposal>`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh --package <implementing-wave6-proposal> --skip-registry-check`

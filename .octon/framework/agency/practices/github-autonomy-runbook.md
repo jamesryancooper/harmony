@@ -114,7 +114,7 @@ Mode control variable:
 
 Waiver contract:
 
-- Merge waiver requires both labels: `ai-gate:waive` and `accept:human`
+- AI-gate waivers are disabled in the autonomy lane
 - `ai-gate:blocker` is managed by the gate workflow on blocker findings
 
 ---
@@ -134,11 +134,10 @@ Before expecting autonomous merges:
 
 Human-review exceptions (default policy):
 
-1. PR carries explicit `accept:human`.
-2. PR carries explicit `autonomy:no-automerge`.
-3. PR head branch matches `exp/*`.
-4. PR touches high-impact governance/control-plane paths (requires `accept:human`).
-5. Dependabot update is `major` or `unknown` semver transition (requires `accept:human`).
+1. PR carries explicit `autonomy:no-automerge`.
+2. PR head branch matches `exp/*`.
+3. PR touches high-impact governance/control-plane paths (manual lane only).
+4. Dependabot update is `major` or `unknown` semver transition (manual lane only).
 
 Useful verification commands:
 
@@ -211,7 +210,7 @@ GitHub Actions dependency updates are split into two lanes:
   - Merged autonomously by `pr-auto-merge.yml`.
 - Escalation lane (human): `semver-major` and unknown version transitions
   - Not auto-merged.
-  - Require explicit `accept:human` before merge.
+  - Leave the PR in the manual lane and merge with ordinary human review.
 
 Configuration source:
 
@@ -408,8 +407,8 @@ Phase 5 (provider-agnostic AI gate):
 - `AI Review Gate` reports `fail-provider-unavailable` in strict mode:
   verify `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` are present for Actions.
 - `AI Review Gate` reports blockers in strict mode:
-  fix blockers or apply temporary waiver labels (`ai-gate:waive` +
-  `accept:human`) with explicit human acknowledgement.
+  fix blockers or handle the merge outside the autonomy lane with explicit
+  human review.
 - PR remains `BLOCKED` after billing was fixed and reruns are green:
   stale failed check contexts can remain attached to the old head SHA.
   Push a no-op commit to mint a fresh SHA, then rerun required checks.

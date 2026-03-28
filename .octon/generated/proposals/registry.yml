@@ -6,7 +6,7 @@ active:
     scope: "octon-internal"
     path: ".octon/inputs/exploratory/proposals/architecture/fully-unified-execution-constitution-for-governed-autonomous-work"
     title: "Fully Unified Execution Constitution for Governed Autonomous Work"
-    status: "accepted"
+    status: "implemented"
     promotion_targets:
       - ".octon/octon.yml"
       - ".octon/README.md"

@@ -37,11 +37,14 @@ Default PR execution in Octon is autonomy-first:
 
 Human check-ins are exception-based and intentionally narrow:
 
-- High-impact path changes must carry explicit `accept:human` before merge.
-- Dependabot major/unknown version jumps must carry explicit `accept:human`.
+- High-impact path changes are triaged out of the autonomous merge lane and
+  require ordinary human review and merge.
+- Dependabot major/unknown version jumps are triaged out of the autonomous
+  merge lane and require ordinary human review and merge.
 - `autonomy:no-automerge` is a manual opt-out from autonomous merging.
-- `accept:human` is a policy acknowledgement, not a substitute for failing CI.
-- AI-gate waiver requires both `ai-gate:waive` and `accept:human`.
+- No label, comment, or check may act as repo-local approval authority.
+- AI-gate waivers are not supported in the autonomy lane; blocking findings
+  must be fixed or handled outside the lane.
 
 ---
 

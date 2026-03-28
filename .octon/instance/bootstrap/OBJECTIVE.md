@@ -11,7 +11,7 @@ constitutional_role: "workspace-charter-narrative"
 constitutional_objective_ref: ".octon/framework/constitution/contracts/objective/workspace-charter-pair.yml"
 release_state: "pre-1.0"
 change_profile: "transitional"
-profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-26-objective-binding-cutover/plan.md"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 ---
 
 # Objective: Octon Governed Harness
@@ -28,7 +28,8 @@ This brief is the narrative side of Octon's workspace-charter pair. Every
 consequential run must bind this workspace objective together with a per-run
 contract under `/.octon/state/control/execution/runs/<run-id>/run-contract.yml`.
 Mission authority remains the continuity container and long-horizon autonomy
-surface during the transitional Wave 1 coexistence window.
+surface, but it no longer substitutes for the bound run contract as the atomic
+execution unit.
 
 ## What Octon Should Optimize For
 

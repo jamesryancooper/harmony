@@ -95,14 +95,14 @@ require_cmd grep
 [[ -f "${SYNC_SCRIPT}" ]] || error "Missing catalog source script: ${SYNC_SCRIPT}"
 
 catalog_labels="$({
-  awk -F'|' '/^(type|area|risk|accept|autonomy|bot|ops|ai-gate):[a-z0-9-]+\|/ { print $1 }' "${SYNC_SCRIPT}" | sort -u
+  awk -F'|' '/^(type|area|risk|autonomy|bot|ops|ai-gate):[a-z0-9-]+\|/ { print $1 }' "${SYNC_SCRIPT}" | sort -u
 } || true)"
 
 [[ -n "${catalog_labels}" ]] || error "No labels could be read from ${SYNC_SCRIPT}"
 
 if command -v rg >/dev/null 2>&1; then
   workflow_labels="$({
-    rg -o --no-filename '(type|area|risk|accept|autonomy|bot|ops|ai-gate):[a-z0-9-]+' \
+    rg -o --no-filename '(type|area|risk|autonomy|bot|ops|ai-gate):[a-z0-9-]+' \
       "${ROOT_DIR}/.github/workflows" \
       -g '*.yml' \
       -g '*.yaml' \
@@ -110,7 +110,7 @@ if command -v rg >/dev/null 2>&1; then
   } || true)"
 else
   workflow_labels="$({
-    grep -RhoE '(type|area|risk|accept|autonomy|bot|ops|ai-gate):[a-z0-9-]+' \
+    grep -RhoE '(type|area|risk|autonomy|bot|ops|ai-gate):[a-z0-9-]+' \
       "${ROOT_DIR}/.github/workflows" \
       --include='*.yml' \
       --include='*.yaml' \
@@ -127,7 +127,6 @@ required_labels=(
   "autonomy:attention-required"
   "ops:autonomy-health"
   "ai-gate:required"
-  "ai-gate:waive"
   "ai-gate:blocker"
 )
 

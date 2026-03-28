@@ -78,7 +78,6 @@ main() {
   require_file "$OCTON_DIR/framework/engine/_ops/scripts/materialize-authority-approval.sh"
   require_file "$OCTON_DIR/framework/engine/_ops/scripts/record-authority-exception-lease.sh"
   require_file "$OCTON_DIR/framework/engine/_ops/scripts/record-authority-revocation.sh"
-  require_file "$OCTON_DIR/framework/agency/_ops/scripts/github/materialize-pr-authority.sh"
   require_file "$OCTON_DIR/framework/assurance/runtime/_ops/tests/test-authority-control-tooling.sh"
   require_file "$SCRIPT_DIR/assert-protected-execution-posture.sh"
 
@@ -113,15 +112,15 @@ main() {
   fi
 
   if has_pattern_in_files 'materialize-pr-authority\.sh' "$ROOT_DIR/.github/workflows/pr-autonomy-policy.yml" "$ROOT_DIR/.github/workflows/ai-review-gate.yml"; then
-    pass "GitHub approval flows materialize canonical authority artifacts"
+    fail "protected GitHub workflows must not materialize authority from host projections"
   else
-    fail "GitHub approval flows must call materialize-pr-authority.sh"
+    pass "protected GitHub workflows do not materialize authority from host projections"
   fi
 
-  if has_pattern_in_files 'waived-by-authority' "$ROOT_DIR/.github/workflows/ai-review-gate.yml"; then
-    pass "AI gate waiver is routed through canonical authority output"
+  if has_pattern_in_files 'accept:human|ai-gate:waive|waived-by-authority' "$ROOT_DIR/.github/workflows/pr-autonomy-policy.yml" "$ROOT_DIR/.github/workflows/ai-review-gate.yml"; then
+    fail "protected GitHub workflows must not depend on label-based approval or waiver paths"
   else
-    fail "AI gate waiver must be routed through canonical authority output"
+    pass "protected GitHub workflows do not depend on label-based approval or waiver paths"
   fi
 
   if has_pattern_in_files 'OCTON_EFFECTIVE_POLICY_MODE="hard-enforce"' "$ROOT_DIR/.github/workflows/ai-review-gate.yml" "$ROOT_DIR/.github/workflows/pr-autonomy-policy.yml" "$ROOT_DIR/.github/workflows/deny-by-default-gates.yml" "$ROOT_DIR/.github/workflows/release-please.yml"; then

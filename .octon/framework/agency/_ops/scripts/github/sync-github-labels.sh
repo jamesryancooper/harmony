@@ -147,13 +147,11 @@ area:uncategorized|BFDADC|No known area match
 risk:low|D4C5F9|Low risk routine change
 risk:med|FBCA04|Medium risk change
 risk:high|B60205|High impact governance/control-plane change
-accept:human|000000|Explicit human acceptance for high-impact merge
 autonomy:auto-merge|1B8835|Eligible for autonomous auto-merge lane
 autonomy:no-automerge|B60205|Excluded from autonomous auto-merge lane
 autonomy:attention-required|D93F0B|PR requires prompt human action to maintain clean-state flow
 ops:autonomy-health|B60205|Automation and autonomy health signal
 ai-gate:required|1B8835|Provider-agnostic AI gate is required for merge
-ai-gate:waive|FBCA04|Temporary human waiver for AI gate blocking conditions
 ai-gate:blocker|B60205|AI gate reported blocking findings
 bot:dependabot|0366D6|Dependabot pull request
 autonomy:stale-draft|C5DEF5|Draft PR marked stale by automation

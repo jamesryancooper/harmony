@@ -31,6 +31,34 @@ mutability: append-only
 
 - None
 
+## 2026-03-28
+
+**Session focus:** Implement Wave 6 retirement, cutover, and closeout for the
+fully unified execution constitution
+
+**Completed:**
+
+- Promoted the live constitutional execution model from transitional markers to
+  one final active state across contract families, precedence, fail-closed
+  rules, evidence obligations, bootstrap surfaces, and support-target
+  declarations
+- Retired mission-only execution metadata from active objective and mission
+  contracts, schemas, exemplars, and validators while keeping mission as the
+  continuity container and run contracts as the atomic execution unit
+- Removed host-shaped approval and waiver shims from runtime and GitHub
+  automation, regenerated the affected cognition/proposal/effective read
+  models, recorded ADR 074 plus the Wave 6 evidence bundle, and promoted the
+  implementing proposal package to `implemented`
+
+**Next:**
+
+- Archive the implementing proposal package in a dedicated follow-up once
+  proposal-resource mutation is allowed
+
+**Blockers:**
+
+- None
+
 ## 2026-03-27
 
 **Session focus:** Record explicit Wave 4 completion status

@@ -260,12 +260,10 @@ Mission creation remains authority-only under `instance/orchestration/missions/*
 Autonomous active or paused runtime state becomes legal only after the
 seed-before-active path materializes mission control truth, continuity, route
 generation, summaries, and mission view outputs under their canonical roots.
-During Wave 3 coexistence, mission remains the continuity container while the
-run root becomes the primary execution-time unit of truth for consequential
-runs.
-Wave 2 adds normalized authority control families so approvals, exceptions,
-revocations, and retained decision artifacts stop depending on host-shaped
-affordances.
+Mission remains the continuity container while the run root is the primary
+execution-time unit of truth for consequential runs.
+Approvals, exceptions, revocations, and retained decision artifacts resolve
+only from canonical control roots rather than host-shaped affordances.
 
 Raw additive packs carry compatibility and provenance in
 `inputs/additive/extensions/<pack-id>/pack.yml`.

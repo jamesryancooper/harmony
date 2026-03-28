@@ -149,3 +149,5 @@ records:
     path: 072-wave4-gap-remediation-cutover.md
   - id: 073-wave5-agency-simplification-and-adapter-hardening-cutover
     path: 073-wave5-agency-simplification-and-adapter-hardening-cutover.md
+  - id: 074-wave6-retirement-cutover
+    path: 074-wave6-retirement-cutover.md

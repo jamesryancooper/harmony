@@ -1,20 +1,10 @@
 schema_version: "octon-constitutional-disclosure-family-v1"
 family_id: "disclosure"
-status: "active-transitional"
+status: "active"
 activation_wave: 4
 release_state: "pre-1.0"
 change_profile: "transitional"
-profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-27-wave4-gap-remediation-cutover/plan.md"
-transitional_exception_note:
-  rationale: >-
-    Wave 4 must make consequential runs and support claims interpretable
-    without allowing disclosure outputs to become a second authority plane.
-  risks:
-    - "RunCards could drift from retained evidence if they are emitted without canonical refs."
-    - "HarnessCards could overstate support if they are not tied back to the support-target matrix."
-    - "Human-readable markdown could diverge from machine-readable card content if validators do not keep them aligned."
-  owner: "Octon governance"
-  target_removal_date: "2026-06-30"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 authority_rules:
   subordinate_to:
     - ".octon/state/control/execution/runs/<run-id>/run-contract.yml"

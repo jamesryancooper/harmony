@@ -90,11 +90,8 @@ main() {
     "authorization accepts seeded autonomous mission context" \
     cargo test --manifest-path "$CARGO_MANIFEST" -p octon_kernel autonomous_request_allows_seeded_mission_context
   run_test \
-    "approval-required autonomous execution returns stage-only without approval" \
+    "approval-required autonomous execution returns stage-only without a canonical grant" \
     cargo test --manifest-path "$CARGO_MANIFEST" -p octon_kernel approval_required_autonomous_request_returns_stage_only_without_human_approval
-  run_test \
-    "host approval projection materializes canonical grant" \
-    cargo test --manifest-path "$CARGO_MANIFEST" -p octon_kernel host_approval_projection_materializes_canonical_grant
   run_test \
     "proceed-on-silence blocks when autonomy budget is not healthy" \
     cargo test --manifest-path "$CARGO_MANIFEST" -p octon_kernel proceed_on_silence_blocks_when_autonomy_budget_not_healthy

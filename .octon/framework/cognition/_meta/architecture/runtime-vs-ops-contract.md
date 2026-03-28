@@ -137,9 +137,9 @@ Use this decision sequence:
     `/.octon/state/control/execution/missions/**`.
   - retained control-plane evidence lives under
     `/.octon/state/evidence/control/execution/**`.
-  - labels, comments, checks, and similar host affordances are projection-only
-    until runtime materializes canonical authority artifacts under the control
-    roots above.
+  - labels, comments, checks, and similar host affordances are
+    non-authoritative projections; runtime consumes only the canonical control
+    roots above when resolving authority.
   - generated effective mission scenario routes live under
     `/.octon/generated/effective/orchestration/missions/**`.
   - execution scratch lives under `/.octon/generated/.tmp/execution/**`.

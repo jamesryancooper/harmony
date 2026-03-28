@@ -160,7 +160,7 @@ Behavior:
 
 When touching high-impact paths (for example `.github/` or governance paths):
 
-1. Add `accept:human` before merge.
+1. Leave the PR in the manual lane and complete ordinary human review.
 2. Keep PR focused and explicitly document risk/rollback.
 3. Use `git-pr-ship.sh --accept-human` to preserve metadata-level check-in.
 4. Cleanup watcher will run automatically once the PR is eventually closed.

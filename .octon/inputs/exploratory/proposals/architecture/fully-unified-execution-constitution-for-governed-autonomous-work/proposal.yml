@@ -24,7 +24,7 @@ promotion_targets:
   - ".octon/state/evidence/"
   - ".octon/generated/effective/"
   - ".octon/generated/cognition/"
-status: "accepted"
+status: "implemented"
 lifecycle:
   temporary: true
   exit_expectation: "Promote the constitutional kernel, run-contract authority model, runtime evidence and disclosure model, and supporting governance, assurance, and generated read-model surfaces into durable .octon authorities; remove proposal-path dependencies from those promoted targets; then archive this package once implementation no longer depends on proposal-local planning artifacts."

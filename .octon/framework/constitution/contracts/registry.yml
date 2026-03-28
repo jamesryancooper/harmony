@@ -18,37 +18,37 @@ kernel_surfaces:
   support_targets:
     schema: ".octon/framework/constitution/support-targets.schema.json"
     authoritative_declaration: ".octon/instance/governance/support-targets.yml"
-    status: "active-transitional"
+    status: "active"
 families:
   - family_id: "objective"
     path: ".octon/framework/constitution/contracts/objective/**"
     activation_wave: 1
-    status: "active-transitional"
+    status: "active"
     description: "Workspace, mission, run, and stage-attempt objective contracts."
   - family_id: "authority"
     path: ".octon/framework/constitution/contracts/authority/**"
     activation_wave: 2
-    status: "active-transitional"
+    status: "active"
     description: "Approval, exception, revocation, and grant-bundle contracts."
   - family_id: "runtime"
     path: ".octon/framework/constitution/contracts/runtime/**"
     activation_wave: 3
-    status: "active-transitional"
+    status: "active"
     description: "Run-lifecycle, checkpoint, and execution-state contracts."
   - family_id: "assurance"
     path: ".octon/framework/constitution/contracts/assurance/**"
     activation_wave: 4
-    status: "active-transitional"
+    status: "active"
     description: "Proof-plane and assurance gating contracts."
   - family_id: "disclosure"
     path: ".octon/framework/constitution/contracts/disclosure/**"
     activation_wave: 4
-    status: "active-transitional"
+    status: "active"
     description: "RunCard and HarnessCard disclosure contracts."
   - family_id: "adapters"
     path: ".octon/framework/constitution/contracts/adapters/**"
     activation_wave: 5
-    status: "active-transitional"
+    status: "active"
     description: "Host and model adapter contracts plus conformance criteria."
   - family_id: "retention"
     path: ".octon/framework/constitution/contracts/retention/**"
@@ -58,22 +58,22 @@ families:
 integration_surfaces:
   objective_contract_family:
     root: ".octon/framework/constitution/contracts/objective/**"
-    status: "active-transitional"
+    status: "active"
   authority_contract_family:
     root: ".octon/framework/constitution/contracts/authority/**"
-    status: "active-transitional"
+    status: "active"
   runtime_contract_family:
     root: ".octon/framework/constitution/contracts/runtime/**"
-    status: "active-transitional"
+    status: "active"
   assurance_contract_family:
     root: ".octon/framework/constitution/contracts/assurance/**"
-    status: "active-transitional"
+    status: "active"
   disclosure_contract_family:
     root: ".octon/framework/constitution/contracts/disclosure/**"
-    status: "active-transitional"
+    status: "active"
   adapter_contract_family:
     root: ".octon/framework/constitution/contracts/adapters/**"
-    status: "active-transitional"
+    status: "active"
   workspace_charter_pair:
     narrative: ".octon/instance/bootstrap/OBJECTIVE.md"
     machine: ".octon/instance/cognition/context/shared/intent.contract.yml"
@@ -82,21 +82,21 @@ integration_surfaces:
   mission_authority:
     path: ".octon/instance/orchestration/missions/**"
     role: "continuity-container"
-    status: "active-transitional"
+    status: "active"
   run_control_root:
     path: ".octon/state/control/execution/runs/**"
-    status: "active-transitional"
+    status: "active"
   run_evidence_root:
     path: ".octon/state/evidence/runs/**"
-    status: "active-transitional"
+    status: "active"
   lab_evidence_root:
     path: ".octon/state/evidence/lab/**"
-    status: "active-transitional"
+    status: "active"
   authority_control_roots:
     approvals: ".octon/state/control/execution/approvals/**"
     exceptions: ".octon/state/control/execution/exceptions/**"
     revocations: ".octon/state/control/execution/revocations/**"
-    status: "active-transitional"
+    status: "active"
   repo_policy_inputs:
     - ".octon/instance/governance/policies/**"
     - ".octon/instance/governance/ownership/registry.yml"
@@ -117,3 +117,4 @@ notes:
   - "Wave 4 activates the assurance and disclosure contract families, promotes lab and observability surfaces, and extends retained run evidence with proof-plane, measurement, intervention, and disclosure families."
   - "Wave 4 remediation adds the maintainability proof plane, reusable evaluator and HarnessCard writers, benchmark-backed lab catalogs, and a generic run evidence backfill path."
   - "Wave 5 activates the adapter contract family, publishes runtime host/model adapter manifests, and bounds adapter support claims through support-target declarations and conformance criteria."
+  - "Wave 6 retires staged coexistence markers, host-shaped approval shims, and mission-only execution assumptions so the final constitutional model remains the only live target."

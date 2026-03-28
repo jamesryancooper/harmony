@@ -3,10 +3,9 @@
 `/.octon/framework/constitution/contracts/authority/**` defines the
 constitutional authority-routing model for governed execution.
 
-## Wave 2 Status
+## Status
 
-Wave 2 normalizes approval, exception, revocation, decision, and grant-bundle
-artifacts without bypassing the existing engine-owned execution boundary.
+The authority family is fully active.
 
 - normalized approval requests live under:
   `/.octon/state/control/execution/approvals/requests/**`
@@ -19,14 +18,13 @@ artifacts without bypassing the existing engine-owned execution boundary.
 - retained authority decisions and grant bundles live under:
   `/.octon/state/evidence/control/execution/**`
 
-## Transitional Rules
+## Final Rules
 
-- Host labels, comments, checks, and similar UI state may project approval
-  intent, but they never become authority by themselves.
-- The runtime may materialize host or environment approval projections into
-  canonical `ApprovalGrant` artifacts during the coexistence window.
-- Legacy root-level exception-lease files remain compatibility projections
-  while the canonical exception root moves under `state/control/execution/exceptions/**`.
+- Host labels, comments, checks, and similar UI state may mirror approval or
+  blocker status, but they never become authority by themselves.
+- Runtime resolves approval only from canonical `ApprovalRequest`,
+  `ApprovalGrant`, revocation, exception, decision, and grant-bundle
+  artifacts.
 
 ## Canonical Files
 

@@ -148,10 +148,10 @@ compatibility_matrix:
 adapter_conformance_criteria:
   - criterion_id: "HOST-001"
     adapter_kind: "host"
-    description: "Host signals remain projection-only until runtime materializes canonical authority artifacts."
+    description: "Host signals remain non-authoritative projections and may mirror, but never mint, canonical authority."
     required_evidence:
       - "authority-decision-artifact"
-      - "authority-grant-bundle"
+      - "control-evidence-root"
   - criterion_id: "HOST-002"
     adapter_kind: "host"
     description: "The default host path remains replaceable and bound to the engine authorization boundary."
@@ -211,7 +211,7 @@ host_adapters:
       - "instruction-layer-manifest"
   - adapter_id: "github-control-plane"
     contract_ref: ".octon/framework/engine/runtime/adapters/host/github-control-plane.yml"
-    authority_mode: "projection_only"
+    authority_mode: "non_authoritative"
     replaceable: true
     support_status: "reduced"
     default_route: "allow"
@@ -230,7 +230,6 @@ host_adapters:
       - "LOC-EN"
     required_evidence:
       - "authority-decision-artifact"
-      - "authority-grant-bundle"
       - "control-evidence-root"
 model_adapters:
   - adapter_id: "repo-local-governed"

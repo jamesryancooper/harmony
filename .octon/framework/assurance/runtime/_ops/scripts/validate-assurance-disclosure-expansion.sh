@@ -29,7 +29,7 @@ BENCHMARK_CARD="$OCTON_DIR/state/evidence/lab/harness-cards/hc-wave4-benchmark-d
 BENCHMARK_SCENARIO="$OCTON_DIR/state/evidence/lab/scenarios/scn-wave4-benchmark-disclosure-20260327/scenario-proof.yml"
 BENCHMARK_SUMMARY="$OCTON_DIR/state/evidence/lab/benchmarks/bmk-wave4-disclosure-parity-20260327/summary.yml"
 BENCHMARK_EVALUATOR="$OCTON_DIR/state/evidence/lab/evaluator-reviews/evr-wave4-benchmark-disclosure-20260327.yml"
-MIGRATION_PLAN="$OCTON_DIR/instance/cognition/context/shared/migrations/2026-03-27-wave4-gap-remediation-cutover/plan.md"
+MIGRATION_PLAN="$OCTON_DIR/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 
 errors=0
 
@@ -111,16 +111,16 @@ main() {
   require_file "$BENCHMARK_EVALUATOR"
   require_dir "$OCTON_DIR/state/evidence/lab"
 
-  require_yq '.families[] | select(.family_id == "assurance" and .status == "active-transitional")' "$CONTRACT_REGISTRY" "constitutional registry activates assurance contract family"
-  require_yq '.families[] | select(.family_id == "disclosure" and .status == "active-transitional")' "$CONTRACT_REGISTRY" "constitutional registry activates disclosure contract family"
+  require_yq '.families[] | select(.family_id == "assurance" and .status == "active")' "$CONTRACT_REGISTRY" "constitutional registry activates assurance contract family"
+  require_yq '.families[] | select(.family_id == "disclosure" and .status == "active")' "$CONTRACT_REGISTRY" "constitutional registry activates disclosure contract family"
   require_yq '.integration_surfaces.assurance_contract_family.root == ".octon/framework/constitution/contracts/assurance/**"' "$CONTRACT_REGISTRY" "constitutional registry exposes assurance contract family root"
   require_yq '.integration_surfaces.disclosure_contract_family.root == ".octon/framework/constitution/contracts/disclosure/**"' "$CONTRACT_REGISTRY" "constitutional registry exposes disclosure contract family root"
-  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-27-wave4-gap-remediation-cutover/plan.md"' "$ASSURANCE_FAMILY" "assurance family points to latest Wave 4 remediation receipt"
-  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-27-wave4-gap-remediation-cutover/plan.md"' "$DISCLOSURE_FAMILY" "disclosure family points to latest Wave 4 remediation receipt"
+  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"' "$ASSURANCE_FAMILY" "assurance family points to the Wave 6 receipt"
+  require_yq '.profile_selection_receipt_ref == ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"' "$DISCLOSURE_FAMILY" "disclosure family points to the Wave 6 receipt"
   require_yq '.retained_evidence_roots[] | select(. == ".octon/state/evidence/lab/**")' "$EVIDENCE_OBLIGATIONS" "evidence obligations include retained lab evidence root"
-  require_yq '.obligations[] | select(.id == "EVI-006" and .adoption_status == "active-transitional")' "$EVIDENCE_OBLIGATIONS" "RunCard disclosure obligation is active-transitional"
-  require_yq '.obligations[] | select(.id == "EVI-007" and .adoption_status == "active-transitional")' "$EVIDENCE_OBLIGATIONS" "HarnessCard disclosure obligation is active-transitional"
-  require_yq '.obligations[] | select(.id == "EVI-010" and .adoption_status == "active-transitional")' "$EVIDENCE_OBLIGATIONS" "behavioral evidence gate obligation is active-transitional"
+  require_yq '.obligations[] | select(.id == "EVI-006" and .adoption_status == "active")' "$EVIDENCE_OBLIGATIONS" "RunCard disclosure obligation is active"
+  require_yq '.obligations[] | select(.id == "EVI-007" and .adoption_status == "active")' "$EVIDENCE_OBLIGATIONS" "HarnessCard disclosure obligation is active"
+  require_yq '.obligations[] | select(.id == "EVI-010" and .adoption_status == "active")' "$EVIDENCE_OBLIGATIONS" "behavioral evidence gate obligation is active"
   require_yq '.rules[] | select(.id == "FCR-013" and .route == "STAGE_ONLY")' "$FAIL_CLOSED" "fail-closed rules gate missing behavioral/disclosure evidence"
 
   require_yq '.resolution.runtime_inputs.assurance_contract_family == ".octon/framework/constitution/contracts/assurance"' "$ROOT_MANIFEST" "root manifest exposes assurance contract family"

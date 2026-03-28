@@ -1,21 +1,10 @@
 schema_version: "octon-constitutional-assurance-family-v1"
 family_id: "assurance"
-status: "active-transitional"
+status: "active"
 activation_wave: 4
 release_state: "pre-1.0"
 change_profile: "transitional"
-profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-27-wave4-gap-remediation-cutover/plan.md"
-transitional_exception_note:
-  rationale: >-
-    Wave 4 must promote proof planes, lab evidence, and consequential proof
-    outputs without weakening the current structural or governance gates while
-    the broader execution constitution remains in staged rollout.
-  risks:
-    - "Behavioral proof could regress to prose if replay and lab evidence are not retained beside the run root."
-    - "System-level support claims could widen beyond the current support-target matrix if disclosure is not kept subordinate to durable authority."
-    - "Older consequential runs may need targeted backfill before every retained run bundle carries the new proof-plane families."
-  owner: "Octon governance"
-  target_removal_date: "2026-06-30"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 proof_planes:
   structural:
     root: ".octon/framework/assurance/structural"

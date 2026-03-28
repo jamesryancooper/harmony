@@ -43,8 +43,8 @@ Define the bounded outcome for this mission.
   run root
 - generated mission summaries and mission views consume per-run run evidence;
   they do not replace the bound run root
-- any mission-only execution assumption is transitional and must retain its
-  retirement gate
+- mission authority remains the continuity surface; consequential execution
+  still binds a run contract before side effects
 
 ## Notes
 

@@ -7,7 +7,7 @@ generated_from:
   - /.octon/generated/effective/orchestration/missions/mission-autonomy-live-validation/scenario-resolution.yml
   - /.octon/state/control/execution/missions/mission-autonomy-live-validation/subscriptions.yml
   - /.octon/instance/governance/ownership/registry.yml
-generated_at: "2026-03-28T04:01:29Z"
+generated_at: "2026-03-28T17:14:37Z"
 generator_version: "0.6.7"
 ---
 
@@ -20,5 +20,5 @@ generator_version: "0.6.7"
 - digest_route: `preview_plus_closure_digest`
 - budget_state: `healthy`
 - breaker_state: `clear`
-- route_fresh_until: `2026-03-28T04:16:29Z`
+- route_fresh_until: `2026-03-28T17:29:37Z`
 - attention_required: `no`

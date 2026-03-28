@@ -3,8 +3,7 @@
 `state/control/execution/runs/` is the canonical mutable control root for
 per-run objective binding and runtime lifecycle execution.
 
-Wave 3 promotes this root to the primary execution-time unit of truth. During
-the transitional coexistence window:
+This root is the primary execution-time unit of truth:
 
 - every consequential run must bind `run-contract.yml` under this root before
   side effects occur

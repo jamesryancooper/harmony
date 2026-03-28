@@ -2463,12 +2463,6 @@ fn resolve_support_tier_posture(
 
 fn review_metadata_from_env() -> BTreeMap<String, String> {
     let mut review_metadata = BTreeMap::new();
-    if std::env::var("OCTON_EXECUTION_HUMAN_APPROVED")
-        .unwrap_or_default()
-        .eq_ignore_ascii_case("true")
-    {
-        review_metadata.insert("human_approval".to_string(), "true".to_string());
-    }
     if let Ok(value) = std::env::var("OCTON_EXECUTION_QUORUM_TOKEN") {
         if !value.trim().is_empty() {
             review_metadata.insert("quorum_token".to_string(), value);
@@ -2484,19 +2478,6 @@ fn review_metadata_from_env() -> BTreeMap<String, String> {
 
 fn approval_projection_sources(request: &ExecutionRequest) -> Vec<AuthorityProjection> {
     let mut projections = Vec::new();
-    if std::env::var("OCTON_EXECUTION_HUMAN_APPROVED")
-        .unwrap_or_default()
-        .eq_ignore_ascii_case("true")
-    {
-        projections.push(AuthorityProjection {
-            kind: "env-approval-flag".to_string(),
-            ref_id: "env://OCTON_EXECUTION_HUMAN_APPROVED".to_string(),
-            notes: Some(
-                "Host approval projection only; runtime materialized the canonical grant."
-                    .to_string(),
-            ),
-        });
-    }
     for key in [
         "approval_projection_label",
         "approval_projection_comment",
@@ -2607,44 +2588,6 @@ fn load_existing_approval_grants(
         return Ok(Vec::new());
     }
     Ok(vec![(grant, path_tail(&cfg.repo_root, &path))])
-}
-
-fn materialize_projection_grant(
-    cfg: &RuntimeConfig,
-    request: &ExecutionRequest,
-    required_evidence: Vec<String>,
-    review_metadata: &BTreeMap<String, String>,
-) -> CoreResult<(ApprovalGrantArtifact, String)> {
-    let now = now_rfc3339().map_err(|e| {
-        KernelError::new(
-            ErrorCode::Internal,
-            format!("failed to compute grant timestamp: {e}"),
-        )
-    })?;
-    let artifact = ApprovalGrantArtifact {
-        schema_version: "authority-approval-grant-v1".to_string(),
-        grant_id: format!("grant-{}", request.request_id),
-        request_id: request.request_id.clone(),
-        run_id: request.request_id.clone(),
-        state: "active".to_string(),
-        issued_by: "projection://runtime-host-approval".to_string(),
-        issued_at: now,
-        expires_at: None,
-        projection_sources: approval_projection_sources(request),
-        review_metadata: review_metadata.clone(),
-        required_evidence,
-    };
-    let path = approval_grant_path(cfg, &request.request_id);
-    write_yaml(&path, &artifact).map_err(|e| {
-        KernelError::new(
-            ErrorCode::Internal,
-            format!(
-                "failed to write approval grant artifact {}: {e}",
-                path.display()
-            ),
-        )
-    })?;
-    Ok((artifact, path_tail(&cfg.repo_root, &path)))
 }
 
 fn load_active_revocation_refs(
@@ -3643,22 +3586,10 @@ pub fn authorize_execution(
         _ => {}
     }
 
-    let mut approval_grant_refs = load_existing_approval_grants(cfg, &request.request_id)?
+    let approval_grant_refs = load_existing_approval_grants(cfg, &request.request_id)?
         .into_iter()
         .map(|(_, path)| path)
         .collect::<Vec<_>>();
-    if approval_required
-        && approval_grant_refs.is_empty()
-        && review_metadata.contains_key("human_approval")
-    {
-        let (_, path) = materialize_projection_grant(
-            cfg,
-            request,
-            required_evidence.clone(),
-            &review_metadata,
-        )?;
-        approval_grant_refs.push(path);
-    }
 
     if approval_required && approval_grant_refs.is_empty() {
         let mut reason_codes = vec![
@@ -5712,27 +5643,10 @@ mod tests {
     }
 
     #[test]
-    fn host_approval_projection_materializes_canonical_grant() {
-        let cfg = temp_runtime_config();
-        seed_mission_autonomy_fixture(&cfg, "mission-b2", "healthy");
-        let policy = PolicyEngine::new(cfg.clone());
-        let request = mission_request(&cfg, "mission-b2", "approval_required", "reversible");
-        std::env::set_var("OCTON_EXECUTION_HUMAN_APPROVED", "true");
-        let grant = authorize_execution(&cfg, &policy, &request, None)
-            .expect("host approval projection should materialize canonical grant");
-        std::env::remove_var("OCTON_EXECUTION_HUMAN_APPROVED");
-        assert!(!grant.approval_grant_refs.is_empty());
-        assert!(cfg
-            .octon_dir
-            .join("state/control/execution/approvals/grants/grant-req-1.yml")
-            .is_file());
-    }
-
-    #[test]
     fn authority_projection_serializes_ref_and_accepts_legacy_alias() {
         let projection = AuthorityProjection {
             kind: "github-label".to_string(),
-            ref_id: "github://pull/214/label/accept:human".to_string(),
+            ref_id: "github://pull/214/check/manual-review-requested".to_string(),
             notes: None,
         };
 
@@ -5741,15 +5655,17 @@ mod tests {
         assert!(!encoded.contains("ref_id:"));
 
         let decoded: AuthorityProjection =
-            serde_yaml::from_str("kind: github-label\nref: github://pull/214/label/accept:human\n")
+            serde_yaml::from_str(
+                "kind: github-label\nref: github://pull/214/check/manual-review-requested\n",
+            )
                 .expect("decode canonical projection");
-        assert_eq!(decoded.ref_id, "github://pull/214/label/accept:human");
+        assert_eq!(decoded.ref_id, "github://pull/214/check/manual-review-requested");
 
         let legacy: AuthorityProjection = serde_yaml::from_str(
-            "kind: github-label\nref_id: github://pull/214/label/accept:human\n",
+            "kind: github-label\nref_id: github://pull/214/check/manual-review-requested\n",
         )
         .expect("decode legacy projection");
-        assert_eq!(legacy.ref_id, "github://pull/214/label/accept:human");
+        assert_eq!(legacy.ref_id, "github://pull/214/check/manual-review-requested");
     }
 
     #[test]

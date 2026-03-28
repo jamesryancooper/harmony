@@ -181,8 +181,8 @@ authority.
     execution after the mission-scoped reversible autonomy cutover.
 66. External UI, chat, or in-memory session state may not become a second
     authoritative mission control plane.
-67. Labels, comments, checks, and similar host affordances are projection-only
-    until runtime materializes canonical authority artifacts under
+67. Labels, comments, checks, and similar host affordances are
+    non-authoritative projections only; canonical authority lives under
     `state/control/execution/**`.
 68. For Mission-Scoped Reversible Autonomy, runtime closeout records under
     `instance/cognition/decisions/067-*.md`; proposal-lineage closeout records

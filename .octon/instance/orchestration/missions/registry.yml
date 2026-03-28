@@ -8,8 +8,7 @@ projection_root: ".octon/generated/cognition/projections/materialized/missions"
 run_evidence_root: ".octon/state/evidence/runs"
 execution_unit: "run-contract"
 mission_role: "continuity-container"
-mission_only_execution: "transitional"
-profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-27-runtime-lifecycle-normalization-cutover/plan.md"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 active:
   - "mission-autonomy-live-validation"
 archived: []

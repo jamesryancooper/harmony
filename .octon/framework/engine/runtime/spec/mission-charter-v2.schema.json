@@ -85,22 +85,6 @@
           "items": { "type": "string", "minLength": 1 }
         }
       }
-    },
-    "transitional_execution_model": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "mission_only_execution",
-        "stage_attempt_root",
-        "retirement_gate",
-        "profile_selection_receipt_ref"
-      ],
-      "properties": {
-        "mission_only_execution": { "type": "string", "enum": ["transitional", "retired"] },
-        "stage_attempt_root": { "type": "string", "minLength": 1 },
-        "retirement_gate": { "type": "string", "minLength": 1 },
-        "profile_selection_receipt_ref": { "type": "string", "minLength": 1 }
-      }
     }
   }
 }

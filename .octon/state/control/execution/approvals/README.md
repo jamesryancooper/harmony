@@ -5,5 +5,5 @@ for normalized approval requests and approval grants.
 
 - `requests/**` stores canonical `ApprovalRequest` artifacts
 - `grants/**` stores canonical `ApprovalGrant` artifacts
-- host labels, comments, checks, and env flags may project into this family,
-  but they are never authority until runtime materializes these artifacts
+- host labels, comments, checks, and env flags may reference this family for
+  visibility, but they never mint authority and cannot replace these artifacts

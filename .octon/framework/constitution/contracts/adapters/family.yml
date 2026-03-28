@@ -1,21 +1,10 @@
 schema_version: "octon-constitutional-adapter-family-v1"
 family_id: "adapters"
-status: "active-transitional"
+status: "active"
 activation_wave: 5
 release_state: "pre-1.0"
 change_profile: "transitional"
-profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-27-wave5-agency-simplification-adapter-hardening-cutover/plan.md"
-transitional_exception_note:
-  rationale: >-
-    Wave 5 must publish explicit host and model adapter contracts while
-    preserving current runtime callers and projection surfaces during the
-    cutover to bounded adapter support declarations.
-  risks:
-    - "Host-facing projections could continue looking authoritative unless the adapter family and support declarations land together."
-    - "Model-family support claims could outrun the declared support-target matrix during the coexistence window."
-    - "Agency docs, runtime configs, and validators could drift if adapter roots stay implicit."
-  owner: "Octon governance"
-  target_removal_date: "2026-06-30"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-03-28-wave6-retirement-cutover/plan.md"
 adapter_boundaries:
   support_target_declaration: ".octon/instance/governance/support-targets.yml"
   host_runtime_root: ".octon/framework/engine/runtime/adapters/host"

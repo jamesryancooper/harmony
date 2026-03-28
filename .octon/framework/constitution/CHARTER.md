@@ -52,27 +52,27 @@ authorized, fail-closed, observable, and reviewable.
   shadow-run evidence
 - keep RunCard and HarnessCard disclosure artifacts subordinate to durable
   authority and retained evidence
-- stage run-contract, disclosure, and support-target cutovers explicitly rather
-  than silently weakening current fail-closed behavior
-- treat labels, comments, checks, and similar host affordances as projection
-  signals only until canonical authority artifacts exist
+- keep run-contract, disclosure, and support-target obligations live under the
+  canonical constitutional families and control roots
+- treat labels, comments, checks, and similar host affordances as
+  non-authoritative projections that may mirror status but never mint
+  authority
 - keep one accountable orchestrator as the default execution role
 - treat host adapters and model adapters as replaceable, non-authoritative
   boundaries
 - require adapter-backed support claims to remain bounded by explicit
   support-target declarations and adapter-conformance criteria
 
-## Transitional Adoption Status
+## Adoption Status
 
-Wave 0 establishes the constitutional kernel and its supremacy. Wave 1
-publishes the run-contract roots, and Wave 2 publishes the authority contract
-family plus the first support-target declaration required for routing.
-Wave 4 promotes the assurance and disclosure contract families, first-class
-lab and observability surfaces, and bounded RunCard/HarnessCard disclosure
-while keeping support claims subordinate to the durable support-target matrix.
-Wave 5 simplifies the agency kernel around one accountable orchestrator and
-promotes explicit host/model adapter contracts plus bounded adapter support
-declarations.
+Waves 0 through 5 are now promoted into one live constitutional execution
+model:
+
+- run contracts and run lifecycle roots are the only atomic consequential
+  execution path
+- mission authority remains the continuity and long-horizon autonomy surface
+- authority, assurance, disclosure, and adapter families are active
+- host and model adapters remain replaceable and non-authoritative
 
 ## Canonical References
 
@@ -106,11 +106,11 @@ declarations.
 - changes require human governance approval plus aligned doc and validator
   updates in the same branch
 - constitutional amendments must record rationale, rollback posture, and any
-  staged adoption notes
-- subordinate surfaces that project this charter must be updated or explicitly
-  documented as transitional shims
+  staged adoption notes that remain live
+- subordinate surfaces that project this charter must be updated in the same
+  change set when the live model changes
 
 ## Review Cadence
 
 - review on each material constitutional change
-- review at least quarterly while the transitional program is active
+- review at least quarterly while the final constitutional model remains active
