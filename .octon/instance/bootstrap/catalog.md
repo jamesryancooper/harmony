@@ -57,7 +57,7 @@ Reusable multi-actor compositions in `agency/runtime/teams/`:
 
 | Team | Lead | Members | Description |
 |------|------|---------|-------------|
-| [delivery-core](./agency/runtime/teams/delivery-core/team.md) | `architect` | `architect`, `auditor`, `reviewer`, `refactor`, `docs` | Default end-to-end delivery composition with verification handoffs |
+| [delivery-core](./agency/runtime/teams/delivery-core/team.md) | `orchestrator` | `orchestrator`, `verifier`, `reviewer`, `refactor`, `docs` | Default end-to-end delivery composition with one accountable owner and optional independent verification |
 
 **Invocation:** `use team: <id>` (if supported by caller) or by explicit agent/workflow routing.
 

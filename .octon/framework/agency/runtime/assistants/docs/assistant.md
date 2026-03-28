@@ -56,5 +56,5 @@ Create, improve, and maintain documentation for clarity, completeness, and accur
 ## When to Escalate
 
 - If documentation reveals unclear requirements, escalate for clarification
-- If documenting involves making design decisions, escalate to Planner agent
+- If documenting involves design or scope decisions, escalate to the orchestrator
 - If documentation scope grows significantly, propose creating a mission

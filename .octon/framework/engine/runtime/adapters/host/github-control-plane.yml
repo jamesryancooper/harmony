@@ -1,0 +1,21 @@
+schema_version: "octon-host-adapter-v1"
+adapter_id: "github-control-plane"
+display_name: "GitHub Control Plane Projection"
+description: "Projects labels, comments, checks, and workflow signals into canonical authority artifacts."
+replaceable: true
+authority_mode: "projection_only"
+runtime_surface:
+  interface_ref: ".octon/framework/agency/_ops/scripts/github/materialize-pr-authority.sh"
+  integration_class: "host-projection"
+projection_sources:
+  - "labels"
+  - "comments"
+  - "checks"
+  - "workflow-env"
+support_target_ref: ".octon/instance/governance/support-targets.yml"
+conformance_criteria_refs:
+  - "HOST-001"
+  - "HOST-003"
+non_authoritative_boundaries:
+  - "GitHub state may request or project authority, but runtime must materialize canonical artifacts before execution."
+  - "No GitHub label, comment, or check is authority by itself."

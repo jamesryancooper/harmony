@@ -32,6 +32,7 @@ run_card:
     - "run-contract"
     - "decision-artifact"
     - "retained-run-evidence"
+    - "adapter-support"
     - "measurements"
     - "interventions"
     - "proof-planes"
@@ -43,6 +44,7 @@ harness_card:
   projection_file_pattern: "<card-id>.md"
   required_refs:
     - "support-target-declaration"
+    - "adapter-support"
     - "lab-scenario-or-benchmark"
     - "proof-bundle"
     - "known-limits"

@@ -1,0 +1,23 @@
+# Command Log
+
+- `chmod +x .octon/framework/agency/_ops/scripts/validate/validate-agency.sh`
+- `chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-wave5-agency-adapter-hardening.sh`
+- `bash .octon/framework/agency/_ops/scripts/validate/validate-agency.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-wave5-agency-adapter-hardening.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-authoritative-doc-triggers.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness,agency`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-harness-structure.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-execution-governance.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-framing-alignment.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-ssot-precedence-drift.sh`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-assurance-disclosure-expansion.sh`
+- `bash .octon/framework/orchestration/runtime/_ops/tests/test-incident-approval-control.sh`
+- `bash .octon/framework/orchestration/runtime/_ops/tests/test-operator-hardening.sh`
+- `bash .octon/framework/assurance/runtime/_ops/tests/test-validate-continuity-memory.sh`
+- `cargo test --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml -p octon_core orchestration::tests::incident_closure_readiness_reports_missing_evidence -- --exact`
+- `cargo test --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml -p octon_studio app_state::tests::operations_incident_blockers_and_playbooks_render -- --exact`
+- `rg -n '@architect|operator://architect|agents/architect|\"agent_id\": \"architect\"|\\bagent_id\\b.*architect|\\bowner: \"@architect\"|\\bowner: @architect|\\bowner_ref: \"operator://architect\"|\\bowner_ref: ''operator://architect''' .octon/framework .octon/instance .github --glob '!.octon/inputs/**' --glob '!.octon/state/evidence/**' --glob '!.octon/instance/cognition/context/shared/migrations/**' --glob '!.octon/instance/cognition/decisions/**'`
+- `cargo test --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml -p octon_kernel -- --list | rg 'undeclared_host_adapter_denies_execution|unsupported_support_tier_denies_execution'`
+- `cargo test --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml -p octon_kernel authorization::tests::undeclared_host_adapter_denies_execution -- --exact`
+- `cargo test --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml -p octon_kernel workflow::tests::create_design_package_writes_execution_artifacts -- --exact`

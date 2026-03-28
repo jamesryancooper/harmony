@@ -42,7 +42,7 @@ rules:
     route: "DENY"
     adoption_status: "active"
   - id: "FCR-009"
-    condition: "A valid support-target tier or adapter behavior declaration is missing."
+    condition: "A valid support-target tier, adapter support declaration, or adapter-conformance criterion is missing."
     route: "DENY"
     adoption_status: "active-transitional"
     activation_wave: 2
@@ -75,3 +75,8 @@ rules:
       Wave 4 promotes the new proof-plane and disclosure families while
       preserving the current structural and governance gates as the blocking
       baseline.
+  - id: "FCR-014"
+    condition: "A host adapter or model adapter attempts to widen authority or bypass canonical authority artifacts."
+    route: "DENY"
+    adoption_status: "active-transitional"
+    activation_wave: 5

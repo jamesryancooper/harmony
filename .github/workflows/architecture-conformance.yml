@@ -5,6 +5,8 @@ on:
     paths:
       - "version.txt"
       - ".octon/octon.yml"
+      - ".octon/framework/constitution/**"
+      - ".octon/framework/agency/**"
       - ".octon/framework/engine/**"
       - ".octon/framework/assurance/runtime/**"
       - ".octon/framework/cognition/_meta/architecture/**"
@@ -14,6 +16,7 @@ on:
       - ".octon/instance/orchestration/missions/**"
       - ".octon/instance/governance/policies/**"
       - ".octon/instance/governance/ownership/**"
+      - ".octon/instance/governance/support-targets.yml"
       - ".octon/state/control/execution/**"
       - ".octon/state/evidence/control/**"
       - ".octon/state/continuity/repo/missions/**"
@@ -27,6 +30,8 @@ on:
     paths:
       - "version.txt"
       - ".octon/octon.yml"
+      - ".octon/framework/constitution/**"
+      - ".octon/framework/agency/**"
       - ".octon/framework/engine/**"
       - ".octon/framework/assurance/runtime/**"
       - ".octon/framework/cognition/_meta/architecture/**"
@@ -36,6 +41,7 @@ on:
       - ".octon/instance/orchestration/missions/**"
       - ".octon/instance/governance/policies/**"
       - ".octon/instance/governance/ownership/**"
+      - ".octon/instance/governance/support-targets.yml"
       - ".octon/state/control/execution/**"
       - ".octon/state/evidence/control/**"
       - ".octon/state/continuity/repo/missions/**"

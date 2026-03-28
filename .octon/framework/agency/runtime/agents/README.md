@@ -1,32 +1,33 @@
 ---
 title: Agents
-description: Autonomous supervisors that reason, plan, orchestrate, and own mission lifecycle.
+description: Accountable execution roles for planning, orchestration, and independent verification.
 ---
 
 # Agents
 
-Agents are persistent supervisors in the agency subsystem.
+Agents are the accountable execution roles in the agency subsystem.
 
 ## Responsibilities
 
-- Reason about goals and constraints
-- Plan and sequence work
-- Delegate scoped tasks to assistants
-- Own mission lifecycle and completion criteria
+- Keep one explicit accountable owner for default execution
+- Plan and sequence work within granted scope
+- Delegate only when bounded context isolation, concurrency, or independence helps
 - Escalate one-way-door decisions to humans
+- Keep memory and execution discipline grounded in runtime artifacts, not persona prose
 
 ## Discovery
 
-Use `registry.yml` for actor routing metadata, `AGENT.md` for execution contracts, and `SOUL.md` for identity contracts.
+Use `registry.yml` for actor routing metadata and `AGENT.md` for execution contracts.
+`SOUL.md` is optional and non-authoritative when present.
 
 ## Contract Layers
 
-Each agent directory uses a two-file contract split:
+Each agent directory requires one execution contract and may include one optional identity overlay:
 
 | File | Responsibility |
 |---|---|
 | `AGENT.md` | Operational policy: scope, delegation, escalation, output contract |
-| `SOUL.md` | Identity policy: values, tone, boundaries in ambiguous situations |
+| `SOUL.md` | Optional identity overlay only; it must not add authority or runtime policy |
 
 Cross-agent overlays in `agency/governance/`:
 
@@ -34,7 +35,7 @@ Cross-agent overlays in `agency/governance/`:
 - `governance/DELEGATION.md`
 - `governance/MEMORY.md`
 
-Precedence: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> agent `AGENT.md` -> agent `SOUL.md`.
+Precedence: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> agent `AGENT.md`.
 
 ## Layout
 
@@ -45,5 +46,5 @@ agents/
 ├── _scaffold/template/SOUL.md
 └── <id>/
     ├── AGENT.md
-    └── SOUL.md
+    └── SOUL.md (optional)
 ```

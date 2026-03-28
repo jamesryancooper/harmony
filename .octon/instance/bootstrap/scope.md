@@ -45,7 +45,7 @@ runtime/governance surfaces live under `framework/**`.
 |--------------|----------|---------|
 | **Shared (in `.octon/`)** | | |
 | Harness templates | `.octon/framework/scaffolding/runtime/templates/` | `octon/` |
-| Generic agents | `.octon/framework/agency/runtime/agents/` | `architect/`, `auditor/` |
+| Generic agents | `.octon/framework/agency/runtime/agents/` | `orchestrator/`, `verifier/` |
 | Generic assistants | `.octon/framework/agency/runtime/assistants/` | `reviewer/`, `refactor/`, `docs/` |
 | Team compositions | `.octon/framework/agency/runtime/teams/` | `delivery-core/` |
 | Harness management workflows | `.octon/framework/orchestration/runtime/workflows/meta/` | `migrate-harness`, `update-harness` |

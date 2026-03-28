@@ -8,6 +8,7 @@
 - `policy` / `policy.cmd`: policy-engine launcher interface
 - `release-targets.yml`: canonical runtime target matrix for launchers and
   release automation
+- `adapters/`: replaceable host and model adapter manifests
 - `crates/`: runtime implementations
 - `config/`: runtime-local configuration (including `policy-interface.yml`)
 - `spec/`: runtime schema/protocol contracts

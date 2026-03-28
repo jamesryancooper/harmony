@@ -112,7 +112,7 @@ EOF
   cat > "$fixture_root/.octon/framework/orchestration/runtime/watchers/example/watcher.yml" <<'EOF'
 watcher_id: "example"
 title: "Example Watcher"
-owner: "@architect"
+owner: "@orchestrator"
 status: "active"
 EOF
   cat > "$fixture_root/.octon/framework/orchestration/runtime/watchers/example/state/health.json" <<'EOF'
@@ -132,7 +132,7 @@ title: "Example Automation"
 workflow_ref:
   workflow_group: "example"
   workflow_id: "sample"
-owner: "@architect"
+owner: "@orchestrator"
 status: "active"
 EOF
   cat > "$fixture_root/.octon/framework/orchestration/runtime/automations/example/state/counters.json" <<'EOF'
@@ -152,7 +152,7 @@ title: "Example Mission"
 summary: "Example mission."
 status: "active"
 mission_class: "maintenance"
-owner_ref: "operator://architect"
+owner_ref: "operator://orchestrator"
 created_at: "2026-03-10T00:00:00Z"
 risk_ceiling: "ACP-1"
 allowed_action_classes:
@@ -247,7 +247,7 @@ incident_id: "inc-001"
 title: "Example Incident"
 severity: "sev2"
 status: "closed"
-owner: "@architect"
+owner: "@orchestrator"
 summary: "Incident summary"
 run_ids:
   - "run-001"
@@ -261,7 +261,7 @@ EOF
 # Incident Closure: inc-001
 
 - Closed At: `2026-03-11T10:30:00Z`
-- Closed By: `@architect`
+- Closed By: `@orchestrator`
 - Approval: `appr-001`
 
 Closed with evidence.
@@ -325,7 +325,7 @@ incident_id: "inc-001"
 title: "Example Incident"
 severity: "sev2"
 status: "open"
-owner: "@architect"
+owner: "@orchestrator"
 summary: "Incident summary"
 EOF
   rm -f "$fixture_root/.octon/framework/orchestration/runtime/incidents/inc-001/closure.md"
@@ -337,7 +337,7 @@ incident_id: "inc-001"
 title: "Example Incident"
 severity: "sev2"
 status: "closed"
-owner: "@architect"
+owner: "@orchestrator"
 summary: "Incident summary"
 run_ids:
   - "run-001"
@@ -346,7 +346,7 @@ EOF
 # Incident Closure: inc-001
 
 - Closed At: `2026-03-11T10:30:00Z`
-- Closed By: `@architect`
+- Closed By: `@orchestrator`
 - Approval: `appr-001`
 
 Closed with evidence.

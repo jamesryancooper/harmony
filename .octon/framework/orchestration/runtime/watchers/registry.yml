@@ -1,6 +1,6 @@
 schema_version: "orchestration-watchers-registry-v1"
 watchers:
   runtime-contract-drift-watcher:
-    owner: "@architect"
+    owner: "@orchestrator"
     status: "active"
     path: "runtime-contract-drift-watcher"

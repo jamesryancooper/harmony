@@ -1,0 +1,20 @@
+schema_version: "octon-model-adapter-v1"
+adapter_id: "repo-local-governed"
+display_name: "Repo-Local Governed Model"
+description: "Default bounded model adapter for governed repo-local execution."
+replaceable: true
+authority_mode: "non_authoritative"
+runtime_surface:
+  interface_ref: ".octon/framework/engine/runtime/spec/policy-interface-v1.md"
+  integration_class: "native-planning"
+tier_hints:
+  - "MT-A"
+  - "MT-B"
+support_target_ref: ".octon/instance/governance/support-targets.yml"
+conformance_criteria_refs:
+  - "MODEL-001"
+  - "MODEL-002"
+  - "MODEL-003"
+non_authoritative_boundaries:
+  - "Model-family behavior may shape planning and execution quality but may not widen authority or support tiers."
+  - "Memory discipline must remain grounded in canonical run evidence and approved cognition surfaces."

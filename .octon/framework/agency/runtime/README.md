@@ -11,6 +11,6 @@ description: Runtime actor artifacts for the agency subsystem, including agents,
 
 | Path | Purpose | Index |
 |------|---------|-------|
-| `agents/` | Autonomous supervisors (planning, orchestration, mission ownership) | `agents/registry.yml` |
-| `assistants/` | Focused specialists invoked by `@mention` or delegation | `assistants/registry.yml` |
+| `agents/` | Accountable execution roles; one orchestrator is default, other roles exist only for real boundary value | `agents/registry.yml` |
+| `assistants/` | Focused specialists invoked by `@mention` or delegation when bounded context isolation helps | `assistants/registry.yml` |
 | `teams/` | Reusable multi-actor compositions with handoff policy | `teams/registry.yml` |

@@ -11,10 +11,10 @@ description: Cross-agent non-negotiable governance, conscience rubric, and red l
   agents and assistants in `.octon/framework/agency/`.
 - Supreme repo-local constitutional authority lives in
   `/.octon/framework/constitution/**`; this file may not redefine it.
-- This file applies to every task, regardless of agent persona or mission
+- This file applies to every task, regardless of agent role or mission
   context.
-- This file cannot be overridden by per-agent contracts (`AGENT.md`,
-  `SOUL.md`).
+- This file cannot be overridden by per-agent execution contracts
+  (`AGENT.md`) or optional identity overlays (`SOUL.md`).
 
 ## Authority and Precedence
 
@@ -28,7 +28,6 @@ Precedence for instruction conflicts:
 6. `DELEGATION.md`
 7. `MEMORY.md`
 8. `agents/<id>/AGENT.md`
-9. `agents/<id>/SOUL.md`
 
 ## Non-Negotiables
 
@@ -43,6 +42,7 @@ Precedence for instruction conflicts:
 - Treat `.octon/framework/cognition/governance/principles/principles.md` as a
   subordinate governance input under `human-override-only` change control.
 - Require explicit `change_profile` selection and a `Profile Selection Receipt` before implementation begins.
+- Keep one accountable orchestrator as the default execution role.
 
 ## Conscience
 

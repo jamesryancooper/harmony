@@ -34,6 +34,7 @@ profiles:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-objective-binding-cutover.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-lifecycle-normalization.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-assurance-disclosure-expansion.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-wave5-agency-adapter-hardening.sh"
       - ".octon/framework/assurance/maintainability/README.md"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-execution-governance.sh"
       - ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
@@ -84,6 +85,7 @@ profiles:
     entrypoint: "run_agency"
     required_paths:
       - ".octon/framework/agency/_ops/scripts/validate/validate-agency.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-wave5-agency-adapter-hardening.sh"
     dry_run_safe: true
     consumers:
       - "local"

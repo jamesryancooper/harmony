@@ -56,6 +56,6 @@ Restructure code for improved clarity, maintainability, and adherence to best pr
 
 ## When to Escalate
 
-- If refactoring requires architectural changes, escalate to Planner agent
+- If refactoring requires architecture or scope changes, escalate to the orchestrator
 - If unclear whether behavior change is acceptable, request human clarification
 - If refactoring scope is too large, propose breaking into smaller missions

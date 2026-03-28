@@ -2,6 +2,9 @@
 
 - Status: succeeded
 - Support tier: release-and-boundary-sensitive
+- Host adapter: repo-shell (supported)
+- Model adapter: repo-local-governed (supported)
+- Conformance criteria: HOST-001, HOST-002, MODEL-001, MODEL-002, MODEL-003
 - Summary: Wave 4 benchmark evidence run completed with maintainability proof and approved evaluator review for benchmark disclosure.
 - Authority:
   - Run contract: .octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/run-contract.yml

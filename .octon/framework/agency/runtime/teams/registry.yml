@@ -7,12 +7,12 @@ default: delivery-core
 teams:
   - id: delivery-core
     path: delivery-core/
-    purpose: "Default delivery composition for architecture, implementation, review, and documentation"
-    lead_agent: architect
+    purpose: "Default delivery composition anchored on one orchestrator with optional independent verification"
+    lead_agent: orchestrator
     members:
-      agents: [architect, auditor]
+      agents: [orchestrator, verifier]
       assistants: [reviewer, refactor, docs]
-    handoff_policy: "architect-plans -> assistants-execute -> auditor-verifies-high-risk-changes"
+    handoff_policy: "orchestrator-owns -> assistants-isolate-bounded-work -> verifier-checks-when-independence-matters"
     default_workflow: null
     recommended_workflows: [audit-pre-release, audit-documentation, audit-orchestration]
     composite_skill_policy:

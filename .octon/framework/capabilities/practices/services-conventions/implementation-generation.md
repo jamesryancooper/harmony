@@ -103,7 +103,7 @@ Illustrative manifest:
   "contract_hash": "sha256:...",
   "fixture_set_hash": "sha256:...",
   "rule_set_hash": "sha256:...",
-  "agent_id": "architect",
+  "agent_id": "orchestrator",
   "agent_version": "2026-02-12",
   "model_id": "example-model",
   "prompt_hash": "sha256:...",

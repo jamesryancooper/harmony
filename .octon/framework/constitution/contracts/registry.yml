@@ -45,6 +45,11 @@ families:
     activation_wave: 4
     status: "active-transitional"
     description: "RunCard and HarnessCard disclosure contracts."
+  - family_id: "adapters"
+    path: ".octon/framework/constitution/contracts/adapters/**"
+    activation_wave: 5
+    status: "active-transitional"
+    description: "Host and model adapter contracts plus conformance criteria."
   - family_id: "retention"
     path: ".octon/framework/constitution/contracts/retention/**"
     activation_wave: 4
@@ -65,6 +70,9 @@ integration_surfaces:
     status: "active-transitional"
   disclosure_contract_family:
     root: ".octon/framework/constitution/contracts/disclosure/**"
+    status: "active-transitional"
+  adapter_contract_family:
+    root: ".octon/framework/constitution/contracts/adapters/**"
     status: "active-transitional"
   workspace_charter_pair:
     narrative: ".octon/instance/bootstrap/OBJECTIVE.md"
@@ -93,6 +101,9 @@ integration_surfaces:
     - ".octon/instance/governance/policies/**"
     - ".octon/instance/governance/ownership/registry.yml"
     - ".octon/instance/governance/support-targets.yml"
+  runtime_adapter_roots:
+    host: ".octon/framework/engine/runtime/adapters/host/**"
+    model: ".octon/framework/engine/runtime/adapters/model/**"
   retained_evidence_roots:
     - ".octon/state/evidence/runs/**"
     - ".octon/state/evidence/lab/**"
@@ -105,3 +116,4 @@ notes:
   - "Wave 3 activates the runtime contract family, makes run roots the primary execution-time unit of truth, and bridges mission continuity plus generated read models onto per-run evidence."
   - "Wave 4 activates the assurance and disclosure contract families, promotes lab and observability surfaces, and extends retained run evidence with proof-plane, measurement, intervention, and disclosure families."
   - "Wave 4 remediation adds the maintainability proof plane, reusable evaluator and HarnessCard writers, benchmark-backed lab catalogs, and a generic run evidence backfill path."
+  - "Wave 5 activates the adapter contract family, publishes runtime host/model adapter manifests, and bounds adapter support claims through support-target declarations and conformance criteria."

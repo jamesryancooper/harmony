@@ -5,10 +5,13 @@ default: null
 
 agents: []
 # Example:
-#   - id: architect
-#     path: architect/
-#     role: "System design and execution governance"
-#     capabilities: [architecture-design, assistant-delegation]
+#   - id: orchestrator
+#     path: orchestrator/
+#     role_class: "orchestrator"
+#     default_execution_role: true
+#     boundary_value: "single accountable owner for planning, delegation, and final integration"
+#     role: "Default accountable execution role"
+#     capabilities: [bounded-planning, execution-orchestration, assistant-delegation]
 #     delegates_to:
 #       assistants: [reviewer, refactor, docs]
 #     allowed_skills: []

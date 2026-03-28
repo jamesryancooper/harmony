@@ -231,7 +231,7 @@ Services under `agents/<agent-name>/<agent-behavior-name>/` should remain **thin
 
 Examples of useful `agents/<agent-name>/<agent-behavior-name>/` hosts:
 
-- `agents/architect/assessment/` — long-running **Architecture Assessment Agent** that:
+- `agents/orchestrator/assessment/` — long-running **Architecture Assessment Agent** that:
   - Consumes architecture specs via Spec/Plan.
   - Orchestrates `architecture_assessment` and related flows via Flow.
   - Produces structured findings and ADR suggestions for Architecture docs.

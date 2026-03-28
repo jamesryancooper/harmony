@@ -97,7 +97,7 @@ active:
     
   - id: billing-v2
     status: active
-    owner: "@architect"
+    owner: "@orchestrator"
     started: 2025-01-05
 
 archived:
@@ -230,14 +230,15 @@ Missions can be owned by:
 
 | Owner Type | Example | Description |
 |------------|---------|-------------|
-| **Agent role** | `planner` | Agent orchestrates the mission |
-| **Assistant** | `@architect` | Assistant leads focused work |
+| **Agent role** | `orchestrator` | Accountable role orchestrates the mission |
 | **Human** | `@alice` | Human drives the mission |
 
 The owner is responsible for:
 - Maintaining the mission's `tasks.json`
 - Updating the mission's `log.md`
 - Completing or cancelling the mission
+
+Assistants may contribute through delegated tasks, but they do not own missions.
 
 ---
 

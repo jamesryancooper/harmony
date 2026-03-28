@@ -11,5 +11,6 @@ assistants: []
 #     path: reviewer/
 #     aliases: ["@reviewer", "@review", "@rev"]
 #     description: "Code review specialist for quality, style, and correctness."
-#     escalates_to: architect
+#     delegation_value: "separation-of-duties and focused review context"
+#     escalates_to: orchestrator
 #     allowed_skills: []

@@ -894,7 +894,7 @@ fi
 
 DEFAULT_AGENT="$(awk '/^default_agent:[[:space:]]*/ {print $2; exit}' "$AGENCY_MANIFEST" | tr -d '"')"
 if [[ -z "$DEFAULT_AGENT" || "$DEFAULT_AGENT" == "null" ]]; then
-  DEFAULT_AGENT="architect"
+  DEFAULT_AGENT="orchestrator"
 fi
 
 if [[ -z "$OBJECTIVE_OWNER" ]]; then

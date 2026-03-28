@@ -64,6 +64,7 @@ Repo-local supreme control authority lives under `framework/constitution/**`.
 | Authority contracts | `.octon/framework/constitution/contracts/authority/` |
 | Assurance contracts | `.octon/framework/constitution/contracts/assurance/` |
 | Disclosure contracts | `.octon/framework/constitution/contracts/disclosure/` |
+| Adapter contracts | `.octon/framework/constitution/contracts/adapters/` |
 | Support-target schema | `.octon/framework/constitution/support-targets.schema.json` |
 
 Prompts, ingress adapters, workflows, and generated projections may project

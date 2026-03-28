@@ -12,6 +12,7 @@
     "summary",
     "support_tier",
     "support_target_ref",
+    "adapter_support",
     "authority_refs",
     "proof_plane_refs",
     "measurement_ref",
@@ -48,6 +49,53 @@
     "support_target_ref": {
       "type": "string",
       "minLength": 1
+    },
+    "adapter_support": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host_adapter",
+        "model_adapter",
+        "host_support_status",
+        "model_support_status",
+        "conformance_criteria"
+      ],
+      "properties": {
+        "host_adapter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_adapter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "host_support_status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "reduced",
+            "experimental",
+            "unsupported"
+          ]
+        },
+        "model_support_status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "reduced",
+            "experimental",
+            "unsupported"
+          ]
+        },
+        "conformance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     },
     "authority_refs": {
       "type": "object",

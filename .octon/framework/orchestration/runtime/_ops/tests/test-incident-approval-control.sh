@@ -69,7 +69,7 @@ write_approval() {
   local fixture_root="$1"
   local approval_id="$2"
   local expires_at="$3"
-  local approved_by="${4:-@architect}"
+  local approved_by="${4:-@orchestrator}"
   local action_class="${5:-close-incident}"
   cat > "$fixture_root/.octon/state/evidence/decisions/repo/approvals/${approval_id}.json" <<EOF
 {
@@ -99,12 +99,12 @@ case_valid_close_requires_approval() {
     --incident-id inc-test-001 \
     --title "Test Incident" \
     --severity sev2 \
-    --owner @architect \
+    --owner @orchestrator \
     --summary "Test incident for close path." >/dev/null
 
   env "${envs[@]}" bash "$REPO_ROOT/$INCIDENT_SCRIPT" close \
     --incident-id inc-test-001 \
-    --closed-by @architect \
+    --closed-by @orchestrator \
     --approval-id appr-valid-close \
     --closure-summary "Incident resolved with evidence." \
     --remediation-ref "run:run-test-001" >/dev/null
@@ -123,12 +123,12 @@ case_missing_or_invalid_approval_blocks_close() {
     --incident-id inc-test-002 \
     --title "Blocked Close Incident" \
     --severity sev2 \
-    --owner @architect \
+    --owner @orchestrator \
     --summary "Close should fail without valid approval." >/dev/null
 
   if env "${envs[@]}" bash "$REPO_ROOT/$INCIDENT_SCRIPT" close \
       --incident-id inc-test-002 \
-      --closed-by @architect \
+      --closed-by @orchestrator \
       --approval-id appr-expired-close \
       --closure-summary "Should not close." \
       --remediation-ref "run:run-test-002" >/dev/null 2>&1; then
@@ -140,7 +140,7 @@ case_scope_mismatch_blocks_approval() {
   local fixture_root envs
   fixture_root="$(create_fixture)"
   envs=("OCTON_DIR_OVERRIDE=$fixture_root/.octon" "OCTON_ROOT_DIR=$fixture_root")
-  write_approval "$fixture_root" "appr-scope-mismatch" "2027-03-10T00:00:00Z" "@architect" "incident-severity-downgrade"
+  write_approval "$fixture_root" "appr-scope-mismatch" "2027-03-10T00:00:00Z" "@orchestrator" "incident-severity-downgrade"
   if env "${envs[@]}" bash "$REPO_ROOT/$VERIFY_SCRIPT" --approval-id appr-scope-mismatch --action-class close-incident --surface incidents >/dev/null 2>&1; then
     return 1
   fi

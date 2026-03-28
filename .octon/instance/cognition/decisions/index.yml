@@ -147,3 +147,5 @@ records:
     path: 071-assurance-lab-disclosure-expansion-cutover.md
   - id: 072-wave4-gap-remediation-cutover
     path: 072-wave4-gap-remediation-cutover.md
+  - id: 073-wave5-agency-simplification-and-adapter-hardening-cutover
+    path: 073-wave5-agency-simplification-and-adapter-hardening-cutover.md

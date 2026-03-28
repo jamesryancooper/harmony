@@ -170,7 +170,7 @@ defaults:
       target_score: 4
       acceptance_criteria: "Developer or operator workflow remains understandable and low-friction."
       evidence:
-        - .octon/framework/agency/runtime/agents/architect/AGENT.md
+        - .octon/framework/agency/runtime/agents/orchestrator/AGENT.md
         - .octon/framework/cognition/governance/principles/accessibility-baseline.md
     accessibility:
       score: 2

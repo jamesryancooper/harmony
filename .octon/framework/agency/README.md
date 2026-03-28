@@ -33,23 +33,23 @@ Read in this order:
 2. `governance/CONSTITUTION.md` for cross-agent non-negotiables and conscience rules
 3. `governance/DELEGATION.md` for delegation protocol and escalation gates
 4. `governance/MEMORY.md` for memory/retention/privacy policy
-5. `runtime/agents/registry.yml` for agent IDs and delegation rules
+5. `runtime/agents/registry.yml` for accountable execution roles and activation criteria
 6. `runtime/assistants/registry.yml` for alias (`@mention`) resolution
 7. `runtime/teams/registry.yml` for composition and handoff policy
 
 ## Interaction Model
 
 ```text
-AGENT (Supervisor) -> delegates -> ASSISTANT (Specialist) -> uses -> SKILL
+ORCHESTRATOR (Default Owner) -> delegates -> ASSISTANT (Specialist) -> uses -> SKILL
 TEAM (Composition) -> coordinates -> AGENTS + ASSISTANTS
 ```
 
-## Agent Contract Split
+## Agent Contract Model
 
 Each agent directory contains:
 
-- `AGENT.md` for execution policy and orchestration behavior.
-- `SOUL.md` for identity and interpersonal behavior.
+- `AGENT.md` for execution policy and runtime-backed role boundaries.
+- Optional `SOUL.md` for non-authoritative identity overlay only.
 
 ## Cross-Agent Contracts
 
@@ -59,4 +59,4 @@ Cross-agent policies live in `governance/`:
 - `governance/DELEGATION.md` for task handoff rules, authority, and escalation.
 - `governance/MEMORY.md` for memory lifecycle and privacy controls.
 
-Conflict precedence is fixed: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> agent `AGENT.md` -> agent `SOUL.md`.
+Conflict precedence is fixed: root `AGENTS.md` -> `CONSTITUTION.md` -> `DELEGATION.md` -> `MEMORY.md` -> agent `AGENT.md`.

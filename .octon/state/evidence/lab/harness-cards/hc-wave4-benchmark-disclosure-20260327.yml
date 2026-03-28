@@ -9,6 +9,17 @@ compatibility_tuple:
   language_resource_tier: LT-REF
   locale_tier: LOC-EN
   support_status: reduced
+adapter_support:
+  host_adapter: repo-shell
+  model_adapter: repo-local-governed
+  host_support_status: supported
+  model_support_status: supported
+  conformance_criteria:
+    - HOST-001
+    - HOST-002
+    - MODEL-001
+    - MODEL-002
+    - MODEL-003
 proof_bundle_refs:
   - .octon/state/evidence/lab/scenarios/scn-wave4-benchmark-disclosure-20260327/scenario-proof.yml
   - .octon/state/evidence/lab/benchmarks/bmk-wave4-disclosure-parity-20260327/summary.yml
@@ -16,6 +27,7 @@ proof_bundle_refs:
   - .octon/state/evidence/lab/evaluator-reviews/evr-wave4-benchmark-disclosure-20260327.yml
 known_limits:
   - Benchmark claim is stage-gated to the release-and-boundary-sensitive support tier.
+  - Adapter provenance remains bounded to the declared repo-shell and repo-local-governed envelopes.
   - External or irreversible claims remain outside this benchmark disclosure.
 generated_at: "2026-03-27T22:46:30Z"
 evaluator_review_ref: .octon/state/evidence/lab/evaluator-reviews/evr-wave4-benchmark-disclosure-20260327.yml

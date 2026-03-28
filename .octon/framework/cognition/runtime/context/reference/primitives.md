@@ -6,7 +6,7 @@ This document explains the core building blocks in Octon and when to use each.
 
 | Primitive | Purpose | Invocation | State |
 |-----------|---------|------------|-------|
-| **Agent** | Autonomous supervisor that orchestrates work | Assigned to harness/mission | Persistent |
+| **Agent** | Accountable execution role that orchestrates work | Assigned to harness/mission | Persistent |
 | **Team** | Reusable multi-actor composition | `use team:`, workflow/agent routing | Stateless configuration |
 | **Mission** | Durable multi-session orchestration | `/start-mission`, agent command | Persistent (state machine) |
 | **Skill** | Composable capability with I/O contract | `/command`, `use skill:`, triggers | Stateless |
@@ -69,7 +69,7 @@ The primitives form a hierarchical multi-agent system:
 
 ## Agents
 
-**Location:** `.octon/framework/agency/runtime/agents/<agent-name>/AGENT.md` + `.octon/framework/agency/runtime/agents/<agent-name>/SOUL.md`
+**Location:** `.octon/framework/agency/runtime/agents/<agent-name>/AGENT.md` with optional `.octon/framework/agency/runtime/agents/<agent-name>/SOUL.md`
 
 **Repo-local constitutional kernel:** `.octon/framework/constitution/CHARTER.md`, `.octon/framework/constitution/precedence/normative.yml`
 
@@ -77,7 +77,7 @@ The primitives form a hierarchical multi-agent system:
 
 **Registry:** `.octon/framework/agency/runtime/agents/registry.yml`
 
-**Purpose:** Autonomous supervisors that orchestrate complex work, command missions, and delegate to assistants.
+**Purpose:** Accountable execution roles that orchestrate complex work, command missions, and delegate to assistants when boundary value is real.
 
 ### Characteristics
 
@@ -97,18 +97,20 @@ The primitives form a hierarchical multi-agent system:
 
 | Role | Purpose |
 |------|---------|
-| Architect | Strategic architecture, planning, and orchestration |
-| Auditor | High-rigor quality and contradiction auditing |
+| Orchestrator | Default accountable planning, execution, and integration role |
+| Verifier | Optional independent verification role when separation of duties matters |
 
 ### Structure
 
 ```yaml
 # registry.yml entry
-- id: architect
-  path: architect/
-  role: "System design and execution governance"
+- id: orchestrator
+  path: orchestrator/
+  role_class: "orchestrator"
+  default_execution_role: true
+  role: "Default accountable execution role"
   capabilities:
-    - architecture-design
+    - bounded-planning
     - assistant-delegation
   delegates_to:
     assistants: [reviewer, refactor, docs]

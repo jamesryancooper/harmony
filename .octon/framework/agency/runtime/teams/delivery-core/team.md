@@ -1,25 +1,25 @@
 ---
 title: "Team: delivery-core"
-description: "Default multi-actor composition for end-to-end delivery with quality verification."
+description: "Default delivery composition with one accountable orchestrator and optional independent verification."
 ---
 
 # Team: delivery-core
 
 ## Purpose
 
-Use this team for non-trivial changes that require architecture, implementation, and verification handoffs.
+Use this team for non-trivial changes that benefit from one accountable orchestrator plus bounded specialist or verifier handoffs.
 
 ## Composition
 
-- **Lead Agent:** architect
-- **Agents:** architect, auditor
+- **Lead Agent:** orchestrator
+- **Agents:** orchestrator, verifier
 - **Assistants:** reviewer, refactor, docs
 
 ## Handoff Policy
 
-1. `architect` defines scope, risks, and execution sequence.
-2. `architect` delegates bounded subtasks to assistants.
-3. `auditor` performs material-risk verification before completion.
+1. `orchestrator` owns scope, risk posture, sequencing, and final integration.
+2. `orchestrator` delegates only bounded subtasks that benefit from context isolation or parallelism.
+3. `verifier` participates only when separation of duties or materially independent review adds value.
 
 ## Workflow Alignment
 
@@ -52,8 +52,8 @@ Escalate to human when:
 ## Team Execution Summary
 
 **Team:** delivery-core
-**Lead:** architect
+**Lead:** orchestrator
 **Delegations:** [assistant tasks and outputs]
-**Verification:** [auditor findings and status]
+**Verification:** [verifier findings and status]
 **Outcome:** [complete / blocked / escalated]
 ```

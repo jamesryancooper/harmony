@@ -1931,7 +1931,7 @@ mod tests {
         .expect("write mission registry");
         fs::write(
             root.join(".octon/framework/orchestration/runtime/watchers/example/watcher.yml"),
-            "watcher_id: example\ntitle: Example Watcher\nowner: '@architect'\nstatus: active\n",
+            "watcher_id: example\ntitle: Example Watcher\nowner: '@orchestrator'\nstatus: active\n",
         )
         .expect("write watcher");
         fs::write(
@@ -1946,7 +1946,7 @@ mod tests {
         .expect("write suppressions");
         fs::write(
             root.join(".octon/framework/orchestration/runtime/automations/example/automation.yml"),
-            "automation_id: example\ntitle: Example Automation\nowner: '@architect'\nstatus: active\nworkflow_ref:\n  workflow_group: example\n  workflow_id: sample\n",
+            "automation_id: example\ntitle: Example Automation\nowner: '@orchestrator'\nstatus: active\nworkflow_ref:\n  workflow_group: example\n  workflow_id: sample\n",
         )
         .expect("write automation");
         fs::write(
@@ -1961,7 +1961,7 @@ mod tests {
         .expect("write automation status");
         fs::write(
             root.join(".octon/instance/orchestration/missions/example/mission.yml"),
-            "schema_version: octon-mission-v2\nmission_id: example\ntitle: Example Mission\nsummary: Example mission.\nstatus: active\nmission_class: maintenance\nowner_ref: 'operator://architect'\ncreated_at: '2026-03-10T00:00:00Z'\nrisk_ceiling: 'ACP-1'\nallowed_action_classes:\n  - 'repo-maintenance'\ndefault_safing_subset:\n  - 'observe_only'\n  - 'stage_only'\ndefault_schedule_hint: 'interruptible_scheduled'\ndefault_overlap_policy: 'skip'\nscope_ids: []\nsuccess_criteria:\n  - 'Example complete'\nfailure_conditions: []\nactive_run_ids:\n  - run-001\n",
+            "schema_version: octon-mission-v2\nmission_id: example\ntitle: Example Mission\nsummary: Example mission.\nstatus: active\nmission_class: maintenance\nowner_ref: 'operator://orchestrator'\ncreated_at: '2026-03-10T00:00:00Z'\nrisk_ceiling: 'ACP-1'\nallowed_action_classes:\n  - 'repo-maintenance'\ndefault_safing_subset:\n  - 'observe_only'\n  - 'stage_only'\ndefault_schedule_hint: 'interruptible_scheduled'\ndefault_overlap_policy: 'skip'\nscope_ids: []\nsuccess_criteria:\n  - 'Example complete'\nfailure_conditions: []\nactive_run_ids:\n  - run-001\n",
         )
         .expect("write mission");
         fs::write(
@@ -1996,7 +1996,7 @@ mod tests {
         .expect("write receipt");
         fs::write(
             root.join(".octon/framework/orchestration/runtime/incidents/inc-001/incident.yml"),
-            "incident_id: inc-001\ntitle: Example Incident\nseverity: sev2\nstatus: closed\nowner: '@architect'\nsummary: Incident summary\nrun_ids:\n  - run-001\n",
+            "incident_id: inc-001\ntitle: Example Incident\nseverity: sev2\nstatus: closed\nowner: '@orchestrator'\nsummary: Incident summary\nrun_ids:\n  - run-001\n",
         )
         .expect("write incident");
         fs::write(
@@ -2006,7 +2006,7 @@ mod tests {
         .expect("write timeline");
         fs::write(
             root.join(".octon/framework/orchestration/runtime/incidents/inc-001/closure.md"),
-            "# Incident Closure: inc-001\n\n- Closed At: `2026-03-11T10:30:00Z`\n- Closed By: `@architect`\n- Approval: `appr-001`\n\nClosed with evidence.\n\n## Remediation Evidence\n\n- Remediation Ref: `run:run-001`\n",
+            "# Incident Closure: inc-001\n\n- Closed At: `2026-03-11T10:30:00Z`\n- Closed By: `@orchestrator`\n- Approval: `appr-001`\n\nClosed with evidence.\n\n## Remediation Evidence\n\n- Remediation Ref: `run:run-001`\n",
         )
         .expect("write closure");
         fs::write(
@@ -2067,7 +2067,7 @@ mod tests {
         seed_base(&root);
         fs::write(
             root.join(".octon/framework/orchestration/runtime/incidents/inc-001/incident.yml"),
-            "incident_id: inc-001\ntitle: Example Incident\nseverity: sev2\nstatus: open\nowner: '@architect'\nsummary: Incident summary\n",
+            "incident_id: inc-001\ntitle: Example Incident\nseverity: sev2\nstatus: open\nowner: '@orchestrator'\nsummary: Incident summary\n",
         )
         .expect("rewrite incident");
         fs::remove_file(root.join(".octon/framework/orchestration/runtime/incidents/inc-001/closure.md"))

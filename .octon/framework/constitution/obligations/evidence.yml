@@ -47,3 +47,9 @@ obligations:
       evidence before they can pass consequential disclosure gates.
     adoption_status: "active-transitional"
     activation_wave: 4
+  - id: "EVI-011"
+    requirement: >-
+      Adapter-backed support claims retain explicit adapter ids and
+      conformance criteria under bound run evidence or disclosure artifacts.
+    adoption_status: "active-transitional"
+    activation_wave: 5

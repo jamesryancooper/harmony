@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/adapters/host-adapter-v1.schema.json",
+  "title": "Octon Host Adapter Contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "adapter_id",
+    "display_name",
+    "replaceable",
+    "authority_mode",
+    "runtime_surface",
+    "support_target_ref",
+    "conformance_criteria_refs",
+    "non_authoritative_boundaries"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-host-adapter-v1"
+    },
+    "adapter_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "replaceable": {
+      "const": true
+    },
+    "authority_mode": {
+      "type": "string",
+      "enum": [
+        "projection_only",
+        "non_authoritative"
+      ]
+    },
+    "runtime_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interface_ref",
+        "integration_class"
+      ],
+      "properties": {
+        "interface_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "integration_class": {
+          "type": "string",
+          "enum": [
+            "native-shell",
+            "desktop-host",
+            "host-projection",
+            "ci-host",
+            "other"
+          ]
+        }
+      }
+    },
+    "projection_sources": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "support_target_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "conformance_criteria_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "non_authoritative_boundaries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
