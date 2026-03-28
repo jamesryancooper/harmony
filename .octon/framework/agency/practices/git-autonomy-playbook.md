@@ -74,7 +74,7 @@ Behavior:
 ### 3) Label, ready, and request auto-merge
 
 ```bash
-.octon/framework/agency/_ops/scripts/git/git-pr-ship.sh --accept-human
+.octon/framework/agency/_ops/scripts/git/git-pr-ship.sh
 ```
 
 Behavior:
@@ -162,7 +162,8 @@ When touching high-impact paths (for example `.github/` or governance paths):
 
 1. Leave the PR in the manual lane and complete ordinary human review.
 2. Keep PR focused and explicitly document risk/rollback.
-3. Use `git-pr-ship.sh --accept-human` to preserve metadata-level check-in.
+3. Use `git-pr-ship.sh --no-auto-label --no-automerge` if you want the
+   ready-state and cleanup helper without enabling the autonomy lane.
 4. Cleanup watcher will run automatically once the PR is eventually closed.
 
 ---
