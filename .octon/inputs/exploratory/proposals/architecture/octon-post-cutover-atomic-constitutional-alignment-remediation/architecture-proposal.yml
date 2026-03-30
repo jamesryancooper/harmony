@@ -1,0 +1,52 @@
+schema_version: "architecture-proposal-v1"
+proposal_id: "octon-post-cutover-atomic-constitutional-alignment-remediation"
+proposal_kind: "architecture"
+architecture_scope: "cross-domain-architecture"
+scope_areas:
+  - "constitutional-family-live-model-semantics"
+  - "bootstrap-authority-surfaces"
+  - "disclosure-live-root-regression-guards"
+  - "support-target-live-claim-bounding"
+  - "portability-claim-narrowing"
+  - "subordinate-governance-owner-normalization"
+  - "validator-and-workflow-hardening"
+decision_type: "boundary-change"
+problem_statement: >-
+  Octon's current default-branch HEAD substantially implements the March 30, 2026
+  unified execution constitution atomic cutover, but residual post-cutover drift
+  remains in three places that materially affect trustworthiness: (1) active
+  constitutional family files still encode stale phase-selection receipt semantics,
+  (2) bootstrap orientation still leaks authored authority into raw inputs, and
+  (3) support, portability, and disclosure-adjacent claims remain broader than
+  the retained proof currently published. Additional subordinate-governance
+  surfaces still use placeholder owner identifiers, and validator coverage is not
+  yet strong enough to keep these drift classes from silently recurring.
+architectural_thesis: >-
+  The correct clean-break remediation is not another staged coexistence layer.
+  It is one atomic alignment pass that preserves the already-landed live atomic
+  model, re-binds all active constitutional family semantics to the same live
+  March 30 profile-selection receipt, restores a single authored-authority
+  boundary across bootstrap and topology docs, narrows every live support and
+  portability claim to retained proof-backed envelopes, normalizes subordinate
+  owner identifiers to ownership-registry-backed values, and adds fail-closed
+  validators that make future divergence impossible to publish silently.
+implementation_posture: >-
+  This packet optimizes for target-state correctness, truthful public claims, and
+  regression resistance. Where prior text, support declarations, or historical
+  intent conflict with current retained proof, the packet chooses truthful
+  narrowing over aspirational continuity.
+required_outcomes:
+  - "All active constitutional family files describe the same live model and the same live profile-selection receipt."
+  - "Historical phase receipts remain explicit lineage only, never ambiguous live selectors."
+  - "No orientation or bootstrap document treats raw inputs as authored authority."
+  - "Disclosure live roots remain authored-governance + retained-release canonical, with lab mirrors historical only."
+  - "Only proof-backed live envelopes remain supported or reduced; all others are demoted to experimental/stage-only or denied unless proof lands in the same atomic change."
+  - "Portability and self-containment prose inside .octon/** becomes evidence-bounded rather than aspirationally broad."
+  - "Binding subordinate governance surfaces use ownership-registry-backed identifiers instead of placeholders."
+  - "Assurance/runtime validators fail closed on recurrence of these drift classes."
+acceptance_gate: >-
+  Octon may claim a fully aligned live atomic execution constitution only when
+  the durable promoted surfaces, not proposal prose, show one live model, one
+  authored-authority boundary, one canonical disclosure model, one proof-bounded
+  live support envelope, and one fail-closed validator set that rejects stale
+  family semantics, authority leaks, and overclaimed support.
