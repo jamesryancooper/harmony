@@ -1,5 +1,5 @@
 use anyhow::{bail, Context, Result};
-use octon_core::config::ConfigLoader;
+use octon_core::config::{ConfigLoader, RuntimeConfig};
 use octon_core::policy::PolicyEngine;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
@@ -605,7 +605,11 @@ fn run_generic_pipeline(
         })
         .transpose()?;
     let request_id = match options.run_id.as_deref() {
-        Some(value) => validate_run_id(value)?,
+        Some(value) => {
+            let run_id = validate_run_id(value)?;
+            ensure_run_id_unused(&runtime_cfg, &run_id)?;
+            run_id
+        }
         None => new_request_id("workflow"),
     };
     let workflow_request = ExecutionRequest {
@@ -1427,6 +1431,44 @@ fn validate_run_id(input: &str) -> Result<String> {
     Ok(trimmed.to_string())
 }
 
+fn ensure_run_id_unused(cfg: &RuntimeConfig, request_id: &str) -> Result<()> {
+    let existing_paths = [
+        cfg.run_control_root(request_id),
+        cfg.run_root(request_id),
+        cfg.run_continuity_path(request_id),
+        cfg.execution_control_root
+            .join("approvals")
+            .join("requests")
+            .join(format!("{request_id}.yml")),
+        cfg.execution_control_root
+            .join("approvals")
+            .join("grants")
+            .join(format!("grant-{request_id}.yml")),
+        cfg.octon_dir
+            .join("state")
+            .join("evidence")
+            .join("control")
+            .join("execution")
+            .join(format!("authority-decision-{request_id}.yml")),
+        cfg.octon_dir
+            .join("state")
+            .join("evidence")
+            .join("control")
+            .join("execution")
+            .join(format!("authority-grant-bundle-{request_id}.yml")),
+    ];
+
+    if let Some(existing) = existing_paths.iter().find(|path| path.exists()) {
+        bail!(
+            "run id '{}' already exists in canonical execution artifacts at {}",
+            request_id,
+            existing.display()
+        );
+    }
+
+    Ok(())
+}
+
 fn slugify(input: &str) -> String {
     let mut out = String::with_capacity(input.len());
     let mut prev_dash = false;
@@ -1850,6 +1892,38 @@ stages:
         assert!(error
             .to_string()
             .contains("must not contain path separators"));
+        fs::remove_dir_all(root).ok();
+    }
+
+    #[test]
+    fn generic_workflow_rejects_reused_run_id() {
+        let root = make_temp_root("reused-run-id");
+        let octon_dir = seed_generic_workflow_fixture(&root);
+        let runtime_cfg = ConfigLoader::load(&octon_dir).expect("runtime config should load");
+        let reused_run_id = "workflow-20260330-1";
+
+        fs::create_dir_all(runtime_cfg.run_control_root(reused_run_id))
+            .expect("existing control root should be seeded");
+
+        let error = run_pipeline_from_octon_dir(
+            &octon_dir,
+            RunPipelineOptions {
+                pipeline_id: "sample-workflow".to_string(),
+                run_id: Some(reused_run_id.to_string()),
+                mission_id: None,
+                executor: ExecutorKind::Mock,
+                executor_bin: None,
+                output_slug: Some("reused-run-id".to_string()),
+                model: None,
+                prepare_only: false,
+                input_overrides: HashMap::new(),
+            },
+        )
+        .expect_err("reused run id must fail before execution");
+
+        assert!(error
+            .to_string()
+            .contains("already exists in canonical execution artifacts"));
         fs::remove_dir_all(root).ok();
     }
 

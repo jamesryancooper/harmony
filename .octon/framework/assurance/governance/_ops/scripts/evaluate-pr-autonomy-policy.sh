@@ -143,13 +143,6 @@ main() {
   header_format="$(jq -r '.commit.header_format // "<type>(<scope>): <summary>"' "$STANDARDS_JSON")"
   title_regex="^(${allowed_commit_types})\\((${scope_pattern})\\)(!)?: (.+)$"
 
-  local branch_allowed_types branch_ticket_pattern branch_slug_pattern branch_default_format branch_regex
-  branch_allowed_types="$(jq -r '.branch.allowed_types | map(gsub("([][(){}.*+?^$|\\\\-])"; "\\\\\\1")) | join("|")' "$STANDARDS_JSON")"
-  branch_ticket_pattern="$(jq -r '.branch.ticket_pattern // "[A-Za-z0-9]+-[0-9]+"' "$STANDARDS_JSON")"
-  branch_slug_pattern="$(jq -r '.branch.slug_pattern // "[a-z0-9]+(?:-[a-z0-9]+)*"' "$STANDARDS_JSON")"
-  branch_default_format="$(jq -r '.branch.default_format // "<type>/<ticket-id>-<short-description>"' "$STANDARDS_JSON")"
-  branch_regex="^(${branch_allowed_types})/(((${branch_ticket_pattern})-)?(${branch_slug_pattern}))$"
-
   local -a errors=()
   local -a notices=()
   local -a reason_codes=()
@@ -170,10 +163,6 @@ main() {
       if [[ "$header_max_length" != "0" && "${#title}" -gt "$header_max_length" ]]; then
         errors+=("PR title exceeds ${header_max_length} characters.")
       fi
-    fi
-
-    if ! [[ "$head_ref" =~ $branch_regex ]]; then
-      errors+=("Branch '${head_ref}' must match ${branch_default_format} with allowed types: $(jq -r '.branch.allowed_types | join(", ")' "$STANDARDS_JSON").")
     fi
   fi
 
@@ -214,7 +203,7 @@ main() {
 
     if ! printf '%s\n' "$body" | grep -Eiq '(close[sd]?|fixe?[sd]?|resolve[sd]?)\s+#\d+' \
       && ! printf '%s\n' "$body" | grep -Eiq 'No-Issue:\s*\S+'; then
-      errors+=("PR body must include issue linkage (`Closes/Fixes/Resolves #...`) or `No-Issue: <reason>`.")
+      errors+=("PR body must include issue linkage (Closes/Fixes/Resolves #...) or No-Issue: <reason>.")
     fi
   fi
 

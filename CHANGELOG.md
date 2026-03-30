@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.9](https://github.com/jamesryancooper/octon/compare/octon-v0.6.8...octon-v0.6.9) (2026-03-30)
+
+
+### Bug Fixes
+
+* **ci:** pair pr auto-merge projections ([#231](https://github.com/jamesryancooper/octon/issues/231)) ([44920e1](https://github.com/jamesryancooper/octon/commit/44920e10bfe92e85932a6db1eccb54b17329f80e))
+
 ## [0.6.8](https://github.com/jamesryancooper/octon/compare/octon-v0.6.7...octon-v0.6.8) (2026-03-28)
 
 
