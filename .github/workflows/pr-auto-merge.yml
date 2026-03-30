@@ -300,6 +300,7 @@ jobs:
               --reason-code "${reason_code}" \
               --projection-check "github://pull/${PR_NUMBER}#check:Validate autonomy policy" \
               --projection-check "github://pull/${PR_NUMBER}#check:AI Review Gate / decision" \
+              --projection-kind "github-head-ref" \
               --projection-ref "github://pull/${PR_NUMBER}#head:${head_ref}" \
               --output-json "${control_json}" >/dev/null
           }
