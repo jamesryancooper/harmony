@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.10](https://github.com/jamesryancooper/octon/compare/octon-v0.6.9...octon-v0.6.10) (2026-03-31)
+
+
+### Features
+
+* **constitution:** complete unified execution closeout ([#240](https://github.com/jamesryancooper/octon/issues/240)) ([79593b7](https://github.com/jamesryancooper/octon/commit/79593b790fa6b0b634c5a460a9b9b05ce96fba03))
+
 ## [0.6.9](https://github.com/jamesryancooper/octon/compare/octon-v0.6.8...octon-v0.6.9) (2026-03-30)
 
 
