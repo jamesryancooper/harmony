@@ -183,6 +183,10 @@ main() {
   require_yq '.host_adapters[] | select(.adapter_id == "ci-control-plane" and .support_status == "experimental" and .default_route == "stage_only")' "$SUPPORT_TARGETS" "CI host is demoted to experimental"
   require_yq '.model_adapters[] | select(.adapter_id == "repo-local-governed" and .support_status == "supported" and .default_route == "allow")' "$SUPPORT_TARGETS" "repo-local-governed remains the supported model adapter"
   require_yq '.model_adapters[] | select(.adapter_id == "experimental-external" and .support_status == "experimental" and .default_route == "stage_only")' "$SUPPORT_TARGETS" "experimental external model remains staged"
+  require_yq '[.host_adapters[] | select(.support_status == "supported")] | length == 1' "$SUPPORT_TARGETS" "support matrix has exactly one supported host adapter"
+  require_yq '.host_adapters[] | select(.support_status == "supported") | .adapter_id == "repo-shell"' "$SUPPORT_TARGETS" "repo-shell is the unique supported host adapter"
+  require_yq '[.model_adapters[] | select(.support_status == "supported")] | length == 1' "$SUPPORT_TARGETS" "support matrix has exactly one supported model adapter"
+  require_yq '.model_adapters[] | select(.support_status == "supported") | .adapter_id == "repo-local-governed"' "$SUPPORT_TARGETS" "repo-local-governed is the unique supported model adapter"
 
   require_yq '.host_adapters[] | select(.adapter_id == "repo-shell" and (.allowed_model_tiers | length) == 1 and .allowed_model_tiers[0] == "MT-B")' "$SUPPORT_TARGETS" "repo-shell allowed model tiers are narrowed to proved live support"
   require_yq '.host_adapters[] | select(.adapter_id == "repo-shell" and (.allowed_workload_tiers | length) == 2 and .allowed_workload_tiers[0] == "WT-2" and .allowed_workload_tiers[1] == "WT-3")' "$SUPPORT_TARGETS" "repo-shell allowed workload tiers are narrowed to proved live support"

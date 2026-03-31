@@ -48,17 +48,15 @@ file_contains() {
   fi
 }
 
-check_lineage_ref() {
+ensure_lineage_ref() {
   local family_file="$1"
   local family_id="$2"
   local receipt="$3"
 
-  if file_contains "$receipt" "$family_file"; then
-    if yq -e ".activation_lineage_refs[] | select(. == \"$receipt\")" "$family_file" >/dev/null 2>&1; then
-      pass "${family_id} preserves historical lineage for ${receipt##*/migrations/}"
-    else
-      fail "${family_id} mentions ${receipt##*/migrations/} outside activation_lineage_refs"
-    fi
+  if yq -e ".activation_lineage_refs[] | select(. == \"$receipt\")" "$family_file" >/dev/null 2>&1; then
+    pass "${family_id} preserves historical lineage for ${receipt##*/migrations/}"
+  else
+    fail "${family_id} is missing historical lineage for ${receipt##*/migrations/}"
   fi
 }
 
@@ -89,10 +87,20 @@ main() {
       fail "${family_id} live selector does not match the charter"
     fi
 
-    check_lineage_ref "$family_file" "$family_id" "$PHASE2_RECEIPT"
-    check_lineage_ref "$family_file" "$family_id" "$PHASE3_RECEIPT"
-    check_lineage_ref "$family_file" "$family_id" "$PHASE4_RECEIPT"
-    check_lineage_ref "$family_file" "$family_id" "$PHASE5_RECEIPT"
+    case "$family_id" in
+      objective|authority)
+        ensure_lineage_ref "$family_file" "$family_id" "$PHASE2_RECEIPT"
+        ;;
+      runtime|retention)
+        ensure_lineage_ref "$family_file" "$family_id" "$PHASE3_RECEIPT"
+        ;;
+      assurance)
+        ensure_lineage_ref "$family_file" "$family_id" "$PHASE4_RECEIPT"
+        ;;
+      adapters)
+        ensure_lineage_ref "$family_file" "$family_id" "$PHASE5_RECEIPT"
+        ;;
+    esac
   done
 
   echo "Validation summary: errors=$errors"
