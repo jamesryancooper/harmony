@@ -730,10 +730,11 @@ pub fn run_create_design_package_from_octon_dir(
     let design_proposals_root = repo_root.join(DESIGN_PACKAGES_ROOT_REL);
     let reports_root = repo_root.join(REPORTS_ROOT_REL);
     let workflow_bundles_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
-    let workflow_request_id = options
-        .run_id
-        .clone()
-        .unwrap_or_else(|| format!("create-design-proposal-{}", options.package_id));
+    let workflow_request_id = resolve_requested_workflow_run_id(
+        &runtime_cfg,
+        options.run_id.as_deref(),
+        "create-design-proposal",
+    )?;
     let workflow_auth = authorize_execution(
         &runtime_cfg,
         &policy,
@@ -1448,10 +1449,11 @@ pub fn run_create_static_proposal_from_octon_dir(
     let proposals_root = repo_root.join(PROPOSALS_ROOT_REL).join(kind.as_str());
     let reports_root = repo_root.join(REPORTS_ROOT_REL);
     let workflow_bundles_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
-    let workflow_request_id = options
-        .run_id
-        .clone()
-        .unwrap_or_else(|| format!("create-{}-proposal-{}", kind.as_str(), options.proposal_id));
+    let workflow_request_id = resolve_requested_workflow_run_id(
+        &runtime_cfg,
+        options.run_id.as_deref(),
+        &format!("create-{}-proposal", kind.as_str()),
+    )?;
     let workflow_request = ExecutionRequest {
         request_id: workflow_request_id,
         caller_path: "workflow".to_string(),
@@ -1800,14 +1802,13 @@ pub fn run_audit_static_proposal_from_octon_dir(
     } else {
         repo_root.join(&options.proposal_path)
     };
-    let audit_slug = slugify(&rel_path(&repo_root, &proposal_root));
-
     let reports_root = repo_root.join(REPORTS_ROOT_REL);
     let workflow_bundles_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
-    let workflow_request_id = options
-        .run_id
-        .clone()
-        .unwrap_or_else(|| format!("audit-{}-proposal-{}", kind.as_str(), audit_slug));
+    let workflow_request_id = resolve_requested_workflow_run_id(
+        &runtime_cfg,
+        options.run_id.as_deref(),
+        &format!("audit-{}-proposal", kind.as_str()),
+    )?;
     let workflow_request = ExecutionRequest {
         request_id: workflow_request_id,
         caller_path: "workflow".to_string(),
@@ -2010,10 +2011,11 @@ pub fn run_validate_proposal_from_octon_dir(
         repo_root.join(&options.proposal_path)
     };
     let proposal_rel = rel_path(&repo_root, &proposal_root);
-    let workflow_request_id = options
-        .run_id
-        .clone()
-        .unwrap_or_else(|| format!("validate-proposal-{}", slugify(&proposal_rel)));
+    let workflow_request_id = resolve_requested_workflow_run_id(
+        &runtime_cfg,
+        options.run_id.as_deref(),
+        "validate-proposal",
+    )?;
 
     let reports_root = repo_root.join(REPORTS_ROOT_REL);
     let workflow_bundles_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
@@ -2354,10 +2356,11 @@ pub fn run_promote_proposal_from_octon_dir(
         repo_root.join(&options.proposal_path)
     };
     let proposal_rel = rel_path(&repo_root, &proposal_root);
-    let workflow_request_id = options
-        .run_id
-        .clone()
-        .unwrap_or_else(|| format!("promote-proposal-{}", slugify(&proposal_rel)));
+    let workflow_request_id = resolve_requested_workflow_run_id(
+        &runtime_cfg,
+        options.run_id.as_deref(),
+        "promote-proposal",
+    )?;
 
     let reports_root = repo_root.join(REPORTS_ROOT_REL);
     let workflow_bundles_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
@@ -2670,10 +2673,11 @@ pub fn run_archive_proposal_from_octon_dir(
         repo_root.join(&options.proposal_path)
     };
     let proposal_rel = rel_path(&repo_root, &proposal_root);
-    let workflow_request_id = options
-        .run_id
-        .clone()
-        .unwrap_or_else(|| format!("archive-proposal-{}", slugify(&proposal_rel)));
+    let workflow_request_id = resolve_requested_workflow_run_id(
+        &runtime_cfg,
+        options.run_id.as_deref(),
+        "archive-proposal",
+    )?;
 
     let reports_root = repo_root.join(REPORTS_ROOT_REL);
     let workflow_bundles_root = repo_root.join(WORKFLOW_REPORTS_ROOT_REL);
@@ -5593,6 +5597,93 @@ fn rel_path(root: &Path, path: &Path) -> String {
         .to_string()
 }
 
+fn new_workflow_request_id(prefix: &str) -> String {
+    let millis = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|duration| duration.as_millis())
+        .unwrap_or(0);
+    format!("{prefix}-{millis}-{}", std::process::id())
+}
+
+fn validate_workflow_run_id(input: &str) -> Result<String> {
+    let trimmed = input.trim();
+    if trimmed.is_empty() {
+        bail!("workflow --run-id must not be empty");
+    }
+    if trimmed.len() > 128 {
+        bail!("workflow --run-id must be 128 characters or fewer");
+    }
+    if trimmed == "." || trimmed == ".." {
+        bail!("workflow --run-id must not be a dot-segment");
+    }
+    if trimmed.contains('/') || trimmed.contains('\\') {
+        bail!("workflow --run-id must not contain path separators");
+    }
+    if !trimmed
+        .chars()
+        .all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-')
+    {
+        bail!("workflow --run-id must match ^[a-z0-9-]+$");
+    }
+    if trimmed.starts_with('-') || trimmed.ends_with('-') || trimmed.contains("--") {
+        bail!("workflow --run-id must use canonical hyphen-separated segments");
+    }
+    Ok(trimmed.to_string())
+}
+
+fn ensure_workflow_run_id_unused(cfg: &RuntimeConfig, request_id: &str) -> Result<()> {
+    let existing_paths = [
+        cfg.run_control_root(request_id),
+        cfg.run_root(request_id),
+        cfg.run_continuity_path(request_id),
+        cfg.execution_control_root
+            .join("approvals")
+            .join("requests")
+            .join(format!("{request_id}.yml")),
+        cfg.execution_control_root
+            .join("approvals")
+            .join("grants")
+            .join(format!("grant-{request_id}.yml")),
+        cfg.octon_dir
+            .join("state")
+            .join("evidence")
+            .join("control")
+            .join("execution")
+            .join(format!("authority-decision-{request_id}.yml")),
+        cfg.octon_dir
+            .join("state")
+            .join("evidence")
+            .join("control")
+            .join("execution")
+            .join(format!("authority-grant-bundle-{request_id}.yml")),
+    ];
+
+    if let Some(existing) = existing_paths.iter().find(|path| path.exists()) {
+        bail!(
+            "run id '{}' already exists in canonical execution artifacts at {}",
+            request_id,
+            existing.display()
+        );
+    }
+
+    Ok(())
+}
+
+fn resolve_requested_workflow_run_id(
+    cfg: &RuntimeConfig,
+    requested: Option<&str>,
+    fallback_prefix: &str,
+) -> Result<String> {
+    match requested {
+        Some(value) => {
+            let run_id = validate_workflow_run_id(value)?;
+            ensure_workflow_run_id_unused(cfg, &run_id)?;
+            Ok(run_id)
+        }
+        None => Ok(new_workflow_request_id(fallback_prefix)),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -6285,6 +6376,91 @@ mod tests {
         );
         assert!(validation.contains("request-validation-failure"));
         assert!(summary.contains("request-validation-failure"));
+        fs::remove_dir_all(root).ok();
+    }
+
+    #[test]
+    fn validate_proposal_rejects_invalid_explicit_run_id() {
+        let root = make_temp_root("validate-invalid-run-id");
+        let octon_dir = seed_create_design_package_fixture(&root);
+
+        run_create_design_package_from_octon_dir(
+            &octon_dir,
+            RunCreateDesignPackageOptions {
+                run_id: None,
+                package_id: "validate-target".to_string(),
+                package_title: "Validate Target".to_string(),
+                package_class: DesignPackageClass::ExperienceProduct,
+                promotion_scope: ProposalScope::OctonInternal,
+                implementation_targets: vec![
+                    ".octon/framework/scaffolding/runtime/example.md".to_string()
+                ],
+                include_contracts: None,
+                include_conformance: None,
+                include_canonicalization: None,
+            },
+        )
+        .expect("fixture package should scaffold");
+
+        let error = run_validate_proposal_from_octon_dir(
+            &octon_dir,
+            RunValidateProposalOptions {
+                run_id: Some("../escape".to_string()),
+                proposal_path: PathBuf::from(
+                    ".octon/inputs/exploratory/proposals/design/validate-target",
+                ),
+            },
+        )
+        .expect_err("invalid explicit run id must fail");
+
+        assert!(error
+            .to_string()
+            .contains("workflow --run-id must not contain path separators"));
+        fs::remove_dir_all(root).ok();
+    }
+
+    #[test]
+    fn validate_proposal_rejects_reused_explicit_run_id() {
+        let root = make_temp_root("validate-reused-run-id");
+        let octon_dir = seed_create_design_package_fixture(&root);
+        let runtime_cfg = ConfigLoader::load(&octon_dir).expect("runtime config should load");
+
+        run_create_design_package_from_octon_dir(
+            &octon_dir,
+            RunCreateDesignPackageOptions {
+                run_id: None,
+                package_id: "validate-target".to_string(),
+                package_title: "Validate Target".to_string(),
+                package_class: DesignPackageClass::ExperienceProduct,
+                promotion_scope: ProposalScope::OctonInternal,
+                implementation_targets: vec![
+                    ".octon/framework/scaffolding/runtime/example.md".to_string()
+                ],
+                include_contracts: None,
+                include_conformance: None,
+                include_canonicalization: None,
+            },
+        )
+        .expect("fixture package should scaffold");
+
+        let reused_run_id = "validate-proposal-20260331";
+        fs::create_dir_all(runtime_cfg.run_control_root(reused_run_id))
+            .expect("existing control root should be seeded");
+
+        let error = run_validate_proposal_from_octon_dir(
+            &octon_dir,
+            RunValidateProposalOptions {
+                run_id: Some(reused_run_id.to_string()),
+                proposal_path: PathBuf::from(
+                    ".octon/inputs/exploratory/proposals/design/validate-target",
+                ),
+            },
+        )
+        .expect_err("reused explicit run id must fail");
+
+        assert!(error
+            .to_string()
+            .contains("already exists in canonical execution artifacts"));
         fs::remove_dir_all(root).ok();
     }
 

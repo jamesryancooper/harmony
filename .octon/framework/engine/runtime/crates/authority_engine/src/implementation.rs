@@ -5181,16 +5181,29 @@ fn materialize_run_disclosure(
             json!({"metric_id":"intervention-count","label":"Material interventions","value":0,"unit":"count"}),
         ]
     } else {
+        let receipt_count = fs::read_dir(&bound.receipts_root)
+            .ok()
+            .map(|entries| entries.filter_map(Result::ok).count())
+            .unwrap_or(0);
+        let checkpoint_count = fs::read_dir(bound.evidence_root.join("checkpoints"))
+            .ok()
+            .map(|entries| entries.filter_map(Result::ok).count())
+            .unwrap_or(0);
+        let proof_plane_count = fs::read_dir(&bound.assurance_root)
+            .ok()
+            .map(|entries| entries.filter_map(Result::ok).count())
+            .unwrap_or(0);
         vec![
-            json!({"metric_id":"validator-count","label":"Proposal validators executed","value":2,"unit":"count"}),
-            json!({"metric_id":"proof-plane-count","label":"Explicit proof-plane reports emitted by the workflow","value":3,"unit":"count"}),
+            json!({"metric_id":"receipt-count","label":"Retained lifecycle receipts","value":receipt_count,"unit":"count"}),
+            json!({"metric_id":"checkpoint-count","label":"Retained checkpoints","value":checkpoint_count,"unit":"count"}),
+            json!({"metric_id":"proof-plane-count","label":"Run-local proof-plane reports","value":proof_plane_count,"unit":"count"}),
             json!({"metric_id":"intervention-count","label":"Material interventions","value":0,"unit":"count"}),
         ]
     };
     let measurement_summary = if outcome.status == "succeeded" {
         "Run emitted the canonical receipt, checkpoint, proof-plane, and disclosure families."
     } else {
-        "Validate-proposal emitted deterministic validator, proof-plane, and canonical run evidence."
+        "Run emitted fail-closed measurement and disclosure artifacts for a non-success outcome."
     };
     write_yaml(
         &measurement_path,
@@ -7020,6 +7033,65 @@ mod tests {
             err.details["reason_codes"][0].as_str(),
             Some("MISSION_SCENARIO_RESOLUTION_STALE")
         );
+    }
+
+    #[test]
+    fn failed_run_measurement_artifacts_remain_workflow_agnostic() {
+        let cfg = temp_runtime_config();
+        let policy = PolicyEngine::new(cfg.clone());
+        let mut request = minimal_request();
+        request.request_id = "archive-proposal-failure-fixture".to_string();
+        request.action_type = "archive_proposal".to_string();
+        request.target_id = "archive-proposal-fixture".to_string();
+        request.metadata.insert(
+            "workflow_id".to_string(),
+            "archive-proposal".to_string(),
+        );
+
+        let grant = authorize_execution(&cfg, &policy, &request, None)
+            .expect("archive proposal request should authorize");
+        let artifacts_root = cfg.execution_tmp_root.join(&request.request_id);
+        let paths = write_execution_start(&artifacts_root, &request, &grant)
+            .expect("execution start should materialize");
+        let outcome = ExecutionOutcome {
+            status: "failed".to_string(),
+            started_at: "2026-03-31T00:00:00Z".to_string(),
+            completed_at: "2026-03-31T00:01:00Z".to_string(),
+            error: Some("fixture failure".to_string()),
+        };
+        finalize_execution(
+            &paths,
+            &request,
+            &grant,
+            &outcome.started_at,
+            &outcome,
+            &SideEffectSummary::default(),
+        )
+        .expect("finalize execution should emit disclosure");
+
+        let measurement_path = cfg
+            .run_root(&request.request_id)
+            .join("measurements")
+            .join("summary.yml");
+        let measurement: serde_yaml::Value = serde_yaml::from_str(
+            &fs::read_to_string(&measurement_path).expect("read measurement summary"),
+        )
+        .expect("parse measurement summary");
+
+        assert_eq!(
+            measurement["summary"].as_str(),
+            Some("Run emitted fail-closed measurement and disclosure artifacts for a non-success outcome.")
+        );
+        let metric_ids: Vec<&str> = measurement["metrics"]
+            .as_sequence()
+            .expect("metrics should be a sequence")
+            .iter()
+            .filter_map(|metric| metric["metric_id"].as_str())
+            .collect();
+        assert!(metric_ids.contains(&"receipt-count"));
+        assert!(metric_ids.contains(&"checkpoint-count"));
+        assert!(metric_ids.contains(&"proof-plane-count"));
+        assert!(!metric_ids.contains(&"validator-count"));
     }
 
     #[test]
