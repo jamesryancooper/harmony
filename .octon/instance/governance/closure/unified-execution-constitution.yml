@@ -120,6 +120,12 @@ claim_wording:
     replayable, auditable, and proven across structural, functional,
     behavioral, governance, recovery, and maintainability planes for its
     supported live envelope.
+permitted_release_wording: >-
+  Octon is a fully unified execution constitution: run-first,
+  authority-artifactized, disclosure-canonical, support-target-enforced,
+  replayable, auditable, and proven across structural, functional,
+  behavioral, governance, recovery, and maintainability planes for its
+  supported live envelope.
 known_limits:
   - "Current successful disclosure is evidenced by `uec-validate-proposal-20260401-agent-augmented-3`, `uec-evaluate-harness-20260401-agent-augmented-1`, and `uec-audit-workflow-system-20260401-agent-augmented-1` for the bounded supported envelope."
   - "Historical lab-local HarnessCard files remain retained as non-live mirrors under state/evidence/lab/harness-cards."
