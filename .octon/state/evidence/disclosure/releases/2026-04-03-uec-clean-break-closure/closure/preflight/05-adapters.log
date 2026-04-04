@@ -1,0 +1,66 @@
+== 05-adapters ==
+== Unified Execution Constitution Phase 5 Validation ==
+[OK] found .octon/instance/cognition/context/shared/migrations/2026-03-29-unified-execution-constitution-phase5-adapter-support-target-hardening/plan.md
+[OK] found .github/workflows/architecture-conformance.yml
+== Wave 5 Agency And Adapter Hardening Validation ==
+[OK] found .octon/framework/constitution/contracts/adapters/family.yml
+[OK] found .octon/instance/governance/support-targets.yml
+[OK] found .octon/framework/constitution/support-targets.schema.json
+[OK] found .octon/framework/constitution/contracts/adapters/capability-pack-v1.schema.json
+[OK] found .octon/framework/capabilities/packs/registry.yml
+[OK] found .octon/instance/capabilities/runtime/packs/registry.yml
+[OK] constitutional registry activates adapter contract family
+[OK] constitutional registry exposes adapter contract family root
+[OK] constitutional registry exposes host adapter runtime root
+[OK] constitutional registry exposes model adapter runtime root
+[OK] constitutional registry exposes framework capability pack root
+[OK] constitutional registry exposes runtime capability pack root
+[OK] root manifest exposes adapter contract family
+[OK] root manifest exposes host adapter root
+[OK] root manifest exposes model adapter root
+[OK] root manifest exposes framework capability pack root
+[OK] root manifest exposes runtime capability pack root
+[OK] policy config exposes adapter contract family
+[OK] policy config exposes host adapter root
+[OK] policy config exposes model adapter root
+[OK] policy config exposes framework capability pack root
+[OK] policy config exposes runtime capability pack root
+[OK] support-target declarations publish adapter conformance criteria
+[OK] support-target declarations publish host adapter envelopes
+[OK] support-target declarations publish model adapter envelopes
+[OK] repo-shell host adapter is declared as replaceable
+[OK] github control-plane host adapter is non-authoritative
+[OK] CI control-plane adapter is declared
+[OK] Studio control-plane adapter is declared
+[OK] repo-local-governed model adapter is declared as replaceable
+[OK] support-target matrix publishes allowed capability packs
+[OK] support-target schema requires adapter conformance criteria
+[OK] support-target schema requires host adapter declarations
+[OK] support-target schema requires model adapter declarations
+[OK] support-target schema requires allowed capability packs
+[OK] repo-shell host manifest points to support-target declaration
+[OK] CI manifest declares ci host family
+[OK] Studio manifest declares studio host family
+[OK] repo-local-governed model manifest points to support-target declaration
+[OK] repo-local-governed model manifest declares conformance suites
+[OK] repo-local-governed model manifest declares hard reset posture
+[OK] framework pack registry declares browser pack
+[OK] runtime pack registry keeps api pack unadmitted
+[OK] runtime pack registry keeps browser pack unadmitted
+[OK] charter states one accountable orchestrator rule
+[OK] charter states adapters are replaceable and non-authoritative
+[OK] normative precedence includes adapter contract family
+[OK] normative precedence includes runtime adapter roots
+[OK] normative precedence includes runtime capability pack root
+[OK] agency manifest defaults to orchestrator
+[OK] agency manifest encodes single-orchestrator execution model
+[OK] instance ingress points to orchestrator execution contract
+Validation summary: errors=0
+[OK] architecture conformance workflow enforces Phase 5 validator
+[OK] architecture workflow triggers on framework capability pack changes
+[OK] architecture workflow triggers on runtime capability pack admission changes
+[OK] kernel unadmitted api pack denies execution
+[OK] kernel invalid model adapter manifest denies execution
+[OK] kernel undeclared host adapter still denies execution
+[ERROR] kernel generic workflow fixture still writes execution artifacts
+Validation summary: errors=1

@@ -1,0 +1,109 @@
+== Unified Execution Richness Validation ==
+[OK] found .octon/framework/constitution/contracts/objective/run-contract-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/objective/stage-attempt-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/runtime/retry-record-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/runtime/contamination-record-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/runtime/trace-pointers-v1.schema.json
+[OK] found .octon/framework/observability/runtime/contracts/measurement-record-v1.schema.json
+[OK] found .octon/framework/observability/runtime/contracts/intervention-record-v1.schema.json
+[OK] found .octon/framework/observability/runtime/contracts/drift-incident-v1.schema.json
+[OK] found .octon/framework/assurance/behavioral/suites/held-out-supported-envelope.yml
+[OK] found .octon/framework/assurance/governance/anti-overfitting-policy.yml
+[OK] found .octon/instance/governance/contracts/agency-surface-classification-ledger.yml
+[OK] found .octon/state/evidence/lab/scenarios/scn-held-out-supported-20260402/scenario-proof.yml
+[OK] found .octon/state/evidence/lab/adversarial/adv-supported-envelope-20260402/adversarial-report.yml
+[OK] found .octon/state/evidence/validation/publication/build-to-delete/2026-04-02/drift-runtime-disclosure-mismatch.yml
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/run-contract.yml
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/stage-attempts/initial.yml
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/rollback-posture.yml
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/retry-records/baseline.yml
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/contamination/current.yml
+[OK] found .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3/measurements/summary.yml
+[OK] found .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3/measurements/records/runtime-lifecycle.yml
+[OK] found .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3/interventions/log.yml
+[OK] found .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3/interventions/records/no-human-intervention.yml
+[OK] found .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3/evidence-classification.yml
+[OK] uec-validate-proposal-20260401-agent-augmented-3 run contract declares mission_mode
+[OK] uec-validate-proposal-20260401-agent-augmented-3 run contract declares objective_summary
+[OK] uec-validate-proposal-20260401-agent-augmented-3 run contract declares done_when
+[OK] uec-validate-proposal-20260401-agent-augmented-3 run contract declares acceptance criteria
+[OK] uec-validate-proposal-20260401-agent-augmented-3 run contract declares protected zones
+[OK] uec-validate-proposal-20260401-agent-augmented-3 run contract declares start/stop conditions
+[OK] uec-validate-proposal-20260401-agent-augmented-3 run contract declares retry/disclosure versioning fields
+[OK] uec-validate-proposal-20260401-agent-augmented-3 stage attempt declares entry/exit criteria
+[OK] uec-validate-proposal-20260401-agent-augmented-3 stage attempt declares allowed capabilities and zones
+[OK] uec-validate-proposal-20260401-agent-augmented-3 stage attempt declares retry and issuance metadata
+[OK] uec-validate-proposal-20260401-agent-augmented-3 rollback posture binds retry/contamination state
+[OK] uec-validate-proposal-20260401-agent-augmented-3 retry record is typed
+[OK] uec-validate-proposal-20260401-agent-augmented-3 contamination record is typed
+[OK] uec-validate-proposal-20260401-agent-augmented-3 measurement summary cites detailed records
+[OK] uec-validate-proposal-20260401-agent-augmented-3 measurement record exists
+[OK] uec-validate-proposal-20260401-agent-augmented-3 intervention log acknowledges detailed records
+[OK] uec-validate-proposal-20260401-agent-augmented-3 intervention record exists
+[ERROR] uec-validate-proposal-20260401-agent-augmented-3 evidence classification covers retry record
+[ERROR] uec-validate-proposal-20260401-agent-augmented-3 evidence classification covers contamination record
+[ERROR] uec-validate-proposal-20260401-agent-augmented-3 evidence classification covers measurement record
+[ERROR] uec-validate-proposal-20260401-agent-augmented-3 evidence classification covers intervention record
+[OK] found .octon/state/control/execution/runs/uec-evaluate-harness-20260401-agent-augmented-1/run-contract.yml
+[OK] found .octon/state/control/execution/runs/uec-evaluate-harness-20260401-agent-augmented-1/stage-attempts/initial.yml
+[OK] found .octon/state/control/execution/runs/uec-evaluate-harness-20260401-agent-augmented-1/rollback-posture.yml
+[OK] found .octon/state/control/execution/runs/uec-evaluate-harness-20260401-agent-augmented-1/retry-records/baseline.yml
+[OK] found .octon/state/control/execution/runs/uec-evaluate-harness-20260401-agent-augmented-1/contamination/current.yml
+[OK] found .octon/state/evidence/runs/uec-evaluate-harness-20260401-agent-augmented-1/measurements/summary.yml
+[OK] found .octon/state/evidence/runs/uec-evaluate-harness-20260401-agent-augmented-1/measurements/records/runtime-lifecycle.yml
+[OK] found .octon/state/evidence/runs/uec-evaluate-harness-20260401-agent-augmented-1/interventions/log.yml
+[OK] found .octon/state/evidence/runs/uec-evaluate-harness-20260401-agent-augmented-1/interventions/records/no-human-intervention.yml
+[OK] found .octon/state/evidence/runs/uec-evaluate-harness-20260401-agent-augmented-1/evidence-classification.yml
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 run contract declares mission_mode
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 run contract declares objective_summary
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 run contract declares done_when
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 run contract declares acceptance criteria
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 run contract declares protected zones
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 run contract declares start/stop conditions
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 run contract declares retry/disclosure versioning fields
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 stage attempt declares entry/exit criteria
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 stage attempt declares allowed capabilities and zones
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 stage attempt declares retry and issuance metadata
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 rollback posture binds retry/contamination state
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 retry record is typed
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 contamination record is typed
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 measurement summary cites detailed records
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 measurement record exists
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 intervention log acknowledges detailed records
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 intervention record exists
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 evidence classification covers retry record
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 evidence classification covers contamination record
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 evidence classification covers measurement record
+[OK] uec-evaluate-harness-20260401-agent-augmented-1 evidence classification covers intervention record
+[OK] found .octon/state/control/execution/runs/uec-audit-workflow-system-20260401-agent-augmented-1/run-contract.yml
+[OK] found .octon/state/control/execution/runs/uec-audit-workflow-system-20260401-agent-augmented-1/stage-attempts/initial.yml
+[OK] found .octon/state/control/execution/runs/uec-audit-workflow-system-20260401-agent-augmented-1/rollback-posture.yml
+[OK] found .octon/state/control/execution/runs/uec-audit-workflow-system-20260401-agent-augmented-1/retry-records/baseline.yml
+[OK] found .octon/state/control/execution/runs/uec-audit-workflow-system-20260401-agent-augmented-1/contamination/current.yml
+[OK] found .octon/state/evidence/runs/uec-audit-workflow-system-20260401-agent-augmented-1/measurements/summary.yml
+[OK] found .octon/state/evidence/runs/uec-audit-workflow-system-20260401-agent-augmented-1/measurements/records/runtime-lifecycle.yml
+[OK] found .octon/state/evidence/runs/uec-audit-workflow-system-20260401-agent-augmented-1/interventions/log.yml
+[OK] found .octon/state/evidence/runs/uec-audit-workflow-system-20260401-agent-augmented-1/interventions/records/no-human-intervention.yml
+[OK] found .octon/state/evidence/runs/uec-audit-workflow-system-20260401-agent-augmented-1/evidence-classification.yml
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 run contract declares mission_mode
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 run contract declares objective_summary
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 run contract declares done_when
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 run contract declares acceptance criteria
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 run contract declares protected zones
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 run contract declares start/stop conditions
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 run contract declares retry/disclosure versioning fields
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 stage attempt declares entry/exit criteria
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 stage attempt declares allowed capabilities and zones
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 stage attempt declares retry and issuance metadata
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 rollback posture binds retry/contamination state
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 retry record is typed
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 contamination record is typed
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 measurement summary cites detailed records
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 measurement record exists
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 intervention log acknowledges detailed records
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 intervention record exists
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 evidence classification covers retry record
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 evidence classification covers contamination record
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 evidence classification covers measurement record
+[OK] uec-audit-workflow-system-20260401-agent-augmented-1 evidence classification covers intervention record
+Validation summary: errors=4

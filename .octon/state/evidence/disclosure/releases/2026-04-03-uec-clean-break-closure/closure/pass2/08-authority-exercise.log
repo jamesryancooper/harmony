@@ -1,0 +1,19 @@
+== Authority Governance Exercise Validation ==
+[OK] found .octon/state/control/execution/approvals/requests/uec-safe-stage-approval-exercise-20260402.yml
+[OK] found .octon/state/control/execution/approvals/grants/grant-uec-safe-stage-approval-exercise-20260402.yml
+[OK] found .octon/state/evidence/disclosure/runs/uec-safe-stage-approval-exercise-20260402/run-card.yml
+[OK] found .octon/state/evidence/control/execution/authority-decision-uec-safe-stage-approval-exercise-20260402.yml
+[OK] approval exercise uses agent-augmented request
+[OK] approval exercise grant is active
+[OK] approval exercise decision is ALLOW
+[OK] found .octon/state/control/execution/approvals/requests/uec-safe-stage-lease-revocation-exercise-20260402.yml
+[OK] found .octon/state/control/execution/approvals/grants/grant-uec-safe-stage-lease-revocation-exercise-20260402.yml
+[OK] found .octon/state/control/execution/exceptions/leases.yml
+[OK] found .octon/state/control/execution/revocations/grants.yml
+[OK] found .octon/state/evidence/disclosure/runs/uec-safe-stage-lease-revocation-exercise-20260402/run-card.yml
+[OK] found .octon/state/evidence/control/execution/authority-decision-uec-safe-stage-lease-revocation-exercise-20260402.yml
+[OK] lease exercise retains bounded exception lease
+[OK] revocation exercise retains active revocation
+[OK] revocation exercise decision is DENY
+[OK] revocation exercise decision records lease and revocation refs
+Validation summary: errors=0

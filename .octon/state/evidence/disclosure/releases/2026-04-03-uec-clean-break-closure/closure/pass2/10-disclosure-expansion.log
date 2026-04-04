@@ -1,0 +1,78 @@
+== Assurance, Lab, And Disclosure Expansion Validation ==
+[OK] found .octon/framework/constitution/contracts/assurance/family.yml
+[OK] found .octon/framework/constitution/contracts/disclosure/family.yml
+[OK] found .octon/instance/cognition/context/shared/migrations/2026-03-30-unified-execution-constitution-atomic-cutover/plan.md
+[OK] found .octon/instance/cognition/context/shared/migrations/2026-03-29-unified-execution-constitution-phase4-proof-evaluation-lab-expansion/plan.md
+[OK] found .octon/instance/cognition/context/shared/migrations/2026-03-30-unified-execution-constitution-atomic-cutover/plan.md
+[OK] found .octon/framework/lab/governance/catalog.yml
+[OK] found .octon/framework/assurance/evaluators/review-routing.yml
+[OK] found .octon/framework/lab/runtime/_ops/scripts/write-harness-card.sh
+[OK] found .octon/framework/assurance/evaluators/runtime/_ops/scripts/write-evaluator-review.sh
+[OK] found .octon/state/evidence/disclosure/runs/run-wave3-runtime-bridge-20260327/run-card.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/behavioral.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/structural.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/governance.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/maintainability.yml
+[OK] found .octon/state/evidence/disclosure/releases/archive-wave4-assurance-disclosure-20260327/harness-card.yml
+[OK] found .octon/state/evidence/lab/scenarios/scn-wave4-assurance-disclosure-20260327/scenario-proof.yml
+[OK] found .octon/state/evidence/disclosure/releases/archive-wave4-benchmark-disclosure-20260327/harness-card.yml
+[OK] found .octon/state/evidence/lab/scenarios/scn-wave4-benchmark-disclosure-20260327/scenario-proof.yml
+[OK] found .octon/state/evidence/lab/benchmarks/bmk-wave4-disclosure-parity-20260327/summary.yml
+[OK] found .octon/state/evidence/lab/evaluator-reviews/evr-wave4-benchmark-disclosure-20260327.yml
+[OK] found .octon/state/evidence/lab
+[OK] found .octon/state/evidence/disclosure
+[OK] found .octon/instance/governance/disclosure
+[OK] constitutional registry activates assurance contract family
+[OK] constitutional registry activates disclosure contract family
+[OK] constitutional registry exposes assurance contract family root
+[OK] constitutional registry exposes disclosure contract family root
+[OK] assurance family points to the live atomic selector
+[OK] assurance family preserves the Phase 4 receipt as lineage
+[OK] disclosure family points to the disclosure receipt
+[OK] evidence obligations include retained lab evidence root
+[OK] RunCard disclosure obligation is active
+[OK] HarnessCard disclosure obligation is active
+[OK] behavioral evidence gate obligation is active
+[OK] fail-closed rules gate missing behavioral/disclosure evidence
+[OK] root manifest exposes assurance contract family
+[OK] root manifest exposes disclosure contract family
+[OK] root manifest exposes lab framework root
+[OK] root manifest exposes observability framework root
+[OK] root manifest exposes retained lab evidence root
+[OK] policy config exposes assurance contract family
+[OK] policy config exposes disclosure contract family
+[OK] policy config exposes retained lab evidence root
+[OK] state evidence README documents lab evidence
+[OK] state evidence README documents canonical disclosure evidence
+[OK] run evidence README documents assurance root
+[OK] run evidence README documents canonical run disclosure root
+[OK] write-run script generates RunCards
+[OK] write-run script expands retained run evidence with proof and disclosure families
+[OK] write-run script writes run continuity handoff
+[OK] lab catalog includes a benchmark claim
+[OK] evaluator routing declares approved review paths
+[OK] RunCard stays subordinate to support-target authority
+[OK] RunCard records host adapter provenance
+[OK] RunCard records model adapter provenance
+[OK] RunCard records adapter conformance criteria
+[OK] RunCard cites canonical authority decision evidence
+[OK] RunCard cites canonical authority grant bundle evidence
+[OK] RunCard references retained structural proof
+[OK] RunCard references retained governance proof
+[OK] RunCard references retained behavioral proof
+[OK] RunCard references retained maintainability proof
+[OK] behavioral proof references retained replay evidence
+[OK] HarnessCard cites support-target authority
+[OK] HarnessCard records model support tier
+[OK] HarnessCard records workload support tier
+[OK] HarnessCard records host adapter provenance
+[OK] HarnessCard records model adapter provenance
+[OK] HarnessCard records adapter conformance criteria
+[OK] HarnessCard references retained lab scenario proof
+[OK] benchmark HarnessCard records benchmark claim kind
+[OK] benchmark HarnessCard records host adapter provenance
+[OK] benchmark HarnessCard records model adapter provenance
+[OK] benchmark HarnessCard references retained evaluator review
+[OK] benchmark evaluator review is approved
+[OK] benchmark measurement summary records proof coverage metric
+Validation summary: errors=0

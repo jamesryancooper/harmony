@@ -1,0 +1,51 @@
+[OK] found .octon/instance/governance/closure/uec-packet-certification-runs.yml
+[OK] found .octon/framework/constitution/contracts/runtime/run-event-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/runtime/run-event-ledger-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/runtime/checkpoint-v2.schema.json
+[OK] found .octon/framework/constitution/contracts/runtime/state-reconstruction-v1.md
+[OK] found .octon/framework/constitution/contracts/retention/evidence-retention-contract-v1.schema.json
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/events.ndjson
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/events.manifest.yml
+[OK] uec-validate-proposal-20260401-agent-augmented-3 event ledger parses as NDJSON
+[OK] uec-validate-proposal-20260401-agent-augmented-3 ledger includes run-created
+[OK] uec-validate-proposal-20260401-agent-augmented-3 ledger includes stage-started
+[OK] uec-validate-proposal-20260401-agent-augmented-3 ledger includes checkpoint-created
+[OK] uec-validate-proposal-20260401-agent-augmented-3 ledger includes disclosure-generated
+[OK] uec-validate-proposal-20260401-agent-augmented-3 ledger includes run-closed
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/events.ndjson
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/events.manifest.yml
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 event ledger parses as NDJSON
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 ledger includes run-created
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 ledger includes stage-started
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 ledger includes checkpoint-created
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 ledger includes disclosure-generated
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 ledger includes run-closed
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-approval-exercise-20260402/events.ndjson
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-approval-exercise-20260402/events.manifest.yml
+[OK] uec-safe-stage-approval-exercise-20260402 event ledger parses as NDJSON
+[OK] uec-safe-stage-approval-exercise-20260402 ledger includes run-created
+[OK] uec-safe-stage-approval-exercise-20260402 ledger includes stage-started
+[OK] uec-safe-stage-approval-exercise-20260402 ledger includes checkpoint-created
+[OK] uec-safe-stage-approval-exercise-20260402 ledger includes disclosure-generated
+[OK] uec-safe-stage-approval-exercise-20260402 ledger includes run-closed
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/authority/index.yml
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/authority/decisions/decision.yml
+[OK] found .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/authority/grants/grant-bundle.yml
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/authority/index.yml
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/authority/decisions/decision.yml
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/authority/grants/grant-bundle.yml
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/authority/leases/index.yml
+[OK] found .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/authority/revocations/index.yml
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 has per-run lease bundle
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 has per-run revocation bundle
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 ledger includes lease-issued
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 ledger includes revocation-activated
+[OK] uec-safe-stage-lease-revocation-exercise-20260402 ledger includes authority-denied
+[OK] found .octon/state/evidence/external-index/runs/uec-validate-proposal-20260401-agent-augmented-3.yml
+[OK] uec-validate-proposal-20260401-agent-augmented-3 retains Class C external immutable evidence
+[OK] found .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/interventions/records/manual-review-override.yml
+[OK] uec-safe-stage-approval-exercise-20260402 retains a non-zero intervention log
+[OK] uec-safe-stage-approval-exercise-20260402 measurement summary records non-zero intervention count
+[OK] found .octon/state/evidence/validation/publication/unified-execution-constitution-closure/hidden-repair-detection.yml
+[OK] hidden-repair detection proof passes
+Validation summary: errors=0

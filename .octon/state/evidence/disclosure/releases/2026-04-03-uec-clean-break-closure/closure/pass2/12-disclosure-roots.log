@@ -1,0 +1,21 @@
+== Disclosure Live-Root Validation ==
+[OK] found .octon/framework/constitution/contracts/disclosure/family.yml
+[OK] found .octon/instance/governance/disclosure/README.md
+[OK] found .octon/instance/governance/disclosure/harness-card.yml
+[OK] found .octon/state/evidence/disclosure/releases/2026-03-30-unified-execution-constitution-atomic-cutover/harness-card.yml
+[OK] found .octon/state/evidence/disclosure/releases/2026-03-30-unified-execution-constitution-closure/harness-card.yml
+[OK] disclosure family remains atomic
+[OK] disclosure family uses the March 30 live selector
+[OK] disclosure family keeps governance as the authored HarnessCard source
+[OK] disclosure family keeps retained release disclosure as the live evidence root
+[OK] disclosure family keeps lab HarnessCards historical only
+[OK] disclosure family keeps run disclosure under retained run evidence roots
+[OK] governance disclosure README keeps authored source semantics
+[OK] governance disclosure README keeps release disclosure roots canonical
+[OK] governance disclosure README keeps lab mirrors historical
+[OK] authored HarnessCard keeps the historical mirror note
+[OK] atomic release HarnessCard keeps the historical mirror note
+[OK] closure release HarnessCard keeps the historical mirror note
+[OK] atomic release HarnessCard does not promote lab HarnessCards into live roots
+[OK] closure release HarnessCard does not promote lab HarnessCards into live roots
+Validation summary: errors=0

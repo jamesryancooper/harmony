@@ -1,7 +1,7 @@
 schema_version: "unified-execution-constitution-closure-v1"
 claim_id: "unified-execution-constitution"
 claim_kind: "release"
-claim_status: "provisional"
+claim_status: "complete"
 owner: "Octon governance"
 profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-04-03-uec-clean-break-packet-implementation/plan.md"
 status_matrix_ref: ".octon/instance/governance/closure/unified-execution-constitution-status.yml"
@@ -12,15 +12,13 @@ checklist_refs:
   workstream_execution: ".octon/inputs/exploratory/proposals/.archive/architecture/octon-unified-execution-constitution-proposal-packet/06_CHECKLISTS/WORKSTREAM_EXECUTION_CHECKLIST.md"
   release_promotion: ".octon/inputs/exploratory/proposals/.archive/architecture/octon-unified-execution-constitution-proposal-packet/06_CHECKLISTS/RELEASE_PROMOTION_CHECKLIST.md"
   brownfield_retrofit: ".octon/inputs/exploratory/proposals/.archive/architecture/octon-unified-execution-constitution-proposal-packet/06_CHECKLISTS/BROWNFIELD_RETROFIT_CHECKLIST.md"
-blocking_reason: >-
-  Packet issue register remains open with 14 unresolved items. Closure
-  certification is blocked by missing packet-required certification reruns and
-  the absence of a valid closure certificate.
+blocking_reason: null
 support_target_ref: ".octon/instance/governance/support-targets.yml"
 supported_claim:
   claim_statement: >-
-    Architecturally aligned but not yet closure-certified. Supported only for
-    the declared supported tuple. Experimental outside the declared envelope.
+    Octon is a fully realized unified execution constitution within its
+    declared support-target envelope, as proved by the retained closure
+    evidence bundle.
   model_tier: "MT-B"
   workload_tier: "WT-2"
   language_resource_tier: "LT-REF"
@@ -106,7 +104,12 @@ publication_refs:
   shim_independence: ".octon/state/evidence/validation/publication/unified-execution-constitution-closure/shim-independence.md"
   build_to_delete_receipt: ".octon/state/evidence/validation/publication/unified-execution-constitution-closure/build-to-delete-receipt.md"
   post_cutover_atomic_alignment_remediation: ".octon/state/evidence/validation/publication/unified-execution-constitution-closure/post-cutover-atomic-alignment-remediation.md"
+  hidden_repair_detection: ".octon/state/evidence/validation/publication/unified-execution-constitution-closure/hidden-repair-detection.yml"
   summary: ".octon/state/evidence/validation/publication/unified-execution-constitution-closure/summary.md"
+certification_refs:
+  pass_1: ".octon/state/evidence/disclosure/releases/2026-04-03-uec-clean-break-closure/closure/pass1/summary.yml"
+  pass_2: ".octon/state/evidence/disclosure/releases/2026-04-03-uec-clean-break-closure/closure/pass2/summary.yml"
+  closure_certificate: ".octon/state/evidence/disclosure/releases/2026-04-03-uec-clean-break-closure/closure/closure-certificate.yml"
 claim_wording:
   provisional: >-
     Architecturally aligned but not yet closure-certified. Supported only for
@@ -116,13 +119,13 @@ claim_wording:
     declared support-target envelope, as proved by the retained closure
     evidence bundle.
 permitted_release_wording: >-
-  Architecturally aligned but not yet closure-certified. Supported only for
-  the declared supported tuple. Experimental outside the declared envelope.
+  Octon is a fully realized unified execution constitution within its
+  declared support-target envelope, as proved by the retained closure
+  evidence bundle.
 known_limits:
-  - "Packet issue register remains open; no closure-certified claim is permitted until UEC-003 through UEC-017 are closed and a valid closure certificate exists."
   - "Current successful disclosure is evidenced by `uec-validate-proposal-20260401-agent-augmented-3`, `uec-evaluate-harness-20260401-agent-augmented-1`, and `uec-audit-workflow-system-20260401-agent-augmented-1` for the bounded supported envelope."
   - "Historical lab-local HarnessCard files remain retained as non-live mirrors under state/evidence/lab/harness-cards."
   - "WT-3 remains a retained reduced stage_only envelope rather than part of the proved supported live claim."
   - "MT-A / WT-1, LT-EXT, LOC-MX, studio-control-plane, github-control-plane, and ci-control-plane remain experimental stage_only until retained disclosure proof lands."
   - "MT-C remains experimental and WT-4 remains unsupported and denied by default."
-generated_at: "2026-04-03T00:00:00Z"
+generated_at: "2026-04-03T23:59:00Z"

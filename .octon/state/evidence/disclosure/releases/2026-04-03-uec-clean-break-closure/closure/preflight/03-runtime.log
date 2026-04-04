@@ -1,0 +1,35 @@
+== 03-runtime ==
+== Unified Execution Constitution Phase 3 Validation ==
+[OK] found .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/run-manifest.yml
+[OK] found .octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/run-manifest.yml
+[OK] found .octon/state/control/execution/runs/run-wave3-runtime-bridge-20260327/runtime-state.yml
+[OK] found .octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/runtime-state.yml
+[OK] found .octon/state/continuity/runs/run-wave3-runtime-bridge-20260327/handoff.yml
+[OK] found .octon/state/continuity/runs/run-wave4-benchmark-evaluator-20260327/handoff.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/evidence-classification.yml
+[OK] found .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/evidence-classification.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/replay-pointers.yml
+[OK] found .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/replay-pointers.yml
+[OK] found .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/replay/manifest.yml
+[OK] found .octon/state/evidence/external-index/runs/run-wave4-benchmark-evaluator-20260327.yml
+[OK] found .octon/framework/constitution/contracts/retention/family.yml
+[OK] found .octon/instance/governance/contracts/disclosure-retention.yml
+[OK] Wave 3 runtime-state points at run manifest
+[OK] Wave 4 runtime-state points at run manifest
+[OK] Wave 3 continuity points at replay pointers
+[OK] Wave 4 continuity points at replay pointers
+[OK] Wave 3 continuity points at evidence classification
+[OK] Wave 4 continuity points at evidence classification
+[OK] Retention family defines Class A
+[OK] Retention family defines Class B
+[OK] Retention family defines Class C
+[OK] Boundary-sensitive run class requires external replay index
+[OK] Wave 3 classification records manifest as Class A
+[OK] Wave 3 classification records replay manifest as Class B
+[OK] Wave 4 classification records external replay index as Class C
+[OK] Wave 4 replay pointers cite external index
+[OK] Wave 4 replay manifest requires external immutable payload
+[OK] Wave 4 replay manifest links canonical external index
+[OK] Wave 4 external index retains immutable replay payload
+[OK] Wave 4 external index retains immutable trace payload
+Validation summary: errors=0

@@ -1,5 +1,5 @@
 schema_version: harness-card-v1
-card_id: hc-unified-execution-constitution-clean-break-20260401
+card_id: hc-unified-execution-constitution-clean-break-20260403
 claim_kind: release
 claim_status: complete
 claim_summary: >-
@@ -43,15 +43,6 @@ proof_bundle_refs:
   - .octon/state/evidence/lab/scenarios/scn-held-out-supported-20260402/scenario-proof.yml
   - .octon/state/evidence/lab/adversarial/adv-supported-envelope-20260402/adversarial-report.yml
   - .octon/state/evidence/validation/publication/unified-execution-constitution-closure/hidden-repair-detection.yml
-  - .octon/instance/governance/contracts/agency-surface-classification-ledger.yml
-  - .octon/state/evidence/validation/publication/build-to-delete/2026-04-02/drift-runtime-disclosure-mismatch.yml
-  - .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/drift-review.yml
-  - .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/support-target-review.yml
-  - .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/adapter-review.yml
-  - .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/retirement-review.yml
-  - .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/ablation-deletion-receipt.yml
-  - .octon/instance/governance/adoption/brownfield-retrofit.md
-  - .octon/state/evidence/validation/publication/brownfield/2026-03-31-snake-game-retrofit-walkthrough.md
 known_limits:
   - "Current successful disclosure is evidenced by `uec-validate-proposal-20260401-agent-augmented-3`, `uec-evaluate-harness-20260401-agent-augmented-1`, and `uec-audit-workflow-system-20260401-agent-augmented-1` for the bounded supported envelope."
   - "Historical lab-local HarnessCard files remain retained as non-live mirrors under state/evidence/lab/harness-cards."
