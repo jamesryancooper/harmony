@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.11](https://github.com/jamesryancooper/octon/compare/octon-v0.6.10...octon-v0.6.11) (2026-04-04)
+
+
+### Features
+
+* **runtime:** complete unified execution constitution ([#244](https://github.com/jamesryancooper/octon/issues/244)) ([d11600c](https://github.com/jamesryancooper/octon/commit/d11600cad246aae411a13785bf67dba58911184e))
+
+
+### Bug Fixes
+
+* **uec:** certify clean-break closure ([#248](https://github.com/jamesryancooper/octon/issues/248)) ([acd57da](https://github.com/jamesryancooper/octon/commit/acd57dab38b9e4aba5873d33237c1680c68bea7e))
+
 ## [0.6.10](https://github.com/jamesryancooper/octon/compare/octon-v0.6.9...octon-v0.6.10) (2026-03-31)
 
 
