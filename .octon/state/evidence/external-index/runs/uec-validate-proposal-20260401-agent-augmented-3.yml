@@ -8,17 +8,17 @@ entries:
     artifact_kind: replay-payload
     evidence_class: C
     storage_class: external-immutable
-    content_digest: sha256:16715fb765bebb57b40c1d7ea813c90b469d842e5cf542b539bcd99515b0ecd5
+    content_digest: sha256:0147520361762e15c5d6d086bf90db486997495e6a01ea8c2ece42fff6528038
     locator: immutable://octon/replays/uec-validate-proposal-20260401-agent-augmented-3/bundle.jsonl
     manifest_ref: .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3/replay/manifest.yml
-    recorded_at: "2026-04-04T04:04:23Z"
+    recorded_at: "2026-04-04T11:12:40Z"
   - entry_id: uec-validate-proposal-20260401-agent-augmented-3-trace-payload
     run_id: uec-validate-proposal-20260401-agent-augmented-3
     artifact_kind: trace-payload
     evidence_class: C
     storage_class: external-immutable
-    content_digest: sha256:b7b0674d24cb460dd04436c802b6103afbcb354f31814e0ff4c02881906077fa
+    content_digest: sha256:76064c0fdf500b3abe8d09d70069ad82362fd6519d1e240df9dfbedb76c425e7
     locator: immutable://octon/replays/uec-validate-proposal-20260401-agent-augmented-3/trace.jsonl
     manifest_ref: .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3/replay/manifest.yml
-    recorded_at: "2026-04-04T04:04:23Z"
-updated_at: "2026-04-04T04:04:23Z"
+    recorded_at: "2026-04-04T11:12:40Z"
+updated_at: "2026-04-04T11:12:40Z"

@@ -183,8 +183,11 @@ write_event_ledger() {
       event_id: "evt-003-authority-resolution",
       run_id: $run_id,
       event_type: (if $status == "failed" or $status == "cancelled" then "authority-denied" else "authority-granted" end),
-      subject_ref: $decision_ref,
-      governing_refs: [$decision_ref, ".octon/state/control/execution/runs/\($run_id)/authority/index.yml"],
+      subject_ref: (if $decision_ref != "" then $decision_ref else null end),
+      governing_refs: (
+        [".octon/state/control/execution/runs/\($run_id)/authority/index.yml"]
+        + (if $decision_ref != "" then [$decision_ref] else [] end)
+      ),
       details: "Run-bound authority decision resolved.",
       payload: {runtime_status: $status},
       recorded_at: $recorded_at
@@ -344,19 +347,33 @@ write_event_ledger() {
     }' >> "$events_file"
   printf '\n' >> "$events_file"
 
+  local event_count first_event_id last_event_id
+  event_count="$(
+    jq -Rcs 'split("\n") | map(select(length > 0) | fromjson) | length' "$events_file"
+  )"
+  first_event_id="$(
+    jq -Rcs 'split("\n") | map(select(length > 0) | fromjson) | .[0].event_id' "$events_file"
+  )"
+  last_event_id="$(
+    jq -Rcs 'split("\n") | map(select(length > 0) | fromjson) | .[-1].event_id' "$events_file"
+  )"
+
   jq -n \
     --arg run_id "$run_id" \
     --arg ledger_ref ".octon/state/control/execution/runs/$run_id/events.ndjson" \
     --arg schema_ref ".octon/framework/constitution/contracts/runtime/run-event-v1.schema.json" \
+    --arg first_event_id "$first_event_id" \
+    --arg last_event_id "$last_event_id" \
+    --argjson event_count "$event_count" \
     --arg updated_at "$updated_at" '
       {
         schema_version: "run-event-ledger-v1",
         run_id: $run_id,
         ledger_ref: $ledger_ref,
         event_schema_ref: $schema_ref,
-        event_count: 12,
-        first_event_id: "evt-001-run-created",
-        last_event_id: "evt-012-run-closed",
+        event_count: $event_count,
+        first_event_id: $first_event_id,
+        last_event_id: $last_event_id,
         governing_event_refs: {
           runtime_state_ref: "evt-012-run-closed",
           rollback_posture_ref: "evt-012-run-closed",
