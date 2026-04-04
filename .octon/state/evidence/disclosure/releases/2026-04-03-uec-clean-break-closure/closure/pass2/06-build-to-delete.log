@@ -1,0 +1,51 @@
+== Unified Execution Constitution Phase 7 Validation ==
+[OK] found .octon/instance/cognition/context/shared/migrations/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization/plan.md
+[OK] found .octon/instance/cognition/decisions/083-unified-execution-constitution-phase7-build-to-delete-institutionalization.md
+[OK] found .octon/state/evidence/migration/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization
+[OK] found .octon/state/evidence/migration/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization/bundle.yml
+[OK] found .octon/state/evidence/migration/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization/evidence.md
+[OK] found .octon/state/evidence/migration/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization/validation.md
+[OK] found .octon/state/evidence/migration/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization/commands.md
+[OK] found .octon/state/evidence/migration/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization/inventory.md
+[OK] found .github/workflows/architecture-conformance.yml
+[OK] found .octon/instance/governance/contracts/README.md
+[OK] found .octon/instance/governance/contracts/retirement-policy.yml
+[OK] found .octon/instance/governance/contracts/retirement-registry.yml
+[OK] found .octon/instance/governance/contracts/drift-review.yml
+[OK] found .octon/instance/governance/contracts/support-target-review.yml
+[OK] found .octon/instance/governance/contracts/adapter-review.yml
+[OK] found .octon/instance/governance/contracts/retirement-review.yml
+[OK] found .octon/instance/governance/contracts/ablation-deletion-workflow.yml
+[OK] found .octon/instance/governance/contracts/closeout-reviews.yml
+[OK] found .octon/state/evidence/validation/publication/build-to-delete/2026-03-30
+[OK] found .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/drift-review.yml
+[OK] found .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/support-target-review.yml
+[OK] found .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/adapter-review.yml
+[OK] found .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/retirement-review.yml
+[OK] found .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/ablation-deletion-receipt.yml
+[OK] found .octon/framework/assurance/runtime/_ops/scripts/validate-phase6-simplification-deletion.sh
+[OK] found .octon/framework/assurance/governance/_ops/scripts/assert-unified-execution-closure.sh
+[OK] governance contracts README publishes retirement registry
+[OK] governance contracts README publishes ablation workflow
+[OK] architecture workflow triggers on governance contract changes
+[OK] architecture workflow triggers on publication review evidence changes
+[OK] architecture workflow enforces Phase 7 validator
+[OK] architecture workflow enforces closeout validator
+[OK] retirement policy uses Phase 7 schema
+[OK] retirement registry binds workspace shims to drift review
+[OK] retirement registry ties helper projections to closeout ablation
+[OK] drift review contract publishes review id
+[OK] support-target review contract publishes review id
+[OK] adapter review contract publishes review id
+[OK] retirement review contract publishes review id
+[OK] ablation workflow contract publishes workflow id
+[OK] closeout review set points at build-to-delete packet
+[OK] closeout reviews publish a canonical latest review packet path
+[OK] retirement review receipt approved
+[OK] ablation receipt completed
+[OK] Phase 6 validator still passes under Phase 7 governance
+[OK] architecture conformance workflow remains valid YAML
+[OK] Phase 7 validator script parses
+[OK] closeout validator script parses
+[OK] git diff check is clean
+Validation summary: errors=0

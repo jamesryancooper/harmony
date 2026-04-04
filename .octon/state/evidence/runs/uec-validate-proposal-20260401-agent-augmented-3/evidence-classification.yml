@@ -1,6 +1,6 @@
 schema_version: run-evidence-classification-v1
 run_id: uec-validate-proposal-20260401-agent-augmented-3
-updated_at: 2026-04-02T00:00:00Z
+updated_at: "2026-04-04T11:12:40Z"
 artifacts:
   - artifact_id: run-contract
     artifact_ref: .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/run-contract.yml
@@ -111,5 +111,6 @@ artifacts:
     external_index_ref: .octon/state/evidence/external-index/runs/uec-validate-proposal-20260401-agent-augmented-3.yml
   - artifact_id: external-replay-index
     artifact_ref: .octon/state/evidence/external-index/runs/uec-validate-proposal-20260401-agent-augmented-3.yml
-    evidence_class: B
-    storage_class: git-pointer
+    evidence_class: C
+    storage_class: external-immutable
+    external_index_ref: .octon/state/evidence/external-index/runs/uec-validate-proposal-20260401-agent-augmented-3.yml

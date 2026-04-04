@@ -1,0 +1,67 @@
+== 04-proof-lab ==
+== Phase 4 Proof And Lab Enforcement Validation ==
+[OK] found .octon/framework/constitution/contracts/assurance/family.yml
+[OK] found .github/workflows/ai-review-gate.yml
+[OK] found .github/workflows/architecture-conformance.yml
+[OK] found .octon/framework/assurance/evaluators/adapters/registry.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/functional-suite-execution.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/behavioral-suite-execution.yml
+[OK] found .octon/state/evidence/runs/run-wave3-runtime-bridge-20260327/assurance/recovery-suite-execution.yml
+[OK] found .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/maintainability-suite-execution.yml
+[OK] found .octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml
+[OK] found .octon/framework/assurance/functional/suites
+[OK] found .octon/framework/assurance/behavioral/suites
+[OK] found .octon/framework/assurance/maintainability/suites
+[OK] found .octon/framework/assurance/recovery/suites
+[OK] found .octon/framework/assurance/functional/suites/registry.yml
+[OK] found .octon/framework/assurance/behavioral/suites/registry.yml
+[OK] found .octon/framework/assurance/maintainability/suites/registry.yml
+[OK] found .octon/framework/assurance/recovery/suites/registry.yml
+[OK] found .octon/framework/lab/scenarios
+[OK] found .octon/framework/lab/replay
+[OK] found .octon/framework/lab/shadow
+[OK] found .octon/framework/lab/faults
+[OK] found .octon/framework/lab/scenarios/registry.yml
+[OK] found .octon/framework/lab/replay/registry.yml
+[OK] found .octon/framework/lab/shadow/registry.yml
+[OK] found .octon/framework/lab/faults/registry.yml
+[OK] found .octon/framework/lab/runtime/contracts/lab-scenario-v1.schema.json
+[OK] found .octon/framework/lab/runtime/contracts/replay-bundle-v1.schema.json
+[OK] found .octon/framework/lab/runtime/contracts/shadow-run-manifest-v1.schema.json
+[OK] found .octon/framework/lab/runtime/contracts/fault-injection-plan-v1.schema.json
+[OK] found .octon/framework/lab/runtime/contracts/probe-contract-v1.schema.json
+[OK] found .octon/state/evidence/lab/replays
+[OK] found .octon/state/evidence/lab/shadow-runs
+[OK] found .octon/state/evidence/lab/faults
+[OK] found .octon/state/evidence/lab/scenarios/scn-runtime-proof-supported-20260329/scenario-proof.yml
+[OK] found .octon/state/evidence/lab/replays/rpl-runtime-proof-supported-20260329/replay-bundle.yml
+[OK] found .octon/state/evidence/lab/shadow-runs/shd-runtime-proof-supported-20260329/shadow-run.yml
+[OK] found .octon/state/evidence/lab/faults/flt-runtime-proof-supported-20260329/fault-report.yml
+[OK] structural proof remains blocking
+[OK] governance proof remains blocking
+[OK] functional suites declared
+[OK] behavioral suites declared
+[OK] maintainability suites declared
+[OK] recovery suites declared
+[OK] evaluator adapters declared
+[OK] functional suite declares executable runner
+[OK] behavioral suite declares executable runner
+[OK] recovery suite declares executable runner
+[OK] AI review gate uses generic evaluator adapter runner
+[OK] AI review gate routes through evaluator adapter manifests
+[OK] architecture conformance workflow enforces Phase 4 proof/lab validator
+[OK] architecture conformance workflow triggers on retained run proof changes
+[OK] Wave 3 functional proof cites functional suite
+[OK] Wave 3 functional proof cites executed functional suite
+[OK] Wave 3 behavioral proof cites behavioral suite
+[OK] Wave 3 behavioral proof cites executed behavioral suite
+[OK] Wave 3 behavioral proof cites scenario evidence
+[OK] Wave 3 behavioral proof cites shadow-run evidence
+[OK] Wave 3 recovery proof cites recovery suite
+[OK] Wave 3 recovery proof cites executed recovery suite
+[OK] Wave 3 recovery proof cites fault evidence
+[OK] Wave 4 maintainability proof cites maintainability suite
+[OK] Wave 4 maintainability proof cites executed maintainability suite
+[OK] Wave 4 evaluator review cites OpenAI adapter
+[OK] Wave 4 evaluator review cites Anthropic adapter
+Validation summary: errors=0

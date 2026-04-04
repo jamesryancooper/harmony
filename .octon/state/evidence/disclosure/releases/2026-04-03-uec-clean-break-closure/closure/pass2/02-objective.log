@@ -1,0 +1,97 @@
+== Objective Binding Cutover Validation ==
+[OK] found .octon/framework/constitution/contracts/objective/family.yml
+[OK] found .octon/framework/constitution/contracts/objective/workspace-charter-pair.yml
+[OK] found .octon/framework/constitution/contracts/objective/workspace-charter-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/objective/run-contract-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/objective/stage-attempt-v1.schema.json
+[OK] found .octon/framework/constitution/contracts/registry.yml
+[OK] found .octon/instance/charter/workspace.md
+[OK] found .octon/instance/charter/workspace.yml
+[OK] found .octon/instance/bootstrap/OBJECTIVE.md
+[OK] found .octon/instance/cognition/context/shared/intent.contract.yml
+[OK] found .octon/instance/orchestration/missions/registry.yml
+[OK] found .octon/instance/orchestration/missions/_scaffold/template/mission.yml
+[OK] found .octon/instance/orchestration/missions/mission-autonomy-live-validation/mission.yml
+[OK] found .octon/state/control/execution/runs
+[OK] found .octon/state/control/execution/runs/README.md
+[OK] found .octon/framework/orchestration/runtime/runs/README.md
+[OK] found .octon/framework/orchestration/practices/run-linkage-standards.md
+[OK] found .octon/framework/orchestration/runtime/_ops/scripts/write-run.sh
+[OK] found .octon/octon.yml
+[OK] found .octon/framework/engine/runtime/config/policy-interface.yml
+[OK] found .octon/instance/cognition/context/shared/migrations/2026-04-03-uec-clean-break-packet-implementation/plan.md
+[OK] constitutional contract registry activates objective family
+[OK] constitutional contract registry records canonical run-control root
+[OK] objective family schema version is correct
+[OK] objective family records release_state
+[OK] objective family records atomic change profile
+[OK] objective family points to the packet implementation selector
+[OK] objective family preserves the Phase 2 receipt as lineage
+[OK] objective family binds the workspace-charter machine schema
+[OK] objective family binds the run control root
+[OK] objective family defines stage-attempt placement
+[OK] objective family no longer carries mission-only execution shims
+[OK] workspace charter pair narrative ref is canonical
+[OK] workspace charter pair machine ref is canonical
+[OK] workspace charter pair points to workspace-charter-v1
+[OK] workspace charter pair records bootstrap objective shim as historical
+[OK] workspace charter pair records intent shim as historical
+[OK] workspace charter pair points to the run control root
+[OK] workspace charter narrative declares workspace-charter layer
+[OK] workspace charter narrative declares narrative constitutional role
+[OK] workspace charter narrative points to workspace-charter pair contract
+[OK] workspace charter narrative records change_profile
+[OK] workspace charter narrative points to the packet implementation receipt
+[OK] workspace charter machine uses workspace-charter-v1
+[OK] workspace charter machine declares a canonical workspace charter id
+[OK] workspace charter machine no longer uses top-level intent semantics
+[OK] workspace charter machine declares workspace-charter layer
+[OK] workspace charter machine declares machine constitutional role
+[OK] workspace charter machine points to workspace-charter pair contract
+[OK] workspace charter machine records atomic change profile
+[OK] workspace charter machine points to the packet implementation receipt
+[OK] workspace charter machine binds the run control root
+[OK] objective brief declares workspace-charter layer
+[OK] objective brief declares narrative constitutional role
+[OK] objective brief points to workspace-charter pair contract
+[OK] objective brief records release_state
+[OK] bootstrap objective brief is marked as compatibility shim
+[OK] bootstrap objective brief points to canonical workspace charter
+[OK] intent contract is marked as compatibility shim
+[OK] intent contract points to canonical workspace machine charter
+[OK] mission registry records canonical run control root
+[OK] mission registry records run-contract execution unit
+[OK] mission registry records continuity-container role
+[OK] mission registry points to the Wave 6 receipt
+[OK] mission registry no longer carries mission-only execution state
+[OK] .octon/instance/orchestration/missions/_scaffold/template/mission.yml binds run-contract execution unit
+[OK] .octon/instance/orchestration/missions/_scaffold/template/mission.yml points to run control root
+[OK] .octon/instance/orchestration/missions/_scaffold/template/mission.yml records continuity-container role
+[OK] .octon/instance/orchestration/missions/_scaffold/template/mission.yml no longer carries transitional execution metadata
+[OK] .octon/instance/orchestration/missions/mission-autonomy-live-validation/mission.yml binds run-contract execution unit
+[OK] .octon/instance/orchestration/missions/mission-autonomy-live-validation/mission.yml points to run control root
+[OK] .octon/instance/orchestration/missions/mission-autonomy-live-validation/mission.yml records continuity-container role
+[OK] .octon/instance/orchestration/missions/mission-autonomy-live-validation/mission.yml no longer carries transitional execution metadata
+[OK] root manifest exposes objective contract family runtime input
+[OK] root manifest exposes canonical workspace charter narrative runtime input
+[OK] root manifest exposes canonical workspace charter machine runtime input
+[OK] root manifest excludes bootstrap objective shim from live runtime inputs
+[OK] root manifest excludes intent shim from live runtime inputs
+[OK] root manifest exposes run control root runtime input
+[OK] policy interface config exposes objective contract family
+[OK] policy interface config exposes canonical workspace charter narrative
+[OK] policy interface config exposes canonical workspace charter machine
+[OK] policy interface config excludes bootstrap objective shim from the live path
+[OK] policy interface config excludes intent shim from the live path
+[OK] policy interface config exposes run control root
+[OK] run control README documents run-contract.yml
+[OK] run control README documents stage-attempts placement
+[OK] run projection README demotes framework runs to projection status
+[OK] run projection README references canonical run contract
+[OK] run linkage guide requires run_contract_path linkage
+[OK] write-run script seeds canonical run-contract roots
+[OK] super-root README references constitutional objective family
+[OK] bootstrap START references canonical run-contract path
+[OK] mission README describes mission as continuity container
+[OK] mission-scoped autonomy principle references run control root
+Validation summary: errors=0

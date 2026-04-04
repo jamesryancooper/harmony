@@ -1,0 +1,44 @@
+== Execution Governance Validation ==
+[OK] found .octon/octon.yml
+[OK] found .octon/framework/engine/runtime/spec/execution-authorization-v1.md
+[OK] found .octon/framework/constitution/contracts/authority/README.md
+[OK] found .octon/framework/engine/runtime/spec/execution-request-v1.schema.json
+[OK] found .octon/framework/engine/runtime/spec/execution-grant-v1.schema.json
+[OK] found .octon/framework/engine/runtime/spec/execution-receipt-v1.schema.json
+[OK] found .octon/framework/engine/runtime/spec/executor-profile-v1.schema.json
+[OK] found .octon/instance/governance/support-targets.yml
+[OK] found .octon/framework/engine/_ops/scripts/write-authority-control-receipt.sh
+[OK] found .octon/framework/engine/_ops/scripts/materialize-authority-approval.sh
+[OK] found .octon/framework/engine/_ops/scripts/project-github-control-approval.sh
+[OK] found .octon/framework/assurance/governance/_ops/scripts/evaluate-pr-autonomy-policy.sh
+[OK] found .octon/framework/engine/_ops/scripts/record-authority-exception-lease.sh
+[OK] found .octon/framework/engine/_ops/scripts/record-authority-revocation.sh
+[OK] found .octon/framework/assurance/runtime/_ops/tests/test-authority-control-tooling.sh
+[OK] found .octon/framework/assurance/runtime/_ops/scripts/assert-protected-execution-posture.sh
+[OK] legacy flat exception-leases.yml is deleted
+[OK] live consequential request paths no longer default to human-only workflow mode
+[OK] root manifest declares hard-enforce default policy mode
+[OK] root manifest declares protected workflows
+[OK] live workflow.yml files use workflow-contract-v2 only
+[OK] workflow contracts declare stage authorization blocks
+[OK] protected GitHub workflows call the execution posture guard
+[OK] GitHub autonomy workflows bind the canonical PR-autonomy classifier
+[OK] GitHub control-plane workflows dual-write into canonical approval artifacts
+[OK] protected GitHub workflows do not depend on label-based approval or waiver paths
+[OK] critical GitHub workflows do not project or sync autonomy/ai-gate labels
+[OK] pr-auto-merge does not use autonomy labels as merge authority
+[OK] canonical approval request artifacts are populated
+[OK] canonical approval grant artifacts are populated
+[OK] canonical exception lease artifacts are populated
+[OK] canonical revocation artifacts are populated
+[OK] protected GitHub workflows derive effective policy mode instead of hardcoding it
+[OK] kernel generic workflow test verifies emitted execution artifacts
+[OK] kernel create-design workflow test verifies emitted execution artifacts
+[OK] kernel static proposal helper tests verify emitted execution artifacts
+[OK] kernel static proposal create failure writes execution artifacts
+[OK] kernel static proposal audit failure writes execution artifacts
+[OK] kernel undeclared host adapter denies execution
+[OK] kernel unadmitted api pack denies execution
+[OK] kernel invalid model adapter manifest denies execution
+[OK] authority control tooling writes canonical artifacts
+Validation summary: errors=0

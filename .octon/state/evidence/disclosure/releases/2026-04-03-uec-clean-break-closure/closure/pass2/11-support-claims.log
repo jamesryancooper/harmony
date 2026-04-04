@@ -1,0 +1,91 @@
+== Support-Target Live-Claim Validation ==
+[OK] found .octon/instance/governance/support-targets.yml
+[OK] found .octon/instance/governance/disclosure/harness-card.yml
+[OK] found .octon/state/evidence/disclosure/releases/2026-03-31-unified-execution-constitution-clean-break/harness-card.yml
+[OK] found .octon/instance/governance/closure/unified-execution-constitution.yml
+[OK] authored HarnessCard wording matches closure manifest
+[OK] closure supported claim statement matches permitted release wording
+[OK] current release HarnessCard wording matches authored claim
+[OK] current release tuple matches authored tuple
+[OK] current release adapter tuple matches authored tuple
+[OK] closure manifest known limits match authored HarnessCard
+[OK] current release known limits match authored HarnessCard
+[OK] support matrix has exactly one supported tuple
+[OK] supported tuple remains the proved repo-local consequential envelope
+[OK] reduced tuple remains retained stage_only evidence
+[OK] MT-A / WT-1 tuple is demoted to experimental
+[OK] extended-context tuple is demoted to experimental
+[OK] secondary-locale tuple is demoted to experimental
+[OK] experimental model tuple remains staged
+[OK] unsupported tuple remains denied
+[OK] repo-shell remains the only supported host adapter
+[OK] studio host is demoted to experimental
+[OK] GitHub host is demoted to experimental
+[OK] CI host is demoted to experimental
+[OK] repo-local-governed remains the supported model adapter
+[OK] experimental external model remains staged
+[OK] support matrix has exactly one supported host adapter
+[OK] repo-shell is the unique supported host adapter
+[OK] support matrix has exactly one supported model adapter
+[OK] repo-local-governed is the unique supported model adapter
+[OK] repo-shell allowed model tiers are narrowed to proved live support
+[OK] repo-shell allowed workload tiers are narrowed to proved live support
+[OK] repo-shell allowed language-resource tiers are narrowed to proved live support
+[OK] repo-shell allowed locale tiers are narrowed to proved live support
+[OK] repo-local-governed allowed model tiers are narrowed to proved live support
+[OK] repo-local-governed allowed workload tiers are narrowed to proved live support
+[OK] repo-local-governed allowed language-resource tiers are narrowed to proved live support
+[OK] repo-local-governed allowed locale tiers are narrowed to proved live support
+[OK] closure manifest freezes the proved supported tuple
+[OK] closure manifest demotes MT-A / WT-1
+[OK] closure manifest demotes Studio host
+[OK] closure manifest demotes GitHub host
+[OK] closure manifest demotes CI host
+[OK] closure manifest preserves reduced WT-3 proof
+[OK] closure manifest demotes extended-context support
+[OK] closure manifest demotes secondary-locale support
+[OK] closure manifest preserves staged experimental model support
+[OK] closure manifest preserves unsupported deny surface
+[OK] authored HarnessCard proof bundle resolves: .octon/instance/governance/closure/unified-execution-constitution.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/instance/governance/closure/unified-execution-constitution-status.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-validate-proposal-20260401-agent-augmented-3/run-card.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-evaluate-harness-20260401-agent-augmented-1/run-card.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-audit-workflow-system-20260401-agent-augmented-1/run-card.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-safe-stage-approval-exercise-20260402/run-card.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-safe-stage-lease-revocation-exercise-20260402/run-card.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/framework/assurance/governance/anti-overfitting-policy.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/framework/assurance/behavioral/suites/held-out-supported-envelope.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/lab/scenarios/scn-held-out-supported-20260402/scenario-proof.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/lab/adversarial/adv-supported-envelope-20260402/adversarial-report.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/instance/governance/contracts/agency-surface-classification-ledger.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-04-02/drift-runtime-disclosure-mismatch.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/instance/governance/contracts/closeout-reviews.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/drift-review.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/support-target-review.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/adapter-review.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/retirement-review.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/ablation-deletion-receipt.yml
+[OK] authored HarnessCard proof bundle resolves: .octon/instance/governance/adoption/brownfield-retrofit.md
+[OK] authored HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/brownfield/2026-03-31-snake-game-retrofit-walkthrough.md
+[OK] current release HarnessCard proof bundle resolves: .octon/instance/governance/disclosure/harness-card.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/instance/governance/closure/unified-execution-constitution.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/instance/governance/closure/unified-execution-constitution-status.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-validate-proposal-20260401-agent-augmented-3/run-card.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-evaluate-harness-20260401-agent-augmented-1/run-card.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-audit-workflow-system-20260401-agent-augmented-1/run-card.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-safe-stage-approval-exercise-20260402/run-card.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/disclosure/runs/uec-safe-stage-lease-revocation-exercise-20260402/run-card.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/framework/assurance/governance/anti-overfitting-policy.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/framework/assurance/behavioral/suites/held-out-supported-envelope.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/lab/scenarios/scn-held-out-supported-20260402/scenario-proof.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/lab/adversarial/adv-supported-envelope-20260402/adversarial-report.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/instance/governance/contracts/agency-surface-classification-ledger.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-04-02/drift-runtime-disclosure-mismatch.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/drift-review.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/support-target-review.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/adapter-review.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/retirement-review.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/build-to-delete/2026-03-30/ablation-deletion-receipt.yml
+[OK] current release HarnessCard proof bundle resolves: .octon/instance/governance/adoption/brownfield-retrofit.md
+[OK] current release HarnessCard proof bundle resolves: .octon/state/evidence/validation/publication/brownfield/2026-03-31-snake-game-retrofit-walkthrough.md
+Validation summary: errors=0
