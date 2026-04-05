@@ -20,6 +20,15 @@ require_ref() {
   [[ -n "$ref" && "$ref" != "null" ]] || { fail "$label missing"; return; }
   [[ -e "$ROOT_DIR/$ref" ]] && pass "$label resolves" || fail "$label missing target $ref"
 }
+contains_text() {
+  local pattern="$1"
+  local path="$2"
+  if command -v rg >/dev/null 2>&1; then
+    rg -q "$pattern" "$path"
+  else
+    grep -q "$pattern" "$path"
+  fi
+}
 
 main() {
   echo "== Capability Truthfulness Validation =="
@@ -40,12 +49,12 @@ main() {
     require_ref "$ref" "pack admission dossier $ref"
   done < <(yq -r '.generated_from[]' "$REGISTRY")
 
-  if rg -q 'stage_only' "$OCTON_DIR/framework/capabilities/packs/browser/README.md"; then
+  if contains_text 'stage_only' "$OCTON_DIR/framework/capabilities/packs/browser/README.md"; then
     pass "browser README matches stage_only posture"
   else
     fail "browser README matches stage_only posture"
   fi
-  if rg -q 'stage_only' "$OCTON_DIR/framework/capabilities/packs/api/README.md"; then
+  if contains_text 'stage_only' "$OCTON_DIR/framework/capabilities/packs/api/README.md"; then
     pass "api README matches stage_only posture"
   else
     fail "api README matches stage_only posture"
