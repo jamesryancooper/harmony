@@ -179,8 +179,30 @@ write_authority_root() {
           .schema_version = "authority-grant-bundle-v2"
           | .route_outcome = ((.route_outcome // .decision // "ALLOW") | ascii_downcase)
           | .budget_ledger_ref = $budget_ref
-          | .exception_lease_refs = ((.exception_refs // []) | map(sub("\\.octon/state/control/execution/exceptions/leases\\.yml#"; ".octon/state/control/execution/exceptions/leases/") + ".yml"))
-          | .revocation_refs = ((.revocation_refs // []) | map(sub("\\.octon/state/control/execution/revocations/grants\\.yml#"; ".octon/state/control/execution/revocations/") + ".yml"))
+          | .exception_lease_refs = (
+              if ((.exception_lease_refs // []) | length) > 0 then
+                .exception_lease_refs
+              else
+                ((.exception_refs // [])
+                  | map(
+                      if endswith(".yml") then .
+                      elif contains(".octon/state/control/execution/exceptions/leases.yml#") then
+                        sub("\\.octon/state/control/execution/exceptions/leases\\.yml#"; ".octon/state/control/execution/exceptions/leases/") + ".yml"
+                      else .
+                      end
+                    ))
+              end
+            )
+          | .revocation_refs = (
+              (.revocation_refs // [])
+              | map(
+                  if endswith(".yml") then .
+                  elif contains(".octon/state/control/execution/revocations/grants.yml#") then
+                    sub("\\.octon/state/control/execution/revocations/grants\\.yml#"; ".octon/state/control/execution/revocations/") + ".yml"
+                  else .
+                  end
+                )
+            )
         ' | yq -P -p=json '.' > "$authority_root/grant-bundle.yml.tmp"
     mv "$authority_root/grant-bundle.yml.tmp" "$authority_root/grant-bundle.yml"
   fi
@@ -190,8 +212,30 @@ write_authority_root() {
       | jq '
           .schema_version = "authority-decision-artifact-v2"
           | .route_outcome = ((.route_outcome // .decision // "ALLOW") | ascii_downcase)
-          | .exception_lease_refs = ((.exception_refs // []) | map(sub("\\.octon/state/control/execution/exceptions/leases\\.yml#"; ".octon/state/control/execution/exceptions/leases/") + ".yml"))
-          | .revocation_refs = ((.revocation_refs // []) | map(sub("\\.octon/state/control/execution/revocations/grants\\.yml#"; ".octon/state/control/execution/revocations/") + ".yml"))
+          | .exception_lease_refs = (
+              if ((.exception_lease_refs // []) | length) > 0 then
+                .exception_lease_refs
+              else
+                ((.exception_refs // [])
+                  | map(
+                      if endswith(".yml") then .
+                      elif contains(".octon/state/control/execution/exceptions/leases.yml#") then
+                        sub("\\.octon/state/control/execution/exceptions/leases\\.yml#"; ".octon/state/control/execution/exceptions/leases/") + ".yml"
+                      else .
+                      end
+                    ))
+              end
+            )
+          | .revocation_refs = (
+              (.revocation_refs // [])
+              | map(
+                  if endswith(".yml") then .
+                  elif contains(".octon/state/control/execution/revocations/grants.yml#") then
+                    sub("\\.octon/state/control/execution/revocations/grants\\.yml#"; ".octon/state/control/execution/revocations/") + ".yml"
+                  else .
+                  end
+                )
+            )
         ' | yq -P -p=json '.' > "$authority_root/decision.yml.tmp"
     mv "$authority_root/decision.yml.tmp" "$authority_root/decision.yml"
   fi

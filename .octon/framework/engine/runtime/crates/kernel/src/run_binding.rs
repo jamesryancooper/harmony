@@ -136,17 +136,6 @@ struct RunManifestV2<'a> {
 }
 
 #[derive(Debug, Clone, Serialize)]
-struct RuntimeStateV1<'a> {
-    schema_version: &'static str,
-    run_id: &'a str,
-    status: &'static str,
-    decision_state: &'static str,
-    last_event: &'static str,
-    authority_bundle_ref: String,
-    updated_at: &'a str,
-}
-
-#[derive(Debug, Clone, Serialize)]
 struct BudgetLedgerV1<'a> {
     schema_version: &'static str,
     run_id: &'a str,
@@ -411,16 +400,13 @@ fn materialize_run_binding(
     };
     write_yaml(&control_root.join("run-manifest.yml"), &run_manifest)?;
 
-    let runtime_state = RuntimeStateV1 {
-        schema_version: "runtime-state-v1",
+    write_runtime_state(
+        cfg,
+        &control_root.join("runtime-state.yml"),
         run_id,
-        status: "bound",
-        decision_state: "allow",
-        last_event: "run-bound",
-        authority_bundle_ref: authority_bundle_rel.clone(),
-        updated_at: &now,
-    };
-    write_yaml(&control_root.join("runtime-state.yml"), &runtime_state)?;
+        &request.workflow_mode,
+        &now,
+    )?;
 
     let budget_ledger = BudgetLedgerV1 {
         schema_version: "budget-ledger-v1",
@@ -707,4 +693,54 @@ fn write_yaml<T: Serialize>(path: &Path, value: &T) -> Result<()> {
     }
     fs::write(path, serde_yaml::to_string(value)?)?;
     Ok(())
+}
+
+fn write_runtime_state(
+    cfg: &RuntimeConfig,
+    path: &Path,
+    run_id: &str,
+    workflow_mode: &str,
+    now: &str,
+) -> Result<()> {
+    let mut root = if path.is_file() {
+        serde_yaml::from_str::<serde_yaml::Mapping>(&fs::read_to_string(path)?)?
+    } else {
+        serde_yaml::Mapping::new()
+    };
+
+    insert_yaml_string(&mut root, "schema_version", "run-runtime-state-v1");
+    insert_yaml_string(&mut root, "run_id", run_id);
+    insert_yaml_string(&mut root, "status", "bound");
+    insert_yaml_string(&mut root, "workflow_mode", workflow_mode);
+    insert_yaml_string(&mut root, "decision_state", "allow");
+    root.entry(serde_yaml::Value::String("run_contract_ref".into()))
+        .or_insert(serde_yaml::Value::String(rel(cfg, &cfg.run_control_root(run_id).join("run-contract.yml"))?));
+    root.entry(serde_yaml::Value::String("run_manifest_ref".into()))
+        .or_insert(serde_yaml::Value::String(rel(cfg, &cfg.run_control_root(run_id).join("run-manifest.yml"))?));
+    root.entry(serde_yaml::Value::String("current_stage_attempt_id".into()))
+        .or_insert(serde_yaml::Value::String("initial".into()));
+    root.entry(serde_yaml::Value::String("last_checkpoint_ref".into()))
+        .or_insert(serde_yaml::Value::Null);
+    root.entry(serde_yaml::Value::String("last_receipt_ref".into()))
+        .or_insert(serde_yaml::Value::Null);
+    root.entry(serde_yaml::Value::String("mission_id".into()))
+        .or_insert(serde_yaml::Value::Null);
+    root.entry(serde_yaml::Value::String("parent_run_ref".into()))
+        .or_insert(serde_yaml::Value::Null);
+    root.entry(serde_yaml::Value::String("created_at".into()))
+        .or_insert(serde_yaml::Value::String(now.to_string()));
+    insert_yaml_string(&mut root, "updated_at", now);
+
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, serde_yaml::to_string(&root)?)?;
+    Ok(())
+}
+
+fn insert_yaml_string(map: &mut serde_yaml::Mapping, key: &str, value: &str) {
+    map.insert(
+        serde_yaml::Value::String(key.to_string()),
+        serde_yaml::Value::String(value.to_string()),
+    );
 }
