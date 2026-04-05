@@ -47,7 +47,10 @@ main() {
     "$OCTON_DIR/instance/capabilities/runtime/packs/registry.yml"
   check_clean "current release disclosure" \
     "$OCTON_DIR/instance/governance/disclosure/harness-card.yml" \
-    "$OCTON_DIR/state/evidence/disclosure/releases/2026-04-04-uec-global-completion" \
+    "$OCTON_DIR/state/evidence/disclosure/releases/2026-04-04-uec-global-completion/harness-card.yml" \
+    "$OCTON_DIR/state/evidence/disclosure/releases/2026-04-04-uec-global-completion/closure/support-universe-coverage.yml" \
+    "$OCTON_DIR/state/evidence/disclosure/releases/2026-04-04-uec-global-completion/closure/closure-certificate.yml" \
+    "$OCTON_DIR/state/evidence/disclosure/releases/2026-04-04-uec-global-completion/closure/proof-plane-coverage.yml" \
     "$OCTON_DIR/state/evidence/control/execution/authority-decision-uec-global-frontier-browser-api-studio-20260404.yml" \
     "$OCTON_DIR/state/evidence/control/execution/authority-grant-bundle-uec-global-frontier-browser-api-studio-20260404.yml"
 
