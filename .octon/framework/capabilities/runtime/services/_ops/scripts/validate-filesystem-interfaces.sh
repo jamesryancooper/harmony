@@ -18,6 +18,7 @@ SERVICES_REGISTRY="$FRAMEWORK_DIR/capabilities/runtime/services/registry.yml"
 CONTEXT_INDEX="$OCTON_DIR/instance/cognition/context/index.yml"
 RUNTIME_RUN="$OCTON_DIR/framework/engine/runtime/run"
 export OCTON_RUNTIME_PREFER_SOURCE="${OCTON_RUNTIME_PREFER_SOURCE:-1}"
+export OCTON_SUPPORT_TIER="${OCTON_SUPPORT_TIER:-observe-and-read}"
 SMOKE_ROOT=".octon/framework/capabilities/runtime/services/interfaces"
 
 errors=0

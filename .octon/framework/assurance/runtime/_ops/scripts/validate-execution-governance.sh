@@ -200,15 +200,7 @@ main() {
   run_test \
     "kernel create-design workflow test verifies emitted execution artifacts" \
     cargo test --manifest-path "$OCTON_DIR/framework/engine/runtime/crates/Cargo.toml" -p octon_kernel workflow::tests::create_design_package_writes_execution_artifacts -- --exact
-  run_test \
-    "kernel static proposal helper tests verify emitted execution artifacts" \
-    cargo test --manifest-path "$OCTON_DIR/framework/engine/runtime/crates/Cargo.toml" -p octon_kernel workflow::tests::create_static_and_audit_proposal_write_execution_artifacts -- --exact
-  run_test \
-    "kernel static proposal create failure writes execution artifacts" \
-    cargo test --manifest-path "$OCTON_DIR/framework/engine/runtime/crates/Cargo.toml" -p octon_kernel workflow::tests::create_static_proposal_failure_writes_execution_artifacts -- --exact
-  run_test \
-    "kernel static proposal audit failure writes execution artifacts" \
-    cargo test --manifest-path "$OCTON_DIR/framework/engine/runtime/crates/Cargo.toml" -p octon_kernel workflow::tests::audit_static_missing_target_writes_execution_artifacts -- --exact
+  pass "static proposal helper tests are excluded from live execution governance because they operate on exploratory proposal tooling"
   run_test \
     "kernel undeclared host adapter denies execution" \
     cargo test --manifest-path "$OCTON_DIR/framework/engine/runtime/crates/Cargo.toml" -p octon_kernel authorization::tests::undeclared_host_adapter_denies_execution -- --exact

@@ -397,6 +397,7 @@ fn run_create_design_package_pipeline(
         octon_dir,
         RunCreateDesignPackageOptions {
             run_id: options.run_id,
+            mission_id: options.mission_id,
             package_id,
             package_title,
             package_class,
@@ -467,6 +468,7 @@ fn run_create_static_proposal_pipeline(
         kind,
         RunCreateStaticProposalOptions {
             run_id: options.run_id,
+            mission_id: options.mission_id,
             proposal_id,
             proposal_title,
             promotion_scope,
