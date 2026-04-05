@@ -15,7 +15,7 @@ use walkdir::WalkDir;
 
 use crate::request;
 use octon_authority_engine::{
-    authorize_execution, build_executor_command, finalize_execution,
+    authorize_execution, build_executor_command, default_autonomy_context, finalize_execution,
     now_rfc3339 as auth_now_rfc3339, resolve_executor_profile, write_execution_start,
     ExecutionArtifactPaths, ExecutionOutcome, ExecutionRequest, ExecutorCommandSpec, GrantBundle,
     ManagedExecutorKind, ReviewRequirements, ScopeConstraints, SideEffectFlags, SideEffectSummary,
@@ -103,6 +103,7 @@ impl DesignPackageClass {
 #[derive(Clone, Debug)]
 pub struct RunCreateDesignPackageOptions {
     pub run_id: Option<String>,
+    pub mission_id: Option<String>,
     pub package_id: String,
     pub package_title: String,
     pub package_class: DesignPackageClass,
@@ -123,6 +124,7 @@ pub struct RunCreateDesignPackageResult {
 #[derive(Clone, Debug)]
 pub struct RunCreateStaticProposalOptions {
     pub run_id: Option<String>,
+    pub mission_id: Option<String>,
     pub proposal_id: String,
     pub proposal_title: String,
     pub promotion_scope: ProposalScope,
@@ -617,14 +619,31 @@ fn authorize_workflow_stage(
     write_repo: bool,
     risk_tier: &str,
     executor_profile: Option<&str>,
+    mission_id: Option<&str>,
+    support_tier_override: Option<&str>,
 ) -> Result<AuthorizedWorkflowStage> {
-    let (intent_ref, actor_ref, metadata) = request::bind_repo_local_request(
-        runtime_cfg,
-        BTreeMap::from([
-            ("workflow_id".to_string(), workflow_id.to_string()),
-            ("stage_id".to_string(), stage_id.to_string()),
-        ]),
-    )?;
+    let workflow_mode = request::workflow_mode(mission_id);
+    let stage_autonomy_context = mission_id
+        .map(|mission_id| {
+            default_autonomy_context(
+                runtime_cfg,
+                mission_id,
+                stage_id,
+                &format!("workflow-stage:{stage_id}"),
+                if write_repo { "feedback_window" } else { "notify" },
+                "continuous",
+                "reversible",
+            )
+        })
+        .transpose()?;
+    let mut metadata = BTreeMap::from([
+        ("workflow_id".to_string(), workflow_id.to_string()),
+        ("stage_id".to_string(), stage_id.to_string()),
+    ]);
+    if let Some(support_tier) = support_tier_override {
+        metadata.insert("support_tier".to_string(), support_tier.to_string());
+    }
+    let (intent_ref, actor_ref, metadata) = request::bind_repo_local_request(runtime_cfg, metadata)?;
     let request = ExecutionRequest {
         request_id: format!("{workflow_id}-{stage_id}"),
         caller_path: "workflow-stage".to_string(),
@@ -642,10 +661,10 @@ fn authorize_workflow_stage(
             branch_mutation: false,
         },
         risk_tier: risk_tier.to_string(),
-        workflow_mode: request::agent_augmented_mode(),
+        workflow_mode,
         locality_scope: None,
         intent_ref: Some(intent_ref),
-        autonomy_context: None,
+        autonomy_context: stage_autonomy_context,
         actor_ref: Some(actor_ref),
         parent_run_ref: Some(workflow_id.to_string()),
         review_requirements: ReviewRequirements::default(),
@@ -751,6 +770,22 @@ pub fn run_create_design_package_from_octon_dir(
         "create-design-proposal",
         false,
     )?;
+    let workflow_mode = request::workflow_mode(options.mission_id.as_deref());
+    let workflow_autonomy_context = options
+        .mission_id
+        .as_deref()
+        .map(|mission_id| {
+            default_autonomy_context(
+                &runtime_cfg,
+                mission_id,
+                "create-design-proposal",
+                "workflow",
+                "feedback_window",
+                "continuous",
+                "reversible",
+            )
+        })
+        .transpose()?;
     let (intent_ref, actor_ref, metadata) = request::bind_repo_local_request(
         &runtime_cfg,
         BTreeMap::from([(
@@ -774,10 +809,10 @@ pub fn run_create_design_package_from_octon_dir(
             ..SideEffectFlags::default()
         },
         risk_tier: "medium".to_string(),
-        workflow_mode: request::agent_augmented_mode(),
+        workflow_mode,
         locality_scope: None,
         intent_ref: Some(intent_ref),
-        autonomy_context: None,
+        autonomy_context: workflow_autonomy_context.clone(),
         actor_ref: Some(actor_ref),
         parent_run_ref: None,
         review_requirements: ReviewRequirements::default(),
@@ -1003,6 +1038,8 @@ pub fn run_create_design_package_from_octon_dir(
             true,
             "medium",
             Some("scoped_repo_mutation"),
+            options.mission_id.as_deref(),
+            None,
         )?;
         let scaffold_result: Result<()> = (|| {
             fs::create_dir_all(&proposal_root)
@@ -1195,6 +1232,8 @@ pub fn run_create_design_package_from_octon_dir(
             false,
             "low",
             Some("read_only_analysis"),
+            options.mission_id.as_deref(),
+            None,
         )?;
         match run_design_proposal_validator_stack(&repo_root, &proposal_root, &bundle_root) {
             Ok(log_path) => {
@@ -1405,6 +1444,22 @@ pub fn run_create_static_proposal_from_octon_dir(
         &format!("create-{}-proposal", kind.as_str()),
         false,
     )?;
+    let workflow_mode = request::workflow_mode(options.mission_id.as_deref());
+    let workflow_autonomy_context = options
+        .mission_id
+        .as_deref()
+        .map(|mission_id| {
+            default_autonomy_context(
+                &runtime_cfg,
+                mission_id,
+                &format!("create-{}-proposal", kind.as_str()),
+                "workflow",
+                "feedback_window",
+                "continuous",
+                "reversible",
+            )
+        })
+        .transpose()?;
     let (intent_ref, actor_ref, metadata) = request::bind_repo_local_request(
         &runtime_cfg,
         BTreeMap::from([(
@@ -1428,10 +1483,10 @@ pub fn run_create_static_proposal_from_octon_dir(
             ..SideEffectFlags::default()
         },
         risk_tier: "medium".to_string(),
-        workflow_mode: request::agent_augmented_mode(),
+        workflow_mode,
         locality_scope: None,
         intent_ref: Some(intent_ref),
-        autonomy_context: None,
+        autonomy_context: workflow_autonomy_context.clone(),
         actor_ref: Some(actor_ref),
         parent_run_ref: None,
         review_requirements: ReviewRequirements::default(),
@@ -1553,6 +1608,8 @@ pub fn run_create_static_proposal_from_octon_dir(
         true,
         "medium",
         Some("scoped_repo_mutation"),
+        options.mission_id.as_deref(),
+        None,
     ) {
         Ok(stage) => stage,
         Err(error) => {
@@ -1669,6 +1726,8 @@ pub fn run_create_static_proposal_from_octon_dir(
         false,
         "low",
         Some("read_only_analysis"),
+        options.mission_id.as_deref(),
+        None,
     ) {
         Ok(stage) => stage,
         Err(error) => {
@@ -1812,10 +1871,13 @@ pub fn run_audit_static_proposal_from_octon_dir(
     )?;
     let (intent_ref, actor_ref, metadata) = request::bind_repo_local_request(
         &runtime_cfg,
-        BTreeMap::from([(
-            "workflow_id".to_string(),
-            format!("audit-{}-proposal", kind.as_str()),
-        )]),
+        BTreeMap::from([
+            (
+                "workflow_id".to_string(),
+                format!("audit-{}-proposal", kind.as_str()),
+            ),
+            ("support_tier".to_string(), "observe-and-read".to_string()),
+        ]),
     )?;
     let workflow_request = ExecutionRequest {
         request_id: workflow_request_id,
@@ -1918,6 +1980,8 @@ pub fn run_audit_static_proposal_from_octon_dir(
         false,
         "low",
         Some("read_only_analysis"),
+        None,
+        None,
     ) {
         Ok(stage) => stage,
         Err(error) => {
@@ -2148,6 +2212,8 @@ pub fn run_validate_proposal_from_octon_dir(
         false,
         "low",
         Some("read_only_analysis"),
+        None,
+        None,
     )?;
     let validator_log = match run_proposal_validator_stack(
         &repo_root,
@@ -2540,6 +2606,8 @@ pub fn run_promote_proposal_from_octon_dir(
         false,
         "low",
         Some("read_only_analysis"),
+        None,
+        None,
     )?;
     let validator_log = match run_proposal_validator_stack(
         &repo_root,
@@ -2603,6 +2671,8 @@ pub fn run_promote_proposal_from_octon_dir(
         true,
         "medium",
         Some("scoped_repo_mutation"),
+        None,
+        None,
     )?;
     let promote_result: Result<()> = (|| {
         let original_manifest = manifest.clone();
@@ -2921,6 +2991,8 @@ pub fn run_archive_proposal_from_octon_dir(
         false,
         "low",
         Some("read_only_analysis"),
+        None,
+        None,
     )?;
     let validator_log = match run_proposal_validator_stack(
         &repo_root,
@@ -2989,6 +3061,8 @@ pub fn run_archive_proposal_from_octon_dir(
         true,
         "medium",
         Some("scoped_repo_mutation"),
+        None,
+        None,
     )?;
     let archive_result: Result<()> = (|| {
         ensure!(
@@ -5957,13 +6031,28 @@ mod tests {
             .expect("ownership registry dir should exist");
         write_file(
             &octon_dir.join("instance/governance/ownership/registry.yml"),
-            "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators:\n  - operator_id: \"fixtures\"\n    display_name: \"Fixtures\"\n    contact: \"repo://fixtures\"\ndefaults:\n  operator_id: \"fixtures\"\n  support_tier: \"repo-consequential\"\nassets:\n  - asset_id: \"workflow-scope\"\n    path_globs:\n      - \"workflow-scope\"\n    owners:\n      - \"fixtures\"\nservices: []\nsubscriptions: {}\n",
+            "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators:\n  - operator_id: \"fixtures\"\n    display_name: \"Fixtures\"\n    contact: \"repo://fixtures\"\ndefaults:\n  operator_id: \"fixtures\"\n  support_tier: \"observe-and-read\"\nassets:\n  - asset_id: \"workflow-scope\"\n    path_globs:\n      - \"workflow-scope\"\n    owners:\n      - \"fixtures\"\nservices: []\nsubscriptions: {}\n",
         );
         fs::copy(
             source_repo_root().join(".octon/instance/governance/support-targets.yml"),
             octon_dir.join("instance/governance/support-targets.yml"),
         )
         .expect("copy support targets");
+        copy_tree(
+            &source_repo_root().join(".octon/instance/governance/policies"),
+            &root.join(".octon/instance/governance/policies"),
+        );
+        fs::create_dir_all(octon_dir.join("instance/governance/policies"))
+            .expect("governance policy dir should exist");
+        fs::copy(
+            source_repo_root().join(".octon/instance/governance/policies/mission-autonomy.yml"),
+            octon_dir.join("instance/governance/policies/mission-autonomy.yml"),
+        )
+        .expect("copy mission autonomy policy");
+        copy_tree(
+            &source_repo_root().join(".octon/instance/orchestration/missions"),
+            &root.join(".octon/instance/orchestration/missions"),
+        );
         fs::create_dir_all(octon_dir.join("instance/capabilities/runtime/packs"))
             .expect("runtime pack dir should exist");
         fs::copy(
@@ -5978,6 +6067,14 @@ mod tests {
         copy_tree(
             &source_repo_root().join(".octon/framework/capabilities/packs"),
             &root.join(".octon/framework/capabilities/packs"),
+        );
+        copy_tree(
+            &source_repo_root().join(".octon/state/control/execution/missions"),
+            &root.join(".octon/state/control/execution/missions"),
+        );
+        copy_tree(
+            &source_repo_root().join(".octon/state/continuity/repo/missions"),
+            &root.join(".octon/state/continuity/repo/missions"),
         );
 
         let target_package = root.join(".design-packages").join("target-package");
@@ -6070,13 +6167,28 @@ mod tests {
         );
         write_file(
             &octon_dir.join("instance/governance/ownership/registry.yml"),
-            "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators:\n  - operator_id: \"fixtures\"\n    display_name: \"Fixtures\"\n    contact: \"repo://fixtures\"\ndefaults:\n  operator_id: \"fixtures\"\n  support_tier: \"repo-consequential\"\nassets:\n  - asset_id: \"workflow-scope\"\n    path_globs:\n      - \"workflow-scope\"\n    owners:\n      - \"fixtures\"\nservices: []\nsubscriptions: {}\n",
+            "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators:\n  - operator_id: \"fixtures\"\n    display_name: \"Fixtures\"\n    contact: \"repo://fixtures\"\ndefaults:\n  operator_id: \"fixtures\"\n  support_tier: \"observe-and-read\"\nassets:\n  - asset_id: \"workflow-scope\"\n    path_globs:\n      - \"workflow-scope\"\n    owners:\n      - \"fixtures\"\nservices: []\nsubscriptions: {}\n",
         );
         fs::copy(
             source_repo_root().join(".octon/instance/governance/support-targets.yml"),
             octon_dir.join("instance/governance/support-targets.yml"),
         )
         .expect("copy support targets");
+        copy_tree(
+            &source_repo_root().join(".octon/instance/governance/policies"),
+            &root.join(".octon/instance/governance/policies"),
+        );
+        fs::create_dir_all(octon_dir.join("instance/governance/policies"))
+            .expect("governance policy dir should exist");
+        fs::copy(
+            source_repo_root().join(".octon/instance/governance/policies/mission-autonomy.yml"),
+            octon_dir.join("instance/governance/policies/mission-autonomy.yml"),
+        )
+        .expect("copy mission autonomy policy");
+        copy_tree(
+            &source_repo_root().join(".octon/instance/orchestration/missions"),
+            &root.join(".octon/instance/orchestration/missions"),
+        );
         fs::create_dir_all(octon_dir.join("instance/capabilities/runtime/packs"))
             .expect("runtime pack dir should exist");
         fs::copy(
@@ -6108,6 +6220,68 @@ mod tests {
             &source_repo_root().join(".octon/framework/capabilities/_ops/scripts"),
             &root.join(".octon/framework/capabilities/_ops/scripts"),
         );
+        copy_tree(
+            &source_repo_root().join(".octon/state/control/execution/missions"),
+            &root.join(".octon/state/control/execution/missions"),
+        );
+        copy_tree(
+            &source_repo_root().join(".octon/state/continuity/repo/missions"),
+            &root.join(".octon/state/continuity/repo/missions"),
+        );
+        copy_tree(
+            &source_repo_root().join(".octon/generated/effective/orchestration/missions"),
+            &root.join(".octon/generated/effective/orchestration/missions"),
+        );
+        let lease_path = octon_dir.join(
+            "state/control/execution/missions/mission-autonomy-live-validation/lease.yml",
+        );
+        let lease = fs::read_to_string(&lease_path).expect("read mission lease");
+        fs::write(&lease_path, lease.replace("state: \"paused\"", "state: \"active\""))
+            .expect("rewrite mission lease active");
+        let mode_state_path = octon_dir.join(
+            "state/control/execution/missions/mission-autonomy-live-validation/mode-state.yml",
+        );
+        let mode_state = fs::read_to_string(&mode_state_path).expect("read mission mode state");
+        fs::write(
+            &mode_state_path,
+            mode_state
+                .replace("oversight_mode: \"notify\"", "oversight_mode: \"feedback_window\"")
+                .replace(
+                    "execution_posture: \"interruptible_scheduled\"",
+                    "execution_posture: \"continuous\"",
+                )
+                .replace("safety_state: \"paused\"", "safety_state: \"active\""),
+        )
+        .expect("rewrite mission mode state active");
+        let scenario_path = octon_dir.join(
+            "generated/effective/orchestration/missions/mission-autonomy-live-validation/scenario-resolution.yml",
+        );
+        let scenario = fs::read_to_string(&scenario_path).expect("read mission scenario resolution");
+        fs::write(
+            &scenario_path,
+            scenario
+                .replace("oversight_mode: \"notify\"", "oversight_mode: \"feedback_window\"")
+                .replace(
+                    "execution_posture: \"interruptible_scheduled\"",
+                    "execution_posture: \"continuous\"",
+                )
+                .replace("feedback_window_required: false", "feedback_window_required: true"),
+        )
+        .expect("rewrite mission scenario resolution active");
+        let schedule_path = octon_dir.join(
+            "state/control/execution/missions/mission-autonomy-live-validation/schedule.yml",
+        );
+        let schedule = fs::read_to_string(&schedule_path).expect("read mission schedule");
+        fs::write(
+            &schedule_path,
+            schedule
+                .replace(
+                    "cadence_or_trigger: \"interruptible_scheduled\"",
+                    "cadence_or_trigger: \"continuous\"",
+                )
+                .replace("pause_active_run_requested: true", "pause_active_run_requested: false"),
+        )
+        .expect("rewrite mission schedule active");
 
         let source_root = source_repo_root();
         copy_tree(
@@ -6418,6 +6592,7 @@ mod tests {
             &octon_dir,
             RunCreateDesignPackageOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 package_id: "runtime-package".to_string(),
                 package_title: "Runtime Package".to_string(),
                 package_class: DesignPackageClass::DomainRuntime,
@@ -6476,6 +6651,7 @@ mod tests {
             &octon_dir,
             RunCreateDesignPackageOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 package_id: "experience-package".to_string(),
                 package_title: "Experience Package".to_string(),
                 package_class: DesignPackageClass::ExperienceProduct,
@@ -6525,6 +6701,7 @@ mod tests {
             &octon_dir,
             RunCreateDesignPackageOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 package_id: "duplicate-package".to_string(),
                 package_title: "Duplicate Package".to_string(),
                 package_class: DesignPackageClass::DomainRuntime,
@@ -6543,6 +6720,7 @@ mod tests {
             &octon_dir,
             RunCreateDesignPackageOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 package_id: "duplicate-package".to_string(),
                 package_title: "Duplicate Package".to_string(),
                 package_class: DesignPackageClass::DomainRuntime,
@@ -6599,6 +6777,7 @@ mod tests {
             &octon_dir,
             RunCreateDesignPackageOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 package_id: "validate-target".to_string(),
                 package_title: "Validate Target".to_string(),
                 package_class: DesignPackageClass::ExperienceProduct,
@@ -6641,6 +6820,7 @@ mod tests {
             &octon_dir,
             RunCreateDesignPackageOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 package_id: "validate-target".to_string(),
                 package_title: "Validate Target".to_string(),
                 package_class: DesignPackageClass::ExperienceProduct,
@@ -6687,6 +6867,7 @@ mod tests {
             StaticProposalKind::Migration,
             RunCreateStaticProposalOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 proposal_id: "shared-id".to_string(),
                 proposal_title: "Shared Migration".to_string(),
                 promotion_scope: ProposalScope::RepoLocal,
@@ -6700,6 +6881,7 @@ mod tests {
             StaticProposalKind::Policy,
             RunCreateStaticProposalOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 proposal_id: "shared-id".to_string(),
                 proposal_title: "Shared Policy".to_string(),
                 promotion_scope: ProposalScope::RepoLocal,
@@ -6736,6 +6918,7 @@ mod tests {
             &octon_dir,
             RunCreateDesignPackageOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 package_id: "artifact-package".to_string(),
                 package_title: "Artifact Package".to_string(),
                 package_class: DesignPackageClass::DomainRuntime,
@@ -6781,6 +6964,7 @@ mod tests {
             StaticProposalKind::Architecture,
             RunCreateStaticProposalOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 proposal_id: "auditable-static".to_string(),
                 proposal_title: "Auditable Static".to_string(),
                 promotion_scope: ProposalScope::RepoLocal,
@@ -6839,6 +7023,7 @@ mod tests {
             StaticProposalKind::Policy,
             RunCreateStaticProposalOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 proposal_id: "duplicate-static".to_string(),
                 proposal_title: "Duplicate Static".to_string(),
                 promotion_scope: ProposalScope::RepoLocal,
@@ -6852,6 +7037,7 @@ mod tests {
             StaticProposalKind::Policy,
             RunCreateStaticProposalOptions {
                 run_id: None,
+                mission_id: Some("mission-autonomy-live-validation".to_string()),
                 proposal_id: "duplicate-static".to_string(),
                 proposal_title: "Duplicate Static".to_string(),
                 promotion_scope: ProposalScope::RepoLocal,
