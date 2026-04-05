@@ -40,10 +40,12 @@ main() {
   require_yq '.paths.governance_exclusions == ".octon/instance/governance/exclusions/action-classes.yml"' "$POLICY_CONFIG" "policy config exposes governance exclusions"
   require_yq '.paths.runtime_bus_root == ".octon/framework/engine/runtime/crates/runtime_bus"' "$POLICY_CONFIG" "policy config exposes runtime_bus"
 
-  require_yq '[.host_adapters[] | select(.support_status == "supported")] | length == 4' "$SUPPORT_TARGETS" "all retained host adapters are supported"
-  require_yq '[.model_adapters[] | select(.support_status == "supported")] | length == 2' "$SUPPORT_TARGETS" "all retained model adapters are supported"
-  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "admitted" and .default_route == "allow")' "$RUNTIME_PACK_REGISTRY" "browser pack is admitted"
-  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "admitted" and .default_route == "allow")' "$RUNTIME_PACK_REGISTRY" "api pack is admitted"
+  require_yq '[.host_adapters[] | select(.support_status == "supported")] | length == 1' "$SUPPORT_TARGETS" "exactly one host adapter is live supported"
+  require_yq '[.host_adapters[] | select(.support_status == "stage_only")] | length == 3' "$SUPPORT_TARGETS" "non-live host adapters remain explicit stage_only surfaces"
+  require_yq '[.model_adapters[] | select(.support_status == "supported")] | length == 1' "$SUPPORT_TARGETS" "exactly one model adapter is live supported"
+  require_yq '[.model_adapters[] | select(.support_status == "stage_only")] | length == 1' "$SUPPORT_TARGETS" "non-live model adapter remains explicit stage_only surface"
+  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "stage_only" and .default_route == "escalate")' "$RUNTIME_PACK_REGISTRY" "browser pack is stage_only"
+  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "stage_only" and .default_route == "escalate")' "$RUNTIME_PACK_REGISTRY" "api pack is stage_only"
 
   require_yq '.host_adapters[] | select(.adapter_id == "studio-control-plane" and .allowed_locale_tiers[] == "spanish-secondary")' "$SUPPORT_TARGETS" "Studio supports the final locale universe"
   require_yq '.model_adapters[] | select(.adapter_id == "frontier-governed" and .allowed_workload_tiers[] == "boundary-sensitive")' "$SUPPORT_TARGETS" "frontier-governed supports boundary-sensitive work"
