@@ -10,7 +10,7 @@ manifest="$root/manifest.yml"
 {
   echo "schema_version: octon-release-bundle-manifest-v1"
   echo "release_id: $release_id"
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"$(deterministic_generated_at)\""
   echo "generator_versions:"
   echo "  release_bundle: 1"
   echo "  harness_card: 1"

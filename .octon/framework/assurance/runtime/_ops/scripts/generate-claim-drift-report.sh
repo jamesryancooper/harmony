@@ -11,11 +11,10 @@ status="pass"
 {
   echo "schema_version: octon-claim-drift-report-v1"
   echo "release_id: $release_id"
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"$(deterministic_generated_at)\""
   echo "status: $status"
   echo "findings:"
   if [[ -n "$matches" ]]; then
     printf '%s\n' "$matches" | sed 's/^/  - "/; s/$/"/'
   fi
 } >"$out"
-

@@ -15,7 +15,7 @@ gate_failures=0
 {
   echo "schema_version: octon-closure-gate-report-v1"
   echo "release_id: $release_id"
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"$(deterministic_generated_at)\""
   echo "gates:"
   for pair in \
     "G0:single-canonical-run-contract-family:validate-single-canonical-run-contract-family.sh" \
@@ -47,7 +47,7 @@ gate_failures=0
 {
   echo "schema_version: closure-summary-v2"
   echo "release_id: $release_id"
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"$(deterministic_generated_at)\""
   echo "claim_status: $( [[ $gate_failures -eq 0 ]] && echo complete || echo incomplete )"
   echo "support_universe_mode: bounded-admitted-finite"
   echo "preclaim_blockers_open: $gate_failures"
@@ -60,7 +60,7 @@ gate_failures=0
 {
   echo "schema_version: closure-certificate-v2"
   echo "release_id: $release_id"
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"$(deterministic_generated_at)\""
   echo "status: $( [[ $gate_failures -eq 0 ]] && echo certified || echo uncertified )"
   echo "proof_bundle_refs:"
   echo "  - .octon/state/evidence/disclosure/releases/$release_id/closure/gate-status.yml"

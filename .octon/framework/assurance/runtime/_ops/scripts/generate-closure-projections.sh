@@ -9,7 +9,7 @@ cp "$root/closure/closure-summary.yml" "$OCTON_DIR/instance/governance/closure/c
 {
   echo "schema_version: octon-projection-parity-report-v1"
   echo "release_id: $release_id"
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"$(deterministic_generated_at)\""
   echo "status: pass"
   echo "comparisons:"
   echo "  - source: .octon/state/evidence/disclosure/releases/$release_id/harness-card.yml"
@@ -22,4 +22,3 @@ cp "$root/closure/closure-summary.yml" "$OCTON_DIR/instance/governance/closure/c
   echo "    target: .octon/instance/governance/closure/closure-summary.yml"
   echo "    status: pass"
 } >"$root/closure/projection-parity-report.yml"
-

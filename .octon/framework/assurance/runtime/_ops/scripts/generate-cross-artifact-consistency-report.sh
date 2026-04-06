@@ -8,7 +8,7 @@ status="pass"
 {
   echo "schema_version: cross-artifact-consistency-v1"
   echo "release_id: $release_id"
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"$(deterministic_generated_at)\""
   echo "runs:"
   while IFS= read -r run_id; do
     mismatch="false"
@@ -27,4 +27,3 @@ status="pass"
   done < <(representative_run_ids)
   echo "status: $status"
 } >"$out"
-

@@ -7,7 +7,7 @@ mkdir -p "$(dirname "$out")"
 {
   echo "schema_version: proof-plane-coverage-v1"
   echo "release_id: $release_id"
-  echo "generated_at: \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\""
+  echo "generated_at: \"$(deterministic_generated_at)\""
   echo "tuples:"
   while IFS= read -r dossier; do
     tuple_id="$(yq -r '.tuple_id' "$dossier")"
@@ -16,4 +16,3 @@ mkdir -p "$(dirname "$out")"
     yq -r '.required_proof_planes[]?' "$dossier" | sed 's/^/      - /'
   done < <(support_dossier_files)
 } >"$out"
-

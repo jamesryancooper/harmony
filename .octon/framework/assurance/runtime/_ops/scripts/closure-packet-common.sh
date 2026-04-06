@@ -116,6 +116,14 @@ sha256_file() {
   shasum -a 256 "$1" | awk '{print "sha256:" $1}'
 }
 
+deterministic_generated_at() {
+  if command -v yq >/dev/null 2>&1 && [[ -f "$RELEASE_LINEAGE_PATH" ]]; then
+    yq -r '.updated_at // ""' "$RELEASE_LINEAGE_PATH"
+  else
+    git log -1 --format=%cI 2>/dev/null || date -u +"%Y-%m-%dT%H:%M:%SZ"
+  fi
+}
+
 forbidden_phrase_pattern() {
   printf '%s\n' 'global complete|globally complete support universe'
 }
