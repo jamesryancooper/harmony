@@ -58,6 +58,7 @@ main() {
   require_status "$retirement_review" '.status == "approved"' "retirement review is not approved"
   require_status "$ablation_receipt" '.status == "completed"' "ablation receipt is not completed"
   require_status "$current_review" '.claim_ready == true and .claim_blocking_count == 0' "governance retirement claim review reports open blockers"
+  require_status "$current_review" ".review_packet_ref == \"$latest_packet_ref\"" "governance retirement claim review is not tied to the latest build-to-delete packet"
 
   while IFS=$'\t' read -r target_id status review_date; do
     [[ -n "$target_id" ]] || continue
