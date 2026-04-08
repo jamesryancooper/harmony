@@ -40,6 +40,30 @@ overlay_points:
     precedence: 27
     artifact_kinds:
       - "contract"
+  - overlay_point_id: "instance-governance-capability-packs"
+    owning_domain: "governance"
+    instance_glob: ".octon/instance/governance/capability-packs/**"
+    merge_mode: "replace_by_path"
+    validator: ".octon/framework/assurance/runtime/_ops/scripts/validate-overlay-points.sh"
+    precedence: 28
+    artifact_kinds:
+      - "contract"
+  - overlay_point_id: "instance-governance-decisions"
+    owning_domain: "governance"
+    instance_glob: ".octon/instance/governance/decisions/**"
+    merge_mode: "append_only"
+    validator: ".octon/framework/assurance/runtime/_ops/scripts/validate-overlay-points.sh"
+    precedence: 29
+    artifact_kinds:
+      - "decision"
+  - overlay_point_id: "instance-governance-retirement-register"
+    owning_domain: "governance"
+    instance_glob: ".octon/instance/governance/retirement-register.yml"
+    merge_mode: "replace_by_path"
+    validator: ".octon/framework/assurance/runtime/_ops/scripts/validate-overlay-points.sh"
+    precedence: 29
+    artifact_kinds:
+      - "contract"
   - overlay_point_id: "instance-agency-runtime"
     owning_domain: "agency"
     instance_glob: ".octon/instance/agency/runtime/**"
