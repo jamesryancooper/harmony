@@ -96,7 +96,7 @@ compatibility_matrix:
     locale_tier: "english-primary"
     support_status: "supported"
     default_route: "allow"
-    requires_mission: true
+    requires_mission: false
     allowed_capability_packs:
       - "repo"
       - "shell"
@@ -173,7 +173,7 @@ tuple_admissions:
       locale_tier: "english-primary"
       host_adapter: "repo-shell"
       model_adapter: "repo-local-governed"
-    requires_mission: true
+    requires_mission: false
     consequence_class: "repo-local-low"
     reversibility_class: "fully_reversible"
     execution_horizon: "single_run_single_stage"
