@@ -318,7 +318,7 @@ tuple_admissions:
       locale_tier: "english-primary"
       host_adapter: "ci-control-plane"
       model_adapter: "repo-local-governed"
-    requires_mission: false
+    requires_mission: true
     consequence_class: "repo-local-low"
     reversibility_class: "fully_reversible"
     execution_horizon: "single_run_single_stage"
