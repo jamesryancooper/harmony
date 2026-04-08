@@ -12,7 +12,8 @@ The objective family is fully active.
   `/.octon/instance/charter/workspace.yml`
 - live workspace machine validation uses:
   `/.octon/framework/constitution/contracts/objective/workspace-charter-v1.schema.json`
-- historical compatibility shims remain retained at:
+- historical compatibility shims remain retained only as archived,
+  non-authoritative provenance at:
   `/.octon/instance/bootstrap/OBJECTIVE.md` and
   `/.octon/instance/cognition/context/shared/intent.contract.yml`
 - mission charter pair remains under:
@@ -40,6 +41,13 @@ The objective family is fully active.
 - Run contracts are the atomic execution unit for consequential work.
 - Stage attempts, checkpoints, rollback posture, replay pointers, and retained
   evidence stay subordinate to the bound run root.
+- `mission_mode` must be machine-distinguishable.
+- Legal states are:
+  - `requires_mission: true` with `mission_id` bound and
+    `mission_mode: mission-bound`
+  - `requires_mission: false` with `mission_mode: run-only`
+- `requires_mission: true` with `mission_id: null` is illegal.
+- `mission_mode: none` is retired from the live state model.
 
 ## Canonical Files
 

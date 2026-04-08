@@ -1,0 +1,7 @@
+schema_version: octon-validator-report-v1
+validator_id: V-OBJ-001
+release_id: 2026-04-08-uec-full-attainment-cutover
+generated_at: "2026-04-08T14:44:31Z"
+status: pass
+summary: >-
+  Run contracts encode only legal workspace, mission, run, and stage relationships.

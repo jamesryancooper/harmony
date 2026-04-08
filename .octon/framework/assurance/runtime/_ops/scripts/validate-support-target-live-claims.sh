@@ -22,16 +22,17 @@ main() {
   echo "== Support-Target Live Claim Validation =="
 
   require_yq '.support_claim_mode == "global-complete-finite"' "$SUPPORT_TARGETS" "support-target declaration uses final global-complete claim mode"
-  require_yq '[.tuple_admissions[] | select(.support_status == "supported")] | length == 2' "$SUPPORT_TARGETS" "exactly two tuples are live supported"
-  require_yq '[.host_adapters[] | select(.support_status == "supported")] | length == 1' "$SUPPORT_TARGETS" "only one host adapter is live supported"
-  require_yq '[.model_adapters[] | select(.support_status == "supported")] | length == 1' "$SUPPORT_TARGETS" "only one model adapter is live supported"
-  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "unsupported" and .default_route == "deny")' "$PACK_REGISTRY" "browser pack is explicitly unsupported"
-  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "unsupported" and .default_route == "deny")' "$PACK_REGISTRY" "api pack is explicitly unsupported"
+  require_yq '[.tuple_admissions[] | select(.support_status == "supported")] | length == 6' "$SUPPORT_TARGETS" "all six target tuples are live supported"
+  require_yq '.live_support_universe.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github host adapter is live supported"
+  require_yq '.live_support_universe.host_adapters[] | select(. == "ci-control-plane")' "$SUPPORT_TARGETS" "ci host adapter is live supported"
+  require_yq '.live_support_universe.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio host adapter is live supported"
+  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "admitted")' "$PACK_REGISTRY" "browser pack is admitted"
+  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "admitted")' "$PACK_REGISTRY" "api pack is admitted"
 
   require_yq '.claim_summary == load("'"$AUTHORED_CARD"'").claim_summary' "$RELEASE_CARD" "active release HarnessCard wording matches authored disclosure"
-  require_yq '.known_limits | length >= 1' "$AUTHORED_CARD" "authored HarnessCard discloses explicit non-live surfaces"
-  require_yq '.known_limits | length >= 1' "$RELEASE_CARD" "active release HarnessCard discloses explicit non-live surfaces"
-  require_yq '[.excluded_surfaces[] | select(. == "browser" or . == "api" or . == "github-control-plane" or . == "ci-control-plane" or . == "studio-control-plane" or . == "frontier-governed" or . == "boundary-sensitive")] | length >= 7' "$COVERAGE_LEDGER" "coverage ledger excludes final non-live surfaces from the live claim"
+  require_yq '(.known_limits | length) == 0' "$AUTHORED_CARD" "authored HarnessCard has no in-scope exclusions"
+  require_yq '(.known_limits | length) == 0' "$RELEASE_CARD" "active release HarnessCard has no in-scope exclusions"
+  require_yq '(.excluded_surfaces | length) == 0' "$COVERAGE_LEDGER" "coverage ledger contains no excluded in-scope surfaces"
 
   echo "Validation summary: errors=$errors"
   [[ $errors -eq 0 ]]

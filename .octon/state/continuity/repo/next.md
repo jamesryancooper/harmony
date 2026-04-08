@@ -9,6 +9,9 @@ Immediate steps to take. Items here are typically derived from project findings 
 
 ## Current
 
+- `uec-full-attainment-cutover-2026-04-08`: Review the cutover branch,
+  confirm commit/merge intent, and close out the branch if the local
+  full-attainment validator sweep is acceptable.
 - `intent-layer-wave1-contract-foundation`: Finalize Wave 1/2 schema and policy
   integration checks by running:
   `bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile intent-layer`.

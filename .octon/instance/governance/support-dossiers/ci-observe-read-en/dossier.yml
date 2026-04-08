@@ -1,6 +1,6 @@
 schema_version: support-dossier-v1
 tuple_id: tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/ci-control-plane
-status: unsupported
+status: supported
 tuple:
   model_tier: repo-local-governed
   workload_tier: observe-and-read
@@ -15,13 +15,16 @@ admitted_capability_packs:
   - shell
   - telemetry
 required_proof_planes:
+  - structural
+  - functional
+  - behavioral
   - governance
   - maintainability
+  - recovery
 required_lab_scenarios:
   - projection-receipt-baseline
 representative_retained_runs:
   - .octon/state/control/execution/runs/uec-global-ci-observe-read-20260404/run-contract.yml
-known_exclusions:
-  - excluded-from-final-live-claim
+known_exclusions: []
 recertification_cadence: quarterly
 support_admission_ref: .octon/instance/governance/support-target-admissions/ci-observe-read-en.yml

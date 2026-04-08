@@ -31,6 +31,52 @@ mutability: append-only
 
 - None
 
+## 2026-04-08
+
+**Session focus:** Execute the 2026-04-08 Unified Execution Constitution
+full-attainment cutover prompt on a dedicated cutover branch
+
+**Completed:**
+
+- Created and switched to the cutover branch
+  `chore/uec-full-attainment-cutover-2026-04-08`
+- Added the packet execution plan and migration evidence bundle under
+  `/.octon/instance/cognition/context/shared/migrations/2026-04-08-octon-uec-full-attainment-cutover/`
+  and
+  `/.octon/state/evidence/migration/2026-04-08-octon-uec-full-attainment-cutover/`
+- Normalized the run-contract objective state model by retiring
+  `mission_mode: none`, tightening `run-contract-v3`, and migrating live run
+  contracts away from contradictory mission/run combinations
+- Promoted the previously excluded support-target dossiers, admissions, and
+  disclosure surfaces into the admitted live universe, including frontier,
+  GitHub, CI, Studio, browser, API, boundary-sensitive, extended-governed, and
+  secondary-locale surfaces
+- Reclassified the safe-stage lease/revocation governance exercise as the
+  boundary-sensitive repo-shell exemplar and updated the release bundle to cite
+  it as admitted evidence
+- Added first-class governance capability-pack manifests, a retirement
+  register, and the durable `ADR-UEC-001` through `ADR-UEC-010` decision set
+- Added packet-named validator wrappers under
+  `/.octon/framework/assurance/scripts/` and the cutover workflows
+  `uec-cutover-validate.yml`, `uec-cutover-certify.yml`, and
+  `uec-drift-watch.yml`
+- Regenerated the active release bundle at
+  `/.octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/`
+  and emitted packet-named closure evidence including
+  `universal-attainment-proof.yml` and `second-pass-no-diff-report.yml`
+- Completed a local packet-named validator sweep with green results on the
+  cutover branch
+
+**Next:**
+
+- Review the cutover branch diff for commit shaping and decide whether to
+  close out the branch
+
+**Blockers:**
+
+- No local implementation blockers remain
+- Merge/release and branch closeout still require an explicit human decision
+
 ## 2026-04-06
 
 **Session focus:** Create a repo-local execution prompt for the current

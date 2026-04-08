@@ -189,13 +189,16 @@ integration_surfaces:
     - ".octon/instance/governance/support-targets.yml"
     - ".octon/instance/governance/support-target-admissions/**"
     - ".octon/instance/governance/support-dossiers/**"
-    - ".octon/instance/capabilities/runtime/packs/admissions/**"
+    - ".octon/instance/governance/capability-packs/**"
+    - ".octon/instance/governance/decisions/**"
+    - ".octon/instance/governance/retirement-register.yml"
   runtime_adapter_roots:
     host: ".octon/framework/engine/runtime/adapters/host/**"
     model: ".octon/framework/engine/runtime/adapters/model/**"
   runtime_capability_pack_roots:
     framework: ".octon/framework/capabilities/packs/**"
-    instance: ".octon/instance/capabilities/runtime/packs/**"
+    governance: ".octon/instance/governance/capability-packs/**"
+    projection: ".octon/instance/capabilities/runtime/packs/**"
   retained_evidence_roots:
     - ".octon/state/evidence/runs/**"
     - ".octon/state/evidence/lab/**"

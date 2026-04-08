@@ -13,7 +13,7 @@ on:
       - ".octon/framework/constitution/claim-truth-conditions.yml"
       - ".octon/framework/engine/runtime/adapters/host/**"
       - ".octon/framework/assurance/governance/**"
-      - ".octon/instance/capabilities/runtime/packs/admissions/**"
+      - ".octon/instance/governance/capability-packs/**"
       - ".octon/state/control/execution/runs/**"
       - ".octon/state/evidence/control/execution/**"
       - ".octon/state/evidence/runs/**"
@@ -37,7 +37,7 @@ on:
       - ".octon/framework/constitution/claim-truth-conditions.yml"
       - ".octon/framework/engine/runtime/adapters/host/**"
       - ".octon/framework/assurance/governance/**"
-      - ".octon/instance/capabilities/runtime/packs/admissions/**"
+      - ".octon/instance/governance/capability-packs/**"
       - ".octon/state/control/execution/runs/**"
       - ".octon/state/evidence/control/execution/**"
       - ".octon/state/evidence/runs/**"
@@ -84,6 +84,6 @@ jobs:
           name: unified-execution-constitution-closure-publication
           path: |
             .octon/generated/.tmp/unified-execution-completion-ci/
-            .octon/state/evidence/disclosure/releases/2026-04-06-target-state-closure-provable-closure/
+            .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/
           if-no-files-found: error
           retention-days: 7

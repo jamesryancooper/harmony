@@ -1,6 +1,6 @@
 schema_version: support-target-admission-v1
 tuple_id: tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/ci-control-plane
-status: unsupported
+status: supported
 tuple:
   model_tier: repo-local-governed
   workload_tier: observe-and-read
@@ -19,11 +19,15 @@ allowed_capability_packs:
   - shell
   - telemetry
 required_proof_planes:
+  - structural
+  - functional
+  - behavioral
   - governance
   - maintainability
+  - recovery
 required_authority_artifacts:
   - decision-artifact
 evidence_refs:
   - .octon/state/evidence/disclosure/runs/uec-global-ci-observe-read-20260404/run-card.yml
 review_due_at: "2026-06-30T00:00:00Z"
-claim_effect: excluded-from-final-live-claim
+claim_effect: admitted-live-claim

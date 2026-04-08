@@ -1,0 +1,38 @@
+name: UEC Drift Watch
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * 1"
+  push:
+    branches:
+      - main
+    paths:
+      - ".octon/**"
+      - ".github/workflows/uec-drift-watch.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  drift-watch:
+    runs-on: ubuntu-latest
+    env:
+      CLOSURE_RELEASE_ID: 2026-04-08-uec-full-attainment-cutover
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Install jq and yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+      - name: Run drift checks
+        run: |
+          chmod +x .octon/framework/assurance/scripts/*.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/generate-release-bundle.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/runtime/_ops/scripts/generate-closure-projections.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-mirror-parity.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-support-target-admission.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-harness-card-claim.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-legacy-retirement.sh "$CLOSURE_RELEASE_ID"

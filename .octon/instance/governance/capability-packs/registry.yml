@@ -1,0 +1,15 @@
+schema_version: governance-capability-pack-registry-v1
+owner: Octon governance
+packs:
+  - pack_id: repo
+    manifest_ref: .octon/instance/governance/capability-packs/repo.yml
+  - pack_id: git
+    manifest_ref: .octon/instance/governance/capability-packs/git.yml
+  - pack_id: shell
+    manifest_ref: .octon/instance/governance/capability-packs/shell.yml
+  - pack_id: telemetry
+    manifest_ref: .octon/instance/governance/capability-packs/telemetry.yml
+  - pack_id: browser
+    manifest_ref: .octon/instance/governance/capability-packs/browser.yml
+  - pack_id: api
+    manifest_ref: .octon/instance/governance/capability-packs/api.yml

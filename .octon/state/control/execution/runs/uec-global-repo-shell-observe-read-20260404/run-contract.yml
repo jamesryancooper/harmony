@@ -3,12 +3,13 @@ run_id: uec-global-repo-shell-observe-read-20260404
 status: closed
 workflow_mode: agent-augmented
 mission_id: null
-mission_mode: none
+mission_mode: run-only
 requires_mission: false
 objective_refs:
   workspace_objective_ref: .octon/instance/charter/workspace.md
   workspace_machine_charter_ref: .octon/instance/charter/workspace.yml
-objective_summary: Observe-and-read repo-shell run completed inside the bounded admitted support universe.
+objective_summary: Observe-and-read repo-shell run completed inside the admitted
+  live support universe.
 scope_in:
 - workflow-scope
 scope_out:
@@ -17,7 +18,8 @@ scope_out:
 exclusions:
 - .octon/inputs/exploratory/ideation/**
 done_when:
-- Run disclosure, evidence classification, replay refs, and recovery refs validate for the bounded observe-and-read envelope.
+- Run disclosure, evidence classification, replay refs, and recovery refs
+  validate for the admitted observe-and-read envelope.
 acceptance_criteria:
 - Canonical replay, trace, recovery, and disclosure references resolve for the retained run bundle.
 materiality: low

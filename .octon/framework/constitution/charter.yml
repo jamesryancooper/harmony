@@ -1,6 +1,6 @@
 schema_version: "octon-constitution-charter-v1"
 charter_id: "octon-harness-charter"
-version: "1.2.0-proposal-packet-completion"
+version: "1.3.0-full-attainment-cutover"
 owner: "Octon governance"
 purpose: >-
   Provide one explicit repo-local constitutional kernel for the Octon
@@ -66,15 +66,15 @@ live_model:
   release_state: "pre-1.0"
   change_profile: "atomic"
   atomic_mode: "clean-break"
-  profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-04-07-two-packet-final-state-execution/plan.md"
+  profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-04-08-octon-uec-full-attainment-cutover/plan.md"
   consequential_execution_unit: "run-contract"
   authority_engine: "runtime-consumed"
   support_universe_mode: "global-complete-finite-product"
   support_universe_doctrine: >-
     The live support universe remains finite and globally complete; every
-    claim-critical modeled surface must be either dossier-backed, runtime-real,
-    validator-covered, proof-backed, and disclosure-backed inside the admitted
-    claim, or explicitly excluded or retired outside it.
+    claim-critical modeled surface must be dossier-backed, runtime-real,
+    validator-covered, proof-backed, and disclosure-backed inside the live
+    target universe.
   governance_exclusions_doctrine: >-
     Prohibited or non-claimed action classes live under explicit governance
     exclusions and must not survive as unsupported support tiers.

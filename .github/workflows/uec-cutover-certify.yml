@@ -1,0 +1,37 @@
+name: UEC Cutover Certify
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".octon/**"
+      - ".github/workflows/uec-cutover-certify.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    env:
+      CLOSURE_RELEASE_ID: 2026-04-08-uec-full-attainment-cutover
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Install jq and yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+      - name: Run certification validators
+        run: |
+          chmod +x .octon/framework/assurance/scripts/*.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/generate-release-bundle.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/runtime/_ops/scripts/generate-closure-projections.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-external-replay-restore.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-proof-planes.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-evaluator-independence.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-harness-card-claim.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-dual-pass-idempotence.sh "$CLOSURE_RELEASE_ID"

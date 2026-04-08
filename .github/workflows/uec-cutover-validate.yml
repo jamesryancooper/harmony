@@ -1,0 +1,56 @@
+name: UEC Cutover Validate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".octon/**"
+      - ".github/workflows/uec-cutover-validate.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - ".octon/**"
+      - ".github/workflows/uec-cutover-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      CLOSURE_RELEASE_ID: 2026-04-08-uec-full-attainment-cutover
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Install jq and yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+      - name: Run pass-1 validators
+        run: |
+          chmod +x .octon/framework/assurance/scripts/*.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/generate-release-bundle.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/runtime/_ops/scripts/generate-closure-projections.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-authority-classification.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-mirror-parity.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-precedence-resolution.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-objective-stack.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-mission-run-normalization.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-authority-centralization.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-authority-artifacts.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-fail-closed-routing.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-support-target-admission.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-capability-packs.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-run-roots.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-durable-lifecycle.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-evidence-retention.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-interventions.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-measurements.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-proof-planes.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-lab-substance.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-evaluator-independence.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-run-card-truth.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-legacy-retirement.sh "$CLOSURE_RELEASE_ID"

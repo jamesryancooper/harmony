@@ -23,7 +23,7 @@ intent_ref:
   version: 1.1.0
 issued_at: 2026-04-01T14:24:36.851912Z
 materiality: low
-mission_mode: none
+mission_mode: run-only
 model_adapter_ref: .octon/framework/engine/runtime/adapters/model/repo-local-governed.yml
 notes_ref: .octon/state/control/execution/runs/uec-validate-proposal-20260401-agent-augmented-3/stage-attempts/initial.yml
 objective_summary: Validate the proposal workflow run bundle and retained evidence against the bounded supported consequential envelope.
