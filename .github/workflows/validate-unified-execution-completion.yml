@@ -11,7 +11,7 @@ on:
       - ".octon/instance/charter/**"
       - ".octon/instance/governance/**"
       - ".octon/instance/governance/support-target-admissions/**"
-      - ".octon/instance/capabilities/runtime/packs/admissions/**"
+      - ".octon/instance/governance/capability-packs/**"
       - ".octon/state/control/execution/**"
       - ".octon/state/evidence/**"
       - ".github/workflows/validate-unified-execution-completion.yml"
@@ -27,7 +27,7 @@ on:
       - ".octon/instance/charter/**"
       - ".octon/instance/governance/**"
       - ".octon/instance/governance/support-target-admissions/**"
-      - ".octon/instance/capabilities/runtime/packs/admissions/**"
+      - ".octon/instance/governance/capability-packs/**"
       - ".octon/state/control/execution/**"
       - ".octon/state/evidence/**"
       - ".github/workflows/validate-unified-execution-completion.yml"
@@ -67,6 +67,6 @@ jobs:
           name: unified-execution-completion
           path: |
             .octon/generated/.tmp/unified-execution-completion/
-            .octon/state/evidence/disclosure/releases/2026-04-06-target-state-closure-provable-closure/
+            .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/
           if-no-files-found: error
           retention-days: 7

@@ -55,7 +55,9 @@ These launchers are the canonical invocation boundary for policy operations.
   - `/.octon/framework/engine/runtime/adapters/model/`
 - Framework capability-pack contracts are published under:
   - `/.octon/framework/capabilities/packs/`
-- Repo-local capability-pack admission is published under:
+- Repo-local governed capability-pack manifests are published under:
+  - `/.octon/instance/governance/capability-packs/`
+- Runtime capability-pack projections are published under:
   - `/.octon/instance/capabilities/runtime/packs/`
 - Canonical run-contract control roots are published under:
   - `/.octon/state/control/execution/runs/`
@@ -191,8 +193,8 @@ also satisfy:
 - repo-owned ownership and support-target declarations for consequential work
 - repo-owned host/model adapter declarations and adapter-conformance criteria
   from `/.octon/instance/governance/support-targets.yml`
-- repo-owned capability-pack admission under
-  `/.octon/instance/capabilities/runtime/packs/registry.yml`
+- repo-owned capability-pack governance under
+  `/.octon/instance/governance/capability-packs/registry.yml`
 - retained run evidence under `state/evidence/runs/<run_id>/**` for any
   resulting egress or cost artifacts
 - canonical run receipts under `state/evidence/runs/<run_id>/receipts/**`

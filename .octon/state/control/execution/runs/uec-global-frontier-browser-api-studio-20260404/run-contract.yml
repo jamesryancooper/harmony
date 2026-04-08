@@ -2,13 +2,14 @@ schema_version: run-contract-v3
 run_id: uec-global-frontier-browser-api-studio-20260404
 status: closed
 workflow_mode: agent-augmented
-mission_id: null
+mission_id: mission-autonomy-live-validation
 requires_mission: true
-mission_mode: none
+mission_mode: mission-bound
 objective_refs:
   workspace_machine_charter_ref: .octon/instance/charter/workspace.yml
   workspace_objective_ref: .octon/instance/charter/workspace.md
-objective_summary: Boundary-sensitive frontier-governed Studio run completed as stage-only evidence outside the bounded live claim.
+objective_summary: Boundary-sensitive frontier-governed Studio run completed as
+  governed evidence inside the admitted live claim.
 scope_in:
   - workflow-scope
 scope_out:
@@ -17,11 +18,12 @@ scope_out:
 exclusions:
   - .octon/inputs/exploratory/ideation/**
 done_when:
-  - The retained run bundle validates against bounded stage-only closure gating.
+  - The retained run bundle validates against canonical closure gating.
   - Run disclosure truthfully reflects the evidence emitted by the canonical run root.
 acceptance_criteria:
   - Canonical replay, trace, recovery, and disclosure references resolve for the retained run bundle.
-  - Run disclosure truthfully reflects the stage-only support surface exercised by the canonical run root.
+  - Run disclosure truthfully reflects the admitted support surface exercised by
+    the canonical run root.
 materiality: low
 protected_zones:
   - .octon/framework/constitution/**
@@ -62,7 +64,7 @@ support_target_tuple:
   model_adapter: frontier-governed
   model_tier: frontier-governed
   workload_tier: boundary-sensitive
-  support_status: stage_only
+  support_status: supported
 support_target_ref: .octon/instance/governance/support-targets.yml
 required_approvals: []
 required_evidence:
@@ -108,4 +110,3 @@ created_at: 2026-04-01T14:24:36.851912Z
 issued_at: 2026-04-01T14:24:36.851912Z
 updated_at: 2026-04-06T15:03:21Z
 notes_ref: .octon/state/control/execution/runs/uec-global-frontier-browser-api-studio-20260404/stage-attempts/initial.yml
-

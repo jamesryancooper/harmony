@@ -1,0 +1,7 @@
+schema_version: octon-validator-report-v1
+validator_id: V-SOT-001
+release_id: 2026-04-08-uec-full-attainment-cutover
+generated_at: "2026-04-08T14:44:31Z"
+status: pass
+summary: >-
+  Authored authority remains confined to framework and instance surfaces, with raw inputs and generated outputs kept non-authoritative.

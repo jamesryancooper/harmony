@@ -8,7 +8,9 @@ requires_mission: true
 objective_refs:
   workspace_objective_ref: .octon/instance/charter/workspace.md
   workspace_machine_charter_ref: .octon/instance/charter/workspace.yml
-objective_summary: Safe-stage lease and revocation exercise retained to prove canonical exception and revocation obedience under the mission-backed supported consequential envelope.
+objective_summary: Safe-stage lease and revocation exercise retained to prove
+  canonical exception and revocation obedience for the mission-backed
+  boundary-sensitive repo-shell envelope.
 scope_in:
 - governance-exercise
 scope_out:
@@ -42,17 +44,17 @@ actor_ref:
 reversibility_class: fully_reversible
 execution_horizon: multi_stage_single_run
 recurrence_class: one_shot
-support_tier: repo-consequential
+support_tier: boundary-sensitive
 support_target:
   model_tier: repo-local-governed
-  workload_tier: repo-consequential
+  workload_tier: boundary-sensitive
   language_resource_tier: reference-owned
   locale_tier: english-primary
   host_adapter: repo-shell
   model_adapter: repo-local-governed
 support_target_tuple:
   model_tier: repo-local-governed
-  workload_tier: repo-consequential
+  workload_tier: boundary-sensitive
   language_resource_tier: reference-owned
   locale_tier: english-primary
   host_adapter: repo-shell
@@ -68,13 +70,14 @@ required_evidence:
 - trace-pointers
 - run-evidence-classification-v2
 start_conditions:
-- Canonical authority artifacts exist for the mission-backed safe-stage governance exercise.
+- Canonical authority artifacts exist for the mission-backed boundary-sensitive
+  safe-stage governance exercise.
 - Mission `mission-autonomy-live-validation` remains active for consequential autonomy.
 stop_conditions:
 - Stop when governance route is no longer ALLOW or when revocation blocks the bounded action.
 retry_class: manual_review_required
 closure_conditions:
-- Run remains bounded to the safe-stage governance exercise.
+- Run remains scoped to the boundary-sensitive safe-stage governance exercise.
 disclosure_expectations:
 - Emit a RunCard and retained evidence for the governance exercise.
 stage_attempt_root: .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/stage-attempts

@@ -1,0 +1,10 @@
+schema_version: retirement-register-v1
+owner: Octon governance
+updated_at: "2026-04-08T14:44:31Z"
+entries:
+  - surface: .octon/instance/bootstrap/OBJECTIVE.md
+    status: archived-non-authoritative
+    rationale: Objective authority now lives in the workspace, mission, run, and stage contract stack.
+  - surface: .octon/instance/cognition/context/shared/intent.contract.yml
+    status: archived-non-authoritative
+    rationale: Intent authority now lives in constitutional and instance objective surfaces, not shared compatibility shims.

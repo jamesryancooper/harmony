@@ -55,7 +55,7 @@ status: completed
 created_at: '2026-03-27T19:52:03Z'
 updated_at: '2026-03-30T00:00:00Z'
 notes_ref: .octon/framework/orchestration/runtime/runs/run-wave3-runtime-bridge-20260327.yml
-mission_mode: none
+mission_mode: run-only
 objective_summary: Historical runtime bridge validation retained under the canonical
   run-first model.
 exclusions:

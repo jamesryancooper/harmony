@@ -39,7 +39,7 @@ stage_attempt_root: .octon/state/control/execution/runs/uec-audit-architecture-2
 status: bound
 support_tier: repo-local-consequential
 updated_at: 2026-03-31 21:23:12.128700+00:00
-mission_mode: none
+mission_mode: run-only
 objective_summary: Architecture audit retained under the canonical run-first model.
 exclusions:
 - .octon/inputs/exploratory/ideation/**

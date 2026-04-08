@@ -23,7 +23,7 @@ intent_ref:
   version: 1.1.0
 issued_at: 2026-04-01T14:28:15.200349Z
 materiality: medium
-mission_mode: none
+mission_mode: run-only
 model_adapter_ref: .octon/framework/engine/runtime/adapters/model/repo-local-governed.yml
 notes_ref: .octon/state/control/execution/runs/uec-evaluate-harness-20260401-agent-augmented-1/stage-attempts/initial.yml
 objective_summary: Evaluate the harness architecture bundle and retained evidence against the supported consequential envelope.

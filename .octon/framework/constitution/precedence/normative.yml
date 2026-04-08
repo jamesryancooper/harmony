@@ -100,6 +100,7 @@ layers:
     surfaces:
       - ".octon/framework/capabilities/**"
       - ".octon/framework/capabilities/packs/**"
+      - ".octon/instance/governance/capability-packs/**"
       - ".octon/instance/capabilities/runtime/packs/**"
       - ".octon/framework/constitution/contracts/adapters/**"
       - ".octon/framework/engine/runtime/adapters/**"

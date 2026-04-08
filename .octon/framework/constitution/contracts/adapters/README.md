@@ -33,5 +33,7 @@ Wave 5 hardens adapters as explicit, replaceable boundaries.
   `/.octon/framework/engine/runtime/adapters/model/**`
 - capability pack contracts:
   `/.octon/framework/capabilities/packs/**`
-- repo-local pack admission:
+- repo-local governed pack manifests:
+  `/.octon/instance/governance/capability-packs/**`
+- runtime pack projection:
   `/.octon/instance/capabilities/runtime/packs/**`

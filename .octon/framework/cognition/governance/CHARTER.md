@@ -132,8 +132,8 @@ Octon is governed by these non-negotiable concepts:
 | Term | Meaning |
 | ---- | ------- |
 | `objective contract` | The required two-artifact objective source for material autonomy: the workspace charter narrative and the workspace charter machine contract. |
-| `objective brief` | The human-readable workspace charter stored at `/.octon/instance/charter/workspace.md`, with `/.octon/instance/bootstrap/OBJECTIVE.md` retained as a compatibility shim. It explains goals, scope, constraints, and acceptance context for the workspace. |
-| `intent contract` | The machine-readable workspace charter stored at `/.octon/instance/charter/workspace.yml`, with `/.octon/instance/cognition/context/shared/intent.contract.yml` retained as a compatibility shim. It is the runtime authority for evaluating scope, binding execution, and validating autonomous material runs. |
+| `objective brief` | The human-readable workspace charter stored at `/.octon/instance/charter/workspace.md`. Any retained `/.octon/instance/bootstrap/OBJECTIVE.md` file is historical compatibility lineage only and not part of the live runtime path. |
+| `intent contract` | The machine-readable workspace charter stored at `/.octon/instance/charter/workspace.yml`. Any retained `/.octon/instance/cognition/context/shared/intent.contract.yml` file is historical compatibility lineage only and not part of the live runtime path. |
 | `material side effect` | Any write, delete, permission change, authority-surface change, external integration action, durable state mutation, destructive operation, or irreversible state transition. |
 | `material run` | Any autonomous or human-assisted execution that can produce one or more material side effects. |
 | `materiality classification` | The determination of whether a proposed operation is a material run by comparing its expected behavior against the `material side effect` definition and the governing objective or policy bounds. |

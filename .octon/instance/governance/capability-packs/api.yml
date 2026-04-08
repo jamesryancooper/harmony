@@ -1,0 +1,17 @@
+schema_version: governance-capability-pack-v1
+pack_id: api
+status: admitted
+default_route: escalate
+contract_ref: .octon/framework/capabilities/packs/api/manifest.yml
+source_admission_ref: .octon/instance/capabilities/runtime/packs/admissions/api.yml
+support_target_refs:
+  - tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell
+  - tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane
+  - tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane
+required_proof:
+  - structural
+  - functional
+  - behavioral
+  - governance
+  - maintainability
+  - recovery

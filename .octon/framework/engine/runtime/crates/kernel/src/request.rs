@@ -7,6 +7,7 @@ use std::collections::BTreeMap;
 
 pub const DEFAULT_MODEL_TIER: &str = "repo-local-governed";
 pub const DEFAULT_WORKLOAD_TIER: &str = "repo-consequential";
+pub const OBSERVE_AND_READ_WORKLOAD_TIER: &str = "observe-and-read";
 pub const DEFAULT_LANGUAGE_RESOURCE_TIER: &str = "reference-owned";
 pub const DEFAULT_LOCALE_TIER: &str = "english-primary";
 pub const DEFAULT_HOST_ADAPTER: &str = "repo-shell";
@@ -64,4 +65,16 @@ pub fn bind_repo_local_request(
     metadata: BTreeMap<String, String>,
 ) -> Result<(IntentRef, ActorRef, BTreeMap<String, String>)> {
     bind_request(cfg, metadata, DEFAULT_WORKLOAD_TIER, DEFAULT_HOST_ADAPTER)
+}
+
+pub fn bind_repo_observe_request(
+    cfg: &RuntimeConfig,
+    metadata: BTreeMap<String, String>,
+) -> Result<(IntentRef, ActorRef, BTreeMap<String, String>)> {
+    bind_request(
+        cfg,
+        metadata,
+        OBSERVE_AND_READ_WORKLOAD_TIER,
+        DEFAULT_HOST_ADAPTER,
+    )
 }

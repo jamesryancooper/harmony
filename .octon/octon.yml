@@ -100,7 +100,8 @@ resolution:
     replay_store_root: .octon/framework/engine/runtime/crates/replay_store
     telemetry_sink_root: .octon/framework/engine/runtime/crates/telemetry_sink
     framework_capability_pack_root: .octon/framework/capabilities/packs
-    runtime_capability_pack_root: .octon/instance/capabilities/runtime/packs
+    runtime_capability_pack_root: .octon/instance/governance/capability-packs
+    runtime_capability_pack_projection_root: .octon/instance/capabilities/runtime/packs
     lab_framework_root: .octon/framework/lab
     observability_framework_root: .octon/framework/observability
     lab_evidence_root: .octon/state/evidence/lab

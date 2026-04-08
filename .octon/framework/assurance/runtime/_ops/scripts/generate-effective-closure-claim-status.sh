@@ -28,7 +28,7 @@ fi
   echo "claim_phrase: fully unified execution constitution"
   echo "release_id: $release_id"
   echo "generated_at: \"$(deterministic_generated_at)\""
-  echo "profile_selection_receipt_ref: .octon/instance/cognition/context/shared/migrations/2026-04-07-two-packet-final-state-execution/plan.md"
+  echo "profile_selection_receipt_ref: .octon/instance/cognition/context/shared/migrations/2026-04-08-octon-uec-full-attainment-cutover/plan.md"
   echo "truth_conditions_ref: .octon/framework/constitution/claim-truth-conditions.yml"
   echo "active_release_refs:"
   echo "  harness_card: .octon/state/evidence/disclosure/releases/$release_id/harness-card.yml"
@@ -45,7 +45,7 @@ fi
   echo "  blocker_count: $blocker_count"
   echo "  ready_for_final_completion_claim: $ready"
   echo "  support_universe_mode: global-complete-finite"
-  echo "  claim_scope: admitted-supported-only"
+  echo "  claim_scope: universal-target-universe"
   echo "  blocked_by:"
   yq -r '.gates[] | select(.status != "green") | .gate_id' "$gate_status" | sed 's/^/    - /'
   echo "blockers:"
@@ -53,19 +53,19 @@ fi
     [[ -n "$gate_id" ]] || continue
     ac="AC-unknown"
     blocker_id="closure-blocker-${gate_id,,}"
-    reason="This gate remains red and continues to block the final admitted-universe claim."
+    reason="This gate remains red and continues to block the full-attainment claim."
     evidence_ref=".octon/state/evidence/disclosure/releases/$release_id/closure/gate-status.yml"
     case "$gate_id" in
       G13)
         ac="AC-11"
         blocker_id="closure-blocker-build-to-delete-open"
-        reason="Retirement and build-to-delete governance is still active, so the final admitted-universe claim cannot be made honestly."
+        reason="Retirement and build-to-delete governance is still active, so the full-attainment claim cannot be made honestly."
         evidence_ref=".octon/instance/governance/contracts/retirement-registry.yml"
         ;;
       G14)
         ac="AC-1"
         blocker_id="closure-blocker-truth-boundary"
-        reason="Claim truth is still depending on an untrusted boundary and must not be treated as complete."
+        reason="Claim truth is still depending on an untrusted boundary and must not be treated as full attainment."
         evidence_ref=".octon/framework/constitution/claim-truth-conditions.yml"
         ;;
     esac

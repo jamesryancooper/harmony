@@ -1,6 +1,6 @@
 schema_version: support-dossier-v1
 tuple_id: tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell
-status: unsupported
+status: supported
 tuple:
   model_tier: repo-local-governed
   workload_tier: boundary-sensitive
@@ -29,8 +29,8 @@ required_lab_scenarios:
   - adversarial-baseline
   - replay-shadow-baseline
   - recovery-fault-baseline
-representative_retained_runs: []
-known_exclusions:
-  - excluded-from-final-live-claim
+representative_retained_runs:
+  - .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/run-contract.yml
+known_exclusions: []
 recertification_cadence: quarterly
 support_admission_ref: .octon/instance/governance/support-target-admissions/repo-shell-boundary-sensitive-en.yml

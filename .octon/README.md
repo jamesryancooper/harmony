@@ -118,9 +118,9 @@ No other `instance/**` subtree is overlay-capable in v1.
   `/.octon/instance/charter/workspace.md`
 - Canonical workspace intent contract:
   `/.octon/instance/charter/workspace.yml`
-- Compatibility workspace objective shim:
+- Historical compatibility workspace objective shim:
   `/.octon/instance/bootstrap/OBJECTIVE.md`
-- Compatibility workspace intent shim:
+- Historical compatibility workspace intent shim:
   `/.octon/instance/cognition/context/shared/intent.contract.yml`
 - Canonical run-contract control roots:
   `/.octon/state/control/execution/runs/<run-id>/`

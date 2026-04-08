@@ -423,7 +423,7 @@ fn cmd_tool(service_id_or_name: &str, op: &str, input_json: Option<&str>) -> any
     let service_profile =
         service_capability_profile(&svc.key.id(), &input, &svc.manifest.capabilities_required);
     let (intent_ref, actor_ref, metadata) =
-        request::bind_repo_local_request(&ctx.cfg, service_profile.metadata.clone())?;
+        request::bind_repo_observe_request(&ctx.cfg, service_profile.metadata.clone())?;
 
     let request = ExecutionRequest {
         request_id: new_request_id("tool"),

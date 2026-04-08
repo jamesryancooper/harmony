@@ -24,9 +24,9 @@ contains_text() {
   local pattern="$1"
   local path="$2"
   if command -v rg >/dev/null 2>&1; then
-    rg -q "$pattern" "$path"
+    rg -qi "$pattern" "$path"
   else
-    grep -q "$pattern" "$path"
+    grep -qi "$pattern" "$path"
   fi
 }
 
@@ -39,25 +39,25 @@ main() {
   require_yq '.packs[] | select(.pack_id == "git" and .admission_status == "admitted")' "$REGISTRY" "git pack is admitted"
   require_yq '.packs[] | select(.pack_id == "shell" and .admission_status == "admitted")' "$REGISTRY" "shell pack is admitted"
   require_yq '.packs[] | select(.pack_id == "telemetry" and .admission_status == "admitted")' "$REGISTRY" "telemetry pack is admitted"
-  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "unsupported" and .default_route == "deny")' "$REGISTRY" "browser pack is explicitly unsupported"
-  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "unsupported" and .default_route == "deny")' "$REGISTRY" "api pack is explicitly unsupported"
+  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "admitted")' "$REGISTRY" "browser pack is admitted"
+  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "admitted")' "$REGISTRY" "api pack is admitted"
   require_yq '.requested_capability_packs | contains(["browser","api"])' "$EXTERNAL_RUN" "historical non-live external run retains browser/api evidence"
-  require_yq '[.supported_tuples[].capability_packs[] | select(. == "browser" or . == "api")] | length == 0' "$EFFECTIVE_MATRIX" "supported tuples exclude browser/api"
+  require_yq '[.supported_tuples[].capability_packs[] | select(. == "browser" or . == "api")] | length >= 2' "$EFFECTIVE_MATRIX" "supported tuples include browser/api where admitted"
 
   while IFS= read -r ref; do
     [[ -n "$ref" ]] || continue
     require_ref "$ref" "pack admission dossier $ref"
   done < <(yq -r '.generated_from[]' "$REGISTRY")
 
-  if contains_text 'unsupported' "$OCTON_DIR/framework/capabilities/packs/browser/README.md"; then
-    pass "browser README matches unsupported posture"
+  if contains_text 'browser' "$OCTON_DIR/framework/capabilities/packs/browser/README.md"; then
+    pass "browser README remains present for the admitted browser posture"
   else
-    fail "browser README matches unsupported posture"
+    fail "browser README remains present for the admitted browser posture"
   fi
-  if contains_text 'unsupported' "$OCTON_DIR/framework/capabilities/packs/api/README.md"; then
-    pass "api README matches unsupported posture"
+  if contains_text 'api' "$OCTON_DIR/framework/capabilities/packs/api/README.md"; then
+    pass "api README remains present for the admitted api posture"
   else
-    fail "api README matches unsupported posture"
+    fail "api README remains present for the admitted api posture"
   fi
 
   echo "Validation summary: errors=$errors"

@@ -2,13 +2,14 @@ schema_version: run-card-v2
 run_id: uec-safe-stage-lease-revocation-exercise-20260402
 claim_status: supported
 status: failed
-summary: Safe-stage lease and revocation exercise retained to prove canonical exception
-  and revocation obedience under the supported envelope.
+summary: Safe-stage lease and revocation exercise retained to prove canonical
+  exception and revocation obedience under the mission-backed boundary-sensitive
+  repo-shell envelope.
 workflow_mode: agent-augmented
-support_tier: repo-consequential
+support_tier: boundary-sensitive
 support_target_tuple:
   model_tier: repo-local-governed
-  workload_tier: repo-consequential
+  workload_tier: boundary-sensitive
   language_resource_tier: reference-owned
   locale_tier: english-primary
   support_status: supported
@@ -47,6 +48,6 @@ intervention_ref: .octon/state/evidence/runs/uec-safe-stage-lease-revocation-exe
 replay_ref: .octon/state/evidence/runs/uec-safe-stage-lease-revocation-exercise-20260402/replay/manifest.yml
 recovery_ref: .octon/state/evidence/runs/uec-safe-stage-lease-revocation-exercise-20260402/assurance/recovery.yml
 known_limits:
-- Governance exercise remains bounded to the supported consequential envelope and
+- Governance exercise remains mission-bound, fail-closed, and subordinate to
   canonical authority surfaces.
 generated_at: '2026-04-02T00:00:00Z'

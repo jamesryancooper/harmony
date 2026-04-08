@@ -5,10 +5,10 @@ runtime_state_ref: .octon/state/control/execution/runs/uec-safe-stage-lease-revo
 run_continuity_ref: .octon/state/continuity/runs/uec-safe-stage-lease-revocation-exercise-20260402/handoff.yml
 decision_artifact_ref: .octon/state/evidence/control/execution/authority-decision-uec-safe-stage-lease-revocation-exercise-20260402.yml
 authority_grant_bundle_ref: .octon/state/evidence/control/execution/authority-grant-bundle-uec-safe-stage-lease-revocation-exercise-20260402.yml
-support_tier: repo-consequential
+support_tier: boundary-sensitive
 support_target:
   model_tier: repo-local-governed
-  workload_tier: repo-consequential
+  workload_tier: boundary-sensitive
   language_resource_tier: reference-owned
   locale_tier: english-primary
   host_adapter: repo-shell

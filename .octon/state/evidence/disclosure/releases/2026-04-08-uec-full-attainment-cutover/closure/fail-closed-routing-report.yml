@@ -1,0 +1,7 @@
+schema_version: octon-validator-report-v1
+validator_id: V-AUTH-003
+release_id: 2026-04-08-uec-full-attainment-cutover
+generated_at: "2026-04-08T14:44:31Z"
+status: pass
+summary: >-
+  Governed routes remain explicit and fail-closed instead of silently widening or continuing.

@@ -60,9 +60,10 @@ gate_failures=0
   yq -r '.gates[] | select(.status != "green") | .gate_id' "$gate_status" | sed 's/^/  - /'
   echo "notes:"
   echo "  - Stable mirrors are generated from the active release bundle only."
-  echo "  - Explicitly excluded non-live surfaces remain disclosed outside the live claim."
   if [[ $gate_failures -gt 0 ]]; then
-    echo "  - Final admitted-universe completion remains blocked until every red gate closes."
+    echo "  - Full attainment remains blocked until every red gate closes."
+  else
+    echo "  - The full target support universe is admitted and evidenced in this release."
   fi
 } >"$summary"
 {

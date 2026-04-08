@@ -11,9 +11,11 @@ workspace_refs:
 allowed_run_classes:
   - "observe-and-read"
   - "repo-consequential"
+  - "boundary-sensitive"
 default_support_tiers:
   - "tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell"
   - "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell"
+  - "tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell"
 autonomy_class: "reversible-governed"
 protected_zones:
   - ".octon/framework/constitution/**"

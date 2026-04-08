@@ -25,6 +25,7 @@
     "support_target_tuple",
     "mission_id",
     "requires_mission",
+    "mission_mode",
     "required_approvals",
     "required_evidence",
     "retry_class",
@@ -109,6 +110,13 @@
     "requires_mission": {
       "type": "boolean"
     },
+    "mission_mode": {
+      "type": "string",
+      "enum": [
+        "mission-bound",
+        "run-only"
+      ]
+    },
     "required_approvals": {
       "type": "array"
     },
@@ -151,6 +159,43 @@
       "type": "string",
       "minLength": 1
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "requires_mission": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mission_mode": {
+            "const": "mission-bound"
+          },
+          "mission_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "requires_mission": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mission_mode": {
+            "const": "run-only"
+          }
+        }
+      }
+    }
+  ]
 }
-

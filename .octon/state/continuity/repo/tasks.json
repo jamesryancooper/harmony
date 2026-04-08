@@ -319,6 +319,41 @@
       "description": "Archive the target-state-closure proposal packet under the canonical proposal archive tree",
       "status": "completed",
       "completed_at": "2026-04-06"
+    },
+    {
+      "id": "uec-full-attainment-cutover-2026-04-08",
+      "description": "Execute the 2026-04-08 UEC full-attainment cutover packet on a dedicated cutover branch",
+      "status": "in_progress",
+      "owner": "octon-platform",
+      "priority": 1,
+      "blockers": [],
+      "acceptance_criteria": [
+        "Cutover branch contains the canonical support-target, disclosure, capability-pack, ADR, and validator/workflow deltas for the packet",
+        "The 2026-04-08 cutover release bundle and closure reports exist",
+        "The packet-named local validator sweep and dual-pass idempotence wrapper pass",
+        "The branch is ready for closeout and merge/release review"
+      ],
+      "knowledge_links": {
+        "specs": [
+          "external:.octon/framework/scaffolding/practices/prompts/2026-04-08-octon-uec-full-attainment-cutover.prompt.md",
+          "external:.octon/inputs/exploratory/proposals/architecture/octon-uec-proposal-packet-2026-04-08/README.md"
+        ],
+        "contracts": [
+          "external:.octon/framework/constitution/claim-truth-conditions.yml",
+          "external:.octon/instance/governance/support-targets.yml"
+        ],
+        "decisions": [
+          "external:.octon/instance/governance/decisions/ADR-UEC-010-full-attainment-certification.md"
+        ],
+        "evidence": [
+          "external:.octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/harness-card.yml",
+          "external:.octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/universal-attainment-proof.yml",
+          "external:.octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/second-pass-no-diff-report.yml"
+        ]
+      },
+      "risk_tier": "T1",
+      "required_approvals": [],
+      "note": "Local cutover implementation and validator sweep are complete; branch closeout is pending."
     }
   ]
 }

@@ -1,0 +1,7 @@
+schema_version: octon-validator-report-v1
+validator_id: V-AUTH-001
+release_id: 2026-04-08-uec-full-attainment-cutover
+generated_at: "2026-04-08T14:44:31Z"
+status: pass
+summary: >-
+  Host workflows remain projection-only and canonical authority artifacts remain the sole authority source.

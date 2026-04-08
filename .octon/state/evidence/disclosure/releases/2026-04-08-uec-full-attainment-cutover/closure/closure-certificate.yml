@@ -1,0 +1,14 @@
+schema_version: closure-certificate-v2
+release_id: 2026-04-08-uec-full-attainment-cutover
+generated_at: "2026-04-08T14:44:31Z"
+status: certified
+proof_bundle_refs:
+  - .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/gate-status.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/closure-summary.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/recertification-status.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/support-universe-coverage.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/proof-plane-coverage.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/cross-artifact-consistency.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/claim-drift-report.yml
+certification_mode: equally-strong-recertification-rule
+recertification_status_ref: .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/recertification-status.yml
