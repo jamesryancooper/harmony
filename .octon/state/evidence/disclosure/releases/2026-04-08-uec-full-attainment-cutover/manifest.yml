@@ -11,7 +11,7 @@ validator_versions:
   wording: 1
 authored_input_digests:
   charter: sha256:0dd26c7254e6e533cc12b59a707bacab002ba7a1b453ef9c981e5aa759408e98
-  support_targets: sha256:0ce453964b376ed80ca54712d6f57235cb42675a37e8e6e617fd3d30ddb00ee3
+  support_targets: sha256:eca17fd07d7cee7ef7cecf7ad56c26a4c524cfc6804030627cffdb2333824c4c
   workspace_charter: sha256:1c07a014b52b0ed30d7d58ded45dd7288b1d7361caef8e060726d8b9fc486baf
 proof_bundle_runs:
   - run://uec-global-ci-observe-read-20260404
