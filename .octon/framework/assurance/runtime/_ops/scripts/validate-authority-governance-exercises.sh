@@ -54,13 +54,13 @@ main() {
 
   require_file "$OCTON_DIR/state/control/execution/approvals/requests/${lease_run}.yml"
   require_file "$OCTON_DIR/state/control/execution/approvals/grants/grant-${lease_run}.yml"
-  require_file "$OCTON_DIR/state/control/execution/exceptions/leases.yml"
-  require_file "$OCTON_DIR/state/control/execution/revocations/grants.yml"
+  require_file "$OCTON_DIR/state/control/execution/exceptions/leases/lease-uec-safe-stage-lease-revocation-exercise-20260402.yml"
+  require_file "$OCTON_DIR/state/control/execution/revocations/revoke-uec-safe-stage-lease-revocation-exercise-20260402.yml"
   require_file "$OCTON_DIR/state/evidence/disclosure/runs/${lease_run}/run-card.yml"
   require_file "$OCTON_DIR/state/evidence/control/execution/authority-decision-${lease_run}.yml"
 
-  require_yq '.leases[] | select(.id == "lease-uec-safe-stage-lease-revocation-exercise-20260402" and .run_id == "uec-safe-stage-lease-revocation-exercise-20260402")' "$OCTON_DIR/state/control/execution/exceptions/leases.yml" "lease exercise retains bounded exception lease"
-  require_yq '.revocations[] | select(.revocation_id == "revoke-uec-safe-stage-lease-revocation-exercise-20260402" and .state == "active")' "$OCTON_DIR/state/control/execution/revocations/grants.yml" "revocation exercise retains active revocation"
+  require_yq '.lease_id == "lease-uec-safe-stage-lease-revocation-exercise-20260402" and .run_id == "uec-safe-stage-lease-revocation-exercise-20260402"' "$OCTON_DIR/state/control/execution/exceptions/leases/lease-uec-safe-stage-lease-revocation-exercise-20260402.yml" "lease exercise retains bounded exception lease"
+  require_yq '.revocation_id == "revoke-uec-safe-stage-lease-revocation-exercise-20260402" and .state == "active"' "$OCTON_DIR/state/control/execution/revocations/revoke-uec-safe-stage-lease-revocation-exercise-20260402.yml" "revocation exercise retains active revocation"
   require_yq '.decision == "DENY"' "$OCTON_DIR/state/evidence/control/execution/authority-decision-${lease_run}.yml" "revocation exercise decision is DENY"
   require_yq '.exception_refs | length > 0 and .revocation_refs | length > 0' "$OCTON_DIR/state/evidence/control/execution/authority-decision-${lease_run}.yml" "revocation exercise decision records lease and revocation refs"
 

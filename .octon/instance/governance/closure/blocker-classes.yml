@@ -1,0 +1,39 @@
+schema_version: closure-blocker-classes-v1
+owner: Octon governance
+blocker_classes:
+  - blocker_id: A
+    title: support-target-tuple-inconsistency
+    severity: critical
+    route: block-complete-claim
+    truth_conditions:
+      - TC-03
+      - TC-08
+      - TC-09
+  - blocker_id: B
+    title: canonical-authority-leakage-into-compatibility-files
+    severity: critical
+    route: block-complete-claim
+    truth_conditions:
+      - TC-04
+      - TC-09
+  - blocker_id: C
+    title: stale-claim-calibration-wording
+    severity: high
+    route: block-complete-claim
+    truth_conditions:
+      - TC-08
+      - TC-09
+  - blocker_id: D
+    title: stage-attempt-family-skew
+    severity: high
+    route: block-complete-claim
+    truth_conditions:
+      - TC-05
+      - TC-09
+  - blocker_id: E
+    title: closure-validator-underreach
+    severity: critical
+    route: block-complete-claim
+    truth_conditions:
+      - TC-09
+      - TC-10

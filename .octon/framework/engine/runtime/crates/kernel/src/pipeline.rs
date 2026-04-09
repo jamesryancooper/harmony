@@ -1568,6 +1568,7 @@ mod tests {
     use std::collections::HashMap;
     use std::path::PathBuf;
     use std::sync::{Mutex, OnceLock};
+    use walkdir::WalkDir;
 
     static PIPELINE_TEST_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
 
@@ -1608,6 +1609,28 @@ mod tests {
         let _ = fs::remove_dir_all(&root);
         fs::create_dir_all(&root).expect("create temp root");
         root
+    }
+
+    fn copy_tree(from: &Path, to: &Path) {
+        for entry in WalkDir::new(from)
+            .follow_links(false)
+            .into_iter()
+            .filter_map(|entry| entry.ok())
+        {
+            let path = entry.path();
+            let rel = path
+                .strip_prefix(from)
+                .expect("relative path should resolve");
+            let dest = to.join(rel);
+            if entry.file_type().is_dir() {
+                fs::create_dir_all(&dest).expect("target directory should exist");
+            } else if entry.file_type().is_file() {
+                if let Some(parent) = dest.parent() {
+                    fs::create_dir_all(parent).expect("parent directory should exist");
+                }
+                fs::copy(path, &dest).expect("file should copy");
+            }
+        }
     }
 
     fn seed_generic_workflow_fixture(root: &Path) -> PathBuf {
@@ -1652,6 +1675,10 @@ mod tests {
             octon_dir.join("instance/governance/support-targets.yml"),
         )
         .expect("copy support targets");
+        copy_tree(
+            &source_repo_root().join(".octon/instance/governance/support-target-admissions"),
+            &root.join(".octon/instance/governance/support-target-admissions"),
+        );
 
         fs::write(
             octon_dir.join("framework/orchestration/runtime/workflows/manifest.yml"),

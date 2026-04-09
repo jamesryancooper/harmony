@@ -4,7 +4,9 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/closure-packet-commo
 release_id="$(resolve_release_id "${1:-}")"
 out_root="$(release_root "$release_id")/closure"
 mkdir -p "$out_root"
+bash "$SCRIPT_DIR/generate-support-target-matrix.sh"
 bash "$SCRIPT_DIR/generate-support-universe-coverage.sh" "$release_id"
+bash "$SCRIPT_DIR/generate-blocker-ledger.sh"
 bash "$SCRIPT_DIR/generate-proof-plane-coverage-report.sh" "$release_id"
 bash "$SCRIPT_DIR/generate-cross-artifact-consistency-report.sh" "$release_id"
 bash "$SCRIPT_DIR/generate-claim-drift-report.sh" "$release_id"
@@ -25,16 +27,23 @@ gate_failures=0
     "G3:run-bundle-completeness:validate-run-bundle-completeness.sh" \
     "G4:evidence-classification:validate-evidence-classification-nonempty.sh" \
     "G5:support-tuple-consistency:validate-cross-artifact-support-tuple-consistency.sh" \
+    "G5A:support-target-canonicality:../../../scripts/validate-support-target-canonicality.sh" \
     "G6:capability-pack-consistency:validate-cross-artifact-capability-pack-consistency.sh" \
     "G7:route-consistency:validate-cross-artifact-route-consistency.sh" \
+    "G7A:run-contract-support-binding:../../../scripts/validate-run-contract-support-binding.sh" \
     "G8:quorum-bindings:validate-quorum-policy-bindings.sh" \
     "G9:host-non-authority:validate-host-projection-non-authority.sh" \
+    "G9A:canonical-authority-purity:../../../scripts/validate-canonical-authority-purity.sh" \
     "G10:proof-plane-completeness:validate-proof-plane-completeness.sh" \
     "G11:wording-coherence:validate-disclosure-wording-coherence.sh" \
+    "G11A:stage-attempt-disclosure-separation:../../../scripts/validate-stage-attempt-disclosure-separation.sh" \
+    "G11B:known-limits-coherence:../../../scripts/validate-known-limits-coherence.sh" \
+    "G11C:claim-calibrated-disclosure:../../../scripts/validate-claim-calibrated-disclosure.sh" \
     "G12:legacy-active-path:validate-no-legacy-active-path.sh" \
     "G13:retirement-and-drift:validate-retirement-registry.sh" \
     "G14:claim-truth-boundary:validate-claim-truth-boundary.sh" \
-    "G15:recertification-discipline:validate-recertification-status.sh"; do
+    "G15:recertification-discipline:validate-recertification-status.sh" \
+    "G16:blocker-ledger-zero:validate-blocker-ledger-zero.sh"; do
     gate_id="${pair%%:*}"
     rest="${pair#*:}"
     title="${rest%%:*}"
@@ -51,9 +60,9 @@ gate_failures=0
   echo "schema_version: closure-summary-v2"
   echo "release_id: $release_id"
   echo "generated_at: \"$(deterministic_generated_at)\""
-  echo "claim_status: $( [[ $gate_failures -eq 0 ]] && echo complete || echo incomplete )"
+  echo "claim_status: $( [[ $gate_failures -eq 0 ]] && [[ "$(yq -r '.open_blocker_count' "$(effective_closure_root)/blocker-ledger.yml")" == "0" ]] && echo complete || echo incomplete )"
   echo "support_universe_mode: global-complete-finite"
-  echo "preclaim_blockers_open: $gate_failures"
+  echo "preclaim_blockers_open: $(yq -r '.open_blocker_count' "$(effective_closure_root)/blocker-ledger.yml")"
   echo "green_gates:"
   yq -r '.gates[] | select(.status == "green") | .gate_id' "$gate_status" | sed 's/^/  - /'
   echo "blocked_by:"

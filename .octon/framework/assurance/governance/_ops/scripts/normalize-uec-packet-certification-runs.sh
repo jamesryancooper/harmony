@@ -6,8 +6,8 @@ DEFAULT_OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../../.." && pwd)"
 OCTON_DIR="${OCTON_DIR_OVERRIDE:-$DEFAULT_OCTON_DIR}"
 ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 CONFIG_FILE="$OCTON_DIR/instance/governance/closure/uec-packet-certification-runs.yml"
-LEASE_SOURCE="$OCTON_DIR/state/control/execution/exceptions/leases.yml"
-REVOCATION_SOURCE="$OCTON_DIR/state/control/execution/revocations/grants.yml"
+LEASE_SOURCE_DIR="$OCTON_DIR/state/control/execution/exceptions/leases"
+REVOCATION_SOURCE_DIR="$OCTON_DIR/state/control/execution/revocations"
 HIDDEN_REPAIR_FILE="$OCTON_DIR/state/evidence/validation/publication/unified-execution-constitution-closure/hidden-repair-detection.yml"
 
 require_tools() {
@@ -86,7 +86,7 @@ write_authority_root() {
     [[ -n "$grant_ref" ]] || continue
     copy_ref_if_present "$grant_ref" "$grant_dir/$(basename "$grant_ref")"
     copy_ref_if_present "$grant_ref" "$authority_root/approval-grant.yml"
-  done < <(yq -r '.approval_grant_refs[]? // empty' "$manifest" 2>/dev/null || true)
+  done < <(yq -r '.approval_grant_refs[]' "$manifest" 2>/dev/null || true)
   copy_ref_if_present "$grant_bundle_ref" "$grant_dir/grant-bundle.yml"
   copy_ref_if_present "$grant_bundle_ref" "$authority_root/grant-bundle.yml"
   copy_ref_if_present "$decision_ref" "$decision_dir/decision.yml"
@@ -122,10 +122,11 @@ write_authority_root() {
 
   local lease_entries_json revocation_entries_json
   lease_entries_json="$(
-    yq -o=json '.leases // []' "$LEASE_SOURCE" 2>/dev/null \
-      | jq --arg run_id "$run_id" '[.[] | select((.run_id // "") == $run_id)]'
+    find "$LEASE_SOURCE_DIR" -maxdepth 1 -type f -name '*.yml' ! -name 'README.md' -print 2>/dev/null \
+      | while IFS= read -r file; do yq -o=json '.' "$file"; done \
+      | jq -s --arg run_id "$run_id" '[.[] | select((.run_id // "") == $run_id)]'
   )"
-  jq -n --arg run_id "$run_id" --arg source_ref ".octon/state/control/execution/exceptions/leases.yml" --argjson leases "$lease_entries_json" '
+  jq -n --arg run_id "$run_id" --arg source_ref ".octon/state/control/execution/exceptions/leases/" --argjson leases "$lease_entries_json" '
         {
           schema_version: "authority-run-lease-index-v1",
           run_id: $run_id,
@@ -147,10 +148,11 @@ write_authority_root() {
   fi
 
   revocation_entries_json="$(
-    yq -o=json '.revocations // []' "$REVOCATION_SOURCE" 2>/dev/null \
-      | jq --arg run_id "$run_id" '[.[] | select((.run_id // "") == $run_id)]'
+    find "$REVOCATION_SOURCE_DIR" -maxdepth 1 -type f -name '*.yml' ! -name 'README.md' -print 2>/dev/null \
+      | while IFS= read -r file; do yq -o=json '.' "$file"; done \
+      | jq -s --arg run_id "$run_id" '[.[] | select((.run_id // "") == $run_id)]'
   )"
-  jq -n --arg run_id "$run_id" --arg source_ref ".octon/state/control/execution/revocations/grants.yml" --argjson revocations "$revocation_entries_json" '
+  jq -n --arg run_id "$run_id" --arg source_ref ".octon/state/control/execution/revocations/" --argjson revocations "$revocation_entries_json" '
         {
           schema_version: "authority-run-revocation-index-v1",
           run_id: $run_id,

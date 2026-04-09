@@ -9,7 +9,7 @@ allowed_zones:
 completion_status: criteria-met
 entry_criteria:
 - Run contract is bound under the canonical run root.
-- Support-target tuple remains admitted for the bounded observe-and-read envelope.
+- Support-target tuple remains admitted for the live observe-and-read claim.
 evidence_refs:
 - .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/receipts/policy-receipt.latest.json
 - .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/receipts/grant-bundle.json
@@ -18,7 +18,7 @@ exit_criteria:
 - Stage receipts, replay refs, and disclosure refs are retained under canonical run roots.
 - Stage status is terminal and agrees with the retained decision artifact.
 objective_ref: .octon/state/control/execution/runs/uec-global-repo-shell-observe-read-20260404/run-contract.yml
-objective_slice: Validate proposal workflow execution and retained evidence closure for the bounded observe-and-read bundle.
+objective_slice: Validate proposal workflow execution and retained evidence closure for the admitted observe-and-read run.
 stage_name: observe-and-read-rebind
 done_when:
 - Run disclosure, evidence classification, and replay refs resolve under the canonical run roots.

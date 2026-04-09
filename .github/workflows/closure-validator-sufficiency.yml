@@ -1,0 +1,29 @@
+name: Closure Validator Sufficiency
+
+on:
+  pull_request:
+    paths:
+      - ".octon/framework/assurance/scripts/**"
+      - ".octon/framework/assurance/runtime/_ops/scripts/**"
+      - ".octon/framework/assurance/fixtures/closure/**"
+      - ".github/workflows/closure-validator-sufficiency.yml"
+  push:
+    branches: [main]
+    paths:
+      - ".octon/framework/assurance/scripts/**"
+      - ".octon/framework/assurance/runtime/_ops/scripts/**"
+      - ".octon/framework/assurance/fixtures/closure/**"
+      - ".github/workflows/closure-validator-sufficiency.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sufficiency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - name: Run closure negative controls
+        run: |
+          bash .octon/framework/assurance/scripts/run-closure-negative-controls.sh

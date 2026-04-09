@@ -1,0 +1,68 @@
+schema_version: "architecture-proposal-v1"
+proposal_id: "octon-uec-proposal-packet-2026-04-08"
+proposal_kind: "architecture"
+architecture_scope: "cross-domain-architecture"
+decision_type: "boundary-change"
+packet_id: "octon-uec-full-attainment-proposal-2026-04-08"
+architecture_target: "full-unified-execution-constitution"
+claim_posture:
+  current_state: "bounded-support constitutional execution"
+  target_state: "universal in-scope Unified Execution Constitution attainment"
+problem_statement: >-
+  The repository needed one packet-grade cutover plan that turned the remaining
+  bounded-support constitutional gaps into explicit remediation, validation,
+  and closeout work so the final full-attainment claim could be made from
+  durable repo surfaces rather than exploratory packet content.
+architectural_thesis: >-
+  Octon reaches full attainment only when constitutional authority, objective
+  routing, runtime evidence, proof, disclosure, and support-target closure are
+  all enforced from durable surfaces in one atomic cutover with no residual
+  shadow authority or packet-path dependency.
+target_support_universe:
+  model_tiers:
+    - "repo-local-governed"
+    - "frontier-governed"
+  host_adapters:
+    - "repo-shell"
+    - "github-control-plane"
+    - "ci-control-plane"
+    - "studio-control-plane"
+  workload_tiers:
+    - "observe-and-read"
+    - "repo-consequential"
+    - "boundary-sensitive"
+  language_resource_tiers:
+    - "reference-owned"
+    - "extended-governed"
+  locale_tiers:
+    - "english-primary"
+    - "spanish-secondary"
+  capability_packs:
+    - "repo"
+    - "git"
+    - "shell"
+    - "telemetry"
+    - "browser"
+    - "api"
+required_outcomes:
+  - "one authoritative constitutional kernel under .octon/framework/constitution/**"
+  - "one legal objective stack with workspace charter, mission authority when required, run contract, and stage attempt"
+  - "one canonical authority regime backed by durable repo surfaces"
+  - "one durable run and evidence model with truthful disclosure"
+  - "one full admitted support universe with no in-scope exclusions"
+  - "one archive-ready exploratory packet once closeout evidence lands"
+blocking_findings:
+  - "UEC-F001"
+  - "UEC-F002"
+  - "UEC-F003"
+  - "UEC-F004"
+  - "UEC-F005"
+  - "UEC-F006"
+  - "UEC-F007"
+  - "UEC-F009"
+  - "UEC-F011"
+  - "UEC-F012"
+  - "UEC-F013"
+  - "UEC-F016"
+  - "UEC-F017"
+  - "UEC-F018"

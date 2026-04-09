@@ -456,8 +456,10 @@ pub fn load_execution_exception_leases(repo_root: &Path) -> Result<ExecutionExce
         }
     }
 
-    let legacy = repo_root.join(".octon/state/control/execution/exceptions/leases.yml");
-    load_yaml_or_default(&legacy)
+    Ok(ExecutionExceptionLeases {
+        schema_version: "authority-exception-lease-directory-v1".to_string(),
+        leases: Vec::new(),
+    })
 }
 
 pub fn load_execution_budget_policy(repo_root: &Path) -> Result<ExecutionBudgetPolicy> {
@@ -566,7 +568,7 @@ pub fn evaluate_network_egress(
                 }),
                 source_kind: "exception-lease".to_string(),
                 artifact_ref: Some(format!(
-                    ".octon/state/control/execution/exceptions/leases.yml#{}",
+                    ".octon/state/control/execution/exceptions/leases/{}.yml",
                     lease.id
                 )),
             });

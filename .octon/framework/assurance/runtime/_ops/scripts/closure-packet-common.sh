@@ -6,6 +6,7 @@ DEFAULT_OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../../.." && pwd)"
 OCTON_DIR="${OCTON_DIR_OVERRIDE:-$DEFAULT_OCTON_DIR}"
 ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 SUPPORT_DOSSIER_ROOT="$OCTON_DIR/instance/governance/support-dossiers"
+SUPPORT_TARGETS_DECLARATION="$OCTON_DIR/instance/governance/support-targets.yml"
 RELEASE_LINEAGE_PATH="$OCTON_DIR/instance/governance/disclosure/release-lineage.yml"
 RETIREMENT_REGISTRY_PATH="$OCTON_DIR/instance/governance/contracts/retirement-registry.yml"
 
@@ -37,6 +38,15 @@ release_root() {
 
 support_dossier_files() {
   find "$SUPPORT_DOSSIER_ROOT" -name dossier.yml -print | sort
+}
+
+tuple_inventory_files() {
+  yq -r '.tuple_admissions[].admission_ref' "$SUPPORT_TARGETS_DECLARATION" 2>/dev/null \
+    | awk 'NF' \
+    | while IFS= read -r ref; do
+        printf '%s/%s\n' "$ROOT_DIR" "$ref"
+      done \
+    | sort
 }
 
 supported_dossier_files() {
@@ -118,6 +128,48 @@ dossier_for_run() {
     fi
   done < <(support_dossier_files)
   return 1
+}
+
+admission_for_run() {
+  local dossier
+  dossier="$(dossier_for_run "$1")"
+  local ref
+  ref="$(yq -r '.support_admission_ref // ""' "$dossier")"
+  [[ -n "$ref" ]] || return 1
+  printf '%s/%s\n' "$ROOT_DIR" "$ref"
+}
+
+tuple_id_for_run() {
+  local admission
+  admission="$(admission_for_run "$1")"
+  yq -r '.tuple_id // ""' "$admission"
+}
+
+admission_ref_for_run() {
+  local dossier
+  dossier="$(dossier_for_run "$1")"
+  yq -r '.support_admission_ref // ""' "$dossier"
+}
+
+support_dossier_ref_for_run() {
+  local dossier
+  dossier="$(dossier_for_run "$1")"
+  yq -r '.support_dossier_ref // ""' "$dossier"
+}
+
+admission_value_for_run() {
+  local run_id="$1"
+  local expr="$2"
+  local admission
+  admission="$(admission_for_run "$run_id")"
+  yq -r "$expr" "$admission"
+}
+
+route_for_run() { admission_value_for_run "$1" '.route // ""'; }
+requires_mission_for_run() { admission_value_for_run "$1" '.requires_mission // false'; }
+
+sorted_admission_packs_for_run() {
+  admission_value_for_run "$1" '.allowed_capability_packs[]' 2>/dev/null | awk 'NF' | sort
 }
 
 dossier_status_for_run() {

@@ -81,11 +81,9 @@ main() {
   [[ -n "$LEASE_KIND" ]] || { echo "--lease-kind is required" >&2; exit 1; }
   [[ -n "$ISSUED_BY" ]] || { echo "--issued-by is required" >&2; exit 1; }
 
-  local leases_file="$OCTON_DIR/state/control/execution/exceptions/leases.yml"
   local canonical_dir="$OCTON_DIR/state/control/execution/exceptions/leases"
   local canonical_file="$canonical_dir/${LEASE_ID}.yml"
-  mkdir -p "$(dirname "$leases_file")" "$canonical_dir"
-  [[ -f "$leases_file" ]] || printf 'schema_version: "authority-exception-lease-set-v1"\nleases: []\n' > "$leases_file"
+  mkdir -p "$canonical_dir"
   local ts
   ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   if [[ -z "$EXPIRES_AT" && -n "$TTL_SECONDS" ]]; then
@@ -96,59 +94,6 @@ main() {
   [[ -n "$REASON" ]] || REASON="Bounded canonical exception lease."
   [[ -n "$ROLLBACK_POSTURE" ]] || ROLLBACK_POSTURE="Revert the widened path and re-run under the canonical deny or stage_only route."
   [[ -n "$RETIREMENT_TRIGGER" ]] || RETIREMENT_TRIGGER="Retire once a canonical policy or adapter rule supersedes the lease."
-
-  local tmp_json tmp_yaml
-  tmp_json="$(mktemp "${TMPDIR:-/tmp}/authority-exception.XXXXXX.json")"
-  tmp_yaml="$(mktemp "${TMPDIR:-/tmp}/authority-exception.XXXXXX.yml")"
-  yq -o=json '.' "$leases_file" | jq \
-    --arg lease_id "$LEASE_ID" \
-    --arg lease_kind "$LEASE_KIND" \
-    --arg state "$STATE" \
-    --arg request_id "$REQUEST_ID" \
-    --arg run_id "$RUN_ID" \
-    --arg issued_by "$ISSUED_BY" \
-    --arg owner "$OWNER" \
-    --arg issued_at "$ts" \
-    --arg expires_at "$EXPIRES_AT" \
-    --arg reason "$REASON" \
-    --arg rollback_posture "$ROLLBACK_POSTURE" \
-    --arg retirement_trigger "$RETIREMENT_TRIGGER" \
-    --arg service "$SERVICE" \
-    --arg adapter "$ADAPTER" \
-    --arg method "$METHOD" \
-    --arg scheme "$SCHEME" \
-    --arg host "$HOST" \
-    --arg port "$PORT" \
-    --arg path_prefix "$PATH_PREFIX" \
-    '
-      .schema_version = "authority-exception-lease-set-v1" |
-      .leases = ((.leases // []) | map(select(.id != $lease_id))) |
-      .leases += [{
-        schema_version: "authority-exception-lease-v1",
-        id: $lease_id,
-        state: $state,
-        lease_kind: $lease_kind,
-        request_id: (if ($request_id | length) > 0 then $request_id else null end),
-        run_id: (if ($run_id | length) > 0 then $run_id else null end),
-        service: (if ($service | length) > 0 then $service else null end),
-        adapter: (if ($adapter | length) > 0 then $adapter else null end),
-        method: (if ($method | length) > 0 then $method else null end),
-        scheme: (if ($scheme | length) > 0 then $scheme else null end),
-        host: (if ($host | length) > 0 then $host else null end),
-        port: (if ($port | length) > 0 then ($port | tonumber) else null end),
-        path_prefix: (if ($path_prefix | length) > 0 then $path_prefix else null end),
-        owner: $owner,
-        issued_by: $issued_by,
-        issued_at: $issued_at,
-        expires_at: $expires_at,
-        reason: $reason,
-        rollback_posture: $rollback_posture,
-        retirement_trigger: $retirement_trigger
-      }]
-    ' > "$tmp_json"
-  yq -oy -p=json '.' "$tmp_json" > "$tmp_yaml"
-  mv "$tmp_yaml" "$leases_file"
-  rm -f "$tmp_json"
 
   jq -n \
     --arg lease_id "$LEASE_ID" \
@@ -173,7 +118,6 @@ main() {
     '
       {
         schema_version: "authority-exception-lease-v2",
-        id: $lease_id,
         lease_id: $lease_id,
         state: $state,
         lease_kind: $lease_kind,

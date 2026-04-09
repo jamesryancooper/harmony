@@ -18,5 +18,4 @@ coverage_status: complete
 retention_policy_ref: .octon/instance/governance/contracts/disclosure-retention.yml
 external_index_ref: .octon/state/evidence/external-index/runs/uec-global-frontier-browser-api-studio-20260404.yml
 missing_artifacts: []
-notes:
-  - Run remains stage-only and excluded from the bounded live claim.
+notes: []

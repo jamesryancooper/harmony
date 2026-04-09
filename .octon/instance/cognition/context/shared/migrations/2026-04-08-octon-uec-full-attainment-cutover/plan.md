@@ -10,6 +10,13 @@
   and the 2026-04-08 packet forbids a partially compliant steady state on
   `main`.
 - `prompt_ref`: `/.octon/framework/scaffolding/practices/prompts/2026-04-08-octon-uec-full-attainment-cutover.prompt.md`
+- `remediation_prompt_ref`: `/.octon/framework/scaffolding/practices/prompts/2026-04-08-octon-uec-remediation-packet-execution.prompt.md`
+
+## Current Remediation State
+
+- blocker ledger status: `zero`
+- open blocker classes: none
+- current release claim posture: `complete`
 
 ## Objective
 

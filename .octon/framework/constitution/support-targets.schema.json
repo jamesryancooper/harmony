@@ -12,7 +12,6 @@
     "governance_exclusions_ref",
     "support_claim_mode",
     "tiers",
-    "compatibility_matrix",
     "adapter_conformance_criteria",
     "host_adapters",
     "model_adapters"
@@ -119,18 +118,11 @@
         }
       }
     },
-    "compatibility_matrix": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "$ref": "#/$defs/matrix_entry"
-      }
-    },
     "tuple_admissions": {
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "#/$defs/tuple_admission"
+        "$ref": "#/$defs/tuple_admission_inventory"
       }
     },
     "adapter_conformance_criteria": {
@@ -258,82 +250,19 @@
         }
       }
     },
-    "matrix_entry": {
+    "tuple_admission_inventory": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "model_tier",
-        "workload_tier",
-        "language_resource_tier",
-        "locale_tier",
-        "support_status",
-        "default_route",
-        "requires_mission",
-        "allowed_capability_packs",
-        "required_evidence"
-      ],
-      "properties": {
-        "model_tier": {
-          "type": "string",
-          "enum": ["frontier-governed", "repo-local-governed"]
-        },
-        "workload_tier": {
-          "type": "string",
-          "enum": ["observe-and-read", "repo-consequential", "boundary-sensitive"]
-        },
-        "language_resource_tier": {
-          "type": "string",
-          "enum": ["reference-owned", "extended-governed"]
-        },
-        "locale_tier": {
-          "type": "string",
-          "enum": ["english-primary", "spanish-secondary"]
-        },
-        "support_status": {
-          "type": "string",
-          "enum": ["supported"]
-        },
-        "default_route": {
-          "type": "string",
-          "enum": ["allow"]
-        },
-        "requires_mission": {
-          "type": "boolean"
-        },
-        "allowed_capability_packs": {
-          "$ref": "#/$defs/string_array"
-        },
-        "required_evidence": {
-          "$ref": "#/$defs/string_array"
-        }
-      }
-    },
-    "tuple_admission": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "admission_id",
-        "support_status",
+        "tuple_id",
         "tuple",
-        "requires_mission",
-        "consequence_class",
-        "reversibility_class",
-        "execution_horizon",
-        "recurrence_class",
-        "allowed_capability_packs",
-        "required_proof_planes",
-        "required_authority_artifacts",
-        "admission_dossier_ref",
-        "review_date"
+        "admission_ref",
+        "support_dossier_ref"
       ],
       "properties": {
-        "admission_id": {
+        "tuple_id": {
           "type": "string",
           "minLength": 1
-        },
-        "support_status": {
-          "type": "string",
-          "enum": ["supported", "stage_only", "unsupported", "deprecated"]
         },
         "tuple": {
           "type": "object",
@@ -373,46 +302,11 @@
             }
           }
         },
-        "requires_mission": {
-          "type": "boolean"
-        },
-        "consequence_class": {
+        "admission_ref": {
           "type": "string",
           "minLength": 1
         },
-        "reversibility_class": {
-          "type": "string",
-          "minLength": 1
-        },
-        "execution_horizon": {
-          "type": "string",
-          "minLength": 1
-        },
-        "recurrence_class": {
-          "type": "string",
-          "minLength": 1
-        },
-        "protected_zone_scope": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "allowed_capability_packs": {
-          "$ref": "#/$defs/string_array"
-        },
-        "required_proof_planes": {
-          "$ref": "#/$defs/string_array"
-        },
-        "required_authority_artifacts": {
-          "$ref": "#/$defs/string_array"
-        },
-        "admission_dossier_ref": {
-          "type": "string",
-          "minLength": 1
-        },
-        "review_date": {
+        "support_dossier_ref": {
           "type": "string",
           "minLength": 1
         }

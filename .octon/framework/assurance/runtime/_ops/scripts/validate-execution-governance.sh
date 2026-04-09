@@ -176,13 +176,13 @@ main() {
     fail "canonical approval grant artifacts must be populated"
   fi
 
-  if has_pattern_in_files 'schema_version:[[:space:]]*authority-exception-lease-v1' "$OCTON_DIR/state/control/execution/exceptions/leases.yml"; then
+  if find "$OCTON_DIR/state/control/execution/exceptions/leases" -type f -name '*.yml' | grep -q .; then
     pass "canonical exception lease artifacts are populated"
   else
     fail "canonical exception lease artifacts must be populated"
   fi
 
-  if has_pattern_in_files 'schema_version:[[:space:]]*authority-revocation-v1' "$OCTON_DIR/state/control/execution/revocations/grants.yml"; then
+  if find "$OCTON_DIR/state/control/execution/revocations" -maxdepth 1 -type f -name '*.yml' ! -name 'README.md' | grep -q .; then
     pass "canonical revocation artifacts are populated"
   else
     fail "canonical revocation artifacts must be populated"
