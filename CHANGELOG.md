@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.14](https://github.com/jamesryancooper/octon/compare/octon-v0.6.13...octon-v0.6.14) (2026-04-09)
+
+
+### Bug Fixes
+
+* **uec:** complete remediation packet closure ([#263](https://github.com/jamesryancooper/octon/issues/263)) ([4004eb9](https://github.com/jamesryancooper/octon/commit/4004eb9b5280fe48beeb9177cde916e3e694a0bb))
+
 ## [0.6.13](https://github.com/jamesryancooper/octon/compare/octon-v0.6.12...octon-v0.6.13) (2026-04-08)
 
 
