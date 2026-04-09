@@ -57,7 +57,7 @@ gates:
     title: stage-attempt-disclosure-separation
     status: green
   - gate_id: G11B
-    title: release-known-limits
+    title: known-limits-coherence
     status: green
   - gate_id: G11C
     title: claim-calibrated-disclosure

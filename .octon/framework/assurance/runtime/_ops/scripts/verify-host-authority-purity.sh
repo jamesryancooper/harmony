@@ -16,10 +16,20 @@ runs_checked=0
 
 bash "$SCRIPT_DIR/verify-host-adapter-projection-parity.sh" || errors=$((errors + 1))
 
+has_pattern() {
+  local pattern="$1"
+  local file="$2"
+  if command -v rg >/dev/null 2>&1; then
+    rg -n "$pattern" "$file" >/dev/null 2>&1
+  else
+    grep -E -n "$pattern" "$file" >/dev/null 2>&1
+  fi
+}
+
 while IFS= read -r workflow; do
   [[ -n "$workflow" ]] || continue
   workflow_checks=$((workflow_checks + 1))
-  if rg -n 'issue_comment|pull_request_review_comment|github\.event\.comment|github\.event\.label' "$workflow" >/dev/null 2>&1; then
+  if has_pattern 'issue_comment|pull_request_review_comment|github\.event\.comment|github\.event\.label' "$workflow"; then
     errors=$((errors + 1))
   fi
 done < <(printf '%s\n' \
@@ -44,7 +54,11 @@ while IFS= read -r run_id; do
   [[ -n "$decision_ref" && -f "$ROOT_DIR/$decision_ref" ]] || errors=$((errors + 1))
 
   grant_ref="$(yq -r '.authority_refs.grant_bundle // ""' "$(run_card_path "$run_id")")"
-  grant_required="$(admission_value_for_run "$run_id" '.required_authority_artifacts[]?' | rg -n 'grant-bundle|approval-grant' -c || true)"
+  if admission_value_for_run "$run_id" '.required_authority_artifacts[]?' | grep -E 'grant-bundle|approval-grant' >/dev/null 2>&1; then
+    grant_required="1"
+  else
+    grant_required="0"
+  fi
   if [[ "$grant_required" != "0" ]]; then
     [[ -n "$grant_ref" && -f "$ROOT_DIR/$grant_ref" ]] || errors=$((errors + 1))
   fi
