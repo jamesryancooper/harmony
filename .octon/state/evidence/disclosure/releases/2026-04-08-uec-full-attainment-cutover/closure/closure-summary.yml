@@ -11,16 +11,23 @@ green_gates:
   - G3
   - G4
   - G5
+  - G5A
   - G6
   - G7
+  - G7A
   - G8
   - G9
+  - G9A
   - G10
   - G11
+  - G11A
+  - G11B
+  - G11C
   - G12
   - G13
   - G14
   - G15
+  - G16
 blocked_by:
 notes:
   - Stable mirrors are generated from the active release bundle only.

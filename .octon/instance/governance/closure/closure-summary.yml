@@ -1,7 +1,7 @@
 schema_version: closure-summary-v2
 release_id: 2026-04-08-uec-full-attainment-cutover
 generated_at: "2026-04-08T14:44:31Z"
-claim_status: complete
+claim_status: incomplete
 support_universe_mode: global-complete-finite
 preclaim_blockers_open: 0
 green_gates:
@@ -11,17 +11,24 @@ green_gates:
   - G3
   - G4
   - G5
+  - G5A
   - G6
   - G7
+  - G7A
   - G8
   - G9
+  - G9A
   - G10
   - G11
+  - G11A
+  - G11B
   - G12
   - G13
   - G14
   - G15
+  - G16
 blocked_by:
+  - G11C
 notes:
   - Stable mirrors are generated from the active release bundle only.
-  - The full target support universe is admitted and evidenced in this release.
+  - Full attainment remains blocked until every red gate closes.

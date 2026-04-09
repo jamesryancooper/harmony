@@ -5,6 +5,7 @@ release_id="$(resolve_release_id "${1:-}")"
 out="$(release_root "$release_id")/harness-card.yml"
 mkdir -p "$(dirname "$out")"
 summary_file="$(release_root "$release_id")/closure/closure-summary.yml"
+blocker_ledger="$(effective_closure_root)/blocker-ledger.yml"
 claim_status="$(yq -r '.claim_status // "incomplete"' "$summary_file" 2>/dev/null || printf 'incomplete')"
 claim_summary="Octon's full Unified Execution Constitution attainment is not yet supportable; this release discloses open certification blockers without overstating closure."
 if [[ "$claim_status" == "complete" ]]; then
@@ -68,7 +69,10 @@ fi
   done < <(representative_run_ids)
   if [[ "$claim_status" != "complete" ]]; then
     echo "known_limits:"
-    echo "  - Full attainment remains blocked until the open certification blockers are resolved."
+    yq -r '.open_blockers[].title' "$blocker_ledger" 2>/dev/null | sed 's/^/  - Open blocker: /'
+    if [[ "$(yq -r '.open_blocker_count' "$blocker_ledger")" == "0" ]]; then
+      echo "  - Full attainment remains blocked until certification artifacts are regenerated from the current canonical state."
+    fi
   else
     echo "known_limits: []"
   fi

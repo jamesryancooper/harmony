@@ -1,6 +1,7 @@
 schema_version: support-target-admission-v1
 tuple_id: tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell
 status: supported
+route: allow
 tuple:
   model_tier: repo-local-governed
   workload_tier: observe-and-read
@@ -28,5 +29,6 @@ required_authority_artifacts:
 evidence_refs:
   - .octon/state/evidence/disclosure/runs/uec-global-repo-shell-observe-read-20260404/run-card.yml
   - .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/measurements/summary.yml
+support_dossier_ref: .octon/instance/governance/support-dossiers/repo-shell-observe-read-en/dossier.yml
 review_due_at: "2026-06-30T00:00:00Z"
-claim_effect: included-in-live-claim
+claim_effect: admitted-live-claim

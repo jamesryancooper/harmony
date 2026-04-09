@@ -17,12 +17,9 @@ trap 'rm -rf "$tmp_root"' EXIT
 mkdir -p \
   "$tmp_root/.octon/state/control/execution/approvals/requests" \
   "$tmp_root/.octon/state/control/execution/approvals/grants" \
-  "$tmp_root/.octon/state/control/execution/exceptions" \
+  "$tmp_root/.octon/state/control/execution/exceptions/leases" \
   "$tmp_root/.octon/state/control/execution/revocations" \
   "$tmp_root/.octon/state/evidence/control/execution"
-
-printf 'schema_version: "authority-exception-lease-set-v1"\nleases: []\n' > "$tmp_root/.octon/state/control/execution/exceptions/leases.yml"
-printf 'schema_version: "authority-revocation-set-v1"\nrevocations: []\n' > "$tmp_root/.octon/state/control/execution/revocations/grants.yml"
 OCTON_DIR_OVERRIDE="$tmp_root/.octon" OCTON_ROOT_DIR="$tmp_root" bash "$APPROVAL_SCRIPT" \
   --request-id "req-tooling" \
   --run-id "req-tooling" \
@@ -87,7 +84,7 @@ OCTON_DIR_OVERRIDE="$tmp_root/.octon" OCTON_ROOT_DIR="$tmp_root" bash "$EXCEPTIO
   --run-id "req-tooling" \
   >/dev/null
 
-yq -e '.leases[] | select(.id == "lease-tooling" and .state == "active")' "$tmp_root/.octon/state/control/execution/exceptions/leases.yml" >/dev/null
+yq -e '.lease_id == "lease-tooling" and .state == "active"' "$tmp_root/.octon/state/control/execution/exceptions/leases/lease-tooling.yml" >/dev/null
 find "$tmp_root/.octon/state/evidence/control/execution" -type f -name '*exception*' | grep -q .
 
 OCTON_DIR_OVERRIDE="$tmp_root/.octon" OCTON_ROOT_DIR="$tmp_root" bash "$REVOCATION_SCRIPT" \
@@ -99,7 +96,7 @@ OCTON_DIR_OVERRIDE="$tmp_root/.octon" OCTON_ROOT_DIR="$tmp_root" bash "$REVOCATI
   --reason-code "AUTHORITY_GRANT_REVOKED" \
   >/dev/null
 
-yq -e '.revocations[] | select(.revocation_id == "revoke-tooling" and .state == "active")' "$tmp_root/.octon/state/control/execution/revocations/grants.yml" >/dev/null
+yq -e '.revocation_id == "revoke-tooling" and .state == "active"' "$tmp_root/.octon/state/control/execution/revocations/revoke-tooling.yml" >/dev/null
 find "$tmp_root/.octon/state/evidence/control/execution" -type f -name '*revocation*' | grep -q .
 
 echo "[OK] authority control tooling writes canonical approval, exception, and revocation artifacts"

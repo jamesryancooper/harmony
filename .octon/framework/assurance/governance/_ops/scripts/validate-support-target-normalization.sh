@@ -27,9 +27,9 @@ main() {
   require_yq '.live_support_universe.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "live support universe includes github-control-plane"
   require_yq '.live_support_universe.host_adapters[] | select(. == "ci-control-plane")' "$SUPPORT_TARGETS" "live support universe includes ci-control-plane"
   require_yq '.live_support_universe.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "live support universe includes studio-control-plane"
-  require_yq '[.compatibility_matrix[] | select(.support_status != "supported")] | length == 0' "$SUPPORT_TARGETS" "compatibility matrix contains only supported runtime tuples"
-  require_yq '[.tuple_admissions[] | select(.support_status == "supported")] | length == 6' "$SUPPORT_TARGETS" "all six tuples are live supported"
-  require_yq '.tuple_admissions[] | select(.admission_id == "tuple-repo-shell-repo-consequential-en" and .requires_mission == true)' "$SUPPORT_TARGETS" "supported consequential tuple requires mission"
+  require_yq 'has("compatibility_matrix") | not' "$SUPPORT_TARGETS" "support-target declaration no longer embeds a duplicate compatibility matrix"
+  require_yq '(.tuple_admissions | length) == 6' "$SUPPORT_TARGETS" "all six tuples remain inventoried in the declaration"
+  require_yq '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell") | .admission_ref == ".octon/instance/governance/support-target-admissions/repo-shell-repo-consequential-en.yml"' "$SUPPORT_TARGETS" "repo-shell consequential tuple points at canonical admission"
   require_yq '(.resolved_non_live_surfaces.host_adapters | length) == 0' "$SUPPORT_TARGETS" "resolved non-live host adapters list is empty"
   require_ref "$(yq -r '.generated_projection_ref' "$SUPPORT_TARGETS")" "generated effective matrix ref"
   require_yq '.supported_tuples | length == 6' "$EFFECTIVE_MATRIX" "effective matrix reflects all supported tuples"
@@ -38,7 +38,7 @@ main() {
   while IFS= read -r ref; do
     [[ -n "$ref" ]] || continue
     require_ref "$ref" "tuple admission dossier $ref"
-  done < <(yq -r '.tuple_admissions[].admission_dossier_ref' "$SUPPORT_TARGETS")
+  done < <(yq -r '.tuple_admissions[].admission_ref' "$SUPPORT_TARGETS")
 
   echo "Validation summary: errors=$errors"
   [[ $errors -eq 0 ]]

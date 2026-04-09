@@ -33,6 +33,103 @@ mutability: append-only
 
 ## 2026-04-08
 
+**Session focus:** Create an execution-grade prompt for the
+`octon_uec_remediation_packet` proposal
+
+**Completed:**
+
+- Read the canonical ingress, constitutional kernel, workspace charter pair,
+  repo constraints, and the remediation packet's blocker, cutover, validator,
+  disclosure, runtime, and closure documents
+- Created
+  `/.octon/framework/scaffolding/practices/prompts/2026-04-08-octon-uec-remediation-packet-execution.prompt.md`
+  as an execution prompt for running the remediation packet as one atomic
+  clean-break implementation and certification program
+- Created the matching refine-prompt run log at
+  `/.octon/state/evidence/runs/skills/refine-prompt/2026-04-08-octon-uec-remediation-packet-execution.md`
+- Anchored the prompt to the packet's blocker set `A` through `E`, the
+  non-authoritative status of `inputs/**`, the repo's `atomic` profile
+  selection, and the required two-pass closure regime
+
+**Next:**
+
+- Execute the new prompt if implementation of the remediation packet should
+  proceed
+
+**Blockers:**
+
+- The prompt has not been executed in this session
+
+## 2026-04-08
+
+**Session focus:** Execute the `octon_uec_remediation_packet` remediation prompt
+
+**Completed:**
+
+- Created and switched to remediation branch
+  `chore/uec-remediation-packet-execution-2026-04-08`
+- Refactored `support-targets.yml` into tuple inventory plus canonical
+  admission refs and updated the support-target schema to match that model
+- Normalized the six active claim-bearing admissions with explicit `route`,
+  dossier refs, and unified `claim_effect`
+- Added blocker/known-limits governance surfaces and new closure scripts for
+  support-target matrix generation, blocker-ledger generation, canonicality
+  validation, disclosure calibration, and closure-validator sufficiency
+- Rebound the six exemplar run contracts and manifests to canonical admission
+  refs and tuple ids, and removed stale claim-envelope wording from the active
+  global exemplar stage attempts and evidence classifications
+- Regenerated the active release bundle and closure projections so the release
+  now truthfully reports `claim_status: incomplete` with blocker `B` still open
+  instead of falsely claiming `complete`
+
+**Next:**
+
+- Close blocker `B` by removing the live-root authority compatibility
+  aggregates and rewriting the remaining active authority/runtime/evidence refs
+  to canonical per-artifact family paths
+- Rerun closure generation after blocker `B` is resolved so `blocker-ledger`
+  reaches zero and `G9A` / `G16` can turn green
+
+**Blockers:**
+
+- Blocker `B` remains open: active authority/runtime/evidence/disclosure
+  surfaces still reference compatibility aggregate files
+
+## 2026-04-08
+
+**Session focus:** Finish the remaining blocker-B closeout for the
+`octon_uec_remediation_packet`
+
+**Completed:**
+
+- Removed the live-root compatibility aggregate authority files
+  `/.octon/state/control/execution/exceptions/leases.yml` and
+  `/.octon/state/control/execution/revocations/grants.yml`
+- Rebound the active authority indexes, safe-stage authority artifacts, and
+  safe-stage assurance reports to canonical per-artifact lease and revocation
+  files
+- Updated the engine authority writers, runtime integrity loader, authority
+  engine runtime posture resolution, harness structure checks, execution
+  governance checks, authority governance exercise checks, and kernel fixtures
+  to the canonical directory-family authority model
+- Regenerated the support-target matrix, blocker ledger, release bundle,
+  closure bundle, projections, HarnessCard, and effective claim status so the
+  active release returned to truthful `claim_status: complete` with zero open
+  blockers
+- Confirmed the packet-specific validators, authority governance exercise
+  validation, execution governance validation, and continuity validation all
+  pass on this branch
+
+**Next:**
+
+- Review the branch diff for commit shaping and closeout
+
+**Blockers:**
+
+- None
+
+## 2026-04-08
+
 **Session focus:** Execute the 2026-04-08 Unified Execution Constitution
 full-attainment cutover prompt on a dedicated cutover branch
 

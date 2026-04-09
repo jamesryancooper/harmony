@@ -1,6 +1,6 @@
 schema_version: authority-run-revocation-index-v1
 run_id: uec-safe-stage-lease-revocation-exercise-20260402
-source_ref: .octon/state/control/execution/revocations/grants.yml
+source_ref: .octon/state/control/execution/revocations/
 revocations:
   - schema_version: authority-revocation-v1
     revocation_id: revoke-uec-safe-stage-lease-revocation-exercise-20260402

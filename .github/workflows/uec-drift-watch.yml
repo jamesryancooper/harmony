@@ -32,6 +32,10 @@ jobs:
           chmod +x .octon/framework/assurance/scripts/*.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/generate-release-bundle.sh "$CLOSURE_RELEASE_ID"
           bash .octon/framework/assurance/runtime/_ops/scripts/generate-closure-projections.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-support-target-canonicality.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-canonical-authority-purity.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/scripts/validate-claim-calibrated-disclosure.sh "$CLOSURE_RELEASE_ID"
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-blocker-ledger-zero.sh "$CLOSURE_RELEASE_ID"
           bash .octon/framework/assurance/scripts/validate-mirror-parity.sh "$CLOSURE_RELEASE_ID"
           bash .octon/framework/assurance/scripts/validate-support-target-admission.sh "$CLOSURE_RELEASE_ID"
           bash .octon/framework/assurance/scripts/validate-harness-card-claim.sh "$CLOSURE_RELEASE_ID"

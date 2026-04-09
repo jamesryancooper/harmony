@@ -9,7 +9,7 @@ allowed_zones:
 completion_status: criteria-met
 entry_criteria:
 - Run contract is bound under the canonical run root.
-- Support-target tuple remains stage-only and excluded from the live claim envelope.
+- Support-target tuple remains admitted under canonical runtime and disclosure controls.
 evidence_refs:
 - .octon/state/evidence/runs/uec-global-github-repo-consequential-20260404/receipts/policy-receipt.latest.json
 - .octon/state/evidence/runs/uec-global-github-repo-consequential-20260404/receipts/grant-bundle.json
@@ -18,10 +18,10 @@ exit_criteria:
 - Stage receipts, replay refs, and disclosure refs are retained under canonical run roots.
 - Stage status is terminal and agrees with the retained decision artifact.
 objective_ref: .octon/state/control/execution/runs/uec-global-github-repo-consequential-20260404/run-contract.yml
-objective_slice: Validate stage-only GitHub projection evidence and retained closure refs.
-stage_name: github-projection-stage-only
+objective_slice: Validate admitted GitHub projection evidence and retained closure refs.
+stage_name: github-projection-admitted
 done_when:
-- Projection-only GitHub evidence resolves without being promoted into the live claim.
+- Projection-only GitHub evidence resolves as admitted live-claim support proof under canonical controls.
 issued_by: octon-kernel
 predecessor_refs: []
 requested_capabilities:

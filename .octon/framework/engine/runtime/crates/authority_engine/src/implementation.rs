@@ -780,6 +780,8 @@ struct RunContractRecord {
     #[serde(default)]
     support_target: SupportTargetTuple,
     #[serde(default)]
+    support_target_admission_ref: String,
+    #[serde(default)]
     requested_capability_packs: Vec<String>,
     #[serde(default)]
     intent_ref: Option<IntentRef>,
@@ -850,6 +852,24 @@ struct SupportTargetsRecord {
     host_adapters: Vec<AdapterSupportDeclaration>,
     #[serde(default)]
     model_adapters: Vec<AdapterSupportDeclaration>,
+}
+
+#[derive(Debug, Clone, Default, Deserialize)]
+struct SupportTargetAdmissionRecord {
+    #[serde(default)]
+    tuple_id: String,
+    #[serde(default)]
+    status: String,
+    #[serde(default)]
+    route: String,
+    #[serde(default)]
+    requires_mission: bool,
+    #[serde(default)]
+    allowed_capability_packs: Vec<String>,
+    #[serde(default)]
+    required_authority_artifacts: Vec<String>,
+    #[serde(default)]
+    tuple: SupportTargetTuple,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -1404,7 +1424,7 @@ fn approval_grant_path(cfg: &RuntimeConfig, request_id: &str) -> PathBuf {
 fn revocation_registry_path(cfg: &RuntimeConfig) -> PathBuf {
     authority_control_root(cfg)
         .join("revocations")
-        .join("grants.yml")
+        .join("__legacy_removed__")
 }
 
 fn revocation_directory_path(cfg: &RuntimeConfig) -> PathBuf {
@@ -2841,6 +2861,39 @@ fn load_support_targets(cfg: &RuntimeConfig) -> CoreResult<SupportTargetsRecord>
     read_yaml_file(&path)
 }
 
+fn load_support_target_admissions(
+    cfg: &RuntimeConfig,
+) -> CoreResult<Vec<SupportTargetAdmissionRecord>> {
+    let root = cfg
+        .octon_dir
+        .join("instance")
+        .join("governance")
+        .join("support-target-admissions");
+    let mut admissions = Vec::new();
+    if !root.is_dir() {
+        return Ok(admissions);
+    }
+    for entry in fs::read_dir(&root).map_err(|e| {
+        KernelError::new(
+            ErrorCode::Internal,
+            format!("failed to read support-target admissions {}: {e}", root.display()),
+        )
+    })? {
+        let entry = entry.map_err(|e| {
+            KernelError::new(
+                ErrorCode::Internal,
+                format!("failed to read support-target admission entry: {e}"),
+            )
+        })?;
+        let path = entry.path();
+        if path.extension().and_then(|value| value.to_str()) != Some("yml") {
+            continue;
+        }
+        admissions.push(read_yaml_file(&path)?);
+    }
+    Ok(admissions)
+}
+
 fn load_runtime_capability_pack_registry(
     cfg: &RuntimeConfig,
 ) -> CoreResult<RuntimeCapabilityPackRegistryRecord> {
@@ -3319,6 +3372,7 @@ fn resolve_support_tier_posture(
     autonomy_state: Option<&ResolvedAutonomyState>,
 ) -> CoreResult<SupportTierPosture> {
     let declaration = load_support_targets(cfg)?;
+    let admissions = load_support_target_admissions(cfg)?;
     let requested_tuple = if run_contract.support_target.workload_tier.trim().is_empty() {
         requested_support_target_tuple(request)?
     } else {
@@ -3389,23 +3443,41 @@ fn resolve_support_tier_posture(
         });
     }
 
-    let matrix_entry = declaration
-        .compatibility_matrix
-        .iter()
-        .find(|entry| {
-            entry.model_tier == model_tier
-                && entry.workload_tier == workload.id
-                && entry.language_resource_tier == language_resource_tier
-                && entry.locale_tier == locale_tier
-        })
-        .cloned();
-    let base_support_status = matrix_entry
+    let admission = if !run_contract.support_target_admission_ref.trim().is_empty() {
+        let path = resolve_contract_path(&cfg.repo_root, &run_contract.support_target_admission_ref);
+        if path.is_file() {
+            Some(read_yaml_file(&path)?)
+        } else {
+            None
+        }
+    } else {
+        admissions
+            .iter()
+            .find(|entry| {
+                entry.tuple.model_tier == model_tier
+                    && entry.tuple.workload_tier == workload.id
+                    && entry.tuple.language_resource_tier == language_resource_tier
+                    && entry.tuple.locale_tier == locale_tier
+                    && entry.tuple.host_adapter == host_adapter_id
+                    && entry.tuple.model_adapter == model_adapter_id
+            })
+            .cloned()
+    };
+    let matrix_entry = declaration.compatibility_matrix.iter().find(|entry| {
+        entry.model_tier == model_tier
+            && entry.workload_tier == workload.id
+            && entry.language_resource_tier == language_resource_tier
+            && entry.locale_tier == locale_tier
+    });
+    let base_support_status = admission
         .as_ref()
-        .map(|entry| entry.support_status.clone())
+        .map(|entry| entry.status.clone())
+        .or_else(|| matrix_entry.map(|entry| entry.support_status.clone()))
         .unwrap_or_else(|| "unsupported".to_string());
-    let base_route = matrix_entry
+    let base_route = admission
         .as_ref()
-        .map(|entry| entry.default_route.clone())
+        .map(|entry| entry.route.clone())
+        .or_else(|| matrix_entry.map(|entry| entry.default_route.clone()))
         .unwrap_or_else(|| {
             if workload.default_route.trim().is_empty() {
                 declaration.default_route.clone()
@@ -3413,17 +3485,20 @@ fn resolve_support_tier_posture(
                 workload.default_route.clone()
             }
         });
-    let requires_mission = matrix_entry
+    let requires_mission = admission
         .as_ref()
-        .and_then(|entry| entry.requires_mission)
+        .map(|entry| entry.requires_mission)
+        .or_else(|| matrix_entry.and_then(|entry| entry.requires_mission))
         .unwrap_or(false);
-    let base_required_evidence = matrix_entry
+    let base_required_evidence = admission
         .as_ref()
-        .map(|entry| entry.required_evidence.clone())
+        .map(|entry| entry.required_authority_artifacts.clone())
+        .or_else(|| matrix_entry.map(|entry| entry.required_evidence.clone()))
         .unwrap_or_default();
-    let allowed_capability_packs = matrix_entry
+    let allowed_capability_packs = admission
         .as_ref()
         .map(|entry| entry.allowed_capability_packs.clone())
+        .or_else(|| matrix_entry.map(|entry| entry.allowed_capability_packs.clone()))
         .unwrap_or_default();
     let host_adapter = resolve_adapter_support(
         cfg,
@@ -6960,16 +7035,8 @@ mod tests {
             "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators:\n  - operator_id: \"test\"\n    display_name: \"Test\"\n    contact: \"repo://test\"\ndefaults:\n  operator_id: \"test\"\n  support_tier: \"repo-consequential\"\nassets:\n  - asset_id: \"workflow-evidence\"\n    path_globs:\n      - \"workflow-evidence\"\n    owners:\n      - \"test\"\nservices: []\nsubscriptions: {}\n",
         )
         .expect("write ownership registry");
-        fs::write(
-            base.join(".octon/state/control/execution/exceptions/leases.yml"),
-            "schema_version: \"authority-exception-lease-set-v1\"\nleases: []\n",
-        )
-        .expect("write exception leases");
-        fs::write(
-            base.join(".octon/state/control/execution/revocations/grants.yml"),
-            "schema_version: \"authority-revocation-set-v1\"\nrevocations: []\n",
-        )
-        .expect("write revocations");
+        fs::create_dir_all(base.join(".octon/state/control/execution/exceptions/leases"))
+            .expect("create exception lease directory");
         let source_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("../../../../../..")
             .canonicalize()
@@ -7380,14 +7447,12 @@ mod tests {
     }
 
     #[test]
-    fn active_revocation_refs_use_fragment_format() {
+    fn active_revocation_refs_use_canonical_file_paths() {
         let cfg = temp_runtime_config();
-        let revocations_path = cfg
-            .octon_dir
-            .join("state/control/execution/revocations/grants.yml");
+        let revocations_dir = cfg.octon_dir.join("state/control/execution/revocations");
         fs::write(
-            &revocations_path,
-            "schema_version: \"authority-revocation-set-v1\"\nrevocations:\n  - schema_version: \"authority-revocation-v1\"\n    revocation_id: \"revoke-1\"\n    grant_id: \"grant-req-1\"\n    request_id: \"req-1\"\n    run_id: \"req-1\"\n    state: \"active\"\n    revoked_at: \"2026-03-27T00:00:00Z\"\n    revoked_by: \"operator://test\"\n    reason_codes: []\n    notes: null\n",
+            revocations_dir.join("revoke-1.yml"),
+            "schema_version: \"authority-revocation-v2\"\nrevocation_id: \"revoke-1\"\ngrant_id: \"grant-req-1\"\nrequest_id: \"req-1\"\nrun_id: \"req-1\"\nstate: \"active\"\nrevoked_at: \"2026-03-27T00:00:00Z\"\nrevoked_by: \"operator://test\"\nreason_codes: []\nnotes: null\n",
         )
         .expect("write revocation fixture");
 
@@ -7395,7 +7460,7 @@ mod tests {
             load_active_revocation_refs(&cfg, "req-1", "grant-req-1").expect("load revocations");
         assert_eq!(
             refs,
-            vec![".octon/state/control/execution/revocations/grants.yml#revoke-1".to_string()]
+            vec![".octon/state/control/execution/revocations/revoke-1.yml".to_string()]
         );
     }
 

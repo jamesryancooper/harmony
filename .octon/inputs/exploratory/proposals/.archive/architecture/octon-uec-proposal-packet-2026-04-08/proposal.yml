@@ -1,0 +1,47 @@
+schema_version: "proposal-v1"
+proposal_id: "octon-uec-proposal-packet-2026-04-08"
+title: "Octon Unified Execution Constitution Full-Attainment Proposal Packet"
+summary: >-
+  Repository-grounded architecture packet for the 2026-04-08 full-attainment
+  cutover that defined the final remediation, validation, and certification
+  program for Octon's unified execution constitution closeout.
+proposal_kind: "architecture"
+promotion_scope: "octon-internal"
+promotion_targets:
+  - ".octon/framework/constitution/"
+  - ".octon/instance/charter/"
+  - ".octon/instance/governance/"
+  - ".octon/instance/governance/closure/"
+  - ".octon/instance/governance/decisions/ADR-UEC-010-full-attainment-certification.md"
+  - ".octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/"
+  - ".octon/state/evidence/migration/2026-04-08-octon-uec-full-attainment-cutover/"
+  - ".octon/generated/effective/closure/"
+status: "archived"
+packet_id: "octon-uec-full-attainment-proposal-2026-04-08"
+prepared_on: "2026-04-08"
+repository:
+  url: "https://github.com/jamesryancooper/octon"
+  ref: "main (observed 2026-04-08)"
+purpose: >-
+  Define the exact remediation, cutover, validation, and certification program
+  required to bring Octon from its bounded-support constitutional state to the
+  full target-state Unified Execution Constitution and then retire the packet
+  once the durable closeout record exists outside proposal space.
+archive:
+  archived_at: "2026-04-08"
+  archived_from_status: "implemented"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/octon-uec-proposal-packet-2026-04-08"
+  promotion_evidence:
+    - ".octon/instance/governance/decisions/ADR-UEC-010-full-attainment-certification.md"
+    - ".octon/state/evidence/migration/2026-04-08-octon-uec-full-attainment-cutover/evidence.md"
+    - ".octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/closure/closure-certificate.yml"
+lifecycle:
+  temporary: true
+  exit_expectation: >-
+    Archive this packet after the full-attainment cutover lands in durable
+    authority, disclosure, and closure surfaces so the retained closeout record
+    lives outside proposal space and the packet remains historical lineage only.
+related_proposals:
+  - "octon-uec-global-completion"
+  - "octon-post-cutover-atomic-constitutional-alignment-remediation"

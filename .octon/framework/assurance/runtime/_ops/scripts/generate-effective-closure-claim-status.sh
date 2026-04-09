@@ -8,13 +8,15 @@ gate_status="$release_root_path/closure/gate-status.yml"
 summary="$release_root_path/closure/closure-summary.yml"
 effective_root="$(effective_closure_root)"
 effective_status="$effective_root/claim-status.yml"
+blocker_ledger="$effective_root/blocker-ledger.yml"
 preclaim_blockers="$OCTON_DIR/instance/governance/closure/preclaim-blockers.yml"
 
 mkdir -p "$effective_root"
 
-blocker_count="$(yq -r '[.gates[] | select(.status != "green")] | length' "$gate_status")"
+gate_blocker_count="$(yq -r '[.gates[] | select(.status != "green")] | length' "$gate_status")"
+blocker_count="$(yq -r '.open_blocker_count // 0' "$blocker_ledger")"
 claim_status="$(yq -r '.claim_status' "$summary")"
-if [[ "$claim_status" == "complete" ]]; then
+if [[ "$claim_status" == "complete" && "$blocker_count" == "0" && "$gate_blocker_count" == "0" ]]; then
   final_verdict="claim_complete"
   ready="true"
 else
@@ -47,7 +49,10 @@ fi
   echo "  support_universe_mode: global-complete-finite"
   echo "  claim_scope: universal-target-universe"
   echo "  blocked_by:"
-  yq -r '.gates[] | select(.status != "green") | .gate_id' "$gate_status" | sed 's/^/    - /'
+  yq -r '.blocked_by[]' "$summary" 2>/dev/null | sed 's/^/    - /'
+  if [[ "$blocker_count" != "0" ]]; then
+    yq -r '.open_blockers[].blocker_id' "$blocker_ledger" 2>/dev/null | sed 's/^/    - blocker-/'
+  fi
   echo "blockers:"
   while IFS=$'\t' read -r gate_id title; do
     [[ -n "$gate_id" ]] || continue
@@ -77,7 +82,16 @@ fi
     echo "    reason: >-"
     printf '      %s\n' "$reason"
     echo "    evidence_ref: $evidence_ref"
-  done < <(yq -r '.gates[] | select(.status != "green") | [.gate_id, .title] | @tsv' "$gate_status")
+  done < <(
+    while IFS= read -r gate_id; do
+      [[ -n "$gate_id" ]] || continue
+      title="$(yq -r ".gates[] | select(.gate_id == \"$gate_id\") | .title" "$gate_status")"
+      printf '%s\t%s\n' "$gate_id" "$title"
+    done < <(yq -r '.blocked_by[]' "$summary" 2>/dev/null)
+  )
+  if [[ "$blocker_count" != "0" ]]; then
+    yq -P '.open_blockers' "$blocker_ledger" | sed 's/^/  /'
+  fi
 } >"$effective_status"
 
 {
@@ -85,7 +99,7 @@ fi
   echo "updated_at: \"$(deterministic_generated_at)\""
   echo "summary:"
   echo "  open_count: $blocker_count"
-  echo "  closure_ready: $( [[ "$blocker_count" == "0" ]] && echo true || echo false )"
+  echo "  closure_ready: $( [[ "$blocker_count" == "0" && "$gate_blocker_count" == "0" ]] && echo true || echo false )"
   if [[ "$blocker_count" == "0" ]]; then
     echo "blockers: []"
   else

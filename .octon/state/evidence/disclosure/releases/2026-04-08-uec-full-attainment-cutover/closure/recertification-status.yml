@@ -9,7 +9,7 @@ active_certificate_ref: .octon/state/evidence/disclosure/releases/2026-04-08-uec
 active_harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-08-uec-full-attainment-cutover/harness-card.yml
 input_digests:
   charter: sha256:0dd26c7254e6e533cc12b59a707bacab002ba7a1b453ef9c981e5aa759408e98
-  support_targets: sha256:145f39a98642947af426da01743c09d42c41c4db0560ef3d83bf8d0e9d454a69
+  support_targets: sha256:734f1aaa8cd9ea1897c68006e47d875661fc122311a71450baba10dff327b0af
   workspace_charter: sha256:1c07a014b52b0ed30d7d58ded45dd7288b1d7361caef8e060726d8b9fc486baf
 trigger_summary:
   total: 10

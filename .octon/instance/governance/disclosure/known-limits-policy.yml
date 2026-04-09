@@ -1,0 +1,16 @@
+schema_version: known-limits-policy-v1
+owner: Octon governance
+scope: active-release-disclosure
+rules:
+  - rule_id: KLP-001
+    requirement: List every open blocker from the generated blocker ledger in active HarnessCard known_limits until the ledger reaches zero.
+  - rule_id: KLP-002
+    requirement: List every still-bounded live support fact that materially qualifies the active release claim.
+  - rule_id: KLP-003
+    requirement: known_limits must be empty only when blocker ledger is zero and no remaining exclusion or bounded live fact materially qualifies the active claim.
+  - rule_id: KLP-004
+    requirement: known_limits entries must not contradict the active release scope or support admissions.
+generated_inputs:
+  blocker_ledger_ref: .octon/generated/effective/closure/blocker-ledger.yml
+  release_lineage_ref: .octon/instance/governance/disclosure/release-lineage.yml
+  governance_exclusions_ref: .octon/instance/governance/exclusions/action-classes.yml

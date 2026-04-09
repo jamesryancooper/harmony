@@ -6039,6 +6039,10 @@ mod tests {
         )
         .expect("copy support targets");
         copy_tree(
+            &source_repo_root().join(".octon/instance/governance/support-target-admissions"),
+            &root.join(".octon/instance/governance/support-target-admissions"),
+        );
+        copy_tree(
             &source_repo_root().join(".octon/instance/governance/policies"),
             &root.join(".octon/instance/governance/policies"),
         );
@@ -6190,6 +6194,10 @@ mod tests {
             octon_dir.join("instance/governance/support-targets.yml"),
         )
         .expect("copy support targets");
+        copy_tree(
+            &source_repo_root().join(".octon/instance/governance/support-target-admissions"),
+            &root.join(".octon/instance/governance/support-target-admissions"),
+        );
         copy_tree(
             &source_repo_root().join(".octon/instance/governance/policies"),
             &root.join(".octon/instance/governance/policies"),

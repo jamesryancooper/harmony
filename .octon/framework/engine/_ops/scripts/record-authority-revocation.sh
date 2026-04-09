@@ -50,49 +50,14 @@ main() {
   [[ -n "$REVOCATION_ID" ]] || { echo "--revocation-id is required" >&2; exit 1; }
   [[ -n "$REVOKED_BY" ]] || { echo "--revoked-by is required" >&2; exit 1; }
 
-  local revocations_file="$OCTON_DIR/state/control/execution/revocations/grants.yml"
   local canonical_dir="$OCTON_DIR/state/control/execution/revocations"
   local canonical_file="$canonical_dir/${REVOCATION_ID}.yml"
-  mkdir -p "$(dirname "$revocations_file")" "$canonical_dir"
-  [[ -f "$revocations_file" ]] || printf 'schema_version: "authority-revocation-set-v1"\nrevocations: []\n' > "$revocations_file"
+  mkdir -p "$canonical_dir"
   local ts
   ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-  local tmp_json tmp_yaml
-  tmp_json="$(mktemp "${TMPDIR:-/tmp}/authority-revocation.XXXXXX.json")"
-  tmp_yaml="$(mktemp "${TMPDIR:-/tmp}/authority-revocation.XXXXXX.yml")"
   local reason_codes_json
   reason_codes_json="$(printf '%s\n' "${REASON_CODES[@]:-}" | jq -R . | jq -s 'map(select(length > 0))')"
-  yq -o=json '.' "$revocations_file" | jq \
-    --arg revocation_id "$REVOCATION_ID" \
-    --arg grant_id "$GRANT_ID" \
-    --arg request_id "$REQUEST_ID" \
-    --arg run_id "$RUN_ID" \
-    --arg state "$STATE" \
-    --arg revoked_at "$ts" \
-    --arg revoked_by "$REVOKED_BY" \
-    --arg notes "$NOTES" \
-    --argjson reason_codes "$reason_codes_json" \
-    '
-      .schema_version = "authority-revocation-set-v1" |
-      .revocations = ((.revocations // []) | map(select(.revocation_id != $revocation_id))) |
-      .revocations += [{
-        schema_version: "authority-revocation-v1",
-        revocation_id: $revocation_id,
-        grant_id: (if ($grant_id | length) > 0 then $grant_id else null end),
-        request_id: (if ($request_id | length) > 0 then $request_id else null end),
-        run_id: (if ($run_id | length) > 0 then $run_id else null end),
-        state: $state,
-        revoked_at: $revoked_at,
-        revoked_by: $revoked_by,
-        reason_codes: $reason_codes,
-        notes: (if ($notes | length) > 0 then $notes else null end)
-      }]
-    ' > "$tmp_json"
-  yq -oy -p=json '.' "$tmp_json" > "$tmp_yaml"
-  mv "$tmp_yaml" "$revocations_file"
-  rm -f "$tmp_json"
-
   jq -n \
     --arg revocation_id "$REVOCATION_ID" \
     --arg grant_id "$GRANT_ID" \

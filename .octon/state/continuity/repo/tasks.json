@@ -354,6 +354,18 @@
       "risk_tier": "T1",
       "required_approvals": [],
       "note": "Local cutover implementation and validator sweep are complete; branch closeout is pending."
+    },
+    {
+      "id": "create-octon-uec-remediation-packet-execution-prompt",
+      "description": "Create an execution-grade prompt for the octon_uec_remediation_packet proposal",
+      "status": "completed",
+      "completed_at": "2026-04-08"
+    },
+    {
+      "id": "execute-octon-uec-remediation-packet-prompt",
+      "description": "Execute the octon_uec_remediation_packet remediation prompt and close blocker classes A-E",
+      "status": "completed",
+      "completed_at": "2026-04-08"
     }
   ]
 }

@@ -6,3 +6,6 @@ for normalized authority revocations.
 Revocations apply to grants or requests only after they materialize into this
 control family. External comments or labels may signal revocation intent, but
 they do not revoke authority on their own.
+
+Each revocation must live as its own file directly under
+`state/control/execution/revocations/`.
