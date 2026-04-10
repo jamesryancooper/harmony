@@ -4,6 +4,6 @@ status: pass
 summary:
   workflows_checked: 5
   host_adapters_checked: 4
-  representative_runs_checked: 6
+  representative_runs_checked: 9
   violations: 0
 generated_at: "2026-04-09T12:00:00Z"
