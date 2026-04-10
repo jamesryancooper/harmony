@@ -2,7 +2,7 @@ schema_version: authority-run-revocation-index-v1
 run_id: uec-bounded-repo-shell-boundary-sensitive-20260409
 source_ref: .octon/state/control/execution/revocations/
 revocations:
-  - schema_version: authority-revocation-v1
+  - schema_version: authority-revocation-v2
     revocation_id: revoke-uec-bounded-repo-shell-boundary-sensitive-20260409
     grant_id: grant-uec-bounded-repo-shell-boundary-sensitive-20260409
     request_id: uec-bounded-repo-shell-boundary-sensitive-20260409

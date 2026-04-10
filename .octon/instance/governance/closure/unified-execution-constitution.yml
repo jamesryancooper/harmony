@@ -57,10 +57,11 @@ required_proof_artifacts:
   - "support-universe-coverage"
   - "proof-plane-coverage"
 permitted_release_wording: >-
-  Octon materially substantiates a bounded Unified Execution Constitution for
-  the admitted live support universe, with release disclosure, support claims,
-  exemplar run evidence, and dual-pass certification regenerated from
-  canonical repo surfaces.
+  Octon materially substantiates a fully hardened, normalized,
+  evidence-backed bounded Unified Execution Constitution for the admitted live
+  support universe, with release disclosure, support claims, exemplar run
+  evidence, and dual-pass certification regenerated from canonical repo
+  surfaces.
 known_limits:
   - "The active claim remains bounded to the admitted live support universe only; no universal support claim is made outside active support-target tuples."
   - "Future widening requires a fresh audit, fresh review packet, refreshed support dossiers, regenerated closure reports, and dual-pass recertification."

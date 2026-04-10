@@ -2,7 +2,7 @@ schema_version: authority-run-lease-index-v1
 run_id: uec-bounded-repo-shell-boundary-sensitive-20260409
 source_ref: .octon/state/control/execution/exceptions/leases/
 leases:
-  - schema_version: authority-exception-lease-v1
+  - schema_version: authority-exception-lease-v2
     id: lease-uec-bounded-repo-shell-boundary-sensitive-20260409
     state: active
     lease_kind: network-egress
@@ -22,3 +22,4 @@ leases:
     reason: Bounded safe-stage exception lease for revocation obedience exercise.
     rollback_posture: Revoke the temporary safe-stage exception and return to deny-by-default routing.
     retirement_trigger: Retire after the AG-05 governance exercise is superseded by a newer retained run.
+    lease_id: lease-uec-bounded-repo-shell-boundary-sensitive-20260409

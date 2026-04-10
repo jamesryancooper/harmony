@@ -32,7 +32,7 @@ support_tier:
     - MODEL-004
   support_status: supported
   route: deny
-  requires_mission: false
+  requires_mission: true
   required_evidence:
     - authority-decision-artifact
     - authority-grant-bundle
@@ -61,7 +61,7 @@ approval_request_ref: .octon/state/control/execution/approvals/requests/uec-boun
 approval_grant_refs:
   - .octon/state/control/execution/approvals/grants/grant-uec-bounded-repo-shell-boundary-sensitive-20260409.yml
 exception_refs:
-- .octon/state/control/execution/exceptions/leases/lease-uec-bounded-repo-shell-boundary-sensitive-20260409.yml
+  - .octon/state/control/execution/exceptions/leases/lease-uec-bounded-repo-shell-boundary-sensitive-20260409.yml
 revocation_refs:
   - .octon/state/control/execution/revocations/revoke-uec-bounded-repo-shell-boundary-sensitive-20260409.yml
 generated_at: "2026-04-02T00:00:00Z"
