@@ -59,6 +59,7 @@ jobs:
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-contract-family-version-coherence.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-projection-shell-boundaries.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-support-target-live-claims.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-global-retirement-closure.sh
           bash .octon/framework/assurance/governance/_ops/scripts/assert-unified-execution-closure.sh
 
       - name: Pass 2
@@ -75,4 +76,5 @@ jobs:
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-contract-family-version-coherence.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-projection-shell-boundaries.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-support-target-live-claims.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-global-retirement-closure.sh
           bash .octon/framework/assurance/governance/_ops/scripts/assert-unified-execution-closure.sh

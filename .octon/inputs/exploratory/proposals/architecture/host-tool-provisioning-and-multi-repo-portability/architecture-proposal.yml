@@ -1,0 +1,37 @@
+schema_version: "architecture-proposal-v1"
+architecture_scope: "repo-architecture"
+decision_type: "new-surface"
+architecture_target: "host-tool-provisioning-subsystem"
+claim_posture: "bounded-octon-internal-target-state"
+coverage_summary:
+  in_scope_source_items: 11
+  target_classes:
+    - "framework host-tool contracts"
+    - "repo-local desired tool requirements"
+    - "host-scoped actual install state"
+    - "multi-repo shared tool cache"
+    - "bootstrap and doctor/provisioning boundaries"
+    - "consumer integration for repo-hygiene"
+top_authority_surfaces:
+  - ".octon/framework/constitution/CHARTER.md"
+  - ".octon/framework/constitution/obligations/fail-closed.yml"
+  - ".octon/framework/constitution/obligations/evidence.yml"
+  - ".octon/instance/bootstrap/START.md"
+  - ".octon/instance/extensions.yml"
+  - ".octon/framework/engine/governance/extensions/README.md"
+  - ".octon/framework/engine/governance/extensions/trust-and-compatibility.md"
+  - ".octon/framework/capabilities/runtime/commands/init.md"
+  - ".octon/instance/governance/policies/repo-hygiene.yml"
+blocking_dependencies:
+  - "host-scoped actual tool state must stay outside repo authority roots"
+  - "repo commands must fail closed when mandatory tools are unresolved"
+implementation_motion: >-
+  Add a framework-owned host-tool contract family plus a repo-owned desired
+  requirements surface; route actual installs into a host-scoped Octon home
+  cache; add a provisioning command and validator; then integrate repo-hygiene
+  as the first governed consumer.
+validation_motion: >-
+  Validate the packet itself, validate structural wiring for host-tool
+  governance, prove multi-repo shared-cache semantics in tests, and require
+  repo-hygiene to resolve its mandatory external tools through the new
+  subsystem rather than through ad hoc temp installs.

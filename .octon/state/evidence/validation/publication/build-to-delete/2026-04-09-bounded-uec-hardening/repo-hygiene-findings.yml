@@ -1,0 +1,37 @@
+schema_version: repo-hygiene-packet-attachment-v1
+generated_at: "2026-04-11T15:46:08Z"
+policy_ref: .octon/instance/governance/policies/repo-hygiene.yml
+audit_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline
+latest_review_packet_ref: .octon/state/evidence/validation/publication/build-to-delete/2026-04-09-bounded-uec-hardening
+active_release_id: 2026-04-11-uec-bounded-recertified-complete
+active_release_root: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete
+current_governance_review_ref: .octon/state/evidence/governance/build-to-delete/2026-04-09-bounded-uec-hardening/retirement-claim-review.yml
+summary:
+  total_findings: 123
+  blocking_findings: 0
+  high_confidence_blocking_findings: 0
+  required_detector_failures: 0
+  packetization_ready: true
+  findings_by_class:
+    - class: rust-static-deadness
+      count: 98
+    - class: rust-dependency-deadness
+      count: 24
+    - class: artifact-bloat
+      count: 1
+  findings_by_action:
+    - action: needs-ablation-before-delete
+      count: 123
+  findings_by_confidence:
+    - confidence: low
+      count: 99
+    - confidence: medium
+      count: 24
+artifact_refs:
+  audit_summary: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  findings: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/findings.yml
+  blocking_findings: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/blocking-findings.yml
+  summary: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/summary.md
+  host_tools: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/host-tools.yml
+blocking_findings: []
+governance_relevant_findings: []

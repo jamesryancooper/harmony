@@ -1,0 +1,100 @@
+name: Repo Hygiene
+
+on:
+  pull_request:
+    paths:
+      - ".octon/octon.yml"
+      - ".octon/framework/engine/runtime/crates/**"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-phase7-build-to-delete-institutionalization.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-global-retirement-closure.sh"
+      - ".octon/instance/governance/policies/repo-hygiene.yml"
+      - ".octon/instance/governance/contracts/**"
+      - ".octon/instance/governance/disclosure/release-lineage.yml"
+      - ".octon/instance/governance/retirement/**"
+      - ".octon/instance/governance/retirement-register.yml"
+      - ".octon/instance/capabilities/runtime/commands/**"
+      - ".octon/state/evidence/disclosure/releases/**"
+      - ".octon/state/evidence/validation/publication/build-to-delete/**"
+      - ".github/workflows/repo-hygiene.yml"
+  schedule:
+    - cron: "15 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  enforce:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OCTON_HOME: ${{ runner.temp }}/octon-home
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq shellcheck
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Install cargo machete
+        run: cargo install --locked cargo-machete
+
+      - name: Validate repo-hygiene governance and enforce hygiene gate
+        run: |
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh
+          bash .octon/instance/capabilities/runtime/commands/repo-hygiene/repo-hygiene.sh enforce
+
+  audit:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      OCTON_HOME: ${{ runner.temp }}/octon-home
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq shellcheck
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Install Rust toolchains
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy
+
+      - name: Install nightly udeps prerequisites
+        run: |
+          rustup toolchain install nightly --profile minimal
+          cargo install --locked cargo-machete
+          cargo +nightly install --locked cargo-udeps
+
+      - name: Run full repo-hygiene audit
+        env:
+          AUDIT_ID: ${{ github.run_id }}
+        run: |
+          audit_id="$(date -u +%F)-repo-hygiene-${AUDIT_ID}"
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh
+          bash .octon/instance/capabilities/runtime/commands/repo-hygiene/repo-hygiene.sh audit --audit-id "${audit_id}"
+
+      - name: Upload repo-hygiene audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-hygiene-audit
+          path: .octon/state/evidence/runs/ci/repo-hygiene/
+          if-no-files-found: error

@@ -687,6 +687,7 @@ mod tests {
     use crate::policy::GrantSet;
     use crate::scoped_fs::ScopedFs;
     use crate::state::HostState;
+    use octon_core::execution_integrity::{ExecutionExceptionLeases, NetworkEgressPolicy};
 
     fn test_state(caps: &[&str]) -> HostState {
         let unique = std::time::SystemTime::now()
@@ -701,6 +702,12 @@ mod tests {
             grants: GrantSet::new(caps.iter().copied()),
             kv: KvStore::open(kv_dir).expect("kv open"),
             fs: ScopedFs::new(std::env::current_dir().expect("cwd")).expect("scoped fs"),
+            run_root: std::env::current_dir().expect("cwd"),
+            trace: None,
+            service_id: "test/http".to_string(),
+            adapter_id: None,
+            network_policy: NetworkEgressPolicy::default(),
+            exception_leases: ExecutionExceptionLeases::default(),
         }
     }
 

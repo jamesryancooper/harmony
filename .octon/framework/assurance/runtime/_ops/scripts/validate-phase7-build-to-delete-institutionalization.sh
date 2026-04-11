@@ -7,6 +7,7 @@ OCTON_DIR="${OCTON_DIR_OVERRIDE:-$DEFAULT_OCTON_DIR}"
 ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 
 ARCH_WORKFLOW="$ROOT_DIR/.github/workflows/architecture-conformance.yml"
+REPO_HYGIENE_WORKFLOW="$ROOT_DIR/.github/workflows/repo-hygiene.yml"
 PHASE7_PLAN="$OCTON_DIR/instance/cognition/context/shared/migrations/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization/plan.md"
 PHASE7_ADR="$OCTON_DIR/instance/cognition/decisions/083-unified-execution-constitution-phase7-build-to-delete-institutionalization.md"
 PHASE7_EVIDENCE_DIR="$OCTON_DIR/state/evidence/migration/2026-03-29-unified-execution-constitution-phase7-build-to-delete-institutionalization"
@@ -14,6 +15,12 @@ GOVERNANCE_CONTRACTS="$OCTON_DIR/instance/governance/contracts"
 BUILD_TO_DELETE_ROOT="$(yq -r '.latest_review_packet // ""' "$GOVERNANCE_CONTRACTS/closeout-reviews.yml" 2>/dev/null || true)"
 PHASE6_VALIDATOR="$OCTON_DIR/framework/assurance/runtime/_ops/scripts/validate-phase6-simplification-deletion.sh"
 CLOSEOUT_VALIDATOR="$OCTON_DIR/framework/assurance/governance/_ops/scripts/assert-unified-execution-closure.sh"
+REPO_HYGIENE_POLICY="$OCTON_DIR/instance/governance/policies/repo-hygiene.yml"
+REPO_HYGIENE_COMMAND_MANIFEST="$OCTON_DIR/instance/capabilities/runtime/commands/manifest.yml"
+REPO_HYGIENE_COMMAND_README="$OCTON_DIR/instance/capabilities/runtime/commands/repo-hygiene/README.md"
+REPO_HYGIENE_COMMAND_SCRIPT="$OCTON_DIR/instance/capabilities/runtime/commands/repo-hygiene/repo-hygiene.sh"
+REPO_HYGIENE_COMMAND_COMMON="$OCTON_DIR/instance/capabilities/runtime/commands/repo-hygiene/repo-hygiene-common.sh"
+REPO_HYGIENE_VALIDATOR="$OCTON_DIR/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh"
 
 errors=0
 
@@ -103,6 +110,13 @@ main() {
   require_file "$GOVERNANCE_CONTRACTS/retirement-review.yml"
   require_file "$GOVERNANCE_CONTRACTS/ablation-deletion-workflow.yml"
   require_file "$GOVERNANCE_CONTRACTS/closeout-reviews.yml"
+  require_file "$REPO_HYGIENE_POLICY"
+  require_file "$REPO_HYGIENE_COMMAND_MANIFEST"
+  require_file "$REPO_HYGIENE_COMMAND_README"
+  require_file "$REPO_HYGIENE_COMMAND_SCRIPT"
+  require_file "$REPO_HYGIENE_COMMAND_COMMON"
+  require_file "$REPO_HYGIENE_VALIDATOR"
+  require_file "$REPO_HYGIENE_WORKFLOW"
   if [[ -z "$BUILD_TO_DELETE_ROOT" ]]; then
     fail "closeout reviews contract does not publish latest_review_packet"
   elif [[ "$BUILD_TO_DELETE_ROOT" == .octon/* ]]; then
@@ -114,17 +128,24 @@ main() {
   require_file "$BUILD_TO_DELETE_ROOT/adapter-review.yml"
   require_file "$BUILD_TO_DELETE_ROOT/retirement-review.yml"
   require_file "$BUILD_TO_DELETE_ROOT/ablation-deletion-receipt.yml"
+  require_file "$BUILD_TO_DELETE_ROOT/repo-hygiene-findings.yml"
   require_file "$PHASE6_VALIDATOR"
   require_file "$CLOSEOUT_VALIDATOR"
 
   require_text 'retirement-registry.yml' "$GOVERNANCE_CONTRACTS/README.md" "governance contracts README publishes retirement registry"
   require_text 'ablation-deletion-workflow.yml' "$GOVERNANCE_CONTRACTS/README.md" "governance contracts README publishes ablation workflow"
   require_text '.octon/instance/governance/contracts/**' "$ARCH_WORKFLOW" "architecture workflow triggers on governance contract changes"
+  require_text '.octon/instance/capabilities/runtime/commands/**' "$ARCH_WORKFLOW" "architecture workflow triggers on repo-native command changes"
   require_text '.octon/state/evidence/validation/publication/**' "$ARCH_WORKFLOW" "architecture workflow triggers on publication review evidence changes"
+  require_text 'validate-repo-hygiene-governance.sh' "$ARCH_WORKFLOW" "architecture workflow runs repo-hygiene validator"
   require_text 'validate-phase7-build-to-delete-institutionalization.sh' "$ARCH_WORKFLOW" "architecture workflow enforces Phase 7 validator"
   require_text 'assert-unified-execution-closure.sh' "$ARCH_WORKFLOW" "architecture workflow enforces closeout validator"
+  require_text 'repo-hygiene.sh enforce' "$REPO_HYGIENE_WORKFLOW" "repo-hygiene workflow runs enforce mode"
+  require_text 'repo-hygiene.sh audit' "$REPO_HYGIENE_WORKFLOW" "repo-hygiene workflow runs audit mode"
 
   require_yq '.schema_version == "repo-retirement-policy-v2"' "$GOVERNANCE_CONTRACTS/retirement-policy.yml" "retirement policy uses Phase 7 schema"
+  require_yq '.schema_version == "repo-hygiene-policy-v1"' "$REPO_HYGIENE_POLICY" "repo-hygiene policy uses expected schema"
+  require_yq '.commands[] | select(.id == "repo-hygiene")' "$REPO_HYGIENE_COMMAND_MANIFEST" "repo-hygiene command is registered"
   require_yq '.entries[] | select(.target_id == "workspace-objective-compatibility-shims" and .review_contract_ref == ".octon/instance/governance/contracts/drift-review.yml")' "$GOVERNANCE_CONTRACTS/retirement-registry.yml" "retirement registry binds workspace shims to drift review"
   require_yq '.entries[] | select(.target_id == "helper-authored-run-projections" and .required_ablation_suite[] == ".octon/framework/assurance/governance/_ops/scripts/assert-unified-execution-closure.sh")' "$GOVERNANCE_CONTRACTS/retirement-registry.yml" "retirement registry ties helper projections to closeout ablation"
   require_yq '.review_id == "drift-review"' "$GOVERNANCE_CONTRACTS/drift-review.yml" "drift review contract publishes review id"
@@ -136,19 +157,29 @@ main() {
   require_yq '.latest_review_packet | test("^\\.octon/state/evidence/validation/publication/build-to-delete/[0-9]{4}-[0-9]{2}-[0-9]{2}([-/][A-Za-z0-9._-]+)?$")' "$GOVERNANCE_CONTRACTS/closeout-reviews.yml" "closeout reviews publish a canonical latest review packet path"
   require_yq '.status == "approved"' "$BUILD_TO_DELETE_ROOT/retirement-review.yml" "retirement review receipt approved"
   require_yq '.status == "completed"' "$BUILD_TO_DELETE_ROOT/ablation-deletion-receipt.yml" "ablation receipt completed"
+  require_yq '.summary.packetization_ready == true and .summary.blocking_findings == 0' "$BUILD_TO_DELETE_ROOT/repo-hygiene-findings.yml" "repo-hygiene packet attachment is closure-ready"
 
   run_test \
     "Phase 6 validator still passes under Phase 7 governance" \
     bash "$PHASE6_VALIDATOR"
   run_test \
+    "repo-hygiene validator passes" \
+    bash "$REPO_HYGIENE_VALIDATOR"
+  run_test \
     "architecture conformance workflow remains valid YAML" \
     yq -e '.' "$ARCH_WORKFLOW"
+  run_test \
+    "repo-hygiene workflow remains valid YAML" \
+    yq -e '.' "$REPO_HYGIENE_WORKFLOW"
   run_test \
     "Phase 7 validator script parses" \
     bash -n "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/validate-phase7-build-to-delete-institutionalization.sh"
   run_test \
     "closeout validator script parses" \
     bash -n "$CLOSEOUT_VALIDATOR"
+  run_test \
+    "repo-hygiene validator script parses" \
+    bash -n "$REPO_HYGIENE_VALIDATOR"
   run_test \
     "git diff check is clean" \
     git diff --check

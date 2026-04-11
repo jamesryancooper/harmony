@@ -8,6 +8,7 @@ Enable reliable agent execution that is deterministic enough to trust, observabl
 ## Contents
 
 - `commands/` - Atomic instruction-driven operations.
+- `host-tools/` - Host-scoped external tool contracts and provisioning rules.
 - `skills/` - Composite instruction-driven workflows.
 - `tools/` - Atomic invocation-driven tool packs.
 - `services/` - Composite invocation-driven domain capabilities.
@@ -26,6 +27,7 @@ For autonomous AI agents, these are four capability classes in one runtime.
 ## Discovery
 
 - `commands/manifest.yml`
+- `host-tools/registry.yml`
 - `skills/manifest.yml`
 - `tools/manifest.yml`
 - `services/manifest.yml`

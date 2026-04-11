@@ -1,0 +1,15 @@
+schema_version: "repo-hygiene-host-tool-resolution-v1"
+generated_at: "2026-04-11T15:46:59Z"
+consumer: "repo-hygiene"
+mode: "audit"
+octon_home: "/tmp/octon-host-home-installed"
+tools:
+  shellcheck:
+    binary_path: "/tmp/octon-host-home-installed/tools/shellcheck/0.10.0/darwin-aarch64/bin/shellcheck"
+    version_line: "0.10.0"
+  cargo-machete:
+    binary_path: "/tmp/octon-host-home-installed/tools/cargo-machete/0.9.1/darwin-aarch64/bin/cargo-machete"
+    version_line: "0.9.1"
+  cargo-udeps:
+    binary_path: "/tmp/octon-host-home-installed/tools/cargo-udeps/0.1.60/darwin-aarch64/bin/cargo-udeps"
+    version_line: "cargo-udeps 0.1.60"

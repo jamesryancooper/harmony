@@ -9,6 +9,7 @@ on:
       - ".octon/framework/agency/**"
       - ".octon/framework/engine/**"
       - ".octon/framework/assurance/**"
+      - ".octon/framework/capabilities/runtime/**"
       - ".octon/framework/capabilities/packs/**"
       - ".octon/framework/lab/**"
       - ".octon/framework/scaffolding/**"
@@ -28,6 +29,7 @@ on:
       - ".octon/instance/governance/support-targets.yml"
       - ".octon/instance/governance/support-target-admissions/**"
       - ".octon/instance/governance/support-dossiers/**"
+      - ".octon/instance/capabilities/runtime/commands/**"
       - ".octon/instance/capabilities/runtime/packs/**"
       - ".octon/instance/ingress/**"
       - ".octon/state/control/execution/**"
@@ -41,6 +43,7 @@ on:
       - ".octon/instance/bootstrap/**"
       - ".github/workflows/ai-review-gate.yml"
       - ".github/workflows/architecture-conformance.yml"
+      - ".github/workflows/repo-hygiene.yml"
   push:
     branches:
       - main
@@ -51,6 +54,7 @@ on:
       - ".octon/framework/agency/**"
       - ".octon/framework/engine/**"
       - ".octon/framework/assurance/**"
+      - ".octon/framework/capabilities/runtime/**"
       - ".octon/framework/capabilities/packs/**"
       - ".octon/framework/lab/**"
       - ".octon/framework/scaffolding/**"
@@ -70,6 +74,7 @@ on:
       - ".octon/instance/governance/support-targets.yml"
       - ".octon/instance/governance/support-target-admissions/**"
       - ".octon/instance/governance/support-dossiers/**"
+      - ".octon/instance/capabilities/runtime/commands/**"
       - ".octon/instance/capabilities/runtime/packs/**"
       - ".octon/instance/ingress/**"
       - ".octon/state/control/execution/**"
@@ -83,6 +88,7 @@ on:
       - ".octon/instance/bootstrap/**"
       - ".github/workflows/ai-review-gate.yml"
       - ".github/workflows/architecture-conformance.yml"
+      - ".github/workflows/repo-hygiene.yml"
 
 permissions:
   contents: read
@@ -101,6 +107,7 @@ jobs:
         run: |
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-version-parity.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-host-tool-governance.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness,mission-autonomy
 
   mission-runtime-contracts:
@@ -248,5 +255,6 @@ jobs:
 
       - name: Validate Phase 7 build-to-delete governance
         run: |
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-phase7-build-to-delete-institutionalization.sh
           bash .octon/framework/assurance/governance/_ops/scripts/assert-unified-execution-closure.sh

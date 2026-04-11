@@ -110,6 +110,7 @@ Atomic operations in `capabilities/runtime/commands/`:
 | Command | Access | Description |
 |---------|--------|-------------|
 | [init.md](./capabilities/runtime/commands/init.md) | human | Complete the `bootstrap_core` install by generating canonical `.octon` bootstrap files plus repo-root ingress adapters (`.octon/AGENTS.md`, `.octon/instance/charter/workspace.{md,yml}`, compatibility shims at `.octon/instance/bootstrap/OBJECTIVE.md` and `intent.contract.yml`, root `AGENTS.md`, root `CLAUDE.md`, `alignment-check`, optional `BOOT*.md`) |
+| [provision-host-tools.md](./capabilities/runtime/commands/provision-host-tools.md) | human | Verify, install, or repair host-scoped external tools for the current repo without storing binaries under `/.octon/**` |
 | [export-harness.md](./capabilities/runtime/commands/export-harness.md) | human | Materialize `repo_snapshot` or `pack_bundle` exports from the root-manifest profile contract |
 | [studio.md](./capabilities/runtime/commands/studio.md) | human | Launch Octon Studio for workflow graph design, read-only orchestration operations, and safe staged edits |
 | [recover.md](./capabilities/runtime/commands/recover.md) | human | Recovery procedures for common agent failure modes |
@@ -427,10 +428,11 @@ The root harness template contains:
 | Script | Description |
 |--------|-------------|
 | [scaffolding/runtime/_ops/scripts/init-project.sh](./scaffolding/runtime/_ops/scripts/init-project.sh) | Stable wrapper path for the canonical bootstrap generator that writes `.octon`-local authored files plus root ingress adapters |
+| [scaffolding/runtime/_ops/scripts/provision-host-tools.sh](./scaffolding/runtime/_ops/scripts/provision-host-tools.sh) | Stable runner for host-scoped tool verification, install, and repair against repo-owned requirements |
 | [orchestration/runtime/_ops/scripts/export-harness.sh](./orchestration/runtime/_ops/scripts/export-harness.sh) | Stable runner for `repo_snapshot` and `pack_bundle` materialization from `octon.yml` |
 | [init.sh](./init.sh) | Health check: verifies required files/directories exist |
 
-**Usage:** Run `.octon/framework/scaffolding/runtime/_ops/scripts/init-project.sh --list-objectives` to inspect common use cases, then run `.octon/framework/scaffolding/runtime/_ops/scripts/init-project.sh --objective <id>` from repo root (or use `/init`) to complete `bootstrap_core` installation. This writes canonical authored files under `/.octon/` and refreshes the root `AGENTS.md` and `CLAUDE.md` ingress adapters. Use `.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh --profile repo_snapshot|pack_bundle --output-dir <path>` (or `/export-harness`) for manifest-governed exports. Run `.octon/instance/bootstrap/init.sh` from `.octon/` for harness health checks.
+**Usage:** Run `.octon/framework/scaffolding/runtime/_ops/scripts/init-project.sh --list-objectives` to inspect common use cases, then run `.octon/framework/scaffolding/runtime/_ops/scripts/init-project.sh --objective <id>` from repo root (or use `/init`) to complete `bootstrap_core` installation. This writes canonical authored files under `/.octon/` and refreshes the root `AGENTS.md` and `CLAUDE.md` ingress adapters; it does not provision host tools. Use `.octon/framework/scaffolding/runtime/_ops/scripts/provision-host-tools.sh verify|install|repair --consumer <id> --mode <mode>` (or `/provision-host-tools`) for host-scoped tool provisioning. Use `.octon/framework/orchestration/runtime/_ops/scripts/export-harness.sh --profile repo_snapshot|pack_bundle --output-dir <path>` (or `/export-harness`) for manifest-governed exports. Run `.octon/instance/bootstrap/init.sh` from `.octon/` for harness health checks.
 
 ---
 
