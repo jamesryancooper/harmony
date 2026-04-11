@@ -21,7 +21,18 @@ promotion_targets:
   - ".octon/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh"
   - ".octon/framework/assurance/runtime/_ops/scripts/validate-phase7-build-to-delete-institutionalization.sh"
   - ".octon/framework/assurance/runtime/_ops/scripts/validate-global-retirement-closure.sh"
-status: "in-review"
+status: "archived"
+archive:
+  archived_at: "2026-04-11"
+  archived_from_status: "implemented"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/repository-hygiene-and-retirement"
+  promotion_evidence:
+    - ".octon/instance/governance/policies/repo-hygiene.yml"
+    - ".octon/instance/capabilities/runtime/commands/repo-hygiene/repo-hygiene.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh"
+    - ".octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml"
+    - ".octon/state/evidence/validation/publication/build-to-delete/2026-04-09-bounded-uec-hardening/repo-hygiene-findings.yml"
 lifecycle:
   temporary: true
   exit_expectation: >-

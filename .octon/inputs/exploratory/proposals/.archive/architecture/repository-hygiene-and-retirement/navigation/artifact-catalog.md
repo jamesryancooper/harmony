@@ -29,5 +29,13 @@ only, not a semantic authority surface.
 | `resources/assumptions-and-blockers.md` | resource | assumptions, blockers, and nonblocking concerns | supporting | explicit blocker handling |
 | `resources/evidence-plan.md` | resource | retained evidence burden | supporting | evidence families and sufficiency tests |
 | `resources/rejection-ledger.md` | resource | rejected alternatives and rationale | supporting | prevents design drift |
-| `resources/source_inputs/**` | resource bundle | user-provided source reproductions | non-authoritative | traceability only |
-| `resources/repo_evidence/**` | resource bundle | copied or summarized repo evidence | non-authoritative | live repo still outranks these copies |
+| `resources/source_inputs/01_user_request_rust_shell_cleanup.md` | resource | user request reproduction | non-authoritative | traceability only |
+| `resources/source_inputs/02_user_request_transitional_surfaces.md` | resource | user request reproduction | non-authoritative | traceability only |
+| `resources/source_inputs/03_user_request_repo_hygiene_capability_spec.md` | resource | user request reproduction | non-authoritative | traceability only |
+| `resources/source_inputs/04_user_request_proposal_packet_generation.md` | resource | user request reproduction | non-authoritative | traceability only |
+| `resources/repo_evidence/01_ingress_constitutional_and_profile_excerpts.md` | resource | repo grounding excerpt set | non-authoritative | live repo outranks packet-local copy |
+| `resources/repo_evidence/02_super_root_and_proposal_contract_excerpts.md` | resource | repo grounding excerpt set | non-authoritative | live repo outranks packet-local copy |
+| `resources/repo_evidence/03_runtime_command_support_and_workflow_excerpts.md` | resource | repo grounding excerpt set | non-authoritative | live repo outranks packet-local copy |
+| `resources/repo_evidence/04_retirement_and_ablation_spine_excerpts.md` | resource | repo grounding excerpt set | non-authoritative | live repo outranks packet-local copy |
+| `resources/repo_evidence/05_runtime_workspace_and_ci_excerpts.md` | resource | repo grounding excerpt set | non-authoritative | live repo outranks packet-local copy |
+| `resources/repo_evidence/06_proposal_workspace_observations.md` | resource | repo grounding excerpt set | non-authoritative | live repo outranks packet-local copy |

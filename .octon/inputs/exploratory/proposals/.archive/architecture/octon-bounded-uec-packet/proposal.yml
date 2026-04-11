@@ -19,7 +19,18 @@ promotion_targets:
   - ".octon/state/evidence/"
   - ".octon/generated/effective/"
   - ".octon/generated/cognition/"
-status: "in-review"
+status: "archived"
+archive:
+  archived_at: "2026-04-11"
+  archived_from_status: "implemented"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/octon-bounded-uec-packet"
+  promotion_evidence:
+    - ".octon/instance/cognition/context/shared/migrations/2026-04-09-octon-bounded-uec-packet-implementation/plan.md"
+    - ".octon/instance/governance/closure/unified-execution-constitution.yml"
+    - ".octon/generated/effective/closure/claim-status.yml"
+    - ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/recertification-status.yml"
+    - ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/harness-card.yml"
 lifecycle:
   temporary: true
   exit_expectation: >-

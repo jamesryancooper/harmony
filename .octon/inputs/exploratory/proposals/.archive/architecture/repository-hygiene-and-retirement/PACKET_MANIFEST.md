@@ -8,8 +8,8 @@ reading aid only; lifecycle authority remains with `proposal.yml` and
 ## Packet root
 
 - canonical packet path:
-  `/.octon/inputs/exploratory/proposals/architecture/repository-hygiene-and-retirement/`
-- packet status: `in-review`
+  `/.octon/inputs/exploratory/proposals/.archive/architecture/repository-hygiene-and-retirement/`
+- packet status: `archived`
 - proposal kind: `architecture`
 - promotion scope: `octon-internal`
 

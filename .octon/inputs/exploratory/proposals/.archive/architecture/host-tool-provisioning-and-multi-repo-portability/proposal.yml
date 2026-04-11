@@ -22,7 +22,18 @@ promotion_targets:
   - ".octon/instance/capabilities/runtime/commands/repo-hygiene/README.md"
   - ".octon/instance/bootstrap/START.md"
   - ".octon/instance/bootstrap/catalog.md"
-status: "in-review"
+status: "archived"
+archive:
+  archived_at: "2026-04-11"
+  archived_from_status: "implemented"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/host-tool-provisioning-and-multi-repo-portability"
+  promotion_evidence:
+    - ".octon/framework/capabilities/runtime/host-tools/registry.yml"
+    - ".octon/framework/scaffolding/runtime/_ops/scripts/provision-host-tools.sh"
+    - ".octon/instance/capabilities/runtime/host-tools/requirements.yml"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-host-tool-governance.sh"
+    - ".octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/host-tools.yml"
 lifecycle:
   temporary: true
   exit_expectation: >-

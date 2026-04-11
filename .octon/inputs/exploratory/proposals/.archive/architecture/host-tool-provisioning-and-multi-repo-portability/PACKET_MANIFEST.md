@@ -8,8 +8,8 @@ authority remains with `proposal.yml` and `architecture-proposal.yml`.
 ## Packet root
 
 - canonical packet path:
-  `/.octon/inputs/exploratory/proposals/architecture/host-tool-provisioning-and-multi-repo-portability/`
-- packet status: `in-review`
+  `/.octon/inputs/exploratory/proposals/.archive/architecture/host-tool-provisioning-and-multi-repo-portability/`
+- packet status: `archived`
 - proposal kind: `architecture`
 - promotion scope: `octon-internal`
 
