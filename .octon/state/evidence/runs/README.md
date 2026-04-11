@@ -7,6 +7,11 @@ Its mutable control-plane counterpart is `state/control/execution/runs/`,
 which holds bound run contracts, run manifests, runtime-state,
 rollback-posture, stage attempts, and control checkpoints.
 
+Canonical top-level retained run containers under `state/evidence/runs/`
+include `ci/`, `engine/`, `operations/`, `services/`, `skills/`, and
+`workflows/`. These family buckets may contain multiple retained run roots,
+such as `ci/repo-hygiene/<audit-id>/`.
+
 Canonical evidence families beneath each run root:
 
 ```text

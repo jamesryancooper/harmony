@@ -891,7 +891,7 @@ validate_runs_retention_contract() {
     [[ -z "$run_path" ]] && continue
     run_name="$(basename "$run_path")"
 
-    if [[ "$run_name" == "operations" || "$run_name" == "workflows" || "$run_name" == "engine" || "$run_name" == "services" || "$run_name" == "skills" ]]; then
+    if [[ "$run_name" == "ci" || "$run_name" == "operations" || "$run_name" == "workflows" || "$run_name" == "engine" || "$run_name" == "services" || "$run_name" == "skills" ]]; then
       pass "run container retained as canonical top-level bucket: ${run_path#$ROOT_DIR/}"
       continue
     fi
