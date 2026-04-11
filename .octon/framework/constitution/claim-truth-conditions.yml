@@ -30,7 +30,7 @@ conditions:
   - id: TC-04
     title: canonical-authority
     required: true
-    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/cross-artifact-consistency.yml"
+    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/authority-ledger-coherence-report.yml"
     invalidated_by:
       - authority-family-change
       - host-only-approval-detected
@@ -38,7 +38,7 @@ conditions:
   - id: TC-05
     title: durable-run-semantics
     required: true
-    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/cross-artifact-consistency.yml"
+    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/instruction-manifest-completeness-report.yml"
     invalidated_by:
       - consequential-run-missing-bundle
       - checkpoint-or-ledger-regression
@@ -48,14 +48,14 @@ conditions:
   - id: TC-06
     title: classed-evidence
     required: true
-    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/cross-artifact-consistency.yml"
+    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/evidence-classification-completeness-report.yml"
     invalidated_by:
       - empty-evidence-classification
       - external-index-digest-regression
   - id: TC-07
     title: complete-proof
     required: true
-    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/proof-plane-coverage.yml"
+    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/proof-plane-coverage.yml"
     invalidated_by:
       - proof-plane-failure
       - evaluator-independence-regression
@@ -63,7 +63,7 @@ conditions:
   - id: TC-08
     title: claim-calibrated-disclosure
     required: true
-    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/harness-card.yml"
+    evidence_ref: ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/claim-calibration-report.yml"
     invalidated_by:
       - authored-claim-outstates-ledgers
       - support-universe-drift

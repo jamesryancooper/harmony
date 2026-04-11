@@ -1,0 +1,18 @@
+schema_version: closure-validator-report-v1
+validator_id: V-06
+generated_at: "2026-04-10T21:00:00Z"
+repo_rev: working-tree
+input_refs:
+  - .octon/state/evidence/runs/uec-global-ci-observe-read-20260404/instruction-layer-manifest.json
+  - .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/instruction-layer-manifest.json
+status: pass
+blocking: false
+findings:
+  - finding_id: CB-02
+    severity: critical
+    summary: All active exemplar runs now carry substantive v2 instruction-layer manifests with bound authority and tuple refs.
+resolved_by_refs:
+  - .octon/state/evidence/runs/uec-global-ci-observe-read-20260404/instruction-layer-manifest.json
+  - .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/instruction-layer-manifest.json
+notes:
+  - Active run-bundle manifests are complete enough for complete-claim disclosure.

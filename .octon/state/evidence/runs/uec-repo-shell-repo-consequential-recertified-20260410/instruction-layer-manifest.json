@@ -1,0 +1,46 @@
+{
+  "schema_version": "instruction-layer-manifest-v2",
+  "run_id": "uec-repo-shell-repo-consequential-recertified-20260410",
+  "mission_id": "mission-autonomy-live-validation",
+  "run_mode": "mission-bound",
+  "workspace_charter_refs": [
+    ".octon/instance/charter/workspace.md",
+    ".octon/instance/charter/workspace.yml"
+  ],
+  "mission_refs": [
+    ".octon/instance/orchestration/missions/mission-autonomy-live-validation/mission.md",
+    ".octon/instance/orchestration/missions/mission-autonomy-live-validation/mission.yml"
+  ],
+  "run_contract_ref": ".octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml",
+  "support_target_tuple_id": "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell",
+  "authority_refs": [
+    ".octon/state/control/execution/approvals/requests/uec-repo-shell-repo-consequential-recertified-20260410.yml",
+    ".octon/state/control/execution/approvals/grants/grant-uec-repo-shell-repo-consequential-recertified-20260410.yml",
+    ".octon/state/evidence/control/execution/authority-decision-uec-repo-shell-repo-consequential-recertified-20260410.yml",
+    ".octon/state/evidence/control/execution/authority-grant-bundle-uec-repo-shell-repo-consequential-recertified-20260410.yml"
+  ],
+  "precedence_stack": [
+    ".octon/framework/constitution/CHARTER.md",
+    ".octon/framework/constitution/charter.yml",
+    ".octon/framework/constitution/obligations/fail-closed.yml",
+    ".octon/framework/constitution/obligations/evidence.yml",
+    ".octon/framework/constitution/precedence/normative.yml",
+    ".octon/framework/constitution/precedence/epistemic.yml",
+    ".octon/instance/charter/workspace.md",
+    ".octon/instance/charter/workspace.yml",
+    ".octon/instance/orchestration/missions/mission-autonomy-live-validation/mission.yml",
+    ".octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml"
+  ],
+  "adapter_projection_refs": [
+    ".octon/framework/engine/runtime/adapters/host/repo-shell.yml",
+    ".octon/framework/engine/runtime/adapters/model/repo-local-governed.yml"
+  ],
+  "generated_at": "2026-04-10T20:30:00Z",
+  "generated_by": "octon-bounded-uec-recertification",
+  "source_digests": [
+    "workspace-charter:current",
+    "mission-autonomy-live-validation:current",
+    "run-contract:uec-repo-shell-repo-consequential-recertified-20260410",
+    "support-target-tuple:tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell"
+  ]
+}

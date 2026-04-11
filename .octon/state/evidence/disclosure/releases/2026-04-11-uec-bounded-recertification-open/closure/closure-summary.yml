@@ -1,0 +1,48 @@
+schema_version: closure-summary-v2
+release_id: 2026-04-11-uec-bounded-recertification-open
+generated_at: "2026-04-10T20:00:00Z"
+claim_status: recertification_open
+support_universe_mode: bounded-admitted-live-universe
+preclaim_blockers_open: 9
+green_gates:
+  - G0
+  - G1
+  - G2
+  - G5A
+  - G6
+  - G7
+  - G8
+  - G10A
+  - G10C
+  - G10D
+  - G11
+  - G11A
+  - G11B
+  - G11C
+  - G11E
+  - G11F
+  - G11G
+  - G12
+  - G13
+  - G13A
+  - G13B
+  - G13C
+  - G13E
+  - G14
+  - G15
+blocked_by:
+  - G3
+  - G4
+  - G5
+  - G7A
+  - G9
+  - G9A
+  - G10
+  - G10B
+  - G11D
+  - G13D
+  - G16
+notes:
+  - The active complete claim has been withdrawn and replaced with a recertification-open release.
+  - The admitted live support universe remains preserved without widening.
+  - Boundary-sensitive repo-shell claim-bearing lineage is quarantined pending a fresh clean exemplar run and substantive run-bundle hardening.

@@ -1,0 +1,20 @@
+schema_version: claim-bearing-run-bundle-v1
+run_id: uec-repo-shell-boundary-sensitive-recertified-20260410
+run_contract_ref: .octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-contract.yml
+run_manifest_ref: .octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-manifest.yml
+runtime_state_ref: .octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/runtime-state.yml
+instruction_layer_manifest_ref: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/instruction-layer-manifest.json
+evidence_classification_ref: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/evidence-classification.yml
+replay_pointers_ref: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/replay-pointers.yml
+trace_pointers_ref: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/trace-pointers.yml
+measurement_summary_ref: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/measurements/summary.yml
+intervention_ref: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/interventions/log.yml
+proof_plane_refs:
+  structural: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/assurance/structural.yml
+  governance: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/assurance/governance.yml
+  functional: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/assurance/functional.yml
+  behavioral: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/assurance/behavioral.yml
+  maintainability: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/assurance/maintainability.yml
+  recovery: .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/assurance/recovery.yml
+run_card_ref: .octon/state/evidence/disclosure/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-card.yml
+generated_at: "2026-04-10T20:30:00Z"

@@ -1,0 +1,48 @@
+schema_version: octon-release-bundle-manifest-v1
+release_id: 2026-04-11-uec-bounded-recertified-complete
+generated_at: "2026-04-10T21:00:00Z"
+generator_versions:
+  release_bundle: 3
+  harness_card: 3
+  closure_bundle: 3
+validator_versions:
+  authority_ledger_coherence: 1
+  exercise_residue: 1
+  instruction_manifest_completeness: 1
+  evidence_classification_completeness: 1
+  claim_calibration: 1
+  workflow_authority_derivation: 1
+  support_target_coverage: 1
+authored_input_digests:
+  charter: refreshed-under-recertified-complete
+  support_targets: refreshed-under-recertified-complete
+  workspace_charter: refreshed-under-recertified-complete
+proof_bundle_runs:
+  - run://uec-global-ci-observe-read-20260404
+  - run://uec-global-repo-shell-observe-read-20260404
+  - run://uec-global-github-repo-consequential-20260404
+  - run://uec-global-frontier-browser-api-studio-20260404
+  - run://uec-repo-shell-repo-consequential-recertified-20260410
+  - run://uec-repo-shell-boundary-sensitive-recertified-20260410
+bundle_contents:
+  - harness-card.yml
+  - closure/gate-status.yml
+  - closure/closure-summary.yml
+  - closure/closure-certificate.yml
+  - closure/recertification-status.yml
+  - closure/support-universe-coverage.yml
+  - closure/support-universe-evidence-depth-report.yml
+  - closure/support-target-coverage-report.yml
+  - closure/proof-plane-coverage.yml
+  - closure/authority-ledger-coherence-report.yml
+  - closure/no-exercise-residue-report.yml
+  - closure/instruction-manifest-completeness-report.yml
+  - closure/evidence-classification-completeness-report.yml
+  - closure/claim-calibration-report.yml
+  - closure/host-projection-purity-report.yml
+  - closure/workflow-authority-derivation-report.yml
+  - closure/agency-overlay-containment-report.yml
+  - closure/build-to-delete-report.yml
+  - closure/residual-ledger.yml
+  - closure/disclosure-calibration-report.yml
+  - closure/dual-pass-diff-report.yml

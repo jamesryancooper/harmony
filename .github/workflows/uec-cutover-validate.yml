@@ -19,6 +19,9 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      CANONICAL_CONTROL_ROOT: .octon/state/control/execution
+      CANONICAL_CONTROL_EVIDENCE_ROOT: .octon/state/evidence/control/execution
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Install jq and yq
@@ -29,6 +32,8 @@ jobs:
           sudo chmod +x /usr/local/bin/yq
       - name: Run bounded closure validators
         run: |
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-run-authority-ledger-coherence.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-workflow-authority-derivation.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-bounded-claim-nomenclature.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-audit-crosswalk.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-review-packet-freshness.sh

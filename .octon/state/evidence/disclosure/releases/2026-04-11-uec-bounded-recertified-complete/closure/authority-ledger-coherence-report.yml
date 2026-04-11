@@ -1,0 +1,18 @@
+schema_version: closure-validator-report-v1
+validator_id: V-04
+generated_at: "2026-04-10T21:00:00Z"
+repo_rev: working-tree
+input_refs:
+  - .octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-contract.yml
+  - .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml
+status: pass
+blocking: false
+findings:
+  - finding_id: CB-01
+    severity: critical
+    summary: Active claim-bearing authority ledgers are coherent across the clean repo-shell consequential and boundary-sensitive exemplar runs.
+resolved_by_refs:
+  - .octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-contract.yml
+  - .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml
+notes:
+  - Clean successor runs now anchor the active release bundle.

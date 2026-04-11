@@ -1,0 +1,8 @@
+{
+  "request_id": "uec-repo-shell-boundary-sensitive-recertified-20260410",
+  "decision": "DENY",
+  "linked_refs": [
+    ".octon/state/control/execution/approvals/requests/uec-repo-shell-boundary-sensitive-recertified-20260410.yml",
+    ".octon/state/control/execution/approvals/grants/grant-uec-repo-shell-boundary-sensitive-recertified-20260410.yml"
+  ]
+}

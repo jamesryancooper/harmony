@@ -1,0 +1,18 @@
+schema_version: closure-validator-report-v1
+validator_id: V-07
+generated_at: "2026-04-10T21:00:00Z"
+repo_rev: working-tree
+input_refs:
+  - .octon/state/evidence/runs/uec-global-ci-observe-read-20260404/evidence-classification.yml
+  - .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/evidence-classification.yml
+status: pass
+blocking: false
+findings:
+  - finding_id: CB-02a
+    severity: critical
+    summary: All active exemplar runs now carry non-empty v2 evidence classifications.
+resolved_by_refs:
+  - .octon/state/evidence/runs/uec-global-ci-observe-read-20260404/evidence-classification.yml
+  - .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/evidence-classification.yml
+notes:
+  - Historical non-active runs may retain older evidence shapes, but the active claim basis is fully classed.

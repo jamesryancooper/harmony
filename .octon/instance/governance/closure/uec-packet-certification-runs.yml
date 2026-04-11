@@ -7,11 +7,11 @@ run_roles:
   supported_run_only:
     run_id: "uec-global-repo-shell-observe-read-20260404"
   authority_exercise:
-    run_id: "uec-bounded-repo-shell-boundary-sensitive-20260409"
+    run_id: "uec-repo-shell-boundary-sensitive-recertified-20260410"
   external_evidence:
     run_id: "uec-global-frontier-browser-api-studio-20260404"
   intervention_control:
-    run_id: "uec-safe-stage-approval-exercise-20260402"
+    run_id: "uec-repo-shell-repo-consequential-recertified-20260410"
   disclosure_derivation:
     run_id: "uec-global-frontier-browser-api-studio-20260404"
   github_projection:
@@ -19,7 +19,7 @@ run_roles:
   ci_projection:
     run_id: "uec-global-ci-observe-read-20260404"
 static_evidence:
-  support_universe_coverage: ".octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/support-universe-coverage.yml"
+  support_universe_coverage: ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/support-universe-coverage.yml"
   replay_bundle: ".octon/framework/lab/replay/workload-packs/global-support-universe.yml"
   browser_scenario: ".octon/framework/lab/scenarios/packs/browser/browser-supported-scenario.yml"
   api_scenario: ".octon/framework/lab/scenarios/packs/api/api-supported-scenario.yml"

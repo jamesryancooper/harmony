@@ -1,0 +1,24 @@
+schema_version: closure-certificate-v2
+release_id: 2026-04-11-uec-bounded-recertification-open
+generated_at: "2026-04-10T20:00:00Z"
+status: provisional
+proof_bundle_refs:
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/gate-status.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/closure-summary.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/recertification-status.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/blocker-register.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/traceability-matrix.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/support-universe-coverage.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/support-target-coverage-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/proof-plane-coverage.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/authority-ledger-coherence-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/no-exercise-residue-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/instruction-manifest-completeness-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/evidence-classification-completeness-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/claim-calibration-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/host-projection-purity-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/workflow-authority-derivation-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/agency-overlay-containment-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/build-to-delete-report.yml
+certification_mode: recertification-open
+recertification_status_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/recertification-status.yml

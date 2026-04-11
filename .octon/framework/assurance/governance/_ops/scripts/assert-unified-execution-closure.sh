@@ -45,7 +45,7 @@ main() {
   require_yq '(.tuple_admissions | length) == 6' "$SUPPORT_TARGETS" "all target tuples remain inventoried"
   require_yq '.schema_version == "support-universe-coverage-v2"' "$COVERAGE_LEDGER" "coverage ledger uses v2 schema"
   require_yq '.schema_version == "closure-certificate-v2"' "$CLOSURE_CERTIFICATE" "closure certificate uses v2 schema"
-  require_yq '.schema_version == "proof-plane-coverage-v1"' "$PROOF_COVERAGE" "proof-plane coverage artifact exists"
+  require_yq '.schema_version == "proof-plane-coverage-v1" or .schema_version == "proof-plane-coverage-v2"' "$PROOF_COVERAGE" "proof-plane coverage artifact exists"
   require_yq '.conditions | length == 10' "$TRUTH_CONDITIONS" "truth-conditions artifact enumerates all ten conditions"
 
   while IFS= read -r ref; do

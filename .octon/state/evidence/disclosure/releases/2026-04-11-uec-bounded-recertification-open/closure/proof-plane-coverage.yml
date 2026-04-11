@@ -1,0 +1,20 @@
+schema_version: proof-plane-coverage-v2
+release_id: 2026-04-11-uec-bounded-recertification-open
+generated_at: "2026-04-10T20:00:00Z"
+status: fail
+planes:
+  - plane_id: structural
+    status: pass
+  - plane_id: functional
+    status: fail
+  - plane_id: behavioral
+    status: fail
+  - plane_id: maintainability
+    status: fail
+  - plane_id: governance
+    status: fail
+  - plane_id: recovery
+    status: fail
+notes:
+  - Structural substrate remains substantially present.
+  - Closure-grade plane parity is blocked by the quarantined boundary-sensitive lineage and missing recertified run-bundle hardening.

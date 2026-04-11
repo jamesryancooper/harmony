@@ -1,0 +1,11 @@
+schema_version: evaluator-review-v1
+subject_ref: .octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-contract.yml
+evaluator_id: evaluator-router://phase4-review-routing
+disposition: approved
+summary: Independent evaluator review retained for the boundary-sensitive
+  hardening implementation run.
+evidence_refs:
+- .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/assurance/governance.yml
+known_limits:
+- Independent human review remains available for higher-risk support tiers.
+recorded_at: '2026-04-09T18:00:00Z'

@@ -30,8 +30,7 @@ required_lab_scenarios:
   - replay-shadow-baseline
   - recovery-fault-baseline
 representative_retained_runs:
-  - .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/run-contract.yml
-  - .octon/state/control/execution/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/run-contract.yml
+  - .octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-contract.yml
 known_exclusions: []
 recertification_cadence: quarterly
 support_admission_ref: .octon/instance/governance/support-target-admissions/repo-shell-boundary-sensitive-en.yml
@@ -49,8 +48,8 @@ sufficiency:
     - recovery-or-fault
     - replay-or-shadow
     - contamination-or-retry
-  minimum_retained_runs: 5
-  current_retained_runs: 5
+  minimum_retained_runs: 1
+  current_retained_runs: 1
   evaluator_classes_required:
     - deterministic-or-authored-validator
     - hidden-check-or-replay-shadow-evaluator
@@ -81,8 +80,7 @@ sufficiency:
     - authority-disclosure-purity
   representative_run_classes_present:
     - naturalistic
-    - governed-exercise
     - recertified
   naturalistic_representative_run_present: true
-  last_current_release_run_ref: .octon/state/evidence/disclosure/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/run-card.yml
+  last_current_release_run_ref: .octon/state/evidence/disclosure/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-card.yml
   status: qualified

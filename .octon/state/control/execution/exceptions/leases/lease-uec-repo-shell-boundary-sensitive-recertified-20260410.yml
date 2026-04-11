@@ -1,0 +1,24 @@
+schema_version: authority-exception-lease-v2
+id: lease-uec-repo-shell-boundary-sensitive-recertified-20260410
+state: active
+lease_kind: network-egress
+request_id: uec-repo-shell-boundary-sensitive-recertified-20260410
+run_id: uec-repo-shell-boundary-sensitive-recertified-20260410
+service: repo-shell-boundary-sensitive
+adapter: repo-shell
+method: POST
+scheme: https
+host: octon.local
+port: null
+path_prefix: /controlled-boundary
+owner: operator://octon-governance
+issued_by: operator://octon-governance
+issued_at: "2026-04-10T20:30:00Z"
+expires_at: "2026-04-10T21:30:00Z"
+reason: Controlled boundary-sensitive lease for the clean repo-shell
+  boundary-sensitive recertification run.
+rollback_posture: Revoke the temporary controlled boundary lease and return to
+  deny-by-default routing.
+retirement_trigger: Retire after the boundary-sensitive recertification run is
+  superseded by a newer retained run.
+lease_id: lease-uec-repo-shell-boundary-sensitive-recertified-20260410

@@ -1,6 +1,6 @@
 schema_version: non-authority-register-v1
 owner: Octon governance
-updated_at: "2026-04-09T18:00:00Z"
+updated_at: "2026-04-10T20:00:00Z"
 entries:
   - surface_id: effective-closure-claim-status
     surface_class: effective-generated-view
@@ -17,13 +17,25 @@ entries:
     surface_class: effective-generated-view
     paths:
       - .octon/generated/effective/closure/recertification-status.yml
-    canonical_source_ref: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/recertification-status.yml
+    canonical_source_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/recertification-status.yml
     authority_mode: derived-non-authority
     generation_or_projection_mechanism: generated-from active release closure reports
     claim_adjacent: true
     validator_ref: .octon/framework/assurance/runtime/_ops/scripts/validate-non-authority-register.sh
     retained_forever: true
     rationale: Recertification status is a convenience projection of retained release evidence, not an authored authority surface.
+  - surface_id: release-blocker-register-projection
+    surface_class: release-evidence-view
+    paths:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/blocker-register.yml
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/traceability-matrix.yml
+    canonical_source_ref: .octon/inputs/exploratory/proposals/architecture/octon_bounded_uec_packet/traceability/01-master-closure-blocker-register.md
+    authority_mode: derived-non-authority
+    generation_or_projection_mechanism: retained release evidence derived from exploratory packet findings
+    claim_adjacent: true
+    validator_ref: .octon/framework/assurance/runtime/_ops/scripts/validate-non-authority-register.sh
+    retained_forever: false
+    rationale: Recertification blocker and traceability mirrors are release evidence aids and must not become independent authority surfaces.
   - surface_id: effective-support-target-matrix
     surface_class: effective-generated-view
     paths:

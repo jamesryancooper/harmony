@@ -1,0 +1,84 @@
+schema_version: closure-blocker-register-v1
+release_id: 2026-04-11-uec-bounded-recertified-complete
+generated_at: "2026-04-10T21:00:00Z"
+open_blocker_count: 0
+items:
+  - blocker_id: CB-01
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: Clean boundary-sensitive and consequential exemplar runs now provide coherent authority ledgers.
+    primary_refs:
+      - .octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/run-contract.yml
+      - .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml
+  - blocker_id: CB-01a
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: No exercise residue remains in the active claim-bearing exception chain.
+    primary_refs:
+      - .octon/state/control/execution/exceptions/leases/lease-uec-repo-shell-boundary-sensitive-recertified-20260410.yml
+  - blocker_id: CB-01b
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: No exercise residue remains in the active claim-bearing revocation chain.
+    primary_refs:
+      - .octon/state/control/execution/revocations/revoke-uec-repo-shell-boundary-sensitive-recertified-20260410.yml
+  - blocker_id: CB-02
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: All active exemplar runs now carry substantive v2 instruction manifests.
+    primary_refs:
+      - .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/instruction-layer-manifest.json
+  - blocker_id: CB-02a
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: All active exemplar runs now carry non-empty v2 evidence classifications.
+    primary_refs:
+      - .octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/evidence-classification.yml
+  - blocker_id: CB-03
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: Active release disclosure is now calibrated to the green gate state and clean exemplar set.
+    primary_refs:
+      - .octon/instance/governance/disclosure/release-lineage.yml
+  - blocker_id: CB-04
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: Host/workflow non-authority is proven by the retained validator set.
+    primary_refs:
+      - .github/workflows/uec-cutover-validate.yml
+      - .github/workflows/uec-cutover-certify.yml
+  - blocker_id: CB-05
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: All six proof planes are represented by the active exemplar set.
+    primary_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/proof-plane-coverage.yml
+  - blocker_id: CB-06
+    status: closed
+    severity: high
+    classification: closure-blocking
+    summary: Agency and ingress containment are sufficiently proven for the complete claim.
+    primary_refs:
+      - .octon/instance/governance/non-authority-register.yml
+  - blocker_id: CB-07
+    status: monitored-nonblocking
+    severity: medium
+    classification: non-blocking-unless-triggered
+    summary: Retirement and build-to-delete governance remains current and non-blocking.
+    primary_refs:
+      - .octon/instance/governance/retirement-register.yml
+  - blocker_id: CB-08
+    status: closed
+    severity: critical
+    classification: closure-blocking
+    summary: Every admitted tuple now has a clean active exemplar or retained closure-grade proof path.
+    primary_refs:
+      - .octon/instance/governance/support-dossiers/repo-shell-boundary-sensitive-en/dossier.yml

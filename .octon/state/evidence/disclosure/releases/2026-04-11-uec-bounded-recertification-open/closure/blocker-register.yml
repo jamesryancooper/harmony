@@ -1,0 +1,86 @@
+schema_version: closure-blocker-register-v1
+release_id: 2026-04-11-uec-bounded-recertification-open
+generated_at: "2026-04-10T20:00:00Z"
+open_blocker_count: 9
+items:
+  - blocker_id: CB-01
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: The sampled boundary-sensitive exemplar has an internally inconsistent authority ledger.
+    primary_refs:
+      - .octon/state/control/execution/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/run-contract.yml
+      - .octon/state/control/execution/approvals/requests/uec-bounded-repo-shell-boundary-sensitive-20260409.yml
+  - blocker_id: CB-01a
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: The linked exception lease still carries exercise-only network-egress semantics.
+    primary_refs:
+      - .octon/state/control/execution/exceptions/leases/lease-uec-bounded-repo-shell-boundary-sensitive-20260409.yml
+  - blocker_id: CB-01b
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: The linked revocation still describes active control truth as a safe-stage exercise.
+    primary_refs:
+      - .octon/state/control/execution/revocations/revoke-uec-bounded-repo-shell-boundary-sensitive-20260409.yml
+  - blocker_id: CB-02
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: The retained instruction-layer manifest for the quarantined exemplar is skeletal.
+    primary_refs:
+      - .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/instruction-layer-manifest.json
+  - blocker_id: CB-02a
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: The retained evidence classification for the quarantined exemplar is empty.
+    primary_refs:
+      - .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/evidence-classification.yml
+  - blocker_id: CB-03
+    status: mitigated
+    severity: critical
+    classification: closure-blocking
+    summary: The over-strong active complete claim has been withdrawn in favor of recertification-open wording.
+    primary_refs:
+      - .octon/instance/governance/disclosure/release-lineage.yml
+      - .octon/instance/governance/disclosure/harness-card.yml
+  - blocker_id: CB-04
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: Host/workflow non-authority remains insufficiently proven under the packet's stricter gate.
+    primary_refs:
+      - .octon/framework/engine/runtime/adapters/host/github-control-plane.yml
+      - .github/workflows/pr-autonomy-policy.yml
+  - blocker_id: CB-05
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: Proof-plane substantiation remains uneven for the preserved admitted support universe.
+    primary_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/proof-plane-coverage.yml
+  - blocker_id: CB-06
+    status: open
+    severity: high
+    classification: closure-blocking
+    summary: Agency simplification and overlay containment are not yet closure-proven.
+    primary_refs:
+      - .octon/framework/agency
+      - .octon/instance/ingress
+  - blocker_id: CB-07
+    status: monitoring
+    severity: medium
+    classification: non-blocking-unless-triggered
+    summary: Retirement and build-to-delete review remains active but does not currently block recertification-open status.
+    primary_refs:
+      - .octon/instance/governance/retirement-register.yml
+  - blocker_id: CB-08
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: The admitted live support universe still lacks closure-grade tuple coverage for the repo-shell boundary-sensitive path.
+    primary_refs:
+      - .octon/instance/governance/support-dossiers/repo-shell-boundary-sensitive-en/dossier.yml

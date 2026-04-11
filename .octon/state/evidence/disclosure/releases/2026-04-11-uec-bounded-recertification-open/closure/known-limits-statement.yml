@@ -1,0 +1,8 @@
+schema_version: known-limits-statement-v1
+release_id: 2026-04-11-uec-bounded-recertification-open
+generated_at: "2026-04-10T20:00:00Z"
+known_limits:
+  - The active release is recertification-open and is not eligible for complete-attainment wording.
+  - The repo-shell boundary-sensitive tuple remains admitted but does not yet have a clean active claim-bearing exemplar bundle.
+  - Contaminated safe-stage lineage is retained as historical evidence only and is excluded from active proof refs.
+  - Dual-pass certification has not yet been re-earned under the current blocker set.

@@ -1,0 +1,19 @@
+schema_version: closure-validator-report-v1
+validator_id: V-08
+generated_at: "2026-04-10T20:00:00Z"
+repo_rev: working-tree
+input_refs:
+  - .octon/instance/governance/disclosure/release-lineage.yml
+  - .octon/instance/governance/disclosure/harness-card.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/harness-card.yml
+status: pass
+blocking: false
+findings:
+  - finding_id: CB-03
+    severity: critical
+    summary: The previously over-strong active complete claim has been superseded by recertification-open wording that no longer outstates the retained blocker state.
+resolved_by_refs:
+  - .octon/instance/governance/disclosure/release-lineage.yml
+  - .octon/instance/governance/disclosure/harness-card.yml
+notes:
+  - Disclosure re-alignment is active for the current release even though other blockers remain open.

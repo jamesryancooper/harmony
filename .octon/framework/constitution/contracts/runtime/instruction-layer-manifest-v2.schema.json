@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/runtime/instruction-layer-manifest-v2.schema.json",
+  "title": "Octon Instruction Layer Manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "run_mode",
+    "workspace_charter_refs",
+    "run_contract_ref",
+    "support_target_tuple_id",
+    "authority_refs",
+    "precedence_stack",
+    "adapter_projection_refs",
+    "generated_at",
+    "source_digests"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "instruction-layer-manifest-v2"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mission_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "run_mode": {
+      "type": "string",
+      "enum": [
+        "mission-bound",
+        "run-only"
+      ]
+    },
+    "workspace_charter_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "mission_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "run_contract_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "support_target_tuple_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "precedence_stack": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "adapter_projection_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_by": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_digests": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "run_mode": {
+            "const": "mission-bound"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "mission_id"
+        ],
+        "properties": {
+          "mission_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

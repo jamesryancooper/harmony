@@ -1,0 +1,13 @@
+schema_version: proof-plane-report-v1
+plane: governance
+subject_kind: run
+subject_ref: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml
+outcome: pass
+proof_class: deterministic
+summary: Governance proof retained for uec-repo-shell-repo-consequential-recertified-20260410.
+evidence_refs:
+- .octon/state/control/execution/approvals/requests/uec-repo-shell-repo-consequential-recertified-20260410.yml
+- .octon/state/control/execution/approvals/grants/grant-uec-repo-shell-repo-consequential-recertified-20260410.yml
+- .octon/state/evidence/control/execution/authority-decision-uec-repo-shell-repo-consequential-recertified-20260410.yml
+known_limits: []
+generated_at: '2026-04-02T00:00:00Z'

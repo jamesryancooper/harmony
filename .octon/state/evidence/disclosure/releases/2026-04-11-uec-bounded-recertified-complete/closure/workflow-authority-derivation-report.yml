@@ -1,0 +1,18 @@
+schema_version: closure-validator-report-v1
+validator_id: V-10
+generated_at: "2026-04-10T21:00:00Z"
+repo_rev: working-tree
+input_refs:
+  - .github/workflows/uec-cutover-validate.yml
+  - .github/workflows/uec-cutover-certify.yml
+status: pass
+blocking: false
+findings:
+  - finding_id: CB-04
+    severity: critical
+    summary: Active cutover workflows visibly derive authority from canonical control and control-evidence roots.
+resolved_by_refs:
+  - .github/workflows/uec-cutover-validate.yml
+  - .github/workflows/uec-cutover-certify.yml
+notes:
+  - Workflow derivation is now explicit enough for claim-bearing release certification.

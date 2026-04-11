@@ -1,0 +1,112 @@
+schema_version: octon-closure-gate-report-v1
+release_id: 2026-04-11-uec-bounded-recertification-open
+generated_at: "2026-04-10T20:00:00Z"
+gates:
+  - gate_id: G0
+    title: single-canonical-run-contract-family
+    status: green
+  - gate_id: G1
+    title: mission-charter-bindings
+    status: green
+  - gate_id: G2
+    title: stage-attempt-family
+    status: green
+  - gate_id: G3
+    title: run-bundle-completeness
+    status: red
+  - gate_id: G4
+    title: evidence-classification
+    status: red
+  - gate_id: G5
+    title: support-tuple-consistency
+    status: red
+  - gate_id: G5A
+    title: support-target-canonicality
+    status: green
+  - gate_id: G6
+    title: capability-pack-consistency
+    status: green
+  - gate_id: G7
+    title: route-consistency
+    status: green
+  - gate_id: G7A
+    title: run-contract-support-binding
+    status: red
+  - gate_id: G8
+    title: quorum-bindings
+    status: green
+  - gate_id: G9
+    title: host-non-authority
+    status: red
+  - gate_id: G9A
+    title: canonical-authority-purity
+    status: red
+  - gate_id: G10
+    title: proof-plane-completeness
+    status: red
+  - gate_id: G10A
+    title: lab-reference-integrity
+    status: green
+  - gate_id: G10B
+    title: support-dossier-evidence-depth
+    status: red
+  - gate_id: G10C
+    title: evaluator-diversity
+    status: green
+  - gate_id: G10D
+    title: hidden-check-breadth
+    status: green
+  - gate_id: G11
+    title: wording-coherence
+    status: green
+  - gate_id: G11A
+    title: stage-attempt-disclosure-separation
+    status: green
+  - gate_id: G11B
+    title: known-limits-coherence
+    status: green
+  - gate_id: G11C
+    title: claim-calibrated-disclosure
+    status: green
+  - gate_id: G11D
+    title: runtime-family-depth
+    status: red
+  - gate_id: G11E
+    title: continuity-linkage
+    status: green
+  - gate_id: G11F
+    title: bounded-claim-nomenclature
+    status: green
+  - gate_id: G11G
+    title: audit-crosswalk
+    status: green
+  - gate_id: G12
+    title: legacy-active-path
+    status: green
+  - gate_id: G13
+    title: retirement-and-drift
+    status: green
+  - gate_id: G13A
+    title: retirement-rationale
+    status: green
+  - gate_id: G13B
+    title: non-authority-register
+    status: green
+  - gate_id: G13C
+    title: contract-version-coherence
+    status: green
+  - gate_id: G13D
+    title: projection-shell-boundaries
+    status: red
+  - gate_id: G13E
+    title: review-packet-freshness
+    status: green
+  - gate_id: G14
+    title: claim-truth-boundary
+    status: green
+  - gate_id: G15
+    title: recertification-discipline
+    status: green
+  - gate_id: G16
+    title: blocker-ledger-zero
+    status: red

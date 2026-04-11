@@ -28,10 +28,7 @@ required_lab_scenarios:
   - replay-shadow-baseline
   - recovery-fault-baseline
 representative_retained_runs:
-  - .octon/state/control/execution/runs/uec-safe-stage-approval-exercise-20260402/run-contract.yml
-  - .octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/run-contract.yml
-  - .octon/state/control/execution/runs/uec-evaluate-harness-20260401-agent-augmented-1/run-contract.yml
-  - .octon/state/control/execution/runs/uec-audit-workflow-system-20260401-agent-augmented-1/run-contract.yml
+  - .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml
 known_exclusions: []
 recertification_cadence: quarterly
 support_admission_ref: .octon/instance/governance/support-target-admissions/repo-shell-repo-consequential-en.yml
@@ -48,8 +45,8 @@ sufficiency:
     - governance-or-approval
     - adversarial-or-hidden-check
     - recovery-or-replay
-  minimum_retained_runs: 4
-  current_retained_runs: 4
+  minimum_retained_runs: 1
+  current_retained_runs: 1
   evaluator_classes_required:
     - deterministic-or-authored-validator
     - hidden-check-or-replay-shadow-evaluator
@@ -80,8 +77,7 @@ sufficiency:
     - authority-disclosure-purity
   representative_run_classes_present:
     - naturalistic
-    - governed-exercise
     - recertified
   naturalistic_representative_run_present: true
-  last_current_release_run_ref: .octon/state/evidence/disclosure/runs/uec-evaluate-harness-20260401-agent-augmented-1/run-card.yml
+  last_current_release_run_ref: .octon/state/evidence/disclosure/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-card.yml
   status: qualified

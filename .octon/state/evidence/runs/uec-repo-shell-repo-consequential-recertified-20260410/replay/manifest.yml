@@ -1,0 +1,15 @@
+schema_version: replay-manifest-v2
+run_id: uec-repo-shell-repo-consequential-recertified-20260410
+environment_topology:
+  evidence_root: .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410
+  control_root: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410
+class_b_refs:
+  - .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/receipts/execution-receipt.json
+  - .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/replay-pointers.yml
+  - .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/trace-pointers.yml
+class_c_refs:
+  - .octon/state/evidence/external-index/runs/uec-repo-shell-repo-consequential-recertified-20260410.yml
+replay_payload_class: external-immutable
+external_index_refs:
+  - .octon/state/evidence/external-index/runs/uec-repo-shell-repo-consequential-recertified-20260410.yml
+recorded_at: "2026-04-10T15:27:53Z"

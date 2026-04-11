@@ -1,0 +1,17 @@
+schema_version: closure-validator-report-v1
+validator_id: V-03
+generated_at: "2026-04-10T20:00:00Z"
+repo_rev: working-tree
+input_refs:
+  - .octon/instance/governance/support-targets.yml
+  - .octon/instance/governance/support-dossiers/repo-shell-boundary-sensitive-en/dossier.yml
+status: fail
+blocking: true
+findings:
+  - finding_id: CB-08
+    severity: critical
+    summary: The preserved repo-shell boundary-sensitive tuple remains admitted but does not yet have a clean active claim-bearing exemplar bundle.
+resolved_by_refs: []
+notes:
+  - Support universe preservation remains intact.
+  - Complete-claim reissue is blocked until tuple-level closure-grade backing is restored.

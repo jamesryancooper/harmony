@@ -1,0 +1,31 @@
+schema_version: recertification-status-v1
+release_id: 2026-04-11-uec-bounded-recertification-open
+generated_at: "2026-04-10T20:00:00Z"
+profile_selection_receipt_ref: .octon/instance/cognition/context/shared/migrations/2026-04-09-octon-bounded-uec-packet-implementation/plan.md
+certification_mode: equally-strong-recertification-rule
+status: open
+trigger_log_ref: .octon/instance/governance/closure/recertification-trigger-log.yml
+active_certificate_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/provisional-certificate.yml
+active_harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/harness-card.yml
+input_digests:
+  charter: sha256:a51730199554c5b74f7964f433817c5cb7e50f569b9f5778ae8f5cc0d543e353
+  support_targets: sha256:734f1aaa8cd9ea1897c68006e47d875661fc122311a71450baba10dff327b0af
+  workspace_charter: sha256:bce6d32f74998b806c4f477c734bc75eb7be5f6db3cedaaac16ad55af1b27b15
+trigger_summary:
+  total: 10
+  clear: 9
+  blocking: 1
+blocking_triggers:
+  - post-release-blocker-discovered
+rule_checks:
+  - check_id: trigger-log-clear
+    status: fail
+  - check_id: current-certificate-ref
+    status: pass
+  - check_id: current-authored-input-digests
+    status: pass
+summary: >-
+  The active complete closure certificate has been withdrawn in favor of a
+  recertification-open release because post-release blocker review found
+  unresolved authority and evidence defects in the retained claim-bearing
+  chain.
