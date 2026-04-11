@@ -1,0 +1,8 @@
+{
+  "request_id": "uec-repo-shell-repo-consequential-recertified-20260410",
+  "decision": "ALLOW",
+  "linked_refs": [
+    ".octon/state/control/execution/approvals/requests/uec-repo-shell-repo-consequential-recertified-20260410.yml",
+    ".octon/state/control/execution/approvals/grants/grant-uec-repo-shell-repo-consequential-recertified-20260410.yml"
+  ]
+}

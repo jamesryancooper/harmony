@@ -1,0 +1,115 @@
+schema_version: run-contract-v3
+run_id: uec-repo-shell-repo-consequential-recertified-20260410
+status: closed
+workflow_mode: agent-augmented
+mission_id: mission-autonomy-live-validation
+mission_mode: mission-bound
+requires_mission: true
+objective_refs:
+  workspace_objective_ref: .octon/instance/charter/workspace.md
+  workspace_machine_charter_ref: .octon/instance/charter/workspace.yml
+objective_summary: Repo-shell consequential recertification run retained to
+  prove canonical approval routing, governed consequential execution, and
+  clean claim-bearing disclosure under the admitted repo-shell consequential
+  tuple.
+scope_in:
+- repo-shell-repo-consequential-recertification
+scope_out:
+- .octon/state/control/execution/approvals
+- .octon/state/evidence/control/execution
+exclusions:
+- .octon/inputs/exploratory/ideation/**
+done_when:
+- Consequential recertification artifacts are retained under canonical control
+  and evidence roots.
+acceptance_criteria:
+- Canonical approval artifacts resolve and match the decision artifact.
+- Run disclosure and retained evidence remain aligned to the repo-shell
+  consequential tuple.
+materiality: low
+protected_zones:
+- .octon/framework/constitution/**
+- .octon/instance/governance/**
+protected_zone_scope:
+- repo-governance
+- repo-state
+requested_capabilities:
+- evidence.write
+requested_capability_packs:
+- repo
+- telemetry
+risk_class: low
+intent_ref:
+  id: intent://octon/octon-governed-harness
+  version: 1.1.0
+actor_ref:
+  kind: system
+  id: octon-kernel
+reversibility_class: fully_reversible
+execution_horizon: multi_stage_single_run
+recurrence_class: one_shot
+support_tier: repo-consequential
+support_target:
+  model_tier: repo-local-governed
+  workload_tier: repo-consequential
+  language_resource_tier: reference-owned
+  locale_tier: english-primary
+  host_adapter: repo-shell
+  model_adapter: repo-local-governed
+support_target_tuple:
+  model_tier: repo-local-governed
+  workload_tier: repo-consequential
+  language_resource_tier: reference-owned
+  locale_tier: english-primary
+  host_adapter: repo-shell
+  model_adapter: repo-local-governed
+  support_status: supported
+support_target_ref: .octon/instance/governance/support-targets.yml
+support_target_tuple_id: tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell
+support_target_admission_ref: .octon/instance/governance/support-target-admissions/repo-shell-repo-consequential-en.yml
+support_target_dossier_ref: .octon/instance/governance/support-dossiers/repo-shell-repo-consequential-en/dossier.yml
+required_approvals:
+- .octon/state/control/execution/approvals/requests/uec-repo-shell-repo-consequential-recertified-20260410.yml
+required_evidence:
+- decision-artifact
+- approval-grant
+- replay-pointers
+- trace-pointers
+- run-evidence-classification-v2
+start_conditions:
+- Canonical authority artifacts exist for the mission-backed repo-shell
+  consequential recertification run.
+- Mission `mission-autonomy-live-validation` remains active for consequential autonomy.
+stop_conditions:
+- Stop when governance route is no longer ALLOW for the admitted repo-shell
+  consequential tuple.
+retry_class: manual_review_required
+closure_conditions:
+- Run remains bounded to the admitted repo-shell consequential
+  recertification envelope.
+disclosure_expectations:
+- Emit a RunCard, claim-bearing disclosure manifest, and retained evidence for
+  the consequential recertification run.
+stage_attempt_root: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/stage-attempts
+run_manifest_ref: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-manifest.yml
+decision_artifact_ref: .octon/state/evidence/control/execution/authority-decision-uec-repo-shell-repo-consequential-recertified-20260410.yml
+authority_grant_bundle_ref: .octon/state/evidence/control/execution/authority-grant-bundle-uec-repo-shell-repo-consequential-recertified-20260410.yml
+authority_bundle_ref: .octon/state/evidence/control/execution/authority-grant-bundle-uec-repo-shell-repo-consequential-recertified-20260410.yml
+run_card_ref: .octon/state/evidence/disclosure/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-card.yml
+host_adapter_ref: .octon/framework/engine/runtime/adapters/host/repo-shell.yml
+model_adapter_ref: .octon/framework/engine/runtime/adapters/model/repo-local-governed.yml
+external_replay_index_ref: .octon/state/evidence/external-index/runs/uec-repo-shell-repo-consequential-recertified-20260410.yml
+control_checkpoint_root: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/checkpoints
+checkpoint_root: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/checkpoints
+continuity_root_ref: .octon/state/continuity/runs/uec-repo-shell-repo-consequential-recertified-20260410/handoff.yml
+runtime_state_ref: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/runtime-state.yml
+rollback_posture_ref: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/rollback-posture.yml
+evidence_root: .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410
+receipt_root: .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/receipts
+replay_pointers_ref: .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/replay-pointers.yml
+rollback_or_compensation_expectation: Consequential recertification work
+  remains reversible and local to canonical control roots.
+contract_version: 1.2.0
+created_at: '2026-04-10T20:30:00Z'
+issued_at: '2026-04-10T20:30:00Z'
+updated_at: '2026-04-10T20:30:00Z'

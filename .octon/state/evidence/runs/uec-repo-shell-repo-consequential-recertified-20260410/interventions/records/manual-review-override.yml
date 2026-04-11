@@ -1,0 +1,12 @@
+schema_version: intervention-record-v1
+record_id: uec-repo-shell-repo-consequential-recertified-20260410-manual-review-override
+subject_kind: run
+subject_ref: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml
+kind: manual-review-override
+disclosed: true
+actor_ref: operator://octon-maintainers
+details: Human governance confirmed the bounded approval exercise and recorded the intervention explicitly.
+evidence_refs:
+  - .octon/state/control/execution/approvals/requests/uec-repo-shell-repo-consequential-recertified-20260410.yml
+  - .octon/state/evidence/control/execution/authority-decision-uec-repo-shell-repo-consequential-recertified-20260410.yml
+recorded_at: "2026-04-10T15:27:53Z"

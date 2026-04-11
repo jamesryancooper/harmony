@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/disclosure/claim-bearing-run-bundle-v1.schema.json",
+  "title": "Octon Claim-Bearing Run Bundle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "run_contract_ref",
+    "run_manifest_ref",
+    "runtime_state_ref",
+    "instruction_layer_manifest_ref",
+    "evidence_classification_ref",
+    "replay_pointers_ref",
+    "trace_pointers_ref",
+    "measurement_summary_ref",
+    "intervention_ref",
+    "proof_plane_refs",
+    "run_card_ref",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "claim-bearing-run-bundle-v1"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_contract_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_manifest_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime_state_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "instruction_layer_manifest_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_classification_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "replay_pointers_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_pointers_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "measurement_summary_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intervention_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proof_plane_refs": {
+      "type": "object",
+      "minProperties": 6
+    },
+    "run_card_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

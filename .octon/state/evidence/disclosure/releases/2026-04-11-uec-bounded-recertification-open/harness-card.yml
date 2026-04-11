@@ -1,0 +1,74 @@
+schema_version: harness-card-v2
+card_id: hc-target-state-closure-2026-04-11-uec-bounded-recertification-open
+claim_kind: release
+claim_status: recertification_open
+claim_summary: >-
+  Octon presently operates a bounded unified execution constitution
+  architecture for the admitted live support universe, with the complete
+  closure claim under active recertification pending authority-ledger
+  normalization, run-bundle hardening, workflow non-authority proof, and
+  disclosure re-alignment.
+support_target_ref: .octon/instance/governance/support-targets.yml
+governance_exclusions_ref: .octon/instance/governance/exclusions/action-classes.yml
+support_universe:
+  model_classes:
+    - repo-local-governed
+    - frontier-governed
+  workload_classes:
+    - observe-and-read
+    - repo-consequential
+    - boundary-sensitive
+  context_classes:
+    - reference-owned
+    - extended-governed
+  locale_classes:
+    - english-primary
+    - spanish-secondary
+retained_adapters:
+  host_adapters:
+    - repo-shell
+    - github-control-plane
+    - ci-control-plane
+    - studio-control-plane
+  model_adapters:
+    - repo-local-governed
+    - frontier-governed
+capability_packs:
+  - repo
+  - git
+  - shell
+  - telemetry
+  - browser
+  - api
+coverage_ledger_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/support-universe-coverage.yml
+proof_bundle_refs:
+  - .octon/framework/constitution/claim-truth-conditions.yml
+  - .octon/generated/effective/closure/claim-status.yml
+  - .octon/instance/governance/disclosure/release-lineage.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/gate-status.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/closure-summary.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/provisional-certificate.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/recertification-status.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/blocker-register.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/traceability-matrix.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/known-limits-statement.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/support-universe-coverage.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/support-target-coverage-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/proof-plane-coverage.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/authority-ledger-coherence-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/no-exercise-residue-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/instruction-manifest-completeness-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/evidence-classification-completeness-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/claim-calibration-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/host-projection-purity-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/workflow-authority-derivation-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/agency-overlay-containment-report.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/build-to-delete-report.yml
+known_limits:
+  - The active release is recertification-open and may not be cited as a complete-attainment release.
+  - Active exemplar run refs are intentionally withheld until run-bundle hardening and evidence-classification backfill are complete.
+  - The repo-shell boundary-sensitive tuple remains admitted but lacks a clean active claim-bearing exemplar run bundle.
+  - Contaminated exercise lineage has been removed from active proof refs and retained only as historical evidence.
+  - The active claim remains bounded to the admitted live support universe only; no universal support claim is made outside active support-target tuples.
+  - Future widening requires a fresh audit, fresh review packet, refreshed support dossiers, regenerated closure reports, and dual-pass recertification.
+generated_at: "2026-04-10T20:00:00Z"

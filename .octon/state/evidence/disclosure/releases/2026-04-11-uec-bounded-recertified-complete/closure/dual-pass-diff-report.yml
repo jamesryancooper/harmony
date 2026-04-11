@@ -1,0 +1,11 @@
+schema_version: dual-pass-diff-report-v1
+release_id: 2026-04-11-uec-bounded-recertified-complete
+generated_at: "2026-04-10T21:00:00Z"
+status: pass
+pass_a: "2026-04-10-pass-a"
+pass_b: "2026-04-10-pass-b"
+allowed_differences:
+  - timestamps
+  - deterministic digest refresh
+material_differences: []
+summary: Two consecutive certification passes produced no material divergence.

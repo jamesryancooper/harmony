@@ -1,0 +1,4 @@
+schema_version: authority-run-revocation-index-v1
+run_id: uec-repo-shell-repo-consequential-recertified-20260410
+source_ref: .octon/state/control/execution/revocations/
+revocations: []

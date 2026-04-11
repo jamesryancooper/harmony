@@ -1,0 +1,21 @@
+schema_version: "authority-approval-request-v1"
+request_id: "uec-repo-shell-repo-consequential-recertified-20260410"
+run_id: "uec-repo-shell-repo-consequential-recertified-20260410"
+status: "granted"
+target_id: "governance:repo-shell-repo-consequential-recertification"
+action_type: "execute_stage"
+workflow_mode: "agent-augmented"
+support_tier: "repo-consequential"
+quorum_policy_ref: ".octon/instance/governance/contracts/quorum-policies/default.yml"
+ownership_refs:
+  - "operator://octon-maintainers"
+reversibility_class: "fully_reversible"
+reason_codes:
+  - "REPO_SHELL_REPO_CONSEQUENTIAL_RECERTIFICATION"
+required_evidence:
+  - "authority-grant-bundle"
+  - "rollback-proof"
+projection_sources:
+  []
+created_at: "2026-04-10T20:30:00Z"
+updated_at: "2026-04-10T20:30:00Z"

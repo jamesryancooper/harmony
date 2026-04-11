@@ -1,0 +1,20 @@
+schema_version: claim-bearing-run-bundle-v1
+run_id: uec-global-repo-shell-observe-read-20260404
+run_contract_ref: .octon/state/control/execution/runs/uec-global-repo-shell-observe-read-20260404/run-contract.yml
+run_manifest_ref: .octon/state/control/execution/runs/uec-global-repo-shell-observe-read-20260404/run-manifest.yml
+runtime_state_ref: .octon/state/control/execution/runs/uec-global-repo-shell-observe-read-20260404/runtime-state.yml
+instruction_layer_manifest_ref: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/instruction-layer-manifest.json
+evidence_classification_ref: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/evidence-classification.yml
+replay_pointers_ref: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/replay-pointers.yml
+trace_pointers_ref: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/trace-pointers.yml
+measurement_summary_ref: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/measurements/summary.yml
+intervention_ref: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/interventions/log.yml
+proof_plane_refs:
+  structural: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/assurance/structural.yml
+  governance: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/assurance/governance.yml
+  functional: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/assurance/functional.yml
+  behavioral: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/assurance/behavioral.yml
+  maintainability: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/assurance/maintainability.yml
+  recovery: .octon/state/evidence/runs/uec-global-repo-shell-observe-read-20260404/assurance/recovery.yml
+run_card_ref: .octon/state/evidence/disclosure/runs/uec-global-repo-shell-observe-read-20260404/run-card.yml
+generated_at: "2026-04-10T20:45:00Z"

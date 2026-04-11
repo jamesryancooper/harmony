@@ -16,7 +16,9 @@ jobs:
   certify:
     runs-on: ubuntu-latest
     env:
-      CLOSURE_RELEASE_ID: 2026-04-09-uec-bounded-hardening-closure
+      CLOSURE_RELEASE_ID: 2026-04-11-uec-bounded-recertified-complete
+      CANONICAL_CONTROL_ROOT: .octon/state/control/execution
+      CANONICAL_CONTROL_EVIDENCE_ROOT: .octon/state/evidence/control/execution
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Install jq and yq
@@ -28,6 +30,8 @@ jobs:
       - name: Run certification validators
         run: |
           chmod +x .octon/framework/assurance/scripts/*.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-run-authority-ledger-coherence.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-workflow-authority-derivation.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/generate-release-bundle.sh "$CLOSURE_RELEASE_ID"
           bash .octon/framework/assurance/runtime/_ops/scripts/generate-closure-projections.sh "$CLOSURE_RELEASE_ID"
           bash .octon/framework/assurance/scripts/validate-external-replay-restore.sh "$CLOSURE_RELEASE_ID"

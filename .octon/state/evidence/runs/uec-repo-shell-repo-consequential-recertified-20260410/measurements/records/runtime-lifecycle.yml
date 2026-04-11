@@ -1,0 +1,15 @@
+schema_version: measurement-record-v1
+record_id: uec-repo-shell-repo-consequential-recertified-20260410-authority-artifact-count
+subject_kind: run
+subject_ref: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml
+metric_id: authority-artifact-count
+label: Authority artifacts retained
+value: 3
+unit: count
+method: Counted decision, approval, grant bundle, and optional lease/revocation artifacts.
+evidence_refs:
+- .octon/state/evidence/control/execution/authority-decision-uec-repo-shell-repo-consequential-recertified-20260410.yml
+- .octon/state/control/execution/approvals/requests/uec-repo-shell-repo-consequential-recertified-20260410.yml
+- .octon/state/control/execution/approvals/grants/grant-uec-repo-shell-repo-consequential-recertified-20260410.yml
+notes: Supports the retained repo-shell consequential recertification for AG-05.
+recorded_at: '2026-04-02T00:00:00Z'

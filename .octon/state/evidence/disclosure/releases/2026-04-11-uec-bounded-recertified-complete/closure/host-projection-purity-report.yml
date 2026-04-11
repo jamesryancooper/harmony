@@ -1,0 +1,17 @@
+schema_version: closure-validator-report-v1
+validator_id: V-09
+generated_at: "2026-04-10T21:00:00Z"
+repo_rev: working-tree
+input_refs:
+  - .octon/framework/engine/runtime/adapters/host/github-control-plane.yml
+  - .github/workflows/pr-autonomy-policy.yml
+status: pass
+blocking: false
+findings:
+  - finding_id: CB-04
+    severity: critical
+    summary: Host adapters remain projection-only and are supported by retained purity validation.
+resolved_by_refs:
+  - .octon/framework/engine/runtime/adapters/host/github-control-plane.yml
+notes:
+  - Host projection evidence is sufficient for the preserved admitted live support universe.

@@ -1,0 +1,17 @@
+schema_version: closure-validator-report-v1
+validator_id: V-14
+generated_at: "2026-04-10T20:00:00Z"
+repo_rev: working-tree
+input_refs:
+  - .octon/framework/agency
+  - .octon/instance/ingress
+  - .octon/instance/governance/non-authority-register.yml
+status: fail
+blocking: true
+findings:
+  - finding_id: CB-06
+    severity: high
+    summary: Agency overlay and ingress containment remains directionally correct but is not yet closure-proven for the active bounded claim.
+resolved_by_refs: []
+notes:
+  - No new authority widening is introduced; the blocker remains proof sufficiency, not architectural absence.

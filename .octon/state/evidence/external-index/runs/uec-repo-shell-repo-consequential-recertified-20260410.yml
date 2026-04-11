@@ -1,0 +1,24 @@
+schema_version: external-replay-index-v1
+index_id: external-replay-uec-repo-shell-repo-consequential-recertified-20260410
+scope: run
+run_id: uec-repo-shell-repo-consequential-recertified-20260410
+entries:
+  - entry_id: uec-repo-shell-repo-consequential-recertified-20260410-replay-payload
+    run_id: uec-repo-shell-repo-consequential-recertified-20260410
+    artifact_kind: replay-payload
+    evidence_class: C
+    storage_class: external-immutable
+    content_digest: sha256:b63deb05b9760fa8644f5d4caf16e9a3363b88bd9c26577007ceec39c24adbdf
+    locator: immutable://octon/replays/uec-repo-shell-repo-consequential-recertified-20260410/bundle.jsonl
+    manifest_ref: .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/replay/manifest.yml
+    recorded_at: "2026-04-10T15:27:53Z"
+  - entry_id: uec-repo-shell-repo-consequential-recertified-20260410-trace-payload
+    run_id: uec-repo-shell-repo-consequential-recertified-20260410
+    artifact_kind: trace-payload
+    evidence_class: C
+    storage_class: external-immutable
+    content_digest: sha256:d226fd822c0c1d5444cab90235448a13c7fcf3ef43ceacf0d1251ada17f21c90
+    locator: immutable://octon/replays/uec-repo-shell-repo-consequential-recertified-20260410/trace.jsonl
+    manifest_ref: .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/replay/manifest.yml
+    recorded_at: "2026-04-10T15:27:53Z"
+updated_at: "2026-04-10T15:27:53Z"

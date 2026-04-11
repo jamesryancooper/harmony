@@ -1,34 +1,36 @@
 {
-  "generated_at": "2026-04-01T14:24:36.915388Z",
-  "layers": [
-    {
-      "bytes": 0,
-      "layer_id": "provider",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "source": "upstream",
-      "visibility": "partial"
-    },
-    {
-      "bytes": 0,
-      "layer_id": "system",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-      "source": "octon-system",
-      "visibility": "partial"
-    },
-    {
-      "bytes": 508,
-      "layer_id": "developer",
-      "sha256": "e3cfa0970e341b4b0b6720b126a7f78dd71da432731760147987f9486bc9fe7c",
-      "source": "AGENTS.md",
-      "visibility": "full"
-    },
-    {
-      "bytes": 1323,
-      "layer_id": "user",
-      "sha256": "9af7036954a84305e124540fceabcdc3fd9320362f244c602e948512c8a8b856",
-      "source": "execution-request",
-      "visibility": "full"
-    }
+  "schema_version": "instruction-layer-manifest-v2",
+  "run_id": "uec-global-repo-shell-observe-read-20260404",
+  "run_mode": "run-only",
+  "workspace_charter_refs": [
+    ".octon/instance/charter/workspace.md",
+    ".octon/instance/charter/workspace.yml"
   ],
-  "schema_version": "instruction-layer-manifest-v1"
+  "mission_refs": [],
+  "run_contract_ref": ".octon/state/control/execution/runs/uec-global-repo-shell-observe-read-20260404/run-contract.yml",
+  "support_target_tuple_id": "tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell",
+  "authority_refs": [
+    ".octon/state/evidence/control/execution/authority-decision-uec-global-repo-shell-observe-read-20260404.yml",
+    ".octon/state/evidence/control/execution/authority-grant-bundle-uec-global-repo-shell-observe-read-20260404.yml"
+  ],
+  "precedence_stack": [
+    ".octon/framework/constitution/CHARTER.md",
+    ".octon/framework/constitution/charter.yml",
+    ".octon/framework/constitution/precedence/normative.yml",
+    ".octon/framework/constitution/precedence/epistemic.yml",
+    ".octon/instance/charter/workspace.md",
+    ".octon/instance/charter/workspace.yml",
+    ".octon/state/control/execution/runs/uec-global-repo-shell-observe-read-20260404/run-contract.yml"
+  ],
+  "adapter_projection_refs": [
+    ".octon/framework/engine/runtime/adapters/host/repo-shell.yml",
+    ".octon/framework/engine/runtime/adapters/model/repo-local-governed.yml"
+  ],
+  "generated_at": "2026-04-10T20:45:00Z",
+  "generated_by": "octon-bounded-uec-recertification",
+  "source_digests": [
+    "workspace-charter:current",
+    "run-contract:uec-global-repo-shell-observe-read-20260404",
+    "support-target-tuple:tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell"
+  ]
 }

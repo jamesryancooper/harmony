@@ -1,0 +1,7 @@
+{
+  "grant_ref": ".octon/state/control/execution/approvals/grants/grant-uec-repo-shell-repo-consequential-recertified-20260410.yml",
+  "decision": "ALLOW",
+  "reason_codes": [
+    "REPO_SHELL_REPO_CONSEQUENTIAL_RECERTIFICATION"
+  ]
+}

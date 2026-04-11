@@ -1,19 +1,19 @@
 schema_version: effective-closure-claim-status-v1
 claim_id: unified-execution-constitution
 claim_phrase: bounded unified execution constitution
-release_id: 2026-04-09-uec-bounded-hardening-closure
-generated_at: "2026-04-09T12:00:00Z"
+release_id: 2026-04-11-uec-bounded-recertified-complete
+generated_at: "2026-04-10T21:00:00Z"
 profile_selection_receipt_ref: .octon/instance/cognition/context/shared/migrations/2026-04-09-octon-bounded-uec-packet-implementation/plan.md
 truth_conditions_ref: .octon/framework/constitution/claim-truth-conditions.yml
 active_release_refs:
-  harness_card: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/harness-card.yml
-  gate_status: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/gate-status.yml
-  closure_summary: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/closure-summary.yml
-  closure_certificate: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/closure-certificate.yml
-  recertification_status: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/recertification-status.yml
-  support_universe_coverage: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/support-universe-coverage.yml
-  proof_plane_coverage: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/proof-plane-coverage.yml
-  cross_artifact_consistency: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/cross-artifact-consistency.yml
+  harness_card: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/harness-card.yml
+  gate_status: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/gate-status.yml
+  closure_summary: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/closure-summary.yml
+  closure_certificate: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/closure-certificate.yml
+  recertification_status: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/recertification-status.yml
+  support_universe_coverage: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/support-universe-coverage.yml
+  proof_plane_coverage: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/proof-plane-coverage.yml
+  cross_artifact_consistency: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/authority-ledger-coherence-report.yml
 summary:
   claim_status: complete
   final_verdict: claim_complete
@@ -22,4 +22,4 @@ summary:
   support_universe_mode: bounded-admitted-live-universe
   claim_scope: bounded-admitted-live-universe
   blocked_by:
-blockers:
+blockers: []

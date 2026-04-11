@@ -1,0 +1,7 @@
+schema_version: known-limits-statement-v1
+release_id: 2026-04-11-uec-bounded-recertified-complete
+generated_at: "2026-04-10T21:00:00Z"
+known_limits:
+  - The active claim remains bounded to the admitted live support universe only; no universal support claim is made outside active support-target tuples.
+  - Future widening requires a fresh audit, fresh review packet, refreshed support dossiers, regenerated closure reports, and dual-pass recertification.
+  - Permanent projections and retained historical residue remain non-authoritative and may not be cited as current authority.

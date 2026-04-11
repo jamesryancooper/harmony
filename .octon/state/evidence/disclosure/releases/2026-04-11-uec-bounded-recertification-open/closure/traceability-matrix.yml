@@ -1,0 +1,72 @@
+schema_version: closure-traceability-matrix-v1
+release_id: 2026-04-11-uec-bounded-recertification-open
+generated_at: "2026-04-10T20:00:00Z"
+rows:
+  - blocker_id: CB-03
+    remediation: downgrade active claim to recertification-open and supersede the over-strong 2026-04-09 complete release
+    validator_refs:
+      - V-08
+      - V-17
+    evidence_refs:
+      - .octon/instance/governance/disclosure/release-lineage.yml
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/claim-calibration-report.yml
+    transition_state: mitigated-in-active-release
+  - blocker_id: CB-01
+    remediation: quarantine contaminated exemplar lineage and require a fresh clean claim-bearing boundary-sensitive run
+    validator_refs:
+      - V-04
+      - V-05
+    evidence_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/authority-ledger-coherence-report.yml
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/no-exercise-residue-report.yml
+    transition_state: open
+  - blocker_id: CB-02
+    remediation: ship v2 manifest/classification contracts and backfill all claim-bearing runs
+    validator_refs:
+      - V-06
+      - V-07
+    evidence_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/instruction-manifest-completeness-report.yml
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/evidence-classification-completeness-report.yml
+    transition_state: open
+  - blocker_id: CB-04
+    remediation: add workflow derivation and host projection purity validators with negative-path coverage
+    validator_refs:
+      - V-09
+      - V-10
+    evidence_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/host-projection-purity-report.yml
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/workflow-authority-derivation-report.yml
+    transition_state: open
+  - blocker_id: CB-05
+    remediation: equalize all six proof planes and re-run coverage gating
+    validator_refs:
+      - V-11
+      - V-12
+      - V-13
+    evidence_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/proof-plane-coverage.yml
+    transition_state: open
+  - blocker_id: CB-06
+    remediation: audit overlays and prove orchestrator-default non-authority containment
+    validator_refs:
+      - V-14
+    evidence_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/agency-overlay-containment-report.yml
+    transition_state: open
+  - blocker_id: CB-07
+    remediation: continue monthly build-to-delete review and keep it non-blocking unless a material trigger appears
+    validator_refs:
+      - V-15
+    evidence_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/build-to-delete-report.yml
+    transition_state: monitoring
+  - blocker_id: CB-08
+    remediation: preserve the support universe but close tuple-level coverage with clean exemplar evidence and disclosure parity
+    validator_refs:
+      - V-03
+      - V-08
+      - V-11
+    evidence_refs:
+      - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/closure/support-target-coverage-report.yml
+    transition_state: open

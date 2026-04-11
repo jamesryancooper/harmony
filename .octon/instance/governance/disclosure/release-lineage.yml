@@ -1,15 +1,25 @@
 schema_version: release-lineage-v1
 owner: Octon governance
-updated_at: "2026-04-09T12:00:00Z"
+updated_at: "2026-04-10T21:00:00Z"
 active_release:
-  release_id: 2026-04-09-uec-bounded-hardening-closure
+  release_id: 2026-04-11-uec-bounded-recertified-complete
   status: active
   claim_scope: bounded-admitted-live-universe
   claim_status: complete
-  harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/harness-card.yml
-  closure_certificate_ref: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/closure/closure-certificate.yml
+  harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/harness-card.yml
+  closure_certificate_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/closure-certificate.yml
   recertification_status_ref: .octon/generated/effective/closure/recertification-status.yml
 historical_releases:
+  - release_id: 2026-04-11-uec-bounded-recertification-open
+    status: superseded
+    superseded_by: 2026-04-11-uec-bounded-recertified-complete
+    reason: Recertification-open release was superseded by a fresh clean complete release after the active exemplar set, workflows, dossiers, and run-bundle evidence were recertified.
+    harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertification-open/harness-card.yml
+  - release_id: 2026-04-09-uec-bounded-hardening-closure
+    status: superseded
+    superseded_by: 2026-04-11-uec-bounded-recertification-open
+    reason: Active complete claim was withdrawn after post-release review confirmed retained authority and evidence blockers; scope is preserved under recertification-open governance.
+    harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-09-uec-bounded-hardening-closure/harness-card.yml
   - release_id: 2026-04-09-uec-hardening-recertification
     status: superseded
     superseded_by: 2026-04-09-uec-bounded-hardening-closure
@@ -59,4 +69,4 @@ notes:
   - Historical release bundles remain retained evidence, not the active live claim.
   - The active release is the only release that may be cited for current support scope and closure truth.
   - The active release remains bounded to the admitted live support universe.
-  - The bounded hardening closure preserves the admitted support universe and closes packet-scope hardening debt without widening support.
+  - The recertified-complete release preserves the admitted support universe without widening support and without rewriting historical evidence.

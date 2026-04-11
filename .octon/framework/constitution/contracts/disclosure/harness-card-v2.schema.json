@@ -25,7 +25,7 @@
     "schema_version": { "const": "harness-card-v2" },
     "card_id": { "type": "string", "minLength": 1 },
     "claim_kind": { "type": "string", "minLength": 1 },
-    "claim_status": { "type": "string", "enum": ["provisional", "complete"] },
+    "claim_status": { "type": "string", "enum": ["provisional", "recertification_open", "complete"] },
     "claim_summary": { "type": "string", "minLength": 1 },
     "support_target_ref": { "type": "string", "minLength": 1 },
     "governance_exclusions_ref": { "type": "string", "minLength": 1 },
