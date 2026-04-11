@@ -1,0 +1,32 @@
+schema_version: "octon-host-tool-requirements-v1"
+owner: "Octon governance"
+consumers:
+  repo-hygiene:
+    surface_refs:
+      - ".octon/instance/governance/policies/repo-hygiene.yml"
+      - ".octon/instance/capabilities/runtime/commands/repo-hygiene/repo-hygiene.sh"
+      - ".octon/instance/capabilities/runtime/commands/repo-hygiene/README.md"
+    mode_requirements:
+      scan:
+        mandatory_tools: {}
+      enforce:
+        mandatory_tools:
+          shellcheck:
+            version_policy: "exact"
+            version: "0.10.0"
+          cargo-machete:
+            version_policy: "exact"
+            version: "0.9.1"
+      audit:
+        mandatory_tools:
+          shellcheck:
+            version_policy: "exact"
+            version: "0.10.0"
+          cargo-machete:
+            version_policy: "exact"
+            version: "0.9.1"
+          cargo-udeps:
+            version_policy: "exact"
+            version: "0.1.60"
+      packetize:
+        mandatory_tools: {}

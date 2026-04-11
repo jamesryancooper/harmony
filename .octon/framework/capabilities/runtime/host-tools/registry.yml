@@ -1,0 +1,12 @@
+schema_version: "octon-host-tool-registry-v1"
+owner: "Octon governance"
+tools:
+  - tool_id: "shellcheck"
+    contract_ref: ".octon/framework/capabilities/runtime/host-tools/contracts/shellcheck.yml"
+    category: "linter"
+  - tool_id: "cargo-machete"
+    contract_ref: ".octon/framework/capabilities/runtime/host-tools/contracts/cargo-machete.yml"
+    category: "dependency-audit"
+  - tool_id: "cargo-udeps"
+    contract_ref: ".octon/framework/capabilities/runtime/host-tools/contracts/cargo-udeps.yml"
+    category: "dependency-audit"

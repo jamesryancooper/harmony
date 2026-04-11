@@ -1,0 +1,38 @@
+schema_version: "host-tool-resolution-policy-v1"
+policy_id: "host-tool-resolution"
+owner: "Octon governance"
+status: "active"
+octon_home:
+  env_var: "OCTON_HOME"
+  defaults:
+    darwin: "~/Library/Application Support/Octon"
+    linux: "${XDG_DATA_HOME:-~/.local/share}/octon"
+    windows: "%LocalAppData%\\Octon"
+resolution:
+  prefer_octon_home_cache: true
+  allow_path_adoption: true
+  allow_side_by_side_versions: true
+  unresolved_mandatory_route: "deny"
+  unresolved_optional_route: "stage_only"
+  repo_fingerprint_basis: "absolute-repo-root"
+host_state:
+  manifest_relpath: "manifest.yml"
+  active_state_relpath: "state/control/host-tools/active.yml"
+  quarantine_state_relpath: "state/control/host-tools/quarantine.yml"
+  provisioning_evidence_root_relpath: "state/evidence/provisioning/host-tools"
+  generated_repo_resolution_root_relpath: "generated/effective/host-tools/repos"
+  toolchains:
+    cargo_home_relpath: "toolchains/cargo-home"
+    rustup_home_relpath: "toolchains/rustup"
+installer_posture:
+  require_explicit_command: true
+  init_must_not_install: true
+  system_package_manager_silent_mutation: "deny"
+  allowed_installer_kinds:
+    - "system-adopt"
+    - "archive-download"
+    - "cargo-install"
+bootstrap_boundary:
+  repo_bootstrap_command: "/init"
+  provisioning_command: "/provision-host-tools"
+  rule: "Repo bootstrap may report missing host tools but must not install them."

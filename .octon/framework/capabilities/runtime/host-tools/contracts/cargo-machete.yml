@@ -1,0 +1,30 @@
+schema_version: "octon-host-tool-contract-v1"
+tool_id: "cargo-machete"
+display_name: "cargo-machete"
+default_version: "0.9.1"
+entrypoint:
+  binary_name: "cargo-machete"
+  command_style: "cargo-subcommand"
+resolution:
+  allow_path_adoption: true
+  shared_cache: true
+  install_root_template: "tools/cargo-machete/<version>/<platform>"
+verification:
+  command: "cargo-machete --version"
+  version_regex: "([0-9]+\\.[0-9]+\\.[0-9]+)"
+prerequisites:
+  required_commands:
+    - "cargo"
+installers:
+  - kind: "system-adopt"
+  - kind: "cargo-install"
+    package_name: "cargo-machete"
+    install_args:
+      - "--locked"
+supported_platforms:
+  - os: "darwin"
+    arches: ["aarch64", "x86_64"]
+  - os: "linux"
+    arches: ["x86_64", "aarch64"]
+  - os: "windows"
+    arches: ["x86_64"]

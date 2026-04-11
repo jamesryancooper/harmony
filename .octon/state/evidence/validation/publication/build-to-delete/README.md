@@ -5,8 +5,9 @@ keep build-to-delete governance active after the one-time cutover phases.
 
 ## Canonical Packet
 
-- `2026-04-06/` is the current active packet for retirement-claim readiness
-  after the closure truth-freeze slice.
+- `2026-04-09-bounded-uec-hardening/` is the current active packet for
+  retirement-claim readiness and bounded hardening closeout.
+- `2026-04-06/` remains the earlier packet from the closure truth-freeze slice.
 - `2026-03-30/` remains the prior packet from the atomic clean-break
   disclosure and support-tier convergence pass.
 - `2026-03-29/` is the first packet that institutionalizes:

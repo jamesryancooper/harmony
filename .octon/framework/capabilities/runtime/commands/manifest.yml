@@ -50,6 +50,24 @@ commands:
       tech_tags: []
       language_tags: []
   host_adapters: []
+- id: provision-host-tools
+  display_name: Provision Host Tools
+  path: provision-host-tools.md
+  summary: Verify, install, or repair host-scoped external tools required by the current repository.
+  access: agent
+  argument_hint: 'verify|install|repair [@repo-root] [--consumer <id>] [--mode <mode>] [--octon-home <path>] [--emit-env <path>] [--tool-id <id>] [--allow-path-adoption true|false]'
+  routing:
+    selectors:
+      include:
+      - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+  host_adapters:
+  - claude
+  - cursor
+  - codex
 - id: export-harness
   display_name: Export Harness
   path: export-harness.md

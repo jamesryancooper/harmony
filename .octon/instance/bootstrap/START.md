@@ -28,6 +28,7 @@ This harness uses one repo-root `.octon/` per repository.
 | Workflows | `.octon/framework/orchestration/runtime/workflows/` |
 | Skills | `.octon/framework/capabilities/runtime/skills/` |
 | Commands | `.octon/framework/capabilities/runtime/commands/` |
+| Host tool contracts | `.octon/framework/capabilities/runtime/host-tools/` |
 | Tools | `.octon/framework/capabilities/runtime/tools/` |
 | Services | `.octon/framework/capabilities/runtime/services/` |
 | Lab | `.octon/framework/lab/` |
@@ -45,7 +46,7 @@ versioning, install/export profiles, and fail-closed policy hooks.
 
 | Profile | Operator Surface | Behavior |
 |-----------|----------------|----------|
-| `bootstrap_core` | `/init` | Complete bootstrap after adopting the framework bundle and minimal instance metadata; raw `inputs/**`, `state/**`, and `generated/**` stay excluded |
+| `bootstrap_core` | `/init` | Complete bootstrap after adopting the framework bundle and minimal instance metadata; raw `inputs/**`, `state/**`, and `generated/**` stay excluded, and host-tool installation remains out of scope |
 | `repo_snapshot` | `/export-harness --profile repo_snapshot` | Export `octon.yml`, `framework/**`, `instance/**`, and the clean published enabled-pack dependency closure while excluding `inputs/exploratory/**`, `state/**`, and `generated/**`; fail closed when enabled-pack state is incompatible, quarantined, or incomplete |
 | `pack_bundle` | `/export-harness --profile pack_bundle --pack-ids <csv>` | Export only selected additive packs plus dependency closure; do not apply repo trust activation policy |
 | `full_fidelity` | Git clone | Advisory only; not a synthetic export payload |
@@ -229,6 +230,24 @@ Extension activation uses one desired/actual/quarantine/compiled model:
 - runtime-facing compiled outputs: `generated/effective/extensions/**`
 - runtime-facing capability routing: `generated/effective/capabilities/**`
 - derived cognition read models: `generated/cognition/**`
+
+Host-tool provisioning uses one repo-desired / host-actual model:
+
+- desired repo requirements:
+  `instance/capabilities/runtime/host-tools/requirements.yml`
+- repo-owned resolution policy:
+  `instance/governance/policies/host-tool-resolution.yml`
+- shared provisioning command:
+  `framework/capabilities/runtime/commands/provision-host-tools.md`
+- actual host installs and control truth:
+  `$OCTON_HOME/{tools/**,state/control/host-tools/**}`
+- retained host provisioning evidence:
+  `$OCTON_HOME/state/evidence/provisioning/host-tools/**`
+- generated per-repo host-tool resolution views:
+  `$OCTON_HOME/generated/effective/host-tools/repos/**`
+
+`/init` may report missing host-tool prerequisites, but it must never install
+them implicitly.
 
 Mission-scoped reversible autonomy uses one authored/control/evidence/read-model
 split:

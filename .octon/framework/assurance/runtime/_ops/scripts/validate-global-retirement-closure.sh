@@ -19,6 +19,8 @@ require_yq() { yq -e "$1" "$2" >/dev/null 2>&1 && pass "$3" || fail "$3"; }
 main() {
   echo "== Global Retirement Closure Validation =="
   CURRENT_REVIEW="$(yq -r '.current_governance_review_ref' "$GATE")"
+  LATEST_PACKET="$(yq -r '.latest_review_packet' "$REVIEW_SET")"
+  HYGIENE_ATTACHMENT="$ROOT_DIR/$LATEST_PACKET/repo-hygiene-findings.yml"
   require_yq '.nonblocking_statuses | length >= 3' "$GATE" "retirement claim gate publishes nonblocking statuses"
   require_yq '[.entries[] | select(.status != "retired" and .review_date == null)] | length == 0' "$REGISTRY" "no non-retired retirement entry is missing review_date"
   require_yq '.latest_review_packet | test("^\\.octon/state/evidence/validation/publication/build-to-delete/[0-9]{4}-[0-9]{2}-[0-9]{2}([-/][A-Za-z0-9._-]+)?$")' "$REVIEW_SET" "closeout reviews point at a canonical build-to-delete packet"
@@ -26,6 +28,18 @@ main() {
   require_yq '.claim_ready == true and .claim_blocking_count == 0' "$ROOT_DIR/$CURRENT_REVIEW" "governance retirement claim review reports no blockers"
   require_yq '.retired[] | select(. == "experimental-model-surface")' "$LEDGER" "surface ledger records retired model surface"
   require_yq '.rebound[] | select(.surface_id == "deny-only-external-irreversible-surface")' "$LEDGER" "surface ledger records rebound deny-only surface"
+  if [[ -f "$HYGIENE_ATTACHMENT" ]]; then
+    pass "repo-hygiene attachment exists in the latest build-to-delete packet"
+  else
+    fail "repo-hygiene attachment missing from the latest build-to-delete packet"
+  fi
+  require_yq '.summary.packetization_ready == true and .summary.blocking_findings == 0' "$HYGIENE_ATTACHMENT" "repo-hygiene attachment reports a closure-ready clean audit"
+  audit_summary_ref="$(yq -r '.artifact_refs.audit_summary // ""' "$HYGIENE_ATTACHMENT")"
+  if [[ -n "$audit_summary_ref" && -f "$ROOT_DIR/$audit_summary_ref" ]]; then
+    pass "repo-hygiene attachment audit summary ref resolves"
+  else
+    fail "repo-hygiene attachment audit summary ref is missing or unresolved"
+  fi
   echo "Validation summary: errors=$errors"
   [[ $errors -eq 0 ]]
 }

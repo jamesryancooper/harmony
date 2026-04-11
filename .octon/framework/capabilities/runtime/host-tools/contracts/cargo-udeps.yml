@@ -1,0 +1,34 @@
+schema_version: "octon-host-tool-contract-v1"
+tool_id: "cargo-udeps"
+display_name: "cargo-udeps"
+default_version: "0.1.60"
+entrypoint:
+  binary_name: "cargo-udeps"
+  command_style: "cargo-subcommand"
+resolution:
+  allow_path_adoption: true
+  shared_cache: true
+  install_root_template: "tools/cargo-udeps/<version>/<platform>"
+verification:
+  command: "cargo-udeps --version"
+  version_regex: "([0-9]+\\.[0-9]+\\.[0-9]+)"
+prerequisites:
+  required_commands:
+    - "cargo"
+    - "rustup"
+  rustup_requirements:
+    - channel: "nightly"
+      profile: "minimal"
+installers:
+  - kind: "system-adopt"
+  - kind: "cargo-install"
+    package_name: "cargo-udeps"
+    install_args:
+      - "--locked"
+supported_platforms:
+  - os: "darwin"
+    arches: ["aarch64", "x86_64"]
+  - os: "linux"
+    arches: ["x86_64", "aarch64"]
+  - os: "windows"
+    arches: ["x86_64"]

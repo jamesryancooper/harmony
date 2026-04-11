@@ -1,3 +1,9 @@
 schema_version: "octon-instance-command-manifest-v1"
 
-commands: []
+commands:
+  - id: "repo-hygiene"
+    display_name: "Repository Hygiene"
+    path: "repo-hygiene/README.md"
+    summary: "Detect dead or stale repo surfaces, emit retained hygiene evidence, and route retirement outcomes into the build-to-delete spine."
+    access: "agent"
+    argument_hint: "scan|enforce|audit|packetize [--audit-id <id>] [--audit-dir <path>] [--packet-root <path>]"

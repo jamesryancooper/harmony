@@ -7,13 +7,17 @@ triggers:
   - "Before any final target-state claim."
   - "When a retirement target reaches its review date or changes status."
   - "When a new compatibility shim, historical shim, or projection-only helper is introduced."
+  - "When repo-hygiene emits a high-confidence transitional or historical finding."
 cadence: "Quarterly while any registered or historical-retained target remains, and immediately before claim or support widening."
 required_inputs:
   - ".octon/instance/governance/contracts/retirement-policy.yml"
   - ".octon/instance/governance/contracts/retirement-registry.yml"
   - ".octon/instance/governance/contracts/ablation-deletion-workflow.yml"
+  - ".octon/instance/governance/policies/repo-hygiene.yml"
+  - ".octon/state/evidence/validation/publication/build-to-delete/<packet>/repo-hygiene-findings.yml"
 evidence_requirements:
   - "Approved retirement-review receipt under .octon/state/evidence/validation/publication/build-to-delete/<date>/retirement-review.yml"
   - "A current ablation-deletion receipt for every target evaluated in the release."
-blocking_rule: "Reject when any registered target lacks owner, support scope, value metric, review date, retirement trigger, required ablation suite, evidence requirements, or retirement path."
+  - "A repo-hygiene findings attachment is present for closure-grade packets."
+blocking_rule: "Reject when any registered target lacks owner, support scope, value metric, review date, retirement trigger, required ablation suite, evidence requirements, or retirement path, or when a high-confidence repo-hygiene transitional or historical finding lacks same-change resolution, registration, or policy-backed reclassification."
 retirement_path: "Retire only if an automated successor review owns the same registry completeness and ablation checks."

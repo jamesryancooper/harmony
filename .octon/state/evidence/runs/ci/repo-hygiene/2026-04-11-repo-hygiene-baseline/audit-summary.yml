@@ -1,0 +1,126 @@
+schema_version: "repo-hygiene-audit-summary-v1"
+audit_id: "2026-04-11-repo-hygiene-baseline"
+mode: "audit"
+generated_at: "2026-04-11T16:42:09Z"
+policy_ref: ".octon/instance/governance/policies/repo-hygiene.yml"
+active_release_id: "2026-04-11-uec-bounded-recertified-complete"
+active_release_root: ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete"
+latest_review_packet_ref: ".octon/state/evidence/validation/publication/build-to-delete/2026-04-09-bounded-uec-hardening"
+current_governance_review_ref: ".octon/state/evidence/governance/build-to-delete/2026-04-09-bounded-uec-hardening/retirement-claim-review.yml"
+detectors:
+  - id: git-ls-files
+    command: git ls-files
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "0"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/git-ls-files.log
+    notes: ""
+  - id: find
+    command: find
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "0"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/find.log
+    notes: ""
+  - id: reference-scan
+    command: rg
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "0"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/reference-scan.log
+    notes: ""
+  - id: cargo-check
+    command: cargo +stable check --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml --workspace --all-targets --all-features
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "0"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/cargo-check.log
+    notes: ""
+  - id: cargo-clippy
+    command: cargo +stable clippy --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml --workspace --all-targets --all-features --message-format short -- -W dead_code -W unused_imports -W unused_variables
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "0"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/cargo-clippy.log
+    notes: ""
+  - id: cargo-machete
+    command: (cd .octon/framework/engine/runtime/crates && cargo machete)
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "1"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/cargo-machete.log
+    notes: cargo-machete reported candidate unused dependencies
+  - id: cargo-udeps
+    command: (cd .octon/framework/engine/runtime/crates && cargo +nightly udeps --workspace --all-targets --all-features)
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "1"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/cargo-udeps.log
+    notes: cargo-udeps reported candidate unused dependencies
+  - id: shellcheck
+    command: shellcheck -x
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "0"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/shellcheck.log
+    notes: shellcheck reported lint findings
+  - id: bash-syntax
+    command: bash -n
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "0"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/bash-syntax.log
+    notes: ""
+  - id: sh-syntax
+    command: sh -n
+    available: true
+    required_for_mode: true
+    ran: true
+    status: passed
+    exit_status: "0"
+    log_ref: .octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/detectors/sh-syntax.log
+    notes: ""
+summary:
+  total_findings: 123
+  blocking_findings: 0
+  high_confidence_blocking_findings: 0
+  required_detector_failures: 0
+  packetization_ready: true
+  findings_by_class:
+    - class: rust-static-deadness
+      count: 98
+    - class: rust-dependency-deadness
+      count: 24
+    - class: artifact-bloat
+      count: 1
+  findings_by_action:
+    - action: needs-ablation-before-delete
+      count: 123
+  findings_by_confidence:
+    - confidence: low
+      count: 99
+    - confidence: medium
+      count: 24
+paths:
+  findings_ref: "findings.yml"
+  blocking_findings_ref: "blocking-findings.yml"
+  summary_ref: "summary.md"
+  host_tool_resolution_ref: host-tools.yml

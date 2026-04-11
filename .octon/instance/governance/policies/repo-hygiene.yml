@@ -1,0 +1,272 @@
+schema_version: "repo-hygiene-policy-v1"
+policy_id: "repository-hygiene-and-retirement"
+owner: "Octon governance"
+status: "active"
+purpose: >-
+  Define the canonical repo-local classification, routing, and fail-closed
+  posture for repository hygiene in the Rust + Shell Octon repository while
+  keeping destructive outcomes subordinate to the existing build-to-delete
+  retirement spine.
+authority_posture:
+  authored_authority_only:
+    - ".octon/framework/**"
+    - ".octon/instance/**"
+  retained_evidence_only:
+    - ".octon/state/**"
+  derived_only:
+    - ".octon/generated/**"
+  raw_inputs_must_remain_non_authoritative:
+    - ".octon/inputs/**"
+dynamic_inputs:
+  root_manifest_ref: ".octon/octon.yml"
+  release_lineage_ref: ".octon/instance/governance/disclosure/release-lineage.yml"
+  closeout_reviews_ref: ".octon/instance/governance/contracts/closeout-reviews.yml"
+  claim_gate_ref: ".octon/instance/governance/retirement/claim-gate.yml"
+  retirement_registry_ref: ".octon/instance/governance/contracts/retirement-registry.yml"
+  retirement_register_ref: ".octon/instance/governance/retirement-register.yml"
+  host_tool_requirements_ref: ".octon/instance/capabilities/runtime/host-tools/requirements.yml"
+  host_tool_resolution_policy_ref: ".octon/instance/governance/policies/host-tool-resolution.yml"
+scope:
+  included_roots:
+    - ".octon/framework/**"
+    - ".octon/instance/**"
+    - ".octon/state/**"
+    - ".octon/generated/**"
+    - ".github/workflows/**"
+  excluded_roots:
+    - ".octon/inputs/exploratory/**"
+    - ".octon/inputs/additive/**"
+    - ".git/**"
+finding_classes:
+  - id: "rust-static-deadness"
+    description: "Warnings or direct deadness signals from cargo check and cargo clippy."
+    detector_ids:
+      - "cargo-check"
+      - "cargo-clippy"
+    allowed_actions:
+      - "needs-ablation-before-delete"
+      - "retain-with-rationale"
+      - "never-delete"
+  - id: "rust-dependency-deadness"
+    description: "Unused dependency signals from cargo machete or cargo +nightly udeps."
+    detector_ids:
+      - "cargo-machete"
+      - "cargo-udeps"
+    allowed_actions:
+      - "needs-ablation-before-delete"
+      - "retain-with-rationale"
+      - "never-delete"
+  - id: "shell-script-orphaning"
+    description: "Tracked shell entrypoints or wrappers with no current live reader."
+    detector_ids:
+      - "git-ls-files"
+      - "shellcheck"
+      - "bash-syntax"
+      - "sh-syntax"
+      - "reference-scan"
+    allowed_actions:
+      - "needs-ablation-before-delete"
+      - "retain-with-rationale"
+      - "register-for-future-retirement"
+      - "never-delete"
+  - id: "artifact-bloat"
+    description: "Tracked generated or output-like surfaces that appear stale, redundant, or rebuildable."
+    detector_ids:
+      - "find"
+      - "reference-scan"
+      - "git-ls-files"
+    allowed_actions:
+      - "safe-to-delete"
+      - "needs-ablation-before-delete"
+      - "retain-with-rationale"
+      - "never-delete"
+  - id: "transitional-residue"
+    description: "Migration leftovers, compatibility shims, helper projections, dual-path surfaces, and other sunsettable transitional residue."
+    detector_ids:
+      - "transition-heuristics"
+      - "retirement-reconciliation"
+    allowed_actions:
+      - "needs-ablation-before-delete"
+      - "demote-to-historical"
+      - "register-for-future-retirement"
+      - "retain-with-rationale"
+      - "never-delete"
+  - id: "historical-retained-surface"
+    description: "Historical mirrors, superseded release bundles, or other retained surfaces that must stay governed and explicit."
+    detector_ids:
+      - "historical-release-reconciliation"
+      - "retirement-reconciliation"
+    allowed_actions:
+      - "demote-to-historical"
+      - "register-for-future-retirement"
+      - "retain-with-rationale"
+      - "never-delete"
+  - id: "never-delete-surface"
+    description: "Claim-adjacent or currently authoritative surfaces that hygiene routing must protect rather than prune."
+    detector_ids:
+      - "dynamic-protection"
+    allowed_actions:
+      - "never-delete"
+decision_grammar:
+  allowed_actions:
+    - "safe-to-delete"
+    - "needs-ablation-before-delete"
+    - "retain-with-rationale"
+    - "demote-to-historical"
+    - "register-for-future-retirement"
+    - "never-delete"
+  invariants:
+    unused_not_equivalent_to_safe_to_delete: true
+    detection_never_authorizes_deletion: true
+    ambiguous_findings_default_to_non_destructive: true
+confidence_rules:
+  low:
+    meaning: "Heuristic or single-detector signal that requires human review before any destructive conclusion."
+  medium:
+    meaning: "Multiple corroborating signals exist, but the surface still needs human review or ablation evidence."
+  high:
+    meaning: >-
+      Direct structural evidence exists and policy can require same-change
+      registration, explicit retention, or a protected-surface override
+      without relying on inference-heavy cleanup logic.
+  high_confidence_requirements:
+    - "The finding is backed by direct detector output or authoritative repo metadata."
+    - "The finding does not depend on generated views or proposal-local artifacts as authority."
+    - "If the finding is transitional or historical, registry/register reconciliation agrees that coverage is missing or stale."
+protected_surfaces:
+  static_prefixes:
+    - ".octon/framework/constitution/"
+    - ".octon/instance/ingress/"
+    - ".octon/instance/charter/"
+    - ".octon/instance/governance/support-targets.yml"
+    - ".octon/instance/governance/contracts/closeout-reviews.yml"
+    - ".octon/instance/governance/contracts/retirement-registry.yml"
+    - ".octon/instance/governance/retirement-register.yml"
+    - ".octon/instance/governance/retirement/claim-gate.yml"
+  dynamic:
+    - id: "active-release-root"
+      source_ref: ".octon/instance/governance/disclosure/release-lineage.yml"
+      description: "The active release bundle is claim-bearing and must never be routed as delete-safe bloat."
+      forced_action: "never-delete"
+    - id: "latest-build-to-delete-packet"
+      source_ref: ".octon/instance/governance/contracts/closeout-reviews.yml"
+      description: "The latest build-to-delete packet remains the live closure review packet and must stay protected."
+      forced_action: "never-delete"
+    - id: "current-governance-review"
+      source_ref: ".octon/instance/governance/retirement/claim-gate.yml"
+      description: "The current governance review receipt is claim-adjacent evidence and must stay protected."
+      forced_action: "never-delete"
+same_change_requirements:
+  - id: "RH-001"
+    condition: "A high-confidence transitional-residue finding lacks retirement-registry coverage."
+    required_outcome:
+      - "fix-the-surface"
+      - "register-the-surface-in-retirement-registry"
+      - "reclassify-the-finding-under-policy-backed-rationale"
+    blocks:
+      - "closure-claims"
+      - "repo-hygiene-enforce"
+      - "repo-hygiene-audit-success"
+  - id: "RH-002"
+    condition: "A high-confidence historical-retained-surface finding lacks retirement-register coverage."
+    required_outcome:
+      - "fix-the-surface"
+      - "update-the-retirement-register"
+      - "reclassify-the-finding-under-policy-backed-rationale"
+    blocks:
+      - "closure-claims"
+      - "repo-hygiene-enforce"
+      - "repo-hygiene-audit-success"
+  - id: "RH-003"
+    condition: "A dynamic protected surface is matched by a hygiene detector."
+    required_outcome:
+      - "force-never-delete"
+      - "retain-with-rationale"
+    blocks:
+      - "safe-to-delete-routing"
+mode_boundaries:
+  scan:
+    side_effects: "none"
+    description: "Read-only discovery; emits console output only."
+    fail_closed_on_required_detector_unavailable: false
+  enforce:
+    side_effects: "none"
+    description: "Read-only gate; blocks on blocking findings or required-detector failures."
+    fail_closed_on_required_detector_unavailable: true
+  audit:
+    side_effects: "write under .octon/state/evidence/runs/ci/repo-hygiene/<audit-id>/ only"
+    description: "Emit retained hygiene evidence and fail closed on blocking findings or required-detector failures."
+    fail_closed_on_required_detector_unavailable: true
+  packetize:
+    side_effects: "write repo-hygiene-findings.yml under the latest build-to-delete packet only"
+    description: "Stage-only packet attachment; never rewrites policy, registry, or review contracts."
+    fail_closed_on_required_detector_unavailable: true
+host_tool_consumer:
+  consumer_id: "repo-hygiene"
+  mandatory_modes:
+    - "enforce"
+    - "audit"
+  provisioning_command_ref: ".octon/framework/capabilities/runtime/commands/provision-host-tools.md"
+detectors:
+  - id: "cargo-check"
+    command: "cargo +stable check --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml --workspace --all-targets --all-features"
+    required_in_modes:
+      - "enforce"
+      - "audit"
+  - id: "cargo-clippy"
+    command: "cargo +stable clippy --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml --workspace --all-targets --all-features --message-format short -- -W dead_code -W unused_imports -W unused_variables"
+    required_in_modes:
+      - "enforce"
+      - "audit"
+  - id: "cargo-machete"
+    command: "(cd .octon/framework/engine/runtime/crates && cargo machete)"
+    required_in_modes:
+      - "enforce"
+      - "audit"
+  - id: "cargo-udeps"
+    command: "(cd .octon/framework/engine/runtime/crates && cargo +nightly udeps --workspace --all-targets --all-features)"
+    required_in_modes:
+      - "audit"
+  - id: "git-ls-files"
+    command: "git ls-files"
+    required_in_modes:
+      - "scan"
+      - "enforce"
+      - "audit"
+  - id: "find"
+    command: "find"
+    required_in_modes:
+      - "scan"
+      - "enforce"
+      - "audit"
+  - id: "reference-scan"
+    command: "rg"
+    required_in_modes:
+      - "scan"
+      - "enforce"
+      - "audit"
+  - id: "shellcheck"
+    command: "shellcheck -x"
+    required_in_modes:
+      - "enforce"
+      - "audit"
+  - id: "bash-syntax"
+    command: "bash -n"
+    required_in_modes:
+      - "enforce"
+      - "audit"
+  - id: "sh-syntax"
+    command: "sh -n"
+    required_in_modes:
+      - "enforce"
+      - "audit"
+blocking_rules:
+  - id: "RB-001"
+    condition: "Any required detector for the selected mode is unavailable or fails."
+    outcome: "fail-closed-for-enforce-and-audit"
+  - id: "RB-002"
+    condition: "Any high-confidence transitional or historical finding lacks same-change resolution, registration, or reclassification."
+    outcome: "fail-closed-for-enforce-and-audit"
+  - id: "RB-003"
+    condition: "A detector proposes safe-to-delete for a protected surface."
+    outcome: "deny-and-force-never-delete"

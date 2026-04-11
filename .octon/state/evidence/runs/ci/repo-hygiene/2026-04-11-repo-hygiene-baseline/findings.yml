@@ -1,0 +1,1486 @@
+schema_version: "repo-hygiene-findings-v1"
+audit_id: "2026-04-11-repo-hygiene-baseline"
+mode: "audit"
+generated_at: "2026-04-11T16:42:09Z"
+policy_ref: ".octon/instance/governance/policies/repo-hygiene.yml"
+active_release_id: "2026-04-11-uec-bounded-recertified-complete"
+active_release_root: ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete"
+latest_review_packet_ref: ".octon/state/evidence/validation/publication/build-to-delete/2026-04-09-bounded-uec-hardening"
+current_governance_review_ref: ".octon/state/evidence/governance/build-to-delete/2026-04-09-bounded-uec-hardening/retirement-claim-review.yml"
+findings:
+  - id: rh-clippy-core-src-execution-integrity-rs-871-manually-reimplementing-div-ceil-help-consider-using-div-ceil-prompt-bytes-max-1-div-ceil-4
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: core/src/execution_integrity.rs:871
+    title: Rust deadness signal from clippy
+    rationale: 'manually reimplementing `div_ceil`: help: consider using `.div_ceil()`: `prompt_bytes.max(1).div_ceil(4)`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-core-src-execution-integrity-rs-1026-using-contains-instead-of-iter-any-is-more-efficient-help-try-rule-ports-contains-target-port
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: core/src/execution_integrity.rs:1026
+    title: Rust deadness signal from clippy
+    rationale: 'using `contains()` instead of `iter().any()` is more efficient: help: try: `rule.ports.contains(&target.port)`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-core-src-jsonlines-rs-20-needless-call-to-as-bytes-help-len-can-be-called-directly-on-strings-line-len
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: core/src/jsonlines.rs:20
+    title: Rust deadness signal from clippy
+    rationale: 'needless call to `as_bytes`: help: `len()` can be called directly on strings: `line.len()`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-core-src-orchestration-rs-998-this-filter-map-can-be-written-more-simply-using-map
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: core/src/orchestration.rs:998
+    title: Rust deadness signal from clippy
+    rationale: this `.filter_map(..)` can be written more simply using `.map(..)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-core-src-orchestration-rs-1758-the-borrowed-expression-implements-the-required-traits-help-change-this-to-missions-dir
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: core/src/orchestration.rs:1758
+    title: Rust deadness signal from clippy
+    rationale: 'the borrowed expression implements the required traits: help: change this to: `missions_dir`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-core-src-orchestration-rs-1758-this-expression-creates-a-reference-which-is-immediately-dereferenced-by-the-compiler-help-change-this-to-missions-dir
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: core/src/orchestration.rs:1758
+    title: Rust deadness signal from clippy
+    rationale: 'this expression creates a reference which is immediately dereferenced by the compiler: help: change this to: `missions_dir`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-core-src-orchestration-rs-1760-this-expression-creates-a-reference-which-is-immediately-dereferenced-by-the-compiler-help-change-this-to-missions-dir
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: core/src/orchestration.rs:1760
+    title: Rust deadness signal from clippy
+    rationale: 'this expression creates a reference which is immediately dereferenced by the compiler: help: change this to: `missions_dir`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-62-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-read-range-max-bytes-too-large
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:62
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: read-range max-bytes too large")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-70-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-write-too-large
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:70
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: write too large")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-80-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-create-file-exclusive-payload-too-large
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:80
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: create-file-exclusive payload too large")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-88-this-operation-has-no-effect-help-consider-reducing-it-to-1024
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:88
+    title: Rust deadness signal from clippy
+    rationale: 'this operation has no effect: help: consider reducing it to: `1024`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-93-this-operation-has-no-effect-help-consider-reducing-it-to-1024
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:93
+    title: Rust deadness signal from clippy
+    rationale: 'this operation has no effect: help: consider reducing it to: `1024`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-244-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-response-too-large
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:244
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: response too large")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-288-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-e
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:288
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: {}", e)`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-302-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-missing-http-method
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:302
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: missing http method")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-325-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-invalid-http-method-method
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:325
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: invalid http method ''{}''", method)`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-334-useless-conversion-to-the-same-type-wasmtime-error
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:334
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-339-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-url-must-start-with-http
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:339
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: url must start with http://")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-349-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-url-missing-host
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:349
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: url missing host")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-352-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-userinfo-is-not-supported
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:352
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: userinfo is not supported")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-373-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-url-path-contains-invalid-characters
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:373
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: url path contains invalid characters")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-396-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-empty-ipv6-host
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:396
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: empty ipv6 host")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-404-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-malformed-authority
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:404
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: malformed authority")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-412-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-empty-host
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:412
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: empty host")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-415-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-ipv6-hosts-must-use-brackets
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:415
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: ipv6 hosts must use brackets")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-418-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-malformed-host
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:418
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: malformed host")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-431-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-missing-url-port
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:431
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: missing url port")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-435-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-invalid-url-port-port-text
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:435
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: invalid url port ''{}''", port_text)`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-449-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-timeout-http-request-timed-out
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:449
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("TIMEOUT: http request timed out")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-459-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-no-resolved-address-for-authority
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:459
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: no resolved address for ''{authority}''")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-509-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-http-header-name-cannot-be-empty
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:509
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: http header name cannot be empty")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-531-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-invalid-http-header-name-name
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:531
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: invalid http header name ''{}''", name)`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-538-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-invalid-input-invalid-http-header-value
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:538
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("INVALID_INPUT: invalid http header value")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-592-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-truncated-response-body
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:592
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: truncated response body")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-600-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-response-body-too-large
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:600
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: response body too large")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-610-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-invalid-status-line
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:610
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: invalid status line")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-616-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-invalid-status-code
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:616
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: invalid status code")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-646-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-truncated-chunked-response
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:646
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: truncated chunked response")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-650-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-response-body-too-large
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:650
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: response body too large")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-654-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-malformed-chunk-terminator
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:654
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: malformed chunk terminator")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-671-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-err
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:671
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: {err}")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-677-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-timeout-http-request-timed-out
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:677
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("TIMEOUT: http request timed out")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-host-api-rs-679-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-http-error-err
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/host_api.rs:679
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("HTTP_ERROR: {err}")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-invoke-rs-42-this-function-has-too-many-arguments-10-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/invoke.rs:42
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (10/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-invoke-rs-89-needless-call-to-as-bytes-help-len-can-be-called-directly-on-strings-input-json-len
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/invoke.rs:89
+    title: Rust deadness signal from clippy
+    rationale: 'needless call to `as_bytes`: help: `len()` can be called directly on strings: `input_json.len()`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-invoke-rs-96-needless-call-to-as-bytes-help-len-can-be-called-directly-on-strings-input-json-len
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/invoke.rs:96
+    title: Rust deadness signal from clippy
+    rationale: 'needless call to `as_bytes`: help: `len()` can be called directly on strings: `input_json.len()`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-invoke-rs-186-needless-call-to-as-bytes-help-len-can-be-called-directly-on-strings-out-json-len
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/invoke.rs:186
+    title: Rust deadness signal from clippy
+    rationale: 'needless call to `as_bytes`: help: `len()` can be called directly on strings: `out_json.len()`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-invoke-rs-193-needless-call-to-as-bytes-help-len-can-be-called-directly-on-strings-out-json-len
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/invoke.rs:193
+    title: Rust deadness signal from clippy
+    rationale: 'needless call to `as_bytes`: help: `len()` can be called directly on strings: `out_json.len()`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-kv-store-rs-62-struct-kvstore-has-a-public-len-method-but-no-is-empty-method
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/kv_store.rs:62
+    title: Rust deadness signal from clippy
+    rationale: struct `KvStore` has a public `len` method, but no `is_empty` method
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-kv-store-rs-169-this-can-be-std-io-error-other
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/kv_store.rs:169
+    title: Rust deadness signal from clippy
+    rationale: this can be `std::io::Error::other(_)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-policy-rs-31-useless-conversion-to-the-same-type-wasmtime-error-help-consider-removing-into-anyhow-anyhow-capability-denied-missing-cap
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/policy.rs:31
+    title: Rust deadness signal from clippy
+    rationale: 'useless conversion to the same type: `wasmtime::Error`: help: consider removing `.into()`: `anyhow::anyhow!("CAPABILITY_DENIED: missing {cap}")`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-run-component-rs-9-this-function-has-too-many-arguments-8-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/run_component.rs:9
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (8/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-run-component-rs-43-manually-reimplementing-div-ceil-help-consider-using-div-ceil-timeout-ms-div-ceil-tick-ms
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/run_component.rs:43
+    title: Rust deadness signal from clippy
+    rationale: 'manually reimplementing `div_ceil`: help: consider using `.div_ceil()`: `timeout_ms.div_ceil(tick_ms)`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-scoped-fs-rs-125-needless-call-to-as-bytes-help-len-can-be-called-directly-on-strings-text-len
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/scoped_fs.rs:125
+    title: Rust deadness signal from clippy
+    rationale: 'needless call to `as_bytes`: help: `len()` can be called directly on strings: `text.len()`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-scoped-fs-rs-162-this-can-be-std-io-error-other
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/scoped_fs.rs:162
+    title: Rust deadness signal from clippy
+    rationale: this can be `std::io::Error::other(_)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-scoped-fs-rs-192-this-can-be-std-io-error-other
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/scoped_fs.rs:192
+    title: Rust deadness signal from clippy
+    rationale: this can be `std::io::Error::other(_)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-scoped-fs-rs-209-this-can-be-std-io-error-other
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/scoped_fs.rs:209
+    title: Rust deadness signal from clippy
+    rationale: this can be `std::io::Error::other(_)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-scoped-fs-rs-280-this-can-be-std-io-error-other
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/scoped_fs.rs:280
+    title: Rust deadness signal from clippy
+    rationale: this can be `std::io::Error::other(_)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-scoped-fs-rs-308-this-can-be-std-io-error-other
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/scoped_fs.rs:308
+    title: Rust deadness signal from clippy
+    rationale: this can be `std::io::Error::other(_)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-scoped-fs-rs-523-this-can-be-std-io-error-other
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/scoped_fs.rs:523
+    title: Rust deadness signal from clippy
+    rationale: this can be `std::io::Error::other(_)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-scoped-fs-rs-594-this-can-be-std-io-error-other
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/scoped_fs.rs:594
+    title: Rust deadness signal from clippy
+    rationale: this can be `std::io::Error::other(_)`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-560-this-impl-can-be-derived
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:560
+    title: Rust deadness signal from clippy
+    rationale: this `impl` can be derived
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2081-this-boolean-expression-can-be-simplified
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2081
+    title: Rust deadness signal from clippy
+    rationale: this boolean expression can be simplified
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2194-this-function-has-too-many-arguments-9-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2194
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (9/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2205-this-let-else-may-be-rewritten-with-the-operator-help-replace-it-with-let-config-policy-acp-docs-gate-as-ref
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2205
+    title: Rust deadness signal from clippy
+    rationale: 'this `let...else` may be rewritten with the `?` operator: help: replace it with: `let config = policy.acp.docs_gate.as_ref()?;`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2281-this-function-has-too-many-arguments-9-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2281
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (9/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2292-this-let-else-may-be-rewritten-with-the-operator-help-replace-it-with-let-config-policy-acp-telemetry-gate-as-ref
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2292
+    title: Rust deadness signal from clippy
+    rationale: 'this `let...else` may be rewritten with the `?` operator: help: replace it with: `let config = policy.acp.telemetry_gate.as_ref()?;`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2383-this-function-has-too-many-arguments-9-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2383
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (9/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2394-this-let-else-may-be-rewritten-with-the-operator-help-replace-it-with-let-config-policy-acp-flag-metadata-gate-as-ref
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2394
+    title: Rust deadness signal from clippy
+    rationale: 'this `let...else` may be rewritten with the `?` operator: help: replace it with: `let config = policy.acp.flag_metadata_gate.as_ref()?;`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2560-this-map-or-can-be-simplified
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2560
+    title: Rust deadness signal from clippy
+    rationale: this `map_or` can be simplified
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-2679-this-let-else-may-be-rewritten-with-the-operator-help-replace-it-with-let-config-policy-attestations-owner-attestation-as-ref
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:2679
+    title: Rust deadness signal from clippy
+    rationale: 'this `let...else` may be rewritten with the `?` operator: help: replace it with: `let config = policy.attestations.owner_attestation.as_ref()?;`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-4506-this-function-has-too-many-arguments-9-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:4506
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (9/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-4535-this-function-has-too-many-arguments-8-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:4535
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (8/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-4793-enclosing-ok-and-operator-are-unneeded
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:4793
+    title: Rust deadness signal from clippy
+    rationale: enclosing `Ok` and `?` operator are unneeded
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-4800-enclosing-ok-and-operator-are-unneeded
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:4800
+    title: Rust deadness signal from clippy
+    rationale: enclosing `Ok` and `?` operator are unneeded
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-policy-engine-src-lib-rs-4810-enclosing-ok-and-operator-are-unneeded
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: policy_engine/src/lib.rs:4810
+    title: Rust deadness signal from clippy
+    rationale: enclosing `Ok` and `?` operator are unneeded
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-authority-engine-src-implementation-rs-860-field-tuple-id-is-never-read
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: authority_engine/src/implementation.rs:860
+    title: Rust deadness signal from clippy
+    rationale: field `tuple_id` is never read
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-authority-engine-src-implementation-rs-3217-this-function-has-too-many-arguments-8-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: authority_engine/src/implementation.rs:3217
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (8/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-authority-engine-src-implementation-rs-3888-this-function-has-too-many-arguments-13-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: authority_engine/src/implementation.rs:3888
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (13/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-authority-engine-src-implementation-rs-4198-this-if-statement-can-be-collapsed
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: authority_engine/src/implementation.rs:4198
+    title: Rust deadness signal from clippy
+    rationale: this `if` statement can be collapsed
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-authority-engine-src-implementation-rs-6146-this-function-has-too-many-arguments-14-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: authority_engine/src/implementation.rs:6146
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (14/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-authority-engine-src-implementation-rs-6523-this-function-has-too-many-arguments-14-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: authority_engine/src/implementation.rs:6523
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (14/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-authority-engine-src-implementation-rs-1915-useless-use-of-vec
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: authority_engine/src/implementation.rs:1915
+    title: Rust deadness signal from clippy
+    rationale: useless use of `vec!`
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-wasm-host-src-kv-store-rs-190-used-assert-eq-with-a-literal-bool
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: wasm_host/src/kv_store.rs:190
+    title: Rust deadness signal from clippy
+    rationale: used `assert_eq!` with a literal bool
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-core-src-orchestration-rs-2326-used-assert-eq-with-a-literal-bool
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: core/src/orchestration.rs:2326
+    title: Rust deadness signal from clippy
+    rationale: used `assert_eq!` with a literal bool
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-assurance-tools-src-ci-latency-rs-611-redundant-closure-help-replace-the-closure-with-the-function-itself-workflow-metric-cmp
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: assurance_tools/src/ci_latency.rs:611
+    title: Rust deadness signal from clippy
+    rationale: 'redundant closure: help: replace the closure with the function itself: `workflow_metric_cmp`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-assurance-tools-src-main-rs-2026-derefed-type-is-same-as-origin-help-try-findings
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: assurance_tools/src/main.rs:2026
+    title: Rust deadness signal from clippy
+    rationale: 'derefed type is same as origin: help: try: `findings`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-assurance-tools-src-main-rs-3521-this-function-has-too-many-arguments-9-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: assurance_tools/src/main.rs:3521
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (9/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-assurance-tools-src-main-rs-3955-this-function-has-too-many-arguments-8-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: assurance_tools/src/main.rs:3955
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (8/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-assurance-tools-src-main-rs-4021-this-function-has-too-many-arguments-8-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: assurance_tools/src/main.rs:4021
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (8/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-kernel-src-pipeline-rs-845-needless-call-to-as-bytes-help-len-can-be-called-directly-on-strings-rendered-len
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: kernel/src/pipeline.rs:845
+    title: Rust deadness signal from clippy
+    rationale: 'needless call to `as_bytes`: help: `len()` can be called directly on strings: `rendered.len()`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-kernel-src-workflow-rs-608-this-function-has-too-many-arguments-15-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: kernel/src/workflow.rs:608
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (15/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-kernel-src-workflow-rs-3646-needless-call-to-as-bytes-help-len-can-be-called-directly-on-strings-prompt-markdown-len
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: kernel/src/workflow.rs:3646
+    title: Rust deadness signal from clippy
+    rationale: 'needless call to `as_bytes`: help: `len()` can be called directly on strings: `prompt_markdown.len()`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-kernel-src-workflow-rs-3726-field-assignment-outside-of-initializer-for-an-instance-created-with-default-default
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: kernel/src/workflow.rs:3726
+    title: Rust deadness signal from clippy
+    rationale: field assignment outside of initializer for an instance created with Default::default()
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-kernel-src-workflow-rs-5095-this-function-has-too-many-arguments-10-7
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: kernel/src/workflow.rs:5095
+    title: Rust deadness signal from clippy
+    rationale: this function has too many arguments (10/7)
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-studio-src-app-state-rs-103-all-variants-have-the-same-postfix-id
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: studio/src/app_state.rs:103
+    title: Rust deadness signal from clippy
+    rationale: 'all variants have the same postfix: `Id`'
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-studio-src-app-state-rs-1462-unneeded-return-statement
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: studio/src/app_state.rs:1462
+    title: Rust deadness signal from clippy
+    rationale: unneeded `return` statement
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-clippy-studio-src-app-state-rs-1540-unneeded-return-statement
+    class: rust-static-deadness
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: studio/src/app_state.rs:1540
+    title: Rust deadness signal from clippy
+    rationale: unneeded `return` statement
+    detector: cargo-clippy
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-analyzing-dependencies-of-crates-in-this-directory
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: Analyzing dependencies of crates in this directory...'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-cargo-machete-found-the-following-unused-dependencies-in-this-directory
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: cargo-machete found the following unused dependencies in this directory:'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-octon-studio-studio-cargo-toml
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: octon_studio -- ./studio/Cargo.toml:'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-walkdir
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: walkdir'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-octon-authority-engine-authority-engine-cargo-toml
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: octon_authority_engine -- ./authority_engine/Cargo.toml:'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-octon-wasm-host
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: octon_wasm_host'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-octon-wasm-host-wasm-host-cargo-toml
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: octon_wasm_host -- ./wasm_host/Cargo.toml:'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-serde
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: serde'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-wit-bindgen
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: wit-bindgen'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-wit-bindgen-rt
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: wit-bindgen-rt'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-policy-engine-policy-engine-cargo-toml
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: policy_engine -- ./policy_engine/Cargo.toml:'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-thiserror
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: thiserror'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-octon-kernel-kernel-cargo-toml
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: octon_kernel -- ./kernel/Cargo.toml:'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-thiserror
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: thiserror'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-if-you-believe-cargo-machete-has-detected-an-unused-dependency-incorrectly
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: If you believe cargo-machete has detected an unused dependency incorrectly,'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-you-can-add-the-dependency-to-the-list-of-dependencies-to-ignore-in-the
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: you can add the dependency to the list of dependencies to ignore in the'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-package-metadata-cargo-machete-section-of-the-appropriate-cargo-toml
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: `[package.metadata.cargo-machete]` section of the appropriate Cargo.toml.'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-for-example
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: For example:'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-package-metadata-cargo-machete
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: [package.metadata.cargo-machete]'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-ignored-prost
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: ignored = ["prost"]'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-you-can-also-try-running-it-with-the-with-metadata-flag-for-better-accuracy
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: You can also try running it with the `--with-metadata` flag for better accuracy,'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-though-this-may-modify-your-cargo-lock-files
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: though this may modify your Cargo.lock files.'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-machete-done
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'cargo machete reported a potentially unused dependency: Done!'
+    detector: cargo-machete
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-udeps-unused-dependencies
+    class: rust-dependency-deadness
+    confidence: medium
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/framework/engine/runtime/crates/Cargo.toml
+    title: Rust dependency deadness candidate
+    rationale: 'unused dependencies:'
+    detector: cargo-udeps
+    evidence_refs:
+      - .octon/framework/engine/runtime/crates/Cargo.toml
+      - /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/ci/repo-hygiene/2026-04-11-repo-hygiene-baseline/audit-summary.yml
+  - id: rh-generated-materialized-rebuild-root
+    class: artifact-bloat
+    confidence: low
+    action: needs-ablation-before-delete
+    blocking: false
+    path: .octon/generated/cognition/projections/materialized/**
+    title: Rebuild-by-default materialized projections remain tracked
+    rationale: The root manifest marks the materialized projection family as rebuild-by-default, and 2 tracked files remain under this root.
+    detector: find
+    evidence_refs:
+      - .octon/octon.yml
+      - .octon/generated/cognition/projections/materialized/**

@@ -1,0 +1,15 @@
+warning: field `tuple_id` is never read
+   --> authority_engine/src/implementation.rs:860:5
+    |
+858 | struct SupportTargetAdmissionRecord {
+    |        ---------------------------- field in this struct
+859 |     #[serde(default)]
+860 |     tuple_id: String,
+    |     ^^^^^^^^
+    |
+    = note: `SupportTargetAdmissionRecord` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `octon_authority_engine` (lib) generated 1 warning
+warning: `octon_authority_engine` (lib test) generated 1 warning (1 duplicate)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.34s

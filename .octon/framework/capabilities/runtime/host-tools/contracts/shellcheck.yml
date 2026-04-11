@@ -1,0 +1,41 @@
+schema_version: "octon-host-tool-contract-v1"
+tool_id: "shellcheck"
+display_name: "ShellCheck"
+default_version: "0.10.0"
+entrypoint:
+  binary_name: "shellcheck"
+  command_style: "direct-binary"
+resolution:
+  allow_path_adoption: true
+  shared_cache: true
+  install_root_template: "tools/shellcheck/<version>/<platform>"
+verification:
+  command: "shellcheck --version"
+  version_regex: "version:\\s*([0-9]+\\.[0-9]+\\.[0-9]+)"
+installers:
+  - kind: "system-adopt"
+  - kind: "archive-download"
+    archives:
+      darwin-aarch64:
+        url: "https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.darwin.aarch64.tar.xz"
+        format: "tar.xz"
+        binary_relpath: "shellcheck-v0.10.0/shellcheck"
+      darwin-x86_64:
+        url: "https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.darwin.x86_64.tar.xz"
+        format: "tar.xz"
+        binary_relpath: "shellcheck-v0.10.0/shellcheck"
+      linux-x86_64:
+        url: "https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz"
+        format: "tar.xz"
+        binary_relpath: "shellcheck-v0.10.0/shellcheck"
+      windows-x86_64:
+        url: "https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.zip"
+        format: "zip"
+        binary_relpath: "shellcheck-v0.10.0/shellcheck.exe"
+supported_platforms:
+  - os: "darwin"
+    arches: ["aarch64", "x86_64"]
+  - os: "linux"
+    arches: ["x86_64"]
+  - os: "windows"
+    arches: ["x86_64"]
