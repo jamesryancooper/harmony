@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.16](https://github.com/jamesryancooper/octon/compare/octon-v0.6.15...octon-v0.6.16) (2026-04-11)
+
+
+### Bug Fixes
+
+* **closure:** promote bounded complete release ([#271](https://github.com/jamesryancooper/octon/issues/271)) ([f6c066b](https://github.com/jamesryancooper/octon/commit/f6c066b0e06f19c1d506d9f0c1c672ddbbdf0acf))
+
 ## [0.6.15](https://github.com/jamesryancooper/octon/compare/octon-v0.6.14...octon-v0.6.15) (2026-04-09)
 
 
