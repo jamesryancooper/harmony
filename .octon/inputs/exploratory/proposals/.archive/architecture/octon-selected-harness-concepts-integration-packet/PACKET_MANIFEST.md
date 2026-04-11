@@ -1,6 +1,6 @@
 # Packet manifest
 
-Packet root: `.octon/inputs/exploratory/proposals/architecture/octon-selected-harness-concepts-integration-packet`
+Packet root: `.octon/inputs/exploratory/proposals/.archive/architecture/octon-selected-harness-concepts-integration-packet`
 
 ## Files
 

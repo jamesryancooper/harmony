@@ -35,4 +35,6 @@ The live repo currently exposes an active architecture packet with a numbered-Ma
 
 ## Packet status
 
-Draft for human review. Proposal artifacts are **non-authoritative**. Durable meaning exists only where and when changes are promoted outside the proposal tree.
+Archived after implementation. Proposal artifacts remain
+**non-authoritative** and are retained only as proposal lineage once durable
+meaning has been promoted outside the proposal tree.
