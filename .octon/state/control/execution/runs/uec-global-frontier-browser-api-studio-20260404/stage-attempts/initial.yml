@@ -14,10 +14,12 @@ evidence_refs:
 - .octon/state/evidence/runs/uec-global-frontier-browser-api-studio-20260404/receipts/policy-receipt.latest.json
 - .octon/state/evidence/runs/uec-global-frontier-browser-api-studio-20260404/receipts/grant-bundle.json
 - .octon/state/evidence/runs/uec-global-frontier-browser-api-studio-20260404/receipts/execution-receipt.json
+- .octon/state/evidence/runs/uec-global-frontier-browser-api-studio-20260404/receipts/stage-action-slice-binding.yml
 exit_criteria:
 - Stage receipts, replay refs, and disclosure refs are retained under canonical run roots.
 - Stage status is terminal and agrees with the retained decision artifact.
 objective_ref: .octon/state/control/execution/runs/uec-global-frontier-browser-api-studio-20260404/run-contract.yml
+action_slice_ref: .octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/steady-state-housekeeping.yml
 objective_slice: Validate frontier/browser/API admitted evidence and retained closure refs.
 stage_name: frontier-browser-api-admitted
 done_when:
@@ -47,5 +49,5 @@ stage_attempt_id: initial
 stage_ref: workflow:validate-proposal
 status: succeeded
 successor_refs: []
-updated_at: 2026-04-01T14:26:11.554683Z
+updated_at: 2026-04-13T21:39:54Z
 validated_by: octon-kernel

@@ -1,0 +1,43 @@
+schema_version: "architecture-proposal-v1"
+packet_id: "octon-verified-harness-concepts-delta-packet"
+architecture_target: "Octon live repo on main branch"
+architecture_scope: "verified harness delta closeout and archive lineage"
+decision_type: "surface-refactor"
+claim_posture: "repo-grounded, archived exploratory lineage after promotion"
+coverage_summary:
+  fully_covered: 1
+  partially_covered: 2
+  not_currently_present: 0
+  already_covered: 1
+  adapt: 2
+  adopt: 0
+  defer: 0
+  reject: 0
+non_negotiables:
+  - "No second authoritative control plane"
+  - "No proposal/generated/chat/session surface as canonical truth"
+  - "No raw inputs/** dependency for runtime or policy"
+  - "No bypass of the engine-owned authorization boundary"
+  - "No docs-only pseudo-capability for adapted concepts"
+top_authority_surfaces:
+  - ".octon/framework/constitution/**"
+  - ".octon/framework/cognition/_meta/architecture/specification.md"
+  - ".octon/instance/manifest.yml"
+  - ".octon/instance/governance/policies/mission-autonomy.yml"
+  - ".octon/instance/governance/contracts/**"
+  - ".octon/state/control/execution/**"
+  - ".octon/state/evidence/**"
+blocking_concepts: []
+blocking_gaps:
+  - "Evaluator disagreement distillation exists only as a generic failure-distillation capability; a reusable disagreement-specific calibration loop is not yet explicit."
+  - "Mission action slices exist, but stage attempts do not yet carry an explicit slice binding in the retained runtime contract example or v2 schema."
+blocking_dependencies:
+  - "Maintainer decision on whether disagreement-specific distillation remains a refinement of the generic failure-distillation workflow or receives a narrower overlay contract."
+  - "Backfill plan for any mission-bound retained run bundles that need explicit action_slice_ref after schema promotion."
+implementation_motion:
+  - "Prefer extension/refinement of existing assurance, runtime-contract, mission-control, and evidence surfaces."
+  - "No new top-level class roots."
+  - "No net-new authority family for objective expansion; current proposal-gated mission classification already covers it."
+validation_motion:
+  - "Additive schema and workflow refinements with fail-closed validators."
+  - "Two consecutive validation passes with no new blocking issues before closure certification."

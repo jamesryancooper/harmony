@@ -7,6 +7,7 @@ evidence_refs:
   evidence_checkpoint: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/checkpoints/bound.yml
   execution_receipt: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/receipts/execution-receipt.json
   execution_request: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/receipts/execution-request.json
+  stage_action_slice_binding_receipt: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/receipts/stage-action-slice-binding.yml
   grant_bundle: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/receipts/grant-bundle.json
   instruction_manifest: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/instruction-layer-manifest.json
   outcome: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/receipts/outcome.json
@@ -37,4 +38,4 @@ evidence_refs:
   contamination_record: .octon/state/control/execution/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/contamination/current.yml
   evaluator_review: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/assurance/evaluator.yml
   trace_pointers: .octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/trace-pointers.yml
-updated_at: '2026-04-02T00:00:00Z'
+updated_at: '2026-04-13T21:39:54Z'

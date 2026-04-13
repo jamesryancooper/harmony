@@ -45,6 +45,10 @@
       "type": "string",
       "minLength": 1
     },
+    "action_slice_ref": {
+      "type": "string",
+      "minLength": 1
+    },
     "retry_class": {
       "type": "string",
       "minLength": 1
@@ -63,4 +67,3 @@
     }
   }
 }
-

@@ -87,6 +87,72 @@ main() {
   has_pattern 'MISSION_PROPOSAL_REF_REQUIRED' "$OCTON_DIR/framework/orchestration/runtime/_ops/scripts/publish-mission-effective-route.sh" && pass "route publisher marks missing required proposal refs" || fail "route publisher missing required proposal-ref signal"
   has_pattern 'proposal_refs_required' "$OCTON_DIR/framework/orchestration/runtime/_ops/scripts/evaluate-mission-control-state.sh" && pass "mission evaluator fails closed on missing proposal refs" || fail "mission evaluator missing proposal-ref fail-closed reason"
 
+  while IFS= read -r run_contract; do
+    [[ -n "$run_contract" ]] || continue
+
+    local run_id mission_mode requires_mission mission_id stage_root_rel stage_root
+    run_id="$(basename "$(dirname "$run_contract")")"
+    mission_mode="$(yq -r '.mission_mode // ""' "$run_contract")"
+    requires_mission="$(yq -r '.requires_mission // false' "$run_contract")"
+    mission_id="$(yq -r '.mission_id // ""' "$run_contract")"
+
+    [[ "$mission_mode" == "mission-bound" && "$requires_mission" == "true" && -n "$mission_id" ]] || continue
+
+    stage_root_rel="$(yq -r '.stage_attempt_root // ""' "$run_contract")"
+    [[ -n "$stage_root_rel" ]] || {
+      fail "$run_id is mission-bound but missing stage_attempt_root"
+      continue
+    }
+    stage_root="$ROOT_DIR/$stage_root_rel"
+    [[ -d "$stage_root" ]] && pass "$run_id publishes a stage-attempt root for mission-bound execution" || {
+      fail "$run_id is mission-bound but missing a stage-attempt root"
+      continue
+    }
+
+    while IFS= read -r stage_file; do
+      [[ -n "$stage_file" ]] || continue
+
+      local stage_schema receipt_path receipt_rel action_slice_ref action_slice_path expected_stage_ref
+      stage_schema="$(yq -r '.schema_version // ""' "$stage_file")"
+      if [[ "$stage_schema" != "stage-attempt-v2" ]]; then
+        pass "$run_id $(basename "$stage_file") remains outside stage-attempt-v2 action-slice enforcement"
+        continue
+      fi
+
+      action_slice_ref="$(yq -r '.action_slice_ref // ""' "$stage_file")"
+      [[ -n "$action_slice_ref" ]] && pass "$run_id stage-attempt-v2 carries action_slice_ref" || {
+        fail "$run_id stage-attempt-v2 is missing action_slice_ref"
+        continue
+      }
+
+      action_slice_path="$ROOT_DIR/$action_slice_ref"
+      [[ -f "$action_slice_path" ]] && pass "$run_id action_slice_ref resolves to a declared mission action slice" || {
+        fail "$run_id action_slice_ref does not resolve: $action_slice_ref"
+        continue
+      }
+
+      [[ "$(yq -r '.mission_id // ""' "$action_slice_path")" == "$mission_id" ]] \
+        && pass "$run_id action_slice_ref remains mission-aligned" \
+        || fail "$run_id action_slice_ref must stay aligned to mission $mission_id"
+
+      receipt_path="$OCTON_DIR/state/evidence/runs/$run_id/receipts/stage-action-slice-binding.yml"
+      receipt_rel=".octon/state/evidence/runs/$run_id/receipts/stage-action-slice-binding.yml"
+      [[ -f "$receipt_path" ]] && pass "$run_id retains a stage-action-slice binding receipt" || {
+        fail "$run_id is missing retained stage-action-slice binding receipt"
+        continue
+      }
+
+      expected_stage_ref=".octon/state/control/execution/runs/$run_id/stage-attempts/$(basename "$stage_file")"
+      yq -e ".run_id == \"$run_id\" and .mission_id == \"$mission_id\" and .action_slice_ref == \"$action_slice_ref\" and .stage_attempt_ref == \"$expected_stage_ref\" and .status == \"verified\"" "$receipt_path" >/dev/null 2>&1 \
+        && pass "$run_id binding receipt matches the mission-bound stage attempt" \
+        || fail "$run_id binding receipt must match the mission-bound stage attempt"
+
+      has_pattern "$receipt_rel" "$stage_file" \
+        && pass "$run_id stage-attempt evidence references the retained binding receipt" \
+        || fail "$run_id stage-attempt evidence must reference the retained binding receipt"
+    done < <(find "$stage_root" -maxdepth 1 -name '*.yml' -print | sort)
+  done < <(find "$OCTON_DIR/state/control/execution/runs" -name run-contract.yml -print | sort)
+
   run_test \
     "authorization denies autonomous execution without mission context" \
     cargo test --manifest-path "$CARGO_MANIFEST" -p octon_kernel autonomous_request_requires_mission_context

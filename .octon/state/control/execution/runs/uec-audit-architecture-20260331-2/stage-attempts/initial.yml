@@ -10,11 +10,11 @@ requested_capabilities:
 - evidence.write
 rollback_candidate: true
 run_id: uec-audit-architecture-20260331-2
-schema_version: stage-attempt-v1
+schema_version: stage-attempt-v2
 stage_attempt_id: initial
 stage_ref: workflow:audit-architecture-proposal
 status: succeeded
-updated_at: 2026-03-31 21:23:37.028785+00:00
+updated_at: 2026-04-13T21:39:54Z
 objective_slice: Retained stage execution for workflow:audit-architecture-proposal.
 entry_criteria:
 - Run contract is bound under the canonical run root.

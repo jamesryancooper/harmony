@@ -241,6 +241,7 @@ jobs:
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-support-dossier-evidence-depth.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-evaluator-diversity.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-hidden-check-breadth.sh
+          bash .octon/framework/assurance/runtime/_ops/scripts/validate-distillation-refinements.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-contract-family-version-coherence.sh
           bash .octon/framework/assurance/runtime/_ops/scripts/validate-projection-shell-boundaries.sh
 

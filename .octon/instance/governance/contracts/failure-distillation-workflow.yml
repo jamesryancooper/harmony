@@ -5,6 +5,13 @@ hardening_recommendation_schema_ref: ".octon/framework/constitution/contracts/as
 source_roots:
   - ".octon/state/evidence/runs/**"
   - ".octon/state/evidence/validation/analysis/**"
+disagreement_support:
+  evaluator_review_root: ".octon/state/evidence/runs/**/assurance/evaluator.yml"
+  review_findings_root: ".octon/state/evidence/runs/**/assurance/review-findings.ndjson"
+  review_dispositions_root: ".octon/state/control/execution/runs/**/authority/review-dispositions.yml"
+  required_bundle_fields:
+    - "disagreement_cases"
+    - "calibration_candidates"
 thresholds:
   min_signal_count: 2
   recurrence_window: "P14D"
