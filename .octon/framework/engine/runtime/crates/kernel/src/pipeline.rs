@@ -780,7 +780,7 @@ fn run_generic_pipeline(
         review_requirements: ReviewRequirements::default(),
         scope_constraints: ScopeConstraints {
             read: vec!["workflow-contract".to_string()],
-            write: vec![reports_root.display().to_string()],
+            write: vec![WORKFLOW_REPORTS_ROOT_REL.to_string()],
             executor_profile: None,
             locality_scope: None,
         },
@@ -2033,6 +2033,15 @@ stages:
             fs::read_to_string(result.bundle_root.join("commands.md")).expect("commands log");
         let inventory =
             fs::read_to_string(result.bundle_root.join("inventory.md")).expect("inventory log");
+        let workflow_request: serde_json::Value = serde_json::from_str(
+            &fs::read_to_string(
+                result
+                    .bundle_root
+                    .join("workflow-execution/execution-request.json"),
+            )
+            .expect("workflow request should exist"),
+        )
+        .expect("workflow request should parse");
 
         assert_eq!(result.summary_report, result.bundle_root.join("summary.md"));
         assert!(result
@@ -2045,6 +2054,10 @@ stages:
         assert!(summary.contains("final_verdict: `mock-executed`"));
         assert!(commands.contains("executor=`mock`"));
         assert!(inventory.contains("stage `02`") || inventory.contains("`02` | kind=`mutation`"));
+        assert_eq!(
+            workflow_request["request"]["scope_constraints"]["write"][0],
+            WORKFLOW_REPORTS_ROOT_REL
+        );
         assert!(result.bundle_root.join("validation.md").is_file());
         assert!(result.bundle_root.join("reports/01-report.md").is_file());
         assert!(result.bundle_root.join("reports/02-report.md").is_file());

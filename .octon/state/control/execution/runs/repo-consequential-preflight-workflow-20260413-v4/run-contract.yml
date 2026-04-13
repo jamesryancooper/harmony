@@ -67,7 +67,7 @@ schema_version: run-contract-v1
 scope_in:
 - workflow-contract
 scope_out:
-- /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/workflows
+- .octon/state/evidence/runs/workflows
 stage_attempt_root: .octon/state/control/execution/runs/repo-consequential-preflight-workflow-20260413-v4/stage-attempts
 start_conditions:
 - Canonical support-target tuple remains admitted for the selected host and model adapters.
