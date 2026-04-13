@@ -1,0 +1,138 @@
+schema_version: "proposal-v1"
+proposal_id: "octon-verified-harness-concepts-delta-packet"
+proposal_kind: "architecture"
+title: "Verified harness concepts delta integration packet for Octon"
+summary: >-
+  Repository-grounded delta packet for the corrected three-concept harness
+  subset, now retained as implemented archive lineage after promotion into
+  durable Octon surfaces.
+version: "1.0.0"
+status: "archived"
+archive:
+  archived_at: "2026-04-13"
+  archived_from_status: "implemented"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/octon-verified-harness-concepts-delta-packet"
+  promotion_evidence:
+    - ".octon/framework/constitution/contracts/assurance/distillation-bundle-v1.schema.json"
+    - ".octon/instance/governance/contracts/failure-distillation-workflow.yml"
+    - ".octon/framework/assurance/evaluators/runtime/_ops/scripts/distill-review-disagreements.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-distillation-refinements.sh"
+    - ".octon/framework/constitution/contracts/runtime/stage-attempt-v2.schema.json"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-stage-attempt-family.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-runtime-contracts.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/test-mission-autonomy-scenarios.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/verify-continuity-linkage.sh"
+    - ".octon/state/evidence/validation/failure-distillation/2026-04-13-review-disagreement-calibration/bundle.yml"
+    - ".octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/continuity-linkage-report.yml"
+prepared_on: "2026-04-13"
+repository:
+  url: "https://github.com/jamesryancooper/octon"
+  ref: "main"
+purpose: >
+  Repository-grounded coverage assessment and manifest-governed architecture
+  proposal packet for the corrected three-concept subset emitted by the Octon
+  extracted-concepts verification stage.
+delivery_format: "manifest-governed architecture proposal packet"
+authoritative_inputs:
+  - "https://github.com/jamesryancooper/octon@main"
+  - ".octon/README.md"
+  - ".octon/AGENTS.md"
+  - ".octon/instance/ingress/AGENTS.md"
+  - ".octon/octon.yml"
+  - ".octon/framework/manifest.yml"
+  - ".octon/instance/manifest.yml"
+  - ".octon/framework/cognition/_meta/architecture/specification.md"
+  - ".octon/framework/constitution/**"
+  - ".octon/framework/overlay-points/registry.yml"
+  - ".octon/instance/governance/policies/mission-autonomy.yml"
+  - ".octon/instance/governance/contracts/**"
+  - ".octon/state/control/execution/**"
+  - ".octon/state/evidence/**"
+  - ".octon/generated/**"
+  - "resources/source-artifact.md"
+  - "resources/concept-extraction-output.md"
+  - "resources/concept-verification-output.md"
+scope:
+  included:
+    - "Evaluator calibration by disagreement distillation"
+    - "Slice-to-stage binding refinement for mission-bound runs"
+    - "Proposal-packet-backed expansion of terse objectives"
+  excluded:
+    - "Canonical continuity handoff artifacts"
+    - "Standalone evaluator lane"
+    - "Generic rubric-family proposal"
+    - "Tool-grounded behavioral QA receipts"
+    - "Harness assumption ledger / simplification cadence"
+    - "Model-contingent runtime heuristics"
+    - "AI-feature injection and aesthetic pivot heuristics"
+promotion_scope: "octon-internal"
+promotion_targets:
+  - ".octon/framework/constitution/contracts/assurance/distillation-bundle-v1.schema.json"
+  - ".octon/instance/governance/contracts/failure-distillation-workflow.yml"
+  - ".octon/framework/assurance/evaluators/runtime/_ops/scripts/distill-review-disagreements.sh"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-distillation-refinements.sh"
+  - ".github/workflows/architecture-conformance.yml"
+  - ".octon/state/evidence/validation/failure-distillation/2026-04-13-review-disagreement-calibration"
+  - ".octon/generated/cognition/distillation/2026-04-13-review-disagreement-calibration/summary.md"
+  - ".octon/framework/constitution/contracts/runtime/stage-attempt-v2.schema.json"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-runtime-contracts.sh"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-stage-attempt-family.sh"
+  - ".octon/framework/assurance/runtime/_ops/scripts/test-mission-autonomy-scenarios.sh"
+  - ".octon/framework/assurance/runtime/_ops/scripts/verify-continuity-linkage.sh"
+  - ".octon/state/control/execution/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/stage-attempts/initial.yml"
+  - ".octon/state/control/execution/runs/uec-global-frontier-browser-api-studio-20260404/stage-attempts/initial.yml"
+  - ".octon/state/control/execution/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/stage-attempts/initial.yml"
+  - ".octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/stage-attempts/initial.yml"
+  - ".octon/state/control/execution/runs/uec-safe-stage-approval-exercise-20260402/stage-attempts/initial.yml"
+  - ".octon/state/control/execution/runs/uec-safe-stage-lease-revocation-exercise-20260402/stage-attempts/initial.yml"
+  - ".octon/state/evidence/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/receipts/stage-action-slice-binding.yml"
+  - ".octon/state/evidence/runs/uec-global-frontier-browser-api-studio-20260404/receipts/stage-action-slice-binding.yml"
+  - ".octon/state/evidence/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/receipts/stage-action-slice-binding.yml"
+  - ".octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/receipts/stage-action-slice-binding.yml"
+  - ".octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/receipts/stage-action-slice-binding.yml"
+  - ".octon/state/evidence/runs/uec-safe-stage-lease-revocation-exercise-20260402/receipts/stage-action-slice-binding.yml"
+artifacts:
+  - "README.md"
+  - "proposal.yml"
+  - "architecture-proposal.yml"
+  - "PACKET_MANIFEST.md"
+  - "SHA256SUMS.txt"
+  - "navigation/source-of-truth-map.md"
+  - "navigation/artifact-catalog.md"
+  - "architecture/target-architecture.md"
+  - "architecture/current-state-gap-map.md"
+  - "architecture/concept-coverage-matrix.md"
+  - "architecture/file-change-map.md"
+  - "architecture/implementation-plan.md"
+  - "architecture/migration-cutover-plan.md"
+  - "architecture/validation-plan.md"
+  - "architecture/acceptance-criteria.md"
+  - "architecture/cutover-checklist.md"
+  - "architecture/closure-certification-plan.md"
+  - "architecture/execution-constitution-conformance-card.md"
+  - "resources/source-artifact.md"
+  - "resources/concept-extraction-output.md"
+  - "resources/concept-verification-output.md"
+  - "resources/repository-baseline-audit.md"
+  - "resources/coverage-traceability-matrix.md"
+  - "resources/full-concept-integration-assessment.md"
+  - "resources/evidence-plan.md"
+  - "resources/decision-record-plan.md"
+  - "resources/risk-register.md"
+  - "resources/assumptions-and-blockers.md"
+  - "resources/rejection-ledger.md"
+archive_expectation: >
+  Satisfied on 2026-04-13. Durable meaning was promoted into framework/**,
+  instance/**, and state/** surfaces outside the packet tree and this packet now
+  remains archived historical lineage only.
+lifecycle:
+  temporary: true
+  exit_expectation: >-
+    Preserve this packet as archived historical lineage only; future work
+    should extend the promoted durable surfaces rather than reactivating the
+    packet path.
+related_proposals:
+  - ".octon/inputs/exploratory/proposals/.archive/architecture/octon-selected-harness-concepts-integration-packet"
+supersedes:
+  - ".octon/inputs/exploratory/proposals/.archive/architecture/octon-selected-harness-concepts-integration-packet"
