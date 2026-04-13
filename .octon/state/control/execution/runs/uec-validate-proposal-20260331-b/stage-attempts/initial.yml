@@ -10,11 +10,11 @@ requested_capabilities:
 - evidence.write
 rollback_candidate: true
 run_id: uec-validate-proposal-20260331-b
-schema_version: stage-attempt-v1
+schema_version: stage-attempt-v2
 stage_attempt_id: initial
 stage_ref: workflow:validate-proposal
 status: failed
-updated_at: 2026-03-31 20:34:32.440771+00:00
+updated_at: 2026-04-13T21:39:54Z
 objective_slice: Retained stage execution for workflow:validate-proposal.
 entry_criteria:
 - Run contract is bound under the canonical run root.

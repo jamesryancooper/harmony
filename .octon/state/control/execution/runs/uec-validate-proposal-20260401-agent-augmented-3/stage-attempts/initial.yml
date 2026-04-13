@@ -28,10 +28,10 @@ retry_class: manual_review_required
 rollback_candidate: true
 rollback_notes: Restore from the bound checkpoint and reissue the stage if retained evidence becomes inconsistent.
 run_id: uec-validate-proposal-20260401-agent-augmented-3
-schema_version: stage-attempt-v1
+schema_version: stage-attempt-v2
 stage_attempt_id: initial
 stage_ref: workflow:validate-proposal
 status: succeeded
 successor_refs: []
-updated_at: 2026-04-01T14:26:11.554683Z
+updated_at: 2026-04-13T21:39:54Z
 validated_by: octon-kernel

@@ -7,6 +7,7 @@ evidence_refs:
   evidence_checkpoint: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/checkpoints/bound.yml
   execution_receipt: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/receipts/execution-receipt.json
   execution_request: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/receipts/execution-request.json
+  stage_action_slice_binding_receipt: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/receipts/stage-action-slice-binding.yml
   grant_bundle: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/receipts/grant-bundle.json
   instruction_manifest: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/instruction-layer-manifest.json
   outcome: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/receipts/outcome.json
@@ -37,4 +38,4 @@ evidence_refs:
   contamination_record: .octon/state/control/execution/runs/uec-safe-stage-approval-exercise-20260402/contamination/current.yml
   evaluator_review: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/assurance/evaluator.yml
   trace_pointers: .octon/state/evidence/runs/uec-safe-stage-approval-exercise-20260402/trace-pointers.yml
-updated_at: '2026-04-02T00:00:00Z'
+updated_at: '2026-04-13T21:39:54Z'

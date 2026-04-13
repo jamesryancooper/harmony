@@ -202,6 +202,56 @@ entries:
 EOF
 }
 
+write_bound_stage_attempt_fixture() {
+  local root="$1"
+  mkdir -p \
+    "$root/.octon/state/control/execution/runs/demo-run/stage-attempts" \
+    "$root/.octon/state/evidence/runs/demo-run/receipts"
+
+  cat > "$root/.octon/state/control/execution/runs/demo-run/run-contract.yml" <<EOF
+schema_version: "run-contract-v3"
+run_id: "demo-run"
+mission_id: "demo"
+mission_mode: "mission-bound"
+requires_mission: true
+stage_attempt_root: ".octon/state/control/execution/runs/demo-run/stage-attempts"
+EOF
+
+  cat > "$root/.octon/state/control/execution/runs/demo-run/stage-attempts/initial.yml" <<EOF
+schema_version: "stage-attempt-v2"
+run_id: "demo-run"
+stage_attempt_id: "initial"
+stage_ref: "scenario:maintenance.repo_housekeeping"
+attempt_kind: "initial"
+status: "queued"
+objective_ref: ".octon/state/control/execution/runs/demo-run/run-contract.yml"
+action_slice_ref: ".octon/state/control/execution/missions/demo/action-slices/slice-1.yml"
+retry_class: "manual_review_required"
+completion_status: "pending"
+evidence_refs:
+  - ".octon/state/evidence/runs/demo-run/receipts/stage-action-slice-binding.yml"
+created_at: "2026-03-24T00:00:00Z"
+updated_at: "2026-03-24T00:00:00Z"
+EOF
+
+  cat > "$root/.octon/state/evidence/runs/demo-run/receipts/stage-action-slice-binding.yml" <<EOF
+schema_version: "stage-action-slice-binding-receipt-v1"
+receipt_id: "demo-run-initial"
+run_id: "demo-run"
+mission_id: "demo"
+stage_attempt_ref: ".octon/state/control/execution/runs/demo-run/stage-attempts/initial.yml"
+run_contract_ref: ".octon/state/control/execution/runs/demo-run/run-contract.yml"
+action_slice_ref: ".octon/state/control/execution/missions/demo/action-slices/slice-1.yml"
+binding_basis: "fixture published action slice"
+status: "verified"
+validated_by: "test-mission-autonomy-scenarios.sh"
+source_refs:
+  - ".octon/state/control/execution/missions/demo/intent-register.yml"
+  - ".octon/state/control/execution/missions/demo/mode-state.yml"
+recorded_at: "2026-03-24T00:00:00Z"
+EOF
+}
+
 set_budget_state() {
   local root="$1"
   local state="$2"
@@ -286,6 +336,21 @@ case_observe_only_monitoring_routes_end_to_end() {
   assert_json "$json" '.allow_new_run == true and .route_family == "observe.monitoring" and .action_class == "mission.idle"'
   assert_yq '.effective.effective_scenario_family == "observe.monitoring"' "$root/.octon/generated/effective/orchestration/missions/demo/scenario-resolution.yml"
   assert_yq '.effective.effective_action_class == "mission.idle"' "$root/.octon/generated/effective/orchestration/missions/demo/scenario-resolution.yml"
+  cleanup_root "$root"
+}
+
+case_stage_attempt_binding_receipt_matches_published_slice() {
+  local root
+  root="$(fixture_root)"
+  seed_fixture_base "$root" "maintenance"
+  activate_fixture_mission "$root"
+  write_published_slice "$root" "git.commit" "reversible" "ACP-1"
+  write_bound_stage_attempt_fixture "$root"
+  local json
+  json="$(evaluate_fixture "$root")"
+  assert_json "$json" '.allow_new_run == true and .route_family == "maintenance.repo_housekeeping"'
+  assert_yq '.action_slice_ref == ".octon/state/control/execution/missions/demo/action-slices/slice-1.yml"' "$root/.octon/state/control/execution/runs/demo-run/stage-attempts/initial.yml"
+  assert_yq '.action_slice_ref == ".octon/state/control/execution/missions/demo/action-slices/slice-1.yml" and .status == "verified"' "$root/.octon/state/evidence/runs/demo-run/receipts/stage-action-slice-binding.yml"
   cleanup_root "$root"
 }
 
@@ -709,6 +774,10 @@ if [[ "$INCLUDE_FIXTURE_SCENARIOS" == "1" ]]; then
   run_case \
     "scenario fixture: routine repo housekeeping" \
     case_routine_repo_housekeeping
+
+  run_case \
+    "scenario fixture: stage-attempt binding matches published action slice" \
+    case_stage_attempt_binding_receipt_matches_published_slice
 
   run_case \
     "scenario fixture: observe-only monitoring routes end to end" \

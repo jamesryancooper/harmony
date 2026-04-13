@@ -5,6 +5,7 @@ stage_ref: governance:repo-shell-repo-consequential-recertification
 attempt_kind: initial
 status: succeeded
 objective_ref: .octon/state/control/execution/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-contract.yml
+action_slice_ref: .octon/state/control/execution/missions/mission-autonomy-live-validation/action-slices/steady-state-housekeeping.yml
 objective_slice: Safe-stage approval exercise retained to prove canonical ApprovalRequest and ApprovalGrant flow under the supported envelope.
 stage_name: repo-shell-repo-consequential-recertification
 entry_criteria:
@@ -27,6 +28,7 @@ evidence_refs:
 - .octon/state/evidence/control/execution/authority-decision-uec-repo-shell-repo-consequential-recertified-20260410.yml
 - .octon/state/control/execution/approvals/requests/uec-repo-shell-repo-consequential-recertified-20260410.yml
 - .octon/state/control/execution/approvals/grants/grant-uec-repo-shell-repo-consequential-recertified-20260410.yml
+- .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/receipts/stage-action-slice-binding.yml
 required_evidence:
 - decision-artifact
 - approval-request
@@ -44,4 +46,4 @@ rollback_notes: Governance exercise remains locally reversible.
 issued_by: octon-kernel
 validated_by: octon-kernel
 created_at: '2026-04-02T00:00:00Z'
-updated_at: '2026-04-02T00:00:00Z'
+updated_at: '2026-04-13T21:39:54Z'
