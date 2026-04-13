@@ -90,6 +90,128 @@
         "type": "object"
       }
     },
+    "disagreement_cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "evaluator_review_ref",
+          "review_finding_refs",
+          "review_disposition_refs",
+          "summary",
+          "source_evidence_refs",
+          "calibration_candidate_refs"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evaluator_review_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "review_finding_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "review_disposition_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "calibration_candidate_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "calibration_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidate_id",
+          "target_refs",
+          "summary",
+          "proposed_change",
+          "intended_effect",
+          "evidence_refs",
+          "status"
+        ],
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "proposed_change": {
+            "type": "string",
+            "minLength": 1
+          },
+          "intended_effect": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "proposed",
+              "trialed",
+              "accepted",
+              "rejected",
+              "deferred"
+            ]
+          }
+        }
+      }
+    },
     "promotion_mode": {
       "type": "string",
       "enum": [

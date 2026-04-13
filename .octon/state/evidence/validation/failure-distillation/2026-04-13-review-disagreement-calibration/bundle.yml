@@ -1,0 +1,80 @@
+schema_version: "distillation-bundle-v1"
+bundle_id: "2026-04-13-review-disagreement-calibration"
+bundle_kind: "failure-distillation"
+subject_ref: ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml"
+source_index_refs:
+  - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml"
+  - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/review-findings.ndjson"
+  - ".octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/authority/review-dispositions.yml"
+clusters:
+  - cluster_id: "review-disagreement-traceability-gap"
+    signal_kind: "evaluator-disagreement"
+    summary: "Retained benchmark review should carry canonical finding/disposition records rather than relying on evaluator summary alone."
+    source_evidence_refs:
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/maintainability.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/review-findings.ndjson"
+      - ".octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/authority/review-dispositions.yml"
+classifications:
+  - schema_version: "failure-classification-v1"
+    class_id: "failure-class/review-disagreement-traceability-gap"
+    failure_kind: "governance"
+    subject_ref: ".octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/run-contract.yml"
+    recurrence_window: "P30D"
+    signal_count: 2
+    summary: "Evaluator approval and later canonical review traceability formalization diverged enough to justify a retained disagreement-calibration bundle."
+    source_evidence_refs:
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/review-findings.ndjson"
+      - ".octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/authority/review-dispositions.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/maintainability.yml"
+    recorded_at: "2026-04-13T21:39:08Z"
+recommendations:
+  - schema_version: "hardening-recommendation-v1"
+    recommendation_id: "hardening/review-disagreement-calibration"
+    failure_class_ref: "failure-class/review-disagreement-traceability-gap"
+    target_refs:
+      - ".octon/framework/constitution/contracts/assurance/distillation-bundle-v1.schema.json"
+      - ".octon/instance/governance/contracts/failure-distillation-workflow.yml"
+      - ".octon/framework/assurance/evaluators/runtime/_ops/scripts/distill-review-disagreements.sh"
+    summary: "Promote reusable disagreement capture and evaluator calibration support through the existing distillation bundle family, failure-distillation workflow, and review-disagreement authoring path."
+    promotion_path: "proposal_gated"
+    confidence: "high"
+    evidence_refs:
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/review-findings.ndjson"
+      - ".octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/authority/review-dispositions.yml"
+    recorded_at: "2026-04-13T21:39:08Z"
+disagreement_cases:
+  - case_id: "case/review-disagreement-traceability-gap"
+    evaluator_review_ref: ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml"
+    review_finding_refs:
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/review-findings.ndjson"
+    review_disposition_refs:
+      - ".octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/authority/review-dispositions.yml"
+    summary: "The evaluator approved the run, but canonical retained review traceability later required an explicit finding/disposition pair and a governed follow-up."
+    source_evidence_refs:
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/maintainability.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/review-findings.ndjson"
+      - ".octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/authority/review-dispositions.yml"
+    calibration_candidate_refs:
+      - "calibration/review-traceability-gap"
+calibration_candidates:
+  - candidate_id: "calibration/review-traceability-gap"
+    target_refs:
+      - ".octon/framework/assurance/evaluators/review-routing.yml"
+      - ".octon/framework/assurance/evaluators/adapters/anthropic-review.yml"
+      - ".octon/framework/assurance/evaluators/adapters/openai-review.yml"
+    summary: "Teach higher-scrutiny evaluator routing to flag missing canonical finding/disposition linkage as a disagreement case instead of approving on evaluator summary alone."
+    proposed_change: "Require evaluator review flows that approve higher-scrutiny runs to check for canonical finding/disposition traceability whenever maintainability or governance proof indicates a gap."
+    intended_effect: "Turn evaluator-vs-review traceability drift into retained calibration input rather than ad hoc prompt tuning."
+    evidence_refs:
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/evaluator.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/review-findings.ndjson"
+      - ".octon/state/control/execution/runs/run-wave4-benchmark-evaluator-20260327/authority/review-dispositions.yml"
+      - ".octon/state/evidence/runs/run-wave4-benchmark-evaluator-20260327/assurance/maintainability.yml"
+    status: "proposed"
+promotion_mode: "proposal_gated"
+generated_summary_ref: ".octon/generated/cognition/distillation/2026-04-13-review-disagreement-calibration/summary.md"
+recorded_at: "2026-04-13T21:39:08Z"
