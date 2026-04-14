@@ -1,6 +1,8 @@
 schema_version: "octon-instance-extensions-v2"
 selection:
-  enabled: []
+  enabled:
+    - pack_id: "octon-concept-integration"
+      source_id: "bundled-first-party"
   disabled:
     - pack_id: "docs"
       source_id: "bundled-first-party"

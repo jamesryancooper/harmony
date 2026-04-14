@@ -187,6 +187,12 @@
                 "withdrawn"
               ]
             },
+            "prompt_bundles": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/promptBundle"
+              }
+            },
             "routing_exports": {
               "type": "object",
               "additionalProperties": false,
@@ -361,6 +367,149 @@
           }
         }
       ]
+    },
+    "promptBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt_set_id",
+        "schema_version",
+        "manifest_path",
+        "manifest_sha256",
+        "bundle_sha256",
+        "publication_status",
+        "alignment_status",
+        "alignment_receipt_path",
+        "default_alignment_mode",
+        "skip_mode_policy",
+        "invalidation_conditions",
+        "required_repo_anchors",
+        "prompt_assets"
+      ],
+      "properties": {
+        "prompt_set_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "schema_version": {
+          "type": "string",
+          "const": "octon-extension-prompt-set-v1"
+        },
+        "manifest_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manifest_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bundle_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "publication_status": {
+          "type": "string",
+          "enum": [
+            "published",
+            "published_with_quarantine",
+            "withdrawn"
+          ]
+        },
+        "alignment_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "alignment_receipt_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "default_alignment_mode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "skip_mode_policy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "invalidation_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required_repo_anchors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pathDigest"
+          }
+        },
+        "prompt_assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/promptAsset"
+          }
+        }
+      }
+    },
+    "pathDigest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "promptAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt_id",
+        "role_class",
+        "path",
+        "sha256",
+        "projection_source_path"
+      ],
+      "properties": {
+        "prompt_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "role_class": {
+          "type": "string",
+          "enum": [
+            "stage",
+            "maintenance-companion",
+            "prompt-generation-companion"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "projection_source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stage_order": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
     }
   }
 }

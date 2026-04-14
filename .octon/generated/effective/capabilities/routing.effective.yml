@@ -1,9 +1,9 @@
 schema_version: octon-capability-routing-effective-v3
 generator_version: capability-routing-publication-v3
-generation_id: capabilities-a4cbfef86420
-published_at: 2026-04-13T23:27:22Z
+generation_id: capabilities-2e0d032e1ba0
+published_at: 2026-04-14T13:27:37Z
 publication_status: published
-publication_receipt_path: .octon/state/evidence/validation/publication/capabilities/2026-04-13T23-27-22Z-capabilities-a4cbfef86420.yml
+publication_receipt_path: .octon/state/evidence/validation/publication/capabilities/2026-04-14T13-27-37Z-capabilities-2e0d032e1ba0.yml
 invalidation_conditions:
   - root-manifest-sha-changed
   - native-capability-manifest-changed
@@ -34,14 +34,14 @@ source:
   locality_generation_lock_sha256: e62418eb25400dfc808bc292b62f8e482221188ad17beac81b08e2d913fdc472
   locality_generation_id: locality-e08a88ec3dda
   extensions_catalog_path: .octon/generated/effective/extensions/catalog.effective.yml
-  extensions_catalog_sha256: 0231d5563cfc2bf2fb4b6e8bfe957791feafeed4199d8d4e6f72961174d2b564
+  extensions_catalog_sha256: 173ef4433d574b839dd3e68d58858c55ee36c00ca6501e3f8f74ce67923a1535
   extensions_generation_lock_path: .octon/generated/effective/extensions/generation.lock.yml
-  extensions_generation_lock_sha256: 7f14d7b89deadc11255f8bcdd44aceb54efe2f82e6de3478edf79375f0c13383
-  extensions_generation_id: extensions-d81e117f4c8a
+  extensions_generation_lock_sha256: 3a94d1dbb5e109bd7766ba54684264f2fdf2e11e8246a8edefbd312b02e12a06
+  extensions_generation_id: extensions-f66caee9e62b
 routing_context:
   selector_schema_version: octon-capability-routing-selectors-v1
   locality_generation_id: locality-e08a88ec3dda
-  extension_generation_id: extensions-d81e117f4c8a
+  extension_generation_id: extensions-f66caee9e62b
   host_projection_mode: materialized-copy-v1
   locality_publication_status: published
   extension_publication_status: published
@@ -3209,6 +3209,68 @@ routing_candidates:
     precedence_tier: native-authority
     stable_sort_key: 9999-9999-1-tool-framework.tool.web-access
     projection_name: web-access
+  - effective_id: extension.command.octon-concept-integration.octon-concept-integration
+    artifact_map_id: extension-command-octon-concept-integration-octon-concept-integration
+    origin_class: extension
+    capability_kind: command
+    capability_id: octon-concept-integration
+    display_name: Octon Concept Integration
+    summary: Run the concept-integration extension-pack capability from source artifact to validated proposal packet.
+    status: active
+    source_manifest: .octon/generated/effective/extensions/catalog.effective.yml
+    capability_domain: extension
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: additive-extension
+    stable_sort_key: 9999-9999-2-command-extension.command.octon-concept-integration.octon-concept-integration
+    projection_name: octon-concept-integration
+  - effective_id: extension.skill.octon-concept-integration.octon-concept-integration
+    artifact_map_id: extension-skill-octon-concept-integration-octon-concept-integration
+    origin_class: extension
+    capability_kind: skill
+    capability_id: octon-concept-integration
+    display_name: Octon Concept Integration
+    summary: Run the concept-integration pipeline from source artifact to validated proposal packet and executable implementation prompt.
+    status: active
+    source_manifest: .octon/generated/effective/extensions/catalog.effective.yml
+    capability_domain: extension
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**'
+      exclude: []
+    fingerprints:
+      tech_tags: []
+      language_tags: []
+    scope_relevance:
+      matching_scope_ids: []
+      tech_tag_matches: []
+      language_tag_matches: []
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 0
+    precedence_tier: additive-extension
+    stable_sort_key: 9999-9999-2-skill-extension.skill.octon-concept-integration.octon-concept-integration
+    projection_name: octon-concept-integration
 resolution_order:
   - instance.command.repo-hygiene
   - framework.command.alignment-check
@@ -3318,3 +3380,5 @@ resolution_order:
   - framework.tool.read-only
   - framework.tool.shell-safe
   - framework.tool.web-access
+  - extension.command.octon-concept-integration.octon-concept-integration
+  - extension.skill.octon-concept-integration.octon-concept-integration

@@ -1,8 +1,38 @@
 schema_version: octon-capability-routing-artifact-map-v3
 generator_version: capability-routing-publication-v3
-generation_id: capabilities-a4cbfef86420
-published_at: 2026-04-13T23:27:22Z
+generation_id: capabilities-2e0d032e1ba0
+published_at: 2026-04-14T13:27:37Z
 artifacts:
+  - artifact_map_id: extension-command-octon-concept-integration-octon-concept-integration
+    effective_id: extension.command.octon-concept-integration.octon-concept-integration
+    origin_class: extension
+    capability_kind: command
+    capability_id: octon-concept-integration
+    display_name: Octon Concept Integration
+    source_kind: extension-export
+    source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
+    source_manifest_sha256: 173ef4433d574b839dd3e68d58858c55ee36c00ca6501e3f8f74ce67923a1535
+    source_path: .octon/generated/effective/extensions/catalog.effective.yml
+    source_sha256: 173ef4433d574b839dd3e68d58858c55ee36c00ca6501e3f8f74ce67923a1535
+    extension_pack_id: octon-concept-integration
+    extension_source_id: bundled-first-party
+    extension_export_kind: command
+    extension_export_id: octon-concept-integration
+  - artifact_map_id: extension-skill-octon-concept-integration-octon-concept-integration
+    effective_id: extension.skill.octon-concept-integration.octon-concept-integration
+    origin_class: extension
+    capability_kind: skill
+    capability_id: octon-concept-integration
+    display_name: Octon Concept Integration
+    source_kind: extension-export
+    source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
+    source_manifest_sha256: 173ef4433d574b839dd3e68d58858c55ee36c00ca6501e3f8f74ce67923a1535
+    source_path: .octon/generated/effective/extensions/catalog.effective.yml
+    source_sha256: 173ef4433d574b839dd3e68d58858c55ee36c00ca6501e3f8f74ce67923a1535
+    extension_pack_id: octon-concept-integration
+    extension_source_id: bundled-first-party
+    extension_export_kind: skill
+    extension_export_id: octon-concept-integration
   - artifact_map_id: framework-command-alignment-check
     effective_id: framework.command.alignment-check
     origin_class: framework

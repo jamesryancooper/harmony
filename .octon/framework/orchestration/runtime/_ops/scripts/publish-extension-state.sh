@@ -67,6 +67,14 @@ write_extension_publication_receipt() {
   for key in "${EXT_SELECTED_KEYS[@]}"; do
     pack_id="$(ext_key_pack_id "$key")"
     required_inputs+=(".octon/inputs/additive/extensions/${pack_id}/pack.yml")
+    while IFS= read -r manifest_path; do
+      [[ -n "$manifest_path" ]] || continue
+      required_inputs+=("${manifest_path#$ROOT_DIR/}")
+      while IFS= read -r anchor_path; do
+        [[ -n "$anchor_path" ]] || continue
+        required_inputs+=("$anchor_path")
+      done < <(yq -r '.required_repo_anchors[]? // ""' "$manifest_path" 2>/dev/null || true)
+    done < <(ext_prompt_bundle_manifest_files_for_pack "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}/pack.yml" "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}")
   done
 
   while IFS= read -r payload_rel; do
@@ -264,8 +272,8 @@ write_fragment_host_adapters() {
     adapters=(claude cursor codex)
   fi
 
-  printf '        host_adapters:\n'
-  write_string_array_yaml '          ' "${adapters[@]}"
+  printf '          host_adapters:\n'
+  write_string_array_yaml '            ' "${adapters[@]}"
 }
 
 write_fragment_selectors() {
@@ -285,11 +293,11 @@ write_fragment_selectors() {
     include=('**')
   fi
 
-  printf '        selectors:\n'
-  printf '          include:\n'
-  write_string_array_yaml '            ' "${include[@]}"
-  printf '          exclude:\n'
-  write_string_array_yaml '            ' "${exclude[@]}"
+  printf '          selectors:\n'
+  printf '            include:\n'
+  write_string_array_yaml '              ' "${include[@]}"
+  printf '            exclude:\n'
+  write_string_array_yaml '              ' "${exclude[@]}"
 }
 
 write_fragment_fingerprints() {
@@ -305,11 +313,11 @@ write_fragment_fingerprints() {
     language_tags+=("$value")
   done < <(yq -r "$item_query.routing.fingerprints.language_tags[]? // \"\"" "$fragment_file" 2>/dev/null || true)
 
-  printf '        fingerprints:\n'
-  printf '          tech_tags:\n'
-  write_string_array_yaml '            ' "${tech_tags[@]}"
-  printf '          language_tags:\n'
-  write_string_array_yaml '            ' "${language_tags[@]}"
+  printf '          fingerprints:\n'
+  printf '            tech_tags:\n'
+  write_string_array_yaml '              ' "${tech_tags[@]}"
+  printf '            language_tags:\n'
+  write_string_array_yaml '              ' "${language_tags[@]}"
 }
 
 copy_projection_file() {
@@ -396,10 +404,26 @@ stage_pack_skill_projections() {
   done
 }
 
+stage_pack_prompt_projections() {
+  local pack_id="$1" source_id="$2" manifest_abs="$3" published_root_abs="$4"
+  local prompts_root_rel source_abs dest_abs
+
+  prompts_root_rel="$(yq -r '.content_entrypoints.prompts // ""' "$manifest_abs")"
+  if [[ -z "$prompts_root_rel" || "$prompts_root_rel" == "null" ]]; then
+    return 0
+  fi
+
+  source_abs="$(ext_pack_root_abs "$pack_id")/${prompts_root_rel%/}"
+  dest_abs="$published_root_abs/prompts"
+  [[ -d "$source_abs" ]] || return 0
+  copy_projection_dir "$source_abs" "$dest_abs"
+}
+
 stage_pack_projection_exports() {
   local pack_id="$1" source_id="$2" manifest_abs="$3" published_root_abs="$4"
   stage_pack_command_projections "$pack_id" "$source_id" "$manifest_abs" "$published_root_abs"
   stage_pack_skill_projections "$pack_id" "$source_id" "$manifest_abs" "$published_root_abs"
+  stage_pack_prompt_projections "$pack_id" "$source_id" "$manifest_abs" "$published_root_abs"
 }
 
 write_pack_command_routing_exports() {
@@ -493,9 +517,166 @@ write_routing_exports() {
   write_pack_skill_routing_exports "$pack_id" "$source_id" "$manifest_abs"
 }
 
+write_pack_prompt_bundles() {
+  local pack_id="$1" source_id="$2" manifest_abs="$3" published_root_abs="$4" retained_tmp_root="$5"
+  local prompt_manifest bundle_dir_abs prompts_root_rel prompt_root_abs bundle_dir_rel prompt_set_id schema_version
+  local manifest_rel manifest_sha default_mode skip_mode_policy receipt_slug receipt_rel receipt_tmp
+  local bundle_lines bundle_sha stage_id prompt_id role_class rel_path stage_order source_abs source_sha projection_rel
+  local anchor_path anchor_sha
+  local -a prompt_manifests=()
+
+  prompts_root_rel="$(yq -r '.content_entrypoints.prompts // ""' "$manifest_abs")"
+  if [[ -z "$prompts_root_rel" || "$prompts_root_rel" == "null" ]]; then
+    printf '    prompt_bundles: []\n'
+    return 0
+  fi
+
+  prompt_root_abs="$(ext_pack_root_abs "$pack_id")/${prompts_root_rel%/}"
+  [[ -d "$prompt_root_abs" ]] || {
+    printf '    prompt_bundles: []\n'
+    return 0
+  }
+
+  mapfile -t prompt_manifests < <(ext_prompt_bundle_manifest_files_for_pack "$manifest_abs" "$(ext_pack_root_abs "$pack_id")")
+  if [[ "${#prompt_manifests[@]}" -eq 0 ]]; then
+    printf '    prompt_bundles: []\n'
+    return 0
+  fi
+
+  printf '    prompt_bundles:\n'
+  for prompt_manifest in "${prompt_manifests[@]}"; do
+    [[ -n "$prompt_manifest" ]] || continue
+    bundle_dir_abs="$(dirname "$prompt_manifest")"
+    if [[ "$bundle_dir_abs" == "$prompt_root_abs" ]]; then
+      bundle_dir_rel=""
+    else
+      bundle_dir_rel="${bundle_dir_abs#$prompt_root_abs/}"
+    fi
+
+    prompt_set_id="$(yq -r '.prompt_set_id // ""' "$prompt_manifest")"
+    schema_version="$(yq -r '.schema_version // ""' "$prompt_manifest")"
+    default_mode="$(yq -r '.alignment_policy.default_mode // ""' "$prompt_manifest")"
+    skip_mode_policy="$(yq -r '.alignment_policy.skip_mode_policy // ""' "$prompt_manifest")"
+    manifest_rel=".octon/inputs/additive/extensions/${pack_id}/${prompts_root_rel%/}/${bundle_dir_rel:+$bundle_dir_rel/}manifest.yml"
+    manifest_sha="$(ext_hash_file "$prompt_manifest")"
+
+    bundle_lines="${manifest_sha} ${manifest_rel}"$'\n'
+    while IFS= read -r anchor_path; do
+      [[ -n "$anchor_path" ]] || continue
+      anchor_sha="$(ext_hash_file "$ROOT_DIR/$anchor_path")"
+      bundle_lines+="${anchor_sha} ${anchor_path}"$'\n'
+    done < <(yq -r '.required_repo_anchors[]? // ""' "$prompt_manifest" 2>/dev/null || true)
+    while IFS=$'\t' read -r prompt_id role_class rel_path stage_order; do
+      [[ -n "$prompt_id" ]] || continue
+      source_abs="$bundle_dir_abs/$rel_path"
+      source_sha="$(ext_hash_file "$source_abs")"
+      bundle_lines+="${source_sha} ${prompt_id} ${role_class} ${rel_path} ${stage_order}"$'\n'
+    done < <(
+      {
+        yq -r '.stages[]? | [.prompt_id, .role_class, .path, (.order | tostring)] | @tsv' "$prompt_manifest" 2>/dev/null || true
+        yq -r '.companions[]? | [.prompt_id, .role_class, .path, ""] | @tsv' "$prompt_manifest" 2>/dev/null || true
+      }
+    )
+    bundle_sha="$(printf '%s' "$bundle_lines" | ext_hash_text)"
+
+    receipt_slug="$(receipt_timestamp_slug "$PUBLISHED_AT")"
+    receipt_rel=".octon/state/evidence/validation/extensions/prompt-alignment/${receipt_slug}-${pack_id}-${prompt_set_id}.yml"
+    receipt_tmp="$retained_tmp_root/$receipt_rel"
+    mkdir -p "$(dirname "$receipt_tmp")"
+    {
+      printf 'schema_version: "octon-extension-prompt-alignment-receipt-v1"\n'
+      printf 'receipt_id: "prompt-alignment-%s-%s-%s"\n' "$receipt_slug" "$pack_id" "$prompt_set_id"
+      printf 'pack_id: "%s"\n' "$pack_id"
+      printf 'source_id: "%s"\n' "$source_id"
+      printf 'prompt_set_id: "%s"\n' "$prompt_set_id"
+      printf 'generation_id: "%s"\n' "$GENERATION_ID"
+      printf 'validated_at: "%s"\n' "$PUBLISHED_AT"
+      printf 'result: "fresh"\n'
+      printf 'safe_to_run: true\n'
+      printf 'default_alignment_mode: "%s"\n' "$default_mode"
+      printf 'skip_mode_policy: "%s"\n' "$skip_mode_policy"
+      printf 'manifest_path: "%s"\n' "$manifest_rel"
+      printf 'manifest_sha256: "%s"\n' "$manifest_sha"
+      printf 'bundle_sha256: "%s"\n' "$bundle_sha"
+      printf 'required_repo_anchors:\n'
+      while IFS= read -r anchor_path; do
+        [[ -n "$anchor_path" ]] || continue
+        anchor_sha="$(ext_hash_file "$ROOT_DIR/$anchor_path")"
+        printf '  - path: "%s"\n' "$anchor_path"
+        printf '    sha256: "%s"\n' "$anchor_sha"
+      done < <(yq -r '.required_repo_anchors[]? // ""' "$prompt_manifest" 2>/dev/null || true)
+      printf 'prompt_assets:\n'
+      while IFS=$'\t' read -r prompt_id role_class rel_path stage_order; do
+        [[ -n "$prompt_id" ]] || continue
+        source_abs="$bundle_dir_abs/$rel_path"
+        source_sha="$(ext_hash_file "$source_abs")"
+        projection_rel="$(ext_published_prompt_projection_rel "$pack_id" "$source_id" "${bundle_dir_rel:+$bundle_dir_rel/}$rel_path")"
+        printf '  - prompt_id: "%s"\n' "$prompt_id"
+        printf '    role_class: "%s"\n' "$role_class"
+        printf '    path: "%s"\n' "$rel_path"
+        printf '    sha256: "%s"\n' "$source_sha"
+        printf '    projection_source_path: "%s"\n' "$projection_rel"
+        if [[ -n "$stage_order" ]]; then
+          printf '    stage_order: %s\n' "$stage_order"
+        fi
+      done < <(
+        {
+          yq -r '.stages[]? | [.prompt_id, .role_class, .path, (.order | tostring)] | @tsv' "$prompt_manifest" 2>/dev/null || true
+          yq -r '.companions[]? | [.prompt_id, .role_class, .path, ""] | @tsv' "$prompt_manifest" 2>/dev/null || true
+        }
+      )
+    } >"$receipt_tmp"
+
+    printf '      - prompt_set_id: "%s"\n' "$prompt_set_id"
+    printf '        schema_version: "%s"\n' "$schema_version"
+    printf '        manifest_path: "%s"\n' "$manifest_rel"
+    printf '        manifest_sha256: "%s"\n' "$manifest_sha"
+    printf '        bundle_sha256: "%s"\n' "$bundle_sha"
+    printf '        publication_status: "%s"\n' "$status"
+    printf '        alignment_status: "fresh"\n'
+    printf '        alignment_receipt_path: "%s"\n' "$receipt_rel"
+    printf '        default_alignment_mode: "%s"\n' "$default_mode"
+    printf '        skip_mode_policy: "%s"\n' "$skip_mode_policy"
+    printf '        invalidation_conditions:\n'
+    write_string_array_yaml '          ' \
+      "prompt-manifest-sha-changed" \
+      "prompt-asset-sha-changed" \
+      "required-anchor-sha-changed" \
+      "extension-desired-config-sha-changed" \
+      "root-manifest-sha-changed"
+    printf '        required_repo_anchors:\n'
+    while IFS= read -r anchor_path; do
+      [[ -n "$anchor_path" ]] || continue
+      anchor_sha="$(ext_hash_file "$ROOT_DIR/$anchor_path")"
+      printf '          - path: "%s"\n' "$anchor_path"
+      printf '            sha256: "%s"\n' "$anchor_sha"
+    done < <(yq -r '.required_repo_anchors[]? // ""' "$prompt_manifest" 2>/dev/null || true)
+    printf '        prompt_assets:\n'
+    while IFS=$'\t' read -r prompt_id role_class rel_path stage_order; do
+      [[ -n "$prompt_id" ]] || continue
+      source_abs="$bundle_dir_abs/$rel_path"
+      source_sha="$(ext_hash_file "$source_abs")"
+      projection_rel="$(ext_published_prompt_projection_rel "$pack_id" "$source_id" "${bundle_dir_rel:+$bundle_dir_rel/}$rel_path")"
+      printf '          - prompt_id: "%s"\n' "$prompt_id"
+      printf '            role_class: "%s"\n' "$role_class"
+      printf '            path: "%s"\n' "$rel_path"
+      printf '            sha256: "%s"\n' "$source_sha"
+      printf '            projection_source_path: "%s"\n' "$projection_rel"
+      if [[ -n "$stage_order" ]]; then
+        printf '            stage_order: %s\n' "$stage_order"
+      fi
+    done < <(
+      {
+        yq -r '.stages[]? | [.prompt_id, .role_class, .path, (.order | tostring)] | @tsv' "$prompt_manifest" 2>/dev/null || true
+        yq -r '.companions[]? | [.prompt_id, .role_class, .path, ""] | @tsv' "$prompt_manifest" 2>/dev/null || true
+      }
+    )
+  done
+}
+
 write_effective_files() {
   local desired_sha="$1" root_sha="$2" tmpdir="$3" status="$4"
-  local active_tmp quarantine_tmp family_tmp catalog_tmp artifact_map_tmp lock_tmp published_tmp receipt_tmp previous_family_tmp
+  local active_tmp quarantine_tmp family_tmp catalog_tmp artifact_map_tmp lock_tmp published_tmp receipt_tmp previous_family_tmp retained_tmp_root
   local key pack_id source_id manifest_abs manifest_rel trust_decision
   local rel_path bucket abs_path sha payload_lines payload_sha
   local receipt_slug receipt_rel receipt_abs receipt_id receipt_sha
@@ -503,6 +684,9 @@ write_effective_files() {
     "desired-config-sha-changed"
     "root-manifest-sha-changed"
     "pack-manifest-or-payload-changed"
+    "prompt-manifest-sha-changed"
+    "prompt-asset-sha-changed"
+    "required-anchor-sha-changed"
     "published-pack-set-changed"
     "quarantine-state-changed"
   )
@@ -515,8 +699,10 @@ write_effective_files() {
   lock_tmp="$family_tmp/generation.lock.yml"
   published_tmp="$family_tmp/published"
   receipt_tmp="$tmpdir/publication.receipt.yml"
+  retained_tmp_root="$tmpdir/retained"
 
   mkdir -p "$published_tmp"
+  mkdir -p "$retained_tmp_root"
 
   for key in "${EXT_PUBLISHED_KEYS[@]}"; do
     pack_id="$(ext_key_pack_id "$key")"
@@ -559,6 +745,14 @@ write_effective_files() {
     printf '  - ".octon/octon.yml"\n'
     for key in "${EXT_SELECTED_KEYS[@]}"; do
       printf '  - ".octon/inputs/additive/extensions/%s/pack.yml"\n' "$(ext_key_pack_id "$key")"
+      while IFS= read -r prompt_manifest; do
+        [[ -n "$prompt_manifest" ]] || continue
+        printf '  - "%s"\n' "${prompt_manifest#$ROOT_DIR/}"
+        while IFS= read -r anchor_path; do
+          [[ -n "$anchor_path" ]] || continue
+          printf '  - "%s"\n' "$anchor_path"
+        done < <(yq -r '.required_repo_anchors[]? // ""' "$prompt_manifest" 2>/dev/null || true)
+      done < <(ext_prompt_bundle_manifest_files_for_pack "$ROOT_DIR/.octon/inputs/additive/extensions/$(ext_key_pack_id "$key")/pack.yml" "$ROOT_DIR/.octon/inputs/additive/extensions/$(ext_key_pack_id "$key")")
     done
     printf 'validation_timestamp: "%s"\n' "$PUBLISHED_AT"
     printf 'status: "%s"\n' "$status"
@@ -594,6 +788,7 @@ write_effective_files() {
         printf '    trust_decision: "%s"\n' "$trust_decision"
         printf '    publication_status: "%s"\n' "$status"
         write_routing_exports "$pack_id" "$source_id" "$manifest_abs"
+        write_pack_prompt_bundles "$pack_id" "$source_id" "$manifest_abs" "$published_tmp/$pack_id/$source_id" "$retained_tmp_root"
       done
     fi
     printf 'source:\n'
@@ -655,6 +850,14 @@ write_effective_files() {
     printf '  - ".octon/octon.yml"\n'
     for key in "${EXT_SELECTED_KEYS[@]}"; do
       printf '  - ".octon/inputs/additive/extensions/%s/pack.yml"\n' "$(ext_key_pack_id "$key")"
+      while IFS= read -r prompt_manifest; do
+        [[ -n "$prompt_manifest" ]] || continue
+        printf '  - "%s"\n' "${prompt_manifest#$ROOT_DIR/}"
+        while IFS= read -r anchor_path; do
+          [[ -n "$anchor_path" ]] || continue
+          printf '  - "%s"\n' "$anchor_path"
+        done < <(yq -r '.required_repo_anchors[]? // ""' "$prompt_manifest" 2>/dev/null || true)
+      done < <(ext_prompt_bundle_manifest_files_for_pack "$ROOT_DIR/.octon/inputs/additive/extensions/$(ext_key_pack_id "$key")/pack.yml" "$ROOT_DIR/.octon/inputs/additive/extensions/$(ext_key_pack_id "$key")")
     done
     printf 'invalidation_conditions:\n'
     write_string_array_yaml '  ' "${invalidation_conditions[@]}"
@@ -700,6 +903,12 @@ write_effective_files() {
   mv "$receipt_tmp" "$receipt_abs"
   mv "$quarantine_tmp" "$QUARANTINE_STATE"
   mv "$active_tmp" "$ACTIVE_STATE"
+  while IFS= read -r abs_path; do
+    [[ -n "$abs_path" ]] || continue
+    rel_path="${abs_path#$retained_tmp_root/}"
+    mkdir -p "$ROOT_DIR/$(dirname "$rel_path")"
+    mv "$abs_path" "$ROOT_DIR/$rel_path"
+  done < <(find "$retained_tmp_root" -type f | sort)
 }
 
 main() {
