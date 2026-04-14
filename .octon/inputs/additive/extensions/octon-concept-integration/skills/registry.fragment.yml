@@ -1,0 +1,31 @@
+schema_version: "extensions-skills-registry-fragment-v1"
+skills:
+  octon-concept-integration:
+    version: "1.1.0"
+    commands:
+      - /octon-concept-integration
+    parameters:
+      - name: source_artifact
+        type: text
+        required: true
+        description: "URL, file path, or inline source artifact to analyze."
+      - name: proposal_id
+        type: text
+        required: false
+        description: "Optional proposal id override for the generated packet."
+      - name: selected_concepts
+        type: text
+        required: false
+        description: "Optional explicit selected-concepts subset."
+      - name: alignment_mode
+        type: text
+        required: false
+        default: "auto"
+        description: "Prompt-set freshness mode: auto (realign or fail closed), always, or skip (explicit degraded execution)."
+      - name: include_execution_prompt
+        type: boolean
+        required: false
+        default: true
+        description: "Generate a packet-specific executable implementation prompt."
+    requires:
+      context: []

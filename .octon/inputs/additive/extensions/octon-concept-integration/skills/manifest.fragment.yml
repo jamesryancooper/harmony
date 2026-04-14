@@ -1,0 +1,20 @@
+schema_version: "extensions-skills-fragment-v1"
+skills:
+  - id: octon-concept-integration
+    display_name: Octon Concept Integration
+    group: extensions
+    path: octon-concept-integration/
+    skill_class: invocable
+    summary: "Run the concept-integration pipeline from source artifact to validated proposal packet and executable implementation prompt."
+    status: active
+    tags:
+      - octon
+      - concept-integration
+      - proposal
+      - extension-pack
+      - composite-skill
+    triggers:
+      - "octon concept integration"
+      - "generate proposal packet from source"
+      - "run concept integration pipeline"
+      - "extract and verify octon concepts"

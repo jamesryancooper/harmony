@@ -1,7 +1,16 @@
 # Git attributes for octon repository
 
-# Ensure symlinks work correctly across platforms
-* text=auto
+# Normalize text files to LF in the repository and on checkout unless a more
+# specific rule overrides it.
+* text=auto eol=lf
+
+# Explicit LF policy for common authored text surfaces.
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.sh text eol=lf
 
 # Preserve symlinks in harness skill folders
 .claude/skills/* -text

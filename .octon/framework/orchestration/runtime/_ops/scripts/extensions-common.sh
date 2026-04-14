@@ -115,6 +115,10 @@ ext_published_skill_projection_rel() {
   printf '%s/skills/%s' "$(ext_published_projection_root_rel "$1" "$2")" "$3"
 }
 
+ext_published_prompt_projection_rel() {
+  printf '%s/prompts/%s' "$(ext_published_projection_root_rel "$1" "$2")" "$3"
+}
+
 ext_bucket_for_relative_path() {
   case "$1" in
     pack.yml) printf 'manifest' ;;
@@ -383,6 +387,159 @@ ext_validate_content_entrypoints() {
   done
 }
 
+ext_validate_prompt_set_manifest_if_present() {
+  local manifest="$1" pack_root="$2"
+  local prompts_root_rel prompts_root prompt_manifest prompt_set_id schema_version
+  local stage_count companion_count
+  declare -A seen_prompt_set_ids=()
+
+  prompts_root_rel="$(yq -r '.content_entrypoints.prompts // ""' "$manifest")"
+  if [[ -z "$prompts_root_rel" || "$prompts_root_rel" == "null" ]]; then
+    return 0
+  fi
+
+  prompts_root="$pack_root/${prompts_root_rel%/}"
+  [[ -d "$prompts_root" ]] || return 0
+
+  while IFS= read -r prompt_manifest; do
+    [[ -n "$prompt_manifest" ]] || continue
+
+    yq -e '.' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="invalid-prompt-set-manifest-yaml:$(basename "$(dirname "$prompt_manifest")")"
+      return 1
+    }
+
+    schema_version="$(yq -r '.schema_version // ""' "$prompt_manifest")"
+    [[ "$schema_version" == "octon-extension-prompt-set-v1" ]] || {
+      EXT_LAST_ERROR_REASON="invalid-prompt-set-schema-version:$(basename "$(dirname "$prompt_manifest")")"
+      return 1
+    }
+
+    prompt_set_id="$(yq -r '.prompt_set_id // ""' "$prompt_manifest")"
+    [[ "$prompt_set_id" =~ ^[a-z][a-z0-9-]*$ ]] || {
+      EXT_LAST_ERROR_REASON="invalid-prompt-set-id:$(basename "$(dirname "$prompt_manifest")")"
+      return 1
+    }
+    if [[ -n "${seen_prompt_set_ids["$prompt_set_id"]:-}" ]]; then
+      EXT_LAST_ERROR_REASON="duplicate-prompt-set-id:$prompt_set_id"
+      return 1
+    fi
+    seen_prompt_set_ids["$prompt_set_id"]="1"
+
+    yq -e '.version | type == "!!str"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-version:$prompt_set_id"
+      return 1
+    }
+
+    yq -e '.stages | type == "!!seq"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-stages:$prompt_set_id"
+      return 1
+    }
+    stage_count="$(yq -r '.stages | length' "$prompt_manifest" 2>/dev/null || echo 0)"
+    [[ "$stage_count" -gt 0 ]] || {
+      EXT_LAST_ERROR_REASON="empty-prompt-set-stages:$prompt_set_id"
+      return 1
+    }
+
+    yq -e '.companions | type == "!!seq"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-companions:$prompt_set_id"
+      return 1
+    }
+    companion_count="$(yq -r '.companions | length' "$prompt_manifest" 2>/dev/null || echo 0)"
+    [[ "$companion_count" -gt 0 ]] || {
+      EXT_LAST_ERROR_REASON="empty-prompt-set-companions:$prompt_set_id"
+      return 1
+    }
+
+    yq -e '.required_repo_anchors | type == "!!seq"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-anchors:$prompt_set_id"
+      return 1
+    }
+    [[ "$(yq -r '.required_repo_anchors | length' "$prompt_manifest" 2>/dev/null || echo 0)" -gt 0 ]] || {
+      EXT_LAST_ERROR_REASON="empty-prompt-set-anchors:$prompt_set_id"
+      return 1
+    }
+
+    yq -e '.alignment_policy | type == "!!map"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-alignment-policy:$prompt_set_id"
+      return 1
+    }
+    yq -e '.alignment_policy.default_mode | type == "!!str"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-default-mode:$prompt_set_id"
+      return 1
+    }
+    yq -e '.alignment_policy.skip_mode_policy | type == "!!str"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-skip-policy:$prompt_set_id"
+      return 1
+    }
+    yq -e '.alignment_policy.receipt_root | type == "!!str"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-receipt-root:$prompt_set_id"
+      return 1
+    }
+
+    yq -e '.invalidation_conditions | type == "!!seq"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-invalidation:$prompt_set_id"
+      return 1
+    }
+    [[ "$(yq -r '.invalidation_conditions | length' "$prompt_manifest" 2>/dev/null || echo 0)" -gt 0 ]] || {
+      EXT_LAST_ERROR_REASON="empty-prompt-set-invalidation:$prompt_set_id"
+      return 1
+    }
+
+    yq -e '.artifact_policy.internal_artifacts | type == "!!seq"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-internal-artifacts:$prompt_set_id"
+      return 1
+    }
+    yq -e '.artifact_policy.packet_support_files | type == "!!seq"' "$prompt_manifest" >/dev/null 2>&1 || {
+      EXT_LAST_ERROR_REASON="missing-prompt-set-packet-support:$prompt_set_id"
+      return 1
+    }
+
+    while IFS=$'\t' read -r rel_path role_class; do
+      [[ -n "$rel_path" ]] || continue
+      [[ -f "$(dirname "$prompt_manifest")/$rel_path" ]] || {
+        EXT_LAST_ERROR_REASON="missing-prompt-set-file:$prompt_set_id:$rel_path"
+        return 1
+      }
+      case "$role_class" in
+        stage|maintenance-companion|prompt-generation-companion)
+          ;;
+        *)
+          EXT_LAST_ERROR_REASON="invalid-prompt-role-class:$prompt_set_id:$role_class"
+          return 1
+          ;;
+      esac
+    done < <(
+      {
+        yq -r '.stages[]? | [.path, .role_class] | @tsv' "$prompt_manifest" 2>/dev/null || true
+        yq -r '.companions[]? | [.path, .role_class] | @tsv' "$prompt_manifest" 2>/dev/null || true
+      }
+    )
+
+    while IFS= read -r anchor_path; do
+      [[ -n "$anchor_path" ]] || continue
+      [[ -e "$ROOT_DIR/$anchor_path" ]] || {
+        EXT_LAST_ERROR_REASON="missing-prompt-set-anchor:$prompt_set_id:$anchor_path"
+        return 1
+      }
+    done < <(yq -r '.required_repo_anchors[]? // ""' "$prompt_manifest" 2>/dev/null || true)
+  done < <(ext_prompt_bundle_manifest_files_for_pack "$manifest" "$pack_root")
+}
+
+ext_prompt_bundle_manifest_files_for_pack() {
+  local manifest="$1" pack_root="$2"
+  local prompts_root_rel prompts_root
+
+  prompts_root_rel="$(yq -r '.content_entrypoints.prompts // ""' "$manifest" 2>/dev/null || true)"
+  if [[ -z "$prompts_root_rel" || "$prompts_root_rel" == "null" ]]; then
+    return 0
+  fi
+
+  prompts_root="$pack_root/${prompts_root_rel%/}"
+  [[ -d "$prompts_root" ]] || return 0
+  find "$prompts_root" -name manifest.yml -type f | sort
+}
+
 ext_validate_pack_contract() {
   local pack_id="$1" source_id="$2" apply_trust="$3"
   local manifest pack_root manifest_id version origin_class octon_range ext_api manifest_source_id
@@ -482,6 +639,7 @@ ext_validate_pack_contract() {
 
   ext_pack_has_allowed_top_level_shape "$pack_root" || return 1
   ext_validate_content_entrypoints "$pack_id" "$manifest" "$pack_root" || return 1
+  ext_validate_prompt_set_manifest_if_present "$manifest" "$pack_root" || return 1
 
   selected_key="$(ext_pack_key "$pack_id" "$source_id")"
   selected_version_pin="${EXT_SELECTED_VERSION_PIN["$selected_key"]:-}"

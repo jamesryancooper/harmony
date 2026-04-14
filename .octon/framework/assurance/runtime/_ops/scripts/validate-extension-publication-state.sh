@@ -44,7 +44,7 @@ sorted_published_files() {
 }
 
 sorted_projection_source_paths() {
-  yq -r '.packs[]? | .routing_exports.commands[]?.projection_source_path, .routing_exports.skills[]?.projection_source_path // ""' "$CATALOG_FILE" 2>/dev/null \
+  yq -r '.packs[]? | .routing_exports.commands[]?.projection_source_path, .routing_exports.skills[]?.projection_source_path, .prompt_bundles[]?.prompt_assets[]?.projection_source_path // ""' "$CATALOG_FILE" 2>/dev/null \
     | awk 'NF' \
     | LC_ALL=C sort
 }
@@ -150,6 +150,63 @@ main() {
     yq -e ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .routing_exports.skills | type == \"!!seq\"" "$CATALOG_FILE" >/dev/null 2>&1 \
       && pass "routing_exports.skills valid for $pack_id" \
       || fail "routing_exports.skills invalid for $pack_id"
+
+    local prompt_manifest_count catalog_prompt_bundle_count prompt_manifest prompt_set_id bundle_manifest_path bundle_manifest_sha alignment_receipt_rel
+    prompt_manifest_count=0
+    while IFS= read -r prompt_manifest; do
+      [[ -n "$prompt_manifest" ]] || continue
+      prompt_manifest_count=$((prompt_manifest_count + 1))
+    done < <(ext_prompt_bundle_manifest_files_for_pack "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}/pack.yml" "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}")
+
+    catalog_prompt_bundle_count="$(yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | (.prompt_bundles // []) | length" "$CATALOG_FILE" 2>/dev/null || echo 0)"
+    if [[ "$prompt_manifest_count" -eq "$catalog_prompt_bundle_count" ]]; then
+      pass "prompt bundle count matches prompt manifests for $pack_id"
+    else
+      fail "prompt bundle count mismatch for $pack_id"
+    fi
+
+    while IFS= read -r prompt_manifest; do
+      [[ -n "$prompt_manifest" ]] || continue
+      prompt_set_id="$(yq -r '.prompt_set_id // ""' "$prompt_manifest" 2>/dev/null || true)"
+      [[ -n "$prompt_set_id" ]] || continue
+      yq -e ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .prompt_bundles[]? | select(.prompt_set_id == \"$prompt_set_id\")" "$CATALOG_FILE" >/dev/null 2>&1 \
+        && pass "prompt bundle published for $pack_id/$prompt_set_id" \
+        || fail "prompt bundle missing for $pack_id/$prompt_set_id"
+
+      bundle_manifest_path="$(yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .prompt_bundles[]? | select(.prompt_set_id == \"$prompt_set_id\") | .manifest_path // \"\"" "$CATALOG_FILE" 2>/dev/null | head -n 1)"
+      bundle_manifest_sha="$(yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .prompt_bundles[]? | select(.prompt_set_id == \"$prompt_set_id\") | .manifest_sha256 // \"\"" "$CATALOG_FILE" 2>/dev/null | head -n 1)"
+      [[ "$bundle_manifest_path" == "${prompt_manifest#$ROOT_DIR/}" ]] && pass "prompt bundle manifest path current for $pack_id/$prompt_set_id" || fail "prompt bundle manifest path mismatch for $pack_id/$prompt_set_id"
+      [[ "$bundle_manifest_sha" == "$(ext_hash_file "$prompt_manifest")" ]] && pass "prompt bundle manifest digest current for $pack_id/$prompt_set_id" || fail "prompt bundle manifest digest stale for $pack_id/$prompt_set_id"
+
+      alignment_receipt_rel="$(yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .prompt_bundles[]? | select(.prompt_set_id == \"$prompt_set_id\") | .alignment_receipt_path // \"\"" "$CATALOG_FILE" 2>/dev/null | head -n 1)"
+      if [[ -n "$alignment_receipt_rel" && -f "$ROOT_DIR/$alignment_receipt_rel" ]]; then
+        pass "prompt bundle alignment receipt exists for $pack_id/$prompt_set_id"
+        yq -e '.' "$ROOT_DIR/$alignment_receipt_rel" >/dev/null 2>&1 && pass "prompt bundle alignment receipt parses for $pack_id/$prompt_set_id" || fail "prompt bundle alignment receipt must parse for $pack_id/$prompt_set_id"
+        [[ "$(yq -r '.schema_version // ""' "$ROOT_DIR/$alignment_receipt_rel" 2>/dev/null)" == "octon-extension-prompt-alignment-receipt-v1" ]] && pass "prompt bundle alignment receipt schema version valid for $pack_id/$prompt_set_id" || fail "prompt bundle alignment receipt schema version invalid for $pack_id/$prompt_set_id"
+        [[ "$(yq -r '.safe_to_run // ""' "$ROOT_DIR/$alignment_receipt_rel" 2>/dev/null)" == "true" ]] && pass "prompt bundle alignment receipt safe_to_run valid for $pack_id/$prompt_set_id" || fail "prompt bundle alignment receipt safe_to_run invalid for $pack_id/$prompt_set_id"
+        [[ "$(yq -r '.bundle_sha256 // ""' "$ROOT_DIR/$alignment_receipt_rel" 2>/dev/null)" == "$(yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .prompt_bundles[]? | select(.prompt_set_id == \"$prompt_set_id\") | .bundle_sha256 // \"\"" "$CATALOG_FILE" 2>/dev/null | head -n 1)" ]] && pass "prompt bundle alignment receipt bundle digest matches for $pack_id/$prompt_set_id" || fail "prompt bundle alignment receipt bundle digest mismatch for $pack_id/$prompt_set_id"
+      else
+        fail "prompt bundle alignment receipt missing for $pack_id/$prompt_set_id"
+      fi
+
+      while IFS=$'\t' read -r anchor_path anchor_sha; do
+        [[ -n "$anchor_path" ]] || continue
+        [[ -e "$ROOT_DIR/$anchor_path" ]] || {
+          fail "prompt bundle anchor missing for $pack_id/$prompt_set_id: $anchor_path"
+          continue
+        }
+        [[ "$(ext_hash_file "$ROOT_DIR/$anchor_path")" == "$anchor_sha" ]] && pass "prompt bundle anchor digest current for $pack_id/$prompt_set_id: $anchor_path" || fail "prompt bundle anchor digest stale for $pack_id/$prompt_set_id: $anchor_path"
+      done < <(yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .prompt_bundles[]? | select(.prompt_set_id == \"$prompt_set_id\") | .required_repo_anchors[]? | [.path, .sha256] | @tsv" "$CATALOG_FILE" 2>/dev/null || true)
+
+      while IFS=$'\t' read -r asset_path asset_sha; do
+        [[ -n "$asset_path" ]] || continue
+        if [[ ! -f "$(dirname "$prompt_manifest")/$asset_path" ]]; then
+          fail "prompt asset path missing for $pack_id/$prompt_set_id: $asset_path"
+          continue
+        fi
+        [[ "$(ext_hash_file "$(dirname "$prompt_manifest")/$asset_path")" == "$asset_sha" ]] && pass "prompt asset digest current for $pack_id/$prompt_set_id: $asset_path" || fail "prompt asset digest stale for $pack_id/$prompt_set_id: $asset_path"
+      done < <(yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .prompt_bundles[]? | select(.prompt_set_id == \"$prompt_set_id\") | .prompt_assets[]? | [.path, .sha256] | @tsv" "$CATALOG_FILE" 2>/dev/null || true)
+    done < <(ext_prompt_bundle_manifest_files_for_pack "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}/pack.yml" "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}")
   done < <(yq -r '.packs[]? | [.pack_id, .source_id] | @tsv' "$CATALOG_FILE" 2>/dev/null || true)
 
   local native_command_ids native_skill_ids collision_lines
@@ -210,6 +267,26 @@ main() {
   else
     fail "generation lock required inputs missing authoritative manifests"
   fi
+
+  while IFS=$'\t' read -r pack_id source_id; do
+    [[ -n "$pack_id" ]] || continue
+    while IFS= read -r prompt_manifest; do
+      [[ -n "$prompt_manifest" ]] || continue
+      if yq -e ".required_inputs[]? | select(. == \"${prompt_manifest#$ROOT_DIR/}\")" "$GENERATION_LOCK_FILE" >/dev/null 2>&1; then
+        pass "generation lock includes prompt manifest input for $pack_id"
+      else
+        fail "generation lock missing prompt manifest input for $pack_id"
+      fi
+      while IFS= read -r anchor_path; do
+        [[ -n "$anchor_path" ]] || continue
+        if yq -e ".required_inputs[]? | select(. == \"$anchor_path\")" "$GENERATION_LOCK_FILE" >/dev/null 2>&1; then
+          pass "generation lock includes prompt anchor input for $pack_id: $anchor_path"
+        else
+          fail "generation lock missing prompt anchor input for $pack_id: $anchor_path"
+        fi
+      done < <(yq -r '.required_repo_anchors[]? // ""' "$prompt_manifest" 2>/dev/null || true)
+    done < <(ext_prompt_bundle_manifest_files_for_pack "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}/pack.yml" "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}")
+  done < <(yq -r '.packs[]? | [.pack_id, .source_id] | @tsv' "$CATALOG_FILE" 2>/dev/null || true)
 
   if yq -e '.invalidation_conditions | length > 0' "$ACTIVE_STATE" >/dev/null 2>&1 \
     && yq -e '.invalidation_conditions | length > 0' "$CATALOG_FILE" >/dev/null 2>&1 \

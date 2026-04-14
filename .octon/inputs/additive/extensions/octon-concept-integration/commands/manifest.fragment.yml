@@ -1,0 +1,8 @@
+schema_version: "extensions-commands-fragment-v1"
+commands:
+  - id: octon-concept-integration
+    display_name: Octon Concept Integration
+    path: octon-concept-integration.md
+    summary: "Run the concept-integration extension-pack capability from source artifact to validated proposal packet."
+    access: agent
+    argument_hint: "<source-artifact> [--proposal-id <id>] [--alignment-mode auto|always|skip] [--selected-concepts <csv>]"
