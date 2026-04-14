@@ -391,6 +391,7 @@ ext_validate_prompt_set_manifest_if_present() {
   local manifest="$1" pack_root="$2"
   local prompts_root_rel prompts_root prompt_manifest prompt_set_id schema_version
   local stage_count companion_count
+  declare -A seen_prompt_set_ids=()
 
   prompts_root_rel="$(yq -r '.content_entrypoints.prompts // ""' "$manifest")"
   if [[ -z "$prompts_root_rel" || "$prompts_root_rel" == "null" ]]; then
@@ -419,6 +420,11 @@ ext_validate_prompt_set_manifest_if_present() {
       EXT_LAST_ERROR_REASON="invalid-prompt-set-id:$(basename "$(dirname "$prompt_manifest")")"
       return 1
     }
+    if [[ -n "${seen_prompt_set_ids["$prompt_set_id"]:-}" ]]; then
+      EXT_LAST_ERROR_REASON="duplicate-prompt-set-id:$prompt_set_id"
+      return 1
+    fi
+    seen_prompt_set_ids["$prompt_set_id"]="1"
 
     yq -e '.version | type == "!!str"' "$prompt_manifest" >/dev/null 2>&1 || {
       EXT_LAST_ERROR_REASON="missing-prompt-set-version:$prompt_set_id"

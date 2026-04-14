@@ -520,7 +520,7 @@ write_routing_exports() {
 write_pack_prompt_bundles() {
   local pack_id="$1" source_id="$2" manifest_abs="$3" published_root_abs="$4" retained_tmp_root="$5"
   local prompt_manifest bundle_dir_abs prompts_root_rel prompt_root_abs bundle_dir_rel prompt_set_id schema_version
-  local manifest_rel manifest_sha default_mode skip_mode_policy receipt_slug receipt_rel receipt_tmp
+  local manifest_rel manifest_sha default_mode skip_mode_policy receipt_root receipt_slug receipt_rel receipt_tmp
   local bundle_lines bundle_sha stage_id prompt_id role_class rel_path stage_order source_abs source_sha projection_rel
   local anchor_path anchor_sha
   local -a prompt_manifests=()
@@ -557,6 +557,10 @@ write_pack_prompt_bundles() {
     schema_version="$(yq -r '.schema_version // ""' "$prompt_manifest")"
     default_mode="$(yq -r '.alignment_policy.default_mode // ""' "$prompt_manifest")"
     skip_mode_policy="$(yq -r '.alignment_policy.skip_mode_policy // ""' "$prompt_manifest")"
+    receipt_root="$(yq -r '.alignment_policy.receipt_root // ""' "$prompt_manifest")"
+    if [[ -z "$receipt_root" || "$receipt_root" == "null" ]]; then
+      receipt_root=".octon/state/evidence/validation/extensions/prompt-alignment"
+    fi
     manifest_rel=".octon/inputs/additive/extensions/${pack_id}/${prompts_root_rel%/}/${bundle_dir_rel:+$bundle_dir_rel/}manifest.yml"
     manifest_sha="$(ext_hash_file "$prompt_manifest")"
 
@@ -580,7 +584,7 @@ write_pack_prompt_bundles() {
     bundle_sha="$(printf '%s' "$bundle_lines" | ext_hash_text)"
 
     receipt_slug="$(receipt_timestamp_slug "$PUBLISHED_AT")"
-    receipt_rel=".octon/state/evidence/validation/extensions/prompt-alignment/${receipt_slug}-${pack_id}-${prompt_set_id}.yml"
+    receipt_rel="${receipt_root%/}/${receipt_slug}-${pack_id}-${prompt_set_id}.yml"
     receipt_tmp="$retained_tmp_root/$receipt_rel"
     mkdir -p "$(dirname "$receipt_tmp")"
     {
