@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.23](https://github.com/jamesryancooper/octon/compare/octon-v0.6.22...octon-v0.6.23) (2026-04-15)
+
+
+### Features
+
+* **extensions:** add extension compatibility gate ([#288](https://github.com/jamesryancooper/octon/issues/288)) ([e435515](https://github.com/jamesryancooper/octon/commit/e435515f6e12c7570f957cf7f3ca98aeaec1114a))
+
 ## [0.6.22](https://github.com/jamesryancooper/octon/compare/octon-v0.6.21...octon-v0.6.22) (2026-04-15)
 
 
