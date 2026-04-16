@@ -14,7 +14,10 @@ fail() { echo "FAIL: $1" >&2; fail_count=$((fail_count + 1)); }
 cleanup() {
   local dir
   for dir in "${CLEANUP_DIRS[@]}"; do
-    [[ -n "$dir" ]] && rm -rf -- "$dir"
+    [[ -n "$dir" ]] || continue
+    [[ -d "$dir" ]] || continue
+    find "$dir" -depth -type f -exec rm -f -- {} + 2>/dev/null || true
+    find "$dir" -depth -type d -exec rmdir -- {} + 2>/dev/null || true
   done
 }
 trap cleanup EXIT

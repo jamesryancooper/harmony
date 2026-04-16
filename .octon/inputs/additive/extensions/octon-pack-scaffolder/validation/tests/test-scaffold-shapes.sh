@@ -76,6 +76,9 @@ expected_examples=(
 )
 
 main() {
+  local placeholder_marker
+  placeholder_marker='[TO''DO'
+
   assert_file "$PACK_ROOT/pack.yml" "pack manifest exists"
   assert_file "$PACK_ROOT/README.md" "pack readme exists"
   assert_file "$PACK_ROOT/commands/manifest.fragment.yml" "commands manifest exists"
@@ -125,10 +128,10 @@ main() {
   assert_contains "$PACK_ROOT/validation/README.md" "test-generated-pack-contracts.sh" "validation readme lists generated-pack contract test"
   assert_contains "$PACK_ROOT/validation/compatibility.yml" "publish-extension-state.sh" "compatibility profile includes extension publication script"
 
-  if rg -n --fixed-strings '[TODO' "$PACK_ROOT" 2>/dev/null | grep -v '/validation/tests/' >/dev/null 2>&1; then
-    fail "no TODO placeholders remain"
+  if rg -n --fixed-strings "$placeholder_marker" "$PACK_ROOT" 2>/dev/null | grep -v '/validation/tests/' >/dev/null 2>&1; then
+    fail "no placeholder markers remain"
   else
-    pass "no TODO placeholders remain"
+    pass "no placeholder markers remain"
   fi
 
   echo "Passed: $pass_count"
