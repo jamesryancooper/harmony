@@ -13,6 +13,7 @@ bash .octon/framework/assurance/runtime/_ops/scripts/validate-host-projections.s
 bash .octon/framework/assurance/runtime/_ops/scripts/validate-extension-local-tests.sh
 bash .octon/inputs/additive/extensions/octon-pack-scaffolder/validation/tests/test-scaffold-shapes.sh
 bash .octon/inputs/additive/extensions/octon-pack-scaffolder/validation/tests/test-generated-pack-contracts.sh
+# publication-only; skips unless the pack is already active and published
 bash .octon/inputs/additive/extensions/octon-pack-scaffolder/validation/tests/test-published-routing-and-projections.sh
 ```
 
@@ -24,6 +25,7 @@ bash .octon/inputs/additive/extensions/octon-pack-scaffolder/validation/tests/te
 - sample generated pack outputs checked with the existing extension and
   capability publication validators in a temporary repo
 - published route dispatcher metadata and host projections for the live repo
+  when the pack is already admitted and published
 
 ## Ownership Rule
 
