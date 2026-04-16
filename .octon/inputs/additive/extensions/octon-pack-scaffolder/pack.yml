@@ -1,0 +1,27 @@
+schema_version: "octon-extension-pack-v4"
+pack_id: "octon-pack-scaffolder"
+version: "1.0.0"
+origin_class: "first_party_bundled"
+compatibility:
+  octon_version: "^0.6.25"
+  extensions_api_version: "1.0"
+  required_contracts: []
+  profile_path: "validation/compatibility.yml"
+dependencies:
+  requires: []
+  conflicts: []
+provenance:
+  source_id: "bundled-first-party"
+  imported_from: null
+  origin_uri: null
+  digest_sha256: null
+  attestation_refs: []
+trust_hints:
+  suggested_action: "allow"
+content_entrypoints:
+  skills: "skills/"
+  commands: "commands/"
+  templates: null
+  prompts: null
+  context: "context/"
+  validation: "validation/"
