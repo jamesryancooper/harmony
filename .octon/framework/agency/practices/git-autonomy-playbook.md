@@ -139,6 +139,8 @@ Behavior:
 - Creates or updates triage/policy labels idempotently.
 - Keeps color/description aligned with workflow expectations.
 
+---
+
 ## Lane Guidance
 
 ### Low-risk autonomous lane
