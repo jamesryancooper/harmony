@@ -4,14 +4,15 @@ Dispatch explicitly to one `octon-pack-scaffolder` leaf target.
 
 Dispatcher behavior:
 
-- requires `--target`
+- accepts `--target` for explicit leaf routing
 - normalizes `--pack-id`
 - resolves the explicit target through `context/routing.contract.yml`
 - performs no implicit route inference beyond that contract
 - forwards only the arguments relevant to the selected leaf scaffold
 
 Use `--target pack|prompt-bundle|skill|command|context-doc|validation-fixture`
-to select the leaf scaffold explicitly.
+to select the leaf scaffold explicitly. If `--target` is omitted, return the
+dispatcher overview without selecting a mutating leaf.
 
 Supported targets:
 

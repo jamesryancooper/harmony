@@ -7,12 +7,12 @@ skills:
     parameters:
       - name: target
         type: text
-        required: true
-        description: "Explicit scaffold target: pack, prompt-bundle, skill, command, context-doc, or validation-fixture."
+        required: false
+        description: "Optional scaffold target: pack, prompt-bundle, skill, command, context-doc, or validation-fixture. Omit to return dispatcher overview."
       - name: pack_id
         type: text
-        required: true
-        description: "Target additive extension pack id."
+        required: false
+        description: "Target additive extension pack id. Required once a leaf target is selected."
       - name: display_name
         type: text
         required: false
