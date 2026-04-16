@@ -1,0 +1,84 @@
+schema_version: "extensions-skills-fragment-v1"
+skills:
+  - id: octon-pack-scaffolder
+    display_name: Octon Pack Scaffolder
+    group: extensions
+    path: octon-pack-scaffolder/
+    skill_class: invocable
+    summary: "Dispatch explicitly to one additive extension-pack scaffold target."
+    status: active
+    tags:
+      - octon
+      - extension-pack
+      - scaffolding
+      - additive
+    triggers:
+      - "octon pack scaffolder"
+      - "scaffold extension pack"
+      - "create additive extension pack asset"
+  - id: octon-pack-scaffolder-create-pack
+    display_name: Octon Pack Scaffolder Create Pack
+    group: extensions
+    path: octon-pack-scaffolder-create-pack/
+    skill_class: invocable
+    summary: "Scaffold a new additive extension pack root."
+    status: active
+    tags: [octon, extension-pack, scaffolding, pack]
+    triggers:
+      - "create extension pack"
+      - "scaffold pack root"
+  - id: octon-pack-scaffolder-create-prompt-bundle
+    display_name: Octon Pack Scaffolder Create Prompt Bundle
+    group: extensions
+    path: octon-pack-scaffolder-create-prompt-bundle/
+    skill_class: invocable
+    summary: "Scaffold a minimal pack-local prompt bundle."
+    status: active
+    tags: [octon, extension-pack, scaffolding, prompt-bundle]
+    triggers:
+      - "create prompt bundle"
+      - "scaffold extension prompt bundle"
+  - id: octon-pack-scaffolder-create-skill
+    display_name: Octon Pack Scaffolder Create Skill
+    group: extensions
+    path: octon-pack-scaffolder-create-skill/
+    skill_class: invocable
+    summary: "Scaffold a pack-local skill and matching fragment entries."
+    status: active
+    tags: [octon, extension-pack, scaffolding, skill]
+    triggers:
+      - "create extension skill"
+      - "scaffold pack skill"
+  - id: octon-pack-scaffolder-create-command
+    display_name: Octon Pack Scaffolder Create Command
+    group: extensions
+    path: octon-pack-scaffolder-create-command/
+    skill_class: invocable
+    summary: "Scaffold a pack-local command and manifest fragment entry."
+    status: active
+    tags: [octon, extension-pack, scaffolding, command]
+    triggers:
+      - "create extension command"
+      - "scaffold pack command"
+  - id: octon-pack-scaffolder-create-context-doc
+    display_name: Octon Pack Scaffolder Create Context Doc
+    group: extensions
+    path: octon-pack-scaffolder-create-context-doc/
+    skill_class: invocable
+    summary: "Scaffold a pack-local context document."
+    status: active
+    tags: [octon, extension-pack, scaffolding, context]
+    triggers:
+      - "create extension context doc"
+      - "scaffold pack context doc"
+  - id: octon-pack-scaffolder-create-validation-fixture
+    display_name: Octon Pack Scaffolder Create Validation Fixture
+    group: extensions
+    path: octon-pack-scaffolder-create-validation-fixture/
+    skill_class: invocable
+    summary: "Scaffold a pack-local validation scenario fixture."
+    status: active
+    tags: [octon, extension-pack, scaffolding, validation]
+    triggers:
+      - "create extension validation fixture"
+      - "scaffold pack validation scenario"

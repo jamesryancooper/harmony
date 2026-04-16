@@ -1,0 +1,219 @@
+schema_version: "extensions-skills-registry-fragment-v1"
+skills:
+  octon-pack-scaffolder:
+    version: "1.0.0"
+    commands:
+      - /octon-pack-scaffolder
+    parameters:
+      - name: target
+        type: text
+        required: true
+        description: "Explicit scaffold target: pack, prompt-bundle, skill, command, context-doc, or validation-fixture."
+      - name: pack_id
+        type: text
+        required: true
+        description: "Target additive extension pack id."
+      - name: display_name
+        type: text
+        required: false
+        description: "Optional display name for pack, skill, or command scaffolds."
+      - name: summary
+        type: text
+        required: false
+        description: "Optional one-line summary for the scaffolded asset."
+      - name: version
+        type: text
+        required: false
+        default: "0.1.0"
+        description: "Optional generated pack version."
+      - name: origin_class
+        type: text
+        required: false
+        default: "first_party_bundled"
+        description: "Optional generated pack origin class."
+      - name: bundle_id
+        type: text
+        required: false
+        description: "Prompt bundle id when target is prompt-bundle."
+      - name: stage_id
+        type: text
+        required: false
+        default: "run"
+        description: "Single stage id for minimal prompt-bundle scaffolds."
+      - name: skill_id
+        type: text
+        required: false
+        description: "Skill id when target is skill."
+      - name: command_id
+        type: text
+        required: false
+        description: "Command id when target is command."
+      - name: argument_hint
+        type: text
+        required: false
+        description: "Optional command argument hint text."
+      - name: doc_id
+        type: text
+        required: false
+        description: "Context document id when target is context-doc."
+      - name: title
+        type: text
+        required: false
+        description: "Optional context document title."
+      - name: fixture_id
+        type: text
+        required: false
+        description: "Validation fixture id when target is validation-fixture."
+      - name: target_kind
+        type: text
+        required: false
+        default: "pack"
+        description: "Fixture target kind for validation scenarios."
+    requires:
+      context: []
+  octon-pack-scaffolder-create-pack:
+    version: "1.0.0"
+    commands:
+      - /octon-pack-scaffolder-create-pack
+    parameters:
+      - name: pack_id
+        type: text
+        required: true
+        description: "Target additive extension pack id."
+      - name: display_name
+        type: text
+        required: false
+        description: "Optional pack display name."
+      - name: summary
+        type: text
+        required: false
+        description: "Optional pack summary."
+      - name: version
+        type: text
+        required: false
+        default: "0.1.0"
+        description: "Generated pack version."
+      - name: origin_class
+        type: text
+        required: false
+        default: "first_party_bundled"
+        description: "Generated pack origin class."
+    requires:
+      context: []
+  octon-pack-scaffolder-create-prompt-bundle:
+    version: "1.0.0"
+    commands:
+      - /octon-pack-scaffolder-create-prompt-bundle
+    parameters:
+      - name: pack_id
+        type: text
+        required: true
+        description: "Target additive extension pack id."
+      - name: bundle_id
+        type: text
+        required: true
+        description: "Prompt bundle id."
+      - name: summary
+        type: text
+        required: false
+        description: "Optional prompt bundle summary."
+      - name: stage_id
+        type: text
+        required: false
+        default: "run"
+        description: "Single stage id for the minimal bundle."
+    requires:
+      context: []
+  octon-pack-scaffolder-create-skill:
+    version: "1.0.0"
+    commands:
+      - /octon-pack-scaffolder-create-skill
+    parameters:
+      - name: pack_id
+        type: text
+        required: true
+        description: "Target additive extension pack id."
+      - name: skill_id
+        type: text
+        required: true
+        description: "Pack-local skill id."
+      - name: display_name
+        type: text
+        required: false
+        description: "Optional skill display name."
+      - name: summary
+        type: text
+        required: false
+        description: "Optional skill summary."
+    requires:
+      context: []
+  octon-pack-scaffolder-create-command:
+    version: "1.0.0"
+    commands:
+      - /octon-pack-scaffolder-create-command
+    parameters:
+      - name: pack_id
+        type: text
+        required: true
+        description: "Target additive extension pack id."
+      - name: command_id
+        type: text
+        required: true
+        description: "Pack-local command id."
+      - name: display_name
+        type: text
+        required: false
+        description: "Optional command display name."
+      - name: summary
+        type: text
+        required: false
+        description: "Optional command summary."
+      - name: argument_hint
+        type: text
+        required: false
+        description: "Optional command argument hint."
+    requires:
+      context: []
+  octon-pack-scaffolder-create-context-doc:
+    version: "1.0.0"
+    commands:
+      - /octon-pack-scaffolder-create-context-doc
+    parameters:
+      - name: pack_id
+        type: text
+        required: true
+        description: "Target additive extension pack id."
+      - name: doc_id
+        type: text
+        required: true
+        description: "Pack-local context document id."
+      - name: title
+        type: text
+        required: false
+        description: "Optional context document title."
+      - name: summary
+        type: text
+        required: false
+        description: "Optional context document summary."
+    requires:
+      context: []
+  octon-pack-scaffolder-create-validation-fixture:
+    version: "1.0.0"
+    commands:
+      - /octon-pack-scaffolder-create-validation-fixture
+    parameters:
+      - name: pack_id
+        type: text
+        required: true
+        description: "Target additive extension pack id."
+      - name: fixture_id
+        type: text
+        required: true
+        description: "Validation scenario fixture id."
+      - name: target_kind
+        type: text
+        required: false
+        default: "pack"
+        description: "Fixture target kind."
+    requires:
+      context: []
