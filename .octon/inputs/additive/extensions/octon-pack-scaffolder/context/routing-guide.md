@@ -23,7 +23,8 @@ bash .octon/framework/orchestration/runtime/_ops/scripts/resolve-extension-route
 - `target=command` -> `create-command`
 - `target=context-doc` -> `create-context-doc`
 - `target=validation-fixture` -> `create-validation-fixture`
-- missing or unsupported `target` -> blocked route result
+- missing `target` -> `dispatcher-overview`
+- unsupported `target` -> blocked route result
 
 The dispatcher is explicit by design. It does not infer routes from partial
 shape alone.
