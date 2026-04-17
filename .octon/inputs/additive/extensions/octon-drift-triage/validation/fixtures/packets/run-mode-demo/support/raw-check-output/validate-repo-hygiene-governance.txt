@@ -1,0 +1,1 @@
+[ERROR] demo repo-hygiene governance failure for fixture coverage

@@ -1,0 +1,1 @@
+[repo-hygiene] demo scan output for fixture coverage

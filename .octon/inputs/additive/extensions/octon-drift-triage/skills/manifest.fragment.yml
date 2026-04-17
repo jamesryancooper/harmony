@@ -1,0 +1,20 @@
+schema_version: "extensions-skills-fragment-v1"
+skills:
+  - id: octon-drift-triage
+    display_name: Octon Drift Triage
+    group: extensions
+    path: octon-drift-triage/
+    skill_class: invocable
+    summary: "Select and optionally run existing Octon checks from changed paths, then emit a ranked remediation packet."
+    status: active
+    tags:
+      - octon
+      - drift
+      - triage
+      - remediation
+      - extension-pack
+    triggers:
+      - "octon drift triage"
+      - "triage changed paths into remediation packet"
+      - "rank octon remediation checks"
+      - "build octon drift remediation report"
