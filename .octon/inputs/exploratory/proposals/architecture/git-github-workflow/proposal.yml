@@ -1,0 +1,28 @@
+schema_version: "proposal-v1"
+proposal_id: "git-github-workflow"
+title: "Octon Git + GitHub Worktree-Native Workflow Normalization"
+summary: >-
+  Architecture packet for a PR-first, worktree-native Git and GitHub workflow
+  that remains portable across any Git implementation and operator environment
+  that supports linked worktrees.
+proposal_kind: "architecture"
+promotion_scope: "octon-internal"
+promotion_targets:
+  - ".octon/instance/ingress/manifest.yml"
+  - ".octon/instance/ingress/AGENTS.md"
+  - ".octon/framework/agency/practices/git-autonomy-playbook.md"
+  - ".octon/framework/agency/practices/git-github-autonomy-workflow-v1.md"
+  - ".octon/framework/agency/practices/pull-request-standards.md"
+  - ".octon/framework/agency/_ops/scripts/git/git-pr-ship.sh"
+  - ".octon/framework/agency/_ops/scripts/git/git-pr-cleanup.sh"
+  - ".octon/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/SKILL.md"
+status: "in-review"
+lifecycle:
+  temporary: true
+  exit_expectation: >-
+    Promote the contextual closeout gate, worktree-native operating model,
+    review-thread semantics, and helper-script clarifications into durable
+    Octon ingress, practice, script, and skill surfaces, then archive this
+    packet once those durable targets stand without proposal-local
+    dependencies.
+related_proposals: []
