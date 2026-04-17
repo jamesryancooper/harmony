@@ -1,0 +1,53 @@
+schema_version: "octon-drift-triage-packet-v1"
+packet_id: "2026-04-15-octon-drift-triage-select-demo"
+generated_at: "2026-04-15T00:00:00Z"
+input_mode: "explicit-paths"
+changed_paths:
+  - ".octon/inputs/additive/extensions/octon-drift-triage/pack.yml"
+  - ".octon/instance/extensions.yml"
+diff_base: null
+diff_head: null
+mode: "select"
+selected_checks:
+  - check_id: "validate-extension-pack-contract"
+    family_id: "extension-publication"
+    status: "selected_not_run"
+    command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh"
+    report_ref: "reports/check-selection.md#validate-extension-pack-contract"
+  - check_id: "validate-extension-publication-state"
+    family_id: "extension-publication"
+    status: "selected_not_run"
+    command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh"
+    report_ref: "reports/check-selection.md#validate-extension-publication-state"
+  - check_id: "validate-runtime-effective-state"
+    family_id: "extension-publication"
+    status: "selected_not_run"
+    command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
+    report_ref: "reports/check-selection.md#validate-runtime-effective-state"
+recommended_bundles:
+  - bundle_id: "alignment-check-harness"
+    status: "recommended"
+    command: "bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness"
+repo_hygiene:
+  selected: false
+  mode: "scan"
+  status: "not-selected"
+ranking_model_version: "1.0.0"
+remediation_items:
+  - item_id: "extension-publication-remediation"
+    priority: "medium"
+    score: 55
+    affected_paths:
+      - ".octon/inputs/additive/extensions/octon-drift-triage/pack.yml"
+      - ".octon/instance/extensions.yml"
+    governing_checks:
+      - "validate-extension-pack-contract"
+      - "validate-extension-publication-state"
+      - "validate-runtime-effective-state"
+    why_selected: "Extension publication surfaces changed and require publication-state review."
+    recommended_actions:
+      - "Review the raw pack contract."
+      - "Review effective extension publication coherence."
+      - "Run the harness alignment profile if wider drift is suspected."
+    report_refs:
+      - "reports/ranked-remediation.md#extension-publication-remediation"

@@ -1,0 +1,4 @@
+# Changed Paths
+
+- `.octon/inputs/additive/extensions/octon-drift-triage/pack.yml`
+- `.octon/instance/extensions.yml`

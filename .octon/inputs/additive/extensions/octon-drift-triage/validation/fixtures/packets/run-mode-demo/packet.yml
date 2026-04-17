@@ -1,0 +1,42 @@
+schema_version: "octon-drift-triage-packet-v1"
+packet_id: "2026-04-15-octon-drift-triage-run-demo"
+generated_at: "2026-04-15T00:00:00Z"
+input_mode: "git-diff"
+changed_paths:
+  - ".github/workflows/repo-hygiene.yml"
+  - ".octon/instance/governance/contracts/drift-review.yml"
+diff_base: "origin/main"
+diff_head: "HEAD"
+mode: "run"
+selected_checks:
+  - check_id: "validate-repo-hygiene-governance"
+    family_id: "repo-hygiene-governance"
+    status: "failed"
+    command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh"
+    report_ref: "reports/check-results.md#validate-repo-hygiene-governance"
+recommended_bundles:
+  - bundle_id: "alignment-check-harness"
+    status: "recommended"
+    command: "bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --profile harness"
+repo_hygiene:
+  selected: true
+  mode: "scan"
+  status: "passed"
+ranking_model_version: "1.0.0"
+remediation_items:
+  - item_id: "repo-hygiene-governance-remediation"
+    priority: "critical"
+    score: 95
+    affected_paths:
+      - ".github/workflows/repo-hygiene.yml"
+      - ".octon/instance/governance/contracts/drift-review.yml"
+    governing_checks:
+      - "validate-repo-hygiene-governance"
+      - "repo-hygiene-scan"
+    why_selected: "Repo-hygiene governance changed and drift-review triggers were hit."
+    recommended_actions:
+      - "Inspect repo-hygiene governance wiring."
+      - "Review the repo-hygiene scan output."
+      - "Resolve any missing packet-attachment or workflow drift."
+    report_refs:
+      - "reports/ranked-remediation.md#repo-hygiene-governance-remediation"

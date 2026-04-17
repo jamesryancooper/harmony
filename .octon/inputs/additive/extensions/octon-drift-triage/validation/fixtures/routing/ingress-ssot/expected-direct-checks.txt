@@ -1,0 +1,3 @@
+validate-bootstrap-ingress
+validate-bootstrap-projections
+validate-ssot-precedence-drift

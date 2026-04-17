@@ -1,0 +1,3 @@
+validate-extension-pack-contract
+validate-extension-publication-state
+validate-runtime-effective-state

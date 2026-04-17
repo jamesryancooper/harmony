@@ -1,0 +1,35 @@
+schema_version: "extensions-skills-registry-fragment-v1"
+skills:
+  octon-drift-triage:
+    version: "1.0.0"
+    commands:
+      - /octon-drift-triage
+    parameters:
+      - name: changed_paths
+        type: text
+        required: false
+        description: "Comma-separated or newline-separated repo-relative changed paths."
+      - name: diff_base
+        type: text
+        required: false
+        description: "Git base ref for diff-driven path collection."
+      - name: diff_head
+        type: text
+        required: false
+        description: "Optional Git head ref. Defaults to HEAD when diff_base is set."
+      - name: packet_path
+        type: text
+        required: false
+        description: "Existing octon-drift-triage packet path to refresh in place."
+      - name: mode
+        type: text
+        required: false
+        default: "select"
+        description: "Bundle mode: select or run."
+      - name: alignment_mode
+        type: text
+        required: false
+        default: "auto"
+        description: "Prompt-set freshness mode: auto, always, or skip."
+    requires:
+      context: []

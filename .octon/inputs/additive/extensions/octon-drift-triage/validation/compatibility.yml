@@ -1,0 +1,39 @@
+schema_version: "octon-extension-compatibility-profile-v1"
+version: "1.0.0"
+compatibility:
+  required_files: []
+  required_directories:
+    - ".octon/inputs/exploratory/packages"
+    - ".octon/state/evidence/validation/extensions"
+    - ".octon/generated/effective/extensions"
+    - ".octon/generated/effective/capabilities"
+  required_commands:
+    - ".octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-extension-pack-contract.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-extension-local-tests.sh"
+    - ".octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-capability-publication-state.sh"
+    - ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-host-projections.sh"
+    - ".octon/framework/orchestration/runtime/_ops/scripts/resolve-extension-prompt-bundle.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-bootstrap-ingress.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-bootstrap-projections.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-ssot-precedence-drift.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-non-authority-register.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-repo-hygiene-governance.sh"
+    - ".octon/instance/capabilities/runtime/commands/repo-hygiene/repo-hygiene.sh"
+  minimum_behavior:
+    fail_closed_publication: true
+    compiled_runtime_consumption_only: true
+    host_generated_receipts: true
+  optional_features:
+    - feature_id: "host-projections"
+      description: "Publish and validate projected host surfaces for the extension command and skill."
+      required_files: []
+      required_directories: []
+      required_commands:
+        - ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+        - ".octon/framework/assurance/runtime/_ops/scripts/validate-host-projections.sh"
+      minimum_behavior: {}
