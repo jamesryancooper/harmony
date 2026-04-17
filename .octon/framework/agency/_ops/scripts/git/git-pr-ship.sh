@@ -2,11 +2,11 @@
 set -euo pipefail
 
 PR_NUMBER=""
-MARK_READY=1
-REQUEST_AUTOMERGE=1
+REQUEST_READY=0
+REQUEST_AUTOMERGE=0
 DRY_RUN=0
 LABELS_CSV=""
-WAIT_FOR_CLOSE=1
+WAIT_FOR_CLOSE=0
 WAIT_TIMEOUT_SECONDS=1800
 RUN_CLEANUP=1
 BACKGROUND_WATCH_TIMEOUT_SECONDS=86400
@@ -18,16 +18,16 @@ Usage:
 
 Options:
   --label <name>         Add additional label(s) before requesting ship actions (repeatable).
-  --no-ready             Do not request the ready-for-review transition.
-  --no-automerge         Skip the GitHub squash auto-merge request.
-  --no-wait              Do not block waiting for PR closure.
+  --request-ready        Request the ready-for-review transition.
+  --request-automerge    Request GitHub squash auto-merge.
+  --wait                 Wait for PR closure after requesting auto-merge.
   --wait-timeout-seconds Seconds to wait for closure before background watcher (default: 1800).
   --no-cleanup           Do not run local cleanup after PR closure.
   --dry-run              Print actions without mutating PR state.
 
 Default behavior:
-  1) request ready-for-review if the PR is still draft,
-  2) request squash auto-merge on GitHub.
+  Report current PR status, lane hints, and blockers without mutating PR state.
+  Use explicit request flags to ask GitHub for ready or auto-merge transitions.
   GitHub required checks and review rules remain the final merge gate.
 USAGE
 }
@@ -50,6 +50,59 @@ require_cmd() {
   command -v "$cmd" >/dev/null 2>&1 || error "Missing required command: $cmd"
 }
 
+urlencode() {
+  jq -nr --arg value "$1" '$value|@uri'
+}
+
+origin_repo_slug() {
+  local url
+  url="$(git remote get-url origin 2>/dev/null || true)"
+  case "$url" in
+    git@github.com:*)
+      url="${url#git@github.com:}"
+      ;;
+    ssh://git@github.com/*)
+      url="${url#ssh://git@github.com/}"
+      ;;
+    https://github.com/*)
+      url="${url#https://github.com/}"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+  url="${url%.git}"
+  printf '%s\n' "$url"
+}
+
+gh_api_retry() {
+  local attempt output err_file err_text rc
+  local -a args=("$@")
+
+  for attempt in 1 2 3; do
+    err_file="$(mktemp "${TMPDIR:-/tmp}/gh-api.XXXXXX")"
+    if output="$(gh api "${args[@]}" 2>"$err_file")"; then
+      rm -f "$err_file"
+      printf '%s' "$output"
+      return 0
+    fi
+    rc=$?
+    err_text="$(cat "$err_file")"
+    rm -f "$err_file"
+
+    if [[ $attempt -lt 3 ]] && [[ "$err_text" == *"error connecting to api.github.com"* ]]; then
+      sleep "$attempt"
+      continue
+    fi
+
+    [[ -n "$err_text" ]] && printf '%s\n' "$err_text" >&2
+    return "$rc"
+  done
+
+  [[ -n "${err_text:-}" ]] && printf '%s\n' "$err_text" >&2
+  return 1
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --pr)
@@ -66,14 +119,14 @@ while [[ $# -gt 0 ]]; do
         LABELS_CSV="${LABELS_CSV},$1"
       fi
       ;;
-    --no-ready)
-      MARK_READY=0
+    --request-ready)
+      REQUEST_READY=1
       ;;
-    --no-automerge)
-      REQUEST_AUTOMERGE=0
+    --request-automerge)
+      REQUEST_AUTOMERGE=1
       ;;
-    --no-wait)
-      WAIT_FOR_CLOSE=0
+    --wait)
+      WAIT_FOR_CLOSE=1
       ;;
     --wait-timeout-seconds)
       shift
@@ -99,6 +152,10 @@ done
 
 require_cmd gh
 require_cmd jq
+
+REPO_SLUG="$(origin_repo_slug)"
+[[ -n "$REPO_SLUG" ]] || error "Unable to resolve origin repo slug."
+REPO_OWNER="${REPO_SLUG%%/*}"
 
 [[ "$WAIT_TIMEOUT_SECONDS" =~ ^[0-9]+$ ]] || error "--wait-timeout-seconds must be a positive integer."
 
@@ -127,19 +184,57 @@ launch_background_watcher() {
 }
 
 if [[ -z "$PR_NUMBER" ]]; then
-  PR_NUMBER="$(gh pr view --json number --jq '.number' 2>/dev/null || true)"
-  [[ -n "$PR_NUMBER" ]] || error "Unable to resolve current branch PR. Pass --pr <number>."
+  CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  [[ -n "$CURRENT_BRANCH" && "$CURRENT_BRANCH" != "HEAD" ]] || error "Unable to resolve current branch PR. Pass --pr <number>."
+  HEAD_QUERY="$(urlencode "${REPO_OWNER}:${CURRENT_BRANCH}")"
+  PR_NUMBER="$(gh_api_retry "repos/${REPO_SLUG}/pulls?state=open&head=${HEAD_QUERY}&per_page=1" | jq -r '.[0].number // empty' 2>/dev/null || true)"
+  if [[ -z "$PR_NUMBER" ]]; then
+    if [[ "$REQUEST_READY" -eq 0 && "$REQUEST_AUTOMERGE" -eq 0 ]]; then
+      echo "[WARN] Unable to resolve the current branch PR right now."
+      echo "[OK] Status unavailable. GitHub API lookup is currently failing, so treat this as a blocker rather than as proof of readiness."
+      exit 0
+    fi
+    error "Unable to resolve current branch PR. Pass --pr <number>."
+  fi
 fi
 
-PR_PAYLOAD="$(gh pr view "$PR_NUMBER" --json state,isDraft,url,headRefName 2>/dev/null || true)"
-[[ -n "$PR_PAYLOAD" ]] || error "Unable to load PR #${PR_NUMBER}."
+PR_PAYLOAD="$(gh_api_retry "repos/${REPO_SLUG}/pulls/${PR_NUMBER}" || true)"
+if [[ -z "$PR_PAYLOAD" ]]; then
+  if [[ "$REQUEST_READY" -eq 0 && "$REQUEST_AUTOMERGE" -eq 0 ]]; then
+    echo "[WARN] Unable to load PR #${PR_NUMBER} right now."
+    echo "[OK] Status unavailable. GitHub API lookup is currently failing, so treat this as a blocker rather than as proof of readiness."
+    exit 0
+  fi
+  error "Unable to load PR #${PR_NUMBER}."
+fi
 
-PR_STATE="$(jq -r '.state' <<<"$PR_PAYLOAD")"
-PR_IS_DRAFT="$(jq -r '.isDraft' <<<"$PR_PAYLOAD")"
-PR_URL="$(jq -r '.url' <<<"$PR_PAYLOAD")"
+PR_STATE="$(jq -r '.state | ascii_upcase' <<<"$PR_PAYLOAD")"
+PR_IS_DRAFT="$(jq -r '.draft' <<<"$PR_PAYLOAD")"
+PR_URL="$(jq -r '.html_url // .url' <<<"$PR_PAYLOAD")"
+PR_HEAD_REF="$(jq -r '.head.ref' <<<"$PR_PAYLOAD")"
 
 if [[ "$PR_STATE" != "OPEN" ]]; then
   error "PR #${PR_NUMBER} is not open (state=$PR_STATE)."
+fi
+
+lane_hint="autonomous-candidate"
+if [[ "$PR_HEAD_REF" == exp/* ]]; then
+  lane_hint="manual"
+fi
+
+if [[ "$REQUEST_AUTOMERGE" -eq 1 && "$PR_IS_DRAFT" == "true" && "$REQUEST_READY" -eq 0 ]]; then
+  error "Cannot request auto-merge while the PR is draft. Add --request-ready or move the PR to ready first."
+fi
+
+if [[ "$REQUEST_READY" -eq 0 && "$REQUEST_AUTOMERGE" -eq 0 ]]; then
+  info "Status for PR #${PR_NUMBER}: state=${PR_STATE}, draft=${PR_IS_DRAFT}, lane-hint=${lane_hint}."
+  if [[ "$PR_IS_DRAFT" == "true" ]]; then
+    info "Blocker: PR is still draft. Use --request-ready when author action items are closed."
+  else
+    info "PR is already in a non-draft state."
+  fi
+  echo "[OK] Status only. Use --request-ready and/or --request-automerge to request transitions. GitHub remains the final merge gate: $PR_URL"
+  exit 0
 fi
 
 info "Preparing helper requests for PR #${PR_NUMBER}. GitHub remains the final merge gate."
@@ -154,7 +249,7 @@ if [[ -n "$LABELS_TO_ADD" ]]; then
   fi
 fi
 
-if [[ "$MARK_READY" -eq 1 && "$PR_IS_DRAFT" == "true" ]]; then
+if [[ "$REQUEST_READY" -eq 1 && "$PR_IS_DRAFT" == "true" ]]; then
   if [[ "$DRY_RUN" -eq 1 ]]; then
     echo "[DRY] gh pr ready \"$PR_NUMBER\""
   else
@@ -178,9 +273,9 @@ if [[ "$RUN_CLEANUP" -eq 1 ]]; then
       info "Waiting for PR #${PR_NUMBER} to close (timeout=${WAIT_TIMEOUT_SECONDS}s)."
       start_epoch="$(date +%s)"
       while true; do
-        PR_STATUS_PAYLOAD="$(gh pr view "$PR_NUMBER" --json state,url 2>/dev/null || true)"
+        PR_STATUS_PAYLOAD="$(gh_api_retry "repos/${REPO_SLUG}/pulls/${PR_NUMBER}" || true)"
         if [[ -n "$PR_STATUS_PAYLOAD" ]]; then
-          current_state="$(jq -r '.state' <<<"$PR_STATUS_PAYLOAD")"
+          current_state="$(jq -r '.state | ascii_upcase' <<<"$PR_STATUS_PAYLOAD")"
           if [[ "$current_state" != "OPEN" ]]; then
             info "PR #${PR_NUMBER} is now ${current_state}; running local cleanup."
             [[ -x "$CLEANUP_SCRIPT" ]] || error "Cleanup script is missing or not executable: $CLEANUP_SCRIPT"
@@ -201,13 +296,11 @@ if [[ "$RUN_CLEANUP" -eq 1 ]]; then
     fi
   elif [[ "$REQUEST_AUTOMERGE" -eq 1 && "$WAIT_FOR_CLOSE" -eq 0 ]]; then
     launch_background_watcher "no-wait"
-  elif [[ "$REQUEST_AUTOMERGE" -eq 0 ]]; then
-    launch_background_watcher "manual-lane"
   fi
 fi
 
 READY_SUMMARY="did not request ready-for-review"
-if [[ "$MARK_READY" -eq 1 ]]; then
+if [[ "$REQUEST_READY" -eq 1 ]]; then
   if [[ "$PR_IS_DRAFT" == "true" ]]; then
     READY_SUMMARY="requested ready-for-review"
   else
