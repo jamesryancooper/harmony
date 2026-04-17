@@ -1,0 +1,32 @@
+schema_version: "proposal-v1"
+proposal_id: "git-github-autonomous-workflow-hardening"
+title: "Octon Git + GitHub Autonomous Workflow Hardening"
+summary: >-
+  Follow-on architecture packet to harden Octon's live worktree-native
+  Git and GitHub workflow by removing authoritative drift across closeout,
+  review-remediation, helper-script, and validation surfaces while preserving
+  portability across any environment that supports linked worktrees.
+proposal_kind: "architecture"
+promotion_scope: "octon-internal"
+promotion_targets:
+  - ".octon/instance/ingress/manifest.yml"
+  - ".octon/instance/ingress/AGENTS.md"
+  - ".octon/framework/agency/practices/standards/git-worktree-autonomy-contract.yml"
+  - ".octon/framework/agency/practices/git-autonomy-playbook.md"
+  - ".octon/framework/agency/practices/git-github-autonomy-workflow-v1.md"
+  - ".octon/framework/agency/practices/pull-request-standards.md"
+  - ".octon/framework/agency/_ops/scripts/git/git-pr-ship.sh"
+  - ".octon/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/SKILL.md"
+  - ".octon/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/references/safety.md"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-git-github-workflow-alignment.sh"
+  - ".octon/framework/assurance/runtime/_ops/tests/test-git-github-workflow-alignment.sh"
+status: "draft"
+lifecycle:
+  temporary: true
+  exit_expectation: >-
+    Promote the canonical workflow contract, explicit ready-pr closeout
+    handling, review-remediation safety rules, helper-script request/status
+    semantics, and alignment validator into durable Octon surfaces, then
+    archive this packet once the live workflow can stand without proposal-local
+    guidance.
+related_proposals: []
