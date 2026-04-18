@@ -20,7 +20,24 @@ promotion_targets:
   - ".octon/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/references/safety.md"
   - ".octon/framework/assurance/runtime/_ops/scripts/validate-git-github-workflow-alignment.sh"
   - ".octon/framework/assurance/runtime/_ops/tests/test-git-github-workflow-alignment.sh"
-status: "draft"
+status: "archived"
+archive:
+  archived_at: "2026-04-17"
+  archived_from_status: "implemented"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/git-github-autonomous-workflow-hardening"
+  promotion_evidence:
+    - ".octon/instance/ingress/manifest.yml"
+    - ".octon/instance/ingress/AGENTS.md"
+    - ".octon/framework/agency/practices/standards/git-worktree-autonomy-contract.yml"
+    - ".octon/framework/agency/practices/git-autonomy-playbook.md"
+    - ".octon/framework/agency/practices/git-github-autonomy-workflow-v1.md"
+    - ".octon/framework/agency/practices/pull-request-standards.md"
+    - ".octon/framework/agency/_ops/scripts/git/git-pr-ship.sh"
+    - ".octon/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/SKILL.md"
+    - ".octon/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/references/safety.md"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-git-github-workflow-alignment.sh"
+    - ".octon/framework/assurance/runtime/_ops/tests/test-git-github-workflow-alignment.sh"
 lifecycle:
   temporary: true
   exit_expectation: >-
