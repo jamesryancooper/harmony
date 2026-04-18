@@ -12,6 +12,7 @@ claim_summary="Octon's full Unified Execution Constitution attainment is not yet
 if [[ "$claim_status" == "complete" ]]; then
   claim_summary="Octon materially substantiates a bounded Unified Execution Constitution for the admitted live support universe, with release disclosure, support claims, exemplar run evidence, and dual-pass certification regenerated from canonical repo surfaces."
 fi
+support_mode="$(yq -r '.support_claim_mode // "bounded-admitted-finite"' "$SUPPORT_TARGETS_DECLARATION")"
 {
   echo "schema_version: harness-card-v2"
   echo "card_id: hc-target-state-closure-$release_id"
@@ -22,35 +23,14 @@ fi
   echo "support_target_ref: .octon/instance/governance/support-targets.yml"
   echo "governance_exclusions_ref: .octon/instance/governance/exclusions/action-classes.yml"
   echo "support_universe:"
-  echo "  model_classes:"
-  echo "    - repo-local-governed"
-  echo "    - frontier-governed"
-  echo "  workload_classes:"
-  echo "    - observe-and-read"
-  echo "    - repo-consequential"
-  echo "    - boundary-sensitive"
-  echo "  context_classes:"
-  echo "    - reference-owned"
-  echo "    - extended-governed"
-  echo "  locale_classes:"
-  echo "    - english-primary"
-  echo "    - spanish-secondary"
+  yq -P '.live_support_universe' "$SUPPORT_TARGETS_DECLARATION" | sed 's/^/  /'
   echo "retained_adapters:"
   echo "  host_adapters:"
-  echo "    - repo-shell"
-  echo "    - github-control-plane"
-  echo "    - ci-control-plane"
-  echo "    - studio-control-plane"
+  yq -r '.live_support_universe.host_adapters[]' "$SUPPORT_TARGETS_DECLARATION" | sed 's/^/    - /'
   echo "  model_adapters:"
-  echo "    - repo-local-governed"
-  echo "    - frontier-governed"
+  yq -r '.live_support_universe.model_adapters[]' "$SUPPORT_TARGETS_DECLARATION" | sed 's/^/    - /'
   echo "capability_packs:"
-  echo "  - repo"
-  echo "  - git"
-  echo "  - shell"
-  echo "  - telemetry"
-  echo "  - browser"
-  echo "  - api"
+  yq -r '.live_support_universe.capability_packs[]' "$SUPPORT_TARGETS_DECLARATION" | sed 's/^/  - /'
   echo "coverage_ledger_ref: .octon/state/evidence/disclosure/releases/$release_id/closure/support-universe-coverage.yml"
   echo "proof_bundle_refs:"
   echo "  - .octon/framework/constitution/claim-truth-conditions.yml"

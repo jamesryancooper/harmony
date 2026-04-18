@@ -3,7 +3,7 @@ owner: "Octon governance"
 default_route: "deny"
 review_cadence: "quarterly and before any support-universe amendment"
 governance_exclusions_ref: ".octon/instance/governance/exclusions/action-classes.yml"
-support_claim_mode: "bounded-admitted-live-universe"
+support_claim_mode: "bounded-admitted-finite"
 generated_projection_ref: ".octon/generated/effective/governance/support-target-matrix.yml"
 pack_registry_ref: ".octon/instance/governance/capability-packs/registry.yml"
 admission_review_contract_ref: ".octon/instance/governance/contracts/support-target-review.yml"
@@ -11,47 +11,40 @@ support_dossier_root: ".octon/instance/governance/support-dossiers"
 live_support_universe:
   model_classes:
     - "repo-local-governed"
-    - "frontier-governed"
   workload_classes:
     - "observe-and-read"
     - "repo-consequential"
-    - "boundary-sensitive"
   context_classes:
     - "reference-owned"
-    - "extended-governed"
   locale_classes:
     - "english-primary"
-    - "spanish-secondary"
   host_adapters:
     - "repo-shell"
-    - "github-control-plane"
     - "ci-control-plane"
-    - "studio-control-plane"
   model_adapters:
     - "repo-local-governed"
-    - "frontier-governed"
   capability_packs:
     - "repo"
     - "git"
     - "shell"
     - "telemetry"
-    - "browser"
-    - "api"
 resolved_non_live_surfaces:
   model_classes:
-    []
+    - "frontier-governed"
   workload_classes:
-    []
+    - "boundary-sensitive"
   context_classes:
-    []
+    - "extended-governed"
   locale_classes:
-    []
+    - "spanish-secondary"
   host_adapters:
-    []
+    - "github-control-plane"
+    - "studio-control-plane"
   model_adapters:
-    []
+    - "frontier-governed"
   capability_packs:
-    []
+    - "browser"
+    - "api"
 tiers:
   model:
     - id: "frontier-governed"
@@ -231,7 +224,7 @@ host_adapters:
     contract_ref: ".octon/framework/engine/runtime/adapters/host/studio-control-plane.yml"
     authority_mode: "non_authoritative"
     replaceable: true
-    support_status: "supported"
+    support_status: "stage_only"
     default_route: "escalate"
     criteria_refs:
       - "HOST-001"
@@ -258,7 +251,7 @@ host_adapters:
     contract_ref: ".octon/framework/engine/runtime/adapters/host/github-control-plane.yml"
     authority_mode: "non_authoritative"
     replaceable: true
-    support_status: "supported"
+    support_status: "stage_only"
     default_route: "allow"
     criteria_refs:
       - "HOST-001"
@@ -341,7 +334,7 @@ model_adapters:
     contract_ref: ".octon/framework/engine/runtime/adapters/model/frontier-governed.yml"
     authority_mode: "non_authoritative"
     replaceable: true
-    support_status: "supported"
+    support_status: "stage_only"
     default_route: "escalate"
     criteria_refs:
       - "MODEL-001"
@@ -366,9 +359,9 @@ model_adapters:
       - "instruction-layer-manifest"
       - "run-evidence-root"
 notes:
-  - "The live claim is the bounded admitted live support universe recorded above; tuple_admissions is an inventory-plus-reference table only."
+  - "The live claim is the bounded admitted finite supported tuple set; tuple_admissions is the inventory and authoritative reference layer for both supported and non-live tuples."
   - "Tuple-specific route, mission, capability-pack, proof-plane, authority-artifact, and claim-effect semantics live only in support-target-admissions/**."
-  - "Mission-backed repo-consequential and boundary-sensitive work remains explicit and fail-closed."
+  - "Stage-only, unsupported, and unadmitted tuple surfaces remain explicit non-live posture and must not be widened by generated or disclosure projections."
 retired_surfaces:
   - "experimental-model-surface"
   - "experimental-context-surface"

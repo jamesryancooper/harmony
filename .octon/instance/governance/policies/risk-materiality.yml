@@ -1,0 +1,48 @@
+schema_version: "risk-materiality-policy-v1"
+owner: "Octon governance"
+tiers:
+  - classification_id: "observe-read-low"
+    action_types:
+      - "observe_read"
+    materiality_class: "low"
+    risk_tier: "ACP-1"
+    reversibility_class: "reversible"
+    required_route: "allow"
+    required_approval_artifacts: []
+    required_evidence:
+      - "execution-receipt"
+  - classification_id: "repo-change-moderate"
+    action_types:
+      - "mutate_repo"
+      - "git.commit"
+    materiality_class: "moderate"
+    risk_tier: "ACP-2"
+    reversibility_class: "reversible"
+    required_route: "escalate"
+    required_approval_artifacts:
+      - "decision-artifact"
+      - "grant-bundle"
+    required_evidence:
+      - "execution-receipt"
+      - "rollback-plan"
+      - "run-card"
+  - classification_id: "boundary-sensitive-high"
+    action_types:
+      - "browser_action"
+      - "api_egress"
+      - "protected_branch_mutation"
+    materiality_class: "high"
+    risk_tier: "ACP-3"
+    reversibility_class: "compensable"
+    required_route: "stage_only"
+    required_approval_artifacts:
+      - "approval-request"
+      - "approval-grant"
+      - "decision-artifact"
+      - "grant-bundle"
+    required_evidence:
+      - "execution-receipt"
+      - "rollback-plan"
+      - "replay-manifest"
+      - "trace-pointer"
+      - "run-card"

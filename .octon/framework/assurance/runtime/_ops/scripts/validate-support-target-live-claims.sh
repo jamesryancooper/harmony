@@ -36,18 +36,19 @@ require_equal_rendered() {
 main() {
   echo "== Support-Target Live Claim Validation =="
 
-  require_yq '.support_claim_mode == "bounded-admitted-live-universe"' "$SUPPORT_TARGETS" "support-target declaration uses bounded admitted-universe claim mode"
+  require_yq '.support_claim_mode == "bounded-admitted-finite"' "$SUPPORT_TARGETS" "support-target declaration uses bounded admitted-finite claim mode"
   require_yq '(.tuple_admissions | length) == 6' "$SUPPORT_TARGETS" "all six target tuples remain inventoried"
-  require_yq '.live_support_universe.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github host adapter is live supported"
+  require_yq '.live_support_universe.host_adapters[] | select(. == "repo-shell")' "$SUPPORT_TARGETS" "repo-shell host adapter is live supported"
   require_yq '.live_support_universe.host_adapters[] | select(. == "ci-control-plane")' "$SUPPORT_TARGETS" "ci host adapter is live supported"
-  require_yq '.live_support_universe.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio host adapter is live supported"
-  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "admitted")' "$PACK_REGISTRY" "browser pack is admitted"
-  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "admitted")' "$PACK_REGISTRY" "api pack is admitted"
+  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github host adapter is explicitly non-live"
+  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio host adapter is explicitly non-live"
+  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "unadmitted")' "$PACK_REGISTRY" "browser pack is unadmitted"
+  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "unadmitted")' "$PACK_REGISTRY" "api pack is unadmitted"
 
   require_yq '.claim_summary == load("'"$AUTHORED_CARD"'").claim_summary' "$RELEASE_CARD" "active release HarnessCard wording matches authored disclosure"
   require_equal_rendered '.known_limits' "$AUTHORED_CARD" "$RESIDUAL_LEDGER" "authored HarnessCard known limits match the residual ledger"
   require_equal_rendered '.known_limits' "$RELEASE_CARD" "$RESIDUAL_LEDGER" "active release HarnessCard known limits match the residual ledger"
-  require_yq '(.excluded_surfaces | length) == 0' "$COVERAGE_LEDGER" "coverage ledger contains no excluded in-scope surfaces"
+  require_yq '(.excluded_surfaces | length) >= 1' "$COVERAGE_LEDGER" "coverage ledger records explicit non-live surfaces"
 
   echo "Validation summary: errors=$errors"
   [[ $errors -eq 0 ]]

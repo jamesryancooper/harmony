@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/runtime/browser-ui-execution-record-v1.schema.json",
+  "title": "Octon Browser UI Execution Record v1",
+  "description": "Retained browser/UI action evidence for governed browser execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "run_id",
+    "session_id",
+    "event_ledger_ref",
+    "replay_manifest_ref",
+    "trace_pointer_ref",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "browser-ui-execution-record-v1"
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_ledger_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "replay_manifest_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_pointer_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "screenshot_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "dom_capture_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -22,18 +22,19 @@ require_ref() {
 main() {
   echo "== Support-Target Normalization Validation =="
 
-  require_yq '.support_claim_mode == "bounded-admitted-live-universe"' "$SUPPORT_TARGETS" "support-target declaration uses bounded admitted-universe claim mode"
-  require_yq '.live_support_universe.model_classes[] | select(. == "frontier-governed")' "$SUPPORT_TARGETS" "live support universe includes frontier-governed"
-  require_yq '.live_support_universe.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "live support universe includes github-control-plane"
+  require_yq '.support_claim_mode == "bounded-admitted-finite"' "$SUPPORT_TARGETS" "support-target declaration uses bounded admitted-finite claim mode"
+  require_yq '.live_support_universe.model_classes[] | select(. == "repo-local-governed")' "$SUPPORT_TARGETS" "live support universe includes repo-local-governed"
+  require_yq '.resolved_non_live_surfaces.model_classes[] | select(. == "frontier-governed")' "$SUPPORT_TARGETS" "frontier-governed is explicitly non-live"
+  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github-control-plane is explicitly non-live"
   require_yq '.live_support_universe.host_adapters[] | select(. == "ci-control-plane")' "$SUPPORT_TARGETS" "live support universe includes ci-control-plane"
-  require_yq '.live_support_universe.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "live support universe includes studio-control-plane"
+  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio-control-plane is explicitly non-live"
   require_yq 'has("compatibility_matrix") | not' "$SUPPORT_TARGETS" "support-target declaration no longer embeds a duplicate compatibility matrix"
   require_yq '(.tuple_admissions | length) == 6' "$SUPPORT_TARGETS" "all six tuples remain inventoried in the declaration"
   require_yq '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell") | .admission_ref == ".octon/instance/governance/support-target-admissions/repo-shell-repo-consequential-en.yml"' "$SUPPORT_TARGETS" "repo-shell consequential tuple points at canonical admission"
-  require_yq '(.resolved_non_live_surfaces.host_adapters | length) == 0' "$SUPPORT_TARGETS" "resolved non-live host adapters list is empty"
+  require_yq '(.resolved_non_live_surfaces.host_adapters | length) >= 1' "$SUPPORT_TARGETS" "resolved non-live host adapters are tracked explicitly"
   require_ref "$(yq -r '.generated_projection_ref' "$SUPPORT_TARGETS")" "generated effective matrix ref"
-  require_yq '.supported_tuples | length == 6' "$EFFECTIVE_MATRIX" "effective matrix reflects all supported tuples"
-  require_yq '[.supported_tuples[].capability_packs[] | select(. == "browser" or . == "api")] | length >= 2' "$EFFECTIVE_MATRIX" "supported effective matrix includes browser and api where admitted"
+  require_yq '.supported_tuples | length == 3' "$EFFECTIVE_MATRIX" "effective matrix reflects only the supported live tuples"
+  require_yq '[.supported_tuples[].capability_packs[] | select(. == "browser" or . == "api")] | length == 0' "$EFFECTIVE_MATRIX" "supported effective matrix excludes browser and api while unadmitted"
 
   while IFS= read -r ref; do
     [[ -n "$ref" ]] || continue

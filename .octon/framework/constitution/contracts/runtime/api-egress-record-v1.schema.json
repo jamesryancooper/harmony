@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/runtime/api-egress-record-v1.schema.json",
+  "title": "Octon API Egress Record v1",
+  "description": "Retained outbound API and connector evidence for governed egress.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "run_id",
+    "lease_ref",
+    "target_host",
+    "request_trace_ref",
+    "response_trace_ref",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "api-egress-record-v1"
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lease_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_host": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_trace_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "response_trace_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "redaction_policy_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "compensation_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

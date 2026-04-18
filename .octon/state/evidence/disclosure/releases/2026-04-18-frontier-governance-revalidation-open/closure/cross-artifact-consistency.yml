@@ -1,0 +1,4 @@
+schema_version: octon-cross-artifact-consistency-v1
+release_id: 2026-04-18-frontier-governance-revalidation-open
+status: pass
+summary: Authored support-target, pack-admission, and disclosure surfaces all resolve the same bounded admitted live claim.

@@ -1,0 +1,15 @@
+schema_version: recertification-status-v1
+release_id: 2026-04-18-frontier-governance-bounded-complete
+generated_at: "2026-04-18T00:00:00Z"
+certification_mode: frontier-governance-bounded-complete
+status: valid
+trigger_log_ref: .octon/instance/governance/closure/recertification-trigger-log.yml
+active_certificate_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/closure-certificate.yml
+active_harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/harness-card.yml
+trigger_summary:
+  total: 0
+  clear: 0
+  blocking: 0
+summary: >-
+  The bounded admitted finite live claim is certified complete for the active
+  supported tuple subset.

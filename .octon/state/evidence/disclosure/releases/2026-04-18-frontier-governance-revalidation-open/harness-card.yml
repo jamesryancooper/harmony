@@ -1,0 +1,50 @@
+schema_version: harness-card-v2
+card_id: hc-frontier-governance-revalidation-open-2026-04-18
+claim_kind: release
+claim_status: recertification_open
+claim_summary: >-
+  Octon presently substantiates a bounded admitted finite live support universe
+  while the frontier-governance target-state migration remains under
+  recertification. Browser/API and frontier-boundary-sensitive surfaces remain
+  outside the active live claim until their runtime substrate and proof are
+  real.
+support_target_ref: .octon/instance/governance/support-targets.yml
+governance_exclusions_ref: .octon/instance/governance/exclusions/action-classes.yml
+support_universe:
+  model_classes:
+    - repo-local-governed
+  workload_classes:
+    - observe-and-read
+    - repo-consequential
+  context_classes:
+    - reference-owned
+  locale_classes:
+    - english-primary
+retained_adapters:
+  host_adapters:
+    - repo-shell
+    - ci-control-plane
+  model_adapters:
+    - repo-local-governed
+capability_packs:
+  - repo
+  - git
+  - shell
+  - telemetry
+coverage_ledger_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/support-universe-coverage.yml
+proof_bundle_refs:
+  - .octon/instance/cognition/context/shared/migrations/2026-04-18-octon-frontier-governance-target-state/plan.md
+  - .octon/instance/cognition/decisions/089-frontier-governance-target-state-revalidation.md
+  - .octon/instance/cognition/decisions/090-support-target-vocabulary-reconciliation.md
+  - .octon/instance/cognition/decisions/091-browser-api-live-claim-restaging.md
+  - .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/gate-status.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/closure-summary.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/closure-certificate.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/blocker-register.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/support-universe-coverage.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/residual-ledger.yml
+known_limits:
+  - Browser and API capability packs are unadmitted and outside the active live claim until runtime-service admission and service-specific evidence exist.
+  - GitHub control-plane, Studio control-plane, frontier-governed, extended-governed, spanish-secondary, and boundary-sensitive tuples remain explicit non-live surfaces.
+  - Full frontier-governance target-state closure remains recertification-open pending later packet phases.
+generated_at: "2026-04-18T00:00:00Z"

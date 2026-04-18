@@ -1,15 +1,25 @@
 schema_version: release-lineage-v1
 owner: Octon governance
-updated_at: "2026-04-10T21:00:00Z"
+updated_at: "2026-04-18T12:00:00Z"
 active_release:
-  release_id: 2026-04-11-uec-bounded-recertified-complete
+  release_id: 2026-04-18-frontier-governance-bounded-complete
   status: active
-  claim_scope: bounded-admitted-live-universe
+  claim_scope: bounded-admitted-finite
   claim_status: complete
-  harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/harness-card.yml
-  closure_certificate_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/closure-certificate.yml
+  harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/harness-card.yml
+  closure_certificate_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/closure-certificate.yml
   recertification_status_ref: .octon/generated/effective/closure/recertification-status.yml
 historical_releases:
+  - release_id: 2026-04-18-frontier-governance-revalidation-open
+    status: superseded
+    superseded_by: 2026-04-18-frontier-governance-bounded-complete
+    reason: Revalidation-open was superseded by a bounded-complete release after active live support was narrowed to the supported tuple subset and blocker-ledger zero was achieved.
+    harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/harness-card.yml
+  - release_id: 2026-04-11-uec-bounded-recertified-complete
+    status: superseded
+    superseded_by: 2026-04-18-frontier-governance-revalidation-open
+    reason: Frontier-governance revalidation withdrew the complete claim after live support and runtime-admission review found browser/API and frontier-boundary overstatement.
+    harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/harness-card.yml
   - release_id: 2026-04-11-uec-bounded-recertification-open
     status: superseded
     superseded_by: 2026-04-11-uec-bounded-recertified-complete
@@ -68,5 +78,5 @@ historical_releases:
 notes:
   - Historical release bundles remain retained evidence, not the active live claim.
   - The active release is the only release that may be cited for current support scope and closure truth.
-  - The active release remains bounded to the admitted live support universe.
-  - The recertified-complete release preserves the admitted support universe without widening support and without rewriting historical evidence.
+  - The active release remains bounded to the admitted finite supported tuple set.
+  - The bounded-complete release preserves historical evidence while keeping unsupported surfaces explicit and non-live.

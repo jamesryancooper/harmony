@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/runtime/rollback-plan-v1.schema.json",
+  "title": "Octon Rollback Plan v1",
+  "description": "Pre-action rollback or compensation plan required for material execution when policy demands it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "run_id",
+    "reversibility_class",
+    "strategy",
+    "verification_steps",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "rollback-plan-v1"
+    },
+    "plan_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reversibility_class": {
+      "type": "string",
+      "enum": [
+        "reversible",
+        "compensable",
+        "irreversible"
+      ]
+    },
+    "strategy": {
+      "type": "string",
+      "enum": [
+        "rollback",
+        "compensate",
+        "checkpoint_restore",
+        "observe_only"
+      ]
+    },
+    "rollback_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "compensation_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "verification_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

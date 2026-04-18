@@ -1,0 +1,40 @@
+schema_version: closure-blocker-register-v1
+release_id: 2026-04-18-frontier-governance-revalidation-open
+generated_at: "2026-04-18T00:00:00Z"
+open_blocker_count: 4
+items:
+  - blocker_id: CB-FG-01
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: Browser and API runtime services are contract-only and not admitted in the active runtime service manifest.
+    primary_refs:
+      - .octon/framework/capabilities/runtime/services/manifest.runtime.yml
+      - .octon/framework/capabilities/runtime/services/browser-session/contract.yml
+      - .octon/framework/capabilities/runtime/services/api-client/contract.yml
+  - blocker_id: CB-FG-02
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: Active browser/API representative run evidence does not substantively exercise browser or API effects.
+    primary_refs:
+      - .octon/state/evidence/disclosure/runs/uec-global-frontier-browser-api-studio-20260404/run-card.yml
+      - .octon/state/evidence/disclosure/runs/uec-global-github-repo-consequential-20260404/run-card.yml
+  - blocker_id: CB-FG-03
+    status: open
+    severity: critical
+    classification: closure-blocking
+    summary: Context-pack, risk/materiality, rollback-plan, and benchmark target-state contracts now exist, but runtime integration and retained proof for them remain incomplete.
+    primary_refs:
+      - .octon/framework/constitution/contracts/authority/risk-materiality-v1.schema.json
+      - .octon/framework/constitution/contracts/runtime/context-pack-v1.schema.json
+      - .octon/framework/constitution/contracts/runtime/rollback-plan-v1.schema.json
+      - .octon/framework/constitution/contracts/assurance/benchmark-suite-v1.schema.json
+  - blocker_id: CB-FG-04
+    status: open
+    severity: high
+    classification: closure-blocking
+    summary: Comparative benchmark and proof-plane automation remain incomplete.
+    primary_refs:
+      - .octon/inputs/exploratory/proposals/architecture/octon-frontier-governance-target-state/architecture/implementation-plan.md
+      - .octon/framework/assurance/runtime/_ops/scripts/generate-harness-card.sh

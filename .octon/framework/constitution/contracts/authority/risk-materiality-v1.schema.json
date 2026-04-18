@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/authority/risk-materiality-v1.schema.json",
+  "title": "Octon Risk Materiality v1",
+  "description": "Canonical classification for materiality, approvals, rollback posture, and evidence depth before consequential execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "classification_id",
+    "action_type",
+    "materiality_class",
+    "risk_tier",
+    "reversibility_class",
+    "required_route",
+    "required_approval_artifacts",
+    "required_evidence",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "risk-materiality-v1"
+    },
+    "classification_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "action_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "materiality_class": {
+      "type": "string",
+      "enum": [
+        "low",
+        "moderate",
+        "high",
+        "critical"
+      ]
+    },
+    "risk_tier": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reversibility_class": {
+      "type": "string",
+      "enum": [
+        "reversible",
+        "compensable",
+        "irreversible"
+      ]
+    },
+    "required_route": {
+      "type": "string",
+      "enum": [
+        "allow",
+        "stage_only",
+        "escalate",
+        "deny"
+      ]
+    },
+    "required_approval_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required_rollback_plan": {
+      "type": "boolean",
+      "default": false
+    },
+    "required_verifier": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

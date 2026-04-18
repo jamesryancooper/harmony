@@ -78,6 +78,11 @@ Overlay-capable repo authority is legal only when
 | --- | --- | --- | ---: |
 | `instance-governance-policies` | `instance/governance/policies/**` | `replace_by_path` | 10 |
 | `instance-governance-contracts` | `instance/governance/contracts/**` | `replace_by_path` | 20 |
+| `instance-governance-adoption` | `instance/governance/adoption/**` | `replace_by_path` | 25 |
+| `instance-governance-retirement` | `instance/governance/retirement/**` | `replace_by_path` | 26 |
+| `instance-governance-exclusions` | `instance/governance/exclusions/**` | `replace_by_path` | 27 |
+| `instance-governance-capability-packs` | `instance/governance/capability-packs/**` | `replace_by_path` | 28 |
+| `instance-governance-decisions` | `instance/governance/decisions/**` | `append_only` | 29 |
 | `instance-agency-runtime` | `instance/agency/runtime/**` | `merge_by_id` | 30 |
 | `instance-assurance-runtime` | `instance/assurance/runtime/**` | `append_only` | 40 |
 

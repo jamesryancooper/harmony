@@ -1,0 +1,25 @@
+schema_version: octon-closure-gate-report-v1
+release_id: 2026-04-18-frontier-governance-revalidation-open
+generated_at: "2026-04-18T00:00:00Z"
+gates:
+  - gate_id: G3
+    title: run-bundle-completeness
+    status: red
+  - gate_id: G5
+    title: support-tuple-consistency
+    status: green
+  - gate_id: G6
+    title: capability-pack-consistency
+    status: green
+  - gate_id: G10
+    title: proof-plane-completeness
+    status: red
+  - gate_id: G11D
+    title: runtime-family-depth
+    status: red
+  - gate_id: G14
+    title: claim-truth-boundary
+    status: green
+  - gate_id: G16
+    title: blocker-ledger-zero
+    status: red

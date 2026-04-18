@@ -8,11 +8,9 @@ Authoritative cognition artifacts that agents and humans consume during work.
 
 ## Surfaces
 
-- `context/` - shared reference context (constraints, lessons, glossary, etc.).
-- `decisions/` - append-only ADR records and discovery index (`index.yml`).
-- `analyses/` - in-depth analytical outputs.
-- `knowledge/` - runtime knowledge contracts plus file-backed graph, source, and query surfaces.
-- `migrations/` - canonical migration plan records and discovery index.
-- `evidence/` - runtime map linking records to generated evidence bundles.
-- `evaluations/` - periodic scorecard digests and remediation action ledgers.
-- `projections/` - projection definitions and materialized read models from canonical sources.
+- `context/reference/` - shared reference context for runtime vocabulary and compaction rules.
+
+This runtime surface is intentionally narrow. Decision records, migrations,
+validation evidence, and derived projections now live under their canonical
+`instance/**`, `state/**`, or `generated/**` families rather than being
+redeclared here.

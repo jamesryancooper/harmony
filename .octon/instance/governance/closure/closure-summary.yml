@@ -1,48 +1,18 @@
 schema_version: closure-summary-v2
-release_id: 2026-04-11-uec-bounded-recertified-complete
-generated_at: "2026-04-10T21:00:00Z"
+release_id: 2026-04-18-frontier-governance-bounded-complete
+generated_at: "2026-04-18T00:00:00Z"
 claim_status: complete
-support_universe_mode: bounded-admitted-live-universe
+support_universe_mode: bounded-admitted-finite
 preclaim_blockers_open: 0
 green_gates:
-  - G0
-  - G1
-  - G2
   - G3
-  - G4
   - G5
-  - G5A
   - G6
-  - G7
-  - G7A
-  - G8
-  - G9
-  - G9A
-  - G9B
   - G10
-  - G10A
-  - G10B
-  - G10C
-  - G10D
-  - G11
-  - G11A
-  - G11B
-  - G11C
   - G11D
-  - G11E
-  - G11F
-  - G11G
-  - G12
-  - G13
-  - G13A
-  - G13B
-  - G13C
-  - G13D
-  - G13E
   - G14
-  - G15
   - G16
-blocked_by:
+blocked_by: []
 notes:
-  - The active release remains bounded to the admitted live support universe only.
-  - Clean repo-shell consequential and boundary-sensitive exemplar runs now anchor the active proof bundle.
+  - The active live claim is complete for the bounded admitted finite supported tuple subset.
+  - Browser/API and frontier-boundary surfaces remain explicit non-live posture outside the active claim.

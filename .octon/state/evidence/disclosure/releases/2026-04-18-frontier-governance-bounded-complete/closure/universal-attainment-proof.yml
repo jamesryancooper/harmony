@@ -1,0 +1,7 @@
+schema_version: octon-validator-report-v1
+validator_id: V-DISC-002
+release_id: 2026-04-18-frontier-governance-bounded-complete
+generated_at: "2026-04-18T12:00:00Z"
+status: pass
+summary: >-
+  The active HarnessCard truthfully discloses a complete bounded admitted finite live claim with explicit excluded surfaces.

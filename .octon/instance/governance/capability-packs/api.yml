@@ -1,6 +1,6 @@
 schema_version: governance-capability-pack-v1
 pack_id: api
-status: admitted
+status: unadmitted
 default_route: escalate
 contract_ref: .octon/framework/capabilities/packs/api/manifest.yml
 source_admission_ref: .octon/instance/capabilities/runtime/packs/admissions/api.yml

@@ -1,0 +1,16 @@
+schema_version: recertification-status-v1
+release_id: 2026-04-18-frontier-governance-revalidation-open
+generated_at: "2026-04-18T00:00:00Z"
+certification_mode: frontier-governance-revalidation-open
+status: recertification_open
+trigger_log_ref: .octon/instance/governance/closure/recertification-trigger-log.yml
+active_certificate_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/closure-certificate.yml
+active_harness_card_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/harness-card.yml
+trigger_summary:
+  total: 4
+  clear: 0
+  blocking: 4
+summary: >-
+  The active release remains recertification-open because browser/API live
+  support is not runtime-proven and later frontier-governance packet phases
+  remain incomplete.

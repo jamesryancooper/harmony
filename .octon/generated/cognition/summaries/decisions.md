@@ -5,8 +5,8 @@ mutability: generated
 generated_from:
   - /.octon/instance/cognition/decisions/index.yml
   - /.octon/instance/cognition/decisions/*.md
-generated_at: "2026-03-29T23:04:02Z"
-generator_version: "0.6.7"
+generated_at: "2026-04-18T21:50:08Z"
+generator_version: "0.6.32"
 ---
 
 # Decisions
@@ -102,6 +102,14 @@ Do not edit manually. Update ADR files and `/.octon/instance/cognition/decisions
 | ADR-082 | Accepted | 2026-03-29 | ADR 082: Unified Execution Constitution Phase 6 Simplification And Deletion | `/.octon/instance/cognition/decisions/082-unified-execution-constitution-phase6-simplification-deletion.md` |
 | ADR-083 | Accepted | 2026-03-29 | ADR 083: Unified Execution Constitution Phase 7 Build-To-Delete Institutionalization | `/.octon/instance/cognition/decisions/083-unified-execution-constitution-phase7-build-to-delete-institutionalization.md` |
 | ADR-084 | Accepted | 2026-03-29 | ADR 084: Unified Execution Constitution Final Cutover Closeout | `/.octon/instance/cognition/decisions/084-unified-execution-constitution-final-cutover-closeout.md` |
+| ADR-085 | Accepted | 2026-04-11 | ADR 085: Review Finding And Disposition Formalization | `/.octon/instance/cognition/decisions/085-review-finding-and-disposition-formalization.md` |
+| ADR-086 | Accepted | 2026-04-11 | ADR 086: Proposal-Gated Distillation And Hardening | `/.octon/instance/cognition/decisions/086-proposal-gated-distillation-and-hardening.md` |
+| ADR-087 | Accepted | 2026-04-11 | ADR 087: Tool Output Envelope Runtime Budgeting | `/.octon/instance/cognition/decisions/087-tool-output-envelope-runtime-budgeting.md` |
+| ADR-088 | Accepted | 2026-04-11 | ADR 088: Proposal-First Mission Classification | `/.octon/instance/cognition/decisions/088-proposal-first-mission-classification.md` |
+| ADR-089 | Accepted | 2026-04-18 | ADR 089: Frontier Governance Target-State Revalidation | `/.octon/instance/cognition/decisions/089-frontier-governance-target-state-revalidation.md` |
+| ADR-090 | Accepted | 2026-04-18 | ADR 090: Support-Target Vocabulary Reconciliation | `/.octon/instance/cognition/decisions/090-support-target-vocabulary-reconciliation.md` |
+| ADR-091 | Accepted | 2026-04-18 | ADR 091: Browser And API Live-Claim Restaging | `/.octon/instance/cognition/decisions/091-browser-api-live-claim-restaging.md` |
+| ADR-092 | Accepted | 2026-04-18 | ADR 092: Frontier Governance Bounded Completion | `/.octon/instance/cognition/decisions/092-frontier-governance-bounded-completion.md` |
 
 ## Update Procedure
 

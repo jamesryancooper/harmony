@@ -1,0 +1,7 @@
+schema_version: octon-validator-report-v1
+validator_id: V-SUP-001
+release_id: 2026-04-18-frontier-governance-revalidation-open
+generated_at: "2026-04-18T00:00:00Z"
+status: pass
+summary: >-
+  Support-target declarations, tuple admissions, and coverage ledgers distinguish the bounded admitted live claim from explicit stage-only or non-live surfaces.

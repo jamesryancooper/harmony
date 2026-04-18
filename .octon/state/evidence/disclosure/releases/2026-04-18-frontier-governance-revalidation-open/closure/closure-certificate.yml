@@ -1,0 +1,12 @@
+schema_version: closure-certificate-v2
+certificate_id: cc-frontier-governance-revalidation-open-2026-04-18
+claim_validating_gate: blocked
+closure_certification: blocked
+proof_bundle_refs:
+  gate_status: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/gate-status.yml
+  closure_summary: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/closure-summary.yml
+  blocker_register: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/blocker-register.yml
+  support_universe_coverage: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-revalidation-open/closure/support-universe-coverage.yml
+sign_off:
+  status: blocked
+  reason: Frontier-governance target-state later phases remain incomplete and browser/API runtime proof is absent.
