@@ -1,0 +1,11 @@
+schema_version: closure-certificate-v2
+certificate_id: cc-frontier-governance-bounded-complete-2026-04-18
+claim_validating_gate: satisfied
+closure_certification: certified
+proof_bundle_refs:
+  gate_status: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/gate-status.yml
+  closure_summary: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/closure-summary.yml
+  support_universe_coverage: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/support-universe-coverage.yml
+sign_off:
+  status: certified
+  reason: The bounded admitted finite live claim is coherent, evidenced, and fail-closed.

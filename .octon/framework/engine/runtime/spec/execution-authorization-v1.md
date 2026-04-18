@@ -36,6 +36,9 @@ artifacts, and grant bundles under `state/control/execution/**` and
 - Ownership resolution, support-tier routing, reversibility posture, budget
   posture, and egress posture must participate in authority routing before a
   grant is emitted.
+- Context-pack provenance, risk/materiality classification, and rollback-plan
+  posture must participate in authority routing whenever the execution path is
+  consequential or boundary-sensitive.
 - Governed capability-pack admission must agree with the published support
   matrix before a grant is emitted.
 - Labels, comments, checks, and similar host affordances are projections only;
@@ -47,6 +50,11 @@ artifacts, and grant bundles under `state/control/execution/**` and
 - `execution-request-v2.schema.json`
 - `execution-grant-v1.schema.json`
 - `execution-receipt-v2.schema.json`
+- `/.octon/framework/constitution/contracts/authority/risk-materiality-v1.schema.json`
+- `/.octon/framework/constitution/contracts/runtime/context-pack-v1.schema.json`
+- `/.octon/framework/constitution/contracts/runtime/rollback-plan-v1.schema.json`
+- `/.octon/framework/constitution/contracts/runtime/browser-ui-execution-record-v1.schema.json`
+- `/.octon/framework/constitution/contracts/runtime/api-egress-record-v1.schema.json`
 - `executor-profile-v1.schema.json`
 - `policy-interface-v1.md`
 - `policy-receipt-v2.schema.json`

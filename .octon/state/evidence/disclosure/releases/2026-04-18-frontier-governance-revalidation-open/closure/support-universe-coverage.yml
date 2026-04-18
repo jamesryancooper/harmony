@@ -1,0 +1,32 @@
+schema_version: support-universe-coverage-v2
+release_id: 2026-04-18-frontier-governance-revalidation-open
+generated_at: "2026-04-18T00:00:00Z"
+surfaces:
+  - model://repo-local-governed
+  - workload://observe-and-read
+  - workload://repo-consequential
+  - context://reference-owned
+  - locale://english-primary
+  - host://repo-shell
+  - host://ci-control-plane
+  - model-adapter://repo-local-governed
+  - capability-pack://repo
+  - capability-pack://git
+  - capability-pack://shell
+  - capability-pack://telemetry
+  - tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell
+  - tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell
+  - tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/ci-control-plane
+excluded_surfaces:
+  - model://frontier-governed
+  - workload://boundary-sensitive
+  - context://extended-governed
+  - locale://spanish-secondary
+  - host://github-control-plane
+  - host://studio-control-plane
+  - model-adapter://frontier-governed
+  - capability-pack://browser
+  - capability-pack://api
+  - tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane
+  - tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell
+  - tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane

@@ -1,0 +1,4 @@
+schema_version: octon-cross-artifact-consistency-v1
+release_id: 2026-04-18-frontier-governance-bounded-complete
+status: pass
+summary: Support-target, pack-admission, disclosure, closure, and generated claim surfaces agree on the bounded admitted finite live claim.

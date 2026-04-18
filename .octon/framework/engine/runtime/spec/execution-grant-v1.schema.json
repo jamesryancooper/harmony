@@ -23,8 +23,15 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
     },
+    "granted_capability_packs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
     "scope_constraints": { "type": "object" },
     "effective_policy_mode": { "type": "string", "minLength": 1 },
+    "context_pack_ref": { "type": ["string", "null"] },
+    "risk_materiality_ref": { "type": ["string", "null"] },
+    "rollback_plan_ref": { "type": ["string", "null"] },
     "reason_codes": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
@@ -33,6 +40,10 @@
     "review_metadata": { "type": "object" },
     "budget": { "type": "object" },
     "receipt_requirements": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evidence_obligations": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
     }

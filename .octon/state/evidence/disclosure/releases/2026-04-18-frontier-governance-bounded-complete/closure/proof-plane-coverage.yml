@@ -1,0 +1,4 @@
+schema_version: octon-proof-plane-coverage-v1
+release_id: 2026-04-18-frontier-governance-bounded-complete
+status: pass
+summary: The active bounded admitted finite live claim is covered by retained proof planes for the supported tuple subset.

@@ -1,0 +1,19 @@
+schema_version: closure-summary-v2
+release_id: 2026-04-18-frontier-governance-revalidation-open
+generated_at: "2026-04-18T00:00:00Z"
+claim_status: recertification_open
+support_universe_mode: bounded-admitted-finite
+preclaim_blockers_open: 4
+green_gates:
+  - G5
+  - G6
+  - G14
+blocked_by:
+  - G3
+  - G10
+  - G11D
+  - G16
+notes:
+  - The previous complete claim has been withdrawn and replaced with a bounded recertification-open release.
+  - The active live claim is limited to the supported tuple subset only.
+  - Browser/API and frontier-boundary surfaces remain explicit non-live posture.

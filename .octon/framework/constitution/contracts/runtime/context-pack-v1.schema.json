@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/runtime/context-pack-v1.schema.json",
+  "title": "Octon Context Pack v1",
+  "description": "Canonical deterministic context assembly contract for consequential runs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "context_pack_id",
+    "run_id",
+    "authority_sources",
+    "derived_sources",
+    "omissions",
+    "budget",
+    "freshness",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "context-pack-v1"
+    },
+    "context_pack_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source_entry"
+      }
+    },
+    "derived_sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source_entry"
+      }
+    },
+    "non_authoritative_inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source_entry"
+      }
+    },
+    "omissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "reason"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_prompt_bytes",
+        "max_estimated_input_tokens"
+      ],
+      "properties": {
+        "max_prompt_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_estimated_input_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "model_context_limit": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "generated_at",
+        "fresh_until"
+      ],
+      "properties": {
+        "generated_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fresh_until": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "source_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "authority_label"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "authority_label": {
+          "type": "string",
+          "enum": [
+            "authoritative",
+            "derived",
+            "non_authoritative"
+          ]
+        }
+      }
+    }
+  }
+}

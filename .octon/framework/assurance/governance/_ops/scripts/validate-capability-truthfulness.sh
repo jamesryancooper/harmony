@@ -39,10 +39,10 @@ main() {
   require_yq '.packs[] | select(.pack_id == "git" and .admission_status == "admitted")' "$REGISTRY" "git pack is admitted"
   require_yq '.packs[] | select(.pack_id == "shell" and .admission_status == "admitted")' "$REGISTRY" "shell pack is admitted"
   require_yq '.packs[] | select(.pack_id == "telemetry" and .admission_status == "admitted")' "$REGISTRY" "telemetry pack is admitted"
-  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "admitted")' "$REGISTRY" "browser pack is admitted"
-  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "admitted")' "$REGISTRY" "api pack is admitted"
+  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "unadmitted")' "$REGISTRY" "browser pack is unadmitted"
+  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "unadmitted")' "$REGISTRY" "api pack is unadmitted"
   require_yq '.requested_capability_packs | contains(["browser","api"])' "$EXTERNAL_RUN" "historical non-live external run retains browser/api evidence"
-  require_yq '[.supported_tuples[].capability_packs[] | select(. == "browser" or . == "api")] | length >= 2' "$EFFECTIVE_MATRIX" "supported tuples include browser/api where admitted"
+  require_yq '[.supported_tuples[].capability_packs[] | select(. == "browser" or . == "api")] | length == 0' "$EFFECTIVE_MATRIX" "supported tuples exclude browser/api while unadmitted"
 
   while IFS= read -r ref; do
     [[ -n "$ref" ]] || continue

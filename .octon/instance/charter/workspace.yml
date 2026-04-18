@@ -9,14 +9,14 @@ constitutional_role: "workspace-charter-machine"
 constitutional_objective_ref: ".octon/framework/constitution/contracts/objective/workspace-charter-pair.yml"
 release_state: "pre-1.0"
 change_profile: "atomic"
-profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-04-09-octon-uec-hardening-recertification/plan.md"
+profile_selection_receipt_ref: ".octon/instance/cognition/context/shared/migrations/2026-04-18-octon-frontier-governance-target-state/plan.md"
 objective_signals:
   - id: harness-coherence
     description: "Keep bootstrap, runtime, validators, and docs aligned to the same governing model."
   - id: portable-bootstrap
     description: "Preserve a self-contained, reproducible bootstrap path for adopted repositories."
   - id: final-support-universe-completion
-    description: "Keep the admitted live support universe truthful, globally complete, machine-enforced, and free of liminal claim surfaces."
+    description: "Keep the admitted live support universe truthful, bounded, machine-enforced, and free of liminal claim surfaces."
 authorized_actions:
   - "Create and update Octon runtime, governance, assurance, scaffolding, workflow, and documentation artifacts inside this repository."
   - "Refactor bootstrap, validation, portability, and authority-routing surfaces when the change remains reviewable and verifiable."
@@ -42,7 +42,7 @@ execution_binding:
   mission_authority_root: ".octon/instance/orchestration/missions"
   support_target_ref: ".octon/instance/governance/support-targets.yml"
   governance_exclusions_ref: ".octon/instance/governance/exclusions/action-classes.yml"
-  support_universe_claim_mode: "global-complete-finite"
+  support_universe_claim_mode: "bounded-admitted-finite"
   mission_required_for:
     - "recurring-autonomy"
     - "overlapping-work"

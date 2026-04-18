@@ -41,16 +41,16 @@ main() {
   require_yq '.paths.runtime_bus_root == ".octon/framework/engine/runtime/crates/runtime_bus"' "$POLICY_CONFIG" "policy config exposes runtime_bus"
 
   require_yq '.live_support_universe.host_adapters[] | select(. == "repo-shell")' "$SUPPORT_TARGETS" "repo-shell is live supported"
-  require_yq '.live_support_universe.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github-control-plane is live supported"
+  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github-control-plane is explicitly non-live"
   require_yq '.live_support_universe.host_adapters[] | select(. == "ci-control-plane")' "$SUPPORT_TARGETS" "ci-control-plane is live supported"
-  require_yq '.live_support_universe.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio-control-plane is live supported"
+  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio-control-plane is explicitly non-live"
   require_yq '.live_support_universe.model_adapters[] | select(. == "repo-local-governed")' "$SUPPORT_TARGETS" "repo-local-governed is live supported"
-  require_yq '.live_support_universe.model_adapters[] | select(. == "frontier-governed")' "$SUPPORT_TARGETS" "frontier-governed is live supported"
-  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "admitted")' "$RUNTIME_PACK_REGISTRY" "browser pack is admitted"
-  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "admitted")' "$RUNTIME_PACK_REGISTRY" "api pack is admitted"
+  require_yq '.resolved_non_live_surfaces.model_adapters[] | select(. == "frontier-governed")' "$SUPPORT_TARGETS" "frontier-governed is explicitly non-live"
+  require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "unadmitted")' "$RUNTIME_PACK_REGISTRY" "browser pack is unadmitted"
+  require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "unadmitted")' "$RUNTIME_PACK_REGISTRY" "api pack is unadmitted"
 
-  require_yq '.live_support_universe.locale_classes[] | select(. == "spanish-secondary")' "$SUPPORT_TARGETS" "spanish-secondary locale is live supported"
-  require_yq '.live_support_universe.workload_classes[] | select(. == "boundary-sensitive")' "$SUPPORT_TARGETS" "boundary-sensitive work is live supported"
+  require_yq '.resolved_non_live_surfaces.locale_classes[] | select(. == "spanish-secondary")' "$SUPPORT_TARGETS" "spanish-secondary locale is explicitly non-live"
+  require_yq '.resolved_non_live_surfaces.workload_classes[] | select(. == "boundary-sensitive")' "$SUPPORT_TARGETS" "boundary-sensitive work is explicitly non-live"
 
   echo "Validation summary: errors=$errors"
   [[ $errors -eq 0 ]]

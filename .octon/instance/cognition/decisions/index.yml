@@ -179,3 +179,11 @@ records:
     path: 087-tool-output-envelope-runtime-budgeting.md
   - id: 088-proposal-first-mission-classification
     path: 088-proposal-first-mission-classification.md
+  - id: 089-frontier-governance-target-state-revalidation
+    path: 089-frontier-governance-target-state-revalidation.md
+  - id: 090-support-target-vocabulary-reconciliation
+    path: 090-support-target-vocabulary-reconciliation.md
+  - id: 091-browser-api-live-claim-restaging
+    path: 091-browser-api-live-claim-restaging.md
+  - id: 092-frontier-governance-bounded-completion
+    path: 092-frontier-governance-bounded-completion.md

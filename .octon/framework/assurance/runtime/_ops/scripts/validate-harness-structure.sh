@@ -226,7 +226,6 @@ require_file "$OCTON_DIR/framework/engine/runtime/adapters/host/studio-control-p
 require_dir "$OCTON_DIR/framework/engine/runtime/adapters/model"
 require_file "$OCTON_DIR/framework/engine/runtime/adapters/model/README.md"
 require_file "$OCTON_DIR/framework/engine/runtime/adapters/model/repo-local-governed.yml"
-require_file "$OCTON_DIR/framework/engine/runtime/adapters/model/experimental-external.yml"
 require_file "$OCTON_DIR/framework/engine/runtime/release-targets.yml"
 require_dir "$OCTON_DIR/framework/lab"
 require_file "$OCTON_DIR/framework/lab/README.md"

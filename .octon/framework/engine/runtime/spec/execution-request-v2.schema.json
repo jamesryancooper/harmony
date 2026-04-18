@@ -30,6 +30,15 @@
       "type": "string",
       "enum": ["autonomous", "agent-augmented", "human-only"]
     },
+    "requested_capability_packs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "context_pack_ref": { "type": ["string", "null"] },
+    "risk_materiality_ref": { "type": ["string", "null"] },
+    "rollback_plan_ref": { "type": ["string", "null"] },
+    "browser_ui_execution_ref": { "type": ["string", "null"] },
+    "api_egress_ref": { "type": ["string", "null"] },
     "intent_ref": { "type": "object" },
     "actor_ref": { "type": "object" },
     "review_requirements": { "type": "object" },

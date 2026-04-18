@@ -1,0 +1,7 @@
+schema_version: octon-validator-report-v1
+validator_id: V-CAP-001
+release_id: 2026-04-18-frontier-governance-revalidation-open
+generated_at: "2026-04-18T00:00:00Z"
+status: pass
+summary: >-
+  Governed capability-pack manifests exist for all live packs and browser/API remain explicitly unadmitted until runtime substrate and proof are real.

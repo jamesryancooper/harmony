@@ -1,0 +1,18 @@
+schema_version: closure-summary-v2
+release_id: 2026-04-18-frontier-governance-bounded-complete
+generated_at: "2026-04-18T00:00:00Z"
+claim_status: complete
+support_universe_mode: bounded-admitted-finite
+preclaim_blockers_open: 0
+green_gates:
+  - G3
+  - G5
+  - G6
+  - G10
+  - G11D
+  - G14
+  - G16
+blocked_by: []
+notes:
+  - The active release truthfully completes the bounded admitted finite live claim.
+  - Browser/API and frontier-boundary surfaces remain explicit non-live posture outside the active live claim.

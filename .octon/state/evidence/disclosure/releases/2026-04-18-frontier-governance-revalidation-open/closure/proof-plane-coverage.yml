@@ -1,0 +1,4 @@
+schema_version: octon-proof-plane-coverage-v1
+release_id: 2026-04-18-frontier-governance-revalidation-open
+status: blocked
+summary: Later frontier-governance proof planes remain incomplete; the active live claim is therefore bounded to the supported tuple subset only.

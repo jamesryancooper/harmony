@@ -4,34 +4,33 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/closure-packet-commo
 release_id="$(resolve_release_id "${1:-}")"
 out="$(release_root "$release_id")/closure/support-universe-coverage.yml"
 mkdir -p "$(dirname "$out")"
-supported="$(find "$SUPPORT_DOSSIER_ROOT" -name dossier.yml -print | while read -r f; do yq -r 'select(.status == "supported") | .tuple_id' "$f"; done | awk 'NF')"
 supported="$(find "$SUPPORT_DOSSIER_ROOT" -name dossier.yml -print | while read -r f; do yq -r 'select(.status == "supported") | .tuple_id' "$f"; done | awk 'NF' | sort)"
+excluded="$(find "$SUPPORT_DOSSIER_ROOT" -name dossier.yml -print | while read -r f; do yq -r 'select(.status != "supported") | .tuple_id' "$f"; done | awk 'NF' | sort)"
+
+emit_surface_group() {
+  local expr="$1"
+  yq -r "$expr // [] | .[]" "$SUPPORT_TARGETS_DECLARATION" | awk 'NF'
+}
 {
   echo "schema_version: support-universe-coverage-v2"
   echo "release_id: $release_id"
   echo "generated_at: \"$(deterministic_generated_at)\""
   echo "surfaces:"
-  echo "  - model://repo-local-governed"
-  echo "  - model://frontier-governed"
-  echo "  - workload://observe-and-read"
-  echo "  - workload://repo-consequential"
-  echo "  - workload://boundary-sensitive"
-  echo "  - context://reference-owned"
-  echo "  - context://extended-governed"
-  echo "  - locale://english-primary"
-  echo "  - locale://spanish-secondary"
-  echo "  - host://repo-shell"
-  echo "  - host://github-control-plane"
-  echo "  - host://ci-control-plane"
-  echo "  - host://studio-control-plane"
-  echo "  - model-adapter://repo-local-governed"
-  echo "  - model-adapter://frontier-governed"
-  echo "  - capability-pack://repo"
-  echo "  - capability-pack://git"
-  echo "  - capability-pack://shell"
-  echo "  - capability-pack://telemetry"
-  echo "  - capability-pack://browser"
-  echo "  - capability-pack://api"
+  emit_surface_group '.live_support_universe.model_classes' | sed 's/^/  - model:\/\//'
+  emit_surface_group '.live_support_universe.workload_classes' | sed 's/^/  - workload:\/\//'
+  emit_surface_group '.live_support_universe.context_classes' | sed 's/^/  - context:\/\//'
+  emit_surface_group '.live_support_universe.locale_classes' | sed 's/^/  - locale:\/\//'
+  emit_surface_group '.live_support_universe.host_adapters' | sed 's/^/  - host:\/\//'
+  emit_surface_group '.live_support_universe.model_adapters' | sed 's/^/  - model-adapter:\/\//'
+  emit_surface_group '.live_support_universe.capability_packs' | sed 's/^/  - capability-pack:\/\//'
   printf '%s\n' "$supported" | sed 's/^/  - /'
-  echo "excluded_surfaces: []"
+  echo "excluded_surfaces:"
+  emit_surface_group '.resolved_non_live_surfaces.model_classes' | sed 's/^/  - model:\/\//'
+  emit_surface_group '.resolved_non_live_surfaces.workload_classes' | sed 's/^/  - workload:\/\//'
+  emit_surface_group '.resolved_non_live_surfaces.context_classes' | sed 's/^/  - context:\/\//'
+  emit_surface_group '.resolved_non_live_surfaces.locale_classes' | sed 's/^/  - locale:\/\//'
+  emit_surface_group '.resolved_non_live_surfaces.host_adapters' | sed 's/^/  - host:\/\//'
+  emit_surface_group '.resolved_non_live_surfaces.model_adapters' | sed 's/^/  - model-adapter:\/\//'
+  emit_surface_group '.resolved_non_live_surfaces.capability_packs' | sed 's/^/  - capability-pack:\/\//'
+  printf '%s\n' "$excluded" | sed 's/^/  - /'
 } >"$out"

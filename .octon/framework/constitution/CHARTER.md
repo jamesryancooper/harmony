@@ -1,6 +1,5 @@
----
 title: Octon Harness Charter
-description: Supreme repo-local constitutional charter for the globally complete Octon super-root.
+description: Supreme repo-local constitutional charter for the bounded-admitted Octon super-root.
 status: Active
 ---
 
@@ -24,13 +23,13 @@ replaceable adapters across repositories.
 Enable reliable agent execution that is deterministic enough to trust,
 observable enough to debug, and flexible enough to evolve.
 
-The live support universe in this repository is the globally complete finite
+The live support universe in this repository is the bounded admitted finite
 universe declared in `/.octon/instance/governance/support-targets.yml`.
-Retained surfaces must be final, governed, runtime-real, validator-covered,
+Retained live surfaces must be governed, runtime-real, validator-covered,
 proof-backed, disclosure-backed, and non-liminal. Any surface that cannot meet
-those conditions must be removed from the live claim instead of surviving as
-experimental, stage-only, unadmitted, reduced, or unsupported architectural
-debt.
+those conditions must be removed from the live claim and remain explicit as
+stage-only, unadmitted, reduced, or unsupported rather than surviving as
+silent architectural debt.
 
 The harness exists to make consequential autonomous work explicitly scoped,
 authorized, fail-closed, observable, and reviewable.
@@ -51,8 +50,8 @@ authorized, fail-closed, observable, and reviewable.
 - keep `generated/**` derived-only and `inputs/**` non-authoritative
 - fail closed on missing ownership, missing required evidence, unsupported
   support claims, or unresolved policy conflicts
-- require the retained support universe to stay explicit, finite, and globally
-  complete with no liminal critical surfaces
+- require the retained support universe to stay explicit, finite, and bounded
+  by admitted supported tuples with no liminal critical surfaces
 - require explicit authority routing before material side effects
 - prohibit hidden human intervention and silent authority widening
 - require long-horizon or recurring autonomy to remain mission-backed
@@ -77,22 +76,24 @@ authorized, fail-closed, observable, and reviewable.
 - require adapter-backed support claims to remain bounded by explicit
   support-target declarations, governance exclusions, and adapter-conformance
   criteria
-- require final disclosure to remove bounded-envelope caveats once the support
-  universe is globally complete and evidence-backed
+- require final disclosure to state the admitted claim envelope and exclude
+  stage-only, unsupported, or unadmitted surfaces from live claims
 
 ## Adoption Status
 
-Waves 0 through 5 are now promoted into one live constitutional execution
-model:
+Waves 0 through 5 remain promoted into one live constitutional execution
+model, but the active claim is bounded to the currently admitted supported
+tuple set:
 
 - run contracts and run lifecycle roots are the only atomic consequential
   execution path
 - mission authority remains the continuity and long-horizon autonomy surface
 - authority, assurance, disclosure, and adapter families are active
 - host and model adapters remain replaceable and non-authoritative
-- the final support universe is declared, governed, evidenced, and disclosed as
-  one globally complete product architecture with no experimental critical
-  holdouts
+- the live support universe is declared, governed, evidenced, and disclosed as
+  one bounded admitted finite product architecture
+- stage-only, unadmitted, and unsupported surfaces remain outside the active
+  live claim until they are runtime-real and proof-backed
 
 ## Canonical References
 
@@ -137,4 +138,4 @@ model:
 ## Review Cadence
 
 - review on each material constitutional change
-- review at least quarterly while the final constitutional model remains active
+- review at least quarterly while the bounded admitted model remains active

@@ -24,10 +24,12 @@ else
   ready="false"
 fi
 
+support_mode="$(yq -r '.support_claim_mode // "bounded-admitted-finite"' "$OCTON_DIR/instance/governance/support-targets.yml")"
+
 {
   echo "schema_version: effective-closure-claim-status-v1"
   echo "claim_id: unified-execution-constitution"
-  echo "claim_phrase: fully unified execution constitution"
+  echo "claim_phrase: bounded admitted execution constitution"
   echo "release_id: $release_id"
   echo "generated_at: \"$(deterministic_generated_at)\""
   echo "profile_selection_receipt_ref: $(migration_plan_ref_for_release "$release_id")"
@@ -46,8 +48,8 @@ fi
   echo "  final_verdict: $final_verdict"
   echo "  blocker_count: $blocker_count"
   echo "  ready_for_final_completion_claim: $ready"
-  echo "  support_universe_mode: global-complete-finite"
-  echo "  claim_scope: admitted-live-support-universe"
+  echo "  support_universe_mode: $support_mode"
+  echo "  claim_scope: $support_mode"
   echo "  blocked_by:"
   yq -r '.blocked_by[]' "$summary" 2>/dev/null | sed 's/^/    - /'
   if [[ "$blocker_count" != "0" ]]; then

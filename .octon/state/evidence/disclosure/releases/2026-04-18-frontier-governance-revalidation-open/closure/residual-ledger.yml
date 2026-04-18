@@ -1,0 +1,6 @@
+schema_version: residual-ledger-v1
+release_id: 2026-04-18-frontier-governance-revalidation-open
+known_limits:
+  - Browser and API capability packs are unadmitted and outside the active live claim until runtime-service admission and service-specific evidence exist.
+  - GitHub control-plane, Studio control-plane, frontier-governed, extended-governed, spanish-secondary, and boundary-sensitive tuples remain explicit non-live surfaces.
+  - Full frontier-governance target-state closure remains recertification-open pending later packet phases.

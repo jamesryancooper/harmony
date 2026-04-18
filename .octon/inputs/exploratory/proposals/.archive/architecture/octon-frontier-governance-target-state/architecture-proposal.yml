@@ -1,0 +1,76 @@
+schema_version: "architecture-proposal-v1"
+architecture_scope: "cross-domain-architecture"
+decision_type: "boundary-change"
+target_state_claims:
+  - id: "frontier-governance-harness"
+    claim: >-
+      Octon should be a control plane and evidence harness for consequential frontier-model
+      engineering work, not a cognition scaffold for weak models.
+  - id: "single-accountable-orchestrator"
+    claim: >-
+      The default execution topology is one accountable orchestrator, optional bounded specialists,
+      and optional independent verifier for separation-of-duties or high-materiality work.
+  - id: "context-pack-default"
+    claim: >-
+      Context assembly should move from token-era discovery/progressive disclosure toward deterministic
+      context packs with authority labels, freshness, source hashes, and generated/authoritative separation.
+  - id: "engine-owned-authorization"
+    claim: >-
+      Engine-owned authorize_execution remains the mandatory material execution boundary and becomes
+      broader and more proof-producing as frontier models become more capable.
+  - id: "proof-backed-support"
+    claim: >-
+      Support targets must be tuple-based, schema-valid, dossier-backed, and fail-closed on drift.
+current_state_findings:
+  - id: "root-class-split-strong"
+    disposition: "retain"
+    evidence: ".octon/README.md defines framework and instance as authored authority, state as operational truth/evidence, generated as rebuildable, and inputs as non-authoritative."
+  - id: "runtime-authorization-strong"
+    disposition: "strengthen"
+    evidence: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md makes authorize_execution mandatory before material side effects."
+  - id: "support-claim-drift"
+    disposition: "fix-first"
+    evidence: "support-targets.yml uses bounded-admitted-live-universe, while support-targets.schema.json allows bounded-admitted-finite and global-complete-finite."
+  - id: "overlay-drift"
+    disposition: "fix-first"
+    evidence: ".octon/README.md lists fewer overlay-capable surfaces than overlay-points/registry.yml and instance/manifest.yml."
+  - id: "browser-api-ahead-of-runtime"
+    disposition: "stage-until-proved"
+    evidence: "browser/API packs reference runtime contracts and replay requirements, while services/manifest.runtime.yml lists filesystem/KV/flow services but not browser-session/api-client as active runtime services."
+  - id: "workflow-catalog-pressure"
+    disposition: "audit-collapse"
+    evidence: "orchestration workflow manifest contains a broad catalog, some of which is governance-critical and some of which may encode token-era process scaffolding."
+proposal_motions:
+  required_deletions_or_demotions:
+    - "Move experimental external model adapter out of active discovery or mark quarantined/stage-only with validator enforcement."
+    - "Delete or demote workflows that merely choreograph model reasoning and do not create authority/evidence/recovery value."
+    - "Remove support claims that are not schema-valid, tuple-admitted, and dossier-backed."
+    - "Forbid generated cognition as authority, memory, approval, or runtime policy."
+  required_simplifications:
+    - "Collapse actor model to accountable orchestrator, bounded specialist, optional verifier, and team/composition profile."
+    - "Collapse capability teaching model to instruction-level operator contracts and invocation-level runtime contracts."
+    - "Collapse support declarations around admitted tuples as operational truth."
+    - "Collapse token-budget/progressive-disclosure rationale into context-pack/budget policy."
+  required_expansions:
+    - "Add risk/materiality classifier and policy."
+    - "Add context-pack contract and retained evidence receipts."
+    - "Add rollback-plan, browser/UI execution record, API-egress record, and benchmark-suite contracts."
+    - "Add browser/API runtime services only when executable, support-dossier-backed, and replay/evidence producing."
+    - "Automate RunCard/HarnessCard generation from retained evidence."
+validation_motions:
+  - "Add structural drift validators for support-target vocabulary, overlay points, cognition runtime index, service manifest vs capability packs, and generated freshness."
+  - "Add governance validators for material action grants, capability admissions, risk/materiality classifications, egress leases, and budget enforcement."
+  - "Add runtime validators for run roots, evidence roots, receipts, replay pointers, rollback posture, and intervention records."
+  - "Add comparative frontier benchmark validation against raw model and thin-wrapper baselines."
+acceptance_gates:
+  - "No material side effect path bypasses authorize_execution."
+  - "No support claim exists outside admitted tuple proof."
+  - "No generated or proposal-local artifact is consumed as authority."
+  - "Browser/API support remains stage-only until active runtime services and support dossiers pass validation."
+  - "RunCards and HarnessCards are generated from retained evidence, not manual statements."
+major_risks:
+  - "Over-simplification could remove governance rather than cognition scaffolding."
+  - "Long-context frontier models could create false confidence without context-pack provenance."
+  - "Support truth may look narrower when tuple-backed honesty replaces broad declarative support."
+  - "Browser/API/multimodal governance may require substantial runtime implementation before claims are safe."
+  - "Assurance may remain taxonomy-heavy unless benchmark and proof automation lands."

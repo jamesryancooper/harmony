@@ -1,0 +1,125 @@
+schema_version: "proposal-v1"
+proposal_id: "octon-frontier-governance-target-state"
+title: "Octon Frontier Governance Target-State Architecture"
+summary: >-
+  Manifest-governed architecture proposal packet that converts the repository-grounded
+  frontier-governance architecture review into an implementation-driving target-state
+  program for Octon as a minimum sufficient governance harness for frontier-model engineering.
+proposal_kind: "architecture"
+promotion_scope: "octon-internal"
+promotion_targets:
+  - ".octon/framework/constitution/CHARTER.md"
+  - ".octon/framework/constitution/charter.yml"
+  - ".octon/framework/constitution/support-targets.schema.json"
+  - ".octon/framework/constitution/contracts/authority/risk-materiality-v1.schema.json"
+  - ".octon/framework/constitution/contracts/runtime/context-pack-v1.schema.json"
+  - ".octon/framework/constitution/contracts/runtime/rollback-plan-v1.schema.json"
+  - ".octon/framework/constitution/contracts/runtime/browser-ui-execution-record-v1.schema.json"
+  - ".octon/framework/constitution/contracts/runtime/api-egress-record-v1.schema.json"
+  - ".octon/framework/constitution/contracts/assurance/benchmark-suite-v1.schema.json"
+  - ".octon/framework/constitution/contracts/disclosure/run-card-v2.schema.json"
+  - ".octon/framework/constitution/contracts/disclosure/harness-card-v2.schema.json"
+  - ".octon/framework/cognition/_meta/architecture/specification.md"
+  - ".octon/README.md"
+  - ".octon/octon.yml"
+  - ".octon/framework/overlay-points/registry.yml"
+  - ".octon/instance/manifest.yml"
+  - ".octon/instance/governance/support-targets.yml"
+  - ".octon/instance/governance/policies/network-egress.yml"
+  - ".octon/instance/governance/policies/execution-budgets.yml"
+  - ".octon/instance/governance/policies/risk-materiality.yml"
+  - ".octon/instance/governance/contracts/support-target-review.yml"
+  - ".octon/instance/governance/support-dossiers/"
+  - ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
+  - ".octon/framework/engine/runtime/spec/execution-request-v2.schema.json"
+  - ".octon/framework/engine/runtime/spec/execution-grant-v1.schema.json"
+  - ".octon/framework/engine/runtime/spec/execution-receipt-v2.schema.json"
+  - ".octon/framework/engine/runtime/spec/mission-control-lease-v1.schema.json"
+  - ".octon/framework/engine/runtime/spec/control-directive-v1.schema.json"
+  - ".octon/framework/engine/runtime/spec/circuit-breaker-v1.schema.json"
+  - ".octon/framework/engine/runtime/adapters/host/"
+  - ".octon/framework/engine/runtime/adapters/model/"
+  - ".octon/framework/capabilities/README.md"
+  - ".octon/framework/capabilities/runtime/services/manifest.runtime.yml"
+  - ".octon/framework/capabilities/runtime/services/browser-session/contract.yml"
+  - ".octon/framework/capabilities/runtime/services/api-client/contract.yml"
+  - ".octon/framework/capabilities/packs/browser/manifest.yml"
+  - ".octon/framework/capabilities/packs/api/manifest.yml"
+  - ".octon/framework/orchestration/_meta/architecture/specification.md"
+  - ".octon/framework/orchestration/runtime/workflows/manifest.yml"
+  - ".octon/framework/agency/_meta/architecture/specification.md"
+  - ".octon/framework/agency/runtime/agents/registry.yml"
+  - ".octon/framework/lab/"
+  - ".octon/framework/assurance/"
+  - ".octon/framework/observability/"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-support-target-live-claims.sh"
+  - ".octon/framework/assurance/scripts/validate-harness-card-claim.sh"
+  - ".octon/generated/effective/capabilities/"
+  - ".octon/generated/cognition/"
+  - ".octon/generated/proposals/registry.yml"
+status: "archived"
+archive:
+  archived_at: "2026-04-18"
+  archived_from_status: "implemented"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/octon-frontier-governance-target-state"
+  promotion_evidence:
+    - ".octon/instance/cognition/decisions/089-frontier-governance-target-state-revalidation.md"
+    - ".octon/instance/cognition/decisions/090-support-target-vocabulary-reconciliation.md"
+    - ".octon/instance/cognition/decisions/091-browser-api-live-claim-restaging.md"
+    - ".octon/instance/cognition/decisions/092-frontier-governance-bounded-completion.md"
+    - ".octon/instance/cognition/context/shared/migrations/2026-04-18-octon-frontier-governance-target-state/plan.md"
+    - ".octon/state/evidence/migration/2026-04-18-octon-frontier-governance-target-state/evidence.md"
+    - ".octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/manifest.yml"
+lifecycle:
+  temporary: true
+  exit_expectation: >-
+    Promote accepted target-state changes into durable .octon authority, runtime, control,
+    evidence, assurance, support-target, and generated-projection surfaces; verify that
+    no durable promoted target depends on this proposal path; then archive this packet
+    with retained promotion evidence or close it as rejected/superseded.
+source_inputs:
+  - id: "live-octon-repository"
+    kind: "repository"
+    uri: "https://github.com/jamesryancooper/octon"
+    role: "primary source of truth"
+  - id: "frontier-governance-architecture-review"
+    kind: "conversation-source-artifact"
+    path: "resources/frontier-governance-architecture-review.md"
+    role: "required upstream analytical review included in full"
+  - id: "proposal-standard"
+    kind: "repo-authority"
+    path: ".octon/framework/scaffolding/governance/patterns/proposal-standard.md"
+    role: "base proposal packet contract"
+  - id: "architecture-proposal-standard"
+    kind: "repo-authority"
+    path: ".octon/framework/scaffolding/governance/patterns/architecture-proposal-standard.md"
+    role: "architecture subtype contract"
+proposal_intent:
+  target_state: >-
+    A minimum sufficient governance harness for frontier-model engineering: one accountable
+    orchestrator, deterministic context packs, engine-owned authorization, deny-by-default
+    capability gates, retained evidence, replay, rollback, intervention, support-proof dossiers,
+    and automated assurance.
+  governing_distinction: >-
+    Delete or demote cognition scaffolding whose reason for existence was weaker models; retain
+    and strengthen governance scaffolding that proves authority, control, evidence, reversibility,
+    and accountability for stronger frontier models.
+non_goals:
+  - "Do not make proposal-local files canonical runtime, policy, or generated authority."
+  - "Do not create a generic agent framework, RAG product, prompt-management platform, or LLM gateway."
+  - "Do not treat generated cognition, raw inputs, host UI, chat state, or model priors as authority."
+  - "Do not claim browser, API, or multimodal live support before runtime services, replay evidence, and tuple-level support dossiers exist."
+  - "Do not broaden support targets without schema-valid, proof-backed tuple admissions."
+closure_conditions:
+  - "All accepted durable promotion targets exist outside .octon/inputs/exploratory/proposals/**."
+  - "Support-target mode, schema, charter language, and live support file are reconciled and validation-covered."
+  - "Overlay registry, instance manifest, and .octon/README overlay description agree."
+  - "Cognition runtime indexes only implemented authority-bearing surfaces or is corrected to derived-only generated read models."
+  - "Every material execution path passes through engine-owned authorization and emits receipts."
+  - "Context-pack, risk/materiality, rollback-plan, browser/UI record, API-egress record, and benchmark schemas are added or explicitly deferred with tracked decisions."
+  - "RunCard/HarnessCard evidence is produced from retained evidence roots, not manual assertion."
+  - "A frontier baseline benchmark suite compares raw frontier-model execution against Octon-governed execution."
+  - "Durable targets contain no dependency on this proposal packet path after promotion."
+related_proposals:
+  - "octon-instruction-layer-execution-envelope-hardening"

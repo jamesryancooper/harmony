@@ -1,0 +1,26 @@
+schema_version: octon-release-bundle-manifest-v1
+release_id: 2026-04-18-frontier-governance-revalidation-open
+generated_at: "2026-04-18T00:00:00Z"
+generator_versions:
+  release_bundle: 4
+  harness_card: 4
+  closure_bundle: 4
+authored_input_digests:
+  charter: refreshed-under-frontier-governance-revalidation-open
+  support_targets: refreshed-under-frontier-governance-revalidation-open
+  workspace_charter: refreshed-under-frontier-governance-revalidation-open
+proof_bundle_runs:
+  - .octon/state/evidence/disclosure/runs/uec-global-ci-observe-read-20260404/run-card.yml
+  - .octon/state/evidence/disclosure/runs/uec-global-repo-shell-observe-read-20260404/run-card.yml
+  - .octon/state/evidence/disclosure/runs/uec-repo-shell-repo-consequential-recertified-20260410/run-card.yml
+bundle_contents:
+  - harness-card.yml
+  - closure/gate-status.yml
+  - closure/closure-summary.yml
+  - closure/closure-certificate.yml
+  - closure/recertification-status.yml
+  - closure/blocker-register.yml
+  - closure/support-universe-coverage.yml
+  - closure/residual-ledger.yml
+  - closure/proof-plane-coverage.yml
+  - closure/cross-artifact-consistency.yml
