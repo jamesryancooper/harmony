@@ -90,8 +90,24 @@ jobs:
             let standardsText = "";
             let templateText = "";
             try {
-              standardsText = await readTextFile(".octon/framework/execution-roles/practices/standards/commit-pr-standards.json");
-              templateText = await readTextFile(".github/PULL_REQUEST_TEMPLATE.md");
+          const standardsCandidates = [
+            ".octon/framework/execution-roles/practices/standards/commit-pr-standards.json",
+            ".octon/framework/agency/practices/standards/commit-pr-standards.json"
+          ];
+          let standardsLoaded = false;
+          for (const candidate of standardsCandidates) {
+            try {
+              standardsText = await readTextFile(candidate);
+              standardsLoaded = true;
+              break;
+            } catch (error) {
+              if (!/Not Found/.test(error.message)) throw error;
+            }
+          }
+          if (!standardsLoaded) {
+            throw new Error(`Could not load standards from base SHA. Tried: ${standardsCandidates.join(", ")}`);
+          }
+          templateText = await readTextFile(".github/PULL_REQUEST_TEMPLATE.md");
             } catch (error) {
               core.setFailed(`Could not load standards/template from base SHA: ${error.message}`);
               return;
