@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.33](https://github.com/jamesryancooper/octon/compare/octon-v0.6.32...octon-v0.6.33) (2026-04-19)
+
+
+### Bug Fixes
+
+* **release:** restore refactor-triggered release bumps ([bb641fc](https://github.com/jamesryancooper/octon/commit/bb641fc02725d8e6e629abd88a2a751e93a79c27))
+
+
+### Refactors
+
+* **governance:** recertify frontier target state ([#321](https://github.com/jamesryancooper/octon/issues/321)) ([7bac22f](https://github.com/jamesryancooper/octon/commit/7bac22f5c6dff84a235879ddb6c2fb20af81f5b7))
+* **octon:** hard-cut execution roles ([#323](https://github.com/jamesryancooper/octon/issues/323)) ([a0161c4](https://github.com/jamesryancooper/octon/commit/a0161c47913174aa4ce254cfc20d791a9a7737ba))
+
 ## [0.6.32](https://github.com/jamesryancooper/octon/compare/octon-v0.6.31...octon-v0.6.32) (2026-04-18)
 
 
