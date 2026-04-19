@@ -1,6 +1,6 @@
 meta:
-  version: "2.2.2"
-  updated_at: "2026-03-19"
+  version: "2.2.3"
+  updated_at: "2026-04-19"
   owner: "octon-platform"
   status: "active"
   schema_version: "2"
@@ -8,7 +8,7 @@ meta:
 
 charter:
   ref: ".octon/framework/assurance/governance/CHARTER.md"
-  version: "2.2.2"
+  version: "2.2.3"
   priority_chain:
     - id: assurance
       name: Assurance
