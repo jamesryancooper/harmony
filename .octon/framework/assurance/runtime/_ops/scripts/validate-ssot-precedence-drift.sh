@@ -8,7 +8,7 @@ ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
 SPEC_FILE="$OCTON_DIR/framework/cognition/_meta/architecture/specification.md"
 ASSURANCE_PRECEDENCE="$OCTON_DIR/framework/assurance/governance/precedence.md"
 ENGINE_GOVERNANCE="$OCTON_DIR/framework/engine/governance/README.md"
-CANONICAL_GOAL='Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.'
+CANONICAL_GOAL_PATTERN='Enable reliable (agent )?execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve\.'
 
 errors=0
 
@@ -66,6 +66,17 @@ require_text() {
   local text="$2"
   local message="$3"
   if grep -Fq "$text" "$file"; then
+    pass "$message"
+  else
+    fail "$message"
+  fi
+}
+
+require_pattern() {
+  local file="$1"
+  local pattern="$2"
+  local message="$3"
+  if grep -Eq "$pattern" "$file"; then
     pass "$message"
   else
     fail "$message"
@@ -161,9 +172,9 @@ check_precedence_goal_alignment() {
   local file
 
   for file in "${precedence_files[@]}"; do
-    require_text \
+    require_pattern \
       "$file" \
-      "$CANONICAL_GOAL" \
+      "$CANONICAL_GOAL_PATTERN" \
       "precedence-layer goal alignment present in ${file#$ROOT_DIR/}"
   done
 

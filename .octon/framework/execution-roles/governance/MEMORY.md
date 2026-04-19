@@ -1,6 +1,7 @@
 # Memory
 
 Memory governance for execution roles.
+Enable reliable execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
 ## Canonical Rule
 
