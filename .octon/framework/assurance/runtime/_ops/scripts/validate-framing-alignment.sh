@@ -129,9 +129,9 @@ validate_canonical_markers() {
 
 validate_goal_explicitness_control_points() {
   require_contains "$OCTON_DIR/instance/ingress/AGENTS.md" 'Enable reliable agent execution' "instance ingress contains canonical goal text"
-  require_contains_literal "$OCTON_DIR/framework/agency/governance/DELEGATION.md" "$CANONICAL_GOAL" "DELEGATION.md contains canonical goal text"
-  require_contains_literal "$OCTON_DIR/framework/agency/governance/MEMORY.md" "$CANONICAL_GOAL" "MEMORY.md contains canonical goal text"
-  require_contains_literal "$OCTON_DIR/framework/agency/runtime/agents/orchestrator/AGENT.md" "$CANONICAL_GOAL" "orchestrator AGENT.md contains canonical goal text"
+  require_contains_literal "$OCTON_DIR/framework/execution-roles/governance/DELEGATION.md" "$CANONICAL_GOAL" "DELEGATION.md contains canonical goal text"
+  require_contains_literal "$OCTON_DIR/framework/execution-roles/governance/MEMORY.md" "$CANONICAL_GOAL" "MEMORY.md contains canonical goal text"
+  require_contains_literal "$OCTON_DIR/framework/execution-roles/runtime/orchestrator/ROLE.md" "$CANONICAL_GOAL" "orchestrator AGENT.md contains canonical goal text"
   require_contains_literal "$OCTON_DIR/instance/bootstrap/START.md" "$CANONICAL_GOAL" ".octon/instance/bootstrap/START.md contains canonical goal text"
   require_contains_literal "$OCTON_DIR/framework/scaffolding/runtime/bootstrap/AGENTS.md" "$CANONICAL_GOAL" "bootstrap AGENTS.md contains canonical goal text"
   require_contains_literal "$OCTON_DIR/framework/scaffolding/runtime/templates/octon/START.md" "$CANONICAL_GOAL" "template octon START.md contains canonical goal text"

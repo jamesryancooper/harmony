@@ -154,9 +154,9 @@ check_precedence_goal_alignment() {
   local precedence_files=(
     "$ROOT_DIR/AGENTS.md"
     "$OCTON_DIR/AGENTS.md"
-    "$OCTON_DIR/framework/agency/governance/DELEGATION.md"
-    "$OCTON_DIR/framework/agency/governance/MEMORY.md"
-    "$OCTON_DIR/framework/agency/runtime/agents/orchestrator/AGENT.md"
+    "$OCTON_DIR/framework/execution-roles/governance/DELEGATION.md"
+    "$OCTON_DIR/framework/execution-roles/governance/MEMORY.md"
+    "$OCTON_DIR/framework/execution-roles/runtime/orchestrator/ROLE.md"
   )
   local file
 

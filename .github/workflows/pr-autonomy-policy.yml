@@ -90,7 +90,7 @@ jobs:
             let standardsText = "";
             let templateText = "";
             try {
-              standardsText = await readTextFile(".octon/framework/agency/practices/standards/commit-pr-standards.json");
+              standardsText = await readTextFile(".octon/framework/execution-roles/practices/standards/commit-pr-standards.json");
               templateText = await readTextFile(".github/PULL_REQUEST_TEMPLATE.md");
             } catch (error) {
               core.setFailed(`Could not load standards/template from base SHA: ${error.message}`);

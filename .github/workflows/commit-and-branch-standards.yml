@@ -75,7 +75,7 @@ jobs:
             }
 
             const standards = await readStandards([
-              ".octon/framework/agency/practices/standards/commit-pr-standards.json"
+              ".octon/framework/execution-roles/practices/standards/commit-pr-standards.json"
             ]);
 
             const branch = standards.branch;
@@ -158,7 +158,7 @@ jobs:
             let standards;
             try {
               standards = await readStandards([
-                ".octon/framework/agency/practices/standards/commit-pr-standards.json"
+                ".octon/framework/execution-roles/practices/standards/commit-pr-standards.json"
               ]);
             } catch (error) {
               core.warning(error.message);

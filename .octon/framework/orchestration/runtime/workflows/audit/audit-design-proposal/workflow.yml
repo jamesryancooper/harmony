@@ -165,7 +165,7 @@ stages:
     allowed_executor_profiles:
     - scoped_repo_mutation
 - id: design-red-team
-  asset: stages/04-design-red-team.md
+  asset: stages/04-design-red-PROFILE.md
   kind: analysis
   consumes:
   - stage:design-audit
@@ -502,7 +502,7 @@ artifacts:
   determinism: unique
   description: Short-mode remediation report and package delta receipt
 - name: design_red_team_report
-  path: "/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/03-design-red-team.md"
+  path: "/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/03-design-red-PROFILE.md"
   kind: file
   format: markdown
   determinism: unique

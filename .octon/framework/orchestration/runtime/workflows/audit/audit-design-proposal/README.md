@@ -12,7 +12,7 @@ steps:
     file: "stages/03-design-proposal-remediation.md"
     description: "design-proposal-remediation"
   - id: "design-red-team"
-    file: "stages/04-design-red-team.md"
+    file: "stages/04-design-red-PROFILE.md"
     description: "design-red-team"
   - id: "design-hardening"
     file: "stages/05-design-hardening.md"
@@ -87,7 +87,7 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 - `design_proposal_workflow_bundle` -> `/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/`: Workflow bundle containing stage reports, metadata, validation state, and aggregate proposal deltas
 - `design_audit_report` -> `/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/01-design-proposal-audit.md`: Stage report produced by the design proposal audit prompt
 - `design_proposal_remediation_report` -> `/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/02-design-proposal-remediation.md`: Short-mode remediation report and package delta receipt
-- `design_red_team_report` -> `/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/03-design-red-team.md`: Rigorous-mode adversarial report
+- `design_red_team_report` -> `/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/03-design-red-PROFILE.md`: Rigorous-mode adversarial report
 - `design_hardening_report` -> `/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/04-design-hardening.md`: Rigorous-mode hardening report and package delta receipt
 - `design_integration_report` -> `/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/05-design-integration.md`: Rigorous-mode integration report and package delta receipt
 - `implementation_simulation_report` -> `/.octon/state/evidence/runs/workflows/{{date}}-audit-design-proposal-{{slug}}/reports/06-implementation-simulation.md`: Buildability simulation report
@@ -100,7 +100,7 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 1. [configure](./stages/01-configure.md)
 2. [design-audit](./stages/02-design-audit.md)
 3. [design-proposal-remediation](./stages/03-design-proposal-remediation.md)
-4. [design-red-team](./stages/04-design-red-team.md)
+4. [design-red-team](./stages/04-design-red-PROFILE.md)
 5. [design-hardening](./stages/05-design-hardening.md)
 6. [design-integration](./stages/06-design-integration.md)
 7. [implementation-simulation](./stages/07-implementation-simulation.md)
