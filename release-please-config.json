@@ -9,6 +9,24 @@
     ".": {
       "package-name": "octon",
       "changelog-path": "CHANGELOG.md",
+      "changelog-sections": [
+        {
+          "type": "feat",
+          "section": "Features"
+        },
+        {
+          "type": "fix",
+          "section": "Bug Fixes"
+        },
+        {
+          "type": "deps",
+          "section": "Dependencies"
+        },
+        {
+          "type": "refactor",
+          "section": "Refactors"
+        }
+      ],
       "extra-files": [
         {
           "type": "yaml",
