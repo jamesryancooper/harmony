@@ -26,6 +26,8 @@
    - `.github/workflows/release-please.yml`
    - `release-please-config.json`
    - `.release-please-manifest.json`
+   - root-package `changelog-sections` keep `refactor` releasable when
+     structural refactors are expected to cut releases
 
 ## Release
 

@@ -176,6 +176,8 @@ For Phase C release acceleration:
    `"bump-minor-pre-major": false` and
    `"bump-patch-for-minor-pre-major": true` so non-breaking `0.x` releases
    advance by patch by default.
+5. Structural refactors remain releasable because the root package declares
+   `refactor` in `release-please-config.json` `changelog-sections`.
 
 ---
 
@@ -601,6 +603,9 @@ Phase 5 (provider-agnostic AI gate):
 - Release tags are advancing too quickly while `<1.0.0`:
   verify `release-please-config.json` keeps `"bump-minor-pre-major": false`
   and `"bump-patch-for-minor-pre-major": true`.
+- Refactor merges are no longer opening release PRs:
+  verify `release-please-config.json` keeps `refactor` in the root-package
+  `changelog-sections`.
 - `Autonomy Release Health` fails with
   `AUTONOMY_AUTO_MERGE_ENABLED=false`: set repository variable back to `true`
   unless intentionally paused for incident response.

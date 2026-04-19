@@ -224,6 +224,32 @@ jobs:
             fail "Release Please config files are missing from repository."
           fi
 
+          if [[ -f "release-please-config.json" ]]; then
+            release_types="$({
+              jq -r '
+                (
+                  .packages["."]["changelog-sections"]
+                  // ."changelog-sections"
+                  // []
+                )
+                | map(.type)
+                | unique
+                | sort
+                | join(",")
+              ' release-please-config.json 2>/dev/null
+            } || echo "")"
+
+            if [[ -z "${release_types}" ]]; then
+              fail "Release Please changelog sections are missing; releasable commit types are not explicit."
+            elif [[ ",${release_types}," == *",feat,"* ]] \
+              && [[ ",${release_types}," == *",fix,"* ]] \
+              && [[ ",${release_types}," == *",refactor,"* ]]; then
+              pass "Release Please changelog sections keep feat/fix/refactor releasable (${release_types})."
+            else
+              fail "Release Please changelog sections drifted; expected feat, fix, and refactor to be releasable (got: ${release_types})."
+            fi
+          fi
+
           release_please_runs="$({
             gh run list \
               --workflow "Release Please" \
