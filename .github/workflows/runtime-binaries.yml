@@ -73,6 +73,13 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@631a55b12751854ce901bb631d5902ceb48146f7 # stable
 
+      - name: Install yq
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
       - name: Build octon runtime (release)
         shell: bash
         working-directory: .octon/framework/engine/runtime/crates
@@ -84,6 +91,13 @@ jobs:
           set -euo pipefail
           chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh
           .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-target-parity.sh
+
+      - name: Validate runtime docs and release target consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-docs-consistency.sh
+          .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-docs-consistency.sh
 
       - name: Package runtime binary
         shell: bash
