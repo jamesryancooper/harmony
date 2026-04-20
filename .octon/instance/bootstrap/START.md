@@ -9,9 +9,9 @@ Octon is an authored Constitutional Engineering Harness designed for
 profile-driven portability, replaceable adapters, governed execution, and
 durable assurance across repositories.
 
-Its execution core is a Governed Agent Runtime that enables reliable agent
-execution deterministic enough to trust, observable enough to debug, bounded
-enough to govern, and flexible enough to evolve.
+Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
+
+Its execution core is a Governed Agent Runtime.
 
 The currently proved live consequential envelope in this repository is the
 retained `MT-B / WT-2 / LT-REF / LOC-EN` tuple using the `repo-shell` host
