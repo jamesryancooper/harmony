@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.35](https://github.com/jamesryancooper/octon/compare/octon-v0.6.34...octon-v0.6.35) (2026-04-21)
+
+
+### Refactors
+
+* **architecture:** implement target-state transition ([#331](https://github.com/jamesryancooper/octon/issues/331)) ([aa132bf](https://github.com/jamesryancooper/octon/commit/aa132bf5cede553bd7938f735f6b8612faabd90d))
+
 ## [0.6.34](https://github.com/jamesryancooper/octon/compare/octon-v0.6.33...octon-v0.6.34) (2026-04-21)
 
 
