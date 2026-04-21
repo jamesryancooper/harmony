@@ -57,8 +57,6 @@ authority_evidence:
 disclosure_evidence:
   run_card_refs:
     - .octon/state/evidence/disclosure/runs/uec-global-repo-shell-observe-read-20260404/run-card.yml
-    - .octon/state/evidence/disclosure/runs/repo-shell-supported-scenario-workflow-20260413-v4/run-card.yml
-    - .octon/state/evidence/disclosure/runs/bootstrap-doctor-workflow-20260413-v4/run-card.yml
   harness_card_ref: .octon/instance/governance/disclosure/harness-card.yml
   support_universe_coverage_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/support-universe-coverage.yml
   proof_plane_coverage_ref: .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/proof-plane-coverage.yml
