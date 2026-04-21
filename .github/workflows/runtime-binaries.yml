@@ -77,8 +77,47 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.50.1/yq_linux_amd64
-          sudo chmod +x /usr/local/bin/yq
+          if command -v yq >/dev/null 2>&1; then
+            exit 0
+          fi
+
+          mkdir -p "$RUNNER_TEMP/bin"
+
+          case "$(uname -s)" in
+            Linux)
+              case "$(uname -m)" in
+                x86_64) asset="yq_linux_amd64" ;;
+                aarch64|arm64) asset="yq_linux_arm64" ;;
+                *) echo "unsupported Linux arch: $(uname -m)" >&2; exit 1 ;;
+              esac
+              curl -sSfL "https://github.com/mikefarah/yq/releases/download/v4.50.1/${asset}" -o "$RUNNER_TEMP/bin/yq"
+              chmod +x "$RUNNER_TEMP/bin/yq"
+              ;;
+            Darwin)
+              case "$(uname -m)" in
+                x86_64) asset="yq_darwin_amd64" ;;
+                arm64) asset="yq_darwin_arm64" ;;
+                *) echo "unsupported macOS arch: $(uname -m)" >&2; exit 1 ;;
+              esac
+              curl -sSfL "https://github.com/mikefarah/yq/releases/download/v4.50.1/${asset}" -o "$RUNNER_TEMP/bin/yq"
+              chmod +x "$RUNNER_TEMP/bin/yq"
+              ;;
+            MINGW*|MSYS*|CYGWIN*)
+              case "$(uname -m)" in
+                x86_64) asset="yq_windows_amd64.exe" ;;
+                aarch64|arm64) asset="yq_windows_arm64.exe" ;;
+                *) echo "unsupported Windows arch: $(uname -m)" >&2; exit 1 ;;
+              esac
+              curl -sSfL "https://github.com/mikefarah/yq/releases/download/v4.50.1/${asset}" -o "$RUNNER_TEMP/bin/yq.exe"
+              chmod +x "$RUNNER_TEMP/bin/yq.exe"
+              ;;
+            *)
+              echo "unsupported runner OS: $(uname -s)" >&2
+              exit 1
+              ;;
+          esac
+
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
 
       - name: Build octon runtime (release)
         shell: bash
