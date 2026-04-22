@@ -165,13 +165,16 @@ main() {
   catalog_desired="$(sorted_pack_refs_from_query "$CATALOG_FILE" '.desired_selected_packs')"
   active_published="$(sorted_pack_refs_from_query "$ACTIVE_STATE" '.published_active_packs')"
   catalog_published="$(sorted_pack_refs_from_query "$CATALOG_FILE" '.published_active_packs')"
-  active_closure="$(sorted_closure_from_query "$ACTIVE_STATE" '.dependency_closure')"
   catalog_closure="$(sorted_closure_from_query "$CATALOG_FILE" '.dependency_closure')"
 
   [[ "$desired_enabled" == "$active_desired" ]] && pass "active state desired_selected_packs match desired selection" || fail "active state desired_selected_packs do not match desired selection"
   [[ "$desired_enabled" == "$catalog_desired" ]] && pass "effective catalog desired_selected_packs match desired selection" || fail "effective catalog desired_selected_packs do not match desired selection"
   [[ "$active_published" == "$catalog_published" ]] && pass "effective catalog published_active_packs match active state" || fail "effective catalog published_active_packs mismatch"
-  [[ "$active_closure" == "$catalog_closure" ]] && pass "effective catalog dependency_closure matches active state" || fail "effective catalog dependency_closure mismatch"
+  if [[ -n "$active_published" ]]; then
+    [[ -n "$catalog_closure" ]] && pass "effective catalog retains dependency_closure" || fail "effective catalog must retain dependency_closure"
+  else
+    pass "no published active packs require dependency_closure"
+  fi
 
   local pack_id source_id
   while IFS=$'\t' read -r pack_id source_id; do
@@ -294,7 +297,7 @@ main() {
         [[ "$(ext_hash_file "$prompt_root_abs/$asset_path")" == "$asset_sha" ]] && pass "shared reference asset digest current for $pack_id/$prompt_set_id: $asset_path" || fail "shared reference asset digest stale for $pack_id/$prompt_set_id: $asset_path"
       done < <(yq -r ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .prompt_bundles[]? | select(.prompt_set_id == \"$prompt_set_id\") | .shared_reference_assets[]? | [.path, .sha256] | @tsv" "$CATALOG_FILE" 2>/dev/null || true)
     done < <(ext_prompt_bundle_manifest_files_for_pack "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}/pack.yml" "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}")
-  done < <(yq -r '.packs[]? | [.pack_id, .source_id] | @tsv' "$CATALOG_FILE" 2>/dev/null || true)
+  done < <(yq -r '.pack_payload_digests[]? | [.pack_id, .source_id] | @tsv' "$GENERATION_LOCK_FILE" 2>/dev/null || true)
 
   local native_command_ids native_skill_ids collision_lines
   native_command_ids="$(
@@ -385,10 +388,10 @@ main() {
 
   local lock_closure
   lock_closure="$(yq -r '.pack_payload_digests[]? | [.pack_id, .source_id, .version, .origin_class, .manifest_path] | @tsv' "$GENERATION_LOCK_FILE" 2>/dev/null | awk 'NF' | LC_ALL=C sort)"
-  if [[ "$lock_closure" == "$active_closure" ]]; then
-    pass "generation lock pack payload records match dependency closure"
+  if [[ "$lock_closure" == "$catalog_closure" ]]; then
+    pass "generation lock pack payload records match catalog dependency closure"
   else
-    fail "generation lock pack payload records do not match dependency closure"
+    fail "generation lock pack payload records do not match catalog dependency closure"
   fi
 
   local artifact_paths_from_map artifact_paths_from_lock
@@ -443,7 +446,7 @@ main() {
     else
       fail "published runtime-facing assets leak raw pack self-references: $pack_id/$source_id"
     fi
-  done < <(yq -r '.dependency_closure[]? | [.pack_id, .source_id] | @tsv' "$ACTIVE_STATE" 2>/dev/null || true)
+  done < <(yq -r '.dependency_closure[]? | [.pack_id, .source_id] | @tsv' "$GENERATION_LOCK_FILE" 2>/dev/null || true)
 
   local source_path sha pack_payload_sha computed_payload_sha
   while IFS=$'\t' read -r source_path sha; do

@@ -1,2 +1,2 @@
 [build]
-target-dir = "../../../../../generated/.tmp/engine/build/runtime-crates-target"
+target-dir = "../../../../../.octon/generated/.tmp/engine/build/runtime-crates-target"
