@@ -17,6 +17,19 @@ freshness:
   status: current
   reviewed_at: "2026-04-21T23:30:00Z"
   review_due_at: "2026-06-30T00:00:00Z"
+command_or_evaluator: validator://validate-proof-bundle-executability
+evaluator_version: executable-proof-bundle-v1
+input_digests:
+  support_targets_sha256: 8af1c10639060a579b289b32887382abd8b5706a7e92730fb47b631b6e683305
+  support_dossier_sha256: 07b8c9c739f0ab6eabb21049d4277b64d47ac1aa826ddfca2fa78365db1e0f24
+output_digests:
+  primary_run_card_sha256: 212cf3cbd3b103c4ea330bead450d3ffca6c87d80885730c914c84eaa753750f
+pass_fail_criteria:
+  - "frontier studio boundary-sensitive tuple remains explicit stage-only and non-live"
+  - "retained proof planes and negative controls remain linked"
+receipt_refs:
+  - .octon/state/evidence/validation/architecture/10of10-target-transition/support-targets/proofing.yml
+result: pass
 proof_planes:
   - plane_id: structural
     status: pass

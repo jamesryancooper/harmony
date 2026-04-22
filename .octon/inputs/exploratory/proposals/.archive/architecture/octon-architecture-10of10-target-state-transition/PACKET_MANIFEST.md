@@ -13,34 +13,33 @@
 - `navigation/source-of-truth-map.md`
 - `navigation/artifact-catalog.md`
 
-## Architecture
+## Architecture artifacts
 
-- `architecture/architecture-proposal.md`
 - `architecture/target-architecture.md`
 - `architecture/current-state-gap-map.md`
-- `architecture/10of10-gap-map.md`
+- `architecture/ten-of-ten-gap-to-target-analysis.md`
+- `architecture/concept-coverage-matrix.md`
 - `architecture/file-change-map.md`
 - `architecture/implementation-plan.md`
-- `architecture/runtime-enforcement-hardening-plan.md`
-- `architecture/publication-freshness-hardening-plan.md`
-- `architecture/support-pack-extension-normalization-plan.md`
-- `architecture/operator-read-model-plan.md`
 - `architecture/migration-cutover-plan.md`
 - `architecture/validation-plan.md`
 - `architecture/acceptance-criteria.md`
 - `architecture/cutover-checklist.md`
 - `architecture/closure-certification-plan.md`
+- `architecture/target-state-conformance-card.md`
 
 ## Resources
 
-- `resources/current-repo-state-audit.md`
-- `resources/complete-architectural-evaluation.md`
+- `resources/source-register.md`
+- `resources/current-state-architectural-evaluation.md`
 - `resources/architecture-scorecard.md`
-- `resources/10of10-gap-to-target-analysis.md`
-- `resources/source-evidence-index.md`
+- `resources/ten-of-ten-gap-to-target-analysis.md`
+- `resources/runtime-enforcement-assessment.md`
+- `resources/publication-and-freshness-assessment.md`
+- `resources/pack-extension-architecture-assessment.md`
+- `resources/support-proof-and-dossier-assessment.md`
+- `resources/proof-plane-hardening-plan.md`
 - `resources/risk-register.md`
-- `resources/tradeoff-analysis.md`
-- `resources/implementation-readiness-notes.md`
-- `resources/validation-status.md`
-- `resources/assumptions-and-non-goals.md`
-- `resources/retirement-and-shim-ledger.md`
+- `resources/tradeoff-register.md`
+- `resources/assumptions-and-blockers.md`
+- `resources/non-goals-and-rejection-ledger.md`

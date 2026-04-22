@@ -9,7 +9,7 @@ retained evidence.
 - Retirement inventory: `/.octon/instance/governance/retirement-register.yml`
 - Retirement policy: `/.octon/instance/governance/contracts/retirement-policy.yml`
 - Retirement review: `/.octon/instance/governance/contracts/retirement-review.yml`
-- Transition evidence: `/.octon/state/evidence/validation/architecture-target-state-transition/compatibility/retirement.yml`
+- Transition evidence: `/.octon/state/evidence/validation/architecture/10of10-target-transition/compatibility/retirement.yml`
 
 ## Retained Transitional Classes
 

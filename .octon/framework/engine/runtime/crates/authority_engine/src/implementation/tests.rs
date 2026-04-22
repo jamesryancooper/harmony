@@ -110,6 +110,50 @@ fn temp_runtime_config() -> RuntimeConfig {
         .join("../../../../../..")
         .canonicalize()
         .expect("source repo root should resolve");
+    let copy_rel = |rel: &str| {
+        let target = base.join(rel);
+        if let Some(parent) = target.parent() {
+            fs::create_dir_all(parent).expect("create parent directories for fixture copy");
+        }
+        fs::copy(source_root.join(rel), target).expect("copy fixture path");
+    };
+    copy_rel(".octon/octon.yml");
+    copy_rel(".octon/instance/governance/runtime-resolution.yml");
+    copy_rel(".octon/instance/governance/support-targets.yml");
+    copy_rel(".octon/instance/governance/capability-packs/registry.yml");
+    copy_rel(".octon/instance/governance/capability-packs/repo.yml");
+    copy_rel(".octon/instance/governance/capability-packs/git.yml");
+    copy_rel(".octon/instance/governance/capability-packs/shell.yml");
+    copy_rel(".octon/instance/governance/capability-packs/telemetry.yml");
+    copy_rel(".octon/instance/governance/capability-packs/browser.yml");
+    copy_rel(".octon/instance/governance/capability-packs/api.yml");
+    copy_rel(".octon/instance/governance/support-target-admissions/live/repo-shell-observe-read-en.yml");
+    copy_rel(".octon/instance/governance/support-target-admissions/live/repo-shell-repo-consequential-en.yml");
+    copy_rel(".octon/instance/governance/support-target-admissions/live/ci-observe-read-en.yml");
+    copy_rel(".octon/instance/governance/support-target-admissions/stage-only/repo-shell-boundary-sensitive-en.yml");
+    copy_rel(".octon/instance/governance/support-target-admissions/stage-only/github-repo-consequential-en.yml");
+    copy_rel(".octon/instance/governance/support-target-admissions/stage-only/frontier-studio-boundary-sensitive-es.yml");
+    copy_rel(".octon/instance/governance/support-dossiers/live/repo-shell-observe-read-en/dossier.yml");
+    copy_rel(".octon/instance/governance/support-dossiers/live/repo-shell-repo-consequential-en/dossier.yml");
+    copy_rel(".octon/instance/governance/support-dossiers/live/ci-observe-read-en/dossier.yml");
+    copy_rel(".octon/instance/governance/support-dossiers/stage-only/repo-shell-boundary-sensitive-en/dossier.yml");
+    copy_rel(".octon/instance/governance/support-dossiers/stage-only/github-repo-consequential-en/dossier.yml");
+    copy_rel(".octon/instance/governance/support-dossiers/stage-only/frontier-studio-boundary-sensitive-es/dossier.yml");
+    copy_rel(".octon/instance/capabilities/runtime/packs/admissions/repo.yml");
+    copy_rel(".octon/instance/capabilities/runtime/packs/admissions/git.yml");
+    copy_rel(".octon/instance/capabilities/runtime/packs/admissions/shell.yml");
+    copy_rel(".octon/instance/capabilities/runtime/packs/admissions/telemetry.yml");
+    copy_rel(".octon/instance/capabilities/runtime/packs/admissions/browser.yml");
+    copy_rel(".octon/instance/capabilities/runtime/packs/admissions/api.yml");
+    copy_rel(".octon/generated/effective/runtime/route-bundle.yml");
+    copy_rel(".octon/generated/effective/runtime/route-bundle.lock.yml");
+    copy_rel(".octon/generated/effective/governance/support-target-matrix.yml");
+    copy_rel(".octon/generated/effective/capabilities/pack-routes.effective.yml");
+    copy_rel(".octon/generated/effective/capabilities/pack-routes.lock.yml");
+    copy_rel(".octon/generated/effective/extensions/catalog.effective.yml");
+    copy_rel(".octon/generated/effective/extensions/generation.lock.yml");
+    copy_rel(".octon/state/control/extensions/active.yml");
+    copy_rel(".octon/state/control/extensions/quarantine.yml");
     fs::copy(
         source_root
             .join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml"),
@@ -162,6 +206,56 @@ fn temp_runtime_config() -> RuntimeConfig {
         base.join(".octon/instance/capabilities/runtime/packs/registry.yml"),
     )
     .expect("copy runtime pack registry");
+    {
+        let receipt_rel = std::fs::read_to_string(
+            source_root.join(".octon/generated/effective/runtime/route-bundle.lock.yml"),
+        )
+        .expect("read live route bundle lock");
+        let receipt_rel = receipt_rel;
+        let route_receipt = source_root
+            .join(
+                serde_yaml::from_str::<serde_yaml::Value>(&receipt_rel)
+                    .expect("parse route bundle lock")
+                    .get("publication_receipt_path")
+                    .and_then(|value| value.as_str())
+                    .expect("route bundle receipt path"),
+            );
+        let pack_receipt = source_root
+            .join(
+                serde_yaml::from_str::<serde_yaml::Value>(
+                    &std::fs::read_to_string(
+                        source_root.join(".octon/generated/effective/capabilities/pack-routes.lock.yml"),
+                    )
+                    .expect("read pack routes lock"),
+                )
+                .expect("parse pack routes lock")
+                .get("publication_receipt_path")
+                .and_then(|value| value.as_str())
+                .expect("pack routes receipt path"),
+            );
+        let extension_receipt = source_root
+            .join(
+                serde_yaml::from_str::<serde_yaml::Value>(
+                    &std::fs::read_to_string(
+                        source_root.join(".octon/generated/effective/extensions/generation.lock.yml"),
+                    )
+                    .expect("read extension generation lock"),
+                )
+                .expect("parse extension generation lock")
+                .get("publication_receipt_path")
+                .and_then(|value| value.as_str())
+                .expect("extension receipt path"),
+            );
+        let route_target = base.join(route_receipt.strip_prefix(&source_root).expect("route receipt relative"));
+        let pack_target = base.join(pack_receipt.strip_prefix(&source_root).expect("pack receipt relative"));
+        let extension_target = base.join(extension_receipt.strip_prefix(&source_root).expect("extension receipt relative"));
+        fs::create_dir_all(route_target.parent().expect("route receipt parent")).expect("create route receipt parent");
+        fs::create_dir_all(pack_target.parent().expect("pack receipt parent")).expect("create pack receipt parent");
+        fs::create_dir_all(extension_target.parent().expect("extension receipt parent")).expect("create extension receipt parent");
+        fs::copy(route_receipt, route_target).expect("copy route receipt");
+        fs::copy(pack_receipt, pack_target).expect("copy pack receipt");
+        fs::copy(extension_receipt, extension_target).expect("copy extension receipt");
+    }
     RuntimeConfig {
         octon_dir: base.join(".octon"),
         repo_root: base.clone(),
@@ -169,6 +263,13 @@ fn temp_runtime_config() -> RuntimeConfig {
         run_continuity_root: base.join(".octon/state/continuity/runs"),
         execution_control_root: base.join(".octon/state/control/execution"),
         execution_tmp_root: base.join(".octon/generated/.tmp/execution"),
+        runtime_resolution_path: base.join(".octon/instance/governance/runtime-resolution.yml"),
+        runtime_route_bundle_path: base.join(".octon/generated/effective/runtime/route-bundle.yml"),
+        runtime_route_bundle_lock_path: base.join(".octon/generated/effective/runtime/route-bundle.lock.yml"),
+        runtime_pack_routes_effective_path: base.join(".octon/generated/effective/capabilities/pack-routes.effective.yml"),
+        runtime_pack_routes_lock_path: base.join(".octon/generated/effective/capabilities/pack-routes.lock.yml"),
+        runtime_route_bundle_generation_id: String::new(),
+        runtime_route_bundle_sha256: String::new(),
         policy: PolicyConfig::default(),
         policy_path: Some(PathBuf::from(
             "framework/capabilities/governance/policy/deny-by-default.v2.yml",

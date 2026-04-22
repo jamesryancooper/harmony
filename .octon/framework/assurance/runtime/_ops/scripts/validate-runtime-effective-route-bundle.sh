@@ -36,7 +36,7 @@ echo "== Runtime Effective Route Bundle Validation =="
 [[ -f "$BUNDLE" ]] && pass "runtime route bundle present" || fail "missing runtime route bundle"
 [[ -f "$LOCK" ]] && pass "runtime route bundle lock present" || fail "missing runtime route bundle lock"
 [[ "$(yq -r '.schema_version // ""' "$BUNDLE")" == "octon-runtime-effective-route-bundle-v1" ]] && pass "runtime route bundle schema current" || fail "runtime route bundle schema invalid"
-[[ "$(yq -r '.schema_version // ""' "$LOCK")" == "octon-runtime-effective-route-bundle-lock-v1" ]] && pass "runtime route bundle lock schema current" || fail "runtime route bundle lock schema invalid"
+[[ "$(yq -r '.schema_version // ""' "$LOCK")" == "octon-runtime-effective-route-bundle-lock-v2" ]] && pass "runtime route bundle lock schema current" || fail "runtime route bundle lock schema invalid"
 [[ "$(yq -r '.generation_id // ""' "$BUNDLE")" == "$(yq -r '.generation_id // ""' "$LOCK")" ]] && pass "route bundle generation ids aligned" || fail "route bundle generation id mismatch"
 
 expected_bundle_ref="$(yq -r '.runtime_effective_route_bundle_ref // ""' "$SELECTOR")"
@@ -48,7 +48,32 @@ bundle_sha="$(hash_file "$BUNDLE")"
 [[ "$(yq -r '.route_bundle_sha256 // ""' "$LOCK")" == "$bundle_sha" ]] && pass "route bundle digest current" || fail "route bundle digest drift"
 
 selector_sha="$(hash_file "$SELECTOR")"
-[[ "$(yq -r '.runtime_resolution_sha256 // ""' "$LOCK")" == "$selector_sha" ]] && pass "selector digest current" || fail "selector digest drift"
+[[ "$(yq -r '.source_digests.runtime_resolution_sha256 // ""' "$LOCK")" == "$selector_sha" ]] && pass "selector digest current" || fail "selector digest drift"
+
+root_sha="$(hash_file "$OCTON_DIR/octon.yml")"
+[[ "$(yq -r '.source_digests.root_manifest_sha256 // ""' "$LOCK")" == "$root_sha" ]] && pass "root manifest digest current" || fail "root manifest digest drift"
+
+freshness_mode="$(yq -r '.freshness.mode // ""' "$LOCK")"
+case "$freshness_mode" in
+  digest_bound|ttl_bound|receipt_bound)
+    pass "runtime route bundle freshness mode current"
+    ;;
+  *)
+    fail "runtime route bundle freshness mode invalid"
+    ;;
+esac
+yq -e '.freshness.invalidation_conditions | length > 0' "$LOCK" >/dev/null 2>&1 \
+  && pass "runtime route bundle invalidation conditions declared" \
+  || fail "runtime route bundle invalidation conditions missing"
+[[ "$(yq -r '.non_authority_classification // ""' "$LOCK")" == "derived-runtime-handle" ]] \
+  && pass "runtime route bundle non-authority classification valid" \
+  || fail "runtime route bundle non-authority classification invalid"
+yq -e '.allowed_consumers[] | select(. == "runtime_resolver")' "$LOCK" >/dev/null 2>&1 \
+  && pass "runtime route bundle allows runtime_resolver" \
+  || fail "runtime route bundle must allow runtime_resolver"
+yq -e '.forbidden_consumers[] | select(. == "direct_runtime_raw_path_read")' "$LOCK" >/dev/null 2>&1 \
+  && pass "runtime route bundle forbids raw runtime reads" \
+  || fail "runtime route bundle must forbid raw runtime reads"
 
 receipt_rel="$(yq -r '.publication_receipt_path // ""' "$LOCK")"
 receipt_abs="$(resolve_repo_path "$receipt_rel")"
@@ -62,11 +87,11 @@ support_tuple_count="$(yq -r '.tuple_admissions | length' "$SUPPORT_TARGETS")"
 [[ "$bundle_tuple_count" == "$support_tuple_count" ]] && pass "bundle covers every declared support tuple" || fail "bundle tuple coverage mismatch"
 
 for query in \
-  '.support_target_matrix_sha256:.support_target_matrix_ref:support target matrix' \
-  '.pack_routes_effective_sha256:.pack_routes_effective_ref:pack routes effective' \
-  '.pack_routes_lock_sha256:.pack_routes_lock_ref:pack routes lock' \
-  '.extensions_catalog_sha256:.extensions_catalog_ref:extensions catalog' \
-  '.extensions_generation_lock_sha256:.extensions_generation_lock_ref:extensions generation lock'
+  '.source_digests.support_target_matrix_sha256:.support_target_matrix_ref:support target matrix' \
+  '.source_digests.pack_routes_effective_sha256:.pack_routes_effective_ref:pack routes effective' \
+  '.source_digests.pack_routes_lock_sha256:.pack_routes_lock_ref:pack routes lock' \
+  '.source_digests.extensions_catalog_sha256:.extensions_catalog_ref:extensions catalog' \
+  '.source_digests.extensions_generation_lock_sha256:.extensions_generation_lock_ref:extensions generation lock'
 do
   digest_query="${query%%:*}"
   rest="${query#*:}"

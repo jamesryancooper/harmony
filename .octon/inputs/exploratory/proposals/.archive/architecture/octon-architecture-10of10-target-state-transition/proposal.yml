@@ -1,87 +1,65 @@
 schema_version: "proposal-v1"
 proposal_id: "octon-architecture-10of10-target-state-transition"
-title: "Octon Architecture 10/10 Target-State Transition"
+title: "Octon 10/10 Target-State Architecture Transition"
 summary: >-
-  Proposal-first packet for transitioning Octon's current live architecture from a strong
-  but materially improvable constitutional engineering harness into a target-state-grade
-  architecture with hardened runtime enforcement, freshness-gated generated/effective
-  consumption, simplified pack and extension lifecycle, aligned support/admission proof,
-  and operator-legible architecture health.
+  Architecture proposal packet for transitioning Octon from its current live
+  registry-backed constitutional harness architecture to a closure-grade 10/10
+  target state by hardening generated/effective runtime consumption, freshness
+  semantics, proof depth, capability-pack routing, compatibility retirement,
+  architecture-health gates, and operator traceability without creating a rival
+  control plane.
 proposal_kind: "architecture"
 promotion_scope: "octon-internal"
 promotion_targets:
-  - ".octon/octon.yml"
   - ".octon/framework/cognition/_meta/architecture/contract-registry.yml"
   - ".octon/framework/cognition/_meta/architecture/specification.md"
+  - ".octon/octon.yml"
   - ".octon/framework/constitution/obligations/fail-closed.yml"
   - ".octon/framework/constitution/obligations/evidence.yml"
-  - ".octon/framework/constitution/contracts/registry.yml"
   - ".octon/framework/engine/runtime/spec/runtime-resolution-v1.md"
-  - ".octon/framework/engine/runtime/spec/runtime-resolution-v1.schema.json"
-  - ".octon/framework/engine/runtime/spec/runtime-effective-route-bundle-v1.schema.json"
-  - ".octon/framework/engine/runtime/spec/publication-freshness-gates-v2.md"
-  - ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
-  - ".octon/framework/engine/runtime/spec/authorization-boundary-coverage.yml"
+  - ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.md"
+  - ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.schema.json"
+  - ".octon/framework/engine/runtime/spec/runtime-effective-route-bundle-lock-v2.schema.json"
+  - ".octon/framework/engine/runtime/spec/publication-freshness-gates-v3.md"
+  - ".octon/framework/engine/runtime/spec/architecture-health-contract-v2.md"
   - ".octon/framework/engine/runtime/spec/material-side-effect-inventory.yml"
-  - ".octon/framework/engine/runtime/crates/core/src/config.rs"
-  - ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs"
+  - ".octon/framework/engine/runtime/spec/authorization-boundary-coverage.yml"
   - ".octon/framework/engine/runtime/crates/runtime_resolver/src/lib.rs"
-  - ".octon/framework/engine/runtime/crates/runtime_resolver/Cargo.toml"
-  - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-resolution.sh"
+  - ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs"
+  - ".octon/framework/engine/runtime/crates/kernel/src/side_effects.rs"
+  - ".octon/instance/governance/runtime-resolution.yml"
+  - ".octon/instance/governance/non-authority-register.yml"
+  - ".octon/instance/governance/retirement-register.yml"
+  - ".octon/instance/governance/contracts/support-pack-admission-alignment.yml"
+  - ".octon/instance/governance/contracts/support-target-proofing.yml"
+  - ".octon/instance/governance/support-targets.yml"
+  - ".octon/instance/governance/support-dossiers/live/**"
+  - ".octon/instance/governance/support-target-admissions/live/**"
+  - ".octon/instance/governance/capability-packs/**"
+  - ".octon/instance/capabilities/runtime/packs/README.md"
+  - ".octon/instance/capabilities/runtime/packs/registry.yml"
+  - ".octon/instance/capabilities/runtime/packs/admissions/**"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-health.sh"
   - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh"
   - ".octon/framework/assurance/runtime/_ops/scripts/validate-publication-freshness-gates.sh"
   - ".octon/framework/assurance/runtime/_ops/scripts/validate-generated-effective-freshness.sh"
-  - ".octon/framework/assurance/runtime/_ops/scripts/validate-support-target-path-normalization.sh"
-  - ".octon/framework/assurance/runtime/_ops/scripts/validate-support-pack-admission-alignment.sh"
-  - ".octon/framework/assurance/runtime/_ops/scripts/validate-extension-active-state-compactness.sh"
-  - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-health.sh"
-  - ".octon/framework/assurance/runtime/_ops/tests/test-runtime-effective-freshness-hard-gate.sh"
-  - ".octon/framework/assurance/runtime/_ops/tests/test-authorization-boundary-negative-controls.sh"
-  - ".octon/framework/assurance/runtime/_ops/tests/test-support-pack-no-widening.sh"
-  - ".octon/framework/assurance/runtime/_ops/tests/test-extension-quarantine-hard-gate.sh"
-  - ".octon/instance/governance/runtime-resolution.yml"
-  - ".octon/instance/governance/support-targets.yml"
-  - ".octon/instance/governance/support-target-admissions/live/repo-shell-observe-read-en.yml"
-  - ".octon/instance/governance/support-target-admissions/live/repo-shell-repo-consequential-en.yml"
-  - ".octon/instance/governance/support-target-admissions/live/ci-observe-read-en.yml"
-  - ".octon/instance/governance/support-target-admissions/stage-only/repo-shell-boundary-sensitive-en.yml"
-  - ".octon/instance/governance/support-target-admissions/stage-only/github-repo-consequential-en.yml"
-  - ".octon/instance/governance/support-target-admissions/stage-only/frontier-studio-boundary-sensitive-es.yml"
-  - ".octon/instance/governance/support-dossiers/live/repo-shell-observe-read-en/dossier.yml"
-  - ".octon/instance/governance/support-dossiers/live/repo-shell-repo-consequential-en/dossier.yml"
-  - ".octon/instance/governance/support-dossiers/live/ci-observe-read-en/dossier.yml"
-  - ".octon/instance/governance/support-dossiers/stage-only/repo-shell-boundary-sensitive-en/dossier.yml"
-  - ".octon/instance/governance/support-dossiers/stage-only/github-repo-consequential-en/dossier.yml"
-  - ".octon/instance/governance/support-dossiers/stage-only/frontier-studio-boundary-sensitive-es/dossier.yml"
-  - ".octon/instance/governance/contracts/support-pack-admission-alignment.yml"
-  - ".octon/instance/governance/retirement-register.yml"
-  - ".octon/instance/capabilities/runtime/packs/README.md"
-  - ".octon/instance/capabilities/runtime/packs/registry.yml"
-  - ".octon/generated/effective/runtime/route-bundle.yml"
-  - ".octon/generated/effective/runtime/route-bundle.lock.yml"
-  - ".octon/generated/effective/capabilities/pack-routes.effective.yml"
-  - ".octon/generated/effective/capabilities/pack-routes.lock.yml"
-  - ".octon/generated/effective/governance/support-target-matrix.yml"
-  - ".octon/generated/effective/extensions/catalog.effective.yml"
-  - ".octon/generated/effective/extensions/generation.lock.yml"
-  - ".octon/generated/effective/extensions/artifact-map.yml"
-  - ".octon/state/control/extensions/active.yml"
-  - ".octon/state/control/extensions/quarantine.yml"
-  - ".octon/state/evidence/validation/architecture/10of10-target-transition/manifest.yml"
-  - ".octon/state/evidence/validation/architecture/10of10-target-transition/closure-certification.yml"
-  - ".octon/state/evidence/validation/architecture/10of10-target-transition/publication/freshness.yml"
-  - ".octon/generated/cognition/projections/materialized/architecture-map.md"
-  - ".octon/generated/cognition/projections/materialized/runtime-route-map.md"
-  - ".octon/generated/cognition/projections/materialized/support-pack-route-map.md"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-no-raw-generated-effective-runtime-reads.sh"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-proof-bundle-executability.sh"
+  - ".octon/framework/assurance/runtime/_ops/scripts/validate-compatibility-retirement-cutover.sh"
+  - ".octon/framework/assurance/runtime/_ops/tests/test-runtime-effective-artifact-handle-negative-controls.sh"
+  - ".octon/framework/assurance/runtime/_ops/tests/test-stale-digest-bound-route-bundle-denial.sh"
+  - ".octon/framework/assurance/runtime/_ops/tests/test-pack-route-widening-denial.sh"
 status: "archived"
 lifecycle:
   temporary: true
   exit_expectation: >-
-    Promote the target-state runtime-resolution, freshness-gating, support-path normalization,
-    pack-route compilation, extension-state compaction, validator, runtime, evidence, and
-    operator-read-model changes into durable Octon surfaces, regenerate generated/effective
-    outputs with publication receipts, record closure evidence, then archive this packet once
-    durable targets stand alone without proposal-path dependencies.
+    Promote the authored contract, runtime, validator, governance, and retirement
+    changes into durable Octon surfaces; publish refreshed generated/effective and
+    generated/cognition read models with retained publication receipts; retain
+    closure evidence under state/evidence/validation/architecture/10of10-target-transition/**;
+    then archive this proposal once durable targets no longer depend on the
+    proposal workspace.
 archive:
   archived_at: "2026-04-22"
   archived_from_status: "implemented"
@@ -92,6 +70,6 @@ archive:
     - ".octon/generated/effective/runtime/route-bundle.yml"
     - ".octon/generated/effective/capabilities/pack-routes.effective.yml"
     - ".octon/state/evidence/validation/architecture/10of10-target-transition/manifest.yml"
-    - ".octon/state/evidence/validation/architecture/10of10-target-transition/closure-certification.yml"
+    - ".octon/state/evidence/validation/architecture/10of10-target-transition/closure/certificate.yml"
 related_proposals:
   - "octon-instruction-layer-execution-envelope-hardening"

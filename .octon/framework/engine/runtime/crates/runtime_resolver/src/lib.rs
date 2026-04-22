@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Context, Result};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use time::format_description::well_known::Rfc3339;
@@ -90,9 +91,21 @@ pub struct RuntimeEffectiveRouteBundle {
 }
 
 #[derive(Debug, Clone, Deserialize, Default)]
+pub struct RuntimeHandleFreshness {
+    #[serde(default)]
+    pub mode: String,
+    #[serde(default)]
+    pub ttl_seconds: Option<i64>,
+    #[serde(default)]
+    pub invalidation_conditions: Vec<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, Default)]
 pub struct RuntimeEffectiveRouteBundleLock {
     pub schema_version: String,
     pub generation_id: String,
+    #[serde(default)]
+    pub published_at: String,
     #[serde(default)]
     pub publication_status: String,
     #[serde(default)]
@@ -117,6 +130,18 @@ pub struct RuntimeEffectiveRouteBundleLock {
     pub extensions_generation_lock_sha256: String,
     #[serde(default)]
     pub fresh_until: String,
+    #[serde(default)]
+    pub source_digests: BTreeMap<String, String>,
+    #[serde(default)]
+    pub freshness: RuntimeHandleFreshness,
+    #[serde(default)]
+    pub legacy_fresh_until: String,
+    #[serde(default)]
+    pub allowed_consumers: Vec<String>,
+    #[serde(default)]
+    pub forbidden_consumers: Vec<String>,
+    #[serde(default)]
+    pub non_authority_classification: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Default)]
@@ -146,6 +171,10 @@ pub struct VerifiedRuntimeRouteBundle {
 impl VerifiedRuntimeRouteBundle {
     pub fn generation_id(&self) -> &str {
         &self.bundle.generation_id
+    }
+
+    pub fn freshness_mode(&self) -> &str {
+        self.lock.freshness.mode.as_str()
     }
 
     pub fn ensure_live_tuple_and_packs(
@@ -240,7 +269,9 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
         fs::read(&lock_path).with_context(|| format!("failed to read {}", lock_path.display()))?;
     let lock: RuntimeEffectiveRouteBundleLock =
         serde_yaml::from_slice(&lock_bytes).context("runtime route bundle lock is not valid YAML")?;
-    if lock.schema_version != "octon-runtime-effective-route-bundle-lock-v1" {
+    if lock.schema_version != "octon-runtime-effective-route-bundle-lock-v1"
+        && lock.schema_version != "octon-runtime-effective-route-bundle-lock-v2"
+    {
         return Err(anyhow!(
             "INVALID_INPUT: unsupported runtime route bundle lock schema '{}'",
             lock.schema_version
@@ -251,24 +282,43 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
     }
     require_non_empty(&lock.publication_receipt_sha256, "publication_receipt_sha256")?;
     require_non_empty(&lock.route_bundle_sha256, "route_bundle_sha256")?;
-    require_non_empty(&lock.runtime_resolution_sha256, "runtime_resolution_sha256")?;
-    require_non_empty(&lock.root_manifest_sha256, "root_manifest_sha256")?;
-    require_non_empty(&lock.support_target_matrix_sha256, "support_target_matrix_sha256")?;
-    require_non_empty(&lock.pack_routes_effective_sha256, "pack_routes_effective_sha256")?;
-    require_non_empty(&lock.pack_routes_lock_sha256, "pack_routes_lock_sha256")?;
-    require_non_empty(&lock.extensions_catalog_sha256, "extensions_catalog_sha256")?;
     require_non_empty(
-        &lock.extensions_generation_lock_sha256,
+        source_digest(&lock, "runtime_resolution_sha256"),
+        "runtime_resolution_sha256",
+    )?;
+    require_non_empty(source_digest(&lock, "root_manifest_sha256"), "root_manifest_sha256")?;
+    require_non_empty(
+        source_digest(&lock, "support_target_matrix_sha256"),
+        "support_target_matrix_sha256",
+    )?;
+    require_non_empty(
+        source_digest(&lock, "pack_routes_effective_sha256"),
+        "pack_routes_effective_sha256",
+    )?;
+    require_non_empty(
+        source_digest(&lock, "pack_routes_lock_sha256"),
+        "pack_routes_lock_sha256",
+    )?;
+    require_non_empty(
+        source_digest(&lock, "extensions_catalog_sha256"),
+        "extensions_catalog_sha256",
+    )?;
+    require_non_empty(
+        source_digest(&lock, "extensions_generation_lock_sha256"),
         "extensions_generation_lock_sha256",
     )?;
 
     if lock.route_bundle_sha256 != bundle_sha256 {
         return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle digest drift detected"));
     }
-    if lock.runtime_resolution_sha256 != resolution_digest {
+    if source_digest(&lock, "runtime_resolution_sha256") != resolution_digest {
         return Err(anyhow!("CAPABILITY_DENIED: runtime-resolution selector digest drift detected"));
     }
-    if !lock.fresh_until.trim().is_empty() {
+
+    if lock.schema_version == "octon-runtime-effective-route-bundle-lock-v2" {
+        require_handle_metadata(&lock)?;
+        enforce_handle_freshness(&lock)?;
+    } else if !lock.fresh_until.trim().is_empty() {
         let fresh_until = OffsetDateTime::parse(lock.fresh_until.trim(), &Rfc3339)
             .context("runtime route bundle lock fresh_until is not valid RFC3339")?;
         if fresh_until <= OffsetDateTime::now_utc() {
@@ -304,32 +354,32 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
 
     verify_optional_digest(
         &resolve_repo_path(root_dir, ".octon/octon.yml"),
-        &lock.root_manifest_sha256,
+        source_digest(&lock, "root_manifest_sha256"),
         "root manifest",
     )?;
     verify_optional_digest(
         &resolve_repo_path(root_dir, &resolution.support_target_matrix_ref),
-        &lock.support_target_matrix_sha256,
+        source_digest(&lock, "support_target_matrix_sha256"),
         "support target matrix",
     )?;
     verify_optional_digest(
         &pack_routes_effective_path,
-        &lock.pack_routes_effective_sha256,
+        source_digest(&lock, "pack_routes_effective_sha256"),
         "pack routes effective",
     )?;
     verify_optional_digest(
         &pack_routes_lock_path,
-        &lock.pack_routes_lock_sha256,
+        source_digest(&lock, "pack_routes_lock_sha256"),
         "pack routes lock",
     )?;
     verify_optional_digest(
         &resolve_repo_path(root_dir, &resolution.extensions_catalog_ref),
-        &lock.extensions_catalog_sha256,
+        source_digest(&lock, "extensions_catalog_sha256"),
         "extensions catalog",
     )?;
     verify_optional_digest(
         &resolve_repo_path(root_dir, &resolution.extensions_generation_lock_ref),
-        &lock.extensions_generation_lock_sha256,
+        source_digest(&lock, "extensions_generation_lock_sha256"),
         "extensions generation lock",
     )?;
 
@@ -343,6 +393,82 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
         bundle,
         lock,
     })
+}
+
+fn source_digest<'a>(lock: &'a RuntimeEffectiveRouteBundleLock, key: &str) -> &'a str {
+    if let Some(value) = lock.source_digests.get(key) {
+        return value.as_str();
+    }
+    match key {
+        "runtime_resolution_sha256" => lock.runtime_resolution_sha256.as_str(),
+        "root_manifest_sha256" => lock.root_manifest_sha256.as_str(),
+        "support_target_matrix_sha256" => lock.support_target_matrix_sha256.as_str(),
+        "pack_routes_effective_sha256" => lock.pack_routes_effective_sha256.as_str(),
+        "pack_routes_lock_sha256" => lock.pack_routes_lock_sha256.as_str(),
+        "extensions_catalog_sha256" => lock.extensions_catalog_sha256.as_str(),
+        "extensions_generation_lock_sha256" => lock.extensions_generation_lock_sha256.as_str(),
+        _ => "",
+    }
+}
+
+fn require_handle_metadata(lock: &RuntimeEffectiveRouteBundleLock) -> Result<()> {
+    require_non_empty(&lock.freshness.mode, "freshness.mode")?;
+    if lock.freshness.invalidation_conditions.is_empty() {
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle lock must declare freshness invalidation conditions"
+        ));
+    }
+    if !lock
+        .allowed_consumers
+        .iter()
+        .any(|value| value == "runtime_resolver")
+    {
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle lock must allow runtime_resolver as a consumer"
+        ));
+    }
+    if lock
+        .forbidden_consumers
+        .iter()
+        .any(|value| value == "runtime_resolver")
+    {
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle lock forbids runtime_resolver"
+        ));
+    }
+    if lock.non_authority_classification != "derived-runtime-handle" {
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle lock non-authority classification is invalid"
+        ));
+    }
+    Ok(())
+}
+
+fn enforce_handle_freshness(lock: &RuntimeEffectiveRouteBundleLock) -> Result<()> {
+    match lock.freshness.mode.as_str() {
+        "digest_bound" | "receipt_bound" => Ok(()),
+        "ttl_bound" => {
+            let ttl_seconds = lock.freshness.ttl_seconds.ok_or_else(|| {
+                anyhow!("CAPABILITY_DENIED: runtime route bundle lock ttl_bound freshness requires ttl_seconds")
+            })?;
+            if ttl_seconds <= 0 {
+                return Err(anyhow!(
+                    "CAPABILITY_DENIED: runtime route bundle lock ttl_bound freshness requires a positive ttl_seconds"
+                ));
+            }
+            let published_at = OffsetDateTime::parse(lock.published_at.trim(), &Rfc3339)
+                .context("runtime route bundle lock published_at is not valid RFC3339")?;
+            if published_at + time::Duration::seconds(ttl_seconds) <= OffsetDateTime::now_utc() {
+                return Err(anyhow!(
+                    "CAPABILITY_DENIED: runtime route bundle lock ttl-bound freshness window expired"
+                ));
+            }
+            Ok(())
+        }
+        _ => Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle lock freshness mode is invalid"
+        )),
+    }
 }
 
 fn require_non_empty(value: &str, field: &str) -> Result<()> {

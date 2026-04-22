@@ -134,3 +134,57 @@ obligations:
       receipt linkage while moving dependency closure and required inputs into
       generation locks and artifact maps.
     adoption_status: "active"
+  - id: "EVI-023"
+    requirement: >-
+      Runtime-effective handle verification retains handle kind, generation
+      id, source refs and digests, output and lock digests, publication
+      receipt linkage, freshness mode, allowed consumers, forbidden
+      consumers, and non-authority classification.
+    adoption_status: "active"
+  - id: "EVI-024"
+    requirement: >-
+      Publication freshness validation retains explicit freshness-mode proof
+      and root-manifest invalidation evidence for runtime route bundles, pack
+      routes, extension catalogs, support matrices, and capability routing
+      outputs when they are published as runtime-facing generated/effective
+      artifacts.
+    adoption_status: "active"
+  - id: "EVI-025"
+    requirement: >-
+      Raw generated/effective runtime read denials retain negative-control
+      evidence showing runtime access remains restricted to resolver-verified
+      handles.
+    adoption_status: "active"
+  - id: "EVI-026"
+    requirement: >-
+      Authorization-boundary coverage retains discovered, static,
+      manual_exception, retired, stage_only, or denied classification plus
+      request-builder, receipt, support-tuple interaction, and rollback or
+      evidence requirements for every material side-effect path.
+    adoption_status: "active"
+  - id: "EVI-027"
+    requirement: >-
+      Executable support proof bundles retain evaluator identity, input and
+      output digests, pass/fail criteria, negative controls, trace or replay
+      references, receipt references, and final result in addition to tuple,
+      dossier, disclosure, and proof-plane linkage.
+    adoption_status: "active"
+  - id: "EVI-028"
+    requirement: >-
+      Compatibility-retirement cutover retains canonical successor,
+      allowed-consumer and forbidden-consumer posture, future-widening
+      blocker status, review cadence, and evidence references for each live
+      compatibility surface.
+    adoption_status: "active"
+  - id: "EVI-029"
+    requirement: >-
+      Architecture-health v2 retains dimension-level depth classifications and
+      a final closure-grade certificate under
+      state/evidence/validation/architecture/10of10-target-transition/closure/**.
+    adoption_status: "active"
+  - id: "EVI-030"
+    requirement: >-
+      Operator read-model publication retains explicit non-authority notice,
+      canonical refs, receipt refs, freshness metadata, and forbidden
+      consumer classification.
+    adoption_status: "active"

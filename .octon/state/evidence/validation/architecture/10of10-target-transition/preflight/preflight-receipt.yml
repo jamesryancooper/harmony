@@ -1,0 +1,43 @@
+schema_version: architecture-transition-preflight-receipt-v1
+proposal_id: octon-architecture-10of10-target-state-transition
+branch: chore/octon-10of10-target-state-transition
+base_head: 4e6dfb405
+captured_at: "2026-04-22T00:00:00-05:00"
+proposal_packet_ref: ".octon/inputs/exploratory/proposals/architecture/octon-architecture-10of10-target-state-transition"
+proposal_authority_check:
+  result: pass
+  notes:
+    - "Proposal packet is present under inputs/exploratory/proposals/**."
+    - "No preflight evidence indicates direct runtime or policy consumption of the packet."
+validators:
+  - id: validate-architecture-health
+    result: fail
+    log_ref: ".octon/state/evidence/validation/architecture/10of10-target-transition/preflight/validate-architecture-health.log"
+    blocking_findings:
+      - "validate-publication-freshness-gates.sh failed inside the aggregate health run."
+  - id: validate-runtime-effective-route-bundle
+    result: pass
+    log_ref: ".octon/state/evidence/validation/architecture/10of10-target-transition/preflight/validate-runtime-effective-route-bundle.log"
+  - id: validate-publication-freshness-gates
+    result: fail
+    log_ref: ".octon/state/evidence/validation/architecture/10of10-target-transition/preflight/validate-publication-freshness-gates.log"
+    blocking_findings:
+      - "validate-capability-publication-state.sh failed."
+      - "validate-extension-publication-state.sh failed."
+  - id: validate-generated-effective-freshness
+    result: pass
+    log_ref: ".octon/state/evidence/validation/architecture/10of10-target-transition/preflight/validate-generated-effective-freshness.log"
+  - id: validate-support-pack-admission-alignment
+    result: pass
+    log_ref: ".octon/state/evidence/validation/architecture/10of10-target-transition/preflight/validate-support-pack-admission-alignment.log"
+  - id: validate-extension-active-state-compactness
+    result: pass
+    log_ref: ".octon/state/evidence/validation/architecture/10of10-target-transition/preflight/validate-extension-active-state-compactness.log"
+derived_findings:
+  - finding_id: preflight-publication-root-manifest-drift
+    severity: high
+    summary: "Capability-routing and extension publication artifacts are stale against the current root manifest digest."
+    evidence_refs:
+      - ".octon/state/evidence/validation/architecture/10of10-target-transition/preflight/validate-publication-freshness-gates.log"
+      - ".octon/state/evidence/validation/architecture/10of10-target-state-transition/preflight/validate-architecture-health.log"
+status: complete

@@ -14,7 +14,7 @@ an authority source.
 
 - Kernel dispatch and command routing: `framework/engine/runtime/crates/kernel/src/**`
 - Authority orchestration and phases: `framework/engine/runtime/crates/authority_engine/src/**`
-- Coverage evidence: `state/evidence/validation/architecture-target-state-transition/authorization-boundary/coverage.yml`
+- Coverage evidence: `state/evidence/validation/architecture/10of10-target-transition/authorization-boundary/coverage.yml`
 
 ## Negative Controls
 

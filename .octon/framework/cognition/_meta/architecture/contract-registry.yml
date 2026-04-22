@@ -63,8 +63,8 @@ class_roots:
     authority_class: "derived-projection"
     authored_authority: false
     steady_state_role: >-
-      Rebuildable effective outputs, cognition summaries, materialized
-      projections, and proposal discovery projections.
+      Rebuildable runtime-effective handles, operator read models,
+      materialized projections, and proposal discovery projections.
     must_not_contain:
       - "durable authority"
       - "retained evidence presented as rebuildable output"
@@ -73,12 +73,69 @@ class_roots:
     authority_class: "non-authoritative-input"
     authored_authority: false
     steady_state_role: >-
-      Raw additive packs, exploratory proposals, and human-led ideation that
+      Raw additive inputs, exploratory proposals, and human-led ideation that
       may inform promotion or publication work without becoming direct runtime
       or policy dependencies.
     must_not_contain:
       - "direct runtime dependencies"
       - "direct policy dependencies"
+steady_state_surface_classes:
+  authored-authority:
+    canonical_roots:
+      - ".octon/framework/**"
+      - ".octon/instance/**"
+    authority_posture: "durable-authored-authority"
+    role: "Canonical authored authority for constitutional, structural, runtime, and repo-governance contracts."
+  mutable-control:
+    canonical_roots:
+      - ".octon/state/control/**"
+    authority_posture: "mutable-operational-truth"
+    role: "Current execution, quarantine, approval, and publication control truth."
+  retained-evidence:
+    canonical_roots:
+      - ".octon/state/evidence/**"
+    authority_posture: "retained-factual-truth"
+    role: "Receipts, proof bundles, validation records, and disclosure evidence."
+  continuity-state:
+    canonical_roots:
+      - ".octon/state/continuity/**"
+    authority_posture: "resumption-context"
+    role: "Handoff and continuity state that may guide resumption without minting authority."
+  generated-operator-read-model:
+    canonical_roots:
+      - ".octon/generated/cognition/**"
+    authority_posture: "derived-non-authority"
+    role: "Traceable operator and maintainer projections that remain barred from runtime, policy, and support authority."
+  generated-runtime-effective-handle:
+    canonical_roots:
+      - ".octon/generated/effective/**"
+    authority_posture: "derived-runtime-handle"
+    role: "Runtime-facing generated outputs that may be consumed only through resolver-verified handles."
+  compatibility-projection:
+    canonical_roots:
+      - ".octon/instance/capabilities/runtime/packs/**"
+      - ".octon/generated/cognition/projections/materialized/**"
+      - ".octon/AGENTS.md"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+    authority_posture: "compatibility-only"
+    role: "Retained shims and transitional mirrors that must never widen runtime, policy, or support authority."
+  historical-evidence:
+    canonical_roots:
+      - ".octon/state/evidence/lab/**"
+      - ".octon/state/evidence/disclosure/releases/**"
+    authority_posture: "retained-historical-record"
+    role: "Historical proof and disclosure records retained for lineage, replay, and audit."
+  proposal-input:
+    canonical_roots:
+      - ".octon/inputs/exploratory/proposals/**"
+    authority_posture: "lineage-only-input"
+    role: "Exploratory proposal packets that may guide promotion work but never become live authority."
+  raw-additive-input:
+    canonical_roots:
+      - ".octon/inputs/additive/**"
+    authority_posture: "untrusted-additive-input"
+    role: "Raw additive extension inputs pending desired selection, activation, publication, and freshness validation."
 delegated_registries:
   root_manifest:
     path: ".octon/octon.yml"
@@ -89,6 +146,7 @@ delegated_registries:
       - "topology.class_roots"
       - "profiles"
       - "resolution"
+      - "resolution.runtime_contract_refs"
       - "policies.generated_commit_defaults"
     status: "active"
   constitutional_contract_registry:
@@ -203,11 +261,13 @@ path_families:
       - "operators"
     forbidden_consumers:
       - "runtime or policy as a parallel authority path"
+      - "runtime or policy direct reads from compatibility projections"
     delegated_registry_refs:
       - "retirement_register"
     validator_refs:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-compatibility-retirement.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-compatibility-retirement-readiness.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-compatibility-retirement-cutover.sh"
     doc_target_refs:
       - "architecture_specification"
       - "bootstrap_start"
@@ -269,43 +329,120 @@ path_families:
       - ".octon/framework/engine/runtime/spec/runtime-effective-route-bundle-v1.schema.json"
       - ".octon/instance/governance/runtime-resolution.yml"
     authority_class: "delegated-runtime-resolution-contract"
-    role: "Delegated runtime-resolution contract, selector, and route-bundle family."
+    role: "Delegated runtime-resolution contract, selector, and generated/effective handle-routing family."
     allowed_consumers:
-      - "runtime"
+      - "runtime_resolver"
       - "validators"
       - "docs"
       - "operators"
     forbidden_consumers:
       - "proposal packets as runtime authority"
       - "generated cognition as runtime authority"
+      - "direct runtime raw-path reads of generated/effective outputs"
     validator_refs:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-resolution.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-no-raw-generated-effective-runtime-reads.sh"
+    doc_target_refs:
+      - "architecture_specification"
+  runtime_effective_handle_contract:
+    class_root: "framework"
+    related_class_roots:
+      - "generated"
+      - "state"
+    canonical_paths:
+      - ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.md"
+      - ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.schema.json"
+      - ".octon/framework/engine/runtime/spec/runtime-effective-route-bundle-lock-v2.schema.json"
+    authority_class: "generated-runtime-handle-contract"
+    role: "Canonical contract for resolver-verified handles over runtime-facing generated/effective artifacts."
+    allowed_consumers:
+      - "runtime_resolver"
+      - "validators"
+      - "docs"
+      - "operators"
+    forbidden_consumers:
+      - "direct runtime raw-path reads"
+      - "generated cognition as runtime or policy authority"
+    validator_refs:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-no-raw-generated-effective-runtime-reads.sh"
+    doc_target_refs:
+      - "architecture_specification"
+  runtime_publication_freshness:
+    class_root: "framework"
+    related_class_roots:
+      - "generated"
+      - "state"
+    canonical_paths:
+      - ".octon/framework/engine/runtime/spec/publication-freshness-gates-v3.md"
+      - ".octon/state/evidence/validation/publication/**"
+      - ".octon/state/evidence/validation/architecture/10of10-target-transition/publication/**"
+    authority_class: "publication-freshness-contract"
+    role: "Explicit freshness-mode, digest, receipt, and invalidation contract for runtime-facing publication."
+    allowed_consumers:
+      - "runtime_resolver"
+      - "validators"
+      - "operators"
+      - "docs"
+    forbidden_consumers:
+      - "fake far-future freshness as a trust substitute"
+      - "receipt-free runtime trust"
+    validator_refs:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-publication-freshness-gates.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-generated-effective-freshness.sh"
     doc_target_refs:
       - "architecture_specification"
   runtime_architecture_health:
     class_root: "framework"
     canonical_paths:
-      - ".octon/framework/engine/runtime/spec/architecture-health-contract-v1.md"
-      - ".octon/framework/engine/runtime/spec/publication-freshness-gates-v2.md"
+      - ".octon/framework/engine/runtime/spec/architecture-health-contract-v2.md"
+      - ".octon/framework/engine/runtime/spec/publication-freshness-gates-v3.md"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-health.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-publication-freshness-gates.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-resolution.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proof-bundle-executability.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-compatibility-retirement-cutover.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-run-lifecycle-transition-coverage.sh"
+      - ".octon/state/evidence/validation/architecture/10of10-target-transition/closure/**"
     authority_class: "aggregate-runtime-health-contract"
-    role: "Aggregate runtime architecture health, publication freshness, and lifecycle coverage surfaces."
+    role: "Depth-aware closure-grade runtime architecture health, publication freshness, proof, and compatibility coverage surfaces."
     allowed_consumers:
       - "operators"
       - "validators"
       - "docs"
     forbidden_consumers:
       - "generated summaries as an authority substitute"
+      - "existence-only checks presented as closure-grade"
     validator_refs:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-health.sh"
     doc_target_refs:
       - "architecture_specification"
       - "bootstrap_start"
+  proof_bundle_executability:
+    class_root: "framework"
+    related_class_roots:
+      - "instance"
+      - "state"
+    canonical_paths:
+      - ".octon/framework/constitution/contracts/assurance/support-target-proof-bundle-v1.schema.json"
+      - ".octon/instance/governance/contracts/support-target-proofing.yml"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proof-bundle-executability.sh"
+      - ".octon/state/evidence/validation/architecture/10of10-target-transition/proof-plane/**"
+    authority_class: "proof-executability-contract"
+    role: "Executable proof-bundle contract, sufficiency gate, and retained proof-plane evidence surfaces."
+    allowed_consumers:
+      - "validators"
+      - "operators"
+      - "docs"
+      - "runtime"
+    forbidden_consumers:
+      - "summary-only proof as live support authority"
+    doc_target_refs:
+      - "architecture_specification"
   overlay_resolution:
     class_root: "framework"
     related_class_roots:
@@ -558,20 +695,22 @@ path_families:
     class_root: "generated"
     canonical_paths:
       - ".octon/generated/effective/**"
-    authority_class: "runtime-facing-derived-publication"
-    role: "Freshness-bounded runtime-facing effective outputs."
+    authority_class: "generated-runtime-effective-handle"
+    role: "Resolver-verified runtime-facing generated outputs published as non-authoritative handles."
     allowed_consumers:
-      - "runtime"
+      - "runtime_resolver"
       - "operators"
       - "validators"
     forbidden_consumers:
       - "authority minting"
       - "stale publication without receipts"
+      - "direct runtime raw-path reads"
     publication_ref: "runtime_effective"
     validator_refs:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-route-normalization.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-publication-freshness-gates.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
     doc_target_refs:
       - "super_root_readme"
       - "architecture_specification"
@@ -581,18 +720,20 @@ path_families:
     canonical_paths:
       - ".octon/generated/effective/runtime/route-bundle.yml"
       - ".octon/generated/effective/runtime/route-bundle.lock.yml"
-    authority_class: "compiled-runtime-route-bundle"
-    role: "Freshness-gated runtime-effective route bundle compiled from canonical authority and generated/effective publication state."
+    authority_class: "generated-runtime-effective-handle"
+    role: "Resolver-verified runtime route bundle handle compiled from canonical authority, control state, and published derivatives."
     allowed_consumers:
-      - "runtime"
+      - "runtime_resolver"
       - "validators"
       - "operators"
     forbidden_consumers:
       - "direct string-path runtime reads without freshness gating"
+      - "fake far-future freshness without explicit mode"
     publication_ref: "runtime_effective"
     validator_refs:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-generated-effective-freshness.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
     doc_target_refs:
       - "architecture_specification"
       - "bootstrap_start"
@@ -601,18 +742,60 @@ path_families:
     canonical_paths:
       - ".octon/generated/effective/capabilities/pack-routes.effective.yml"
       - ".octon/generated/effective/capabilities/pack-routes.lock.yml"
-    authority_class: "compiled-runtime-pack-route"
-    role: "Generated/effective runtime-facing pack routes with explicit tuple claim effects and no-widening discipline."
+    authority_class: "generated-runtime-effective-handle"
+    role: "Resolver-verified generated pack-route handle with explicit tuple claim effects and no-widening discipline."
     allowed_consumers:
-      - "runtime"
+      - "runtime_resolver"
       - "validators"
       - "operators"
     forbidden_consumers:
       - "support widening beyond canonical admissions"
+      - "direct runtime pack-route reads outside the resolver"
     publication_ref: "runtime_effective"
     validator_refs:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-support-pack-admission-alignment.sh"
       - ".octon/framework/assurance/runtime/_ops/tests/test-support-pack-no-widening.sh"
+      - ".octon/framework/assurance/runtime/_ops/tests/test-pack-route-widening-denial.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
+    doc_target_refs:
+      - "architecture_specification"
+  runtime_extension_catalog:
+    class_root: "generated"
+    canonical_paths:
+      - ".octon/generated/effective/extensions/catalog.effective.yml"
+      - ".octon/generated/effective/extensions/generation.lock.yml"
+    authority_class: "generated-runtime-effective-handle"
+    role: "Resolver-verified published extension catalog handle separated from desired, active, and quarantine state."
+    allowed_consumers:
+      - "runtime_resolver"
+      - "validators"
+      - "operators"
+    forbidden_consumers:
+      - "selected-but-unpublished extension use"
+      - "raw additive input as runtime authority"
+    publication_ref: "runtime_effective"
+    validator_refs:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
+    doc_target_refs:
+      - "architecture_specification"
+  runtime_support_matrix:
+    class_root: "generated"
+    canonical_paths:
+      - ".octon/generated/effective/governance/support-target-matrix.yml"
+    authority_class: "generated-runtime-effective-handle"
+    role: "Derived support-matrix handle used for traceability and runtime narrowing, never for widening live support claims."
+    allowed_consumers:
+      - "runtime_resolver"
+      - "validators"
+      - "operators"
+    forbidden_consumers:
+      - "standalone live-support authority"
+      - "support widening beyond admissions, dossiers, proof bundles, and receipts"
+    publication_ref: "runtime_effective"
+    validator_refs:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-support-target-proofing.sh"
     doc_target_refs:
       - "architecture_specification"
   extension_active_state_compactness:
@@ -625,7 +808,7 @@ path_families:
     authority_class: "compact-extension-activation-control"
     role: "Desired/active/quarantine extension lifecycle with compact active control state and publication-safe generated outputs."
     allowed_consumers:
-      - "runtime"
+      - "runtime_resolver"
       - "validators"
       - "operators"
     forbidden_consumers:
@@ -639,8 +822,8 @@ path_families:
     class_root: "generated"
     canonical_paths:
       - ".octon/generated/cognition/**"
-    authority_class: "non-authoritative-derived-read-model"
-    role: "Generated mission, operator, and decision summaries plus materialized projections."
+    authority_class: "generated-operator-read-model"
+    role: "Generated mission, operator, and decision read models with traceability and explicit non-authority posture."
     allowed_consumers:
       - "operators"
       - "validators"
@@ -648,13 +831,38 @@ path_families:
     forbidden_consumers:
       - "runtime authority routing"
       - "policy authority routing"
+      - "support-claim widening"
     publication_ref: "cognition_read_models"
     validator_refs:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-view-generation.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-operator-read-models.sh"
     doc_target_refs:
       - "super_root_readme"
       - "architecture_specification"
       - "bootstrap_start"
+  generated_operator_navigation_maps:
+    class_root: "generated"
+    canonical_paths:
+      - ".octon/generated/cognition/projections/materialized/architecture-map.md"
+      - ".octon/generated/cognition/projections/materialized/runtime-route-map.md"
+      - ".octon/generated/cognition/projections/materialized/support-pack-route-map.md"
+      - ".octon/generated/cognition/projections/materialized/compatibility-retirement-map.md"
+    authority_class: "generated-operator-read-model"
+    role: "Traceable non-authoritative operator maps for architecture, runtime routes, support-pack routing, and compatibility retirement."
+    allowed_consumers:
+      - "operators"
+      - "validators"
+      - "docs"
+    forbidden_consumers:
+      - "runtime"
+      - "policy"
+      - "support-claim authority"
+    publication_ref: "cognition_read_models"
+    validator_refs:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-operator-read-models.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-generated-non-authority.sh"
+    doc_target_refs:
+      - "architecture_specification"
   generated_proposals:
     class_root: "generated"
     canonical_paths:
@@ -718,6 +926,13 @@ publication_metadata:
     authority_status: "derived-only"
     runtime_facing: true
     receipt_root: ".octon/state/evidence/validation/publication/"
+    architecture_validation_root: ".octon/state/evidence/validation/architecture/10of10-target-transition/"
+    historical_compatibility_receipt_roots:
+      - ".octon/state/evidence/validation/architecture-target-state-transition/"
+    handle_contract_ref: ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.md"
+    handle_schema_ref: ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.schema.json"
+    freshness_contract_ref: ".octon/framework/engine/runtime/spec/publication-freshness-gates-v3.md"
+    route_bundle_lock_schema_ref: ".octon/framework/engine/runtime/spec/runtime-effective-route-bundle-lock-v2.schema.json"
     freshness_artifacts:
       - "artifact-map.yml"
       - "generation.lock.yml"
@@ -734,7 +949,10 @@ publication_metadata:
     required_conditions:
       - "publication receipt retained"
       - "generation lock current"
-      - "freshness-checked runtime handle required"
+      - "resolver-verified runtime handle required"
+      - "freshness.mode required with digest_bound, ttl_bound, or receipt_bound semantics"
+      - "root manifest digest drift invalidates trust immediately"
+      - "canonical architecture evidence root resolves under architecture/10of10-target-transition"
       - "no authority widening beyond canonical sources"
   cognition_read_models:
     output_root: ".octon/generated/cognition/"
@@ -753,19 +971,15 @@ publication_metadata:
     required_conditions:
       - "field-level traceability to canonical authored, control, evidence, or continuity sources"
       - "freshness bounded by retained evidence and current control state"
+      - "non-authority notice and forbidden-consumer metadata retained"
     named_maps:
       - projection_id: "architecture-map"
         definition_ref: ".octon/generated/cognition/projections/definitions/architecture-map.yml"
         materialized_ref: ".octon/generated/cognition/projections/materialized/architecture-map.md"
       - projection_id: "runtime-route-map"
-        definition_ref: ".octon/generated/cognition/projections/definitions/authorization-coverage-map.yml"
         materialized_ref: ".octon/generated/cognition/projections/materialized/runtime-route-map.md"
       - projection_id: "support-pack-route-map"
-        definition_ref: ".octon/generated/cognition/projections/definitions/compatibility-retirement-map.yml"
         materialized_ref: ".octon/generated/cognition/projections/materialized/support-pack-route-map.md"
-      - projection_id: "authorization-coverage-map"
-        definition_ref: ".octon/generated/cognition/projections/definitions/authorization-coverage-map.yml"
-        materialized_ref: ".octon/generated/cognition/projections/materialized/authorization-coverage-map.md"
       - projection_id: "compatibility-retirement-map"
         definition_ref: ".octon/generated/cognition/projections/definitions/compatibility-retirement-map.yml"
         materialized_ref: ".octon/generated/cognition/projections/materialized/compatibility-retirement-map.md"
@@ -814,6 +1028,12 @@ doc_targets:
       path_family_refs:
         - "structural_architecture"
         - "constitutional_kernel"
+        - "runtime_resolution"
+        - "runtime_effective_handle_contract"
+        - "runtime_publication_freshness"
+        - "runtime_architecture_health"
+        - "proof_bundle_executability"
+        - "compatibility_retirement"
         - "overlay_resolution"
         - "workspace_charter_pair"
         - "instance_governance"
@@ -825,6 +1045,7 @@ doc_targets:
         - "state_continuity"
         - "generated_effective"
         - "generated_cognition"
+        - "generated_operator_navigation_maps"
         - "generated_proposals"
         - "inputs_additive"
         - "inputs_exploratory"
@@ -988,6 +1209,10 @@ execution:
     - ".octon/framework/engine/runtime/spec/execution-receipt-v3.schema.json"
     - ".octon/framework/engine/runtime/spec/policy-receipt-v2.schema.json"
     - ".octon/framework/engine/runtime/spec/policy-digest-v2.md"
+    - ".octon/framework/engine/runtime/spec/runtime-resolution-v1.md"
+    - ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.md"
+    - ".octon/framework/engine/runtime/spec/publication-freshness-gates-v3.md"
+    - ".octon/framework/engine/runtime/spec/architecture-health-contract-v2.md"
     - ".octon/state/control/execution/runs/README.md"
     - ".octon/state/control/README.md"
     - ".octon/state/evidence/README.md"
@@ -1001,13 +1226,17 @@ execution:
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-authorization-boundary-coverage.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-evidence-completeness.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-proof-bundle-completeness.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-proof-bundle-executability.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-generated-effective-freshness.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-no-raw-generated-effective-runtime-reads.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-generated-non-authority.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-input-non-authority.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-promotion-receipts.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-support-target-proofing.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-active-doc-hygiene.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-compatibility-retirement.sh"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-compatibility-retirement-cutover.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-operator-read-models.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-docs-consistency.sh"
     - ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh"
@@ -1068,6 +1297,10 @@ documentation:
         - ".octon/framework/engine/README.md"
         - ".octon/framework/engine/runtime/spec/policy-interface-v1.md"
         - ".octon/framework/engine/runtime/spec/policy-digest-v2.md"
+        - ".octon/framework/engine/runtime/spec/runtime-resolution-v1.md"
+        - ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.md"
+        - ".octon/framework/engine/runtime/spec/publication-freshness-gates-v3.md"
+        - ".octon/framework/engine/runtime/spec/architecture-health-contract-v2.md"
         - ".octon/state/control/README.md"
         - ".octon/state/evidence/README.md"
         - ".octon/state/control/execution/runs/README.md"

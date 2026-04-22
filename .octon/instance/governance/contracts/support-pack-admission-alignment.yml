@@ -20,4 +20,6 @@ alignment_requirements:
   - "Live tuples may cite only admitted packs."
   - "Stage-only or non-live tuples may cite unadmitted packs only when the tuple remains non-live."
   - "Runtime registry status, default_route, support_target_refs, and required_proof remain in parity with runtime admissions."
+  - "Runtime-facing pack routes retain explicit freshness metadata and remain consumable only through resolver-verified handles."
+  - "Compatibility runtime-pack projections remain frozen and may not be consumed by runtime or policy."
 blocking_rule: "Reject when pack intent, runtime admission, or live tuple use diverges enough that a live support claim could be widened by drift."

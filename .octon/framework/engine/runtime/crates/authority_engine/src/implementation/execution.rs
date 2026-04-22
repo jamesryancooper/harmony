@@ -87,8 +87,23 @@ pub fn authorize_execution(
         "runtime_effective_route_bundle_ref".to_string(),
         path_tail(&cfg.repo_root, &verified_runtime_route_bundle.bundle_path),
     );
-    let request = &request;
-    let environment = resolve_execution_environment(cfg, request);
+    request.metadata.insert(
+        "runtime_effective_handle_kind".to_string(),
+        "runtime_route_bundle".to_string(),
+    );
+    request.metadata.insert(
+        "runtime_effective_freshness_mode".to_string(),
+        verified_runtime_route_bundle.freshness_mode().to_string(),
+    );
+    request.metadata.insert(
+        "runtime_effective_publication_receipt_ref".to_string(),
+        verified_runtime_route_bundle.lock.publication_receipt_path.clone(),
+    );
+    request.metadata.insert(
+        "runtime_effective_non_authority_classification".to_string(),
+        verified_runtime_route_bundle.lock.non_authority_classification.clone(),
+    );
+    let environment = resolve_execution_environment(cfg, &request);
     let intent_ref = request
         .intent_ref
         .clone()
@@ -104,7 +119,7 @@ pub fn authorize_execution(
         .execution_role_ref
         .clone()
         .unwrap_or_else(default_execution_role_ref);
-    let autonomy_state = resolve_autonomy_state(cfg, request, &intent_ref)?;
+    let autonomy_state = resolve_autonomy_state(cfg, &request, &intent_ref)?;
 
     let requested_mode = request
         .policy_mode_requested
@@ -196,7 +211,7 @@ pub fn authorize_execution(
         }
     }
 
-    if is_critical_action(cfg, request, executor_profile)
+    if is_critical_action(cfg, &request, executor_profile)
         && effective_policy_mode != cfg.execution_governance.protected_policy_mode
     {
         return Err(KernelError::new(
@@ -206,19 +221,19 @@ pub fn authorize_execution(
         .with_details(json!({"reason_codes":["CRITICAL_ACTION_REQUIRES_HARD_ENFORCE"]})));
     }
 
-    let bound_run = bind_run_lifecycle(cfg, request, autonomy_state.as_ref())?;
+    let bound_run = bind_run_lifecycle(cfg, &request, autonomy_state.as_ref())?;
     let run_root = bound_run.evidence_root.clone();
     let run_root_rel = bound_run.evidence_root_rel.clone();
-    let run_contract = load_run_contract_record(cfg, request, autonomy_state.as_ref())?;
-    let ownership = resolve_ownership_posture(cfg, request, &run_contract)?;
+    let run_contract = load_run_contract_record(cfg, &request, autonomy_state.as_ref())?;
+    let ownership = resolve_ownership_posture(cfg, &request, &run_contract)?;
     let support_tier =
-        resolve_support_tier_posture(cfg, request, &run_contract, autonomy_state.as_ref())?;
+        resolve_support_tier_posture(cfg, &request, &run_contract, autonomy_state.as_ref())?;
     let requested_support_tuple = if run_contract.support_target.workload_tier.trim().is_empty() {
-        requested_support_target_tuple(request)?
+        requested_support_target_tuple(&request)?
     } else {
         run_contract.support_target.clone()
     };
-    verified_runtime_route_bundle
+    let runtime_route = verified_runtime_route_bundle
         .ensure_live_tuple_and_packs(
             &RuntimeSupportTupleRef {
                 model_tier: requested_support_tuple.model_tier.clone(),
@@ -231,10 +246,30 @@ pub fn authorize_execution(
             &support_tier.requested_capability_packs,
         )
         .map_err(runtime_route_bundle_denial)?;
+    request.metadata.insert(
+        "runtime_effective_support_tuple".to_string(),
+        runtime_route.tuple_id.clone(),
+    );
+    request.metadata.insert(
+        "runtime_effective_claim_effect".to_string(),
+        runtime_route.claim_effect.clone(),
+    );
+    request.metadata.insert(
+        "runtime_effective_allowed_capability_packs".to_string(),
+        runtime_route.allowed_capability_packs.join(","),
+    );
     verified_runtime_route_bundle
         .ensure_extensions_available()
         .map_err(runtime_route_bundle_denial)?;
-    let reversibility = reversibility_payload(request, &run_contract, autonomy_state.as_ref());
+    request.metadata.insert(
+        "runtime_effective_extensions_status".to_string(),
+        verified_runtime_route_bundle.bundle.extensions.status.clone(),
+    );
+    request.metadata.insert(
+        "runtime_effective_extensions_generation_id".to_string(),
+        verified_runtime_route_bundle.bundle.extensions.generation_id.clone(),
+    );
+    let reversibility = reversibility_payload(&request, &run_contract, autonomy_state.as_ref());
     let preflight_result = phases::results::AuthorizationPhaseResult {
         schema_version: "authorization-phase-result-v1".to_string(),
         request_id: request.request_id.clone(),
@@ -352,7 +387,7 @@ pub fn authorize_execution(
     let approval_request_ref = if approval_required {
         Some(write_approval_request(
             cfg,
-            request,
+            &request,
             &run_contract,
             &ownership,
             required_evidence.clone(),
@@ -364,7 +399,7 @@ pub fn authorize_execution(
 
     let budget_preview_decision = preview_execution_budget(
         cfg,
-        request,
+        &request,
         executor_profile.map(|profile| profile.name.as_str()),
     )?;
     let budget_preview = budget_preview_decision
@@ -390,7 +425,7 @@ pub fn authorize_execution(
      -> CoreResult<GrantBundle> {
         let decision_ref = write_decision_artifact(
             cfg,
-            request,
+            &request,
             decision.clone(),
             reason_codes.clone(),
             ownership.clone(),
@@ -522,14 +557,14 @@ pub fn authorize_execution(
     if requested_network {
         let egress_decision = match authorize_network_egress(
             cfg,
-            request,
+            &request,
             executor_profile.map(|profile| profile.name.as_str()),
         ) {
             Ok(decision) => decision,
             Err(err) => {
                 let decision_ref = write_decision_artifact(
                     cfg,
-                    request,
+                    &request,
                     ExecutionDecision::Deny,
                     vec!["NETWORK_EGRESS_DENIED".to_string()],
                     ownership.clone(),
@@ -744,7 +779,7 @@ pub fn authorize_execution(
 
     let policy_artifacts = compose_policy_receipt(
         cfg,
-        request,
+        &request,
         &intent_ref,
         &execution_role_ref,
         &effective_policy_mode,
@@ -862,7 +897,7 @@ pub fn authorize_execution(
     };
     let decision_ref = write_decision_artifact(
         cfg,
-        request,
+        &request,
         ExecutionDecision::Allow,
         grant.reason_codes.clone(),
         ownership,
@@ -964,13 +999,43 @@ pub fn authorize_execution(
 }
 
 fn runtime_route_bundle_denial(err: anyhow::Error) -> KernelError {
+    let message = err.to_string();
+    let reason_code = if message.contains("does not cover the requested support tuple")
+        || message.contains("denied requested capability pack")
+        || message.contains("non-live support tuple")
+    {
+        "SUPPORT_TIER_UNSUPPORTED"
+    } else if message.contains("non-authority classification is invalid") {
+        "runtime_effective_handle_missing"
+    } else if message.contains("freshness mode is invalid")
+        || message.contains("freshness window expired")
+        || message.contains("ttl-bound freshness window expired")
+    {
+        "runtime_effective_handle_stale"
+    } else if message.contains("digest drift detected") {
+        "runtime_effective_handle_digest_mismatch"
+    } else if message.contains("publication receipt") {
+        "runtime_effective_receipt_missing"
+    } else if message.contains("quarantined extensions") {
+        "extension_quarantined"
+    } else if message.contains("unpublished or degraded extension state") {
+        "extension_active_not_published"
+    } else {
+        "runtime_effective_handle_missing"
+    };
     KernelError::new(
         ErrorCode::CapabilityDenied,
         format!("runtime-effective route bundle denied execution: {err}"),
     )
-    .with_details(
-        json!({"reason_codes":["FCR-025","FCR-026","FCR-028","FCR-029"]}),
-    )
+    .with_details(json!({
+        "reason_codes":[
+            reason_code,
+            "FCR-025",
+            "FCR-026",
+            "FCR-028",
+            "FCR-029"
+        ]
+    }))
 }
 
 pub fn artifact_root_from_relative(

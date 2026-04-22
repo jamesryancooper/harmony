@@ -2,6 +2,44 @@ schema_version: non-authority-register-v1
 owner: Octon governance
 updated_at: "2026-04-10T20:00:00Z"
 entries:
+  - surface_id: runtime-route-bundle-handle
+    surface_class: effective-generated-view
+    paths:
+      - .octon/generated/effective/runtime/route-bundle.yml
+      - .octon/generated/effective/runtime/route-bundle.lock.yml
+    canonical_source_ref: .octon/instance/governance/runtime-resolution.yml
+    authority_mode: derived-runtime-handle
+    generation_or_projection_mechanism: generated-from runtime selector, support matrix, pack routes, and extension publication state
+    claim_adjacent: true
+    validator_ref: .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh
+    retained_forever: true
+    rationale: Runtime route bundle surfaces are runtime-facing only through verified handle metadata and never become authored authority.
+  - surface_id: runtime-pack-routes-handle
+    surface_class: effective-generated-view
+    paths:
+      - .octon/generated/effective/capabilities/pack-routes.effective.yml
+      - .octon/generated/effective/capabilities/pack-routes.lock.yml
+    canonical_source_ref: .octon/instance/governance/capability-packs/registry.yml
+    authority_mode: derived-runtime-handle
+    generation_or_projection_mechanism: generated-from governance pack intent, runtime admissions, and support-target claim state
+    claim_adjacent: true
+    validator_ref: .octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh
+    retained_forever: true
+    rationale: Pack routes remain generated routing handles and may narrow execution but never widen authority or support by themselves.
+  - surface_id: operator-navigation-maps
+    surface_class: effective-generated-view
+    paths:
+      - .octon/generated/cognition/projections/materialized/architecture-map.md
+      - .octon/generated/cognition/projections/materialized/runtime-route-map.md
+      - .octon/generated/cognition/projections/materialized/support-pack-route-map.md
+      - .octon/generated/cognition/projections/materialized/compatibility-retirement-map.md
+    canonical_source_ref: .octon/framework/engine/runtime/spec/operator-read-models-v1.md
+    authority_mode: derived-non-authority
+    generation_or_projection_mechanism: generated-from authored authority, retained evidence, and runtime-effective handles
+    claim_adjacent: true
+    validator_ref: .octon/framework/assurance/runtime/_ops/scripts/validate-operator-read-models.sh
+    retained_forever: true
+    rationale: Operator navigation maps improve legibility but remain barred from runtime, policy, and support authority decisions.
   - surface_id: effective-closure-claim-status
     surface_class: effective-generated-view
     paths:

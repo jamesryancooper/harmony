@@ -1,6 +1,6 @@
 # Runtime Route Map
 
-Generated at: `2026-04-22T03:44:21Z`
+Generated at: `2026-04-22T15:00:18Z`
 
 Non-authority disclaimer: this map is derived from canonical authored authority, retained evidence, and freshness-gated generated/effective outputs. It does not mint authority.
 
@@ -12,7 +12,17 @@ Source refs:
 - `/.octon/generated/effective/runtime/route-bundle.lock.yml`
 - `/.octon/state/evidence/validation/architecture/10of10-target-transition/publication/freshness.yml`
 
-Route bundle generation: `runtime-route-bundle-c029628e00b1`
+Route bundle generation: `runtime-route-bundle-0e35dffede77`
+Publication receipt: `.octon/state/evidence/validation/publication/runtime/2026-04-22T13-33-00Z-runtime-route-bundle-0e35dffede77.yml`
+Freshness mode: `digest_bound`
+Validator refs:
+
+- `/.octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh`
+- `/.octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh`
+- `/.octon/framework/assurance/runtime/_ops/scripts/validate-no-raw-generated-effective-runtime-reads.sh`
+
+Runtime consumers: `runtime_resolver`, `validators`
+Forbidden consumers: `direct_runtime_raw_path_read`, `generated_cognition_as_authority`
 
 ## Tuple Routes
 - `tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell`: `admitted-live-claim`, route=`allow`

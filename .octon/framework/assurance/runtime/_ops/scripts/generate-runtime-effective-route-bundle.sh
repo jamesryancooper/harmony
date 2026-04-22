@@ -101,21 +101,37 @@ quarantine_count="$(yq -r '.records | length' "$OCTON_DIR/state/control/extensio
 out_sha="$(hash_file "$tmp_out")"
 
 {
-  echo 'schema_version: "octon-runtime-effective-route-bundle-lock-v1"'
+  echo 'schema_version: "octon-runtime-effective-route-bundle-lock-v2"'
   echo "generation_id: \"$generation_id\""
   echo "published_at: \"$timestamp\""
   echo 'publication_status: "published"'
   echo "publication_receipt_path: \"$receipt_rel\""
   echo 'publication_receipt_sha256: ""'
   echo "route_bundle_sha256: \"$out_sha\""
-  echo "runtime_resolution_sha256: \"$resolution_sha\""
-  echo "root_manifest_sha256: \"$root_sha\""
-  echo "support_target_matrix_sha256: \"$matrix_sha\""
-  echo "pack_routes_effective_sha256: \"$pack_sha\""
-  echo "pack_routes_lock_sha256: \"$pack_lock_sha\""
-  echo "extensions_catalog_sha256: \"$ext_catalog_sha\""
-  echo "extensions_generation_lock_sha256: \"$ext_lock_sha\""
-  echo 'fresh_until: "2099-12-31T00:00:00Z"'
+  echo 'source_digests:'
+  echo "  runtime_resolution_sha256: \"$resolution_sha\""
+  echo "  root_manifest_sha256: \"$root_sha\""
+  echo "  support_target_matrix_sha256: \"$matrix_sha\""
+  echo "  pack_routes_effective_sha256: \"$pack_sha\""
+  echo "  pack_routes_lock_sha256: \"$pack_lock_sha\""
+  echo "  extensions_catalog_sha256: \"$ext_catalog_sha\""
+  echo "  extensions_generation_lock_sha256: \"$ext_lock_sha\""
+  echo 'freshness:'
+  echo '  mode: "digest_bound"'
+  echo '  invalidation_conditions:'
+  echo '    - "runtime-resolution-sha-changed"'
+  echo '    - "root-manifest-sha-changed"'
+  echo '    - "support-target-matrix-sha-changed"'
+  echo '    - "pack-routes-sha-changed"'
+  echo '    - "extensions-publication-sha-changed"'
+  echo 'legacy_fresh_until: "2099-12-31T00:00:00Z"'
+  echo 'allowed_consumers:'
+  echo '  - "runtime_resolver"'
+  echo '  - "validators"'
+  echo 'forbidden_consumers:'
+  echo '  - "direct_runtime_raw_path_read"'
+  echo '  - "generated_cognition_as_authority"'
+  echo 'non_authority_classification: "derived-runtime-handle"'
   echo 'required_inputs:'
   echo '  - ".octon/octon.yml"'
   echo '  - ".octon/instance/governance/runtime-resolution.yml"'
@@ -126,12 +142,6 @@ out_sha="$(hash_file "$tmp_out")"
   echo '  - ".octon/generated/effective/extensions/generation.lock.yml"'
   echo '  - ".octon/state/control/extensions/active.yml"'
   echo '  - ".octon/state/control/extensions/quarantine.yml"'
-  echo 'invalidation_conditions:'
-  echo '  - runtime-resolution-sha-changed'
-  echo '  - root-manifest-sha-changed'
-  echo '  - support-target-matrix-sha-changed'
-  echo '  - pack-routes-sha-changed'
-  echo '  - extensions-publication-sha-changed'
   echo 'published_files:'
   echo '  - path: ".octon/generated/effective/runtime/route-bundle.yml"'
   echo '  - path: ".octon/generated/effective/runtime/route-bundle.lock.yml"'

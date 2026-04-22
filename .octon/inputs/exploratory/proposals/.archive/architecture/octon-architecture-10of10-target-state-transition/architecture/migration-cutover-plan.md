@@ -1,44 +1,35 @@
 # Migration and Cutover Plan
 
-## Cutover principle
+## Cutover posture
 
-Use staged cutover with hard gates. Do not make a big-bang transition that lets old and new runtime
-routes silently coexist.
+The transition must be additive, fail-closed, and reversible until the closure certificate is retained. No implementation step may broaden runtime authority, support claims, pack admission, extension availability, or generated/effective consumption.
 
-## Cutover stages
+## Cutover sequence
 
-### Stage 1 — Parallel generation
+1. **Contract landing** — promote new specs, schemas, fail-closed obligations, evidence obligations, and registry entries.
+2. **Resolver dual-read phase** — runtime resolver supports current route bundle locks and new handle contract but emits warnings for legacy freshness semantics.
+3. **Publication regeneration** — regenerate route bundle, pack routes, extension catalog, support matrix, and locks under v2/v3 freshness semantics.
+4. **Hard-enforce phase** — grants require handle verification; raw generated/effective path reads fail closed.
+5. **Capability-pack cutover** — runtime pack projection becomes frozen compatibility; generated/effective pack routes become the only runtime-facing route surface.
+6. **Extension hardening** — selected/active/quarantine/published states are validated by handle and negative controls.
+7. **Proof upgrade** — live support dossiers require executable proof bundles; shallow proof downgrades claims.
+8. **Architecture-health v2** — closure-grade depth-aware `octon doctor --architecture` becomes the target gate.
+9. **Compatibility retirement** — retired or frozen compatibility surfaces are recorded with evidence and no longer consumed by runtime.
 
-Generate new runtime-effective route bundle, pack routes, support matrix, and extension locks while
-runtime still uses existing paths. Validate no source drift.
+## Compatibility handling
 
-### Stage 2 — Shadow validation
+| Surface | Interim treatment | Target treatment |
+|---|---|---|
+| `instance/capabilities/runtime/packs/**` | Retained compatibility projection; may be read by validators for migration comparison. | Not consumed by runtime; frozen or retired. |
+| Workflow execution wrappers | Retained compatibility wrapper over run-first lifecycle. | Keep only as explicit wrapper; no workflow-first authority. |
+| Root `AGENTS.md` / `CLAUDE.md` | Keep as ingress parity projections. | Keep if parity validation passes. |
+| Support-card projections | Keep as generated operator read models. | Keep, but validate no-widening against canonical support targets/dossiers. |
+| Generated/effective runtime outputs | Keep runtime-facing only through resolver. | Keep as handle-verified compiled outputs, not authority. |
 
-Run validators comparing old and new routes:
+## Rollback posture
 
-- support tuple equivalence
-- pack route no-widening
-- extension active-state equivalence
-- generated/effective freshness
-- authorization boundary coverage
+Rollback must restore the previous runtime selector, previous route bundle and lock, previous pack routes and lock, previous extension publication state, and previous validator set. Rollback must not restore any stale generated/effective artifact without its matching receipt and lock.
 
-### Stage 3 — Runtime binding
+## No-big-bang rule
 
-Switch runtime consumption to the new route bundle through `GeneratedEffectiveHandle`.
-Existing paths remain readable only for compatibility validators and generated read models.
-
-### Stage 4 — Hard gate activation
-
-Fail closed on stale generated/effective outputs, missing route bundle lock, support-path mismatch,
-unadmitted pack, or unpublished extension.
-
-### Stage 5 — Shim retirement
-
-Retire flat support files, old runtime pack projection, and legacy workflow wrappers after retained
-closure evidence proves runtime and operator surfaces use the target-state paths.
-
-## Rollback
-
-Rollback is permitted only by restoring the previous root manifest/runtime-resolution pointers and
-recording a rollback receipt under `state/evidence/validation/architecture/10of10-target-transition/**`.
-Rollback must not restore generated/cognition or proposal paths as runtime authority.
+The proposal forbids a single unvalidated cutover that changes contracts, runtime resolver, support claims, pack routes, and publication outputs at once. Each phase must retain evidence before the next phase broadens enforcement.

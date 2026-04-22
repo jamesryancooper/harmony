@@ -6,7 +6,9 @@ require_yq
 
 OUT_DIR="$OCTON_DIR/generated/cognition/projections/materialized"
 RUNTIME_BUNDLE="$OCTON_DIR/generated/effective/runtime/route-bundle.yml"
+RUNTIME_LOCK="$OCTON_DIR/generated/effective/runtime/route-bundle.lock.yml"
 PACK_ROUTES="$OCTON_DIR/generated/effective/capabilities/pack-routes.effective.yml"
+PACK_LOCK="$OCTON_DIR/generated/effective/capabilities/pack-routes.lock.yml"
 EVIDENCE_ROOT="$OCTON_DIR/state/evidence/validation/architecture/10of10-target-transition/operator-views"
 mkdir -p "$OUT_DIR" "$EVIDENCE_ROOT"
 
@@ -28,6 +30,16 @@ Source refs:
 - \`/.octon/state/evidence/validation/architecture/10of10-target-transition/publication/freshness.yml\`
 
 Route bundle generation: \`$(yq -r '.generation_id // ""' "$RUNTIME_BUNDLE")\`
+Publication receipt: \`$(yq -r '.publication_receipt_path // ""' "$RUNTIME_LOCK")\`
+Freshness mode: \`$(yq -r '.freshness.mode // ""' "$RUNTIME_LOCK")\`
+Validator refs:
+
+- \`/.octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh\`
+- \`/.octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh\`
+- \`/.octon/framework/assurance/runtime/_ops/scripts/validate-no-raw-generated-effective-runtime-reads.sh\`
+
+Runtime consumers: \`runtime_resolver\`, \`validators\`
+Forbidden consumers: \`direct_runtime_raw_path_read\`, \`generated_cognition_as_authority\`
 
 ## Tuple Routes
 EOF
@@ -55,6 +67,15 @@ Source refs:
 - \`/.octon/state/evidence/validation/architecture/10of10-target-transition/capabilities/pack-route-no-widening.yml\`
 
 ## Pack Routes
+Publication receipt: \`$(yq -r '.publication_receipt_path // ""' "$PACK_LOCK")\`
+Freshness mode: \`$(yq -r '.freshness.mode // ""' "$PACK_LOCK")\`
+Validator refs:
+
+- \`/.octon/framework/assurance/runtime/_ops/scripts/validate-support-pack-admission-alignment.sh\`
+- \`/.octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-artifact-handles.sh\`
+
+Runtime consumers: \`runtime_resolver\`, \`validators\`
+Forbidden consumers: \`direct_runtime_raw_path_read\`, \`generated_cognition_as_authority\`
 EOF
 
 while IFS=$'\t' read -r pack_id status; do
@@ -76,10 +97,38 @@ published_views:
   - view_kind: "runtime-route"
     projection_ref: ".octon/generated/cognition/projections/materialized/runtime-route-map.md"
     summary_ref: ".octon/generated/effective/runtime/route-bundle.yml"
+    publication_receipt_ref: "$(yq -r '.publication_receipt_path // ""' "$RUNTIME_LOCK")"
+    freshness_mode: "$(yq -r '.freshness.mode // ""' "$RUNTIME_LOCK")"
+    validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh"
+    runtime_consumers:
+      - "runtime_resolver"
+      - "validators"
+    forbidden_consumers:
+      - "direct_runtime_raw_path_read"
+      - "generated_cognition_as_authority"
   - view_kind: "support-pack-route"
     projection_ref: ".octon/generated/cognition/projections/materialized/support-pack-route-map.md"
     summary_ref: ".octon/generated/effective/capabilities/pack-routes.effective.yml"
+    publication_receipt_ref: "$(yq -r '.publication_receipt_path // ""' "$PACK_LOCK")"
+    freshness_mode: "$(yq -r '.freshness.mode // ""' "$PACK_LOCK")"
+    validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-support-pack-admission-alignment.sh"
+    runtime_consumers:
+      - "runtime_resolver"
+      - "validators"
+    forbidden_consumers:
+      - "direct_runtime_raw_path_read"
+      - "generated_cognition_as_authority"
   - view_kind: "architecture"
     projection_ref: ".octon/generated/cognition/projections/materialized/architecture-map.md"
     summary_ref: ".octon/state/evidence/validation/architecture/10of10-target-transition/manifest.yml"
+    publication_receipt_ref: ".octon/state/evidence/validation/architecture/10of10-target-transition/operator-views/generation.yml"
+    freshness_mode: "receipt_bound"
+    validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-operator-read-models.sh"
+    runtime_consumers:
+      - "operators"
+      - "validators"
+    forbidden_consumers:
+      - "runtime"
+      - "policy"
+      - "support-claim-evaluation"
 EOF
