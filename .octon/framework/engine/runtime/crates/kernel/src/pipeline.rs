@@ -2053,10 +2053,21 @@ stages:
         .expect("write fixture runtime route bundle");
         let bundle_sha = fixture_sha256(&octon_dir.join("generated/effective/runtime/route-bundle.yml"));
         let selector_sha = fixture_sha256(&octon_dir.join("instance/governance/runtime-resolution.yml"));
+        let root_manifest_sha = fixture_sha256(&octon_dir.join("octon.yml"));
+        let support_target_matrix_sha =
+            fixture_sha256(&octon_dir.join("generated/effective/governance/support-target-matrix.yml"));
+        let pack_routes_effective_sha =
+            fixture_sha256(&octon_dir.join("generated/effective/capabilities/pack-routes.effective.yml"));
+        let pack_routes_lock_sha =
+            fixture_sha256(&octon_dir.join("generated/effective/capabilities/pack-routes.lock.yml"));
+        let extensions_catalog_sha =
+            fixture_sha256(&octon_dir.join("generated/effective/extensions/catalog.effective.yml"));
+        let extensions_generation_lock_sha =
+            fixture_sha256(&octon_dir.join("generated/effective/extensions/generation.lock.yml"));
         fs::write(
             octon_dir.join("generated/effective/runtime/route-bundle.lock.yml"),
             format!(
-                "schema_version: \"octon-runtime-effective-route-bundle-lock-v1\"\ngeneration_id: \"fixture-runtime-route-bundle\"\npublished_at: \"2026-03-23T00:00:00Z\"\npublication_status: \"published\"\npublication_receipt_path: \"{runtime_receipt_rel}\"\npublication_receipt_sha256: \"\"\nroute_bundle_sha256: \"{bundle_sha}\"\nruntime_resolution_sha256: \"{selector_sha}\"\nroot_manifest_sha256: \"\"\nsupport_target_matrix_sha256: \"\"\npack_routes_effective_sha256: \"\"\npack_routes_lock_sha256: \"\"\nextensions_catalog_sha256: \"\"\nextensions_generation_lock_sha256: \"\"\nfresh_until: \"2099-03-30T00:00:00Z\"\n"
+                "schema_version: \"octon-runtime-effective-route-bundle-lock-v1\"\ngeneration_id: \"fixture-runtime-route-bundle\"\npublished_at: \"2026-03-23T00:00:00Z\"\npublication_status: \"published\"\npublication_receipt_path: \"{runtime_receipt_rel}\"\npublication_receipt_sha256: \"\"\nroute_bundle_sha256: \"{bundle_sha}\"\nruntime_resolution_sha256: \"{selector_sha}\"\nroot_manifest_sha256: \"{root_manifest_sha}\"\nsupport_target_matrix_sha256: \"{support_target_matrix_sha}\"\npack_routes_effective_sha256: \"{pack_routes_effective_sha}\"\npack_routes_lock_sha256: \"{pack_routes_lock_sha}\"\nextensions_catalog_sha256: \"{extensions_catalog_sha}\"\nextensions_generation_lock_sha256: \"{extensions_generation_lock_sha}\"\nfresh_until: \"2099-03-30T00:00:00Z\"\n"
             ),
         )
         .expect("write fixture runtime route bundle lock");
