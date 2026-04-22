@@ -117,6 +117,7 @@ check_overlay_domain_shape() {
       ! -path "$INSTANCE_DIR/governance/retirement-register.yml" \
       ! -path "$INSTANCE_DIR/governance/non-authority-register.yml" \
       ! -path "$INSTANCE_DIR/governance/support-targets.yml" \
+      ! -path "$INSTANCE_DIR/governance/runtime-resolution.yml" \
       ! -path "$INSTANCE_DIR/governance/support-target-admissions" \
       ! -path "$INSTANCE_DIR/governance/support-target-admissions/*" \
       ! -path "$INSTANCE_DIR/governance/support-dossiers" \

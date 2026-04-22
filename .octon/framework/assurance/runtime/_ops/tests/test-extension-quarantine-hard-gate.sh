@@ -3,7 +3,13 @@ set -euo pipefail
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../../../../.." && pwd)"
 FIXTURE="$(mktemp -d)"
-trap 'rm -rf "$FIXTURE"' EXIT
+cleanup_fixture() {
+  local dir="$1"
+  [[ -d "$dir" ]] || return 0
+  find "$dir" -depth -mindepth 1 \( -type f -o -type l \) -exec rm -f {} +
+  find "$dir" -depth -type d -empty -exec rmdir {} +
+}
+trap 'cleanup_fixture "$FIXTURE"' EXIT
 
 mkdir -p \
   "$FIXTURE/.octon/instance/governance" \

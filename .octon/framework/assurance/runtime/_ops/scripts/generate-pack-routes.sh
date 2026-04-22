@@ -34,7 +34,13 @@ receipt_rel=".octon/state/evidence/validation/publication/capabilities/${stamp_i
 receipt_abs="$ROOT_DIR/$receipt_rel"
 
 tmpdir="$(mktemp -d)"
-trap 'rm -rf "$tmpdir"' EXIT
+cleanup_tmpdir() {
+  local dir="$1"
+  [[ -d "$dir" ]] || return 0
+  find "$dir" -depth -mindepth 1 \( -type f -o -type l \) -exec rm -f {} +
+  find "$dir" -depth -type d -empty -exec rmdir {} +
+}
+trap 'cleanup_tmpdir "$tmpdir"' EXIT
 tmp_out="$tmpdir/pack-routes.effective.yml"
 tmp_lock="$tmpdir/pack-routes.lock.yml"
 

@@ -1651,6 +1651,7 @@ fn slugify(input: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use sha2::{Digest, Sha256};
     use std::collections::HashMap;
     use std::path::PathBuf;
     use walkdir::WalkDir;
@@ -1713,6 +1714,13 @@ mod tests {
         }
     }
 
+    fn fixture_sha256(path: &Path) -> String {
+        let bytes = fs::read(path).expect("fixture file should be readable");
+        let mut hasher = Sha256::new();
+        hasher.update(bytes);
+        hex::encode(hasher.finalize())
+    }
+
     fn seed_generic_workflow_fixture(root: &Path) -> PathBuf {
         seed_policy_runtime_env();
         let octon_dir = root.join(".octon");
@@ -1724,6 +1732,18 @@ mod tests {
         fs::create_dir_all(octon_dir.join("instance/charter"))
             .expect("create workspace charter root");
         fs::create_dir_all(octon_dir.join("instance/governance")).expect("create governance root");
+        fs::create_dir_all(octon_dir.join("generated/effective/runtime"))
+            .expect("create runtime effective root");
+        fs::create_dir_all(octon_dir.join("generated/effective/governance"))
+            .expect("create governance effective root");
+        fs::create_dir_all(octon_dir.join("generated/effective/capabilities"))
+            .expect("create capability effective root");
+        fs::create_dir_all(octon_dir.join("generated/effective/extensions"))
+            .expect("create extension effective root");
+        fs::create_dir_all(octon_dir.join("state/control/extensions"))
+            .expect("create extension control root");
+        fs::create_dir_all(octon_dir.join("state/evidence/validation/publication/runtime"))
+            .expect("create runtime publication evidence root");
         fs::create_dir_all(octon_dir.join("framework/capabilities/governance/policy"))
             .expect("create policy root");
         fs::create_dir_all(octon_dir.join("framework/capabilities/_ops/scripts"))
@@ -1755,6 +1775,41 @@ mod tests {
             octon_dir.join("instance/governance/support-targets.yml"),
         )
         .expect("copy support targets");
+        fs::copy(
+            source_repo_root().join(".octon/generated/effective/governance/support-target-matrix.yml"),
+            octon_dir.join("generated/effective/governance/support-target-matrix.yml"),
+        )
+        .expect("copy support target matrix");
+        fs::copy(
+            source_repo_root().join(".octon/generated/effective/capabilities/pack-routes.effective.yml"),
+            octon_dir.join("generated/effective/capabilities/pack-routes.effective.yml"),
+        )
+        .expect("copy pack routes effective");
+        fs::copy(
+            source_repo_root().join(".octon/generated/effective/capabilities/pack-routes.lock.yml"),
+            octon_dir.join("generated/effective/capabilities/pack-routes.lock.yml"),
+        )
+        .expect("copy pack routes lock");
+        fs::copy(
+            source_repo_root().join(".octon/generated/effective/extensions/catalog.effective.yml"),
+            octon_dir.join("generated/effective/extensions/catalog.effective.yml"),
+        )
+        .expect("copy extension catalog");
+        fs::copy(
+            source_repo_root().join(".octon/generated/effective/extensions/generation.lock.yml"),
+            octon_dir.join("generated/effective/extensions/generation.lock.yml"),
+        )
+        .expect("copy extension generation lock");
+        fs::copy(
+            source_repo_root().join(".octon/state/control/extensions/active.yml"),
+            octon_dir.join("state/control/extensions/active.yml"),
+        )
+        .expect("copy extension active state");
+        fs::copy(
+            source_repo_root().join(".octon/state/control/extensions/quarantine.yml"),
+            octon_dir.join("state/control/extensions/quarantine.yml"),
+        )
+        .expect("copy extension quarantine state");
         copy_tree(
             &source_repo_root().join(".octon/instance/governance/support-target-admissions"),
             &root.join(".octon/instance/governance/support-target-admissions"),
@@ -1984,6 +2039,39 @@ stages:
             "schema_version: \"scenario-resolution-v1\"\nmission_id: \"sample-mission\"\nsource_refs: {}\neffective:\n  scenario_family: \"maintenance.repo_housekeeping\"\n  mission_class: \"maintenance\"\n  effective_scenario_family: \"maintenance.repo_housekeeping\"\n  effective_action_class: \"git.commit\"\n  scenario_family_source: \"mission_class.default\"\n  boundary_source: \"action_class.default\"\n  recovery_source: \"deny_by_default_policy\"\n  tightening_overlays: []\n  oversight_mode: \"feedback_window\"\n  execution_posture: \"continuous\"\n  preview_policy: {}\n  feedback_window_required: true\n  proceed_on_silence_allowed: false\n  approval_required: false\n  safe_interrupt_boundary_class: \"task_boundary\"\n  overlap_policy: \"skip\"\n  backfill_policy: \"latest_only\"\n  pause_on_failure:\n    enabled: true\n    triggers: []\n  digest_route: \"preview_plus_closure_digest\"\n  alert_route: \"owners-first-digest\"\n  required_quorum: \"1\"\n  recovery_profile:\n    action_class: \"git.commit\"\n    primitive: \"git.revert_commit\"\n    rollback_handle_type: \"git-commit\"\n    recovery_window: \"P30D\"\n    reversibility_class: \"reversible\"\n  finalize_policy:\n    approval_required: false\n    block_finalize: false\n    break_glass_required: false\n  safing_subset:\n    - \"observe_only\"\nrationale:\n  - \"fixture\"\ngenerated_at: \"2026-03-23T00:00:00Z\"\nfresh_until: \"2099-03-30T00:00:00Z\"\n",
         )
         .expect("write scenario resolution");
+        let runtime_receipt_rel =
+            ".octon/state/evidence/validation/publication/runtime/fixture-runtime-route-bundle.yml";
+        fs::write(
+            octon_dir.join("instance/governance/runtime-resolution.yml"),
+            "schema_version: \"octon-runtime-resolution-v1\"\nowner: \"test\"\nroot_manifest_ref: \".octon/octon.yml\"\nruntime_effective_route_bundle_ref: \".octon/generated/effective/runtime/route-bundle.yml\"\nruntime_effective_route_bundle_lock_ref: \".octon/generated/effective/runtime/route-bundle.lock.yml\"\npack_routes_effective_ref: \".octon/generated/effective/capabilities/pack-routes.effective.yml\"\npack_routes_lock_ref: \".octon/generated/effective/capabilities/pack-routes.lock.yml\"\nsupport_target_matrix_ref: \".octon/generated/effective/governance/support-target-matrix.yml\"\nextensions_catalog_ref: \".octon/generated/effective/extensions/catalog.effective.yml\"\nextensions_generation_lock_ref: \".octon/generated/effective/extensions/generation.lock.yml\"\nmission_effective_route_root: \".octon/generated/effective/orchestration/missions\"\nruntime_inputs: {}\n",
+        )
+        .expect("write fixture runtime-resolution selector");
+        fs::write(
+            octon_dir.join("generated/effective/runtime/route-bundle.yml"),
+            "schema_version: \"octon-runtime-effective-route-bundle-v1\"\ngeneration_id: \"fixture-runtime-route-bundle\"\ngenerated_at: \"2026-03-23T00:00:00Z\"\npublication_status: \"published\"\npublication_receipt_path: \".octon/state/evidence/validation/publication/runtime/fixture-runtime-route-bundle.yml\"\nroutes:\n  - tuple_id: \"tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell\"\n    tuple:\n      model_tier: \"repo-local-governed\"\n      workload_tier: \"repo-consequential\"\n      language_resource_tier: \"reference-owned\"\n      locale_tier: \"english-primary\"\n      host_adapter: \"repo-shell\"\n      model_adapter: \"repo-local-governed\"\n    claim_effect: \"admitted-live-claim\"\n    route: \"allow\"\n    requires_mission: false\n    allowed_capability_packs:\n      - \"git\"\n      - \"repo\"\n      - \"shell\"\n      - \"telemetry\"\n  - tuple_id: \"tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell\"\n    tuple:\n      model_tier: \"repo-local-governed\"\n      workload_tier: \"observe-and-read\"\n      language_resource_tier: \"reference-owned\"\n      locale_tier: \"english-primary\"\n      host_adapter: \"repo-shell\"\n      model_adapter: \"repo-local-governed\"\n    claim_effect: \"admitted-live-claim\"\n    route: \"allow\"\n    requires_mission: false\n    allowed_capability_packs:\n      - \"repo\"\n      - \"shell\"\n      - \"telemetry\"\nextensions:\n  generation_id: \"extensions-090beb843d30\"\n  status: \"published\"\n  quarantine_count: 0\n",
+        )
+        .expect("write fixture runtime route bundle");
+        let bundle_sha = fixture_sha256(&octon_dir.join("generated/effective/runtime/route-bundle.yml"));
+        let selector_sha = fixture_sha256(&octon_dir.join("instance/governance/runtime-resolution.yml"));
+        fs::write(
+            octon_dir.join("generated/effective/runtime/route-bundle.lock.yml"),
+            format!(
+                "schema_version: \"octon-runtime-effective-route-bundle-lock-v1\"\ngeneration_id: \"fixture-runtime-route-bundle\"\npublished_at: \"2026-03-23T00:00:00Z\"\npublication_status: \"published\"\npublication_receipt_path: \"{runtime_receipt_rel}\"\npublication_receipt_sha256: \"\"\nroute_bundle_sha256: \"{bundle_sha}\"\nruntime_resolution_sha256: \"{selector_sha}\"\nroot_manifest_sha256: \"\"\nsupport_target_matrix_sha256: \"\"\npack_routes_effective_sha256: \"\"\npack_routes_lock_sha256: \"\"\nextensions_catalog_sha256: \"\"\nextensions_generation_lock_sha256: \"\"\nfresh_until: \"2099-03-30T00:00:00Z\"\n"
+            ),
+        )
+        .expect("write fixture runtime route bundle lock");
+        fs::write(
+            octon_dir.join("state/evidence/validation/publication/runtime/fixture-runtime-route-bundle.yml"),
+            "schema_version: \"octon-validation-publication-receipt-v1\"\nreceipt_id: \"fixture-runtime-route-bundle\"\npublication_family: \"runtime-route-bundle\"\ngeneration_id: \"fixture-runtime-route-bundle\"\nresult: \"published\"\nvalidated_at: \"2026-03-23T00:00:00Z\"\npublished_paths:\n  - \".octon/generated/effective/runtime/route-bundle.yml\"\n",
+        )
+        .expect("write fixture runtime route bundle receipt");
+        let receipt_sha = fixture_sha256(
+            &octon_dir.join("state/evidence/validation/publication/runtime/fixture-runtime-route-bundle.yml"),
+        );
+        let lock_path = octon_dir.join("generated/effective/runtime/route-bundle.lock.yml");
+        let mut lock_text = fs::read_to_string(&lock_path).expect("read fixture runtime route bundle lock");
+        lock_text = lock_text.replace("publication_receipt_sha256: \"\"", &format!("publication_receipt_sha256: \"{}\"", receipt_sha));
+        fs::write(&lock_path, lock_text).expect("update fixture route bundle lock receipt digest");
         fs::write(
             workflows_dir.join("stages/01-analyze.md"),
             "# Analyze\n\nInspect the fixture.\n",
