@@ -14,7 +14,7 @@ generated_effective_outputs:
       - .octon/generated/effective/capabilities/generation.lock.yml
       - .octon/generated/effective/capabilities/artifact-map.yml
   - output_ref: .octon/generated/effective/governance/support-target-matrix.yml
-    evidence_ref: .octon/state/evidence/validation/architecture-target-state-transition/support-targets/proofing.yml
+    evidence_ref: .octon/state/evidence/validation/architecture/10of10-target-transition/support-targets/proof-refresh.yml
     freshness_refs:
       - .octon/generated/effective/governance/support-target-matrix.yml
   - output_ref: .octon/generated/effective/extensions/catalog.effective.yml

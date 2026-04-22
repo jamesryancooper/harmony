@@ -34,12 +34,36 @@ Repo-local supreme control authority lives under
 Structural interpretation flows through the contract registry rather than
 through repeated hand-maintained path matrices.
 
+## Target-State Surface Classes
+
+The 10/10 target state distinguishes these surface classes clearly:
+
+| Surface class | Canonical roots | Authority posture |
+| --- | --- | --- |
+| `authored-authority` | `framework/**`, `instance/**` | durable authored authority only |
+| `mutable-control` | `state/control/**` | current mutable operational truth |
+| `retained-evidence` | `state/evidence/**` | retained factual proof and receipts |
+| `continuity-state` | `state/continuity/**` | resumable context, not authority |
+| `generated-runtime-effective-handle` | `generated/effective/**` | derived runtime-facing handle only |
+| `generated-operator-read-model` | `generated/cognition/**` | derived operator/maintainer read model only |
+| `compatibility-projection` | retained shims such as `instance/capabilities/runtime/packs/**`, repo-root ingress adapters, and current `generated/cognition/projections/materialized/**` mirrors | compatibility only; never authority |
+| `historical-evidence` | retained disclosure and lab history under `state/evidence/**` | historical proof and lineage |
+| `proposal-input` | `inputs/exploratory/proposals/**` | exploratory lineage only |
+| `raw-additive-input` | `inputs/additive/**` | untrusted additive input pending activation/publication |
+
+These classes keep target-state language precise without creating a rival
+control plane. The registry is the machine-readable source for their role and
+boundaries.
+
 ## How To Use The Structural Registry
 
 Use these sections of
 `/.octon/framework/cognition/_meta/architecture/contract-registry.yml`:
 
 - `class_roots`: canonical class-root bindings and placement rules
+- `steady_state_surface_classes`: closure-grade categories for authored,
+  control, evidence, generated-handle, operator-map, compatibility, and input
+  surfaces
 - `delegated_registries`: machine-readable surfaces that own more specific
   subdomains
 - `path_families`: canonical steady-state path families, authority classes,
@@ -80,6 +104,8 @@ Use these sections of
 - maintainability proof plane:
   `/.octon/framework/assurance/maintainability/`
 - retained lab evidence root: `/.octon/state/evidence/lab/`
+- canonical 10/10 architecture closure evidence root:
+  `/.octon/state/evidence/validation/architecture/10of10-target-transition/`
 
 ## Structural Invariants
 
@@ -107,9 +133,19 @@ Use these sections of
     `state/control/execution/runs/**`.
 11. Retained evidence, disclosure, and validation receipts live only under
     `state/evidence/**`.
-12. Runtime-facing effective outputs under `generated/effective/**` require
-    publication receipts and freshness artifacts before runtime may trust them.
-13. Proposal packets remain under `inputs/exploratory/proposals/**` and stay
+12. Runtime-facing generated/effective outputs are derived-only and may be
+    consumed by runtime only through resolver-verified handles.
+13. Publication freshness is explicit and falsifiable. Accepted
+    `freshness.mode` values are `digest_bound`, `ttl_bound`, and
+    `receipt_bound`; fake far-future freshness is invalid as a trust
+    substitute.
+14. Source-digest drift, including root-manifest digest drift, invalidates
+    runtime-effective trust immediately.
+15. The canonical architecture transition evidence root is
+    `state/evidence/validation/architecture/10of10-target-transition/**`.
+    Older `state/evidence/validation/architecture-target-state-transition/**`
+    paths are historical compatibility lineage only until fully retired.
+16. Proposal packets remain under `inputs/exploratory/proposals/**` and stay
     lineage-only; generated proposal discovery stays non-authoritative.
 
 ## Delegated Registries
@@ -125,6 +161,7 @@ machine-readable surfaces:
 | `/.octon/instance/manifest.yml` | Repo-side overlay enablement |
 | `/.octon/instance/ingress/manifest.yml` | Mandatory ingress read order, optional orientation, and closeout workflow pointer |
 | `/.octon/instance/cognition/decisions/index.yml` | Append-only ADR discovery |
+| `/.octon/instance/governance/retirement-register.yml` | Compatibility successors, review cadence, and cutover posture |
 
 When any delegated registry changes, this specification stays descriptive and
 the machine-readable registry remains canonical.
@@ -141,7 +178,10 @@ family groups:
 | `compatibility_retirement` | `instance/governance/retirement-register.yml` + retirement contracts | Retained compatibility inventory, review cadence, and retirement posture |
 | `runtime_authorization_coverage` | `framework/engine/runtime/spec/{execution-authorization-v1.md,authorization-boundary-coverage.yml,material-side-effect-inventory.yml}` | Authorization-boundary and material-side-effect coverage contract |
 | `runtime_resolution` | `framework/engine/runtime/spec/runtime-resolution-v1.md` + `instance/governance/runtime-resolution.yml` | Delegated runtime-resolution selector and route-bundle contract |
-| `runtime_architecture_health` | `framework/engine/runtime/spec/architecture-health-contract-v1.md` + health/freshness validators | Aggregate runtime health, lifecycle, and publication-freshness gate |
+| `runtime_effective_handle_contract` | `framework/engine/runtime/spec/{runtime-effective-artifact-handle-v1.md,runtime-effective-artifact-handle-v1.schema.json,runtime-effective-route-bundle-lock-v2.schema.json}` | Resolver-verified generated/effective handle contract |
+| `runtime_publication_freshness` | `framework/engine/runtime/spec/publication-freshness-gates-v3.md` + publication receipts | Freshness-mode, digest, and receipt gate |
+| `runtime_architecture_health` | `framework/engine/runtime/spec/architecture-health-contract-v2.md` + health/freshness validators | Depth-aware closure-grade runtime health gate |
+| `proof_bundle_executability` | support-target proof contract + executability validator + retained proof-plane evidence | Executable proof sufficiency contract |
 | `overlay_resolution` | `framework/overlay-points/registry.yml` + `instance/manifest.yml` | Declared overlay legality |
 | `instance_ingress_and_bootstrap` | `instance/{ingress,bootstrap}/**` | Ingress and optional orientation |
 | `branch_pr_closeout_workflow` | `framework/orchestration/runtime/workflows/meta/closeout/**` + Git/worktree autonomy contract | Branch and PR closeout policy plus workflow ownership |
@@ -153,10 +193,13 @@ family groups:
 | `state_control_execution` | `state/control/**` | Mutable execution, publication, and quarantine truth |
 | `state_evidence` | `state/evidence/**` | Retained evidence, disclosure, and validation receipts |
 | `state_continuity` | `state/continuity/**` | Handoff and resumption state |
-| `generated_effective` | `generated/effective/**` | Runtime-facing effective outputs |
-| `runtime_effective_route_bundle` | `generated/effective/runtime/{route-bundle.yml,route-bundle.lock.yml}` | Single fresh, receipt-backed runtime route bundle |
-| `runtime_pack_routes` | `generated/effective/capabilities/{pack-routes.effective.yml,pack-routes.lock.yml}` | Generated runtime-facing pack route view |
+| `generated_effective` | `generated/effective/**` | Runtime-facing generated handle outputs |
+| `runtime_effective_route_bundle` | `generated/effective/runtime/{route-bundle.yml,route-bundle.lock.yml}` | Resolver-verified route-bundle handle |
+| `runtime_pack_routes` | `generated/effective/capabilities/{pack-routes.effective.yml,pack-routes.lock.yml}` | Resolver-verified pack-route handle |
+| `runtime_extension_catalog` | `generated/effective/extensions/{catalog.effective.yml,generation.lock.yml}` | Resolver-verified extension-catalog handle |
+| `runtime_support_matrix` | `generated/effective/governance/support-target-matrix.yml` | Derived support-matrix handle that may narrow but not widen claims |
 | `generated_cognition` | `generated/cognition/**` | Non-authoritative operator and mission read models |
+| `generated_operator_navigation_maps` | current live successor paths under `generated/cognition/projections/materialized/**` | Traceable operator maps published without authority |
 | `generated_proposals` | `generated/proposals/registry.yml` | Non-authoritative proposal discovery |
 | `inputs_additive` | `inputs/additive/extensions/**` | Raw additive packs before trust activation and publication |
 | `inputs_exploratory` | `inputs/exploratory/**` | Ideation and proposal lineage only |
@@ -171,15 +214,21 @@ The structural registry recognizes three steady-state publication classes:
 1. `runtime_effective`
    - output root: `/.octon/generated/effective/`
    - trust condition: retained publication receipt plus current freshness
-     artifacts
+     artifacts and resolver-verified handle metadata
    - source rule: no direct raw-input publication into runtime-facing outputs
    - runtime handle rule: runtime-facing reads must resolve through
-     freshness-checked handles rather than raw string paths
+     resolver-verified handles rather than raw string paths
+   - freshness rule: locks must carry explicit `freshness.mode` semantics;
+     stale root-manifest digests, missing receipts, or fake far-future TTLs
+     fail closed
 2. `cognition_read_models`
    - output root: `/.octon/generated/cognition/`
    - role: operator and mission projections only
    - traceability rule: every field must trace back to authored authority,
      control truth, retained evidence, or continuity state
+   - live successor note: operator maps currently live under
+     `generated/cognition/projections/materialized/**`; that is the current
+     canonical generated path family until a repo-wide cutover says otherwise
 3. `proposal_discovery`
    - output path: `/.octon/generated/proposals/registry.yml`
    - role: deterministic proposal discovery only
@@ -195,7 +244,6 @@ remain non-authoritative:
 - `generated/cognition/projections/materialized/architecture-map.md`
 - `generated/cognition/projections/materialized/runtime-route-map.md`
 - `generated/cognition/projections/materialized/support-pack-route-map.md`
-- `generated/cognition/projections/materialized/authorization-coverage-map.md`
 - `generated/cognition/projections/materialized/compatibility-retirement-map.md`
 
 ## Active Doc Roles
@@ -224,8 +272,14 @@ rather than in active operating docs.
 - Wrong-class placement is invalid.
 - Undeclared or disabled overlay content is invalid.
 - Runtime or policy direct reads from `inputs/**` are invalid.
-- Generated outputs are invalid as authority when freshness or publication
-  receipts are missing.
+- Direct runtime reads from `generated/effective/**` are invalid.
+- Generated runtime-effective outputs are invalid when handle metadata,
+  publication receipts, source digests, or freshness semantics are missing,
+  stale, or unverifiable.
+- Generated operator read models are invalid when consumed as runtime, policy,
+  or support authority.
+- Historical evidence-root aliases are invalid as the active closure source
+  when the canonical `architecture/10of10-target-transition/**` root exists.
 - Repo-root ingress adapters are invalid if they diverge from the projected
   ingress surface.
 - Host affordances, chat transcripts, and generated views may mirror state but
@@ -254,7 +308,15 @@ contract registry and its delegated registries.
 - constitutional contract registry:
   `/.octon/framework/constitution/contracts/registry.yml`
 - root manifest: `/.octon/octon.yml`
+- runtime-effective handle contract:
+  `/.octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.md`
+- publication freshness contract:
+  `/.octon/framework/engine/runtime/spec/publication-freshness-gates-v3.md`
+- architecture health contract:
+  `/.octon/framework/engine/runtime/spec/architecture-health-contract-v2.md`
 - overlay registry: `/.octon/framework/overlay-points/registry.yml`
 - overlay enablement: `/.octon/instance/manifest.yml#enabled_overlay_points`
 - ingress manifest: `/.octon/instance/ingress/manifest.yml`
 - decisions index: `/.octon/instance/cognition/decisions/index.yml`
+- compatibility retirement register:
+  `/.octon/instance/governance/retirement-register.yml`

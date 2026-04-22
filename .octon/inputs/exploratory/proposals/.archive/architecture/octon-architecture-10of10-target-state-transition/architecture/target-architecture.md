@@ -1,174 +1,81 @@
 # Target Architecture
 
-## Target-state summary
+## Target-state thesis
 
-The 10/10 target state is a repo-native constitutional runtime architecture where:
+Octon's 10/10 architecture is the current constitutional harness architecture made closure-grade: fewer ambiguous compatibility surfaces, one enforced runtime-effective handle path, explicit digest-bound freshness, executable proof bundles, deeper architecture-health validation, stronger non-authority coverage, and generated navigation maps that improve legibility without minting authority.
 
-1. authored authority is finite, explicit, and located only under `framework/**` and `instance/**`
-2. runtime consumes a single fresh, receipt-backed effective route bundle rather than scattered
-   projections, stale generated/effective files, or raw registries
-3. every material side-effect path proves execution-authorization coverage before side effects
-4. generated/effective outputs are runtime-facing only through hard freshness gates
-5. support claims, support admissions, dossiers, proof bundles, support cards, and pack routes agree
-   mechanically and path-normalize to the same partitioned claim-state model
-6. extension activation has a compact desired/active/quarantine/published lifecycle with dependency
-   closure and required-input expansion moved into generation locks, not mutable active state
-7. proof-plane, support, publication, and runtime claims are backed by current retained evidence
-8. operator read models are concise, traceable, current, and explicitly non-authoritative
+The target state preserves the core architecture. It does not replace the constitutional kernel, does not create a new control plane, and does not collapse repo-native authority into generated, host, chat, or proposal surfaces.
 
-## Target-state layers
+## 10/10 target-state invariants
 
-### 1. Constitutional and structural authority
+1. **Authority remains class-rooted.** Durable authored authority may live only in `framework/**` and `instance/**`; mutable execution truth remains in `state/control/**`; retained evidence remains in `state/evidence/**`; continuity remains in `state/continuity/**`; generated surfaces remain derived-only; inputs remain non-authoritative.
+2. **Runtime-effective generated outputs are handles, not authority.** Runtime may consume generated/effective outputs only through a verified resolver handle that validates schema, lock, digest, receipt, source hashes, invalidation conditions, freshness mode, and allowed consumer class.
+3. **Freshness is explicit and falsifiable.** Lock files must declare `freshness.mode` rather than relying on a far-future timestamp. Accepted modes are `digest_bound`, `ttl_bound`, and `receipt_bound`.
+4. **Run-first lifecycle is structurally primary.** The run contract is the atomic consequential execution unit; mission remains the continuity container; workflow wrappers are compatibility or orchestration surfaces only.
+5. **All material side effects prove boundary coverage.** Every material side-effect entrypoint is mapped in `material-side-effect-inventory.yml` and `authorization-boundary-coverage.yml`, auto-checked against runtime command, service, workflow, publication, and extension-publisher code paths, and denied when uncovered.
+6. **Support claims are finite, partitioned, and proof-backed.** Live, stage-only, unadmitted, and retired claim states stay partitioned under support admissions and dossiers. Generated support matrices and support cards cannot widen the live claim.
+7. **Capability-pack routing has one runtime-facing compiled view.** Framework pack contracts define portable contract semantics; instance governance packs declare repo-specific intent; generated/effective pack routes are the single runtime-facing route view. `instance/capabilities/runtime/packs/**` is frozen as compatibility projection or retired.
+8. **Extension lifecycle remains desired / active / quarantine / published.** Raw additive extension inputs remain non-authoritative until desired selection, active materialization, quarantine check, publication, and freshness validation complete. Published effective extension catalogs are derived handles only.
+9. **Proof reports become executable.** Support, runtime, governance, maintainability, publication, and architecture-health proofs must include commands or evaluator IDs, input/source digests, output digests, pass/fail criteria, negative controls, replay or trace references, and retained evidence refs.
+10. **Architecture-health is depth-aware.** `octon doctor --architecture` reports existence, structural, semantic, runtime-enforcement, proof-plane, publication-freshness, operator-read-model, and compatibility-retirement grades separately. A shallow existence pass cannot masquerade as closure-grade architecture health.
+11. **Non-authority registration covers all claim-adjacent projections.** The non-authority register includes generated/effective runtime handles, support cards, route maps, mission summaries, closure projections, operator digests, and generated architecture maps.
+12. **Operator navigation is generated, traceable, and non-authoritative.** New generated cognition maps explain canonical sources, generated/effective handles, compatibility projections, validators, receipts, runtime consumers, and retirement posture.
 
-Preserve:
+## Target-state planes
 
-- `/.octon/framework/constitution/**`
-- `/.octon/framework/cognition/_meta/architecture/contract-registry.yml`
-- `/.octon/framework/cognition/_meta/architecture/specification.md`
-- `/.octon/octon.yml` as root manifest
-- `/.octon/instance/manifest.yml` as overlay enablement
+| Plane | Target-state role | Canonical roots |
+|---|---|---|
+| Constitutional authority | Supreme repo-local authority | `framework/constitution/**` |
+| Structural architecture | Registry-backed topology and doc targets | `framework/cognition/_meta/architecture/**` |
+| Root manifest | Super-root anchors, profiles, runtime-resolution refs, global defaults | `octon.yml` |
+| Runtime resolution | Authored selector plus compiled verified handles | `instance/governance/runtime-resolution.yml`, `generated/effective/runtime/**` |
+| Execution control | Run-first lifecycle, approvals, exceptions, revocations, runtime state | `state/control/execution/**` |
+| Mission continuity | Long-horizon mission authority and continuity state | `instance/orchestration/missions/**`, `state/continuity/**` |
+| Support governance | Bounded live/stage-only/unadmitted/retired claims | `instance/governance/support-targets.yml`, admissions, dossiers |
+| Capability packs | Portable contracts, repo intent, compiled pack routes | `framework/capabilities/packs/**`, `instance/governance/capability-packs/**`, `generated/effective/capabilities/**` |
+| Extensions | Raw inputs, desired selection, active/quarantine state, compiled catalog | `inputs/additive/extensions/**`, `instance/extensions.yml`, `state/control/extensions/**`, `generated/effective/extensions/**` |
+| Evidence and proof | Retained proof, receipts, RunCards, HarnessCards, validation evidence | `state/evidence/**` |
+| Operator read models | Generated traceable summaries and maps | `generated/cognition/**` |
 
-Change:
+## Target-state runtime-effective handle contract
 
-- keep `octon.yml` as a thin anchor for roots, profiles, and top-level runtime-resolution pointers
-- move dense runtime-resolution details into `/.octon/framework/engine/runtime/spec/runtime-resolution-v1.md`,
-  `runtime-resolution-v1.schema.json`, and `/.octon/instance/governance/runtime-resolution.yml`
-- update the structural contract registry to declare the runtime-resolution family, runtime-effective
-  route-bundle family, and support-path normalization family explicitly
+A new `runtime-effective-artifact-handle-v1` contract governs runtime-facing derived outputs.
 
-### 2. Runtime-effective route bundle
-
-Add:
-
-- `/.octon/framework/engine/runtime/spec/runtime-effective-route-bundle-v1.schema.json`
-- `/.octon/generated/effective/runtime/route-bundle.yml`
-- `/.octon/generated/effective/runtime/route-bundle.lock.yml`
-- retained publication receipt under `/.octon/state/evidence/validation/architecture/10of10-target-transition/publication/freshness.yml`
-
-The route bundle must join:
-
-- root manifest anchors
-- support targets and tuple admissions
-- support dossiers and proof-bundle freshness
-- capability-pack governance and runtime pack routes
-- active extension generation IDs and quarantine state
-- mission/run roots
-- material side-effect inventory
-- authorization-boundary coverage
-- generated/effective publication state
-- required validators
-
-Runtime may consume the bundle only after freshness validation.
-
-### 3. Execution authorization hard gate
-
-Preserve the engine-owned boundary:
-
-```rust
-authorize_execution(request: ExecutionRequest) -> GrantBundle
+```yaml
+schema_version: runtime-effective-artifact-handle-v1
+artifact_kind: runtime_route_bundle | pack_routes | support_matrix | extension_catalog | capability_routing
+output_ref: .octon/generated/effective/...
+lock_ref: .octon/generated/effective/...
+publication_receipt_ref: .octon/state/evidence/validation/publication/...
+source_refs:
+  - .octon/octon.yml
+  - .octon/instance/governance/runtime-resolution.yml
+source_digests:
+  .octon/octon.yml: <sha256>
+freshness:
+  mode: digest_bound
+  invalidation_conditions:
+    - root-manifest-sha-changed
+    - runtime-resolution-sha-changed
+allowed_consumers:
+  - runtime_resolver
+  - validators
+forbidden_consumers:
+  - direct_runtime_raw_path_read
+  - generated_cognition_as_authority
+non_authority_classification: derived-runtime-handle
 ```
 
-Strengthen it so that all side-effect paths must enter through a request builder that binds:
+The resolver fails closed when any field is missing, stale, digest-drifted, receipt-missing, incompatible with freshness mode, or consumed by an unauthorized runtime path.
 
-- run contract
-- run manifest
-- support tuple
-- effective route bundle digest
-- requested capability packs
-- execution role and executor profile
-- risk/materiality classification
-- rollback plan
-- publication/freshness proof where generated/effective outputs participate
-- evidence receipt roots
+## Target-state proof maturity
 
-No code path may open generated/effective runtime artifacts, invoke a service, mutate repo files,
-launch an executor, publish artifacts, write protected control state, or close a run without a grant
-or explicit stage-only/deny/escalate receipt.
+A closure-grade proof bundle must include source refs/digests, validator or evaluator version, exact command invocation or evaluator ID, pass/fail criteria, negative controls, replay or trace refs, retained evidence refs, support tuple or runtime route affected, expected claim effect, and denial/stage/allow evidence where relevant.
 
-### 4. Publication freshness v2
+## Target-state compatibility posture
 
-Replace advisory freshness with hard runtime handles:
+Compatibility surfaces may remain only if they are listed in `retirement-register.yml`, have canonical successor refs, have next review dates, carry `future_widening_blocker: true` when claim-adjacent, are listed in `non-authority-register.yml` when claim-adjacent, are not consumed directly by runtime or policy paths, and are covered by a validator or retirement-readiness check.
 
-- `GeneratedEffectiveHandle::open(output_ref)` validates output, lock, artifact map, publication
-  receipt, source digests, freshness window, and no-authority-widening before returning contents
-- stale outputs return a fail-closed reason, not a warning
-- runtime-effective files may not be read by string path in runtime code
-- generated/cognition and generated/proposals remain completely unavailable for runtime authority
-  routing
+## Non-goals
 
-### 5. Support, pack, and admission alignment
-
-Normalize support admissions and dossiers into the declared claim-state partitions:
-
-- `support-target-admissions/live/**`
-- `support-target-admissions/stage-only/**`
-- `support-target-admissions/unadmitted/**`
-- `support-target-admissions/retired/**`
-- matching `support-dossiers/<partition>/**`
-
-The target state eliminates the current ambiguity where support-target references name partitioned
-paths while currently visible admission and dossier files are flat. Flat files may remain only as
-compatibility shims with retirement records and must not be runtime-consumed.
-
-Capability packs become three clean layers:
-
-1. `framework/capabilities/packs/**`: portable pack contract
-2. `instance/governance/capability-packs/**`: repo-owned governance/admission intent
-3. `generated/effective/capabilities/pack-routes.effective.yml`: compiled runtime-facing route view
-
-`instance/capabilities/runtime/packs/**` becomes a transitional compatibility projection or is
-retired after generated/effective pack routes are runtime-consumed.
-
-### 6. Extension lifecycle
-
-Target extension lifecycle:
-
-- raw additive inputs: `inputs/additive/extensions/**` only
-- desired selection: `instance/extensions.yml`
-- compact active state: `state/control/extensions/active.yml`
-- quarantine state: `state/control/extensions/quarantine.yml`
-- compiled outputs: `generated/effective/extensions/**`
-- retained publication and compatibility receipts: `state/evidence/validation/**`
-
-`active.yml` should contain only:
-
-- desired config path and digest
-- active pack IDs
-- active generation ID
-- effective catalog digest/ref
-- artifact map digest/ref
-- generation lock digest/ref
-- publication receipt digest/ref
-- compatibility receipt digest/ref
-- compact invalidation condition IDs
-- status
-
-Large repeated `required_inputs` and dependency closure expansion belongs in the generation lock.
-
-### 7. Proof and operator read models
-
-Add or strengthen:
-
-- `octon doctor --architecture` to show current authority, generated/effective freshness, support
-  tuple states, admitted packs, active extensions, quarantines, shims, stale outputs, and validator
-  failures
-- `generated/cognition/projections/materialized/architecture-map.md`
-- `generated/cognition/projections/materialized/runtime-route-map.md`
-- `generated/cognition/projections/materialized/support-pack-route-map.md`
-
-These are operator read models only and must carry source refs, generation time, freshness, and a
-non-authority disclaimer.
-
-## Target-state invariant
-
-A consequential run cannot proceed if any of the following is true:
-
-- run contract missing or invalid
-- support tuple missing, stale, stage-only, unadmitted, or proof-incomplete
-- requested pack exists but is not admitted for the tuple
-- generated/effective route bundle stale or missing receipt
-- raw input or proposal path participates in runtime or policy resolution
-- generated/cognition output is used for authority or policy routing
-- active extension generation is stale, quarantined, or unpublished
-- material side-effect coverage is unproven
-- required evidence roots or receipts are absent
+This target state does not make generated/effective outputs authored authority, does not make proposal packets runtime inputs, does not broaden live support, does not remove stage-only/unadmitted/retired partitions, does not replace the existing Rust runtime, and does not make active docs carry full path matrices again.

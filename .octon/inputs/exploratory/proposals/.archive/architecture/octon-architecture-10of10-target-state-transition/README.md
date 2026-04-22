@@ -1,41 +1,40 @@
-# Octon Architecture 10/10 Target-State Transition
+# Octon 10/10 Target-State Architecture Transition
 
 ## Purpose
 
-This proposal packet defines the implementation-oriented transition from Octon's current live
-architecture to a target-state architecture that could credibly earn a rigorous 10/10 architecture
-score. It is an Octon-native, proposal-first packet: temporary, non-canonical, promotion-safe, and
-intended to guide durable changes outside `/.octon/inputs/exploratory/proposals/**`.
+This packet defines a closure-ready architecture transition plan for moving Octon from its current live architecture to the strongest plausible target-state architecture that could credibly earn a true 10/10 architectural evaluation score.
 
-The target is not rhetorical perfection. The target is a real architecture in which:
+The packet is Octon-native and remains non-canonical until promoted. It does not create a rival control plane, does not make generated outputs authoritative, and does not widen live support claims.
 
-- canonical authority remains only in `framework/**` and `instance/**`
-- generated/effective outputs are runtime-facing only when receipt-backed and fresh
-- generated/cognition and generated/proposals remain non-authoritative
-- raw additive and exploratory inputs never become runtime or policy dependencies
-- every material side-effect path is proven to pass through the execution authorization boundary
-- support, pack, admission, and extension states cannot widen claims by projection accident
-- publication receipts and freshness locks are runtime hard gates, not advisory metadata
-- support proof is current, path-normalized, negative-control-backed, and disclosure-backed
-- operator boot, doctor, and architecture maps are concise projections of canonical truth
+## Executive judgment
 
-## Current architectural judgment
+Octon's current architecture is strong enough to preserve. The correct motion is not re-foundation. The required motion is focused gap-closing plus selective moderate restructuring:
 
-The live repo is already strong. The current architecture deserves approximately **7.6/10** under a
-strict review: excellent authority discipline, strong constitutional/governance structure, good run
-and mission modeling, credible support-bounded claim architecture, meaningful runtime code, and
-serious proof-plane intent.
+- harden runtime-effective generated/effective consumption through a single freshness-checked handle API;
+- replace fake time freshness with explicit freshness modes;
+- retire or freeze compatibility runtime-pack projections;
+- deepen proof bundles from summary-pass artifacts into executable, falsifiable evidence;
+- make architecture-health closure-grade by distinguishing existence, structural, semantic, runtime, and proof checks;
+- expand the non-authority register to all claim-adjacent and runtime-facing generated/effective surfaces;
+- add generated non-authoritative architecture navigation maps for maintainers and operators;
+- prove all material side-effect paths pass through the engine-owned authorization boundary.
 
-It does not yet deserve 10/10 because the executable chain from canonical authority to fresh
-runtime-effective bundle to authorization enforcement to retained proof is still too fragmented,
-partly over-projected, and not yet hard enough to make bypass, staleness, support-path drift, or
-pack/extension widening mechanically impossible.
+## Current repo posture assumed
 
-## Recommended reading order
+- `.octon/` is the single authoritative super-root.
+- `framework/**` and `instance/**` are the only authored authority class roots.
+- `state/**` is mutable control, continuity, and retained evidence truth.
+- `generated/**` is derived-only, including runtime-facing generated/effective outputs.
+- `inputs/**` is non-authoritative and may not become a direct runtime or policy dependency.
+- Run contracts are the atomic consequential execution unit; missions are long-horizon continuity containers.
+- Runtime resolution is delegated from `octon.yml` into `instance/governance/runtime-resolution.yml` and compiled into `generated/effective/runtime/route-bundle.yml` plus lock/receipt state.
+- Support claims are bounded by `instance/governance/support-targets.yml`, support admissions, dossiers, proof bundles, and disclosure projections.
+
+## Required reading order
 
 1. `navigation/source-of-truth-map.md`
-2. `resources/complete-architectural-evaluation.md`
-3. `resources/10of10-gap-to-target-analysis.md`
+2. `resources/current-state-architectural-evaluation.md`
+3. `resources/ten-of-ten-gap-to-target-analysis.md`
 4. `architecture/current-state-gap-map.md`
 5. `architecture/target-architecture.md`
 6. `architecture/file-change-map.md`
@@ -47,6 +46,4 @@ pack/extension widening mechanically impossible.
 
 ## Non-authority notice
 
-This packet lives under `/.octon/inputs/exploratory/proposals/**`. It is not canonical runtime,
-policy, governance, support, publication, or architectural authority. Promotion targets named here
-must stand on their own after promotion and must not depend on this packet path.
+This packet is an implementation aid. Proposal-local files may guide promotion work, but durable targets must stand on their own after promotion. Runtime, policy, support, publication, support-card, operator read-model, or architecture-health behavior must never depend on this proposal path after implementation.

@@ -17,6 +17,19 @@ freshness:
   status: current
   reviewed_at: "2026-04-20T23:30:00Z"
   review_due_at: "2026-06-30T00:00:00Z"
+command_or_evaluator: validator://validate-proof-bundle-executability
+evaluator_version: executable-proof-bundle-v1
+input_digests:
+  support_targets_sha256: 8af1c10639060a579b289b32887382abd8b5706a7e92730fb47b631b6e683305
+  support_dossier_sha256: cca69d1b09aedefa76b46ffa0f99532dd8992619fb5dccb51e603639fd3124ae
+output_digests:
+  primary_run_card_sha256: 81abbfef4c02784c71f289fc85d0a7f470a38f6746cdc66eaac1ab0eb9f84c3e
+pass_fail_criteria:
+  - "ci observe-and-read tuple remains admitted-live with retained disclosure evidence"
+  - "negative controls and proof planes remain current"
+receipt_refs:
+  - .octon/state/evidence/validation/architecture/10of10-target-transition/support-targets/proofing.yml
+result: pass
 proof_planes:
   - plane_id: structural
     status: pass

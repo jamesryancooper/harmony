@@ -16,6 +16,13 @@
     "support_dossier_ref",
     "generated_at",
     "freshness",
+    "command_or_evaluator",
+    "evaluator_version",
+    "input_digests",
+    "output_digests",
+    "pass_fail_criteria",
+    "receipt_refs",
+    "result",
     "proof_planes",
     "scenario_evidence",
     "disclosure_evidence",
@@ -121,6 +128,50 @@
           "minLength": 1
         }
       }
+    },
+    "command_or_evaluator": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evaluator_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_digests": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    },
+    "output_digests": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-f0-9]{64}$"
+      }
+    },
+    "pass_fail_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "receipt_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "result": {
+      "type": "string",
+      "enum": ["pass", "fail"]
     },
     "proof_planes": {
       "type": "array",

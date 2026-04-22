@@ -17,6 +17,19 @@ freshness:
   status: current
   reviewed_at: "2026-04-21T23:30:00Z"
   review_due_at: "2026-06-30T00:00:00Z"
+command_or_evaluator: validator://validate-proof-bundle-executability
+evaluator_version: executable-proof-bundle-v1
+input_digests:
+  support_targets_sha256: 8af1c10639060a579b289b32887382abd8b5706a7e92730fb47b631b6e683305
+  support_dossier_sha256: 7c32dcb10c0c52d1e03e3e52f30a200abf1a0d55f7b13b3b7c035dd4f1349e14
+output_digests:
+  primary_run_card_sha256: 89195a7227e11087dac1b61e98fdbcc0122be013813981f7033dd1f83cabac49
+pass_fail_criteria:
+  - "boundary-sensitive tuple remains explicit stage-only and outside the live claim"
+  - "negative controls continue to prove non-live posture"
+receipt_refs:
+  - .octon/state/evidence/validation/architecture/10of10-target-transition/support-targets/proofing.yml
+result: pass
 proof_planes:
   - plane_id: structural
     status: pass

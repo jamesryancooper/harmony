@@ -1,0 +1,28 @@
+schema_version: architecture-closure-certificate-v1
+proposal_id: octon-architecture-10of10-target-state-transition
+closed_at: "2026-04-22T15:05:44Z"
+result: pass
+closure_grade: closure-grade
+validated_dimensions:
+  structural_contract: pass
+  runtime_effective_handles: pass
+  freshness_modes: pass
+  authorization_coverage: pass
+  capability_pack_cutover: pass
+  extension_lifecycle: pass
+  support_proof: pass
+  operator_read_models: pass
+  compatibility_retirement: pass
+  architecture_health_v2: pass
+negative_controls:
+  stale_route_bundle_denial: pass
+  raw_generated_effective_read_denial: pass
+  pack_route_widening_denial: pass
+  quarantined_extension_denial: pass
+  generated_read_model_authority_denial: pass
+publication_receipts:
+  runtime_route_bundle: .octon/state/evidence/validation/publication/runtime/2026-04-22T13-33-00Z-runtime-route-bundle-0e35dffede77.yml
+  capability_pack_routes: .octon/state/evidence/validation/publication/capabilities/2026-04-22T13-30-38Z-pack-routes-8af1c1063906.yml
+  extension_catalog: .octon/state/evidence/validation/publication/extensions/2026-04-22T13-29-54Z-extensions-090beb843d30.yml
+  support_matrix: .octon/state/evidence/validation/architecture/10of10-target-transition/support-targets/proofing.yml
+remaining_exceptions: []

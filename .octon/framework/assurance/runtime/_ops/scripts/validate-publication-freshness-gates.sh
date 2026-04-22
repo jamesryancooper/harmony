@@ -6,7 +6,7 @@ DEFAULT_OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../../../" && pwd)"
 OCTON_DIR="${OCTON_DIR_OVERRIDE:-$DEFAULT_OCTON_DIR}"
 ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 
-CONTRACT="$OCTON_DIR/framework/engine/runtime/spec/publication-freshness-gates-v2.md"
+CONTRACT="$OCTON_DIR/framework/engine/runtime/spec/publication-freshness-gates-v3.md"
 RECEIPT="$OCTON_DIR/state/evidence/validation/architecture/10of10-target-transition/publication/freshness.yml"
 
 errors=0
@@ -49,6 +49,8 @@ main() {
     || fail "freshness receipt must cover runtime route-bundle publication"
 
   run_validator "validate-generated-effective-freshness.sh"
+  run_validator "validate-runtime-effective-artifact-handles.sh"
+  run_validator "validate-no-raw-generated-effective-runtime-reads.sh"
   run_validator "validate-capability-publication-state.sh"
   run_validator "validate-extension-publication-state.sh"
   run_validator "validate-runtime-effective-route-bundle.sh"

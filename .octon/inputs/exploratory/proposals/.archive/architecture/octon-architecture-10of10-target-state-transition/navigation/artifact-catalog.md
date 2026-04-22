@@ -2,45 +2,44 @@
 
 ## Root
 
-- `PACKET_MANIFEST.md` — enumerated packet contents
-- `README.md` — executive framing, scope, reading order, non-authority notice
-- `SHA256SUMS.txt` — checksums for packet files, excluding itself
-- `architecture-proposal.yml` — architecture subtype manifest
-- `proposal.yml` — base proposal lifecycle manifest
+- `README.md` — executive framing and reading order.
+- `proposal.yml` — shared proposal manifest and promotion target list.
+- `architecture-proposal.yml` — architecture subtype manifest.
+- `PACKET_MANIFEST.md` — full packet inventory.
+- `SHA256SUMS.txt` — checksum inventory for packet integrity.
 
 ## Navigation
 
-- `navigation/artifact-catalog.md` — packet artifact inventory
-- `navigation/source-of-truth-map.md` — authority, state, generated, input, and proposal boundary map
+- `navigation/source-of-truth-map.md` — durable sources, proposal-local authority, and boundary rules.
+- `navigation/artifact-catalog.md` — this packet inventory.
 
 ## Architecture
 
-- `architecture/10of10-gap-map.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/acceptance-criteria.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/architecture-proposal.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/closure-certification-plan.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/current-state-gap-map.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/cutover-checklist.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/file-change-map.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/implementation-plan.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/migration-cutover-plan.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/operator-read-model-plan.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/publication-freshness-hardening-plan.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/runtime-enforcement-hardening-plan.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/support-pack-extension-normalization-plan.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/target-architecture.md` — architecture planning, target-state, validation, or cutover artifact
-- `architecture/validation-plan.md` — architecture planning, target-state, validation, or cutover artifact
+- `architecture/target-architecture.md` — recommended 10/10 landing shape.
+- `architecture/current-state-gap-map.md` — current coverage and target gaps.
+- `architecture/ten-of-ten-gap-to-target-analysis.md` — blocker-by-blocker target analysis.
+- `architecture/concept-coverage-matrix.md` — concept-to-target crosswalk.
+- `architecture/file-change-map.md` — promotion, publication, evidence, and retirement targets.
+- `architecture/implementation-plan.md` — phased implementation motion.
+- `architecture/migration-cutover-plan.md` — cutover sequence and rollback posture.
+- `architecture/validation-plan.md` — structural, runtime, proof, and negative-control validation.
+- `architecture/acceptance-criteria.md` — closure criteria.
+- `architecture/cutover-checklist.md` — execution gate checklist.
+- `architecture/closure-certification-plan.md` — closure evidence protocol.
+- `architecture/target-state-conformance-card.md` — compact review card.
 
 ## Resources
 
-- `resources/10of10-gap-to-target-analysis.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/architecture-scorecard.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/assumptions-and-non-goals.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/complete-architectural-evaluation.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/current-repo-state-audit.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/implementation-readiness-notes.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/retirement-and-shim-ledger.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/risk-register.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/source-evidence-index.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/tradeoff-analysis.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
-- `resources/validation-status.md` — supporting evaluation, audit, risk, tradeoff, or evidence analysis
+- `resources/source-register.md` — repo surfaces inspected and classification.
+- `resources/current-state-architectural-evaluation.md` — detailed current-state evaluation.
+- `resources/architecture-scorecard.md` — scoring across review dimensions.
+- `resources/ten-of-ten-gap-to-target-analysis.md` — full gap analysis.
+- `resources/runtime-enforcement-assessment.md` — runtime boundary and route-bundle enforcement.
+- `resources/publication-and-freshness-assessment.md` — publication, freshness, and lock assessment.
+- `resources/pack-extension-architecture-assessment.md` — pack and extension lifecycle assessment.
+- `resources/support-proof-and-dossier-assessment.md` — support target, dossier, proof, and support-card assessment.
+- `resources/proof-plane-hardening-plan.md` — proof maturity plan.
+- `resources/risk-register.md` — risks and mitigations.
+- `resources/tradeoff-register.md` — target-state tradeoffs.
+- `resources/assumptions-and-blockers.md` — assumptions and blockers.
+- `resources/non-goals-and-rejection-ledger.md` — out-of-scope and rejected approaches.

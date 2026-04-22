@@ -6011,6 +6011,15 @@ mod tests {
     fn seed_pipeline_fixture(root: &Path) -> (PathBuf, PathBuf) {
         seed_policy_runtime_env();
         let octon_dir = root.join(".octon");
+        let source_root = source_repo_root();
+        let copy_rel = |rel: &str| {
+            let from = source_root.join(rel);
+            let to = root.join(rel);
+            if let Some(parent) = to.parent() {
+                fs::create_dir_all(parent).expect("fixture parent should exist");
+            }
+            fs::copy(from, to).expect("fixture file should copy");
+        };
         fs::create_dir_all(&octon_dir).expect(".octon dir should exist");
         fs::create_dir_all(octon_dir.join("instance/charter"))
             .expect("workspace charter dir should exist");
@@ -6020,12 +6029,9 @@ mod tests {
         );
         fs::create_dir_all(octon_dir.join("framework/capabilities/governance/policy"))
             .expect("policy root should exist");
-        write_file(
-            &octon_dir.join("octon.yml"),
-            "engine:\n  runtime:\n    policy_file: framework/capabilities/governance/policy/deny-by-default.v2.yml\n",
-        );
+        copy_rel(".octon/octon.yml");
         fs::copy(
-            source_repo_root()
+            source_root
                 .join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml"),
             octon_dir.join("framework/capabilities/governance/policy/deny-by-default.v2.yml"),
         )
@@ -6041,51 +6047,96 @@ mod tests {
             "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators:\n  - operator_id: \"fixtures\"\n    display_name: \"Fixtures\"\n    contact: \"repo://fixtures\"\ndefaults:\n  operator_id: \"fixtures\"\n  support_tier: \"observe-and-read\"\nassets:\n  - asset_id: \"workflow-scope\"\n    path_globs:\n      - \"workflow-scope\"\n    owners:\n      - \"fixtures\"\nservices: []\nsubscriptions: {}\n",
         );
         fs::copy(
-            source_repo_root().join(".octon/instance/governance/support-targets.yml"),
+            source_root.join(".octon/instance/governance/support-targets.yml"),
             octon_dir.join("instance/governance/support-targets.yml"),
         )
         .expect("copy support targets");
+        fs::copy(
+            source_root.join(".octon/instance/governance/runtime-resolution.yml"),
+            octon_dir.join("instance/governance/runtime-resolution.yml"),
+        )
+        .expect("copy runtime resolution");
         copy_tree(
-            &source_repo_root().join(".octon/instance/governance/support-target-admissions"),
+            &source_root.join(".octon/instance/governance/support-target-admissions"),
             &root.join(".octon/instance/governance/support-target-admissions"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/instance/governance/policies"),
+            &source_root.join(".octon/instance/governance/support-dossiers"),
+            &root.join(".octon/instance/governance/support-dossiers"),
+        );
+        copy_tree(
+            &source_root.join(".octon/instance/governance/capability-packs"),
+            &root.join(".octon/instance/governance/capability-packs"),
+        );
+        copy_tree(
+            &source_root.join(".octon/instance/governance/policies"),
             &root.join(".octon/instance/governance/policies"),
         );
         fs::create_dir_all(octon_dir.join("instance/governance/policies"))
             .expect("governance policy dir should exist");
         fs::copy(
-            source_repo_root().join(".octon/instance/governance/policies/mission-autonomy.yml"),
+            source_root.join(".octon/instance/governance/policies/mission-autonomy.yml"),
             octon_dir.join("instance/governance/policies/mission-autonomy.yml"),
         )
         .expect("copy mission autonomy policy");
         copy_tree(
-            &source_repo_root().join(".octon/instance/orchestration/missions"),
+            &source_root.join(".octon/instance/orchestration/missions"),
             &root.join(".octon/instance/orchestration/missions"),
         );
         fs::create_dir_all(octon_dir.join("instance/capabilities/runtime/packs"))
             .expect("runtime pack dir should exist");
         fs::copy(
-            source_repo_root().join(".octon/instance/capabilities/runtime/packs/registry.yml"),
+            source_root.join(".octon/instance/capabilities/runtime/packs/registry.yml"),
             octon_dir.join("instance/capabilities/runtime/packs/registry.yml"),
         )
         .expect("copy runtime pack registry");
         copy_tree(
-            &source_repo_root().join(".octon/framework/engine/runtime/adapters"),
+            &source_root.join(".octon/framework/engine/runtime/adapters"),
             &root.join(".octon/framework/engine/runtime/adapters"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/framework/capabilities/packs"),
+            &source_root.join(".octon/framework/capabilities/packs"),
             &root.join(".octon/framework/capabilities/packs"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/state/control/execution/missions"),
+            &source_root.join(".octon/state/control/execution/missions"),
             &root.join(".octon/state/control/execution/missions"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/state/continuity/repo/missions"),
+            &source_root.join(".octon/state/control/extensions"),
+            &root.join(".octon/state/control/extensions"),
+        );
+        copy_tree(
+            &source_root.join(".octon/state/continuity/repo/missions"),
             &root.join(".octon/state/continuity/repo/missions"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/runtime"),
+            &root.join(".octon/generated/effective/runtime"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/capabilities"),
+            &root.join(".octon/generated/effective/capabilities"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/governance"),
+            &root.join(".octon/generated/effective/governance"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/extensions"),
+            &root.join(".octon/generated/effective/extensions"),
+        );
+        copy_tree(
+            &source_root.join(".octon/state/evidence/validation/publication/runtime"),
+            &root.join(".octon/state/evidence/validation/publication/runtime"),
+        );
+        copy_tree(
+            &source_root.join(".octon/state/evidence/validation/publication/capabilities"),
+            &root.join(".octon/state/evidence/validation/publication/capabilities"),
+        );
+        copy_tree(
+            &source_root.join(".octon/state/evidence/validation/publication/extensions"),
+            &root.join(".octon/state/evidence/validation/publication/extensions"),
         );
 
         let target_package = root.join(".design-packages").join("target-package");
@@ -6183,6 +6234,15 @@ mod tests {
     fn seed_create_design_package_fixture(root: &Path) -> PathBuf {
         seed_policy_runtime_env();
         let octon_dir = root.join(".octon");
+        let source_root = source_repo_root();
+        let copy_rel = |rel: &str| {
+            let from = source_root.join(rel);
+            let to = root.join(rel);
+            if let Some(parent) = to.parent() {
+                fs::create_dir_all(parent).expect("fixture parent should exist");
+            }
+            fs::copy(from, to).expect("fixture file should copy");
+        };
         fs::create_dir_all(&octon_dir).expect(".octon dir should exist");
         fs::create_dir_all(octon_dir.join("instance/charter"))
             .expect("workspace charter dir should exist");
@@ -6196,71 +6256,105 @@ mod tests {
             &octon_dir.join("instance/governance/ownership/registry.yml"),
             "schema_version: \"ownership-registry-v1\"\ndirective_precedence:\n  - mission_owner\noperators:\n  - operator_id: \"fixtures\"\n    display_name: \"Fixtures\"\n    contact: \"repo://fixtures\"\ndefaults:\n  operator_id: \"fixtures\"\n  support_tier: \"observe-and-read\"\nassets:\n  - asset_id: \"workflow-scope\"\n    path_globs:\n      - \"workflow-scope\"\n    owners:\n      - \"fixtures\"\nservices: []\nsubscriptions: {}\n",
         );
-        fs::copy(
-            source_repo_root().join(".octon/instance/governance/support-targets.yml"),
-            octon_dir.join("instance/governance/support-targets.yml"),
-        )
-        .expect("copy support targets");
+        copy_rel(".octon/octon.yml");
+        copy_rel(".octon/instance/governance/runtime-resolution.yml");
+        copy_rel(".octon/instance/governance/support-targets.yml");
         copy_tree(
-            &source_repo_root().join(".octon/instance/governance/support-target-admissions"),
+            &source_root.join(".octon/instance/governance/support-target-admissions"),
             &root.join(".octon/instance/governance/support-target-admissions"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/instance/governance/policies"),
+            &source_root.join(".octon/instance/governance/support-dossiers"),
+            &root.join(".octon/instance/governance/support-dossiers"),
+        );
+        copy_tree(
+            &source_root.join(".octon/instance/governance/capability-packs"),
+            &root.join(".octon/instance/governance/capability-packs"),
+        );
+        copy_tree(
+            &source_root.join(".octon/instance/governance/policies"),
             &root.join(".octon/instance/governance/policies"),
         );
         fs::create_dir_all(octon_dir.join("instance/governance/policies"))
             .expect("governance policy dir should exist");
         fs::copy(
-            source_repo_root().join(".octon/instance/governance/policies/mission-autonomy.yml"),
+            source_root.join(".octon/instance/governance/policies/mission-autonomy.yml"),
             octon_dir.join("instance/governance/policies/mission-autonomy.yml"),
         )
         .expect("copy mission autonomy policy");
         copy_tree(
-            &source_repo_root().join(".octon/instance/orchestration/missions"),
+            &source_root.join(".octon/instance/orchestration/missions"),
             &root.join(".octon/instance/orchestration/missions"),
         );
         fs::create_dir_all(octon_dir.join("instance/capabilities/runtime/packs"))
             .expect("runtime pack dir should exist");
-        fs::copy(
-            source_repo_root().join(".octon/instance/capabilities/runtime/packs/registry.yml"),
-            octon_dir.join("instance/capabilities/runtime/packs/registry.yml"),
-        )
-        .expect("copy runtime pack registry");
+        copy_rel(".octon/instance/capabilities/runtime/packs/registry.yml");
+        copy_tree(
+            &source_root.join(".octon/instance/capabilities/runtime/packs/admissions"),
+            &root.join(".octon/instance/capabilities/runtime/packs/admissions"),
+        );
         fs::create_dir_all(octon_dir.join("framework/capabilities/governance/policy"))
             .expect("policy root should exist");
         copy_tree(
-            &source_repo_root().join(".octon/framework/engine/runtime/adapters"),
+            &source_root.join(".octon/framework/engine/runtime/adapters"),
             &root.join(".octon/framework/engine/runtime/adapters"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/framework/capabilities/packs"),
+            &source_root.join(".octon/framework/capabilities/packs"),
             &root.join(".octon/framework/capabilities/packs"),
         );
-        write_file(
-            &octon_dir.join("octon.yml"),
-            "engine:\n  runtime:\n    policy_file: framework/capabilities/governance/policy/deny-by-default.v2.yml\n",
-        );
         fs::copy(
-            source_repo_root()
+            source_root
                 .join(".octon/framework/capabilities/governance/policy/deny-by-default.v2.yml"),
             octon_dir.join("framework/capabilities/governance/policy/deny-by-default.v2.yml"),
         )
         .expect("copy ACP policy");
         copy_tree(
-            &source_repo_root().join(".octon/framework/capabilities/_ops/scripts"),
+            &source_root.join(".octon/framework/capabilities/_ops/scripts"),
             &root.join(".octon/framework/capabilities/_ops/scripts"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/state/control/execution/missions"),
+            &source_root.join(".octon/state/control/execution/missions"),
             &root.join(".octon/state/control/execution/missions"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/state/continuity/repo/missions"),
+            &source_root.join(".octon/state/continuity/repo/missions"),
             &root.join(".octon/state/continuity/repo/missions"),
         );
         copy_tree(
-            &source_repo_root().join(".octon/generated/effective/orchestration/missions"),
+            &source_root.join(".octon/state/control/extensions"),
+            &root.join(".octon/state/control/extensions"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/runtime"),
+            &root.join(".octon/generated/effective/runtime"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/capabilities"),
+            &root.join(".octon/generated/effective/capabilities"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/governance"),
+            &root.join(".octon/generated/effective/governance"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/extensions"),
+            &root.join(".octon/generated/effective/extensions"),
+        );
+        copy_tree(
+            &source_root.join(".octon/state/evidence/validation/publication/runtime"),
+            &root.join(".octon/state/evidence/validation/publication/runtime"),
+        );
+        copy_tree(
+            &source_root.join(".octon/state/evidence/validation/publication/capabilities"),
+            &root.join(".octon/state/evidence/validation/publication/capabilities"),
+        );
+        copy_tree(
+            &source_root.join(".octon/state/evidence/validation/publication/extensions"),
+            &root.join(".octon/state/evidence/validation/publication/extensions"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/orchestration/missions"),
             &root.join(".octon/generated/effective/orchestration/missions"),
         );
         let lease_path = octon_dir

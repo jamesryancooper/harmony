@@ -1,3 +1,80 @@
 schema_version: "architecture-proposal-v1"
+proposal_id: "octon-architecture-10of10-target-state-transition"
+proposal_kind: "architecture"
 architecture_scope: "repo-architecture"
 decision_type: "boundary-change"
+status: "draft"
+non_authority_notice: >-
+  This packet is an exploratory architecture proposal under inputs/**. It is not
+  canonical authority, is not generated/effective runtime truth, and must not be
+  consumed by runtime, policy, support claims, or generated/effective publication
+  without explicit promotion into authored authority or retained control/evidence
+  roots according to Octon's promotion/activation/publication discipline.
+current_state_score:
+  overall: 8.0
+  confidence: "high-structural-medium-high-runtime"
+  severity: "focused-gap-closing-with-selective-moderate-restructuring"
+target_state_score:
+  intended_review_score: 10.0
+  score_basis: >-
+    Closure-grade structural simplification, runtime-effective consumption
+    hardening, honest freshness semantics, executable proof bundles,
+    compatibility retirement, runtime authorization coverage, and traceable
+    operator read models.
+core_target_moves:
+  - id: "runtime-effective-handle-api"
+    summary: "All generated/effective runtime-facing artifacts are consumed through a resolver-verified handle."
+  - id: "freshness-mode-v2"
+    summary: "Replace fake-future TTL freshness with explicit digest_bound / ttl_bound / receipt_bound freshness modes."
+  - id: "side-effect-coverage-automation"
+    summary: "Auto-discover material side-effect paths and prove authorization-boundary coverage."
+  - id: "capability-pack-cutover"
+    summary: "Retire instance runtime-pack projections as steady-state route surfaces and use generated/effective pack routes only."
+  - id: "proof-plane-executability"
+    summary: "Upgrade support/proof reports from summary-pass records to executable, falsifiable evidence bundles."
+  - id: "architecture-health-v2"
+    summary: "Make architecture health depth-aware and closure-grade rather than only aggregation-oriented."
+  - id: "operator-traceability"
+    summary: "Publish generated non-authoritative architecture, route, support, and compatibility maps with canonical refs."
+promotion_boundaries:
+  authored_authority_targets:
+    - ".octon/framework/**"
+    - ".octon/instance/**"
+  mutable_control_targets:
+    - ".octon/state/control/**"
+  retained_evidence_targets:
+    - ".octon/state/evidence/validation/architecture/10of10-target-transition/**"
+  generated_publication_targets:
+    - ".octon/generated/effective/**"
+    - ".octon/generated/cognition/projections/**"
+  proposal_workspace:
+    - ".octon/inputs/exploratory/proposals/architecture/octon-architecture-10of10-target-state-transition/**"
+forbidden_promotion_effects:
+  - "Do not make this proposal packet itself authority."
+  - "Do not allow generated/effective artifacts to mint authority."
+  - "Do not consume generated/effective outputs by raw path in runtime."
+  - "Do not treat capability-pack admission as live support unless support-target admission, dossier, proof, and runtime route state agree."
+  - "Do not treat extension selection as activation, publication, or runtime-effective availability."
+  - "Do not introduce a rival control plane outside Octon's constitutional authority model."
+acceptance_artifacts:
+  architecture:
+    - "architecture/target-architecture.md"
+    - "architecture/current-state-gap-map.md"
+    - "architecture/ten-of-ten-gap-to-target-analysis.md"
+    - "architecture/file-change-map.md"
+    - "architecture/implementation-plan.md"
+    - "architecture/validation-plan.md"
+    - "architecture/acceptance-criteria.md"
+  resources:
+    - "resources/current-state-architectural-evaluation.md"
+    - "resources/architecture-scorecard.md"
+    - "resources/runtime-enforcement-assessment.md"
+    - "resources/publication-and-freshness-assessment.md"
+    - "resources/proof-plane-hardening-plan.md"
+closure_standard:
+  must_pass:
+    - "octon doctor --architecture reports depth-aware closure-grade pass."
+    - "Runtime resolver denies stale, widened, unpublished, quarantined, or raw-path generated/effective states."
+    - "Publication freshness gates verify source digests, receipts, invalidation conditions, and freshness mode."
+    - "Support dossiers are backed by executable proof bundles and downgrade automatically when stale or insufficient."
+    - "Compatibility projections are registered, frozen, or retired and cannot widen authority."

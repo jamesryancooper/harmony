@@ -1,6 +1,7 @@
 schema_version: "octon-runtime-resolution-v1"
 owner: "Octon governance"
 root_manifest_ref: ".octon/octon.yml"
+runtime_effective_handle_contract_ref: ".octon/framework/engine/runtime/spec/runtime-effective-artifact-handle-v1.md"
 runtime_effective_route_bundle_ref: ".octon/generated/effective/runtime/route-bundle.yml"
 runtime_effective_route_bundle_lock_ref: ".octon/generated/effective/runtime/route-bundle.lock.yml"
 pack_routes_effective_ref: ".octon/generated/effective/capabilities/pack-routes.effective.yml"
@@ -16,6 +17,27 @@ forbidden_runtime_authority_roots:
   - ".octon/inputs/**"
   - ".octon/generated/cognition/**"
   - ".octon/generated/proposals/**"
+runtime_effective_handle_kinds:
+  runtime_route_bundle:
+    output_ref: ".octon/generated/effective/runtime/route-bundle.yml"
+    lock_ref: ".octon/generated/effective/runtime/route-bundle.lock.yml"
+    freshness_mode: "digest_bound"
+  pack_routes:
+    output_ref: ".octon/generated/effective/capabilities/pack-routes.effective.yml"
+    lock_ref: ".octon/generated/effective/capabilities/pack-routes.lock.yml"
+    freshness_mode: "digest_bound"
+  support_matrix:
+    output_ref: ".octon/generated/effective/governance/support-target-matrix.yml"
+    lock_ref: ""
+    freshness_mode: "digest_bound"
+  extension_catalog:
+    output_ref: ".octon/generated/effective/extensions/catalog.effective.yml"
+    lock_ref: ".octon/generated/effective/extensions/generation.lock.yml"
+    freshness_mode: "receipt_bound"
+  capability_routing:
+    output_ref: ".octon/generated/effective/capabilities/routing.effective.yml"
+    lock_ref: ".octon/generated/effective/capabilities/generation.lock.yml"
+    freshness_mode: "receipt_bound"
 runtime_inputs:
   proposals_registry: ".octon/generated/proposals/registry.yml"
   continuity: ".octon/state/continuity/"

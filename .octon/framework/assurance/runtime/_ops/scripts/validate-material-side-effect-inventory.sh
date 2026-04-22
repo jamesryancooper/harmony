@@ -7,7 +7,7 @@ OCTON_DIR="${OCTON_DIR_OVERRIDE:-$DEFAULT_OCTON_DIR}"
 ROOT_DIR="${OCTON_ROOT_DIR:-$(cd -- "$OCTON_DIR/.." && pwd)}"
 SCHEMA="$OCTON_DIR/framework/engine/runtime/spec/material-side-effect-inventory-v1.schema.json"
 INVENTORY="$OCTON_DIR/framework/engine/runtime/spec/material-side-effect-inventory.yml"
-RECEIPT="$OCTON_DIR/state/evidence/validation/architecture-target-state-transition/authorization-boundary/coverage.yml"
+RECEIPT="$OCTON_DIR/state/evidence/validation/architecture/10of10-target-transition/authorization-boundary/coverage.yml"
 
 errors=0
 fail() { echo "[ERROR] $1"; errors=$((errors + 1)); }

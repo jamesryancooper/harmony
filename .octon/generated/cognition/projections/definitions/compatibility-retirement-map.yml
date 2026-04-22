@@ -6,7 +6,7 @@ sources:
   - /.octon/framework/cognition/_meta/architecture/contract-registry.yml
   - /.octon/instance/governance/retirement-register.yml
   - /.octon/instance/governance/contracts/retirement-policy.yml
-  - /.octon/state/evidence/validation/architecture-target-state-transition/compatibility/retirement.yml
+  - /.octon/state/evidence/validation/architecture/10of10-target-transition/compatibility/retirement.yml
 
 refresh:
   mode: on-change
@@ -14,7 +14,7 @@ refresh:
     - .octon/framework/cognition/_meta/architecture/contract-registry.yml
     - .octon/instance/governance/retirement-register.yml
     - .octon/instance/governance/contracts/retirement-policy.yml
-    - .octon/state/evidence/validation/architecture-target-state-transition/compatibility/**
+    - .octon/state/evidence/validation/architecture/10of10-target-transition/compatibility/**
 
 materialization:
   output: ../materialized/compatibility-retirement-map.md

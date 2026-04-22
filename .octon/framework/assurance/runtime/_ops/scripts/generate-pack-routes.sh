@@ -12,6 +12,7 @@ SUPPORT_TARGETS="$OCTON_DIR/instance/governance/support-targets.yml"
 GOV_REGISTRY="$OCTON_DIR/instance/governance/capability-packs/registry.yml"
 RUNTIME_REGISTRY="$OCTON_DIR/instance/capabilities/runtime/packs/registry.yml"
 SUPPORT_MATRIX="$OCTON_DIR/generated/effective/governance/support-target-matrix.yml"
+ROOT_MANIFEST="$OCTON_DIR/octon.yml"
 
 mkdir -p "$EFFECTIVE_DIR" "$RECEIPT_DIR"
 
@@ -29,6 +30,7 @@ support_sha="$(hash_file "$SUPPORT_TARGETS")"
 gov_sha="$(hash_file "$GOV_REGISTRY")"
 runtime_sha="$(hash_file "$RUNTIME_REGISTRY")"
 matrix_sha="$(hash_file "$SUPPORT_MATRIX")"
+root_sha="$(hash_file "$ROOT_MANIFEST")"
 generation_id="pack-routes-${support_sha:0:12}"
 receipt_rel=".octon/state/evidence/validation/publication/capabilities/${stamp_id}-${generation_id}.yml"
 receipt_abs="$ROOT_DIR/$receipt_rel"
@@ -88,11 +90,28 @@ out_sha="$(hash_file "$tmp_out")"
   echo "publication_receipt_path: \"$receipt_rel\""
   echo 'publication_receipt_sha256: ""'
   echo "pack_routes_sha256: \"$out_sha\""
+  echo "root_manifest_sha256: \"$root_sha\""
   echo "support_targets_sha256: \"$support_sha\""
   echo "governance_registry_sha256: \"$gov_sha\""
   echo "runtime_registry_sha256: \"$runtime_sha\""
   echo "support_target_matrix_sha256: \"$matrix_sha\""
+  echo 'freshness:'
+  echo '  mode: "digest_bound"'
+  echo '  invalidation_conditions:'
+  echo '    - "root-manifest-sha-changed"'
+  echo '    - "support-targets-sha-changed"'
+  echo '    - "governance-pack-registry-sha-changed"'
+  echo '    - "runtime-pack-registry-sha-changed"'
+  echo '    - "support-matrix-sha-changed"'
+  echo 'allowed_consumers:'
+  echo '  - "runtime_resolver"'
+  echo '  - "validators"'
+  echo 'forbidden_consumers:'
+  echo '  - "direct_runtime_raw_path_read"'
+  echo '  - "generated_cognition_as_authority"'
+  echo 'non_authority_classification: "derived-runtime-handle"'
   echo 'required_inputs:'
+  echo '  - ".octon/octon.yml"'
   echo '  - ".octon/instance/governance/support-targets.yml"'
   echo '  - ".octon/instance/governance/capability-packs/registry.yml"'
   echo '  - ".octon/instance/capabilities/runtime/packs/registry.yml"'
@@ -102,11 +121,6 @@ out_sha="$(hash_file "$tmp_out")"
     echo "  - \".octon/instance/governance/capability-packs/$pack_id.yml\""
     echo "  - \".octon/instance/capabilities/runtime/packs/admissions/$pack_id.yml\""
   done < <(yq -r '.packs[]?.pack_id // ""' "$GOV_REGISTRY")
-  echo 'invalidation_conditions:'
-  echo '  - support-targets-sha-changed'
-  echo '  - governance-pack-registry-sha-changed'
-  echo '  - runtime-pack-registry-sha-changed'
-  echo '  - support-matrix-sha-changed'
   echo 'published_files:'
   echo '  - path: ".octon/generated/effective/capabilities/pack-routes.effective.yml"'
   echo '  - path: ".octon/generated/effective/capabilities/pack-routes.lock.yml"'
@@ -127,6 +141,7 @@ cp "$tmp_lock" "$LOCK_FILE"
   echo '  - ".octon/framework/engine/runtime/spec/runtime-resolution-v1.md"'
   echo '  - ".octon/instance/governance/contracts/support-pack-admission-alignment.yml"'
   echo 'source_digests:'
+  echo "  root_manifest_sha256: \"$root_sha\""
   echo "  support_targets_sha256: \"$support_sha\""
   echo "  governance_registry_sha256: \"$gov_sha\""
   echo "  runtime_registry_sha256: \"$runtime_sha\""

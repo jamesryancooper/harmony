@@ -33,7 +33,7 @@ support_admission_ref: .octon/instance/governance/support-target-admissions/live
 proof_bundle_ref: .octon/state/evidence/validation/support-targets/ci-observe-read-en.yml
 support_card_ref: .octon/generated/cognition/projections/materialized/support-cards/ci-observe-read-en.yml
 review_due_at: "2026-06-30T00:00:00Z"
-last_recertification_receipt_ref: .octon/state/evidence/validation/architecture-target-state-transition/support-targets/proofing.yml
+last_recertification_receipt_ref: .octon/state/evidence/validation/architecture/10of10-target-transition/support-targets/proof-refresh.yml
 sufficiency:
   required_proof_planes:
     - structural
