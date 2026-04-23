@@ -20,6 +20,24 @@ generated_at: 2026-04-23T15:00:07.672972Z
 intervention_ref: .octon/state/evidence/runs/protected-ci-1776956405637-68212/interventions/log.yml
 known_limits:
 - Support posture remains bounded to the support-target declaration under .octon/instance/governance/support-targets.yml.
+runtime_artifact_depth:
+  validation_status: pass
+  replay_integrity: pass
+  stage_attempts:
+    applicable: true
+    present: true
+  checkpoints:
+    applicable: true
+    present: true
+  continuity:
+    applicable: true
+    present: true
+  contamination:
+    applicable: true
+    present: true
+  retries:
+    applicable: true
+    present: true
 measurement_ref: .octon/state/evidence/runs/protected-ci-1776956405637-68212/measurements/summary.yml
 proof_plane_refs:
   behavioral: .octon/state/evidence/runs/protected-ci-1776956405637-68212/assurance/behavioral.yml

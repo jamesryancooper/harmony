@@ -1,0 +1,24 @@
+schema_version: external-replay-index-v1
+index_id: external-replay-protected-ci-1776956405637-68212
+scope: run
+run_id: protected-ci-1776956405637-68212
+entries:
+  - entry_id: protected-ci-1776956405637-68212-replay-payload
+    run_id: protected-ci-1776956405637-68212
+    artifact_kind: replay-payload
+    evidence_class: C
+    storage_class: external-immutable
+    content_digest: sha256:1b0182fe4f13bb399f6a4bc679df4f340b266dd7254484aa27c5644da6725846
+    locator: immutable://octon/replays/protected-ci-1776956405637-68212/bundle.jsonl
+    manifest_ref: .octon/state/evidence/runs/protected-ci-1776956405637-68212/replay/manifest.yml
+    recorded_at: "2026-04-23T15:00:07.672972Z"
+  - entry_id: protected-ci-1776956405637-68212-trace-payload
+    run_id: protected-ci-1776956405637-68212
+    artifact_kind: trace-payload
+    evidence_class: C
+    storage_class: external-immutable
+    content_digest: sha256:d92af78b326985cfc50dc6fdf0abea36f5cfe4b1399c897b268c006eed269bed
+    locator: immutable://octon/replays/protected-ci-1776956405637-68212/trace.jsonl
+    manifest_ref: .octon/state/evidence/runs/protected-ci-1776956405637-68212/replay/manifest.yml
+    recorded_at: "2026-04-23T15:00:07.672972Z"
+updated_at: "2026-04-23T15:00:07.672972Z"

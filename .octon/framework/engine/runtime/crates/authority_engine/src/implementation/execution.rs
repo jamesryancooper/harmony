@@ -2573,6 +2573,51 @@ fn materialize_run_disclosure(
         }),
     )?;
 
+    let external_index_path = repo_root
+        .join(".octon/state/evidence/external-index/runs")
+        .join(format!("{}.yml", request.request_id));
+    fs::create_dir_all(
+        external_index_path
+            .parent()
+            .expect("external index parent should exist"),
+    )?;
+    let replay_manifest_digest = sha256_file(&bound.replay_manifest_path);
+    let trace_pointer_digest = sha256_file(&bound.evidence_root.join("trace-pointers.yml"));
+    write_yaml(
+        &external_index_path,
+        &json!({
+            "schema_version": "external-replay-index-v1",
+            "index_id": format!("external-replay-{}", request.request_id),
+            "scope": "run",
+            "run_id": request.request_id,
+            "entries": [
+                {
+                    "entry_id": format!("{}-replay-payload", request.request_id),
+                    "run_id": request.request_id,
+                    "artifact_kind": "replay-payload",
+                    "evidence_class": "C",
+                    "storage_class": "external-immutable",
+                    "content_digest": format!("sha256:{}", replay_manifest_digest),
+                    "locator": format!("immutable://octon/replays/{}/bundle.jsonl", request.request_id),
+                    "manifest_ref": path_tail(repo_root, &bound.replay_manifest_path),
+                    "recorded_at": outcome.completed_at,
+                },
+                {
+                    "entry_id": format!("{}-trace-payload", request.request_id),
+                    "run_id": request.request_id,
+                    "artifact_kind": "trace-payload",
+                    "evidence_class": "C",
+                    "storage_class": "external-immutable",
+                    "content_digest": format!("sha256:{}", trace_pointer_digest),
+                    "locator": format!("immutable://octon/replays/{}/trace.jsonl", request.request_id),
+                    "manifest_ref": path_tail(repo_root, &bound.replay_manifest_path),
+                    "recorded_at": outcome.completed_at,
+                }
+            ],
+            "updated_at": outcome.completed_at,
+        }),
+    )?;
+
     let support_posture = grant.support_posture.clone().unwrap_or_default();
     let host_adapter = support_posture
         .host_adapter_id
@@ -2616,6 +2661,47 @@ fn materialize_run_disclosure(
             outcome.status
         ));
     }
+    let execution_complete_checkpoint_path = bound
+        .control_root
+        .join("checkpoints")
+        .join("execution-complete.yml");
+    let contamination_path = bound.control_root.join("contamination").join("current.yml");
+    let retry_path = bound.control_root.join("retry-records").join("baseline.yml");
+    let runtime_artifact_depth = json!({
+        "validation_status": if outcome.status == "succeeded"
+            && bound.stage_attempt_path.is_file()
+            && execution_complete_checkpoint_path.is_file()
+            && bound.continuity_handoff_path.is_file()
+            && contamination_path.is_file()
+            && retry_path.is_file()
+            && bound.replay_manifest_path.is_file()
+        {
+            "pass"
+        } else {
+            "review-required"
+        },
+        "replay_integrity": if bound.replay_manifest_path.is_file() { "pass" } else { "fail" },
+        "stage_attempts": {
+            "applicable": true,
+            "present": bound.stage_attempt_path.is_file(),
+        },
+        "checkpoints": {
+            "applicable": true,
+            "present": execution_complete_checkpoint_path.is_file(),
+        },
+        "continuity": {
+            "applicable": true,
+            "present": bound.continuity_handoff_path.is_file(),
+        },
+        "contamination": {
+            "applicable": true,
+            "present": contamination_path.is_file(),
+        },
+        "retries": {
+            "applicable": true,
+            "present": retry_path.is_file(),
+        }
+    });
 
     let run_card_path = bound.disclosure_root.join("run-card.yml");
     write_yaml(
@@ -2668,6 +2754,7 @@ fn materialize_run_disclosure(
             "replay_ref": path_tail(repo_root, &bound.replay_manifest_path),
             "recovery_ref": path_tail(repo_root, &bound.assurance_root.join("recovery.yml")),
             "known_limits": known_limits,
+            "runtime_artifact_depth": runtime_artifact_depth,
             "generated_at": outcome.completed_at,
         }),
     )?;
