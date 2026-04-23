@@ -1750,6 +1750,19 @@ mod tests {
         });
     }
 
+    fn fixture_yaml_string(path: &Path, query: &str) -> Option<String> {
+        let raw = fs::read_to_string(path).ok()?;
+        let value: serde_yaml::Value = serde_yaml::from_str(&raw).ok()?;
+        let mut current = &value;
+        for segment in query.trim_start_matches('.').split('.') {
+            if segment.is_empty() {
+                continue;
+            }
+            current = current.get(segment)?;
+        }
+        current.as_str().map(ToOwned::to_owned)
+    }
+
     fn seed_generic_workflow_fixture(root: &Path) -> PathBuf {
         seed_policy_runtime_env();
         let octon_dir = root.join(".octon");
@@ -1829,16 +1842,20 @@ mod tests {
             octon_dir.join("generated/effective/extensions/generation.lock.yml"),
         )
         .expect("copy extension generation lock");
-        copy_fixture_ref(
-            root,
-            &source_repo_root(),
-            ".octon/state/evidence/validation/publication/capabilities/2026-04-22T19-02-10Z-pack-routes-f66aed7b3fdd.yml",
-        );
-        copy_fixture_ref(
-            root,
-            &source_repo_root(),
-            ".octon/state/evidence/validation/publication/extensions/2026-04-22T19-03-58Z-extensions-090beb843d30.yml",
-        );
+        let active_pack_routes_receipt_ref = fixture_yaml_string(
+            &source_repo_root()
+                .join(".octon/generated/effective/capabilities/pack-routes.lock.yml"),
+            ".publication_receipt_path",
+        )
+        .expect("read active pack-routes receipt ref");
+        copy_fixture_ref(root, &source_repo_root(), &active_pack_routes_receipt_ref);
+        let active_extension_receipt_ref = fixture_yaml_string(
+            &source_repo_root()
+                .join(".octon/generated/effective/extensions/generation.lock.yml"),
+            ".publication_receipt_path",
+        )
+        .expect("read active extension publication receipt ref");
+        copy_fixture_ref(root, &source_repo_root(), &active_extension_receipt_ref);
         fs::copy(
             source_repo_root().join(".octon/state/control/extensions/active.yml"),
             octon_dir.join("state/control/extensions/active.yml"),
