@@ -1,0 +1,52 @@
+{
+  "touched_scope": [
+    "github://repo/example/repo/pull/17/merge"
+  ],
+  "shell_commands": [
+    "/tmp/octon-protected-ci-refresh.PeVLRG/gh api --method PUT repos/example/repo/pulls/17/merge -f merge_method=squash",
+    "/tmp/octon-protected-ci-refresh.PeVLRG/gh api --method DELETE repos/example/repo/git/refs/heads/feature%2Fexample"
+  ],
+  "network_targets": [],
+  "publications": [],
+  "branch_mutations": [],
+  "executor_profile": "scoped_repo_mutation",
+  "dangerous_flags_blocked": [],
+  "authorized_effects": [
+    {
+      "token_id": "effect-token-evidence-mutation-d8a0e1d71b1a",
+      "token_type": "AuthorizedEffect<EvidenceMutation>",
+      "effect_kind": "evidence-mutation",
+      "scope_ref": "/Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/kernel/protected-ci-1776956405637-68212",
+      "token_record_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/effect-tokens/effect-token-evidence-mutation-d8a0e1d71b1a.json",
+      "consumption_receipt_ref": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/effect-tokens/effect-token-evidence-mutation-d8a0e1d71b1a/consumption-92fa21bad004.json",
+      "journal_event_refs": [
+        ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumption-requested-effect-token-evidence-mutation-d8a0e1d71b1a",
+        ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumed-effect-token-evidence-mutation-d8a0e1d71b1a"
+      ]
+    },
+    {
+      "token_id": "effect-token-protected-ci-check-75eea2626c67",
+      "token_type": "AuthorizedEffect<ProtectedCiCheck>",
+      "effect_kind": "protected-ci-check",
+      "scope_ref": "github://repo/example/repo/pull/17/merge",
+      "token_record_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/effect-tokens/effect-token-protected-ci-check-75eea2626c67.json",
+      "consumption_receipt_ref": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/effect-tokens/effect-token-protected-ci-check-75eea2626c67/consumption-35910427b914.json",
+      "journal_event_refs": [
+        ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumption-requested-effect-token-protected-ci-check-75eea2626c67",
+        ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumed-effect-token-protected-ci-check-75eea2626c67"
+      ]
+    },
+    {
+      "token_id": "effect-token-state-control-mutation-3c19e6ccec34",
+      "token_type": "AuthorizedEffect<StateControlMutation>",
+      "effect_kind": "state-control-mutation",
+      "scope_ref": "/Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/kernel/protected-ci-1776956405637-68212",
+      "token_record_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/effect-tokens/effect-token-state-control-mutation-3c19e6ccec34.json",
+      "consumption_receipt_ref": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/effect-tokens/effect-token-state-control-mutation-3c19e6ccec34/consumption-77ded47523af.json",
+      "journal_event_refs": [
+        ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumption-requested-effect-token-state-control-mutation-3c19e6ccec34",
+        ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumed-effect-token-state-control-mutation-3c19e6ccec34"
+      ]
+    }
+  ]
+}

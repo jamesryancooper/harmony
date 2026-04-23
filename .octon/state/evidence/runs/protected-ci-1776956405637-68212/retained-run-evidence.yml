@@ -1,0 +1,29 @@
+schema_version: retained-run-evidence-v1
+run_id: protected-ci-1776956405637-68212
+evidence_refs:
+  authority_decision: .octon/state/evidence/control/execution/authority-decision-protected-ci-1776956405637-68212.yml
+  authority_grant_bundle: .octon/state/evidence/control/execution/authority-grant-bundle-protected-ci-1776956405637-68212.yml
+  authorization_phase_grant: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/authorization-phases/grant.json
+  authorization_phase_preflight: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/authorization-phases/preflight.json
+  authorization_phase_receipt_materialization: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/authorization-phases/receipt-materialization.json
+  authorization_phase_request_materialization: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/authorization-phases/request-materialization.json
+  contamination_record: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/contamination/current.yml
+  control_checkpoint: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/checkpoints/bound.yml
+  evidence_checkpoint: .octon/state/evidence/runs/protected-ci-1776956405637-68212/checkpoints/bound.yml
+  execution_receipt: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/execution-receipt.json
+  execution_request: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/execution-request.json
+  grant_bundle: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/grant-bundle.json
+  instruction_manifest: .octon/state/evidence/runs/protected-ci-1776956405637-68212/instruction-layer-manifest.json
+  outcome: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/outcome.json
+  policy_decision: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/policy-decision.json
+  policy_digest: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/policy-digest.latest.md
+  policy_receipt: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/policy-receipt.latest.json
+  replay_pointers: .octon/state/evidence/runs/protected-ci-1776956405637-68212/replay-pointers.yml
+  retry_record: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/retry-records/baseline.yml
+  rollback_posture: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/rollback-posture.yml
+  run_contract: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml
+  run_manifest: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-manifest.yml
+  runtime_state: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/runtime-state.yml
+  side_effects: .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/side-effects.json
+  trace_pointers: .octon/state/evidence/runs/protected-ci-1776956405637-68212/trace-pointers.yml
+updated_at: 2026-04-23T15:00:07.74064Z

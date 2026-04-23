@@ -57,6 +57,8 @@ At minimum, the live runtime must journal:
 
 - run creation and binding,
 - authority request and resolution,
+- effect-token request, mint or deny, consumption request, consume or reject,
+  and expiry or revocation when applicable,
 - checkpoint creation,
 - capability authorization and invocation,
 - terminal capability outcome,
@@ -66,6 +68,11 @@ At minimum, the live runtime must journal:
 
 Material side effects must not occur before the authorization path and journal
 coverage for that effect have been recorded.
+
+Token lifecycle coverage may use canonical effect-token event types or
+equivalent typed journal items, but the retained journal must make token
+provenance, verification, and consumption falsifiable for every material
+effect.
 
 ## Runtime-State Materialization
 

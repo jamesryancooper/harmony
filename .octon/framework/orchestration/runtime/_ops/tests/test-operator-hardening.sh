@@ -86,6 +86,11 @@ create_fixture() {
     "$fixture_root/.octon/framework/orchestration/runtime/workflows/example/sample" \
     "$fixture_root/.octon/state/evidence/decisions/repo/dec-001" \
     "$fixture_root/.octon/state/evidence/runs/run-001" \
+    "$fixture_root/.octon/state/control/extensions" \
+    "$fixture_root/.octon/state/evidence/validation/publication/capabilities" \
+    "$fixture_root/.octon/state/evidence/validation/publication/extensions" \
+    "$fixture_root/.octon/state/evidence/validation/compatibility/extensions" \
+    "$fixture_root/.octon/state/evidence/validation/extensions/prompt-alignment" \
     "$fixture_root/.octon/state/evidence/validation/publication/runtime" \
     "$fixture_root/.octon/framework/orchestration/governance" \
     "$fixture_root/.octon/framework/engine/runtime/config" \
@@ -94,7 +99,10 @@ create_fixture() {
     "$fixture_root/.octon/generated/effective/governance" \
     "$fixture_root/.octon/generated/effective/capabilities" \
     "$fixture_root/.octon/generated/effective/extensions" \
+    "$fixture_root/.octon/generated/effective/locality" \
     "$fixture_root/.octon/instance/governance" \
+    "$fixture_root/.octon/instance/governance/capability-packs" \
+    "$fixture_root/.octon/instance/capabilities/runtime/packs/admissions" \
     "$fixture_root/.octon/framework/engine/runtime/spec"
 
   cp "$REPO_ROOT/.octon/framework/engine/runtime/spec/service-manifest-v1.schema.json" \
@@ -104,22 +112,59 @@ create_fixture() {
     "$fixture_root/.octon/framework/engine/runtime/config/policy.yml"
   cp "$REPO_ROOT/.octon/instance/governance/runtime-resolution.yml" \
     "$fixture_root/.octon/instance/governance/runtime-resolution.yml"
+  cp "$REPO_ROOT/.octon/instance/governance/support-targets.yml" \
+    "$fixture_root/.octon/instance/governance/support-targets.yml"
+  cp "$REPO_ROOT/.octon/instance/governance/capability-packs/registry.yml" \
+    "$fixture_root/.octon/instance/governance/capability-packs/registry.yml"
+  cp "$REPO_ROOT/.octon/instance/capabilities/runtime/packs/registry.yml" \
+    "$fixture_root/.octon/instance/capabilities/runtime/packs/registry.yml"
+  local capability_pack
+  for capability_pack in repo git shell telemetry browser api; do
+    cp "$REPO_ROOT/.octon/instance/governance/capability-packs/${capability_pack}.yml" \
+      "$fixture_root/.octon/instance/governance/capability-packs/${capability_pack}.yml"
+    cp "$REPO_ROOT/.octon/instance/capabilities/runtime/packs/admissions/${capability_pack}.yml" \
+      "$fixture_root/.octon/instance/capabilities/runtime/packs/admissions/${capability_pack}.yml"
+  done
   cp "$REPO_ROOT/.octon/generated/effective/runtime/route-bundle.yml" \
     "$fixture_root/.octon/generated/effective/runtime/route-bundle.yml"
   cp "$REPO_ROOT/.octon/generated/effective/runtime/route-bundle.lock.yml" \
     "$fixture_root/.octon/generated/effective/runtime/route-bundle.lock.yml"
   cp "$REPO_ROOT/.octon/generated/effective/governance/support-target-matrix.yml" \
     "$fixture_root/.octon/generated/effective/governance/support-target-matrix.yml"
+  cp "$REPO_ROOT/.octon/generated/effective/capabilities/routing.effective.yml" \
+    "$fixture_root/.octon/generated/effective/capabilities/routing.effective.yml"
+  cp "$REPO_ROOT/.octon/generated/effective/capabilities/artifact-map.yml" \
+    "$fixture_root/.octon/generated/effective/capabilities/artifact-map.yml"
+  cp "$REPO_ROOT/.octon/generated/effective/capabilities/generation.lock.yml" \
+    "$fixture_root/.octon/generated/effective/capabilities/generation.lock.yml"
+  cp "$REPO_ROOT/.octon/generated/effective/locality/scopes.effective.yml" \
+    "$fixture_root/.octon/generated/effective/locality/scopes.effective.yml"
+  cp "$REPO_ROOT/.octon/generated/effective/locality/generation.lock.yml" \
+    "$fixture_root/.octon/generated/effective/locality/generation.lock.yml"
   cp "$REPO_ROOT/.octon/generated/effective/capabilities/pack-routes.effective.yml" \
     "$fixture_root/.octon/generated/effective/capabilities/pack-routes.effective.yml"
   cp "$REPO_ROOT/.octon/generated/effective/capabilities/pack-routes.lock.yml" \
     "$fixture_root/.octon/generated/effective/capabilities/pack-routes.lock.yml"
   cp "$REPO_ROOT/.octon/generated/effective/extensions/catalog.effective.yml" \
     "$fixture_root/.octon/generated/effective/extensions/catalog.effective.yml"
+  cp "$REPO_ROOT/.octon/generated/effective/extensions/artifact-map.yml" \
+    "$fixture_root/.octon/generated/effective/extensions/artifact-map.yml"
   cp "$REPO_ROOT/.octon/generated/effective/extensions/generation.lock.yml" \
     "$fixture_root/.octon/generated/effective/extensions/generation.lock.yml"
+  cp "$REPO_ROOT/.octon/state/control/extensions/active.yml" \
+    "$fixture_root/.octon/state/control/extensions/active.yml"
+  cp "$REPO_ROOT/.octon/state/control/extensions/quarantine.yml" \
+    "$fixture_root/.octon/state/control/extensions/quarantine.yml"
   cp -R "$REPO_ROOT/.octon/state/evidence/validation/publication/runtime/." \
     "$fixture_root/.octon/state/evidence/validation/publication/runtime/"
+  cp -R "$REPO_ROOT/.octon/state/evidence/validation/publication/capabilities/." \
+    "$fixture_root/.octon/state/evidence/validation/publication/capabilities/"
+  cp -R "$REPO_ROOT/.octon/state/evidence/validation/publication/extensions/." \
+    "$fixture_root/.octon/state/evidence/validation/publication/extensions/"
+  cp -R "$REPO_ROOT/.octon/state/evidence/validation/compatibility/extensions/." \
+    "$fixture_root/.octon/state/evidence/validation/compatibility/extensions/"
+  cp -R "$REPO_ROOT/.octon/state/evidence/validation/extensions/prompt-alignment/." \
+    "$fixture_root/.octon/state/evidence/validation/extensions/prompt-alignment/"
 
   cat > "$fixture_root/.octon/framework/orchestration/runtime/queue/registry.yml" <<'EOF'
 schema_version: "orchestration-queue-registry-v1"

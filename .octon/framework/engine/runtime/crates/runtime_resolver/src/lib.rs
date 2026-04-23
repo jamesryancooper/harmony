@@ -225,7 +225,11 @@ impl VerifiedRuntimeRouteBundle {
             ));
         }
         for pack_id in requested_capability_packs {
-            if !route.allowed_capability_packs.iter().any(|allowed| allowed == pack_id) {
+            if !route
+                .allowed_capability_packs
+                .iter()
+                .any(|allowed| allowed == pack_id)
+            {
                 return Err(anyhow!(
                     "CAPABILITY_DENIED: runtime route bundle denied requested capability pack '{}'",
                     pack_id
@@ -269,8 +273,8 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
     let resolution_bytes = fs::read(&resolution_path)
         .with_context(|| format!("failed to read {}", resolution_path.display()))?;
     let resolution_digest = sha256_hex(&resolution_bytes);
-    let resolution: RuntimeResolutionRecord =
-        serde_yaml::from_slice(&resolution_bytes).context("runtime-resolution selector is not valid YAML")?;
+    let resolution: RuntimeResolutionRecord = serde_yaml::from_slice(&resolution_bytes)
+        .context("runtime-resolution selector is not valid YAML")?;
     if resolution.schema_version != "octon-runtime-resolution-v1" {
         return Err(anyhow!(
             "INVALID_INPUT: unsupported runtime-resolution schema '{}'",
@@ -279,12 +283,16 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
     }
 
     let bundle_path = resolve_repo_path(root_dir, &resolution.runtime_effective_route_bundle_ref);
-    let lock_path = resolve_repo_path(root_dir, &resolution.runtime_effective_route_bundle_lock_ref);
-    let pack_routes_effective_path = resolve_repo_path(root_dir, &resolution.pack_routes_effective_ref);
+    let lock_path = resolve_repo_path(
+        root_dir,
+        &resolution.runtime_effective_route_bundle_lock_ref,
+    );
+    let pack_routes_effective_path =
+        resolve_repo_path(root_dir, &resolution.pack_routes_effective_ref);
     let pack_routes_lock_path = resolve_repo_path(root_dir, &resolution.pack_routes_lock_ref);
 
-    let bundle_bytes =
-        fs::read(&bundle_path).with_context(|| format!("failed to read {}", bundle_path.display()))?;
+    let bundle_bytes = fs::read(&bundle_path)
+        .with_context(|| format!("failed to read {}", bundle_path.display()))?;
     let bundle_sha256 = sha256_hex(&bundle_bytes);
     let bundle: RuntimeEffectiveRouteBundle =
         serde_yaml::from_slice(&bundle_bytes).context("runtime route bundle is not valid YAML")?;
@@ -297,8 +305,8 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
 
     let lock_bytes =
         fs::read(&lock_path).with_context(|| format!("failed to read {}", lock_path.display()))?;
-    let lock: RuntimeEffectiveRouteBundleLock =
-        serde_yaml::from_slice(&lock_bytes).context("runtime route bundle lock is not valid YAML")?;
+    let lock: RuntimeEffectiveRouteBundleLock = serde_yaml::from_slice(&lock_bytes)
+        .context("runtime route bundle lock is not valid YAML")?;
     if lock.schema_version != "octon-runtime-effective-route-bundle-lock-v1"
         && lock.schema_version != "octon-runtime-effective-route-bundle-lock-v2"
         && lock.schema_version != "octon-runtime-effective-route-bundle-lock-v3"
@@ -309,15 +317,23 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
         ));
     }
     if bundle.generation_id != lock.generation_id {
-        return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle generation_id mismatch"));
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle generation_id mismatch"
+        ));
     }
-    require_non_empty(&lock.publication_receipt_sha256, "publication_receipt_sha256")?;
+    require_non_empty(
+        &lock.publication_receipt_sha256,
+        "publication_receipt_sha256",
+    )?;
     require_non_empty(&lock.route_bundle_sha256, "route_bundle_sha256")?;
     require_non_empty(
         source_digest(&lock, "runtime_resolution_sha256"),
         "runtime_resolution_sha256",
     )?;
-    require_non_empty(source_digest(&lock, "root_manifest_sha256"), "root_manifest_sha256")?;
+    require_non_empty(
+        source_digest(&lock, "root_manifest_sha256"),
+        "root_manifest_sha256",
+    )?;
     require_non_empty(
         source_digest(&lock, "support_target_matrix_sha256"),
         "support_target_matrix_sha256",
@@ -340,10 +356,14 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
     )?;
 
     if lock.route_bundle_sha256 != bundle_sha256 {
-        return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle digest drift detected"));
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle digest drift detected"
+        ));
     }
     if source_digest(&lock, "runtime_resolution_sha256") != resolution_digest {
-        return Err(anyhow!("CAPABILITY_DENIED: runtime-resolution selector digest drift detected"));
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime-resolution selector digest drift detected"
+        ));
     }
 
     if lock.schema_version == "octon-runtime-effective-route-bundle-lock-v2"
@@ -372,34 +392,46 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
         let fresh_until = OffsetDateTime::parse(lock.fresh_until.trim(), &Rfc3339)
             .context("runtime route bundle lock fresh_until is not valid RFC3339")?;
         if fresh_until <= OffsetDateTime::now_utc() {
-            return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle freshness window expired"));
+            return Err(anyhow!(
+                "CAPABILITY_DENIED: runtime route bundle freshness window expired"
+            ));
         }
     }
 
     let receipt_path = resolve_repo_path(root_dir, &lock.publication_receipt_path);
-    let receipt_bytes =
-        fs::read(&receipt_path).with_context(|| format!("failed to read {}", receipt_path.display()))?;
+    let receipt_bytes = fs::read(&receipt_path)
+        .with_context(|| format!("failed to read {}", receipt_path.display()))?;
     let receipt_sha256 = sha256_hex(&receipt_bytes);
-    let receipt: PublicationReceipt =
-        serde_yaml::from_slice(&receipt_bytes).context("runtime route bundle receipt is not valid YAML")?;
+    let receipt: PublicationReceipt = serde_yaml::from_slice(&receipt_bytes)
+        .context("runtime route bundle receipt is not valid YAML")?;
     if lock.publication_receipt_sha256 != receipt_sha256 {
-        return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle publication receipt digest drift detected"));
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle publication receipt digest drift detected"
+        ));
     }
     if receipt.schema_version != "octon-validation-publication-receipt-v1" {
-        return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle receipt schema is not current"));
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle receipt schema is not current"
+        ));
     }
     if receipt.generation_id != bundle.generation_id {
-        return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle receipt generation mismatch"));
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle receipt generation mismatch"
+        ));
     }
     if receipt.result != bundle.publication_status {
-        return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle receipt status mismatch"));
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle receipt status mismatch"
+        ));
     }
     if !receipt
         .published_paths
         .iter()
         .any(|path| path == &resolution.runtime_effective_route_bundle_ref)
     {
-        return Err(anyhow!("CAPABILITY_DENIED: runtime route bundle receipt does not publish the bundle path"));
+        return Err(anyhow!(
+            "CAPABILITY_DENIED: runtime route bundle receipt does not publish the bundle path"
+        ));
     }
 
     verify_optional_digest(
@@ -438,11 +470,8 @@ pub fn verify_runtime_route_bundle(octon_dir: &Path) -> Result<VerifiedRuntimeRo
         "support_matrix",
         "route_bundle_compiler",
     )?;
-    let _pack_routes = handles::verify_runtime_effective_handle(
-        octon_dir,
-        "pack_routes",
-        "runtime_resolver",
-    )?;
+    let _pack_routes =
+        handles::verify_runtime_effective_handle(octon_dir, "pack_routes", "runtime_resolver")?;
     let extension_catalog = handles::verify_runtime_effective_handle(
         octon_dir,
         "extension_catalog",

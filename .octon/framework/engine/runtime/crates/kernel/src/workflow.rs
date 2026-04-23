@@ -15,11 +15,14 @@ use walkdir::WalkDir;
 
 use crate::request;
 use octon_authority_engine::{
-    authorize_execution, build_executor_command, default_autonomy_context, finalize_execution,
-    now_rfc3339 as auth_now_rfc3339, resolve_executor_profile, write_execution_start,
+    authorize_execution, authorized_effect_reference, build_executor_command,
+    default_autonomy_context, finalize_execution, issue_evidence_mutation_effect,
+    issue_execution_artifact_effects, issue_repo_mutation_effect_with_mode,
+    now_rfc3339 as auth_now_rfc3339, resolve_executor_profile, verify_authorized_effect,
+    write_execution_start, AuthorizedEffect, AuthorizedEffectReference, EvidenceMutation,
     ExecutionArtifactEffects, ExecutionArtifactPaths, ExecutionOutcome, ExecutionRequest,
-    ExecutorCommandSpec, GrantBundle, ManagedExecutorKind, ReviewRequirements, ScopeConstraints,
-    SideEffectFlags, SideEffectSummary,
+    ExecutorCommandSpec, GrantBundle, ManagedExecutorKind, RepoMutation, ReviewRequirements,
+    ScopeConstraints, SideEffectFlags, SideEffectSummary,
 };
 
 const WORKFLOW_ID: &str = "audit-design-proposal";
@@ -608,7 +611,79 @@ struct AuthorizedWorkflowStage {
 }
 
 fn artifact_effects_for_root(root: &Path, grant: &GrantBundle) -> Result<ExecutionArtifactEffects> {
-    Ok(grant.execution_artifact_effects(root.display().to_string())?)
+    Ok(issue_execution_artifact_effects(
+        root,
+        grant,
+        root.display().to_string(),
+    )?)
+}
+
+fn write_file_with_verified_evidence_effect(
+    runtime_path: &Path,
+    grant: &GrantBundle,
+    effect: &AuthorizedEffect<EvidenceMutation>,
+    path: &Path,
+    contents: impl AsRef<[u8]>,
+    consumer_api_ref: &str,
+    authorized_effects: &mut Vec<AuthorizedEffectReference>,
+) -> Result<()> {
+    let verified = verify_authorized_effect(
+        runtime_path,
+        grant,
+        effect,
+        consumer_api_ref,
+        path.display().to_string(),
+    )?;
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).with_context(|| format!("create {}", parent.display()))?;
+    }
+    fs::write(path, contents).with_context(|| format!("write {}", path.display()))?;
+    authorized_effects.push(authorized_effect_reference(&verified));
+    Ok(())
+}
+
+fn create_dir_with_verified_repo_effect(
+    runtime_path: &Path,
+    grant: &GrantBundle,
+    effect: &AuthorizedEffect<RepoMutation>,
+    path: &Path,
+    consumer_api_ref: &str,
+    authorized_effects: &mut Vec<AuthorizedEffectReference>,
+) -> Result<()> {
+    let verified = verify_authorized_effect(
+        runtime_path,
+        grant,
+        effect,
+        consumer_api_ref,
+        path.display().to_string(),
+    )?;
+    fs::create_dir_all(path).with_context(|| format!("create {}", path.display()))?;
+    authorized_effects.push(authorized_effect_reference(&verified));
+    Ok(())
+}
+
+fn write_file_with_verified_repo_effect(
+    runtime_path: &Path,
+    grant: &GrantBundle,
+    effect: &AuthorizedEffect<RepoMutation>,
+    path: &Path,
+    contents: impl AsRef<[u8]>,
+    consumer_api_ref: &str,
+    authorized_effects: &mut Vec<AuthorizedEffectReference>,
+) -> Result<()> {
+    let verified = verify_authorized_effect(
+        runtime_path,
+        grant,
+        effect,
+        consumer_api_ref,
+        path.display().to_string(),
+    )?;
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).with_context(|| format!("create {}", parent.display()))?;
+    }
+    fs::write(path, contents).with_context(|| format!("write {}", path.display()))?;
+    authorized_effects.push(authorized_effect_reference(&verified));
+    Ok(())
 }
 
 fn authorize_workflow_stage(
@@ -3567,9 +3642,10 @@ impl Runner {
             side_effect_flags: SideEffectFlags {
                 write_repo: stage.class.is_file_writing(),
                 write_evidence: true,
-                shell: self.options.executor != ExecutorKind::Mock,
+                shell: !self.options.prepare_only && self.options.executor != ExecutorKind::Mock,
                 network: false,
-                model_invoke: self.options.executor != ExecutorKind::Mock,
+                model_invoke: !self.options.prepare_only
+                    && self.options.executor != ExecutorKind::Mock,
                 state_mutation: false,
                 publication: false,
                 branch_mutation: false,
@@ -3634,32 +3710,12 @@ impl Runner {
                 stage.id,
                 trim_md_suffix(stage.report_file)
             ));
-            fs::write(&prompt_packet_path, &prompt_markdown)
-                .with_context(|| format!("write prompt packet {}", prompt_packet_path.display()))
-                .map_err(|error| {
-                    RunFailure::new(
-                        FailureClass::PromptPacket,
-                        Some(stage.id),
-                        error.to_string(),
-                    )
-                })?;
 
             let relative_report_path = PathBuf::from("reports").join(stage.report_file);
             report_paths.insert(
                 stage.id.to_string(),
                 relative_report_path.display().to_string(),
             );
-
-            if self.options.prepare_only {
-                command_log.push(format!(
-                    "- stage {} | prepare-only | prompt_packet={} | report={}",
-                    stage.id,
-                    rel_path(&self.repo_root, &prompt_packet_path),
-                    relative_report_path.display()
-                ));
-                stage_outcomes.insert(stage.id.to_string(), StageOutcome::default());
-                continue;
-            }
 
             let package_before = if stage.class.is_file_writing() {
                 Some(snapshot_package(&self.target_package).map_err(|error| {
@@ -3721,6 +3777,65 @@ impl Runner {
                         error.to_string(),
                     )
                 })?;
+            let stage_evidence_effect = issue_evidence_mutation_effect(
+                &stage_artifact_root,
+                &stage_grant,
+                self.bundle_root.display().to_string(),
+                false,
+            )
+            .map_err(|error| {
+                RunFailure::new(
+                    FailureClass::ExecutorEnvironment,
+                    Some(stage.id),
+                    error.to_string(),
+                )
+            })?;
+            let stage_repo_effect = if stage.class.is_file_writing() {
+                Some(
+                    issue_repo_mutation_effect_with_mode(
+                        &stage_artifact_root,
+                        &stage_grant,
+                        self.target_package.display().to_string(),
+                        false,
+                    )
+                    .map_err(|error| {
+                        RunFailure::new(
+                            FailureClass::ExecutorEnvironment,
+                            Some(stage.id),
+                            error.to_string(),
+                        )
+                    })?,
+                )
+            } else {
+                None
+            };
+            let mut stage_authorized_effects = Vec::new();
+            write_file_with_verified_evidence_effect(
+                &stage_artifact_root,
+                &stage_grant,
+                &stage_evidence_effect,
+                &prompt_packet_path,
+                &prompt_markdown,
+                ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stages:prompt_packet",
+                &mut stage_authorized_effects,
+            )
+            .map_err(|error| {
+                RunFailure::new(
+                    FailureClass::PromptPacket,
+                    Some(stage.id),
+                    error.to_string(),
+                )
+            })?;
+            if self.options.prepare_only {
+                command_log.push(format!(
+                    "- stage {} | prepare-only | prompt_packet={} | report={}",
+                    stage.id,
+                    rel_path(&self.repo_root, &prompt_packet_path),
+                    relative_report_path.display()
+                ));
+                stage_outcomes.insert(stage.id.to_string(), StageOutcome::default());
+                continue;
+            }
             let stage_artifacts = write_execution_start(
                 &stage_artifact_root,
                 &stage_request,
@@ -3746,6 +3861,11 @@ impl Runner {
                 &prompt_markdown,
                 &report_path,
                 &log_path,
+                &stage_artifact_root,
+                &stage_grant,
+                &stage_evidence_effect,
+                stage_repo_effect.as_ref(),
+                &mut stage_authorized_effects,
             ) {
                 Ok(execution) => execution,
                 Err(error) => {
@@ -3768,6 +3888,7 @@ impl Runner {
                                 rel_path(&self.repo_root, &log_path),
                             ],
                             executor_profile: Some(Self::stage_executor_profile(stage).to_string()),
+                            authorized_effects: stage_authorized_effects.clone(),
                             ..SideEffectSummary::default()
                         },
                     );
@@ -3894,6 +4015,7 @@ impl Runner {
                     ],
                     executor_profile: Some(Self::stage_executor_profile(stage).to_string()),
                     dangerous_flags_blocked: execution.blocked_flags,
+                    authorized_effects: stage_authorized_effects,
                     ..SideEffectSummary::default()
                 },
             )
@@ -3918,10 +4040,25 @@ impl Runner {
         prompt_markdown: &str,
         report_path: &Path,
         log_path: &Path,
+        runtime_path: &Path,
+        grant: &GrantBundle,
+        evidence_effect: &AuthorizedEffect<EvidenceMutation>,
+        repo_effect: Option<&AuthorizedEffect<RepoMutation>>,
+        authorized_effects: &mut Vec<AuthorizedEffectReference>,
     ) -> Result<StageExecutionResult> {
         match resolve_executor(self.options.executor, self.options.executor_bin.as_deref())? {
             ResolvedExecutor::Mock => {
-                self.execute_stage_mock(stage, prompt_markdown, report_path, log_path)?;
+                self.execute_stage_mock(
+                    stage,
+                    prompt_markdown,
+                    report_path,
+                    log_path,
+                    runtime_path,
+                    grant,
+                    evidence_effect,
+                    repo_effect,
+                    authorized_effects,
+                )?;
                 Ok(StageExecutionResult {
                     executor_used: "mock".to_string(),
                     blocked_flags: Vec::new(),
@@ -3934,6 +4071,11 @@ impl Runner {
                     report_path,
                     log_path,
                     &executor_bin,
+                    runtime_path,
+                    grant,
+                    evidence_effect,
+                    repo_effect,
+                    authorized_effects,
                 )?;
                 Ok(StageExecutionResult {
                     executor_used: "codex".to_string(),
@@ -3947,6 +4089,11 @@ impl Runner {
                     report_path,
                     log_path,
                     &executor_bin,
+                    runtime_path,
+                    grant,
+                    evidence_effect,
+                    repo_effect,
+                    authorized_effects,
                 )?;
                 Ok(StageExecutionResult {
                     executor_used: "claude".to_string(),
@@ -3963,6 +4110,11 @@ impl Runner {
         report_path: &Path,
         log_path: &Path,
         executor_bin: &Path,
+        runtime_path: &Path,
+        grant: &GrantBundle,
+        evidence_effect: &AuthorizedEffect<EvidenceMutation>,
+        repo_effect: Option<&AuthorizedEffect<RepoMutation>>,
+        authorized_effects: &mut Vec<AuthorizedEffectReference>,
     ) -> Result<Vec<String>> {
         let profile =
             resolve_executor_profile(&self.runtime_cfg, Self::stage_executor_profile(stage))?;
@@ -3974,6 +4126,24 @@ impl Runner {
             model: self.options.model.as_deref(),
             profile,
         })?;
+        let report_effect = verify_authorized_effect(
+            runtime_path,
+            grant,
+            evidence_effect,
+            ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage_codex:report_output",
+            report_path.display().to_string(),
+        )?;
+        authorized_effects.push(authorized_effect_reference(&report_effect));
+        if let Some(repo_effect) = repo_effect {
+            let verified_repo_effect = verify_authorized_effect(
+                runtime_path,
+                grant,
+                repo_effect,
+                ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage_codex:executor_repo_scope",
+                self.target_package.display().to_string(),
+            )?;
+            authorized_effects.push(authorized_effect_reference(&verified_repo_effect));
+        }
 
         let output = run_command_with_stdin(
             &mut command,
@@ -3987,6 +4157,10 @@ impl Runner {
             executor_bin.display().to_string(),
             &output,
             log_path,
+            runtime_path,
+            grant,
+            evidence_effect,
+            authorized_effects,
         )?;
         if !output.status.success() {
             bail!(
@@ -4006,6 +4180,11 @@ impl Runner {
         report_path: &Path,
         log_path: &Path,
         executor_bin: &Path,
+        runtime_path: &Path,
+        grant: &GrantBundle,
+        evidence_effect: &AuthorizedEffect<EvidenceMutation>,
+        repo_effect: Option<&AuthorizedEffect<RepoMutation>>,
+        authorized_effects: &mut Vec<AuthorizedEffectReference>,
     ) -> Result<Vec<String>> {
         let profile =
             resolve_executor_profile(&self.runtime_cfg, Self::stage_executor_profile(stage))?;
@@ -4017,6 +4196,16 @@ impl Runner {
             model: self.options.model.as_deref(),
             profile,
         })?;
+        if let Some(repo_effect) = repo_effect {
+            let verified_repo_effect = verify_authorized_effect(
+                runtime_path,
+                grant,
+                repo_effect,
+                ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage_claude:executor_repo_scope",
+                self.target_package.display().to_string(),
+            )?;
+            authorized_effects.push(authorized_effect_reference(&verified_repo_effect));
+        }
 
         let output = run_command_with_stdin(
             &mut command,
@@ -4030,6 +4219,10 @@ impl Runner {
             executor_bin.display().to_string(),
             &output,
             log_path,
+            runtime_path,
+            grant,
+            evidence_effect,
+            authorized_effects,
         )?;
         if !output.status.success() {
             bail!(
@@ -4040,8 +4233,15 @@ impl Runner {
             );
         }
 
-        fs::write(report_path, &output.stdout)
-            .with_context(|| format!("write stage report {}", report_path.display()))?;
+        write_file_with_verified_evidence_effect(
+            runtime_path,
+            grant,
+            evidence_effect,
+            report_path,
+            &output.stdout,
+            ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage_claude:report",
+            authorized_effects,
+        )?;
         Ok(blocked_flags)
     }
 
@@ -4051,34 +4251,63 @@ impl Runner {
         prompt_markdown: &str,
         report_path: &Path,
         log_path: &Path,
+        runtime_path: &Path,
+        grant: &GrantBundle,
+        evidence_effect: &AuthorizedEffect<EvidenceMutation>,
+        repo_effect: Option<&AuthorizedEffect<RepoMutation>>,
+        authorized_effects: &mut Vec<AuthorizedEffectReference>,
     ) -> Result<()> {
         let mock_root = self.target_package.join(".octon-mock-runner");
-        fs::create_dir_all(&mock_root)
-            .with_context(|| format!("create mock artifact root {}", mock_root.display()))?;
-
         let (mutations, report_body) =
             build_mock_stage_artifacts(stage, &self.target_package, &mock_root, prompt_markdown)?;
 
-        for (path, contents) in mutations {
-            if let Some(parent) = path.parent() {
-                fs::create_dir_all(parent)
-                    .with_context(|| format!("create parent directory {}", parent.display()))?;
+        if !mutations.is_empty() {
+            let repo_effect = repo_effect.ok_or_else(|| {
+                anyhow::anyhow!("workflow mock execution requires a repo mutation effect")
+            })?;
+            create_dir_with_verified_repo_effect(
+                runtime_path,
+                grant,
+                repo_effect,
+                &mock_root,
+                ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage_mock:mock_root",
+                authorized_effects,
+            )?;
+            for (path, contents) in mutations {
+                write_file_with_verified_repo_effect(
+                    runtime_path,
+                    grant,
+                    repo_effect,
+                    &path,
+                    contents,
+                    ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage_mock:artifact",
+                    authorized_effects,
+                )?;
             }
-            fs::write(&path, contents)
-                .with_context(|| format!("write mock artifact {}", path.display()))?;
         }
 
-        fs::write(report_path, report_body)
-            .with_context(|| format!("write mock stage report {}", report_path.display()))?;
-        fs::write(
+        write_file_with_verified_evidence_effect(
+            runtime_path,
+            grant,
+            evidence_effect,
+            report_path,
+            report_body,
+            ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage_mock:report",
+            authorized_effects,
+        )?;
+        write_file_with_verified_evidence_effect(
+            runtime_path,
+            grant,
+            evidence_effect,
             log_path,
             format!(
                 "# Stage {}\n\n- executor: mock\n- status: synthetic-success\n- report: {}\n",
                 stage.id,
                 report_path.display()
             ),
-        )
-        .with_context(|| format!("write stage log {}", log_path.display()))?;
+            ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage_mock:log",
+            authorized_effects,
+        )?;
 
         Ok(())
     }
@@ -4089,6 +4318,10 @@ impl Runner {
         executor_label: String,
         output: &std::process::Output,
         log_path: &Path,
+        runtime_path: &Path,
+        grant: &GrantBundle,
+        evidence_effect: &AuthorizedEffect<EvidenceMutation>,
+        authorized_effects: &mut Vec<AuthorizedEffectReference>,
     ) -> Result<()> {
         let mut log = String::new();
         log.push_str(&format!(
@@ -4099,7 +4332,15 @@ impl Runner {
             String::from_utf8_lossy(&output.stdout),
             String::from_utf8_lossy(&output.stderr)
         ));
-        fs::write(log_path, log).with_context(|| format!("write stage log {}", log_path.display()))
+        write_file_with_verified_evidence_effect(
+            runtime_path,
+            grant,
+            evidence_effect,
+            log_path,
+            log,
+            ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::write_executor_log",
+            authorized_effects,
+        )
     }
 
     fn render_stage_prompt(
@@ -6175,6 +6416,10 @@ mod tests {
             &root.join(".octon/generated/effective/extensions"),
         );
         copy_tree(
+            &source_root.join(".octon/generated/effective/locality"),
+            &root.join(".octon/generated/effective/locality"),
+        );
+        copy_tree(
             &source_root.join(".octon/state/evidence/validation/publication/runtime"),
             &root.join(".octon/state/evidence/validation/publication/runtime"),
         );
@@ -6388,6 +6633,10 @@ mod tests {
         copy_tree(
             &source_root.join(".octon/generated/effective/extensions"),
             &root.join(".octon/generated/effective/extensions"),
+        );
+        copy_tree(
+            &source_root.join(".octon/generated/effective/locality"),
+            &root.join(".octon/generated/effective/locality"),
         );
         copy_tree(
             &source_root.join(".octon/state/evidence/validation/publication/runtime"),

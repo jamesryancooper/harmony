@@ -5,40 +5,52 @@ use crate::request_builders as request;
 use crate::run_binding;
 use crate::scaffold;
 use crate::stdio;
-use crate::workflow::{self, ExecutorKind};
+use crate::workflow::ExecutorKind;
 use anyhow::Result;
 use octon_authority_engine::{
-    artifact_root_from_relative, authorize_execution, finalize_execution, now_rfc3339,
-    validate_authorized_effect, write_execution_start, AuthorizedEffect, ExecutionArtifactEffects,
-    ExecutionOutcome, ExecutionRequest, ExecutorLaunch, GrantBundle, RepoMutation,
-    ReviewRequirements, ScopeConstraints, ServiceInvocation, SideEffectFlags,
-    SideEffectSummary,
+    artifact_root_from_relative, authorize_execution, authorized_effect_reference,
+    finalize_execution, issue_capability_pack_activation_effect, issue_evidence_mutation_effect,
+    issue_execution_artifact_effects, issue_executor_launch_effect,
+    issue_extension_activation_effect, issue_generated_effective_publication_effect,
+    issue_protected_ci_check_effect, issue_repo_mutation_effect, issue_service_invocation_effect,
+    now_rfc3339, verify_authorized_effect, verify_authorized_effect_verification_bundle,
+    write_authorized_effect_verification_bundle, write_execution_start, AuthorizedEffectReference,
+    AuthorizedEffectVerificationBundle, ExecutionArtifactEffects, ExecutionOutcome,
+    ExecutionRequest, ExecutorLaunch, GrantBundle, RepoMutation, ReviewRequirements,
+    ScopeConstraints, ServiceInvocation, SideEffectFlags, SideEffectSummary, VerifiedEffect,
 };
 use octon_core::errors::{ErrorCode, KernelError};
 use octon_core::execution_integrity::service_capability_profile;
 use octon_core::tiers::validate_runtime_discovery_tiers;
 use octon_core::trace::TraceWriter;
 use octon_wasm_host::policy::GrantSet;
+use serde::{Deserialize, Serialize};
 use serde_yaml::{Mapping, Value};
 use std::collections::{BTreeMap, HashMap};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command as ProcessCommand;
 use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
 
 use super::{
-    Command, OrchestrationCmd, OrchestrationIncidentCmd, OrchestrationSurfaceArg, RunCmd,
-    ServiceCmd, ServicesCmd, WorkflowCmd,
+    Command, OrchestrationCmd, OrchestrationIncidentCmd, ProtectedCiCmd, PublicationInternalCmd,
+    PublishCmd, RunCmd, ServiceCmd, ServicesCmd, WorkflowCmd,
 };
 
 fn artifact_effects_for_root(root: &Path, grant: &GrantBundle) -> Result<ExecutionArtifactEffects> {
-    Ok(grant.execution_artifact_effects(root.display().to_string())?)
+    Ok(issue_execution_artifact_effects(
+        root,
+        grant,
+        root.display().to_string(),
+    )?)
 }
 
-fn invoke_service_with_effect(
+fn invoke_service_with_verified_effect(
     ctx: &KernelContext,
     grant: &GrantBundle,
-    effect: &AuthorizedEffect<ServiceInvocation>,
+    _effect: &VerifiedEffect<ServiceInvocation>,
     svc: &octon_core::registry::ServiceDescriptor,
     op: &str,
     input: serde_json::Value,
@@ -46,41 +58,37 @@ fn invoke_service_with_effect(
     run_root: &Path,
     adapter_id: Option<&str>,
 ) -> Result<serde_json::Value> {
-    validate_authorized_effect(grant, effect)?;
     let grants = GrantSet::new(grant.granted_capabilities.clone());
-    Ok(ctx
-        .invoker
-        .invoke(svc, grants, op, input, trace, run_root, adapter_id, None, None)?)
+    Ok(ctx.invoker.invoke(
+        svc, grants, op, input, trace, run_root, adapter_id, None, None,
+    )?)
 }
 
-fn scaffold_service_new_with_effect(
+fn scaffold_service_new_with_verified_effect(
     octon_dir: &Path,
     category: &str,
     name: &str,
-    grant: &GrantBundle,
-    effect: &AuthorizedEffect<RepoMutation>,
+    _grant: &GrantBundle,
+    _effect: &VerifiedEffect<RepoMutation>,
 ) -> Result<()> {
-    validate_authorized_effect(grant, effect)?;
     scaffold::service_new(octon_dir, category, name)
 }
 
-fn scaffold_service_build_with_effect(
+fn scaffold_service_build_with_verified_effect(
     octon_dir: &Path,
     category: &str,
     name: &str,
-    grant: &GrantBundle,
-    effect: &AuthorizedEffect<RepoMutation>,
+    _grant: &GrantBundle,
+    _effect: &VerifiedEffect<RepoMutation>,
 ) -> Result<()> {
-    validate_authorized_effect(grant, effect)?;
     scaffold::service_build(octon_dir, category, name)
 }
 
-fn ensure_dir_with_executor_effect(
+fn ensure_dir_with_verified_executor_effect(
     path: &Path,
-    grant: &GrantBundle,
-    effect: &AuthorizedEffect<ExecutorLaunch>,
+    _grant: &GrantBundle,
+    _effect: &VerifiedEffect<ExecutorLaunch>,
 ) -> Result<()> {
-    validate_authorized_effect(grant, effect)?;
     std::fs::create_dir_all(path)?;
     Ok(())
 }
@@ -97,8 +105,291 @@ pub(crate) fn dispatch(cmd: Command) -> Result<()> {
         Command::Service { cmd } => cmd_service(cmd),
         Command::Run { cmd } => cmd_run(cmd),
         Command::Workflow { cmd } => cmd_workflow(cmd),
+        Command::Publish { cmd } => cmd_publish(cmd),
+        Command::ProtectedCi { cmd } => cmd_protected_ci(cmd),
+        Command::PublicationInternal { cmd } => cmd_publication_internal(cmd),
         Command::Orchestration { cmd } => cmd_orchestration(cmd),
     }
+}
+
+#[derive(Clone, Copy)]
+enum PublicationEffectKind {
+    GeneratedEffectivePublication,
+    EvidenceMutation,
+    ExtensionActivation,
+    CapabilityPackActivation,
+}
+
+impl PublicationEffectKind {
+    fn as_effect_kind(self) -> &'static str {
+        match self {
+            Self::GeneratedEffectivePublication => "generated-effective-publication",
+            Self::EvidenceMutation => "evidence-mutation",
+            Self::ExtensionActivation => "extension-activation",
+            Self::CapabilityPackActivation => "capability-pack-activation",
+        }
+    }
+}
+
+struct PublicationScope<'a> {
+    scope_rel: &'a str,
+    consumer_suffix: &'a str,
+    effect_kind: PublicationEffectKind,
+    single_use: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct PublicationTokenManifest {
+    schema_version: String,
+    publisher_id: String,
+    bundle_paths: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct PublicationTokenResultManifest {
+    schema_version: String,
+    publisher_id: String,
+    authorized_effects: Vec<AuthorizedEffectReference>,
+}
+
+struct PublicationSpec<'a> {
+    publisher_id: &'a str,
+    action_type: &'a str,
+    script_rel: &'a str,
+    requested_capabilities: Vec<String>,
+    scope_constraints_write_rel: Vec<&'a str>,
+    scope_bindings: Vec<PublicationScope<'a>>,
+    route_bundle_bypass: bool,
+}
+
+fn publication_spec(cmd: PublishCmd) -> PublicationSpec<'static> {
+    match cmd {
+        PublishCmd::SupportTargetMatrix => PublicationSpec {
+            publisher_id: "support-target-matrix",
+            action_type: "publish_generated_effective",
+            script_rel: ".octon/framework/assurance/runtime/_ops/scripts/generate-support-target-matrix.sh",
+            requested_capabilities: vec![
+                "generated.effective.publish".to_string(),
+                "governance.support.publish".to_string(),
+            ],
+            scope_constraints_write_rel: vec![".octon/generated/effective/governance"],
+            scope_bindings: vec![PublicationScope {
+                scope_rel: ".octon/generated/effective/governance",
+                consumer_suffix: "generated",
+                effect_kind: PublicationEffectKind::GeneratedEffectivePublication,
+                single_use: false,
+            }],
+            route_bundle_bypass: true,
+        },
+        PublishCmd::PackRoutes => PublicationSpec {
+            publisher_id: "pack-routes",
+            action_type: "publish_generated_effective",
+            script_rel: ".octon/framework/assurance/runtime/_ops/scripts/generate-pack-routes.sh",
+            requested_capabilities: vec![
+                "generated.effective.publish".to_string(),
+                "capability.routing.publish".to_string(),
+                "evidence.write".to_string(),
+            ],
+            scope_constraints_write_rel: vec![
+                ".octon/generated/effective/capabilities",
+                ".octon/state/evidence/validation/publication/capabilities",
+            ],
+            scope_bindings: vec![
+                PublicationScope {
+                    scope_rel: ".octon/generated/effective/capabilities",
+                    consumer_suffix: "generated",
+                    effect_kind: PublicationEffectKind::GeneratedEffectivePublication,
+                    single_use: false,
+                },
+                PublicationScope {
+                    scope_rel: ".octon/state/evidence/validation/publication/capabilities",
+                    consumer_suffix: "evidence",
+                    effect_kind: PublicationEffectKind::EvidenceMutation,
+                    single_use: false,
+                },
+            ],
+            route_bundle_bypass: true,
+        },
+        PublishCmd::RuntimeRouteBundle => PublicationSpec {
+            publisher_id: "runtime-route-bundle",
+            action_type: "publish_generated_effective",
+            script_rel: ".octon/framework/assurance/runtime/_ops/scripts/generate-runtime-effective-route-bundle.sh",
+            requested_capabilities: vec![
+                "generated.effective.publish".to_string(),
+                "runtime.route.publish".to_string(),
+                "evidence.write".to_string(),
+            ],
+            scope_constraints_write_rel: vec![
+                ".octon/generated/effective/runtime",
+                ".octon/state/evidence/validation/publication/runtime",
+            ],
+            scope_bindings: vec![
+                PublicationScope {
+                    scope_rel: ".octon/generated/effective/runtime",
+                    consumer_suffix: "generated",
+                    effect_kind: PublicationEffectKind::GeneratedEffectivePublication,
+                    single_use: false,
+                },
+                PublicationScope {
+                    scope_rel: ".octon/state/evidence/validation/publication/runtime",
+                    consumer_suffix: "evidence",
+                    effect_kind: PublicationEffectKind::EvidenceMutation,
+                    single_use: false,
+                },
+            ],
+            route_bundle_bypass: true,
+        },
+        PublishCmd::ExtensionState => PublicationSpec {
+            publisher_id: "extension-state",
+            action_type: "publish_extension_activation",
+            script_rel: ".octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh",
+            requested_capabilities: vec![
+                "extension.activation.publish".to_string(),
+                "generated.effective.publish".to_string(),
+                "state.control.write".to_string(),
+                "evidence.write".to_string(),
+            ],
+            scope_constraints_write_rel: vec![
+                ".octon/generated/effective/extensions",
+                ".octon/state/control/extensions",
+                ".octon/state/evidence/validation/publication/extensions",
+                ".octon/state/evidence/validation/compatibility/extensions",
+            ],
+            scope_bindings: vec![
+                PublicationScope {
+                    scope_rel: ".octon/generated/effective/extensions",
+                    consumer_suffix: "extensions-generated",
+                    effect_kind: PublicationEffectKind::ExtensionActivation,
+                    single_use: false,
+                },
+                PublicationScope {
+                    scope_rel: ".octon/state/control/extensions",
+                    consumer_suffix: "extensions-control",
+                    effect_kind: PublicationEffectKind::ExtensionActivation,
+                    single_use: false,
+                },
+                PublicationScope {
+                    scope_rel: ".octon/state/evidence/validation/publication/extensions",
+                    consumer_suffix: "extensions-publication-evidence",
+                    effect_kind: PublicationEffectKind::EvidenceMutation,
+                    single_use: false,
+                },
+                PublicationScope {
+                    scope_rel: ".octon/state/evidence/validation/compatibility/extensions",
+                    consumer_suffix: "extensions-compatibility-evidence",
+                    effect_kind: PublicationEffectKind::EvidenceMutation,
+                    single_use: false,
+                },
+            ],
+            route_bundle_bypass: true,
+        },
+        PublishCmd::CapabilityRouting => PublicationSpec {
+            publisher_id: "capability-routing",
+            action_type: "publish_capability_pack_activation",
+            script_rel: ".octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh",
+            requested_capabilities: vec![
+                "capability.routing.publish".to_string(),
+                "capability.pack.activation".to_string(),
+                "generated.effective.publish".to_string(),
+                "evidence.write".to_string(),
+            ],
+            scope_constraints_write_rel: vec![
+                ".octon/generated/effective/capabilities",
+                ".octon/state/evidence/validation/publication/capabilities",
+            ],
+            scope_bindings: vec![
+                PublicationScope {
+                    scope_rel: ".octon/generated/effective/capabilities",
+                    consumer_suffix: "capability-routing",
+                    effect_kind: PublicationEffectKind::CapabilityPackActivation,
+                    single_use: false,
+                },
+                PublicationScope {
+                    scope_rel: ".octon/state/evidence/validation/publication/capabilities",
+                    consumer_suffix: "capability-routing-evidence",
+                    effect_kind: PublicationEffectKind::EvidenceMutation,
+                    single_use: false,
+                },
+            ],
+            route_bundle_bypass: true,
+        },
+        PublishCmd::HostProjections => PublicationSpec {
+            publisher_id: "host-projections",
+            action_type: "publish_extension_activation",
+            script_rel: ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh",
+            requested_capabilities: vec![
+                "extension.activation.publish".to_string(),
+                "host.projection.publish".to_string(),
+            ],
+            scope_constraints_write_rel: vec![".claude", ".cursor", ".codex"],
+            scope_bindings: vec![
+                PublicationScope {
+                    scope_rel: ".claude",
+                    consumer_suffix: "host-projections-claude",
+                    effect_kind: PublicationEffectKind::ExtensionActivation,
+                    single_use: false,
+                },
+                PublicationScope {
+                    scope_rel: ".cursor",
+                    consumer_suffix: "host-projections-cursor",
+                    effect_kind: PublicationEffectKind::ExtensionActivation,
+                    single_use: false,
+                },
+                PublicationScope {
+                    scope_rel: ".codex",
+                    consumer_suffix: "host-projections-codex",
+                    effect_kind: PublicationEffectKind::ExtensionActivation,
+                    single_use: false,
+                },
+            ],
+            route_bundle_bypass: true,
+        },
+    }
+}
+
+fn publication_spec_by_publisher(publisher_id: &str) -> Option<PublicationSpec<'static>> {
+    [
+        PublishCmd::SupportTargetMatrix,
+        PublishCmd::PackRoutes,
+        PublishCmd::RuntimeRouteBundle,
+        PublishCmd::ExtensionState,
+        PublishCmd::CapabilityRouting,
+        PublishCmd::HostProjections,
+    ]
+    .into_iter()
+    .map(publication_spec)
+    .find(|spec| spec.publisher_id == publisher_id)
+}
+
+fn resolve_scope_rel(repo_root: &Path, scope_rel: &str) -> PathBuf {
+    if scope_rel == "." {
+        repo_root.to_path_buf()
+    } else {
+        repo_root.join(scope_rel)
+    }
+}
+
+fn write_publication_token_manifest(
+    path: &Path,
+    manifest: &PublicationTokenManifest,
+) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, serde_json::to_vec_pretty(manifest)?)?;
+    Ok(())
+}
+
+fn read_publication_token_result_manifest(path: &Path) -> Result<PublicationTokenResultManifest> {
+    Ok(serde_json::from_slice(&fs::read(path)?)?)
+}
+
+fn write_runtime_grant_bundle(path: &Path, grant: &GrantBundle) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, serde_json::to_vec_pretty(grant)?)?;
+    Ok(())
 }
 
 fn cmd_doctor(architecture: bool) -> Result<()> {
@@ -249,11 +540,19 @@ fn cmd_tool(service_id_or_name: &str, op: &str, input_json: Option<&str>) -> Res
     let run_root = ctx.cfg.repo_root.join(&grant.run_root);
     ctx.cfg.ensure_execution_write_path(&run_root)?;
     let trace = TraceWriter::new(&run_root, None).ok();
-    let service_effect = grant.service_invocation_effect(format!("{}::{op}", svc.key.id()))?;
-    let out = invoke_service_with_effect(
-        &ctx,
+    let service_effect =
+        issue_service_invocation_effect(&artifact_root, &grant, format!("{}::{op}", svc.key.id()))?;
+    let verified_service_effect = verify_authorized_effect(
+        &artifact_root,
         &grant,
         &service_effect,
+        ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::invoke_service_with_verified_effect",
+        format!("{}::{op}", svc.key.id()),
+    )?;
+    let out = invoke_service_with_verified_effect(
+        &ctx,
+        &grant,
+        &verified_service_effect,
         svc,
         op,
         input,
@@ -275,6 +574,7 @@ fn cmd_tool(service_id_or_name: &str, op: &str, input_json: Option<&str>) -> Res
         },
         &SideEffectSummary {
             touched_scope: vec!["service-state".to_string()],
+            authorized_effects: vec![authorized_effect_reference(&verified_service_effect)],
             ..SideEffectSummary::default()
         },
     )?;
@@ -327,7 +627,7 @@ fn cmd_studio() -> Result<()> {
         execution_role_ref: Some(execution_role_ref),
         parent_run_ref: None,
         review_requirements: ReviewRequirements {
-            human_approval: true,
+            human_approval: false,
             quorum: false,
             rollback_metadata: false,
         },
@@ -352,9 +652,17 @@ fn cmd_studio() -> Result<()> {
     let artifact_effects = artifact_effects_for_root(&artifact_root, &grant)?;
     let artifacts = write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
     let started_at = now_rfc3339()?;
-    let executor_effect = grant.executor_launch_effect(target_dir.display().to_string())?;
+    let executor_effect =
+        issue_executor_launch_effect(&artifact_root, &grant, target_dir.display().to_string())?;
+    let verified_executor_effect = verify_authorized_effect(
+        &artifact_root,
+        &grant,
+        &executor_effect,
+        ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::ensure_dir_with_verified_executor_effect",
+        target_dir.display().to_string(),
+    )?;
 
-    ensure_dir_with_executor_effect(&target_dir, &grant, &executor_effect)?;
+    ensure_dir_with_verified_executor_effect(&target_dir, &grant, &verified_executor_effect)?;
 
     let status = ProcessCommand::new("cargo")
         .arg("run")
@@ -392,6 +700,7 @@ fn cmd_studio() -> Result<()> {
             touched_scope: vec![target_dir.display().to_string()],
             shell_commands: vec!["cargo run -p octon_studio --bin octon-studio".to_string()],
             executor_profile: Some("scoped_repo_mutation".to_string()),
+            authorized_effects: vec![authorized_effect_reference(&verified_executor_effect)],
             ..SideEffectSummary::default()
         },
     )?;
@@ -462,10 +771,28 @@ fn cmd_service(cmd: ServiceCmd) -> Result<()> {
                 &request.request_id,
             );
             let artifact_effects = artifact_effects_for_root(&artifact_root, &grant)?;
-            let artifacts = write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
+            let artifacts =
+                write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
             let started_at = now_rfc3339()?;
-            let repo_effect = grant.repo_mutation_effect(service_root.display().to_string())?;
-            scaffold_service_new_with_effect(&octon_dir, &category, &name, &grant, &repo_effect)?;
+            let repo_effect = issue_repo_mutation_effect(
+                &artifact_root,
+                &grant,
+                service_root.display().to_string(),
+            )?;
+            let verified_repo_effect = verify_authorized_effect(
+                &artifact_root,
+                &grant,
+                &repo_effect,
+                ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::scaffold_service_new_with_verified_effect",
+                service_root.display().to_string(),
+            )?;
+            scaffold_service_new_with_verified_effect(
+                &octon_dir,
+                &category,
+                &name,
+                &grant,
+                &verified_repo_effect,
+            )?;
             finalize_execution(
                 &artifacts,
                 &request,
@@ -480,6 +807,7 @@ fn cmd_service(cmd: ServiceCmd) -> Result<()> {
                 },
                 &SideEffectSummary {
                     touched_scope: vec![service_root.display().to_string()],
+                    authorized_effects: vec![authorized_effect_reference(&verified_repo_effect)],
                     ..SideEffectSummary::default()
                 },
             )?;
@@ -557,10 +885,28 @@ fn cmd_service(cmd: ServiceCmd) -> Result<()> {
                 &request.request_id,
             );
             let artifact_effects = artifact_effects_for_root(&artifact_root, &grant)?;
-            let artifacts = write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
+            let artifacts =
+                write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
             let started_at = now_rfc3339()?;
-            let repo_effect = grant.repo_mutation_effect(service_root.display().to_string())?;
-            scaffold_service_build_with_effect(&octon_dir, &category, &name, &grant, &repo_effect)?;
+            let repo_effect = issue_repo_mutation_effect(
+                &artifact_root,
+                &grant,
+                service_root.display().to_string(),
+            )?;
+            let verified_repo_effect = verify_authorized_effect(
+                &artifact_root,
+                &grant,
+                &repo_effect,
+                ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::scaffold_service_build_with_verified_effect",
+                service_root.display().to_string(),
+            )?;
+            scaffold_service_build_with_verified_effect(
+                &octon_dir,
+                &category,
+                &name,
+                &grant,
+                &verified_repo_effect,
+            )?;
             finalize_execution(
                 &artifacts,
                 &request,
@@ -583,6 +929,7 @@ fn cmd_service(cmd: ServiceCmd) -> Result<()> {
                         "cargo component build --release --offline".to_string(),
                     ],
                     executor_profile: Some("scoped_repo_mutation".to_string()),
+                    authorized_effects: vec![authorized_effect_reference(&verified_repo_effect)],
                     ..SideEffectSummary::default()
                 },
             )?;
@@ -590,6 +937,679 @@ fn cmd_service(cmd: ServiceCmd) -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn issue_publication_effect_bundle(
+    artifact_root: &Path,
+    grant: &GrantBundle,
+    binding: &PublicationScope<'_>,
+    absolute_scope: &Path,
+    execution_grant_path: &Path,
+    bundle_root: &Path,
+) -> Result<String> {
+    let scope = absolute_scope.display().to_string();
+    let consumer_api_ref = format!(
+        ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:{}",
+        binding.consumer_suffix
+    );
+    let bundle_path = bundle_root.join(format!("{}.json", binding.consumer_suffix));
+    match binding.effect_kind {
+        PublicationEffectKind::GeneratedEffectivePublication => {
+            let effect = issue_generated_effective_publication_effect(
+                artifact_root,
+                grant,
+                scope.clone(),
+                binding.single_use,
+            )?;
+            write_authorized_effect_verification_bundle(
+                &effect,
+                execution_grant_path.display().to_string(),
+                &consumer_api_ref,
+                scope,
+                &bundle_path,
+            )?;
+        }
+        PublicationEffectKind::EvidenceMutation => {
+            let effect = issue_evidence_mutation_effect(
+                artifact_root,
+                grant,
+                scope.clone(),
+                binding.single_use,
+            )?;
+            write_authorized_effect_verification_bundle(
+                &effect,
+                execution_grant_path.display().to_string(),
+                &consumer_api_ref,
+                scope,
+                &bundle_path,
+            )?;
+        }
+        PublicationEffectKind::ExtensionActivation => {
+            let effect = issue_extension_activation_effect(
+                artifact_root,
+                grant,
+                scope.clone(),
+                binding.single_use,
+            )?;
+            write_authorized_effect_verification_bundle(
+                &effect,
+                execution_grant_path.display().to_string(),
+                &consumer_api_ref,
+                scope,
+                &bundle_path,
+            )?;
+        }
+        PublicationEffectKind::CapabilityPackActivation => {
+            let effect = issue_capability_pack_activation_effect(
+                artifact_root,
+                grant,
+                scope.clone(),
+                binding.single_use,
+            )?;
+            write_authorized_effect_verification_bundle(
+                &effect,
+                execution_grant_path.display().to_string(),
+                &consumer_api_ref,
+                scope,
+                &bundle_path,
+            )?;
+        }
+    }
+    Ok(bundle_path.display().to_string())
+}
+
+fn cmd_publish(cmd: PublishCmd) -> Result<()> {
+    let spec = publication_spec(cmd);
+    if spec.route_bundle_bypass {
+        std::env::set_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE", "1");
+    }
+    let ctx = KernelContext::load()?;
+    let mut write_scope: Vec<String> = spec
+        .scope_constraints_write_rel
+        .iter()
+        .map(|scope_rel| {
+            resolve_scope_rel(&ctx.cfg.repo_root, scope_rel)
+                .display()
+                .to_string()
+        })
+        .collect();
+    write_scope.sort();
+    write_scope.dedup();
+    let (intent_ref, execution_role_ref, metadata) =
+        request::bind_repo_local_request(&ctx.cfg, BTreeMap::new())?;
+    let request = ExecutionRequest {
+        request_id: new_request_id("publish"),
+        caller_path: "kernel".to_string(),
+        action_type: spec.action_type.to_string(),
+        target_id: format!("publication:{}", spec.publisher_id),
+        requested_capabilities: spec.requested_capabilities.clone(),
+        side_effect_flags: SideEffectFlags {
+            write_evidence: spec.scope_bindings.iter().any(|binding| {
+                matches!(binding.effect_kind, PublicationEffectKind::EvidenceMutation)
+            }),
+            shell: true,
+            publication: true,
+            state_mutation: write_scope
+                .iter()
+                .any(|scope| scope.contains("/.octon/state/control/")),
+            ..SideEffectFlags::default()
+        },
+        risk_tier: "medium".to_string(),
+        workflow_mode: request::role_mediated_mode(),
+        locality_scope: None,
+        intent_ref: Some(intent_ref),
+        autonomy_context: None,
+        execution_role_ref: Some(execution_role_ref),
+        parent_run_ref: None,
+        review_requirements: ReviewRequirements {
+            human_approval: false,
+            quorum: false,
+            rollback_metadata: false,
+        },
+        scope_constraints: ScopeConstraints {
+            read: vec![ctx.cfg.repo_root.display().to_string()],
+            write: write_scope.clone(),
+            executor_profile: Some("scoped_repo_mutation".to_string()),
+            locality_scope: None,
+        },
+        policy_mode_requested: Some("hard-enforce".to_string()),
+        environment_hint: None,
+        metadata,
+        ..ExecutionRequest::default()
+    };
+
+    let grant = authorize_execution(&ctx.cfg, &ctx.policy, &request, None)?;
+    run_binding::ensure_canonical_run_binding(&ctx.cfg, &request, &grant, "publication")?;
+
+    let artifact_root = artifact_root_from_relative(
+        &ctx.cfg.repo_root,
+        &ctx.cfg.execution_governance.receipt_roots.kernel,
+        &request.request_id,
+    );
+    let artifact_effects = artifact_effects_for_root(&artifact_root, &grant)?;
+    let artifacts = write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
+    let started_at = now_rfc3339()?;
+    let publication_bundle_root = ctx
+        .cfg
+        .repo_root
+        .join(".octon/generated/.tmp/publication-effect-bundles")
+        .join(&request.request_id);
+    let publication_manifest_path = publication_bundle_root.join("manifest.json");
+    let publication_result_manifest_path = publication_bundle_root.join("result.json");
+    let execution_grant_path = publication_bundle_root.join("runtime-grant.json");
+    write_runtime_grant_bundle(&execution_grant_path, &grant)?;
+
+    let mut bundle_paths = Vec::new();
+    for binding in &spec.scope_bindings {
+        let absolute_scope = resolve_scope_rel(&ctx.cfg.repo_root, binding.scope_rel);
+        bundle_paths.push(issue_publication_effect_bundle(
+            &artifact_root,
+            &grant,
+            binding,
+            &absolute_scope,
+            &execution_grant_path,
+            &publication_bundle_root,
+        )?);
+    }
+    write_publication_token_manifest(
+        &publication_manifest_path,
+        &PublicationTokenManifest {
+            schema_version: "publication-token-manifest-v1".to_string(),
+            publisher_id: spec.publisher_id.to_string(),
+            bundle_paths,
+        },
+    )?;
+
+    let script_path = ctx.cfg.repo_root.join(spec.script_rel);
+    if !script_path.is_file() {
+        anyhow::bail!("publication script not found: {}", script_path.display());
+    }
+    let status = ProcessCommand::new("bash")
+        .arg(&script_path)
+        .current_dir(&ctx.cfg.repo_root)
+        .env("OCTON_PUBLICATION_ENTRYPOINT", "runtime")
+        .env(
+            "OCTON_PUBLICATION_TOKEN_MANIFEST",
+            &publication_manifest_path,
+        )
+        .env(
+            "OCTON_PUBLICATION_TOKEN_RESULT_MANIFEST",
+            &publication_result_manifest_path,
+        )
+        .status()?;
+    let mut publication_error = if status.success() {
+        None
+    } else {
+        Some(format!("publication wrapper exited with status {status}"))
+    };
+    let authorized_effects = if publication_result_manifest_path.is_file() {
+        let result_manifest =
+            read_publication_token_result_manifest(&publication_result_manifest_path)?;
+        if result_manifest.publisher_id != spec.publisher_id {
+            publication_error = Some(format!(
+                "publication result manifest publisher mismatch: expected {}, got {}",
+                spec.publisher_id, result_manifest.publisher_id
+            ));
+            Vec::new()
+        } else {
+            result_manifest.authorized_effects
+        }
+    } else {
+        if publication_error.is_none() {
+            publication_error = Some(format!(
+                "publication script completed without a verified token result manifest: {}",
+                publication_result_manifest_path.display()
+            ));
+        }
+        Vec::new()
+    };
+
+    finalize_execution(
+        &artifacts,
+        &request,
+        &grant,
+        &artifact_effects,
+        &started_at,
+        &ExecutionOutcome {
+            status: if publication_error.is_none() {
+                "succeeded".to_string()
+            } else {
+                "failed".to_string()
+            },
+            started_at: started_at.clone(),
+            completed_at: now_rfc3339()?,
+            error: publication_error.clone(),
+        },
+        &SideEffectSummary {
+            touched_scope: write_scope.clone(),
+            shell_commands: vec![format!("bash {}", script_path.display())],
+            executor_profile: Some("scoped_repo_mutation".to_string()),
+            authorized_effects,
+            ..SideEffectSummary::default()
+        },
+    )?;
+
+    if let Some(error) = publication_error {
+        anyhow::bail!(error);
+    }
+
+    let _ = fs::remove_dir_all(&publication_bundle_root);
+
+    if spec.route_bundle_bypass {
+        std::env::remove_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE");
+    }
+
+    Ok(())
+}
+
+fn cmd_publication_internal(cmd: PublicationInternalCmd) -> Result<()> {
+    match cmd {
+        PublicationInternalCmd::VerifyManifest {
+            publisher,
+            manifest,
+            result_manifest,
+        } => {
+            let ctx = KernelContext::load()?;
+            let repo_root = ctx.cfg.repo_root.clone();
+            let manifest: PublicationTokenManifest = serde_json::from_slice(&fs::read(&manifest)?)?;
+            if manifest.publisher_id != publisher {
+                anyhow::bail!(
+                    "publication token manifest publisher mismatch: expected {}, got {}",
+                    publisher,
+                    manifest.publisher_id
+                );
+            }
+            let spec = publication_spec_by_publisher(&publisher)
+                .ok_or_else(|| anyhow::anyhow!("unknown publication publisher id: {publisher}"))?;
+            if manifest.bundle_paths.len() != spec.scope_bindings.len() {
+                anyhow::bail!(
+                    "publication token manifest bundle count mismatch for {}: expected {}, got {}",
+                    publisher,
+                    spec.scope_bindings.len(),
+                    manifest.bundle_paths.len()
+                );
+            }
+
+            let mut authorized_effects = Vec::new();
+            let mut seen_suffixes = std::collections::BTreeSet::new();
+            for bundle_path in manifest.bundle_paths {
+                let bundle: AuthorizedEffectVerificationBundle =
+                    serde_json::from_slice(&fs::read(&bundle_path)?)?;
+                let matching_binding = spec.scope_bindings.iter().find(|binding| {
+                    let expected_consumer = format!(
+                        ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:{}",
+                        binding.consumer_suffix
+                    );
+                    bundle.consumer_api_ref == expected_consumer
+                        && bundle.token_payload.effect_kind == binding.effect_kind.as_effect_kind()
+                        && bundle.target_scope
+                            == resolve_scope_rel(&repo_root, binding.scope_rel)
+                            .display()
+                            .to_string()
+                });
+                let binding = matching_binding.ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "publication token bundle {} does not match the expected publisher binding set for {}",
+                        bundle_path,
+                        publisher
+                    )
+                })?;
+                if !seen_suffixes.insert(binding.consumer_suffix.to_string()) {
+                    anyhow::bail!(
+                        "duplicate publication token bundle binding for {}:{}",
+                        publisher,
+                        binding.consumer_suffix
+                    );
+                }
+                authorized_effects.push(verify_authorized_effect_verification_bundle(Path::new(
+                    &bundle_path,
+                ))?);
+            }
+
+            if let Some(parent) = result_manifest.parent() {
+                fs::create_dir_all(parent)?;
+            }
+            fs::write(
+                &result_manifest,
+                serde_json::to_vec_pretty(&PublicationTokenResultManifest {
+                    schema_version: "publication-token-result-manifest-v1".to_string(),
+                    publisher_id: publisher,
+                    authorized_effects,
+                })?,
+            )?;
+            Ok(())
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+struct ProtectedCiApprovalProjection {
+    #[serde(default)]
+    approval_request_ref: Option<String>,
+    #[serde(default)]
+    approval_grant_ref: Option<String>,
+    #[serde(default)]
+    approval_granted: bool,
+}
+
+fn repo_relative_path(repo_root: &Path, path: &Path) -> String {
+    path.strip_prefix(repo_root)
+        .map(|value| value.display().to_string())
+        .unwrap_or_else(|_| path.display().to_string())
+}
+
+fn percent_encode_path_segment(value: &str) -> String {
+    let mut encoded = String::new();
+    for byte in value.bytes() {
+        match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                encoded.push(byte as char)
+            }
+            _ => encoded.push_str(&format!("%{:02X}", byte)),
+        }
+    }
+    encoded
+}
+
+fn gh_output(gh_bin: &str, repo_root: &Path, args: &[&str]) -> Result<String> {
+    let output = ProcessCommand::new(gh_bin)
+        .args(args)
+        .current_dir(repo_root)
+        .output()?;
+    if output.status.success() {
+        Ok(String::from_utf8(output.stdout)?)
+    } else {
+        anyhow::bail!(
+            "gh command failed: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        );
+    }
+}
+
+fn cmd_protected_ci(cmd: ProtectedCiCmd) -> Result<()> {
+    match cmd {
+        ProtectedCiCmd::AutoMerge {
+            repo,
+            pr_number,
+            control_json,
+            delete_head_ref,
+        } => {
+            let ctx = KernelContext::load()?;
+            let repo = repo
+                .or_else(|| std::env::var("GH_REPO").ok())
+                .ok_or_else(|| anyhow::anyhow!("--repo is required when GH_REPO is unset"))?;
+            let control_json = if control_json.is_absolute() {
+                control_json
+            } else {
+                ctx.cfg.repo_root.join(control_json)
+            };
+            let projection: ProtectedCiApprovalProjection =
+                serde_json::from_slice(&fs::read(&control_json)?)?;
+            if !projection.approval_granted {
+                anyhow::bail!(
+                    "protected CI merge requires a granted approval projection: {}",
+                    control_json.display()
+                );
+            }
+            for approval_ref in [
+                projection.approval_request_ref.as_deref(),
+                projection.approval_grant_ref.as_deref(),
+            ]
+            .into_iter()
+            .flatten()
+            {
+                let approval_path = ctx.cfg.repo_root.join(approval_ref);
+                if !approval_path.is_file() {
+                    anyhow::bail!(
+                        "protected CI approval artifact missing: {}",
+                        approval_path.display()
+                    );
+                }
+            }
+            let target_scope = format!("github://repo/{repo}/pull/{pr_number}/merge");
+            let mut metadata_input = BTreeMap::new();
+            if let Some(approval_request_ref) = &projection.approval_request_ref {
+                metadata_input.insert(
+                    "protected_ci_approval_request_ref".to_string(),
+                    approval_request_ref.clone(),
+                );
+            }
+            if let Some(approval_grant_ref) = &projection.approval_grant_ref {
+                metadata_input.insert(
+                    "protected_ci_approval_grant_ref".to_string(),
+                    approval_grant_ref.clone(),
+                );
+            }
+            metadata_input.insert(
+                "support_capability_packs".to_string(),
+                "repo,git,shell,telemetry".to_string(),
+            );
+
+            let (intent_ref, execution_role_ref, metadata) = request::bind_request(
+                &ctx.cfg,
+                metadata_input,
+                request::DEFAULT_WORKLOAD_TIER,
+                "github-control-plane",
+            )?;
+            let request = ExecutionRequest {
+                request_id: new_request_id("protected-ci"),
+                caller_path: "kernel".to_string(),
+                action_type: "protected_ci_auto_merge".to_string(),
+                target_id: format!("github-pr:{repo}#{pr_number}"),
+                requested_capabilities: vec![
+                    "github.pr.merge".to_string(),
+                    "github.branch.delete".to_string(),
+                    "protected.ci.check".to_string(),
+                ],
+                side_effect_flags: SideEffectFlags {
+                    shell: true,
+                    network: true,
+                    ..SideEffectFlags::default()
+                },
+                risk_tier: "high".to_string(),
+                workflow_mode: request::role_mediated_mode(),
+                locality_scope: None,
+                intent_ref: Some(intent_ref),
+                autonomy_context: None,
+                execution_role_ref: Some(execution_role_ref),
+                parent_run_ref: None,
+                review_requirements: ReviewRequirements {
+                    human_approval: false,
+                    quorum: false,
+                    rollback_metadata: false,
+                },
+                scope_constraints: ScopeConstraints {
+                    read: vec![ctx.cfg.repo_root.display().to_string()],
+                    write: vec![target_scope.clone()],
+                    executor_profile: Some("scoped_repo_mutation".to_string()),
+                    locality_scope: None,
+                },
+                policy_mode_requested: Some("hard-enforce".to_string()),
+                environment_hint: None,
+                metadata,
+                ..ExecutionRequest::default()
+            };
+
+            let grant = authorize_execution(&ctx.cfg, &ctx.policy, &request, None)?;
+            run_binding::ensure_canonical_run_binding(&ctx.cfg, &request, &grant, "protected-ci")?;
+            let artifact_root = artifact_root_from_relative(
+                &ctx.cfg.repo_root,
+                &ctx.cfg.execution_governance.receipt_roots.kernel,
+                &request.request_id,
+            );
+            let artifact_effects = artifact_effects_for_root(&artifact_root, &grant)?;
+            let artifacts =
+                write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
+            let started_at = now_rfc3339()?;
+
+            let protected_effect = issue_protected_ci_check_effect(
+                &artifact_root,
+                &grant,
+                target_scope.clone(),
+                true,
+            )?;
+            let verified_effect = verify_authorized_effect(
+                &artifact_root,
+                &grant,
+                &protected_effect,
+                ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_protected_ci_auto_merge",
+                target_scope.clone(),
+            )?;
+
+            let gh_bin = std::env::var("OCTON_GH_BIN").unwrap_or_else(|_| "gh".to_string());
+            let pr_view = gh_output(
+                &gh_bin,
+                &ctx.cfg.repo_root,
+                &["api", &format!("repos/{repo}/pulls/{pr_number}")],
+            )?;
+            let pr_json: serde_json::Value = serde_json::from_str(&pr_view)?;
+            if pr_json
+                .get("state")
+                .and_then(|value| value.as_str())
+                .unwrap_or_default()
+                != "open"
+            {
+                finalize_execution(
+                    &artifacts,
+                    &request,
+                    &grant,
+                    &artifact_effects,
+                    &started_at,
+                    &ExecutionOutcome {
+                        status: "succeeded".to_string(),
+                        started_at: started_at.clone(),
+                        completed_at: now_rfc3339()?,
+                        error: None,
+                    },
+                    &SideEffectSummary {
+                        touched_scope: vec![target_scope.clone()],
+                        authorized_effects: vec![authorized_effect_reference(&verified_effect)],
+                        ..SideEffectSummary::default()
+                    },
+                )?;
+                return Ok(());
+            }
+
+            let mut shell_commands = vec![format!(
+                "{gh_bin} api --method PUT repos/{repo}/pulls/{pr_number}/merge -f merge_method=squash"
+            )];
+            let mut merge_error = None;
+            let mut merged = false;
+            for _ in 0..120 {
+                let output = ProcessCommand::new(&gh_bin)
+                    .args([
+                        "api",
+                        "--method",
+                        "PUT",
+                        &format!("repos/{repo}/pulls/{pr_number}/merge"),
+                        "-f",
+                        "merge_method=squash",
+                    ])
+                    .current_dir(&ctx.cfg.repo_root)
+                    .output()?;
+                if output.status.success() {
+                    merged = true;
+                    break;
+                }
+
+                let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+                let transient_error = [
+                    "HTTP 405",
+                    "HTTP 409",
+                    "HTTP 422",
+                    "HTTP 500",
+                    "HTTP 501",
+                    "HTTP 502",
+                    "HTTP 503",
+                    "HTTP 504",
+                    "Pull Request is not mergeable",
+                    "required status check",
+                    "review",
+                    "Server Error",
+                    "Bad Gateway",
+                    "Service Unavailable",
+                    "Gateway Timeout",
+                ]
+                .iter()
+                .any(|pattern| stderr.contains(pattern));
+                if transient_error {
+                    thread::sleep(Duration::from_secs(5));
+                    continue;
+                }
+
+                merge_error = Some(stderr);
+                break;
+            }
+
+            let head_ref = pr_json
+                .get("head")
+                .and_then(|value| value.get("ref"))
+                .and_then(|value| value.as_str())
+                .unwrap_or_default()
+                .to_string();
+            if merged && delete_head_ref && !head_ref.is_empty() {
+                let encoded_ref = percent_encode_path_segment(&head_ref);
+                shell_commands.push(format!(
+                    "{gh_bin} api --method DELETE repos/{repo}/git/refs/heads/{encoded_ref}"
+                ));
+                let _ = ProcessCommand::new(&gh_bin)
+                    .args([
+                        "api",
+                        "--method",
+                        "DELETE",
+                        &format!("repos/{repo}/git/refs/heads/{encoded_ref}"),
+                    ])
+                    .current_dir(&ctx.cfg.repo_root)
+                    .output();
+            }
+
+            let outcome = if merged {
+                ExecutionOutcome {
+                    status: "succeeded".to_string(),
+                    started_at: started_at.clone(),
+                    completed_at: now_rfc3339()?,
+                    error: None,
+                }
+            } else {
+                ExecutionOutcome {
+                    status: "failed".to_string(),
+                    started_at: started_at.clone(),
+                    completed_at: now_rfc3339()?,
+                    error: Some(merge_error.unwrap_or_else(|| {
+                        "PR did not become mergeable within the protected-CI wait window"
+                            .to_string()
+                    })),
+                }
+            };
+
+            finalize_execution(
+                &artifacts,
+                &request,
+                &grant,
+                &artifact_effects,
+                &started_at,
+                &outcome,
+                &SideEffectSummary {
+                    touched_scope: vec![target_scope.clone()],
+                    shell_commands,
+                    executor_profile: Some("scoped_repo_mutation".to_string()),
+                    authorized_effects: vec![authorized_effect_reference(&verified_effect)],
+                    ..SideEffectSummary::default()
+                },
+            )?;
+
+            if merged {
+                Ok(())
+            } else {
+                anyhow::bail!(
+                    "{}",
+                    outcome
+                        .error
+                        .unwrap_or_else(|| "protected CI merge failed".to_string())
+                )
+            }
+        }
+    }
 }
 
 fn cmd_workflow(cmd: WorkflowCmd) -> Result<()> {
@@ -769,7 +1789,8 @@ fn cmd_orchestration(cmd: OrchestrationCmd) -> Result<()> {
                     &request.request_id,
                 );
                 let artifact_effects = artifact_effects_for_root(&artifact_root, &grant)?;
-                let artifacts = write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
+                let artifacts =
+                    write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
                 let started_at = now_rfc3339()?;
                 orchestration::write_lookup(
                     &octon_dir,
@@ -847,7 +1868,8 @@ fn cmd_orchestration(cmd: OrchestrationCmd) -> Result<()> {
                     &request.request_id,
                 );
                 let artifact_effects = artifact_effects_for_root(&artifact_root, &grant)?;
-                let artifacts = write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
+                let artifacts =
+                    write_execution_start(&artifact_root, &request, &grant, &artifact_effects)?;
                 let started_at = now_rfc3339()?;
                 orchestration::write_summary(
                     &octon_dir,

@@ -1,10 +1,6 @@
 use super::*;
-use octon_authorized_effects::{
-    AuthorizedEffect, EffectKind, EvidenceMutation, ExecutorLaunch, RepoMutation,
-    ServiceInvocation, StateControlMutation,
-};
+use octon_authorized_effects::{AuthorizedEffect, EvidenceMutation, StateControlMutation};
 use octon_core::config::{ExecutorProfileConfig, RuntimeConfig};
-use octon_core::errors::{ErrorCode, KernelError, Result as CoreResult};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::fs;
@@ -362,6 +358,8 @@ pub struct GrantBundle {
     pub decision: ExecutionDecision,
     #[serde(default)]
     pub granted_capabilities: Vec<String>,
+    #[serde(default)]
+    pub granted_effect_kinds: Vec<String>,
     pub scope_constraints: ScopeConstraints,
     pub effective_policy_mode: String,
     #[serde(default)]
@@ -412,6 +410,8 @@ pub struct GrantBundle {
     #[serde(default)]
     pub support_tier: Option<String>,
     #[serde(default)]
+    pub support_target_tuple_ref: Option<String>,
+    #[serde(default)]
     pub support_posture: Option<SupportTierPosture>,
     #[serde(default)]
     pub quorum_policy_ref: Option<String>,
@@ -439,75 +439,6 @@ pub struct ExecutionArtifactEffects {
     pub control: AuthorizedEffect<StateControlMutation>,
 }
 
-impl GrantBundle {
-    fn issue_effect<T: EffectKind>(&self, scope_ref: impl Into<String>) -> CoreResult<AuthorizedEffect<T>> {
-        if !matches!(self.decision, ExecutionDecision::Allow) {
-            return Err(KernelError::new(
-                ErrorCode::CapabilityDenied,
-                format!(
-                    "cannot issue authorized effect '{}' from non-allow decision",
-                    T::KIND
-                ),
-            ));
-        }
-        let allowed_capability_packs = self
-            .support_posture
-            .as_ref()
-            .map(|posture| {
-                if posture.requested_capability_packs.is_empty() {
-                    posture.allowed_capability_packs.clone()
-                } else {
-                    posture.requested_capability_packs.clone()
-                }
-            })
-            .unwrap_or_default();
-        let support_tuple_ref = self
-            .support_posture
-            .as_ref()
-            .map(|posture| posture.support_tier.clone())
-            .filter(|value| !value.trim().is_empty());
-        Ok(AuthorizedEffect::new(
-            self.request_id.clone(),
-            self.run_root.clone(),
-            support_tuple_ref,
-            allowed_capability_packs,
-            scope_ref,
-        ))
-    }
-
-    pub fn execution_artifact_effects(
-        &self,
-        artifact_root: impl Into<String>,
-    ) -> CoreResult<ExecutionArtifactEffects> {
-        let artifact_root = artifact_root.into();
-        Ok(ExecutionArtifactEffects {
-            evidence: self.issue_effect::<EvidenceMutation>(artifact_root.clone())?,
-            control: self.issue_effect::<StateControlMutation>(artifact_root)?,
-        })
-    }
-
-    pub fn service_invocation_effect(
-        &self,
-        scope_ref: impl Into<String>,
-    ) -> CoreResult<AuthorizedEffect<ServiceInvocation>> {
-        self.issue_effect::<ServiceInvocation>(scope_ref)
-    }
-
-    pub fn repo_mutation_effect(
-        &self,
-        scope_ref: impl Into<String>,
-    ) -> CoreResult<AuthorizedEffect<RepoMutation>> {
-        self.issue_effect::<RepoMutation>(scope_ref)
-    }
-
-    pub fn executor_launch_effect(
-        &self,
-        scope_ref: impl Into<String>,
-    ) -> CoreResult<AuthorizedEffect<ExecutorLaunch>> {
-        self.issue_effect::<ExecutorLaunch>(scope_ref)
-    }
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SideEffectSummary {
     #[serde(default)]
@@ -524,6 +455,8 @@ pub struct SideEffectSummary {
     pub executor_profile: Option<String>,
     #[serde(default)]
     pub dangerous_flags_blocked: Vec<String>,
+    #[serde(default)]
+    pub authorized_effects: Vec<AuthorizedEffectReference>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -624,6 +557,8 @@ pub struct ExecutionReceipt {
     #[serde(default)]
     pub authority_grant_bundle_ref: Option<String>,
     #[serde(default)]
+    pub authorized_effects: Vec<AuthorizedEffectReference>,
+    #[serde(default)]
     pub network_egress_posture: Option<NetworkEgressPosture>,
     #[serde(default)]
     pub evidence_completeness_status: Option<String>,
@@ -634,6 +569,18 @@ pub struct ExecutionReceipt {
 pub struct ReceiptTimestamps {
     pub started_at: String,
     pub completed_at: String,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct AuthorizedEffectReference {
+    pub token_id: String,
+    pub token_type: String,
+    pub effect_kind: String,
+    pub scope_ref: String,
+    pub token_record_ref: String,
+    pub consumption_receipt_ref: String,
+    #[serde(default)]
+    pub journal_event_refs: Vec<String>,
 }
 
 #[derive(Debug, Clone)]

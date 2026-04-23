@@ -10,6 +10,11 @@ All material execution must pass through:
 authorize_execution(request: ExecutionRequest) -> GrantBundle
 ```
 
+`GrantBundle` is the engine-owned authorization decision product. It is not by
+itself a consumable side-effect capability. Material APIs must consume
+`AuthorizedEffect<T>` values issued from the active allow grant and verify them
+into `VerifiedEffect<T>` guards before mutation.
+
 Material paths include service invocation, workflow-stage execution, executor
 launch, repo mutation, publication, protected CI checks, and any other path
 that can produce durable side effects.
@@ -22,6 +27,11 @@ artifacts, and grant bundles under `state/control/execution/**` and
 ## Required Guarantees
 
 - No material side effect may occur before a valid `GrantBundle` exists.
+- No material side effect may occur unless the callee receives a valid typed
+  `AuthorizedEffect<T>` derived from the current allow grant.
+- No material side effect may occur unless that token verifies against the
+  canonical token record, run lifecycle state, support posture, and capability
+  envelope and yields `VerifiedEffect<T>`.
 - The authorization boundary binds the canonical retained run root under
   `state/evidence/runs/<run_id>/` before retained execution artifacts are
   emitted.
@@ -41,6 +51,11 @@ artifacts, and grant bundles under `state/control/execution/**` and
   consequential or boundary-sensitive.
 - Governed capability-pack admission must agree with the published support
   matrix before a grant is emitted.
+- Token issuance, verification, consumption, rejection, expiry, and revocation
+  must materialize in canonical control/evidence roots and the Run Journal.
+- Missing token record, digest drift, support-tuple mismatch, capability-pack
+  mismatch, expiry, revocation, scope mismatch, or missing receipt/journal
+  persistence must fail closed.
 - Labels, comments, checks, and similar host affordances are projections only;
   policy evaluation ignores them whenever they disagree with canonical
   approval artifacts.
@@ -50,6 +65,9 @@ artifacts, and grant bundles under `state/control/execution/**` and
 - `execution-request-v3.schema.json`
 - `execution-grant-v1.schema.json`
 - `execution-receipt-v3.schema.json`
+- `authorized-effect-token-v1.md`
+- `authorized-effect-token-v2.schema.json`
+- `authorized-effect-token-consumption-v1.schema.json`
 - `authorization-phase-result-v1.schema.json`
 - `runtime-event-v1.schema.json`
 - `/.octon/framework/constitution/contracts/authority/risk-materiality-v1.schema.json`

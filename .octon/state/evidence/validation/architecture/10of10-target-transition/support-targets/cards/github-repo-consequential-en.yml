@@ -1,12 +1,12 @@
 schema_version: support-target-proof-card-v1
 proposal_id: octon-target-state-architecture-transition
-validated_at: "2026-04-21T23:30:00Z"
+validated_at: "2026-04-23T14:06:35Z"
 tuple_id: tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane
-status: stage_only
-admission_ref: .octon/instance/governance/support-target-admissions/stage-only/github-repo-consequential-en.yml
-support_dossier_ref: .octon/instance/governance/support-dossiers/stage-only/github-repo-consequential-en/dossier.yml
-representative_run_ref: .octon/state/control/execution/runs/uec-global-github-repo-consequential-20260404/run-contract.yml
-disclosure_ref: .octon/state/evidence/disclosure/runs/uec-global-github-repo-consequential-20260404/run-card.yml
+status: qualified
+admission_ref: .octon/instance/governance/support-target-admissions/live/github-repo-consequential-en.yml
+support_dossier_ref: .octon/instance/governance/support-dossiers/live/github-repo-consequential-en/dossier.yml
+representative_run_ref: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml
+disclosure_ref: .octon/state/evidence/disclosure/runs/protected-ci-1776956405637-68212/run-card.yml
 evidence_completeness_ref: .octon/state/evidence/validation/architecture/10of10-target-transition/evidence-store/completeness.yml
 denied_case_ref: .octon/instance/governance/exclusions/action-classes.yml
-summary: GitHub repo-consequential posture remains explicit stage-only evidence and is excluded from the live support claim.
+summary: GitHub repo-consequential support is qualified for the narrow token-enforced protected-CI merge lane and is now bound to the retained protected-CI runtime run rather than the historical pre-token exemplar.

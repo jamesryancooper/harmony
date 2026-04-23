@@ -1,0 +1,26 @@
+schema_version: "authority-approval-request-v1"
+request_id: "github-pr-automerge-local-representative-17d"
+run_id: "github-pr-automerge-local-representative-17d"
+status: "granted"
+target_id: "github-pr:17"
+action_type: "github-pr-autonomy-merge"
+workflow_mode: "role-mediated"
+support_tier: "repo-local-consequential"
+quorum_policy_ref: ".octon/instance/governance/policies/mission-autonomy.yml#quorum"
+ownership_refs:
+  []
+reversibility_class: null
+reason_codes:
+  - "LOCAL_REPRESENTATIVE_FIXTURE"
+required_evidence:
+  - "pr-autonomy-policy"
+  - "required-checks"
+projection_sources:
+  - kind: "github-check"
+    ref: "github://pull/17#check:Validate autonomy policy"
+  - kind: "github-check"
+    ref: "github://pull/17#check:AI Review Gate / decision"
+  - kind: "github-head-ref"
+    ref: "github://pull/17#head:feature/example"
+created_at: "2026-04-23T14:06:03Z"
+updated_at: "2026-04-23T14:06:03Z"

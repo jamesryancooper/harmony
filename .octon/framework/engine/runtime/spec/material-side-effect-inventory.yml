@@ -4,14 +4,14 @@ classes:
     token_type: "AuthorizedEffect<RepoMutation>"
     roots:
       - ".octon/framework/capabilities/runtime/services/**"
-      - ".octon/state/control/**"
+      - ".octon/framework/orchestration/runtime/workflows/**"
     examples:
       - "service scaffold creation"
-      - "repo-local runtime mutation"
-      - "workflow stage write"
+      - "service build mutation"
+      - "workflow-stage repo write"
     required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
     owner: "Octon runtime"
-    risk_tier: "medium"
+    risk_tier: "high"
     material: true
   - id: evidence-mutation
     token_type: "AuthorizedEffect<EvidenceMutation>"
@@ -19,11 +19,11 @@ classes:
       - ".octon/state/evidence/**"
     examples:
       - "execution receipt write"
-      - "retained evidence linkage"
-      - "disclosure materialization"
+      - "authorization phase receipt write"
+      - "disclosure evidence linkage"
     required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
     owner: "Octon runtime"
-    risk_tier: "medium"
+    risk_tier: "high"
     material: true
   - id: control-mutation
     token_type: "AuthorizedEffect<StateControlMutation>"
@@ -31,7 +31,7 @@ classes:
       - ".octon/state/control/**"
     examples:
       - "run lifecycle binding"
-      - "approval, exception, or revocation control mutation"
+      - "checkpoint and runtime-state mutation"
     required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
     owner: "Octon runtime"
     risk_tier: "high"
@@ -41,13 +41,12 @@ classes:
     roots:
       - ".octon/generated/effective/**"
     examples:
-      - "support target matrix publication"
-      - "effective locality refresh"
-      - "runtime route bundle publication"
-      - "pack route compilation"
+      - "runtime route-bundle publication"
+      - "pack-route publication"
+      - "support-target matrix publication"
     required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
     owner: "Octon runtime"
-    risk_tier: "medium"
+    risk_tier: "high"
     material: true
   - id: executor-launch
     token_type: "AuthorizedEffect<ExecutorLaunch>"
@@ -56,7 +55,7 @@ classes:
       - ".octon/generated/.tmp/engine/**"
     examples:
       - "studio launch"
-      - "executor bootstrap"
+      - "workflow executor bootstrap"
     required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
     owner: "Octon runtime"
     risk_tier: "high"
@@ -65,21 +64,212 @@ classes:
     token_type: "AuthorizedEffect<ServiceInvocation>"
     roots:
       - ".octon/framework/capabilities/runtime/services/**"
+      - ".octon/framework/engine/runtime/adapters/**"
     examples:
       - "tool or service invocation"
       - "stdio-mediated service execution"
+      - "outbound network egress"
+      - "model-backed invocation"
     required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
     owner: "Octon runtime"
-    risk_tier: "medium"
+    risk_tier: "high"
     material: true
-  - id: read-only-projection
+  - id: protected-ci-check
+    token_type: "AuthorizedEffect<ProtectedCiCheck>"
     roots:
-      - ".octon/generated/cognition/**"
-      - ".octon/state/evidence/**"
+      - ".github/workflows/**"
     examples:
-      - "read-only orchestration inspection"
-      - "operator projection rendering"
+      - "protected CI merge or approval action"
     required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
-    owner: "Octon runtime"
-    risk_tier: "low"
-    material: false
+    owner: "Octon governance"
+    risk_tier: "high"
+    material: true
+  - id: extension-activation
+    token_type: "AuthorizedEffect<ExtensionActivation>"
+    roots:
+      - ".octon/generated/effective/extensions/**"
+      - ".octon/state/control/extensions/**"
+      - ".claude/**"
+      - ".cursor/**"
+      - ".codex/**"
+    examples:
+      - "extension activation or publication"
+      - "host projection publication"
+    required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
+    owner: "Octon governance"
+    risk_tier: "high"
+    material: true
+  - id: capability-pack-activation
+    token_type: "AuthorizedEffect<CapabilityPackActivation>"
+    roots:
+      - ".octon/generated/effective/capabilities/**"
+      - ".octon/instance/governance/capability-packs/**"
+    examples:
+      - "capability pack route activation"
+    required_boundary: ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
+    owner: "Octon governance"
+    risk_tier: "high"
+    material: true
+paths:
+  - path_id: kernel-tool-invoke
+    class_id: service-invocation
+    owner_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::invoke_service_with_verified_effect"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-authorized-effect-token-negative-bypass.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: stdio-service-run
+    class_id: service-invocation
+    owner_ref: ".octon/framework/engine/runtime/crates/kernel/src/stdio.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/stdio.rs::service_grants_for_verified_effect"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-authorized-effect-token-negative-bypass.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: kernel-studio-launch
+    class_id: executor-launch
+    owner_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::ensure_dir_with_verified_executor_effect"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-authorized-effect-token-negative-bypass.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: kernel-service-scaffold
+    class_id: repo-mutation
+    owner_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::scaffold_service_new_with_verified_effect"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-authorized-effect-token-negative-bypass.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: kernel-service-build
+    class_id: repo-mutation
+    owner_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::scaffold_service_build_with_verified_effect"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-authorized-effect-token-negative-bypass.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: authority-execution
+    class_id: control-mutation
+    owner_ref: ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs::write_execution_start"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-authorized-effect-token-consumption.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: authority-phases
+    class_id: evidence-mutation
+    owner_ref: ".octon/framework/engine/runtime/crates/authority_engine/src/phases/receipt.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs::finalize_execution"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-authorized-effect-token-consumption.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: workflow-pipeline-run
+    class_id: control-mutation
+    owner_ref: ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-material-side-effect-coverage-fixtures.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: workflow-stage-run
+    class_id: repo-mutation
+    owner_ref: ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/workflow.rs::execute_stage"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-material-side-effect-coverage-fixtures.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: publication-runtime-route-bundle
+    class_id: generated-effective-publication
+    owner_ref: ".octon/framework/assurance/runtime/_ops/scripts/publish-runtime-route-bundle.sh"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:generated"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-generated-effective-publication-live-wrapper.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: publication-pack-routes
+    class_id: generated-effective-publication
+    owner_ref: ".octon/framework/assurance/runtime/_ops/scripts/publish-pack-routes.sh"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:generated"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-generated-effective-publication-live-wrapper.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: publication-support-target-matrix
+    class_id: generated-effective-publication
+    owner_ref: ".octon/framework/assurance/runtime/_ops/scripts/publish-support-target-matrix.sh"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:generated"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-generated-effective-publication-live-wrapper.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: protected-ci-auto-merge
+    class_id: protected-ci-check
+    owner_ref: ".github/workflows/pr-auto-merge.yml"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_protected_ci_auto_merge"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-protected-ci-live-wrapper.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: extension-state-publication
+    class_id: extension-activation
+    owner_ref: ".octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:extensions-control"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: extension-publication-claude
+    class_id: extension-activation
+    owner_ref: ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:host-projections-claude"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: extension-publication-cursor
+    class_id: extension-activation
+    owner_ref: ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:host-projections-cursor"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: extension-publication-codex
+    class_id: extension-activation
+    owner_ref: ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:host-projections-codex"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live
+  - path_id: capability-pack-publication
+    class_id: capability-pack-activation
+    owner_ref: ".octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh"
+    consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:capability-routing"
+    negative_bypass_test_ref: ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+    consumption_receipt_required: true
+    journal_event_required: true
+    token_required: true
+    coverage_state: live

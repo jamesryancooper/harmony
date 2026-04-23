@@ -1,0 +1,87 @@
+schema_version: support-dossier-v1
+tuple_id: tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane
+status: supported
+tuple:
+  model_tier: repo-local-governed
+  workload_tier: repo-consequential
+  language_resource_tier: reference-owned
+  locale_tier: english-primary
+admitted_host_adapters:
+  - github-control-plane
+admitted_model_adapters:
+  - repo-local-governed
+admitted_capability_packs:
+  - repo
+  - git
+  - shell
+  - telemetry
+required_proof_planes:
+  - structural
+  - functional
+  - behavioral
+  - governance
+  - maintainability
+  - recovery
+required_lab_scenarios:
+  - projection-receipt-baseline
+representative_retained_runs:
+  - .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml
+known_exclusions:
+  - "api-client remains unadmitted in manifest.runtime.yml"
+recertification_cadence: quarterly
+support_admission_ref: .octon/instance/governance/support-target-admissions/live/github-repo-consequential-en.yml
+proof_bundle_ref: .octon/state/evidence/validation/support-targets/github-repo-consequential-en.yml
+support_card_ref: .octon/generated/cognition/projections/materialized/support-cards/github-repo-consequential-en.yml
+review_due_at: "2026-06-30T00:00:00Z"
+last_recertification_receipt_ref: .octon/state/evidence/validation/architecture/10of10-target-transition/support-targets/proof-refresh.yml
+sufficiency:
+  required_proof_planes:
+    - structural
+    - functional
+    - behavioral
+    - governance
+    - maintainability
+    - recovery
+  required_scenario_classes:
+    - baseline
+    - governance-or-approval
+    - adversarial-or-hidden-check
+    - recovery-or-replay
+  minimum_retained_runs: 1
+  current_retained_runs: 1
+  evaluator_classes_required:
+    - deterministic-or-authored-validator
+    - hidden-check-or-replay-shadow-evaluator
+    - secondary-reviewer-class
+  evaluator_classes_present:
+    - deterministic-or-authored-validator
+    - hidden-check-or-replay-shadow-evaluator
+    - provider-routed-evaluator
+  hidden_check_dimensions_required:
+    - structural
+    - functional
+    - governance
+    - maintainability
+    - behavioral
+    - recovery
+    - drift-regression
+    - contamination-retry
+    - authority-disclosure-purity
+  hidden_check_dimensions_present:
+    - structural
+    - functional
+    - governance
+    - maintainability
+    - behavioral
+    - recovery
+    - drift-regression
+    - contamination-retry
+    - authority-disclosure-purity
+  representative_run_classes_present:
+    - token-enforced-runtime
+  naturalistic_representative_run_present: false
+  last_current_release_run_ref: .octon/state/evidence/disclosure/runs/protected-ci-1776956405637-68212/run-card.yml
+  status: qualified
+notes:
+  - Narrow live claim is limited to token-enforced protected-CI merge operations; broader API-client and frontier GitHub surfaces remain unadmitted.
+  - The representative retained run is the local token-enforced protected-CI execution path. A branch-published GitHub Actions observation of the wrapperized workflow remains the only external evidence gap.

@@ -1,8 +1,8 @@
 schema_version: "octon-runtime-effective-route-bundle-v1"
 generation_id: "runtime-route-bundle-d832aab6f332"
-generated_at: "2026-04-23T02:47:55Z"
+generated_at: "2026-04-23T17:11:39Z"
 publication_status: "published"
-publication_receipt_path: ".octon/state/evidence/validation/publication/runtime/2026-04-23T02-47-55Z-runtime-route-bundle-d832aab6f332.yml"
+publication_receipt_path: ".octon/state/evidence/validation/publication/runtime/2026-04-23T17-11-39Z-runtime-route-bundle-d832aab6f332.yml"
 source_refs:
   root_manifest_ref: ".octon/octon.yml"
   runtime_resolution_ref: ".octon/instance/governance/runtime-resolution.yml"
@@ -84,15 +84,14 @@ routes:
       locale_tier: "english-primary"
       host_adapter: "github-control-plane"
       model_adapter: "repo-local-governed"
-    claim_effect: "stage-only-non-live"
-    route: "stage_only"
+    claim_effect: "admitted-live-claim"
+    route: "allow"
     requires_mission: false
     allowed_capability_packs:
       - "repo"
       - "git"
       - "shell"
       - "telemetry"
-      - "api"
   - tuple_id: "tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane"
     tuple:
       model_tier: "frontier-governed"

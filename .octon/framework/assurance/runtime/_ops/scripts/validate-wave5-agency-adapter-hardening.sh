@@ -21,6 +21,10 @@ require_yq() { yq -e "$1" "$2" >/dev/null 2>&1 && pass "$3" || fail "$3"; }
 main() {
   echo "== Global Adapter And Pack Hardening Validation =="
 
+  local github_dossier_ref github_dossier_path
+  github_dossier_ref="$(yq -r '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane") | .support_dossier_ref // ""' "$SUPPORT_TARGETS")"
+  github_dossier_path="$ROOT_DIR/$github_dossier_ref"
+
   require_file "$CONTRACT_REGISTRY"
   require_file "$SUPPORT_TARGETS"
   require_file "$RUNTIME_PACK_REGISTRY"
@@ -41,7 +45,14 @@ main() {
   require_yq '.paths.runtime_bus_root == ".octon/framework/engine/runtime/crates/runtime_bus"' "$POLICY_CONFIG" "policy config exposes runtime_bus"
 
   require_yq '.live_support_universe.host_adapters[] | select(. == "repo-shell")' "$SUPPORT_TARGETS" "repo-shell is live supported"
-  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github-control-plane is explicitly non-live"
+  require_yq '.live_support_universe.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github-control-plane is live supported"
+  require_yq '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane" and .claim_effect == "admitted-live-claim")' "$SUPPORT_TARGETS" "github-control-plane tuple stays admitted live"
+  require_yq '.admitted_capability_packs | length == 4' "$github_dossier_path" "github-control-plane live claim stays narrow"
+  require_yq '.admitted_capability_packs[] | select(. == "repo")' "$github_dossier_path" "github-control-plane includes repo pack"
+  require_yq '.admitted_capability_packs[] | select(. == "git")' "$github_dossier_path" "github-control-plane includes git pack"
+  require_yq '.admitted_capability_packs[] | select(. == "shell")' "$github_dossier_path" "github-control-plane includes shell pack"
+  require_yq '.admitted_capability_packs[] | select(. == "telemetry")' "$github_dossier_path" "github-control-plane includes telemetry pack"
+  require_yq '.known_exclusions[] | select(test("api-client remains unadmitted"))' "$github_dossier_path" "github-control-plane excludes broader api surfaces"
   require_yq '.live_support_universe.host_adapters[] | select(. == "ci-control-plane")' "$SUPPORT_TARGETS" "ci-control-plane is live supported"
   require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio-control-plane is explicitly non-live"
   require_yq '.live_support_universe.model_adapters[] | select(. == "repo-local-governed")' "$SUPPORT_TARGETS" "repo-local-governed is live supported"

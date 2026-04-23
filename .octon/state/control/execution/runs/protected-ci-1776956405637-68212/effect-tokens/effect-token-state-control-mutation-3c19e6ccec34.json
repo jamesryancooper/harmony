@@ -1,0 +1,54 @@
+{
+  "schema_version": "authorized-effect-token-v2",
+  "payload": {
+    "schema_version": "authorized-effect-token-v2",
+    "token_id": "effect-token-state-control-mutation-3c19e6ccec34",
+    "token_type": "AuthorizedEffect<StateControlMutation>",
+    "effect_kind": "state-control-mutation",
+    "run_id": "protected-ci-1776956405637-68212",
+    "request_id": "protected-ci-1776956405637-68212",
+    "grant_id": "grant-protected-ci-1776956405637-68212",
+    "decision_artifact_ref": ".octon/state/evidence/control/execution/authority-decision-protected-ci-1776956405637-68212.yml",
+    "authority_grant_bundle_ref": ".octon/state/evidence/control/execution/authority-grant-bundle-protected-ci-1776956405637-68212.yml",
+    "run_control_root": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212",
+    "run_evidence_root": ".octon/state/evidence/runs/protected-ci-1776956405637-68212",
+    "support_target_tuple_ref": "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane",
+    "allowed_capability_packs": [
+      "repo",
+      "git",
+      "shell",
+      "telemetry"
+    ],
+    "scope_ref": "/Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/kernel/protected-ci-1776956405637-68212",
+    "scope_envelope": {
+      "read": [
+        "/Users/jamesryancooper/Projects/octon"
+      ],
+      "write": [
+        "github://repo/example/repo/pull/17/merge"
+      ],
+      "executor_profile": "scoped_repo_mutation",
+      "locality_scope": null
+    },
+    "rollback_plan_ref": null,
+    "approval_request_ref": ".octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml",
+    "issued_at": "2026-04-23T15:00:07.396687Z",
+    "expires_at": null,
+    "single_use": false,
+    "issuer_ref": ".octon/framework/engine/runtime/crates/authority_engine",
+    "revocation_refs": [],
+    "token_record_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/effect-tokens/effect-token-state-control-mutation-3c19e6ccec34.json",
+    "journal_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-minted-effect-token-state-control-mutation-3c19e6ccec34",
+    "token_digest": "sha256:04a8aa2ad2ac1cc260956ca77cfa2628ef2d96486a4111b6b3129c0ab12e820e"
+  },
+  "status": "minted",
+  "single_use": false,
+  "consumption_count": 2,
+  "issued_event_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-minted-effect-token-state-control-mutation-3c19e6ccec34",
+  "last_event_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumed-effect-token-state-control-mutation-3c19e6ccec34",
+  "last_consumption_receipt_ref": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/effect-tokens/effect-token-state-control-mutation-3c19e6ccec34/consumption-77ded47523af.json",
+  "last_consumed_at": "2026-04-23T15:00:07.694674Z",
+  "last_consumer_api_ref": ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs::finalize_execution:control",
+  "last_target_scope": "/Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/kernel/protected-ci-1776956405637-68212",
+  "rejection_reason_codes": []
+}

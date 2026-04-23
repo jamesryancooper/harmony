@@ -1,10 +1,11 @@
 use crate::context::KernelContext;
 use crate::request;
 use octon_authority_engine::{
-    artifact_root_from_relative, authorize_execution, finalize_execution, now_rfc3339,
-    validate_authorized_effect, write_execution_start, AuthorizedEffect, ExecutionArtifactEffects,
+    artifact_root_from_relative, authorize_execution, authorized_effect_reference,
+    finalize_execution, issue_execution_artifact_effects, issue_service_invocation_effect,
+    now_rfc3339, verify_authorized_effect, write_execution_start, ExecutionArtifactEffects,
     ExecutionOutcome, ExecutionRequest, GrantBundle, ReviewRequirements, ScopeConstraints,
-    ServiceInvocation, SideEffectFlags, SideEffectSummary,
+    ServiceInvocation, SideEffectFlags, SideEffectSummary, VerifiedEffect,
 };
 use octon_core::errors::{ErrorCode, KernelError};
 use octon_core::execution_integrity::service_capability_profile;
@@ -22,14 +23,17 @@ fn artifact_effects_for_root(
     root: &std::path::Path,
     grant: &GrantBundle,
 ) -> anyhow::Result<ExecutionArtifactEffects> {
-    Ok(grant.execution_artifact_effects(root.display().to_string())?)
+    Ok(issue_execution_artifact_effects(
+        root,
+        grant,
+        root.display().to_string(),
+    )?)
 }
 
-fn service_grants_for_effect(
+fn service_grants_for_verified_effect(
     grant: &GrantBundle,
-    effect: &AuthorizedEffect<ServiceInvocation>,
+    _effect: &VerifiedEffect<ServiceInvocation>,
 ) -> anyhow::Result<GrantSet> {
-    validate_authorized_effect(grant, effect)?;
     Ok(GrantSet::new(grant.granted_capabilities.clone()))
 }
 
@@ -321,9 +325,11 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                             return;
                         }
                     };
-                    let service_effect = match grant
-                        .service_invocation_effect(format!("{}::{op}", service.key.id()))
-                    {
+                    let service_effect = match issue_service_invocation_effect(
+                        &artifact_root,
+                        &grant,
+                        format!("{}::{op}", service.key.id()),
+                    ) {
                         Ok(effect) => effect,
                         Err(error) => {
                             let err = KernelError::new(
@@ -335,7 +341,22 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                             return;
                         }
                     };
-                    let grants = match service_grants_for_effect(&grant, &service_effect) {
+                    let verified_effect = match verify_authorized_effect(
+                        &artifact_root,
+                        &grant,
+                        &service_effect,
+                        ".octon/framework/engine/runtime/crates/kernel/src/stdio.rs::service_grants_for_verified_effect",
+                        format!("{}::{op}", service.key.id()),
+                    ) {
+                        Ok(effect) => effect,
+                        Err(error) => {
+                            let _ = out_tx.send(response_error(&id, error));
+                            let _ = inflight.lock().unwrap().remove(&id);
+                            return;
+                        }
+                    };
+                    let grants = match service_grants_for_verified_effect(&grant, &verified_effect)
+                    {
                         Ok(grants) => grants,
                         Err(error) => {
                             let err = KernelError::new(
@@ -384,6 +405,9 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                                 },
                                 &SideEffectSummary {
                                     touched_scope: vec!["service-state".to_string()],
+                                    authorized_effects: vec![authorized_effect_reference(
+                                        &verified_effect,
+                                    )],
                                     ..SideEffectSummary::default()
                                 },
                             );
@@ -405,6 +429,9 @@ pub fn serve_stdio(ctx: Arc<KernelContext>) -> anyhow::Result<()> {
                                 },
                                 &SideEffectSummary {
                                     touched_scope: vec!["service-state".to_string()],
+                                    authorized_effects: vec![authorized_effect_reference(
+                                        &verified_effect,
+                                    )],
                                     ..SideEffectSummary::default()
                                 },
                             );

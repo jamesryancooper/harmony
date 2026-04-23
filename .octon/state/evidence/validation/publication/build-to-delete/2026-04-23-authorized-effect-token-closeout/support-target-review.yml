@@ -1,0 +1,28 @@
+schema_version: build-to-delete-review-evidence-v1
+review_id: support-target-review
+contract_ref: .octon/instance/governance/contracts/support-target-review.yml
+owner: Octon governance
+status: approved
+reviewed_at: "2026-04-23T14:06:35Z"
+triggered_by:
+  - Authorized effect token enforcement closeout
+  - Narrow live GitHub consequential protected-CI support reconciliation
+summary: >-
+  The admitted live support envelope now includes the narrow
+  github-control-plane repo-consequential tuple only for the token-enforced
+  protected-CI merge lane. No browser, API, frontier, locale, or broader
+  GitHub control-plane widening was admitted. The retained representative run
+  now resolves to the local token-enforced protected-CI runtime path.
+findings: []
+evidence_refs:
+  - .octon/instance/governance/support-targets.yml
+  - .octon/instance/governance/support-target-admissions/**
+  - .octon/instance/governance/support-dossiers/**
+  - .octon/generated/cognition/projections/materialized/support-cards/github-repo-consequential-en.yml
+  - .octon/state/evidence/validation/support-targets/github-repo-consequential-en.yml
+  - .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml
+  - .octon/state/evidence/disclosure/runs/protected-ci-1776956405637-68212/run-card.yml
+  - .octon/state/evidence/validation/publication/build-to-delete/2026-04-23-authorized-effect-token-closeout/github-actions-observation.yml
+  - .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/support-universe-coverage.yml
+  - .octon/framework/assurance/runtime/_ops/scripts/validate-support-target-admission.sh
+  - .octon/framework/assurance/runtime/_ops/scripts/validate-support-target-proofing.sh

@@ -445,11 +445,28 @@ pub(crate) fn compose_policy_receipt(
             )
         })?;
     let stdout = String::from_utf8_lossy(&acp_output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&acp_output.stderr)
+        .trim()
+        .to_string();
     let decision_json: serde_json::Value = serde_json::from_str(stdout.trim()).map_err(|e| {
-        KernelError::new(
-            ErrorCode::Internal,
-            format!("failed to parse ACP decision output: {e}"),
-        )
+        let detail = if stdout.trim().is_empty() {
+            if stderr.is_empty() {
+                format!(
+                    "ACP execution flow produced no JSON decision output (status: {})",
+                    acp_output.status
+                )
+            } else {
+                format!(
+                    "ACP execution flow produced no JSON decision output (status: {}, stderr: {})",
+                    acp_output.status, stderr
+                )
+            }
+        } else if stderr.is_empty() {
+            format!("failed to parse ACP decision output: {e}")
+        } else {
+            format!("failed to parse ACP decision output: {e}; stderr: {stderr}")
+        };
+        KernelError::new(ErrorCode::Internal, detail)
     })?;
     let decision = match decision_json
         .get("decision")
@@ -469,10 +486,7 @@ pub(crate) fn compose_policy_receipt(
     {
         return Err(KernelError::new(
             ErrorCode::Internal,
-            format!(
-                "ACP execution flow failed: {}",
-                String::from_utf8_lossy(&acp_output.stderr)
-            ),
+            format!("ACP execution flow failed: {}", stderr),
         ));
     }
     fs::write(

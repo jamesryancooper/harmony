@@ -126,10 +126,13 @@ main() {
     local workload_tier representative_run_dir representative_manifest representative_state representative_ledger
     workload_tier="$(yq -r '.tuple.workload_tier // ""' "$resolved_card")"
     if [[ "$workload_tier" == "repo-consequential" ]]; then
+      local resolved_representative_run internal_run_manifest_ref internal_runtime_state_ref internal_run_card_ref internal_authority_bundle_ref internal_decision_ref representative_evidence_journal
+      resolved_representative_run="$(resolve_repo_path "$representative_run_ref")"
       representative_run_dir="$(dirname "$(resolve_repo_path "$representative_run_ref")")"
       representative_manifest="$representative_run_dir/run-manifest.yml"
       representative_state="$representative_run_dir/runtime-state.yml"
       representative_ledger="$representative_run_dir/events.manifest.yml"
+      representative_evidence_journal="$ROOT_DIR/.octon/state/evidence/runs/$(basename "$representative_run_dir")/run-journal/events.snapshot.ndjson"
       if [[ -f "$representative_manifest" && -f "$representative_state" && -f "$representative_ledger" ]]; then
         [[ "$(yq -r '.schema_version // ""' "$representative_manifest")" == "run-manifest-v2" ]] \
           && pass "$tuple_id representative run manifest is v2" \
@@ -149,6 +152,82 @@ main() {
           pass "$tuple_id representative runtime-state tuple ref is normalized"
         else
           fail "$tuple_id representative runtime-state tuple ref must match the claimed tuple"
+        fi
+        local tuple_drift
+        tuple_drift="$(
+          {
+            [[ -f "$representative_run_dir/events.ndjson" ]] && rg -n '"support_target_tuple_ref":"[^"]+"' "$representative_run_dir/events.ndjson" || true
+            [[ -f "$representative_evidence_journal" ]] && rg -n '"support_target_tuple_ref":"[^"]+"' "$representative_evidence_journal" || true
+          } | awk -F'"support_target_tuple_ref":"' -v expected="$tuple_id" '
+              {
+                split($2, parts, "\"");
+                if (parts[1] != expected) {
+                  print $0;
+                }
+              }
+            '
+        )"
+        if [[ -z "$tuple_drift" ]]; then
+          pass "$tuple_id representative journals keep the normalized tuple ref"
+        else
+          fail "$tuple_id representative journals must keep the normalized tuple ref"
+        fi
+        internal_run_manifest_ref="$(yq -r '.run_manifest_ref // ""' "$resolved_representative_run")"
+        internal_runtime_state_ref="$(yq -r '.runtime_state_ref // ""' "$resolved_representative_run")"
+        internal_run_card_ref="$(yq -r '.run_card_ref // ""' "$resolved_representative_run")"
+        internal_authority_bundle_ref="$(yq -r '.authority_bundle_ref // .authority_grant_bundle_ref // ""' "$resolved_representative_run")"
+        internal_decision_ref="$(yq -r '.decision_artifact_ref // ""' "$resolved_representative_run")"
+        [[ -f "$(resolve_repo_path "$internal_run_manifest_ref")" ]] \
+          && pass "$tuple_id representative run-contract run-manifest ref resolves" \
+          || fail "$tuple_id representative run-contract run-manifest ref must resolve"
+        [[ -f "$(resolve_repo_path "$internal_runtime_state_ref")" ]] \
+          && pass "$tuple_id representative run-contract runtime-state ref resolves" \
+          || fail "$tuple_id representative run-contract runtime-state ref must resolve"
+        [[ -f "$(resolve_repo_path "$internal_run_card_ref")" ]] \
+          && pass "$tuple_id representative run-contract run-card ref resolves" \
+          || fail "$tuple_id representative run-contract run-card ref must resolve"
+        [[ -f "$(resolve_repo_path "$internal_authority_bundle_ref")" ]] \
+          && pass "$tuple_id representative run-contract authority bundle ref resolves" \
+          || fail "$tuple_id representative run-contract authority bundle ref must resolve"
+        [[ -f "$(resolve_repo_path "$internal_decision_ref")" ]] \
+          && pass "$tuple_id representative run-contract decision artifact ref resolves" \
+          || fail "$tuple_id representative run-contract decision artifact ref must resolve"
+        if [[ "$(yq -r '.run_contract_ref // ""' "$representative_manifest")" == "$representative_run_ref" ]]; then
+          pass "$tuple_id representative run-manifest run-contract ref is normalized"
+        else
+          fail "$tuple_id representative run-manifest run-contract ref must match the representative run"
+        fi
+        if yq -e '.required_authority_artifacts[] | select(. == "approval-request")' "$(resolve_repo_path "$admission_ref")" >/dev/null 2>&1; then
+          local contract_approval_request_ref decision_approval_request_ref
+          contract_approval_request_ref="$(yq -r '.approval_request_ref // ""' "$resolved_representative_run")"
+          [[ -n "$contract_approval_request_ref" && -f "$(resolve_repo_path "$contract_approval_request_ref")" ]] \
+            && pass "$tuple_id representative approval request ref is retained" \
+            || fail "$tuple_id representative approval request ref must resolve"
+          decision_approval_request_ref="$(yq -r '.approval_request_ref // ""' "$(resolve_repo_path "$internal_decision_ref")")"
+          if [[ -n "$contract_approval_request_ref" && "$decision_approval_request_ref" == "$contract_approval_request_ref" ]]; then
+            pass "$tuple_id representative decision artifact binds the approval request"
+          else
+            fail "$tuple_id representative decision artifact must bind the approval request"
+          fi
+        fi
+        if yq -e '.required_authority_artifacts[] | select(. == "approval-grant")' "$(resolve_repo_path "$admission_ref")" >/dev/null 2>&1; then
+          local contract_approval_grant_ref decision_approval_grant_ref bundle_approval_grant_ref
+          contract_approval_grant_ref="$(yq -r '.approval_grant_refs[0] // ""' "$resolved_representative_run")"
+          [[ -n "$contract_approval_grant_ref" && -f "$(resolve_repo_path "$contract_approval_grant_ref")" ]] \
+            && pass "$tuple_id representative approval grant ref is retained" \
+            || fail "$tuple_id representative approval grant ref must resolve"
+          decision_approval_grant_ref="$(yq -r '.approval_grant_refs[0] // ""' "$(resolve_repo_path "$internal_decision_ref")")"
+          bundle_approval_grant_ref="$(yq -r '.approval_grant_refs[0] // ""' "$(resolve_repo_path "$internal_authority_bundle_ref")")"
+          if [[ -n "$contract_approval_grant_ref" && "$decision_approval_grant_ref" == "$contract_approval_grant_ref" ]]; then
+            pass "$tuple_id representative decision artifact binds the approval grant"
+          else
+            fail "$tuple_id representative decision artifact must bind the approval grant"
+          fi
+          if [[ -n "$contract_approval_grant_ref" && "$bundle_approval_grant_ref" == "$contract_approval_grant_ref" ]]; then
+            pass "$tuple_id representative authority grant bundle binds the approval grant"
+          else
+            fail "$tuple_id representative authority grant bundle must bind the approval grant"
+          fi
         fi
       else
         fail "$tuple_id representative run must retain v2 manifest, state, and journal surfaces"

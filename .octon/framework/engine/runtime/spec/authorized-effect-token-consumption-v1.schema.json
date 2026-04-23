@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/authorized-effect-token-consumption-v1.schema.json",
+  "title": "Octon Authorized Effect Token Consumption v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "token_id",
+    "token_digest",
+    "token_type",
+    "effect_kind",
+    "consumer_api_ref",
+    "target_scope",
+    "verification_result",
+    "journal_event_refs",
+    "evidence_refs",
+    "recorded_at",
+    "run_id",
+    "request_id",
+    "grant_id",
+    "token_record_ref"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "authorized-effect-token-consumption-v1"
+    },
+    "token_id": { "type": "string", "minLength": 1 },
+    "token_digest": {
+      "type": "string",
+      "pattern": "^sha256:[A-Fa-f0-9]{64}$"
+    },
+    "token_type": { "type": "string", "minLength": 1 },
+    "effect_kind": { "type": "string", "minLength": 1 },
+    "consumer_api_ref": { "type": "string", "minLength": 1 },
+    "target_scope": { "type": "string", "minLength": 1 },
+    "verification_result": {
+      "type": "string",
+      "enum": ["minted", "verified", "rejected"]
+    },
+    "rejection_reason_codes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "journal_event_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "recorded_at": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "request_id": { "type": "string", "minLength": 1 },
+    "grant_id": { "type": "string", "minLength": 1 },
+    "token_record_ref": { "type": "string", "minLength": 1 }
+  }
+}

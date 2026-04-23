@@ -99,7 +99,9 @@ validator_result_add_evidence \
 validator_result_add_runtime_test \
   ".octon/framework/assurance/runtime/_ops/tests/test-authorization-boundary-coverage.sh" \
   ".octon/framework/assurance/runtime/_ops/tests/test-authorization-boundary-negative-controls.sh" \
-  ".octon/framework/assurance/runtime/_ops/tests/test-material-side-effect-token-bypass-denials.sh"
+  ".octon/framework/assurance/runtime/_ops/tests/test-material-side-effect-token-bypass-denials.sh" \
+  ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh" \
+  ".octon/framework/assurance/runtime/_ops/tests/test-protected-ci-live-wrapper.sh"
 validator_result_add_negative_control \
   "negative-controls-declared-for-each-path" \
   "token-bypass-denial-declared-when-token-mode-active"

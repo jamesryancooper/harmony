@@ -10,10 +10,10 @@
     "action_type",
     "target_id",
     "requested_capabilities",
+    "requested_capability_packs",
     "side_effect_flags",
     "risk_tier",
     "workflow_mode",
-    "requested_capability_packs",
     "execution_role_ref",
     "context_pack_ref",
     "risk_materiality_ref",
@@ -40,6 +40,10 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 },
       "minItems": 1
+    },
+    "requested_effect_kinds": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
     },
     "execution_role_ref": { "type": "object" },
     "context_pack_ref": { "type": "string", "minLength": 1 },

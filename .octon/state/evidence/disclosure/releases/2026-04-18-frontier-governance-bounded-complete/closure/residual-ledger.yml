@@ -2,5 +2,6 @@ schema_version: residual-ledger-v1
 release_id: 2026-04-18-frontier-governance-bounded-complete
 known_limits:
   - Browser and API capability packs remain governed but non-live until runtime-service admission and service-specific proof exist.
-  - Frontier-governed, extended-governed, spanish-secondary, github-control-plane, studio-control-plane, and boundary-sensitive surfaces remain explicit non-live posture.
+  - Frontier-governed, extended-governed, spanish-secondary, studio-control-plane, and boundary-sensitive surfaces remain explicit non-live posture.
+  - GitHub support remains live only for the token-enforced protected-CI merge lane; broader GitHub/API/frontier surfaces remain non-live.
   - Future widening requires a fresh support admission and disclosure cycle.

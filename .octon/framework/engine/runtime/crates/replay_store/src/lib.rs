@@ -192,12 +192,7 @@ impl RunJournalEvent {
     pub fn is_side_effecting(&self) -> bool {
         matches!(
             self.effect.effect_class.as_str(),
-            "write"
-                | "mutate"
-                | "external-side-effect"
-                | "rollback"
-                | "recovery"
-                | "disclosure"
+            "write" | "mutate" | "external-side-effect" | "rollback" | "recovery" | "disclosure"
         )
     }
 }
@@ -443,7 +438,9 @@ pub enum ReplayError {
         expected: String,
         actual: String,
     },
-    #[error("live replay of side-effecting event {event_id} is denied without fresh authorization")]
+    #[error(
+        "live replay of side-effecting event {event_id} is denied without fresh authorization"
+    )]
     MissingFreshAuthorization { event_id: String },
     #[error("live replay of event {event_id} requires payload artifact {missing_ref}")]
     MissingPayloadArtifact {
@@ -592,7 +589,10 @@ pub fn validate_journal(journal: &RunJournal) -> Result<JournalIntegritySummary,
                 }
             }
             None => {
-                if event.previous_event_hash.as_deref().is_some_and(|hash| !hash.trim().is_empty())
+                if event
+                    .previous_event_hash
+                    .as_deref()
+                    .is_some_and(|hash| !hash.trim().is_empty())
                 {
                     return Err(ReplayError::PreviousHashMismatch {
                         event_id: event.event_id.clone(),
@@ -631,12 +631,18 @@ pub fn validate_journal(journal: &RunJournal) -> Result<JournalIntegritySummary,
     )?;
     ensure_manifest_field(
         "first_sequence",
-        journal.manifest.first_sequence.map(|value| value.to_string()),
+        journal
+            .manifest
+            .first_sequence
+            .map(|value| value.to_string()),
         Some(first.sequence.to_string()),
     )?;
     ensure_manifest_field(
         "last_sequence",
-        journal.manifest.last_sequence.map(|value| value.to_string()),
+        journal
+            .manifest
+            .last_sequence
+            .map(|value| value.to_string()),
         Some(last.sequence.to_string()),
     )?;
     ensure_manifest_field(
@@ -699,7 +705,10 @@ pub fn reconstruct_runtime_state(
         }
     }
 
-    let last = journal.events.last().expect("validated journal is non-empty");
+    let last = journal
+        .events
+        .last()
+        .expect("validated journal is non-empty");
     let drift_status = if journal.manifest.drift_status.trim().is_empty()
         || journal.manifest.drift_status == "clean"
     {
@@ -771,12 +780,11 @@ pub fn plan_replay(
                             missing_ref,
                         });
                     }
-                    let authorization = request
-                        .fresh_authorization
-                        .as_ref()
-                        .ok_or_else(|| ReplayError::MissingFreshAuthorization {
+                    let authorization = request.fresh_authorization.as_ref().ok_or_else(|| {
+                        ReplayError::MissingFreshAuthorization {
                             event_id: event.event_id.clone(),
-                        })?;
+                        }
+                    })?;
                     if !authorization.permits(event) {
                         return Err(ReplayError::MissingFreshAuthorization {
                             event_id: event.event_id.clone(),
@@ -895,9 +903,15 @@ mod tests {
                 state_after: state_after.to_string(),
             },
             governing_refs: GoverningRefs {
-                execution_request_ref: Some(".octon/state/control/execution/runs/run-123/request.yml".to_string()),
-                grant_ref: Some(".octon/state/control/execution/runs/run-123/grant.yml".to_string()),
-                policy_receipt_ref: Some(".octon/state/control/execution/runs/run-123/policy.yml".to_string()),
+                execution_request_ref: Some(
+                    ".octon/state/control/execution/runs/run-123/request.yml".to_string(),
+                ),
+                grant_ref: Some(
+                    ".octon/state/control/execution/runs/run-123/grant.yml".to_string(),
+                ),
+                policy_receipt_ref: Some(
+                    ".octon/state/control/execution/runs/run-123/policy.yml".to_string(),
+                ),
                 support_target_tuple_ref: None,
                 rollback_plan_ref: None,
                 context_pack_ref: None,
@@ -998,9 +1012,15 @@ mod tests {
             .expect("dry-run plan should succeed");
 
         assert_eq!(plan.mode, ReplayMode::DryRun);
-        assert_eq!(plan.actions[0].disposition, ReplayDisposition::ReconstructOnly);
+        assert_eq!(
+            plan.actions[0].disposition,
+            ReplayDisposition::ReconstructOnly
+        );
         assert_eq!(plan.actions[1].disposition, ReplayDisposition::Simulate);
-        assert_eq!(plan.actions[2].disposition, ReplayDisposition::ReconstructOnly);
+        assert_eq!(
+            plan.actions[2].disposition,
+            ReplayDisposition::ReconstructOnly
+        );
     }
 
     #[test]

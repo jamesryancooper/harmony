@@ -90,6 +90,25 @@ enum Command {
         cmd: WorkflowCmd,
     },
 
+    /// Token-enforced publication wrappers for generated-effective outputs.
+    Publish {
+        #[command(subcommand)]
+        cmd: PublishCmd,
+    },
+
+    /// Narrow protected-CI operations routed through the runtime boundary.
+    ProtectedCi {
+        #[command(subcommand)]
+        cmd: ProtectedCiCmd,
+    },
+
+    /// Internal publication verification entrypoints.
+    #[command(hide = true)]
+    PublicationInternal {
+        #[command(subcommand)]
+        cmd: PublicationInternalCmd,
+    },
+
     /// Read-only orchestration operator inspection commands.
     Orchestration {
         #[command(subcommand)]
@@ -218,6 +237,55 @@ enum WorkflowCmd {
     Validate {
         /// Optional workflow id to validate semantically after collection checks.
         workflow_id: Option<String>,
+    },
+}
+
+#[derive(Subcommand)]
+enum PublishCmd {
+    /// Publish the effective support-target matrix through the runtime boundary.
+    SupportTargetMatrix,
+    /// Publish effective pack routes through the runtime boundary.
+    PackRoutes,
+    /// Publish the runtime route bundle through the runtime boundary.
+    RuntimeRouteBundle,
+    /// Publish extension active/quarantine state through the runtime boundary.
+    ExtensionState,
+    /// Publish capability routing through the runtime boundary.
+    CapabilityRouting,
+    /// Publish host projections through the runtime boundary.
+    HostProjections,
+}
+
+#[derive(Subcommand)]
+enum ProtectedCiCmd {
+    /// Merge one PR through the token-enforced protected-CI boundary.
+    AutoMerge {
+        /// Repository slug in owner/name form. Defaults to GH_REPO when omitted.
+        #[arg(long = "repo")]
+        repo: Option<String>,
+        /// Pull request number.
+        #[arg(long = "pr-number")]
+        pr_number: u64,
+        /// Canonical GitHub control approval projection JSON.
+        #[arg(long = "control-json")]
+        control_json: PathBuf,
+        /// Delete the head branch after a successful merge when possible.
+        #[arg(long = "delete-head-ref", default_value_t = true)]
+        delete_head_ref: bool,
+    },
+}
+
+#[derive(Subcommand)]
+enum PublicationInternalCmd {
+    /// Verify one runtime-issued publication token manifest before script mutation.
+    #[command(hide = true)]
+    VerifyManifest {
+        #[arg(long = "publisher")]
+        publisher: String,
+        #[arg(long = "manifest")]
+        manifest: PathBuf,
+        #[arg(long = "result-manifest")]
+        result_manifest: PathBuf,
     },
 }
 

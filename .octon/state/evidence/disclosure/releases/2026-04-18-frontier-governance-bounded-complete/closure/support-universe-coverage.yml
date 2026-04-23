@@ -9,6 +9,7 @@ surfaces:
   - locale://english-primary
   - host://repo-shell
   - host://ci-control-plane
+  - host://github-control-plane
   - model-adapter://repo-local-governed
   - capability-pack://repo
   - capability-pack://git
@@ -17,16 +18,15 @@ surfaces:
   - tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell
   - tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell
   - tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/ci-control-plane
+  - tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane
 excluded_surfaces:
   - model://frontier-governed
   - workload://boundary-sensitive
   - context://extended-governed
   - locale://spanish-secondary
-  - host://github-control-plane
   - host://studio-control-plane
   - model-adapter://frontier-governed
   - capability-pack://browser
   - capability-pack://api
-  - tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane
   - tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell
   - tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane

@@ -1,0 +1,20 @@
+schema_version: "authority-approval-grant-v1"
+grant_id: "grant-github-pr-automerge-local-representative-17d"
+request_id: "github-pr-automerge-local-representative-17d"
+run_id: "github-pr-automerge-local-representative-17d"
+state: "active"
+issued_by: "github://workflow/pr-auto-merge"
+issued_at: "2026-04-23T14:06:03Z"
+expires_at: null
+quorum_policy_ref: ".octon/instance/governance/policies/mission-autonomy.yml#quorum"
+projection_sources:
+  - kind: "github-check"
+    ref: "github://pull/17#check:Validate autonomy policy"
+  - kind: "github-check"
+    ref: "github://pull/17#check:AI Review Gate / decision"
+  - kind: "github-head-ref"
+    ref: "github://pull/17#head:feature/example"
+review_metadata: {}
+required_evidence:
+  - "pr-autonomy-policy"
+  - "required-checks"

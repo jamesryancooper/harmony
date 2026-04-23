@@ -370,16 +370,13 @@ pub fn append_event(
     let mut causality = request.causality.clone();
     if causality.causal_parent_event_ids.is_empty() {
         if let Some(parent) = existing.events.last() {
-            causality.causal_parent_event_ids.push(parent.event_id.clone());
+            causality
+                .causal_parent_event_ids
+                .push(parent.event_id.clone());
         }
     }
 
-    let event = seal_event(
-        &request,
-        sequence,
-        previous_event_hash,
-        causality,
-    )?;
+    let event = seal_event(&request, sequence, previous_event_hash, causality)?;
     existing.events.push(event.clone());
     existing.manifest = rebuild_manifest(&request, &existing.events, &existing.manifest)?;
 
@@ -486,7 +483,11 @@ fn validate_existing_document(document: &RunJournalDocument) -> Result<(), Runti
 fn empty_manifest(
     request: &RunJournalAppendRequest,
 ) -> Result<RunJournalLedgerManifest, RuntimeBusError> {
-    let manifest_ref = join_control_ref(&request.control_root_ref, "events.manifest.yml", &request.run_id)?;
+    let manifest_ref = join_control_ref(
+        &request.control_root_ref,
+        "events.manifest.yml",
+        &request.run_id,
+    )?;
     let ledger_ref = join_control_ref(&request.control_root_ref, "events.ndjson", &request.run_id)?;
     let zero_ref = JournalEventRef {
         event_id: request.event_id.clone(),
@@ -562,8 +563,12 @@ fn rebuild_manifest(
     events: &[RunJournalEvent],
     previous_manifest: &RunJournalLedgerManifest,
 ) -> Result<RunJournalLedgerManifest, RuntimeBusError> {
-    let first = events.first().expect("append_event always provides an event");
-    let last = events.last().expect("append_event always provides an event");
+    let first = events
+        .first()
+        .expect("append_event always provides an event");
+    let last = events
+        .last()
+        .expect("append_event always provides an event");
     let mut governing_event_refs = previous_manifest.governing_event_refs.clone();
     for role in &request.governing_manifest_roles {
         governing_event_refs.insert(role.clone(), last.event_id.clone());
@@ -573,26 +578,30 @@ fn rebuild_manifest(
         .snapshot_refs
         .clone()
         .unwrap_or_else(|| previous_manifest.snapshot_refs.clone());
-    let last_materialization = request.materialization.clone().unwrap_or_else(|| {
-        RunJournalMaterialization {
-            runtime_state_ref: Some(format!(
-                "{}/runtime-state.yml",
-                request.control_root_ref.trim_end_matches('/')
-            )),
-            last_applied_event_id: Some(last.event_id.clone()),
-            last_applied_sequence: Some(last.sequence),
-            last_applied_event_hash: Some(last.integrity.event_hash.clone()),
-            materialized_at: Some(last.recorded_at.clone()),
-            materialized_by_ref: Some(
-                ".octon/framework/engine/runtime/crates/runtime_bus".to_string(),
-            ),
-        }
-    });
+    let last_materialization =
+        request
+            .materialization
+            .clone()
+            .unwrap_or_else(|| RunJournalMaterialization {
+                runtime_state_ref: Some(format!(
+                    "{}/runtime-state.yml",
+                    request.control_root_ref.trim_end_matches('/')
+                )),
+                last_applied_event_id: Some(last.event_id.clone()),
+                last_applied_sequence: Some(last.sequence),
+                last_applied_event_hash: Some(last.integrity.event_hash.clone()),
+                materialized_at: Some(last.recorded_at.clone()),
+                materialized_by_ref: Some(
+                    ".octon/framework/engine/runtime/crates/runtime_bus".to_string(),
+                ),
+            });
 
-    let ledger_ref =
-        join_control_ref(&request.control_root_ref, "events.ndjson", &request.run_id)?;
-    let manifest_ref =
-        join_control_ref(&request.control_root_ref, "events.manifest.yml", &request.run_id)?;
+    let ledger_ref = join_control_ref(&request.control_root_ref, "events.ndjson", &request.run_id)?;
+    let manifest_ref = join_control_ref(
+        &request.control_root_ref,
+        "events.manifest.yml",
+        &request.run_id,
+    )?;
     let ledger_digest = Some(digest_events(events)?);
 
     Ok(RunJournalLedgerManifest {
@@ -668,10 +677,7 @@ fn write_event(path: &Path, event: &RunJournalEvent) -> Result<(), RuntimeBusErr
     Ok(())
 }
 
-fn write_manifest(
-    path: &Path,
-    manifest: &RunJournalLedgerManifest,
-) -> Result<(), RuntimeBusError> {
+fn write_manifest(path: &Path, manifest: &RunJournalLedgerManifest) -> Result<(), RuntimeBusError> {
     let parent = path.parent().expect("manifest path always has a parent");
     fs::create_dir_all(parent).map_err(|source| RuntimeBusError::Write {
         path: parent.to_path_buf(),
@@ -775,7 +781,11 @@ mod tests {
         path
     }
 
-    fn sample_request(run_id: &str, control_root_ref: &str, event_id: &str) -> RunJournalAppendRequest {
+    fn sample_request(
+        run_id: &str,
+        control_root_ref: &str,
+        event_id: &str,
+    ) -> RunJournalAppendRequest {
         RunJournalAppendRequest {
             run_id: run_id.to_string(),
             control_root_ref: control_root_ref.to_string(),
@@ -855,9 +865,8 @@ mod tests {
         let root = unique_temp_dir();
         let run_id = "run-123";
         let control_root_ref = ".octon/state/control/execution/runs/run-123";
-        let receipt =
-            append_event(&root, sample_request(run_id, control_root_ref, "evt-001"))
-                .expect("first append should succeed");
+        let receipt = append_event(&root, sample_request(run_id, control_root_ref, "evt-001"))
+            .expect("first append should succeed");
 
         assert_eq!(receipt.event.sequence, 1);
         assert!(receipt.event.causality.causal_parent_event_ids.is_empty());
@@ -880,8 +889,7 @@ mod tests {
         second_request.lifecycle.state_after = Some("authorizing".to_string());
         second_request.governing_manifest_roles = vec!["runtime_state_ref".to_string()];
 
-        let second =
-            append_event(&root, second_request).expect("second append should succeed");
+        let second = append_event(&root, second_request).expect("second append should succeed");
         assert_eq!(second.event.sequence, 2);
         assert_eq!(
             second.event.integrity.previous_event_hash.as_deref(),
@@ -892,7 +900,10 @@ mod tests {
             vec!["evt-001".to_string()]
         );
         assert_eq!(
-            second.manifest.governing_event_refs.get("runtime_state_ref"),
+            second
+                .manifest
+                .governing_event_refs
+                .get("runtime_state_ref"),
             Some(&"evt-002".to_string())
         );
         assert_eq!(second.manifest.event_count, 2);
@@ -912,8 +923,7 @@ mod tests {
             serde_json::from_str(raw.lines().next().expect("one event"))
                 .expect("event line should parse");
         tampered.integrity.event_hash =
-            "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-                .to_string();
+            "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".to_string();
         fs::write(
             &ledger_path,
             format!(

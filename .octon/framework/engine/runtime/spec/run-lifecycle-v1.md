@@ -44,8 +44,14 @@ state must satisfy.
 - `bound` requires `run-created`, `run-bound`, and initial checkpoint coverage
   in the canonical Run Journal.
 - `authorized` requires both a decision artifact and a grant bundle.
+- `authorized` requires token issuance readiness for each material effect class
+  the run will consume.
 - `authorized` requires journal coverage for authority request and authority
   resolution before any capability execution continues.
+- `running` requires every material effect to verify a current
+  `AuthorizedEffect<T>` into `VerifiedEffect<T>` before mutation.
+- `running` must reject expired, revoked, already-consumed single-use, or
+  out-of-scope effect tokens.
 - `running` requires the active stage attempt to remain within the granted
   support-target and capability-pack envelope.
 - `running` requires event-driven transitions such as `stage-started`,

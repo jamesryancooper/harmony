@@ -36,6 +36,10 @@ require_equal_rendered() {
 main() {
   echo "== Support-Target Live Claim Validation =="
 
+  local github_dossier_ref github_dossier_path
+  github_dossier_ref="$(yq -r '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane") | .support_dossier_ref // ""' "$SUPPORT_TARGETS")"
+  github_dossier_path="$ROOT_DIR/$github_dossier_ref"
+
   if OCTON_DIR_OVERRIDE="$OCTON_DIR" bash "$SCRIPT_DIR/validate-support-target-admission.sh" >/dev/null; then
     pass "Run Journal consequential admission requirements passed"
   else
@@ -44,10 +48,16 @@ main() {
 
   require_yq '.support_claim_mode == "bounded-admitted-finite"' "$SUPPORT_TARGETS" "support-target declaration uses bounded admitted-finite claim mode"
   require_yq '(.tuple_admissions | length) == 6' "$SUPPORT_TARGETS" "tuple admission inventory includes live and cited non-live tuples"
-  require_yq '[.tuple_admissions[] | select(.claim_effect == "admitted-live-claim")] | length == 3' "$SUPPORT_TARGETS" "live support tuple inventory remains narrowed to the three admitted tuples"
+  require_yq '[.tuple_admissions[] | select(.claim_effect == "admitted-live-claim")] | length == 4' "$SUPPORT_TARGETS" "live support tuple inventory remains narrowed to the four admitted tuples"
   require_yq '.live_support_universe.host_adapters[] | select(. == "repo-shell")' "$SUPPORT_TARGETS" "repo-shell host adapter is live supported"
   require_yq '.live_support_universe.host_adapters[] | select(. == "ci-control-plane")' "$SUPPORT_TARGETS" "ci host adapter is live supported"
-  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github host adapter is explicitly non-live"
+  require_yq '.live_support_universe.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github host adapter is live supported"
+  require_yq '.admitted_capability_packs | length == 4' "$github_dossier_path" "github live claim stays narrow"
+  require_yq '.admitted_capability_packs[] | select(. == "repo")' "$github_dossier_path" "github live claim includes repo pack"
+  require_yq '.admitted_capability_packs[] | select(. == "git")' "$github_dossier_path" "github live claim includes git pack"
+  require_yq '.admitted_capability_packs[] | select(. == "shell")' "$github_dossier_path" "github live claim includes shell pack"
+  require_yq '.admitted_capability_packs[] | select(. == "telemetry")' "$github_dossier_path" "github live claim includes telemetry pack"
+  require_yq '.known_exclusions[] | select(test("api-client remains unadmitted"))' "$github_dossier_path" "github live claim excludes broader api surfaces"
   require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio host adapter is explicitly non-live"
   require_yq '.packs[] | select(.pack_id == "browser" and .admission_status == "unadmitted")' "$PACK_REGISTRY" "browser pack is unadmitted"
   require_yq '.packs[] | select(.pack_id == "api" and .admission_status == "unadmitted")' "$PACK_REGISTRY" "api pack is unadmitted"

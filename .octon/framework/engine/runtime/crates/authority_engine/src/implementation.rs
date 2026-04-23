@@ -2,6 +2,7 @@ mod api;
 mod authority;
 mod autonomy;
 mod common;
+mod effects;
 mod execution;
 #[path = "phases/mod.rs"]
 mod phases;
@@ -11,9 +12,10 @@ mod runtime_state;
 mod support;
 
 pub use octon_authorized_effects::{
-    AuthorizedEffect, CapabilityPackActivation, EffectKind, EvidenceMutation,
-    ExecutorLaunch, ExtensionActivation, GeneratedEffectivePublication, ProtectedCiCheck,
-    RepoMutation, ServiceInvocation, StateControlMutation,
+    AuthorizedEffect, AuthorizedEffectPayload, AuthorizedEffectScope, CapabilityPackActivation,
+    EffectKind, EvidenceMutation, ExecutorLaunch, ExtensionActivation,
+    GeneratedEffectivePublication, ProtectedCiCheck, RepoMutation, ServiceInvocation,
+    StateControlMutation, VerifiedEffect,
 };
 
 // Compatibility note for validator readers:
@@ -23,9 +25,18 @@ pub use octon_authorized_effects::{
 
 pub use api::*;
 pub use authority::with_authority_env_metadata;
+pub use effects::{
+    authorized_effect_reference, issue_capability_pack_activation_effect,
+    issue_evidence_mutation_effect, issue_execution_artifact_effects, issue_executor_launch_effect,
+    issue_extension_activation_effect, issue_generated_effective_publication_effect,
+    issue_protected_ci_check_effect, issue_repo_mutation_effect,
+    issue_repo_mutation_effect_with_mode, issue_service_invocation_effect,
+    verify_authorized_effect, verify_authorized_effect_verification_bundle,
+    write_authorized_effect_verification_bundle, AuthorizedEffectVerificationBundle,
+};
 pub use execution::{
     artifact_root_from_relative, authorize_execution, default_autonomy_context, finalize_execution,
-    validate_authorized_effect, write_execution_start,
+    write_execution_start,
 };
 pub use policy::{build_executor_command, now_rfc3339, resolve_executor_profile};
 

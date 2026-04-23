@@ -1,0 +1,21 @@
+schema_version: run-replay-pointers-v1
+run_id: protected-ci-1776956405637-68212
+replay_manifest_refs:
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/replay/manifest.yml
+receipt_refs:
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/authorization-phases/preflight.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/policy-receipt.latest.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/authorization-phases/grant.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/authorization-phases/request-materialization.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/grant-bundle.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/authorization-phases/receipt-materialization.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/execution-receipt.json
+checkpoint_refs:
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/checkpoints/bound.yml
+- /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/protected-ci-1776956405637-68212/checkpoints/execution-start.yml
+- /Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/protected-ci-1776956405637-68212/checkpoints/execution-complete.yml
+trace_refs:
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/trace-pointers.yml
+external_index_refs:
+- .octon/state/evidence/external-index/runs/protected-ci-1776956405637-68212.yml
+updated_at: 2026-04-23T15:00:07.739229Z

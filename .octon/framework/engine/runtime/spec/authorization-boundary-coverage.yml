@@ -19,6 +19,7 @@ paths:
     tests:
       - ".octon/framework/assurance/runtime/_ops/tests/test-authorization-boundary-coverage.sh"
       - ".octon/framework/assurance/runtime/_ops/tests/test-authorization-boundary-negative-controls.sh"
+      - ".octon/framework/assurance/runtime/_ops/tests/test-material-side-effect-coverage-fixtures.sh"
   - path_id: kernel-studio-launch
     authorized_effect_token_type: "AuthorizedEffect<ExecutorLaunch>"
     entrypoint: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs"
@@ -124,6 +125,149 @@ paths:
     tests:
       - ".octon/framework/assurance/runtime/_ops/tests/test-authorization-boundary-coverage.sh"
       - ".octon/framework/assurance/runtime/_ops/tests/test-authorization-boundary-negative-controls.sh"
+  - path_id: publication-support-target-matrix
+    authorized_effect_token_type: "AuthorizedEffect<GeneratedEffectivePublication>"
+    entrypoint: ".octon/framework/assurance/runtime/_ops/scripts/publish-support-target-matrix.sh"
+    side_effect_class: "generated-effective-publication"
+    affected_root: ".octon/generated/effective/governance/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_publish"
+    token_consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:generated"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_repo_local_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw script direct-call denial"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-generated-effective-publication-live-wrapper.sh"
+  - path_id: publication-pack-routes
+    authorized_effect_token_type: "AuthorizedEffect<GeneratedEffectivePublication>"
+    entrypoint: ".octon/framework/assurance/runtime/_ops/scripts/publish-pack-routes.sh"
+    side_effect_class: "generated-effective-publication"
+    affected_root: ".octon/generated/effective/capabilities/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_publish"
+    token_consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:generated"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_repo_local_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw script direct-call denial"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-generated-effective-publication-live-wrapper.sh"
+  - path_id: publication-runtime-route-bundle
+    authorized_effect_token_type: "AuthorizedEffect<GeneratedEffectivePublication>"
+    entrypoint: ".octon/framework/assurance/runtime/_ops/scripts/publish-runtime-route-bundle.sh"
+    side_effect_class: "generated-effective-publication"
+    affected_root: ".octon/generated/effective/runtime/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_publish"
+    token_consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:generated"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_repo_local_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw script direct-call denial"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-generated-effective-publication-live-wrapper.sh"
+  - path_id: extension-state-publication
+    authorized_effect_token_type: "AuthorizedEffect<ExtensionActivation>"
+    entrypoint: ".octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh"
+    side_effect_class: "extension-activation"
+    affected_root: ".octon/generated/effective/extensions/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_publish"
+    token_consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:extensions-control"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_repo_local_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw script delegation to runtime boundary"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+  - path_id: extension-publication-claude
+    authorized_effect_token_type: "AuthorizedEffect<ExtensionActivation>"
+    entrypoint: ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+    side_effect_class: "extension-activation"
+    affected_root: ".claude/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_publish"
+    token_consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:host-projections-claude"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_repo_local_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw script delegation to runtime boundary"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+  - path_id: extension-publication-cursor
+    authorized_effect_token_type: "AuthorizedEffect<ExtensionActivation>"
+    entrypoint: ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+    side_effect_class: "extension-activation"
+    affected_root: ".cursor/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_publish"
+    token_consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:host-projections-cursor"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_repo_local_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw script delegation to runtime boundary"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+  - path_id: extension-publication-codex
+    authorized_effect_token_type: "AuthorizedEffect<ExtensionActivation>"
+    entrypoint: ".octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+    side_effect_class: "extension-activation"
+    affected_root: ".codex/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_publish"
+    token_consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:host-projections-codex"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_repo_local_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw script delegation to runtime boundary"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+  - path_id: capability-pack-publication
+    authorized_effect_token_type: "AuthorizedEffect<CapabilityPackActivation>"
+    entrypoint: ".octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh"
+    side_effect_class: "capability-pack-activation"
+    affected_root: ".octon/generated/effective/capabilities/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_publish"
+    token_consumer_api_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::publication_internal_verify:capability-routing"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_repo_local_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw script delegation to runtime boundary"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-publication-runtime-boundary-delegation.sh"
+  - path_id: protected-ci-auto-merge
+    authorized_effect_token_type: "AuthorizedEffect<ProtectedCiCheck>"
+    entrypoint: ".github/workflows/pr-auto-merge.yml"
+    side_effect_class: "protected-ci-check"
+    affected_root: ".github/workflows/**"
+    authorize_execution_ref: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_protected_ci_auto_merge"
+    request_builder: ".octon/framework/engine/runtime/crates/kernel/src/request_builders/mod.rs::bind_request"
+    grant_artifact_ref: ".octon/state/evidence/control/execution/authority-grant-bundle-<run-id>.yml"
+    receipt_artifact_ref: ".octon/state/evidence/runs/<run-id>/receipts/execution-receipt.json"
+    denial_reason_code: "FCR-023"
+    negative_controls:
+      - "raw workflow merge endpoint denial"
+      - "token bypass denial"
+    tests:
+      - ".octon/framework/assurance/runtime/_ops/tests/test-protected-ci-live-wrapper.sh"
   - path_id: orchestration-report-write
     authorized_effect_token_type: "AuthorizedEffect<EvidenceMutation>"
     entrypoint: ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs"

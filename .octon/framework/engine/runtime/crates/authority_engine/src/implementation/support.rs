@@ -292,6 +292,17 @@ pub(crate) fn validate_model_adapter_manifest(
 }
 
 pub(crate) fn infer_requested_capability_packs(request: &ExecutionRequest) -> Vec<String> {
+    if let Some(raw) = request.metadata.get("support_capability_packs") {
+        let mut explicit = Vec::new();
+        for item in raw.split(',') {
+            let trimmed = item.trim();
+            if !trimmed.is_empty() {
+                explicit.push(trimmed.to_string());
+            }
+        }
+        return dedupe_strings(&explicit);
+    }
+
     let mut packs = Vec::new();
 
     if !request.scope_constraints.read.is_empty()
@@ -334,15 +345,6 @@ pub(crate) fn infer_requested_capability_packs(request: &ExecutionRequest) -> Ve
     {
         packs.push("browser".to_string());
     }
-    if let Some(raw) = request.metadata.get("support_capability_packs") {
-        for item in raw.split(',') {
-            let trimmed = item.trim();
-            if !trimmed.is_empty() {
-                packs.push(trimmed.to_string());
-            }
-        }
-    }
-
     dedupe_strings(&packs)
 }
 

@@ -27,6 +27,7 @@
     "support_target_tuple_ref",
     "rollback_plan_ref",
     "side_effects",
+    "authorized_effects",
     "timestamps"
   ],
   "properties": {
@@ -54,6 +55,34 @@
     "browser_ui_record_refs": { "type": "array", "items": { "type": "string" } },
     "api_egress_record_refs": { "type": "array", "items": { "type": "string" } },
     "side_effects": { "type": "object" },
+    "authorized_effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "token_id",
+          "token_type",
+          "effect_kind",
+          "scope_ref",
+          "token_record_ref",
+          "consumption_receipt_ref",
+          "journal_event_refs"
+        ],
+        "properties": {
+          "token_id": { "type": "string", "minLength": 1 },
+          "token_type": { "type": "string", "minLength": 1 },
+          "effect_kind": { "type": "string", "minLength": 1 },
+          "scope_ref": { "type": "string", "minLength": 1 },
+          "token_record_ref": { "type": "string", "minLength": 1 },
+          "consumption_receipt_ref": { "type": "string", "minLength": 1 },
+          "journal_event_refs": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "minItems": 1
+          }
+        }
+      }
+    },
     "intent_ref": { "type": "object" },
     "evidence_links": { "type": "object" },
     "budget": { "type": "object" },

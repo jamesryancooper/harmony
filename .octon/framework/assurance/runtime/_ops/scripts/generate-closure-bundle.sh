@@ -4,7 +4,7 @@ source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/closure-packet-commo
 release_id="$(resolve_release_id "${1:-}")"
 out_root="$(release_root "$release_id")/closure"
 mkdir -p "$out_root"
-bash "$SCRIPT_DIR/generate-support-target-matrix.sh"
+bash "$SCRIPT_DIR/publish-support-target-matrix.sh"
 bash "$SCRIPT_DIR/generate-support-universe-coverage.sh" "$release_id"
 bash "$SCRIPT_DIR/verify-support-dossier-parity.sh" "$release_id"
 bash "$SCRIPT_DIR/verify-lab-reference-integrity.sh" "$release_id"

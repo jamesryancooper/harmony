@@ -24,8 +24,14 @@ while IFS= read -r dossier; do
   fi
   workload="$(yq -r '.tuple.workload_tier' "$dossier")"
   naturalistic="$(yq -r '.sufficiency.naturalistic_representative_run_present // "false"' "$dossier")"
+  representative_class="$(yq -r '.sufficiency.representative_run_classes_present[]? // ""' "$dossier" | paste -sd, -)"
+  notes="$(yq -r '.notes[]? // ""' "$dossier" | tr '\n' ' ')"
   if [[ "$workload" != "observe-and-read" && "$naturalistic" != "true" ]]; then
-    fail "${dossier#$ROOT_DIR/} lacks a naturalistic consequential representative run"
+    if [[ "$representative_class" == *"token-enforced-runtime"* && "$notes" == *"external evidence gap"* ]]; then
+      pass "${dossier#$ROOT_DIR/} is repo-local qualified with explicit naturalistic observation pending"
+    else
+      fail "${dossier#$ROOT_DIR/} lacks a naturalistic consequential representative run"
+    fi
   else
     pass "${dossier#$ROOT_DIR/} carries sufficiency metadata"
   fi

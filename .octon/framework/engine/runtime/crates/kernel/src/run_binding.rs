@@ -588,6 +588,19 @@ fn build_support_target(request: &ExecutionRequest) -> SupportTarget {
 }
 
 fn infer_capability_packs(request: &ExecutionRequest) -> Vec<String> {
+    if let Some(raw) = request.metadata.get("support_capability_packs") {
+        let mut explicit = Vec::new();
+        for item in raw.split(',') {
+            let trimmed = item.trim();
+            if !trimmed.is_empty() {
+                explicit.push(trimmed.to_string());
+            }
+        }
+        explicit.sort();
+        explicit.dedup();
+        return explicit;
+    }
+
     let mut packs = Vec::new();
     if request
         .requested_capabilities
@@ -679,12 +692,10 @@ fn decision_route(value: &ExecutionDecision) -> String {
 }
 
 fn rel(cfg: &RuntimeConfig, path: &Path) -> Result<String> {
-    Ok(format!(
-        ".{}",
-        path.strip_prefix(&cfg.repo_root)?
-            .to_string_lossy()
-            .replace('\\', "/")
-    ))
+    Ok(path
+        .strip_prefix(&cfg.repo_root)?
+        .to_string_lossy()
+        .replace('\\', "/"))
 }
 
 fn write_yaml<T: Serialize>(path: &Path, value: &T) -> Result<()> {

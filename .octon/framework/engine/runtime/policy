@@ -105,6 +105,14 @@ policy_receipts_runs_dir() {
   printf '%s\n' "$runs_dir"
 }
 
+mktemp_json() {
+  local prefix="$1"
+  local tmp_path=""
+  tmp_path="$(mktemp "${TMPDIR:-/tmp}/${prefix}.XXXXXX")" || return 1
+  mv "$tmp_path" "${tmp_path}.json"
+  printf '%s.json\n' "$tmp_path"
+}
+
 resolve_receipt_validate_path() {
   local receipt_output="$1"
   local policy_path="$2"
@@ -421,7 +429,7 @@ prepare_request_with_manifest() {
     layers_json="$(jq -c '.instruction_layers' "$request_file")"
   else
     layers_json="$(build_default_instruction_layers_json "$request_file")"
-    tmp_request="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-manifest-request.XXXXXX.json")"
+    tmp_request="$(mktemp_json "acp-enforce-manifest-request")"
     if ! jq --argjson layers "$layers_json" '.instruction_layers = $layers' "$request_file" > "$tmp_request"; then
       rm -f "$tmp_request"
       echo "failed to inject instruction_layers into material request" >&2
@@ -438,7 +446,7 @@ prepare_request_with_manifest() {
       context_overhead_ratio="0"
     fi
 
-    tmp_with_telemetry="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-telemetry-request.XXXXXX.json")"
+    tmp_with_telemetry="$(mktemp_json "acp-enforce-telemetry-request")"
     if ! jq \
       --argjson context_acquisition "$context_acquisition_json" \
       --arg context_overhead_ratio "$context_overhead_ratio" \
@@ -475,7 +483,7 @@ prepare_request_with_manifest() {
   fi
 
   if [[ "$output_request" == "$request_file" ]]; then
-    tmp_request="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-manifest-request.XXXXXX.json")"
+    tmp_request="$(mktemp_json "acp-enforce-manifest-request")"
     if ! jq --arg manifest "$manifest_path" '.instruction_layer_manifest = $manifest' "$request_file" > "$tmp_request"; then
       rm -f "$tmp_request"
       echo "failed to attach instruction-layer manifest path to request payload" >&2
@@ -484,7 +492,7 @@ prepare_request_with_manifest() {
     output_request="$tmp_request"
   else
     local tmp_with_manifest
-    tmp_with_manifest="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-manifest-request.XXXXXX.json")"
+    tmp_with_manifest="$(mktemp_json "acp-enforce-manifest-request")"
     if ! jq --arg manifest "$manifest_path" '.instruction_layer_manifest = $manifest' "$output_request" > "$tmp_with_manifest"; then
       rm -f "$tmp_with_manifest" "$output_request"
       echo "failed to attach instruction-layer manifest path to request payload" >&2
@@ -642,7 +650,7 @@ USAGE
       echo "jq is required for --run-id request override" >&2
       return "$CONTRACT_ERROR_EXIT_CODE"
     fi
-    tmp_request="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-request.XXXXXX.json")"
+    tmp_request="$(mktemp_json "acp-enforce-request")"
     if ! jq --arg run_id "$run_id_override" '.run_id = $run_id' "$request_path" > "$tmp_request"; then
       rm -f "$tmp_request"
       echo "failed to apply run_id override to request: $request_path" >&2
@@ -699,7 +707,7 @@ USAGE
       return "$rc"
     fi
 
-    tmp_decision="$(mktemp "${TMPDIR:-/tmp}/acp-enforce-decision.XXXXXX.json")"
+    tmp_decision="$(mktemp_json "acp-enforce-decision")"
     printf '%s\n' "$decision_output" > "$tmp_decision"
 
     set +e

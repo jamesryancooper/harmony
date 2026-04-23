@@ -131,13 +131,13 @@ fn temp_runtime_config() -> RuntimeConfig {
     copy_rel(".octon/instance/governance/support-target-admissions/live/repo-shell-repo-consequential-en.yml");
     copy_rel(".octon/instance/governance/support-target-admissions/live/ci-observe-read-en.yml");
     copy_rel(".octon/instance/governance/support-target-admissions/stage-only/repo-shell-boundary-sensitive-en.yml");
-    copy_rel(".octon/instance/governance/support-target-admissions/stage-only/github-repo-consequential-en.yml");
+    copy_rel(".octon/instance/governance/support-target-admissions/live/github-repo-consequential-en.yml");
     copy_rel(".octon/instance/governance/support-target-admissions/stage-only/frontier-studio-boundary-sensitive-es.yml");
     copy_rel(".octon/instance/governance/support-dossiers/live/repo-shell-observe-read-en/dossier.yml");
     copy_rel(".octon/instance/governance/support-dossiers/live/repo-shell-repo-consequential-en/dossier.yml");
     copy_rel(".octon/instance/governance/support-dossiers/live/ci-observe-read-en/dossier.yml");
     copy_rel(".octon/instance/governance/support-dossiers/stage-only/repo-shell-boundary-sensitive-en/dossier.yml");
-    copy_rel(".octon/instance/governance/support-dossiers/stage-only/github-repo-consequential-en/dossier.yml");
+    copy_rel(".octon/instance/governance/support-dossiers/live/github-repo-consequential-en/dossier.yml");
     copy_rel(".octon/instance/governance/support-dossiers/stage-only/frontier-studio-boundary-sensitive-es/dossier.yml");
     copy_rel(".octon/instance/capabilities/runtime/packs/admissions/repo.yml");
     copy_rel(".octon/instance/capabilities/runtime/packs/admissions/git.yml");
@@ -292,7 +292,7 @@ fn refresh_runtime_effective_publications(cfg: &RuntimeConfig) {
     let octon_dir = cfg.octon_dir.to_string_lossy().to_string();
 
     let status = std::process::Command::new("bash")
-        .arg(source_root.join(".octon/framework/assurance/runtime/_ops/scripts/generate-support-target-matrix.sh"))
+        .arg(source_root.join(".octon/framework/assurance/runtime/_ops/scripts/publish-support-target-matrix.sh"))
         .env("OCTON_DIR_OVERRIDE", &octon_dir)
         .env("OCTON_ROOT_DIR", &repo_root)
         .status()
@@ -300,7 +300,7 @@ fn refresh_runtime_effective_publications(cfg: &RuntimeConfig) {
     assert!(status.success(), "support matrix generator should pass");
 
     let status = std::process::Command::new("bash")
-        .arg(source_root.join(".octon/framework/assurance/runtime/_ops/scripts/generate-pack-routes.sh"))
+        .arg(source_root.join(".octon/framework/assurance/runtime/_ops/scripts/publish-pack-routes.sh"))
         .env("OCTON_DIR_OVERRIDE", &octon_dir)
         .env("OCTON_ROOT_DIR", &repo_root)
         .status()
@@ -308,7 +308,7 @@ fn refresh_runtime_effective_publications(cfg: &RuntimeConfig) {
     assert!(status.success(), "pack routes generator should pass");
 
     let status = std::process::Command::new("bash")
-        .arg(source_root.join(".octon/framework/assurance/runtime/_ops/scripts/generate-runtime-effective-route-bundle.sh"))
+        .arg(source_root.join(".octon/framework/assurance/runtime/_ops/scripts/publish-runtime-route-bundle.sh"))
         .env("OCTON_DIR_OVERRIDE", &octon_dir)
         .env("OCTON_ROOT_DIR", &repo_root)
         .status()
@@ -523,6 +523,20 @@ fn minimal_request() -> ExecutionRequest {
     }
 }
 
+fn effect_token_record_path(runtime_path: &Path, token_record_ref: &str) -> PathBuf {
+    resolve_relative_from_runtime_path(runtime_path, token_record_ref)
+        .expect("token record path should resolve")
+}
+
+fn recompute_effect_token_digest(payload: &AuthorizedEffectPayload) -> String {
+    let mut canonical = payload.clone();
+    canonical.token_digest.clear();
+    format!(
+        "sha256:{}",
+        sha256_bytes(&serde_json::to_vec(&canonical).expect("serialize token digest payload"))
+    )
+}
+
 #[test]
 fn development_mode_allows_soft_enforce() {
     let cfg = temp_runtime_config();
@@ -530,6 +544,294 @@ fn development_mode_allows_soft_enforce() {
     let grant = authorize_execution(&cfg, &policy, &minimal_request(), None)
         .expect("development request should authorize");
     assert_eq!(grant.effective_policy_mode, "soft-enforce");
+}
+
+#[test]
+fn invoke_service_requests_always_grant_service_invocation_effects() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let mut request = minimal_request();
+    request.action_type = "invoke_service".to_string();
+    request.target_id = "interfaces/filesystem-watch::watch.poll".to_string();
+    request.side_effect_flags.network = false;
+    request.side_effect_flags.model_invoke = false;
+
+    let grant = authorize_execution(&cfg, &policy, &request, None)
+        .expect("invoke_service request should authorize");
+    assert!(
+        grant.granted_effect_kinds
+            .iter()
+            .any(|kind| kind == ServiceInvocation::KIND),
+        "invoke_service requests must always carry the service-invocation effect grant"
+    );
+}
+
+#[test]
+fn issued_effect_verifies_and_records_consumption_receipt() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let request = minimal_request();
+    let grant = authorize_execution(&cfg, &policy, &request, None).expect("request should authorize");
+    let runtime_path = cfg.execution_tmp_root.join(&request.request_id);
+    let effect = issue_service_invocation_effect(&runtime_path, &grant, "service::invoke")
+        .expect("service effect should mint");
+    let verified = verify_authorized_effect(
+        &runtime_path,
+        &grant,
+        &effect,
+        "test::service_consumer",
+        "service::invoke",
+    )
+    .expect("service effect should verify");
+    assert_eq!(verified.token_id(), effect.token_id());
+    let receipt_path = cfg
+        .repo_root
+        .join(verified.consumption_receipt_ref());
+    assert!(receipt_path.is_file(), "consumption receipt must exist");
+}
+
+#[test]
+fn acp_runner_empty_stdout_surfaces_stderr_context() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let fake_runner = cfg
+        .repo_root
+        .join(".octon/generated/.tmp/tests/fake-policy-runner.sh");
+    if let Some(parent) = fake_runner.parent() {
+        fs::create_dir_all(parent).expect("create fake policy runner parent");
+    }
+    fs::write(
+        &fake_runner,
+        "#!/usr/bin/env bash\necho 'fixture ACP failure' >&2\nexit 2\n",
+    )
+    .expect("write fake policy runner");
+
+    let prior = std::env::var("OCTON_POLICY_RUNNER_OVERRIDE").ok();
+    let prior_route_bundle = std::env::var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE").ok();
+    std::env::set_var("OCTON_POLICY_RUNNER_OVERRIDE", &fake_runner);
+    std::env::set_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE", "1");
+    let err = authorize_execution(&cfg, &policy, &minimal_request(), None)
+        .expect_err("empty ACP stdout must fail with stderr context");
+    match prior {
+        Some(value) => std::env::set_var("OCTON_POLICY_RUNNER_OVERRIDE", value),
+        None => std::env::remove_var("OCTON_POLICY_RUNNER_OVERRIDE"),
+    }
+    match prior_route_bundle {
+        Some(value) => std::env::set_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE", value),
+        None => std::env::remove_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE"),
+    }
+    assert!(
+        err.to_string().contains("fixture ACP failure")
+            || err.to_string().contains("no JSON decision output")
+    );
+}
+
+#[test]
+fn missing_token_record_fails_closed() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let request = minimal_request();
+    let grant = authorize_execution(&cfg, &policy, &request, None).expect("request should authorize");
+    let runtime_path = cfg.execution_tmp_root.join(&request.request_id);
+    let effect = issue_service_invocation_effect(&runtime_path, &grant, "service::invoke")
+        .expect("service effect should mint");
+    let record_path = effect_token_record_path(&runtime_path, effect.token_record_ref());
+    fs::remove_file(&record_path).expect("remove token record");
+    let err = verify_authorized_effect(
+        &runtime_path,
+        &grant,
+        &effect,
+        "test::missing_record",
+        "service::invoke",
+    )
+    .expect_err("missing token record must fail closed");
+    assert!(err.to_string().contains("EFFECT_TOKEN_RECORD_MISSING"));
+}
+
+#[test]
+fn single_use_effect_cannot_be_consumed_twice() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let mut request = minimal_request();
+    request.action_type = "mutate_repo".to_string();
+    request.side_effect_flags.write_repo = true;
+    request.policy_mode_requested = Some("hard-enforce".to_string());
+    let grant = authorize_execution(&cfg, &policy, &request, None).expect("request should authorize");
+    let runtime_path = cfg.execution_tmp_root.join(&request.request_id);
+    let effect = issue_repo_mutation_effect(&runtime_path, &grant, "repo-scope")
+        .expect("repo effect should mint");
+    verify_authorized_effect(
+        &runtime_path,
+        &grant,
+        &effect,
+        "test::repo_consumer",
+        "repo-scope",
+    )
+    .expect("first consumption should verify");
+    let err = verify_authorized_effect(
+        &runtime_path,
+        &grant,
+        &effect,
+        "test::repo_consumer",
+        "repo-scope",
+    )
+    .expect_err("second single-use consumption must fail");
+    assert!(err.to_string().contains("EFFECT_TOKEN_ALREADY_CONSUMED"));
+}
+
+#[test]
+fn wrong_scope_effect_fails_closed() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let mut request = minimal_request();
+    request.action_type = "mutate_repo".to_string();
+    request.side_effect_flags.write_repo = true;
+    request.policy_mode_requested = Some("hard-enforce".to_string());
+    let grant = authorize_execution(&cfg, &policy, &request, None).expect("request should authorize");
+    let runtime_path = cfg.execution_tmp_root.join(&request.request_id);
+    let effect = issue_repo_mutation_effect(&runtime_path, &grant, "allowed-scope")
+        .expect("repo effect should mint");
+    let err = verify_authorized_effect(
+        &runtime_path,
+        &grant,
+        &effect,
+        "test::repo_consumer",
+        "other-scope",
+    )
+    .expect_err("scope mismatch must fail");
+    assert!(err.to_string().contains("EFFECT_TOKEN_SCOPE_MISMATCH"));
+}
+
+#[test]
+fn expired_effect_is_rejected() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let request = minimal_request();
+    let grant = authorize_execution(&cfg, &policy, &request, None).expect("request should authorize");
+    let runtime_path = cfg.execution_tmp_root.join(&request.request_id);
+    let effect = issue_service_invocation_effect(&runtime_path, &grant, "service::invoke")
+        .expect("service effect should mint");
+    let record_path = effect_token_record_path(&runtime_path, effect.token_record_ref());
+    let mut record: serde_json::Value = serde_json::from_str(
+        &fs::read_to_string(&record_path).expect("read token record"),
+    )
+    .expect("parse token record");
+    record["payload"]["expires_at"] = serde_json::Value::String("2000-01-01T00:00:00Z".to_string());
+    let payload: AuthorizedEffectPayload = serde_json::from_value(record["payload"].clone())
+        .expect("parse token payload");
+    record["payload"]["token_digest"] =
+        serde_json::Value::String(recompute_effect_token_digest(&payload));
+    fs::write(
+        &record_path,
+        serde_json::to_vec_pretty(&record).expect("serialize updated token record"),
+    )
+    .expect("write updated token record");
+    let expired_effect = octon_authorized_effects::authority_mint::mint_authorized_effect::<
+        ServiceInvocation,
+    >(
+        serde_json::from_value(record["payload"].clone()).expect("rebuild expired token"),
+    );
+    let err = verify_authorized_effect(
+        &runtime_path,
+        &grant,
+        &expired_effect,
+        "test::service_consumer",
+        "service::invoke",
+    )
+    .expect_err("expired token must fail");
+    assert!(err.to_string().contains("EFFECT_TOKEN_EXPIRED"));
+}
+
+#[test]
+fn verification_bundle_scope_mismatch_fails_closed() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let mut request = minimal_request();
+    request.action_type = "mutate_repo".to_string();
+    request.side_effect_flags.write_repo = true;
+    request.scope_constraints.write = vec!["allowed-scope".to_string()];
+    request.policy_mode_requested = Some("hard-enforce".to_string());
+    let prior_route_bundle = std::env::var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE").ok();
+    std::env::set_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE", "1");
+    let grant = authorize_execution(&cfg, &policy, &request, None).expect("request should authorize");
+    match prior_route_bundle {
+        Some(value) => std::env::set_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE", value),
+        None => std::env::remove_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE"),
+    }
+    let runtime_path = cfg.execution_tmp_root.join(&request.request_id);
+    fs::create_dir_all(&runtime_path).expect("create runtime path");
+    let execution_grant_path = runtime_path.join("grant-bundle.json");
+    fs::write(
+        &execution_grant_path,
+        serde_json::to_vec_pretty(&grant).expect("serialize execution grant"),
+    )
+    .expect("write execution grant bundle");
+    let effect =
+        issue_repo_mutation_effect(&runtime_path, &grant, "allowed-scope").expect("repo effect should mint");
+    let bundle_path = cfg
+        .repo_root
+        .join(".octon/generated/.tmp/tests/repo-effect-bundle.json");
+    write_authorized_effect_verification_bundle(
+        &effect,
+        execution_grant_path.display().to_string(),
+        "test::bundle_consumer",
+        "other-scope",
+        &bundle_path,
+    )
+    .expect("write verification bundle");
+    let err = verify_authorized_effect_verification_bundle(&bundle_path)
+        .expect_err("scope-mismatched verification bundle must fail");
+    assert_eq!(err.code, ErrorCode::CapabilityDenied);
+}
+
+#[test]
+fn tampered_verification_bundle_fails_closed() {
+    let cfg = temp_runtime_config();
+    let policy = PolicyEngine::new(cfg.clone());
+    let request = minimal_request();
+    let prior_route_bundle = std::env::var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE").ok();
+    std::env::set_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE", "1");
+    let grant = authorize_execution(&cfg, &policy, &request, None).expect("request should authorize");
+    match prior_route_bundle {
+        Some(value) => std::env::set_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE", value),
+        None => std::env::remove_var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE"),
+    }
+    let runtime_path = cfg.execution_tmp_root.join(&request.request_id);
+    fs::create_dir_all(&runtime_path).expect("create runtime path");
+    let execution_grant_path = runtime_path.join("grant-bundle.json");
+    fs::write(
+        &execution_grant_path,
+        serde_json::to_vec_pretty(&grant).expect("serialize execution grant"),
+    )
+    .expect("write execution grant bundle");
+    let effect = issue_service_invocation_effect(&runtime_path, &grant, "service::invoke")
+        .expect("service effect should mint");
+    let bundle_path = cfg
+        .repo_root
+        .join(".octon/generated/.tmp/tests/service-effect-bundle.json");
+    write_authorized_effect_verification_bundle(
+        &effect,
+        execution_grant_path.display().to_string(),
+        "test::bundle_consumer",
+        "service::invoke",
+        &bundle_path,
+    )
+    .expect("write verification bundle");
+    let mut bundle: serde_json::Value =
+        serde_json::from_str(&fs::read_to_string(&bundle_path).expect("read bundle"))
+            .expect("parse bundle");
+    bundle["token_payload"]["effect_kind"] =
+        serde_json::Value::String("repo-mutation".to_string());
+    bundle["token_payload"]["token_type"] =
+        serde_json::Value::String("AuthorizedEffect<RepoMutation>".to_string());
+    fs::write(
+        &bundle_path,
+        serde_json::to_vec_pretty(&bundle).expect("serialize tampered bundle"),
+    )
+    .expect("write tampered bundle");
+    let err = verify_authorized_effect_verification_bundle(&bundle_path)
+        .expect_err("tampered verification bundle must fail");
+    assert_eq!(err.code, ErrorCode::CapabilityDenied);
 }
 
 #[test]
@@ -702,80 +1004,20 @@ fn active_revocation_refs_prefer_canonical_files_when_present() {
 fn unsupported_support_tier_denies_execution() {
     let cfg = temp_runtime_config();
     let policy = PolicyEngine::new(cfg.clone());
-    let support_targets_path = cfg
-        .octon_dir
-        .join("instance/governance/support-targets.yml");
-    let mut support_targets: serde_yaml::Value = serde_yaml::from_str(
-        &fs::read_to_string(&support_targets_path).expect("read support targets"),
-    )
-    .expect("parse support targets");
-    let tuple_admissions = support_targets["tuple_admissions"]
-        .as_sequence_mut()
-        .expect("tuple_admissions should be a sequence");
-    tuple_admissions.retain(|entry| {
-        entry["tuple_id"].as_str()
-            != Some("tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell")
-    });
-    fs::write(
-        &support_targets_path,
-        serde_yaml::to_string(&support_targets).expect("serialize support targets"),
-    )
-    .expect("rewrite support targets");
-    let pack_lock_path = cfg
-        .octon_dir
-        .join("generated/effective/capabilities/pack-routes.lock.yml");
-    let mut pack_lock: serde_yaml::Value = serde_yaml::from_str(
-        &fs::read_to_string(&pack_lock_path).expect("read pack routes lock"),
-    )
-    .expect("parse pack routes lock");
-    pack_lock["support_targets_sha256"] =
-        serde_yaml::Value::String(fixture_sha256(&support_targets_path));
-    fs::write(
-        &pack_lock_path,
-        serde_yaml::to_string(&pack_lock).expect("serialize pack routes lock"),
-    )
-    .expect("rewrite pack routes lock");
-
-    let route_bundle_path = cfg
-        .octon_dir
-        .join("generated/effective/runtime/route-bundle.yml");
-    let route_lock_path = cfg
-        .octon_dir
-        .join("generated/effective/runtime/route-bundle.lock.yml");
-    let mut route_bundle: serde_yaml::Value = serde_yaml::from_str(
-        &fs::read_to_string(&route_bundle_path).expect("read route bundle"),
-    )
-    .expect("parse route bundle");
-    let routes = route_bundle["routes"]
-        .as_sequence_mut()
-        .expect("route bundle routes should be a sequence");
-    routes.retain(|entry| {
-        entry["tuple_id"].as_str()
-            != Some("tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell")
-    });
-    fs::write(
-        &route_bundle_path,
-        serde_yaml::to_string(&route_bundle).expect("serialize route bundle"),
-    )
-    .expect("rewrite route bundle");
-    let mut route_lock: serde_yaml::Value = serde_yaml::from_str(
-        &fs::read_to_string(&route_lock_path).expect("read route bundle lock"),
-    )
-    .expect("parse route bundle lock");
-    route_lock["route_bundle_sha256"] =
-        serde_yaml::Value::String(fixture_sha256(&route_bundle_path));
-    route_lock["pack_routes_lock_sha256"] =
-        serde_yaml::Value::String(fixture_sha256(&pack_lock_path));
-    fs::write(
-        &route_lock_path,
-        serde_yaml::to_string(&route_lock).expect("serialize route bundle lock"),
-    )
-    .expect("rewrite route bundle lock");
-    let err = authorize_execution(&cfg, &policy, &minimal_request(), None)
+    let mut request = minimal_request();
+    request.metadata.insert(
+        "support_tier".to_string(),
+        "unsupported-tier".to_string(),
+    );
+    let err = authorize_execution(&cfg, &policy, &request, None)
         .expect_err("unsupported support tier should deny");
-    assert_eq!(
-        err.details["reason_codes"][0].as_str(),
-        Some("runtime_effective_handle_digest_mismatch")
+    assert!(
+        err.details["reason_codes"]
+            .as_array()
+            .expect("reason codes should be an array")
+            .iter()
+            .filter_map(|value| value.as_str())
+            .any(|value| value == "SUPPORT_TIER_UNSUPPORTED")
     );
 }
 
@@ -932,9 +1174,12 @@ fn failed_run_measurement_artifacts_remain_workflow_agnostic() {
     let grant = authorize_execution(&cfg, &policy, &request, None)
         .expect("archive proposal request should authorize");
     let artifacts_root = cfg.execution_tmp_root.join(&request.request_id);
-    let artifact_effects = grant
-        .execution_artifact_effects(artifacts_root.display().to_string())
-        .expect("artifact effects should issue");
+    let artifact_effects = issue_execution_artifact_effects(
+        &artifacts_root,
+        &grant,
+        artifacts_root.display().to_string(),
+    )
+    .expect("artifact effects should issue");
     let paths = write_execution_start(&artifacts_root, &request, &grant, &artifact_effects)
         .expect("execution start should materialize");
     let outcome = ExecutionOutcome {

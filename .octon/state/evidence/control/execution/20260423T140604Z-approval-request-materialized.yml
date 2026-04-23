@@ -1,0 +1,24 @@
+schema_version: "authority-control-receipt-v1"
+receipt_id: "20260423T140604Z-approval-request-materialized"
+control_mutation_class: "approval_request_materialized"
+source_ref: ".octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml"
+applied_to_ref: ".octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml"
+issuer_ref: "github://workflow/pr-auto-merge"
+timestamp: "2026-04-23T14:06:04Z"
+result: "applied"
+reason: "Canonical GitHub control projection granted."
+reason_codes:
+  - "LOCAL_REPRESENTATIVE_FIXTURE"
+affected_paths:
+  - ".octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml"
+policy_refs:
+  []
+projection_refs:
+  - "github://pull/17#check:Validate autonomy policy"
+  - "github://pull/17#check:AI Review Gate / decision"
+  - "github://pull/17#head:feature/example"
+approval_request_ref: ".octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml"
+approval_grant_ref: null
+exception_lease_ref: null
+revocation_ref: null
+linked_run_id: "github-pr-automerge-local-representative-17d"
