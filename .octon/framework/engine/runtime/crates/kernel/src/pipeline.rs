@@ -2608,7 +2608,7 @@ stages:
                 run_id: None,
                 mission_id: Some("sample-mission".to_string()),
                 resume_existing: false,
-                executor: ExecutorKind::Auto,
+                executor: ExecutorKind::Mock,
                 executor_bin: None,
                 output_slug: Some("prepare".to_string()),
                 model: None,
