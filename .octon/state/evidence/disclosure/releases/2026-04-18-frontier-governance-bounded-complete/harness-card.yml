@@ -23,6 +23,7 @@ retained_adapters:
   host_adapters:
     - repo-shell
     - ci-control-plane
+    - github-control-plane
   model_adapters:
     - repo-local-governed
 capability_packs:
@@ -46,6 +47,7 @@ proof_bundle_refs:
   - .octon/state/evidence/disclosure/releases/2026-04-18-frontier-governance-bounded-complete/closure/residual-ledger.yml
 known_limits:
   - Browser and API capability packs remain governed but non-live until runtime-service admission and service-specific proof exist.
-  - Frontier-governed, extended-governed, spanish-secondary, github-control-plane, studio-control-plane, and boundary-sensitive surfaces remain explicit non-live posture.
+  - Frontier-governed, extended-governed, spanish-secondary, studio-control-plane, and boundary-sensitive surfaces remain explicit non-live posture.
+  - GitHub support remains live only for the token-enforced protected-CI merge lane; broader GitHub/API/frontier surfaces remain non-live.
   - Future widening requires a fresh support admission and disclosure cycle.
 generated_at: "2026-04-18T00:00:00Z"

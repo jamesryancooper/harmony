@@ -9,6 +9,9 @@ else
   OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../.." && pwd)"
   ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
 fi
+source "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/publication-wrapper-common.sh"
+
+enter_publication_runtime_boundary capability-routing
 
 ROOT_MANIFEST="$OCTON_DIR/octon.yml"
 COMMANDS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/commands/manifest.yml"

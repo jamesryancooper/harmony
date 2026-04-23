@@ -1,0 +1,39 @@
+allowed_capabilities:
+- github.pr.merge
+- github.branch.delete
+- protected.ci.check
+allowed_zones:
+- .octon/state/control/execution/runs/protected-ci-1776956405637-68212
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212
+attempt_kind: initial
+completion_status: criteria-pending
+created_at: 2026-04-23T15:00:05.766315Z
+entry_criteria:
+- Run contract is bound under the canonical run root.
+- Support-target tuple remains admitted for the bounded consequential envelope.
+evidence_refs:
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/policy-receipt.latest.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/grant-bundle.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/execution-receipt.json
+exit_criteria:
+- Stage receipts, replay refs, and disclosure refs are retained under canonical run roots.
+- Stage status reaches a terminal state that agrees with the decision artifact.
+issued_by: octon-kernel
+objective_ref: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml
+objective_slice: Stage github-pr:example/repo#17 for target github-pr:example/repo#17
+predecessor_refs: []
+requested_capabilities:
+- github.pr.merge
+- github.branch.delete
+- protected.ci.check
+retry_class: manual_review_required
+rollback_candidate: true
+rollback_notes: Restore from the canonical checkpoint and reissue the stage if retained evidence becomes inconsistent.
+run_id: protected-ci-1776956405637-68212
+schema_version: stage-attempt-v1
+stage_attempt_id: initial
+stage_ref: github-pr:example/repo#17
+status: succeeded
+successor_refs: []
+updated_at: 2026-04-23T15:00:07.738534Z
+validated_by: octon-kernel

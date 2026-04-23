@@ -1,0 +1,22 @@
+{
+  "schema_version": "authorization-phase-result-v1",
+  "request_id": "protected-ci-1776956405637-68212",
+  "run_id": "protected-ci-1776956405637-68212",
+  "phase_id": "receipt-materialization",
+  "phase_status": "completed",
+  "decision": "ALLOW",
+  "reason_codes": [
+    "ACP_EVIDENCE_INVALID"
+  ],
+  "artifact_refs": {
+    "execution_receipt": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/execution-receipt.json",
+    "outcome": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/outcome.json",
+    "side_effects": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/side-effects.json"
+  },
+  "details": {
+    "completed_at": "2026-04-23T15:00:07.672972Z",
+    "outcome_status": "succeeded",
+    "started_at": "2026-04-23T15:00:07.459749Z"
+  },
+  "generated_at": "2026-04-23T15:00:07.71714Z"
+}

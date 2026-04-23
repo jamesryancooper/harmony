@@ -35,6 +35,8 @@ from retained evidence only:
   `runtime-state.yml`, `rollback-posture.yml`, checkpoints, and stage attempts
 - authority evidence: decision artifact, grant bundle, and any approval,
   exception, or revocation refs used by the run
+- effect-token evidence: canonical token records plus mint, consume, reject,
+  expiry, or revocation receipts for material effects
 - replay and trace evidence: replay manifest, replay pointers, trace pointers,
   and external index entries when payloads are externalized
 - assurance evidence: required proof-plane reports for the admitted workload

@@ -125,3 +125,20 @@ entries:
     review_artifact_ref: .octon/instance/governance/contracts/retirement-review.yml
     latest_review_packet_ref: .octon/state/evidence/validation/architecture/10of10-target-transition/compatibility/retirement.yml
     next_review_due: "2026-06-30"
+  - surface: publication-validation-run-artifacts
+    paths:
+      - .octon/state/control/execution/runs/publish-*
+      - .octon/state/continuity/runs/publish-*
+      - .octon/state/control/execution/approvals/requests/publish-*.yml
+      - .octon/state/evidence/control/execution/authority-decision-publish-*.yml
+      - .octon/state/evidence/control/execution/authority-grant-bundle-publish-*.yml
+    status: retired
+    disposition: deleted
+    claim_adjacent: false
+    rationale: Transient publication-validation run residue was removed after canonical publication receipts were retained under validation/publication evidence roots.
+    canonical_successor_ref: .octon/state/evidence/validation/publication/**
+    certificate_blocker: false
+    future_widening_blocker: false
+    review_artifact_ref: .octon/instance/governance/contracts/retirement-review.yml
+    latest_review_packet_ref: .octon/state/evidence/validation/publication/build-to-delete/2026-04-23-publication-validation-runs
+    next_review_due: "2026-07-23"

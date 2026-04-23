@@ -1,0 +1,23 @@
+{
+  "schema_version": "authorized-effect-token-consumption-v1",
+  "token_id": "effect-token-protected-ci-check-75eea2626c67",
+  "token_digest": "sha256:dd985a2de54530524cdb302e8813adfb91b4a222dd79f15e49d1f24f68aab920",
+  "token_type": "AuthorizedEffect<ProtectedCiCheck>",
+  "effect_kind": "protected-ci-check",
+  "consumer_api_ref": ".octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs::cmd_protected_ci_auto_merge",
+  "target_scope": "github://repo/example/repo/pull/17/merge",
+  "verification_result": "verified",
+  "rejection_reason_codes": [],
+  "journal_event_refs": [
+    ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumption-requested-effect-token-protected-ci-check-75eea2626c67",
+    ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-consumed-effect-token-protected-ci-check-75eea2626c67"
+  ],
+  "evidence_refs": [
+    ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/effect-tokens/effect-token-protected-ci-check-75eea2626c67.json"
+  ],
+  "recorded_at": "2026-04-23T15:00:07.473335Z",
+  "run_id": "protected-ci-1776956405637-68212",
+  "request_id": "protected-ci-1776956405637-68212",
+  "grant_id": "grant-protected-ci-1776956405637-68212",
+  "token_record_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/effect-tokens/effect-token-protected-ci-check-75eea2626c67.json"
+}

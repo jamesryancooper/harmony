@@ -84,9 +84,9 @@ impl TelemetryEnvelope {
 mod tests {
     use super::*;
     use octon_replay_store::{
-        FreshReplayAuthorization, GoverningRefs, JournalActor, JournalEffect, JournalLifecycle,
-        JournalRedaction, ReplayMode, ReplayRequest, RunJournal, RunJournalEvent,
-        RunJournalLedger, plan_replay,
+        plan_replay, FreshReplayAuthorization, GoverningRefs, JournalActor, JournalEffect,
+        JournalLifecycle, JournalRedaction, ReplayMode, ReplayRequest, RunJournal, RunJournalEvent,
+        RunJournalLedger,
     };
     use std::collections::BTreeSet;
 
@@ -238,7 +238,10 @@ mod tests {
             .expect("default replay plan should build");
         let envelope = TelemetryEnvelope::from_replay_plan(&plan);
 
-        assert_eq!(envelope.replay_mode, format!("{:?}", ReplayMode::DryRun).to_lowercase());
+        assert_eq!(
+            envelope.replay_mode,
+            format!("{:?}", ReplayMode::DryRun).to_lowercase()
+        );
         assert_eq!(envelope.simulated_side_effects, 1);
         assert_eq!(envelope.live_side_effects, 0);
     }

@@ -70,6 +70,113 @@ pub fn default_autonomy_context(
     })
 }
 
+fn allow_stale_runtime_route_bundle() -> bool {
+    std::env::var("OCTON_ALLOW_STALE_RUNTIME_ROUTE_BUNDLE")
+        .map(|value| value == "1" || value.eq_ignore_ascii_case("true"))
+        .unwrap_or(false)
+}
+
+fn request_metadata_ref(request: &ExecutionRequest, key: &str) -> Option<String> {
+    request
+        .metadata
+        .get(key)
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty())
+}
+
+fn load_explicit_approval_request_ref(
+    cfg: &RuntimeConfig,
+    request: &ExecutionRequest,
+) -> CoreResult<Option<String>> {
+    let Some(approval_request_ref) =
+        request_metadata_ref(request, "protected_ci_approval_request_ref")
+            .or_else(|| request_metadata_ref(request, "approval_request_ref"))
+    else {
+        return Ok(None);
+    };
+    let approval_path = cfg.repo_root.join(&approval_request_ref);
+    if !approval_path.is_file() {
+        return Err(KernelError::new(
+            ErrorCode::CapabilityDenied,
+            format!(
+                "approval request artifact missing: {}",
+                approval_path.display()
+            ),
+        )
+        .with_details(json!({"reason_codes":["APPROVAL_REQUEST_MISSING"]})));
+    }
+    let _: ApprovalRequestArtifact = read_yaml_file(&approval_path)?;
+    Ok(Some(approval_request_ref))
+}
+
+fn load_explicit_approval_grants(
+    cfg: &RuntimeConfig,
+    request: &ExecutionRequest,
+) -> CoreResult<Vec<(ApprovalGrantArtifact, String)>> {
+    let mut grants = Vec::new();
+    let mut seen = BTreeSet::new();
+    for key in ["protected_ci_approval_grant_ref", "approval_grant_ref"] {
+        let Some(approval_grant_ref) = request_metadata_ref(request, key) else {
+            continue;
+        };
+        if !seen.insert(approval_grant_ref.clone()) {
+            continue;
+        }
+        let approval_path = cfg.repo_root.join(&approval_grant_ref);
+        if !approval_path.is_file() {
+            return Err(KernelError::new(
+                ErrorCode::CapabilityDenied,
+                format!(
+                    "approval grant artifact missing: {}",
+                    approval_path.display()
+                ),
+            )
+            .with_details(json!({"reason_codes":["APPROVAL_GRANT_MISSING"]})));
+        }
+        let approval_grant: ApprovalGrantArtifact = read_yaml_file(&approval_path)?;
+        if approval_grant.state == "active" {
+            grants.push((approval_grant, approval_grant_ref));
+        }
+    }
+    Ok(grants)
+}
+
+fn granted_effect_kinds_for_request(request: &ExecutionRequest) -> Vec<String> {
+    let mut effect_kinds = vec![
+        EvidenceMutation::KIND.to_string(),
+        StateControlMutation::KIND.to_string(),
+    ];
+    if request.side_effect_flags.write_repo || request.side_effect_flags.branch_mutation {
+        effect_kinds.push(RepoMutation::KIND.to_string());
+    }
+    if request.side_effect_flags.publication {
+        match request.action_type.as_str() {
+            "publish_extension_activation" => {
+                effect_kinds.push(ExtensionActivation::KIND.to_string());
+            }
+            "publish_capability_pack_activation" => {
+                effect_kinds.push(CapabilityPackActivation::KIND.to_string());
+            }
+            _ => {
+                effect_kinds.push(GeneratedEffectivePublication::KIND.to_string());
+            }
+        }
+    }
+    if request.side_effect_flags.network || request.side_effect_flags.model_invoke {
+        effect_kinds.push(ServiceInvocation::KIND.to_string());
+    }
+    if request.action_type == "launch_executor" || request.target_id == "octon-studio" {
+        effect_kinds.push(ExecutorLaunch::KIND.to_string());
+    }
+    if request.action_type == "protected_ci_auto_merge" {
+        effect_kinds.push(ProtectedCiCheck::KIND.to_string());
+    }
+    if effect_kinds.is_empty() {
+        effect_kinds.push(ServiceInvocation::KIND.to_string());
+    }
+    dedupe_strings(&effect_kinds)
+}
+
 pub fn authorize_execution(
     cfg: &RuntimeConfig,
     policy: &PolicyEngine,
@@ -78,36 +185,80 @@ pub fn authorize_execution(
 ) -> CoreResult<GrantBundle> {
     let mut request = request.clone();
     request.metadata = with_authority_env_metadata(request.metadata);
-    let verified_runtime_route_bundle = verify_runtime_route_bundle(&cfg.octon_dir)
-        .map_err(runtime_route_bundle_denial)?;
-    request.metadata.insert(
-        "runtime_effective_route_bundle_generation_id".to_string(),
-        verified_runtime_route_bundle.generation_id().to_string(),
-    );
-    request.metadata.insert(
-        "runtime_effective_route_bundle_sha256".to_string(),
-        verified_runtime_route_bundle.bundle_sha256.clone(),
-    );
-    request.metadata.insert(
-        "runtime_effective_route_bundle_ref".to_string(),
-        path_tail(&cfg.repo_root, &verified_runtime_route_bundle.bundle_path),
-    );
-    request.metadata.insert(
-        "runtime_effective_handle_kind".to_string(),
-        "runtime_route_bundle".to_string(),
-    );
-    request.metadata.insert(
-        "runtime_effective_freshness_mode".to_string(),
-        verified_runtime_route_bundle.freshness_mode().to_string(),
-    );
-    request.metadata.insert(
-        "runtime_effective_publication_receipt_ref".to_string(),
-        verified_runtime_route_bundle.lock.publication_receipt_path.clone(),
-    );
-    request.metadata.insert(
-        "runtime_effective_non_authority_classification".to_string(),
-        verified_runtime_route_bundle.lock.non_authority_classification.clone(),
-    );
+    if request.support_target_tuple_ref.is_none() {
+        request.support_target_tuple_ref = Some(support_target_tuple_id(
+            &requested_support_target_tuple(&request)?,
+        ));
+    }
+    let verified_runtime_route_bundle = if allow_stale_runtime_route_bundle() {
+        request.metadata.insert(
+            "runtime_effective_route_bundle_generation_id".to_string(),
+            "runtime-route-bundle-publication-bypass".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_route_bundle_sha256".to_string(),
+            "runtime-route-bundle-publication-bypass".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_route_bundle_ref".to_string(),
+            ".octon/generated/effective/runtime/route-bundle.yml".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_handle_kind".to_string(),
+            "runtime_route_bundle".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_freshness_mode".to_string(),
+            "publication-bypass".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_publication_receipt_ref".to_string(),
+            ".octon/state/evidence/validation/publication/runtime/<pending>".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_non_authority_classification".to_string(),
+            "derived-runtime-handle".to_string(),
+        );
+        None
+    } else {
+        let verified_runtime_route_bundle =
+            verify_runtime_route_bundle(&cfg.octon_dir).map_err(runtime_route_bundle_denial)?;
+        request.metadata.insert(
+            "runtime_effective_route_bundle_generation_id".to_string(),
+            verified_runtime_route_bundle.generation_id().to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_route_bundle_sha256".to_string(),
+            verified_runtime_route_bundle.bundle_sha256.clone(),
+        );
+        request.metadata.insert(
+            "runtime_effective_route_bundle_ref".to_string(),
+            path_tail(&cfg.repo_root, &verified_runtime_route_bundle.bundle_path),
+        );
+        request.metadata.insert(
+            "runtime_effective_handle_kind".to_string(),
+            "runtime_route_bundle".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_freshness_mode".to_string(),
+            verified_runtime_route_bundle.freshness_mode().to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_publication_receipt_ref".to_string(),
+            verified_runtime_route_bundle
+                .lock
+                .publication_receipt_path
+                .clone(),
+        );
+        request.metadata.insert(
+            "runtime_effective_non_authority_classification".to_string(),
+            verified_runtime_route_bundle
+                .lock
+                .non_authority_classification
+                .clone(),
+        );
+        Some(verified_runtime_route_bundle)
+    };
     let environment = resolve_execution_environment(cfg, &request);
     let intent_ref = request
         .intent_ref
@@ -238,42 +389,77 @@ pub fn authorize_execution(
     } else {
         run_contract.support_target.clone()
     };
-    let runtime_route = verified_runtime_route_bundle
-        .ensure_live_tuple_and_packs(
-            &RuntimeSupportTupleRef {
-                model_tier: requested_support_tuple.model_tier.clone(),
-                workload_tier: requested_support_tuple.workload_tier.clone(),
-                language_resource_tier: requested_support_tuple.language_resource_tier.clone(),
-                locale_tier: requested_support_tuple.locale_tier.clone(),
-                host_adapter: requested_support_tuple.host_adapter.clone(),
-                model_adapter: requested_support_tuple.model_adapter.clone(),
-            },
-            &support_tier.requested_capability_packs,
-        )
-        .map_err(runtime_route_bundle_denial)?;
-    request.metadata.insert(
-        "runtime_effective_support_tuple".to_string(),
-        runtime_route.tuple_id.clone(),
-    );
-    request.metadata.insert(
-        "runtime_effective_claim_effect".to_string(),
-        runtime_route.claim_effect.clone(),
-    );
-    request.metadata.insert(
-        "runtime_effective_allowed_capability_packs".to_string(),
-        runtime_route.allowed_capability_packs.join(","),
-    );
-    verified_runtime_route_bundle
-        .ensure_extensions_available()
-        .map_err(runtime_route_bundle_denial)?;
-    request.metadata.insert(
-        "runtime_effective_extensions_status".to_string(),
-        verified_runtime_route_bundle.bundle.extensions.status.clone(),
-    );
-    request.metadata.insert(
-        "runtime_effective_extensions_generation_id".to_string(),
-        verified_runtime_route_bundle.bundle.extensions.generation_id.clone(),
-    );
+    if let Some(verified_runtime_route_bundle) = verified_runtime_route_bundle.as_ref() {
+        let runtime_route = verified_runtime_route_bundle
+            .ensure_live_tuple_and_packs(
+                &RuntimeSupportTupleRef {
+                    model_tier: requested_support_tuple.model_tier.clone(),
+                    workload_tier: requested_support_tuple.workload_tier.clone(),
+                    language_resource_tier: requested_support_tuple.language_resource_tier.clone(),
+                    locale_tier: requested_support_tuple.locale_tier.clone(),
+                    host_adapter: requested_support_tuple.host_adapter.clone(),
+                    model_adapter: requested_support_tuple.model_adapter.clone(),
+                },
+                &support_tier.requested_capability_packs,
+            )
+            .map_err(runtime_route_bundle_denial)?;
+        request.metadata.insert(
+            "runtime_effective_support_tuple".to_string(),
+            runtime_route.tuple_id.clone(),
+        );
+        request.support_target_tuple_ref = Some(runtime_route.tuple_id.clone());
+        request.metadata.insert(
+            "runtime_effective_claim_effect".to_string(),
+            runtime_route.claim_effect.clone(),
+        );
+        request.metadata.insert(
+            "runtime_effective_allowed_capability_packs".to_string(),
+            runtime_route.allowed_capability_packs.join(","),
+        );
+        verified_runtime_route_bundle
+            .ensure_extensions_available()
+            .map_err(runtime_route_bundle_denial)?;
+        request.metadata.insert(
+            "runtime_effective_extensions_status".to_string(),
+            verified_runtime_route_bundle
+                .bundle
+                .extensions
+                .status
+                .clone(),
+        );
+        request.metadata.insert(
+            "runtime_effective_extensions_generation_id".to_string(),
+            verified_runtime_route_bundle
+                .bundle
+                .extensions
+                .generation_id
+                .clone(),
+        );
+    } else {
+        request.metadata.insert(
+            "runtime_effective_support_tuple".to_string(),
+            request
+                .support_target_tuple_ref
+                .clone()
+                .unwrap_or_else(|| "publication-bypass".to_string()),
+        );
+        request.metadata.insert(
+            "runtime_effective_claim_effect".to_string(),
+            "publication-bypass".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_allowed_capability_packs".to_string(),
+            support_tier.allowed_capability_packs.join(","),
+        );
+        request.metadata.insert(
+            "runtime_effective_extensions_status".to_string(),
+            "publication-bypass".to_string(),
+        );
+        request.metadata.insert(
+            "runtime_effective_extensions_generation_id".to_string(),
+            "publication-bypass".to_string(),
+        );
+    }
     let reversibility = reversibility_payload(&request, &run_contract, autonomy_state.as_ref());
     let preflight_result = phases::results::AuthorizationPhaseResult {
         schema_version: "authorization-phase-result-v1".to_string(),
@@ -360,9 +546,13 @@ pub fn authorize_execution(
         .as_ref()
         .map(|state| state.approval_required || state.break_glass_required)
         .unwrap_or(false);
+    let explicit_approval_request_ref = load_explicit_approval_request_ref(cfg, &request)?;
+    let explicit_approval_grants = load_explicit_approval_grants(cfg, &request)?;
     let approval_required = profile_requires_human_review
         || request.review_requirements.human_approval
         || autonomy_requires_approval
+        || explicit_approval_request_ref.is_some()
+        || !explicit_approval_grants.is_empty()
         || !run_contract.required_approvals.is_empty();
     let quorum_required = request.review_requirements.quorum;
     let rollback_required =
@@ -390,14 +580,17 @@ pub fn authorize_execution(
         Vec::new()
     };
     let approval_request_ref = if approval_required {
-        Some(write_approval_request(
-            cfg,
-            &request,
-            &run_contract,
-            &ownership,
-            required_evidence.clone(),
-            approval_request_reason_codes.clone(),
-        )?)
+        match explicit_approval_request_ref.clone() {
+            Some(value) => Some(value),
+            None => Some(write_approval_request(
+                cfg,
+                &request,
+                &run_contract,
+                &ownership,
+                required_evidence.clone(),
+                approval_request_reason_codes.clone(),
+            )?),
+        }
     } else {
         None
     };
@@ -672,7 +865,15 @@ pub fn authorize_execution(
         _ => {}
     }
 
-    let loaded_approval_grants = load_existing_approval_grants(cfg, &request.request_id)?;
+    let mut loaded_approval_grants = load_existing_approval_grants(cfg, &request.request_id)?;
+    for explicit_grant in explicit_approval_grants {
+        if loaded_approval_grants
+            .iter()
+            .all(|(_, path)| path != &explicit_grant.1)
+        {
+            loaded_approval_grants.push(explicit_grant);
+        }
+    }
     let approval_grant_refs = loaded_approval_grants
         .iter()
         .map(|(_, path)| path.clone())
@@ -835,6 +1036,7 @@ pub fn authorize_execution(
         request_id: request.request_id.clone(),
         decision: ExecutionDecision::Allow,
         granted_capabilities,
+        granted_effect_kinds: granted_effect_kinds_for_request(&request),
         scope_constraints: request.scope_constraints.clone(),
         effective_policy_mode,
         reason_codes: if policy_artifacts.reason_codes.is_empty() {
@@ -889,6 +1091,13 @@ pub fn authorize_execution(
             .as_ref()
             .map(|state| state.breaker_state.clone()),
         support_tier: Some(run_contract.support_tier.clone()),
+        support_target_tuple_ref: request.support_target_tuple_ref.clone().or_else(|| {
+            request
+                .metadata
+                .get("runtime_effective_support_tuple")
+                .filter(|value| value.starts_with("tuple://"))
+                .cloned()
+        }),
         support_posture: Some(support_tier.clone()),
         quorum_policy_ref: Some(canonical_quorum_policy_ref().to_string()),
         ownership_refs: ownership.owner_refs.clone(),
@@ -1140,9 +1349,15 @@ fn journal_governing_refs_for_bound_run(
         lease_ref: grant.exception_lease_refs.first().cloned(),
         revocation_ref: grant.revocation_refs.first().cloned(),
         support_target_tuple_ref: request
-            .metadata
-            .get("runtime_effective_support_tuple")
-            .cloned()
+            .support_target_tuple_ref
+            .clone()
+            .or_else(|| grant.support_target_tuple_ref.clone())
+            .or_else(|| {
+                request
+                    .metadata
+                    .get("runtime_effective_support_tuple")
+                    .cloned()
+            })
             .or_else(|| grant.support_tier.clone()),
         rollback_plan_ref: grant.rollback_handle.clone(),
         rollback_posture_ref: Some(format!(
@@ -1273,59 +1488,28 @@ fn snapshot_run_journal(repo_root: &Path, request_id: &str) -> CoreResult<RunJou
     })
 }
 
-pub fn validate_authorized_effect<T: EffectKind>(
-    grant: &GrantBundle,
-    effect: &AuthorizedEffect<T>,
-) -> CoreResult<()> {
-    if !matches!(grant.decision, ExecutionDecision::Allow) {
-        return Err(KernelError::new(
-            ErrorCode::CapabilityDenied,
-            format!(
-                "authorized effect '{}' requires an allow decision",
-                T::KIND
-            ),
-        ));
-    }
-    if effect.request_id != grant.request_id {
-        return Err(KernelError::new(
-            ErrorCode::CapabilityDenied,
-            format!(
-                "authorized effect '{}' request id mismatch",
-                T::KIND
-            ),
-        ));
-    }
-    if effect.run_root != grant.run_root {
-        return Err(KernelError::new(
-            ErrorCode::CapabilityDenied,
-            format!(
-                "authorized effect '{}' run root mismatch",
-                T::KIND
-            ),
-        ));
-    }
-    if effect.scope_ref.trim().is_empty() {
-        return Err(KernelError::new(
-            ErrorCode::CapabilityDenied,
-            format!(
-                "authorized effect '{}' must declare a scope",
-                T::KIND
-            ),
-        ));
-    }
-    Ok(())
-}
-
 pub fn write_execution_start(
     root: &Path,
     request: &ExecutionRequest,
     grant: &GrantBundle,
     effects: &ExecutionArtifactEffects,
 ) -> anyhow::Result<ExecutionArtifactPaths> {
-    validate_authorized_effect(grant, &effects.evidence)
-        .map_err(|error| anyhow::anyhow!(error.to_string()))?;
-    validate_authorized_effect(grant, &effects.control)
-        .map_err(|error| anyhow::anyhow!(error.to_string()))?;
+    verify_authorized_effect(
+        root,
+        grant,
+        &effects.evidence,
+        ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs::write_execution_start:evidence",
+        root.display().to_string(),
+    )
+    .map_err(|error: KernelError| anyhow::anyhow!(error.to_string()))?;
+    verify_authorized_effect(
+        root,
+        grant,
+        &effects.control,
+        ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs::write_execution_start:control",
+        root.display().to_string(),
+    )
+    .map_err(|error: KernelError| anyhow::anyhow!(error.to_string()))?;
     fs::create_dir_all(root)
         .with_context(|| format!("create execution artifact root {}", root.display()))?;
     let paths = ExecutionArtifactPaths::new(root.to_path_buf());
@@ -1456,14 +1640,7 @@ pub fn write_execution_start(
                 state_before: Some("authorizing".to_string()),
                 state_after: Some("authorized".to_string()),
             },
-            journal_governing_refs_for_bound_run(
-                &bound,
-                request,
-                grant,
-                None,
-                None,
-                None,
-            ),
+            journal_governing_refs_for_bound_run(&bound, request, grant, None, None, None),
             journal_payload(
                 Some(json!({
                     "granted_capabilities": grant.granted_capabilities.clone(),
@@ -1492,14 +1669,7 @@ pub fn write_execution_start(
                 state_before: Some("authorized".to_string()),
                 state_after: Some("running".to_string()),
             },
-            journal_governing_refs_for_bound_run(
-                &bound,
-                request,
-                grant,
-                None,
-                None,
-                None,
-            ),
+            journal_governing_refs_for_bound_run(&bound, request, grant, None, None, None),
             journal_payload(
                 Some(json!({"stage_attempt_id": bound.stage_attempt_id.clone()})),
                 None,
@@ -1536,7 +1706,7 @@ pub fn write_execution_start(
             journal_payload(
                 Some(json!({
                     "requested_capabilities": request.requested_capabilities.clone(),
-                    "scope_ref": effects.control.scope_ref.clone(),
+                    "scope_ref": effects.control.scope_ref().to_string(),
                 })),
                 None,
                 Some("Capability invocation is journal-covered before consequential execution proceeds.".to_string()),
@@ -1575,7 +1745,10 @@ pub fn write_execution_start(
                     "evidence_checkpoint_ref": evidence_checkpoint_ref,
                 })),
                 None,
-                Some("Execution-start checkpoint materialized under canonical run roots.".to_string()),
+                Some(
+                    "Execution-start checkpoint materialized under canonical run roots."
+                        .to_string(),
+                ),
             ),
             journal_effect("evidence"),
             vec!["checkpoint_ref".to_string()],
@@ -1654,18 +1827,51 @@ pub fn finalize_execution(
     outcome: &ExecutionOutcome,
     side_effects: &SideEffectSummary,
 ) -> anyhow::Result<()> {
-    validate_authorized_effect(grant, &effects.evidence)
-        .map_err(|error| anyhow::anyhow!(error.to_string()))?;
-    validate_authorized_effect(grant, &effects.control)
-        .map_err(|error| anyhow::anyhow!(error.to_string()))?;
-    write_json(&paths.side_effects, side_effects)?;
+    let verified_evidence = verify_authorized_effect(
+        &paths.root,
+        grant,
+        &effects.evidence,
+        ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs::finalize_execution:evidence",
+        paths.root.display().to_string(),
+    )
+    .map_err(|error: KernelError| anyhow::anyhow!(error.to_string()))?;
+    let verified_control = verify_authorized_effect(
+        &paths.root,
+        grant,
+        &effects.control,
+        ".octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs::finalize_execution:control",
+        paths.root.display().to_string(),
+    )
+    .map_err(|error: KernelError| anyhow::anyhow!(error.to_string()))?;
+    let mut side_effects_with_tokens = side_effects.clone();
+    side_effects_with_tokens
+        .authorized_effects
+        .push(authorized_effect_reference(&verified_evidence));
+    side_effects_with_tokens
+        .authorized_effects
+        .push(authorized_effect_reference(&verified_control));
+    side_effects_with_tokens
+        .authorized_effects
+        .sort_by(|left, right| {
+            left.token_id.cmp(&right.token_id).then(
+                left.consumption_receipt_ref
+                    .cmp(&right.consumption_receipt_ref),
+            )
+        });
+    side_effects_with_tokens
+        .authorized_effects
+        .dedup_by(|left, right| {
+            left.token_id == right.token_id
+                && left.consumption_receipt_ref == right.consumption_receipt_ref
+        });
+    write_json(&paths.side_effects, &side_effects_with_tokens)?;
     write_json(&paths.outcome, outcome)?;
     let receipt = phases::receipt::execution_receipt_payload(
         request,
         grant,
         started_at,
         outcome,
-        side_effects,
+        &side_effects_with_tokens,
         paths,
     );
     write_json(&paths.receipt, &receipt)?;
@@ -1761,21 +1967,17 @@ pub fn finalize_execution(
                 state_before: Some("running".to_string()),
                 state_after: Some(outcome.status.clone()),
             },
-            journal_governing_refs_for_bound_run(
-                &bound,
-                request,
-                grant,
-                None,
-                None,
-                None,
-            ),
+            journal_governing_refs_for_bound_run(&bound, request, grant, None, None, None),
             journal_payload(
                 Some(json!({
                     "outcome_status": outcome.status,
                     "execution_receipt_ref": path_tail(&repo_root, &execution_receipt),
                 })),
                 None,
-                Some("Capability terminal outcome is recorded in the canonical Run Journal.".to_string()),
+                Some(
+                    "Capability terminal outcome is recorded in the canonical Run Journal."
+                        .to_string(),
+                ),
             ),
             journal_effect("mutate"),
             Vec::new(),
@@ -1811,7 +2013,10 @@ pub fn finalize_execution(
                     "evidence_checkpoint_ref": evidence_checkpoint_ref.clone(),
                 })),
                 None,
-                Some("Execution-complete checkpoint materialized under canonical run roots.".to_string()),
+                Some(
+                    "Execution-complete checkpoint materialized under canonical run roots."
+                        .to_string(),
+                ),
             ),
             journal_effect("evidence"),
             vec!["checkpoint_ref".to_string()],
@@ -1977,10 +2182,16 @@ pub fn finalize_execution(
             journal_payload(
                 Some(json!({"final_state":"closed","outcome_status": outcome.status})),
                 None,
-                Some("Run reached closure with journal snapshot and disclosure retained.".to_string()),
+                Some(
+                    "Run reached closure with journal snapshot and disclosure retained."
+                        .to_string(),
+                ),
             ),
             journal_effect("write"),
-            vec!["runtime_state_ref".to_string(), "disclosure_ref".to_string()],
+            vec![
+                "runtime_state_ref".to_string(),
+                "disclosure_ref".to_string(),
+            ],
             Some(snapshot_refs),
         )
         .map_err(|e| anyhow::anyhow!(e.to_string()))?;

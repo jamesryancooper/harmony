@@ -1,0 +1,28 @@
+approval_grant_refs:
+- .octon/state/control/execution/approvals/grants/grant-github-pr-automerge-local-representative-17d.yml
+approval_request_ref: .octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml
+decision_artifact_ref: .octon/state/evidence/control/execution/authority-decision-protected-ci-1776956405637-68212.yml
+exception_refs: []
+generated_at: 2026-04-23T15:00:07.381571Z
+grant_id: grant-protected-ci-1776956405637-68212
+quorum_policy_ref: .octon/instance/governance/policies/mission-autonomy.yml#quorum
+request_id: protected-ci-1776956405637-68212
+requested_capability_packs:
+- repo
+- git
+- shell
+- telemetry
+revocation_refs: []
+run_id: protected-ci-1776956405637-68212
+schema_version: authority-grant-bundle-v1
+support_target:
+  host_adapter: github-control-plane
+  language_resource_tier: reference-owned
+  locale_tier: english-primary
+  model_adapter: repo-local-governed
+  model_tier: repo-local-governed
+  route: allow
+  support_status: supported
+  workload_tier: repo-consequential
+support_tier: repo-consequential
+workflow_mode: role-mediated

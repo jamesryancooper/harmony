@@ -1,0 +1,25 @@
+{
+  "schema_version": "authorization-phase-result-v1",
+  "request_id": "protected-ci-1776956405637-68212",
+  "run_id": "protected-ci-1776956405637-68212",
+  "phase_id": "preflight",
+  "phase_status": "completed",
+  "decision": "ALLOW",
+  "reason_codes": [
+    "PREFLIGHT_READY"
+  ],
+  "artifact_refs": {
+    "replay_pointers": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/replay-pointers.yml",
+    "retained_evidence": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/retained-run-evidence.yml",
+    "run_contract": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml",
+    "runtime_state": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/runtime-state.yml"
+  },
+  "details": {
+    "effective_policy_mode": "hard-enforce",
+    "environment_class": "development",
+    "executor_profile": "scoped_repo_mutation",
+    "ownership_status": "resolved",
+    "support_route": "allow"
+  },
+  "generated_at": "2026-04-23T15:00:05.781386Z"
+}

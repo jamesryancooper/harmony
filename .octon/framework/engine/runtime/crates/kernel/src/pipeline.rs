@@ -17,17 +17,92 @@ use crate::workflow::{
     StaticProposalKind,
 };
 use octon_authority_engine::{
-    authorize_execution, build_executor_command, default_autonomy_context, finalize_execution,
-    now_rfc3339 as auth_now_rfc3339, resolve_executor_profile, write_execution_start,
-    ExecutionArtifactEffects, ExecutionOutcome, ExecutionRequest, ExecutorCommandSpec,
-    GrantBundle, ManagedExecutorKind, ReviewRequirements, ScopeConstraints, SideEffectFlags,
+    authorize_execution, authorized_effect_reference, build_executor_command,
+    default_autonomy_context, finalize_execution, issue_evidence_mutation_effect,
+    issue_execution_artifact_effects, issue_repo_mutation_effect_with_mode,
+    now_rfc3339 as auth_now_rfc3339, resolve_executor_profile, verify_authorized_effect,
+    write_execution_start, AuthorizedEffect, AuthorizedEffectReference, EvidenceMutation,
+    ExecutionArtifactEffects, ExecutionOutcome, ExecutionRequest, ExecutorCommandSpec, GrantBundle,
+    ManagedExecutorKind, RepoMutation, ReviewRequirements, ScopeConstraints, SideEffectFlags,
     SideEffectSummary,
 };
 
 const WORKFLOW_REPORTS_ROOT_REL: &str = ".octon/state/evidence/runs/workflows";
 
 fn artifact_effects_for_root(root: &Path, grant: &GrantBundle) -> Result<ExecutionArtifactEffects> {
-    Ok(grant.execution_artifact_effects(root.display().to_string())?)
+    Ok(issue_execution_artifact_effects(
+        root,
+        grant,
+        root.display().to_string(),
+    )?)
+}
+
+fn write_file_with_verified_evidence_effect(
+    runtime_path: &Path,
+    grant: &GrantBundle,
+    effect: &AuthorizedEffect<EvidenceMutation>,
+    path: &Path,
+    contents: impl AsRef<[u8]>,
+    consumer_api_ref: &str,
+    authorized_effects: &mut Vec<AuthorizedEffectReference>,
+) -> Result<()> {
+    let verified = verify_authorized_effect(
+        runtime_path,
+        grant,
+        effect,
+        consumer_api_ref,
+        path.display().to_string(),
+    )?;
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).with_context(|| format!("create {}", parent.display()))?;
+    }
+    fs::write(path, contents).with_context(|| format!("write {}", path.display()))?;
+    authorized_effects.push(authorized_effect_reference(&verified));
+    Ok(())
+}
+
+fn create_dir_with_verified_repo_effect(
+    runtime_path: &Path,
+    grant: &GrantBundle,
+    effect: &AuthorizedEffect<RepoMutation>,
+    path: &Path,
+    consumer_api_ref: &str,
+    authorized_effects: &mut Vec<AuthorizedEffectReference>,
+) -> Result<()> {
+    let verified = verify_authorized_effect(
+        runtime_path,
+        grant,
+        effect,
+        consumer_api_ref,
+        path.display().to_string(),
+    )?;
+    fs::create_dir_all(path).with_context(|| format!("create {}", path.display()))?;
+    authorized_effects.push(authorized_effect_reference(&verified));
+    Ok(())
+}
+
+fn write_file_with_verified_repo_effect(
+    runtime_path: &Path,
+    grant: &GrantBundle,
+    effect: &AuthorizedEffect<RepoMutation>,
+    path: &Path,
+    contents: impl AsRef<[u8]>,
+    consumer_api_ref: &str,
+    authorized_effects: &mut Vec<AuthorizedEffectReference>,
+) -> Result<()> {
+    let verified = verify_authorized_effect(
+        runtime_path,
+        grant,
+        effect,
+        consumer_api_ref,
+        path.display().to_string(),
+    )?;
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).with_context(|| format!("create {}", parent.display()))?;
+    }
+    fs::write(path, contents).with_context(|| format!("write {}", path.display()))?;
+    authorized_effects.push(authorized_effect_reference(&verified));
+    Ok(())
 }
 
 fn workflows_root(octon_dir: &Path) -> PathBuf {
@@ -876,7 +951,6 @@ fn run_generic_pipeline(
         }
 
         let packet_path = stage_inputs_dir.join(format!("{}-packet.md", stage.id));
-        fs::write(&packet_path, &rendered)?;
         let report_path = reports_dir.join(format!("{}-report.md", stage.id));
         let log_path = stage_logs_dir.join(format!("{}-executor.log", stage.id));
         let packet_rel = packet_path
@@ -896,28 +970,6 @@ fn run_generic_pipeline(
             .to_string();
         stage_assets.insert(stage.id.clone(), stage.asset.clone());
         stage_reports.insert(stage.id.clone(), report_rel.clone());
-
-        if options.prepare_only {
-            fs::write(
-                &report_path,
-                format!(
-                    "# Planned Stage Report\n\n- stage: `{}`\n- kind: `{}`\n- asset: `{}`\n",
-                    stage.id, stage.kind, stage.asset
-                ),
-            )?;
-            fs::write(
-                &log_path,
-                format!(
-                    "prepare-only: stage `{}` was not executed; prompt packet materialized.\n",
-                    stage.id
-                ),
-            )?;
-            command_log.push(format!(
-                "- stage `{}` | kind=`{}` | asset=`{}` | prompt_packet=`{}` | report=`{}` | log=`{}` | executor=`prepare-only`",
-                stage.id, stage.kind, stage.asset, packet_rel, report_rel, log_rel
-            ));
-            continue;
-        }
 
         let stage_executor_profile = stage
             .authorization
@@ -1024,6 +1076,37 @@ fn run_generic_pipeline(
         let stage_grant = authorize_execution(&runtime_cfg, &policy, &stage_request, None)?;
         let stage_artifact_root = bundle_root.join("stages").join(&stage.id);
         let stage_effects = artifact_effects_for_root(&stage_artifact_root, &stage_grant)?;
+        let stage_evidence_effect = issue_evidence_mutation_effect(
+            &stage_artifact_root,
+            &stage_grant,
+            bundle_root.display().to_string(),
+            false,
+        )?;
+        let stage_repo_effect =
+            if stage.authorization.side_effects.write_repo || stage.kind == "mutation" {
+                Some(issue_repo_mutation_effect_with_mode(
+                    &stage_artifact_root,
+                    &stage_grant,
+                    target_root
+                        .clone()
+                        .unwrap_or_else(|| bundle_root.join("mock-state"))
+                        .display()
+                        .to_string(),
+                    false,
+                )?)
+            } else {
+                None
+            };
+        let mut stage_authorized_effects = Vec::new();
+        write_file_with_verified_evidence_effect(
+            &stage_artifact_root,
+            &stage_grant,
+            &stage_evidence_effect,
+            &packet_path,
+            &rendered,
+            ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:packet",
+            &mut stage_authorized_effects,
+        )?;
         let stage_artifacts = write_execution_start(
             &stage_artifact_root,
             &stage_request,
@@ -1032,31 +1115,107 @@ fn run_generic_pipeline(
         )?;
         let stage_started_at = auth_now_rfc3339()?;
 
+        if options.prepare_only {
+            write_file_with_verified_evidence_effect(
+                &stage_artifact_root,
+                &stage_grant,
+                &stage_evidence_effect,
+                &report_path,
+                format!(
+                    "# Planned Stage Report\n\n- stage: `{}`\n- kind: `{}`\n- asset: `{}`\n",
+                    stage.id, stage.kind, stage.asset
+                ),
+                ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:prepare_only_report",
+                &mut stage_authorized_effects,
+            )?;
+            write_file_with_verified_evidence_effect(
+                &stage_artifact_root,
+                &stage_grant,
+                &stage_evidence_effect,
+                &log_path,
+                format!(
+                    "prepare-only: stage `{}` was not executed; prompt packet materialized.\n",
+                    stage.id
+                ),
+                ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:prepare_only_log",
+                &mut stage_authorized_effects,
+            )?;
+            finalize_execution(
+                &stage_artifacts,
+                &stage_request,
+                &stage_grant,
+                &stage_effects,
+                &stage_started_at,
+                &ExecutionOutcome {
+                    status: "succeeded".to_string(),
+                    started_at: stage_started_at.clone(),
+                    completed_at: auth_now_rfc3339()?,
+                    error: None,
+                },
+                &SideEffectSummary {
+                    touched_scope: vec![report_rel.clone(), log_rel.clone()],
+                    executor_profile: stage_executor_profile.clone(),
+                    authorized_effects: stage_authorized_effects,
+                    ..SideEffectSummary::default()
+                },
+            )?;
+            command_log.push(format!(
+                "- stage `{}` | kind=`{}` | asset=`{}` | prompt_packet=`{}` | report=`{}` | log=`{}` | executor=`prepare-only`",
+                stage.id, stage.kind, stage.asset, packet_rel, report_rel, log_rel
+            ));
+            continue;
+        }
+
         match options.executor {
             ExecutorKind::Mock => {
                 if stage.kind == "mutation" {
                     let mutation_root = target_root
                         .clone()
                         .unwrap_or_else(|| bundle_root.join("mock-state"));
-                    fs::create_dir_all(&mutation_root)?;
-                    fs::write(
-                        mutation_root.join(format!("{}-mutation.md", stage.id)),
+                    let repo_effect = stage_repo_effect.as_ref().ok_or_else(|| {
+                        anyhow::anyhow!("pipeline mutation stage requires a repo effect")
+                    })?;
+                    create_dir_with_verified_repo_effect(
+                        &stage_artifact_root,
+                        &stage_grant,
+                        repo_effect,
+                        &mutation_root,
+                        ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:mock_mutation_root",
+                        &mut stage_authorized_effects,
+                    )?;
+                    write_file_with_verified_repo_effect(
+                        &stage_artifact_root,
+                        &stage_grant,
+                        repo_effect,
+                        &mutation_root.join(format!("{}-mutation.md", stage.id)),
                         format!("# Synthetic mutation for {}\n", stage.id),
+                        ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:mock_mutation_file",
+                        &mut stage_authorized_effects,
                     )?;
                 }
-                fs::write(
+                write_file_with_verified_evidence_effect(
+                    &stage_artifact_root,
+                    &stage_grant,
+                    &stage_evidence_effect,
                     &report_path,
                     format!(
                         "# Synthetic Stage Report\n\n- stage: `{}`\n- kind: `{}`\n",
                         stage.id, stage.kind
                     ),
+                    ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:mock_report",
+                    &mut stage_authorized_effects,
                 )?;
-                fs::write(
+                write_file_with_verified_evidence_effect(
+                    &stage_artifact_root,
+                    &stage_grant,
+                    &stage_evidence_effect,
                     &log_path,
                     format!(
                         "mock executor produced synthetic output for stage `{}`.\n",
                         stage.id
                     ),
+                    ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:mock_log",
+                    &mut stage_authorized_effects,
                 )?;
                 finalize_execution(
                     &stage_artifacts,
@@ -1073,6 +1232,7 @@ fn run_generic_pipeline(
                     &SideEffectSummary {
                         touched_scope: vec![report_rel.clone(), log_rel.clone()],
                         executor_profile: stage_executor_profile.clone(),
+                        authorized_effects: stage_authorized_effects,
                         ..SideEffectSummary::default()
                     },
                 )?;
@@ -1086,6 +1246,21 @@ fn run_generic_pipeline(
                 let output = if matches!(options.executor, ExecutorKind::Claude)
                     || executor_bin.ends_with("claude")
                 {
+                    if let Some(repo_effect) = stage_repo_effect.as_ref() {
+                        let verified_repo_effect = verify_authorized_effect(
+                            &stage_artifact_root,
+                            &stage_grant,
+                            repo_effect,
+                            ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:executor_repo_scope",
+                            target_root
+                                .clone()
+                                .unwrap_or_else(|| bundle_root.join("mock-state"))
+                                .display()
+                                .to_string(),
+                        )?;
+                        stage_authorized_effects
+                            .push(authorized_effect_reference(&verified_repo_effect));
+                    }
                     run_claude(
                         &repo_root,
                         &executor_bin,
@@ -1095,6 +1270,21 @@ fn run_generic_pipeline(
                         &runtime_cfg,
                     )?
                 } else {
+                    if let Some(repo_effect) = stage_repo_effect.as_ref() {
+                        let verified_repo_effect = verify_authorized_effect(
+                            &stage_artifact_root,
+                            &stage_grant,
+                            repo_effect,
+                            ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:executor_repo_scope",
+                            target_root
+                                .clone()
+                                .unwrap_or_else(|| bundle_root.join("mock-state"))
+                                .display()
+                                .to_string(),
+                        )?;
+                        stage_authorized_effects
+                            .push(authorized_effect_reference(&verified_repo_effect));
+                    }
                     run_codex(
                         &repo_root,
                         &executor_bin,
@@ -1104,8 +1294,24 @@ fn run_generic_pipeline(
                         &runtime_cfg,
                     )?
                 };
-                fs::write(&log_path, &output.stderr)?;
-                fs::write(&report_path, &output.stdout)?;
+                write_file_with_verified_evidence_effect(
+                    &stage_artifact_root,
+                    &stage_grant,
+                    &stage_evidence_effect,
+                    &log_path,
+                    &output.stderr,
+                    ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:executor_log",
+                    &mut stage_authorized_effects,
+                )?;
+                write_file_with_verified_evidence_effect(
+                    &stage_artifact_root,
+                    &stage_grant,
+                    &stage_evidence_effect,
+                    &report_path,
+                    &output.stdout,
+                    ".octon/framework/engine/runtime/crates/kernel/src/pipeline.rs::run_pipeline:executor_report",
+                    &mut stage_authorized_effects,
+                )?;
                 finalize_execution(
                     &stage_artifacts,
                     &stage_request,
@@ -1123,6 +1329,7 @@ fn run_generic_pipeline(
                         shell_commands: vec![executor_bin.display().to_string()],
                         executor_profile: Some(profile_name),
                         dangerous_flags_blocked: output.blocked_flags,
+                        authorized_effects: stage_authorized_effects,
                         ..SideEffectSummary::default()
                     },
                 )?;
@@ -1818,12 +2025,14 @@ mod tests {
         )
         .expect("copy support targets");
         fs::copy(
-            source_repo_root().join(".octon/generated/effective/governance/support-target-matrix.yml"),
+            source_repo_root()
+                .join(".octon/generated/effective/governance/support-target-matrix.yml"),
             octon_dir.join("generated/effective/governance/support-target-matrix.yml"),
         )
         .expect("copy support target matrix");
         fs::copy(
-            source_repo_root().join(".octon/generated/effective/capabilities/pack-routes.effective.yml"),
+            source_repo_root()
+                .join(".octon/generated/effective/capabilities/pack-routes.effective.yml"),
             octon_dir.join("generated/effective/capabilities/pack-routes.effective.yml"),
         )
         .expect("copy pack routes effective");
@@ -1850,8 +2059,7 @@ mod tests {
         .expect("read active pack-routes receipt ref");
         copy_fixture_ref(root, &source_repo_root(), &active_pack_routes_receipt_ref);
         let active_extension_receipt_ref = fixture_yaml_string(
-            &source_repo_root()
-                .join(".octon/generated/effective/extensions/generation.lock.yml"),
+            &source_repo_root().join(".octon/generated/effective/extensions/generation.lock.yml"),
             ".publication_receipt_path",
         )
         .expect("read active extension publication receipt ref");
@@ -2115,15 +2323,20 @@ stages:
             "schema_version: \"octon-runtime-effective-route-bundle-v1\"\ngeneration_id: \"fixture-runtime-route-bundle\"\ngenerated_at: \"2026-03-23T00:00:00Z\"\npublication_status: \"published\"\npublication_receipt_path: \".octon/state/evidence/validation/publication/runtime/fixture-runtime-route-bundle.yml\"\nroutes:\n  - tuple_id: \"tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell\"\n    tuple:\n      model_tier: \"repo-local-governed\"\n      workload_tier: \"repo-consequential\"\n      language_resource_tier: \"reference-owned\"\n      locale_tier: \"english-primary\"\n      host_adapter: \"repo-shell\"\n      model_adapter: \"repo-local-governed\"\n    claim_effect: \"admitted-live-claim\"\n    route: \"allow\"\n    requires_mission: false\n    allowed_capability_packs:\n      - \"git\"\n      - \"repo\"\n      - \"shell\"\n      - \"telemetry\"\n  - tuple_id: \"tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell\"\n    tuple:\n      model_tier: \"repo-local-governed\"\n      workload_tier: \"observe-and-read\"\n      language_resource_tier: \"reference-owned\"\n      locale_tier: \"english-primary\"\n      host_adapter: \"repo-shell\"\n      model_adapter: \"repo-local-governed\"\n    claim_effect: \"admitted-live-claim\"\n    route: \"allow\"\n    requires_mission: false\n    allowed_capability_packs:\n      - \"repo\"\n      - \"shell\"\n      - \"telemetry\"\nextensions:\n  generation_id: \"extensions-090beb843d30\"\n  status: \"published\"\n  quarantine_count: 0\n",
         )
         .expect("write fixture runtime route bundle");
-        let bundle_sha = fixture_sha256(&octon_dir.join("generated/effective/runtime/route-bundle.yml"));
-        let selector_sha = fixture_sha256(&octon_dir.join("instance/governance/runtime-resolution.yml"));
+        let bundle_sha =
+            fixture_sha256(&octon_dir.join("generated/effective/runtime/route-bundle.yml"));
+        let selector_sha =
+            fixture_sha256(&octon_dir.join("instance/governance/runtime-resolution.yml"));
         let root_manifest_sha = fixture_sha256(&octon_dir.join("octon.yml"));
-        let support_target_matrix_sha =
-            fixture_sha256(&octon_dir.join("generated/effective/governance/support-target-matrix.yml"));
-        let pack_routes_effective_sha =
-            fixture_sha256(&octon_dir.join("generated/effective/capabilities/pack-routes.effective.yml"));
-        let pack_routes_lock_sha =
-            fixture_sha256(&octon_dir.join("generated/effective/capabilities/pack-routes.lock.yml"));
+        let support_target_matrix_sha = fixture_sha256(
+            &octon_dir.join("generated/effective/governance/support-target-matrix.yml"),
+        );
+        let pack_routes_effective_sha = fixture_sha256(
+            &octon_dir.join("generated/effective/capabilities/pack-routes.effective.yml"),
+        );
+        let pack_routes_lock_sha = fixture_sha256(
+            &octon_dir.join("generated/effective/capabilities/pack-routes.lock.yml"),
+        );
         let extensions_catalog_sha =
             fixture_sha256(&octon_dir.join("generated/effective/extensions/catalog.effective.yml"));
         let extensions_generation_lock_sha =
@@ -2140,12 +2353,16 @@ stages:
             "schema_version: \"octon-validation-publication-receipt-v1\"\nreceipt_id: \"fixture-runtime-route-bundle\"\npublication_family: \"runtime-route-bundle\"\ngeneration_id: \"fixture-runtime-route-bundle\"\nresult: \"published\"\nvalidated_at: \"2026-03-23T00:00:00Z\"\npublished_paths:\n  - \".octon/generated/effective/runtime/route-bundle.yml\"\n",
         )
         .expect("write fixture runtime route bundle receipt");
-        let receipt_sha = fixture_sha256(
-            &octon_dir.join("state/evidence/validation/publication/runtime/fixture-runtime-route-bundle.yml"),
-        );
+        let receipt_sha = fixture_sha256(&octon_dir.join(
+            "state/evidence/validation/publication/runtime/fixture-runtime-route-bundle.yml",
+        ));
         let lock_path = octon_dir.join("generated/effective/runtime/route-bundle.lock.yml");
-        let mut lock_text = fs::read_to_string(&lock_path).expect("read fixture runtime route bundle lock");
-        lock_text = lock_text.replace("publication_receipt_sha256: \"\"", &format!("publication_receipt_sha256: \"{}\"", receipt_sha));
+        let mut lock_text =
+            fs::read_to_string(&lock_path).expect("read fixture runtime route bundle lock");
+        lock_text = lock_text.replace(
+            "publication_receipt_sha256: \"\"",
+            &format!("publication_receipt_sha256: \"{}\"", receipt_sha),
+        );
         fs::write(&lock_path, lock_text).expect("update fixture route bundle lock receipt digest");
         fs::write(
             workflows_dir.join("stages/01-analyze.md"),

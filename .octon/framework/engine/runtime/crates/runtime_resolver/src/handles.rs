@@ -67,7 +67,11 @@ impl VerifiedRuntimeHandle {
                 self.kind
             ));
         }
-        if self.forbidden_consumers.iter().any(|value| value == consumer) {
+        if self
+            .forbidden_consumers
+            .iter()
+            .any(|value| value == consumer)
+        {
             return Err(anyhow!(
                 "CAPABILITY_DENIED: runtime-effective handle consumer '{}' is forbidden for '{}'",
                 consumer,
@@ -91,13 +95,19 @@ pub fn verify_runtime_effective_handle(
     let output_path = resolve_repo_path(root_dir, &config.output_ref);
 
     match kind {
-        "pack_routes" => verify_pack_routes_handle(root_dir, &output_path, &config, expected_consumer),
+        "pack_routes" => {
+            verify_pack_routes_handle(root_dir, &output_path, &config, expected_consumer)
+        }
         "support_matrix" => verify_support_matrix_handle(root_dir, &output_path, expected_consumer),
-        "extension_catalog" => verify_extension_catalog_handle(root_dir, &output_path, &config, expected_consumer),
+        "extension_catalog" => {
+            verify_extension_catalog_handle(root_dir, &output_path, &config, expected_consumer)
+        }
         "extension_generation_lock" => {
             verify_extension_generation_lock_handle(root_dir, &output_path, expected_consumer)
         }
-        "capability_routing" => verify_capability_routing_handle(root_dir, &output_path, &config, expected_consumer),
+        "capability_routing" => {
+            verify_capability_routing_handle(root_dir, &output_path, &config, expected_consumer)
+        }
         "runtime_route_bundle" => Err(anyhow!(
             "INTERNAL: runtime_route_bundle is verified by verify_runtime_route_bundle"
         )),
@@ -142,18 +152,31 @@ fn verify_pack_routes_handle(
         fs::read(&lock_path).with_context(|| format!("failed to read {}", lock_path.display()))?;
     let output_sha = sha256_hex(&output_bytes);
     let lock_sha = sha256_hex(&lock_bytes);
-    let generation_id = required_str(&output_value, &["generation_id"], "pack routes generation_id")?;
-    let lock_generation_id =
-        required_str(&lock_value, &["generation_id"], "pack routes lock generation_id")?;
+    let generation_id = required_str(
+        &output_value,
+        &["generation_id"],
+        "pack routes generation_id",
+    )?;
+    let lock_generation_id = required_str(
+        &lock_value,
+        &["generation_id"],
+        "pack routes lock generation_id",
+    )?;
     if generation_id != lock_generation_id {
         return Err(anyhow!(
             "CAPABILITY_DENIED: runtime-effective handle generation mismatch for 'pack_routes'"
         ));
     }
-    let publication_status =
-        required_str(&output_value, &["publication_status"], "pack routes publication_status")?;
-    let lock_status =
-        required_str(&lock_value, &["publication_status"], "pack routes lock publication_status")?;
+    let publication_status = required_str(
+        &output_value,
+        &["publication_status"],
+        "pack routes publication_status",
+    )?;
+    let lock_status = required_str(
+        &lock_value,
+        &["publication_status"],
+        "pack routes lock publication_status",
+    )?;
     if publication_status != lock_status {
         return Err(anyhow!(
             "CAPABILITY_DENIED: runtime-effective handle publication status mismatch for 'pack_routes'"
@@ -169,8 +192,11 @@ fn verify_pack_routes_handle(
         &["publication_receipt_sha256"],
         "pack routes publication_receipt_sha256",
     )?;
-    let expected_output_sha =
-        required_str(&lock_value, &["pack_routes_sha256"], "pack routes output digest")?;
+    let expected_output_sha = required_str(
+        &lock_value,
+        &["pack_routes_sha256"],
+        "pack routes output digest",
+    )?;
     if output_sha != expected_output_sha {
         return Err(anyhow!(
             "CAPABILITY_DENIED: runtime-effective handle output digest drift detected for 'pack_routes'"
@@ -187,45 +213,69 @@ fn verify_pack_routes_handle(
     verify_digest_field(
         root_dir,
         ".octon/octon.yml",
-        &required_str(&lock_value, &["root_manifest_sha256"], "pack routes root manifest digest")?,
+        &required_str(
+            &lock_value,
+            &["root_manifest_sha256"],
+            "pack routes root manifest digest",
+        )?,
         "pack routes root manifest",
     )?;
     verify_digest_field(
         root_dir,
         ".octon/instance/governance/support-targets.yml",
-        &required_str(&lock_value, &["support_targets_sha256"], "pack routes support-targets digest")?,
+        &required_str(
+            &lock_value,
+            &["support_targets_sha256"],
+            "pack routes support-targets digest",
+        )?,
         "pack routes support targets",
     )?;
     verify_digest_field(
         root_dir,
         ".octon/instance/governance/capability-packs/registry.yml",
-        &required_str(&lock_value, &["governance_registry_sha256"], "pack routes governance registry digest")?,
+        &required_str(
+            &lock_value,
+            &["governance_registry_sha256"],
+            "pack routes governance registry digest",
+        )?,
         "pack routes governance registry",
     )?;
     verify_digest_field(
         root_dir,
         ".octon/instance/capabilities/runtime/packs/registry.yml",
-        &required_str(&lock_value, &["runtime_registry_sha256"], "pack routes runtime registry digest")?,
+        &required_str(
+            &lock_value,
+            &["runtime_registry_sha256"],
+            "pack routes runtime registry digest",
+        )?,
         "pack routes runtime registry",
     )?;
     verify_digest_field(
         root_dir,
         ".octon/generated/effective/governance/support-target-matrix.yml",
-        &required_str(&lock_value, &["support_target_matrix_sha256"], "pack routes support matrix digest")?,
+        &required_str(
+            &lock_value,
+            &["support_target_matrix_sha256"],
+            "pack routes support matrix digest",
+        )?,
         "pack routes support matrix",
     )?;
 
-    let freshness_mode = required_str(&lock_value, &["freshness", "mode"], "pack routes freshness.mode")?;
+    let freshness_mode = required_str(
+        &lock_value,
+        &["freshness", "mode"],
+        "pack routes freshness.mode",
+    )?;
     let invalidation_conditions = required_seq(
         &lock_value,
         &["freshness", "invalidation_conditions"],
         "pack routes invalidation conditions",
     )?;
     enforce_freshness_mode(&freshness_mode, &lock_value, "pack routes")?;
-    let allowed_consumers =
-        optional_seq(&lock_value, &["allowed_consumers"]).unwrap_or_else(|| default_allowed(kind_to_runtime("pack_routes")));
-    let forbidden_consumers =
-        optional_seq(&lock_value, &["forbidden_consumers"]).unwrap_or_else(|| default_forbidden(kind_to_runtime("pack_routes")));
+    let allowed_consumers = optional_seq(&lock_value, &["allowed_consumers"])
+        .unwrap_or_else(|| default_allowed(kind_to_runtime("pack_routes")));
+    let forbidden_consumers = optional_seq(&lock_value, &["forbidden_consumers"])
+        .unwrap_or_else(|| default_forbidden(kind_to_runtime("pack_routes")));
     let non_authority = required_str(
         &lock_value,
         &["non_authority_classification"],
@@ -319,10 +369,16 @@ fn verify_extension_catalog_handle(
         fs::read(&lock_path).with_context(|| format!("failed to read {}", lock_path.display()))?;
     let output_sha = sha256_hex(&output_bytes);
     let lock_sha = sha256_hex(&lock_bytes);
-    let generation_id =
-        required_str(&output_value, &["generation_id"], "extension catalog generation_id")?;
-    let lock_generation_id =
-        required_str(&lock_value, &["generation_id"], "extension generation lock generation_id")?;
+    let generation_id = required_str(
+        &output_value,
+        &["generation_id"],
+        "extension catalog generation_id",
+    )?;
+    let lock_generation_id = required_str(
+        &lock_value,
+        &["generation_id"],
+        "extension generation lock generation_id",
+    )?;
     if generation_id != lock_generation_id {
         return Err(anyhow!(
             "CAPABILITY_DENIED: runtime-effective handle generation mismatch for 'extension_catalog'"
@@ -380,7 +436,13 @@ fn verify_extension_catalog_handle(
         )?,
         "extension catalog desired config",
     )?;
-    verify_extension_active_state(root_dir, &generation_id, &receipt_path, &receipt_sha, &publication_status)?;
+    verify_extension_active_state(
+        root_dir,
+        &generation_id,
+        &receipt_path,
+        &receipt_sha,
+        &publication_status,
+    )?;
     let freshness_mode = if config.freshness_mode.trim().is_empty() {
         "receipt_bound".to_string()
     } else {
@@ -415,8 +477,8 @@ fn verify_extension_generation_lock_handle(
     expected_consumer: &str,
 ) -> Result<VerifiedRuntimeHandle> {
     let lock_value = read_yaml(output_path)?;
-    let lock_bytes =
-        fs::read(output_path).with_context(|| format!("failed to read {}", output_path.display()))?;
+    let lock_bytes = fs::read(output_path)
+        .with_context(|| format!("failed to read {}", output_path.display()))?;
     let generation_id = required_str(
         &lock_value,
         &["generation_id"],
@@ -464,7 +526,13 @@ fn verify_extension_generation_lock_handle(
         )?,
         "extension generation lock desired config",
     )?;
-    verify_extension_active_state(root_dir, &generation_id, &receipt_path, &receipt_sha, &publication_status)?;
+    verify_extension_active_state(
+        root_dir,
+        &generation_id,
+        &receipt_path,
+        &receipt_sha,
+        &publication_status,
+    )?;
     let handle = VerifiedRuntimeHandle {
         kind: "extension_generation_lock".to_string(),
         output_path: output_path.to_path_buf(),
@@ -501,8 +569,11 @@ fn verify_capability_routing_handle(
         fs::read(&lock_path).with_context(|| format!("failed to read {}", lock_path.display()))?;
     let output_sha = sha256_hex(&output_bytes);
     let lock_sha = sha256_hex(&lock_bytes);
-    let generation_id =
-        required_str(&output_value, &["generation_id"], "capability routing generation_id")?;
+    let generation_id = required_str(
+        &output_value,
+        &["generation_id"],
+        "capability routing generation_id",
+    )?;
     let lock_generation_id = required_str(
         &lock_value,
         &["generation_id"],
@@ -633,15 +704,17 @@ fn verify_extension_active_state(
 ) -> Result<()> {
     let active_path = resolve_repo_path(root_dir, ".octon/state/control/extensions/active.yml");
     let active_value = read_yaml(&active_path)?;
-    let active_generation_id =
-        required_str(&active_value, &["generation_id"], "extension active state generation_id")?;
+    let active_generation_id = required_str(
+        &active_value,
+        &["generation_id"],
+        "extension active state generation_id",
+    )?;
     if active_generation_id != generation_id {
         return Err(anyhow!(
             "CAPABILITY_DENIED: extension active state generation mismatch"
         ));
     }
-    let active_status =
-        required_str(&active_value, &["status"], "extension active state status")?;
+    let active_status = required_str(&active_value, &["status"], "extension active state status")?;
     if active_status != publication_status {
         return Err(anyhow!(
             "CAPABILITY_DENIED: extension active state publication status mismatch"
@@ -673,7 +746,12 @@ fn verify_extension_active_state(
 fn verify_extension_desired_config(root_dir: &Path, expected_sha: &str, label: &str) -> Result<()> {
     let desired_config_path = resolve_repo_path(root_dir, ".octon/instance/extensions.yml");
     if desired_config_path.is_file() {
-        return verify_digest_field(root_dir, ".octon/instance/extensions.yml", expected_sha, label);
+        return verify_digest_field(
+            root_dir,
+            ".octon/instance/extensions.yml",
+            expected_sha,
+            label,
+        );
     }
     let active_path = resolve_repo_path(root_dir, ".octon/state/control/extensions/active.yml");
     let active_value = read_yaml(&active_path)?;
@@ -683,9 +761,7 @@ fn verify_extension_desired_config(root_dir: &Path, expected_sha: &str, label: &
         "extension active state desired_config_revision.sha256",
     )?;
     if active_desired_sha != expected_sha {
-        return Err(anyhow!(
-            "CAPABILITY_DENIED: {label} digest drift detected"
-        ));
+        return Err(anyhow!("CAPABILITY_DENIED: {label} digest drift detected"));
     }
     Ok(())
 }
@@ -705,7 +781,10 @@ fn load_runtime_resolution(octon_dir: &Path) -> Result<RuntimeResolutionRecord> 
     Ok(selector)
 }
 
-fn resolve_handle_config(selector: &RuntimeResolutionRecord, kind: &str) -> Result<RuntimeHandleConfig> {
+fn resolve_handle_config(
+    selector: &RuntimeResolutionRecord,
+    kind: &str,
+) -> Result<RuntimeHandleConfig> {
     if let Some(config) = selector.runtime_effective_handle_kinds.get(kind) {
         return Ok(config.clone());
     }
@@ -769,8 +848,11 @@ fn verify_publication_receipt(
         ));
     }
     let receipt_value = read_yaml(&receipt_path)?;
-    let schema_version =
-        required_str(&receipt_value, &["schema_version"], "publication receipt schema_version")?;
+    let schema_version = required_str(
+        &receipt_value,
+        &["schema_version"],
+        "publication receipt schema_version",
+    )?;
     if schema_version != "octon-validation-publication-receipt-v1" {
         return Err(anyhow!(
             "CAPABILITY_DENIED: runtime-effective handle publication receipt schema is not current"
@@ -792,9 +874,15 @@ fn verify_publication_receipt(
             "CAPABILITY_DENIED: runtime-effective handle publication receipt status mismatch"
         ));
     }
-    let published_paths =
-        required_seq(&receipt_value, &["published_paths"], "publication receipt published_paths")?;
-    if !published_paths.iter().any(|value| value == expected_output_ref) {
+    let published_paths = required_seq(
+        &receipt_value,
+        &["published_paths"],
+        "publication receipt published_paths",
+    )?;
+    if !published_paths
+        .iter()
+        .any(|value| value == expected_output_ref)
+    {
         return Err(anyhow!(
             "CAPABILITY_DENIED: runtime-effective handle publication receipt does not publish the expected output"
         ));
@@ -802,14 +890,17 @@ fn verify_publication_receipt(
     Ok(())
 }
 
-fn verify_digest_field(root_dir: &Path, raw_path: &str, expected_sha: &str, label: &str) -> Result<()> {
+fn verify_digest_field(
+    root_dir: &Path,
+    raw_path: &str,
+    expected_sha: &str,
+    label: &str,
+) -> Result<()> {
     let path = resolve_repo_path(root_dir, raw_path);
     let bytes = fs::read(&path).with_context(|| format!("failed to read {}", path.display()))?;
     let actual_sha = sha256_hex(&bytes);
     if actual_sha != expected_sha {
-        return Err(anyhow!(
-            "CAPABILITY_DENIED: {label} digest drift detected"
-        ));
+        return Err(anyhow!("CAPABILITY_DENIED: {label} digest drift detected"));
     }
     Ok(())
 }
@@ -856,15 +947,24 @@ fn ensure_non_authority(kind: &str, classification: &str) -> Result<()> {
 
 fn default_allowed(kind: &str) -> Vec<String> {
     match kind {
-        "support_matrix" => vec!["route_bundle_compiler".to_string(), "validators".to_string()],
+        "support_matrix" => vec![
+            "route_bundle_compiler".to_string(),
+            "validators".to_string(),
+        ],
         _ => vec!["runtime_resolver".to_string(), "validators".to_string()],
     }
 }
 
 fn default_forbidden(kind: &str) -> Vec<String> {
     match kind {
-        "support_matrix" => vec!["runtime_resolver".to_string(), "direct_runtime_raw_path_read".to_string()],
-        _ => vec!["direct_runtime_raw_path_read".to_string(), "generated_cognition_as_authority".to_string()],
+        "support_matrix" => vec![
+            "runtime_resolver".to_string(),
+            "direct_runtime_raw_path_read".to_string(),
+        ],
+        _ => vec![
+            "direct_runtime_raw_path_read".to_string(),
+            "generated_cognition_as_authority".to_string(),
+        ],
     }
 }
 
@@ -891,12 +991,14 @@ fn required_i64(value: &Value, keys: &[&str], label: &str) -> Result<i64> {
 }
 
 fn optional_seq(value: &Value, keys: &[&str]) -> Option<Vec<String>> {
-    descend(value, keys).and_then(Value::as_sequence).map(|seq| {
-        seq.iter()
-            .filter_map(Value::as_str)
-            .map(ToString::to_string)
-            .collect::<Vec<_>>()
-    })
+    descend(value, keys)
+        .and_then(Value::as_sequence)
+        .map(|seq| {
+            seq.iter()
+                .filter_map(Value::as_str)
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+        })
 }
 
 fn required_seq(value: &Value, keys: &[&str], label: &str) -> Result<Vec<String>> {

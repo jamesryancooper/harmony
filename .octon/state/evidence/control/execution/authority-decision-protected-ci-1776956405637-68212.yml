@@ -1,0 +1,82 @@
+schema_version: authority-decision-artifact-v1
+decision_id: decision-protected-ci-1776956405637-68212
+request_id: protected-ci-1776956405637-68212
+run_id: protected-ci-1776956405637-68212
+decision: ALLOW
+reason_codes:
+- ACP_EVIDENCE_INVALID
+ownership:
+  status: resolved
+  source: ownership_registry.default
+  owner_refs:
+  - operator://octon-maintainers
+  matched_asset_ref: null
+support_tier:
+  support_tier: repo-consequential
+  model_tier_id: repo-local-governed
+  workload_tier_id: repo-consequential
+  language_resource_tier_id: reference-owned
+  locale_tier_id: english-primary
+  workload_tier_label: repo-consequential
+  host_adapter_id: github-control-plane
+  host_adapter_status: supported
+  model_adapter_id: repo-local-governed
+  model_adapter_status: supported
+  adapter_conformance_criteria:
+  - HOST-001
+  - HOST-003
+  - HOST-004
+  - MODEL-001
+  - MODEL-002
+  - MODEL-003
+  - MODEL-004
+  support_status: supported
+  route: allow
+  requires_mission: false
+  required_evidence:
+  - approval-request
+  - approval-grant
+  - decision-artifact
+  - grant-bundle
+  - external-replay-index
+  - authority-decision-artifact
+  - control-evidence-root
+  - runtime-event-ledger
+  - authority-grant-bundle
+  - support-target-declaration
+  - proof-plane-coverage
+  - authorized-effect-token-proof
+  - instruction-layer-manifest
+  - run-evidence-root
+  - contamination-reset-proof
+  - rollback-proof
+  allowed_capability_packs:
+  - repo
+  - git
+  - shell
+  - telemetry
+  requested_capability_packs:
+  - repo
+  - git
+  - shell
+  - telemetry
+  declaration_ref: .octon/instance/governance/support-targets.yml
+reversibility:
+  effective: reversible
+  requested: reversible
+  rollback_ref_present: false
+  workflow_mode: role-mediated
+budget:
+  route: not-applicable
+egress:
+  artifact_ref: null
+  matched_rule_id: null
+  route: ''
+  source_kind: null
+  target_url: null
+approval_request_ref: .octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml
+approval_grant_refs:
+- .octon/state/control/execution/approvals/grants/grant-github-pr-automerge-local-representative-17d.yml
+exception_refs: []
+revocation_refs: []
+generated_at: 2026-04-23T15:00:07.381097Z

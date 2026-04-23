@@ -1,0 +1,33 @@
+schema_version: authority-grant-bundle-v2
+run_id: protected-ci-1776956405637-68212
+request_id: protected-ci-1776956405637-68212
+route_outcome: allow
+granted_capabilities:
+- github.pr.merge
+- github.branch.delete
+- protected.ci.check
+requested_capability_packs:
+- git
+- repo
+- shell
+- telemetry
+support_target:
+  model_tier: repo-local-governed
+  workload_tier: repo-consequential
+  language_resource_tier: reference-owned
+  locale_tier: english-primary
+  host_adapter: github-control-plane
+  model_adapter: repo-local-governed
+approval_request_ref: .octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml
+approval_grant_refs:
+- .octon/state/control/execution/approvals/grants/grant-github-pr-automerge-local-representative-17d.yml
+exception_lease_refs: []
+revocation_refs: []
+budget_ledger_ref: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/authority/budget-ledger.yml
+decision_artifact_ref: .octon/state/evidence/control/execution/authority-decision-protected-ci-1776956405637-68212.yml
+quorum_policy_ref: .octon/instance/governance/policies/mission-autonomy.yml#quorum
+effective_scope:
+  action_type: protected_ci_auto_merge
+  target_id: github-pr:example/repo#17
+  workflow_mode: role-mediated
+generated_at: 2026-04-04T00:00:00Z

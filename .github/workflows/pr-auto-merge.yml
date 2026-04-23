@@ -280,50 +280,13 @@ jobs:
             exit 0
           fi
 
-          # Fine-grained PATs cannot reliably inspect check-runs. Instead, poll
-          # the merge endpoint and let rulesets/branch protections be the source
-          # of truth for required checks and mergeability.
-          direct_merge_output=""
-          merged=false
-          for _ in {1..120}; do
-            pr_json="$(pr_view)"
-            assert_automerge_eligible "${pr_json}" " during merge polling"
+          chmod +x .octon/framework/assurance/runtime/_ops/scripts/protected-ci-auto-merge.sh
+          .octon/framework/assurance/runtime/_ops/scripts/protected-ci-auto-merge.sh \
+            --repo "${GH_REPO}" \
+            --pr-number "${PR_NUMBER}" \
+            --control-json ".octon/generated/.tmp/pr-auto-merge/authority-${PR_NUMBER}.json"
 
-            if direct_merge_output="$(
-              gh api \
-                --method PUT \
-                "repos/${GH_REPO}/pulls/${PR_NUMBER}/merge" \
-                -f merge_method='squash' 2>&1
-            )"; then
-              merged=true
-              break
-            fi
-
-            # Treat GitHub-side merge endpoint flakiness like other transient
-            # mergeability conditions so scheduled/next-event retries can recover.
-            if grep -qiE 'HTTP 405|HTTP 409|HTTP 422|HTTP 5[0-9][0-9]|Pull Request is not mergeable|required status check|review|Server Error|Bad Gateway|Service Unavailable|Gateway Timeout' <<<"${direct_merge_output}"; then
-              sleep 5
-              continue
-            fi
-
-            echo "${direct_merge_output}"
-            exit 1
-          done
-
-          if [[ "${merged}" != "true" ]]; then
-            echo "PR did not become mergeable within wait window."
-            exit 0
-          fi
-
-          echo "${direct_merge_output}"
-
-          head_ref="$(jq -r '.head.ref // ""' <<<"${pr_json}")"
-          head_ref_encoded="$(jq -rn --arg ref "${head_ref}" '$ref | @uri')"
-          if ! gh api --method DELETE "repos/${GH_REPO}/git/refs/heads/${head_ref_encoded}" >/dev/null 2>&1; then
-            echo "Note: head branch '${head_ref}' could not be deleted automatically."
-          fi
-
-          echo "Merged PR #${PR_NUMBER} autonomously via REST."
+          echo "Merged PR #${PR_NUMBER} through the runtime-protected CI boundary."
 
       - name: Upload PR auto-merge control artifacts
         if: always()
@@ -334,6 +297,8 @@ jobs:
             .octon/generated/.tmp/pr-auto-merge/authority-${{ matrix.pr_number }}.json
             .octon/state/control/execution/approvals/requests/github-pr-automerge-${{ matrix.pr_number }}.yml
             .octon/state/control/execution/approvals/grants/grant-github-pr-automerge-${{ matrix.pr_number }}.yml
+            .octon/state/control/execution/runs
             .octon/state/evidence/control/execution
+            .octon/state/evidence/runs
           if-no-files-found: warn
           retention-days: 7

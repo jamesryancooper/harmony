@@ -22,6 +22,14 @@
         "run.context_pack_bound",
         "run.grant_issued",
         "run.grant_denied",
+        "effect_token.requested",
+        "effect_token.minted",
+        "effect_token.denied",
+        "effect_token.consumption_requested",
+        "effect_token.consumed",
+        "effect_token.rejected",
+        "effect_token.expired",
+        "effect_token.revoked",
         "approval.requested",
         "approval.resolved",
         "capability.invoked",
@@ -69,6 +77,12 @@
       "type": ["string", "null"]
     },
     "request_id": { "type": ["string", "null"] },
+    "grant_id": { "type": ["string", "null"] },
+    "token_id": { "type": ["string", "null"] },
+    "effect_kind": { "type": ["string", "null"] },
+    "scope_ref": { "type": ["string", "null"] },
+    "token_record_ref": { "type": ["string", "null"] },
+    "consumption_receipt_ref": { "type": ["string", "null"] },
     "refs": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }

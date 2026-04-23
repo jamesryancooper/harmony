@@ -65,14 +65,13 @@
     "repo",
     "git",
     "shell",
-    "telemetry",
-    "api"
+    "telemetry"
   ],
   "run_id": "uec-global-github-repo-consequential-20260404",
   "claim_status": "supported",
   "schema_version": "run-card-v2",
   "status": "succeeded",
-  "summary": "Repo-consequential GitHub control-plane run is retained as governed projection proof inside the admitted live claim envelope.",
+  "summary": "Repo-consequential GitHub control-plane run is retained as narrow protected-CI proof inside the admitted live claim envelope.",
   "support_target_ref": ".octon/instance/governance/support-targets.yml",
   "support_target_tuple": {
     "language_resource_tier": "reference-owned",

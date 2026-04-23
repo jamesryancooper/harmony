@@ -54,6 +54,7 @@ live_support_universe:
   host_adapters:
     - "repo-shell"
     - "ci-control-plane"
+    - "github-control-plane"
   model_adapters:
     - "repo-local-governed"
   capability_packs:
@@ -71,7 +72,6 @@ resolved_non_live_surfaces:
   locale_classes:
     - "spanish-secondary"
   host_adapters:
-    - "github-control-plane"
     - "studio-control-plane"
   model_adapters:
     - "frontier-governed"
@@ -176,11 +176,11 @@ tuple_admissions:
       locale_tier: "english-primary"
       host_adapter: "github-control-plane"
       model_adapter: "repo-local-governed"
-    admission_ref: ".octon/instance/governance/support-target-admissions/stage-only/github-repo-consequential-en.yml"
-    support_dossier_ref: ".octon/instance/governance/support-dossiers/stage-only/github-repo-consequential-en/dossier.yml"
+    admission_ref: ".octon/instance/governance/support-target-admissions/live/github-repo-consequential-en.yml"
+    support_dossier_ref: ".octon/instance/governance/support-dossiers/live/github-repo-consequential-en/dossier.yml"
     proof_bundle_ref: ".octon/state/evidence/validation/support-targets/github-repo-consequential-en.yml"
     support_card_ref: ".octon/generated/cognition/projections/materialized/support-cards/github-repo-consequential-en.yml"
-    claim_effect: "stage-only-non-live"
+    claim_effect: "admitted-live-claim"
   - tuple_id: "tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane"
     tuple:
       model_tier: "frontier-governed"
@@ -207,6 +207,7 @@ adapter_conformance_criteria:
     required_evidence:
       - "instruction-layer-manifest"
       - "runtime-event-ledger"
+      - "authorized-effect-token-proof"
   - criterion_id: "HOST-003"
     adapter_kind: "host"
     description: "Projected host state never becomes hidden authority outside canonical control roots."
@@ -219,6 +220,7 @@ adapter_conformance_criteria:
     required_evidence:
       - "support-target-declaration"
       - "proof-plane-coverage"
+      - "authorized-effect-token-proof"
   - criterion_id: "MODEL-001"
     adapter_kind: "model"
     description: "Model adapter support claims remain bounded by declared support targets and governance exclusions."
@@ -302,7 +304,7 @@ host_adapters:
     contract_ref: ".octon/framework/engine/runtime/adapters/host/github-control-plane.yml"
     authority_mode: "non_authoritative"
     replaceable: true
-    support_status: "stage_only"
+    support_status: "supported"
     default_route: "allow"
     criteria_refs:
       - "HOST-001"

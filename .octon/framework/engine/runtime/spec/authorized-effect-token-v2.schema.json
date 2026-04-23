@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/engine/runtime/spec/authorized-effect-token-v2.schema.json",
+  "title": "Octon Authorized Effect Token v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "token_id",
+    "token_type",
+    "effect_kind",
+    "run_id",
+    "request_id",
+    "grant_id",
+    "run_control_root",
+    "run_evidence_root",
+    "allowed_capability_packs",
+    "scope_ref",
+    "scope_envelope",
+    "issued_at",
+    "single_use",
+    "issuer_ref",
+    "revocation_refs",
+    "token_record_ref",
+    "token_digest"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "authorized-effect-token-v2"
+    },
+    "token_id": { "type": "string", "minLength": 1 },
+    "token_type": { "type": "string", "minLength": 1 },
+    "effect_kind": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "request_id": { "type": "string", "minLength": 1 },
+    "grant_id": { "type": "string", "minLength": 1 },
+    "decision_artifact_ref": { "type": ["string", "null"] },
+    "authority_grant_bundle_ref": { "type": ["string", "null"] },
+    "run_control_root": { "type": "string", "minLength": 1 },
+    "run_evidence_root": { "type": "string", "minLength": 1 },
+    "support_target_tuple_ref": { "type": ["string", "null"] },
+    "allowed_capability_packs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "scope_ref": { "type": "string", "minLength": 1 },
+    "scope_envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "read": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "write": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "executor_profile": { "type": ["string", "null"] },
+        "locality_scope": { "type": ["string", "null"] }
+      }
+    },
+    "rollback_plan_ref": { "type": ["string", "null"] },
+    "approval_request_ref": { "type": ["string", "null"] },
+    "issued_at": { "type": "string", "minLength": 1 },
+    "expires_at": { "type": ["string", "null"] },
+    "single_use": { "type": "boolean" },
+    "issuer_ref": { "type": "string", "minLength": 1 },
+    "revocation_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "token_record_ref": { "type": "string", "minLength": 1 },
+    "journal_ref": { "type": ["string", "null"] },
+    "token_digest": {
+      "type": "string",
+      "pattern": "^sha256:[A-Fa-f0-9]{64}$"
+    }
+  }
+}

@@ -14,6 +14,9 @@ pub enum MaterialSideEffectClass {
     EvidenceMutation,
     ControlMutation,
     GeneratedEffectivePublication,
+    ProtectedCiCheck,
+    ExtensionActivation,
+    CapabilityPackActivation,
     ExecutorLaunch,
     ServiceInvocation,
     ReadOnlyProjection,
@@ -26,6 +29,9 @@ impl MaterialSideEffectClass {
             Self::EvidenceMutation => "evidence-mutation",
             Self::ControlMutation => "control-mutation",
             Self::GeneratedEffectivePublication => "generated-effective-publication",
+            Self::ProtectedCiCheck => "protected-ci-check",
+            Self::ExtensionActivation => "extension-activation",
+            Self::CapabilityPackActivation => "capability-pack-activation",
             Self::ExecutorLaunch => "executor-launch",
             Self::ServiceInvocation => "service-invocation",
             Self::ReadOnlyProjection => "read-only-projection",
@@ -93,6 +99,33 @@ const INVENTORY: &[MaterialSideEffectInventoryEntry] = &[
         material: true,
     },
     MaterialSideEffectInventoryEntry {
+        id: "kernel.protected-ci.merge",
+        class: MaterialSideEffectClass::ProtectedCiCheck,
+        affected_roots: &[".github/workflows/**"],
+        required_boundary: AUTHORIZATION_BOUNDARY_REF,
+        material: true,
+    },
+    MaterialSideEffectInventoryEntry {
+        id: "kernel.extension.activation",
+        class: MaterialSideEffectClass::ExtensionActivation,
+        affected_roots: &[
+            ".octon/generated/effective/extensions/**",
+            ".octon/state/control/extensions/**",
+        ],
+        required_boundary: AUTHORIZATION_BOUNDARY_REF,
+        material: true,
+    },
+    MaterialSideEffectInventoryEntry {
+        id: "kernel.capability-pack.activation",
+        class: MaterialSideEffectClass::CapabilityPackActivation,
+        affected_roots: &[
+            ".octon/generated/effective/capabilities/**",
+            ".octon/instance/governance/capability-packs/**",
+        ],
+        required_boundary: AUTHORIZATION_BOUNDARY_REF,
+        material: true,
+    },
+    MaterialSideEffectInventoryEntry {
         id: "kernel.read.only",
         class: MaterialSideEffectClass::ReadOnlyProjection,
         affected_roots: &[".octon/state/**"],
@@ -113,10 +146,10 @@ pub fn classify_support_posture(
         return MaterialSideEffectClass::ReadOnlyProjection;
     }
 
-    if host_adapter == "repo-shell" {
-        MaterialSideEffectClass::RepoMutation
-    } else {
-        MaterialSideEffectClass::ServiceInvocation
+    match host_adapter {
+        "repo-shell" => MaterialSideEffectClass::RepoMutation,
+        "github-control-plane" => MaterialSideEffectClass::ProtectedCiCheck,
+        _ => MaterialSideEffectClass::ServiceInvocation,
     }
 }
 
@@ -127,6 +160,18 @@ pub fn classify_execution_request(
 ) -> MaterialSideEffectClass {
     if action_type == "launch_executor" || target_id == "octon-studio" {
         return MaterialSideEffectClass::ExecutorLaunch;
+    }
+    if action_type == "protected_ci_auto_merge" {
+        return MaterialSideEffectClass::ProtectedCiCheck;
+    }
+    if action_type == "publish_extension_activation" {
+        return MaterialSideEffectClass::ExtensionActivation;
+    }
+    if action_type == "publish_capability_pack_activation" {
+        return MaterialSideEffectClass::CapabilityPackActivation;
+    }
+    if side_effect_flags.publication {
+        return MaterialSideEffectClass::GeneratedEffectivePublication;
     }
 
     if side_effect_flags.write_repo

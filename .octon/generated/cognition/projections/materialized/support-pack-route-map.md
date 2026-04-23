@@ -1,6 +1,6 @@
 # Support Pack Route Map
 
-Generated at: `2026-04-22T15:00:18Z`
+Generated at: `2026-04-23T13:19:44Z`
 
 Non-authority disclaimer: this derived read model traces support tuples, pack routes, and retained receipts. Canonical authority remains in `framework/**`, `instance/**`, `state/**`, and freshness-gated generated/effective outputs.
 
@@ -13,7 +13,7 @@ Source refs:
 - `/.octon/state/evidence/validation/architecture/10of10-target-transition/capabilities/pack-route-no-widening.yml`
 
 ## Pack Routes
-Publication receipt: `.octon/state/evidence/validation/publication/capabilities/2026-04-22T13-30-38Z-pack-routes-8af1c1063906.yml`
+Publication receipt: `.octon/state/evidence/validation/publication/capabilities/2026-04-23T13-18-10Z-pack-routes-5b35e51a5f7d.yml`
 Freshness mode: `digest_bound`
 Validator refs:
 
@@ -26,26 +26,26 @@ Forbidden consumers: `direct_runtime_raw_path_read`, `generated_cognition_as_aut
   - `tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell`: `stage-only-non-live`, route=`stage_only`
-  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `stage-only-non-live`, route=`stage_only`
+  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/ci-control-plane`: `admitted-live-claim`, route=`allow`
   - `tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane`: `stage-only-non-live`, route=`stage_only`
 - `git`: status=`admitted`
   - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell`: `stage-only-non-live`, route=`stage_only`
-  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `stage-only-non-live`, route=`stage_only`
+  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `admitted-live-claim`, route=`allow`
   - `tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane`: `stage-only-non-live`, route=`stage_only`
 - `shell`: status=`admitted`
   - `tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell`: `stage-only-non-live`, route=`stage_only`
-  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `stage-only-non-live`, route=`stage_only`
+  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/ci-control-plane`: `admitted-live-claim`, route=`allow`
   - `tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane`: `stage-only-non-live`, route=`stage_only`
 - `telemetry`: status=`admitted`
   - `tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/repo-shell`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell`: `stage-only-non-live`, route=`stage_only`
-  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `stage-only-non-live`, route=`stage_only`
+  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `admitted-live-claim`, route=`allow`
   - `tuple://repo-local-governed/observe-and-read/reference-owned/english-primary/ci-control-plane`: `admitted-live-claim`, route=`allow`
   - `tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane`: `stage-only-non-live`, route=`stage_only`
 - `browser`: status=`unadmitted`
@@ -53,5 +53,4 @@ Forbidden consumers: `direct_runtime_raw_path_read`, `generated_cognition_as_aut
   - `tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane`: `stage-only-non-live`, route=`stage_only`
 - `api`: status=`unadmitted`
   - `tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell`: `stage-only-non-live`, route=`stage_only`
-  - `tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane`: `stage-only-non-live`, route=`stage_only`
   - `tuple://frontier-governed/boundary-sensitive/extended-governed/spanish-secondary/studio-control-plane`: `stage-only-non-live`, route=`stage_only`

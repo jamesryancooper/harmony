@@ -1,0 +1,14 @@
+evidence_refs:
+- .octon/framework/assurance/functional/suites/run-lifecycle-integrity.yml
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/receipts/execution-receipt.json
+- .octon/state/evidence/runs/protected-ci-1776956405637-68212/retained-run-evidence.yml
+- .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-manifest.yml
+generated_at: 2026-04-23T15:00:07.672972Z
+known_limits: []
+outcome: pass
+plane: functional
+proof_class: deterministic
+schema_version: proof-plane-report-v1
+subject_kind: run
+subject_ref: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml
+summary: Functional proof confirms the run emitted the canonical receipt, retained evidence, and replay chain for a successful consequential workflow.

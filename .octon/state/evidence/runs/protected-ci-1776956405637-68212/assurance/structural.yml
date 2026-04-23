@@ -1,0 +1,14 @@
+evidence_refs:
+- .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml
+- .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-manifest.yml
+- .octon/state/control/execution/runs/protected-ci-1776956405637-68212/checkpoints/bound.yml
+- .octon/state/continuity/runs/protected-ci-1776956405637-68212/handoff.yml
+generated_at: 2026-04-23T15:00:07.672972Z
+known_limits: []
+outcome: pass
+plane: structural
+proof_class: deterministic
+schema_version: proof-plane-report-v1
+subject_kind: run
+subject_ref: .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml
+summary: Structural proof confirms the canonical run contract, manifest, and checkpoint topology were emitted for this successful run.

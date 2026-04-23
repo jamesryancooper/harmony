@@ -4,5 +4,10 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[features]
+default = []
+authority-mint = []
+test-support = ["authority-mint"]
+
 [dependencies]
 serde.workspace = true

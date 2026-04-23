@@ -182,6 +182,7 @@ pub(crate) fn execution_receipt_payload(
         revocation_refs: grant.revocation_refs.clone(),
         decision_artifact_ref: grant.decision_artifact_ref.clone(),
         authority_grant_bundle_ref: grant.authority_grant_bundle_ref.clone(),
+        authorized_effects: side_effects.authorized_effects.clone(),
         network_egress_posture: grant.network_egress_posture.clone(),
         evidence_completeness_status: None,
         timestamps: ReceiptTimestamps {

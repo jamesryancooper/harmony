@@ -8,6 +8,10 @@ spec_assertions:
   - workflow-stage execution
   - executor launch
   - control mutations under `/.octon/state/control/**`
+  - runtime-facing publication under `/.octon/generated/effective/**`
+  - extension activation through runtime-owned wrappers
+  - capability-pack activation through runtime-owned wrappers
+  - protected CI merge through a token-enforced runtime boundary
 inventory:
   - path_id: kernel-tool-invoke
     file: .octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs
@@ -51,6 +55,43 @@ inventory:
       - authorize_execution(
       - write_execution_start(
       - finalize_execution(
+  - path_id: publication-support-target-matrix
+    file: .octon/framework/assurance/runtime/_ops/scripts/publish-support-target-matrix.sh
+    required_patterns:
+      - run_publication_wrapper support-target-matrix
+  - path_id: publication-pack-routes
+    file: .octon/framework/assurance/runtime/_ops/scripts/publish-pack-routes.sh
+    required_patterns:
+      - run_publication_wrapper pack-routes
+  - path_id: publication-runtime-route-bundle
+    file: .octon/framework/assurance/runtime/_ops/scripts/publish-runtime-route-bundle.sh
+    required_patterns:
+      - run_publication_wrapper runtime-route-bundle
+  - path_id: extension-state-publication
+    file: .octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh
+    required_patterns:
+      - enter_publication_runtime_boundary extension-state
+  - path_id: extension-publication-claude
+    file: .octon/framework/capabilities/_ops/scripts/publish-host-projections.sh
+    required_patterns:
+      - enter_publication_runtime_boundary host-projections
+  - path_id: extension-publication-cursor
+    file: .octon/framework/capabilities/_ops/scripts/publish-host-projections.sh
+    required_patterns:
+      - enter_publication_runtime_boundary host-projections
+  - path_id: extension-publication-codex
+    file: .octon/framework/capabilities/_ops/scripts/publish-host-projections.sh
+    required_patterns:
+      - enter_publication_runtime_boundary host-projections
+  - path_id: capability-pack-publication
+    file: .octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh
+    required_patterns:
+      - enter_publication_runtime_boundary capability-routing
+  - path_id: protected-ci-auto-merge
+    file: .github/workflows/pr-auto-merge.yml
+    required_patterns:
+      - protected-ci-auto-merge.sh
+      - --control-json
   - path_id: orchestration-report-write
     file: .octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs
     required_patterns:

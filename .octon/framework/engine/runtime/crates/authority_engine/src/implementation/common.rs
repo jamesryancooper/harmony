@@ -168,10 +168,7 @@ pub(crate) fn run_journal_snapshot_path(cfg: &RuntimeConfig, request_id: &str) -
     run_journal_snapshot_root(cfg, request_id).join("events.snapshot.ndjson")
 }
 
-pub(crate) fn run_journal_manifest_snapshot_path(
-    cfg: &RuntimeConfig,
-    request_id: &str,
-) -> PathBuf {
+pub(crate) fn run_journal_manifest_snapshot_path(cfg: &RuntimeConfig, request_id: &str) -> PathBuf {
     run_journal_snapshot_root(cfg, request_id).join("events.manifest.snapshot.yml")
 }
 
@@ -292,4 +289,15 @@ pub(crate) fn requested_support_target_tuple(
         host_adapter: required_request_metadata(request, "support_host_adapter")?,
         model_adapter: required_request_metadata(request, "support_model_adapter")?,
     })
+}
+
+pub(crate) fn support_target_tuple_id(tuple: &SupportTargetTuple) -> String {
+    format!(
+        "tuple://{}/{}/{}/{}/{}",
+        tuple.model_tier,
+        tuple.workload_tier,
+        tuple.language_resource_tier,
+        tuple.locale_tier,
+        tuple.host_adapter,
+    )
 }

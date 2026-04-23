@@ -1,0 +1,23 @@
+{
+  "schema_version": "authorized-effect-token-consumption-v1",
+  "token_id": "effect-token-state-control-mutation-3c19e6ccec34",
+  "token_digest": "sha256:04a8aa2ad2ac1cc260956ca77cfa2628ef2d96486a4111b6b3129c0ab12e820e",
+  "token_type": "AuthorizedEffect<StateControlMutation>",
+  "effect_kind": "state-control-mutation",
+  "consumer_api_ref": "authority-engine::mint",
+  "target_scope": "/Users/jamesryancooper/Projects/octon/.octon/state/evidence/runs/kernel/protected-ci-1776956405637-68212",
+  "verification_result": "minted",
+  "rejection_reason_codes": [],
+  "journal_event_refs": [
+    ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-requested-effect-token-state-control-mutation-3c19e6ccec34",
+    ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/events.ndjson#evt-effect-token-minted-effect-token-state-control-mutation-3c19e6ccec34"
+  ],
+  "evidence_refs": [
+    ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/effect-tokens/effect-token-state-control-mutation-3c19e6ccec34.json"
+  ],
+  "recorded_at": "2026-04-23T15:00:07.396687Z",
+  "run_id": "protected-ci-1776956405637-68212",
+  "request_id": "protected-ci-1776956405637-68212",
+  "grant_id": "grant-protected-ci-1776956405637-68212",
+  "token_record_ref": ".octon/state/control/execution/runs/protected-ci-1776956405637-68212/effect-tokens/effect-token-state-control-mutation-3c19e6ccec34.json"
+}

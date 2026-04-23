@@ -1,11 +1,11 @@
 schema_version: "operator-read-model-publication-v1"
-generated_at: "2026-04-22T15:00:18Z"
+generated_at: "2026-04-23T13:19:44Z"
 view_contract_ref: ".octon/framework/engine/runtime/spec/operator-read-models-v1.md"
 published_views:
   - view_kind: "runtime-route"
     projection_ref: ".octon/generated/cognition/projections/materialized/runtime-route-map.md"
     summary_ref: ".octon/generated/effective/runtime/route-bundle.yml"
-    publication_receipt_ref: ".octon/state/evidence/validation/publication/runtime/2026-04-22T13-33-00Z-runtime-route-bundle-0e35dffede77.yml"
+    publication_receipt_ref: ".octon/state/evidence/validation/publication/runtime/2026-04-23T13-18-16Z-runtime-route-bundle-d832aab6f332.yml"
     freshness_mode: "digest_bound"
     validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh"
     runtime_consumers:
@@ -17,7 +17,7 @@ published_views:
   - view_kind: "support-pack-route"
     projection_ref: ".octon/generated/cognition/projections/materialized/support-pack-route-map.md"
     summary_ref: ".octon/generated/effective/capabilities/pack-routes.effective.yml"
-    publication_receipt_ref: ".octon/state/evidence/validation/publication/capabilities/2026-04-22T13-30-38Z-pack-routes-8af1c1063906.yml"
+    publication_receipt_ref: ".octon/state/evidence/validation/publication/capabilities/2026-04-23T13-18-10Z-pack-routes-5b35e51a5f7d.yml"
     freshness_mode: "digest_bound"
     validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-support-pack-admission-alignment.sh"
     runtime_consumers:

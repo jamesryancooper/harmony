@@ -5,6 +5,9 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/extensions-common.sh"
 
 extensions_common_init "${BASH_SOURCE[0]}"
+source "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/publication-wrapper-common.sh"
+
+enter_publication_runtime_boundary extension-state
 
 FRAMEWORK_COMMANDS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/commands/manifest.yml"
 FRAMEWORK_SKILLS_MANIFEST="$OCTON_DIR/framework/capabilities/runtime/skills/manifest.yml"

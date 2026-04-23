@@ -1,0 +1,166 @@
+{
+  "actor": {
+    "id": "octon-kernel",
+    "type": "system"
+  },
+  "approval_grant_refs": [
+    ".octon/state/control/execution/approvals/grants/grant-github-pr-automerge-local-representative-17d.yml"
+  ],
+  "approval_request_ref": ".octon/state/control/execution/approvals/requests/github-pr-automerge-local-representative-17d.yml",
+  "autonomy_budget_state": null,
+  "boundaries": "kernel",
+  "boundary_id": "kernel",
+  "boundary_set_version": "v1",
+  "breaker_state": null,
+  "budget_reason_codes": [],
+  "budget_rule_id": null,
+  "capability_classification": "role-mediated",
+  "context_acquisition": {
+    "commands": 1,
+    "duration_ms": 0,
+    "file_reads": 0,
+    "search_queries": 0,
+    "subagent_spawns": 0
+  },
+  "context_overhead_ratio": 0,
+  "cost_evidence_path": null,
+  "evidence": [
+    {
+      "ref": ".octon/state/evidence/runs/protected-ci-1776956405637-68212/execution-request.json",
+      "type": "diff"
+    }
+  ],
+  "exception_refs": [],
+  "execution_posture": null,
+  "instruction_layers": [
+    {
+      "bytes": 0,
+      "layer_id": "provider",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source": "upstream",
+      "visibility": "partial"
+    },
+    {
+      "bytes": 0,
+      "layer_id": "system",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source": "octon-system",
+      "visibility": "partial"
+    },
+    {
+      "bytes": 508,
+      "layer_id": "developer",
+      "sha256": "e3cfa0970e341b4b0b6720b126a7f78dd71da432731760147987f9486bc9fe7c",
+      "source": "AGENTS.md",
+      "visibility": "full"
+    },
+    {
+      "bytes": 3293,
+      "layer_id": "user",
+      "sha256": "599ed83ea9d9c6ed7ce259b73e402b5752f7feb0720944bf91f0b4fe04018a50",
+      "source": "execution-request",
+      "visibility": "full"
+    }
+  ],
+  "intent": "execution authorization for github-pr:example/repo#17",
+  "intent_ref": {
+    "id": "workspace-charter://octon/octon-governed-harness",
+    "version": "1.3.0"
+  },
+  "mission_ref": null,
+  "network_egress": null,
+  "operation": {
+    "class": "execution.authorize",
+    "resources": [
+      "github://repo/example/repo/pull/17/merge"
+    ],
+    "target": {
+      "boundary_route": null,
+      "capability_classification": "role-mediated",
+      "material_side_effect": true,
+      "telemetry_profile": "full",
+      "workflow_mode": "role-mediated"
+    },
+    "targets": [
+      "github-pr:example/repo#17"
+    ]
+  },
+  "oversight_mode": null,
+  "ownership": {
+    "matched_asset_ref": null,
+    "owner_refs": [
+      "operator://octon-maintainers"
+    ],
+    "source": "ownership_registry.default",
+    "status": "resolved"
+  },
+  "phase": "stage",
+  "profile": "refactor",
+  "reversibility": {
+    "compensation_handle": null,
+    "primitive": "git.revert_commit",
+    "recovery_window": "P14D",
+    "reversible": true,
+    "rollback_handle": "rollback-protected-ci-1776956405637-68212"
+  },
+  "reversibility_class": null,
+  "revocation_refs": [],
+  "run_id": "protected-ci-1776956405637-68212",
+  "slice_ref": null,
+  "support_tier": {
+    "adapter_conformance_criteria": [
+      "HOST-001",
+      "HOST-003",
+      "HOST-004",
+      "MODEL-001",
+      "MODEL-002",
+      "MODEL-003",
+      "MODEL-004"
+    ],
+    "allowed_capability_packs": [
+      "repo",
+      "git",
+      "shell",
+      "telemetry"
+    ],
+    "declaration_ref": ".octon/instance/governance/support-targets.yml",
+    "host_adapter_id": "github-control-plane",
+    "host_adapter_status": "supported",
+    "language_resource_tier_id": "reference-owned",
+    "locale_tier_id": "english-primary",
+    "model_adapter_id": "repo-local-governed",
+    "model_adapter_status": "supported",
+    "model_tier_id": "repo-local-governed",
+    "requested_capability_packs": [
+      "repo",
+      "git",
+      "shell",
+      "telemetry"
+    ],
+    "required_evidence": [
+      "approval-request",
+      "approval-grant",
+      "decision-artifact",
+      "grant-bundle",
+      "external-replay-index",
+      "authority-decision-artifact",
+      "control-evidence-root",
+      "runtime-event-ledger",
+      "authority-grant-bundle",
+      "support-target-declaration",
+      "proof-plane-coverage",
+      "authorized-effect-token-proof",
+      "instruction-layer-manifest",
+      "run-evidence-root",
+      "contamination-reset-proof",
+      "rollback-proof"
+    ],
+    "requires_mission": false,
+    "route": "allow",
+    "support_status": "supported",
+    "support_tier": "repo-consequential",
+    "workload_tier_id": "repo-consequential",
+    "workload_tier_label": "repo-consequential"
+  },
+  "workflow_mode": "role-mediated"
+}

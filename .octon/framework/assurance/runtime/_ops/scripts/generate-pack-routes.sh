@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/closure-packet-common.sh"
+source "$OCTON_DIR/framework/assurance/runtime/_ops/scripts/publication-wrapper-common.sh"
+
+enter_publication_runtime_boundary pack-routes
 
 require_yq
 

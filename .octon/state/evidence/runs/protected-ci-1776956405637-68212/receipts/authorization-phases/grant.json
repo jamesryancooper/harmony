@@ -1,0 +1,22 @@
+{
+  "schema_version": "authorization-phase-result-v1",
+  "request_id": "protected-ci-1776956405637-68212",
+  "run_id": "protected-ci-1776956405637-68212",
+  "phase_id": "grant",
+  "phase_status": "completed",
+  "decision": "ALLOW",
+  "reason_codes": [
+    "ACP_EVIDENCE_INVALID"
+  ],
+  "artifact_refs": {
+    "authority_grant_bundle": ".octon/state/evidence/control/execution/authority-grant-bundle-protected-ci-1776956405637-68212.yml",
+    "decision_artifact": ".octon/state/evidence/control/execution/authority-decision-protected-ci-1776956405637-68212.yml"
+  },
+  "details": {
+    "approval_required": true,
+    "effective_policy_mode": "hard-enforce",
+    "environment_class": "development",
+    "quorum_required": false
+  },
+  "generated_at": "2026-04-23T15:00:07.384235Z"
+}

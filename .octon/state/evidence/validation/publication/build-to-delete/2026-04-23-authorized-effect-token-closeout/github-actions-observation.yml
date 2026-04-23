@@ -1,0 +1,22 @@
+schema_version: support-target-actions-observation-v1
+tuple_id: tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane
+observed_at: "2026-04-23T14:06:35Z"
+observer: octon-local-closeout
+workflow_run:
+  run_id: 24802746609
+  workflow_name: PR Auto Merge
+  event: pull_request_target
+  conclusion: success
+  created_at: "2026-04-22T21:07:54Z"
+  url: https://github.com/jamesryancooper/octon/actions/runs/24802746609
+job:
+  job_id: 72589333554
+  name: auto-merge-pr-343
+  url: https://github.com/jamesryancooper/octon/actions/runs/24802746609/job/72589333554
+artifact:
+  artifact_id: 6588772924
+  url: https://github.com/jamesryancooper/octon/actions/runs/24802746609/artifacts/6588772924
+observations:
+  - The published default-branch workflow still exercised the PR Auto Merge lane on GitHub-hosted runners with live control artifacts.
+  - That observed run predates the local wrapperized protected-CI workflow update, so it is retained as naturalistic context only.
+  - The representative retained runtime proof for the current token-enforced implementation is .octon/state/control/execution/runs/protected-ci-1776956405637-68212/run-contract.yml.

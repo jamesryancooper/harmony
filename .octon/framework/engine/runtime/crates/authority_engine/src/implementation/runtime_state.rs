@@ -11,10 +11,10 @@ use octon_core::execution_integrity::{
 use octon_core::policy::PolicyEngine;
 use octon_core::registry::ServiceDescriptor;
 use octon_runtime_bus::{
-    append_event as append_run_journal_event, JournalActor, JournalCausality,
-    JournalClassification, JournalEffect, JournalGoverningRefs, JournalLifecycle,
-    JournalPayload, JournalRedaction, load_journal as load_run_journal,
-    RunJournalAppendRequest, RunJournalMaterialization, RunJournalSnapshotRefs,
+    append_event as append_run_journal_event, load_journal as load_run_journal, JournalActor,
+    JournalCausality, JournalClassification, JournalEffect, JournalGoverningRefs, JournalLifecycle,
+    JournalPayload, JournalRedaction, RunJournalAppendRequest, RunJournalMaterialization,
+    RunJournalSnapshotRefs,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -423,10 +423,8 @@ pub(crate) fn bind_run_lifecycle(
     runtime_state.last_checkpoint_ref = Some(control_checkpoint_ref.clone());
     runtime_state.mission_id = mission_id.clone();
     runtime_state.parent_run_ref = parent_run_ref.clone();
-    runtime_state.source_ledger_ref = Some(path_tail(
-        &cfg.repo_root,
-        &run_journal_path(cfg, run_id),
-    ));
+    runtime_state.source_ledger_ref =
+        Some(path_tail(&cfg.repo_root, &run_journal_path(cfg, run_id)));
     runtime_state.source_ledger_manifest_ref = Some(path_tail(
         &cfg.repo_root,
         &run_journal_manifest_path(cfg, run_id),
@@ -714,18 +712,13 @@ pub(crate) fn bind_run_lifecycle(
         &now,
     )?;
     runtime_state.schema_version = "runtime-state-v2".to_string();
-    runtime_state.source_ledger_ref = Some(path_tail(&cfg.repo_root, &run_journal_path(cfg, run_id)));
-    runtime_state.source_ledger_manifest_ref =
-        Some(path_tail(&cfg.repo_root, &run_journal_manifest_path(cfg, run_id)));
-    runtime_state.support_target_tuple_ref = Some(format!(
-        "tuple://{}/{}/{}/{}/{}/{}",
-        support_target.model_tier,
-        support_target.workload_tier,
-        support_target.language_resource_tier,
-        support_target.locale_tier,
-        support_target.host_adapter,
-        support_target.model_adapter,
+    runtime_state.source_ledger_ref =
+        Some(path_tail(&cfg.repo_root, &run_journal_path(cfg, run_id)));
+    runtime_state.source_ledger_manifest_ref = Some(path_tail(
+        &cfg.repo_root,
+        &run_journal_manifest_path(cfg, run_id),
     ));
+    runtime_state.support_target_tuple_ref = Some(support_target_tuple_id(&support_target));
     runtime_state.rollback_posture_ref = Some(rollback_posture_ref.clone());
     runtime_state.last_applied_event_id = journal_materialization.last_applied_event_id.clone();
     runtime_state.last_applied_sequence = journal_materialization.last_applied_sequence;
@@ -817,15 +810,7 @@ fn initialize_run_journal(
     support_target: &SupportTargetTuple,
     recorded_at: &str,
 ) -> CoreResult<RunJournalMaterialization> {
-    let support_target_tuple_ref = Some(format!(
-        "tuple://{}/{}/{}/{}/{}/{}",
-        support_target.model_tier,
-        support_target.workload_tier,
-        support_target.language_resource_tier,
-        support_target.locale_tier,
-        support_target.host_adapter,
-        support_target.model_adapter,
-    ));
+    let support_target_tuple_ref = Some(support_target_tuple_id(support_target));
 
     let created = append_run_journal(
         control_root,
@@ -1059,7 +1044,10 @@ fn journal_governing_refs(
     }
 }
 
-fn inline_payload(typed_body: Option<serde_json::Value>, summary: Option<String>) -> JournalPayload {
+fn inline_payload(
+    typed_body: Option<serde_json::Value>,
+    summary: Option<String>,
+) -> JournalPayload {
     JournalPayload {
         payload_kind: if typed_body.is_some() {
             "inline-typed".to_string()

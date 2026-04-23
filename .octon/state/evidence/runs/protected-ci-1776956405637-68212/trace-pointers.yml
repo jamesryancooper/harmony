@@ -1,0 +1,8 @@
+schema_version: run-trace-pointers-v1
+run_id: protected-ci-1776956405637-68212
+trace_id: protected-ci-1776956405637-68212-canonical-trace-index
+trace_refs: []
+external_index_refs:
+- .octon/state/evidence/external-index/runs/protected-ci-1776956405637-68212.yml
+notes: No separate class-C trace payload was retained for this exemplar; canonical replay stays in repo-local receipts and manifests.
+updated_at: 2026-04-23T15:00:07.672972Z
