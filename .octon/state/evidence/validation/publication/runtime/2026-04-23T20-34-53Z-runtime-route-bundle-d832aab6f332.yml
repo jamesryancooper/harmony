@@ -1,9 +1,9 @@
 schema_version: "octon-validation-publication-receipt-v1"
-receipt_id: "runtime-route-bundle-2026-04-23T20-27-14Z-runtime-route-bundle-d832aab6f332"
+receipt_id: "runtime-route-bundle-2026-04-23T20-34-53Z-runtime-route-bundle-d832aab6f332"
 publication_family: "runtime-route-bundle"
 generation_id: "runtime-route-bundle-d832aab6f332"
 result: "published"
-validated_at: "2026-04-23T20:27:14Z"
+validated_at: "2026-04-23T20:34:53Z"
 validator_version: "runtime-route-bundle-publication-v1"
 contract_refs:
   - ".octon/framework/engine/runtime/spec/runtime-resolution-v1.md"
@@ -14,8 +14,8 @@ source_digests:
   support_target_matrix_sha256: "99740e3f5e96a29ea4d4ae998f54ac6b683654cd0e50e3bfd4414c8726a69b02"
   pack_routes_effective_sha256: "38fe7cb2ffe82083cb6740d76c06b64c3515152031b29d2bef347bbce40b19a8"
   pack_routes_lock_sha256: "8d734b150983e92daf4de08698be8f8432c51f718d20031b1ba9b211374b0328"
-  extensions_catalog_sha256: "1d0f08c153370a4623d45d92ddce0ff761eddec305758d9fc2dc3f0e14f600ee"
-  extensions_generation_lock_sha256: "5551a53292450752141e8f03aeb86b47fabf99be0deb636f0dba22f8e6be4757"
+  extensions_catalog_sha256: "c2f7b4998233b71065cf2d1f1d74c235f91e26e8978737f8841f6f77a83c42ce"
+  extensions_generation_lock_sha256: "fe1f4995451b2a59a35dd463c34667aba04fbde6494cda80501938aef4c67777"
 blocked_reasons: []
 published_paths:
   - ".octon/generated/effective/runtime/route-bundle.yml"
