@@ -22,21 +22,29 @@ require_ref() {
 main() {
   echo "== Support-Target Normalization Validation =="
 
+  local github_dossier_ref github_dossier_path
+  github_dossier_ref="$(yq -r '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane") | .support_dossier_ref // ""' "$SUPPORT_TARGETS")"
+  github_dossier_path="$ROOT_DIR/$github_dossier_ref"
+
   require_yq '.support_claim_mode == "bounded-admitted-finite"' "$SUPPORT_TARGETS" "support-target declaration uses bounded admitted-finite claim mode"
   require_yq '.live_support_universe.model_classes[] | select(. == "repo-local-governed")' "$SUPPORT_TARGETS" "live support universe includes repo-local-governed"
   require_yq '.resolved_non_live_surfaces.model_classes[] | select(. == "frontier-governed")' "$SUPPORT_TARGETS" "frontier-governed is explicitly non-live"
-  require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github-control-plane is explicitly non-live"
+  require_yq '.live_support_universe.host_adapters[] | select(. == "github-control-plane")' "$SUPPORT_TARGETS" "github-control-plane is live supported"
   require_yq '.live_support_universe.host_adapters[] | select(. == "ci-control-plane")' "$SUPPORT_TARGETS" "live support universe includes ci-control-plane"
   require_yq '.resolved_non_live_surfaces.host_adapters[] | select(. == "studio-control-plane")' "$SUPPORT_TARGETS" "studio-control-plane is explicitly non-live"
   require_yq 'has("compatibility_matrix") | not' "$SUPPORT_TARGETS" "support-target declaration no longer embeds a duplicate compatibility matrix"
   require_yq '(.tuple_admissions | length) == 6' "$SUPPORT_TARGETS" "tuple admission inventory includes live and cited non-live tuples"
-  require_yq '[.tuple_admissions[] | select(.claim_effect == "admitted-live-claim")] | length == 3' "$SUPPORT_TARGETS" "live claim remains narrowed to the three active tuples"
+  require_yq '[.tuple_admissions[] | select(.claim_effect == "admitted-live-claim")] | length == 4' "$SUPPORT_TARGETS" "live claim remains narrowed to the four active tuples"
   require_yq '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/repo-shell") | .admission_ref == ".octon/instance/governance/support-target-admissions/live/repo-shell-repo-consequential-en.yml"' "$SUPPORT_TARGETS" "repo-shell consequential tuple points at canonical live admission"
   require_yq '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/boundary-sensitive/reference-owned/english-primary/repo-shell") | .admission_ref == ".octon/instance/governance/support-target-admissions/stage-only/repo-shell-boundary-sensitive-en.yml"' "$SUPPORT_TARGETS" "boundary-sensitive tuple points at canonical stage-only admission"
+  require_yq '.tuple_admissions[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane" and .admission_ref == ".octon/instance/governance/support-target-admissions/live/github-repo-consequential-en.yml")' "$SUPPORT_TARGETS" "github consequential tuple points at canonical live admission"
   require_yq '(.resolved_non_live_surfaces.host_adapters | length) >= 1' "$SUPPORT_TARGETS" "resolved non-live host adapters are tracked explicitly"
   require_ref "$(yq -r '.generated_projection_ref' "$SUPPORT_TARGETS")" "generated effective matrix ref"
-  require_yq '.supported_tuples | length == 3' "$EFFECTIVE_MATRIX" "effective matrix reflects only the supported live tuples"
+  require_yq '.supported_tuples | length == 4' "$EFFECTIVE_MATRIX" "effective matrix reflects only the supported live tuples"
+  require_yq '.supported_tuples[] | select(.tuple_id == "tuple://repo-local-governed/repo-consequential/reference-owned/english-primary/github-control-plane" and .claim_effect == "admitted-live-claim")' "$EFFECTIVE_MATRIX" "effective matrix includes the narrow live github tuple"
   require_yq '[.supported_tuples[].capability_packs[] | select(. == "browser" or . == "api")] | length == 0' "$EFFECTIVE_MATRIX" "supported effective matrix excludes browser and api while unadmitted"
+  require_yq '.admitted_capability_packs | length == 4' "$github_dossier_path" "github live claim stays narrow"
+  require_yq '.known_exclusions[] | select(test("api-client remains unadmitted"))' "$github_dossier_path" "github live claim excludes broader api surfaces"
 
   while IFS= read -r ref; do
     [[ -n "$ref" ]] || continue
