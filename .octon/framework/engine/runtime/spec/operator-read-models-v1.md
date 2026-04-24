@@ -54,8 +54,9 @@ the mismatch.
 - Operator read models may never be the sole input to runtime policy,
   authority routing, or claim validation.
 - Operator read models may never be consumed as authorization, policy,
-  support-target, or state-reconstruction input; journal and retained evidence
-  roots remain the only valid sources for those paths.
+  support-target, or state-reconstruction input.
+- journal and retained evidence roots remain the only valid sources for those
+  paths.
 - Generated summaries, mission views, and operator digests may mirror current
   state but must not outstate `support-targets.yml`, release-lineage, RunCard
   v2, or HarnessCard v2.

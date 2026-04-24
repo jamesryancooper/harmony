@@ -13,7 +13,14 @@ cleanup_dirs=()
 cleanup() {
   local dir
   for dir in "${cleanup_dirs[@]}"; do
-    [[ -d "$dir" ]] && rm -rf "$dir"
+    case "$dir" in
+      "${TMPDIR:-/tmp}"/run-lifecycle-v1.*)
+        [[ -d "$dir" ]] && rm -r -- "$dir"
+        ;;
+      *)
+        echo "refusing to remove unexpected cleanup path: $dir" >&2
+        ;;
+    esac
   done
 }
 trap cleanup EXIT
