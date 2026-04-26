@@ -11,13 +11,25 @@ pass() { echo "[OK] $1"; }
 
 echo "== Raw Generated Effective Runtime Read Validation =="
 
-hits="$(rg -n "generated/effective/(runtime/route-bundle|capabilities/pack-routes|governance/support-target-matrix|extensions/catalog\\.effective|capabilities/routing\\.effective)" \
-  "$OCTON_DIR/framework/engine/runtime/crates/authority_engine" \
-  "$OCTON_DIR/framework/engine/runtime/crates/core" \
-  "$OCTON_DIR/framework/engine/runtime/crates/kernel/src" \
-  -g '!**/tests.rs' \
-  -g '!**/pipeline.rs' \
-  -g '!**/runtime_resolver/**' || true)"
+pattern="generated/effective/(runtime/route-bundle|capabilities/pack-routes|governance/support-target-matrix|governance/support-envelope-reconciliation|extensions/catalog\\.effective|capabilities/routing\\.effective)"
+raw_hits="$(rg -n "$pattern" "$OCTON_DIR/framework/engine/runtime/crates" -g '*.rs' || true)"
+hits=""
+
+while IFS= read -r hit; do
+  [[ -n "$hit" ]] || continue
+  file="${hit%%:*}"
+  rest="${hit#*:}"
+  line_no="${rest%%:*}"
+  case "$file" in
+    "$OCTON_DIR/framework/engine/runtime/crates/runtime_resolver/"*) continue ;;
+    */tests.rs|*/tests/*|*/fixtures/*) continue ;;
+  esac
+  test_start="$(rg -n '^[[:space:]]*#\[cfg\(test\)\]' "$file" | head -1 | cut -d: -f1 || true)"
+  if [[ -n "$test_start" && "$line_no" -ge "$test_start" ]]; then
+    continue
+  fi
+  hits+="$hit"$'\n'
+done <<< "$raw_hits"
 
 if [[ -z "$hits" ]]; then
   pass "runtime crates avoid raw generated/effective reads outside runtime_resolver"
