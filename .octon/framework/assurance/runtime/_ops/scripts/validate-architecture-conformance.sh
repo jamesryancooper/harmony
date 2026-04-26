@@ -366,9 +366,11 @@ main() {
   fi
 
   require_file "$OCTON_DIR/framework/engine/runtime/spec/run-health-read-model-v1.schema.json"
-  if OCTON_DIR_OVERRIDE="$OCTON_DIR" OCTON_ROOT_DIR="$ROOT_DIR" bash "$SCRIPT_DIR/validate-run-health-read-model.sh" >/dev/null; then
+  local run_health_output
+  if run_health_output="$(OCTON_DIR_OVERRIDE="$OCTON_DIR" OCTON_ROOT_DIR="$ROOT_DIR" bash "$SCRIPT_DIR/validate-run-health-read-model.sh" 2>&1)"; then
     pass "run-health read-model validation passed"
   else
+    printf '%s\n' "$run_health_output"
     fail "run-health read-model validation failed"
   fi
 
