@@ -337,6 +337,46 @@ def resolve_ref(ref):
     return ROOT_DIR / raw
 
 
+def repo_relative_path(path):
+    if path is None:
+        return None
+    try:
+        return Path(path).resolve().relative_to(ROOT_DIR.resolve()).as_posix()
+    except ValueError:
+        return None
+
+
+def is_retained_evidence_path(path):
+    rel = repo_relative_path(path)
+    if not rel:
+        return False
+    retained_roots = (
+        ".octon/state/evidence/runs/",
+        ".octon/state/evidence/disclosure/runs/",
+    )
+    return any(rel == root.rstrip("/") or rel.startswith(root) for root in retained_roots)
+
+
+def git_tracked_files_for(path):
+    rel = repo_relative_path(path)
+    if not rel:
+        return None
+    query = rel
+    if Path(path).is_dir() or (not Path(path).exists() and Path(path).suffix == ""):
+        query = rel.rstrip("/") + "/"
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT_DIR), "ls-files", "--", query],
+            check=True,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return [ROOT_DIR / line for line in result.stdout.splitlines() if line]
+
+
 def sha256_file(path):
     if not path or not Path(path).is_file():
         return None
@@ -351,6 +391,24 @@ def sha256_path(path):
     if not path:
         return None
     path = Path(path)
+    if is_retained_evidence_path(path):
+        tracked = git_tracked_files_for(path) or []
+        if path.is_file():
+            return sha256_file(path) if path in tracked else None
+        if not tracked:
+            return None
+        entries = []
+        for child in sorted(item for item in tracked if item.is_file()):
+            try:
+                child_ref = child.relative_to(path).as_posix()
+            except ValueError:
+                continue
+            child_digest = sha256_file(child)
+            entries.append({"path": child_ref, "digest": child_digest})
+        if not entries:
+            return None
+        encoded = json.dumps(entries, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        return "sha256:" + hashlib.sha256(encoded).hexdigest()
     if path.is_file():
         return sha256_file(path)
     if path.is_dir():

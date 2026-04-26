@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: fresh
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:8c0c34f8d7c8d685231fac1b0fc8c244e5ab3fe4e3cd8be24c0304b543f9f9cd
+  combined_source_digest: sha256:062376fc57fd3edf7d6974bc73ace219924613e22f73c5abd616e2fef577f30d
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,24 +101,24 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4-stage-inline
-    digest: sha256:ea35adcf3967241abaf09882f3850651637a9bac883b93548a1cf63ad5aeb502
+    digest: sha256:f91dd840b50eb926b71a7c9d4bd8a07f154c7d7d0c1e0e2a078971b0e70cca90
     status: present
   evidence_classification:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4-stage-inline/evidence-classification.yml
-    digest: sha256:ecaa99c622c4ca221f04006f69c1bb82700b701c448b978ab8ebf58817e66145
-    status: present
+    digest: missing
+    status: missing
   retained_evidence:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4-stage-inline/retained-run-evidence.yml
-    digest: sha256:41f38e4c88f5631ba89164e7823efe71fd2999947fdef544660b47a02e3febec
-    status: present
+    digest: missing
+    status: missing
   replay_pointers:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4-stage-inline/replay-pointers.yml
-    digest: sha256:43135a55dafd0a211fab6d87b33961ed21b7e5c852d0044fb094452a03f39fae
-    status: present
+    digest: missing
+    status: missing
   intervention_log:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4-stage-inline/interventions/log.yml
-    digest: sha256:aa0baf676855d97d79d8a1a295db4305cb1462049f16646dc4c471cd1687b52a
-    status: present
+    digest: missing
+    status: missing
   disclosure_run_card:
     ref: .octon/state/evidence/disclosure/runs/repo-consequential-preflight-workflow-20260413-v4-stage-inline/run-card.yml
     digest: sha256:06f2ce4ccf7e560bbbd3b62fb2bbed38ca5e702eb78f35436373e226690b4a0e
@@ -180,6 +180,9 @@ authorization:
 evidence:
   completeness: incomplete
   missing_required:
+  - evidence_classification
+  - retained_evidence
+  - replay_pointers
   - events_journal
   - events_manifest
   - journal_snapshot
@@ -188,7 +191,7 @@ rollback:
   status: ready
   hard_reset_required: false
 intervention:
-  status: none
+  status: unknown
   undisclosed_count: 0
   records: []
 disclosure:

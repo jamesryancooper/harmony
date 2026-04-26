@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: stale
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:e80cd8aa83e924fab9a363ab9caf2cb67fab23369df4dd98b0f71c004c5be783
+  combined_source_digest: sha256:c09c72bfad8fca67a55cf5e6e1530091fa6652535da14f22ba4e701794ed8073
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,7 +101,7 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/uec-audit-workflow-system-20260401-agent-augmented-1
-    digest: sha256:6ac42fa33e48339f4944f8b707f54a657ef7b99dc4a78673b63886ed4ed3aa29
+    digest: sha256:8f5244ae558ae62da56fc681243554b3b13ec486672e12d682fb46ca0cb253db
     status: present
   evidence_classification:
     ref: .octon/state/evidence/runs/uec-audit-workflow-system-20260401-agent-augmented-1/evidence-classification.yml
@@ -178,8 +178,10 @@ authorization:
   active_exceptions: []
   active_revocations: []
 evidence:
-  completeness: complete
-  missing_required: []
+  completeness: incomplete
+  missing_required:
+  - journal_snapshot
+  - journal_manifest_snapshot
 rollback:
   status: ready
   hard_reset_required: false

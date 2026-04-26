@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: stale
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:d1f156ddc901f3dc9607c4db5fea3f0c0552017de5d243d4d904be10d169605f
+  combined_source_digest: sha256:80ea1a8cd4ddd3874a463b82d0bb62a7393424e0e6124fd3554b0c543421f2ff
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,7 +101,7 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410
-    digest: sha256:b0dd3779146d782e32f09d8216ab822a397762b8e8b5e972f47b1465d9d91992
+    digest: sha256:5818d925e7770942f10efd2c45b1771bf488fee26656e0a22151a43bdda3d789
     status: present
   evidence_classification:
     ref: .octon/state/evidence/runs/uec-repo-shell-repo-consequential-recertified-20260410/evidence-classification.yml
@@ -178,8 +178,10 @@ authorization:
   active_exceptions: []
   active_revocations: []
 evidence:
-  completeness: complete
-  missing_required: []
+  completeness: incomplete
+  missing_required:
+  - journal_snapshot
+  - journal_manifest_snapshot
 rollback:
   status: ready
   hard_reset_required: false

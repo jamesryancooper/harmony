@@ -11,11 +11,11 @@ outputs:
 - run_id: bootstrap-doctor-workflow-20260413-v4
   health_ref: .octon/generated/cognition/projections/materialized/runs/bootstrap-doctor-workflow-20260413-v4/health.yml
   status: evidence-incomplete
-  health_digest: sha256:ebd7b3d3e03c921cd5f50f3c3f4e34bbae1e0bd0ef20df83b8477a337481eeb4
+  health_digest: sha256:b20af3a398c7e645163015773a1af11849bb442993ecd841a9d572cb4d3a8191
 - run_id: bootstrap-doctor-workflow-20260413-v4-stage-inline
   health_ref: .octon/generated/cognition/projections/materialized/runs/bootstrap-doctor-workflow-20260413-v4-stage-inline/health.yml
   status: evidence-incomplete
-  health_digest: sha256:bbad0b71c2e253e718cc6d64d0bd820872269e535863a28c794544ac5c08c3b5
+  health_digest: sha256:b7d07a752c19ce7a20f4c3a462b77dbe859b641d9af9cdb189eeaaeefb058187
 - run_id: protected-ci-1776956405637-68212
   health_ref: .octon/generated/cognition/projections/materialized/runs/protected-ci-1776956405637-68212/health.yml
   status: stale
@@ -23,31 +23,31 @@ outputs:
 - run_id: publish-1777215062293-99294
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777215062293-99294/health.yml
   status: stale
-  health_digest: sha256:213f3750074ec3dd1abd350b716cb0a12accf87a52c94ce1348d134a5f4a6d2d
+  health_digest: sha256:460fe249d0b969d52382d2cb4317259e0289b2ce6b1a8d1f687d70cd933e1200
 - run_id: publish-1777216728113-34874
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777216728113-34874/health.yml
   status: stale
-  health_digest: sha256:631734049e8ea5ccae8c3e7512d787bd447f8c4da7c52aea2105d30724a43de3
+  health_digest: sha256:4caedc9907834b1d95c925372fb3b1a545b133144bff89390f37169e4c4bb75d
 - run_id: publish-1777217145785-18561
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777217145785-18561/health.yml
   status: stale
-  health_digest: sha256:c1db76c2300c24338b8c2bfc2fdeb473c2a716134fc48c08422be1339da32b74
+  health_digest: sha256:eee71c2a4a89dd2910a54d7f049a8705b014b8f2b4bd386abae28ebf953aebe1
 - run_id: repo-consequential-preflight-workflow-20260413-v4
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-consequential-preflight-workflow-20260413-v4/health.yml
   status: evidence-incomplete
-  health_digest: sha256:3f77802237e9407241d5329479e3041e177f959c338370b29f215496187a7911
+  health_digest: sha256:7d487f291263e0247ee1d0e9b041da889aa4731a6cf36fdb89fbb733ff8b2779
 - run_id: repo-consequential-preflight-workflow-20260413-v4-stage-inline
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-consequential-preflight-workflow-20260413-v4-stage-inline/health.yml
   status: evidence-incomplete
-  health_digest: sha256:489abe04addf49f4a8556631d8db20b19b1ff3f58f0e569297ece515181826f1
+  health_digest: sha256:2432db432e386183a13a0dfb19576f118c32f44efaee7385f90f3a96431acb2e
 - run_id: repo-shell-supported-scenario-workflow-20260413-v4
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-shell-supported-scenario-workflow-20260413-v4/health.yml
   status: evidence-incomplete
-  health_digest: sha256:d000918dae07671299fd8660c0be35ed9ba6ed24ec724deb385719eb4655e9a9
+  health_digest: sha256:edc680a4c3c709137efb4bc0f9e177da9a8cd8662ffee118b765355d5216bcc3
 - run_id: repo-shell-supported-scenario-workflow-20260413-v4-stage-inline
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-shell-supported-scenario-workflow-20260413-v4-stage-inline/health.yml
   status: evidence-incomplete
-  health_digest: sha256:896c87dce87ffc320fb5f549ad9864267dc04d1749b80c632e4f594836391585
+  health_digest: sha256:cd97522cfd5b5399fe209296bdf52a23bf1b11c690e705eea51b232a93c11bec
 - run_id: run-wave3-runtime-bridge-20260327
   health_ref: .octon/generated/cognition/projections/materialized/runs/run-wave3-runtime-bridge-20260327/health.yml
   status: evidence-incomplete
@@ -63,7 +63,7 @@ outputs:
 - run_id: uec-audit-workflow-system-20260401-agent-augmented-1
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-audit-workflow-system-20260401-agent-augmented-1/health.yml
   status: stale
-  health_digest: sha256:17eab724e3c859d8bc1d116315332461425ab6e8d95f100fb37be54ed86ae4a1
+  health_digest: sha256:01468ed9cb40b1f7fa3a62ad7a5848f098fab8568bcda7e15e02d49ebf201d3f
 - run_id: uec-bounded-repo-shell-boundary-sensitive-20260409
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/health.yml
   status: revoked
@@ -71,7 +71,7 @@ outputs:
 - run_id: uec-evaluate-harness-20260401-agent-augmented-1
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-evaluate-harness-20260401-agent-augmented-1/health.yml
   status: stale
-  health_digest: sha256:8b6a74870d28b9d4b4c6e381e6fa0065289d284c4037e47a39ba7109e80c83cd
+  health_digest: sha256:90c01a00ddfa59487ebc6506f200ac8df6a2d9160fb4151b3d45fdaf43cf8e42
 - run_id: uec-global-ci-observe-read-20260404
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-global-ci-observe-read-20260404/health.yml
   status: evidence-incomplete
@@ -95,7 +95,7 @@ outputs:
 - run_id: uec-repo-shell-repo-consequential-recertified-20260410
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-repo-shell-repo-consequential-recertified-20260410/health.yml
   status: stale
-  health_digest: sha256:d57daeb5bb8dafd71e7467faeb664f911e2fba4cf9d69f186cceabd12937f858
+  health_digest: sha256:45409efe9735a369f61ed652fdcc6170eeca2ef2993fccf58fa8de23501f0569
 - run_id: uec-safe-stage-approval-exercise-20260402
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-safe-stage-approval-exercise-20260402/health.yml
   status: stale
@@ -115,4 +115,4 @@ outputs:
 - run_id: uec-validate-proposal-20260401-agent-augmented-3
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-validate-proposal-20260401-agent-augmented-3/health.yml
   status: stale
-  health_digest: sha256:98f7b05bd3f981223e854a038f86adcd3cde9fe49548157bcb448923a0f2e062
+  health_digest: sha256:f9a3e7d714e76cbbcd42b2c67ce99a88450398b6123c7e537b7b43025fcefc24

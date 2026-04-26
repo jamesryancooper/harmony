@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: stale
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:8fad9b2cf5e9f4f7004d0a52e15ca5a82f25ee995ed2a6880f570195207fe618
+  combined_source_digest: sha256:657a25dac5c38f045582248a8526f019b486d387ab5afadcf5a3d872df8f788c
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,28 +101,28 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/publish-1777215062293-99294
-    digest: sha256:20562a59a0c21753fd499e7e2d3c1e7b554694c2808c02e1900a1a94cd4afe9c
-    status: present
+    digest: missing
+    status: missing
   evidence_classification:
     ref: .octon/state/evidence/runs/publish-1777215062293-99294/evidence-classification.yml
-    digest: sha256:29f2c82785c1ed99e67e343c2c9370c28bfa3796a5746b0db6d15ff9302226ab
-    status: present
+    digest: missing
+    status: missing
   retained_evidence:
     ref: .octon/state/evidence/runs/publish-1777215062293-99294/retained-run-evidence.yml
-    digest: sha256:86675a0ff7ed7b226d8beb6bbb300832e55ef14541dc3fe167582986eff06700
-    status: present
+    digest: missing
+    status: missing
   replay_pointers:
     ref: .octon/state/evidence/runs/publish-1777215062293-99294/replay-pointers.yml
-    digest: sha256:bf5a716912f173d510202485a527447606532749464fc47b2e4ea3a52f2bd466
-    status: present
+    digest: missing
+    status: missing
   intervention_log:
     ref: .octon/state/evidence/runs/publish-1777215062293-99294/interventions/log.yml
-    digest: sha256:528f2fec75f5b314882606416b43270e861008d7f96c9cf73cb254b6dbc0c977
-    status: present
+    digest: missing
+    status: missing
   disclosure_run_card:
     ref: .octon/state/evidence/disclosure/runs/publish-1777215062293-99294/run-card.yml
-    digest: sha256:b8dce18b8dc37ac049d6903fb1e1f845fbd041b9f9b80faf960e52bd9f042ce3
-    status: present
+    digest: missing
+    status: missing
   support_targets:
     ref: .octon/instance/governance/support-targets.yml
     digest: sha256:4ac5c45f0d45f2f14138b454b86988a04e102e9a254d7960a24773a2b67b5008
@@ -176,17 +176,22 @@ authorization:
   active_exceptions: []
   active_revocations: []
 evidence:
-  completeness: complete
-  missing_required: []
+  completeness: incomplete
+  missing_required:
+  - evidence_classification
+  - retained_evidence
+  - replay_pointers
+  - journal_snapshot
+  - journal_manifest_snapshot
 rollback:
   status: ready
   hard_reset_required: false
 intervention:
-  status: none
+  status: unknown
   undisclosed_count: 0
   records: []
 disclosure:
-  status: complete
+  status: incomplete
 closure:
   status: not-ready
 diagnostics:

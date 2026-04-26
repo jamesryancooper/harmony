@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: fresh
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:44c71e3a5761af0ae81fcb6b28a4f49172d0737d196f235db7e8909c4f2d54c0
+  combined_source_digest: sha256:3c79f6b413ab9c67559c4025a2b733d279d2d44ceb78cc5b3efb1e9f5db1d15a
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,24 +101,24 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4-stage-inline
-    digest: sha256:541865218924614643cb0fb42514aa001ba5a058e14678ba6ba01f650fb4bb2c
+    digest: sha256:8f04e3de43abac6ef73da47b64732cb6b00fc158c2b213b7b933350443cd6902
     status: present
   evidence_classification:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4-stage-inline/evidence-classification.yml
-    digest: sha256:e18f079feb4a67e322c03b9c9b0ba974b37983b9c445b73ea8658a4015fbce6d
-    status: present
+    digest: missing
+    status: missing
   retained_evidence:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4-stage-inline/retained-run-evidence.yml
-    digest: sha256:8f71da9ae42214f49ed06c6d850268e7ecc3b21c2a148bc79e015f9bfe0025e9
-    status: present
+    digest: missing
+    status: missing
   replay_pointers:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4-stage-inline/replay-pointers.yml
-    digest: sha256:78972d9b2e3c51fb8a74147c0493bc8f1de58a28ffeeeeebdc49641bda889cfb
-    status: present
+    digest: missing
+    status: missing
   intervention_log:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4-stage-inline/interventions/log.yml
-    digest: sha256:c0af0a2bc49d73aa132911055428b59213f5203105d70585d1835bbc3f93b517
-    status: present
+    digest: missing
+    status: missing
   disclosure_run_card:
     ref: .octon/state/evidence/disclosure/runs/bootstrap-doctor-workflow-20260413-v4-stage-inline/run-card.yml
     digest: sha256:0b545589c2b81ddc376a07ed048f1d4cac5c99c376bb580c52edfc03e72d98db
@@ -180,6 +180,9 @@ authorization:
 evidence:
   completeness: incomplete
   missing_required:
+  - evidence_classification
+  - retained_evidence
+  - replay_pointers
   - events_journal
   - events_manifest
   - journal_snapshot
@@ -188,7 +191,7 @@ rollback:
   status: ready
   hard_reset_required: false
 intervention:
-  status: none
+  status: unknown
   undisclosed_count: 0
   records: []
 disclosure:

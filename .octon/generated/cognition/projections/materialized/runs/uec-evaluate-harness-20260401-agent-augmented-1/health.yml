@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: stale
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:3eb4b7fe7c48a4d57951703e7e7822187a75643ca7196ddfea94d931920801d3
+  combined_source_digest: sha256:7550fbb7b97bf39f1d95b77aeecb2b5894472575b1dbe600927d926cfcd48c75
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,7 +101,7 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/uec-evaluate-harness-20260401-agent-augmented-1
-    digest: sha256:6ee15895f924551f915be4a3a3e543af6a3e3bf85de55a2a63ef1bf8e4d30284
+    digest: sha256:487003334aaf55a9a7398039a50ffae590bcacc3aff8668ce9e8a1b32153898b
     status: present
   evidence_classification:
     ref: .octon/state/evidence/runs/uec-evaluate-harness-20260401-agent-augmented-1/evidence-classification.yml
@@ -178,8 +178,10 @@ authorization:
   active_exceptions: []
   active_revocations: []
 evidence:
-  completeness: complete
-  missing_required: []
+  completeness: incomplete
+  missing_required:
+  - journal_snapshot
+  - journal_manifest_snapshot
 rollback:
   status: ready
   hard_reset_required: false

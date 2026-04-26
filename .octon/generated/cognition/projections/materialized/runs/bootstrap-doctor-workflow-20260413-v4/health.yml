@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: fresh
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:735bb1925a34fc4673be9a798944d8820d370fce255f8111057c7cac6077ed05
+  combined_source_digest: sha256:aad2fc80806f1abb56fcc704e7f8747c2853ee2472d4f0790c2d0f2de13ef9bd
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,24 +101,24 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4
-    digest: sha256:b78850c4b58416adffeb417b636ffc1d6ce4e05a91052f075bea7ad36006727c
+    digest: sha256:faeeb4dc743c37040d5f17c7366a72f9b2af8e51acb1a58f17f80519b1cd4918
     status: present
   evidence_classification:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4/evidence-classification.yml
-    digest: sha256:4cdc6d2c52709e6878932aabc45e50adbfff84f287903b0da6b10d911c939751
-    status: present
+    digest: missing
+    status: missing
   retained_evidence:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4/retained-run-evidence.yml
-    digest: sha256:76bc6aec78385e1e0681b6f6acd7a93a546c73f71efacca5c4e7a6705250e482
-    status: present
+    digest: missing
+    status: missing
   replay_pointers:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4/replay-pointers.yml
-    digest: sha256:3ecbaec9340ddd604b5779db473d1f3a5f426c6f141fab322ffffcd6ddea65ae
-    status: present
+    digest: missing
+    status: missing
   intervention_log:
     ref: .octon/state/evidence/runs/bootstrap-doctor-workflow-20260413-v4/interventions/log.yml
-    digest: sha256:28f797e7089d70dc4adf3dbf5cd1d466f6fdcc37f6689be178db11ee81702a4e
-    status: present
+    digest: missing
+    status: missing
   disclosure_run_card:
     ref: .octon/state/evidence/disclosure/runs/bootstrap-doctor-workflow-20260413-v4/run-card.yml
     digest: sha256:b64e98f394e97e40b09a6e9dbb45b198e931ead3a2df7c4e24249522dbb5b32b
@@ -180,6 +180,9 @@ authorization:
 evidence:
   completeness: incomplete
   missing_required:
+  - evidence_classification
+  - retained_evidence
+  - replay_pointers
   - events_journal
   - events_manifest
   - journal_snapshot
@@ -188,7 +191,7 @@ rollback:
   status: ready
   hard_reset_required: false
 intervention:
-  status: none
+  status: unknown
   undisclosed_count: 0
   records: []
 disclosure:

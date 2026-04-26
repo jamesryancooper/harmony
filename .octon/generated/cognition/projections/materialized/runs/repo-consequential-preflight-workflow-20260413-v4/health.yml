@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: fresh
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:d2bf994bacbeee637538865c4444c7c7dd50e9bf519c6ca2859d9537dd743a2a
+  combined_source_digest: sha256:306448e66624deb8918166741633423717ee5421af3c289740a1dc2c92899210
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,24 +101,24 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4
-    digest: sha256:aefcead54d5ff7ea9899305dfd30129a1fb043efd9bf715ab2e4814c582e45a6
+    digest: sha256:9b8e30db9946d1d4891872e382d967002e87bdbd427a88f2ee985d72203d3247
     status: present
   evidence_classification:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4/evidence-classification.yml
-    digest: sha256:95c8c9bd27c7bee6bb6863507ace0ae20e2c3da07b1be30b57cf0591c53b5db2
-    status: present
+    digest: missing
+    status: missing
   retained_evidence:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4/retained-run-evidence.yml
-    digest: sha256:f7f91800a8d29ed66f42dd22c0e8c8a6732a4e7a9d61d5d8a45a6eaaaf61cdb2
-    status: present
+    digest: missing
+    status: missing
   replay_pointers:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4/replay-pointers.yml
-    digest: sha256:24313d971132f5b8ce40ea9d209caf095e9f1144800afcaa65b84561de69d04f
-    status: present
+    digest: missing
+    status: missing
   intervention_log:
     ref: .octon/state/evidence/runs/repo-consequential-preflight-workflow-20260413-v4/interventions/log.yml
-    digest: sha256:489f9a97ef4ec3b69d4268e60714bda12179b52eaed8f2d5345848f2ffd42a48
-    status: present
+    digest: missing
+    status: missing
   disclosure_run_card:
     ref: .octon/state/evidence/disclosure/runs/repo-consequential-preflight-workflow-20260413-v4/run-card.yml
     digest: sha256:3a9e4cc4522ccd83f35bb16e198abe2abae10d9af84653302a16b41b685559e4
@@ -180,6 +180,9 @@ authorization:
 evidence:
   completeness: incomplete
   missing_required:
+  - evidence_classification
+  - retained_evidence
+  - replay_pointers
   - events_journal
   - events_manifest
   - journal_snapshot
@@ -188,7 +191,7 @@ rollback:
   status: ready
   hard_reset_required: false
 intervention:
-  status: none
+  status: unknown
   undisclosed_count: 0
   records: []
 disclosure:

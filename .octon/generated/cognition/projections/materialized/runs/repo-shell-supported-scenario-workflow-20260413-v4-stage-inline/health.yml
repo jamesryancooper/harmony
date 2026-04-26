@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: fresh
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:6e0b4341b7ac71b5aca7b701356275c3a1f0cea80d846c9cd5486fab14c5dcfa
+  combined_source_digest: sha256:589448dbe162ea1f3e660433449a5abd6f022eb092eadebfbeeb26b9d5ce7de0
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,28 +101,28 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/repo-shell-supported-scenario-workflow-20260413-v4-stage-inline
-    digest: sha256:7ddf5f89f803bb00ab17244332281b1106e4b31aecd4bf549c454a636ca7a80a
-    status: present
+    digest: missing
+    status: missing
   evidence_classification:
     ref: .octon/state/evidence/runs/repo-shell-supported-scenario-workflow-20260413-v4-stage-inline/evidence-classification.yml
-    digest: sha256:7d7089d60fdb6d80a9aab85e9eee3a566486087781a0d45a91d61e703315c025
-    status: present
+    digest: missing
+    status: missing
   retained_evidence:
     ref: .octon/state/evidence/runs/repo-shell-supported-scenario-workflow-20260413-v4-stage-inline/retained-run-evidence.yml
-    digest: sha256:231b29827aff6549d4042d9bfa76bbf6adfb359315362c9c37924b3852d20f3f
-    status: present
+    digest: missing
+    status: missing
   replay_pointers:
     ref: .octon/state/evidence/runs/repo-shell-supported-scenario-workflow-20260413-v4-stage-inline/replay-pointers.yml
-    digest: sha256:6374f036cef2abfd74030ed36fa2695cee12f7a52131a625cf31b8d32d574332
-    status: present
+    digest: missing
+    status: missing
   intervention_log:
     ref: .octon/state/evidence/runs/repo-shell-supported-scenario-workflow-20260413-v4-stage-inline/interventions/log.yml
-    digest: sha256:538ced4935502453c874aadbbe4c8d4ff389e3b64e87c88cf9fd7a94890faffb
-    status: present
+    digest: missing
+    status: missing
   disclosure_run_card:
     ref: .octon/state/evidence/disclosure/runs/repo-shell-supported-scenario-workflow-20260413-v4-stage-inline/run-card.yml
-    digest: sha256:6a6aeaa435ce949a5aeae29df6b4a3f270ee35f353926c7e238b999e949553bf
-    status: present
+    digest: missing
+    status: missing
   support_targets:
     ref: .octon/instance/governance/support-targets.yml
     digest: sha256:4ac5c45f0d45f2f14138b454b86988a04e102e9a254d7960a24773a2b67b5008
@@ -180,6 +180,9 @@ authorization:
 evidence:
   completeness: incomplete
   missing_required:
+  - evidence_classification
+  - retained_evidence
+  - replay_pointers
   - events_journal
   - events_manifest
   - journal_snapshot
@@ -188,11 +191,11 @@ rollback:
   status: ready
   hard_reset_required: false
 intervention:
-  status: none
+  status: unknown
   undisclosed_count: 0
   records: []
 disclosure:
-  status: complete
+  status: incomplete
 closure:
   status: not-ready
 diagnostics: []

@@ -23,7 +23,7 @@ freshness:
   mode: digest-bound
   status: stale
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:105e7d44a1681135f1f16b9d224d7c6697ba012aac7f9b710f330c82fb6739b4
+  combined_source_digest: sha256:eee857d696cc94200ff7a305b067f8bef8c84f43e3b13e0f264f3301d5365499
   checked_at: '2026-04-24T18:40:00Z'
   expires_at: null
   freshness_refs:
@@ -101,7 +101,7 @@ source_digests:
     status: present
   evidence_root:
     ref: .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3
-    digest: sha256:482b566efe392adfe39fdd0c62566e321287710b74e926b2b8153c00daf64bbe
+    digest: sha256:eeda72d7c839613ff348976b09c302c74d8a4efdd6836f6bbbfa9a2c99eb7aab
     status: present
   evidence_classification:
     ref: .octon/state/evidence/runs/uec-validate-proposal-20260401-agent-augmented-3/evidence-classification.yml
@@ -177,8 +177,10 @@ authorization:
   active_exceptions: []
   active_revocations: []
 evidence:
-  completeness: complete
-  missing_required: []
+  completeness: incomplete
+  missing_required:
+  - journal_snapshot
+  - journal_manifest_snapshot
 rollback:
   status: ready
   hard_reset_required: false
