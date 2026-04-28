@@ -5,7 +5,7 @@
 - Proposal ID: `octon-connector-admission-runtime-v4`
 - Kind: `architecture`
 - Selected v4 step: `Connector Admission Runtime + Connector Trust Dossier`
-- Status: `implemented`
+- Status: `archived`
 - Promotion scope: `octon-internal`
 
 ## Required root files

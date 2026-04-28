@@ -5,7 +5,7 @@
 - Proposal ID: `mission-autonomy-runtime-v2-drop-in-governed-autonomy`
 - Title: Mission Autonomy Runtime v2 for Full Drop-In Governed Autonomy
 - Kind: architecture
-- Status: implemented
+- Status: archived
 - Generated: 2026-04-28
 
 ## Required proposal artifacts

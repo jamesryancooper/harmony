@@ -57,7 +57,17 @@ promotion_targets:
   - .octon/state/evidence/stewardship/
   - .octon/state/continuity/stewardship/
   - .octon/generated/cognition/projections/materialized/stewardship/
-status: implemented
+status: archived
+archive:
+  archived_at: "2026-04-28"
+  archived_from_status: implemented
+  disposition: implemented
+  original_path: .octon/inputs/exploratory/proposals/architecture/continuous-stewardship-runtime-v3
+  promotion_evidence:
+    - .octon/framework/engine/runtime/spec/continuous-stewardship-runtime-v3.md
+    - .octon/framework/engine/runtime/crates/kernel/src/commands/stewardship.rs
+    - .octon/framework/assurance/runtime/_ops/scripts/validate-continuous-stewardship-runtime-v3.sh
+    - .octon/state/control/stewardship/programs/octon-continuous-stewardship/ledger.yml
 lifecycle:
   temporary: true
   exit_expectation: >-

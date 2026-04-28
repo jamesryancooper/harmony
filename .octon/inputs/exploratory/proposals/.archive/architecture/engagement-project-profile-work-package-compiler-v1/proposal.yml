@@ -54,7 +54,17 @@ promotion_targets:
   - ".octon/instance/governance/connectors/posture.yml"
   - ".octon/instance/governance/engagements/path-families.yml"
   - ".octon/instance/locality/project-profile.yml"
-status: "implemented"
+status: "archived"
+archive:
+  archived_at: "2026-04-28"
+  archived_from_status: "implemented"
+  disposition: "implemented"
+  original_path: ".octon/inputs/exploratory/proposals/architecture/engagement-project-profile-work-package-compiler-v1"
+  promotion_evidence:
+    - ".octon/framework/engine/runtime/spec/engagement-work-package-compiler-v1.md"
+    - ".octon/framework/engine/runtime/crates/kernel/src/commands/engagement.rs"
+    - ".octon/framework/assurance/runtime/_ops/scripts/validate-engagement-work-package-compiler.sh"
+    - ".octon/state/control/engagements/engagement-compiler-v1-validation/work-package.yml"
 lifecycle:
   temporary: true
   exit_expectation: >-

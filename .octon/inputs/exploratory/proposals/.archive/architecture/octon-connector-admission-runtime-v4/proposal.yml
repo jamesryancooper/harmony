@@ -33,7 +33,17 @@ promotion_targets:
 - .octon/state/control/connectors/
 - .octon/state/evidence/connectors/
 - .octon/generated/cognition/projections/materialized/connectors/
-status: implemented
+status: archived
+archive:
+  archived_at: "2026-04-28"
+  archived_from_status: implemented
+  disposition: implemented
+  original_path: .octon/inputs/exploratory/proposals/architecture/octon-connector-admission-runtime-v4
+  promotion_evidence:
+  - .octon/framework/engine/runtime/spec/connector-trust-dossier-v1.schema.json
+  - .octon/framework/orchestration/practices/connector-admission-standards.md
+  - .octon/framework/assurance/runtime/_ops/scripts/validate-connector-admission-runtime-v4.sh
+  - .octon/state/control/connectors/mcp/status.yml
 lifecycle:
   temporary: true
   exit_expectation: Promote connector operation/admission/dossier contracts, governance

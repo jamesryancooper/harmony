@@ -34,7 +34,17 @@ promotion_targets:
   - .octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs
   - .octon/framework/assurance/runtime/_ops/scripts/validate-mission-autonomy-runtime-v2.sh
   - .octon/framework/assurance/runtime/_ops/tests/test-mission-autonomy-runtime-v2.sh
-status: implemented
+status: archived
+archive:
+  archived_at: "2026-04-28"
+  archived_from_status: implemented
+  disposition: implemented
+  original_path: .octon/inputs/exploratory/proposals/architecture/mission-autonomy-runtime-v2-drop-in-governed-autonomy
+  promotion_evidence:
+    - .octon/framework/engine/runtime/spec/mission-autonomy-runtime-v2.md
+    - .octon/framework/engine/runtime/crates/kernel/src/commands/mission.rs
+    - .octon/framework/assurance/runtime/_ops/scripts/validate-mission-autonomy-runtime-v2.sh
+    - .octon/state/control/execution/missions/mission-autonomy-v2-validation/queue.yml
 lifecycle:
   temporary: true
   exit_expectation: >-

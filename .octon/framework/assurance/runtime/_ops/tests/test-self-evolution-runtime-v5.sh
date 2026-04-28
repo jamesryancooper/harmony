@@ -33,6 +33,9 @@ recert_receipt="$tmp/.octon/state/evidence/evolution/recertifications/evolution-
 promotion_receipt="$tmp/.octon/state/evidence/evolution/promotions/evolution-promotion-v5-validation/receipt.yml"
 rollback="$tmp/.octon/state/control/evolution/rollbacks/evolution-rollback-v5-validation.yml"
 proposal="$tmp/.octon/inputs/exploratory/proposals/architecture/$proposal_id/proposal.yml"
+if [[ ! -f "$proposal" ]]; then
+  proposal="$tmp/.octon/inputs/exploratory/proposals/.archive/architecture/$proposal_id/proposal.yml"
+fi
 generated="$tmp/.octon/generated/cognition/projections/materialized/evolution/ledger.yml"
 framework_doc="$tmp/.octon/framework/orchestration/practices/evolution-lifecycle-standards.md"
 
@@ -112,7 +115,7 @@ expect_fail "rollback-posture-missing-plan"
 cp "$tmp/rollback.bak" "$rollback"
 
 cp "$proposal" "$tmp/proposal.bak"
-yq -i '.status = "in-review"' "$proposal"
+yq -i '.status = "in-review" | del(.archive)' "$proposal"
 expect_fail "proposal-status-mismatch"
 cp "$tmp/proposal.bak" "$proposal"
 

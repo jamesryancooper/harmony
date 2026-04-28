@@ -2,8 +2,8 @@
 
 - Proposal ID: `continuous-stewardship-runtime-v3`
 - Proposal kind: `architecture`
-- Status: `implemented`
-- Non-canonical proposal path: `/.octon/inputs/exploratory/proposals/architecture/continuous-stewardship-runtime-v3/`
+- Status: `archived`
+- Non-canonical proposal path: `/.octon/inputs/exploratory/proposals/.archive/architecture/continuous-stewardship-runtime-v3/`
 
 ## Required Root Files
 

@@ -162,6 +162,39 @@ resolve_repo_path() {
   esac
 }
 
+resolve_proposal_dir() {
+  local active="$OCTON_DIR/inputs/exploratory/proposals/architecture/$PROPOSAL_ID"
+  local archived="$OCTON_DIR/inputs/exploratory/proposals/.archive/architecture/$PROPOSAL_ID"
+  if [[ -f "$active/proposal.yml" ]]; then
+    printf '%s\n' "$active"
+  elif [[ -f "$archived/proposal.yml" ]]; then
+    printf '%s\n' "$archived"
+  else
+    printf '%s\n' "$active"
+  fi
+}
+
+effective_implemented_status() {
+  local proposal="$1"
+  local status
+  status="$(yq -r '.status // ""' "$proposal" 2>/dev/null || true)"
+  case "$status" in
+    implemented)
+      printf '%s\n' "implemented"
+      ;;
+    archived)
+      if yq -e '(.archive.disposition == "implemented") or (.archive.archived_from_status == "implemented")' "$proposal" >/dev/null 2>&1; then
+        printf '%s\n' "implemented"
+      else
+        printf '%s\n' "archived"
+      fi
+      ;;
+    *)
+      printf '%s\n' "$status"
+      ;;
+  esac
+}
+
 check_tools() {
   command -v yq >/dev/null 2>&1 || fail "yq is required"
   command -v jq >/dev/null 2>&1 || fail "jq is required"
@@ -380,19 +413,20 @@ check_instance_and_control() {
 
 check_proposal_and_promotion() {
   echo "== Proposal, Promotion, and Recertification Validation =="
-  local proposal_dir="$OCTON_DIR/inputs/exploratory/proposals/architecture/octon-self-evolution-proposal-to-promotion-runtime-v5"
+  local proposal_dir
+  proposal_dir="$(resolve_proposal_dir)"
   local proposal="$proposal_dir/proposal.yml"
   local promotion="$OCTON_DIR/state/control/evolution/promotions/$PROMOTION_ID.yml"
   local recert="$OCTON_DIR/state/control/evolution/recertifications/$RECERTIFICATION_ID.yml"
   local receipt="$OCTON_DIR/state/evidence/evolution/promotions/$PROMOTION_ID/receipt.yml"
   require_yaml_schema "$proposal" "proposal-v1"
-  require_yq "$proposal" '.status == "implemented"' "v5 proposal status is implemented"
+  require_yq "$proposal" '.status == "implemented" or (.status == "archived" and ((.archive.disposition == "implemented") or (.archive.archived_from_status == "implemented")))' "v5 proposal status is implemented or archived as implemented"
   require_yq "$proposal" '.lifecycle.temporary == true' "proposal remains temporary non-authoritative"
 
   local proposal_status control_status
-  proposal_status="$(yq -r '.status // ""' "$proposal")"
+  proposal_status="$(effective_implemented_status "$proposal")"
   control_status="$(yq -r '.proposal_status // ""' "$promotion")"
-  [[ "$proposal_status" == "$control_status" ]] && pass "promotion status matches proposal manifest" || fail "promotion proposal_status must match actual proposal manifest"
+  [[ "$proposal_status" == "$control_status" ]] && pass "promotion status matches proposal manifest effective implemented state" || fail "promotion proposal_status must match actual proposal manifest effective implemented state"
 
   while IFS= read -r target; do
     [[ -n "$target" ]] || continue
@@ -437,7 +471,7 @@ check_proposal_and_promotion() {
   done < <(yq -r '.target_refs[]? // ""' "$receipt")
 
   local proposal_dep_pattern
-  proposal_dep_pattern="\\.octon/inputs/exploratory/proposals/architecture/${PROPOSAL_ID}"
+  proposal_dep_pattern="\\.octon/inputs/exploratory/proposals/(\\.archive/)?architecture/${PROPOSAL_ID}"
   if rg -n "$proposal_dep_pattern" \
     "$OCTON_DIR/framework" "$OCTON_DIR/instance" \
     -g '!**/validate-self-evolution-runtime-v5.sh' \

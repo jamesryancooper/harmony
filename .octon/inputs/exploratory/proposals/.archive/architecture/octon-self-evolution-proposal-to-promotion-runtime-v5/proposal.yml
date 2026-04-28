@@ -54,11 +54,21 @@ promotion_targets:
   - .octon/state/evidence/evolution/
   - .octon/state/continuity/evolution/
   - .octon/generated/cognition/projections/materialized/evolution/
-status: implemented
+status: archived
+archive:
+  archived_at: "2026-04-28"
+  archived_from_status: implemented
+  disposition: implemented
+  original_path: .octon/inputs/exploratory/proposals/architecture/octon-self-evolution-proposal-to-promotion-runtime-v5
+  promotion_evidence:
+    - .octon/framework/engine/runtime/spec/evolution-program-v1.schema.json
+    - .octon/framework/engine/runtime/crates/kernel/src/commands/evolution.rs
+    - .octon/framework/assurance/runtime/_ops/scripts/validate-self-evolution-runtime-v5.sh
+    - .octon/state/control/evolution/ledger.yml
 lifecycle:
   temporary: true
   exit_expectation: >-
     Promote accepted durable outputs into framework/instance/state/generated targets,
     retain promotion and recertification evidence, then archive or close this proposal packet.
-implementation_receipt_ref: ".octon/inputs/exploratory/proposals/architecture/octon-self-evolution-proposal-to-promotion-runtime-v5/resources/implementation-report.md"
+implementation_receipt_ref: "resources/implementation-report.md"
 related_proposals: []
