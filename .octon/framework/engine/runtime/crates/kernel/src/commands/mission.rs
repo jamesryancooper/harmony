@@ -858,7 +858,7 @@ fn admit_connector(octon_dir: &Path, args: ConnectorAdmitCmd) -> Result<MissionR
             &args.connector_id,
             &args.operation_id,
             "connector_quarantine_reset_required",
-            "Connector operation is quarantined; reset requires retained evidence and required human approval before admission can change.",
+            "Connector operation is quarantined; reset requires retained evidence and required operator/quorum approval before admission can change.",
         )?;
         return Ok(report(
             "connector-admit",

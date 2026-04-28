@@ -206,7 +206,7 @@ connector execution is still deferred unless routed through
 `octon run start --contract <run-contract>`, context packing, execution
 authorization, authorized-effect token verification, run journal evidence, and
 connector receipts. Active quarantine blocks admission changes until reset
-evidence and required human approval exist.
+evidence and required operator/quorum approval exist.
 
 Continuous Stewardship Runtime v3 commands make Octon available over time
 without creating unbounded work. A Stewardship Program under `instance/**`

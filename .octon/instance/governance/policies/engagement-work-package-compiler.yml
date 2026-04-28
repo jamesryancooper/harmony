@@ -64,7 +64,7 @@ work_package_required_sections:
 
 gate_matrix:
   - gate_id: "approval"
-    requirement: "Human approvals, risk acceptances, exceptions, revocations, and policy clarifications are represented as Decision Requests and resolved into canonical low-level control artifacts before live effects."
+    requirement: "Operator/quorum approvals, risk acceptances, exceptions, revocations, and policy clarifications are represented as Decision Requests and resolved into canonical low-level control artifacts before live effects."
     required_for:
       - "adoption writes into an unadopted repo"
       - "workspace charter creation or material rewrite"

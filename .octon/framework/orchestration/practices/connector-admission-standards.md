@@ -10,6 +10,6 @@ Generated connector projections under `generated/cognition/projections/materiali
 
 V4 MVP admits only observe, read, and stage-only connector operations by default. `live_effectful` remains blocked unless a future promotion supplies support admission, proof bundle, trust dossier sufficiency, credential and egress posture, data-boundary posture, rollback or compensation plan, resolved Decision Request, run contract, context pack, execution authorization, authorized-effect token verification, run journal evidence, connector receipts, and disclosure.
 
-Quarantine is fail-closed. Active quarantine blocks admission posture changes until reset evidence and required human approval exist. Drift in connector manifest, operation schema, support posture, egress, credential class, capability mapping, evidence obligations, rollback posture, allowed mode, failure taxonomy, or budget/rate class routes to quarantine or Decision Request.
+Quarantine is fail-closed. Active quarantine blocks admission posture changes until reset evidence and required operator/quorum approval exist. Drift in connector manifest, operation schema, support posture, egress, credential class, capability mapping, evidence obligations, rollback posture, allowed mode, failure taxonomy, or budget/rate class routes to quarantine or Decision Request.
 
 Administrative connector CLI commands prepare or inspect connector control state. They must not execute connector operations. Any material connector operation must enter through a governed run contract and the runtime authorization boundary.

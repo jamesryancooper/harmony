@@ -1168,7 +1168,7 @@ Evidence obligations require consequential execution and closeout evidence under
 ### Must be reversible or explicitly risk-accepted
 
 Rollback planning must happen before material execution when policy demands it. The rollback plan schema requires run ID, reversibility class, strategy, verification steps, and optional rollback or compensation refs. ([GitHub](https://raw.githubusercontent.com/jamesryancooper/octon/main/.octon/framework/constitution/contracts/runtime/rollback-plan-v1.schema.json))
-Irreversible or destructive actions should require human approval, break-glass review, or denial. External irreversible operations are explicitly deny-routed in governance exclusions unless break-glass review applies. ([GitHub](https://github.com/jamesryancooper/octon/blob/main/.octon/instance/governance/exclusions/action-classes.yml))
+Irreversible or destructive actions should require canonical operator approval, break-glass review, or denial. External irreversible operations are explicitly deny-routed in governance exclusions unless break-glass review applies. ([GitHub](https://github.com/jamesryancooper/octon/blob/main/.octon/instance/governance/exclusions/action-classes.yml))
 ### Must be human-reviewable
 
 Human review is required for:
