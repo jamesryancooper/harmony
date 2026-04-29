@@ -183,4 +183,4 @@ fi
 catalog_count="$(printf '%s\n' "${catalog_labels}" | sed '/^$/d' | wc -l | tr -d ' ')"
 workflow_count="$(printf '%s\n' "${workflow_labels}" | sed '/^$/d' | wc -l | tr -d ' ')"
 
-pass "Agency label catalog validated (${catalog_count} catalog labels, ${workflow_count} workflow labels)."
+pass "Execution-role label catalog validated (${catalog_count} catalog labels, ${workflow_count} workflow labels)."
