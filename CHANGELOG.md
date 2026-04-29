@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.47](https://github.com/jamesryancooper/octon/compare/octon-v0.6.46...octon-v0.6.47) (2026-04-29)
+
+
+### Bug Fixes
+
+* **release:** refresh architecture projections ([#368](https://github.com/jamesryancooper/octon/issues/368)) ([6b85ecd](https://github.com/jamesryancooper/octon/commit/6b85ecdb0cec239fde571f8ac28172996be2446d))
+
+## [0.6.46](https://github.com/jamesryancooper/octon/compare/octon-v0.6.45...octon-v0.6.46) (2026-04-28)
+
+
+### Features
+
+* **runtime:** add governed self-evolution runtime stack ([#366](https://github.com/jamesryancooper/octon/issues/366)) ([a0a3f05](https://github.com/jamesryancooper/octon/commit/a0a3f05e1f6a86ae24efadc3093dedbd1e3b2f9a))
+
 ## [0.6.45](https://github.com/jamesryancooper/octon/compare/octon-v0.6.44...octon-v0.6.45) (2026-04-26)
 
 
