@@ -387,6 +387,9 @@ mentions `.codex/**` projection state rather than GitHub CLI auth.
 Remote cleanup behavior:
 
 - Deletes closed PR head refs on origin when no open PR still references the branch.
+- Bounds closed-ref deletion per run with `AUTONOMY_CLOSED_HEAD_CLEANUP_LIMIT`
+  and treats GitHub API rate limits as cleanup deferral, not as an open-PR
+  clean-state failure.
 - Labels blocked/manual PRs with `autonomy:attention-required`.
 - Opens/updates issue `[autonomy-health] open-pr attention required` when action is needed.
 - Auto-closes the attention issue when queue is healthy.
