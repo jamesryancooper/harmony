@@ -260,7 +260,7 @@ jobs:
               exit 1
             fi
 
-            git fetch --no-tags --depth=1 origin "+refs/heads/${head_ref}:refs/remotes/origin/${head_ref}"
+            git fetch --no-tags --depth=1 origin "${head_sha}"
             git checkout --detach "${head_sha}"
             echo "Checked out PR #${PR_NUMBER} head ${head_sha} (${head_ref}) for runtime-protected merge boundary."
           }

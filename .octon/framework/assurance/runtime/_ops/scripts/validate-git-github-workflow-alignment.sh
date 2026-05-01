@@ -312,6 +312,11 @@ check_github_companions() {
     "pr-auto-merge checks out the same-repo PR head before protected runtime merge" \
     "pr-auto-merge missing PR-head checkout before protected runtime merge"
   require_literal \
+    "$PR_AUTO_MERGE_FILE" \
+    'git fetch --no-tags --depth=1 origin "${head_sha}"' \
+    "pr-auto-merge fetches the exact PR head SHA before detached checkout" \
+    "pr-auto-merge fetches branch ref instead of exact PR head SHA"
+  require_literal \
     "$OCTON_DIR/framework/assurance/governance/_ops/scripts/evaluate-pr-autonomy-policy.sh" \
     "PR_AUTONOMY_MANUAL_LANE_REQUESTED" \
     "pr autonomy policy honors manual-lane PR body requests" \
