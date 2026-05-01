@@ -2,19 +2,20 @@
 
 change_id: octon-change-first-work-unit-policy
 selected_route: branch-no-pr
-lifecycle_outcome: branch-local-complete
-integration_status: not_landed
+lifecycle_outcome: cleaned
+integration_status: landed
 publication_status: none
-cleanup_status: deferred
+cleanup_status: completed
 closeout_outcome: completed
 created_at: 2026-05-01T14:58:27Z
-updated_at: 2026-05-01T16:12:31Z
+updated_at: 2026-05-01T19:50:19Z
 
 ## Inputs
 
-- User request: close out the changes in accordance with the new policy.
-- Branch: `chore/change-first-default-work-unit-policy`
+- User request: finish and land the Change using the no-PR branch route.
+- Source branch: `chore/change-first-default-work-unit-policy`
 - Base HEAD: `1336f1467`
+- Landed main ref: `8949cf3e1d89a6b156614ce25a8b457d73ac9d77`
 - Proposal packet:
   `.octon/inputs/exploratory/proposals/policy/octon-change-first-work-unit-policy`
 
@@ -29,20 +30,21 @@ updated_at: 2026-05-01T16:12:31Z
 
 ## Decision
 
-Selected `branch-no-pr` with lifecycle outcome `branch-local-complete`.
+Selected `branch-no-pr` with lifecycle outcome `cleaned`.
 
 Reasoning:
 
-- `direct-main` is unavailable because the work is on an isolated branch with a
-  dirty worktree.
+- `direct-main` was not selected because the Change began on an isolated
+  branch with a broad implementation change set.
 - `branch-pr` is not required because no PR, hosted review, remote CI,
   external signoff, preview publication, or release automation was requested.
 - `stage-only-escalate` is not required because implementation conformance
   passed with no unresolved items.
-- The implementation is committed on branch commit
-  `ba5511b0f06b7d0323969893f89dcfb7d5e53f24`.
-- The closeout did not push, land on `main`, or clean up the branch, so it does
-  not claim `published-branch`, `landed`, or `cleaned`.
+- The implementation was committed on the source branch and fast-forward landed
+  on `main` at `8949cf3e1d89a6b156614ce25a8b457d73ac9d77`.
+- No PR was opened and no source branch was pushed.
+- The local source branch was deleted after merge; no remote source branch was
+  found.
 
 ## Validation Evidence
 
@@ -52,7 +54,11 @@ Reasoning:
 - `test-change-closeout-lifecycle-alignment.sh`: `10` passed, `0` failed
 - `test-default-work-unit-alignment.sh`: `6` passed, `0` failed
 - `test-git-github-workflow-alignment.sh`: `6` passed, `0` failed
+- `test-pack-shape.sh`: `142` passed, `0` failed
 - `git diff --cached --check`: pass before commit
+- `git diff --check`: pass before landing
+- `git-branch-land.sh --target main --method fast-forward --confirm`: pass
+- `git-branch-cleanup.sh --branch chore/change-first-default-work-unit-policy --base main --confirm`: pass
 
 ## Outputs
 
@@ -65,8 +71,8 @@ Reasoning:
 
 ## Remaining Blockers
 
-Branch/worktree cleanup and any eventual landing remain deferred. This receipt
-records branch-local completion only.
+No remaining closeout blockers for the no-PR branch landing path. Remote `main`
+still needs to be pushed after this landed closeout evidence commit.
 
 The earlier publisher wrapper run-journal closeout defect is retained as a
 separate residual tooling issue and did not block proposal implementation

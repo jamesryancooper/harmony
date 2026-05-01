@@ -2,36 +2,37 @@
 
 change_id: octon-change-first-work-unit-policy
 selected_route: branch-no-pr
-lifecycle_outcome: branch-local-complete
-integration_status: not_landed
+lifecycle_outcome: cleaned
+integration_status: landed
 publication_status: none
-cleanup_status: deferred
+cleanup_status: completed
 closeout_outcome: completed
 created_at: 2026-05-01T14:58:27Z
-updated_at: 2026-05-01T16:12:31Z
+updated_at: 2026-05-01T19:50:19Z
 
 ## Route Selection
 
-`direct-main` is not eligible because the repository is on
-`chore/change-first-default-work-unit-policy`, not a clean current `main`, and
-the worktree contains a broad implementation change set.
+`direct-main` was not selected because the Change began on isolated branch
+`chore/change-first-default-work-unit-policy` with a broad implementation
+change set.
 
 `branch-pr` is not selected because there is no existing PR context and the
 operator did not request hosted review, remote checks, external signoff,
 preview publication, or PR-backed release behavior.
 
 `branch-no-pr` is selected because the Change already has branch isolation,
-local validation evidence, a no-PR rationale, and a closeout receipt. Its
-lifecycle outcome is `branch-local-complete`, not `landed`, because the
-intended scope is committed on the branch but no push, main integration, or
-cleanup was performed by this closeout.
+local validation evidence, a no-PR rationale, and no PR-required predicate.
+Its lifecycle outcome is `cleaned`: the branch was fast-forward landed on
+`main`, the local branch was deleted after merge, and no remote branch existed.
 
 ## Evidence
 
 - Branch: `chore/change-first-default-work-unit-policy`
 - Base HEAD: `1336f1467`
-- Branch-local implementation commit:
-  `ba5511b0f06b7d0323969893f89dcfb7d5e53f24`
+- Landed main ref:
+  `8949cf3e1d89a6b156614ce25a8b457d73ac9d77`
+- Pre-landing main ref:
+  `1336f14674a80fca0c58ab02bb3a01c4bbfcf0a3`
 - Change receipt:
   `.octon/state/evidence/validation/analysis/2026-05-01-change-receipt-octon-change-first-work-unit-policy.json`
 - Implementation conformance receipt:
@@ -55,46 +56,50 @@ Additional closeout validation:
 - `test-change-closeout-lifecycle-alignment.sh`: `10` passed, `0` failed
 - `test-default-work-unit-alignment.sh`: `6` passed, `0` failed
 - `test-git-github-workflow-alignment.sh`: `6` passed, `0` failed
+- `test-pack-shape.sh`: `142` passed, `0` failed
 - `git diff --cached --check`: pass before the implementation commit
+- `git diff --check`: pass before landing
 
 ## No-PR Rationale
 
-The new policy makes PRs optional outputs. This closeout does not require a PR
-because the Change was locally validated, there is no existing PR context, and
-the operator asked for policy-compliant closeout rather than publication.
+The new policy makes PRs optional outputs. This closeout did not require a PR
+because the Change was locally validated, there was no existing PR context, and
+the operator explicitly asked to finish and land the Change without requiring
+PR-backed publication.
 
 ## Durable History
 
-Durable history is the branch-local implementation commit plus the closeout
-evidence bundle:
+Durable history is the landed main commit plus the closeout evidence bundle:
 
-- `ba5511b0f06b7d0323969893f89dcfb7d5e53f24`
+- `8949cf3e1d89a6b156614ce25a8b457d73ac9d77`
 
 - `.octon/state/evidence/runs/skills/closeout-change/2026-05-01-octon-change-first-work-unit-policy.md`
 - `.octon/state/evidence/validation/analysis/2026-05-01-change-closeout-octon-change-first-work-unit-policy.md`
 - `.octon/state/evidence/validation/analysis/2026-05-01-change-receipt-octon-change-first-work-unit-policy.json`
 
-No PR, remote push, main integration, or cleanup was performed by this
-closeout.
+No PR was opened and no feature branch was pushed. `main` was fast-forwarded
+from `1336f14674a80fca0c58ab02bb3a01c4bbfcf0a3` to
+`8949cf3e1d89a6b156614ce25a8b457d73ac9d77`.
 
 ## Lifecycle Outcome
 
-This closeout records `branch-local-complete` under the broad `branch-no-pr`
-route. The intended implementation scope is committed on the branch and the
-branch remains available for operator review or later landing. It does not
-claim `published-branch`, `landed`, or `cleaned`.
+This closeout records `cleaned` under the broad `branch-no-pr` route. The
+intended implementation scope is landed on `main`, no PR metadata exists, the
+local source branch was deleted after merge, and no remote source branch was
+found.
 
 ## Rollback
 
-Rollback is manual and branch-scoped: abandon the branch or revert commit
-`ba5511b0f06b7d0323969893f89dcfb7d5e53f24` on the branch. No destructive
-cleanup should run without explicit operator approval.
+Rollback is manual and main-scoped: revert the landed commit range
+`1336f14674a80fca0c58ab02bb3a01c4bbfcf0a3..8949cf3e1d89a6b156614ce25a8b457d73ac9d77`
+on `main`. Do not reset published main without explicit operator approval.
 
 ## Residual Notes
 
-Branch/worktree cleanup is explicitly deferred because the branch remains the
-operator-visible rollback and review handle for the committed implementation
-state.
+Cleanup completed for the local source branch:
+`git-branch-cleanup.sh --branch chore/change-first-default-work-unit-policy --base main --confirm`.
+No remote branch was found by `git ls-remote --heads origin
+chore/change-first-default-work-unit-policy`.
 
 The publication wrapper run-journal closeout defect observed during
 implementation remains outside this Change closeout verdict. Generated outputs
