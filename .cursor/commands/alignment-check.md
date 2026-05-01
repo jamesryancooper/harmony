@@ -16,7 +16,9 @@ Profile ids are registry-backed by
 ```text
 /alignment-check --list-profiles
 /alignment-check --profile commit-pr
+/alignment-check --profile default-work-unit
 /alignment-check --profile skills,workflows
+/alignment-check --profile proposal-lifecycle
 /alignment-check --profile all
 ```
 
@@ -54,4 +56,9 @@ bash .octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh --list-p
 - **Runner:** `.octon/framework/assurance/runtime/_ops/scripts/alignment-check.sh`
 - **Contract governance validator:** `.octon/framework/assurance/runtime/_ops/scripts/validate-contract-governance.sh`
 - **Commit/PR validator:** `.octon/framework/assurance/runtime/_ops/scripts/validate-commit-pr-alignment.sh`
+- **Default work unit validator:** `.octon/framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh`
+- **Change closeout lifecycle validator:** `.octon/framework/assurance/runtime/_ops/scripts/validate-change-closeout-lifecycle-alignment.sh`
+- **Proposal lifecycle readiness validator:** `.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-implementation-readiness.sh`
+- **Proposal lifecycle workflow validators:** `.octon/framework/assurance/runtime/_ops/scripts/validate-create-*-proposal-workflow.sh`,
+  `.octon/framework/assurance/runtime/_ops/scripts/validate-audit-*-proposal-workflow.sh`
 - **Quality baseline:** `.octon/framework/assurance/README.md`
