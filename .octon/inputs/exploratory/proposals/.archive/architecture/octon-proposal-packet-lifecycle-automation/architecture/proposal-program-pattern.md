@@ -180,8 +180,8 @@ Allowed execution modes:
 - `gated-parallel`: children may run in groups separated by gates.
 - `program-atomic`: all child changes are implemented in one coordinated
   changeset, while children remain separate packets for review and traceability.
-- `manual-gated`: parent prompts prepare the plan, but a human must approve
-  each child or group transition.
+- `approval-gated`: parent prompts prepare the plan, but explicit approval is
+  required for each child or group transition.
 
 Allowed child gate states:
 

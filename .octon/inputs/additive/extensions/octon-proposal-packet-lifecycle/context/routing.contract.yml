@@ -68,7 +68,7 @@ dispatchers:
           - "parallel-independent"
           - "gated-parallel"
           - "program-atomic"
-          - "manual-gated"
+          - "approval-gated"
     precedence:
       - "explicit-bundle-create-proposal-packet"
       - "explicit-bundle-explain-proposal-packet"

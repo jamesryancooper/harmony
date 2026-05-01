@@ -54,7 +54,7 @@ normal manifest-governed proposal.
 - `parallel-independent`
 - `gated-parallel`
 - `program-atomic`
-- `manual-gated`
+- `approval-gated`
 
 ## Closeout
 
