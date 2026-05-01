@@ -28,7 +28,7 @@ This step must run the fail-closed policy proposal validator stack:
 - [ ] Top-level summary report exists
 - [ ] Baseline proposal validator passes
 - [ ] Policy proposal validator passes
-- [ ] Implementation-readiness validator records structural-only, blocked, or implementation-grade status
+- [ ] Implementation-readiness validator records a structural-only, blocked, or implementation-grade gate outcome
 - [ ] Final readiness verdict is explicit
 
 ## Outcome Rules

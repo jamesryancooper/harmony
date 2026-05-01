@@ -2,12 +2,13 @@
 
 change_id: octon-change-first-work-unit-policy
 selected_route: branch-no-pr
-lifecycle_outcome: preserved
+lifecycle_outcome: branch-local-complete
 integration_status: not_landed
 publication_status: none
 cleanup_status: deferred
-closeout_outcome: continued
+closeout_outcome: completed
 created_at: 2026-05-01T14:58:27Z
+updated_at: 2026-05-01T16:12:31Z
 
 ## Inputs
 
@@ -28,7 +29,7 @@ created_at: 2026-05-01T14:58:27Z
 
 ## Decision
 
-Selected `branch-no-pr` with lifecycle outcome `preserved`.
+Selected `branch-no-pr` with lifecycle outcome `branch-local-complete`.
 
 Reasoning:
 
@@ -38,13 +39,20 @@ Reasoning:
   external signoff, preview publication, or release automation was requested.
 - `stage-only-escalate` is not required because implementation conformance
   passed with no unresolved items.
-- The closeout did not commit, push, land on `main`, or clean up the branch, so
-  it records a preserved checkpoint rather than full landing.
+- The implementation is committed on branch commit
+  `ba5511b0f06b7d0323969893f89dcfb7d5e53f24`.
+- The closeout did not push, land on `main`, or clean up the branch, so it does
+  not claim `published-branch`, `landed`, or `cleaned`.
 
 ## Validation Evidence
 
 - `validate-proposal-implementation-conformance.sh --package .octon/inputs/exploratory/proposals/policy/octon-change-first-work-unit-policy`
 - Final result: `Validation summary: errors=0 warnings=0`
+- `alignment-check.sh --profile default-work-unit`: `errors=0`
+- `test-change-closeout-lifecycle-alignment.sh`: `10` passed, `0` failed
+- `test-default-work-unit-alignment.sh`: `6` passed, `0` failed
+- `test-git-github-workflow-alignment.sh`: `6` passed, `0` failed
+- `git diff --cached --check`: pass before commit
 
 ## Outputs
 
@@ -58,7 +66,7 @@ Reasoning:
 ## Remaining Blockers
 
 Branch/worktree cleanup and any eventual landing remain deferred. This receipt
-only preserves evidence for the current branch-local implementation state.
+records branch-local completion only.
 
 The earlier publisher wrapper run-journal closeout defect is retained as a
 separate residual tooling issue and did not block proposal implementation

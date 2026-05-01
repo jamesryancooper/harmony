@@ -33,7 +33,7 @@ Implementation-readiness validation must also run:
 - [ ] `stage-inputs/` and `stage-logs/` exist
 - [ ] Top-level summary report exists
 - [ ] Proposal validator stack passes when `design-proposal.yml` is present
-- [ ] Implementation-readiness validator records structural-only, blocked, or implementation-grade status
+- [ ] Implementation-readiness validator records a structural-only, blocked, or implementation-grade gate outcome
 - [ ] Final readiness verdict is explicit
 
 ## Outcome Rules

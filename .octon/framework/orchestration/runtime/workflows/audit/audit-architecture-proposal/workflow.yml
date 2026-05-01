@@ -248,8 +248,8 @@ done_gate:
     target proposal
   - implementation simulation and specification closure reports exist
   - support/implementation-grade-completeness-review.md exists in the packet
-  - validate-proposal-implementation-readiness.sh records structural-only,
-    blocked, or implementation-grade status
+  - validate-proposal-implementation-readiness.sh records a structural-only,
+    blocked, or implementation-grade gate outcome
   - Final validation verdict is explicit
 constraints:
   fail_closed: true

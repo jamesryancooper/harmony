@@ -15,4 +15,5 @@ allowed-tools: Read Glob Grep Write(/.octon/inputs/exploratory/proposals/*)
 # Proposal Packet Lifecycle Generate Closeout Prompt
 
 Generate `support/custom-closeout-prompt.md` with proposal archival,
-validation, evidence, PR/CI/review, merge, branch cleanup, and sync gates.
+validation, evidence, final hygiene, and route-required PR/CI/review, merge,
+branch cleanup, or sync gates.

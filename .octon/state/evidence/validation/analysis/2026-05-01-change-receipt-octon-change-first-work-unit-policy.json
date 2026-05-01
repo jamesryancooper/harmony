@@ -2,7 +2,7 @@
   "schema_version": "change-receipt-v1",
   "change_id": "octon-change-first-work-unit-policy",
   "selected_route": "branch-no-pr",
-  "lifecycle_outcome": "preserved",
+  "lifecycle_outcome": "branch-local-complete",
   "intent": "Implement and close out the Change-first default work unit policy from the proposal packet.",
   "scope": {
     "summary": "Change-first default work unit policy implementation, Work Package to Change Package cutover, route-neutral closeout skill and workflow updates, validators, generated effective projections, implementation conformance evidence, and linked repo-local GitHub projection proposal.",
@@ -21,12 +21,12 @@
     "diff_refs": [
       "branch chore/change-first-default-work-unit-policy",
       "base HEAD 1336f1467",
-      "git diff --stat: 248 tracked files changed, 3218 insertions, 2100 deletions",
+      "commit ba5511b0f06b7d0323969893f89dcfb7d5e53f24: 596 files changed, 20694 insertions, 2118 deletions",
       ".octon/state/evidence/validation/analysis/2026-05-01-implementation-conformance.md",
       ".octon/state/evidence/validation/analysis/2026-05-01-change-closeout-octon-change-first-work-unit-policy.md"
     ]
   },
-  "source_branch_ref": "chore/change-first-default-work-unit-policy@1336f1467",
+  "source_branch_ref": "chore/change-first-default-work-unit-policy@ba5511b0f06b7d0323969893f89dcfb7d5e53f24",
   "integration_method": "not-applicable",
   "integration_status": "not_landed",
   "publication_status": "none",
@@ -38,24 +38,28 @@
     ".octon/inputs/exploratory/proposals/policy/octon-change-first-work-unit-policy/support/implementation-conformance-review.md",
     ".octon/state/evidence/validation/analysis/2026-05-01-implementation-conformance.md",
     ".octon/state/evidence/runs/workflows/2026-05-01-implementation-conformance-octon-change-first-work-unit-policy/",
-    "validate-proposal-implementation-conformance.sh --package .octon/inputs/exploratory/proposals/policy/octon-change-first-work-unit-policy: pass, errors=0 warnings=0"
+    "validate-proposal-implementation-conformance.sh --package .octon/inputs/exploratory/proposals/policy/octon-change-first-work-unit-policy: pass, errors=0 warnings=0",
+    "alignment-check.sh --profile default-work-unit: pass, errors=0",
+    "test-change-closeout-lifecycle-alignment.sh: pass, 10 passed, 0 failed",
+    "test-default-work-unit-alignment.sh: pass, 6 passed, 0 failed",
+    "test-git-github-workflow-alignment.sh: pass, 6 passed, 0 failed",
+    "git diff --cached --check before commit: pass"
   ],
   "review_waiver_refs": [
     "branch-no-pr route selected: no operator PR request, no existing PR context, local implementation conformance passed, and hosted review was not required for this closeout"
   ],
   "durable_history": {
-    "kind": "checkpoint",
-    "ref": ".octon/state/evidence/runs/skills/closeout-change/2026-05-01-octon-change-first-work-unit-policy.md",
+    "kind": "commit",
+    "ref": "ba5511b0f06b7d0323969893f89dcfb7d5e53f24",
     "branch": "chore/change-first-default-work-unit-policy"
   },
   "rollback_handle": {
     "kind": "manual-instructions",
-    "ref": "chore/change-first-default-work-unit-policy",
-    "instructions": "Because this closeout is branch-no-pr and no commit was created, rollback is to leave the branch unpublished/unmerged or restore from the pre-change HEAD 1336f1467 after preserving any unrelated user work. Do not run destructive cleanup without explicit operator approval."
+    "ref": "ba5511b0f06b7d0323969893f89dcfb7d5e53f24",
+    "instructions": "Because this closeout is branch-no-pr and not landed on main, rollback is to abandon this branch or revert commit ba5511b0f06b7d0323969893f89dcfb7d5e53f24 on the branch. Do not run destructive cleanup without explicit operator approval."
   },
-  "closeout_outcome": "continued",
-  "remaining_blockers": [
-    "branch-no-pr lifecycle outcome is preserved only; no commit, main integration, publication, or branch/worktree cleanup was performed"
-  ],
-  "created_at": "2026-05-01T14:58:27Z"
+  "closeout_outcome": "completed",
+  "remaining_blockers": [],
+  "created_at": "2026-05-01T14:58:27Z",
+  "updated_at": "2026-05-01T16:12:31Z"
 }
