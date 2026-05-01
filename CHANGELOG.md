@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.52](https://github.com/jamesryancooper/octon/compare/octon-v0.6.51...octon-v0.6.52) (2026-05-01)
+
+
+### Features
+
+* **change:** make change-first closeout enforceable ([#382](https://github.com/jamesryancooper/octon/issues/382)) ([2058198](https://github.com/jamesryancooper/octon/commit/2058198e7b1c362f34219d9b4bea2eb9d358b086))
+
 ## [0.6.51](https://github.com/jamesryancooper/octon/compare/octon-v0.6.50...octon-v0.6.51) (2026-05-01)
 
 
