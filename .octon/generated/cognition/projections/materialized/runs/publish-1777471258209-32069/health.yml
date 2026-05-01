@@ -1,6 +1,6 @@
 schema_version: run-health-read-model-v1
 run_id: publish-1777471258209-32069
-generated_at: '2026-05-01T14:33:54Z'
+generated_at: '2026-05-01T20:22:16Z'
 generator:
   id: generate-run-health-read-model.sh
   version: 1.0.0
@@ -23,8 +23,8 @@ freshness:
   mode: digest-bound
   status: stale
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:bfb07f98f66ce3f6b20a9aa1f7f56a027a6c2736446ba42167959d8b6170d6e3
-  checked_at: '2026-05-01T14:33:54Z'
+  combined_source_digest: sha256:39c7c2e5c1788f792844aae7b5541fef79ddb9a166cb9dd5c8012508eda9f023
+  checked_at: '2026-05-01T20:22:16Z'
   expires_at: null
   freshness_refs:
   - .octon/state/control/execution/runs/publish-1777471258209-32069/events.manifest.yml
@@ -129,7 +129,7 @@ source_digests:
     status: present
   support_reconciliation:
     ref: .octon/generated/effective/governance/support-envelope-reconciliation.yml
-    digest: sha256:d8fcd78600d360b418ca81ceec5ed44a2961e884e35ff592e2efe8576d917748
+    digest: sha256:9345c272357e3d66d23539f4cf505e7f88a8efda15154e3334d9576f47d2713c
     status: present
   run_continuity:
     ref: .octon/state/continuity/runs/publish-1777471258209-32069/handoff.yml
@@ -137,7 +137,7 @@ source_digests:
     status: present
   runtime_route_bundle:
     ref: .octon/generated/effective/runtime/route-bundle.yml
-    digest: sha256:7bcae9c6583c6ac3bb3351fba72ca8ca150623806ccfc793d24986b1d313f441
+    digest: sha256:8d132a80dac3a4e684701b151896f7f57d7997cad5f93be98efe79e9029e8a42
     status: present
   pack_routes:
     ref: .octon/generated/effective/capabilities/pack-routes.effective.yml

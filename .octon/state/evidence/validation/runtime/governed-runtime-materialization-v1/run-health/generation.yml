@@ -1,5 +1,5 @@
 schema_version: run-health-generation-receipt-v1
-generated_at: '2026-05-01T14:33:54Z'
+generated_at: '2026-05-01T20:22:16Z'
 generator_ref: .octon/framework/assurance/runtime/_ops/scripts/generate-run-health-read-model.sh
 schema_ref: .octon/framework/engine/runtime/spec/run-health-read-model-v1.schema.json
 validator_ref: .octon/framework/assurance/runtime/_ops/scripts/validate-run-health-read-model.sh
@@ -11,200 +11,212 @@ outputs:
 - run_id: bootstrap-doctor-workflow-20260413-v4
   health_ref: .octon/generated/cognition/projections/materialized/runs/bootstrap-doctor-workflow-20260413-v4/health.yml
   status: evidence-incomplete
-  health_digest: sha256:45ce8e3304e00af2c4aedbdf2e15df575910d7f61eac48ca37e08e8d92e7cd10
+  health_digest: sha256:788d05026a10eb65e5ee9b3c56dd2603c51fa6fcd5392db1b87c9d23aa6eb021
 - run_id: bootstrap-doctor-workflow-20260413-v4-stage-inline
   health_ref: .octon/generated/cognition/projections/materialized/runs/bootstrap-doctor-workflow-20260413-v4-stage-inline/health.yml
   status: evidence-incomplete
-  health_digest: sha256:13997002d9d037c8b720788e6e66be7f70ed0afa656bf1ba22f455489dddd3fe
+  health_digest: sha256:03b6a293fde815a590c33d16a8eb157a897dfc661f78cd83d9d7499a00387046
 - run_id: protected-ci-1776956405637-68212
   health_ref: .octon/generated/cognition/projections/materialized/runs/protected-ci-1776956405637-68212/health.yml
   status: stale
-  health_digest: sha256:cabbaef42f402e30e925cff90aa4c57ea6d28f185ef9debd7a4aa5dba34d4fa6
+  health_digest: sha256:0c787cd5238a8e3b3b6f71b6b02af6e794f90302317c9d35b262a971b121d3d6
 - run_id: publish-1777422984064-73566
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777422984064-73566/health.yml
   status: stale
-  health_digest: sha256:187723b1e2ca1ebab57df827dba40ccde87e27e1b95cc9d3468b3be98443ec01
+  health_digest: sha256:2dec1a3573192b0588f158cc91ed52c22f620033f1cc7182f9966e5bfadcdda9
 - run_id: publish-1777423061903-95134
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777423061903-95134/health.yml
   status: stale
-  health_digest: sha256:ad4c9473583bf72fe3c80e2b65961236ea9c2fea8da5851fa0cc328cab777b04
+  health_digest: sha256:6b385587720ff0010d9263c70a79a4802fda66bc8898829795407a6a5d887477
 - run_id: publish-1777423080924-1883
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777423080924-1883/health.yml
   status: stale
-  health_digest: sha256:31d92f6b762d6d0fbad8319fe8716b167284e2ba480034515224617086c39c86
+  health_digest: sha256:6dca841080f51bba6e155d2b84e08e6a8cdf3bde7ab531d4dbcd61c92400f6b7
 - run_id: publish-1777423089728-2628
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777423089728-2628/health.yml
   status: stale
-  health_digest: sha256:2d09254090946efa45e490d40918fe1ba46f348f9f61ff8ae8545c3a7968414d
+  health_digest: sha256:28ff26cd26babc29c96495235a1aceb74b8cae4f2f6e48545ba6f82f4e671665
 - run_id: publish-1777424810079-75845
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777424810079-75845/health.yml
   status: stale
-  health_digest: sha256:dc6d7d20687b94957715a54825cdc3d0746f6be1d792d446b389895701613176
+  health_digest: sha256:b23341854f548a95b60c7edf721871b69ee7ede6211db5d88c2a87f831c2b3b8
 - run_id: publish-1777424884404-97686
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777424884404-97686/health.yml
   status: stale
-  health_digest: sha256:af59a530361318978d4ab9e29fcb2939705f47f4ead8323c8b5f801c7da1762d
+  health_digest: sha256:c3d67af70aa148aa0c99a002926238b7ffce9896be3bcbae0d914a57f41b7c22
 - run_id: publish-1777424916339-5871
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777424916339-5871/health.yml
   status: stale
-  health_digest: sha256:d28b4c4c3825dc1e86794e555ba2029265a5f2c5b8f739802a98d734f194613f
+  health_digest: sha256:a8e23e8723fd6b34202d69362a74c0bce3e11058578259563f0d980777e12987
 - run_id: publish-1777424924984-6610
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777424924984-6610/health.yml
   status: stale
-  health_digest: sha256:190336547f289ee328887a8ae536ca42232b094292427b7779799cae20a95948
+  health_digest: sha256:d64145cd4ed98da324fce0825660fee5795fe6185b6021909d2428b7395c8faa
 - run_id: publish-1777471258209-32069
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777471258209-32069/health.yml
   status: stale
-  health_digest: sha256:55897f02341ea78ad4c661448dfa58019c263631e1f55e095070dcfe533e0483
+  health_digest: sha256:f95f1f5f5f572f2bedc87ffc8488015a45750eba07bc60aaa8defc3ae73d43c6
 - run_id: publish-1777471367077-57702
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777471367077-57702/health.yml
   status: stale
-  health_digest: sha256:3fba18ec49845b72b4a9fda6896d64a6b65266f0673d568edb43d11c51f70569
+  health_digest: sha256:3727e9a381d09b3278fab3bfb40649b26a1cbabb10da2b819c86207c759e08b5
 - run_id: publish-1777471375866-58163
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777471375866-58163/health.yml
   status: stale
-  health_digest: sha256:39dd04f70757f4bc411147f691f70398143ebdc745dda6ce83b77dacaf22e9ff
+  health_digest: sha256:a95a2eac2495bd6f3e319a0102126658c457b4dc4e8bac4a208a93db3857bc16
 - run_id: publish-1777471430431-75071
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777471430431-75071/health.yml
   status: stale
-  health_digest: sha256:e27042014df201057e47e44b8bb49a7a052a6ce18db129011ee0ca9fceeb7d03
+  health_digest: sha256:ecc1288d382b587a95b4eac5999da26fcb0dcb2e1a50cfed3f7a1e8387c09ee2
 - run_id: publish-1777471448764-89339
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777471448764-89339/health.yml
   status: stale
-  health_digest: sha256:7d745ef479fa4c6d27517e6e624be6fb3171efc712b70c9a3da0b7db39dc8226
+  health_digest: sha256:3e00155c6f08657f043db042fc1ba0ef0fc6c51a196a235645b469d27bb0545a
 - run_id: publish-1777472435164-84124
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777472435164-84124/health.yml
   status: stale
-  health_digest: sha256:a6d10fa17702c2729f6faadbe887ff6e9497cf238bc5487c7ecfde534f69d37f
+  health_digest: sha256:17dad63c36fc777a4d113100d43faeeb4d183f38445d26beb48feb64f71b9c5d
 - run_id: publish-1777472507311-5563
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777472507311-5563/health.yml
   status: stale
-  health_digest: sha256:fe2449d7377ac9a54a5987441523a5e20c3d8de3d3aecb70c9b1465fbf12827f
+  health_digest: sha256:cbea5b5a70fcdd3e8f4b0eb0ea97a95b5f81ff8b805d9aeb05bebdfcd29b1a1a
 - run_id: publish-1777472515437-5926
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777472515437-5926/health.yml
   status: stale
-  health_digest: sha256:2478d5531b5f40a3c9c6a61c9cb91f96cdbd877ab6f81e310ac9c4c29db55d0c
+  health_digest: sha256:6acd5251d15353c11c5fbb58c57260ce0346b4df2111062fc5d063be61492aa0
 - run_id: publish-1777472536856-11767
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777472536856-11767/health.yml
   status: stale
-  health_digest: sha256:ac541bfd902d2c5c72caf3d5e2f06d5f1e46f6e4195285c3ae7e0c439a38de81
+  health_digest: sha256:d9d7d947a77a9cd94aa110955873119f00ef965ed3c7ff37bb78e8216028d2c7
 - run_id: publish-1777632056333-84806
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777632056333-84806/health.yml
   status: stale
-  health_digest: sha256:ce04230c3f536d3cfce898b5f4283f4d556c8eda63f329048cdff5145bd52c33
+  health_digest: sha256:5eb093a1e791ddd0f4d2e13b5aeadc14da77ee1a515a44436417548a0c41a9e3
 - run_id: publish-1777632076001-91565
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777632076001-91565/health.yml
   status: stale
-  health_digest: sha256:89bc15d219e3e814c5c7fb0ef0146d43610dd633fced3c5570836b8be11e1e6f
+  health_digest: sha256:56b471da023c5626caaba7337f13644792f0de5f7a33d353c8a63b6e7ac05c04
 - run_id: publish-1777645675141-62877
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645675141-62877/health.yml
   status: stale
-  health_digest: sha256:5317269878ea098fdc9bce9dca32e12dced42e056edd8bd3b88422ca744fc5e2
+  health_digest: sha256:8eb60259d8bf8cb0a897c1d7f17b174ba1e1ddedf3d1b2d385e90215d2bdd757
 - run_id: publish-1777645695599-82172
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645695599-82172/health.yml
   status: stale
-  health_digest: sha256:01755aeecf397eccbcd5c725558095856ce8b373ca0c932f49c46e981aff1e88
+  health_digest: sha256:d22a14708b3db26ae7470ba455a7461e09fade3ac55f507e05782ed54f4b911b
 - run_id: publish-1777645703361-87101
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645703361-87101/health.yml
   status: stale
-  health_digest: sha256:2e31459f3e28f0c1efbc36dd03cbf6406e7cea53377756d1f5c628e533d516c8
+  health_digest: sha256:0f9a76f36b5fac9c320719bcb829189171b0e4017b1dc67f584b3f722b3cd39a
 - run_id: publish-1777645737021-7127
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645737021-7127/health.yml
   status: stale
-  health_digest: sha256:10eb3be81821e11e5a69c70de8957838ae341860ef6a3cb6621e84568c53d897
+  health_digest: sha256:c7e3371c44ec8cf1df7b958514f6181f0e7a042cfd71ce4e34792e1bbd4da35c
 - run_id: publish-1777645854848-6068
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645854848-6068/health.yml
   status: stale
-  health_digest: sha256:0ba5abf6533f04db1816a2218362b443d6cdddf356e76fbbc204330760ae7cb9
+  health_digest: sha256:52bbcfe60fd8158a4f70b750051db90d1904915047eafc86ddf1ea98d78811ef
 - run_id: publish-1777645877352-18070
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645877352-18070/health.yml
   status: stale
-  health_digest: sha256:a263e66fa44d6ecf6ed449a348b82d8dd531712ddf9f33db64f7437360aad73a
+  health_digest: sha256:f76190f1501f92e8faa7dee7b7eab54637b95cd0b68c487345ca87bf267a7d23
 - run_id: publish-1777645884878-19017
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645884878-19017/health.yml
   status: stale
-  health_digest: sha256:b349a2ee2ffbed9ac1c89ebde7f3e932e6bc8a501b748d2b963e55646d4c531e
+  health_digest: sha256:c7a944b6341c196f4df0cf28a82cf9d9e4742ecf774ebf4ecdb258993d5724fd
+- run_id: publish-1777652598179-97374
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777652598179-97374/health.yml
+  status: stale
+  health_digest: sha256:e6415480b6192ab44d52dccbcb01e10c91a097c23515d578091f897d596fe6de
+- run_id: publish-1777665554323-38413
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777665554323-38413/health.yml
+  status: stale
+  health_digest: sha256:949285124dfde628268e2abeb3aff16ad6a609b0f5ec2d7cd0090c75c7f3e532
+- run_id: publish-1777666570603-87006
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777666570603-87006/health.yml
+  status: stale
+  health_digest: sha256:cfe2fd7c120beacb6c80b6ea7f42a683297ced4630c68c2b257d088b055f6a9a
 - run_id: repo-consequential-preflight-workflow-20260413-v4
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-consequential-preflight-workflow-20260413-v4/health.yml
   status: evidence-incomplete
-  health_digest: sha256:4dd7bbbee1b9be20cf25c61d7e7c1fd7f611752ec42930166ec9e574c13c7ea0
+  health_digest: sha256:36884b820146bd3eaff7c29dee0fad3826ce83c4a2967001c420fb63b296ba66
 - run_id: repo-consequential-preflight-workflow-20260413-v4-stage-inline
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-consequential-preflight-workflow-20260413-v4-stage-inline/health.yml
   status: evidence-incomplete
-  health_digest: sha256:f83135a2fb6f33bc4d90d6f8d6a26b098598f2fb681fcf860aec72533279672b
+  health_digest: sha256:4220716fd10892fd1d626e51c7ce0bfe18366195ab6c84bd80983b68eb5c11ba
 - run_id: repo-shell-supported-scenario-workflow-20260413-v4
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-shell-supported-scenario-workflow-20260413-v4/health.yml
   status: evidence-incomplete
-  health_digest: sha256:b9b994f94bbb3a1fae96dab544adff8d6860425e37d0587e79abef1ce9d83473
+  health_digest: sha256:3b99838d4459a948b72fcfcec3efd3cb211fffc3b0490d8e18d13fccfdaab770
 - run_id: repo-shell-supported-scenario-workflow-20260413-v4-stage-inline
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-shell-supported-scenario-workflow-20260413-v4-stage-inline/health.yml
   status: evidence-incomplete
-  health_digest: sha256:cb298349c9de3b59f3b40de1d48c4761fd699c4e8f033b31c3b77a69ef1ad30c
+  health_digest: sha256:d5b66bf4a91ad8655dd4eb9b644dba96ded38c6dba980525ef85f17bcc09a076
 - run_id: run-wave3-runtime-bridge-20260327
   health_ref: .octon/generated/cognition/projections/materialized/runs/run-wave3-runtime-bridge-20260327/health.yml
   status: evidence-incomplete
-  health_digest: sha256:bed712dbb1df3fb83e7216da036ce51b22be257ddd7f715db93ffbf5654fb06d
+  health_digest: sha256:b370feff2d9e409c610688384fdd176b902bacd0434341b13091e9430a27f6d1
 - run_id: run-wave4-benchmark-evaluator-20260327
   health_ref: .octon/generated/cognition/projections/materialized/runs/run-wave4-benchmark-evaluator-20260327/health.yml
   status: evidence-incomplete
-  health_digest: sha256:6f527dfe7c5de07e6ba2b9cb4245e988270f5c31f3e4a0df43692e2449315efa
+  health_digest: sha256:42a42016a9fc292e8b43a48389e70ad6e082eade02468a54b68319811cfe11e0
 - run_id: uec-audit-architecture-20260331-2
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-audit-architecture-20260331-2/health.yml
   status: evidence-incomplete
-  health_digest: sha256:7868811283a1f56a16cdada726275ff1434a1dabb0ea94e233820a57c81ac583
+  health_digest: sha256:293e41334af281ffdaf272204bd9c5143526a20369b1ac5eafe48fac8e048024
 - run_id: uec-audit-workflow-system-20260401-agent-augmented-1
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-audit-workflow-system-20260401-agent-augmented-1/health.yml
   status: stale
-  health_digest: sha256:41f28c98591def4cec9c275e87154b5ac4f6965960de10a4b8787c8df9f0f50d
+  health_digest: sha256:f644f072f9d14232dd0630c6aee9bf9218a62a89743e5ba7d63a50d1fc46bd96
 - run_id: uec-bounded-repo-shell-boundary-sensitive-20260409
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-bounded-repo-shell-boundary-sensitive-20260409/health.yml
   status: revoked
-  health_digest: sha256:8b14d248e852e7df8144a7f207f0e3a1516c7a6386b56cadc2f2fc1e54a69ad8
+  health_digest: sha256:7265ebe0f32f2293f7396a484835b411ac22899731a44a07712f5996df200e7a
 - run_id: uec-evaluate-harness-20260401-agent-augmented-1
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-evaluate-harness-20260401-agent-augmented-1/health.yml
   status: stale
-  health_digest: sha256:e40ef677d677f6c92350d44071af945697dcc299a5bdb3bec32601ff94f66db1
+  health_digest: sha256:4af20d1dd96c9f6df2753b6a3a1b4885ee96ada6c69815125a9a05cb94d702bc
 - run_id: uec-global-ci-observe-read-20260404
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-global-ci-observe-read-20260404/health.yml
   status: evidence-incomplete
-  health_digest: sha256:f9104879797cfc14b6c2695848d65b560c5be640f903e3e3a76575d4120bbbf6
+  health_digest: sha256:f30980770dc101a3a541a7f43d5a0a1a0a07247737ad61669109056df36eb3e9
 - run_id: uec-global-frontier-browser-api-studio-20260404
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-global-frontier-browser-api-studio-20260404/health.yml
   status: review-required
-  health_digest: sha256:4fa34ae07bc44b5f00db78d5113fadd210475ef6f91d0812ba5ed794525e664b
+  health_digest: sha256:9aa723eddca77a8df0714cf1e1afd5eadc35d825ba83b8e826759f83beb182ad
 - run_id: uec-global-github-repo-consequential-20260404
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-global-github-repo-consequential-20260404/health.yml
   status: stale
-  health_digest: sha256:4ea9092c47b74adc08bf83bded1b42609f9b286f8188462649472bfce6c7eb38
+  health_digest: sha256:7c0985d62156cf123dfdb6a409b01b14e9936e15bad6dc1cc475d01b057355b4
 - run_id: uec-global-repo-shell-observe-read-20260404
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-global-repo-shell-observe-read-20260404/health.yml
   status: evidence-incomplete
-  health_digest: sha256:d0dff02430c7f03b75bb634cd0832048f8136e9fdd1945a18dc4453d6b8b4539
+  health_digest: sha256:63126e85879ce632ef0f9c3ad3b088f7eec5087524f289492bf7a9473f24184f
 - run_id: uec-repo-shell-boundary-sensitive-recertified-20260410
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-repo-shell-boundary-sensitive-recertified-20260410/health.yml
   status: revoked
-  health_digest: sha256:0d2f67a09bd81dcefdea290b67689c8245e41be95287c3d7f9ab70827a75bf39
+  health_digest: sha256:b3e77f68ad7b56fb95feb5e3ef522ebc216f99e33a88443ccd6fe57e6f07edca
 - run_id: uec-repo-shell-repo-consequential-recertified-20260410
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-repo-shell-repo-consequential-recertified-20260410/health.yml
   status: stale
-  health_digest: sha256:ccccf7501ba50b8ef5f72a9f3877fac5c56d48e4b3a6678c9d8b0b826a5daf6d
+  health_digest: sha256:4aa7a33eac8e6d1f43508dd6b0a7c287cb4381e0cba2841de37650ad279b79b5
 - run_id: uec-safe-stage-approval-exercise-20260402
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-safe-stage-approval-exercise-20260402/health.yml
   status: stale
-  health_digest: sha256:c22ea55ddbbef0dc59d43c1b3f20ce8070ec3466c22b5574902854b35fa51829
+  health_digest: sha256:bc685a9efa94f1bd3b0512eb99c9f9d8e165635a702dbe2c0943fadd69af99a4
 - run_id: uec-safe-stage-lease-revocation-exercise-20260402
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-safe-stage-lease-revocation-exercise-20260402/health.yml
   status: revoked
-  health_digest: sha256:7d399159e9e1effe24afbd6c4b3013ed13a9081c0434858325770672c72e93b3
+  health_digest: sha256:4ac9e84b58e239f95a89834da3607d77ef862343ce41d3d3a75c50d88110f892
 - run_id: uec-validate-proposal-20260331-b
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-validate-proposal-20260331-b/health.yml
   status: blocked
-  health_digest: sha256:553a46e985c7e81b6143718d138b8f39a3811ca63849e1b756218a5d1104230e
+  health_digest: sha256:7b8f9d49d12fe4c533dc8aa71886ff8eec5e778404336f2ef907d6b2ce61317b
 - run_id: uec-validate-proposal-20260331-success-3
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-validate-proposal-20260331-success-3/health.yml
   status: evidence-incomplete
-  health_digest: sha256:7493f92d352508de17fe3e4d42ba5473949477b0f4f9b39252e65b2a43e21e13
+  health_digest: sha256:bf122a3b099cd1ce79cb1d225f008b11aa7fe54d37a238058a3dc5ad503a91b9
 - run_id: uec-validate-proposal-20260401-agent-augmented-3
   health_ref: .octon/generated/cognition/projections/materialized/runs/uec-validate-proposal-20260401-agent-augmented-3/health.yml
   status: stale
-  health_digest: sha256:702e0c8e26e5967269d07d2499b02038f9706d47df9664196f2f6271872f8b07
+  health_digest: sha256:597b744ff7e611db5be7385d5881617a75978b9ee4fdc318bd3345672cf56b58
