@@ -25,4 +25,5 @@ program may aggregate child receipts, but it may not replace the packet-level
 post-implementation evidence.
 
 Execute gated program closeout after required child lifecycle states are
-implemented, archived, rejected, superseded, or explicitly deferred.
+implemented, archived, rejected, superseded, or covered by an explicitly
+deferred report outcome.

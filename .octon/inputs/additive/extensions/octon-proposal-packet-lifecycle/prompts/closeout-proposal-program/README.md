@@ -1,3 +1,4 @@
 # Closeout Proposal Program
 
-Execute gated parent program closeout after child lifecycle states are coherent.
+Execute gated parent program closeout after child lifecycle outcomes are
+coherent.
