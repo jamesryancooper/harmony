@@ -1,0 +1,541 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/product/contracts/change-receipt-v1.schema.json",
+  "title": "Octon Change Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "change_id",
+    "selected_route",
+    "lifecycle_outcome",
+    "intent",
+    "scope",
+    "validation_evidence_refs",
+    "durable_history",
+    "integration_status",
+    "publication_status",
+    "cleanup_status",
+    "rollback_handle",
+    "closeout_outcome",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "change-receipt-v1"
+    },
+    "change_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "selected_route": {
+      "type": "string",
+      "enum": [
+        "direct-main",
+        "branch-no-pr",
+        "branch-pr",
+        "stage-only-escalate"
+      ]
+    },
+    "lifecycle_outcome": {
+      "type": "string",
+      "enum": [
+        "preserved",
+        "branch-local-complete",
+        "published-branch",
+        "published",
+        "ready",
+        "landed",
+        "cleaned",
+        "blocked",
+        "escalated",
+        "denied"
+      ]
+    },
+    "intent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "summary": { "type": "string" },
+        "touched_paths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "diff_refs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "source_branch_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_branch_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "remote_branch_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "landed_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "integration_method": {
+      "type": "string",
+      "enum": [
+        "direct-commit",
+        "fast-forward",
+        "merge-commit",
+        "squash",
+        "cherry-pick",
+        "github-merge",
+        "manual",
+        "not-applicable"
+      ]
+    },
+    "integration_status": {
+      "type": "string",
+      "enum": [
+        "not_landed",
+        "landed",
+        "not_applicable"
+      ]
+    },
+    "publication_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "pushed-branch",
+        "pr-opened",
+        "pr-ready",
+        "pr-merged",
+        "not_applicable"
+      ]
+    },
+    "cleanup_status": {
+      "type": "string",
+      "enum": [
+        "not_applicable",
+        "pending",
+        "completed",
+        "deferred"
+      ]
+    },
+    "cleanup_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "external_blocker_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "validation_evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "review_evidence_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "review_waiver_refs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "durable_history": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["commit", "patch", "checkpoint", "branch", "pr"]
+        },
+        "ref": { "type": "string", "minLength": 1 },
+        "pr_url": { "type": "string" },
+        "branch": { "type": "string" }
+      }
+    },
+    "rollback_handle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["revert-commit", "patch-reversal", "checkpoint-restore", "discard-branch", "manual-instructions"]
+        },
+        "ref": { "type": "string", "minLength": 1 },
+        "instructions": { "type": "string" }
+      }
+    },
+    "closeout_outcome": {
+      "type": "string",
+      "enum": ["completed", "continued", "stage_only", "blocked", "escalated", "denied"]
+    },
+    "remaining_blockers": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "created_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "updated_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "selected_route": { "const": "branch-pr" } } },
+      "then": {
+        "required": ["source_branch_ref"],
+        "properties": {
+          "lifecycle_outcome": {
+            "enum": ["preserved", "published", "ready", "landed", "cleaned", "blocked", "escalated", "denied"]
+          },
+          "publication_status": {
+            "enum": ["none", "pr-opened", "pr-ready", "pr-merged"]
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "selected_route": { "const": "branch-no-pr" } } },
+      "then": {
+        "required": ["source_branch_ref"],
+        "properties": {
+          "lifecycle_outcome": {
+            "enum": ["preserved", "branch-local-complete", "published-branch", "landed", "cleaned", "blocked", "escalated", "denied"]
+          },
+          "publication_status": {
+            "enum": ["none", "pushed-branch"]
+          },
+          "durable_history": {
+            "properties": {
+              "kind": {
+                "enum": ["commit", "patch", "checkpoint", "branch"]
+              }
+            }
+          }
+        },
+        "not": {
+          "anyOf": [
+            { "required": ["pr_url"] },
+            { "required": ["pr_number"] },
+            {
+              "properties": {
+                "durable_history": {
+                  "required": ["pr_url"]
+                }
+              }
+            },
+            {
+              "properties": {
+                "durable_history": {
+                  "properties": {
+                    "kind": { "const": "pr" }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selected_route": { "const": "branch-no-pr" },
+          "lifecycle_outcome": { "const": "branch-local-complete" }
+        }
+      },
+      "then": {
+        "properties": {
+          "integration_status": {
+            "enum": ["not_landed", "not_applicable"]
+          },
+          "publication_status": {
+            "enum": ["none", "pushed-branch"]
+          },
+          "durable_history": {
+            "properties": {
+              "kind": { "const": "commit" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selected_route": { "const": "branch-no-pr" },
+          "lifecycle_outcome": { "const": "published-branch" }
+        }
+      },
+      "then": {
+        "required": ["remote_branch_ref"],
+        "properties": {
+          "integration_status": {
+            "enum": ["not_landed", "not_applicable"]
+          },
+          "publication_status": {
+            "const": "pushed-branch"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selected_route": { "const": "branch-pr" },
+          "lifecycle_outcome": { "const": "preserved" }
+        }
+      },
+      "then": {
+        "properties": {
+          "integration_status": {
+            "enum": ["not_landed", "not_applicable"]
+          },
+          "publication_status": {
+            "const": "none"
+          },
+          "durable_history": {
+            "properties": {
+              "kind": {
+                "enum": ["commit", "patch", "checkpoint", "branch"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selected_route": { "const": "branch-pr" },
+          "lifecycle_outcome": { "const": "published" }
+        }
+      },
+      "then": {
+        "properties": {
+          "integration_status": {
+            "enum": ["not_landed", "not_applicable"]
+          },
+          "publication_status": {
+            "const": "pr-opened"
+          },
+          "durable_history": {
+            "properties": {
+              "kind": { "const": "pr" },
+              "pr_url": { "type": "string", "minLength": 1 }
+            },
+            "required": ["kind", "ref", "pr_url"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selected_route": { "const": "branch-pr" },
+          "lifecycle_outcome": { "const": "ready" }
+        }
+      },
+      "then": {
+        "properties": {
+          "integration_status": {
+            "enum": ["not_landed", "not_applicable"]
+          },
+          "publication_status": {
+            "const": "pr-ready"
+          },
+          "durable_history": {
+            "properties": {
+              "kind": { "const": "pr" },
+              "pr_url": { "type": "string", "minLength": 1 }
+            },
+            "required": ["kind", "ref", "pr_url"]
+          },
+          "closeout_outcome": {
+            "enum": ["continued", "blocked", "escalated", "denied"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selected_route": { "const": "branch-pr" },
+          "lifecycle_outcome": {
+            "enum": ["landed", "cleaned"]
+          }
+        }
+      },
+      "then": {
+        "required": ["landed_ref", "target_branch_ref", "integration_method"],
+        "properties": {
+          "integration_status": {
+            "const": "landed"
+          },
+          "publication_status": {
+            "const": "pr-merged"
+          },
+          "durable_history": {
+            "properties": {
+              "kind": { "const": "pr" },
+              "pr_url": { "type": "string", "minLength": 1 }
+            },
+            "required": ["kind", "ref", "pr_url"]
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "selected_route": { "const": "direct-main" } } },
+      "then": {
+        "required": ["landed_ref", "target_branch_ref"],
+        "properties": {
+          "lifecycle_outcome": {
+            "enum": ["landed", "cleaned"]
+          },
+          "integration_status": {
+            "const": "landed"
+          },
+          "publication_status": {
+            "enum": ["none", "not_applicable"]
+          },
+          "integration_method": {
+            "const": "direct-commit"
+          },
+          "durable_history": {
+            "properties": {
+              "kind": { "const": "commit" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "integration_status": { "const": "landed" }
+        }
+      },
+      "then": {
+        "required": ["landed_ref", "target_branch_ref", "integration_method"],
+        "properties": {
+          "lifecycle_outcome": {
+            "enum": ["landed", "cleaned"]
+          },
+          "durable_history": {
+            "properties": {
+              "kind": {
+                "enum": ["commit", "branch", "pr"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle_outcome": {
+            "enum": ["landed", "cleaned"]
+          }
+        }
+      },
+      "then": {
+        "required": ["landed_ref", "target_branch_ref", "integration_method"],
+        "properties": {
+          "integration_status": {
+            "const": "landed"
+          },
+          "durable_history": {
+            "properties": {
+              "kind": {
+                "enum": ["commit", "branch", "pr"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "cleanup_status": { "const": "completed" }
+        }
+      },
+      "then": {
+        "required": ["cleanup_evidence_refs"],
+        "properties": {
+          "cleanup_evidence_refs": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "cleanup_status": { "const": "deferred" }
+        }
+      },
+      "then": {
+        "anyOf": [
+          {
+            "required": ["cleanup_evidence_refs"],
+            "properties": {
+              "cleanup_evidence_refs": { "minItems": 1 }
+            }
+          },
+          {
+            "required": ["external_blocker_refs"],
+            "properties": {
+              "external_blocker_refs": { "minItems": 1 }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": { "properties": { "lifecycle_outcome": { "const": "preserved" } } },
+      "then": {
+        "properties": {
+          "integration_status": {
+            "enum": ["not_landed", "not_applicable"]
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "selected_route": { "const": "stage-only-escalate" } } },
+      "then": {
+        "properties": {
+          "lifecycle_outcome": {
+            "enum": ["preserved", "blocked", "escalated", "denied"]
+          },
+          "integration_status": {
+            "enum": ["not_landed", "not_applicable"]
+          },
+          "publication_status": {
+            "enum": ["none", "not_applicable"]
+          },
+          "closeout_outcome": {
+            "enum": ["stage_only", "blocked", "escalated", "denied"]
+          }
+        }
+      }
+    }
+  ]
+}

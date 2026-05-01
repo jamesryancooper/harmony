@@ -66,12 +66,12 @@ token_mode_enabled() {
 }
 
 token_runtime_enforced() {
-  has_text 'execution_artifact_effects(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs" \
-    && has_text 'service_invocation_effect(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs" \
-    && has_text 'service_invocation_effect(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/stdio.rs" \
-    && has_text 'execution_artifact_effects(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/pipeline.rs" \
-    && has_text 'execution_artifact_effects(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/workflow.rs" \
-    && has_text 'validate_authorized_effect<' "$ROOT_DIR/.octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs"
+  has_text 'issue_execution_artifact_effects(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs" \
+    && has_text 'issue_service_invocation_effect(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/commands/mod.rs" \
+    && has_text 'issue_service_invocation_effect(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/stdio.rs" \
+    && has_text 'issue_execution_artifact_effects(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/pipeline.rs" \
+    && has_text 'issue_execution_artifact_effects(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/kernel/src/workflow.rs" \
+    && has_text 'verify_authorized_effect(' "$ROOT_DIR/.octon/framework/engine/runtime/crates/authority_engine/src/implementation/execution.rs"
 }
 
 path_token_ref() {

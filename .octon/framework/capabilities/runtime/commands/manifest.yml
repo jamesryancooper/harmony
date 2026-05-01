@@ -21,7 +21,7 @@ commands:
 - id: alignment-check
   display_name: Alignment Check
   path: alignment-check.md
-  summary: Run profile-based harness alignment validations through a single command.
+  summary: Run profile-based harness alignment validations, including Change-first default-work-unit checks, through a single command.
   access: agent
   argument_hint: --profile <aspect>[,<aspect>...] [--dry-run] [--list-profiles]
   routing:

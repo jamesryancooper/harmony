@@ -17,7 +17,8 @@ allowed-tools: Read Glob Grep Bash(gh *) Write(/.octon/state/evidence/runs/skill
 
 # Provider GitHub Gates
 
-Apply GitHub-specific CI and branch-protection mapping as an optional provider adapter layer.
+Apply GitHub-specific CI and branch-protection mapping as an optional provider
+adapter layer for PR-backed Changes.
 
 ## When to Use
 
@@ -55,6 +56,9 @@ Primary output is execution evidence in `/.octon/state/evidence/runs/skills/prov
 ## Boundaries
 
 - Provider-specific details are non-canonical and must defer to methodology policy
+- No-PR Changes satisfy gate intent through local validation, local review or
+  waiver evidence, and rollback evidence when the selected validation floor
+  allows local proof
 - Do not mutate branch protections or workflow definitions in this skill
 - Do not expose sensitive token or permission data
 

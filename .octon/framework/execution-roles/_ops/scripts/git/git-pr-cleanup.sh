@@ -25,6 +25,7 @@ Options:
 Default mode (no --pr/--branch):
   Sweep local branches, prune safe linked worktree directories for closed branches,
   and remove branches whose latest PR is closed/merged.
+  Route guard: PR-backed cleanup only unless branch-only cleanup is explicitly selected.
 
 Worktree housekeeping:
   - Clean linked worktrees for closed branches are pruned automatically when safe.

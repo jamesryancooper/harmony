@@ -18,7 +18,7 @@ source-context
   -> archived
 ```
 
-Fail-closed or pause states:
+Fail-closed or pause report outcomes:
 
 - `blocked`
 - `needs-packet-revision`
@@ -26,7 +26,10 @@ Fail-closed or pause states:
 - `explicitly-deferred`
 
 Routes must refuse jumps that skip required packet validation, implementation
-grounding, verification, correction, or closeout gates.
+grounding, verification, correction, or closeout gates. `blocked`,
+`needs-packet-revision`, `superseded`, and `explicitly-deferred` are reported
+outcomes for a lifecycle gate or route decision; they are not additional
+proposal statuses.
 
 ## Program State Machine
 

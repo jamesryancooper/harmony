@@ -26,15 +26,20 @@ layers:
     decision_rule: "The constitutional kernel is the supreme repo-local control regime."
     adoption_status: "active"
   - rank: 3
-    authority: "repo-governance-declarations"
+    authority: "product-and-repo-governance-declarations"
     surfaces:
+      - ".octon/framework/product/contracts/default-work-unit.md"
+      - ".octon/framework/product/contracts/default-work-unit.yml"
+      - ".octon/framework/product/contracts/change-receipt-v1.schema.json"
       - ".octon/instance/governance/support-targets.yml"
       - ".octon/instance/governance/exclusions/action-classes.yml"
       - ".octon/instance/governance/policies/**"
       - ".octon/instance/governance/contracts/**"
     decision_rule: >-
-      Published repo-owned policy families and support-target declarations apply
-      beneath the kernel.
+      Product policy contracts, published repo-owned policy families, and
+      support-target declarations apply beneath the kernel. The default work
+      unit policy controls Change, branch, PR, GitHub, and Change Package
+      semantics when lower implementation surfaces conflict.
     adoption_status: "active"
     notes:
       - "Repo policy families are active."

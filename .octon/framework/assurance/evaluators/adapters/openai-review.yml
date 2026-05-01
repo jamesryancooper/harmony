@@ -3,6 +3,8 @@ adapter_id: "openai-review"
 provider: "openai"
 script_ref: ".octon/framework/execution-roles/_ops/scripts/ai-gate/provider-openai.sh"
 output_schema_ref: ".octon/framework/execution-roles/practices/standards/ai-gate-findings.schema.json"
+default_work_unit_policy_ref: ".octon/framework/product/contracts/default-work-unit.yml"
 non_authoritative: true
 review_kinds:
+  - "change-route-review"
   - "pr-risk-review"

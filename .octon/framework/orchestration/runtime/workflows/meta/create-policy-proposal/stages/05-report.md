@@ -29,6 +29,13 @@ authoring workflow.
    - `/audit-policy-proposal`
 5. Record that the proposal is ready for content authoring, not automatically
    implementation-ready.
+6. Include the packet-finalizing fields:
+   - `implementation_grade_complete: yes/no`
+   - completeness receipt path
+   - validators run
+   - unresolved question count
+   - known exclusions
+   - next canonical route
 
 ## Proceed When
 
@@ -36,3 +43,4 @@ authoring workflow.
 - [ ] Workflow bundle contract files exist
 - [ ] Top-level summary exists
 - [ ] Next authoring path is explicit
+- [ ] Report does not claim final or implementation-ready status unless the completeness gate passes

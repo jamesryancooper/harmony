@@ -1,4 +1,8 @@
 # Git Pack
 
-Governed pack for branch, commit, and repository mutation primitives that
-require explicit authority routing and rollback posture.
+Governed pack for route-aware Git mutation primitives.
+
+The pack supports direct-main commits, branch-only checkpoints or commits, and
+PR-backed publication after the canonical default work unit policy selects a
+Change route. Branch and PR helpers are implementation tools; they are not the
+default work unit.

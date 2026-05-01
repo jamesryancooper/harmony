@@ -51,6 +51,11 @@ shim_surfaces:
     status: "subordinate-governance"
     retirement_condition: "Delete only if a stricter subordinate governance successor fully replaces the protected principles charter."
 families:
+  - family_id: "product"
+    path: ".octon/framework/product/contracts/**"
+    activation_wave: 8
+    status: "active"
+    description: "Product-level contracts such as the Change-first default work unit policy and route-neutral Change receipt schema."
   - family_id: "objective"
     path: ".octon/framework/constitution/contracts/objective/**"
     activation_wave: 1
@@ -87,6 +92,12 @@ families:
     status: "active"
     description: "Retention, evidence-store, replay, and evidence lifecycle contracts."
 integration_surfaces:
+  default_work_unit_policy:
+    human_contract: ".octon/framework/product/contracts/default-work-unit.md"
+    machine_contract: ".octon/framework/product/contracts/default-work-unit.yml"
+    change_receipt_schema: ".octon/framework/product/contracts/change-receipt-v1.schema.json"
+    precedence_role: "outranks Git, GitHub, branch, PR, and Change Package implementation policies when default work-unit semantics conflict"
+    status: "active"
   objective_contract_family:
     root: ".octon/framework/constitution/contracts/objective/**"
     status: "active"
@@ -240,11 +251,11 @@ integration_surfaces:
   runtime_run_lifecycle_contract:
     path: ".octon/framework/engine/runtime/spec/run-lifecycle-v1.md"
     status: "active"
-  engagement_work_package_compiler_contracts:
+  engagement_change_package_compiler_contracts:
     engagement_schema: ".octon/framework/constitution/contracts/runtime/engagement-v1.schema.json"
     project_profile_schema: ".octon/framework/constitution/contracts/runtime/project-profile-v1.schema.json"
     engagement_objective_brief_schema: ".octon/framework/constitution/contracts/runtime/engagement-objective-brief-v1.schema.json"
-    work_package_schema: ".octon/framework/constitution/contracts/runtime/work-package-v1.schema.json"
+    change_package_schema: ".octon/framework/constitution/contracts/runtime/change-package-v1.schema.json"
     decision_request_schema: ".octon/framework/constitution/contracts/authority/decision-request-v1.schema.json"
     evidence_profile_schema: ".octon/framework/constitution/contracts/runtime/evidence-profile-v1.schema.json"
     preflight_evidence_lane_spec: ".octon/framework/engine/runtime/spec/preflight-evidence-lane-v1.md"

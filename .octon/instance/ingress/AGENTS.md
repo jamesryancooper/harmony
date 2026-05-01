@@ -9,7 +9,7 @@ observable enough to debug, and flexible enough to evolve.
 The machine-readable ingress declaration lives at
 `/.octon/instance/ingress/manifest.yml`. Treat that manifest as the source of
 truth for mandatory reads, optional overlays, conditional overlays, adapter
-parity targets, and the canonical branch/PR closeout workflow pointer.
+parity targets, and the canonical Change closeout workflow pointer.
 
 Structural topology, class roots, publication metadata, and doc-target roles
 live at `/.octon/framework/cognition/_meta/architecture/contract-registry.yml`.
@@ -92,12 +92,13 @@ requires `transitional`.
 `/.octon/inputs/exploratory/ideation/**` is human-led. Autonomous access is
 blocked unless a human explicitly scopes the request.
 
-## Branch And PR Closeout
+## Change Closeout
 
-Ingress does not own branch or PR closeout policy.
+Ingress does not own Change closeout policy.
 
-When work reaches a credible completion point, resolve branch/PR closeout from:
+When work reaches a credible completion point, resolve Change closeout from:
 
+- `/.octon/framework/product/contracts/default-work-unit.yml`
 - `closeout_workflow_ref` in `/.octon/instance/ingress/manifest.yml`
 - `/.octon/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml`
 

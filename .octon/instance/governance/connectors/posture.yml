@@ -10,7 +10,7 @@ network_egress_policy_ref: ".octon/instance/governance/policies/network-egress.y
 governance_exclusions_ref: ".octon/instance/governance/exclusions/action-classes.yml"
 
 v1_doctrine:
-  - "Connector discovery and posture mapping may support prepare-only Work Package compilation."
+  - "Connector discovery and posture mapping may support prepare-only Change Package compilation."
   - "Connector posture never admits support or capability use by itself."
   - "MCP, API, and browser connectors must not be used for live effects in v1."
   - "Future live connector admission requires support-target admission, capability-pack admission, egress lease, credential posture, rollback or compensation posture, replay, evidence, and runtime authorization."

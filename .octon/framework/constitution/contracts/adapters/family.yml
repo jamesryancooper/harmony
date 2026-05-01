@@ -29,7 +29,7 @@ connector_posture:
   runtime_registry_spec_ref: ".octon/framework/engine/runtime/spec/connector-posture-registry-v1.schema.json"
   repo_policy_ref: ".octon/instance/governance/connectors/posture.yml"
   repo_registry_ref: ".octon/instance/governance/connectors/registry.yml"
-  v1_rule: "Connector posture may narrow, stage, block, or deny Work Package readiness; it may not authorize live connector effects."
+  v1_rule: "Connector posture may narrow, stage, block, or deny Change Package readiness; it may not authorize live connector effects."
 connector_admission:
   identity_schema_ref: ".octon/framework/constitution/contracts/adapters/connector-identity-v1.schema.json"
   operation_schema_ref: ".octon/framework/constitution/contracts/adapters/connector-operation-v1.schema.json"

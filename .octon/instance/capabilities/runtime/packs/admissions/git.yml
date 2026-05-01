@@ -10,4 +10,10 @@ required_proof:
   - governance
   - recovery
 docs_alignment_ref: .octon/framework/capabilities/packs/git/README.md
+default_work_unit_policy_ref: .octon/framework/product/contracts/default-work-unit.yml
+admitted_change_routes:
+  - direct-main
+  - branch-no-pr
+  - branch-pr
+  - stage-only-escalate
 review_due_at: "2026-06-30T00:00:00Z"

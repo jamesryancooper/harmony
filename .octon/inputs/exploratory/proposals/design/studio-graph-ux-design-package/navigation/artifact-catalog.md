@@ -26,6 +26,7 @@ proposal package.
 - `production-workflow.md`
 - `navigation/artifact-catalog.md`
 - `navigation/source-of-truth-map.md`
+- `support/implementation-grade-completeness-review.md`
 - `implementation/README.md`
 - `implementation/minimal-implementation-blueprint.md`
 - `implementation/first-implementation-plan.md`

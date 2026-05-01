@@ -24,7 +24,7 @@ Rules that limit what can be done. Agents MUST respect these constraints.
 | Required files | `START.md`, `scope.md`, `conventions.md`, `continuity/`, `assurance/` | Minimum viable harness. |
 | Protected principles change control | Agents may modify `.octon/framework/cognition/governance/principles/principles.md` only under explicit human override instructions with required override evidence. | Preserve a stable, auditable cognition-governance principles surface without confusing it with the repo-local constitutional kernel. |
 | Principles override ledger | Every direct protected-principles edit must append a record in `.octon/framework/cognition/governance/exceptions/principles-charter-overrides.md`. | Preserve auditable, append-only override provenance for the protected principles surface. |
-| Main branch update model | `main` updates are PR-first; direct pushes require break-glass criteria and explicit record linkage. | Keep change control reviewable by default while allowing emergency operation. |
+| Main branch update model | `main` updates follow Change route selection; direct-main requires validation, receipt, rollback evidence, and explicit safety criteria. | Keep change control reviewable by default while allowing emergency operation. |
 | Human-led zone | Agents MUST NOT autonomously access `ideation/scratchpad/**` | Single human-led space for all non-agent content. |
 | Human-led collaboration | `ideation/scratchpad/` accessible only under explicit human direction | Enables collaboration without autonomous scanning. |
 | Single task in progress | Only one task can have `in_progress` status | Prevents context fragmentation. |

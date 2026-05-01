@@ -83,7 +83,7 @@
         "null"
       ]
     },
-    "work_package_ref": {
+    "change_package_ref": {
       "type": [
         "string",
         "null"
@@ -124,7 +124,7 @@
         "preflight",
         "orientation",
         "project_profile_source_facts",
-        "work_package_compilation",
+        "change_package_compilation",
         "decisions",
         "run_contract_readiness"
       ],

@@ -1,15 +1,15 @@
 # Mission Autonomy Runtime v2
 
 Mission Autonomy Runtime v2 is Octon's bounded continuation layer. It starts
-after the v1 Engagement / Project Profile / Work Package compiler has prepared a
-governed Work Package and first run-contract candidate.
+after the v1 Engagement / Project Profile / Change Package compiler has prepared a
+governed Change Package and first run-contract candidate.
 
 v1 makes Octon safe to start. v2 makes Octon safe to continue.
 
 ## Lifecycle
 
 1. Resolve one active Engagement.
-2. Resolve one active Work Package.
+2. Resolve one active Change Package.
 3. Open or verify one Mission.
 4. Open or verify one Autonomy Window.
 5. Verify mission-control lease, autonomy budget, and circuit breakers.
@@ -37,7 +37,7 @@ Generated mission projections are not control or authority.
 ## MVP Boundary
 
 The v2 MVP supports one active Engagement, one active Mission per Engagement,
-one active Work Package, one active Autonomy Window, and one active run at a
+one active Change Package, one active Autonomy Window, and one active run at a
 time. It prepares and can submit governed run-contract candidates through the
 existing run lifecycle. Broad MCP, API, browser-driving, deployment, credential,
 multi-repo, destructive, and fully unattended autonomy remain deferred.

@@ -177,7 +177,7 @@ until submitted through `octon run start --contract <candidate>`. The compiler
 does not execute candidates or create canonical run lifecycle roots during
 `octon arm --prepare-only`.
 
-Mission Autonomy Runtime v2 commands consume v1 Engagement and Work Package
+Mission Autonomy Runtime v2 commands consume v1 Engagement and Change Package
 state, open one Mission, maintain one Autonomy Window, one Mission Queue, one
 Mission Run Ledger, mission-aware Decision Requests, and Continuation Decisions.
 Mission state lives under `state/control/execution/missions/<mission-id>/**`;

@@ -114,6 +114,14 @@ while IFS= read -r module; do
   esac
 done < <(yq -r '.selected_modules[]?' "$MANIFEST" 2>/dev/null || true)
 
+if [[ -f "$SCRIPT_DIR/validate-proposal-implementation-readiness.sh" ]]; then
+  if bash "$SCRIPT_DIR/validate-proposal-implementation-readiness.sh" --package "$PROPOSAL_DIR"; then
+    true
+  else
+    errors=$((errors + 1))
+  fi
+fi
+
 echo "Validation summary: errors=$errors"
 if [[ $errors -gt 0 ]]; then
   exit 1

@@ -26,7 +26,7 @@ allowed_action_classes:
 max_concurrent_runs: 1
 context_freshness:
   project_profile_required: true
-  work_package_required: true
+  change_package_required: true
   context_pack_required_per_run: true
   stale_route: "pause_or_decision_request"
 review_cadence:

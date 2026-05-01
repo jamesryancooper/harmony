@@ -3,7 +3,7 @@
 The Mission Runner is the deterministic control-plane loop for Mission Autonomy
 Runtime v2.
 
-It consumes v1 Engagement and Work Package state, verifies mission controls,
+It consumes v1 Engagement and Change Package state, verifies mission controls,
 selects one Mission Queue Action Slice, prepares a run-contract candidate, emits
 Continuation Decisions, and updates mission evidence and continuity.
 

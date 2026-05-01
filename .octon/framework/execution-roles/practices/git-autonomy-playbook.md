@@ -38,7 +38,7 @@ token, permissions, and control-plane drift operations.
 
 ## Core Model
 
-Octon's default execution unit is one branch worktree per task or PR.
+Octon's default work unit is a Change; branch worktrees are selected only for branch-no-pr or branch-pr routes.
 
 - **Primary `main` worktree or clone**
   - Keep this clean.
@@ -81,7 +81,7 @@ Octon's default execution unit is one branch worktree per task or PR.
 state to the correct next Git/PR action. Depending on state, closeout may mean:
 
 - branch the work off `main` into a feature worktree
-- stage, commit, push, and open a draft PR
+- stage, commit, validate, receipt, and open a draft PR only for branch-pr
 - mark a draft PR ready and request squash auto-merge
 - mark a draft PR ready for human review with auto-merge off
 - report blockers and continue implementation with no closeout mutation
@@ -112,10 +112,9 @@ Behavior:
 - Runs clean-state preflight (prune/sync/closed-branch cleanup) by default.
 - Creates a new linked worktree in a sibling folder.
 - Creates the branch from `main` (or `--base` override).
-- Establishes the default execution unit: one branch worktree for one task or
-  PR.
+- Establishes branch-route isolation for one branch-routed Change.
 
-### 2. Commit, push, and open a draft PR
+### 2. Commit, validate, receipt, and publish when branch-pr
 
 ```bash
 .octon/framework/execution-roles/_ops/scripts/git/git-pr-open.sh \
@@ -271,7 +270,8 @@ file-changing turn.
     PR?"
 - **Branch worktree, no PR yet**
   - "This branch worktree looks ready for PR closeout. Should I stage,
-    commit, push, and open a draft PR?"
+    commit, validate, record a Change receipt, and open a draft PR only if
+    branch-pr is selected?"
 - **Branch worktree, existing draft PR, autonomous lane**
   - "This draft PR looks ready for Octon's autonomous merge lane. Should I
     mark it ready and request squash auto-merge?"
@@ -456,7 +456,7 @@ Manual-lane flow:
 ## Safety and Exceptions
 
 - Do not bypass required checks or branch rules via local scripts.
-- Keep `main` PR-first; direct push remains break-glass only.
+- Keep `main` clean; direct-main is allowed only for low-risk solo Changes with validation, receipt, and rollback.
 - If a PR has red required checks or unresolved author action items, keep
   working instead of invoking closeout.
 - Cleanup hooks are non-blocking and must not interrupt local work.

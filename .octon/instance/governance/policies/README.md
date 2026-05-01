@@ -5,11 +5,11 @@ are valid only when covered by enabled framework overlay points.
 
 ## Engagement Compiler Policies
 
-These policies narrow prepare-only Work Package readiness. They do not replace
+These policies narrow prepare-only Change Package readiness. They do not replace
 run contracts, grant bundles, authorized-effect tokens, or existing runtime
 authorization.
 
-- `engagement-work-package-compiler.yml`: Work Package readiness gates for
+- `engagement-change-package-compiler.yml`: Change Package readiness gates for
   approvals, runtime authorization, support/capability reconciliation,
   connector posture, context-pack readiness, rollback, evidence profile
   selection, and Decision Request generation.

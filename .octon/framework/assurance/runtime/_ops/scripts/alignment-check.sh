@@ -102,6 +102,16 @@ run_commit_pr() {
     bash "$SCRIPT_DIR/validate-commit-pr-alignment.sh"
 }
 
+run_default_work_unit() {
+  run_step \
+    "Validate Change-first default work unit alignment" \
+    bash "$SCRIPT_DIR/validate-default-work-unit-alignment.sh"
+
+  run_step \
+    "Validate Change closeout lifecycle outcome alignment" \
+    bash "$SCRIPT_DIR/validate-change-closeout-lifecycle-alignment.sh"
+}
+
 run_harness() {
   run_step \
     "Validate harness structure contract" \
@@ -174,6 +184,14 @@ run_harness() {
   run_step \
     "Validate Git and GitHub workflow hardening alignment" \
     bash "$SCRIPT_DIR/validate-git-github-workflow-alignment.sh"
+
+  run_step \
+    "Validate Change-first default work unit alignment" \
+    bash "$SCRIPT_DIR/validate-default-work-unit-alignment.sh"
+
+  run_step \
+    "Validate Change closeout lifecycle outcome alignment" \
+    bash "$SCRIPT_DIR/validate-change-closeout-lifecycle-alignment.sh"
 
   run_step \
     "Validate audit-subsystem-health drift alignment" \
@@ -328,6 +346,60 @@ run_workflows() {
   run_step \
     "Validate create-design-proposal workflow" \
     bash "$SCRIPT_DIR/validate-create-design-proposal-workflow.sh"
+}
+
+run_proposal_lifecycle() {
+  run_step \
+    "Test proposal implementation-readiness validator" \
+    bash "$SCRIPT_DIR/../tests/test-validate-proposal-implementation-readiness.sh"
+
+  run_step \
+    "Test proposal implementation-conformance validator" \
+    bash "$SCRIPT_DIR/../tests/test-validate-proposal-implementation-conformance.sh"
+
+  run_step \
+    "Test proposal post-implementation drift/churn validator" \
+    bash "$SCRIPT_DIR/../tests/test-validate-proposal-post-implementation-drift.sh"
+
+  run_step \
+    "Validate proposal standard fixtures" \
+    bash "$SCRIPT_DIR/../tests/test-validate-proposal-standard.sh"
+
+  run_step \
+    "Validate proposal operation workflows" \
+    bash "$SCRIPT_DIR/../tests/test-validate-proposal-operation-workflows.sh"
+
+  run_step \
+    "Validate create-policy-proposal workflow" \
+    bash "$SCRIPT_DIR/validate-create-policy-proposal-workflow.sh"
+
+  run_step \
+    "Validate create-architecture-proposal workflow" \
+    bash "$SCRIPT_DIR/validate-create-architecture-proposal-workflow.sh"
+
+  run_step \
+    "Validate create-migration-proposal workflow" \
+    bash "$SCRIPT_DIR/validate-create-migration-proposal-workflow.sh"
+
+  run_step \
+    "Validate create-design-proposal workflow" \
+    bash "$SCRIPT_DIR/validate-create-design-proposal-workflow.sh"
+
+  run_step \
+    "Validate audit-policy-proposal workflow" \
+    bash "$SCRIPT_DIR/validate-audit-policy-proposal-workflow.sh"
+
+  run_step \
+    "Validate audit-architecture-proposal workflow" \
+    bash "$SCRIPT_DIR/validate-audit-architecture-proposal-workflow.sh"
+
+  run_step \
+    "Validate audit-migration-proposal workflow" \
+    bash "$SCRIPT_DIR/validate-audit-migration-proposal-workflow.sh"
+
+  run_step \
+    "Validate audit-design-proposal workflow" \
+    bash "$SCRIPT_DIR/validate-audit-design-proposal-workflow.sh"
 }
 
 run_skills() {

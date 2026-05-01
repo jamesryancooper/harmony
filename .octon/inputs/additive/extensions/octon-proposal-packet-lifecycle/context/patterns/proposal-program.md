@@ -59,7 +59,7 @@ normal manifest-governed proposal.
 ## Closeout
 
 Program closeout requires every required child to be implemented, archived,
-rejected, superseded, or explicitly deferred with rationale. The parent closeout
-route refuses archival while any required child remains planned, created,
-validated, ready, implementing, correction-needed, or blocked without an
-explicit deferral, supersession, or rejection receipt.
+rejected, superseded, or covered by an explicitly deferred report outcome with
+rationale. The parent closeout route refuses archival while any required child
+remains planned, created, validated, ready, implementing, correction-needed, or
+blocked without an explicit deferral, supersession, or rejection receipt.

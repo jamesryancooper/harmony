@@ -17,6 +17,8 @@ description: Safety policies and constraints for the closeout-pr skill.
 - Reuse the same branch and same PR for the life of the task
 - Keep the PR in draft until the ready gate is satisfied
 - Do not treat helper output as proof of readiness or mergeability
+- Do not report draft/open PR state as full closeout
+- Do not report ready PR state as landed
 
 ## Review Safety
 
@@ -32,3 +34,5 @@ description: Safety policies and constraints for the closeout-pr skill.
 
 - If GitHub transport or policy blocks progress, report the exact blocker
 - Do not claim success until merged
+- Do not claim cleanup without local branch, remote branch, and worktree cleanup
+  evidence or a deferred-cleanup record

@@ -9,6 +9,18 @@ profiles:
     consumers:
       - "local"
       - "ci"
+  - id: "default-work-unit"
+    label: "Change-first default work unit and route alignment checks"
+    entrypoint: "run_default_work_unit"
+    required_paths:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-change-closeout-lifecycle-alignment.sh"
+      - ".octon/framework/product/contracts/default-work-unit.yml"
+      - ".octon/framework/product/contracts/change-receipt-v1.schema.json"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
   - id: "harness"
     label: ".octon architecture and drift guardrail checks"
     entrypoint: "run_harness"
@@ -28,6 +40,8 @@ profiles:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-continuity-memory.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-state-surface-alignment.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-git-github-workflow-alignment.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-change-closeout-lifecycle-alignment.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-subsystem-health-alignment.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-capability-engine-consistency.sh"
       - ".octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh"
@@ -106,6 +120,35 @@ profiles:
       - ".octon/framework/orchestration/runtime/workflows/_ops/scripts/validate-workflows.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-design-proposal-workflow.sh"
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-create-design-proposal-workflow.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
+  - id: "proposal-lifecycle"
+    label: "Proposal lifecycle completeness, conformance, and drift/churn checks"
+    entrypoint: "run_proposal_lifecycle"
+    required_paths:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-implementation-readiness.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-implementation-conformance.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-post-implementation-drift.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-policy-proposal.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-proposal.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-migration-proposal.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-design-proposal.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-create-policy-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-create-architecture-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-create-migration-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-create-design-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-policy-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-architecture-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-migration-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-design-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-validate-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-promote-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-archive-proposal-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-verify-implementation-conformance-workflow.sh"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-post-implementation-drift-workflow.sh"
     dry_run_safe: true
     consumers:
       - "local"

@@ -1,6 +1,6 @@
 # Pull Requests — Convention and Quality Standards
 
-> A PR is a proposal to change the codebase. It should make the reviewer's job easy: clear intent, minimal scope, obvious correctness, and enough context to evaluate tradeoffs without a meeting.
+> A PR is an optional publication and review output for PR-backed Changes. It should make the reviewer's job easy: clear intent, minimal scope, obvious correctness, and enough context to evaluate tradeoffs without a meeting.
 
 ---
 
@@ -28,7 +28,8 @@ Use this progressive path to get only the depth you need:
 
 ## Autonomy-First Flow
 
-Default PR execution in Octon is draft-first and autonomy-first:
+When Change routing selects `branch-pr`, PR execution in Octon is draft-first
+and autonomy-first:
 
 1. Open early as draft from a branch worktree.
 2. Keep one task or PR per branch worktree and iterate on the same branch and
@@ -38,6 +39,10 @@ Default PR execution in Octon is draft-first and autonomy-first:
 5. Move to ready only when the work is complete, no unresolved author action
    items remain, and the lane is appropriate.
 6. Use autonomous squash merge only for eligible PRs.
+
+PR bodies for PR-backed Changes must carry the Change receipt fields: Change
+intent, selected route, scope, validation evidence, review evidence or waiver,
+durable history, rollback handle, outcome, and remaining blockers.
 
 Ready-for-review is a state criterion, not a helper-script side effect or a
 synonym for "probably done." Helper scripts may request ready or auto-merge
@@ -70,8 +75,8 @@ control provider and CI system.
 - Use PR templates (or equivalent automation) to prompt required structure.
 - Validate required PR sections and checklist items on every PR update.
 - Enforce branch naming and commit-message conventions with automated checks.
-- Protect trunk so required PR quality and commit/branch checks must pass
-  before merge.
+- Protect trunk so route-required quality checks pass before merge or
+  direct-main publication.
 - Unresolved review conversations block merge.
 - Authors address reviewer-owned threads by pushing fixes and replying; the
   reviewer or a maintainer confirms and resolves those threads.

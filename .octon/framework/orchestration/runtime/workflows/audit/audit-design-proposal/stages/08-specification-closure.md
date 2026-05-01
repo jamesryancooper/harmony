@@ -24,12 +24,15 @@ further package changes are required.
 2. If blockers remain:
    - run the canonical specification-closure stage prompt
    - update the target package directly when possible
+   - update or create `support/implementation-grade-completeness-review.md`
    - persist `bundle/reports/07-specification-closure.md`
    - record a change manifest
 3. If no blockers remain:
    - write `bundle/reports/07-specification-closure.md` as an explicit
      zero-change receipt
    - include rationale and reviewed files
+   - update or create `support/implementation-grade-completeness-review.md`
+     with a passing verdict only when implementation-grade completeness is proven
 
 ## Output
 
@@ -41,3 +44,5 @@ further package changes are required.
 - [ ] Specification Closure output exists
 - [ ] Remaining blockers are resolved or explicitly declared absent
 - [ ] Package delta summary is updated when files changed
+- [ ] `support/implementation-grade-completeness-review.md` exists and records
+      pass, fail, or blocker status

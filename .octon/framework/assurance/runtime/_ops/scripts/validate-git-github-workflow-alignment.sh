@@ -5,46 +5,31 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 OCTON_DIR="$(cd -- "$SCRIPT_DIR/../../../../../" && pwd)"
 ROOT_DIR="$(cd -- "$OCTON_DIR/.." && pwd)"
 
-CONTRACT_FILE="$OCTON_DIR/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml"
-MANIFEST_FILE="$OCTON_DIR/instance/ingress/manifest.yml"
-INGRESS_FILE="$OCTON_DIR/instance/ingress/AGENTS.md"
-PLAYBOOK_FILE="$OCTON_DIR/framework/execution-roles/practices/git-autonomy-playbook.md"
-OVERVIEW_FILE="$OCTON_DIR/framework/execution-roles/practices/git-github-autonomy-workflow-v1.md"
-PR_DOC_FILE="$OCTON_DIR/framework/execution-roles/practices/pull-request-standards.md"
+POLICY="$OCTON_DIR/framework/product/contracts/default-work-unit.yml"
+CONTRACT="$OCTON_DIR/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml"
+WORKFLOW="$OCTON_DIR/framework/orchestration/runtime/workflows/meta/closeout/workflow.yml"
+INGRESS="$OCTON_DIR/instance/ingress/AGENTS.md"
+MANIFEST="$OCTON_DIR/instance/ingress/manifest.yml"
+CLOSEOUT_CHANGE="$OCTON_DIR/framework/capabilities/runtime/skills/remediation/closeout-change/SKILL.md"
+CLOSEOUT_PR="$OCTON_DIR/framework/capabilities/runtime/skills/remediation/closeout-pr/SKILL.md"
 OPEN_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-pr-open.sh"
 SHIP_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-pr-ship.sh"
-CLOSEOUT_SKILL_FILE="$OCTON_DIR/framework/capabilities/runtime/skills/remediation/closeout-pr/SKILL.md"
-SKILL_FILE="$OCTON_DIR/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/SKILL.md"
-SAFETY_FILE="$OCTON_DIR/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/references/safety.md"
-TEMPLATE_FILE="$ROOT_DIR/.github/PULL_REQUEST_TEMPLATE.md"
-PR_QUALITY_FILE="$ROOT_DIR/.github/workflows/pr-quality.yml"
-PR_AUTONOMY_FILE="$ROOT_DIR/.github/workflows/pr-autonomy-policy.yml"
-PR_AUTO_MERGE_FILE="$ROOT_DIR/.github/workflows/pr-auto-merge.yml"
+WT_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-wt-new.sh"
+BRANCH_COMMIT_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-branch-commit.sh"
+BRANCH_PUSH_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-branch-push.sh"
+BRANCH_LAND_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-branch-land.sh"
+BRANCH_CLEANUP_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-branch-cleanup.sh"
+GITHUB_ADAPTER="$OCTON_DIR/framework/engine/runtime/adapters/host/github-control-plane.yml"
+REPO_ADAPTER="$OCTON_DIR/framework/engine/runtime/adapters/host/repo-shell.yml"
 
 errors=0
-warnings=0
 
-fail() {
-  echo "[ERROR] $1"
-  errors=$((errors + 1))
-}
-
-warn() {
-  echo "[WARN] $1"
-  warnings=$((warnings + 1))
-}
-
-pass() {
-  echo "[OK] $1"
-}
+pass() { echo "[OK] $1"; }
+fail() { echo "[ERROR] $1"; errors=$((errors + 1)); }
 
 require_file() {
   local file="$1"
-  if [[ ! -f "$file" ]]; then
-    fail "missing file: ${file#$ROOT_DIR/}"
-  else
-    pass "found file: ${file#$ROOT_DIR/}"
-  fi
+  [[ -f "$file" ]] && pass "found ${file#$ROOT_DIR/}" || fail "missing ${file#$ROOT_DIR/}"
 }
 
 require_literal() {
@@ -52,14 +37,10 @@ require_literal() {
   local needle="$2"
   local ok_msg="$3"
   local fail_msg="$4"
-  if grep -Fq -- "$needle" "$file"; then
-    pass "$ok_msg"
-  else
-    fail "$fail_msg"
-  fi
+  grep -Fq -- "$needle" "$file" && pass "$ok_msg" || fail "$fail_msg"
 }
 
-require_absent_literal() {
+forbid_literal() {
   local file="$1"
   local needle="$2"
   local ok_msg="$3"
@@ -71,337 +52,56 @@ require_absent_literal() {
   fi
 }
 
-require_yq_value() {
+require_yq() {
   local file="$1"
   local expr="$2"
   local ok_msg="$3"
   local fail_msg="$4"
-  local value
-
-  value="$(yq -r "$expr // \"\"" "$file" 2>/dev/null || true)"
-  if [[ -n "$value" && "$value" != "null" ]]; then
-    pass "$ok_msg"
-  else
-    fail "$fail_msg"
-  fi
-}
-
-check_contract() {
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.operating_model.final_merge_authority.system' \
-    "workflow contract defines final merge authority" \
-    "workflow contract missing final merge authority"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.operating_model.final_merge_authority.requirements[] | select(. == "reviewer_or_maintainer_confirmation_or_documented_solo_maintainer_exception")' \
-    "workflow contract binds solo-maintainer exception into final merge authority" \
-    "workflow contract final merge authority missing solo-maintainer exception binding"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.closeout.ready_pr_status_contexts.branch_worktree_ready_pr_waiting_on_required_checks_or_auto_merge.message' \
-    "workflow contract defines ready-pr check or auto-merge status" \
-    "workflow contract missing ready-pr waiting-on-checks or auto-merge status"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.remediation.allowed_git_subset[] | select(. == "git push")' \
-    "workflow contract includes git push in safe remediation subset" \
-    "workflow contract missing git push in safe remediation subset"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.helpers.git_pr_ship.explicit_request_flags[] | select(. == "--request-ready")' \
-    "workflow contract defines explicit ready request flag" \
-    "workflow contract missing explicit ready request flag"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.helpers.git_pr_open.draft_only | select(. == true)' \
-    "workflow contract defines git-pr-open as draft-only" \
-    "workflow contract missing draft-only git-pr-open semantics"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.autonomous_closeout_loop.owner_surface' \
-    "workflow contract defines an owner surface for the autonomous closeout loop" \
-    "workflow contract missing autonomous closeout loop owner surface"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.operating_model.reviewer_owned_thread_resolution.solo_maintainer_exception.status | select(. == "allowed")' \
-    "workflow contract defines solo-maintainer review-thread exception" \
-    "workflow contract missing solo-maintainer review-thread exception"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.operating_model.reviewer_owned_thread_resolution.solo_maintainer_exception.forbidden_uses[] | select(. == "substitute for required review approval")' \
-    "workflow contract forbids using solo-maintainer thread resolution as review approval" \
-    "workflow contract must forbid solo-maintainer thread resolution as review approval"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.remediation.forbidden_operations[] | select(. == "unauthorized programmatic review-thread resolution")' \
-    "workflow contract forbids unauthorized programmatic review-thread resolution" \
-    "workflow contract missing unauthorized programmatic review-thread resolution guard"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.autonomous_closeout_loop.conversation_policy.solo_maintainer_exception' \
-    "workflow contract binds solo-maintainer exception into closeout conversation policy" \
-    "workflow contract missing solo-maintainer closeout conversation policy"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.validation.drift_classes[] | select(. == "git-pr-open widening initial PR creation beyond draft-first")' \
-    "workflow contract tracks git-pr-open draft-first drift" \
-    "workflow contract missing git-pr-open draft-first drift coverage"
-  require_yq_value \
-    "$CONTRACT_FILE" \
-    '.validation.drift_classes[] | select(. == "git-pr-open template population coupled to stale placeholder prose")' \
-    "workflow contract tracks git-pr-open template-population drift" \
-    "workflow contract missing git-pr-open template-population drift coverage"
-}
-
-check_ingress() {
-  require_yq_value \
-    "$MANIFEST_FILE" \
-    '.workflow_contract_ref' \
-    "ingress manifest points to workflow contract" \
-    "ingress manifest missing workflow contract reference"
-  require_yq_value \
-    "$MANIFEST_FILE" \
-    '.closeout_workflow_ref' \
-    "ingress manifest points to canonical closeout workflow" \
-    "ingress manifest missing closeout workflow reference"
-  if yq -e 'has("branch_closeout_gate") | not' "$MANIFEST_FILE" >/dev/null 2>&1; then
-    pass "ingress manifest does not duplicate closeout gate policy"
-  else
-    fail "ingress manifest must not duplicate closeout gate policy"
-  fi
-  require_literal \
-    "$INGRESS_FILE" \
-    "Ingress does not own branch or PR closeout policy." \
-    "ingress AGENTS redirects branch/PR closeout ownership" \
-    "ingress AGENTS must redirect branch/PR closeout ownership"
-}
-
-check_docs() {
-  require_literal \
-    "$PLAYBOOK_FILE" \
-    ".octon/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml" \
-    "playbook references canonical workflow contract" \
-    "playbook missing canonical workflow contract reference"
-  require_literal \
-    "$OVERVIEW_FILE" \
-    ".octon/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml" \
-    "workflow overview references canonical workflow contract" \
-    "workflow overview missing canonical workflow contract reference"
-  require_literal \
-    "$PLAYBOOK_FILE" \
-    "/closeout-pr" \
-    "playbook documents the closeout-pr skill" \
-    "playbook missing closeout-pr skill reference"
-  require_literal \
-    "$OVERVIEW_FILE" \
-    "closeout-pr" \
-    "workflow overview documents the closeout-pr skill" \
-    "workflow overview missing closeout-pr skill reference"
-  require_absent_literal \
-    "$PLAYBOOK_FILE" \
-    "Opens or updates the PR in draft-first posture." \
-    "playbook no longer overstates git-pr-open behavior" \
-    "playbook still claims git-pr-open opens or updates PRs"
-  require_literal \
-    "$PR_DOC_FILE" \
-    "fix + commit + push + reply" \
-    "pull-request standards use fix + commit + push + reply remediation" \
-    "pull-request standards missing fix + commit + push + reply remediation"
-  require_literal \
-    "$PR_DOC_FILE" \
-    "solo-maintainer exception" \
-    "pull-request standards document solo-maintainer thread resolution exception" \
-    "pull-request standards missing solo-maintainer thread resolution exception"
-  require_absent_literal \
-    "$PR_DOC_FILE" \
-    "Rebase and force-push cleanup." \
-    "pull-request standards no longer teach stale rebase and force-push cleanup wording" \
-    "pull-request standards still teach stale rebase and force-push cleanup wording"
-}
-
-check_helper_and_skill() {
-  require_literal \
-    "$OPEN_SCRIPT" \
-    "git-pr-open.sh is draft-only. Use git-pr-ship.sh --request-ready once author action items are closed." \
-    "git-pr-open rejects non-draft widening" \
-    "git-pr-open missing draft-only rejection guidance"
-  require_literal \
-    "$OPEN_SCRIPT" \
-    'PR_ARGS=(pr create --base "$BASE_BRANCH" --head "$CURRENT_BRANCH" --title "$TITLE" --body-file "$BODY_TMP" --draft)' \
-    "git-pr-open always creates draft PRs" \
-    "git-pr-open is not pinned to draft PR creation"
-  require_literal \
-    "$OPEN_SCRIPT" \
-    'replace_markdown_section "$BODY_TMP" "## Why" "$WHY_TEXT"' \
-    "git-pr-open populates the Why section from the canonical heading" \
-    "git-pr-open missing canonical Why-section population"
-  require_absent_literal \
-    "$OPEN_SCRIPT" \
-    "Open non-draft PR instead of draft." \
-    "git-pr-open no longer advertises non-draft PR creation" \
-    "git-pr-open still advertises non-draft PR creation"
-  require_absent_literal \
-    "$OPEN_SCRIPT" \
-    "The problem this solves and why it matters. Include ticket/issue links." \
-    "git-pr-open no longer depends on stale placeholder prose" \
-    "git-pr-open still depends on stale placeholder prose"
-  require_literal \
-    "$SHIP_SCRIPT" \
-    "--request-ready" \
-    "git-pr-ship exposes explicit ready request flag" \
-    "git-pr-ship missing explicit ready request flag"
-  require_literal \
-    "$SHIP_SCRIPT" \
-    "--request-automerge" \
-    "git-pr-ship exposes explicit auto-merge request flag" \
-    "git-pr-ship missing explicit auto-merge request flag"
-  require_literal \
-    "$SHIP_SCRIPT" \
-    "Report current PR status, lane hints, and blockers without mutating PR state." \
-    "git-pr-ship defaults to status-only mode" \
-    "git-pr-ship missing status-only default behavior"
-  require_absent_literal \
-    "$SHIP_SCRIPT" \
-    "1) request ready-for-review if the PR is still draft," \
-    "git-pr-ship no longer defaults to eager mutation" \
-    "git-pr-ship still defaults to eager mutation"
-  require_literal \
-    "$SHIP_SCRIPT" \
-    "GitHub remains the final merge gate" \
-    "git-pr-ship states that GitHub is the final merge gate" \
-    "git-pr-ship missing final merge gate message"
-  require_literal \
-    "$SKILL_FILE" \
-    "Bash(git add *)" \
-    "resolve-pr-comments skill allows git add" \
-    "resolve-pr-comments skill missing git add from allowed-tools"
-  require_literal \
-    "$SKILL_FILE" \
-    "Bash(git commit *)" \
-    "resolve-pr-comments skill allows git commit" \
-    "resolve-pr-comments skill missing git commit from allowed-tools"
-  require_literal \
-    "$SKILL_FILE" \
-    "Bash(git push *)" \
-    "resolve-pr-comments skill allows git push" \
-    "resolve-pr-comments skill missing git push from allowed-tools"
-  require_file \
-    "$CLOSEOUT_SKILL_FILE"
-  require_literal \
-    "$CLOSEOUT_SKILL_FILE" \
-    "same branch and same PR for the life of the task" \
-    "closeout-pr skill preserves same branch and same PR lifetime" \
-    "closeout-pr skill missing same branch/same PR lifetime rule"
-  require_literal \
-    "$CLOSEOUT_SKILL_FILE" \
-    "fix + commit + push + reply" \
-    "closeout-pr skill uses fix + commit + push + reply remediation" \
-    "closeout-pr skill missing fix + commit + push + reply remediation rule"
-  require_literal \
-    "$CLOSEOUT_SKILL_FILE" \
-    "solo-maintainer exception" \
-    "closeout-pr skill documents solo-maintainer thread resolution exception" \
-    "closeout-pr skill missing solo-maintainer thread resolution exception"
-  require_literal \
-    "$CLOSEOUT_SKILL_FILE" \
-    "Continue until merged or until a precise external blocker is reached and reported" \
-    "closeout-pr skill defines the merged-or-blocker stop condition" \
-    "closeout-pr skill missing merged-or-blocker stop condition"
-  require_literal \
-    "$SAFETY_FILE" \
-    "Push the updated branch before replying that the fix landed" \
-    "resolve-pr-comments safety requires push before reply" \
-    "resolve-pr-comments safety missing push-before-reply rule"
-  require_literal \
-    "$SAFETY_FILE" \
-    "solo-maintainer exception" \
-    "resolve-pr-comments safety documents solo-maintainer thread resolution exception" \
-    "resolve-pr-comments safety missing solo-maintainer thread resolution exception"
-  require_absent_literal \
-    "$SAFETY_FILE" \
-    '`git push` access (user must push manually)' \
-    "resolve-pr-comments safety no longer claims git push is unavailable" \
-    "resolve-pr-comments safety still claims git push is unavailable"
-}
-
-check_github_companions() {
-  require_literal \
-    "$TEMPLATE_FILE" \
-    "fix, commit, push, reply" \
-    "PR template reflects hardened remediation wording" \
-    "PR template missing hardened remediation wording"
-  require_literal \
-    "$TEMPLATE_FILE" \
-    "solo-maintainer exception" \
-    "PR template references solo-maintainer thread resolution exception" \
-    "PR template missing solo-maintainer thread resolution exception"
-  require_literal \
-    "$PR_QUALITY_FILE" \
-    "const templatePath = \".github/PULL_REQUEST_TEMPLATE.md\";" \
-    "pr-quality workflow validates canonical PR template path" \
-    "pr-quality workflow not pinned to canonical PR template path"
-  require_literal \
-    "$PR_AUTONOMY_FILE" \
-    "standardsText = await readTextFile" \
-    "pr-autonomy-policy reads standards from canonical repo state" \
-    "pr-autonomy-policy missing canonical standards read"
-  require_literal \
-    "$PR_AUTO_MERGE_FILE" \
-    "evaluate-pr-autonomy-policy.sh" \
-    "pr-auto-merge derives merge authority from canonical policy evaluator" \
-    "pr-auto-merge missing canonical autonomy policy evaluator"
-  require_literal \
-    "$PR_AUTO_MERGE_FILE" \
-    "checkout_pr_head" \
-    "pr-auto-merge checks out the same-repo PR head before protected runtime merge" \
-    "pr-auto-merge missing PR-head checkout before protected runtime merge"
-  require_literal \
-    "$PR_AUTO_MERGE_FILE" \
-    'git fetch --no-tags --depth=1 origin "${head_sha}"' \
-    "pr-auto-merge fetches the exact PR head SHA before detached checkout" \
-    "pr-auto-merge fetches branch ref instead of exact PR head SHA"
-  require_literal \
-    "$OCTON_DIR/framework/assurance/governance/_ops/scripts/evaluate-pr-autonomy-policy.sh" \
-    "PR_AUTONOMY_MANUAL_LANE_REQUESTED" \
-    "pr autonomy policy honors manual-lane PR body requests" \
-    "pr autonomy policy missing manual-lane PR body request handling"
+  yq -e "$expr" "$file" >/dev/null 2>&1 && pass "$ok_msg" || fail "$fail_msg"
 }
 
 main() {
   echo "== Git/GitHub Workflow Alignment Validation =="
+  command -v yq >/dev/null 2>&1 || { echo "[ERROR] yq is required" >&2; exit 1; }
 
-  command -v yq >/dev/null 2>&1 || {
-    echo "[ERROR] yq is required for workflow alignment validation" >&2
-    exit 1
-  }
+  for file in "$POLICY" "$CONTRACT" "$WORKFLOW" "$INGRESS" "$MANIFEST" "$CLOSEOUT_CHANGE" "$CLOSEOUT_PR" "$OPEN_SCRIPT" "$SHIP_SCRIPT" "$WT_SCRIPT" "$BRANCH_COMMIT_SCRIPT" "$BRANCH_PUSH_SCRIPT" "$BRANCH_LAND_SCRIPT" "$BRANCH_CLEANUP_SCRIPT" "$GITHUB_ADAPTER" "$REPO_ADAPTER"; do
+    require_file "$file"
+  done
 
-  require_file "$CONTRACT_FILE"
-  require_file "$MANIFEST_FILE"
-  require_file "$INGRESS_FILE"
-  require_file "$PLAYBOOK_FILE"
-  require_file "$OVERVIEW_FILE"
-  require_file "$PR_DOC_FILE"
-  require_file "$OPEN_SCRIPT"
-  require_file "$SHIP_SCRIPT"
-  require_file "$SKILL_FILE"
-  require_file "$SAFETY_FILE"
-  require_file "$TEMPLATE_FILE"
-  require_file "$PR_QUALITY_FILE"
-  require_file "$PR_AUTONOMY_FILE"
-  require_file "$PR_AUTO_MERGE_FILE"
-
-  check_contract
-  check_ingress
-  check_docs
-  check_helper_and_skill
-  check_github_companions
+  require_yq "$POLICY" '.routes[]? | select(.route_id == "direct-main")' "policy exposes direct-main route" "policy missing direct-main route"
+  require_yq "$POLICY" '.routes[]? | select(.route_id == "branch-no-pr")' "policy exposes branch-no-pr route" "policy missing branch-no-pr route"
+  require_yq "$POLICY" '.routes[]? | select(.route_id == "branch-pr")' "policy exposes branch-pr route" "policy missing branch-pr route"
+  if yq -e '.routes[]? | select(.route_id == "branch-land-no-pr")' "$POLICY" >/dev/null 2>&1; then
+    fail "policy must not add branch-land-no-pr top-level route"
+  else
+    pass "policy keeps no-PR branch landing as branch-no-pr lifecycle outcome"
+  fi
+  require_yq "$CONTRACT" '.helpers.git_wt_new.route_guard == "branch-no-pr or branch-pr only"' "worktree helper is route-gated to branch routes" "worktree helper must be branch-route gated"
+  require_yq "$CONTRACT" '.helpers.git_pr_open.route_guard == "branch-pr only"' "PR open helper is branch-pr gated" "PR open helper must be branch-pr gated"
+  require_yq "$CONTRACT" '.helpers.git_branch_land.route_guard == "branch-no-pr only"' "no-PR branch landing helper is branch-no-pr gated" "branch landing helper must be branch-no-pr gated"
+  require_yq "$CONTRACT" '.helpers.git_branch_cleanup.route_guard == "branch-no-pr or branch-pr only"' "branch cleanup helper is branch-route gated" "branch cleanup helper must be branch-route gated"
+  require_yq "$CONTRACT" '.closeout.owner_surface == "/closeout-change"' "closeout owner is closeout-change" "closeout owner must be closeout-change"
+  require_yq "$CONTRACT" '.closeout.pr_backed_subflow == "/closeout-pr"' "closeout-pr is PR-backed subflow" "closeout-pr must be PR-backed subflow"
+  require_yq "$WORKFLOW" '.policy_refs.default_work_unit_policy_ref == ".octon/framework/product/contracts/default-work-unit.yml"' "workflow references default work unit policy" "workflow missing default work unit policy"
+  require_yq "$MANIFEST" '.default_work_unit_policy_ref == ".octon/framework/product/contracts/default-work-unit.yml"' "ingress manifest references default work unit policy" "ingress manifest missing default work unit policy"
+  require_literal "$INGRESS" "Ingress does not own Change closeout policy." "ingress delegates Change closeout policy" "ingress must delegate Change closeout policy"
+  require_literal "$CLOSEOUT_CHANGE" 'Do not open a PR unless route selection returns `branch-pr`.' "closeout-change route-gates PR creation" "closeout-change must route-gate PR creation"
+  require_literal "$CLOSEOUT_PR" 'selected route `branch-pr`' "closeout-pr requires branch-pr route" "closeout-pr must require branch-pr route"
+  require_literal "$OPEN_SCRIPT" "branch-pr" "git-pr-open documents branch-pr route guard" "git-pr-open must document branch-pr route guard"
+  require_literal "$WT_SCRIPT" "branch-no-pr or branch-pr" "git-wt-new documents branch route guard" "git-wt-new must document branch route guard"
+  require_literal "$SHIP_SCRIPT" "branch-pr" "git-pr-ship documents branch-pr route guard" "git-pr-ship must document branch-pr route guard"
+  require_literal "$BRANCH_COMMIT_SCRIPT" "branch-no-pr or branch-pr" "git-branch-commit documents branch route guard" "git-branch-commit must document branch route guard"
+  require_literal "$BRANCH_PUSH_SCRIPT" "without opening a PR" "git-branch-push avoids PR mutation" "git-branch-push must avoid PR mutation"
+  require_literal "$BRANCH_LAND_SCRIPT" "branch-no-pr" "git-branch-land documents branch-no-pr route guard" "git-branch-land must document branch-no-pr route guard"
+  require_literal "$BRANCH_LAND_SCRIPT" 'rev-list --reverse "$TARGET_PRE_REF..$SOURCE_REF"' "git-branch-land cherry-picks full branch range" "git-branch-land must cherry-pick the full target-to-source range"
+  forbid_literal "$BRANCH_LAND_SCRIPT" 'cherry-pick "$SOURCE_BRANCH"' "git-branch-land avoids tip-only cherry-pick" "git-branch-land must not cherry-pick only the branch tip"
+  require_literal "$BRANCH_CLEANUP_SCRIPT" "without requiring PR metadata" "git-branch-cleanup avoids PR metadata dependency" "git-branch-cleanup must avoid PR metadata dependency"
+  require_literal "$GITHUB_ADAPTER" "PR-backed Changes" "GitHub adapter scoped to PR-backed Changes" "GitHub adapter must scope GitHub to PR-backed Changes"
+  require_literal "$REPO_ADAPTER" "direct-main" "repo shell adapter covers direct-main route" "repo shell adapter must cover direct-main route"
 
   echo
-  echo "Validation summary: errors=$errors warnings=$warnings"
-  if [[ $errors -gt 0 ]]; then
-    exit 1
-  fi
+  echo "Validation summary: errors=$errors"
+  [[ "$errors" -eq 0 ]]
 }
 
 main "$@"

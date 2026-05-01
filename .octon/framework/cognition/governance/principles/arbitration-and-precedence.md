@@ -31,7 +31,7 @@ status: Active
 
 ## Governed Autonomy Lifecycle Arbitration
 
-- Safe Start artifacts prepare Engagement, Project Profile, Work Package,
+- Safe Start artifacts prepare Engagement, Project Profile, Change Package,
   Decision Request, Evidence Profile, Preflight Evidence Lane, Tool/MCP
   Connector Posture, and Run Contract Candidate surfaces; they do not authorize
   material execution.

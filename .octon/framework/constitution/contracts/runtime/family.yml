@@ -80,7 +80,7 @@ run_lifecycle:
       - "trace-pointers.yml"
       - "evidence-classification.yml"
       - "retained-run-evidence.yml"
-engagement_work_package_compiler:
+engagement_change_package_compiler:
   engagement:
     schema_ref: ".octon/framework/constitution/contracts/runtime/engagement-v1.schema.json"
     runtime_spec_ref: ".octon/framework/engine/runtime/spec/engagement-v1.schema.json"
@@ -98,11 +98,11 @@ engagement_work_package_compiler:
     control_file: ".octon/state/control/engagements/<engagement-id>/objective/objective-brief.yml"
     evidence_root: ".octon/state/evidence/engagements/<engagement-id>/objective"
     authority_status: "candidate-control-not-workspace-authority"
-  work_package:
-    schema_ref: ".octon/framework/constitution/contracts/runtime/work-package-v1.schema.json"
-    runtime_spec_ref: ".octon/framework/engine/runtime/spec/work-package-v1.schema.json"
-    control_file: ".octon/state/control/engagements/<engagement-id>/work-package.yml"
-    evidence_root: ".octon/state/evidence/engagements/<engagement-id>/work-packages"
+  change_package:
+    schema_ref: ".octon/framework/constitution/contracts/runtime/change-package-v1.schema.json"
+    runtime_spec_ref: ".octon/framework/engine/runtime/spec/change-package-v1.schema.json"
+    control_file: ".octon/state/control/engagements/<engagement-id>/change-package.yml"
+    evidence_root: ".octon/state/evidence/engagements/<engagement-id>/change-packages"
   evidence_profile:
     schema_ref: ".octon/framework/constitution/contracts/runtime/evidence-profile-v1.schema.json"
     runtime_spec_ref: ".octon/framework/engine/runtime/spec/evidence-profile-v1.schema.json"

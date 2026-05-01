@@ -34,12 +34,17 @@ main() {
     require_file "$file"
   done
 
-  require_fixed 'name: "create-design-proposal"' "$WORKFLOW_DIR/workflow.yml" "workflow contract name matches id"
+  if yq -e '.name == "create-design-proposal"' "$WORKFLOW_DIR/workflow.yml" >/dev/null 2>&1; then
+    pass "workflow contract name matches id"
+  else
+    fail "workflow contract name matches id"
+  fi
   require_fixed 'proposal_id' "$WORKFLOW_DIR/workflow.yml" "workflow contract exposes proposal_id input"
   require_fixed 'promotion_scope' "$WORKFLOW_DIR/workflow.yml" "workflow contract exposes promotion_scope input"
   require_fixed 'generate-proposal-registry.sh' "$WORKFLOW_DIR/stages/03-scaffold-package.md" "scaffold stage regenerates proposal registry via canonical generator"
   require_fixed 'validate-proposal-standard.sh' "$WORKFLOW_DIR/stages/04-validate-package.md" "validate stage runs baseline proposal validator"
   require_fixed 'validate-design-proposal.sh' "$WORKFLOW_DIR/stages/04-validate-package.md" "validate stage runs design proposal validator"
+  require_fixed 'validate-proposal-implementation-readiness.sh' "$WORKFLOW_DIR/stages/04-validate-package.md" "validate stage runs implementation-readiness validator"
 
   if yq -e '.workflows[] | select(.id == "create-design-proposal" and .path == "meta/create-design-proposal/")' "$WORKFLOW_MANIFEST" >/dev/null 2>&1; then
     pass "workflow manifest includes create-design-proposal"

@@ -556,6 +556,9 @@ done_gate:
     --package <target>` passes
   - If the target proposal contains `design-proposal.yml`, `validate-design-proposal.sh
     --package <target>` passes
+  - support/implementation-grade-completeness-review.md exists in the packet
+  - validate-proposal-implementation-readiness.sh records a structural-only,
+    blocked, or implementation-grade gate outcome
   - Final readiness verdict is explicit
 constraints:
   fail_closed: true

@@ -30,5 +30,8 @@ description: Decision boundaries for the closeout-pr skill.
 
 ## Stop Conditions
 
-- PR merged -> success
+- PR draft/open -> `published`, not full closeout
+- PR ready but unmerged -> `ready`, not landed
+- PR merged -> `landed`
+- PR merged plus cleanup evidence or deferred cleanup record -> `cleaned`
 - Real external blocker -> report and stop

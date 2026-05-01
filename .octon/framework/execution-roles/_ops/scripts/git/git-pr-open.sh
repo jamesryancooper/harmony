@@ -34,6 +34,7 @@ Behavior:
   - Commits staged changes, or stages all changes with --stage-all.
   - Pushes current branch to origin.
   - Populates canonical PR template sections by heading and always opens a draft PR.
+  - Route guard: call only after Change routing selects branch-pr.
 USAGE
 }
 

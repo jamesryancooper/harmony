@@ -56,7 +56,7 @@ main() {
   if yq -e 'has("branch_closeout_gate") | not and has("branch_closeout_prompt") | not' "$MANIFEST" >/dev/null 2>&1; then
     pass "ingress manifest is boot-only and free of inline closeout policy"
   else
-    fail "ingress manifest must not carry inline branch/PR closeout policy"
+    fail "ingress manifest must not carry inline Change closeout policy"
   fi
 
   closeout_workflow_ref="$(yq -r '.closeout_workflow_ref // ""' "$MANIFEST")"
@@ -68,14 +68,14 @@ main() {
 
   require_literal \
     "$INGRESS" \
-    "Ingress does not own branch or PR closeout policy." \
+    "Ingress does not own Change closeout policy." \
     "ingress AGENTS keeps closeout out of ingress" \
     "ingress AGENTS must explicitly keep closeout out of ingress"
   require_literal \
     "$INGRESS" \
     "Build-to-delete or claim-closeout governance remains distinct" \
-    "ingress AGENTS distinguishes branch/PR closeout from governance closeout" \
-    "ingress AGENTS must distinguish branch/PR closeout from governance closeout"
+    "ingress AGENTS distinguishes Change closeout from governance closeout" \
+    "ingress AGENTS must distinguish Change closeout from governance closeout"
   require_literal \
     "$START" \
     "octon doctor --architecture" \

@@ -23,7 +23,7 @@ the fail-closed proposal validator stack.
 5. Render `navigation/source-of-truth-map.md` from the migration subtype
    contract.
 6. Regenerate `.octon/generated/proposals/registry.yml` from manifests by
-   invoking the canonical projection generator.
+   invoking `.octon/framework/assurance/runtime/_ops/scripts/generate-proposal-registry.sh --write`.
 7. Record the scaffolded package inventory so later stages can prove the exact
    on-disk shape that passed validation.
 

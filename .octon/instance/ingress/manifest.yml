@@ -31,6 +31,7 @@ adapter_parity_targets:
   - AGENTS.md
   - CLAUDE.md
 workflow_contract_ref: .octon/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml
+default_work_unit_policy_ref: .octon/framework/product/contracts/default-work-unit.yml
 closeout_workflow_ref: .octon/framework/orchestration/runtime/workflows/meta/closeout/workflow.yml
 change_profile_rule: pre-1.0 defaults to atomic unless a hard gate requires transitional
 human_led_blocked_roots:

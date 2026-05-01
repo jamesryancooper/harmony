@@ -1334,6 +1334,26 @@ workflows:
         description: "Comma-separated pack ids. Required only for pack_bundle."
     access: human
     depends_on: []
+  closeout:
+    version: "2.0.0"
+    execution_profile: core
+    commands: ["/closeout"]
+    parameters: []
+    access: human
+    depends_on:
+      - skill: closeout-change
+        condition: "active in skill manifest"
+      - skill: closeout-pr
+        condition: "active in skill manifest when selected route is branch-pr"
+    io:
+      inputs: []
+      outputs:
+        - name: closeout_workflow_summary
+          path: "/.octon/state/evidence/validation/analysis/{{date}}-change-closeout-workflow.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Change closeout context resolution summary."
   update-harness:
     version: "1.3.0"
     commands: ["/update-harness"]
@@ -1587,6 +1607,70 @@ workflows:
           format: mixed
           determinism: unique
           description: "Workflow bundle containing proposal promotion metadata and outputs"
+  verify-implementation-conformance:
+    version: "1.0.0"
+    commands: ["/verify-implementation-conformance"]
+    parameters:
+      - name: proposal_path
+        type: folder
+        required: true
+        description: "Root proposal directory to verify against implemented repo changes"
+    access: human
+    depends_on: []
+    io:
+      inputs:
+        - name: proposal_root
+          path: "{{proposal_path}}"
+          kind: directory
+          format: mixed
+          required: true
+          description: "Implemented proposal under conformance verification"
+      outputs:
+        - name: implementation_conformance_summary
+          path: "/.octon/state/evidence/validation/analysis/{{date}}-implementation-conformance.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Top-level implementation conformance verification summary"
+        - name: implementation_conformance_bundle
+          path: "/.octon/state/evidence/runs/workflows/{{date}}-implementation-conformance-{{slug}}/"
+          kind: directory
+          format: mixed
+          determinism: unique
+          description: "Workflow bundle containing implementation conformance metadata and outputs"
+  audit-post-implementation-drift:
+    version: "1.0.0"
+    commands: ["/audit-post-implementation-drift"]
+    parameters:
+      - name: proposal_path
+        type: folder
+        required: true
+        description: "Root proposal directory to audit after implementation conformance"
+    access: human
+    depends_on:
+      - workflow: verify-implementation-conformance
+        condition: "recommended immediately before drift/churn audit"
+    io:
+      inputs:
+        - name: proposal_root
+          path: "{{proposal_path}}"
+          kind: directory
+          format: mixed
+          required: true
+          description: "Implemented proposal under drift/churn audit"
+      outputs:
+        - name: post_implementation_drift_summary
+          path: "/.octon/state/evidence/validation/analysis/{{date}}-post-implementation-drift.md"
+          kind: file
+          format: markdown
+          determinism: unique
+          description: "Top-level post-implementation drift/churn audit summary"
+        - name: post_implementation_drift_bundle
+          path: "/.octon/state/evidence/runs/workflows/{{date}}-post-implementation-drift-{{slug}}/"
+          kind: directory
+          format: mixed
+          determinism: unique
+          description: "Workflow bundle containing post-implementation drift/churn metadata and outputs"
   archive-proposal:
     version: "1.0.0"
     commands: ["/archive-proposal"]

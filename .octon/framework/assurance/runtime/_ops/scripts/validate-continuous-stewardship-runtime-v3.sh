@@ -172,7 +172,7 @@ check_v1_v2_dependencies() {
   echo "== v1/v2 Dependency Validation =="
   local required=(
     framework/engine/runtime/spec/engagement-v1.schema.json
-    framework/engine/runtime/spec/work-package-v1.schema.json
+    framework/engine/runtime/spec/change-package-v1.schema.json
     framework/engine/runtime/spec/decision-request-v1.schema.json
     framework/engine/runtime/spec/evidence-profile-v1.schema.json
     framework/engine/runtime/spec/autonomy-window-v1.schema.json

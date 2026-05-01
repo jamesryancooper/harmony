@@ -1,0 +1,230 @@
+schema_version: "octon-default-work-unit-policy-v1"
+policy_id: "default-work-unit"
+owner: "Octon governance"
+status: "active"
+default_work_unit: "change"
+internal_execution_bundle: "change-package"
+run_authority_unit: "run-contract"
+deprecated_terms:
+  - term: "work-package"
+    replacement: "change-package"
+    compatibility_alias_allowed: false
+routes:
+  - route_id: "branch-pr"
+    description: "PR-backed Change for hosted review, remote checks, branch protection, publication, release automation, collaboration, or explicit operator request."
+    precedence: 10
+    selected_when_any:
+      - "operator requests PR, hosted review, remote CI, preview publication, or external signoff"
+      - "repository protection or release automation requires PR"
+      - "work starts from an existing PR, PR review thread, release PR, Dependabot PR, or GitHub merge lane"
+      - "declared risk or protected surface requires hosted review or remote validation"
+    required_evidence:
+      - "change_receipt"
+      - "branch_identity"
+      - "pr_url_or_number"
+      - "hosted_checks_when_required"
+      - "review_or_solo_maintainer_exception_when_required"
+      - "rollback_handle"
+    required_validation:
+      - "selected_validation_floor"
+      - "hosted_required_checks_when_policy_requires"
+    receipt_required_fields:
+      - "change_id"
+      - "selected_route"
+      - "lifecycle_outcome"
+      - "intent"
+      - "scope"
+      - "validation_evidence_refs"
+      - "review_evidence_refs_or_waiver"
+      - "durable_history"
+      - "integration_status"
+      - "publication_status"
+      - "cleanup_status"
+      - "rollback_handle"
+      - "closeout_outcome"
+  - route_id: "branch-no-pr"
+    description: "Branch-isolated Change without PR-backed review or publication. The route may preserve state, complete on the branch, push the branch for backup or handoff, land on main without a PR, and clean up only when lifecycle evidence supports that outcome."
+    precedence: 20
+    selected_when_any:
+      - "change needs isolation, pause/resume, multiple commits, uncertain scope, or handoff"
+      - "change needs branch identity but not hosted review or publication"
+      - "operator wants branch-isolated work landed without PR and no PR-required predicate applies"
+    required_evidence:
+      - "change_receipt_or_continuation_receipt"
+      - "branch_or_worktree_identity"
+      - "reason_no_pr_required"
+      - "local_validation_or_recorded_blocker"
+      - "durable_commit_patch_or_checkpoint"
+      - "lifecycle_outcome"
+      - "integration_status"
+      - "publication_status"
+      - "cleanup_status"
+      - "rollback_or_discard_plan"
+    required_validation:
+      - "local_validation_at_selected_floor_or_blocker"
+    forbidden_evidence:
+      - "pr_url_or_number"
+      - "pr_metadata"
+      - "host_projection_claims_authority"
+  - route_id: "direct-main"
+    description: "Low-risk solo Change landed directly on current clean main."
+    precedence: 30
+    selected_when_all:
+      - "current branch is main"
+      - "main is clean and current"
+      - "no unrelated working tree changes"
+      - "change is low risk and locally understandable"
+      - "validation can run locally at the selected floor"
+      - "rollback is straightforward from the resulting commit"
+      - "no policy, repository protection, collaboration need, or operator instruction requires branch or PR"
+    required_evidence:
+      - "change_receipt"
+      - "landed_commit"
+      - "local_validation_evidence"
+      - "rollback_handle"
+    required_validation:
+      - "local_validation_at_selected_floor"
+  - route_id: "stage-only-escalate"
+    description: "Blocked or ambiguous Change that preserves state without claiming completion."
+    precedence: 40
+    selected_when_any:
+      - "risk, validation, rollback, freshness, ownership, authority, or support posture is ambiguous"
+      - "required decision, validation, rollback, auth, or review item is missing"
+      - "higher policy returns stage-only or escalation instead of completion"
+    required_evidence:
+      - "preserved_patch_checkpoint_or_branch_state"
+      - "blocker_reason"
+      - "missing_item"
+      - "next_route_condition"
+    forbidden_claims:
+      - "landed"
+      - "complete"
+      - "publication_ready"
+route_selection_order:
+  - "resolve_or_create_change_identity"
+  - "branch-pr"
+  - "branch-no-pr"
+  - "direct-main"
+  - "stage-only-escalate"
+route_lifecycle_outcomes:
+  direct-main:
+    allowed_outcomes:
+      - "landed"
+      - "cleaned"
+    full_closeout_requires:
+      - "landed_commit_on_main"
+      - "local_validation_evidence"
+      - "change_receipt"
+      - "rollback_handle"
+      - "cleanup_status"
+  branch-no-pr:
+    allowed_outcomes:
+      - "preserved"
+      - "branch-local-complete"
+      - "published-branch"
+      - "landed"
+      - "cleaned"
+      - "blocked"
+      - "escalated"
+      - "denied"
+    preserved_requires:
+      - "patch_checkpoint_or_branch_state"
+      - "continuation_or_blocker_reason"
+      - "rollback_or_discard_plan"
+    branch_local_complete_requires:
+      - "intended_scope_committed_on_branch"
+      - "local_validation_evidence"
+      - "change_receipt"
+      - "rollback_or_discard_plan"
+    published_branch_requires:
+      - "branch_commit_or_checkpoint"
+      - "remote_branch_ref"
+      - "no_pr_rationale"
+      - "local_validation_or_recorded_blocker"
+      - "rollback_or_discard_plan"
+    landed_requires:
+      - "intended_scope_committed_on_branch"
+      - "local_validation_evidence"
+      - "integration_method"
+      - "target_branch_ref"
+      - "landed_ref"
+      - "rollback_handle"
+      - "cleanup_status"
+    cleaned_requires:
+      - "landed_ref_or_explicit_non_landing_outcome"
+      - "local_branch_cleanup_evidence_or_deferred_cleanup_record"
+      - "worktree_cleanup_evidence_or_deferred_cleanup_record"
+      - "remote_branch_cleanup_evidence_or_deferred_cleanup_record_when_remote_branch_existed"
+  branch-pr:
+    allowed_outcomes:
+      - "preserved"
+      - "published"
+      - "ready"
+      - "landed"
+      - "cleaned"
+      - "blocked"
+      - "escalated"
+      - "denied"
+    published_requires:
+      - "branch_pushed"
+      - "pr_url_or_number"
+      - "change_receipt"
+    ready_requires:
+      - "pr_url_or_number"
+      - "hosted_required_checks_green_or_blocker"
+      - "review_evidence_or_solo_maintainer_exception_when_required"
+      - "no_unresolved_author_action_items"
+    landed_requires:
+      - "pr_merged"
+      - "merge_ref_or_landed_ref"
+      - "rollback_handle"
+    cleaned_requires:
+      - "pr_merged_or_external_blocker"
+      - "local_branch_cleanup_evidence_or_deferred_cleanup_record"
+      - "worktree_cleanup_evidence_or_deferred_cleanup_record"
+      - "remote_branch_cleanup_evidence_or_deferred_cleanup_record"
+  stage-only-escalate:
+    allowed_outcomes:
+      - "preserved"
+      - "blocked"
+      - "escalated"
+      - "denied"
+pr_required_predicates:
+  - "explicit_operator_pr_request"
+  - "hosted_review_required"
+  - "remote_ci_required"
+  - "preview_publication_required"
+  - "external_signoff_required"
+  - "repository_protection_requires_pr"
+  - "release_automation_requires_pr"
+  - "existing_pr_or_review_thread_context"
+branch_required_predicates:
+  - "route_is_branch-pr"
+  - "route_is_branch-no-pr"
+  - "isolation_required"
+  - "pause_or_handoff_required"
+  - "multi_commit_or_uncertain_scope"
+  - "protected_surface_requires_isolation"
+direct_main_eligibility_predicates:
+  - "clean_current_main"
+  - "solo_low_risk_change"
+  - "local_validation_sufficient"
+  - "straightforward_commit_rollback"
+  - "no_branch_or_pr_required_predicate"
+fail_closed_conditions:
+  - "missing_change_identity"
+  - "ambiguous_ownership"
+  - "ambiguous_risk_or_materiality"
+  - "missing_required_validation"
+  - "missing_rollback_handle"
+  - "missing_change_receipt"
+  - "lifecycle_outcome_missing_or_unsupported"
+  - "checkpoint_claims_landed"
+  - "branch_local_commit_claims_landed_without_main_integration"
+  - "branch_no_pr_contains_pr_metadata"
+  - "branch_pr_claims_full_closeout_before_merge"
+  - "cleanup_claim_missing_cleanup_evidence"
+  - "unsupported_support_claim"
+  - "proposal_local_runtime_dependency"
+  - "host_projection_claims_authority"
+receipt_schema_ref: ".octon/framework/product/contracts/change-receipt-v1.schema.json"

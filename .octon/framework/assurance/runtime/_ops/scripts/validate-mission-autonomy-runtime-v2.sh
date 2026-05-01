@@ -172,7 +172,7 @@ check_live_mission() {
 
   require_yq "$root/autonomy-window.yml" '.authority_boundary.autonomy_window_authorizes_execution == false and .authority_boundary.run_contract_required == true and .authority_boundary.execution_authorization_required == true' "Autonomy Window does not authorize execution"
   require_yq "$root/autonomy-window.yml" '.max_concurrent_runs == 1' "Autonomy Window enforces one active run"
-  require_yq "$root/lease.yml" '.continuation_scope.max_concurrent_runs == 1 and .engagement_id != null and .work_package_ref != null' "lease is scoped to Engagement and Work Package"
+  require_yq "$root/lease.yml" '.continuation_scope.max_concurrent_runs == 1 and .engagement_id != null and .change_package_ref != null' "lease is scoped to Engagement and Change Package"
   require_yq "$root/autonomy-budget.yml" '.last_recomputed_at != null' "budget has recompute receipt field"
   require_yq "$root/circuit-breakers.yml" '.last_recomputed_at != null and (.state == "clear" or .state == "tripped" or .state == "latched")' "breakers carry recompute state"
   require_yq "$root/queue.yml" '.selection_policy.one_active_run_at_a_time == true and (.action_slices | length >= 1)' "Mission Queue selects bounded Action Slices"

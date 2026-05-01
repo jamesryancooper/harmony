@@ -31,7 +31,7 @@
         "support_posture_drift",
         "context_staleness",
         "project_profile_staleness",
-        "work_package_assumption_expiry",
+        "change_package_assumption_expiry",
         "decision_request_resolved",
         "connector_posture_drift",
         "generated_effective_handle_staleness"

@@ -73,6 +73,19 @@ workflows:
       - "build repo snapshot"
       - "export pack bundle"
       - "materialize repo snapshot"
+  - id: closeout
+    display_name: Closeout Change
+    group: meta
+    domain: change-closeout
+    path: meta/closeout/
+    execution_profile: core
+    summary: Resolve Change closeout route before direct-main, branch-only, PR-backed, or stage-only action.
+    status: active
+    triggers:
+      - "closeout"
+      - "close out this change"
+      - "finish this change"
+      - "ship this change"
   - id: update-harness
     display_name: Update Harness
     group: meta
@@ -171,6 +184,28 @@ workflows:
       - "promote proposal"
       - "mark proposal implemented"
       - "finalize proposal promotion"
+  - id: verify-implementation-conformance
+    display_name: Verify Implementation Conformance
+    group: meta
+    domain: proposals
+    path: meta/verify-implementation-conformance/
+    summary: Verify implemented repository changes against the proposal packet before closeout.
+    status: active
+    triggers:
+      - "verify implementation conformance"
+      - "check proposal implementation conformance"
+      - "prove proposal implementation matches packet"
+  - id: audit-post-implementation-drift
+    display_name: Audit Post Implementation Drift
+    group: meta
+    domain: proposals
+    path: meta/audit-post-implementation-drift/
+    summary: Audit an implemented proposal for proposal-path backreferences, projection drift, naming drift, and excess churn.
+    status: active
+    triggers:
+      - "audit post implementation drift"
+      - "check proposal drift after implementation"
+      - "run proposal drift churn gate"
   - id: archive-proposal
     display_name: Archive Proposal
     group: meta
@@ -559,7 +594,7 @@ workflow_group_definitions:
   meta:
     description: Operate on the harness itself (CRUD for harness components)
     path: meta/
-    members: [evaluate-harness, evaluate-ci-latency, migrate-harness, export-harness, update-harness, create-workflow, evaluate-workflow, update-workflow, create-skill, create-design-proposal, create-migration-proposal, create-policy-proposal, create-architecture-proposal, validate-proposal, promote-proposal, archive-proposal]
+    members: [evaluate-harness, evaluate-ci-latency, migrate-harness, export-harness, update-harness, create-workflow, evaluate-workflow, update-workflow, create-skill, create-design-proposal, create-migration-proposal, create-policy-proposal, create-architecture-proposal, validate-proposal, promote-proposal, verify-implementation-conformance, audit-post-implementation-drift, archive-proposal]
   audit:
     description: Audit orchestration and release gates
     path: audit/

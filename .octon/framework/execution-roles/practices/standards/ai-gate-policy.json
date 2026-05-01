@@ -1,5 +1,16 @@
 {
   "version": "2026-03-03",
+  "default_work_unit_policy_ref": ".octon/framework/product/contracts/default-work-unit.yml",
+  "change_receipt_schema_ref": ".octon/framework/product/contracts/change-receipt-v1.schema.json",
+  "route_scope": {
+    "hosted_gate_route": "branch-pr",
+    "no_pr_change_gate_required": false,
+    "no_pr_evidence_modes": [
+      "local_validation",
+      "local_review_or_waiver",
+      "change_receipt"
+    ]
+  },
   "enforcement": {
     "variable": "AI_GATE_ENFORCE",
     "default": false,

@@ -25,6 +25,7 @@ description: Phase-by-phase execution for the closeout-pr skill.
 1. Reuse the existing branch PR if one already exists.
 2. Otherwise create a draft PR from the current branch worktree.
 3. Ensure the PR body satisfies the repository PR quality template.
+4. Record lifecycle outcome `published`; do not claim full closeout.
 
 ## Phase 4: Monitor Checks And Conversations
 
@@ -60,8 +61,14 @@ description: Phase-by-phase execution for the closeout-pr skill.
    once GitHub allows it.
 3. If the PR is in the manual lane, leave it ready for authorized human merge
    and continue monitoring until merged.
+4. Record lifecycle outcome `ready`; do not claim landed until merge evidence
+   exists.
 
-## Phase 8: Completion
+## Phase 8: Completion And Cleanup
 
-1. Exit only when the PR is merged.
-2. If a real external blocker prevents progress, report it explicitly and stop.
+1. Exit successfully only when the PR is merged or a precise external blocker is
+   recorded.
+2. Record lifecycle outcome `landed` after merge evidence exists.
+3. Record lifecycle outcome `cleaned` only after local branch, remote branch,
+   and worktree cleanup evidence exists or deferred-cleanup evidence is written.
+4. If a real external blocker prevents progress, report it explicitly and stop.

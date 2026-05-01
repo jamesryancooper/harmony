@@ -11,7 +11,7 @@ The builder is not a Control Plane, approval authority, memory subsystem, or
 policy interpreter. It is subordinate to `authorize_execution(...)` and can only
 produce evidence that authorization validates.
 
-Work Package compilation may prepare a context-pack request before material
+Change Package compilation may prepare a context-pack request before material
 authorization. That request is preparation control state under
 `/.octon/state/control/engagements/<engagement-id>/context/context-pack-request.yml`.
 It is not a context-pack receipt and cannot satisfy authorization until the

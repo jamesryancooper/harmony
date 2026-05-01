@@ -8,6 +8,10 @@ but buildable end-to-end implementation blueprints.
 This standard applies only to proposals that opt in with a root
 `design-proposal.yml`.
 
+Lifecycle gates, receipt requirements, and closeout/archive semantics are owned
+by `proposal-standard.md`. This subtype standard only adds design-specific
+content requirements.
+
 ## Scope And Rollout
 
 - `design-proposal.yml` is the subtype marker for a manifest-governed design
@@ -42,6 +46,7 @@ Every standard-governed design proposal must contain:
 - `implementation/README.md`
 - `implementation/minimal-implementation-blueprint.md`
 - `implementation/first-implementation-plan.md`
+- `support/implementation-grade-completeness-review.md` before `in-review`
 
 ## Class-Specific Required Docs
 
@@ -141,37 +146,25 @@ Archived design proposal READMEs must also:
 The README may describe proposal-local reading order or precedence, but it must
 not claim enduring repository authority.
 
-## Proposal Lifecycle Rule
+## Design-Specific Lifecycle Content Gates
 
-Standard-governed design proposals use the generic proposal lifecycle with the
-following design-specific content gates:
+Standard-governed design proposals use the canonical proposal lifecycle defined
+by `proposal-standard.md`. This section adds only design-specific content
+expectations for those lifecycle gates:
 
-1. `draft` means scaffold-complete, not implementation-ready.
-   - The core artifact set exists.
-   - The class-specific required docs exist.
-   - `implementation/minimal-implementation-blueprint.md` and
-     `implementation/first-implementation-plan.md` may still be placeholders.
-   - The proposal is ready for content authoring and audit, not yet for
-     implementation.
-2. `in-review` means content-complete enough for real design review.
-   - The class-specific normative docs contain the spec/PRD-equivalent design
-     content for the package.
-   - The implementation blueprint and first implementation plan reflect the
-     current design rather than scaffold placeholders.
-   - Every selected module contains the supporting material required by that
-     module set.
-3. `accepted` means implementation-ready temporary authority.
-   - The readiness definition below is satisfied.
-   - A competent engineer can implement the first slice without inventing
-     architecture, contracts, runtime behavior, or validation expectations.
-4. `implemented` means promotion-complete and archive-ready.
-   - Durable targets have absorbed every required runtime, documentation,
-     contract, schema, fixture, validator, or operator-guide artifact needed to
-     stand on their own.
-   - Canonical targets no longer depend on the proposal path.
-5. `archived` means historical retention only.
-   - The proposal has moved to the archive path with archive metadata and
-     evidence recorded in `proposal.yml` and `/.octon/generated/proposals/registry.yml`.
+1. At `draft`, the core artifact set and class-specific required docs exist, but
+   `implementation/minimal-implementation-blueprint.md` and
+   `implementation/first-implementation-plan.md` may still be placeholders.
+2. At `in-review`, the class-specific normative docs contain the
+   spec/PRD-equivalent design content, the implementation blueprint and first
+   implementation plan reflect the current design, and every selected module
+   contains its required supporting material.
+3. At `accepted`, the readiness definition below is satisfied and a competent
+   engineer can implement the first slice without inventing architecture,
+   contracts, runtime behavior, or validation expectations.
+4. At `implemented` or `archived`, the generic lifecycle, receipt, conformance,
+   drift/churn, archive metadata, and non-canonical rules in
+   `proposal-standard.md` are controlling.
 
 Artifact classes in this lifecycle:
 
@@ -203,6 +196,18 @@ the proposal alone, the required:
 - first implementation slice
 
 without inventing architecture.
+
+## Implementation-Grade Requirements
+
+A design proposal is implementation-grade complete only when it defines:
+
+- user-facing and system-facing behavior;
+- affected surfaces and ownership boundaries;
+- implementation readiness for at least the first slice;
+- validation, fixture, conformance, and evidence expectations;
+- rollback, closeout, and known exclusions;
+- the artifact coverage needed to implement without discovering missing product
+  or architecture decisions midstream.
 
 ## Canonicalization Independence Rule
 

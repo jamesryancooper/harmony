@@ -11,6 +11,37 @@
     "findings"
   ],
   "properties": {
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "change_id",
+        "selected_route"
+      ],
+      "properties": {
+        "change_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selected_route": {
+          "type": "string",
+          "enum": [
+            "direct-main",
+            "branch-no-pr",
+            "branch-pr",
+            "stage-only-escalate"
+          ]
+        },
+        "change_receipt_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pr_url": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
     "provider": {
       "type": "string",
       "minLength": 1

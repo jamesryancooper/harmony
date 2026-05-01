@@ -25,6 +25,10 @@ description: Parameters, outputs, and tool surface for the closeout-pr skill.
   `/.octon/state/evidence/runs/skills/closeout-pr/{{run_id}}.md`
 - Log index:
   `/.octon/state/evidence/runs/skills/closeout-pr/index.yml`
+- Change receipt lifecycle fields:
+  `lifecycle_outcome`, `integration_status`, `publication_status`,
+  `cleanup_status`, `landed_ref` when merged, and cleanup evidence or
+  deferred-cleanup evidence when cleanup is claimed
 
 ## Dependencies
 

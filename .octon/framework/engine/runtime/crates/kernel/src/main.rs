@@ -44,10 +44,10 @@ enum Command {
     /// Build or reconcile the Project Profile for an Engagement.
     Profile(ProfileCmd),
 
-    /// Compile the Objective Brief and Work Package draft for an Engagement.
+    /// Compile the Objective Brief and Change Package draft for an Engagement.
     Plan(PlanCmd),
 
-    /// Prepare a Work Package handoff candidate without executing it.
+    /// Prepare a Change Package handoff candidate without executing it.
     Arm(ArmCmd),
 
     /// Show Engagement status from canonical control and evidence roots.
@@ -1039,7 +1039,7 @@ pub(crate) enum StewardTriggerArg {
     SupportPostureDrift,
     ContextStaleness,
     ProjectProfileStaleness,
-    WorkPackageAssumptionExpiry,
+    ChangePackageAssumptionExpiry,
     DecisionRequestResolved,
     ConnectorPostureDrift,
     GeneratedEffectiveHandleStaleness,
@@ -1058,7 +1058,7 @@ impl StewardTriggerArg {
             Self::SupportPostureDrift => "support_posture_drift",
             Self::ContextStaleness => "context_staleness",
             Self::ProjectProfileStaleness => "project_profile_staleness",
-            Self::WorkPackageAssumptionExpiry => "work_package_assumption_expiry",
+            Self::ChangePackageAssumptionExpiry => "change_package_assumption_expiry",
             Self::DecisionRequestResolved => "decision_request_resolved",
             Self::ConnectorPostureDrift => "connector_posture_drift",
             Self::GeneratedEffectiveHandleStaleness => "generated_effective_handle_staleness",
@@ -1424,7 +1424,7 @@ mod tests {
             "octon",
             "start",
             "--intent",
-            "Prepare a governed work package",
+            "Prepare a governed change package",
         ])
         .expect("start command should parse successfully");
 
@@ -1434,7 +1434,7 @@ mod tests {
                 prepare_only,
                 ..
             }) => {
-                assert_eq!(intent.as_deref(), Some("Prepare a governed work package"));
+                assert_eq!(intent.as_deref(), Some("Prepare a governed change package"));
                 assert!(prepare_only);
             }
             _ => panic!("parsed command should be start"),
@@ -1947,7 +1947,7 @@ mod tests {
             );
         }
         assert!(
-            help.contains("Prepare a Work Package handoff candidate without executing it"),
+            help.contains("Prepare a Change Package handoff candidate without executing it"),
             "help output should describe arm as a prepare-only handoff"
         );
     }

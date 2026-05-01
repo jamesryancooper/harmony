@@ -5,13 +5,15 @@
   "inherits": "proposal-core",
   "additions": {
     "directories": [
-      "policy"
+      "policy",
+      "implementation"
     ],
     "files": [
       "policy-proposal.yml",
       "policy/decision.md",
       "policy/policy-delta.md",
-      "policy/enforcement-plan.md"
+      "policy/enforcement-plan.md",
+      "implementation/implementation-map.md"
     ]
   },
   "usage": "/create-policy-proposal"

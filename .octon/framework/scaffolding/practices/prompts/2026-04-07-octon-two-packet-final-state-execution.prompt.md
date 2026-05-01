@@ -35,7 +35,7 @@ The two packets are compatible if and only if you apply this precedence model:
    - stage ordering
    - public claim language before full final-state completion
    - separation of bounded certification from later expansion
-3. The closure packet is the architectural rationale and work-package map for:
+3. The closure packet is the architectural rationale and change-package map for:
    - run-first completion
    - authority hardening
    - proof-plane closure
@@ -138,7 +138,7 @@ Do not preserve a critical surface in a liminal middle state.
 ## Core objective
 
 Use the remediation packet to drive bounded certification first, then use its
-later-stage expansion packets plus the closure packet's work-package model to
+later-stage expansion packets plus the closure packet's change-package model to
 finish final-state completion.
 
 In concrete terms, make all of the following true:
@@ -277,7 +277,7 @@ until its own later phase closes.
 ### Phase 2: Use the closure packet to deepen the implementation model
 
 While executing Phase 1 and later phases, use the closure packet as the
-work-package and architecture-hardening map for:
+change-package and architecture-hardening map for:
 
 1. run-first cutover and mission continuity separation
 2. canonical authority routing and host projection parity

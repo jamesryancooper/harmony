@@ -407,7 +407,7 @@ fn admit_trigger(octon_dir: &Path, args: StewardAdmitCmd) -> Result<StewardRepor
                         &epoch_id,
                         &trigger_id,
                         "mission_creation",
-                        &["human-objective-requires-engagement-work-package-handoff".to_string()],
+                        &["human-objective-requires-engagement-change-package-handoff".to_string()],
                         &now,
                     )?;
                     ("decision_request", None, Some(decision_id))
@@ -446,7 +446,7 @@ fn admit_trigger(octon_dir: &Path, args: StewardAdmitCmd) -> Result<StewardRepor
             "support_posture_ref": SUPPORT_TARGET_REF,
             "context_freshness": "checked_for_mvp_required_refs",
             "project_profile_ref": PROJECT_PROFILE_REF,
-            "work_package_assumption_freshness": "requires_v1_work_package_for_mission_handoff",
+            "change_package_assumption_freshness": "requires_v1_change_package_for_mission_handoff",
             "governance_constraints": {
                 "stewardship_trigger_authorizes_work": false,
                 "admission_decision_authorizes_material_execution": false,
@@ -1628,7 +1628,7 @@ fn ensure_v1_v2_dependencies(octon_dir: &Path) -> Result<()> {
     let root = repo_root(octon_dir);
     let required = [
         ".octon/framework/engine/runtime/spec/engagement-v1.schema.json",
-        ".octon/framework/engine/runtime/spec/work-package-v1.schema.json",
+        ".octon/framework/engine/runtime/spec/change-package-v1.schema.json",
         ".octon/framework/engine/runtime/spec/decision-request-v1.schema.json",
         ".octon/framework/engine/runtime/spec/evidence-profile-v1.schema.json",
         ".octon/framework/engine/runtime/spec/autonomy-window-v1.schema.json",

@@ -2,12 +2,15 @@ schema_version: "octon-capability-pack-v1"
 pack_id: "git"
 surface: "git"
 display_name: "Git Mutation Pack"
-description: "Branch, commit, and rollback-capable git surfaces for governed repo mutation."
+description: "Route-aware direct-main, branch-only, PR-backed, commit, and rollback-capable git surfaces for governed Change mutation."
 runtime_surface_refs:
   - ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
+  - ".octon/framework/product/contracts/default-work-unit.yml"
 required_evidence:
   - "authority-grant-bundle"
+  - "change-receipt"
   - "rollback-proof"
 support_target_ref: ".octon/instance/governance/support-targets.yml"
 known_limitations:
   - "Git mutation remains bounded by executor profile, support tier, and protected-ref policy."
+  - "Branch and PR helpers are available only after Change route selection."

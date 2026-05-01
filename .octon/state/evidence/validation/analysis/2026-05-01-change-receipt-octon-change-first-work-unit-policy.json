@@ -1,0 +1,74 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "octon-change-first-work-unit-policy",
+  "selected_route": "branch-no-pr",
+  "lifecycle_outcome": "cleaned",
+  "intent": "Implement and close out the Change-first default work unit policy from the proposal packet.",
+  "scope": {
+    "summary": "Change-first default work unit policy implementation, Work Package to Change Package cutover, route-neutral closeout skill and workflow updates, validators, generated effective projections, implementation conformance evidence, and linked repo-local GitHub projection proposal.",
+    "touched_paths": [
+      ".octon/framework/product/contracts/",
+      ".octon/framework/capabilities/runtime/skills/remediation/closeout-change/",
+      ".octon/framework/orchestration/runtime/workflows/meta/closeout/",
+      ".octon/framework/assurance/runtime/_ops/",
+      ".octon/framework/engine/runtime/spec/",
+      ".octon/framework/constitution/contracts/runtime/",
+      ".octon/instance/ingress/",
+      ".octon/inputs/exploratory/proposals/policy/octon-change-first-work-unit-policy/",
+      ".octon/inputs/exploratory/proposals/policy/octon-change-first-github-projection-policy/",
+      ".octon/generated/"
+    ],
+    "diff_refs": [
+      "branch chore/change-first-default-work-unit-policy",
+      "base HEAD 1336f1467",
+      "commit ba5511b0f06b7d0323969893f89dcfb7d5e53f24: 596 files changed, 20694 insertions, 2118 deletions",
+      "commit 8949cf3e1d89a6b156614ce25a8b457d73ac9d77: final branch tip landed on main by fast-forward",
+      ".octon/state/evidence/validation/analysis/2026-05-01-implementation-conformance.md",
+      ".octon/state/evidence/validation/analysis/2026-05-01-change-closeout-octon-change-first-work-unit-policy.md"
+    ]
+  },
+  "source_branch_ref": "chore/change-first-default-work-unit-policy@8949cf3e1d89a6b156614ce25a8b457d73ac9d77",
+  "target_branch_ref": "main@8949cf3e1d89a6b156614ce25a8b457d73ac9d77",
+  "landed_ref": "8949cf3e1d89a6b156614ce25a8b457d73ac9d77",
+  "integration_method": "fast-forward",
+  "integration_status": "landed",
+  "publication_status": "none",
+  "cleanup_status": "completed",
+  "cleanup_evidence_refs": [
+    "git-branch-land.sh --target main --method fast-forward --confirm: target pre-ref 1336f14674a80fca0c58ab02bb3a01c4bbfcf0a3, target post-ref 8949cf3e1d89a6b156614ce25a8b457d73ac9d77",
+    "git-branch-cleanup.sh --branch chore/change-first-default-work-unit-policy --base main --confirm: deleted local branch chore/change-first-default-work-unit-policy",
+    "git ls-remote --heads origin chore/change-first-default-work-unit-policy: no remote branch found"
+  ],
+  "validation_evidence_refs": [
+    ".octon/inputs/exploratory/proposals/policy/octon-change-first-work-unit-policy/support/implementation-conformance-review.md",
+    ".octon/state/evidence/validation/analysis/2026-05-01-implementation-conformance.md",
+    ".octon/state/evidence/runs/workflows/2026-05-01-implementation-conformance-octon-change-first-work-unit-policy/",
+    "validate-proposal-implementation-conformance.sh --package .octon/inputs/exploratory/proposals/policy/octon-change-first-work-unit-policy: pass, errors=0 warnings=0",
+    "alignment-check.sh --profile default-work-unit: pass, errors=0",
+    "test-change-closeout-lifecycle-alignment.sh: pass, 10 passed, 0 failed",
+    "test-default-work-unit-alignment.sh: pass, 6 passed, 0 failed",
+    "test-git-github-workflow-alignment.sh: pass, 6 passed, 0 failed",
+    "git diff --cached --check before commit: pass",
+    "test-pack-shape.sh: pass, 142 passed, 0 failed",
+    "git diff --check before landing: pass",
+    "git fetch origin main: origin/main at 1336f14674a80fca0c58ab02bb3a01c4bbfcf0a3 before landing",
+    "no-PR branch landing: fast-forward main from 1336f14674a80fca0c58ab02bb3a01c4bbfcf0a3 to 8949cf3e1d89a6b156614ce25a8b457d73ac9d77"
+  ],
+  "review_waiver_refs": [
+    "branch-no-pr route selected: no operator PR request, no existing PR context, local implementation conformance passed, and hosted review was not required for this closeout"
+  ],
+  "durable_history": {
+    "kind": "commit",
+    "ref": "8949cf3e1d89a6b156614ce25a8b457d73ac9d77",
+    "branch": "main"
+  },
+  "rollback_handle": {
+    "kind": "manual-instructions",
+    "ref": "1336f14674a80fca0c58ab02bb3a01c4bbfcf0a3..8949cf3e1d89a6b156614ce25a8b457d73ac9d77",
+    "instructions": "The no-PR branch landing fast-forwarded main from 1336f14674a80fca0c58ab02bb3a01c4bbfcf0a3 to 8949cf3e1d89a6b156614ce25a8b457d73ac9d77. To roll back, revert the landed commit range on main, preserving this receipt as evidence. Do not reset published main without explicit operator approval."
+  },
+  "closeout_outcome": "completed",
+  "remaining_blockers": [],
+  "created_at": "2026-05-01T14:58:27Z",
+  "updated_at": "2026-05-01T19:50:19Z"
+}

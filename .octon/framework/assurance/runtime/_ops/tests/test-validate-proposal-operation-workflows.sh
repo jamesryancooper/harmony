@@ -49,12 +49,20 @@ create_fixture_repo() {
     "$fixture_root/.octon/framework/orchestration/runtime/workflows/meta/"
   cp -R "$REPO_ROOT/.octon/framework/orchestration/runtime/workflows/meta/archive-proposal" \
     "$fixture_root/.octon/framework/orchestration/runtime/workflows/meta/"
+  cp -R "$REPO_ROOT/.octon/framework/orchestration/runtime/workflows/meta/verify-implementation-conformance" \
+    "$fixture_root/.octon/framework/orchestration/runtime/workflows/meta/"
+  cp -R "$REPO_ROOT/.octon/framework/orchestration/runtime/workflows/meta/audit-post-implementation-drift" \
+    "$fixture_root/.octon/framework/orchestration/runtime/workflows/meta/"
   cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-validate-proposal-workflow.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-validate-proposal-workflow.sh"
   cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-promote-proposal-workflow.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-promote-proposal-workflow.sh"
   cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-archive-proposal-workflow.sh" \
     "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-archive-proposal-workflow.sh"
+  cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-verify-implementation-conformance-workflow.sh" \
+    "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-verify-implementation-conformance-workflow.sh"
+  cp "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-audit-post-implementation-drift-workflow.sh" \
+    "$fixture_root/.octon/framework/assurance/runtime/_ops/scripts/validate-audit-post-implementation-drift-workflow.sh"
   printf '%s\n' "$fixture_root"
 }
 
@@ -85,10 +93,24 @@ case_archive_workflow_passes() {
   run_validator "$fixture_root" ".octon/framework/assurance/runtime/_ops/scripts/validate-archive-proposal-workflow.sh"
 }
 
+case_conformance_workflow_passes() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  run_validator "$fixture_root" ".octon/framework/assurance/runtime/_ops/scripts/validate-verify-implementation-conformance-workflow.sh"
+}
+
+case_drift_workflow_passes() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+  run_validator "$fixture_root" ".octon/framework/assurance/runtime/_ops/scripts/validate-audit-post-implementation-drift-workflow.sh"
+}
+
 main() {
   assert_success "validate-proposal workflow validator accepts the baseline workflow" case_validate_workflow_passes
   assert_success "promote-proposal workflow validator accepts the baseline workflow" case_promote_workflow_passes
   assert_success "archive-proposal workflow validator accepts the baseline workflow" case_archive_workflow_passes
+  assert_success "verify-implementation-conformance workflow validator accepts the baseline workflow" case_conformance_workflow_passes
+  assert_success "audit-post-implementation-drift workflow validator accepts the baseline workflow" case_drift_workflow_passes
 
   echo
   echo "Passed: $pass_count"
