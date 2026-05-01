@@ -1,8 +1,30 @@
 {
   "version": "2026-03-05",
+  "default_work_unit_policy_ref": ".octon/framework/product/contracts/default-work-unit.yml",
+  "change_receipt_schema_ref": ".octon/framework/product/contracts/change-receipt-v1.schema.json",
+  "scope": {
+    "projection_host_for": "PR-backed Changes",
+    "not_authority_for": [
+      "default work unit",
+      "Change route selection",
+      "direct-main eligibility",
+      "branch-only completion"
+    ]
+  },
+  "change_routes": {
+    "hosted_pr_route": "branch-pr",
+    "no_pr_routes": [
+      "direct-main",
+      "branch-no-pr",
+      "stage-only-escalate"
+    ]
+  },
   "default_branch": "main",
   "rulesets": {
     "main": {
+      "applies_to_routes": [
+        "branch-pr"
+      ],
       "required_checks": [
         "AI Review Gate / decision",
         "enforce-ci-efficiency-policy",
@@ -24,5 +46,14 @@
     "workflow": {
       "can_approve_pull_request_reviews": true
     }
+  },
+  "direct_main_projection": {
+    "github_pr_metadata_required": false,
+    "required_local_evidence": [
+      "change_receipt",
+      "local_validation",
+      "rollback_handle",
+      "landed_commit"
+    ]
   }
 }

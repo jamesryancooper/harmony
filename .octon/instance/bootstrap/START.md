@@ -83,7 +83,7 @@ maturity labels are lineage only; they are not the primary artifact identity.
 
 Safe Start enters through `octon start`, `octon profile`, `octon plan`, and
 `octon arm --prepare-only`. The flow creates or updates Engagement, Project
-Profile, Work Package, Decision Request, Evidence Profile, Preflight Evidence
+Profile, Change Package, Decision Request, Evidence Profile, Preflight Evidence
 Lane, Tool/MCP Connector Posture, and Run Contract Candidate surfaces. It does
 not execute material work. The Run Contract Candidate becomes executable only
 through `octon run start --contract <path>` after required decisions, context,
@@ -186,7 +186,7 @@ boot document. Use:
 2. Read the structural registry if the task affects topology, docs, bootstrap,
    publication, or placement.
 3. Run `/bootstrap-doctor` when freshness or local harness health is in doubt.
-4. Use Safe Start to prepare Engagement, Project Profile, Work Package,
+4. Use Safe Start to prepare Engagement, Project Profile, Change Package,
    Decision Request, Evidence Profile, connector posture, and Run Contract
    Candidate surfaces when the task is new.
 5. Use Safe Continuation or Continuous Stewardship only when the work is

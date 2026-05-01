@@ -30,5 +30,13 @@ else
   errors=$((errors+1))
 fi
 
+if [[ -f "$SCRIPT_DIR/validate-proposal-implementation-readiness.sh" ]]; then
+  if bash "$SCRIPT_DIR/validate-proposal-implementation-readiness.sh" --package "$PROPOSAL_DIR"; then
+    true
+  else
+    errors=$((errors+1))
+  fi
+fi
+
 echo "Validation summary: errors=$errors"
 [[ $errors -eq 0 ]]

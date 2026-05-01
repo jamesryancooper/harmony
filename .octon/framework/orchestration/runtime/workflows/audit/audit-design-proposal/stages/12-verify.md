@@ -16,6 +16,10 @@ If the target proposal contains `design-proposal.yml`, this step must also run:
 
 `bash .octon/framework/assurance/runtime/_ops/scripts/validate-design-proposal.sh --package "<target-package>"`
 
+Implementation-readiness validation must also run:
+
+`bash .octon/framework/assurance/runtime/_ops/scripts/validate-proposal-implementation-readiness.sh --package "<target-package>"`
+
 ## Verification Checklist
 
 - [ ] Selected mode is recorded in `bundle.yml`
@@ -29,6 +33,7 @@ If the target proposal contains `design-proposal.yml`, this step must also run:
 - [ ] `stage-inputs/` and `stage-logs/` exist
 - [ ] Top-level summary report exists
 - [ ] Proposal validator stack passes when `design-proposal.yml` is present
+- [ ] Implementation-readiness validator records structural-only, blocked, or implementation-grade status
 - [ ] Final readiness verdict is explicit
 
 ## Outcome Rules
@@ -41,8 +46,8 @@ If the target proposal contains `design-proposal.yml`, this step must also run:
 ## Actions
 
 1. Evaluate each checklist item.
-2. If `design-proposal.yml` exists, run the baseline and design validators and record the
-   result in `validation.md`.
+2. If `design-proposal.yml` exists, run the baseline, design, and
+   implementation-readiness validators and record the result in `validation.md`.
 3. Record the final pass/fail result in `validation.md`.
 4. If any item fails, return to the producing step and repair the artifacts.
 

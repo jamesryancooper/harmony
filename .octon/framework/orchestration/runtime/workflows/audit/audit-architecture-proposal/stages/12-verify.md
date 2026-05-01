@@ -12,6 +12,7 @@ This step must run the fail-closed architecture proposal validator stack:
 
 - `bash .octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh --package "<target-package>"`
 - `bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-proposal.sh --package "<target-package>"`
+- `bash .octon/framework/assurance/runtime/_ops/scripts/validate-proposal-implementation-readiness.sh --package "<target-package>"`
 
 ## Verification Checklist
 
@@ -27,6 +28,7 @@ This step must run the fail-closed architecture proposal validator stack:
 - [ ] Top-level summary report exists
 - [ ] Baseline proposal validator passes
 - [ ] Architecture proposal validator passes
+- [ ] Implementation-readiness validator records structural-only, blocked, or implementation-grade status
 - [ ] Final readiness verdict is explicit
 
 ## Outcome Rules
@@ -39,7 +41,7 @@ This step must run the fail-closed architecture proposal validator stack:
 ## Actions
 
 1. Evaluate each checklist item.
-2. Run the baseline and architecture validators and record the result in
+2. Run the baseline, architecture, and implementation-readiness validators and record the result in
    `validation.md`.
 3. Record the final pass/fail result in `validation.md`.
 4. If any item fails, return to the producing step and repair the artifacts.

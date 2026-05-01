@@ -1,11 +1,11 @@
 ---
 name: closeout-pr
 description: >
-  Autonomous Git/GitHub closeout loop for one branch worktree. Reviews the
-  current task-scoped changes, creates or updates the branch PR, monitors
-  checks and unresolved conversations, applies the smallest credible
-  remediation when failures appear, and continues until merge or an explicit
-  external blocker.
+  PR-backed Change closeout subflow. Reviews the current task-scoped branch,
+  creates or updates the PR selected by Change routing, monitors checks and
+  unresolved conversations, applies the smallest credible remediation when
+  failures appear, and records published, ready, landed, and cleaned lifecycle
+  outcomes until merge or an explicit external blocker.
 license: MIT
 compatibility: Designed for Claude Code and similar AI coding assistants.
 metadata:
@@ -19,12 +19,14 @@ allowed-tools: Read Glob Grep Edit Bash(gh *) Bash(git status *) Bash(git diff *
 
 # Closeout PR
 
-Autonomous Git/GitHub closeout loop for one branch worktree.
+PR-backed Change closeout subflow for one branch worktree.
 
 ## When to Use
 
 Use this skill when:
 
+- `closeout-change` or an equivalent canonical route selector has selected
+  `branch-pr`
 - work on a branch worktree has reached a credible completion point
 - the branch should move through commit, push, PR, checks, review resolution,
   and merge without stopping at the first closeout mutation
@@ -59,7 +61,9 @@ Or, when a PR already exists:
    merge lane is correct
 8. **Merge** — Request squash auto-merge for the autonomous lane, or keep the
    PR ready in the manual lane until an authorized human merges it
-9. **Stop condition** — Continue until merged or until a precise external
+9. **Cleanup** — After merge, record local branch, remote branch, and worktree
+   cleanup evidence or explicit deferred-cleanup evidence
+10. **Stop condition** — Continue until merged or until a precise external
    blocker is reached and reported. Continue until merged or until a precise
    external blocker is reached and reported.
 
@@ -82,6 +86,8 @@ Outputs are written to:
 
 ## Boundaries
 
+- Require upstream Change identity and selected route `branch-pr`, except when
+  the task itself starts from an existing PR context
 - Start from the current branch worktree, never from `main`
 - Reuse the same branch and same PR for the life of the task
 - Review tracked, unstaged, and untracked changes before staging
@@ -94,7 +100,10 @@ Outputs are written to:
   an evidence reply, required checks are green, and the resolution is recorded
   as conversation cleanup rather than approval
 - GitHub required checks, branch policy, and unresolved conversations remain
-  the final merge gate
+  the final merge gate for PR-backed Changes only
+- Draft/open PR state is `published`, not full closeout
+- Ready PR state is `ready`, not landed
+- Full PR-backed closeout requires merge evidence or a precise external blocker
 - Continue until merged or until a precise external blocker is reached and reported
 - If progress cannot continue, report the exact blocker instead of claiming
   success

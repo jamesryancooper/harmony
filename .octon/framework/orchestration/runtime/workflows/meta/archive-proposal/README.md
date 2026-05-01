@@ -65,6 +65,7 @@ This README summarizes the canonical workflow unit at `.octon/framework/orchestr
 - [ ] `stage-inputs/` and `stage-logs/` exist for the workflow bundle
 - [ ] the source proposal validates before archival
 - [ ] the source proposal starts from the active path and is not already archived
+- [ ] implemented archival requires passing implementation-grade, conformance, and drift/churn receipts
 - [ ] archive metadata is coherent for the chosen disposition
 - [ ] the proposal moves to `.archive/<kind>/<proposal_id>/`
 - [ ] `proposal.yml` is rewritten to `status: archived` with archive metadata

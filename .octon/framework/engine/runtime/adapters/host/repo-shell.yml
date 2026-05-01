@@ -36,7 +36,9 @@ known_limitations:
   - "Shell interaction quality is bounded by the active executor profile and repo-local sandboxing."
   - "Repo-shell execution classes may narrow command and path handling, but they never replace canonical authority routing or support-target checks."
   - "This host may narrow execution, but never widen authority or governance exclusions."
+  - "Repo-shell is the local evidence path for direct-main and branch-no-pr Changes when the selected validation floor allows local proof."
 non_authoritative_boundaries:
   - "Host I/O may provide interaction context but may not approve, revoke, or widen authority."
   - "Repo-shell classification and branch-freshness signals may annotate receipts, but they never become authority outside canonical control roots."
+  - "Local no-PR validation, Change receipt, and rollback evidence remain subordinate to the canonical default work unit policy."
   - "Consequential execution still resolves through the engine authorization boundary."

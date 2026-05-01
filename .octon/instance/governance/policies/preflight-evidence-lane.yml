@@ -56,7 +56,7 @@ allowed_actions:
     route: "allow"
     allowed_roots:
       - ".octon/state/control/engagements/<engagement-id>/context-pack-request.yml"
-      - ".octon/state/evidence/engagements/<engagement-id>/work-packages/**"
+      - ".octon/state/evidence/engagements/<engagement-id>/change-packages/**"
     required_evidence:
       - "request source refs"
       - "context policy ref"
@@ -72,7 +72,7 @@ allowed_actions:
     route: "stage_only"
     allowed_roots:
       - ".octon/generated/cognition/projections/materialized/engagements/**"
-      - ".octon/generated/cognition/projections/materialized/work-packages/**"
+      - ".octon/generated/cognition/projections/materialized/change-packages/**"
     required_evidence:
       - "non-authority notice for generated projection"
       - "source control/evidence refs"
@@ -118,7 +118,7 @@ exit_gates:
     requirement: "Project Profile durable facts must cite retained source evidence."
     missing_or_stale_route: "blocked"
   - gate_id: "preflight-context-request"
-    requirement: "Context-pack request may be prepared, but missing receipt keeps Work Package stage_only before material effects."
+    requirement: "Context-pack request may be prepared, but missing receipt keeps Change Package stage_only before material effects."
     missing_or_stale_route: "stage_only"
   - gate_id: "preflight-run-contract-handoff"
     requirement: "Run-contract candidate handoff must enter through octon run start --contract and runtime authorization."

@@ -34,7 +34,7 @@ runtime/governance surfaces live under `framework/**`.
 - Repository-wide workflows
 - Managing missions (time-bounded sub-projects)
 - Repo-specific conventions and style rules
-- Preparing Engagement, Project Profile, Work Package, Decision Request,
+- Preparing Engagement, Project Profile, Change Package, Decision Request,
   Evidence Profile, Preflight Evidence Lane, Tool/MCP Connector Posture, and
   Run Contract Candidate surfaces
 - Managing mission-scoped Autonomy Window, Mission Queue, Action Slice,

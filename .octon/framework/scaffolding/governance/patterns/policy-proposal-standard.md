@@ -7,6 +7,10 @@ description: Required files and policy-specific constraints for v1 policy propos
 
 Policy proposals extend `proposal-standard.md`.
 
+Lifecycle gates, receipt requirements, and closeout/archive semantics are owned
+by `proposal-standard.md`. This subtype standard only adds policy-specific
+content requirements.
+
 Canonical path:
 
 - `/.octon/inputs/exploratory/proposals/policy/<proposal_id>/`
@@ -18,6 +22,8 @@ Required files:
 - `policy/decision.md`
 - `policy/policy-delta.md`
 - `policy/enforcement-plan.md`
+- `implementation/implementation-map.md` before `in-review`
+- `support/implementation-grade-completeness-review.md` before `in-review`
 
 ## Subtype Manifest Contract
 
@@ -46,3 +52,18 @@ Rules:
 - `implemented` means the policy change is promoted into durable authority
   surfaces and the named enforcement or verification updates exist outside the
   proposal workspace.
+
+## Implementation-Grade Requirements
+
+Policy proposals are implementation-grade complete only when they define:
+
+- the canonical policy authority location;
+- the machine-readable policy contract when downstream automation depends on
+  the policy;
+- an enforcement and validator plan;
+- an artifact-by-artifact implementation map;
+- the role of each affected artifact: owns policy, references policy, or
+  implementation-specific;
+- downstream alignment for workflows, manifests, skills, validators,
+  generated projections, and repo-local surfaces when applicable;
+- explicit rollback, evidence, and closeout expectations.

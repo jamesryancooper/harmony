@@ -121,7 +121,7 @@ claim.
 
 | Surface | CLI entry | Live posture |
 |---------|-----------|--------------|
-| Safe Start | `octon start`, `octon profile`, `octon plan`, `octon arm --prepare-only`, `octon decide` | Prepares Engagement, Project Profile, Work Package, Decision Request, Evidence Profile, Preflight Evidence Lane, Tool/MCP Connector Posture, and Run Contract Candidate surfaces. |
+| Safe Start | `octon start`, `octon profile`, `octon plan`, `octon arm --prepare-only`, `octon decide` | Prepares Engagement, Project Profile, Change Package, Decision Request, Evidence Profile, Preflight Evidence Lane, Tool/MCP Connector Posture, and Run Contract Candidate surfaces. |
 | Run Lifecycle | `octon run start --contract`, `octon run inspect`, `octon run resume`, `octon run checkpoint`, `octon run close`, `octon run replay`, `octon run disclose` | Atomic material execution path; requires run contract, context, authorization, evidence, and rollback posture. |
 | Safe Continuation | `octon mission`, `octon continue` | Evaluates Autonomy Window, Mission Queue, Action Slice, Continuation Decision, Mission Run Ledger, and Mission Evidence Profile before staging bounded continuation. |
 | Continuous Stewardship | `octon steward` | Maintains Stewardship Program, Stewardship Epoch, Stewardship Trigger, Stewardship Admission Decision, Idle Decision, Renewal Decision, and Stewardship Ledger surfaces without direct execution. |

@@ -41,31 +41,12 @@ write_valid_fixture() {
   local fixture_root="$1"
 
   mkdir -p \
+    "$fixture_root/.octon/instance/charter" \
     "$fixture_root/.octon/instance/bootstrap" \
     "$fixture_root/.octon/instance/ingress" \
     "$fixture_root/.octon/instance/cognition/context/shared"
 
-  cat >"$fixture_root/.octon/AGENTS.md" <<'EOF'
-# `.octon` Ingress Adapter
-
-## Behavioral Contract
-
-Enable reliable agent execution that is deterministic enough to trust,
-observable enough to debug, and flexible enough to evolve.
-
-Canonical internal ingress lives at `/.octon/instance/ingress/AGENTS.md`.
-
-Read in this order:
-
-1. `/.octon/instance/ingress/AGENTS.md`
-2. `/.octon/instance/bootstrap/OBJECTIVE.md`
-3. `/.octon/instance/cognition/context/shared/intent.contract.yml`
-4. `/.octon/instance/bootstrap/START.md`
-
-Repo-root `AGENTS.md` and `CLAUDE.md` are thin adapters to this file. They
-must be a symlink to `/.octon/AGENTS.md` or a byte-for-byte parity copy and
-must not add runtime or policy text.
-EOF
+  cp "$REPO_ROOT/.octon/AGENTS.md" "$fixture_root/.octon/AGENTS.md"
 
   cp "$fixture_root/.octon/AGENTS.md" "$fixture_root/AGENTS.md"
   cp "$fixture_root/.octon/AGENTS.md" "$fixture_root/CLAUDE.md"
@@ -76,6 +57,17 @@ EOF
 ## Execution Profile Governance
 
 Use `change_profile`.
+EOF
+
+  cat >"$fixture_root/.octon/instance/charter/workspace.md" <<'EOF'
+# Workspace Charter
+
+This fixture provides a canonical workspace charter narrative.
+EOF
+
+  cat >"$fixture_root/.octon/instance/charter/workspace.yml" <<'EOF'
+schema_version: "workspace-charter-v1"
+workspace_id: "fixture"
 EOF
 
   cat >"$fixture_root/.octon/instance/bootstrap/OBJECTIVE.md" <<'EOF'

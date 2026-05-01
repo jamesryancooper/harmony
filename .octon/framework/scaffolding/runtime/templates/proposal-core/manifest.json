@@ -8,11 +8,15 @@
       "proposal.yml",
       "README.md",
       "navigation/artifact-catalog.md",
-      "navigation/source-of-truth-map.md"
+      "navigation/source-of-truth-map.md",
+      "support/implementation-grade-completeness-review.md",
+      "support/implementation-conformance-review.md",
+      "support/post-implementation-drift-churn-review.md"
     ],
     "directories": {
       "required": [
-        "navigation"
+        "navigation",
+        "support"
       ]
     }
   },

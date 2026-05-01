@@ -1,8 +1,8 @@
 ---
 schema_version: workflow-contract-v2
 name: closeout
-description: Resolve branch and PR closeout context from the canonical Git/worktree autonomy contract without duplicating policy in ingress.
-version: 1.0.0
+description: Resolve Change closeout context from the canonical default work unit policy before selecting direct-main, branch-only, PR-backed, or stage-only outputs.
+version: 2.0.0
 entry_mode: human
 execution_profile: core
 side_effect_class: mutating
@@ -16,11 +16,13 @@ coordination_key_strategy:
   format: workflow:{workflow_group}/{workflow_id}
 executor_interface_version: workflow-executor-v1
 policy_refs:
+  default_work_unit_policy_ref: ".octon/framework/product/contracts/default-work-unit.yml"
   workflow_contract_ref: ".octon/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml"
-  owner_surface_ref: ".octon/framework/capabilities/runtime/skills/remediation/closeout-pr/SKILL.md"
+  owner_surface_ref: ".octon/framework/capabilities/runtime/skills/remediation/closeout-change/SKILL.md"
+  pr_subflow_ref: ".octon/framework/capabilities/runtime/skills/remediation/closeout-pr/SKILL.md"
   governance_closeout_ref: ".octon/instance/governance/contracts/closeout-reviews.yml"
 compatibility:
-  deprecated_fallback_prompt: "Are you ready to closeout this branch?"
+  deprecated_fallback_prompt: "Are you ready to close out this Change?"
   retirement_register_ref: ".octon/instance/governance/retirement-register.yml"
 inputs: []
 stages:
@@ -48,7 +50,7 @@ stages:
       risk_tier: low
       scope:
         read:
-          - workflow-contract
+          - default-work-unit-policy
           - worktree-state
           - pr-state
         write:
@@ -84,7 +86,7 @@ stages:
       risk_tier: low
       scope:
         read:
-          - workflow-contract
+          - default-work-unit-policy
           - workflow-evidence
         write:
           - workflow-evidence
@@ -96,15 +98,20 @@ stages:
         - read_only_analysis
 artifacts:
   - name: closeout_workflow_summary
-    path: "/.octon/state/evidence/validation/analysis/{{date}}-closeout-workflow.md"
+    path: "/.octon/state/evidence/validation/analysis/{{date}}-change-closeout-workflow.md"
     kind: file
     format: markdown
     determinism: unique
-    description: Closeout context resolution summary.
+    description: Change closeout context resolution summary.
 done_gate:
   checks:
-    - "closeout context resolves from the Git/worktree autonomy contract"
-    - "already-ready PR contexts report status instead of prompting again"
+    - "Change route resolves from the default work unit policy"
+    - "Lifecycle outcome resolves separately from the selected route"
+    - "direct-main, branch-no-pr, branch-pr, and stage-only-escalate contexts are distinguished"
+    - "branch-no-pr preservation, branch-local completion, branch publication, no-PR landing, and cleanup outcomes are distinguished"
+    - "branch-pr published, ready, landed, and cleaned outcomes are distinguished"
+    - "PR-specific mechanics are selected only after branch-pr routing"
+    - "landed and cleaned claims require route-appropriate evidence"
     - "ingress remains a pointer to this workflow rather than an inline closeout policy surface"
 constraints:
   fail_closed: true

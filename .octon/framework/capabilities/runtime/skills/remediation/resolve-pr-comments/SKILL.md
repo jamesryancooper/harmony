@@ -27,6 +27,7 @@ Systematic resolution of pull request review comments.
 Use this skill when:
 
 - A PR has received review comments that need to be addressed
+- The PR belongs to a Change whose selected route is `branch-pr`
 - You want to resolve many review comments consistently and efficiently
 - You need deterministic author-side remediation: fix, commit, push, reply
 - You need to close a review round before re-requesting review
@@ -100,6 +101,8 @@ Outputs are written to:
 
 ## Boundaries
 
+- Require existing PR-backed Change context: Change identity, selected route
+  `branch-pr`, and a Change receipt or receipt projection.
 - Never force-push, amend, or rebase during ordinary remediation
 - Never dismiss or resolve PR comments programmatically unless the documented
   solo-maintainer exception applies; by default, let the reviewer or a

@@ -6,9 +6,9 @@ description: Run deterministic completeness and consistency validation for a mig
 version: 1.0.0
 entry_mode: human
 execution_profile: core
-side_effect_class: read_only
+side_effect_class: mutating
 execution_controls:
-  cancel_safe: true
+  cancel_safe: false
 coordination_key_strategy:
   kind: workflow-target
   source_fields:
@@ -89,11 +89,80 @@ stages:
       rollback_metadata: false
     allowed_executor_profiles:
     - read_only_analysis
+- id: implementation-simulation
+  asset: stages/07-implementation-simulation.md
+  kind: analysis
+  consumes:
+  - stage:proposal-audit
+  produces:
+  - stage:implementation-simulation
+  mutation_scope: []
+  authorization:
+    action_type: execute_stage
+    requested_capabilities:
+    - workflow.stage.execute
+    - evidence.write
+    side_effects:
+      write_repo: false
+      write_evidence: true
+      shell: true
+      network: false
+      model_invoke: true
+      state_mutation: false
+      publication: false
+      branch_mutation: false
+    risk_tier: low
+    scope:
+      read:
+      - workflow-scope
+      write:
+      - workflow-evidence
+    review_requirements:
+      human_approval: false
+      quorum: false
+      rollback_metadata: false
+    allowed_executor_profiles:
+    - read_only_analysis
+- id: specification-closure
+  asset: stages/08-specification-closure.md
+  kind: mutation
+  consumes:
+  - stage:implementation-simulation
+  produces:
+  - stage:specification-closure
+  mutation_scope: &1
+  - workflow-scope
+  authorization:
+    action_type: execute_stage
+    requested_capabilities:
+    - workflow.stage.execute
+    - repo.write
+    - evidence.write
+    side_effects:
+      write_repo: true
+      write_evidence: true
+      shell: true
+      network: false
+      model_invoke: true
+      state_mutation: false
+      publication: false
+      branch_mutation: false
+    risk_tier: medium
+    scope:
+      read:
+      - workflow-scope
+      write: *1
+    review_requirements:
+      human_approval: false
+      quorum: false
+      rollback_metadata: true
+    allowed_executor_profiles:
+    - scoped_repo_mutation
 - id: report
   asset: stages/11-report.md
   kind: projection
   consumes:
-  - stage:proposal-audit
+  - stage:specification-closure
   produces:
   - stage:report
   mutation_scope: []
@@ -177,6 +246,10 @@ done_gate:
   - "`stage-inputs/` and `stage-logs/` exist for the workflow bundle"
   - validate-proposal-standard.sh and validate-migration-proposal.sh pass for the
     target proposal
+  - implementation simulation and specification closure reports exist
+  - support/implementation-grade-completeness-review.md exists in the packet
+  - validate-proposal-implementation-readiness.sh records structural-only,
+    blocked, or implementation-grade status
   - Final validation verdict is explicit
 constraints:
   fail_closed: true

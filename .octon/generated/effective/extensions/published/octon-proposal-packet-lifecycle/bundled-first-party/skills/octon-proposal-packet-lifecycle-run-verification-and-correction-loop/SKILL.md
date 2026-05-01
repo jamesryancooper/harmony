@@ -18,3 +18,13 @@ Run verification, generate targeted corrections, re-verify, and stop only at
 `clean`, `blocked`, `needs-packet-revision`, `superseded`, or explicitly
 deferred. Retain every verification and correction pass, and honor declared
 no-new-finding or consecutive-clean-pass closure thresholds.
+
+The loop is not clean while the implementation-grade completeness receipt is
+missing, failing, contains unresolved questions, or leaves executable
+implementation prompt readiness unproven.
+
+This loop is the pre-implementation packet completeness loop unless the packet
+has already been implemented. For implemented packets, continue into the
+post-implementation conformance loop and drift/churn loop; do not mark the
+proposal closed out while either post-implementation receipt is missing,
+failing, or unresolved.

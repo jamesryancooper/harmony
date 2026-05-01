@@ -56,7 +56,7 @@
           "type": "string",
           "minLength": 1
         },
-        "work_package_compilation": {
+        "change_package_compilation": {
           "type": "string",
           "minLength": 1
         },

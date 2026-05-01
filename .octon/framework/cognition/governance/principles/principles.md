@@ -112,7 +112,7 @@ applies_to:
 
 ### 0B.6 Governed Autonomy Lifecycle Surfaces (Normative)
 
-- Safe Start standardizes drop-in governed start through Engagement, Project Profile, Work Package, Decision Request, Evidence Profile, Preflight Evidence Lane, Tool/MCP Connector Posture, and Run Contract Candidate surfaces.
+- Safe Start standardizes drop-in governed start through Engagement, Project Profile, Change Package, Decision Request, Evidence Profile, Preflight Evidence Lane, Tool/MCP Connector Posture, and Run Contract Candidate surfaces.
 - Safe Continuation standardizes mission-scoped continuation through Autonomy Window, Mission Runner, Mission Queue, Action Slice, Continuation Decision, Mission Run Ledger, and Mission Evidence Profile surfaces.
 - Continuous Stewardship standardizes finite, non-executing care through Stewardship Program, Stewardship Epoch, Stewardship Trigger, Stewardship Admission Decision, Idle Decision, Renewal Decision, and Stewardship Ledger surfaces; it must not become an infinite agent loop.
 - Connector Admission Runtime standardizes operation-level connector and capability admission through Connector Operation, Connector Trust Dossier, Connector Evidence Profile, Connector Drift Record, Connector Quarantine, support-target proof hooks, and operation-level capability mapping.

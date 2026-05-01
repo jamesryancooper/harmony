@@ -25,3 +25,24 @@ Resolve `bundle` or `lifecycle_action` through
 - Use generated effective extension and capability outputs after publication.
 - Never treat prompts, proposal packets, generated registries, GitHub, CI,
   chat, browser state, tool availability, or model memory as authority.
+
+## Lifecycle Gates
+
+- Proposal lifecycle owns completeness; users should not need to ask whether a
+  packet includes everything.
+- Do not present a proposal packet as final or implementation-ready unless
+  `support/implementation-grade-completeness-review.md` exists with
+  `verdict: pass`, `unresolved_questions_count: 0`, and
+  `clarification_required: no`.
+- Implementation-grade completeness runs before implementation. After
+  implementation, closeout must also prove `support/implementation-conformance-review.md`
+  and `support/post-implementation-drift-churn-review.md` pass with
+  `verdict: pass` and `unresolved_items_count: 0`.
+- Ask clarifying questions only when the missing answer changes product
+  semantics, promotion scope, irreversible churn, or authority ownership.
+  Proceed with recorded assumptions when missing details are discoverable or
+  safely inferable.
+- Packet-finalizing responses must include `implementation_grade_complete`,
+  `implementation_conformant`, `post_implementation_drift_clean`, receipt
+  paths, validators run, unresolved counts, known exclusions, and next
+  canonical route.

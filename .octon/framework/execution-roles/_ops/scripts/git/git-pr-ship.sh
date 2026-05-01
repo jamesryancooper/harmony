@@ -29,6 +29,7 @@ Default behavior:
   Report current PR status, lane hints, and blockers without mutating PR state.
   Use explicit request flags to ask GitHub for ready or auto-merge transitions.
   GitHub required checks and review rules remain the final merge gate.
+  Route guard: call only for PR-backed Changes after branch-pr route selection.
 USAGE
 }
 

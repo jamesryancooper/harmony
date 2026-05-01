@@ -9,9 +9,10 @@ WORKFLOW_REGISTRY="$OCTON_DIR/orchestration/runtime/workflows/registry.yml"
 errors=0
 fail(){ echo "[ERROR] $1"; errors=$((errors+1)); }
 pass(){ echo "[OK] $1"; }
-grep -Fq 'name: "create-policy-proposal"' "$WORKFLOW_DIR/workflow.yml" && pass "workflow id matches" || fail "workflow id matches"
+yq -e '.name == "create-policy-proposal"' "$WORKFLOW_DIR/workflow.yml" >/dev/null 2>&1 && pass "workflow id matches" || fail "workflow id matches"
 grep -Fq 'generate-proposal-registry.sh' "$WORKFLOW_DIR/stages/03-scaffold-package.md" && pass "policy scaffold stage regenerates proposal registry" || fail "policy scaffold stage regenerates proposal registry"
 grep -Fq 'validate-proposal-standard.sh' "$WORKFLOW_DIR/stages/04-validate-package.md" && pass "baseline proposal validator referenced" || fail "baseline proposal validator referenced"
+grep -Fq 'validate-proposal-implementation-readiness.sh' "$WORKFLOW_DIR/stages/04-validate-package.md" && pass "implementation-readiness validator referenced" || fail "implementation-readiness validator referenced"
 grep -Fq 'validate-policy-proposal.sh' "$WORKFLOW_DIR/workflow.yml" && pass "policy validator referenced" || fail "policy validator referenced"
 yq -e '.workflows[] | select(.id == "create-policy-proposal" and .path == "meta/create-policy-proposal/")' "$WORKFLOW_MANIFEST" >/dev/null 2>&1 && pass "manifest registration exists" || fail "manifest registration exists"
 grep -Fq 'create-policy-proposal:' "$WORKFLOW_REGISTRY" && pass "registry entry exists" || fail "registry entry exists"

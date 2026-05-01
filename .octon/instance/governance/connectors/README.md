@@ -8,7 +8,7 @@ Repo-local connector posture declarations live in:
 - `registry.yml`
 - `posture.yml`
 
-Those files are machine-readable stage/block/deny policy for Work Package
+Those files are machine-readable stage/block/deny policy for Change Package
 readiness. They are not support admission, capability admission, egress
 authorization, credential authorization, or live execution authority.
 

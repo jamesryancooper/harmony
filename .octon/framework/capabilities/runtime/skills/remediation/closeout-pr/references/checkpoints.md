@@ -15,6 +15,7 @@ Use these checkpoints inside the loop:
 6. Review feedback remediation applied
 7. Ready gate satisfied
 8. Merge requested or confirmed
+9. Branch, remote branch, and worktree cleanup completed or explicitly deferred
 
 Checkpoint intent:
 

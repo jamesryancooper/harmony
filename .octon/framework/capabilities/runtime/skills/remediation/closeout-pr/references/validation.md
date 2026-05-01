@@ -14,13 +14,19 @@ description: Acceptance criteria and verification for the closeout-pr skill.
 - [ ] Required checks are green
 - [ ] No unresolved review conversations remain
 - [ ] The PR is moved out of draft only after the ready gate is satisfied
+- [ ] Draft/open PR state is recorded as `published`, not full closeout
+- [ ] Ready but unmerged PR state is recorded as `ready`, not landed
 - [ ] The PR is merged, or a precise external blocker is reported
+- [ ] Cleanup is recorded as completed or deferred with evidence
 
 ## Verification Checklist
 
 1. Report exists under `.octon/state/evidence/validation/analysis/`
 2. Execution log exists under `/.octon/state/evidence/runs/skills/closeout-pr/`
 3. The loop outcome is one of:
-   - merged
+   - published
+   - ready
+   - landed
+   - cleaned
    - blocked with explicit reason
 4. No force-push, amend, or rebase occurred during remediation

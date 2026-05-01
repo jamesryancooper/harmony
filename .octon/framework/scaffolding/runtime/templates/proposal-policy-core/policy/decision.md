@@ -19,6 +19,16 @@ proposed
 
 [Describe the intended policy change.]
 
+## Canonical Authority
+
+[Name the durable policy authority surfaces and any machine-readable companion
+contracts needed for automation.]
+
+## Ownership Model
+
+[State which artifacts own policy, which reference policy, and which remain
+implementation-specific.]
+
 ## Consequences
 
 ### Benefits
@@ -28,3 +38,7 @@ proposed
 ### Tradeoffs
 
 - [Tradeoff]
+
+## Open Questions
+
+[List unresolved product questions. If none remain, state "None."]

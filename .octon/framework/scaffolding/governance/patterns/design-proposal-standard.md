@@ -8,6 +8,10 @@ but buildable end-to-end implementation blueprints.
 This standard applies only to proposals that opt in with a root
 `design-proposal.yml`.
 
+Lifecycle gates, receipt requirements, and closeout/archive semantics are owned
+by `proposal-standard.md`. This subtype standard only adds design-specific
+content requirements.
+
 ## Scope And Rollout
 
 - `design-proposal.yml` is the subtype marker for a manifest-governed design
@@ -42,6 +46,7 @@ Every standard-governed design proposal must contain:
 - `implementation/README.md`
 - `implementation/minimal-implementation-blueprint.md`
 - `implementation/first-implementation-plan.md`
+- `support/implementation-grade-completeness-review.md` before `in-review`
 
 ## Class-Specific Required Docs
 
@@ -203,6 +208,18 @@ the proposal alone, the required:
 - first implementation slice
 
 without inventing architecture.
+
+## Implementation-Grade Requirements
+
+A design proposal is implementation-grade complete only when it defines:
+
+- user-facing and system-facing behavior;
+- affected surfaces and ownership boundaries;
+- implementation readiness for at least the first slice;
+- validation, fixture, conformance, and evidence expectations;
+- rollback, closeout, and known exclusions;
+- the artifact coverage needed to implement without discovering missing product
+  or architecture decisions midstream.
 
 ## Canonicalization Independence Rule
 

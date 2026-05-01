@@ -10,7 +10,7 @@ evidence_obligations_ref: ".octon/framework/constitution/obligations/evidence.ym
 
 selection_doctrine:
   - "Evidence profiles narrow compiler readiness; they never authorize material effects by themselves."
-  - "A Work Package must select exactly one evidence profile before it can emit a run-contract candidate."
+  - "A Change Package must select exactly one evidence profile before it can emit a run-contract candidate."
   - "Missing, stale, or conflicting profile selection blocks readiness until a Decision Request or canonical authority artifact resolves it."
   - "The compiler may select a stricter profile than the minimum, but it may not downgrade repo-consequential work to orientation-only or stage-only."
 
@@ -51,7 +51,7 @@ profiles:
     aliases:
       - "stage_only"
     applies_to:
-      - "prepare-only-work-package"
+      - "prepare-only-change-package"
       - "unsupported-or-unadmitted-surface"
       - "missing-context-receipt"
       - "missing-runtime-authorization"
@@ -66,7 +66,7 @@ profiles:
       - "blocked"
       - "denied"
     required_evidence:
-      - "work-package-compilation-evidence"
+      - "change-package-compilation-evidence"
       - "support-posture-evidence"
       - "capability-posture-evidence"
       - "decision-request-evidence-when-needed"
@@ -82,7 +82,7 @@ profiles:
       - "compiler input refs"
       - "candidate handoff refs"
     disclosure_requirements:
-      - "operator Work Package summary"
+      - "operator Change Package summary"
     closeout_requirements:
       - "open Decision Requests carried as blockers or resolved"
   - profile_id: "repo-consequential"
@@ -135,7 +135,7 @@ selection_rules:
     when: "The request requires prepare-only output, has unresolved authority, lacks a context-pack receipt, or touches a stage-only support tuple."
     select_profile: "stage-only"
   - rule_id: "EPR-003"
-    when: "The Work Package proposes repo-local material effects through an admitted support tuple and admitted capability packs."
+    when: "The Change Package proposes repo-local material effects through an admitted support tuple and admitted capability packs."
     select_profile: "repo-consequential"
   - rule_id: "EPR-004"
     when: "A non-admitted MCP, API, or browser connector is requested."

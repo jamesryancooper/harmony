@@ -53,13 +53,13 @@
       "type": "object",
       "required": [
         "project_profile_required",
-        "work_package_required",
+        "change_package_required",
         "context_pack_required_per_run",
         "stale_posture_route"
       ],
       "properties": {
         "project_profile_required": { "type": "boolean" },
-        "work_package_required": { "type": "boolean" },
+        "change_package_required": { "type": "boolean" },
         "context_pack_required_per_run": { "type": "boolean" },
         "stale_posture_route": { "type": "string", "minLength": 1 }
       }

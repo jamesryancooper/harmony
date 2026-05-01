@@ -192,7 +192,7 @@ family groups:
 | `structural_architecture` | `framework/cognition/_meta/architecture/**` | Structural registry plus narrative companion |
 | `compatibility_retirement` | `instance/governance/retirement-register.yml` + retirement contracts | Retained compatibility inventory, review cadence, and retirement posture |
 | `runtime_authorization_coverage` | `framework/engine/runtime/spec/{execution-authorization-v1.md,authorization-boundary-coverage.yml,material-side-effect-inventory.yml}` | Authorization-boundary and material-side-effect coverage contract |
-| `engagement_work_package_compiler` | `framework/engine/runtime/spec/engagement-work-package-compiler-v1.md` + Engagement/Profile/Objective/Work Package schemas | Preparation layer that creates engagement-scoped candidate control and evidence without replacing run contracts |
+| `engagement_change_package_compiler` | `framework/engine/runtime/spec/engagement-change-package-compiler-v1.md` + Engagement/Profile/Objective/Change Package schemas | Preparation layer that creates engagement-scoped candidate control and evidence without replacing run contracts |
 | `continuous_stewardship_runtime_v3` | `framework/engine/runtime/spec/continuous-stewardship-runtime-v3.md` + stewardship schemas | Long-running availability layer that opens finite epochs, admits triggers, idles, renews, and hands bounded work to missions without replacing run contracts |
 | `runtime_resolution` | `framework/engine/runtime/spec/runtime-resolution-v1.md` + `instance/governance/runtime-resolution.yml` | Delegated runtime-resolution selector and route-bundle contract |
 | `runtime_effective_handle_contract` | `framework/engine/runtime/spec/{runtime-effective-artifact-handle-v2.md,runtime-effective-artifact-handle-v2.schema.json,runtime-effective-route-bundle-lock-v3.schema.json}` | Recursive resolver-verified generated/effective handle contract |
@@ -224,7 +224,7 @@ family groups:
 Full canonical paths, allowed consumers, forbidden consumers, validators, and
 doc bindings are maintained in the registry rather than in this document.
 
-The Engagement / Project Profile / Work Package Compiler path family is a
+The Engagement / Project Profile / Change Package Compiler path family is a
 preparation layer above the run lifecycle. Its per-engagement Objective Brief
 lives under `state/control/engagements/<engagement-id>/objective/**` as
 candidate control state and must not become a workspace-charter substitute.

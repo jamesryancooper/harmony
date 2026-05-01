@@ -1,5 +1,5 @@
 schema_version: run-health-read-model-index-v1
-generated_at: '2026-05-01T04:23:14Z'
+generated_at: '2026-05-01T14:33:54Z'
 authority:
   classification: generated_read_model_non_authoritative
   may_authorize: false
@@ -64,6 +64,33 @@ runs:
   status: stale
 - run_id: publish-1777472536856-11767
   health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777472536856-11767/health.yml
+  status: stale
+- run_id: publish-1777632056333-84806
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777632056333-84806/health.yml
+  status: stale
+- run_id: publish-1777632076001-91565
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777632076001-91565/health.yml
+  status: stale
+- run_id: publish-1777645675141-62877
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645675141-62877/health.yml
+  status: stale
+- run_id: publish-1777645695599-82172
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645695599-82172/health.yml
+  status: stale
+- run_id: publish-1777645703361-87101
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645703361-87101/health.yml
+  status: stale
+- run_id: publish-1777645737021-7127
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645737021-7127/health.yml
+  status: stale
+- run_id: publish-1777645854848-6068
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645854848-6068/health.yml
+  status: stale
+- run_id: publish-1777645877352-18070
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645877352-18070/health.yml
+  status: stale
+- run_id: publish-1777645884878-19017
+  health_ref: .octon/generated/cognition/projections/materialized/runs/publish-1777645884878-19017/health.yml
   status: stale
 - run_id: repo-consequential-preflight-workflow-20260413-v4
   health_ref: .octon/generated/cognition/projections/materialized/runs/repo-consequential-preflight-workflow-20260413-v4/health.yml

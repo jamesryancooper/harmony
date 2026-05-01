@@ -103,7 +103,7 @@ System-level support or closure claims must additionally retain:
 ## Minimum Engagement Preparation Bundle
 
 Engagement preparation is not run execution evidence. The compiler must retain
-enough evidence to explain why a Work Package is ready, staged, blocked,
+enough evidence to explain why a Change Package is ready, staged, blocked,
 denied, or waiting on a Decision Request:
 
 - adoption preflight and classification evidence under
@@ -113,14 +113,14 @@ denied, or waiting on a Decision Request:
 - orientation evidence under `/.octon/state/evidence/orientation/<orientation-id>/**`
 - Project Profile source facts under
   `/.octon/state/evidence/project-profiles/<profile-id>/source-facts/**`
-- Work Package compilation evidence under
-  `/.octon/state/evidence/engagements/<engagement-id>/work-packages/<work-package-id>/**`
+- Change Package compilation evidence under
+  `/.octon/state/evidence/engagements/<engagement-id>/change-packages/<change-package-id>/**`
 - Decision Request evidence under
   `/.octon/state/evidence/decisions/<decision-id>/**`
 - run-contract readiness evidence under
   `/.octon/state/evidence/engagements/<engagement-id>/run-contract-readiness/**`
 
-Generated engagement or Work Package read models may summarize those roots, but
+Generated engagement or Change Package read models may summarize those roots, but
 they never satisfy evidence requirements by themselves.
 
 ## Completeness Rules

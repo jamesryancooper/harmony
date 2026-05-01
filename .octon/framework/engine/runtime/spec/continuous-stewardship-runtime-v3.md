@@ -1,7 +1,7 @@
 # Continuous Stewardship Runtime v3
 
 Continuous Stewardship Runtime v3 is the governed long-running availability
-layer above the Engagement/Work Package compiler and Mission Autonomy Runtime.
+layer above the Engagement/Change Package compiler and Mission Autonomy Runtime.
 
 The service may remain available indefinitely. The work may not become
 unbounded.
@@ -20,7 +20,7 @@ Stewardship Program
   -> Stewardship Epoch
     -> Stewardship Trigger
       -> Stewardship Admission Decision
-        -> optional v1 Engagement / Work Package / v2 Mission handoff
+        -> optional v1 Engagement / Change Package / v2 Mission handoff
           -> Mission Runner
             -> Mission Queue
               -> Action Slice

@@ -2,7 +2,13 @@ schema_version: "evaluator-review-routing-v1"
 default_run_disposition: "not_required"
 default_harness_claim_disposition: "approved"
 adapter_registry_ref: ".octon/framework/assurance/evaluators/adapters/registry.yml"
+default_work_unit_policy_ref: ".octon/framework/product/contracts/default-work-unit.yml"
 run_requirements:
+  route_requirements:
+    direct-main: "not_required_unless_selected_validation_floor_requires_review"
+    branch-no-pr: "not_required_unless_selected_validation_floor_requires_review"
+    branch-pr: "required_when_hosted_review_or_ai_gate_policy_selects_it"
+    stage-only-escalate: "record_blocker_without_claiming_review_completion"
   support_tiers_require_approved_review:
     - "release-and-boundary-sensitive"
     - "external-or-irreversible"

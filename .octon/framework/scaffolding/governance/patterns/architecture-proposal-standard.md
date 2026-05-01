@@ -7,6 +7,10 @@ description: Required files and architecture-specific constraints for v1 archite
 
 Architecture proposals extend `proposal-standard.md`.
 
+Lifecycle gates, receipt requirements, and closeout/archive semantics are owned
+by `proposal-standard.md`. This subtype standard only adds
+architecture-specific content requirements.
+
 Canonical path:
 
 - `/.octon/inputs/exploratory/proposals/architecture/<proposal_id>/`
@@ -18,6 +22,7 @@ Required files:
 - `architecture/target-architecture.md`
 - `architecture/acceptance-criteria.md`
 - `architecture/implementation-plan.md`
+- `support/implementation-grade-completeness-review.md` before `in-review`
 
 ## Subtype Manifest Contract
 
@@ -47,3 +52,14 @@ Rules:
 - `implemented` means the promoted architecture surfaces exist outside the
   proposal workspace, proposal-path dependencies have been removed from those
   durable targets, and retained promotion evidence exists.
+
+## Implementation-Grade Requirements
+
+Architecture proposals are implementation-grade complete only when they define:
+
+- the target architecture;
+- affected contracts, manifests, adapters, registries, and operator surfaces;
+- the migration or adoption path from current state to target state;
+- validator, fixture, and retained-evidence requirements;
+- rollback and closeout expectations;
+- artifact ownership roles and downstream reference boundaries.

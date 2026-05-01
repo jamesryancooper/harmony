@@ -39,6 +39,6 @@ status: active
 updated_at: 2026-04-28T14:00:56.364733Z
 validation_strategy:
 - cargo test -p octon_kernel
-- bash .octon/framework/assurance/runtime/_ops/scripts/validate-engagement-work-package-compiler.sh
+- bash .octon/framework/assurance/runtime/_ops/scripts/validate-engagement-change-package-compiler.sh
 workspace_charter_ref: .octon/instance/charter/workspace.md
 workspace_machine_charter_ref: .octon/instance/charter/workspace.yml

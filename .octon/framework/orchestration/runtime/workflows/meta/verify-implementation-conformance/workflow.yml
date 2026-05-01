@@ -1,0 +1,116 @@
+---
+schema_version: workflow-contract-v2
+name: verify-implementation-conformance
+description: Verify that implemented repository changes satisfy the proposal packet before closeout or implemented archival.
+version: 1.0.0
+entry_mode: human
+execution_profile: core
+side_effect_class: read_only
+execution_controls:
+  cancel_safe: true
+coordination_key_strategy:
+  kind: workflow-target
+  source_fields:
+    - workflow_group
+    - workflow_id
+  format: workflow:{workflow_group}/{workflow_id}
+executor_interface_version: workflow-executor-v1
+inputs:
+  - name: proposal_path
+    type: folder
+    required: true
+    description: Root proposal directory to verify against implemented repo changes
+stages:
+  - id: verify-implementation-conformance
+    asset: stages/01-verify-implementation-conformance.md
+    kind: verification
+    consumes: []
+    produces:
+      - stage:verify-implementation-conformance
+    mutation_scope: []
+    authorization:
+      action_type: execute_stage
+      requested_capabilities:
+        - workflow.stage.execute
+        - evidence.write
+      side_effects:
+        write_repo: false
+        write_evidence: true
+        shell: true
+        network: false
+        model_invoke: false
+        state_mutation: false
+        publication: false
+        branch_mutation: false
+      risk_tier: low
+      scope:
+        read:
+          - workflow-scope
+        write:
+          - workflow-evidence
+      review_requirements:
+        human_approval: false
+        quorum: false
+        rollback_metadata: false
+      allowed_executor_profiles:
+        - read_only_analysis
+  - id: report
+    asset: stages/02-report.md
+    kind: projection
+    consumes:
+      - stage:verify-implementation-conformance
+    produces:
+      - stage:report
+    mutation_scope: []
+    authorization:
+      action_type: execute_stage
+      requested_capabilities:
+        - workflow.stage.execute
+        - evidence.write
+      side_effects:
+        write_repo: false
+        write_evidence: true
+        shell: true
+        network: false
+        model_invoke: false
+        state_mutation: false
+        publication: false
+        branch_mutation: false
+      risk_tier: low
+      scope:
+        read:
+          - workflow-scope
+        write:
+          - workflow-evidence
+      review_requirements:
+        human_approval: false
+        quorum: false
+        rollback_metadata: false
+      allowed_executor_profiles:
+        - read_only_analysis
+artifacts:
+  - name: implementation_conformance_summary
+    path: "/.octon/state/evidence/validation/analysis/{{date}}-implementation-conformance.md"
+    kind: file
+    format: markdown
+    determinism: unique
+    description: Top-level implementation conformance verification summary
+  - name: implementation_conformance_bundle
+    path: "/.octon/state/evidence/runs/workflows/{{date}}-implementation-conformance-{{slug}}/"
+    kind: directory
+    format: mixed
+    determinism: unique
+    description: Workflow bundle containing implementation conformance metadata and outputs
+done_gate:
+  checks:
+    - "`summary.md`, `commands.md`, `inventory.md`, `bundle.yml`, and `validation.md` exist"
+    - "`stage-inputs/` and `stage-logs/` exist for the workflow bundle"
+    - "validate-proposal-implementation-readiness.sh passes before implementation conformance is accepted"
+    - "validate-proposal-implementation-conformance.sh passes for the target proposal"
+    - "`support/implementation-conformance-review.md` records `verdict: pass` and `unresolved_items_count: 0` for implemented closeout"
+    - "promotion target coverage, implementation map coverage, validator coverage, generated output coverage, rollback coverage, and downstream reference coverage are explicit"
+    - "final conformance verdict is explicit"
+constraints:
+  fail_closed: true
+  forbid_design_packages: false
+  require_relative_local_assets: true

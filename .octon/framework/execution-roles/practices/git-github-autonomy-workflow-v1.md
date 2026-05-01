@@ -42,10 +42,10 @@ This workflow covers:
 ### Core execution model
 
 1. Keep one clean primary `main` worktree or clone as the integration anchor.
-2. Create one branch worktree per task or PR.
+2. Create one branch worktree per branch-routed Change.
 3. Do implementation, validation, review remediation, and PR iteration in the
    branch worktree, not on `main`.
-4. Open draft PRs early from the branch worktree.
+4. Open draft PRs only after Change routing selects branch-pr.
 5. Treat ready-for-review as a state criterion:
    - the current slice is complete
    - no unresolved author action items remain
@@ -128,7 +128,8 @@ Prompt set:
     PR?"
 - **Branch worktree, no PR yet**
   - "This branch worktree looks ready for PR closeout. Should I stage,
-    commit, push, and open a draft PR?"
+    commit, validate, record a Change receipt, and open a draft PR only if
+    branch-pr is selected?"
 - **Branch worktree, existing draft PR, autonomous lane**
   - "This draft PR looks ready for Octon's autonomous merge lane. Should I
     mark it ready and request squash auto-merge?"
@@ -181,7 +182,7 @@ Use this table to find canonical detail by concern.
 | Machine-readable Git/worktree/PR contract | `.octon/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml` |
 | Commit contract and branch naming | `.octon/framework/execution-roles/practices/commits.md` |
 | PR quality policy and autonomy flow | `.octon/framework/execution-roles/practices/pull-request-standards.md` |
-| Agent-driven closeout loop | `.octon/framework/capabilities/runtime/skills/remediation/closeout-pr/SKILL.md` |
+| Route-neutral Change closeout loop | `.octon/framework/capabilities/runtime/skills/remediation/closeout-pr/SKILL.md` |
 | Machine-enforced commit/PR contract | `.octon/framework/execution-roles/practices/standards/commit-pr-standards.json` |
 | Merge-critical control-plane contract | `.octon/framework/execution-roles/practices/standards/github-control-plane-contract.json` |
 | AI gate policy contract | `.octon/framework/execution-roles/practices/standards/ai-gate-policy.json` |
@@ -219,7 +220,7 @@ Core guardrails that stay active with this model:
 
 Minimum control-plane expectations:
 
-- `main` remains PR-first and serves as the clean integration anchor.
+- `main` remains Change-first and serves as the clean integration anchor.
 - One branch worktree or equivalent branch workspace is the default unit of
   execution for one task or PR.
 - Repository variable `AUTONOMY_AUTO_MERGE_ENABLED=true`.

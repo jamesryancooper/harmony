@@ -14,5 +14,15 @@ allowed-tools: Read Glob Grep Bash(git status) Bash(git diff) Bash(gh pr) Write(
 
 # Proposal Packet Lifecycle Closeout Program
 
+Program closeout must refuse final or implementation-ready claims unless every
+required packet-level completeness receipt passes or the program records an
+explicit blocked/deferred report outcome or rejected/superseded/historical
+archive disposition.
+
+For implemented child packets, program closeout must also require passing
+implementation conformance and post-implementation drift/churn receipts. A
+program may aggregate child receipts, but it may not replace the packet-level
+post-implementation evidence.
+
 Execute gated program closeout after required child lifecycle states are
 implemented, archived, rejected, superseded, or explicitly deferred.

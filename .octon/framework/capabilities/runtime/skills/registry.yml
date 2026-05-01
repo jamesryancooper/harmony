@@ -3354,6 +3354,77 @@ skills:
       fingerprints:
         tech_tags: []
         language_tags: []
+  closeout-change:
+    version: 1.0.1
+    commands:
+    - /closeout-change
+    parameters:
+    - name: change_id
+      type: text
+      required: false
+      description: Existing Change identifier when one is known
+    - name: route
+      type: text
+      required: false
+      description: Optional preselected route; must be one of direct-main, branch-no-pr, branch-pr, stage-only-escalate
+    - name: receipt_ref
+      type: text
+      required: false
+      description: Existing Change receipt path to update
+    - name: include_paths
+      type: text
+      required: false
+      description: Optional comma-separated include paths
+    - name: exclude_paths
+      type: text
+      required: false
+      description: Optional comma-separated exclude paths
+    requires:
+      context:
+      - type: file_exists
+        path: /.octon/framework/product/contracts/default-work-unit.yml
+        description: Canonical default work unit policy
+      - type: file_exists
+        path: /.octon/framework/product/contracts/change-receipt-v1.schema.json
+        description: Canonical Change receipt schema
+    io:
+      inputs: []
+      outputs:
+      - name: change_closeout_report
+        path: /.octon/state/evidence/validation/analysis/{{date}}-change-closeout-{{run_id}}.md
+        kind: file
+        format: markdown
+        determinism: unique
+        description: Structured Change closeout report covering route, evidence, validation, and rollback
+      - name: run_log
+        path: /.octon/state/evidence/runs/skills/closeout-change/{{run_id}}.md
+        kind: file
+        format: markdown
+        determinism: unique
+        description: Execution log for closeout-change runs
+      - name: log_index
+        path: /.octon/state/evidence/runs/skills/closeout-change/index.yml
+        kind: file
+        format: yaml
+        determinism: variable
+        description: Index of closeout-change runs
+      - name: top_log_index
+        path: /.octon/state/evidence/runs/skills/index.yml
+        kind: file
+        format: yaml
+        determinism: variable
+        description: Top-level log index (cross-skill)
+    host_adapters: []
+    routing:
+      selectors:
+        include:
+        - '**'
+        exclude: []
+      fingerprints:
+        tech_tags:
+        - change
+        - closeout
+        language_tags: []
   triage-ci-failure:
     version: 1.0.1
     commands:

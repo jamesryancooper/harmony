@@ -7,6 +7,7 @@ description: Summarize the promotion result and persist the workflow bundle rece
 
 ## Actions
 
-1. Write a top-level summary with proposal identity, kind, validator result, and evidence inputs.
+1. Write a top-level summary with proposal identity, kind, validator result, gate receipt status, and evidence inputs.
 2. Persist `summary.md`, `commands.md`, `inventory.md`, `validation.md`, and `bundle.yml`.
-3. Emit an explicit final verdict.
+3. Emit an explicit final verdict that names the implementation-grade,
+   conformance, and drift/churn gate states.

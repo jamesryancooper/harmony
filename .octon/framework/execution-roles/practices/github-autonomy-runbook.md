@@ -126,7 +126,8 @@ Waiver contract:
 Before expecting autonomous merges:
 
 1. `AUTONOMY_AUTO_MERGE_ENABLED=true` is set as a repository variable.
-2. Main branch ruleset is active with required checks and PR-first merge.
+2. Main branch ruleset is active with required checks and route-aware Change
+   merge or push policy.
 3. Actions workflow setting has `can_approve_pull_request_reviews=true`.
 4. `AUTONOMY_PAT` is set as a repository Actions secret.
 5. Main control-plane matches

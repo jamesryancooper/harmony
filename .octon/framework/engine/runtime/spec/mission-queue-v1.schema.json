@@ -52,7 +52,7 @@
           "mission_id",
           "engagement_id",
           "objective_ref",
-          "work_package_ref",
+          "change_package_ref",
           "status",
           "action_class",
           "scope_ids",
@@ -72,7 +72,7 @@
           "mission_id": { "type": "string", "minLength": 1 },
           "engagement_id": { "type": "string", "minLength": 1 },
           "objective_ref": { "type": "string", "minLength": 1 },
-          "work_package_ref": { "type": "string", "minLength": 1 },
+          "change_package_ref": { "type": "string", "minLength": 1 },
           "status": {
             "type": "string",
             "enum": [

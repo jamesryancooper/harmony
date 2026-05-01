@@ -1,7 +1,7 @@
 # Preflight Evidence Lane v1
 
 Preflight Evidence Lane v1 is the narrow preauthorization lane used by the
-Engagement / Project Profile / Work Package compiler to collect adoption,
+Engagement / Project Profile / Change Package compiler to collect adoption,
 orientation, profile-source, and context-request evidence before ordinary
 material execution authorization is available.
 
@@ -18,7 +18,7 @@ effects.
 - read-only repo inventory and omission records
 - per-engagement Objective Brief candidate evidence
 - Project Profile source-fact evidence
-- Work Package compilation evidence
+- Change Package compilation evidence
 - context-pack request preparation evidence
 - operator-visible diagnostics
 

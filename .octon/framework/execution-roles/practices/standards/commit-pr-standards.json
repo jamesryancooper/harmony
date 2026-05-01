@@ -3,9 +3,34 @@
   "canonical": {
     "commit_policy_doc": ".octon/framework/execution-roles/practices/commits.md",
     "pr_policy_doc": ".octon/framework/execution-roles/practices/pull-request-standards.md",
-    "pr_template_path": ".github/PULL_REQUEST_TEMPLATE.md"
+    "pr_template_path": ".github/PULL_REQUEST_TEMPLATE.md",
+    "default_work_unit_policy_ref": ".octon/framework/product/contracts/default-work-unit.yml",
+    "change_receipt_schema_ref": ".octon/framework/product/contracts/change-receipt-v1.schema.json"
+  },
+  "change": {
+    "default_work_unit": "change",
+    "route_ids": [
+      "direct-main",
+      "branch-no-pr",
+      "branch-pr",
+      "stage-only-escalate"
+    ],
+    "pr_required_routes": [
+      "branch-pr"
+    ],
+    "branch_required_routes": [
+      "branch-no-pr",
+      "branch-pr"
+    ],
+    "no_pr_routes": [
+      "direct-main",
+      "branch-no-pr",
+      "stage-only-escalate"
+    ],
+    "receipt_required": true
   },
   "commit": {
+    "policy_doc": ".octon/framework/execution-roles/practices/commits.md",
     "header_format": "<type>(<scope>): <summary>",
     "allowed_types": [
       "feat",
@@ -24,6 +49,14 @@
     "footer_max_line_length": 72,
     "summary_must_be_lowercase": true,
     "summary_must_not_end_with_period": true
+  },
+  "pr": {
+    "policy_doc": ".octon/framework/execution-roles/practices/pull-request-standards.md",
+    "applies_to_routes": [
+      "branch-pr"
+    ],
+    "requires_change_identity": true,
+    "requires_change_receipt_projection": true
   },
   "branch": {
     "default_format": "<type>/<ticket-id>-<short-description>",

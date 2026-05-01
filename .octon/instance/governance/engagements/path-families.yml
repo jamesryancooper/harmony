@@ -1,11 +1,11 @@
 schema_version: "engagement-path-family-registry-v1"
-registry_id: "engagement-work-package-path-families"
+registry_id: "engagement-change-package-path-families"
 owner: "Octon governance"
 status: "active"
 default_route: "deny"
-compiler_policy_ref: ".octon/instance/governance/policies/engagement-work-package-compiler.yml"
+compiler_policy_ref: ".octon/instance/governance/policies/engagement-change-package-compiler.yml"
 architecture_registry_ref: ".octon/framework/cognition/_meta/architecture/contract-registry.yml"
-validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-engagement-work-package-compiler.sh"
+validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-engagement-change-package-compiler.sh"
 
 registration_doctrine:
   - "Engagement compiler control, evidence, locality, and generated read-model paths must be registered before validator-gated runtime-write readiness."
@@ -14,7 +14,7 @@ registration_doctrine:
 
 runtime_write_requires_registered_families:
   - "engagement-control"
-  - "work-package-control"
+  - "change-package-control"
   - "objective-brief-control"
   - "decision-request-control"
   - "engagement-evidence"
@@ -22,7 +22,7 @@ runtime_write_requires_registered_families:
   - "orientation-evidence"
   - "project-profile-evidence"
   - "project-profile-source-fact-evidence"
-  - "work-package-compilation-evidence"
+  - "change-package-compilation-evidence"
   - "decision-evidence"
   - "run-contract-readiness-evidence"
   - "engagement-continuity"
@@ -42,11 +42,11 @@ path_families:
     forbidden_consumers:
       - "generated projections as authority"
       - "proposal-local files as runtime dependencies"
-  - family_id: "work-package-control"
+  - family_id: "change-package-control"
     class_root: "state"
     surface_class: "mutable-control"
     canonical_paths:
-      - ".octon/state/control/engagements/<engagement-id>/work-package.yml"
+      - ".octon/state/control/engagements/<engagement-id>/change-package.yml"
     authority_posture: "mutable-operational-truth"
     runtime_write_gate: "registered-path-family-required"
     allowed_writers:
@@ -131,11 +131,11 @@ path_families:
       - ".octon/state/evidence/project-profiles/<profile-id>/source-facts/**"
     authority_posture: "retained-factual-truth"
     runtime_write_gate: "registered-path-family-required"
-  - family_id: "work-package-compilation-evidence"
+  - family_id: "change-package-compilation-evidence"
     class_root: "state"
     surface_class: "retained-evidence"
     canonical_paths:
-      - ".octon/state/evidence/engagements/<engagement-id>/work-packages/<work-package-id>/**"
+      - ".octon/state/evidence/engagements/<engagement-id>/change-packages/<change-package-id>/**"
     authority_posture: "retained-factual-truth"
     runtime_write_gate: "registered-path-family-required"
   - family_id: "decision-evidence"
@@ -169,7 +169,7 @@ path_families:
     surface_class: "generated-operator-read-model"
     canonical_paths:
       - ".octon/generated/cognition/projections/materialized/engagements/<engagement-id>.yml"
-      - ".octon/generated/cognition/projections/materialized/work-packages/<work-package-id>.yml"
+      - ".octon/generated/cognition/projections/materialized/change-packages/<change-package-id>.yml"
     authority_posture: "derived-non-authority"
     runtime_write_gate: "forbidden-as-runtime-authority"
     forbidden_consumers:

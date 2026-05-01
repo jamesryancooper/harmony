@@ -36,10 +36,17 @@ main() {
     require_file "$file"
   done
 
-  require_fixed 'name: "audit-design-proposal"' "$WORKFLOW_DIR/workflow.yml" "workflow contract name matches id"
+  if yq -e '.name == "audit-design-proposal"' "$WORKFLOW_DIR/workflow.yml" >/dev/null 2>&1; then
+    pass "workflow contract name matches id"
+  else
+    fail "workflow contract name matches id"
+  fi
   require_fixed 'proposal_path' "$WORKFLOW_DIR/workflow.yml" "workflow contract exposes proposal_path input"
   require_fixed 'validate-proposal-standard.sh' "$WORKFLOW_DIR/stages/12-verify.md" "verify stage runs baseline proposal validator"
   require_fixed 'validate-design-proposal.sh' "$WORKFLOW_DIR/stages/12-verify.md" "verify stage runs design proposal validator"
+  require_fixed 'implementation-simulation' "$WORKFLOW_DIR/workflow.yml" "implementation simulation stage is active"
+  require_fixed 'specification-closure' "$WORKFLOW_DIR/workflow.yml" "specification closure stage is active"
+  require_fixed 'implementation-grade-completeness-review.md' "$WORKFLOW_DIR/stages/08-specification-closure.md" "completeness review receipt is produced"
   require_absent '.design-packages/' "$WORKFLOW_DIR/workflow.yml" "workflow contract avoids legacy design-package paths"
 
   if yq -e '.workflows[] | select(.id == "audit-design-proposal" and .path == "audit/audit-design-proposal/")' "$WORKFLOW_MANIFEST" >/dev/null 2>&1; then

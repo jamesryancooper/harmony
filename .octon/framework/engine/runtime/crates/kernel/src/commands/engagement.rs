@@ -12,12 +12,12 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const DEFAULT_INTENT: &str = "Prepare a governed Octon Work Package.";
+const DEFAULT_INTENT: &str = "Prepare a governed Octon Change Package.";
 const DEFAULT_WORKFLOW_ID: &str = "agent-led-happy-path";
 const SUPPORT_TARGET_REF: &str = ".octon/instance/governance/support-targets.yml";
 const GOVERNANCE_EXCLUSIONS_REF: &str = ".octon/instance/governance/exclusions/action-classes.yml";
 const COMPILER_POLICY_REF: &str =
-    ".octon/instance/governance/policies/engagement-work-package-compiler.yml";
+    ".octon/instance/governance/policies/engagement-change-package-compiler.yml";
 const EVIDENCE_PROFILES_POLICY_REF: &str =
     ".octon/instance/governance/policies/evidence-profiles.yml";
 const PREFLIGHT_EVIDENCE_LANE_POLICY_REF: &str =
@@ -188,8 +188,8 @@ fn start_engagement(
         format!(".octon/state/evidence/orientation/{engagement_id}-orientation");
     let project_profile_evidence_root_ref =
         format!(".octon/state/evidence/project-profiles/{engagement_id}-project-profile");
-    let work_package_evidence_root_ref =
-        format!(".octon/state/evidence/engagements/{engagement_id}/work-packages");
+    let change_package_evidence_root_ref =
+        format!(".octon/state/evidence/engagements/{engagement_id}/change-packages");
     let decision_evidence_root_ref = ".octon/state/evidence/decisions".to_string();
     let run_readiness_root_ref =
         format!(".octon/state/evidence/engagements/{engagement_id}/run-contract-readiness");
@@ -256,7 +256,7 @@ fn start_engagement(
             "objective_control_root": null,
             "objective_brief_ref": null,
             "project_profile_ref": null,
-            "work_package_ref": null,
+            "change_package_ref": null,
             "run_contract_candidate_ref": null,
             "canonical_run_contract_ref": null,
             "decision_request_refs": [],
@@ -266,7 +266,7 @@ fn start_engagement(
                 "preflight": format!(".octon/state/evidence/engagements/{engagement_id}/preflight"),
                 "orientation": orientation_root_ref,
                 "project_profile_source_facts": format!("{project_profile_evidence_root_ref}/source-facts"),
-                "work_package_compilation": work_package_evidence_root_ref,
+                "change_package_compilation": change_package_evidence_root_ref,
                 "decisions": decision_evidence_root_ref,
                 "run_contract_readiness": run_readiness_root_ref,
                 "objective": format!(".octon/state/evidence/engagements/{engagement_id}/objective")
@@ -428,7 +428,7 @@ fn profile_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRe
             ],
             "validation_strategy": [
                 "cargo test -p octon_kernel",
-                "bash .octon/framework/assurance/runtime/_ops/scripts/validate-engagement-work-package-compiler.sh"
+                "bash .octon/framework/assurance/runtime/_ops/scripts/validate-engagement-change-package-compiler.sh"
             ],
             "rollback_constraints": [
                 "Do not revert unrelated user or parallel-agent edits.",
@@ -492,18 +492,18 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
     let risk_ref = repo_ref(octon_dir, &plan_root.join("risk-materiality.yml"))?;
     let validation_ref = repo_ref(octon_dir, &plan_root.join("validation-plan.yml"))?;
     let rollback_ref = repo_ref(octon_dir, &plan_root.join("rollback-plan.yml"))?;
-    let work_package_ref = repo_ref(octon_dir, &control_root.join("work-package.yml"))?;
-    let work_package_id = format!("{engagement_id}-work-package");
+    let change_package_ref = repo_ref(octon_dir, &control_root.join("change-package.yml"))?;
+    let change_package_id = format!("{engagement_id}-change-package");
     let objective_evidence_path = repo_root(octon_dir)
         .join(".octon/state/evidence/engagements")
         .join(engagement_id)
         .join("objective")
         .join("objective-brief-source.yml");
-    let work_package_evidence_path = repo_root(octon_dir)
+    let change_package_evidence_path = repo_root(octon_dir)
         .join(".octon/state/evidence/engagements")
         .join(engagement_id)
-        .join("work-packages")
-        .join(&work_package_id)
+        .join("change-packages")
+        .join(&change_package_id)
         .join("compilation-receipt.yml");
     let run_readiness_evidence_path = repo_root(octon_dir)
         .join(".octon/state/evidence/engagements")
@@ -511,7 +511,7 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
         .join("run-contract-readiness")
         .join("pre-arm.yml");
     let objective_evidence_ref = repo_ref(octon_dir, &objective_evidence_path)?;
-    let work_package_evidence_ref = repo_ref(octon_dir, &work_package_evidence_path)?;
+    let change_package_evidence_ref = repo_ref(octon_dir, &change_package_evidence_path)?;
     let run_readiness_evidence_ref = repo_ref(octon_dir, &run_readiness_evidence_path)?;
     let seed_intent = engagement
         .get("seed_intent")
@@ -539,11 +539,11 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
                 format!(".octon/state/control/engagements/{engagement_id}/seed-intent.yml")
             ],
             "scope_out": [
-                format!(".octon/state/control/engagements/{engagement_id}/work-package.yml"),
-                format!(".octon/state/evidence/engagements/{engagement_id}/work-packages/**")
+                format!(".octon/state/control/engagements/{engagement_id}/change-package.yml"),
+                format!(".octon/state/evidence/engagements/{engagement_id}/change-packages/**")
             ],
             "done_when": [
-                "Work Package is compiled with support, capability, connector, evidence, context, rollback, validation, and placement posture."
+                "Change Package is compiled with support, capability, connector, evidence, context, rollback, validation, and placement posture."
             ],
             "acceptance_criteria": [
                 "Objective Brief remains per-engagement candidate control state.",
@@ -633,11 +633,11 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
         }),
     )?;
     write_yaml(
-        &work_package_evidence_path,
+        &change_package_evidence_path,
         &json!({
-            "schema_version": "work-package-compilation-evidence-v1",
+            "schema_version": "change-package-compilation-evidence-v1",
             "engagement_id": engagement_id,
-            "work_package_id": work_package_id,
+            "change_package_id": change_package_id,
             "compiler_policy_ref": COMPILER_POLICY_REF,
             "input_refs": {
                 "project_profile_ref": PROJECT_PROFILE_REF,
@@ -655,17 +655,17 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
         &json!({
             "schema_version": "run-contract-readiness-evidence-v1",
             "engagement_id": engagement_id,
-            "work_package_id": work_package_id,
+            "change_package_id": change_package_id,
             "candidate_status": "not_prepared",
             "material_execution_entrypoint": "octon run start --contract",
             "recorded_at": now,
         }),
     )?;
     write_yaml(
-        &control_root.join("work-package.yml"),
+        &control_root.join("change-package.yml"),
         &json!({
-            "schema_version": "work-package-v1",
-            "work_package_id": work_package_id,
+            "schema_version": "change-package-v1",
+            "change_package_id": change_package_id,
             "engagement_ref": repo_ref(octon_dir, &engagement_path)?,
             "project_profile_ref": PROJECT_PROFILE_REF,
             "objective_brief_schema_ref": ".octon/framework/engine/runtime/spec/engagement-objective-brief-v1.schema.json",
@@ -717,7 +717,7 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
                 "policy_ref": EVIDENCE_PROFILES_POLICY_REF,
                 "required_evidence": [
                     objective_evidence_ref,
-                    work_package_evidence_ref,
+                    change_package_evidence_ref,
                     run_readiness_evidence_ref
                 ]
             },
@@ -744,7 +744,7 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
                 "path_family_registry_ref": ".octon/instance/governance/engagements/path-families.yml",
                 "runtime_write_family_refs": [
                     "engagement-control",
-                    "work-package-control",
+                    "change-package-control",
                     "objective-brief-control",
                     "decision-request-control",
                     "engagement-evidence",
@@ -752,7 +752,7 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
                     "orientation-evidence",
                     "project-profile-evidence",
                     "project-profile-source-fact-evidence",
-                    "work-package-compilation-evidence",
+                    "change-package-compilation-evidence",
                     "decision-evidence",
                     "run-contract-readiness-evidence",
                     "engagement-continuity",
@@ -767,7 +767,7 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
             "autonomy_envelope": {
                 "mode": "run-only",
                 "mission_required": false,
-                "v1_boundary": "merged-into-work-package"
+                "v1_boundary": "merged-into-change-package"
             },
             "outcome": "stage_only",
             "blockers": [
@@ -790,7 +790,7 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
             ("risk_materiality_ref", risk_ref.as_str()),
             ("validation_plan_ref", validation_ref.as_str()),
             ("rollback_plan_ref", rollback_ref.as_str()),
-            ("work_package_ref", work_package_ref.as_str()),
+            ("change_package_ref", change_package_ref.as_str()),
         ],
         &now,
     );
@@ -810,7 +810,7 @@ fn plan_engagement(octon_dir: &Path, engagement_id: &str) -> Result<CommandRepor
             ("risk_materiality_ref".to_string(), risk_ref),
             ("validation_plan_ref".to_string(), validation_ref),
             ("rollback_plan_ref".to_string(), rollback_ref),
-            ("work_package_ref".to_string(), work_package_ref),
+            ("change_package_ref".to_string(), change_package_ref),
         ]),
         format!("octon arm --engagement-id {engagement_id} --prepare-only"),
     ))
@@ -832,8 +832,8 @@ fn arm_engagement(
     let control_root = engagement_control_root(octon_dir, engagement_id);
     let engagement_path = control_root.join("engagement.yml");
     let mut engagement = read_yaml_object(&engagement_path)?;
-    require_ref(&engagement, "work_package_ref")?;
-    let mut work_package = read_yaml_object(&control_root.join("work-package.yml"))?;
+    require_ref(&engagement, "change_package_ref")?;
+    let mut change_package = read_yaml_object(&control_root.join("change-package.yml"))?;
     let now = now_rfc3339()?;
     let run_id = format!("{engagement_id}-run-1");
     validate_id(&run_id, "run_id")?;
@@ -935,7 +935,7 @@ fn arm_engagement(
             "source_refs": [
                 PROJECT_PROFILE_REF,
                 format!(".octon/state/control/engagements/{engagement_id}/objective/objective-brief.yml"),
-                format!(".octon/state/control/engagements/{engagement_id}/work-package.yml")
+                format!(".octon/state/control/engagements/{engagement_id}/change-package.yml")
             ],
             "recorded_at": now,
         }),
@@ -985,7 +985,7 @@ fn arm_engagement(
             ],
             "subject_refs": {
                 "engagement_ref": repo_ref(octon_dir, &engagement_path)?,
-                "work_package_ref": repo_ref(octon_dir, &control_root.join("work-package.yml"))?,
+                "change_package_ref": repo_ref(octon_dir, &control_root.join("change-package.yml"))?,
                 "run_contract_candidate_ref": candidate_ref,
                 "context_pack_request_ref": context_request_ref,
                 "support_capability_posture_ref": support_ref,
@@ -1009,7 +1009,7 @@ fn arm_engagement(
             "decision_request_id": decision_id,
             "engagement_id": engagement_id,
             "decision_request_ref": decision_ref,
-            "work_package_ref": repo_ref(octon_dir, &control_root.join("work-package.yml"))?,
+            "change_package_ref": repo_ref(octon_dir, &control_root.join("change-package.yml"))?,
             "run_contract_candidate_ref": candidate_ref,
             "recorded_at": now,
         }),
@@ -1044,7 +1044,7 @@ fn arm_engagement(
     )?;
 
     upsert(
-        &mut work_package,
+        &mut change_package,
         "support_posture",
         json!({
             "support_capability_posture_ref": support_ref,
@@ -1055,7 +1055,7 @@ fn arm_engagement(
         }),
     );
     upsert(
-        &mut work_package,
+        &mut change_package,
         "capability_posture",
         json!({
             "pack_ids": ["repo", "telemetry"],
@@ -1064,7 +1064,7 @@ fn arm_engagement(
         }),
     );
     upsert(
-        &mut work_package,
+        &mut change_package,
         "connector_posture",
         json!({
             "connector_posture_schema_ref": ".octon/framework/engine/runtime/spec/tool-connector-posture-v1.schema.json",
@@ -1079,7 +1079,7 @@ fn arm_engagement(
         }),
     );
     upsert(
-        &mut work_package,
+        &mut change_package,
         "evidence_profile",
         json!({
             "evidence_profile_ref": evidence_profile_ref,
@@ -1099,7 +1099,7 @@ fn arm_engagement(
         }),
     );
     upsert(
-        &mut work_package,
+        &mut change_package,
         "context_pack",
         json!({
             "context_pack_request_ref": context_request_ref,
@@ -1109,7 +1109,7 @@ fn arm_engagement(
         }),
     );
     upsert(
-        &mut work_package,
+        &mut change_package,
         "decision_requests",
         json!([
             {
@@ -1121,7 +1121,7 @@ fn arm_engagement(
         ]),
     );
     upsert(
-        &mut work_package,
+        &mut change_package,
         "run_contract_candidate",
         json!({
             "run_id": run_id,
@@ -1132,23 +1132,23 @@ fn arm_engagement(
         }),
     );
     upsert(
-        &mut work_package,
+        &mut change_package,
         "run_contract_readiness_evidence_refs",
         json!([run_readiness_evidence_ref]),
     );
-    upsert(&mut work_package, "outcome", json!("requires_decision"));
+    upsert(&mut change_package, "outcome", json!("requires_decision"));
     upsert(
-        &mut work_package,
+        &mut change_package,
         "blockers",
         json!([
             "decision-request-open",
             "context-pack-receipt-required-before-material-effects"
         ]),
     );
-    upsert(&mut work_package, "updated_at", json!(now));
+    upsert(&mut change_package, "updated_at", json!(now));
     write_yaml(
-        &control_root.join("work-package.yml"),
-        &Value::Object(work_package),
+        &control_root.join("change-package.yml"),
+        &Value::Object(change_package),
     )?;
 
     set_status_and_ref(
@@ -1297,7 +1297,7 @@ fn decide_engagement(
         }),
     )?;
     update_decision_index_status(&decision_index_path, decision_id, status, response, &now)?;
-    update_work_package_after_decision(
+    update_change_package_after_decision(
         octon_dir,
         engagement_id,
         decision_id,
@@ -1355,7 +1355,7 @@ fn write_canonical_decision_resolution(
                     "action_type": "engagement-run-contract-candidate-handoff",
                     "workflow_mode": "role-mediated",
                     "support_tier": "repo-consequential",
-                    "reason_codes": ["engagement-work-package-compiler-v1"],
+                    "reason_codes": ["engagement-change-package-compiler-v1"],
                     "required_evidence": [
                         format!(".octon/state/evidence/decisions/{decision_id}/request.yml"),
                         format!(".octon/state/evidence/decisions/{decision_id}/resolution.yml")
@@ -1504,7 +1504,7 @@ fn update_engagement_after_decision(
     refresh_projection_from_engagement(octon_dir, engagement_id, &engagement)
 }
 
-fn update_work_package_after_decision(
+fn update_change_package_after_decision(
     octon_dir: &Path,
     engagement_id: &str,
     decision_id: &str,
@@ -1512,13 +1512,13 @@ fn update_work_package_after_decision(
     response: &str,
     now: &str,
 ) -> Result<()> {
-    let work_package_path =
-        engagement_control_root(octon_dir, engagement_id).join("work-package.yml");
-    if !work_package_path.is_file() {
+    let change_package_path =
+        engagement_control_root(octon_dir, engagement_id).join("change-package.yml");
+    if !change_package_path.is_file() {
         return Ok(());
     }
-    let mut work_package = read_yaml_object(&work_package_path)?;
-    if let Some(requests) = work_package
+    let mut change_package = read_yaml_object(&change_package_path)?;
+    if let Some(requests) = change_package
         .get_mut("decision_requests")
         .and_then(Value::as_array_mut)
     {
@@ -1535,19 +1535,19 @@ fn update_work_package_after_decision(
 
     match (status, response) {
         ("resolved", "approval") => {
-            upsert(&mut work_package, "outcome", json!("stage_only"));
+            upsert(&mut change_package, "outcome", json!("stage_only"));
             upsert(
-                &mut work_package,
+                &mut change_package,
                 "blockers",
                 json!(["context-pack-receipt-required-before-material-effects"]),
             );
-            if let Some(support) = work_package
+            if let Some(support) = change_package
                 .get_mut("support_posture")
                 .and_then(Value::as_object_mut)
             {
                 support.insert("route".to_string(), json!("stage_only"));
             }
-            if let Some(capability) = work_package
+            if let Some(capability) = change_package
                 .get_mut("capability_posture")
                 .and_then(Value::as_object_mut)
             {
@@ -1555,19 +1555,19 @@ fn update_work_package_after_decision(
             }
         }
         ("denied", _) | ("revoked", _) => {
-            upsert(&mut work_package, "outcome", json!("denied"));
+            upsert(&mut change_package, "outcome", json!("denied"));
             upsert(
-                &mut work_package,
+                &mut change_package,
                 "blockers",
                 json!(["decision-request-denied"]),
             );
         }
         _ => {
-            upsert(&mut work_package, "outcome", json!("requires_decision"));
+            upsert(&mut change_package, "outcome", json!("requires_decision"));
         }
     }
-    upsert(&mut work_package, "updated_at", json!(now));
-    write_yaml(&work_package_path, &Value::Object(work_package))
+    upsert(&mut change_package, "updated_at", json!(now));
+    write_yaml(&change_package_path, &Value::Object(change_package))
 }
 
 fn ensure_candidate_decisions_resolved(octon_dir: &Path, candidate: &Value) -> Result<()> {
@@ -1620,8 +1620,8 @@ fn run_contract_candidate(
     let evidence_root = format!(".octon/state/evidence/runs/{run_id}");
     let objective_ref =
         format!(".octon/state/control/engagements/{engagement_id}/objective/objective-brief.yml");
-    let work_package_ref =
-        format!(".octon/state/control/engagements/{engagement_id}/work-package.yml");
+    let change_package_ref =
+        format!(".octon/state/control/engagements/{engagement_id}/change-package.yml");
     let engagement_ref = format!(".octon/state/control/engagements/{engagement_id}/engagement.yml");
     let support_target = support_tuple();
     Ok(json!({
@@ -1642,14 +1642,14 @@ fn run_contract_candidate(
             "engagement_ref": engagement_ref,
             "project_profile_ref": PROJECT_PROFILE_REF,
             "objective_brief_ref": objective_ref,
-            "work_package_ref": work_package_ref
+            "change_package_ref": change_package_ref
         },
         "objective_summary": engagement_seed_intent(octon_dir, engagement_id)?,
         "scope_in": [
             "workflow-contract",
             PROJECT_PROFILE_REF,
             objective_ref,
-            work_package_ref
+            change_package_ref
         ],
         "scope_out": [
             evidence_root.clone(),
@@ -1661,7 +1661,7 @@ fn run_contract_candidate(
         ],
         "acceptance_criteria": [
             "Material execution enters through octon run start --contract.",
-            "Support, connector, evidence, context, validation, and rollback posture remain bounded by the Work Package."
+            "Support, connector, evidence, context, validation, and rollback posture remain bounded by the Change Package."
         ],
         "materiality": "bounded-consequential",
         "risk_class": "low",
@@ -2156,7 +2156,7 @@ mod tests {
         )?;
         write_yaml(
             &root.join(COMPILER_POLICY_REF),
-            &json!({"schema_version": "engagement-work-package-compiler-governance-v1"}),
+            &json!({"schema_version": "engagement-change-package-compiler-governance-v1"}),
         )?;
         write_yaml(
             &root.join(EVIDENCE_PROFILES_POLICY_REF),

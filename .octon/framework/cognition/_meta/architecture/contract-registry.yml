@@ -246,6 +246,39 @@ path_families:
       - "architecture_specification"
       - "bootstrap_start"
       - "ingress_surface"
+  default_work_unit_policy:
+    class_root: "framework"
+    related_class_roots:
+      - "instance"
+      - "state"
+      - "generated"
+    canonical_paths:
+      - ".octon/framework/product/contracts/default-work-unit.md"
+      - ".octon/framework/product/contracts/default-work-unit.yml"
+      - ".octon/framework/product/contracts/change-receipt-v1.schema.json"
+    authority_class: "product-policy-contract"
+    role: >-
+      Canonical Change-first product policy that defines Change as the default
+      work unit, Change Package as the internal execution bundle, PRs as
+      optional publication and review outputs, branches as isolation tools, and
+      route-neutral Change receipts as durable closeout evidence.
+    allowed_consumers:
+      - "runtime"
+      - "validators"
+      - "operators"
+      - "docs"
+      - "skills"
+      - "workflows"
+    forbidden_consumers:
+      - "generated projections as authority substitutes"
+      - "GitHub or host adapters minting work-unit authority"
+      - "proposal-local packet paths as runtime or policy inputs"
+    validator_refs:
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh"
+    doc_target_refs:
+      - "architecture_specification"
+      - "bootstrap_start"
+      - "ingress_surface"
   compatibility_retirement:
     class_root: "instance"
     canonical_paths:
@@ -323,18 +356,18 @@ path_families:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-run-lifecycle-transition-coverage.sh"
     doc_target_refs:
       - "architecture_specification"
-  engagement_work_package_compiler:
+  engagement_change_package_compiler:
     class_root: "framework"
     related_class_roots:
       - "instance"
       - "state"
       - "generated"
     canonical_paths:
-      - ".octon/framework/engine/runtime/spec/engagement-work-package-compiler-v1.md"
+      - ".octon/framework/engine/runtime/spec/engagement-change-package-compiler-v1.md"
       - ".octon/framework/engine/runtime/spec/engagement-v1.schema.json"
       - ".octon/framework/engine/runtime/spec/project-profile-v1.schema.json"
       - ".octon/framework/engine/runtime/spec/engagement-objective-brief-v1.schema.json"
-      - ".octon/framework/engine/runtime/spec/work-package-v1.schema.json"
+      - ".octon/framework/engine/runtime/spec/change-package-v1.schema.json"
       - ".octon/framework/engine/runtime/spec/decision-request-v1.schema.json"
       - ".octon/framework/engine/runtime/spec/evidence-profile-v1.schema.json"
       - ".octon/framework/engine/runtime/spec/preflight-evidence-lane-v1.md"
@@ -344,7 +377,7 @@ path_families:
       - ".octon/framework/constitution/contracts/runtime/engagement-v1.schema.json"
       - ".octon/framework/constitution/contracts/runtime/project-profile-v1.schema.json"
       - ".octon/framework/constitution/contracts/runtime/engagement-objective-brief-v1.schema.json"
-      - ".octon/framework/constitution/contracts/runtime/work-package-v1.schema.json"
+      - ".octon/framework/constitution/contracts/runtime/change-package-v1.schema.json"
       - ".octon/framework/constitution/contracts/authority/decision-request-v1.schema.json"
       - ".octon/framework/constitution/contracts/runtime/evidence-profile-v1.schema.json"
       - ".octon/framework/constitution/contracts/adapters/tool-connector-posture-v1.schema.json"
@@ -362,11 +395,11 @@ path_families:
       - ".octon/state/evidence/engagements/<engagement-id>/run-contract-readiness/**"
       - ".octon/state/continuity/engagements/**"
       - ".octon/generated/cognition/projections/materialized/engagements/**"
-      - ".octon/generated/cognition/projections/materialized/work-packages/**"
+      - ".octon/generated/cognition/projections/materialized/change-packages/**"
     authority_class: "engagement-compiler-preparation-contract"
     role: >-
       Product-level preparation layer that compiles adoption, Project Profile,
-      engagement-scoped Objective Brief candidate, Work Package, Decision
+      engagement-scoped Objective Brief candidate, Change Package, Decision
       Requests, evidence profile, connector posture, context-pack request, and
       first run-contract candidate without replacing the run lifecycle.
     allowed_consumers:
@@ -1259,7 +1292,7 @@ path_families:
       - ".octon/generated/cognition/projections/definitions/run-health.yml"
       - ".octon/generated/cognition/projections/materialized/runs/**"
       - ".octon/generated/cognition/projections/materialized/engagements/**"
-      - ".octon/generated/cognition/projections/materialized/work-packages/**"
+      - ".octon/generated/cognition/projections/materialized/change-packages/**"
     authority_class: "generated-operator-read-model"
     role: "Generated mission, operator, decision, and run-health read models with traceability and explicit non-authority posture."
     allowed_consumers:
@@ -1483,7 +1516,7 @@ doc_targets:
         - "runtime_effective_handle_contract"
         - "runtime_publication_freshness"
         - "runtime_architecture_health"
-        - "engagement_work_package_compiler"
+        - "engagement_change_package_compiler"
         - "proof_bundle_executability"
         - "compatibility_retirement"
         - "overlay_resolution"
@@ -1522,7 +1555,7 @@ doc_targets:
         - "constitutional_kernel"
         - "structural_architecture"
         - "instance_ingress_and_bootstrap"
-        - "engagement_work_package_compiler"
+        - "engagement_change_package_compiler"
         - "workspace_charter_pair"
         - "state_continuity"
         - "generated_effective"

@@ -17,6 +17,7 @@ Usage:
   git-wt-new.sh --branch <type/slug-or-ticket-slug> [--base <branch>] [--worktree <path>] [--no-cleanup-preflight] [--dry-run]
 
 Creates a new git worktree and branch using repository branch naming standards.
+Route guard: call this helper only after Change routing selects branch-no-pr or branch-pr.
 USAGE
 }
 

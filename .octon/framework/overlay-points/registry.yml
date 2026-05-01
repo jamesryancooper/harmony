@@ -52,7 +52,7 @@ overlay_points:
     owning_domain: "governance"
     instance_glob: ".octon/instance/governance/engagements/**"
     merge_mode: "replace_by_path"
-    validator: ".octon/framework/assurance/runtime/_ops/scripts/validate-engagement-work-package-compiler.sh"
+    validator: ".octon/framework/assurance/runtime/_ops/scripts/validate-engagement-change-package-compiler.sh"
     precedence: 28
     artifact_kinds:
       - "engagement-path-family-registry"

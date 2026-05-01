@@ -11,6 +11,9 @@ fail(){ echo "[ERROR] $1"; errors=$((errors+1)); }
 pass(){ echo "[OK] $1"; }
 grep -Fq 'name: archive-proposal' "$WORKFLOW_DIR/workflow.yml" && pass "workflow id matches" || fail "workflow id matches"
 grep -Fq 'validate-proposal-standard.sh' "$WORKFLOW_DIR/stages/01-validate-proposal.md" && pass "baseline proposal validator referenced" || fail "baseline proposal validator referenced"
+grep -Fq 'validate-proposal-implementation-readiness.sh' "$WORKFLOW_DIR/stages/01-validate-proposal.md" && pass "implementation-readiness validator referenced" || fail "implementation-readiness validator referenced"
+grep -Fq 'validate-proposal-implementation-conformance.sh' "$WORKFLOW_DIR/stages/01-validate-proposal.md" && pass "implementation-conformance validator referenced" || fail "implementation-conformance validator referenced"
+grep -Fq 'validate-proposal-post-implementation-drift.sh' "$WORKFLOW_DIR/stages/01-validate-proposal.md" && pass "post-implementation drift validator referenced" || fail "post-implementation drift validator referenced"
 grep -Fq 'generated/proposals/registry.yml' "$WORKFLOW_DIR/stages/02-archive-proposal.md" && pass "registry regeneration documented" || fail "registry regeneration documented"
 grep -Fq 'disposition' "$WORKFLOW_DIR/workflow.yml" && pass "archive disposition input declared" || fail "archive disposition input declared"
 yq -e '.workflows[] | select(.id == "archive-proposal" and .path == "meta/archive-proposal/")' "$WORKFLOW_MANIFEST" >/dev/null 2>&1 && pass "manifest registration exists" || fail "manifest registration exists"

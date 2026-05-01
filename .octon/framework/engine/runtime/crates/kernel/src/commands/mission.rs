@@ -217,8 +217,8 @@ fn open_mission(octon_dir: &Path, args: &MissionOpenCmd) -> Result<MissionReport
     let engagement_root = repo_root(octon_dir)
         .join(".octon/state/control/engagements")
         .join(&args.engagement_id);
-    let work_package = read_yaml_value(&engagement_root.join("work-package.yml"))?;
-    let objective_summary = work_package
+    let change_package = read_yaml_value(&engagement_root.join("change-package.yml"))?;
+    let objective_summary = change_package
         .get("implementation_plan_summary")
         .and_then(Value::as_str)
         .unwrap_or("Continue bounded governed mission work.");
@@ -289,7 +289,7 @@ fn open_mission(octon_dir: &Path, args: &MissionOpenCmd) -> Result<MissionReport
             "status": "active",
             "mission_authority_ref": mission_instance_ref,
             "engagement_ref": format!(".octon/state/control/engagements/{}/engagement.yml", args.engagement_id),
-            "work_package_ref": format!(".octon/state/control/engagements/{}/work-package.yml", args.engagement_id),
+            "change_package_ref": format!(".octon/state/control/engagements/{}/change-package.yml", args.engagement_id),
             "autonomy_window_ref": format!(".octon/state/control/execution/missions/{mission_id}/autonomy-window.yml"),
             "queue_ref": format!(".octon/state/control/execution/missions/{mission_id}/queue.yml"),
             "runs_ref": format!(".octon/state/control/execution/missions/{mission_id}/runs.yml"),
@@ -2074,9 +2074,9 @@ fn ensure_required_v1(octon_dir: &Path, engagement_id: &str) -> Result<()> {
         .join(engagement_id);
     let required = [
         engagement_root.join("engagement.yml"),
-        engagement_root.join("work-package.yml"),
+        engagement_root.join("change-package.yml"),
         root.join(PROJECT_PROFILE_REF),
-        root.join(".octon/framework/engine/runtime/spec/work-package-v1.schema.json"),
+        root.join(".octon/framework/engine/runtime/spec/change-package-v1.schema.json"),
         root.join(".octon/framework/engine/runtime/spec/decision-request-v1.schema.json"),
         root.join(".octon/framework/engine/runtime/spec/evidence-profile-v1.schema.json"),
         root.join(".octon/framework/engine/runtime/spec/preflight-evidence-lane-v1.md"),
@@ -2093,7 +2093,7 @@ fn ensure_required_v1(octon_dir: &Path, engagement_id: &str) -> Result<()> {
         Ok(())
     } else {
         bail!(
-            "Mission Autonomy Runtime v2 requires v1 Engagement/Profile/Work Package surfaces; missing: {}",
+            "Mission Autonomy Runtime v2 requires v1 Engagement/Profile/Change Package surfaces; missing: {}",
             missing.join(", ")
         )
     }
@@ -2138,7 +2138,7 @@ fn write_autonomy_window(
             "schema_version": "mission-control-lease-v1",
             "mission_id": mission_id,
             "engagement_id": engagement_id,
-            "work_package_ref": format!(".octon/state/control/engagements/{engagement_id}/work-package.yml"),
+            "change_package_ref": format!(".octon/state/control/engagements/{engagement_id}/change-package.yml"),
             "lease_id": format!("{mission_id}-lease"),
             "state": state,
             "issued_by": "operator://octon-mission-runtime-v2",
@@ -2171,7 +2171,7 @@ fn write_autonomy_window(
             "max_concurrent_runs": 1,
             "context_freshness_policy": {
                 "project_profile_required": true,
-                "work_package_required": true,
+                "change_package_required": true,
                 "context_pack_required_per_run": true,
                 "stale_posture_route": "pause_or_decision_request"
             },
@@ -2293,9 +2293,9 @@ fn write_queue(octon_dir: &Path, mission_id: &str, engagement_id: &str, now: &st
                     "slice_id": format!("{mission_id}-slice-1"),
                     "mission_id": mission_id,
                     "engagement_id": engagement_id,
-                    "title": "Continue the v1 Work Package as one bounded governed run candidate",
+                    "title": "Continue the v1 Change Package as one bounded governed run candidate",
                     "objective_ref": format!(".octon/state/control/engagements/{engagement_id}/objective/objective-brief.yml"),
-                    "work_package_ref": format!(".octon/state/control/engagements/{engagement_id}/work-package.yml"),
+                    "change_package_ref": format!(".octon/state/control/engagements/{engagement_id}/change-package.yml"),
                     "status": "pending",
                     "action_class": "repo-maintenance",
                     "scope_ids": ["octon-harness"],
@@ -2510,12 +2510,12 @@ fn evaluate_lease(
     if lease.get("engagement_id").and_then(Value::as_str) != Some(engagement_id) {
         blockers.push("mission-control-lease-engagement-scope-mismatch".to_string());
     }
-    let expected_work_package_ref =
-        format!(".octon/state/control/engagements/{engagement_id}/work-package.yml");
-    if lease.get("work_package_ref").and_then(Value::as_str)
-        != Some(expected_work_package_ref.as_str())
+    let expected_change_package_ref =
+        format!(".octon/state/control/engagements/{engagement_id}/change-package.yml");
+    if lease.get("change_package_ref").and_then(Value::as_str)
+        != Some(expected_change_package_ref.as_str())
     {
-        blockers.push("mission-control-lease-work-package-scope-mismatch".to_string());
+        blockers.push("mission-control-lease-change-package-scope-mismatch".to_string());
     }
     enforce_timestamp_not_expired(
         &lease,
@@ -2614,12 +2614,12 @@ fn evaluate_context_support_capability(
             blockers.push(blocker.to_string());
         }
     }
-    let work_package_path = root
+    let change_package_path = root
         .join(".octon/state/control/engagements")
         .join(engagement_id)
-        .join("work-package.yml");
-    if !work_package_path.is_file() {
-        blockers.push("work-package-missing".to_string());
+        .join("change-package.yml");
+    if !change_package_path.is_file() {
+        blockers.push("change-package-missing".to_string());
     }
     let queue_path = mission_control_root(octon_dir, mission_id).join("queue.yml");
     if !queue_path.is_file() {
@@ -2726,14 +2726,14 @@ fn compile_next_candidate(
             "objective_refs": {
                 "engagement_ref": format!(".octon/state/control/engagements/{engagement_id}/engagement.yml"),
                 "project_profile_ref": PROJECT_PROFILE_REF,
-                "work_package_ref": format!(".octon/state/control/engagements/{engagement_id}/work-package.yml"),
+                "change_package_ref": format!(".octon/state/control/engagements/{engagement_id}/change-package.yml"),
                 "mission_ref": format!(".octon/state/control/execution/missions/{mission_id}/mission.yml"),
                 "mission_queue_ref": format!(".octon/state/control/execution/missions/{mission_id}/queue.yml"),
                 "action_slice_ref": format!(".octon/state/control/execution/missions/{mission_id}/queue.yml#action_slices/{slice_id}")
             },
             "objective_summary": "Execute one bounded Mission Queue Action Slice through the governed run lifecycle.",
             "scope_in": [
-                format!(".octon/state/control/engagements/{engagement_id}/work-package.yml"),
+                format!(".octon/state/control/engagements/{engagement_id}/change-package.yml"),
                 format!(".octon/state/control/execution/missions/{mission_id}/queue.yml"),
                 format!(".octon/state/control/execution/missions/{mission_id}/autonomy-window.yml")
             ],

@@ -19,3 +19,4 @@
 - `manifest-and-controller-prompt-pack.md`
 - `screen-prompt-pack.md`
 - `production-workflow.md`
+- `support/implementation-grade-completeness-review.md`

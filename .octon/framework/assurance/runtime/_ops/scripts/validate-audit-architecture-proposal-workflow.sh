@@ -9,8 +9,11 @@ WORKFLOW_REGISTRY="$OCTON_DIR/orchestration/runtime/workflows/registry.yml"
 errors=0
 fail(){ echo "[ERROR] $1"; errors=$((errors+1)); }
 pass(){ echo "[OK] $1"; }
-grep -Fq 'name: "audit-architecture-proposal"' "$WORKFLOW_DIR/workflow.yml" && pass "workflow id matches" || fail "workflow id matches"
+yq -e '.name == "audit-architecture-proposal"' "$WORKFLOW_DIR/workflow.yml" >/dev/null 2>&1 && pass "workflow id matches" || fail "workflow id matches"
 grep -Fq 'validate-architecture-proposal.sh' "$WORKFLOW_DIR/workflow.yml" && pass "architecture validator referenced" || fail "architecture validator referenced"
+grep -Fq 'implementation-simulation' "$WORKFLOW_DIR/workflow.yml" && pass "implementation simulation stage is active" || fail "implementation simulation stage is active"
+grep -Fq 'specification-closure' "$WORKFLOW_DIR/workflow.yml" && pass "specification closure stage is active" || fail "specification closure stage is active"
+grep -Fq 'implementation-grade-completeness-review.md' "$WORKFLOW_DIR/stages/08-specification-closure.md" && pass "completeness review receipt is produced" || fail "completeness review receipt is produced"
 yq -e '.workflows[] | select(.id == "audit-architecture-proposal" and .path == "audit/audit-architecture-proposal/")' "$WORKFLOW_MANIFEST" >/dev/null 2>&1 && pass "manifest registration exists" || fail "manifest registration exists"
 grep -Fq 'audit-architecture-proposal:' "$WORKFLOW_REGISTRY" && pass "registry entry exists" || fail "registry entry exists"
 echo "Validation summary: errors=$errors"

@@ -6,7 +6,7 @@ Mission continuation is the post-v1 governed runtime sequence:
 2. Verify an active, unexpired, scoped, recently reviewed mission-control lease.
 3. Verify autonomy budget is healthy.
 4. Verify circuit breakers are clear and recently recomputed.
-5. Verify Project Profile, Work Package, support, capability, connector, and
+5. Verify Project Profile, Change Package, support, capability, connector, and
    context posture are available.
 6. Select one Action Slice.
 7. Compile one run-contract candidate.
