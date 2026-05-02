@@ -91,7 +91,7 @@ jobs:
           standards=".octon/framework/execution-roles/practices/standards/commit-pr-standards.json"
           type_pattern="$(jq -r '.branch.allowed_types | map(gsub("([][(){}.*+?^$|\\\\])"; "\\\\\\1")) | join("|")' "${standards}")"
           ticket_pattern="$(jq -r '.branch.ticket_pattern' "${standards}")"
-          slug_pattern="$(jq -r '.branch.slug_pattern' "${standards}")"
+          slug_pattern="$(jq -r '.branch.slug_pattern | gsub("\\(\\?:"; "(")' "${standards}")"
           expected="$(jq -r '.branch.default_format' "${standards}")"
 
           if [[ ! "${branch_name}" =~ ^(${type_pattern})/(${ticket_pattern}-)?${slug_pattern}$ ]]; then

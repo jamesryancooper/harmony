@@ -98,6 +98,16 @@ require_jq() {
   jq -e "$expr" "$file" >/dev/null 2>&1 && pass "$ok_msg" || fail "$fail_msg"
 }
 
+search_regex() {
+  local pattern="$1"
+  shift
+  if command -v rg >/dev/null 2>&1; then
+    rg -n -- "$pattern" "$@" 2>/dev/null || true
+  else
+    grep -REn -- "$pattern" "$@" 2>/dev/null || true
+  fi
+}
+
 existing_search_roots() {
   local root
   for root in "$GITHUB_DIR" "$OCTON_DIR/framework" "$OCTON_DIR/instance"; do
@@ -178,7 +188,7 @@ check_validators() {
   require_literal "$RULESET_VALIDATOR" "PR-required ruleset blocks hosted branch-no-pr landing" "ruleset validator detects current PR-required blocker" "ruleset validator must detect current PR-required blocker"
 
   local mutation
-  mutation="$(rg -n -- '--method[[:space:]]+(PATCH|POST|PUT|DELETE)|-X[[:space:]]+(PATCH|POST|PUT|DELETE)' "$RULESET_VALIDATOR" 2>/dev/null || true)"
+  mutation="$(search_regex '--method[[:space:]]+(PATCH|POST|PUT|DELETE)|-X[[:space:]]+(PATCH|POST|PUT|DELETE)' "$RULESET_VALIDATOR")"
   if [[ -n "$mutation" ]]; then
     printf '%s\n' "$mutation"
     fail "ruleset validator must not mutate live GitHub settings"
@@ -189,7 +199,7 @@ check_validators() {
 
 check_stale_projection_drift() {
   local stale_github
-  stale_github="$(rg -n 'PR-first|pr-first|main-pr-first|required-pr-|Main PR-First|Enforce PR-first|Direct pushes to main are blocked|\[main-pr-first\]' "$GITHUB_DIR" 2>/dev/null || true)"
+  stale_github="$(search_regex 'PR-first|pr-first|main-pr-first|required-pr-|Main PR-First|Enforce PR-first|Direct pushes to main are blocked|\[main-pr-first\]' "$GITHUB_DIR")"
   if [[ -n "$stale_github" ]]; then
     printf '%s\n' "$stale_github"
     fail ".github projection must not retain universal PR-first language"
@@ -204,7 +214,7 @@ check_stale_projection_drift() {
 
   local old_refs
   old_refs="$(
-    rg -n 'main-pr-first-guard\.yml|main-pr-first' "${old_ref_roots[@]}" 2>/dev/null \
+    search_regex 'main-pr-first-guard\.yml|main-pr-first' "${old_ref_roots[@]}" \
       | grep -v 'validate-github-projection-alignment.sh' \
       | grep -v 'test-github-projection-alignment.sh' \
       || true
@@ -220,7 +230,6 @@ check_stale_projection_drift() {
 main() {
   echo "== GitHub Projection Alignment Validation =="
   command -v jq >/dev/null 2>&1 || { echo "[ERROR] jq is required" >&2; exit 1; }
-  command -v rg >/dev/null 2>&1 || { echo "[ERROR] rg is required" >&2; exit 1; }
 
   check_guard_projection
   check_route_neutral_projection_workflow
