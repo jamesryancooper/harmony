@@ -63,7 +63,12 @@ while IFS= read -r run_contract; do
   else
     errors=$((errors + 1))
   fi
-done < <(find "$OCTON_DIR/state/control/execution/runs" -name run-contract.yml -type f | sort)
+done < <(
+  while IFS= read -r run_id; do
+    [[ -n "$run_id" ]] || continue
+    run_contract_path "$run_id"
+  done < <(representative_run_ids)
+)
 
 {
   echo "schema_version: octon-continuity-linkage-v1"

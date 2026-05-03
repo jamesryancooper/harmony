@@ -30,7 +30,7 @@ retry_class: manual_review_required
 rollback_candidate: true
 rollback_notes: Restore from the canonical checkpoint and reissue the stage if retained evidence becomes inconsistent.
 run_id: protected-ci-1776956405637-68212
-schema_version: stage-attempt-v1
+schema_version: stage-attempt-v2
 stage_attempt_id: initial
 stage_ref: github-pr:example/repo#17
 status: succeeded
