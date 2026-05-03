@@ -136,12 +136,54 @@ Before expecting autonomous merges:
 6. (Optional) `AUTONOMY_AUTO_CLOSE_ENABLED=true` if stale draft auto-close is desired.
 7. (Optional) `AUTONOMY_ATTENTION_AFTER_HOURS=<n>` to tune attention indicator threshold.
 
-Human-review exceptions (default policy):
+Human escalation exceptions (default policy):
 
 1. PR head branch matches `exp/*`.
-2. PR touches high-impact governance/control-plane paths (manual lane only).
-3. Dependabot update is `major` or `unknown` semver transition (manual lane only).
-4. Canonical approval artifacts and required checks are the authority source.
+2. Dependabot update is `major` or `unknown` semver transition and the agent
+   cannot prove safe compatibility, validation, and rollback.
+3. Live rulesets, required approvals, credentials, policy acceptance, or
+   unresolved review judgment require authority the agent does not have.
+4. Required evidence, mergeability, rollback safety, or post-merge
+   `origin/main` state cannot be proven.
+5. Canonical approval artifacts and required checks are the authority source.
+
+High-impact `branch-pr` PRs do not default to this list. They enter
+elevated-autonomy: keep progressing while checks, evidence, review-thread
+state, rollback, mergeability, and protected-main controls can be proven.
+Escalation must cite a concrete blocker rather than the `risk:high` label
+alone.
+
+## Autonomous Draft Completion Preflight
+
+Agents may complete a draft PR autonomously only in the `branch-pr` route and
+only after this preflight passes:
+
+1. The PR is open and still draft.
+2. The PR belongs to the autonomous `branch-pr` lane.
+3. For high-impact PRs, the agent has completed explicit self-review of the
+   diff, policy impact, evidence, and rollback path.
+4. All required GitHub checks are passing.
+5. `AI Review Gate / decision` is passing when it is required.
+6. `PR Quality Standards`, `Validate branch naming`, `PR Clean State
+   Enforcer`, and `Validate autonomy policy` are passing.
+7. No unresolved author-action review threads remain.
+8. No blocking labels, requested changes, merge conflicts, or stale head state
+   remain.
+9. The PR has the required Change receipt or PR closeout evidence.
+10. The current live GitHub ruleset allows the protected-main merge path.
+
+After the preflight passes, an agent may mark the PR ready for review and
+request or perform the currently valid protected-main merge path. In the
+current PR-required live posture, that path is GitHub squash auto-merge or a
+GitHub-accepted squash merge for the PR. The agent must not push directly to
+protected `main`, bypass required checks, bypass review policy, bypass
+rulesets, or treat labels/comments/helper output as authority.
+
+For high-impact PRs, the agent owns the full closeout loop after merge request:
+watch until GitHub merges, fetch `origin/main`, verify the merged result is
+present, and record merged ref, validation evidence, rollback handle, and
+cleanup disposition. If any of those facts cannot be proven, escalate with the
+exact blocker and smallest needed human decision.
 
 Useful verification commands:
 
@@ -418,9 +460,10 @@ GitHub Actions dependency updates are split into two lanes:
   - Merged autonomously by `pr-auto-merge.yml`.
   - AI gate provider adapters are skipped for Dependabot-authored PRs so the
     safe lane does not fail on unavailable Actions secrets.
-- Escalation lane (human): `semver-major` and unknown version transitions
-  - Not auto-merged.
-  - Leave the PR in the manual lane and merge with ordinary human review.
+- Escalation lane: `semver-major` and unknown version transitions
+  - Escalate when compatibility, validation coverage, or rollback safety cannot
+    be proven autonomously.
+  - Human merge is required only after that concrete blocker is documented.
 
 Configuration source:
 

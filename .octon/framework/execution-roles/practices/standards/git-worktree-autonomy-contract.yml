@@ -177,6 +177,57 @@ remediation:
     - "unauthorized programmatic review-thread resolution"
     - "merge main into branch as remediation shortcut"
 pr_backed_review_policy:
+  autonomous_draft_completion:
+    status: "allowed"
+    route_guard: "branch-pr only"
+    scope: "draft-to-ready transition plus protected-main merge request"
+    allowed_transitions:
+      - "mark_draft_pr_ready_for_review"
+      - "request_or_execute_protected_main_merge"
+    high_impact_posture:
+      classification: "risk:high"
+      autonomy_model: "elevated-autonomy"
+      manual_default: false
+      required_extra_evidence:
+        - "explicit_diff_self_review"
+        - "policy_impact_self_review"
+        - "rollback_path_self_review"
+        - "post_merge_origin_main_verification"
+      escalation_rule: "escalate only for concrete unresolved blockers; high-impact alone is not a blocker"
+    eligibility:
+      - "PR is open and draft"
+      - "PR belongs to the autonomous branch-pr lane"
+      - "high-impact PRs include explicit self-review of diff, policy impact, evidence, and rollback path"
+      - "all required GitHub checks are passing"
+      - "AI Review Gate / decision is passing when required"
+      - "PR Quality Standards is passing"
+      - "Validate branch naming is passing"
+      - "PR Clean State Enforcer is passing"
+      - "Validate autonomy policy is passing"
+      - "no unresolved author-action review threads remain"
+      - "no blocking labels remain"
+      - "no requested changes remain"
+      - "no merge conflicts remain"
+      - "no stale head state remains"
+      - "Change receipt or PR closeout evidence is present"
+      - "current live GitHub rulesets allow the merge path"
+    merge_determination:
+      - "repo-local autonomy policy returns granted for the PR"
+      - "GitHub reports the PR mergeable under the current protected-main rules"
+      - "the merge request uses the currently valid protected-main route"
+      - "GitHub required checks and rulesets remain authoritative at merge time"
+    protected_main_bypass_allowed: false
+    forbidden_uses:
+      - "mark ready when any eligibility item is missing"
+      - "request auto-merge for manual-lane PRs"
+      - "merge by pushing directly to protected main"
+      - "treat labels, comments, or helper output as authority"
+      - "bypass required checks, rulesets, review policy, or GitHub mergeability"
+    escalation_requires:
+      - "exact blocker"
+      - "evidence gathered"
+      - "remediation attempted"
+      - "smallest human decision needed"
   reviewer_owned_thread_resolution:
     default: "reviewer-or-maintainer"
     solo_maintainer_exception:

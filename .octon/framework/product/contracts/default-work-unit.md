@@ -86,8 +86,17 @@ PR-backed outcomes:
 - `preserved`: branch state is recoverable but no usable PR exists yet.
 - `published`: the branch is pushed and a PR exists.
 - `ready`: required hosted checks and review gates are satisfied or blocked by
-  a precise external condition.
-- `landed`: the PR is merged into `main`.
+  a precise external condition. Autonomous draft completion may mark an open
+  draft PR ready only when it is in the autonomous `branch-pr` lane, all
+  required checks are green, `AI Review Gate / decision` is green when
+  required, PR quality, branch naming, clean-state, and autonomy checks are
+  green, no unresolved author-action review threads, blocking labels,
+  requested changes, merge conflicts, or stale head state remain, and required
+  Change receipt or PR closeout evidence is present. High-impact PRs also
+  require explicit self-review of diff, policy impact, evidence, and rollback
+  path, but high-impact classification alone is not a manual-lane outcome.
+- `landed`: the PR is merged into `main` and `origin/main` is fetched and
+  verified to contain the merged result.
 - `cleaned`: local branch, remote branch, and worktree cleanup are complete or
   explicitly deferred with evidence.
 
