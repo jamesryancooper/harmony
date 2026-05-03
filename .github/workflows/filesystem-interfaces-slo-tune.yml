@@ -46,8 +46,9 @@ jobs:
         run: |
           cargo install --locked cargo-component
 
-      - name: Prefetch filesystem service crates
+      - name: Prefetch runtime and filesystem service crates
         run: |
+          cargo fetch --locked --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml
           for crate_dir in \
             .octon/framework/capabilities/runtime/services/interfaces/filesystem-snapshot/rust \
             .octon/framework/capabilities/runtime/services/interfaces/filesystem-discovery/rust \
@@ -81,14 +82,21 @@ jobs:
             --headroom-percent "$HEADROOM_PERCENT" \
             --max-tighten-percent "$MAX_TIGHTEN_PERCENT"
 
-      - name: Validate tuned budgets
+      - name: Compile split filesystem wasm services from source
         env:
-          OCTON_SERVICE_BUILD_OFFLINE_ONLY: "1"
           CARGO_NET_OFFLINE: "true"
         run: |
-          .octon/framework/engine/runtime/run service build interfaces/filesystem-snapshot
-          .octon/framework/engine/runtime/run service build interfaces/filesystem-discovery
-          .octon/framework/engine/runtime/run service build interfaces/filesystem-watch
+          for service in filesystem-snapshot filesystem-discovery filesystem-watch
+          do
+            (
+              cd ".octon/framework/capabilities/runtime/services/interfaces/${service}/rust"
+              CARGO_TARGET_DIR="${GITHUB_WORKSPACE}/.octon/generated/.tmp/engine/filesystem-service-build/${service}" \
+                cargo component build --release --offline
+            )
+          done
+
+      - name: Validate tuned budgets
+        run: |
           FILESYSTEM_INTERFACES_VALIDATE_SLO=1 bash .octon/framework/capabilities/runtime/services/_ops/scripts/validate-filesystem-interfaces.sh
 
       - name: Create pull request

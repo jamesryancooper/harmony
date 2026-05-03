@@ -129,8 +129,9 @@ jobs:
             cargo install --locked cargo-component
           fi
 
-      - name: Prefetch filesystem service crates
+      - name: Prefetch runtime and filesystem service crates
         run: |
+          cargo fetch --locked --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml
           for crate_dir in \
             .octon/framework/capabilities/runtime/services/interfaces/filesystem-snapshot/rust \
             .octon/framework/capabilities/runtime/services/interfaces/filesystem-discovery/rust \
@@ -139,14 +140,18 @@ jobs:
             (cd "$crate_dir" && cargo fetch --locked --target wasm32-wasip1)
           done
 
-      - name: Build split filesystem wasm services from source
+      - name: Compile split filesystem wasm services from source
         env:
-          OCTON_SERVICE_BUILD_OFFLINE_ONLY: "1"
           CARGO_NET_OFFLINE: "true"
         run: |
-          .octon/framework/engine/runtime/run service build interfaces/filesystem-snapshot
-          .octon/framework/engine/runtime/run service build interfaces/filesystem-discovery
-          .octon/framework/engine/runtime/run service build interfaces/filesystem-watch
+          for service in filesystem-snapshot filesystem-discovery filesystem-watch
+          do
+            (
+              cd ".octon/framework/capabilities/runtime/services/interfaces/${service}/rust"
+              CARGO_TARGET_DIR="${GITHUB_WORKSPACE}/.octon/generated/.tmp/engine/filesystem-service-build/${service}" \
+                cargo component build --release --offline
+            )
+          done
 
       - name: Unit tests (filesystem-snapshot Rust crate)
         if: needs.changes.outputs.runtime_required == 'true'
@@ -187,9 +192,13 @@ jobs:
         if: needs.changes.outputs.runtime_required == 'true'
         run: |
           chmod +x .octon/framework/capabilities/runtime/services/_ops/scripts/build-filesystem-interfaces-benchmark-fixture.sh
-          FIXTURE_ROOT=".octon/generated/.tmp/filesystem-interfaces-bench/cross-os-fixture"
-          STATE_DIR=".octon/generated/.tmp/engine/filesystem-snapshots-cross-os"
-          rm -rf "$FIXTURE_ROOT"
+          FIXTURE_ROOT=".octon/generated/effective/capabilities/filesystem-cross-os-fixture"
+          STATE_DIR=".octon/generated/effective/capabilities/filesystem-snapshots-cross-os"
+          for cleanup_path in "$FIXTURE_ROOT" "$STATE_DIR"; do
+            if [[ -e "$cleanup_path" ]]; then
+              rm -r "$cleanup_path"
+            fi
+          done
           .octon/framework/capabilities/runtime/services/_ops/scripts/build-filesystem-interfaces-benchmark-fixture.sh \
             --profile ci \
             --fixture-root "$FIXTURE_ROOT" >/dev/null
@@ -224,7 +233,7 @@ jobs:
             --summary-out "$RUNNER_TEMP/filesystem-interfaces-slo/filesystem-interfaces-slo.summary.tsv"
 
       - name: Upload SLO summary artifact
-        if: ${{ needs.changes.outputs.runtime_required == 'true' && matrix.publish_slo_artifacts }}
+        if: ${{ always() && needs.changes.outputs.runtime_required == 'true' && matrix.publish_slo_artifacts }}
         uses: actions/upload-artifact@v4
         with:
           name: filesystem-interfaces-slo-summary
@@ -232,7 +241,7 @@ jobs:
           retention-days: 7
 
       - name: Upload SLO raw metrics artifact
-        if: ${{ needs.changes.outputs.runtime_required == 'true' && matrix.publish_slo_artifacts }}
+        if: ${{ always() && needs.changes.outputs.runtime_required == 'true' && matrix.publish_slo_artifacts }}
         uses: actions/upload-artifact@v4
         with:
           name: filesystem-interfaces-slo-raw
@@ -251,7 +260,7 @@ jobs:
             --summary-out "$RUNNER_TEMP/filesystem-interfaces-perf/filesystem-interfaces-perf.summary.tsv"
 
       - name: Upload perf summary artifact
-        if: ${{ matrix.run_perf_regression && needs.changes.outputs.perf_required == 'true' }}
+        if: ${{ always() && matrix.run_perf_regression && needs.changes.outputs.perf_required == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: filesystem-interfaces-perf-summary
@@ -259,7 +268,7 @@ jobs:
           retention-days: 7
 
       - name: Upload perf raw artifact
-        if: ${{ matrix.run_perf_regression && needs.changes.outputs.perf_required == 'true' }}
+        if: ${{ always() && matrix.run_perf_regression && needs.changes.outputs.perf_required == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: filesystem-interfaces-perf-raw
