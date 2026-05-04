@@ -143,10 +143,69 @@ Start with the route matrix and operator path in
 
 | concern | current live state | repo-local target | operator rule |
 |---|---|---|---|
-| `main` protection posture | PR-required protected `main`; hosted `branch-no-pr` landing remains blocked. | Route-neutral protected `main` with required status checks, linear history, non-fast-forward protection, and deletion protection. | Do not claim live route-neutral migration from repo-local projection alone. |
-| Universal route-neutral checks | Current live required checks are represented by `current_live_main` in `.octon/framework/execution-roles/practices/standards/github-control-plane-contract.json`. | `route_neutral_closeout_validation`, `branch_naming_validation`, `route_aware_autonomy_validation`, `exact_source_sha_validation`. | Checks must be runnable against the exact source SHA intended for hosted no-PR landing. |
-| PR-only checks | Required only by the current PR-backed live lane when configured by live rulesets. | `AI Review Gate / decision`, `PR Quality Standards`, PR auto-merge, clean-state, PR template quality, and PR review projections stay behind `branch-pr`. | Do not add PR-only checks as universal `main` requirements for `direct-main` or hosted `branch-no-pr`. |
-| Post-migration contract update | `current_live_main` remains PR-required until live evidence proves otherwise. | After accepted live migration, `current_live_main` must be updated to match the proven target posture. | Update `current_live_main` only after `.octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh --expect target-route-neutral --strict-live` passes and durable evidence is retained. |
+| `main` protection posture | Route-neutral protected `main`; universal PR-required merging has been removed while required status checks, linear history, non-fast-forward protection, and deletion protection remain. | Same as current live state. | Do not claim live route-neutral migration from repo-local projection alone. Require accepted migration evidence and strict-live validation. |
+| Universal route-neutral checks | `route_neutral_closeout_validation`, `branch_naming_validation`, `route_aware_autonomy_validation`, `exact_source_sha_validation`. | Same route-neutral check set. | Checks must be runnable against the exact source SHA intended for hosted no-PR landing. |
+| PR-only checks | `AI Review Gate / decision`, `PR Quality Standards`, PR auto-merge, clean-state, PR template quality, and PR review projections stay behind `branch-pr`. | Same PR-specific scope. | Do not add PR-only checks as universal `main` requirements for `direct-main` or hosted `branch-no-pr`. |
+| Post-migration contract update | `current_live_main` records the proven route-neutral live posture. | Future live ruleset changes must update `current_live_main` to match strict-live provider evidence. | Update `current_live_main` only after `.octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh --expect target-route-neutral --strict-live` passes and durable evidence is retained. |
+
+## Route-Neutral Main Ruleset Migration Plan
+
+This is a reviewed operator procedure, not an instruction to mutate live
+GitHub settings during ordinary documentation or validator changes.
+
+Read-only inspection:
+
+```bash
+gh api repos/<owner>/<repo>/rulesets
+gh api repos/<owner>/<repo>/rulesets/<ruleset-id>
+```
+
+Preserve rollback snapshots before preparing any patch:
+
+```bash
+gh api repos/<owner>/<repo>/rulesets > .octon/state/evidence/control/execution/github-rulesets/current-rulesets.json
+gh api repos/<owner>/<repo>/rulesets/<ruleset-id> > .octon/state/evidence/control/execution/github-rulesets/current-main-ruleset.json
+```
+
+Build a target fixture from the live ruleset object. The fixture must remove
+the universal PR-required rule for `main`, preserve unrelated settings exactly,
+keep required status checks, linear history, non-fast-forward protection, and
+deletion protection, and use only the observed route-neutral check contexts:
+`route_neutral_closeout_validation`, `branch_naming_validation`,
+`route_aware_autonomy_validation`, and `exact_source_sha_validation`.
+
+Validate the fixture before maintainer acceptance:
+
+```bash
+.octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh \
+  --expect target-route-neutral \
+  --ruleset-json <target-route-neutral-ruleset.json>
+```
+
+Do not run until maintainer accepts the migration packet:
+
+```bash
+gh api \
+  --method PUT \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  repos/<owner>/<repo>/rulesets/<ruleset-id> \
+  --input <target-route-neutral-ruleset.json>
+```
+
+The accepted migration packet must contain current live-state evidence, shadow
+route-neutral check evidence against an exact pushed source SHA, the target
+ruleset fixture, the exact diff from the live ruleset object, the rollback
+snapshot and command, and the first hosted `branch-no-pr` landing procedure.
+
+After migration, validate live state before updating
+`github-control-plane-contract.json`:
+
+```bash
+.octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh \
+  --expect target-route-neutral \
+  --strict-live
+```
 
 Human escalation exceptions (default policy):
 

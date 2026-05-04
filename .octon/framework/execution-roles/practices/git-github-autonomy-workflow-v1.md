@@ -47,10 +47,12 @@ This workflow covers:
 
 1. Keep one clean primary `main` worktree or clone as the integration anchor.
 2. Create one branch worktree per branch-routed Change.
-3. Do implementation, validation, review remediation, and PR iteration in the
-   branch worktree, not on `main`.
-4. Open draft PRs only after Change routing selects branch-pr.
-5. Treat ready-for-review as a state criterion:
+3. For eligible low-risk solo Changes, use `direct-main` on clean current
+   `main` with local validation, Change receipt evidence, and rollback.
+4. Do implementation, validation, review remediation, and PR iteration for
+   branch-routed work in the branch worktree, not on `main`.
+5. Open draft PRs only after Change routing selects branch-pr.
+6. Treat ready-for-review as a state criterion:
    - the current slice is complete
    - no unresolved author action items remain
    - the lane is appropriate
@@ -167,11 +169,11 @@ asks to finish, ship, or closeout.
 Prompt set:
 
 - **Primary `main` worktree**
-  - "This work is on the main worktree, and Octon does not open PRs from
-    `main`. Should I branch it into a feature worktree and prepare a draft
-    PR?"
+  - "This work is on the main worktree. I will first check whether it qualifies
+    for direct-main; if it needs isolation or PR-backed review, I will report
+    the route and next mutation."
 - **Branch worktree, no PR yet**
-  - "This branch worktree looks ready for PR closeout. Should I stage,
+  - "This branch worktree looks ready for Change closeout. Should I stage,
     commit, validate, record a Change receipt, and open a draft PR only if
     branch-pr is selected?"
 - **Branch worktree, existing draft PR, autonomous lane**

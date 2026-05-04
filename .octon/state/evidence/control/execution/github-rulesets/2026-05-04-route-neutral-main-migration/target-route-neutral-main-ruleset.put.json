@@ -1,0 +1,50 @@
+{
+  "name": "Main Branch Guardrails (Change Route + CI)",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [],
+      "include": [
+        "~DEFAULT_BRANCH"
+      ]
+    }
+  },
+  "bypass_actors": [],
+  "rules": [
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "route_neutral_closeout_validation",
+            "integration_id": 15368
+          },
+          {
+            "context": "branch_naming_validation",
+            "integration_id": 15368
+          },
+          {
+            "context": "route_aware_autonomy_validation",
+            "integration_id": 15368
+          },
+          {
+            "context": "exact_source_sha_validation",
+            "integration_id": 15368
+          }
+        ]
+      }
+    },
+    {
+      "type": "non_fast_forward"
+    },
+    {
+      "type": "required_linear_history"
+    }
+  ]
+}

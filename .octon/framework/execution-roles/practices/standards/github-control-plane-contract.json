@@ -29,24 +29,26 @@
   "default_branch": "main",
   "rulesets": {
     "current_live_main": {
-      "expectation": "current-pr-required",
-      "migration_status": "pre-route-neutral-live-cutover",
+      "expectation": "target-route-neutral",
+      "migration_status": "post-route-neutral-live-cutover",
       "applies_to_routes": [
+        "direct-main",
+        "branch-no-pr",
         "branch-pr"
       ],
       "required_checks": [
-        "AI Review Gate / decision",
-        "enforce-ci-efficiency-policy",
-        "PR Quality Standards",
-        "Validate branch naming",
-        "Validate autonomy policy"
+        "route_neutral_closeout_validation",
+        "branch_naming_validation",
+        "route_aware_autonomy_validation",
+        "exact_source_sha_validation"
       ],
-      "require_review_thread_resolution": true,
-      "note": "Documents the live pre-migration posture only; it is not the route-neutral target projection."
+      "require_review_thread_resolution": false,
+      "migration_evidence_ref": ".octon/state/evidence/control/execution/github-rulesets/2026-05-04-route-neutral-main-migration/",
+      "note": "Documents the live post-migration posture proven by accepted ruleset migration and strict-live validation. PR review-thread requirements remain branch-pr route behavior, not universal main rules."
     },
     "target_route_neutral_main": {
       "expectation": "target-route-neutral",
-      "migration_status": "repo-local-projection-only",
+      "migration_status": "accepted-live-posture",
       "applies_to_routes": [
         "direct-main",
         "branch-no-pr",

@@ -19,18 +19,25 @@ itself.
 Pull Requests are optional publication and review outputs. They are selected
 when a Change needs hosted review, external signoff, unresolved review
 discussion, PR-required provider rules, collaboration, preview publication,
-release automation, protected or high-impact governance handling, or when the
-operator explicitly requests a PR.
+release automation, protected or high-impact work whose governing evidence
+requires hosted review or remote validation, or when the operator explicitly
+requests a PR.
 
 Branches are isolation mechanisms. They are selected when a Change needs
 isolation from `main`, pause/resume safety, multiple commits, handoff,
 elevated-risk validation, protected-surface review, or when repository policy
 requires branch-based handling.
 
-Direct-main is allowed only for low-risk solo Changes on a clean current
-`main` when local validation, durable history, rollback, and Change receipt
-requirements are satisfied and no policy, repository protection, collaboration
-need, or operator instruction requires a branch or PR.
+For solo work, select the fastest safe route. Consider `direct-main` first
+when the Change is low-risk, the operator is on clean current `main`, local
+validation is sufficient, rollback is straightforward from the resulting
+commit, durable history and Change receipt evidence can be recorded, and no
+policy, repository protection, collaboration need, branch-isolation need, or
+operator instruction requires a branch or PR.
+
+Provider route-neutral capability is not itself a reason to choose
+`branch-no-pr`. It is a hosted landing precondition after `branch-no-pr` is
+selected for branch isolation and hosted no-PR landing is intended.
 
 Change Package is the active internal execution-bundle name for pre-1.0 and
 later target-state surfaces. No active compatibility alias, shim, parallel
@@ -59,8 +66,9 @@ how far through closeout the Change actually progressed.
   lifecycle outcome.
 - `branch-pr`: PR-backed Change selected for hosted review, external signoff,
   unresolved review discussion, PR-required provider rules, publication, release
-  automation, collaboration, protected or high-impact governance handling,
-  existing PR context, or explicit operator request.
+  automation, collaboration, protected or high-impact work whose governing
+  evidence requires hosted review or remote validation, existing PR context, or
+  explicit operator request.
 - `stage-only-escalate`: blocked Change that preserves state and records the
   missing decision, validation, rollback, authorization, review, or ownership
   condition.
@@ -171,6 +179,9 @@ The route-neutral hosted check set is `route_neutral_closeout_validation`,
 - Do not claim `branch-no-pr` as hosted landed unless `origin/main` equals the
   recorded landed ref after the fast-forward push.
 - Do not open a PR unless `branch-pr` is selected.
+- Do not choose `branch-no-pr` solely because the provider can support
+  route-neutral hosted landing; direct-main remains the faster safe route for
+  eligible low-risk solo Changes.
 - Do not use proposal-local files as runtime or policy dependencies.
 - Keep GitHub and host adapters projection-only. They may mirror status, but
   they do not mint authority.

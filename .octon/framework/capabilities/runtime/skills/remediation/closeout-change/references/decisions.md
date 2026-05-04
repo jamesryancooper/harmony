@@ -13,6 +13,8 @@ title: Closeout Change Decisions
   without PR-backed publication and no PR-required predicate applies.
 - Select `direct-main` only on clean current `main` for low-risk solo Changes
   with local validation, receipt, durable history, and rollback ready.
+- Provider route-neutral capability is a hosted no-PR landing precondition, not
+  by itself a reason to choose `branch-no-pr` over eligible `direct-main`.
 - Select `stage-only-escalate` when route, validation, rollback, ownership,
   support, or authority is ambiguous.
 

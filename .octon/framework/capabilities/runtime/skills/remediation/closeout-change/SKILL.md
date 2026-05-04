@@ -36,7 +36,8 @@ selected `branch-pr`, or when the task starts from an existing PR context.
 2. **Select Route** — Load
    `.octon/framework/product/contracts/default-work-unit.yml` and select exactly
    one route: `direct-main`, `branch-no-pr`, `branch-pr`, or
-   `stage-only-escalate`.
+   `stage-only-escalate`. For solo work, consider `direct-main` first when all
+   direct-main predicates are satisfied and no branch or PR predicate applies.
 3. **Select Outcome** — Resolve lifecycle outcome separately from route:
    `preserved`, `branch-local-complete`, `published-branch`, `published`,
    `ready`, `landed`, `cleaned`, `blocked`, `escalated`, or `denied`.
@@ -53,6 +54,9 @@ selected `branch-pr`, or when the task starts from an existing PR context.
 
 - Do not open a PR unless route selection returns `branch-pr`.
 - Do not create a branch merely because a Change exists.
+- Do not choose `branch-no-pr` solely because the provider can support
+  route-neutral hosted landing; provider support is a hosted landing
+  precondition, not a route-selection reason by itself.
 - Do not claim direct-main completion without a commit, local validation
   evidence, Change receipt, and rollback handle.
 - Do not claim `branch-no-pr` as `landed` without branch commit evidence, main

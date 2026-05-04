@@ -1,0 +1,57 @@
+--- current-main-ruleset.update-body.json
++++ target-route-neutral-main-ruleset.put.json
+@@ -1,5 +1,5 @@
+ {
+-  "name": "Main Branch Guardrails (PR + CI + Codex)",
++  "name": "Main Branch Guardrails (Change Route + CI)",
+   "target": "branch",
+   "enforcement": "active",
+   "conditions": {
+@@ -22,43 +22,25 @@
+         "do_not_enforce_on_create": false,
+         "required_status_checks": [
+           {
+-            "context": "AI Review Gate / decision",
++            "context": "route_neutral_closeout_validation",
+             "integration_id": 15368
+           },
+           {
+-            "context": "enforce-ci-efficiency-policy",
++            "context": "branch_naming_validation",
+             "integration_id": 15368
+           },
+           {
+-            "context": "PR Quality Standards",
++            "context": "route_aware_autonomy_validation",
+             "integration_id": 15368
+           },
+           {
+-            "context": "Validate autonomy policy",
++            "context": "exact_source_sha_validation",
+             "integration_id": 15368
+-          },
+-          {
+-            "context": "Validate branch naming",
+-            "integration_id": 15368
+           }
+         ]
+       }
+     },
+     {
+-      "type": "pull_request",
+-      "parameters": {
+-        "required_approving_review_count": 0,
+-        "dismiss_stale_reviews_on_push": false,
+-        "required_reviewers": [],
+-        "require_code_owner_review": false,
+-        "require_last_push_approval": false,
+-        "required_review_thread_resolution": true,
+-        "allowed_merge_methods": [
+-          "squash"
+-        ]
+-      }
+-    },
+-    {
+       "type": "non_fast_forward"
+     },
+     {

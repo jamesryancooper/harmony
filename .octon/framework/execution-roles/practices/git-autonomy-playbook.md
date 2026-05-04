@@ -16,10 +16,11 @@ Treat that contract as the durable source of truth for operating model,
 closeout contexts, remediation policy, helper semantics, and validation
 scenarios.
 
-For agent-driven autonomous closeout from a branch worktree, use the
-`/closeout-pr` skill. It owns the full loop from task-scoped file review
-through commit, draft PR, check remediation, review-thread remediation, ready
-gate, and merge or explicit blocker.
+For route-neutral Change closeout, start from `/closeout-change`. Use
+`/closeout-pr` only after the Change route is `branch-pr` or when the task
+already starts from an existing PR context. The PR subflow owns the full loop
+from task-scoped file review through commit, draft PR, check remediation,
+review-thread remediation, ready gate, and merge or explicit blocker.
 
 This playbook covers the helper lane:
 
@@ -43,7 +44,8 @@ Octon's default work unit is a Change; branch worktrees are selected only for br
 - **Primary `main` worktree or clone**
   - Keep this clean.
   - Use it for `fetch`, `pull --ff-only`, repo-wide inspection, conflict
-    investigation, and creating new branch worktrees.
+    investigation, eligible `direct-main` Changes, and creating new branch
+    worktrees.
   - Never open a PR from `main`.
 - **Branch worktree**
   - One task or PR per worktree.
@@ -61,7 +63,9 @@ Octon's default work unit is a Change; branch worktrees are selected only for br
 - Git supports linked worktrees or an equivalent worktree-capable interface.
 - A clean primary `main` worktree or clone exists and is treated as the
   integration anchor.
-- New work starts in a branch worktree, not on `main`.
+- New work starts with Change route selection. Use `direct-main` on clean
+  current `main` only when the direct-main predicates are satisfied; otherwise
+  use a branch worktree for `branch-no-pr` or `branch-pr`.
 - `gh auth status` is healthy for the target account when using GitHub helper
   commands.
 - Branch naming and commit conventions remain governed by:
@@ -77,10 +81,14 @@ Octon's default work unit is a Change; branch worktrees are selected only for br
 
 ## Closeout Model
 
-`Branch closeout` is the context-sensitive handoff from current implementation
-state to the correct next Git/PR action. Depending on state, closeout may mean:
+`Change closeout` is the context-sensitive handoff from current implementation
+state to the correct next Git, branch, or PR action. Depending on state,
+closeout may mean:
 
-- branch the work off `main` into a feature worktree
+- validate, commit on clean current `main`, record a Change receipt, and
+  retain rollback evidence for eligible `direct-main`
+- branch the work off `main` into a branch worktree when the selected route
+  needs branch isolation
 - stage, commit, validate, receipt, and open a draft PR only for branch-pr
 - mark a draft PR ready and request squash auto-merge
 - mark a draft PR ready for human review with auto-merge off
@@ -266,11 +274,11 @@ file-changing turn.
 ### Standard prompt set
 
 - **Primary `main` worktree**
-  - "This work is on the main worktree, and Octon does not open PRs from
-    `main`. Should I branch it into a feature worktree and prepare a draft
-    PR?"
+  - "This work is on the main worktree. I will first check whether it qualifies
+    for direct-main; if it needs isolation or PR-backed review, I will report
+    the route and next mutation."
 - **Branch worktree, no PR yet**
-  - "This branch worktree looks ready for PR closeout. Should I stage,
+  - "This branch worktree looks ready for Change closeout. Should I stage,
     commit, validate, record a Change receipt, and open a draft PR only if
     branch-pr is selected?"
 - **Branch worktree, existing draft PR, autonomous lane**
@@ -296,13 +304,13 @@ question:
 
 ## Managing Multiple Active Worktrees
 
-Use this workflow when you have several live worktrees in parallel and want to
-land them through PRs without creating merge churn.
+Use this workflow when you have several live branch worktrees in parallel and
+want to land branch-routed Changes without creating merge churn.
 
 ### Core Rule
 
 Keep exactly one integration worktree on `main`, and treat every other
-worktree as branch-only.
+worktree as branch-routed.
 
 - Use the main worktree only for `git fetch`, `git pull --ff-only`,
   validation, and conflict inspection.
@@ -396,9 +404,9 @@ In those cases:
 - Do not delete a worktree by hand when it still has an open PR; use normal
   closeout and cleanup flow first.
 
-### Closeout Cadence
+### Branch-PR Closeout Cadence
 
-The safest rhythm is:
+For overlapping PR-backed branch work, use this rhythm:
 
 1. worktree branch
 2. draft PR

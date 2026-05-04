@@ -11,14 +11,14 @@ deprecated_terms:
     compatibility_alias_allowed: false
 routes:
   - route_id: "branch-pr"
-    description: "PR-backed Change for hosted review, external signoff, unresolved review discussion, PR-required provider rules, release automation, collaboration, protected/high-impact governance handling, or explicit operator request."
+    description: "PR-backed Change for hosted review, external signoff, unresolved review discussion, PR-required provider rules, release automation, collaboration, protected or high-impact work whose governing evidence requires hosted review or remote validation, or explicit operator request."
     precedence: 10
     selected_when_any:
       - "operator requests PR, hosted review, preview publication, or external signoff"
       - "provider ruleset requires PR for the requested hosted landing"
       - "release automation requires PR"
       - "work starts from an existing PR, PR review thread, release PR, Dependabot PR, or GitHub merge lane"
-      - "declared risk or protected surface requires hosted review or remote validation"
+      - "declared risk, high-impact posture, or protected surface requires hosted review or remote validation"
     required_evidence:
       - "change_receipt"
       - "branch_identity"
@@ -44,13 +44,13 @@ routes:
       - "rollback_handle"
       - "closeout_outcome"
   - route_id: "branch-no-pr"
-    description: "Branch-isolated Change without PR-backed review or publication. The route may preserve state, complete on the branch, push the branch for backup or handoff, fast-forward land on hosted main without a PR when provider rules allow route-neutral updates, and clean up only when lifecycle evidence supports that outcome."
-    precedence: 20
+    description: "Branch-isolated Change without PR-backed review or publication. The route may preserve state, complete on the branch, push the branch for backup or handoff, fast-forward land on hosted main without a PR when branch isolation was selected and provider rules allow route-neutral updates, and clean up only when lifecycle evidence supports that outcome."
+    precedence: 30
     selected_when_any:
-      - "change needs isolation, pause/resume, multiple commits, uncertain scope, or handoff"
-      - "change needs branch identity but not hosted review or publication"
+      - "change needs isolation, pause/resume, multiple commits, uncertain scope, or handoff, and no PR-required predicate applies"
+      - "change needs branch identity but not hosted review or publication, and no PR-required predicate applies"
       - "operator wants branch-isolated work landed without PR and no PR-required predicate applies"
-      - "provider rules allow route-neutral fast-forward update for hosted no-PR landing"
+      - "hosted no-PR landing is intended after branch isolation is selected, no PR-required predicate applies, and provider route-neutral capability can be proven"
     required_evidence:
       - "change_receipt_or_continuation_receipt"
       - "branch_or_worktree_identity"
@@ -73,7 +73,7 @@ routes:
       - "hosted_landed_claim_without_origin_main_equality"
   - route_id: "direct-main"
     description: "Low-risk solo Change landed directly on current clean main."
-    precedence: 30
+    precedence: 20
     selected_when_all:
       - "current branch is main"
       - "main is clean and current"
@@ -107,10 +107,26 @@ routes:
       - "publication_ready"
 route_selection_order:
   - "resolve_or_create_change_identity"
-  - "branch-pr"
-  - "branch-no-pr"
+  - "fail_closed_conditions"
+  - "branch-pr when a PR-required predicate applies"
   - "direct-main"
+  - "branch-no-pr"
   - "stage-only-escalate"
+solo_route_selection:
+  rule: "Choose the fastest safe route that satisfies evidence, validation, rollback, cleanup, and protected-main controls."
+  direct_main_first_when_all:
+    - "clean_current_main"
+    - "solo_low_risk_change"
+    - "local_validation_sufficient"
+    - "straightforward_commit_rollback"
+    - "change_receipt_can_be_recorded"
+    - "no_branch_or_pr_required_predicate"
+  branch_no_pr_when:
+    - "branch_isolation_needed"
+    - "no_pr_required_predicate_applies"
+    - "direct_main_predicates_not_all_satisfied"
+  provider_route_neutral_capability: "hosted branch-no-pr landing precondition, not an independent reason to choose branch-no-pr"
+  high_impact_rule: "high-impact increases caution and evidence requirements but does not by itself force branch-pr"
 route_lifecycle_outcomes:
   direct-main:
     allowed_outcomes:

@@ -14,6 +14,7 @@ CLOSEOUT_CHANGE="$OCTON_DIR/framework/capabilities/runtime/skills/remediation/cl
 CLOSEOUT_PR="$OCTON_DIR/framework/capabilities/runtime/skills/remediation/closeout-pr/SKILL.md"
 PR_DOC="$OCTON_DIR/framework/execution-roles/practices/pull-request-standards.md"
 WORKFLOW_DOC="$OCTON_DIR/framework/execution-roles/practices/git-github-autonomy-workflow-v1.md"
+PLAYBOOK="$OCTON_DIR/framework/execution-roles/practices/git-autonomy-playbook.md"
 GITHUB_RUNBOOK="$OCTON_DIR/framework/execution-roles/practices/github-autonomy-runbook.md"
 PR_AUTONOMY_EVALUATOR="$OCTON_DIR/framework/assurance/governance/_ops/scripts/evaluate-pr-autonomy-policy.sh"
 OPEN_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-pr-open.sh"
@@ -38,6 +39,7 @@ CHANGE_ROUTE_PROJECTION="$ROOT_DIR/.github/workflows/change-route-projection.yml
 PR_AUTO_MERGE_WORKFLOW="$ROOT_DIR/.github/workflows/pr-auto-merge.yml"
 PR_TRIAGE_WORKFLOW="$ROOT_DIR/.github/workflows/pr-triage.yml"
 PR_AUTONOMY_POLICY_TEST="$OCTON_DIR/framework/assurance/runtime/_ops/tests/test-pr-autonomy-policy.sh"
+SOLO_ROUTE_SELECTION_TEST="$OCTON_DIR/framework/assurance/runtime/_ops/tests/test-solo-route-selection.sh"
 
 errors=0
 
@@ -90,10 +92,11 @@ main() {
   command -v jq >/dev/null 2>&1 || { echo "[ERROR] jq is required" >&2; exit 1; }
   command -v yq >/dev/null 2>&1 || { echo "[ERROR] yq is required" >&2; exit 1; }
 
-  for file in "$POLICY" "$CONTRACT" "$WORKFLOW" "$INGRESS" "$MANIFEST" "$CLOSEOUT_CHANGE" "$CLOSEOUT_PR" "$PR_DOC" "$WORKFLOW_DOC" "$GITHUB_RUNBOOK" "$PR_AUTONOMY_EVALUATOR" "$OPEN_SCRIPT" "$SHIP_SCRIPT" "$WT_SCRIPT" "$BRANCH_COMMIT_SCRIPT" "$BRANCH_PUSH_SCRIPT" "$BRANCH_LAND_SCRIPT" "$BRANCH_CLEANUP_SCRIPT" "$REQUIRED_CHECKS_SCRIPT" "$HOSTED_PREFLIGHT_SCRIPT" "$HOSTED_LAND_SCRIPT" "$HOSTED_NO_PR_VALIDATOR" "$GITHUB_RULESET_VALIDATOR" "$GITHUB_PROJECTION_VALIDATOR" "$COMMIT_PR_STANDARDS" "$GITHUB_ADAPTER" "$REPO_ADAPTER" "$GITHUB_CONTROL_CONTRACT" "$MAIN_CHANGE_ROUTE_GUARD" "$CHANGE_ROUTE_PROJECTION" "$PR_AUTO_MERGE_WORKFLOW" "$PR_TRIAGE_WORKFLOW" "$PR_AUTONOMY_POLICY_TEST"; do
+  for file in "$POLICY" "$CONTRACT" "$WORKFLOW" "$INGRESS" "$MANIFEST" "$CLOSEOUT_CHANGE" "$CLOSEOUT_PR" "$PR_DOC" "$WORKFLOW_DOC" "$PLAYBOOK" "$GITHUB_RUNBOOK" "$PR_AUTONOMY_EVALUATOR" "$OPEN_SCRIPT" "$SHIP_SCRIPT" "$WT_SCRIPT" "$BRANCH_COMMIT_SCRIPT" "$BRANCH_PUSH_SCRIPT" "$BRANCH_LAND_SCRIPT" "$BRANCH_CLEANUP_SCRIPT" "$REQUIRED_CHECKS_SCRIPT" "$HOSTED_PREFLIGHT_SCRIPT" "$HOSTED_LAND_SCRIPT" "$HOSTED_NO_PR_VALIDATOR" "$GITHUB_RULESET_VALIDATOR" "$GITHUB_PROJECTION_VALIDATOR" "$COMMIT_PR_STANDARDS" "$GITHUB_ADAPTER" "$REPO_ADAPTER" "$GITHUB_CONTROL_CONTRACT" "$MAIN_CHANGE_ROUTE_GUARD" "$CHANGE_ROUTE_PROJECTION" "$PR_AUTO_MERGE_WORKFLOW" "$PR_TRIAGE_WORKFLOW" "$PR_AUTONOMY_POLICY_TEST" "$SOLO_ROUTE_SELECTION_TEST"; do
     require_file "$file"
   done
   [[ -x "$PR_AUTONOMY_POLICY_TEST" ]] && pass "PR autonomy policy test is directly executable" || fail "PR autonomy policy test must be directly executable"
+  [[ -x "$SOLO_ROUTE_SELECTION_TEST" ]] && pass "solo route-selection test is directly executable" || fail "solo route-selection test must be directly executable"
 
   require_yq "$POLICY" '.routes[]? | select(.route_id == "direct-main")' "policy exposes direct-main route" "policy missing direct-main route"
   require_yq "$POLICY" '.routes[]? | select(.route_id == "branch-no-pr")' "policy exposes branch-no-pr route" "policy missing branch-no-pr route"
@@ -112,6 +115,8 @@ main() {
   require_yq "$POLICY" '.hosted_provider_ruleset.target_model == "route-neutral protected main"' "policy defines route-neutral protected main target" "policy must define route-neutral protected main target"
   require_yq "$POLICY" '.hosted_provider_ruleset.forbidden_universal_rules[]? | select(. == "pull_request_required_for_all_main_updates")' "policy forbids universal PR rule in target ruleset" "policy must forbid universal PR rule in target ruleset"
   require_yq "$POLICY" '.hosted_provider_ruleset.pr_specific_checks[]? | select(. == "PR Quality Standards")' "policy keeps PR quality behind PR route" "policy must keep PR quality behind PR route"
+  require_yq "$POLICY" '.solo_route_selection.provider_route_neutral_capability == "hosted branch-no-pr landing precondition, not an independent reason to choose branch-no-pr"' "policy treats provider route-neutral support as landing precondition" "policy must treat provider route-neutral support as landing precondition"
+  require_yq "$POLICY" '.solo_route_selection.high_impact_rule == "high-impact increases caution and evidence requirements but does not by itself force branch-pr"' "policy says high-impact alone does not force branch-pr" "policy must say high-impact alone does not force branch-pr"
   require_yq "$POLICY" '.route_lifecycle_outcomes."branch-pr".ready_requires[]? | select(. == "AI Review Gate / decision passing when required")' "policy includes AI gate in branch-pr ready evidence" "policy must include AI gate in branch-pr ready evidence"
   require_yq "$POLICY" '.route_lifecycle_outcomes."branch-pr".ready_requires[]? | select(. == "high_impact_diff_policy_evidence_rollback_self_review_when_applicable")' "policy includes high-impact self-review ready evidence" "policy must include high-impact self-review ready evidence"
   require_yq "$POLICY" '.route_lifecycle_outcomes."branch-pr".ready_requires[]? | select(. == "no_merge_conflicts")' "policy includes merge-conflict absence in branch-pr ready evidence" "policy must include merge-conflict absence in branch-pr ready evidence"
@@ -143,7 +148,15 @@ main() {
   forbid_literal "$PR_DOC" "High-impact path changes are triaged out of the autonomous merge lane" "PR standards avoid high-impact manual-only drift" "PR standards must not make high-impact manual-only"
   require_literal "$WORKFLOW_DOC" "A draft PR in the autonomous branch-pr lane may be marked ready only when" "workflow overview defines draft-to-ready eligibility" "workflow overview must define draft-to-ready eligibility"
   require_literal "$WORKFLOW_DOC" "High-impact elevated-autonomy lane" "workflow overview defines high-impact elevated lane" "workflow overview must define high-impact elevated lane"
+  require_literal "$WORKFLOW_DOC" "For eligible low-risk solo Changes, use \`direct-main\`" "workflow overview documents direct-main solo lane" "workflow overview must document direct-main solo lane"
+  require_literal "$PLAYBOOK" "New work starts with Change route selection." "playbook starts new work with route selection" "playbook must start new work with route selection"
+  require_literal "$PLAYBOOK" "eligible \`direct-main\` Changes" "playbook allows eligible direct-main Changes from main" "playbook must allow eligible direct-main Changes from main"
+  forbid_literal "$PLAYBOOK" "New work starts in a branch worktree, not on \`main\`." "playbook avoids universal branch worktree start" "playbook must not say all new work starts in branch worktrees"
+  forbid_literal "$PLAYBOOK" "Should I branch it into a feature worktree and prepare a draft PR?" "playbook avoids PR-first main prompt" "playbook must not use PR-first main prompt"
   require_literal "$GITHUB_RUNBOOK" "Autonomous Draft Completion Preflight" "GitHub runbook documents autonomous draft preflight" "GitHub runbook must document autonomous draft preflight"
+  require_literal "$GITHUB_RUNBOOK" "Route-Neutral Main Ruleset Migration Plan" "GitHub runbook documents route-neutral migration plan" "GitHub runbook must document route-neutral migration plan"
+  require_literal "$GITHUB_RUNBOOK" "gh api repos/<owner>/<repo>/rulesets" "GitHub runbook includes read-only ruleset inspection command" "GitHub runbook must include read-only ruleset inspection command"
+  require_literal "$GITHUB_RUNBOOK" "Do not run until maintainer accepts the migration packet" "GitHub runbook gates live ruleset mutation on maintainer acceptance" "GitHub runbook must gate live ruleset mutation on maintainer acceptance"
   require_literal "$GITHUB_RUNBOOK" 'High-impact `branch-pr` PRs do not default' "GitHub runbook rejects high-impact manual default" "GitHub runbook must reject high-impact manual default"
   require_literal "$PR_AUTONOMY_EVALUATOR" "PR_AUTONOMY_HIGH_IMPACT_ELEVATED" "autonomy evaluator grants high-impact elevated posture" "autonomy evaluator must grant high-impact elevated posture"
   forbid_literal "$PR_AUTONOMY_EVALUATOR" "PR_AUTONOMY_HIGH_IMPACT_REVIEW_REQUIRED" "autonomy evaluator avoids high-impact review-required reason" "autonomy evaluator must not make high-impact review-required"

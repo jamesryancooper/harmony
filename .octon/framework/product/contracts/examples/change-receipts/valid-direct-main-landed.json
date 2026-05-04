@@ -1,0 +1,42 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "example-direct-main-landed",
+  "selected_route": "direct-main",
+  "lifecycle_outcome": "landed",
+  "intent": "Demonstrate a low-risk solo Change landed directly on clean current main.",
+  "scope": {
+    "summary": "Example direct-main landed receipt.",
+    "touched_paths": [
+      ".octon/framework/execution-roles/practices/example.md"
+    ],
+    "diff_refs": [
+      "main@eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+    ]
+  },
+  "target_branch_ref": "main@eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "landed_ref": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "integration_method": "direct-commit",
+  "integration_status": "landed",
+  "publication_status": "none",
+  "cleanup_status": "completed",
+  "cleanup_evidence_refs": [
+    "git status --short returned clean after direct-main commit."
+  ],
+  "validation_evidence_refs": [
+    "local-validator:validate-default-work-unit-alignment@eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  ],
+  "review_waiver_refs": [
+    "solo-maintainer low-risk direct-main route waiver@example"
+  ],
+  "durable_history": {
+    "kind": "commit",
+    "ref": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  },
+  "rollback_handle": {
+    "kind": "revert-commit",
+    "ref": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "instructions": "Revert the direct-main commit if post-closeout validation fails."
+  },
+  "closeout_outcome": "completed",
+  "created_at": "2026-05-04T00:00:00Z"
+}

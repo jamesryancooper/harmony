@@ -1,0 +1,42 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "example-branch-no-pr-branch-local-complete",
+  "selected_route": "branch-no-pr",
+  "lifecycle_outcome": "branch-local-complete",
+  "intent": "Demonstrate branch-local completion without PR-backed review or hosted landing.",
+  "scope": {
+    "summary": "Example branch-no-pr branch-local-complete receipt.",
+    "touched_paths": [
+      ".octon/framework/execution-roles/practices/example.md"
+    ],
+    "diff_refs": [
+      "chore/example-branch-local@ffffffffffffffffffffffffffffffffffffffff"
+    ]
+  },
+  "source_branch_ref": "chore/example-branch-local",
+  "integration_method": "not-applicable",
+  "integration_status": "not_landed",
+  "publication_status": "none",
+  "cleanup_status": "pending",
+  "validation_evidence_refs": [
+    "local-validator:validate-change-closeout-lifecycle-alignment@ffffffffffffffffffffffffffffffffffffffff"
+  ],
+  "review_waiver_refs": [
+    "solo-maintainer branch-no-pr route waiver@example"
+  ],
+  "durable_history": {
+    "kind": "commit",
+    "ref": "ffffffffffffffffffffffffffffffffffffffff",
+    "branch": "chore/example-branch-local"
+  },
+  "rollback_handle": {
+    "kind": "discard-branch",
+    "ref": "chore/example-branch-local",
+    "instructions": "Delete or reset the branch if the branch-local Change is abandoned before hosted landing."
+  },
+  "closeout_outcome": "continued",
+  "remaining_blockers": [
+    "Branch-local completion is not landed on main."
+  ],
+  "created_at": "2026-05-04T00:00:00Z"
+}

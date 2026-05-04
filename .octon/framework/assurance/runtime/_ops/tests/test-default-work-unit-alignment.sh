@@ -38,6 +38,13 @@ case_quickstart_has_ruleset_table() {
     grep -Fq 'Do not claim live route-neutral migration from repo-local projection alone.' "$quickstart"
 }
 
+case_quickstart_has_fastest_safe_solo_route() {
+  local quickstart="$ROOT_DIR/.octon/framework/execution-roles/practices/change-lifecycle-routing-quickstart.md"
+  grep -Fq '## Fastest Safe Solo Route' "$quickstart" &&
+    grep -Fq 'select `direct-main` when `main`' "$quickstart" &&
+    grep -Fq 'Provider route-neutral capability is a hosted `branch-no-pr` landing' "$quickstart"
+}
+
 case_receipt_schema_has_routes() {
   local schema="$ROOT_DIR/.octon/framework/product/contracts/change-receipt-v1.schema.json"
   jq -e '.properties.selected_route.enum | index("direct-main") and index("branch-no-pr") and index("branch-pr") and index("stage-only-escalate")' "$schema" >/dev/null
@@ -97,10 +104,24 @@ case_policy_defines_route_neutral_ruleset_target() {
     yq -e '.hosted_provider_ruleset.pr_specific_checks[] | select(. == "AI Review Gate / decision")' "$policy" >/dev/null
 }
 
+case_policy_defines_solo_route_selection() {
+  local policy="$ROOT_DIR/.octon/framework/product/contracts/default-work-unit.yml"
+  yq -e '.solo_route_selection.rule == "Choose the fastest safe route that satisfies evidence, validation, rollback, cleanup, and protected-main controls."' "$policy" >/dev/null &&
+    yq -e '.solo_route_selection.provider_route_neutral_capability == "hosted branch-no-pr landing precondition, not an independent reason to choose branch-no-pr"' "$policy" >/dev/null &&
+    yq -e '.solo_route_selection.high_impact_rule == "high-impact increases caution and evidence requirements but does not by itself force branch-pr"' "$policy" >/dev/null
+}
+
+case_receipt_examples_cover_solo_routes() {
+  local examples="$ROOT_DIR/.octon/framework/product/contracts/examples/change-receipts"
+  jq -e '.selected_route == "direct-main" and .lifecycle_outcome == "landed" and .integration_method == "direct-commit"' "$examples/valid-direct-main-landed.json" >/dev/null &&
+    jq -e '.selected_route == "branch-no-pr" and .lifecycle_outcome == "branch-local-complete" and .integration_status == "not_landed"' "$examples/valid-branch-no-pr-branch-local-complete.json" >/dev/null
+}
+
 main() {
   assert_success "default work unit validator passes live repo" case_live_repo_passes
   assert_success "quickstart has route matrix for all routes" case_quickstart_has_route_matrix
   assert_success "quickstart has live-vs-target ruleset table" case_quickstart_has_ruleset_table
+  assert_success "quickstart has fastest safe solo route rule" case_quickstart_has_fastest_safe_solo_route
   assert_success "receipt schema includes all route ids" case_receipt_schema_has_routes
   assert_success "receipt schema requires lifecycle status fields" case_receipt_schema_requires_lifecycle_fields
   assert_success "receipt schema includes lifecycle outcomes" case_receipt_schema_has_lifecycle_outcomes
@@ -108,6 +129,8 @@ main() {
   assert_success "machine policy includes fail-closed receipt condition" case_policy_has_fail_closed_conditions
   assert_success "machine policy keeps no-PR landing as branch-no-pr outcome" case_policy_keeps_no_pr_landing_as_outcome
   assert_success "machine policy defines route-neutral ruleset target" case_policy_defines_route_neutral_ruleset_target
+  assert_success "machine policy defines solo route selection semantics" case_policy_defines_solo_route_selection
+  assert_success "receipt examples cover solo direct-main and branch-local routes" case_receipt_examples_cover_solo_routes
   echo
   echo "Passed: $pass_count"
   echo "Failed: $fail_count"

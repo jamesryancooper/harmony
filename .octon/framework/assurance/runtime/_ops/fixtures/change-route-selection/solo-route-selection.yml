@@ -1,0 +1,80 @@
+schema_version: "octon-change-route-selection-fixtures-v1"
+cases:
+  - id: "solo-low-risk-clean-main-selects-direct-main"
+    description: "Clean current main plus low-risk solo evidence selects direct-main."
+    facts:
+      change_identity_resolved: true
+      current_branch_main: true
+      main_clean_current: true
+      no_unrelated_changes: true
+      solo_low_risk: true
+      local_validation_sufficient: true
+      straightforward_rollback: true
+      change_receipt_available: true
+      branch_isolation_needed: false
+      explicit_operator_pr_request: false
+      hosted_review_required: false
+      external_signoff_required: false
+      provider_ruleset_requires_pr: false
+      release_automation_requires_pr: false
+      existing_pr_context: false
+    expected_route: "direct-main"
+    expected_reason: "fastest safe solo route"
+  - id: "solo-branch-isolation-without-pr-selects-branch-no-pr"
+    description: "Branch isolation with no PR predicate selects branch-no-pr."
+    facts:
+      change_identity_resolved: true
+      current_branch_main: true
+      main_clean_current: true
+      no_unrelated_changes: true
+      solo_low_risk: false
+      local_validation_sufficient: true
+      straightforward_rollback: true
+      change_receipt_available: true
+      branch_isolation_needed: true
+      explicit_operator_pr_request: false
+      hosted_review_required: false
+      external_signoff_required: false
+      provider_ruleset_requires_pr: false
+      release_automation_requires_pr: false
+      existing_pr_context: false
+    expected_route: "branch-no-pr"
+    expected_reason: "branch isolation needed without PR predicate"
+  - id: "provider-pr-required-blocks-requested-hosted-no-pr"
+    description: "PR-required live rules block hosted no-PR landing instead of silently converting to branch-pr."
+    facts:
+      change_identity_resolved: true
+      requested_hosted_no_pr_landing: true
+      branch_isolation_needed: true
+      explicit_operator_pr_request: false
+      hosted_review_required: false
+      external_signoff_required: false
+      provider_ruleset_requires_pr: true
+      release_automation_requires_pr: false
+      existing_pr_context: false
+      local_validation_sufficient: true
+      straightforward_rollback: true
+      change_receipt_available: true
+    expected_route: "stage-only-escalate"
+    expected_reason: "provider ruleset blocks requested hosted no-PR landing"
+  - id: "high-impact-alone-does-not-force-branch-pr"
+    description: "High-impact branch-isolated work stays branch-no-pr when no PR-required predicate applies."
+    facts:
+      change_identity_resolved: true
+      current_branch_main: true
+      main_clean_current: true
+      no_unrelated_changes: true
+      solo_low_risk: false
+      high_impact: true
+      local_validation_sufficient: true
+      straightforward_rollback: true
+      change_receipt_available: true
+      branch_isolation_needed: true
+      explicit_operator_pr_request: false
+      hosted_review_required: false
+      external_signoff_required: false
+      provider_ruleset_requires_pr: false
+      release_automation_requires_pr: false
+      existing_pr_context: false
+    expected_route: "branch-no-pr"
+    expected_reason: "high-impact alone is not a PR predicate"

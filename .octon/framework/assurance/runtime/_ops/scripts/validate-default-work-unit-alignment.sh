@@ -12,9 +12,12 @@ QUICKSTART="$OCTON_DIR/framework/execution-roles/practices/change-lifecycle-rout
 RECEIPT_EXAMPLES_DIR="$OCTON_DIR/framework/product/contracts/examples/change-receipts"
 RECEIPT_EXAMPLES_README="$RECEIPT_EXAMPLES_DIR/README.md"
 VALID_BRANCH_PR_READY="$RECEIPT_EXAMPLES_DIR/valid-branch-pr-ready.json"
+VALID_DIRECT_MAIN_LANDED="$RECEIPT_EXAMPLES_DIR/valid-direct-main-landed.json"
+VALID_BRANCH_NO_PR_BRANCH_LOCAL_COMPLETE="$RECEIPT_EXAMPLES_DIR/valid-branch-no-pr-branch-local-complete.json"
 VALID_HOSTED_BRANCH_NO_PR_LANDED="$RECEIPT_EXAMPLES_DIR/valid-hosted-branch-no-pr-landed.json"
 INVALID_PUSHED_ONLY_BRANCH_CLAIMED_LANDED="$RECEIPT_EXAMPLES_DIR/invalid-pushed-only-branch-claimed-landed.json"
 INVALID_DRAFT_PR_CLAIMED_FULL_CLOSEOUT="$RECEIPT_EXAMPLES_DIR/invalid-draft-pr-claimed-full-closeout.json"
+SOLO_ROUTE_FIXTURES="$OCTON_DIR/framework/assurance/runtime/_ops/fixtures/change-route-selection/solo-route-selection.yml"
 CONTRACT_REGISTRY="$OCTON_DIR/framework/constitution/contracts/registry.yml"
 ARCH_REGISTRY="$OCTON_DIR/framework/cognition/_meta/architecture/contract-registry.yml"
 NORMATIVE="$OCTON_DIR/framework/constitution/precedence/normative.yml"
@@ -102,10 +105,13 @@ check_core_contracts() {
   require_file "$RECEIPT_SCHEMA"
   require_file "$QUICKSTART"
   require_file "$RECEIPT_EXAMPLES_README"
+  require_file "$VALID_DIRECT_MAIN_LANDED"
+  require_file "$VALID_BRANCH_NO_PR_BRANCH_LOCAL_COMPLETE"
   require_file "$VALID_BRANCH_PR_READY"
   require_file "$VALID_HOSTED_BRANCH_NO_PR_LANDED"
   require_file "$INVALID_PUSHED_ONLY_BRANCH_CLAIMED_LANDED"
   require_file "$INVALID_DRAFT_PR_CLAIMED_FULL_CLOSEOUT"
+  require_file "$SOLO_ROUTE_FIXTURES"
   require_file "$CHANGE_PACKAGE_SCHEMA"
   require_file "$CHANGE_PACKAGE_CONSTITUTIONAL_SCHEMA"
   require_file "$CHANGE_PACKAGE_COMPILER"
@@ -138,6 +144,14 @@ check_core_contracts() {
   require_yq "$POLICY_YML" '.hosted_provider_ruleset.target_model == "route-neutral protected main"' "machine policy defines route-neutral hosted ruleset target" "machine policy must define route-neutral hosted ruleset target"
   require_yq "$POLICY_YML" '.hosted_provider_ruleset.universal_required_checks[]? | select(. == "exact_source_sha_validation")' "machine policy includes exact source SHA route-neutral check" "machine policy must include exact source SHA route-neutral check"
   require_yq "$POLICY_YML" '.hosted_provider_ruleset.pr_specific_checks[]? | select(. == "AI Review Gate / decision")' "machine policy keeps AI review gate PR-specific" "machine policy must keep AI review gate PR-specific"
+  require_yq "$POLICY_YML" '.solo_route_selection.rule == "Choose the fastest safe route that satisfies evidence, validation, rollback, cleanup, and protected-main controls."' "machine policy defines fastest safe solo route rule" "machine policy must define fastest safe solo route rule"
+  require_yq "$POLICY_YML" '.solo_route_selection.direct_main_first_when_all[]? | select(. == "clean_current_main")' "machine policy evaluates direct-main first for eligible solo work" "machine policy must evaluate direct-main first for eligible solo work"
+  require_yq "$POLICY_YML" '.solo_route_selection.provider_route_neutral_capability == "hosted branch-no-pr landing precondition, not an independent reason to choose branch-no-pr"' "machine policy treats provider route-neutral support as landing precondition" "machine policy must not treat provider route-neutral support as an independent branch-no-pr reason"
+  require_yq "$POLICY_YML" '.solo_route_selection.high_impact_rule == "high-impact increases caution and evidence requirements but does not by itself force branch-pr"' "machine policy says high-impact alone does not force branch-pr" "machine policy must say high-impact alone does not force branch-pr"
+  require_yq "$SOLO_ROUTE_FIXTURES" '.cases[]? | select(.id == "solo-low-risk-clean-main-selects-direct-main" and .expected_route == "direct-main")' "solo route fixtures cover direct-main default for low-risk clean main" "solo route fixtures must cover direct-main low-risk clean-main case"
+  require_yq "$SOLO_ROUTE_FIXTURES" '.cases[]? | select(.id == "solo-branch-isolation-without-pr-selects-branch-no-pr" and .expected_route == "branch-no-pr")' "solo route fixtures cover branch-no-pr isolation" "solo route fixtures must cover branch-no-pr isolation"
+  require_yq "$SOLO_ROUTE_FIXTURES" '.cases[]? | select(.id == "provider-pr-required-blocks-requested-hosted-no-pr" and .expected_route == "stage-only-escalate")' "solo route fixtures block PR-required hosted no-PR landing" "solo route fixtures must block PR-required hosted no-PR landing"
+  require_yq "$SOLO_ROUTE_FIXTURES" '.cases[]? | select(.id == "high-impact-alone-does-not-force-branch-pr" and .expected_route == "branch-no-pr")' "solo route fixtures prove high-impact alone does not force branch-pr" "solo route fixtures must prove high-impact alone does not force branch-pr"
   require_yq "$POLICY_YML" '.route_lifecycle_outcomes."branch-pr".allowed_outcomes[]? | select(. == "ready")' "machine policy distinguishes PR ready outcome" "machine policy must distinguish PR ready outcome"
   require_yq "$POLICY_YML" '.route_lifecycle_outcomes."branch-pr".ready_requires[]? | select(. == "high_impact_diff_policy_evidence_rollback_self_review_when_applicable")' "machine policy requires high-impact self-review before PR ready" "machine policy must require high-impact self-review before PR ready"
   require_yq "$POLICY_YML" '.route_lifecycle_outcomes."branch-pr".ready_requires[]? | select(. == "AI Review Gate / decision passing when required")' "machine policy requires AI gate when required before PR ready" "machine policy must require AI gate when required before PR ready"
@@ -156,7 +170,8 @@ check_core_contracts() {
   require_jq "$COMMIT_PR_STANDARDS" '.change.default_work_unit == "change" and (.change.pr_required_routes[]? == "branch-pr")' "commit/PR standards bind to Change routes" "commit/PR standards must bind to Change routes"
   require_jq "$GITHUB_CONTROL_CONTRACT" '.scope.projection_host_for == "route-aware Change lifecycle GitHub projection" and .direct_main_projection.github_pr_metadata_required == false' "GitHub control contract is route-aware and projection-only" "GitHub control contract must be route-aware and projection-only"
   require_jq "$GITHUB_CONTROL_CONTRACT" '(.rulesets.target_route_neutral_main.universal_required_checks | index("AI Review Gate / decision") | not) and (.rulesets.target_route_neutral_main.pr_specific_checks | index("AI Review Gate / decision") != null)' "GitHub control contract keeps AI gate out of universal target checks" "GitHub control contract must keep AI gate out of universal target checks"
-  require_jq "$GITHUB_CONTROL_CONTRACT" '.rulesets.target_route_neutral_main.live_mutation_performed_by_this_projection == false' "GitHub control contract does not claim live ruleset mutation" "GitHub control contract must not claim live ruleset mutation"
+  require_jq "$GITHUB_CONTROL_CONTRACT" '.rulesets.current_live_main.expectation == "target-route-neutral"' "GitHub control contract records current live route-neutral posture" "GitHub control contract must record current live route-neutral posture"
+  require_jq "$GITHUB_CONTROL_CONTRACT" '.rulesets.target_route_neutral_main.live_mutation_performed_by_this_projection == false' "GitHub control contract does not claim repo-local projection mutated live rulesets" "GitHub control contract must not claim repo-local projection mutated live rulesets"
   require_jq "$AI_GATE_POLICY" '.route_scope.hosted_gate_route == "branch-pr" and .route_scope.no_pr_change_gate_required == false' "AI gate policy is scoped to hosted PR route" "AI gate policy must be scoped to hosted PR route"
   require_yq "$REVIEW_ROUTING" '.default_work_unit_policy_ref == ".octon/framework/product/contracts/default-work-unit.yml"' "review routing references default work unit policy" "review routing must reference default work unit policy"
 }
@@ -165,6 +180,9 @@ check_quickstart_and_examples() {
   require_literal "$POLICY_MD" "change-lifecycle-routing-quickstart.md" "policy docs link Change Lifecycle Routing quickstart" "policy docs must link Change Lifecycle Routing quickstart"
   require_literal "$QUICKSTART" "Route selection and lifecycle outcome are separate decisions." "quickstart separates route selection from lifecycle outcome" "quickstart must separate route selection from lifecycle outcome"
   require_literal "$QUICKSTART" "## Route Matrix" "quickstart includes route matrix" "quickstart must include route matrix"
+  require_literal "$QUICKSTART" "## Fastest Safe Solo Route" "quickstart includes fastest safe solo route rule" "quickstart must include fastest safe solo route rule"
+  require_literal "$QUICKSTART" 'select `direct-main` when `main`' "quickstart makes direct-main the first eligible solo route" "quickstart must make direct-main the first eligible solo route"
+  require_literal "$QUICKSTART" 'Provider route-neutral capability is a hosted `branch-no-pr` landing' "quickstart treats provider route-neutral capability as landing precondition" "quickstart must treat provider capability as landing precondition"
   require_literal "$QUICKSTART" "| route | select when | allowed outcomes | required evidence | forbidden claims | handoff or escalation point |" "quickstart route matrix has required columns" "quickstart route matrix must have required columns"
   for route in direct-main branch-no-pr branch-pr stage-only-escalate; do
     require_literal "$QUICKSTART" "\`$route\`" "quickstart documents route $route" "quickstart must document route $route"
@@ -178,11 +196,15 @@ check_quickstart_and_examples() {
   require_literal "$QUICKSTART" "Update \`current_live_main\` only after" "quickstart defines post-migration current_live_main update rule" "quickstart must define current_live_main post-migration rule"
   require_literal "$QUICKSTART" "AI Review Gate / decision" "quickstart keeps AI gate visible as PR-only check" "quickstart must mention PR-only AI gate"
   require_literal "$QUICKSTART" "PR Quality Standards" "quickstart keeps PR quality visible as PR-only check" "quickstart must mention PR-only PR quality"
+  require_literal "$RECEIPT_EXAMPLES_README" "valid-direct-main-landed.json" "receipt examples README lists valid direct-main landed example" "receipt examples README must list valid direct-main landed example"
   require_literal "$RECEIPT_EXAMPLES_README" "valid-branch-pr-ready.json" "receipt examples README lists valid branch-pr ready example" "receipt examples README must list valid branch-pr ready example"
+  require_literal "$RECEIPT_EXAMPLES_README" "valid-branch-no-pr-branch-local-complete.json" "receipt examples README lists valid branch-local complete example" "receipt examples README must list valid branch-local complete example"
   require_literal "$RECEIPT_EXAMPLES_README" "valid-hosted-branch-no-pr-landed.json" "receipt examples README lists valid hosted no-PR landing example" "receipt examples README must list valid hosted no-PR landing example"
   require_literal "$RECEIPT_EXAMPLES_README" "invalid-pushed-only-branch-claimed-landed.json" "receipt examples README lists pushed-only invalid example" "receipt examples README must list pushed-only invalid example"
   require_literal "$RECEIPT_EXAMPLES_README" "invalid-draft-pr-claimed-full-closeout.json" "receipt examples README lists draft PR invalid example" "receipt examples README must list draft PR invalid example"
+  require_jq "$VALID_DIRECT_MAIN_LANDED" '.selected_route == "direct-main" and .lifecycle_outcome == "landed" and .integration_method == "direct-commit" and .publication_status == "none" and .integration_status == "landed" and .durable_history.kind == "commit"' "valid direct-main example has direct landed semantics" "valid direct-main example must have direct landed semantics"
   require_jq "$VALID_BRANCH_PR_READY" '.selected_route == "branch-pr" and .lifecycle_outcome == "ready" and .publication_status == "pr-ready" and .integration_status == "not_landed" and .closeout_outcome == "continued"' "valid branch-pr ready example has ready-not-landed semantics" "valid branch-pr ready example must be ready, not landed"
+  require_jq "$VALID_BRANCH_NO_PR_BRANCH_LOCAL_COMPLETE" '.selected_route == "branch-no-pr" and .lifecycle_outcome == "branch-local-complete" and .publication_status == "none" and .integration_status == "not_landed" and .closeout_outcome == "continued" and (.durable_history.pr_url? | not)' "valid branch-local complete example has not-landed no-PR semantics" "valid branch-local complete example must be not-landed and no-PR"
   require_jq "$VALID_HOSTED_BRANCH_NO_PR_LANDED" '.selected_route == "branch-no-pr" and .lifecycle_outcome == "landed" and .integration_method == "fast-forward" and .publication_status == "hosted-main-updated" and .hosted_landing.source_ref == .hosted_landing.validated_ref and .hosted_landing.target_post_ref == .landed_ref' "valid hosted no-PR example has exact-SHA landing semantics" "valid hosted no-PR example must have exact-SHA landing semantics"
   require_jq "$INVALID_PUSHED_ONLY_BRANCH_CLAIMED_LANDED" '.selected_route == "branch-no-pr" and .lifecycle_outcome == "landed" and .publication_status == "pushed-branch"' "invalid pushed-only example encodes landed overclaim" "invalid pushed-only example must encode landed overclaim"
   require_jq "$INVALID_DRAFT_PR_CLAIMED_FULL_CLOSEOUT" '.selected_route == "branch-pr" and .lifecycle_outcome == "ready" and .publication_status == "pr-ready" and .closeout_outcome == "completed"' "invalid draft PR example encodes full-closeout overclaim" "invalid draft PR example must encode full-closeout overclaim"
@@ -235,10 +257,12 @@ check_no_active_legacy_or_default_drift() {
   local default_drift
   default_drift="$(
     cd "$OCTON_DIR"
-    rg -n "PR-first|main remains PR-first|default execution unit is one branch|one branch worktree per task or PR|Stage, commit, push, and open a draft PR" framework instance \
+    rg -n "PR-first|main remains PR-first|default execution unit is one branch|one branch worktree per task or PR|Stage, commit, push, and open a draft PR|New work starts in a branch worktree|all new work starts in a branch|Should I branch it into a feature worktree and prepare a draft PR" framework instance \
       -g '!framework/scaffolding/practices/prompts/**' \
       -g '!framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh' \
+      -g '!framework/assurance/runtime/_ops/scripts/validate-git-github-workflow-alignment.sh' \
       -g '!framework/assurance/runtime/_ops/scripts/validate-github-projection-alignment.sh' \
+      -g '!framework/assurance/runtime/_ops/tests/test-solo-route-selection.sh' \
       -g '!framework/assurance/runtime/_ops/tests/test-github-projection-alignment.sh' \
       -g '!instance/cognition/decisions/**' 2>/dev/null || true
   )"

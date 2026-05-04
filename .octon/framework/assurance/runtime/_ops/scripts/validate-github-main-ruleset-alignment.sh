@@ -10,7 +10,7 @@ CLOSEOUT_CHANGE="$OCTON_DIR/framework/capabilities/runtime/skills/remediation/cl
 HOSTED_PREFLIGHT_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-branch-hosted-preflight.sh"
 GITHUB_CONTROL_CONTRACT="$OCTON_DIR/framework/execution-roles/practices/standards/github-control-plane-contract.json"
 
-EXPECTATION="current-pr-required"
+EXPECTATION="target-route-neutral"
 RULESET_JSON=""
 STRICT_LIVE=0
 REMOTE="origin"
@@ -23,9 +23,9 @@ usage:
   validate-github-main-ruleset-alignment.sh [--expect current-pr-required|target-route-neutral] [--ruleset-json <path>] [--strict-live]
 
 Validates GitHub main ruleset posture against Octon's hybrid landing model.
-The default expectation documents the current repository state: a PR-required
-ruleset blocks hosted branch-no-pr landing. Use --expect target-route-neutral
-after the live ruleset is migrated.
+The default expectation documents the current repository state after accepted
+route-neutral live migration. Use --expect current-pr-required only for
+rollback snapshots or pre-migration fixtures.
 USAGE
 }
 
@@ -107,9 +107,12 @@ validate_static_policy() {
   require_yq "$POLICY" '.pr_required_predicates[]? | select(. == "provider_ruleset_requires_pr")' "policy treats provider PR rule as PR-required predicate" "policy must treat provider PR rule as PR-required predicate"
   require_literal "$CLOSEOUT_CHANGE" 'If the provider ruleset requires PR for `main`, report a blocker' "closeout-change reports PR-required no-PR blocker" "closeout-change must report PR-required no-PR blocker"
   require_literal "$HOSTED_PREFLIGHT_SCRIPT" "Provider ruleset requires PR; hosted branch-no-pr landing unavailable." "preflight produces clear PR-required blocker" "preflight must produce clear PR-required blocker"
-  jq -e '.rulesets.current_live_main.expectation == "current-pr-required"' "$GITHUB_CONTROL_CONTRACT" >/dev/null 2>&1 \
-    && pass "control contract records current live PR-required posture" \
-    || fail "control contract must record current live PR-required posture"
+  jq -e '.rulesets.current_live_main.expectation == "target-route-neutral"' "$GITHUB_CONTROL_CONTRACT" >/dev/null 2>&1 \
+    && pass "control contract records current live route-neutral posture" \
+    || fail "control contract must record current live route-neutral posture"
+  jq -e '(.rulesets.current_live_main.required_checks | index("route_neutral_closeout_validation") != null) and (.rulesets.current_live_main.required_checks | index("branch_naming_validation") != null) and (.rulesets.current_live_main.required_checks | index("route_aware_autonomy_validation") != null) and (.rulesets.current_live_main.required_checks | index("exact_source_sha_validation") != null)' "$GITHUB_CONTROL_CONTRACT" >/dev/null 2>&1 \
+    && pass "control contract records current live route-neutral checks" \
+    || fail "control contract must record current live route-neutral checks"
   jq -e '.rulesets.target_route_neutral_main.live_mutation_performed_by_this_projection == false' "$GITHUB_CONTROL_CONTRACT" >/dev/null 2>&1 \
     && pass "control contract states repo-local projection does not mutate live rulesets" \
     || fail "control contract must state live ruleset mutation was not performed"

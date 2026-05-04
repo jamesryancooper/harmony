@@ -46,6 +46,14 @@ case_valid_branch_pr_ready_example_passes() {
   run_validator "$EXAMPLE_DIR/valid-branch-pr-ready.json"
 }
 
+case_valid_direct_main_landed_example_passes() {
+  run_validator "$EXAMPLE_DIR/valid-direct-main-landed.json"
+}
+
+case_valid_branch_no_pr_branch_local_example_passes() {
+  run_validator "$EXAMPLE_DIR/valid-branch-no-pr-branch-local-complete.json"
+}
+
 case_invalid_draft_pr_full_closeout_example_fails() {
   ! run_validator "$EXAMPLE_DIR/invalid-draft-pr-claimed-full-closeout.json"
 }
@@ -323,7 +331,9 @@ JSON
 
 main() {
   assert_success "lifecycle validator passes live repo" case_live_repo_passes
+  assert_success "valid direct-main landed example passes" case_valid_direct_main_landed_example_passes
   assert_success "valid branch-pr ready example passes" case_valid_branch_pr_ready_example_passes
+  assert_success "valid branch-no-pr branch-local example passes" case_valid_branch_no_pr_branch_local_example_passes
   assert_success "invalid draft PR full closeout example fails" case_invalid_draft_pr_full_closeout_example_fails
   assert_success "invalid pushed-only landed example fails" case_invalid_pushed_only_landed_example_fails
   assert_success "valid no-PR landed receipt passes" case_no_pr_landed_receipt_passes
