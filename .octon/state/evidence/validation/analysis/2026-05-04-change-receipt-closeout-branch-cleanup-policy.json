@@ -1,0 +1,77 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "closeout-branch-cleanup-policy",
+  "selected_route": "direct-main",
+  "lifecycle_outcome": "landed",
+  "intent": "Ensure Change closeout includes safe branch cleanup after branch-pr or branch-no-pr work lands in origin/main, and always syncs local main after landed direct-main closeout.",
+  "scope": {
+    "summary": "Codified post-landing branch cleanup and local-main sync requirements across the default work unit contract, closeout skills, workflow stage, Git/GitHub operator docs, branch cleanup helper, validators, and focused shell tests.",
+    "touched_paths": [
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-change-closeout-lifecycle-alignment.sh",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-git-github-workflow-alignment.sh",
+      ".octon/framework/assurance/runtime/_ops/tests/test-change-closeout-lifecycle-alignment.sh",
+      ".octon/framework/assurance/runtime/_ops/tests/test-default-work-unit-alignment.sh",
+      ".octon/framework/assurance/runtime/_ops/tests/test-git-github-workflow-alignment.sh",
+      ".octon/framework/capabilities/runtime/skills/remediation/closeout-change/SKILL.md",
+      ".octon/framework/capabilities/runtime/skills/remediation/closeout-pr/SKILL.md",
+      ".octon/framework/execution-roles/_ops/scripts/git/git-branch-cleanup.sh",
+      ".octon/framework/execution-roles/practices/change-lifecycle-routing-quickstart.md",
+      ".octon/framework/execution-roles/practices/git-autonomy-playbook.md",
+      ".octon/framework/execution-roles/practices/git-github-autonomy-workflow-v1.md",
+      ".octon/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml",
+      ".octon/framework/orchestration/runtime/workflows/meta/closeout/stages/02-request-or-report.md",
+      ".octon/framework/product/contracts/change-receipt-v1.schema.json",
+      ".octon/framework/product/contracts/default-work-unit.md",
+      ".octon/framework/product/contracts/default-work-unit.yml"
+    ],
+    "diff_refs": [
+      "base origin/main@3ed924ab16a4b6a281857a22f8dd05135cf690ec",
+      "implementation commit 15a14655e0ee8a9ab03239a43b9497288c3d8e0d",
+      "alignment follow-up commit dfde0898bfdd8951d43322310ec05a4555a14169"
+    ]
+  },
+  "target_branch_ref": "main@dfde0898bfdd8951d43322310ec05a4555a14169",
+  "landed_ref": "dfde0898bfdd8951d43322310ec05a4555a14169",
+  "integration_method": "direct-commit",
+  "integration_status": "landed",
+  "publication_status": "none",
+  "cleanup_status": "completed",
+  "cleanup_evidence_refs": [
+    "direct-main route has no source branch to clean during implementation closeout.",
+    "existing untracked .octon/state/** run/control/evidence artifacts were left untouched as retained-evidence candidates requiring separate maintainer disposition."
+  ],
+  "validation_evidence_refs": [
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-change-closeout-lifecycle-alignment.sh: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-git-github-workflow-alignment.sh: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-hosted-no-pr-landing.sh: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-github-projection-alignment.sh: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh --expect target-route-neutral --ruleset-json .octon/state/evidence/control/execution/github-rulesets/2026-05-04-route-neutral-main-migration/post-migration-main-effective-branch-rules.json: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh --strict-live: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-default-work-unit-alignment.sh: pass, 16 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-change-closeout-lifecycle-alignment.sh: pass, 19 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-git-github-workflow-alignment.sh: pass, 20 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-hosted-no-pr-landing.sh: pass, 18 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-github-projection-alignment.sh: pass, 7 passed, 0 failed.",
+    "git diff --check: pass.",
+    "git diff --cached --check before implementation commit: pass.",
+    "git diff --cached --check before alignment follow-up commit: pass."
+  ],
+  "review_waiver_refs": [
+    "Operator explicitly instructed that closeout must include safe branch cleanup after branch-pr or branch-no-pr work lands in origin/main and local main sync for direct-main.",
+    "No PR metadata was created or used for this direct-main Change."
+  ],
+  "durable_history": {
+    "kind": "commit",
+    "ref": "dfde0898bfdd8951d43322310ec05a4555a14169"
+  },
+  "rollback_handle": {
+    "kind": "revert-commit",
+    "ref": "dfde0898bfdd8951d43322310ec05a4555a14169",
+    "instructions": "Revert dfde0898bfdd8951d43322310ec05a4555a14169 and 15a14655e0ee8a9ab03239a43b9497288c3d8e0d on main if the closeout branch-cleanup policy needs rollback. Do not reset published main without explicit operator approval."
+  },
+  "closeout_outcome": "completed",
+  "remaining_blockers": [],
+  "created_at": "2026-05-04T19:24:02Z"
+}
