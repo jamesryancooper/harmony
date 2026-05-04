@@ -135,6 +135,7 @@ check_core_contracts() {
   done
   require_jq "$RECEIPT_SCHEMA" '.properties.hosted_landing.required[] | select(. == "provider_ruleset_ref")' "receipt schema requires hosted landing provider evidence" "receipt schema must require hosted landing provider evidence"
   require_jq "$RECEIPT_SCHEMA" '.properties.publication_status.enum[] | select(. == "hosted-main-updated")' "receipt schema models hosted main update status" "receipt schema must model hosted main update status"
+  require_jq "$RECEIPT_SCHEMA" '[.allOf[]? | select(.if.properties.lifecycle_outcome.const == "cleaned") | select((.then.properties.cleanup_status.enum | index("completed")) != null) | select((.then.properties.cleanup_status.enum | index("deferred")) != null) | select((.then.properties.cleanup_status.enum | index("pending")) == null)] | length == 1' "receipt schema blocks cleaned with pending cleanup" "receipt schema must block cleaned with pending cleanup"
   for outcome in preserved branch-local-complete published-branch published ready landed cleaned blocked escalated denied; do
     require_jq "$RECEIPT_SCHEMA" ".properties.lifecycle_outcome.enum[] | select(. == \"$outcome\")" "receipt schema accepts lifecycle outcome $outcome" "receipt schema missing lifecycle outcome $outcome"
   done

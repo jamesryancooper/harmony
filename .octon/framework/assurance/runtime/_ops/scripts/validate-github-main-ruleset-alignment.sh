@@ -85,6 +85,21 @@ rules_require_checks() {
   jq -e '.. | objects | select(.type? == "required_status_checks")' "$file" >/dev/null 2>&1
 }
 
+rules_have_type() {
+  local file="$1"
+  local type="$2"
+  jq -e --arg type "$type" '.. | objects | select(.type? == $type)' "$file" >/dev/null 2>&1
+}
+
+rules_require_strict_checks() {
+  local file="$1"
+  jq -e '
+    .. | objects
+    | select(.type? == "required_status_checks")
+    | .parameters.strict_required_status_checks_policy == true
+  ' "$file" >/dev/null 2>&1
+}
+
 rules_required_check_contexts() {
   local file="$1"
   jq -r '
@@ -96,6 +111,24 @@ rules_required_check_contexts() {
     | unique
     | .[]
   ' "$file" 2>/dev/null || true
+}
+
+validate_forbidden_universal_pr_checks() {
+  local file="$1"
+  local forbidden actual_contexts found
+  mapfile -t actual_contexts < <(rules_required_check_contexts "$file")
+  while IFS= read -r forbidden; do
+    [[ -n "$forbidden" ]] || continue
+    found=0
+    if printf '%s\n' "${actual_contexts[@]}" | grep -Fxq -- "$forbidden"; then
+      found=1
+    fi
+    if [[ "$found" -eq 1 ]]; then
+      fail "target route-neutral ruleset must not require PR-only check ${forbidden}"
+    else
+      pass "target route-neutral ruleset does not universally require PR-only check ${forbidden}"
+    fi
+  done < <(jq -r '.rulesets.target_route_neutral_main.pr_specific_checks[]?' "$GITHUB_CONTROL_CONTRACT")
 }
 
 validate_static_policy() {
@@ -152,6 +185,18 @@ validate_rules_file() {
       else
         fail "target route-neutral ruleset must retain required checks"
       fi
+      if rules_require_strict_checks "$file"; then
+        pass "target route-neutral ruleset uses strict required status checks"
+      else
+        fail "target route-neutral ruleset must use strict required status checks"
+      fi
+      for required_rule in deletion non_fast_forward required_linear_history; do
+        if rules_have_type "$file" "$required_rule"; then
+          pass "target route-neutral ruleset retains ${required_rule}"
+        else
+          fail "target route-neutral ruleset missing ${required_rule}"
+        fi
+      done
       local expected_check actual_contexts missing_check
       mapfile -t actual_contexts < <(rules_required_check_contexts "$file")
       while IFS= read -r expected_check; do
@@ -163,6 +208,7 @@ validate_rules_file() {
           fail "target route-neutral ruleset missing required check ${expected_check}"
         fi
       done < <(jq -r '.rulesets.target_route_neutral_main.universal_required_checks[]?' "$GITHUB_CONTROL_CONTRACT")
+      validate_forbidden_universal_pr_checks "$file"
       ;;
     *)
       fail "unknown expectation: $EXPECTATION"

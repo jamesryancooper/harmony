@@ -127,8 +127,9 @@ Before expecting autonomous merges:
 
 1. `AUTONOMY_AUTO_MERGE_ENABLED=true` is set as a repository variable.
 2. Current live `main` ruleset is active with required checks. The accepted
-   repo-local target is route-neutral Change projection; live migration remains
-   a separate operator action.
+   route-neutral live posture is recorded in retained 2026-05-04 provider
+   evidence and must be rechecked with strict-live validation before making a
+   current live-state claim.
 3. Actions workflow setting has `can_approve_pull_request_reviews=true`.
 4. `AUTONOMY_PAT` is set as a repository Actions secret.
 5. Main control-plane matches the `current_live_main` posture in
@@ -155,10 +156,13 @@ rollback ref, and cleanup-pending source branch disposition. Retain durable
 closeout evidence after landing and finish source branch cleanup only after the
 guard has observed the source branch head.
 
-## Route-Neutral Main Ruleset Migration Plan
+## Route-Neutral Main Ruleset Change Plan
 
-This is a reviewed operator procedure, not an instruction to mutate live
-GitHub settings during ordinary documentation or validator changes.
+Route-neutral `main` migration has already been accepted and recorded in
+`.octon/state/evidence/control/execution/github-rulesets/2026-05-04-route-neutral-main-migration/`.
+This procedure is retained as rollback and future-change guidance, not as an
+instruction to mutate live GitHub settings during ordinary documentation or
+validator changes.
 
 Read-only inspection:
 
@@ -189,7 +193,7 @@ Validate the fixture before maintainer acceptance:
   --ruleset-json <target-route-neutral-ruleset.json>
 ```
 
-Do not run until maintainer accepts the migration packet:
+Do not run unless a maintainer accepts a new ruleset change or rollback packet:
 
 ```bash
 gh api \
@@ -200,13 +204,14 @@ gh api \
   --input <target-route-neutral-ruleset.json>
 ```
 
-The accepted migration packet must contain current live-state evidence, shadow
-route-neutral check evidence against an exact pushed source SHA, the target
-ruleset fixture, the exact diff from the live ruleset object, the rollback
-snapshot and command, and the first hosted `branch-no-pr` landing procedure.
+The accepted ruleset-change packet must contain current live-state evidence,
+shadow route-neutral check evidence against an exact pushed source SHA, the
+target ruleset fixture, the exact diff from the live ruleset object, the
+rollback snapshot and command, and the first hosted `branch-no-pr` landing
+procedure when that proof remains pending.
 
-After migration, validate live state before updating
-`github-control-plane-contract.json`:
+Before updating `github-control-plane-contract.json` for any future live-state
+claim, validate live state:
 
 ```bash
 .octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh \
@@ -251,11 +256,11 @@ only after this preflight passes:
 10. The current live GitHub ruleset allows the protected-main merge path.
 
 After the preflight passes, an agent may mark the PR ready for review and
-request or perform the currently valid protected-main merge path. In the
-current PR-required live posture, that path is GitHub squash auto-merge or a
-GitHub-accepted squash merge for the PR. The agent must not push directly to
-protected `main`, bypass required checks, bypass review policy, bypass
-rulesets, or treat labels/comments/helper output as authority.
+request or perform the currently valid protected-main merge path. For the
+`branch-pr` route, that path is GitHub squash auto-merge or a GitHub-accepted
+squash merge for the PR. The agent must not bypass required checks, bypass
+review policy, bypass rulesets, or treat labels/comments/helper output as
+authority.
 
 For high-impact PRs, the agent owns the full closeout loop after merge request:
 watch until GitHub merges, fetch `origin/main`, verify the merged result is
@@ -571,8 +576,8 @@ It checks for control-plane drift:
 - `AUTONOMY_POLICY_ENFORCE` is effectively `true`.
 - Live `main` ruleset required checks match the `current_live_main` section of
   `.octon/framework/execution-roles/practices/standards/github-control-plane-contract.json`.
-  The `target_route_neutral_main` section is repo-local projection state until
-  the live ruleset migration is accepted.
+  The `target_route_neutral_main` section remains the repo-local target for
+  future drift repair or rollback, not proof of live state by itself.
 - Pull-request rules require review-thread resolution.
 - Repository merge settings remain squash-only and auto-merge compatible.
 - Repository settings preserve `delete_branch_on_merge=true`.
@@ -625,7 +630,8 @@ Strict branch-pr mode cutover:
 gh variable set AI_GATE_ENFORCE --body true
 ```
 
-Route-neutral main ruleset migration remains separate follow-up work. The target
+Route-neutral `main` ruleset migration is complete as retained repo evidence,
+but any current live-state claim still requires strict-live validation. The
 universal check set is:
 
 - `route_neutral_closeout_validation`
@@ -636,7 +642,8 @@ universal check set is:
 Keep `AI Review Gate / decision` and `PR Quality Standards` behind branch-pr;
 do not add them as universal target `main` checks.
 
-Post-cutover verification after an accepted live migration:
+Post-cutover verification after an accepted live migration or future ruleset
+change:
 
 ```bash
 .octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh --expect target-route-neutral --strict-live

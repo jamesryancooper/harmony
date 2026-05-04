@@ -13,6 +13,7 @@ WORKTREE_CONTRACT="$OCTON_DIR/framework/execution-roles/practices/standards/git-
 REQUIRED_CHECKS_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-required-checks-at-ref.sh"
 HOSTED_PREFLIGHT_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-branch-hosted-preflight.sh"
 HOSTED_LAND_SCRIPT="$OCTON_DIR/framework/execution-roles/_ops/scripts/git/git-branch-land-hosted-no-pr.sh"
+GITHUB_CONTROL_CONTRACT="$OCTON_DIR/framework/execution-roles/practices/standards/github-control-plane-contract.json"
 
 RECEIPT_PATH=""
 SKIP_LIVE_REMOTE=0
@@ -79,7 +80,7 @@ json_array_nonempty() {
 }
 
 validate_static() {
-  for file in "$POLICY" "$RECEIPT_SCHEMA" "$CLOSEOUT_CHANGE" "$WORKFLOW_STAGE" "$WORKTREE_CONTRACT" "$REQUIRED_CHECKS_SCRIPT" "$HOSTED_PREFLIGHT_SCRIPT" "$HOSTED_LAND_SCRIPT"; do
+  for file in "$POLICY" "$RECEIPT_SCHEMA" "$CLOSEOUT_CHANGE" "$WORKFLOW_STAGE" "$WORKTREE_CONTRACT" "$REQUIRED_CHECKS_SCRIPT" "$HOSTED_PREFLIGHT_SCRIPT" "$HOSTED_LAND_SCRIPT" "$GITHUB_CONTROL_CONTRACT"; do
     require_file "$file"
   done
 
@@ -95,13 +96,47 @@ validate_static() {
   require_literal "$REQUIRED_CHECKS_SCRIPT" "exact commit SHA" "required-check helper validates exact commit SHA" "required-check helper must validate exact commit SHA"
   require_literal "$HOSTED_PREFLIGHT_SCRIPT" "Provider ruleset requires PR; hosted branch-no-pr landing unavailable." "preflight fails closed when provider requires PR" "preflight must fail closed when provider requires PR"
   require_literal "$HOSTED_LAND_SCRIPT" 'push "$REMOTE" "$SOURCE_REF:refs/heads/$TARGET_BRANCH"' "hosted land helper uses non-force target push" "hosted land helper must use non-force target push"
+  require_jq "$GITHUB_CONTROL_CONTRACT" '(.rulesets.current_live_main.required_checks // []) | index("route_neutral_closeout_validation")' "control contract exposes route-neutral required checks" "control contract must expose route-neutral required checks"
+}
+
+expected_route_neutral_checks() {
+  jq -r '
+    if (.rulesets.current_live_main.required_checks // [] | length) > 0 then
+      .rulesets.current_live_main.required_checks[]
+    else
+      .rulesets.target_route_neutral_main.universal_required_checks[]?
+    end
+  ' "$GITHUB_CONTROL_CONTRACT"
+}
+
+validate_required_check_refs() {
+  local source_ref="$1"
+  local expected_check ref found
+  local -a refs=()
+  mapfile -t refs < <(jq -r '.hosted_landing.required_check_refs[]?' "$RECEIPT_PATH")
+
+  while IFS= read -r expected_check; do
+    [[ -n "$expected_check" ]] || continue
+    found=0
+    for ref in "${refs[@]}"; do
+      if [[ "$ref" == *"$expected_check"* && "$ref" == *"$source_ref"* ]]; then
+        found=1
+        break
+      fi
+    done
+    if [[ "$found" -eq 1 ]]; then
+      pass "hosted landing has exact-SHA check ref for $expected_check"
+    else
+      fail "hosted landing missing exact-SHA check ref for $expected_check"
+    fi
+  done < <(expected_route_neutral_checks)
 }
 
 validate_receipt() {
   [[ -f "$RECEIPT_PATH" ]] || { fail "receipt exists: $RECEIPT_PATH"; return; }
   jq -e '.' "$RECEIPT_PATH" >/dev/null 2>&1 && pass "receipt parses as JSON" || { fail "receipt parses as JSON"; return; }
 
-  local route outcome publication integration integration_method durable_kind cleanup landed_ref target_post_ref source_ref validated_ref
+  local route outcome publication integration integration_method durable_kind cleanup landed_ref target_post_ref source_ref validated_ref source_branch_ref hosted_source_branch remote_branch_ref
   route="$(json_value '.selected_route')"
   outcome="$(json_value '.lifecycle_outcome')"
   publication="$(json_value '.publication_status')"
@@ -113,6 +148,9 @@ validate_receipt() {
   target_post_ref="$(json_value '.hosted_landing.target_post_ref')"
   source_ref="$(json_value '.hosted_landing.source_ref')"
   validated_ref="$(json_value '.hosted_landing.validated_ref')"
+  source_branch_ref="$(json_value '.source_branch_ref')"
+  hosted_source_branch="$(json_value '.hosted_landing.source_branch')"
+  remote_branch_ref="$(json_value '.remote_branch_ref')"
 
   [[ "$route" == "branch-no-pr" ]] && pass "receipt route is branch-no-pr" || fail "hosted no-PR landing receipt must use branch-no-pr route"
   case "$outcome" in
@@ -137,10 +175,32 @@ validate_receipt() {
   jq -e '.hosted_landing | type == "object"' "$RECEIPT_PATH" >/dev/null 2>&1 && pass "receipt has hosted_landing evidence" || fail "branch-no-pr landed/cleaned requires hosted landing evidence"
   json_has_nonempty '.hosted_landing.provider_ruleset_ref' && pass "hosted landing has provider ruleset ref" || fail "hosted landing requires provider_ruleset_ref"
   json_array_nonempty '.hosted_landing.required_check_refs' && pass "hosted landing has required check refs" || fail "hosted landing requires required_check_refs"
+  [[ -n "$hosted_source_branch" ]] && pass "hosted landing has source branch evidence" || fail "hosted landing requires source_branch"
+  [[ -n "$remote_branch_ref" ]] && pass "hosted landing has pushed remote branch ref" || fail "hosted landing requires remote_branch_ref"
+  [[ -n "$source_branch_ref" && "$source_branch_ref" == "$hosted_source_branch" ]] && pass "source branch ref matches hosted source branch" || fail "source_branch_ref must equal hosted_landing.source_branch"
+  [[ -n "$remote_branch_ref" && -n "$hosted_source_branch" && "$remote_branch_ref" == *"$hosted_source_branch"* ]] && pass "remote branch ref proves pushed source branch" || fail "remote_branch_ref must identify the hosted source branch"
   jq -e '.hosted_landing.fast_forward_only == true' "$RECEIPT_PATH" >/dev/null 2>&1 && pass "hosted landing is fast-forward-only" || fail "hosted landing requires fast_forward_only true"
   [[ -n "$source_ref" && "$source_ref" == "$validated_ref" ]] && pass "validated ref equals source ref" || fail "hosted landing validated_ref must equal source_ref"
   [[ -n "$landed_ref" && "$landed_ref" == "$target_post_ref" ]] && pass "target post-ref equals landed ref" || fail "hosted landing target_post_ref must equal landed_ref"
   [[ "$cleanup" == "completed" || "$cleanup" == "deferred" || "$cleanup" == "pending" ]] && pass "cleanup status is explicit" || fail "cleanup status must be explicit"
+  validate_required_check_refs "$source_ref"
+
+  if [[ "$outcome" == "cleaned" ]]; then
+    case "$cleanup" in
+      completed|deferred) pass "cleaned hosted landing has terminal or explicitly deferred cleanup status" ;;
+      *) fail "cleaned hosted landing must not have pending cleanup status" ;;
+    esac
+  fi
+
+  if [[ "$cleanup" == "completed" ]]; then
+    json_array_nonempty '.cleanup_evidence_refs' && pass "completed cleanup has evidence refs" || fail "completed cleanup requires cleanup_evidence_refs"
+  elif [[ "$cleanup" == "deferred" ]]; then
+    if json_array_nonempty '.cleanup_evidence_refs' || json_array_nonempty '.external_blocker_refs'; then
+      pass "deferred cleanup has evidence or blocker refs"
+    else
+      fail "deferred cleanup requires cleanup evidence or external blocker refs"
+    fi
+  fi
 
   if [[ "$SKIP_LIVE_REMOTE" -eq 0 ]]; then
     if git -C "$ROOT_DIR" rev-parse --verify "origin/main^{commit}" >/dev/null 2>&1; then

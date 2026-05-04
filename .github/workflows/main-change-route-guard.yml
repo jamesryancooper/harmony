@@ -62,6 +62,39 @@ jobs:
               return ["completed", "deferred", "pending"].includes(receipt.cleanup_status);
             }
 
+            function cleanupStatusMatchesOutcome(receipt) {
+              if (receipt.lifecycle_outcome === "cleaned") {
+                return ["completed", "deferred"].includes(receipt.cleanup_status);
+              }
+              return true;
+            }
+
+            function cleanupEvidenceMatchesStatus(receipt) {
+              if (receipt.cleanup_status === "completed") {
+                return isNonEmptyArray(receipt.cleanup_evidence_refs);
+              }
+              if (receipt.cleanup_status === "deferred") {
+                return isNonEmptyArray(receipt.cleanup_evidence_refs) || isNonEmptyArray(receipt.external_blocker_refs);
+              }
+              return true;
+            }
+
+            function requiredCheckRefsCoverSourceSha(refs, sourceRef) {
+              const problems = [];
+              const requiredChecks = routeNeutralRequiredChecks();
+              if (!requiredChecks.length) {
+                problems.push("route-neutral required check set is empty");
+                return problems;
+              }
+              for (const check of requiredChecks) {
+                const matched = refs.some((ref) => ref.includes(check) && ref.includes(sourceRef));
+                if (!matched) {
+                  problems.push(`hosted_landing.required_check_refs missing ${check} at ${sourceRef}`);
+                }
+              }
+              return problems;
+            }
+
             function validateDirectMain(receipt) {
               const problems = [];
               if (receipt.selected_route !== "direct-main") problems.push("selected_route is not direct-main");
@@ -72,6 +105,16 @@ jobs:
               if (!isNonEmptyArray(receipt.validation_evidence_refs)) problems.push("validation_evidence_refs is empty");
               if (!isNonEmptyString(receipt.rollback_handle?.ref)) problems.push("rollback_handle.ref is missing");
               if (!cleanupStatusIsExplicit(receipt)) problems.push("cleanup_status is not explicit");
+              if (!cleanupStatusMatchesOutcome(receipt)) problems.push("cleaned lifecycle requires completed or deferred cleanup_status");
+              if (!cleanupEvidenceMatchesStatus(receipt)) problems.push("cleanup_status requires matching cleanup or blocker evidence");
+              if (receipt.publication_status === "hosted-main-updated") {
+                const hosted = receipt.hosted_landing || {};
+                if (!isNonEmptyArray(hosted.required_check_refs)) {
+                  problems.push("direct-main hosted-main-updated claim requires route-neutral check refs");
+                } else {
+                  problems.push(...requiredCheckRefsCoverSourceSha(hosted.required_check_refs, sha));
+                }
+              }
               return problems;
             }
 
@@ -87,6 +130,8 @@ jobs:
               if (!isNonEmptyString(receipt.source_branch_ref)) problems.push("source_branch_ref is missing");
               if (!isNonEmptyString(receipt.remote_branch_ref)) problems.push("remote_branch_ref is missing");
               if (!isNonEmptyString(hosted.source_branch)) problems.push("hosted_landing.source_branch is missing");
+              if (isNonEmptyString(receipt.source_branch_ref) && isNonEmptyString(hosted.source_branch) && receipt.source_branch_ref !== hosted.source_branch) problems.push("source_branch_ref does not match hosted_landing.source_branch");
+              if (isNonEmptyString(receipt.remote_branch_ref) && isNonEmptyString(hosted.source_branch) && !receipt.remote_branch_ref.includes(hosted.source_branch)) problems.push("remote_branch_ref does not identify hosted_landing.source_branch");
               if (!isNonEmptyString(hosted.provider_ruleset_ref)) problems.push("hosted_landing.provider_ruleset_ref is missing");
               if (!isNonEmptyArray(hosted.required_check_refs)) problems.push("hosted_landing.required_check_refs is empty");
               if (hosted.fast_forward_only !== true) problems.push("hosted_landing.fast_forward_only is not true");
@@ -98,6 +143,11 @@ jobs:
               if (hosted.target_post_ref !== receipt.landed_ref) problems.push("target_post_ref does not equal landed_ref");
               if (!isNonEmptyString(receipt.rollback_handle?.ref)) problems.push("rollback_handle.ref is missing");
               if (!cleanupStatusIsExplicit(receipt)) problems.push("cleanup_status is not explicit");
+              if (!cleanupStatusMatchesOutcome(receipt)) problems.push("cleaned lifecycle requires completed or deferred cleanup_status");
+              if (!cleanupEvidenceMatchesStatus(receipt)) problems.push("cleanup_status requires matching cleanup or blocker evidence");
+              if (isNonEmptyArray(hosted.required_check_refs) && isNonEmptyString(hosted.source_ref)) {
+                problems.push(...requiredCheckRefsCoverSourceSha(hosted.required_check_refs, hosted.source_ref));
+              }
               return problems;
             }
 
@@ -150,7 +200,7 @@ jobs:
               const missing = [];
               for (const check of requiredChecks) {
                 if (successful.has(check)) {
-                  refs.push(`${check}: ${successful.get(check)}`);
+                  refs.push(`${check}@${sha}: ${successful.get(check)}`);
                 } else {
                   missing.push(check);
                 }

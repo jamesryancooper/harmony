@@ -80,11 +80,14 @@
       "hosted_no_pr_evidence_required": [
         "provider_ruleset_ref",
         "pushed_source_branch",
+        "remote_branch_ref",
         "source_ref_equals_validated_ref",
+        "required_check_refs_bind_exact_source_ref",
         "integration_method_fast_forward",
         "rollback_handle",
         "cleanup_status",
-        "target_post_ref_equals_landed_ref_equals_github_sha"
+        "target_post_ref_equals_landed_ref_equals_github_sha",
+        "origin_main_equals_landed_ref_after_push"
       ],
       "live_mutation_performed_by_this_projection": false
     }

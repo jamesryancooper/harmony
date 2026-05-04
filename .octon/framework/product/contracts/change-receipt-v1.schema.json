@@ -548,6 +548,20 @@
     {
       "if": {
         "properties": {
+          "lifecycle_outcome": { "const": "cleaned" }
+        }
+      },
+      "then": {
+        "properties": {
+          "cleanup_status": {
+            "enum": ["completed", "deferred"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
           "cleanup_status": { "const": "completed" }
         }
       },

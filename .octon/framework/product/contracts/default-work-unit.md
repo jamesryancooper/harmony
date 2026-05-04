@@ -147,6 +147,13 @@ gate projections for PR-backed Changes. Route-neutral required checks may also
 gate hosted no-PR landing, but the check evidence must attach to the exact
 source SHA that is fast-forward pushed to `main`.
 
+For `direct-main`, hosted protected-main checks do not convert the Change into
+`branch-pr`. The route still starts from clean current `main`, local validation,
+Change receipt evidence, and a rollback handle. If the receipt claims
+`hosted-main-updated` or hosted protected-main checks were required for the
+direct update, route-neutral check evidence must attach to the exact
+`landed_ref`; PR metadata and PR-only checks are not required.
+
 Local validation output, local review evidence, AI review evidence, explicit
 waiver, and rollback evidence are valid gate projections for no-PR Changes when
 the governing validation floor allows local proof. A no-PR branch checkpoint,

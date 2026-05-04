@@ -35,6 +35,23 @@ write_file() {
   printf '%s\n' "$file"
 }
 
+copy_valid_hosted_receipt() {
+  local file
+  file="$(mktemp)"
+  CLEANUP_FILES+=("$file")
+  cp "$EXAMPLE_DIR/valid-hosted-branch-no-pr-landed.json" "$file"
+  printf '%s\n' "$file"
+}
+
+rewrite_json_file() {
+  local file="$1"
+  local filter="$2"
+  local tmp
+  tmp="$(mktemp)"
+  jq "$filter" "$file" >"$tmp"
+  mv "$tmp" "$file"
+}
+
 run_hosted_validator() {
   bash "$VALIDATOR" --receipt "$1" --skip-live-remote >/dev/null
 }
@@ -73,7 +90,12 @@ case_valid_hosted_no_pr_receipt_passes() {
     "target_pre_ref": "abc0000000000000000000000000000000000000",
     "target_post_ref": "def0000000000000000000000000000000000000",
     "validated_ref": "def0000000000000000000000000000000000000",
-    "required_check_refs": ["route-neutral-ci@def0000000000000000000000000000000000000"],
+    "required_check_refs": [
+      "route_neutral_closeout_validation@def0000000000000000000000000000000000000",
+      "branch_naming_validation@def0000000000000000000000000000000000000",
+      "route_aware_autonomy_validation@def0000000000000000000000000000000000000",
+      "exact_source_sha_validation@def0000000000000000000000000000000000000"
+    ],
     "provider_ruleset_ref": "main-route-neutral-ruleset",
     "push_refspec": "def0000000000000000000000000000000000000:refs/heads/main",
     "fast_forward_only": true
@@ -83,7 +105,7 @@ case_valid_hosted_no_pr_receipt_passes() {
   "publication_status": "hosted-main-updated",
   "cleanup_status": "deferred",
   "cleanup_evidence_refs": ["cleanup deferred while operator remains on branch"],
-  "validation_evidence_refs": ["route-neutral-ci passed at def0000000000000000000000000000000000000"],
+  "validation_evidence_refs": ["route-neutral checks passed at def0000000000000000000000000000000000000"],
   "review_waiver_refs": ["solo maintainer no-PR route"],
   "durable_history": {"kind": "commit", "ref": "def0000000000000000000000000000000000000", "branch": "feature/no-pr"},
   "rollback_handle": {"kind": "revert-commit", "ref": "def0000000000000000000000000000000000000"},
@@ -189,6 +211,27 @@ JSON
   ! run_hosted_validator "$receipt"
 }
 
+case_missing_route_neutral_check_fails() {
+  local receipt
+  receipt="$(copy_valid_hosted_receipt)"
+  rewrite_json_file "$receipt" 'del(.hosted_landing.required_check_refs[3])'
+  ! run_hosted_validator "$receipt"
+}
+
+case_check_ref_without_source_sha_fails() {
+  local receipt
+  receipt="$(copy_valid_hosted_receipt)"
+  rewrite_json_file "$receipt" '.hosted_landing.required_check_refs[1] = "branch_naming_validation@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"'
+  ! run_hosted_validator "$receipt"
+}
+
+case_missing_pushed_source_branch_evidence_fails() {
+  local receipt
+  receipt="$(copy_valid_hosted_receipt)"
+  rewrite_json_file "$receipt" 'del(.remote_branch_ref)'
+  ! run_hosted_validator "$receipt"
+}
+
 case_pr_metadata_fails() {
   local receipt
   receipt="$(write_file <<'JSON'
@@ -242,13 +285,13 @@ JSON
   bash "$RULESET_VALIDATOR" --expect current-pr-required --ruleset-json "$rules" >/dev/null
 }
 
-case_route_neutral_ruleset_passes_target_expectation() {
-  local rules
-  rules="$(write_file <<'JSON'
+write_valid_target_route_neutral_ruleset() {
+  write_file <<'JSON'
 [
   {
     "type": "required_status_checks",
     "parameters": {
+      "strict_required_status_checks_policy": true,
       "required_status_checks": [
         {"context": "route_neutral_closeout_validation"},
         {"context": "branch_naming_validation"},
@@ -258,10 +301,15 @@ case_route_neutral_ruleset_passes_target_expectation() {
     }
   },
   {"type": "non_fast_forward"},
-  {"type": "deletion"}
+  {"type": "deletion"},
+  {"type": "required_linear_history"}
 ]
 JSON
-)"
+}
+
+case_route_neutral_ruleset_passes_target_expectation() {
+  local rules
+  rules="$(write_valid_target_route_neutral_ruleset)"
   bash "$RULESET_VALIDATOR" --expect target-route-neutral --ruleset-json "$rules" >/dev/null
 }
 
@@ -277,6 +325,34 @@ JSON
   ! bash "$RULESET_VALIDATOR" --expect target-route-neutral --ruleset-json "$rules" >/dev/null
 }
 
+case_missing_linear_history_rule_fails_target_expectation() {
+  local rules
+  rules="$(write_valid_target_route_neutral_ruleset)"
+  rewrite_json_file "$rules" 'map(select(.type != "required_linear_history"))'
+  ! bash "$RULESET_VALIDATOR" --expect target-route-neutral --ruleset-json "$rules" >/dev/null
+}
+
+case_missing_deletion_rule_fails_target_expectation() {
+  local rules
+  rules="$(write_valid_target_route_neutral_ruleset)"
+  rewrite_json_file "$rules" 'map(select(.type != "deletion"))'
+  ! bash "$RULESET_VALIDATOR" --expect target-route-neutral --ruleset-json "$rules" >/dev/null
+}
+
+case_missing_non_fast_forward_rule_fails_target_expectation() {
+  local rules
+  rules="$(write_valid_target_route_neutral_ruleset)"
+  rewrite_json_file "$rules" 'map(select(.type != "non_fast_forward"))'
+  ! bash "$RULESET_VALIDATOR" --expect target-route-neutral --ruleset-json "$rules" >/dev/null
+}
+
+case_pr_only_universal_check_fails_target_expectation() {
+  local rules
+  rules="$(write_valid_target_route_neutral_ruleset)"
+  rewrite_json_file "$rules" 'map(if .type == "required_status_checks" then .parameters.required_status_checks += [{"context": "AI Review Gate / decision"}] else . end)'
+  ! bash "$RULESET_VALIDATOR" --expect target-route-neutral --ruleset-json "$rules" >/dev/null
+}
+
 main() {
   assert_success "hosted no-PR static alignment passes" case_static_alignment_passes
   assert_success "valid hosted no-PR example passes" case_valid_hosted_no_pr_example_passes
@@ -285,10 +361,17 @@ main() {
   assert_success "pushed-only branch cannot claim hosted landing" case_pushed_only_branch_cannot_claim_hosted_landing
   assert_success "missing hosted landing evidence fails" case_missing_hosted_landing_fails
   assert_success "mismatched landed ref fails" case_mismatched_landed_ref_fails
+  assert_success "hosted no-PR receipt missing one route-neutral check fails" case_missing_route_neutral_check_fails
+  assert_success "hosted no-PR check ref not bound to source SHA fails" case_check_ref_without_source_sha_fails
+  assert_success "hosted no-PR receipt missing pushed source branch evidence fails" case_missing_pushed_source_branch_evidence_fails
   assert_success "PR metadata fails for branch-no-pr hosted landing" case_pr_metadata_fails
   assert_success "current PR-required ruleset passes current expectation" case_current_pr_required_ruleset_passes_current_expectation
   assert_success "route-neutral ruleset passes target expectation" case_route_neutral_ruleset_passes_target_expectation
   assert_success "PR rule fails target route-neutral expectation" case_pr_rule_fails_target_expectation
+  assert_success "missing linear history rule fails target route-neutral expectation" case_missing_linear_history_rule_fails_target_expectation
+  assert_success "missing deletion rule fails target route-neutral expectation" case_missing_deletion_rule_fails_target_expectation
+  assert_success "missing non-fast-forward rule fails target route-neutral expectation" case_missing_non_fast_forward_rule_fails_target_expectation
+  assert_success "PR-only universal check fails target route-neutral expectation" case_pr_only_universal_check_fails_target_expectation
 
   echo
   echo "Passed: $pass_count"

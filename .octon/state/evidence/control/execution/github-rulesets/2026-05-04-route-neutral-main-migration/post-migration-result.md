@@ -1,5 +1,7 @@
 # Post-Migration Result
 
+Status: ruleset migration complete; first hosted no-PR landing proof pending.
+
 ## Live Update
 
 Applied accepted route-neutral main ruleset fixture on 2026-05-04.
@@ -65,3 +67,5 @@ before proposal closeout:
 - `target_post_ref == landed_ref`
 - `origin/main == landed_ref`
 
+Until that receipt exists under retained Change evidence, hosted no-PR landing
+support is ruleset-enabled but not fully exercised.

@@ -280,9 +280,9 @@ Minimum control-plane expectations:
 - Repository secret `AUTONOMY_PAT` is configured with minimum needed
   fine-grained permissions documented in
   `.octon/framework/execution-roles/practices/github-autonomy-runbook.md`.
-- Current live branch protection may remain PR-required until the accepted live
-  migration. The repo-local target is route-neutral protected `main` with
-  universal route-neutral checks only.
+- Current live branch protection is route-neutral protected `main` per the
+  retained 2026-05-04 provider evidence. Do not claim that posture from
+  repo-local projection alone; use durable evidence or strict-live validation.
 - `AI Review Gate / decision` and `PR Quality Standards` remain branch-pr
   checks, not universal direct-main or branch-no-pr requirements.
 - Reviewer-owned thread confirmation participates in branch-pr merge gating.

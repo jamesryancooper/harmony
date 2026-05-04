@@ -295,6 +295,13 @@ validate_receipt() {
       fail "deferred cleanup requires cleanup evidence or external blocker refs"
     fi
   fi
+
+  if [[ "$outcome" == "cleaned" ]]; then
+    case "$cleanup" in
+      completed|deferred) pass "cleaned outcome has terminal or explicitly deferred cleanup status" ;;
+      *) fail "cleaned outcome must not have pending or not_applicable cleanup status" ;;
+    esac
+  fi
 }
 
 while [[ $# -gt 0 ]]; do

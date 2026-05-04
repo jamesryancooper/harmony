@@ -83,6 +83,20 @@ case_receipt_schema_has_hosted_landing_evidence() {
   ' "$schema" >/dev/null
 }
 
+case_receipt_schema_blocks_cleaned_pending_cleanup() {
+  local schema="$ROOT_DIR/.octon/framework/product/contracts/change-receipt-v1.schema.json"
+  jq -e '
+    [
+      .allOf[]?
+      | select(.if.properties.lifecycle_outcome.const == "cleaned")
+      | select((.then.properties.cleanup_status.enum | index("completed")) != null)
+      | select((.then.properties.cleanup_status.enum | index("deferred")) != null)
+      | select((.then.properties.cleanup_status.enum | index("pending")) == null)
+    ]
+    | length == 1
+  ' "$schema" >/dev/null
+}
+
 case_policy_has_fail_closed_conditions() {
   local policy="$ROOT_DIR/.octon/framework/product/contracts/default-work-unit.yml"
   yq -e '.fail_closed_conditions[] | select(. == "missing_change_receipt")' "$policy" >/dev/null &&
@@ -126,6 +140,7 @@ main() {
   assert_success "receipt schema requires lifecycle status fields" case_receipt_schema_requires_lifecycle_fields
   assert_success "receipt schema includes lifecycle outcomes" case_receipt_schema_has_lifecycle_outcomes
   assert_success "receipt schema includes hosted no-PR landing evidence" case_receipt_schema_has_hosted_landing_evidence
+  assert_success "receipt schema blocks cleaned with pending cleanup" case_receipt_schema_blocks_cleaned_pending_cleanup
   assert_success "machine policy includes fail-closed receipt condition" case_policy_has_fail_closed_conditions
   assert_success "machine policy keeps no-PR landing as branch-no-pr outcome" case_policy_keeps_no_pr_landing_as_outcome
   assert_success "machine policy defines route-neutral ruleset target" case_policy_defines_route_neutral_ruleset_target

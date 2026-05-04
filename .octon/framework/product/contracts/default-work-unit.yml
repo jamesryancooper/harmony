@@ -89,6 +89,7 @@ routes:
       - "rollback_handle"
     required_validation:
       - "local_validation_at_selected_floor"
+      - "exact_sha_route_neutral_validation_when_hosted_publication_claimed"
   - route_id: "stage-only-escalate"
     description: "Blocked or ambiguous Change that preserves state without claiming completion."
     precedence: 40
@@ -135,6 +136,7 @@ route_lifecycle_outcomes:
     full_closeout_requires:
       - "landed_commit_on_main"
       - "local_validation_evidence"
+      - "route_neutral_exact_sha_check_evidence_when_hosted_publication_claimed"
       - "change_receipt"
       - "rollback_handle"
       - "cleanup_status"
@@ -258,6 +260,7 @@ fail_closed_conditions:
   - "missing_change_receipt"
   - "provider_ruleset_blocks_requested_hosted_no_pr_landing"
   - "hosted_no_pr_landing_missing_exact_sha_checks"
+  - "direct_main_hosted_publication_missing_exact_sha_checks"
   - "hosted_no_pr_landing_from_stale_branch"
   - "hosted_no_pr_landing_without_origin_main_equality"
   - "lifecycle_outcome_missing_or_unsupported"

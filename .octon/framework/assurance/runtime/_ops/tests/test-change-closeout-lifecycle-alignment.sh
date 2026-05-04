@@ -34,6 +34,24 @@ write_receipt() {
   printf '%s\n' "$file"
 }
 
+copy_example_receipt() {
+  local name="$1"
+  local file
+  file="$(mktemp)"
+  CLEANUP_FILES+=("$file")
+  cp "$EXAMPLE_DIR/$name" "$file"
+  printf '%s\n' "$file"
+}
+
+rewrite_json_file() {
+  local file="$1"
+  local filter="$2"
+  local tmp
+  tmp="$(mktemp)"
+  jq "$filter" "$file" >"$tmp"
+  mv "$tmp" "$file"
+}
+
 run_validator() {
   bash "$VALIDATOR" --receipt "$1" >/dev/null
 }
@@ -329,6 +347,20 @@ JSON
   ! run_validator "$receipt"
 }
 
+case_cleaned_pending_cleanup_fails() {
+  local receipt
+  receipt="$(copy_example_receipt valid-hosted-branch-no-pr-landed.json)"
+  rewrite_json_file "$receipt" '.lifecycle_outcome = "cleaned" | .cleanup_status = "pending" | del(.cleanup_evidence_refs)'
+  ! run_validator "$receipt"
+}
+
+case_landed_pending_cleanup_passes() {
+  local receipt
+  receipt="$(copy_example_receipt valid-hosted-branch-no-pr-landed.json)"
+  rewrite_json_file "$receipt" '.lifecycle_outcome = "landed" | .cleanup_status = "pending" | del(.cleanup_evidence_refs)'
+  run_validator "$receipt"
+}
+
 main() {
   assert_success "lifecycle validator passes live repo" case_live_repo_passes
   assert_success "valid direct-main landed example passes" case_valid_direct_main_landed_example_passes
@@ -345,6 +377,8 @@ main() {
   assert_success "branch-pr rejects branch-only lifecycle outcome" case_branch_pr_rejects_branch_only_lifecycle_outcome
   assert_success "branch-pr draft/open cannot claim full closeout" case_branch_pr_draft_not_full_closeout
   assert_success "cleanup claim requires evidence" case_cleanup_claim_requires_evidence
+  assert_success "cleaned with pending cleanup fails" case_cleaned_pending_cleanup_fails
+  assert_success "landed with pending cleanup remains valid" case_landed_pending_cleanup_passes
 
   echo
   echo "Passed: $pass_count"
