@@ -1,0 +1,68 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "no-pr-closeout-origin-push-safeguard",
+  "selected_route": "direct-main",
+  "lifecycle_outcome": "landed",
+  "intent": "Ensure future direct-main and branch-no-pr closeout includes an origin push by default.",
+  "scope": {
+    "summary": "Codified origin-push closeout requirements for direct-main and branch-no-pr routes, added validator coverage, and tightened the main route guard so direct-main receipt evidence must refer to a landed ref included in the pushed range.",
+    "touched_paths": [
+      ".github/workflows/main-change-route-guard.yml",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-change-closeout-lifecycle-alignment.sh",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-github-projection-alignment.sh",
+      ".octon/framework/capabilities/runtime/skills/remediation/closeout-change/SKILL.md",
+      ".octon/framework/execution-roles/practices/change-lifecycle-routing-quickstart.md",
+      ".octon/framework/execution-roles/practices/git-autonomy-playbook.md",
+      ".octon/framework/execution-roles/practices/git-github-autonomy-workflow-v1.md",
+      ".octon/framework/orchestration/runtime/workflows/meta/closeout/stages/02-request-or-report.md",
+      ".octon/framework/product/contracts/default-work-unit.md",
+      ".octon/framework/product/contracts/default-work-unit.yml"
+    ],
+    "diff_refs": [
+      "base origin/main@25c5455d72c23ea5ccbae07c69afba4e3c115674",
+      "direct-main safeguard commit ec506f5869f3347d658976f87b6d980463fd92d5"
+    ]
+  },
+  "target_branch_ref": "main@ec506f5869f3347d658976f87b6d980463fd92d5",
+  "landed_ref": "ec506f5869f3347d658976f87b6d980463fd92d5",
+  "integration_method": "direct-commit",
+  "integration_status": "landed",
+  "publication_status": "none",
+  "cleanup_status": "deferred",
+  "cleanup_evidence_refs": [
+    ".octon/state/evidence/validation/analysis/2026-05-04-change-lifecycle-routing-hygiene-note.md classifies unrelated untracked .octon/state/** artifacts as retained-evidence candidates requiring separate maintainer disposition.",
+    "git status -sb after safeguard commit shows only unrelated untracked .octon/state/** retained-evidence candidates."
+  ],
+  "validation_evidence_refs": [
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-default-work-unit-alignment.sh after safeguard patch: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-change-closeout-lifecycle-alignment.sh after safeguard patch: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-git-github-workflow-alignment.sh after safeguard patch: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-github-projection-alignment.sh after safeguard patch: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-github-main-ruleset-alignment.sh --expect target-route-neutral --ruleset-json .octon/state/evidence/control/execution/github-rulesets/2026-05-04-route-neutral-main-migration/post-migration-main-effective-branch-rules.json after safeguard patch: pass, errors=0.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-default-work-unit-alignment.sh after safeguard patch: pass, 14 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-change-closeout-lifecycle-alignment.sh after safeguard patch: pass, 17 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-git-github-workflow-alignment.sh after safeguard patch: pass, 17 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-github-projection-alignment.sh after safeguard patch: pass, 7 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-hosted-no-pr-landing.sh after safeguard patch: pass, 18 passed, 0 failed.",
+    ".octon/framework/assurance/runtime/_ops/tests/test-solo-route-selection.sh after safeguard patch: pass, 4 passed, 0 failed.",
+    "git diff --check after safeguard patch: pass.",
+    "git diff --cached --check before safeguard commit: pass."
+  ],
+  "review_waiver_refs": [
+    "Operator explicitly instructed that future direct-main or branch-no-pr closeout must include a push to origin.",
+    "No PR metadata was created or used for this direct-main safeguard Change."
+  ],
+  "durable_history": {
+    "kind": "commit",
+    "ref": "ec506f5869f3347d658976f87b6d980463fd92d5"
+  },
+  "rollback_handle": {
+    "kind": "revert-commit",
+    "ref": "ec506f5869f3347d658976f87b6d980463fd92d5",
+    "instructions": "Revert commit ec506f5869f3347d658976f87b6d980463fd92d5 on main if the no-PR closeout push safeguard needs rollback. Do not reset published main without explicit operator approval."
+  },
+  "closeout_outcome": "completed",
+  "remaining_blockers": [],
+  "created_at": "2026-05-04T18:08:37Z"
+}
