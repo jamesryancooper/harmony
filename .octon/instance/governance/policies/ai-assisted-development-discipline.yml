@@ -1,0 +1,66 @@
+schema_version: "ai-assisted-development-discipline-v1"
+policy_id: "ai-assisted-development-discipline"
+owner: "Octon governance"
+status: "active"
+authority_posture:
+  subordinate_to:
+    - ".octon/framework/constitution/CHARTER.md"
+    - ".octon/framework/constitution/obligations/fail-closed.yml"
+    - ".octon/framework/constitution/obligations/evidence.yml"
+    - ".octon/instance/ingress/AGENTS.md"
+    - ".octon/framework/execution-roles/runtime/orchestrator/ROLE.md"
+practice_refs:
+  standard: ".octon/framework/execution-roles/practices/standards/ai-assisted-development-discipline.md"
+  repository_reconnaissance: ".octon/framework/execution-roles/practices/standards/repository-reconnaissance.md"
+  cleanup_pass: ".octon/framework/execution-roles/practices/standards/cleanup-pass.md"
+  dependency_discipline: ".octon/framework/execution-roles/practices/standards/dependency-discipline.md"
+  validation_evidence_quality: ".octon/framework/execution-roles/practices/standards/validation-evidence-quality.md"
+applies_to:
+  change_classes:
+    - "governance"
+    - "runtime"
+    - "refactor"
+    - "migration"
+    - "assurance"
+    - "generated-publication"
+    - "repo-consequential"
+required_receipts:
+  - "profile-selection"
+  - "repository-reconnaissance"
+  - "minimality-anti-bloat"
+  - "behavior-preservation"
+  - "cleanup-pass"
+  - "boundary-compliance"
+conditional_receipts:
+  dependency_change:
+    required: "dependency-addition-or-removal"
+    policy_ref: ".octon/instance/governance/policies/dependency-discipline.yml"
+  deletion_or_retirement:
+    required: "deletion-safety-or-ablation"
+    policy_ref: ".octon/instance/governance/policies/repo-hygiene.yml"
+  generated_output:
+    required: "publication-freshness-and-non-authority"
+  proposal_promotion:
+    required: "proposal-path-backreference-scan"
+forbidden_patterns:
+  - "speculative-abstraction"
+  - "duplicate-surface"
+  - "policy-without-enforcement-route"
+  - "proposal-path-authority"
+  - "generated-as-authority"
+  - "raw-input-runtime-dependency"
+  - "dependency-without-receipt"
+  - "cleanup-without-behavior-preservation"
+  - "shallow-validation-evidence"
+  - "unsupported-support-claim"
+validation:
+  maintainability_suites:
+    - ".octon/framework/assurance/maintainability/suites/ai-assisted-development-minimality.yml"
+    - ".octon/framework/assurance/maintainability/suites/behavior-preservation.yml"
+  ai_gate_policy_ref: ".octon/framework/execution-roles/practices/standards/ai-gate-policy.json"
+  pr_standard_ref: ".octon/framework/execution-roles/practices/pull-request-standards.md"
+routes:
+  missing_required_receipt: "stage-only"
+  authority_boundary_violation: "deny"
+  ownership_ambiguity: "escalate"
+  weak_validation_evidence: "stage-only"

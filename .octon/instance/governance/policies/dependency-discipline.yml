@@ -1,0 +1,48 @@
+schema_version: "dependency-discipline-policy-v1"
+policy_id: "dependency-discipline"
+owner: "Octon governance"
+status: "active"
+authority_posture:
+  subordinate_to:
+    - ".octon/framework/constitution/CHARTER.md"
+    - ".octon/instance/governance/policies/ai-assisted-development-discipline.yml"
+practice_ref: ".octon/framework/execution-roles/practices/standards/dependency-discipline.md"
+scope:
+  ecosystems:
+    - "cargo"
+    - "github-actions"
+    - "shell-host-tools"
+    - "developer-tooling"
+required_receipt_fields:
+  - "dependency_name"
+  - "ecosystem"
+  - "problem_solved"
+  - "existing_workspace_alternatives"
+  - "why_local_implementation_is_worse"
+  - "direct_call_sites"
+  - "transitive_risk"
+  - "license_posture"
+  - "security_posture"
+  - "runtime_or_tooling_classification"
+  - "removal_or_retirement_path"
+  - "validation_run"
+  - "separation_from_feature_work"
+default_rules:
+  dependency_updates_are_separate_changes: true
+  missing_receipt_route: "stage-only"
+  ambiguous_license_or_security_route: "escalate"
+  unused_dependency_detection_policy_ref: ".octon/instance/governance/policies/repo-hygiene.yml"
+review_requirements:
+  cargo:
+    - "Cargo manifest and lockfile changes are explicit."
+    - "Dependency review or equivalent local risk check is recorded."
+  github_actions:
+    - "Action pin, permissions, and workflow surface are recorded."
+  shell_host_tools:
+    - "Host-tool availability and fallback posture are recorded."
+forbidden_patterns:
+  - "dependency-added-for-speculative-future-use"
+  - "dependency-bump-mixed-with-unrelated-feature"
+  - "transitive-risk-unreviewed"
+  - "license-posture-unknown"
+  - "security-posture-unknown"

@@ -20,6 +20,12 @@ optional_orientation:
   - .octon/instance/bootstrap/conventions.md
   - .octon/instance/bootstrap/catalog.md
 conditional_orientation:
+  ai_assisted_development_discipline:
+    - .octon/framework/execution-roles/practices/standards/ai-assisted-development-discipline.md
+    - .octon/framework/execution-roles/practices/standards/repository-reconnaissance.md
+    - .octon/framework/execution-roles/practices/standards/cleanup-pass.md
+    - .octon/framework/execution-roles/practices/standards/dependency-discipline.md
+    - .octon/framework/execution-roles/practices/standards/validation-evidence-quality.md
   continuity_repo:
     - .octon/state/continuity/repo/log.md
     - .octon/state/continuity/repo/tasks.json

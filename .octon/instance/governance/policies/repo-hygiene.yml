@@ -26,6 +26,11 @@ dynamic_inputs:
   retirement_register_ref: ".octon/instance/governance/retirement-register.yml"
   host_tool_requirements_ref: ".octon/instance/capabilities/runtime/host-tools/requirements.yml"
   host_tool_resolution_policy_ref: ".octon/instance/governance/policies/host-tool-resolution.yml"
+ai_assisted_cleanup_refs:
+  development_discipline_policy_ref: ".octon/instance/governance/policies/ai-assisted-development-discipline.yml"
+  cleanup_pass_standard_ref: ".octon/framework/execution-roles/practices/standards/cleanup-pass.md"
+  validation_evidence_quality_ref: ".octon/framework/execution-roles/practices/standards/validation-evidence-quality.md"
+  rule: "AI-assisted cleanup pass receipts may identify candidates, but destructive outcomes still require this policy's routing, confidence rules, and ablation or retention evidence."
 scope:
   included_roots:
     - ".octon/framework/**"
@@ -184,6 +189,15 @@ same_change_requirements:
       - "retain-with-rationale"
     blocks:
       - "safe-to-delete-routing"
+  - id: "RH-004"
+    condition: "An AI-assisted cleanup pass proposes deletion, demotion, or retirement without repo-hygiene routing."
+    required_outcome:
+      - "classify-under-repo-hygiene"
+      - "retain-with-rationale"
+      - "produce-ablation-or-retirement-evidence-before-delete"
+    blocks:
+      - "safe-to-delete-routing"
+      - "ai-assisted-development-closeout"
 mode_boundaries:
   scan:
     side_effects: "none"

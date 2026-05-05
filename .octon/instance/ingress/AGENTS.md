@@ -65,6 +65,17 @@ Use these only after the minimal constitutional read set above is bound:
 - `.octon/state/continuity/scopes/<scope-id>/{log.md,tasks.json}` when the
   current work is primarily owned by a declared scope
 
+## Conditional Orientation
+
+For non-trivial AI-assisted governance, runtime, refactor, migration, assurance,
+or repo-consequential work, read:
+
+- `.octon/framework/execution-roles/practices/standards/ai-assisted-development-discipline.md`
+- `.octon/framework/execution-roles/practices/standards/repository-reconnaissance.md`
+- `.octon/framework/execution-roles/practices/standards/cleanup-pass.md`
+- `.octon/framework/execution-roles/practices/standards/dependency-discipline.md`
+- `.octon/framework/execution-roles/practices/standards/validation-evidence-quality.md`
+
 ## Topology Reference
 
 - Only `framework/**` and `instance/**` are authored authority surfaces.

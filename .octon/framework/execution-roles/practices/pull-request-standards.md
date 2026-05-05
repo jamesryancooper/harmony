@@ -166,6 +166,16 @@ one-line summary is acceptable.
   - `## Impact Map (code, tests, docs, contracts)`
   - `## Compliance Receipt`
   - `## Exceptions/Escalations`
+- For AI-assisted governance, runtime, refactor, migration, assurance, or
+  repo-consequential PR-backed Changes, PR bodies must include a Minimality /
+  Anti-Bloat Receipt. The receipt must cite existing surfaces searched, reused
+  utilities or contracts, new files and abstractions with rationale,
+  dependency changes or `none`, cleanup pass result, behavior-preservation
+  evidence, generated/input/proposal boundary checks, and remaining
+  change-quality risk or `none`.
+- Dependency changes must carry a Dependency Receipt or remain out of scope.
+  Dependency updates stay separate from behavior, refactor, formatting, and
+  cleanup work unless a policy route explicitly authorizes coupling.
 - Governance receipts must declare machine keys when applicable:
   - `change_profile`
   - `release_state`

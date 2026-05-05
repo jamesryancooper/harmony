@@ -115,6 +115,23 @@
             "type": "integer",
             "minimum": 1
           },
+          "class": {
+            "type": "string",
+            "enum": [
+              "unnecessary-authority-surface",
+              "proposal-authority-leak",
+              "generated-authority-leak",
+              "raw-input-runtime-dependency",
+              "speculative-abstraction",
+              "duplicate-logic",
+              "dependency-without-receipt",
+              "shallow-validation-evidence",
+              "cleanup-pass-missing",
+              "behavior-preservation-unproven",
+              "unsupported-support-claim",
+              "unregistered-retirement-residue"
+            ]
+          },
           "rule": {
             "type": "string"
           }

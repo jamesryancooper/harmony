@@ -19,6 +19,68 @@
   "waiver": {
     "mode": "disabled"
   },
+  "finding_classes": [
+    {
+      "id": "unnecessary-authority-surface",
+      "default_decision": "block",
+      "description": "New authored authority surface exists without clear durable ownership and enforcement need."
+    },
+    {
+      "id": "proposal-authority-leak",
+      "default_decision": "block",
+      "description": "Active proposal content is treated as runtime, policy, support, or closure authority."
+    },
+    {
+      "id": "generated-authority-leak",
+      "default_decision": "block",
+      "description": "Generated output is treated as source of truth or a second control plane."
+    },
+    {
+      "id": "raw-input-runtime-dependency",
+      "default_decision": "block",
+      "description": "Raw input path is consumed as runtime or policy dependency."
+    },
+    {
+      "id": "speculative-abstraction",
+      "default_decision": "warn",
+      "description": "New abstraction exists without current complexity, duplication, or local-pattern need."
+    },
+    {
+      "id": "duplicate-logic",
+      "default_decision": "warn",
+      "description": "New helper, type, validator, policy, or workflow duplicates an existing surface."
+    },
+    {
+      "id": "dependency-without-receipt",
+      "default_decision": "block",
+      "description": "Dependency change lacks the required decision receipt."
+    },
+    {
+      "id": "shallow-validation-evidence",
+      "default_decision": "warn",
+      "description": "Tests or checks mirror implementation details without proving behavior or boundaries."
+    },
+    {
+      "id": "cleanup-pass-missing",
+      "default_decision": "warn",
+      "description": "Non-trivial AI-assisted change lacks a cleanup pass result."
+    },
+    {
+      "id": "behavior-preservation-unproven",
+      "default_decision": "block",
+      "description": "Behavior or boundary preservation claims lack supporting validation evidence."
+    },
+    {
+      "id": "unsupported-support-claim",
+      "default_decision": "block",
+      "description": "Support claim exceeds admitted support targets or retained evidence."
+    },
+    {
+      "id": "unregistered-retirement-residue",
+      "default_decision": "warn",
+      "description": "Transitional or historical residue lacks required retirement-register coverage."
+    }
+  ],
   "providers": [
     {
       "id": "openai",

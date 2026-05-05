@@ -1,0 +1,29 @@
+schema_version: "proof-suite-v1"
+suite_id: "ai-assisted-development-minimality"
+plane: "maintainability"
+purpose: "Prove AI-assisted Changes stay minimal, discoverable, non-duplicative, and bounded by Octon authority classes."
+policy_ref: ".octon/instance/governance/policies/ai-assisted-development-discipline.yml"
+runner_ref: ".octon/framework/assurance/runtime/_ops/scripts/assurance-gate.sh"
+validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-post-implementation-drift.sh"
+required_artifacts:
+  - "repository-reconnaissance-receipt"
+  - "minimality-anti-bloat-receipt"
+  - "dependency-receipt-or-none"
+  - "cleanup-pass-result"
+  - "boundary-compliance-result"
+dimensions:
+  repository_reconnaissance:
+    pass_condition: "Relevant existing surfaces were searched before new ones were added."
+  minimality:
+    pass_condition: "No unnecessary new file, abstraction, generated output, workflow, validator, policy, or dependency remains."
+  duplicate_surface_avoidance:
+    pass_condition: "New surfaces do not duplicate existing local helpers, contracts, policies, validators, or workflows."
+  dependency_discipline:
+    pass_condition: "Dependency changes carry a complete receipt or are absent."
+  cleanup_pass:
+    pass_condition: "Deletion and simplification candidates were routed through cleanup-pass and repo-hygiene policy."
+  authority_boundary:
+    pass_condition: "No generated, input, proposal, host, or chat surface is consumed as authority."
+blocking_support_tiers:
+  - "repo-consequential"
+  - "release-and-boundary-sensitive"

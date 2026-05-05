@@ -1,0 +1,26 @@
+schema_version: "proof-suite-v1"
+suite_id: "behavior-preservation"
+plane: "maintainability"
+purpose: "Prove changed behavior is tied to acceptance criteria and unchanged behavior remains protected."
+policy_ref: ".octon/instance/governance/policies/ai-assisted-development-discipline.yml"
+runner_ref: ".octon/framework/assurance/runtime/_ops/scripts/assurance-gate.sh"
+validator_ref: ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-implementation-conformance.sh"
+required_artifacts:
+  - "behavior-preservation-evidence"
+  - "validation-evidence-quality-receipt"
+  - "rollback-posture"
+  - "generated-input-proposal-boundary-check"
+dimensions:
+  changed_behavior_mapping:
+    pass_condition: "Every intended behavior change maps to acceptance criteria and validation evidence."
+  unchanged_behavior_protection:
+    pass_condition: "Behavior claimed unchanged is covered by tests, scenarios, replay, review evidence, or an explicit exclusion."
+  deletion_safety:
+    pass_condition: "Deleted or retired surfaces have repo-hygiene routing, ablation evidence, or retained rationale."
+  generated_freshness:
+    pass_condition: "Generated outputs are refreshed or explicitly excluded with non-authority posture preserved."
+  validation_depth:
+    pass_condition: "Evidence proves behavior or boundary preservation rather than implementation trivia."
+blocking_support_tiers:
+  - "repo-consequential"
+  - "release-and-boundary-sensitive"
