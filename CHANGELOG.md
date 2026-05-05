@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.58](https://github.com/jamesryancooper/octon/compare/octon-v0.6.57...octon-v0.6.58) (2026-05-05)
+
+
+### Bug Fixes
+
+* **capabilities:** prevent nested octon temp output ([b002a2c](https://github.com/jamesryancooper/octon/commit/b002a2c9552f8e67a11e1e99bf76d3dccb657f89))
+* **octon:** refresh main check artifacts ([2e86a21](https://github.com/jamesryancooper/octon/commit/2e86a210e30f765e93e639bc5385f4c9c94d1f47))
+* **runtime:** close succeeded runs with retained evidence ([85b2abc](https://github.com/jamesryancooper/octon/commit/85b2abc4252293cbb2929af9f0c13e2a127bba0e))
+
 ## [0.6.57](https://github.com/jamesryancooper/octon/compare/octon-v0.6.56...octon-v0.6.57) (2026-05-04)
 
 
