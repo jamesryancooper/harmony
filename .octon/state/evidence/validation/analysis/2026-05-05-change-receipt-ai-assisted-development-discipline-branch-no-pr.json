@@ -1,0 +1,74 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "ai-assisted-development-discipline-branch-no-pr",
+  "selected_route": "branch-no-pr",
+  "lifecycle_outcome": "published-branch",
+  "intent": "Preserve and publish the Octon-internal AI-assisted development discipline Change without opening a PR.",
+  "scope": {
+    "summary": "Added Octon-internal AI-assisted development discipline standards, instance policies, AI gate finding classes, maintainability assurance suites, ingress references, proposal registry refresh, and retained implementation evidence.",
+    "touched_paths": [
+      ".octon/framework/assurance/maintainability/suites/ai-assisted-development-minimality.yml",
+      ".octon/framework/assurance/maintainability/suites/behavior-preservation.yml",
+      ".octon/framework/assurance/maintainability/suites/registry.yml",
+      ".octon/framework/execution-roles/practices/pull-request-standards.md",
+      ".octon/framework/execution-roles/practices/standards/ai-assisted-development-discipline.md",
+      ".octon/framework/execution-roles/practices/standards/ai-gate-findings.schema.json",
+      ".octon/framework/execution-roles/practices/standards/ai-gate-policy.json",
+      ".octon/framework/execution-roles/practices/standards/cleanup-pass.md",
+      ".octon/framework/execution-roles/practices/standards/dependency-discipline.md",
+      ".octon/framework/execution-roles/practices/standards/repository-reconnaissance.md",
+      ".octon/framework/execution-roles/practices/standards/validation-evidence-quality.md",
+      ".octon/generated/proposals/registry.yml",
+      ".octon/instance/governance/policies/ai-assisted-development-discipline.yml",
+      ".octon/instance/governance/policies/dependency-discipline.yml",
+      ".octon/instance/governance/policies/repo-hygiene.yml",
+      ".octon/instance/ingress/AGENTS.md",
+      ".octon/instance/ingress/manifest.yml",
+      ".octon/state/evidence/runs/skills/octon-concept-integration/2026-05-05-octon-ai-assisted-development-discipline-implementation.md"
+    ],
+    "diff_refs": [
+      "branch chore/ai-assisted-development-discipline-closeout@10c2330e6d10a5b211647603d56e8dea47e465f0"
+    ]
+  },
+  "source_branch_ref": "chore/ai-assisted-development-discipline-closeout",
+  "remote_branch_ref": "origin/chore/ai-assisted-development-discipline-closeout@10c2330e6d10a5b211647603d56e8dea47e465f0",
+  "integration_method": "not-applicable",
+  "integration_status": "not_landed",
+  "publication_status": "pushed-branch",
+  "cleanup_status": "deferred",
+  "cleanup_evidence_refs": [
+    "Source branch retained because branch-no-pr selected published-branch handoff rather than hosted main landing.",
+    "Unrelated untracked .octon/state/** runtime artifacts were left unstaged and require separate disposition."
+  ],
+  "validation_evidence_refs": [
+    "rg -n \"\\b[Ss]lop\\b|AI[- ]slop|slop[- ]\" .octon .github AGENTS.md README.md: no matches.",
+    "git diff --check: pass.",
+    "git diff --cached --check before implementation commit: pass.",
+    "yq -e . .octon/generated/proposals/registry.yml: pass.",
+    "validate-ingress-manifest-parity.sh: pass, errors=0.",
+    "validate-repo-hygiene-governance.sh: pass, errors=0.",
+    "validate-change-closeout-lifecycle-alignment.sh: pass, errors=0.",
+    "validate-default-work-unit-alignment.sh: pass, errors=0.",
+    "validate-git-github-workflow-alignment.sh: pass, errors=0.",
+    "validate-proposal-standard.sh --package .octon/inputs/exploratory/proposals/.archive/policy/octon-ai-assisted-development-discipline: pass, errors=0 warnings=0."
+  ],
+  "review_waiver_refs": [
+    "Operator selected branch-no-pr route.",
+    "No PR was opened or used for this closeout route."
+  ],
+  "durable_history": {
+    "kind": "commit",
+    "ref": "10c2330e6d10a5b211647603d56e8dea47e465f0",
+    "branch": "chore/ai-assisted-development-discipline-closeout"
+  },
+  "rollback_handle": {
+    "kind": "discard-branch",
+    "ref": "chore/ai-assisted-development-discipline-closeout",
+    "instructions": "Delete or reset local and remote branch chore/ai-assisted-development-discipline-closeout if the branch-no-pr Change is abandoned before any hosted landing."
+  },
+  "closeout_outcome": "continued",
+  "remaining_blockers": [
+    "Branch is published for handoff but not landed on main."
+  ],
+  "created_at": "2026-05-05T15:07:52Z"
+}
