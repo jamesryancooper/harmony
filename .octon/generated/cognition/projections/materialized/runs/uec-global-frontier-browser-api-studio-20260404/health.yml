@@ -1,6 +1,6 @@
 schema_version: run-health-read-model-v1
 run_id: uec-global-frontier-browser-api-studio-20260404
-generated_at: '2026-05-04T18:35:11Z'
+generated_at: '2026-05-05T21:50:10Z'
 generator:
   id: generate-run-health-read-model.sh
   version: 1.0.0
@@ -23,8 +23,8 @@ freshness:
   mode: digest-bound
   status: fresh
   source_digest_algorithm: sha256
-  combined_source_digest: sha256:962d079573d63924b4a15fe1e87cb8dd813fd7979e169c1b7956718e8da660cb
-  checked_at: '2026-05-04T18:35:11Z'
+  combined_source_digest: sha256:d3c5982781559beaaf226620dc911de079f59efb409d70b7f54bebbdd82d3c8c
+  checked_at: '2026-05-05T21:50:10Z'
   expires_at: null
   freshness_refs:
   - .octon/state/control/execution/runs/uec-global-frontier-browser-api-studio-20260404/events.manifest.yml
@@ -129,7 +129,7 @@ source_digests:
     status: present
   support_reconciliation:
     ref: .octon/generated/effective/governance/support-envelope-reconciliation.yml
-    digest: sha256:79e5ef64a48fa595e5f660ba2aaeac12c57e44744775b11c6a08fcd0b96a4b49
+    digest: sha256:67c9f3dad0ae0e6c01c5fadd9d8bbc322fb6c4aa14831375b851645ae02f6eb8
     status: present
   run_continuity:
     ref: .octon/state/continuity/runs/uec-global-frontier-browser-api-studio-20260404/handoff.yml
@@ -137,11 +137,11 @@ source_digests:
     status: present
   runtime_route_bundle:
     ref: .octon/generated/effective/runtime/route-bundle.yml
-    digest: sha256:bd2bb69cf5f1c45302b47aedce2c62e47d3371a1deaebbdfcbe8192d7917d30f
+    digest: sha256:f529cc35afc7fca020d5c6e868d4395371b1fad8df261edb551730f219c65d27
     status: present
   pack_routes:
     ref: .octon/generated/effective/capabilities/pack-routes.effective.yml
-    digest: sha256:2f8781136b196b33989246f9250dfd43f6d597ad50091c5463278d285bccc97f
+    digest: sha256:11a3d677d70475d5be6e72e8522d31d9bced4ece98d70a14d079fd4babc4de0d
     status: present
   schema:
     ref: .octon/framework/engine/runtime/spec/run-health-read-model-v1.schema.json

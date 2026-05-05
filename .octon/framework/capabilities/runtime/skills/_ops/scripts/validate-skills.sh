@@ -1122,11 +1122,13 @@ get_skill_allowed_tools() {
 has_non_minimal_bash_permissions() {
     local skill_dir="$1"
     local allowed
+    local found=false
 
     while IFS= read -r allowed; do
         [[ -z "$allowed" ]] && continue
         if [[ "$allowed" == "Bash" ]]; then
-            return 0
+            found=true
+            continue
         fi
         if [[ "$allowed" =~ ^Bash\((.*)\)$ ]]; then
             local command_scope="${BASH_REMATCH[1]}"
@@ -1134,31 +1136,32 @@ has_non_minimal_bash_permissions() {
                 mkdir|cp|mv|ln)
                     ;;
                 *)
-                    return 0
+                    found=true
                     ;;
             esac
         fi
     done < <(get_skill_allowed_tools "$skill_dir")
 
-    return 1
+    [[ "$found" == true ]]
 }
 
 # Returns 0 when any Write(...) scope is broad (contains **), 1 otherwise.
 skill_has_broad_write_scope() {
     local skill_dir="$1"
     local allowed
+    local found=false
 
     while IFS= read -r allowed; do
         [[ -z "$allowed" ]] && continue
         if [[ "$allowed" =~ ^Write\((.*)\)$ ]]; then
             local write_scope="${BASH_REMATCH[1]}"
             if [[ "$write_scope" == *"**"* ]]; then
-                return 0
+                found=true
             fi
         fi
     done < <(get_skill_allowed_tools "$skill_dir")
 
-    return 1
+    [[ "$found" == true ]]
 }
 
 # Returns 0 when manifest capabilities explicitly acknowledge external dependencies.

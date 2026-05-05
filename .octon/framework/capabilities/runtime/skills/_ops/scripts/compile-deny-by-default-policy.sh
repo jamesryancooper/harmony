@@ -124,7 +124,6 @@ RELATIVE_MANIFEST="${MANIFEST#$REPO_ROOT/}"
             write_scope="${BASH_REMATCH[1]}"
             if [[ "$write_scope" == *"**"* ]]; then
               broad_write_scope=true
-              break
             fi
           fi
         done < <(split_allowed_tools "$allowed_tools_raw")
