@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.60](https://github.com/jamesryancooper/octon/compare/octon-v0.6.59...octon-v0.6.60) (2026-05-06)
+
+
+### Bug Fixes
+
+* **runtime:** rename mission plan candidate status ([81abe7f](https://github.com/jamesryancooper/octon/commit/81abe7fe9b980c0cc8ce95a140c9639067e45afb))
+
 ## [0.6.59](https://github.com/jamesryancooper/octon/compare/octon-v0.6.58...octon-v0.6.59) (2026-05-06)
 
 
