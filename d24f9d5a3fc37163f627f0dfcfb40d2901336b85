@@ -1,0 +1,126 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "mission-plan-compiler-layer-2026-05-06-cleaned",
+  "selected_route": "branch-no-pr",
+  "operator_requested_route": "branch-no-pr",
+  "target_lifecycle_outcome": "cleaned",
+  "lifecycle_outcome": "cleaned",
+  "outcome_intent": "attempt-cleaned-closeout",
+  "intent": "Land and clean the mission plan compiler layer implementation branch after the prior closeout stopped at published-branch.",
+  "scope": {
+    "summary": "Landed the mission plan compiler layer as a linear no-PR fast-forward update, preserving the mission planning schemas, compiler workflow, validators, archived proposal packet, registry updates, and retained closeout evidence.",
+    "touched_paths": [
+      ".octon/framework/engine/runtime/spec/mission-plan-v1.md",
+      ".octon/framework/engine/runtime/spec/mission-plan-v1.schema.json",
+      ".octon/framework/engine/runtime/spec/plan-*.schema.json",
+      ".octon/framework/orchestration/runtime/workflows/missions/derive-mission-plan/**",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-mission-plan-compiler.sh",
+      ".octon/framework/assurance/runtime/_ops/tests/test-mission-plan-compiler.sh",
+      ".octon/framework/cognition/_meta/architecture/contract-registry.yml",
+      ".octon/framework/constitution/contracts/registry.yml",
+      ".octon/instance/governance/policies/hierarchical-planning.yml",
+      ".octon/inputs/exploratory/proposals/.archive/architecture/mission-plan-compiler-layer/**",
+      ".octon/state/evidence/runs/skills/octon-proposal-packet-lifecycle-closeout/2026-05-06-mission-plan-compiler-layer-closeout.md"
+    ],
+    "diff_refs": [
+      "origin/main@cecea1fcf77abe3e0f0fdc57b1040259c1c7c5b4..d24f9d5a3fc37163f627f0dfcfb40d2901336b85"
+    ]
+  },
+  "source_branch_ref": "chore/mission-plan-compiler-layer-closeout",
+  "target_branch_ref": "origin/main@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+  "remote_branch_ref": "origin/chore/mission-plan-compiler-layer-closeout@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+  "hosted_landing": {
+    "remote": "origin",
+    "target_branch": "main",
+    "source_branch": "chore/mission-plan-compiler-layer-closeout",
+    "source_ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "target_pre_ref": "cecea1fcf77abe3e0f0fdc57b1040259c1c7c5b4",
+    "target_post_ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validated_ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "required_check_refs": [
+      "route_neutral_closeout_validation@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+      "branch_naming_validation@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+      "route_aware_autonomy_validation@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+      "exact_source_sha_validation@d24f9d5a3fc37163f627f0dfcfb40d2901336b85"
+    ],
+    "provider_ruleset_ref": "github:repos/jamesryancooper/octon/rules/branches/main@2026-05-06T11:40:48Z",
+    "push_refspec": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85:refs/heads/main",
+    "fast_forward_only": true
+  },
+  "landing_evaluation": {
+    "status": "succeeded",
+    "provider_ruleset_ref": "github:repos/jamesryancooper/octon/rules/branches/main@2026-05-06T11:40:48Z",
+    "source_ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "target_ref": "origin/main@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "evidence_refs": [
+      "git-branch-hosted-preflight.sh@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+      "git-branch-land-hosted-no-pr.sh@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+      "github:Change Route Projection run 25433013218@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+      "github:main-push-rejected-merge-commit@3c7937d4c3929dc2999c4de56865950967e61541",
+      "linearized-source-branch@d24f9d5a3fc37163f627f0dfcfb40d2901336b85"
+    ]
+  },
+  "landed_ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+  "main_alignment": {
+    "local_main_ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "origin_main_ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "landed_ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "aligned": true,
+    "verification_ref": "git rev-parse HEAD main origin/main == d24f9d5a3fc37163f627f0dfcfb40d2901336b85"
+  },
+  "integration_method": "fast-forward",
+  "integration_status": "landed",
+  "publication_status": "hosted-main-updated",
+  "cleanup_status": "completed",
+  "cleanup_evidence_refs": [
+    "git-branch-cleanup.sh --branch chore/mission-plan-compiler-layer-closeout --landed-ref d24f9d5a3fc37163f627f0dfcfb40d2901336b85 --delete-remote --confirm",
+    "no-open-pr@chore/mission-plan-compiler-layer-closeout",
+    "deleted-local-branch@chore/mission-plan-compiler-layer-closeout",
+    "deleted-remote-branch@origin/chore/mission-plan-compiler-layer-closeout",
+    "local-main-synced@d24f9d5a3fc37163f627f0dfcfb40d2901336b85"
+  ],
+  "source_branch_cleanup": {
+    "status": "completed",
+    "local_branch": "chore/mission-plan-compiler-layer-closeout",
+    "remote_branch": "origin/chore/mission-plan-compiler-layer-closeout",
+    "worktree": "/Users/jamesryancooper/Projects/octon",
+    "evidence_refs": [
+      "local branch contained in origin/main before deletion",
+      "remote branch contained in origin/main before deletion",
+      "gh pr list --head chore/mission-plan-compiler-layer-closeout --state open == 0"
+    ]
+  },
+  "validation_evidence_refs": [
+    "git diff --check@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validate-mission-plan-compiler.sh:errors=0@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "test-mission-plan-compiler.sh:pass@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validate-proposal-standard.sh --skip-registry-check:errors=0,warnings=0@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validate-architecture-proposal.sh:errors=0@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validate-proposal-implementation-readiness.sh:errors=0,warnings=0@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validate-proposal-implementation-conformance.sh:errors=0,warnings=0@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validate-proposal-post-implementation-drift.sh:errors=0,warnings=0@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validate-architecture-contract-registry.sh:errors=0@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "validate-runtime-docs-consistency.sh:errors=0@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "route_neutral_closeout_validation@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "branch_naming_validation@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "route_aware_autonomy_validation@d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "exact_source_sha_validation@d24f9d5a3fc37163f627f0dfcfb40d2901336b85"
+  ],
+  "review_waiver_refs": [
+    "operator-selected branch-no-pr cleaned route",
+    "no open PR existed for chore/mission-plan-compiler-layer-closeout",
+    "live provider rules allowed route-neutral fast-forward update after linearizing the source branch"
+  ],
+  "durable_history": {
+    "kind": "commit",
+    "ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "branch": "chore/mission-plan-compiler-layer-closeout"
+  },
+  "rollback_handle": {
+    "kind": "revert-commit",
+    "ref": "d24f9d5a3fc37163f627f0dfcfb40d2901336b85",
+    "instructions": "Run git revert d24f9d5a3fc37163f627f0dfcfb40d2901336b85 on main, validate the rollback, and push origin main under the same route policy if rollback is needed."
+  },
+  "closeout_outcome": "completed",
+  "created_at": "2026-05-06T11:40:48Z"
+}
