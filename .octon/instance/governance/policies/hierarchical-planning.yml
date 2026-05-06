@@ -41,12 +41,12 @@ acp_thresholds:
     material_effects_require_authorization: true
   ACP-2:
     agent_may_decompose: true
-    human_approval_before_activation_when_scope_risk_or_support_changes: true
+    policy_gate_before_activation_when_scope_risk_or_support_changes: true
   ACP-3:
-    human_approval_before_compile_to_run: true
+    policy_gate_before_compile_to_run: true
   ACP-4:
-    stage_only_until_human_approval_and_authorization_gates_exist: true
-human_approval_required_for:
+    stage_only_until_break_glass_policy_and_authorization_gates_exist: true
+policy_gate_or_owner_attestation_required_for:
   - "mission scope changes"
   - "strategic goal changes"
   - "risk ceiling changes"
@@ -63,7 +63,7 @@ fail_closed_conditions:
   - "missing mission authority"
   - "stale mission digest"
   - "missing ownership"
-  - "missing approval evidence"
+  - "missing policy gate or owner-attestation evidence"
   - "duplicate leaf candidates"
   - "dependency cycles"
   - "unresolved assumptions before compile"

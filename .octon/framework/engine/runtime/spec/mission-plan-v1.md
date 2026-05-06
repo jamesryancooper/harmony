@@ -141,9 +141,11 @@ A node is ready for compile only when it has:
 - authorization path.
 
 Unresolved assumptions may compile only to discovery work or remain blocked.
-Unresolved approvals, scope changes, support-target widening, capability
-admission, high-risk activation, destructive work, irreversible work, or
-external effects require the governing human approval path before compile-to-run.
+Unresolved approval dispositions, scope changes, support-target widening,
+capability admission, high-risk activation, destructive work, irreversible
+work, or external effects remain stage-only until the governing ACP policy
+gate, required owner/quorum attestation, break-glass posture where applicable,
+and execution authorization boundary have passed.
 
 ## Stop Rules
 

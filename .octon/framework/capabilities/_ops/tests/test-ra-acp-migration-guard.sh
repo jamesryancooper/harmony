@@ -147,6 +147,19 @@ EOF
   run_guard_in_fixture "$fixture_root"
 }
 
+case_ignores_archived_proposal_terms() {
+  local fixture_root
+  fixture_root="$(create_fixture_repo)"
+
+  mkdir -p "$fixture_root/.octon/inputs/exploratory/proposals/.archive/architecture/example"
+  cat > "$fixture_root/.octon/inputs/exploratory/proposals/.archive/architecture/example/notes.md" <<'EOF'
+Historical proposal text said compile-to-run requires human approval.
+The archive is raw input lineage, not an active runtime or policy surface.
+EOF
+
+  run_guard_in_fixture "$fixture_root"
+}
+
 case_detects_tracked_temp_artifacts() {
   local fixture_root
   fixture_root="$(create_fixture_repo)"
@@ -179,6 +192,10 @@ main() {
   assert_success \
     "ra-acp migration guard allows explicit negation language" \
     case_allows_explicit_negation_terms
+
+  assert_success \
+    "ra-acp migration guard ignores archived proposal lineage" \
+    case_ignores_archived_proposal_terms
 
   assert_failure_contains \
     "ra-acp migration guard rejects tracked temp artifacts" \
