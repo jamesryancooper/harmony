@@ -1,6 +1,20 @@
 schema_version: "proposal-registry-v1"
 
 active:
+  - id: "foundational-entry-artifact-canonical-framing-update"
+    kind: "architecture"
+    scope: "octon-internal"
+    path: ".octon/inputs/exploratory/proposals/architecture/foundational-entry-artifact-canonical-framing-update"
+    title: "Foundational Entry-Artifact Canonical Framing Update"
+    status: "in-review"
+    promotion_targets:
+      - ".octon/README.md"
+      - ".octon/AGENTS.md"
+      - ".octon/instance/ingress/AGENTS.md"
+      - ".octon/instance/bootstrap/START.md"
+      - ".octon/framework/cognition/_meta/terminology/glossary.md"
+      - ".octon/framework/cognition/_meta/architecture/specification.md"
+      - ".octon/framework/cognition/_meta/architecture/contract-registry.yml"
   - id: "octon-instruction-layer-execution-envelope-hardening"
     kind: "architecture"
     scope: "octon-internal"

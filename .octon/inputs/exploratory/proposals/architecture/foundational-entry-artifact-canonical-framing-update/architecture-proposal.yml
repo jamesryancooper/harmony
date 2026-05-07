@@ -1,0 +1,28 @@
+schema_version: architecture-proposal-v1
+architecture_scope: repo-architecture
+decision_type: surface-refactor
+title: Foundational Entry-Artifact Canonical Framing Update
+target_state: Entry artifacts introduce Octon as a governed workflow runtime with
+  task-specific execution harnesses and bounded agent nodes. This packet's active
+  promotion targets are octon-internal; repo-root entry artifacts require a linked
+  repo-local companion proposal.
+boundary_change: Terminology and framing only; no runtime control boundary changes.
+authoritative_targets_after_promotion:
+- .octon/README.md
+- .octon/AGENTS.md
+- .octon/instance/ingress/AGENTS.md
+- .octon/instance/bootstrap/START.md
+- .octon/framework/cognition/_meta/terminology/glossary.md
+- .octon/framework/cognition/_meta/architecture/specification.md
+- .octon/framework/cognition/_meta/architecture/contract-registry.yml
+repo_local_companion_targets:
+- README.md
+- AGENTS.md
+proposal_local_authority:
+- proposal.yml
+- architecture-proposal.yml
+non_authoritative_supporting_artifacts:
+- resources/**
+- support/**
+- README.md
+- navigation/**
