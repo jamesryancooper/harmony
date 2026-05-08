@@ -1,0 +1,215 @@
+schema_version: "octon-product-roadmap-v1"
+roadmap_role: "planning-only"
+authority_note: >-
+  This roadmap is informative planning only. It records suggested and planned
+  follow-up work for cross-surface product features, but it does not mint
+  authority, support commitments, runtime routes, generated-effective state,
+  durable execution evidence, or a work queue.
+items:
+  - roadmap_item_id: "lifecycle-autopilot-live-provider-smoke-tests"
+    title: "Lifecycle Autopilot live provider smoke tests"
+    status: "suggested"
+    feature_id: "lifecycle-autopilot"
+    summary: >-
+      Add optional smoke coverage that exercises real codex, claude, and auto
+      executor adapters against disposable lifecycle fixtures.
+    why_deferred: >-
+      Current validation covers mock and fake-provider paths. Live provider
+      execution depends on local tools, credentials, and operator environment,
+      so it should remain optional and evidence-backed.
+    owner_subsystems:
+      - "engine/runtime"
+      - "assurance/runtime"
+    source_refs:
+      - path: ".octon/framework/product/features/lifecycle-autopilot.md"
+        role: "feature note describing the runner and executor adapter boundary"
+        authority_class: "navigation-only"
+      - path: ".octon/framework/engine/runtime/crates/lifecycle_executor/tests/adapter.rs"
+        role: "current fake-provider adapter coverage"
+        authority_class: "validation"
+    acceptance_criteria:
+      - "Optional smoke tests can run codex, claude, and auto against disposable lifecycle fixtures without mutating durable repo state."
+      - "Smoke output records provider availability, prompt packet path, execution result, and cleanup disposition."
+      - "The smoke suite is skipped or marked inconclusive when a provider binary or credential is unavailable."
+    validation_refs:
+      - path: ".octon/framework/assurance/runtime/_ops/tests/test-lifecycle-executor-adapter.sh"
+        role: "current adapter validation entrypoint"
+        authority_class: "validation"
+    completion_refs: []
+    authority_notes:
+      - "Live provider smoke evidence is validation evidence only."
+      - "Smoke tests must remain optional unless a separate support target makes them mandatory."
+
+  - roadmap_item_id: "lifecycle-autopilot-operator-run-diagnostics"
+    title: "Lifecycle Autopilot operator run diagnostics"
+    status: "suggested"
+    feature_id: "lifecycle-autopilot"
+    summary: >-
+      Add a concise explain/status surface for why a lifecycle stopped and what
+      exact resume or remediation action is available.
+    why_deferred: >-
+      The runner already writes structured evidence and checkpoints. A
+      higher-level diagnostic view is useful but not required for the checked-in
+      automation contract.
+    owner_subsystems:
+      - "engine/runtime"
+      - "product"
+    source_refs:
+      - path: ".octon/framework/engine/runtime/crates/kernel/src/lifecycle_driver.rs"
+        role: "plan-execute-observe-replan driver"
+        authority_class: "runtime-implementation"
+      - path: ".octon/framework/product/features/lifecycle-autopilot.md"
+        role: "feature note describing operator entrypoints"
+        authority_class: "navigation-only"
+    acceptance_criteria:
+      - "Operators can inspect the current route, gate result, receipt freshness, approval pause, checkpoint drift, and resume command from one command or report."
+      - "Diagnostic output is read-only and does not change lifecycle state."
+      - "Diagnostic tests cover stale receipt, missing input, approval-required, blocked, and completed outcomes."
+    validation_refs:
+      - path: ".octon/framework/assurance/runtime/_ops/tests/test-lifecycle-runner.sh"
+        role: "current lifecycle runner validation"
+        authority_class: "validation"
+    completion_refs: []
+    authority_notes:
+      - "Diagnostics explain existing runtime evidence; they do not become lifecycle authority."
+
+  - roadmap_item_id: "lifecycle-autopilot-approval-grant-ux"
+    title: "Lifecycle Autopilot approval grant UX"
+    status: "suggested"
+    feature_id: "lifecycle-autopilot"
+    summary: >-
+      Improve the operator flow for issuing and reviewing resumable approval
+      artifacts for durable lifecycle routes.
+    why_deferred: >-
+      Durable mutation approval is already enforced. The remaining work is
+      usability around how humans create, inspect, and resume from approval
+      evidence.
+    owner_subsystems:
+      - "engine/runtime"
+      - "orchestration/workflows"
+      - "product"
+    source_refs:
+      - path: ".octon/framework/engine/runtime/crates/lifecycle_executor/src/approval.rs"
+        role: "current approval pause behavior"
+        authority_class: "runtime-implementation"
+      - path: ".octon/framework/product/features/lifecycle-autopilot.md"
+        role: "feature note describing approval boundary"
+        authority_class: "navigation-only"
+    acceptance_criteria:
+      - "Approval pause evidence tells an operator exactly what route is blocked, why it is durable, and how to grant or deny it."
+      - "Grant artifacts are resumable, repo-local, and auditable without creating proposal manifest statuses."
+      - "Tests prove durable routes remain blocked without approval and resume only with valid approval evidence."
+    validation_refs:
+      - path: ".octon/framework/assurance/runtime/_ops/tests/test-proposal-lifecycle-v1-acceptance.sh"
+        role: "current approval pause acceptance coverage"
+        authority_class: "validation"
+    completion_refs: []
+    authority_notes:
+      - "Approval artifacts are evidence and control inputs, not product roadmap authority."
+
+  - roadmap_item_id: "lifecycle-autopilot-second-extension-pilot"
+    title: "Lifecycle Autopilot second extension pilot"
+    status: "suggested"
+    feature_id: "lifecycle-autopilot"
+    summary: >-
+      Add a non-proposal lifecycle extension pilot to prove the generic
+      lifecycle contract and executor adapter across a second domain.
+    why_deferred: >-
+      Proposal packets are the first concrete pilot and already exercise the
+      full lifecycle loop. A second extension is useful portability evidence,
+      not a blocker for the initial feature.
+    owner_subsystems:
+      - "capabilities/extensions"
+      - "engine/runtime"
+      - "assurance/runtime"
+    source_refs:
+      - path: ".octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/extension-lifecycle-contract.schema.json"
+        role: "generic lifecycle contract schema"
+        authority_class: "runtime-spec"
+      - path: ".octon/framework/product/features/lifecycle-autopilot.md"
+        role: "feature note describing proposal packets as the first pilot"
+        authority_class: "navigation-only"
+    acceptance_criteria:
+      - "A second extension declares a lifecycle contract without proposal-specific runner or adapter changes."
+      - "The second lifecycle has route-selection, gate, completion, resume, and approval tests."
+      - "Documentation identifies which behavior is shared infrastructure versus extension-owned semantics."
+    validation_refs:
+      - path: ".octon/framework/assurance/runtime/_ops/tests/test-validate-lifecycle-contracts.sh"
+        role: "generic lifecycle contract validation tests"
+        authority_class: "validation"
+      - path: ".octon/framework/assurance/runtime/_ops/tests/test-lifecycle-runner.sh"
+        role: "generic lifecycle runner tests"
+        authority_class: "validation"
+    completion_refs: []
+    authority_notes:
+      - "A second pilot should remain extension-authored; shared runtime code must stay domain-neutral."
+
+  - roadmap_item_id: "lifecycle-autopilot-program-multi-target-support"
+    title: "Lifecycle Autopilot program and multi-target support"
+    status: "suggested"
+    feature_id: "lifecycle-autopilot"
+    summary: >-
+      Extend lifecycle automation beyond one target per run when a concrete
+      program-level lifecycle requires coordinated multi-target execution.
+    why_deferred: >-
+      The initial implementation intentionally supports one target lifecycle per
+      run. Multi-target behavior adds scheduling, dependency, approval, and
+      rollback complexity that should be designed from a real use case.
+    owner_subsystems:
+      - "engine/runtime"
+      - "orchestration/workflows"
+    source_refs:
+      - path: ".octon/framework/engine/runtime/crates/kernel/src/lifecycle.rs"
+        role: "single-target lifecycle planning and resume implementation"
+        authority_class: "runtime-implementation"
+      - path: ".octon/framework/product/features/lifecycle-autopilot.md"
+        role: "feature note describing current lifecycle scope"
+        authority_class: "navigation-only"
+    acceptance_criteria:
+      - "A program lifecycle contract can coordinate multiple targets without adding proposal manifest statuses."
+      - "Checkpoint and resume semantics identify target-level progress, drift, and rollback posture."
+      - "Tests cover partial completion, approval pauses, target drift, and idempotent rerun across multiple targets."
+    validation_refs:
+      - path: ".octon/framework/assurance/runtime/_ops/tests/test-lifecycle-runner.sh"
+        role: "current single-target lifecycle runner tests"
+        authority_class: "validation"
+    completion_refs: []
+    authority_notes:
+      - "Multi-target support must not turn proposal-local receipts into durable runtime authority."
+
+  - roadmap_item_id: "lifecycle-autopilot-state-evidence-hygiene"
+    title: "Lifecycle Autopilot state and evidence hygiene"
+    status: "suggested"
+    feature_id: "lifecycle-autopilot"
+    summary: >-
+      Define retention, ignore, and cleanup guidance for untracked lifecycle,
+      publication, validation, and executor evidence outputs.
+    why_deferred: >-
+      The feature writes useful evidence, but local runs can leave confusing
+      untracked `.octon/state/**` output. Cleanup policy should be explicit and
+      separate from lifecycle execution semantics.
+    owner_subsystems:
+      - "assurance/runtime"
+      - "engine/runtime"
+      - "product"
+    source_refs:
+      - path_pattern: ".octon/state/evidence/runs/workflows/<run-id>/"
+        role: "workflow run evidence pattern"
+        authority_class: "retained-evidence-pattern"
+      - path_pattern: ".octon/state/control/execution/runs/<run-id>/lifecycle-checkpoint.yml"
+        role: "lifecycle checkpoint pattern"
+        authority_class: "retained-evidence-pattern"
+      - path: ".octon/framework/product/features/lifecycle-autopilot.md"
+        role: "feature note describing evidence and checkpoint surfaces"
+        authority_class: "navigation-only"
+    acceptance_criteria:
+      - "Repository guidance distinguishes retained evidence, generated-effective projections, caches, and local run exhaust."
+      - "Cleanup tooling or ignore rules can remove safe local run exhaust without touching tracked generated state."
+      - "Tests or dry-run checks prove cleanup does not remove source, contracts, generated-effective locks, or retained evidence selected for commit."
+    validation_refs:
+      - path: ".octon/framework/assurance/runtime/_ops/tests/test-lifecycle-executor-adapter.sh"
+        role: "current lifecycle executor evidence tests"
+        authority_class: "validation"
+    completion_refs: []
+    authority_notes:
+      - "Evidence hygiene guidance must not weaken evidence obligations for durable lifecycle execution."

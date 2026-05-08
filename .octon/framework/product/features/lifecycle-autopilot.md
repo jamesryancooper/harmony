@@ -1,4 +1,4 @@
-# Lifecycle Autopilot
+# Lifecycle Autopilot: End-To-End Lifecycle Automation Loop
 
 Lifecycle Autopilot is the generic lifecycle orchestration and execution
 mechanism for extension-declared lifecycle contracts. It combines the lifecycle
@@ -38,3 +38,10 @@ proposal-local receipts remain evidence only.
 Focused validation lives in the lifecycle runner, lifecycle executor adapter,
 lifecycle contract, and proposal lifecycle acceptance tests referenced by the
 product feature catalog.
+
+## Roadmap
+
+Follow-up work is tracked in
+`.octon/framework/product/roadmap/lifecycle-autopilot.md`. The end-to-end
+lifecycle automation loop itself is implemented; roadmap entries capture future
+improvements only.

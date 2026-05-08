@@ -118,6 +118,12 @@ run_product_features() {
     bash "$SCRIPT_DIR/validate-product-feature-catalog.sh"
 }
 
+run_product_roadmap() {
+  run_step \
+    "Validate product roadmap" \
+    bash "$SCRIPT_DIR/validate-product-roadmap.sh"
+}
+
 run_harness() {
   run_step \
     "Validate harness structure contract" \

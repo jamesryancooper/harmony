@@ -36,6 +36,21 @@ profiles:
     consumers:
       - "local"
       - "ci"
+  - id: "product-roadmap"
+    label: "Product roadmap planning checks"
+    entrypoint: "run_product_roadmap"
+    required_paths:
+      - ".octon/framework/product/README.md"
+      - ".octon/framework/product/roadmap/README.md"
+      - ".octon/framework/product/roadmap/catalog.yml"
+      - ".octon/framework/product/roadmap/lifecycle-autopilot.md"
+      - ".octon/framework/product/contracts/product-roadmap-v1.schema.json"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-product-roadmap.sh"
+      - ".octon/framework/assurance/runtime/_ops/tests/test-validate-product-roadmap.sh"
+    dry_run_safe: true
+    consumers:
+      - "local"
+      - "ci"
   - id: "harness"
     label: ".octon architecture and drift guardrail checks"
     entrypoint: "run_harness"
