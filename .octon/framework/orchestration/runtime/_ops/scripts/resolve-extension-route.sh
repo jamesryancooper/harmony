@@ -193,6 +193,11 @@ if [[ "$compatibility_status" == "incompatible" ]]; then
   exit 1
 fi
 
+if ! jq -e '.capability_profiles[]? | select(. == "routing-contract")' <<<"$pack_json" >/dev/null 2>&1; then
+  emit_result "blocked" false "" "$null_json" '["missing-capability-profile:routing-contract"]' "$empty_array" "$empty_json" "$empty_array"
+  exit 1
+fi
+
 mapfile -t dispatcher_matches < <(
   jq -c --arg dispatcher_id "$DISPATCHER_ID" '.route_dispatchers[]? | select(.dispatcher_id == $dispatcher_id)' <<<"$pack_json" || true
 )

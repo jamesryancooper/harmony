@@ -54,6 +54,14 @@ pub fn resolve_prompt_bundle(
         if scalar(pack.get("pack_id")) != Some(owner_extension) {
             continue;
         }
+        if !value_sequence_contains(pack.get("capability_profiles"), "prompt-bundle") {
+            return Err(LifecycleExecutionError::new(
+                LifecycleErrorClass::Discovery,
+                format!(
+                    "owner extension {owner_extension} is missing prompt-bundle capability profile"
+                ),
+            ));
+        }
         let Some(bundles) = pack.get("prompt_bundles").and_then(Value::as_sequence) else {
             continue;
         };
@@ -338,4 +346,11 @@ fn scalar(value: Option<&Value>) -> Option<&str> {
         Value::String(raw) => Some(raw.as_str()),
         _ => None,
     })
+}
+
+fn value_sequence_contains(value: Option<&Value>, expected: &str) -> bool {
+    value
+        .and_then(Value::as_sequence)
+        .map(|items| items.iter().any(|item| item.as_str() == Some(expected)))
+        .unwrap_or(false)
 }

@@ -1,0 +1,38 @@
+schema_version: "octon-extension-prompt-set-v1"
+prompt_set_id: "nextjs-architecture-review"
+version: "1.0.0"
+stages:
+  - stage_id: "architecture-review"
+    prompt_id: "nextjs-architecture-review"
+    path: "stages/01-architecture-review.md"
+    role_class: "stage"
+    order: 1
+companions:
+  - prompt_id: "nextjs-architecture-review-align-bundle"
+    path: "companions/01-align-bundle.md"
+    role_class: "maintenance-companion"
+references: []
+shared_references: []
+required_repo_anchors:
+  - "README.md"
+  - ".octon/inputs/additive/extensions/nextjs/README.md"
+alignment_policy:
+  default_mode: "auto"
+  stale_behavior: "realign_or_fail_closed"
+  skip_mode_policy: "degraded-retained-explicit"
+  receipt_root: ".octon/state/evidence/validation/extensions/prompt-alignment"
+invalidation_conditions:
+  - "prompt-manifest-sha-changed"
+  - "prompt-asset-sha-changed"
+  - "required-anchor-sha-changed"
+  - "extension-desired-config-sha-changed"
+  - "root-manifest-sha-changed"
+artifact_policy:
+  internal_artifacts:
+    - "review-input"
+    - "target-surface"
+    - "review-output"
+  packet_support_files:
+    - "support/review-input.md"
+    - "support/target-surface.md"
+    - "support/review-output.md"

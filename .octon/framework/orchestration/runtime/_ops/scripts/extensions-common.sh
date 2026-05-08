@@ -431,6 +431,191 @@ ext_validate_content_entrypoints() {
   }
 }
 
+ext_pack_capability_profiles_sorted() {
+  local manifest="$1"
+  yq -r '.capability_profiles[]? // ""' "$manifest" 2>/dev/null | awk 'NF' | LC_ALL=C sort
+}
+
+ext_has_capability_profile() {
+  local manifest="$1" profile="$2"
+  ext_pack_capability_profiles_sorted "$manifest" | grep -Fx "$profile" >/dev/null 2>&1
+}
+
+ext_validate_capability_profiles() {
+  local pack_id="$1" manifest="$2" pack_root="$3"
+  local profile rel path count has_validation=0
+  declare -A seen_profiles=()
+
+  yq -e '.capability_profiles | tag == "!!seq" and length > 0' "$manifest" >/dev/null 2>&1 || {
+    EXT_LAST_ERROR_REASON="missing-capability-profiles"
+    return 1
+  }
+
+  while IFS= read -r profile; do
+    [[ -n "$profile" ]] || continue
+    if [[ -n "${seen_profiles["$profile"]:-}" ]]; then
+      EXT_LAST_ERROR_REASON="duplicate-capability-profile:$profile"
+      return 1
+    fi
+    seen_profiles["$profile"]="1"
+    case "$profile" in
+      validation-surface)
+        has_validation=1
+        ;;
+      command-surface|skill-surface|prompt-bundle|routing-contract|lifecycle-contract|template-surface)
+        ;;
+      *)
+        EXT_LAST_ERROR_REASON="unknown-capability-profile:$profile"
+        return 1
+        ;;
+    esac
+  done < <(yq -r '.capability_profiles[]? // ""' "$manifest" 2>/dev/null || true)
+
+  [[ "$has_validation" == "1" ]] || {
+    EXT_LAST_ERROR_REASON="missing-required-capability-profile:validation-surface"
+    return 1
+  }
+
+  if ext_has_capability_profile "$manifest" "command-surface"; then
+    rel="$(yq -r '.content_entrypoints.commands // ""' "$manifest")"
+    [[ "$rel" == "commands/" ]] || {
+      EXT_LAST_ERROR_REASON="capability-entrypoint-missing:command-surface"
+      return 1
+    }
+    [[ -f "$pack_root/commands/manifest.fragment.yml" ]] || {
+      EXT_LAST_ERROR_REASON="missing-command-manifest:$pack_id"
+      return 1
+    }
+    while IFS=$'\t' read -r command_id path; do
+      [[ -n "$command_id" ]] || continue
+      [[ -n "$path" && -f "$pack_root/commands/$path" ]] || {
+        EXT_LAST_ERROR_REASON="missing-command-file:$pack_id:$command_id"
+        return 1
+      }
+    done < <(yq -r '.commands[]? | [.id, .path] | @tsv' "$pack_root/commands/manifest.fragment.yml" 2>/dev/null || true)
+  elif [[ "$(yq -r '.content_entrypoints.commands // ""' "$manifest")" != "" && "$(yq -r '.content_entrypoints.commands // ""' "$manifest")" != "null" ]]; then
+    EXT_LAST_ERROR_REASON="undeclared-capability-profile:command-surface"
+    return 1
+  fi
+
+  if ext_has_capability_profile "$manifest" "skill-surface"; then
+    rel="$(yq -r '.content_entrypoints.skills // ""' "$manifest")"
+    [[ "$rel" == "skills/" ]] || {
+      EXT_LAST_ERROR_REASON="capability-entrypoint-missing:skill-surface"
+      return 1
+    }
+    [[ -f "$pack_root/skills/manifest.fragment.yml" && -f "$pack_root/skills/registry.fragment.yml" ]] || {
+      EXT_LAST_ERROR_REASON="missing-skill-manifest-or-registry:$pack_id"
+      return 1
+    }
+    while IFS=$'\t' read -r skill_id path; do
+      [[ -n "$skill_id" ]] || continue
+      [[ -n "$path" && -e "$pack_root/skills/${path%/}" ]] || {
+        EXT_LAST_ERROR_REASON="missing-skill-path:$pack_id:$skill_id"
+        return 1
+      }
+    done < <(yq -r '.skills[]? | [.id, .path] | @tsv' "$pack_root/skills/manifest.fragment.yml" 2>/dev/null || true)
+  elif [[ "$(yq -r '.content_entrypoints.skills // ""' "$manifest")" != "" && "$(yq -r '.content_entrypoints.skills // ""' "$manifest")" != "null" ]]; then
+    EXT_LAST_ERROR_REASON="undeclared-capability-profile:skill-surface"
+    return 1
+  fi
+
+  if ext_has_capability_profile "$manifest" "prompt-bundle"; then
+    rel="$(yq -r '.content_entrypoints.prompts // ""' "$manifest")"
+    [[ "$rel" == "prompts/" ]] || {
+      EXT_LAST_ERROR_REASON="capability-entrypoint-missing:prompt-bundle"
+      return 1
+    }
+    count="$(ext_prompt_bundle_manifest_files_for_pack "$manifest" "$pack_root" | wc -l | tr -d ' ')"
+    [[ "$count" -gt 0 ]] || {
+      EXT_LAST_ERROR_REASON="missing-prompt-bundle-manifest:$pack_id"
+      return 1
+    }
+  elif [[ "$(yq -r '.content_entrypoints.prompts // ""' "$manifest")" != "" && "$(yq -r '.content_entrypoints.prompts // ""' "$manifest")" != "null" ]]; then
+    EXT_LAST_ERROR_REASON="undeclared-capability-profile:prompt-bundle"
+    return 1
+  fi
+
+  if ext_has_capability_profile "$manifest" "template-surface"; then
+    rel="$(yq -r '.content_entrypoints.templates // ""' "$manifest")"
+    [[ "$rel" == "templates/" ]] || {
+      EXT_LAST_ERROR_REASON="capability-entrypoint-missing:template-surface"
+      return 1
+    }
+    [[ -f "$pack_root/templates/catalog.fragment.yml" ]] || {
+      EXT_LAST_ERROR_REASON="missing-template-catalog:$pack_id"
+      return 1
+    }
+    while IFS=$'\t' read -r template_id path; do
+      [[ -n "$template_id" ]] || continue
+      [[ -n "$path" && -e "$pack_root/templates/${path%/}" ]] || {
+        EXT_LAST_ERROR_REASON="missing-template-path:$pack_id:$template_id"
+        return 1
+      }
+    done < <(yq -r '.templates[]? | [.id, .path] | @tsv' "$pack_root/templates/catalog.fragment.yml" 2>/dev/null || true)
+  elif [[ "$(yq -r '.content_entrypoints.templates // ""' "$manifest")" != "" && "$(yq -r '.content_entrypoints.templates // ""' "$manifest")" != "null" ]]; then
+    EXT_LAST_ERROR_REASON="undeclared-capability-profile:template-surface"
+    return 1
+  fi
+
+  if ext_has_capability_profile "$manifest" "routing-contract"; then
+    path="$(ext_routing_contract_abs_for_pack "$manifest" "$pack_root" 2>/dev/null || true)"
+    [[ -n "$path" ]] || {
+      EXT_LAST_ERROR_REASON="missing-routing-contract:$pack_id"
+      return 1
+    }
+    if yq -e '.dispatchers[]?.execution_bindings[]? | has("command_capability_id")' "$path" >/dev/null 2>&1 \
+      && ! ext_has_capability_profile "$manifest" "command-surface"; then
+      EXT_LAST_ERROR_REASON="routing-contract-requires-profile:command-surface"
+      return 1
+    fi
+    if yq -e '.dispatchers[]?.execution_bindings[]? | has("skill_capability_id")' "$path" >/dev/null 2>&1 \
+      && ! ext_has_capability_profile "$manifest" "skill-surface"; then
+      EXT_LAST_ERROR_REASON="routing-contract-requires-profile:skill-surface"
+      return 1
+    fi
+    if yq -e '.dispatchers[]?.execution_bindings[]? | has("prompt_set_id")' "$path" >/dev/null 2>&1 \
+      && ! ext_has_capability_profile "$manifest" "prompt-bundle"; then
+      EXT_LAST_ERROR_REASON="routing-contract-requires-profile:prompt-bundle"
+      return 1
+    fi
+  elif [[ -n "$(ext_routing_contract_abs_for_pack "$manifest" "$pack_root" 2>/dev/null || true)" ]]; then
+    EXT_LAST_ERROR_REASON="undeclared-capability-profile:routing-contract"
+    return 1
+  fi
+
+  if ext_has_capability_profile "$manifest" "lifecycle-contract"; then
+    path="$(ext_lifecycle_contract_abs_for_pack "$manifest" "$pack_root" 2>/dev/null || true)"
+    [[ -n "$path" ]] || {
+      EXT_LAST_ERROR_REASON="missing-lifecycle-contract:$pack_id"
+      return 1
+    }
+    if yq -e '.routes[]? | select(.route_type == "extension")' "$path" >/dev/null 2>&1 \
+      && ! ext_has_capability_profile "$manifest" "routing-contract"; then
+      EXT_LAST_ERROR_REASON="lifecycle-contract-requires-profile:routing-contract"
+      return 1
+    fi
+    if yq -e '.routes[]? | has("command_id")' "$path" >/dev/null 2>&1 \
+      && ! ext_has_capability_profile "$manifest" "command-surface"; then
+      EXT_LAST_ERROR_REASON="lifecycle-contract-requires-profile:command-surface"
+      return 1
+    fi
+    if yq -e '.routes[]? | has("skill_id")' "$path" >/dev/null 2>&1 \
+      && ! ext_has_capability_profile "$manifest" "skill-surface"; then
+      EXT_LAST_ERROR_REASON="lifecycle-contract-requires-profile:skill-surface"
+      return 1
+    fi
+    if yq -e '.routes[]? | has("prompt_set_id")' "$path" >/dev/null 2>&1 \
+      && ! ext_has_capability_profile "$manifest" "prompt-bundle"; then
+      EXT_LAST_ERROR_REASON="lifecycle-contract-requires-profile:prompt-bundle"
+      return 1
+    fi
+  elif [[ -n "$(ext_lifecycle_contract_abs_for_pack "$manifest" "$pack_root" 2>/dev/null || true)" ]]; then
+    EXT_LAST_ERROR_REASON="undeclared-capability-profile:lifecycle-contract"
+    return 1
+  fi
+}
+
 ext_validate_repo_relative_path_value() {
   local value="$1" label="$2"
   [[ -n "$value" ]] || {
@@ -1213,7 +1398,7 @@ ext_validate_pack_core_contract() {
   }
   pack_root="$(ext_pack_root_abs "$pack_id")"
 
-  [[ "$(yq -r '.schema_version // ""' "$manifest")" == "octon-extension-pack-v4" ]] || {
+  [[ "$(yq -r '.schema_version // ""' "$manifest")" == "octon-extension-pack-v5" ]] || {
     EXT_LAST_ERROR_REASON="invalid-schema-version"
     return 1
   }
@@ -1269,6 +1454,7 @@ ext_validate_pack_core_contract() {
 
   ext_pack_has_allowed_top_level_shape "$pack_root" || return 1
   ext_validate_content_entrypoints "$pack_id" "$manifest" "$pack_root" || return 1
+  ext_validate_capability_profiles "$pack_id" "$manifest" "$pack_root" || return 1
   ext_validate_prompt_set_manifest_if_present "$manifest" "$pack_root" || return 1
   ext_validate_routing_contract_if_present "$pack_id" "$manifest" "$pack_root" || return 1
   ext_validate_lifecycle_contract_if_present "$pack_id" "$manifest" "$pack_root" || return 1

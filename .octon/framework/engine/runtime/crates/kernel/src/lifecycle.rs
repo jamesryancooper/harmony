@@ -680,6 +680,12 @@ fn contract_path_from_effective_catalog(octon_dir: &Path, lifecycle_id: &str) ->
         let Some(contracts) = pack.get("lifecycle_contracts").and_then(Value::as_sequence) else {
             continue;
         };
+        if !value_sequence_contains(pack.get("capability_profiles"), "lifecycle-contract") {
+            let pack_id = scalar_str(pack.get("pack_id")).unwrap_or("<unknown>");
+            bail!(
+                "effective extension catalog pack {pack_id} declares lifecycle contracts without lifecycle-contract capability profile"
+            );
+        }
         for contract in contracts {
             if scalar_str(contract.get("lifecycle_id")) != Some(lifecycle_id) {
                 continue;
@@ -1396,6 +1402,13 @@ fn scalar_str(value: Option<&Value>) -> Option<&str> {
     })
 }
 
+fn value_sequence_contains(value: Option<&Value>, expected: &str) -> bool {
+    value
+        .and_then(Value::as_sequence)
+        .map(|items| items.iter().any(|item| item.as_str() == Some(expected)))
+        .unwrap_or(false)
+}
+
 fn repo_root_for_octon(octon_dir: &Path) -> Result<PathBuf> {
     Ok(octon_dir
         .parent()
@@ -1918,6 +1931,7 @@ mod tests {
 schema_version: "test"
 packs:
   - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         projection_source_path: ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml"
@@ -1976,6 +1990,7 @@ routes:
 schema_version: "test"
 packs:
   - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         projection_source_path: ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml"
@@ -2025,6 +2040,7 @@ routes:
 schema_version: "test"
 packs:
   - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
     lifecycle_contracts:
       - lifecycle_id: "custom-lifecycle"
         projection_source_path: ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml"
@@ -2088,6 +2104,7 @@ routes:
 schema_version: "test"
 packs:
   - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         projection_source_path: ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml"
@@ -2167,6 +2184,7 @@ routes:
 schema_version: "test"
 packs:
   - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         projection_source_path: ".octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
@@ -2208,6 +2226,7 @@ routes: []
 schema_version: "test"
 packs:
   - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         projection_source_path: ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml"
@@ -2261,6 +2280,7 @@ routes:
 schema_version: "test"
 packs:
   - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         projection_source_path: ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml"

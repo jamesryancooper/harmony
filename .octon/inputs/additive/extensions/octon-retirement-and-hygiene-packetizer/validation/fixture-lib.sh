@@ -94,7 +94,7 @@ records: []
 EOF
 
   cat >"$fixture_root/.octon/generated/effective/extensions/catalog.effective.yml" <<'EOF'
-schema_version: "octon-extension-effective-catalog-v6"
+schema_version: "octon-extension-effective-catalog-v7"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"
@@ -116,15 +116,16 @@ source:
 EOF
 
   cat >"$fixture_root/.octon/generated/effective/extensions/artifact-map.yml" <<'EOF'
-schema_version: "octon-extension-artifact-map-v4"
+schema_version: "octon-extension-artifact-map-v5"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"
+capability_profiles: []
 artifacts: []
 EOF
 
   cat >"$fixture_root/.octon/generated/effective/extensions/generation.lock.yml" <<'EOF'
-schema_version: "octon-extension-generation-lock-v5"
+schema_version: "octon-extension-generation-lock-v6"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"

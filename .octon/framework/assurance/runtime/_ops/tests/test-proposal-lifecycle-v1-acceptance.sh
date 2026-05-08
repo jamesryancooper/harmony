@@ -36,10 +36,17 @@ new_fixture_repo() {
   cp "$REAL_CONTRACT" "$root/.octon/generated/effective/extensions/published/octon-proposal-packet-lifecycle/bundled-first-party/context/lifecycle.contract.yml"
   cp "$REAL_REVIEW_GATE" "$root/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-review-gate.sh"
   cat >"$root/.octon/generated/effective/extensions/catalog.effective.yml" <<'YAML'
-schema_version: "octon-extension-effective-catalog-v6"
+schema_version: "octon-extension-effective-catalog-v7"
 packs:
   - pack_id: "octon-proposal-packet-lifecycle"
     source_id: "bundled-first-party"
+    capability_profiles:
+      - "validation-surface"
+      - "command-surface"
+      - "skill-surface"
+      - "prompt-bundle"
+      - "routing-contract"
+      - "lifecycle-contract"
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         projection_source_path: ".octon/generated/effective/extensions/published/octon-proposal-packet-lifecycle/bundled-first-party/context/lifecycle.contract.yml"

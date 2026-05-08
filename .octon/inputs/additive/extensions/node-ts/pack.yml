@@ -1,7 +1,10 @@
-schema_version: "octon-extension-pack-v4"
+schema_version: "octon-extension-pack-v5"
 pack_id: "node-ts"
 version: "1.0.0"
 origin_class: "first_party_bundled"
+capability_profiles:
+  - "validation-surface"
+  - "template-surface"
 compatibility:
   octon_version: "^0.6.0"
   extensions_api_version: "1.0"

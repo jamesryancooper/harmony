@@ -9,6 +9,7 @@
     "pack_id",
     "version",
     "origin_class",
+    "capability_profiles",
     "compatibility",
     "dependencies",
     "provenance",
@@ -17,7 +18,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-extension-pack-v4"
+      "const": "octon-extension-pack-v5"
     },
     "pack_id": {
       "type": "string",
@@ -34,6 +35,26 @@
         "first_party_external",
         "third_party"
       ]
+    },
+    "capability_profiles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "validation-surface",
+          "command-surface",
+          "skill-surface",
+          "prompt-bundle",
+          "routing-contract",
+          "lifecycle-contract",
+          "template-surface"
+        ]
+      },
+      "contains": {
+        "const": "validation-surface"
+      }
     },
     "compatibility": {
       "type": "object",

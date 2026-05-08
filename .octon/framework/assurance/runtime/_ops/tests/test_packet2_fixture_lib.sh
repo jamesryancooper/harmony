@@ -136,6 +136,7 @@ write_packet8_pack() {
   local conflicts_block="$7"
   local content_root="${8:-}"
   local templates_entry="null"
+  local capability_profiles
   local imported_from="null"
 
   if [[ "$origin_class" != "first_party_bundled" ]]; then
@@ -146,19 +147,31 @@ write_packet8_pack() {
   mkdir -p "$fixture_root/.octon/inputs/additive/extensions/$pack_id/validation"
   if [[ -n "$content_root" ]]; then
     templates_entry="\"$content_root/\""
+    capability_profiles=$'  - "validation-surface"\n  - "template-surface"'
     mkdir -p "$fixture_root/.octon/inputs/additive/extensions/$pack_id/$content_root"
     cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/$content_root/README.md" <<EOF
 # ${pack_id} ${content_root}
 EOF
+    cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/$content_root/catalog.fragment.yml" <<EOF
+schema_version: "extensions-templates-catalog-fragment-v1"
+templates:
+  - id: "${pack_id}-template"
+    path: "README.md"
+    summary: "${pack_id} fixture template."
+EOF
+  else
+    capability_profiles=$'  - "validation-surface"'
   fi
   cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/README.md" <<EOF
 # $pack_id
 EOF
   cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/pack.yml" <<EOF
-schema_version: "octon-extension-pack-v4"
+schema_version: "octon-extension-pack-v5"
 pack_id: "$pack_id"
 version: "1.0.0"
 origin_class: "$origin_class"
+capability_profiles:
+$capability_profiles
 compatibility:
   octon_version: "^0.5.0"
   extensions_api_version: "1.0"

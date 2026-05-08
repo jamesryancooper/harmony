@@ -20,6 +20,10 @@ surface.
   `shared_reference_assets`,
   so runtime consumers do not have to rediscover raw pack content from
   `inputs/**`.
+- `catalog.effective.yml`, `artifact-map.yml`, and `generation.lock.yml`
+  project pack `capability_profiles` so runtime resolvers can fail closed when
+  a pack lacks the profile required for routing, prompt bundle execution, or
+  lifecycle discovery.
 - Runtime trusts the family only when publication status, generation lock,
   receipt linkage, and `state/control/extensions/{active.yml,quarantine.yml}`
   remain coherent.

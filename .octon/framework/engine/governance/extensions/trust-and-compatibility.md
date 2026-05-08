@@ -13,18 +13,23 @@ Compatibility is evaluated in this order:
    contract set
 7. pack `compatibility.profile_path` shape against the extension compatibility
    profile contract
-8. host compatibility evaluation against the declared compatibility profile plus
+8. capability-profile artifact dependencies and cross-profile references
+9. host compatibility evaluation against the declared compatibility profile plus
    derived prompt-anchor requirements
 
 - Extension compatibility is checked against
   `octon.yml.versioning.harness.release_version`.
 - Extension API compatibility is checked against
   `octon.yml.versioning.extensions.api_version`.
-- `pack.yml` is `octon-extension-pack-v4` and must carry
-  `compatibility.required_contracts` plus
+- `pack.yml` is `octon-extension-pack-v5` and must carry
+  `capability_profiles`, `compatibility.required_contracts`, plus
   `compatibility.profile_path: "validation/compatibility.yml"`.
 - `validation/compatibility.yml` is `octon-extension-compatibility-profile-v1`
-  and is mandatory for every v4 pack.
+  and is mandatory for every v5 pack through `validation-surface`.
+- Capability profiles are composable, not mutually exclusive extension types.
+  `validation-surface` is required for every pack; command, skill, prompt,
+  routing, lifecycle, and template profiles require their corresponding
+  artifacts.
 
 Supported `required_contracts.contract_id` values in this cutover are:
 

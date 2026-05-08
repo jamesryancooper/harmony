@@ -43,7 +43,10 @@ Local implication for this surface:
 
 ## Packet Contract
 
-- `pack.yml` uses `octon-extension-pack-v4`.
+- `pack.yml` uses `octon-extension-pack-v5`.
+- `capability_profiles` is required and declares the composable surfaces the
+  pack provides. It must include `validation-surface`; other profiles are
+  additive and artifact-backed.
 - `compatibility.required_contracts` is required, even when empty.
 - `compatibility.profile_path` is required and must point to
   `validation/compatibility.yml`.
@@ -51,3 +54,23 @@ Local implication for this surface:
   attestation references.
 - Repo trust remains in `instance/extensions.yml`; it does not move into raw
   pack payloads.
+
+## Capability Profiles
+
+Capability profiles are not mutually exclusive extension types. They keep one
+extension-pack substrate while making each surface explicit:
+
+- `validation-surface`: required for every pack; requires `validation/` and
+  `validation/compatibility.yml`.
+- `command-surface`: requires `commands/manifest.fragment.yml` and referenced
+  command files.
+- `skill-surface`: requires `skills/manifest.fragment.yml`,
+  `skills/registry.fragment.yml`, and referenced skill roots.
+- `prompt-bundle`: requires at least one manifest-based prompt bundle under
+  `prompts/**/manifest.yml`.
+- `routing-contract`: requires `context/routing.contract.yml` and may only
+  reference command, skill, or prompt capabilities declared by profiles.
+- `lifecycle-contract`: requires `context/lifecycle.contract.yml`; extension
+  lifecycle routes require `routing-contract`.
+- `template-surface`: requires `templates/catalog.fragment.yml` and referenced
+  template paths.

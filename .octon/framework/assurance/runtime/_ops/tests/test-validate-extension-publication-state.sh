@@ -319,6 +319,21 @@ EOF
   ! run_validator "$fixture_root"
 }
 
+case_capability_profile_drift_invalidates_publication_state() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  write_enabled_pack_manifest "$fixture_root" "docs" "bundled-first-party"
+  publish_state "$fixture_root"
+  perl -0pi -e 's/      - "template-surface"\n//' \
+    "$fixture_root/.octon/generated/effective/extensions/catalog.effective.yml"
+
+  ! run_validator "$fixture_root"
+}
+
 case_dependency_root_cause_records_affected_dependents() {
   local fixture_root
   fixture_root="$(create_packet2_fixture_repo)"
@@ -382,10 +397,13 @@ case_native_command_collision_quarantines_before_validation() {
 # collision
 EOF
   cat >"$fixture_root/.octon/inputs/additive/extensions/collision/pack.yml" <<'EOF'
-schema_version: "octon-extension-pack-v4"
+schema_version: "octon-extension-pack-v5"
 pack_id: "collision"
 version: "1.0.0"
 origin_class: "first_party_bundled"
+capability_profiles:
+  - "validation-surface"
+  - "command-surface"
 compatibility:
   octon_version: "^0.5.0"
   extensions_api_version: "1.0"
@@ -604,15 +622,19 @@ case_prompt_anchor_paths_appear_in_compatibility_inputs() {
 
   mkdir -p \
     "$fixture_root/.octon/inputs/additive/extensions/prompt-pack/prompts/simple/stages" \
+    "$fixture_root/.octon/inputs/additive/extensions/prompt-pack/prompts/simple/companions" \
     "$fixture_root/.octon/inputs/additive/extensions/prompt-pack/validation"
   cat >"$fixture_root/.octon/inputs/additive/extensions/prompt-pack/README.md" <<'EOF'
 # prompt-pack
 EOF
   cat >"$fixture_root/.octon/inputs/additive/extensions/prompt-pack/pack.yml" <<'EOF'
-schema_version: "octon-extension-pack-v4"
+schema_version: "octon-extension-pack-v5"
 pack_id: "prompt-pack"
 version: "1.0.0"
 origin_class: "first_party_bundled"
+capability_profiles:
+  - "validation-surface"
+  - "prompt-bundle"
 compatibility:
   octon_version: "^0.5.0"
   extensions_api_version: "1.0"
@@ -660,7 +682,10 @@ stages:
     path: "stages/01-stage.md"
     role_class: "stage"
     order: 1
-companions: []
+companions:
+  - prompt_id: "prompt-pack-simple-align"
+    path: "companions/01-align.md"
+    role_class: "maintenance-companion"
 references: []
 shared_references: []
 required_repo_anchors:
@@ -670,13 +695,19 @@ alignment_policy:
   stale_behavior: "realign_or_fail_closed"
   skip_mode_policy: "degraded-retained-explicit"
   receipt_root: ".octon/state/evidence/validation/extensions/prompt-alignment"
-invalidation_conditions: []
+invalidation_conditions:
+  - "prompt-manifest-sha-changed"
+  - "prompt-asset-sha-changed"
+  - "required-anchor-sha-changed"
 artifact_policy:
   internal_artifacts: []
   packet_support_files: []
 EOF
   cat >"$fixture_root/.octon/inputs/additive/extensions/prompt-pack/prompts/simple/stages/01-stage.md" <<'EOF'
 # stage
+EOF
+  cat >"$fixture_root/.octon/inputs/additive/extensions/prompt-pack/prompts/simple/companions/01-align.md" <<'EOF'
+# align
 EOF
   write_enabled_pack_manifest "$fixture_root" "prompt-pack" "bundled-first-party"
 
@@ -695,6 +726,7 @@ main() {
   assert_success "fully invalid selected set withdraws extension contributions" case_fully_invalid_selection_withdraws_extensions
   assert_success "active-state generation mismatches fail validation" case_active_state_generation_mismatch_fails
   assert_success "non-manifest payload changes invalidate the generation lock" case_non_manifest_payload_change_invalidates_generation_lock
+  assert_success "capability profile drift invalidates publication state" case_capability_profile_drift_invalidates_publication_state
   assert_success "dependency root-cause quarantine records carry affected dependents" case_dependency_root_cause_records_affected_dependents
   assert_success "native command collisions quarantine before validation" case_native_command_collision_quarantines_before_validation
   assert_success "missing required files mark selected packs incompatible" case_missing_required_file_marks_pack_incompatible

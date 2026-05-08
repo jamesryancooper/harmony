@@ -16,7 +16,7 @@ INSTANCE_SKILLS_MANIFEST="$OCTON_DIR/instance/capabilities/runtime/skills/manife
 
 PUBLISHED_AT=""
 GENERATION_ID=""
-GENERATOR_VERSION="extension-publication-v5"
+GENERATOR_VERSION="extension-publication-v6"
 COMPATIBILITY_VALIDATOR_VERSION="extension-compatibility-v1"
 declare -a PUBLISHED_SELECTED_KEYS=()
 
@@ -31,6 +31,13 @@ write_string_array_yaml() {
   for value in "$@"; do
     printf '%s- "%s"\n' "$indent" "$value"
   done
+}
+
+write_pack_capability_profiles_yaml() {
+  local indent="$1" manifest_abs="$2"
+  local profiles=()
+  mapfile -t profiles < <(ext_pack_capability_profiles_sorted "$manifest_abs")
+  write_string_array_yaml "$indent" "${profiles[@]}"
 }
 
 receipt_timestamp_slug() {
@@ -261,6 +268,20 @@ write_extension_publication_receipt() {
           printf '    reason_code: "dependency-unavailable:%s"\n' "$pack_id"
           printf '    manifest_path: null\n'
         done
+      done
+    fi
+    if [[ "${#EXT_PUBLISHED_KEYS[@]}" -eq 0 ]]; then
+      printf 'published_pack_capability_profiles: []\n'
+    else
+      printf 'published_pack_capability_profiles:\n'
+      for key in "${EXT_PUBLISHED_KEYS[@]}"; do
+        pack_id="$(ext_key_pack_id "$key")"
+        source_id="$(ext_key_source_id "$key")"
+        manifest_rel=".octon/inputs/additive/extensions/${pack_id}/pack.yml"
+        printf '  - pack_id: "%s"\n' "$pack_id"
+        printf '    source_id: "%s"\n' "$source_id"
+        printf '    profiles:\n'
+        write_pack_capability_profiles_yaml '      ' "$ROOT_DIR/$manifest_rel"
       done
     fi
     printf 'published_paths:\n'
@@ -998,6 +1019,7 @@ write_effective_files() {
     "prompt-asset-sha-changed"
     "required-anchor-sha-changed"
     "compatibility-profile-sha-changed"
+    "capability-profile-changed"
     "published-pack-set-changed"
     "quarantine-state-changed"
   )
@@ -1065,7 +1087,7 @@ write_effective_files() {
   } >"$active_tmp"
 
   {
-    printf 'schema_version: "octon-extension-effective-catalog-v6"\n'
+    printf 'schema_version: "octon-extension-effective-catalog-v7"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
@@ -1098,6 +1120,8 @@ write_effective_files() {
         printf '    publication_status: "%s"\n' "$status"
         printf '    compatibility_status: "%s"\n' "${EXT_COMPAT_RESULT_STATUS["$key"]:-compatible}"
         printf '    compatibility_profile_path: "%s"\n' "${EXT_COMPAT_PROFILE_REL["$key"]:-.octon/inputs/additive/extensions/$pack_id/validation/compatibility.yml}"
+        printf '    capability_profiles:\n'
+        write_pack_capability_profiles_yaml '      ' "$manifest_abs"
         write_pack_lifecycle_contracts "$pack_id" "$source_id" "$manifest_abs"
         write_pack_route_dispatchers "$pack_id" "$manifest_abs"
         write_routing_exports "$pack_id" "$source_id" "$manifest_abs"
@@ -1112,10 +1136,24 @@ write_effective_files() {
   } >"$catalog_tmp"
 
   {
-    printf 'schema_version: "octon-extension-artifact-map-v4"\n'
+    printf 'schema_version: "octon-extension-artifact-map-v5"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
+    if [[ "${#EXT_PUBLISHED_KEYS[@]}" -eq 0 ]]; then
+      printf 'capability_profiles: []\n'
+    else
+      printf 'capability_profiles:\n'
+      for key in "${EXT_PUBLISHED_KEYS[@]}"; do
+        pack_id="$(ext_key_pack_id "$key")"
+        source_id="$(ext_key_source_id "$key")"
+        manifest_abs="$ROOT_DIR/${EXT_PUBLISHED_MANIFEST_REL["$key"]}"
+        printf '  - pack_id: "%s"\n' "$pack_id"
+        printf '    source_id: "%s"\n' "$source_id"
+        printf '    profiles:\n'
+        write_pack_capability_profiles_yaml '      ' "$manifest_abs"
+      done
+    fi
     if [[ "${#EXT_PUBLISHED_KEYS[@]}" -eq 0 ]]; then
       printf 'artifacts: []\n'
     else
@@ -1140,7 +1178,7 @@ write_effective_files() {
   } >"$artifact_map_tmp"
 
   {
-    printf 'schema_version: "octon-extension-generation-lock-v5"\n'
+    printf 'schema_version: "octon-extension-generation-lock-v6"\n'
     printf 'generator_version: "%s"\n' "$GENERATOR_VERSION"
     printf 'generation_id: "%s"\n' "$GENERATION_ID"
     printf 'published_at: "%s"\n' "$PUBLISHED_AT"
@@ -1197,6 +1235,8 @@ write_effective_files() {
         printf '    manifest_path: "%s"\n' "${EXT_PUBLISHED_MANIFEST_REL["$key"]}"
         printf '    origin_class: "%s"\n' "${EXT_PUBLISHED_ORIGIN_CLASS["$key"]}"
         printf '    version: "%s"\n' "${EXT_PUBLISHED_VERSION["$key"]}"
+        printf '    capability_profiles:\n'
+        write_pack_capability_profiles_yaml '      ' "$ROOT_DIR/${EXT_PUBLISHED_MANIFEST_REL["$key"]}"
         while IFS= read -r abs_path; do
           [[ -n "$abs_path" ]] || continue
           rel_path="${abs_path#$(ext_pack_root_abs "$pack_id")/}"

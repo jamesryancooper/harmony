@@ -37,10 +37,15 @@ Creates this baseline tree:
 `pack.yml` baseline:
 
 ```yaml
-schema_version: "octon-extension-pack-v4"
+schema_version: "octon-extension-pack-v5"
 pack_id: "<pack-id>"
 version: "0.1.0"
 origin_class: "first_party_bundled"
+capability_profiles:
+  - "validation-surface"
+  - "command-surface"
+  - "skill-surface"
+  - "prompt-bundle"
 compatibility:
   octon_version: "^0.6.25"
   extensions_api_version: "1.0"

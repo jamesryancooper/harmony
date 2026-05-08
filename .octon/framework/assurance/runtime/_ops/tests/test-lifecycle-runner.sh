@@ -22,10 +22,13 @@ new_fixture_repo() {
 write_runner_fixture() {
   local root="$1"
   cat >"$root/.octon/generated/effective/extensions/catalog.effective.yml" <<'YAML'
-schema_version: "octon-extension-effective-catalog-v6"
+schema_version: "octon-extension-effective-catalog-v7"
 packs:
   - pack_id: "test-extension"
     source_id: "bundled"
+    capability_profiles:
+      - "validation-surface"
+      - "lifecycle-contract"
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         projection_source_path: ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml"
@@ -326,10 +329,13 @@ main() {
     "$missing_projection_root/.octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml" \
     "$missing_projection_root/.octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
   cat >"$missing_projection_root/.octon/generated/effective/extensions/catalog.effective.yml" <<'YAML'
-schema_version: "octon-extension-effective-catalog-v6"
+schema_version: "octon-extension-effective-catalog-v7"
 packs:
   - pack_id: "test-extension"
     source_id: "bundled"
+    capability_profiles:
+      - "validation-surface"
+      - "lifecycle-contract"
     lifecycle_contracts:
       - lifecycle_id: "proposal-packet"
         contract_path: ".octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"

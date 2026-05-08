@@ -49,6 +49,13 @@ sorted_projection_source_paths() {
     | LC_ALL=C sort
 }
 
+sorted_profiles_from_yq_query() {
+  local file="$1" query="$2"
+  yq -r "$query[]? // \"\"" "$file" 2>/dev/null \
+    | awk 'NF' \
+    | LC_ALL=C sort -u
+}
+
 valid_lifecycle_projection_path() {
   local value="$1"
   [[ -n "$value" \
@@ -80,11 +87,11 @@ main() {
 
   [[ "$(yq -r '.schema_version // ""' "$ACTIVE_STATE")" == "octon-extension-active-state-v4" ]] && pass "active state schema version valid" || fail "active state schema_version invalid"
   [[ "$(yq -r '.schema_version // ""' "$QUARANTINE_STATE")" == "octon-extension-quarantine-state-v3" ]] && pass "quarantine state schema version valid" || fail "quarantine state schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v6" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v4" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
-  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v5" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$CATALOG_FILE")" == "octon-extension-effective-catalog-v7" ]] && pass "effective catalog schema version valid" || fail "effective catalog schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$ARTIFACT_MAP_FILE")" == "octon-extension-artifact-map-v5" ]] && pass "artifact map schema version valid" || fail "artifact map schema_version invalid"
+  [[ "$(yq -r '.schema_version // ""' "$GENERATION_LOCK_FILE")" == "octon-extension-generation-lock-v6" ]] && pass "generation lock schema version valid" || fail "generation lock schema_version invalid"
   local expected_generator_version
-  expected_generator_version="extension-publication-v5"
+  expected_generator_version="extension-publication-v6"
   pass "extension publication generator version contract declared"
   [[ "$(yq -r '.generator_version // ""' "$CATALOG_FILE")" == "$expected_generator_version" ]] && pass "effective catalog generator_version current" || fail "effective catalog generator_version missing or stale"
   [[ "$(yq -r '.generator_version // ""' "$ARTIFACT_MAP_FILE")" == "$expected_generator_version" ]] && pass "artifact map generator_version current" || fail "artifact map generator_version missing or stale"
@@ -213,6 +220,25 @@ main() {
     yq -e ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .lifecycle_contracts | type == \"!!seq\"" "$CATALOG_FILE" >/dev/null 2>&1 \
       && pass "lifecycle_contracts valid for $pack_id" \
       || fail "lifecycle_contracts invalid for $pack_id"
+
+    local authored_profiles catalog_profiles artifact_profiles lock_profiles receipt_profiles
+    authored_profiles="$(ext_pack_capability_profiles_sorted "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}/pack.yml")"
+    catalog_profiles="$(sorted_profiles_from_yq_query "$CATALOG_FILE" ".packs[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .capability_profiles")"
+    artifact_profiles="$(sorted_profiles_from_yq_query "$ARTIFACT_MAP_FILE" ".capability_profiles[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .profiles")"
+    lock_profiles="$(sorted_profiles_from_yq_query "$GENERATION_LOCK_FILE" ".pack_payload_digests[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .capability_profiles")"
+    receipt_profiles="$(sorted_profiles_from_yq_query "$receipt_abs" ".published_pack_capability_profiles[]? | select(.pack_id == \"$pack_id\" and .source_id == \"$source_id\") | .profiles")"
+    [[ "$catalog_profiles" == "$authored_profiles" ]] \
+      && pass "catalog capability profiles match authored pack for $pack_id" \
+      || fail "catalog capability profiles drift from authored pack for $pack_id"
+    [[ "$artifact_profiles" == "$authored_profiles" ]] \
+      && pass "artifact map capability profiles match authored pack for $pack_id" \
+      || fail "artifact map capability profiles drift from authored pack for $pack_id"
+    [[ "$lock_profiles" == "$authored_profiles" ]] \
+      && pass "generation lock capability profiles match authored pack for $pack_id" \
+      || fail "generation lock capability profiles drift from authored pack for $pack_id"
+    [[ "$receipt_profiles" == "$authored_profiles" ]] \
+      && pass "publication receipt capability profiles match authored pack for $pack_id" \
+      || fail "publication receipt capability profiles drift from authored pack for $pack_id"
 
     local routing_contract_abs routing_contract_rel authored_route_dispatchers published_route_dispatchers
     routing_contract_abs="$(ext_routing_contract_abs_for_pack "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}/pack.yml" "$ROOT_DIR/.octon/inputs/additive/extensions/${pack_id}" 2>/dev/null || true)"

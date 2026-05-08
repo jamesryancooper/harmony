@@ -77,7 +77,49 @@ esac
   exit 1
 }
 
-mapfile -t bundle_matches < <(yq -o=json ".packs[]? | select(.pack_id == \"$PACK_ID\" and .source_id == \"$SOURCE_ID\") | .prompt_bundles[]? | select(.prompt_set_id == \"$PROMPT_SET_ID\")" "$CATALOG_PATH" 2>/dev/null | jq -c '.' || true)
+mapfile -t pack_matches < <(yq -o=json ".packs[]? | select(.pack_id == \"$PACK_ID\" and .source_id == \"$SOURCE_ID\")" "$CATALOG_PATH" 2>/dev/null | jq -c '.' || true)
+
+if [[ "${#pack_matches[@]}" -gt 1 ]]; then
+  jq -cn --arg mode "$ALIGNMENT_MODE" --arg pack "$PACK_ID" --arg prompt_set "$PROMPT_SET_ID" '
+    {
+      status: "blocked",
+      safe_to_run: false,
+      alignment_mode: $mode,
+      pack_id: $pack,
+      prompt_set_id: $prompt_set,
+      reason_codes: ["duplicate-pack-entry"]
+    }'
+  exit 1
+fi
+
+pack_json="${pack_matches[0]:-}"
+if [[ -z "$pack_json" || "$pack_json" == "null" ]]; then
+  jq -cn --arg mode "$ALIGNMENT_MODE" --arg pack "$PACK_ID" --arg prompt_set "$PROMPT_SET_ID" '
+    {
+      status: "blocked",
+      safe_to_run: false,
+      alignment_mode: $mode,
+      pack_id: $pack,
+      prompt_set_id: $prompt_set,
+      reason_codes: ["missing-pack-entry"]
+    }'
+  exit 1
+fi
+
+if ! jq -e '.capability_profiles[]? | select(. == "prompt-bundle")' <<<"$pack_json" >/dev/null 2>&1; then
+  jq -cn --arg mode "$ALIGNMENT_MODE" --arg pack "$PACK_ID" --arg prompt_set "$PROMPT_SET_ID" '
+    {
+      status: "blocked",
+      safe_to_run: false,
+      alignment_mode: $mode,
+      pack_id: $pack,
+      prompt_set_id: $prompt_set,
+      reason_codes: ["missing-capability-profile:prompt-bundle"]
+    }'
+  exit 1
+fi
+
+mapfile -t bundle_matches < <(jq -c --arg prompt_set "$PROMPT_SET_ID" '.prompt_bundles[]? | select(.prompt_set_id == $prompt_set)' <<<"$pack_json" || true)
 
 if [[ "${#bundle_matches[@]}" -gt 1 ]]; then
   jq -cn --arg mode "$ALIGNMENT_MODE" --arg pack "$PACK_ID" --arg prompt_set "$PROMPT_SET_ID" '

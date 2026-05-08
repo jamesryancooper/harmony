@@ -159,7 +159,7 @@ records: []
 EOF
 
   cat >"$root/.octon/generated/effective/extensions/catalog.effective.yml" <<'EOF'
-schema_version: "octon-extension-effective-catalog-v6"
+schema_version: "octon-extension-effective-catalog-v7"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"
@@ -181,15 +181,16 @@ source:
 EOF
 
   cat >"$root/.octon/generated/effective/extensions/artifact-map.yml" <<'EOF'
-schema_version: "octon-extension-artifact-map-v4"
+schema_version: "octon-extension-artifact-map-v5"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"
+capability_profiles: []
 artifacts: []
 EOF
 
   cat >"$root/.octon/generated/effective/extensions/generation.lock.yml" <<'EOF'
-schema_version: "octon-extension-generation-lock-v5"
+schema_version: "octon-extension-generation-lock-v6"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"
@@ -220,6 +221,11 @@ EOF
   copy_file "$root" ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-proposal.sh"
   copy_file "$root" ".octon/framework/assurance/runtime/_ops/scripts/validate-policy-proposal.sh"
   copy_file "$root" ".octon/framework/assurance/runtime/_ops/scripts/validate-migration-proposal.sh"
+  cat >"$root/.octon/framework/assurance/runtime/_ops/scripts/publication-wrapper-common.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+enter_publication_runtime_boundary() { :; }
+EOF
 
   chmod +x \
     "$root/.octon/framework/orchestration/runtime/_ops/scripts/extensions-common.sh" \
@@ -258,6 +264,20 @@ build_non_prompt_route_fixture() {
   write_valid_packet2_fixture "$root"
 
   mkdir -p "$root/.octon/inputs/additive/extensions/docs/context"
+  mkdir -p "$root/.octon/inputs/additive/extensions/docs/commands"
+  cat >"$root/.octon/inputs/additive/extensions/docs/commands/manifest.fragment.yml" <<'EOF'
+schema_version: "extensions-commands-manifest-fragment-v1"
+commands:
+  - id: "docs-command"
+    path: "docs-command.md"
+    display_name: "Docs Command"
+    summary: "Fixture command."
+EOF
+  cat >"$root/.octon/inputs/additive/extensions/docs/commands/docs-command.md" <<'EOF'
+# Docs Command
+EOF
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"\n  - "template-surface"/capability_profiles:\n  - "validation-surface"\n  - "command-surface"\n  - "routing-contract"\n  - "template-surface"/; s/commands: null/commands: "commands\/"/' \
+    "$root/.octon/inputs/additive/extensions/docs/pack.yml"
   perl -0pi -e 's/context: null/context: "context\/"/' \
     "$root/.octon/inputs/additive/extensions/docs/pack.yml"
   cat >"$root/.octon/inputs/additive/extensions/docs/context/routing.contract.yml" <<'EOF'
@@ -394,6 +414,19 @@ case_unpublished_extension_blocks() {
   jq -e '.status == "blocked" and (.reason_codes | index("extension-not-published")) != null' <<<"$out" >/dev/null
 }
 
+case_missing_routing_profile_blocks() {
+  local fixture out
+  fixture="$(create_prompt_fixture)"
+  CLEANUP_DIRS+=("$fixture")
+  write_prompt_backed_fixture "$fixture"
+  publish_state "$fixture"
+
+  perl -0pi -e 's/      - "routing-contract"\n//' \
+    "$fixture/.octon/generated/effective/extensions/catalog.effective.yml"
+  out="$(resolve_route "$fixture" octon-concept-integration '{"source_artifact":"artifact.md"}')" && return 1
+  jq -e '.status == "blocked" and (.reason_codes | index("missing-capability-profile:routing-contract")) != null' <<<"$out" >/dev/null
+}
+
 case_non_prompt_binding_resolves_without_prompt_set() {
   local fixture out
   fixture="$(create_packet2_fixture_repo)"
@@ -410,6 +443,7 @@ main() {
   assert_success "prompt-backed resolver denies unsupported explicit routes" case_prompt_backed_route_denies_unsupported_bundle
   assert_success "resolver blocks when the dispatcher is missing" case_missing_dispatcher_blocks
   assert_success "resolver blocks when the extension publication is withdrawn" case_unpublished_extension_blocks
+  assert_success "resolver blocks packs missing routing-contract capability profile" case_missing_routing_profile_blocks
   assert_success "non-prompt bindings resolve without prompt metadata" case_non_prompt_binding_resolves_without_prompt_set
 
   echo

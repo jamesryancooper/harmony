@@ -66,7 +66,7 @@ case_supported_required_contracts_pass() {
   copy_packet2_runtime_scripts "$fixture_root"
   write_valid_packet2_fixture "$fixture_root"
 
-  perl -0pi -e 's/required_contracts: \[\]/required_contracts:\n    - contract_id: "extension-effective-catalog"\n      schema_version: "octon-extension-effective-catalog-v6"/' \
+  perl -0pi -e 's/required_contracts: \[\]/required_contracts:\n    - contract_id: "extension-effective-catalog"\n      schema_version: "octon-extension-effective-catalog-v7"/' \
     "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
 
   run_validator "$fixture_root"
@@ -92,7 +92,7 @@ case_required_contracts_follow_live_schema_versions() {
   copy_packet2_runtime_scripts "$fixture_root"
   write_valid_packet2_fixture "$fixture_root"
 
-  perl -0pi -e 's/schema_version: "octon-extension-effective-catalog-v6"/schema_version: "octon-extension-effective-catalog-v9"/' \
+  perl -0pi -e 's/schema_version: "octon-extension-effective-catalog-v7"/schema_version: "octon-extension-effective-catalog-v9"/' \
     "$fixture_root/.octon/generated/effective/extensions/catalog.effective.yml"
   perl -0pi -e 's/required_contracts: \[\]/required_contracts:\n    - contract_id: "extension-effective-catalog"\n      schema_version: "octon-extension-effective-catalog-v9"/' \
     "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
@@ -121,6 +121,20 @@ case_valid_routing_contract_passes() {
   write_valid_packet2_fixture "$fixture_root"
 
   mkdir -p "$fixture_root/.octon/inputs/additive/extensions/docs/context"
+  mkdir -p "$fixture_root/.octon/inputs/additive/extensions/docs/commands"
+  cat >"$fixture_root/.octon/inputs/additive/extensions/docs/commands/manifest.fragment.yml" <<'EOF'
+schema_version: "extensions-commands-manifest-fragment-v1"
+commands:
+  - id: "docs-command"
+    path: "docs-command.md"
+    display_name: "Docs Command"
+    summary: "Fixture command."
+EOF
+  cat >"$fixture_root/.octon/inputs/additive/extensions/docs/commands/docs-command.md" <<'EOF'
+# Docs Command
+EOF
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"\n  - "template-surface"/capability_profiles:\n  - "validation-surface"\n  - "command-surface"\n  - "routing-contract"\n  - "template-surface"/; s/commands: null/commands: "commands\/"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
   perl -0pi -e 's/context: null/context: "context\/"/' \
     "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
   cat >"$fixture_root/.octon/inputs/additive/extensions/docs/context/routing.contract.yml" <<'EOF'
@@ -176,6 +190,20 @@ case_invalid_routing_contract_fails() {
   write_valid_packet2_fixture "$fixture_root"
 
   mkdir -p "$fixture_root/.octon/inputs/additive/extensions/docs/context"
+  mkdir -p "$fixture_root/.octon/inputs/additive/extensions/docs/commands"
+  cat >"$fixture_root/.octon/inputs/additive/extensions/docs/commands/manifest.fragment.yml" <<'EOF'
+schema_version: "extensions-commands-manifest-fragment-v1"
+commands:
+  - id: "docs-command"
+    path: "docs-command.md"
+    display_name: "Docs Command"
+    summary: "Fixture command."
+EOF
+  cat >"$fixture_root/.octon/inputs/additive/extensions/docs/commands/docs-command.md" <<'EOF'
+# Docs Command
+EOF
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"\n  - "template-surface"/capability_profiles:\n  - "validation-surface"\n  - "command-surface"\n  - "routing-contract"\n  - "template-surface"/; s/commands: null/commands: "commands\/"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
   perl -0pi -e 's/context: null/context: "context\/"/' \
     "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
   cat >"$fixture_root/.octon/inputs/additive/extensions/docs/context/routing.contract.yml" <<'EOF'
@@ -276,6 +304,159 @@ case_unsupported_required_contract_fails() {
   ! run_validator "$fixture_root"
 }
 
+case_missing_capability_profiles_fail() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  perl -0pi -e 's/capability_profiles:\n(?:  - "[^"]+"\n)+//' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
+case_duplicate_capability_profile_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"/capability_profiles:\n  - "validation-surface"\n  - "validation-surface"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
+case_unknown_capability_profile_fails() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"/capability_profiles:\n  - "validation-surface"\n  - "unknown-surface"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
+case_validation_surface_required() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  perl -0pi -e 's/  - "validation-surface"\n//' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
+case_capability_artifact_dependencies_fail_closed() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"/capability_profiles:\n  - "validation-surface"\n  - "command-surface"/; s/commands: null/commands: "commands\/"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
+case_prompt_bundle_requires_manifest() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  mkdir -p "$fixture_root/.octon/inputs/additive/extensions/docs/prompts"
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"/capability_profiles:\n  - "validation-surface"\n  - "prompt-bundle"/; s/prompts: null/prompts: "prompts\/"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+
+  ! run_validator "$fixture_root"
+}
+
+case_routing_references_require_declared_profiles() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  mkdir -p "$fixture_root/.octon/inputs/additive/extensions/docs/context"
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"/capability_profiles:\n  - "validation-surface"\n  - "routing-contract"/; s/context: null/context: "context\/"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+  cat >"$fixture_root/.octon/inputs/additive/extensions/docs/context/routing.contract.yml" <<'EOF'
+schema_version: "octon-extension-routing-contract-v1"
+dispatchers:
+  - dispatcher_id: "docs-dispatcher"
+    default_route_id: "docs-route"
+    accepted_inputs: []
+    disambiguators: []
+    precedence:
+      - "always"
+    routes:
+      - route_id: "docs-route"
+        status: "resolved"
+        execution_binding_id: "docs-route"
+        matchers:
+          - matcher_id: "always"
+            reason_codes:
+              - "always"
+            all_of: []
+    execution_bindings:
+      - binding_id: "docs-route"
+        route_id: "docs-route"
+        command_capability_id: "docs-command"
+EOF
+
+  ! run_validator "$fixture_root"
+}
+
+case_lifecycle_extension_routes_require_routing_profile() {
+  local fixture_root
+  fixture_root="$(create_packet2_fixture_repo)"
+  CLEANUP_DIRS+=("$fixture_root")
+  copy_packet2_runtime_scripts "$fixture_root"
+  write_valid_packet2_fixture "$fixture_root"
+
+  mkdir -p "$fixture_root/.octon/inputs/additive/extensions/docs/context"
+  perl -0pi -e 's/capability_profiles:\n  - "validation-surface"/capability_profiles:\n  - "validation-surface"\n  - "lifecycle-contract"/; s/context: null/context: "context\/"/' \
+    "$fixture_root/.octon/inputs/additive/extensions/docs/pack.yml"
+  cat >"$fixture_root/.octon/inputs/additive/extensions/docs/context/lifecycle.contract.yml" <<'EOF'
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "docs-lifecycle"
+owner_extension: "docs"
+version: "1.0.0"
+target:
+  input: "target"
+  manifest_path: "manifest.yml"
+  status_field: "status"
+  allowed_statuses: ["draft"]
+states: []
+terminal_outcomes: []
+validators: []
+gates: []
+receipts: []
+loops: []
+input_bindings: {}
+routes:
+  - route_id: "docs-route"
+    route_type: "extension"
+    enter_when:
+      target_missing: true
+EOF
+
+  ! run_validator "$fixture_root"
+}
+
 case_missing_compatibility_profile_fails() {
   local fixture_root
   fixture_root="$(create_packet2_fixture_repo)"
@@ -324,6 +505,14 @@ main() {
   assert_success "pack validator rejects provenance/source mismatches" case_provenance_source_mismatch_fails
   assert_success "external packs require external provenance" case_external_pack_requires_external_provenance
   assert_success "unsupported required_contracts entries are rejected" case_unsupported_required_contract_fails
+  assert_success "missing capability_profiles are rejected" case_missing_capability_profiles_fail
+  assert_success "duplicate capability profiles are rejected" case_duplicate_capability_profile_fails
+  assert_success "unknown capability profiles are rejected" case_unknown_capability_profile_fails
+  assert_success "validation-surface is required for every pack" case_validation_surface_required
+  assert_success "capability profiles require their artifacts" case_capability_artifact_dependencies_fail_closed
+  assert_success "prompt-bundle requires a manifest-based prompt bundle" case_prompt_bundle_requires_manifest
+  assert_success "routing contracts require referenced capability profiles" case_routing_references_require_declared_profiles
+  assert_success "lifecycle extension routes require routing capability profile" case_lifecycle_extension_routes_require_routing_profile
   assert_success "missing compatibility profiles are rejected" case_missing_compatibility_profile_fails
   assert_success "invalid compatibility profile behavior keys are rejected" case_invalid_compatibility_profile_contract_fails
 

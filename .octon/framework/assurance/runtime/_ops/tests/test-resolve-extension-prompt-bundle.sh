@@ -171,7 +171,7 @@ records: []
 EOF
 
   cat >"$root/.octon/generated/effective/extensions/catalog.effective.yml" <<'EOF'
-schema_version: "octon-extension-effective-catalog-v6"
+schema_version: "octon-extension-effective-catalog-v7"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"
@@ -193,15 +193,16 @@ source:
 EOF
 
   cat >"$root/.octon/generated/effective/extensions/artifact-map.yml" <<'EOF'
-schema_version: "octon-extension-artifact-map-v4"
+schema_version: "octon-extension-artifact-map-v5"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"
+capability_profiles: []
 artifacts: []
 EOF
 
   cat >"$root/.octon/generated/effective/extensions/generation.lock.yml" <<'EOF'
-schema_version: "octon-extension-generation-lock-v5"
+schema_version: "octon-extension-generation-lock-v6"
 generator_version: "stub"
 generation_id: "stub"
 published_at: "1970-01-01T00:00:00Z"
@@ -232,6 +233,11 @@ EOF
   copy_file "$root" ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-proposal.sh"
   copy_file "$root" ".octon/framework/assurance/runtime/_ops/scripts/validate-policy-proposal.sh"
   copy_file "$root" ".octon/framework/assurance/runtime/_ops/scripts/validate-migration-proposal.sh"
+  cat >"$root/.octon/framework/assurance/runtime/_ops/scripts/publication-wrapper-common.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+enter_publication_runtime_boundary() { :; }
+EOF
 
   chmod +x \
     "$root/.octon/framework/orchestration/runtime/_ops/scripts/extensions-common.sh" \
@@ -285,6 +291,19 @@ case_stale_architecture_prompt_blocks_auto() {
   printf '\n<!-- stale fixture mutation -->\n' >> "$fixture/.octon/inputs/additive/extensions/octon-concept-integration/prompts/source-to-architecture-packet/stages/01-extract.md"
   out="$(resolve_bundle "$fixture" octon-concept-integration-source-to-architecture-packet auto)" && return 1
   jq -e '.status == "blocked" and .safe_to_run == false and (.reason_codes | any(startswith("prompt-asset-sha-changed:stages/01-extract.md")))' <<<"$out" >/dev/null
+}
+
+case_missing_prompt_bundle_profile_blocks() {
+  local fixture out
+  fixture="$(create_fixture)"
+  CLEANUP_DIRS+=("$fixture")
+  write_fixture "$fixture"
+  publish_state "$fixture"
+  perl -0pi -e 's/      - "prompt-bundle"\n//' \
+    "$fixture/.octon/generated/effective/extensions/catalog.effective.yml"
+
+  out="$(resolve_bundle "$fixture" octon-concept-integration-source-to-architecture-packet auto)" && return 1
+  jq -e '.status == "blocked" and (.reason_codes | index("missing-capability-profile:prompt-bundle")) != null' <<<"$out" >/dev/null
 }
 
 case_stale_architecture_prompt_skip_degrades() {
@@ -355,6 +374,7 @@ case_republish_after_shared_reference_change_restores_auto() {
 main() {
   assert_success "all bundles publish fresh in auto mode" case_all_bundles_publish_fresh
   assert_success "stale architecture prompt blocks auto mode" case_stale_architecture_prompt_blocks_auto
+  assert_success "prompt resolver blocks missing prompt-bundle capability profile" case_missing_prompt_bundle_profile_blocks
   assert_success "stale architecture prompt degrades skip mode" case_stale_architecture_prompt_skip_degrades
   assert_success "shared reference change blocks auto mode" case_shared_reference_change_blocks_auto
   assert_success "shared reference change degrades skip mode" case_shared_reference_change_degrades_skip

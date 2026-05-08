@@ -14,7 +14,8 @@
 
 ## Expected Outputs
 
-- a valid `pack.yml` with `schema_version: "octon-extension-pack-v4"`
+- a valid `pack.yml` with `schema_version: "octon-extension-pack-v5"` and
+  explicit `capability_profiles`
 - MVP fragment files under `commands/` and `skills/`
 - `context/overview.md`
 - `validation/compatibility.yml`

@@ -42,6 +42,7 @@ write_fixture() {
     "$root/.octon/framework/capabilities/runtime/skills/demo" \
     "$root/.octon/framework/capabilities/runtime/services/demo" \
     "$root/.octon/framework/capabilities/runtime/tools" \
+    "$root/.octon/framework/assurance/runtime/_ops/scripts" \
     "$root/.octon/generated/effective/extensions" \
     "$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/commands" \
     "$root/.octon/generated/effective/extensions/published/demo-ext/bundled-first-party/skills/demo-ext-skill" \
@@ -49,6 +50,15 @@ write_fixture() {
     "$root/.octon/generated/effective/capabilities/filesystem-snapshots" \
     "$root/.octon/instance/capabilities/runtime/commands" \
     "$root/.octon/instance/capabilities/runtime/skills"
+
+  cat >"$root/.octon/framework/assurance/runtime/_ops/scripts/publication-wrapper-common.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+enter_publication_runtime_boundary() {
+  return 0
+}
+EOF
 
   cat >"$root/.octon/octon.yml" <<'EOF'
 schema_version: octon-root-manifest-v2
@@ -251,7 +261,7 @@ scope_manifest_digests: []
 EOF
 
   cat >"$root/.octon/generated/effective/extensions/catalog.effective.yml" <<'EOF'
-schema_version: "octon-extension-effective-catalog-v6"
+schema_version: "octon-extension-effective-catalog-v7"
 generator_version: "0.5.1"
 generation_id: "extensions-fixture"
 published_at: "2026-03-20T00:00:00Z"
@@ -322,7 +332,7 @@ source:
 EOF
 
   cat >"$root/.octon/generated/effective/extensions/generation.lock.yml" <<'EOF'
-schema_version: "octon-extension-generation-lock-v5"
+schema_version: "octon-extension-generation-lock-v6"
 generator_version: "0.5.1"
 generation_id: "extensions-fixture"
 published_at: "2026-03-20T00:00:00Z"

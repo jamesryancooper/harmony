@@ -54,10 +54,12 @@ write_pack() {
 # $pack_id
 EOF
   cat >"$fixture_root/.octon/inputs/additive/extensions/$pack_id/pack.yml" <<EOF
-schema_version: "octon-extension-pack-v4"
+schema_version: "octon-extension-pack-v5"
 pack_id: "$pack_id"
 version: "1.0.0"
 origin_class: "$origin_class"
+capability_profiles:
+  - "validation-surface"
 compatibility:
   octon_version: "0.5.0"
   extensions_api_version: "1.0"
@@ -252,10 +254,12 @@ case_repo_snapshot_incompatible_selected_pack_fails() {
 
   mkdir -p "$fixture_root/.octon/inputs/additive/extensions/incompatible/validation"
   cat >"$fixture_root/.octon/inputs/additive/extensions/incompatible/pack.yml" <<'EOF'
-schema_version: "octon-extension-pack-v4"
+schema_version: "octon-extension-pack-v5"
 pack_id: "incompatible"
 version: "1.0.0"
 origin_class: "first_party_bundled"
+capability_profiles:
+  - "validation-surface"
 compatibility:
   octon_version: "^9.0.0"
   extensions_api_version: "1.0"
@@ -384,10 +388,12 @@ case_pack_bundle_compatibility_mismatch_fails() {
 
   mkdir -p "$fixture_root/.octon/inputs/additive/extensions/a/validation"
   cat >"$fixture_root/.octon/inputs/additive/extensions/a/pack.yml" <<'EOF'
-schema_version: "octon-extension-pack-v4"
+schema_version: "octon-extension-pack-v5"
 pack_id: "a"
 version: "1.0.0"
 origin_class: "first_party_bundled"
+capability_profiles:
+  - "validation-surface"
 compatibility:
   octon_version: "^9.0.0"
   extensions_api_version: "1.0"

@@ -14,13 +14,20 @@ use std::sync::{Mutex, OnceLock};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 fn temp_root(name: &str) -> PathBuf {
-    let millis = SystemTime::now()
+    let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
-        .as_millis();
-    let root = std::env::temp_dir().join(format!("octon-lifecycle-executor-{name}-{millis}"));
-    fs::create_dir_all(&root).unwrap();
-    root
+        .as_nanos();
+    for counter in 0..1000 {
+        let root = std::env::temp_dir().join(format!(
+            "octon-lifecycle-executor-{name}-{}-{nanos}-{counter}",
+            std::process::id()
+        ));
+        if fs::create_dir(&root).is_ok() {
+            return root;
+        }
+    }
+    panic!("unable to create unique lifecycle executor temp root for {name}");
 }
 
 fn write_file(path: &Path, content: &str) {
@@ -113,10 +120,13 @@ fn write_fake_prompt_catalog(root: &Path) {
     write_file(
         &root.join(".octon/generated/effective/extensions/catalog.effective.yml"),
         &format!(
-            r#"schema_version: "octon-extension-effective-catalog-v6"
+            r#"schema_version: "octon-extension-effective-catalog-v7"
 packs:
   - pack_id: "test-extension"
     source_id: "bundled"
+    capability_profiles:
+      - "validation-surface"
+      - "prompt-bundle"
     prompt_bundles:
       - prompt_set_id: "test-extension-fake-route"
         prompt_assets:
@@ -248,14 +258,22 @@ fn prompt_bundle_resolution_is_scoped_to_owner_extension() {
     write_prompt_catalog(
         &root,
         &format!(
-            r#"schema_version: "octon-extension-effective-catalog-v6"
+            r#"schema_version: "octon-extension-effective-catalog-v7"
 packs:
   - pack_id: "other-extension"
+    source_id: "bundled"
+    capability_profiles:
+      - "validation-surface"
+      - "prompt-bundle"
     prompt_bundles:
       - prompt_set_id: "duplicate-route"
         prompt_assets:
           - projection_source_path: "{other_asset}"
   - pack_id: "test-extension"
+    source_id: "bundled"
+    capability_profiles:
+      - "validation-surface"
+      - "prompt-bundle"
     prompt_bundles:
       - prompt_set_id: "duplicate-route"
         prompt_assets:
@@ -295,9 +313,13 @@ fn prompt_bundle_resolution_fails_closed_on_missing_projection_path() {
     let root = temp_root("missing-projection-source-path");
     write_prompt_catalog(
         &root,
-        r#"schema_version: "octon-extension-effective-catalog-v6"
+        r#"schema_version: "octon-extension-effective-catalog-v7"
 packs:
   - pack_id: "test-extension"
+    source_id: "bundled"
+    capability_profiles:
+      - "validation-surface"
+      - "prompt-bundle"
     prompt_bundles:
       - prompt_set_id: "bad-route"
         prompt_assets:
@@ -336,9 +358,13 @@ fn prompt_bundle_resolution_rejects_traversal_and_non_generated_assets() {
         write_prompt_catalog(
             &root,
             &format!(
-                r#"schema_version: "octon-extension-effective-catalog-v6"
+                r#"schema_version: "octon-extension-effective-catalog-v7"
 packs:
   - pack_id: "test-extension"
+    source_id: "bundled"
+    capability_profiles:
+      - "validation-surface"
+      - "prompt-bundle"
     prompt_bundles:
       - prompt_set_id: "bad-route"
         prompt_assets:
@@ -371,9 +397,13 @@ fn prompt_bundle_resolution_requires_generated_effective_catalog_path() {
     let asset_rel =
         ".octon/generated/effective/extensions/published/test-extension/bundled/prompts/fake.md";
     let catalog = format!(
-        r#"schema_version: "octon-extension-effective-catalog-v6"
+        r#"schema_version: "octon-extension-effective-catalog-v7"
 packs:
   - pack_id: "test-extension"
+    source_id: "bundled"
+    capability_profiles:
+      - "validation-surface"
+      - "prompt-bundle"
     prompt_bundles:
       - prompt_set_id: "fake-route"
         prompt_assets:

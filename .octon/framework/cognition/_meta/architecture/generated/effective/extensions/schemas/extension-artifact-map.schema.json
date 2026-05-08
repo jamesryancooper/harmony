@@ -9,11 +9,12 @@
     "generator_version",
     "generation_id",
     "published_at",
-    "artifacts"
+    "artifacts",
+    "capability_profiles"
   ],
   "properties": {
     "schema_version": {
-      "const": "octon-extension-artifact-map-v4"
+      "const": "octon-extension-artifact-map-v5"
     },
     "generator_version": {
       "type": "string",
@@ -73,6 +74,48 @@
           "sha256": {
             "type": "string",
             "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "capability_profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pack_id",
+          "source_id",
+          "profiles"
+        ],
+        "properties": {
+          "pack_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "source_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "profiles": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "validation-surface",
+                "command-surface",
+                "skill-surface",
+                "prompt-bundle",
+                "routing-contract",
+                "lifecycle-contract",
+                "template-surface"
+              ]
+            },
+            "contains": {
+              "const": "validation-surface"
+            }
           }
         }
       }
