@@ -1,0 +1,1050 @@
+schema_version: "octon-extension-routing-contract-v1"
+dispatchers:
+  - dispatcher_id: "octon-proposal-lifecycle"
+    default_route_id: "create-packet"
+    accepted_inputs:
+      - "bundle"
+      - "source_kind"
+      - "proposal_kind"
+      - "lifecycle_action"
+      - "packet_path"
+      - "proposal_id"
+      - "current_lifecycle_state"
+      - "finding_id"
+      - "program_packet_path"
+      - "child_packet_paths"
+      - "execution_mode"
+      - "closeout_scope"
+      - "user_constraints"
+      - "dry_run_route"
+    disambiguators:
+      - input_name: "bundle"
+        kind: "route-id"
+        allowed_values:
+          - "create-packet"
+          - "explain-packet"
+          - "review-packet"
+          - "revise-packet"
+          - "generate-packet-implementation-prompt"
+          - "run-packet-implementation"
+          - "generate-packet-verification-prompt"
+          - "generate-packet-correction-prompt"
+          - "run-packet-verification-and-correction-loop"
+          - "generate-packet-closeout-prompt"
+          - "closeout-packet"
+          - "create-program"
+          - "explain-program"
+          - "review-program"
+          - "revise-program"
+          - "generate-program-implementation-prompt"
+          - "generate-program-verification-prompt"
+          - "generate-program-correction-prompt"
+          - "run-program-verification-and-correction-loop"
+          - "generate-program-closeout-prompt"
+          - "closeout-program"
+      - input_name: "lifecycle_action"
+        kind: "enum"
+        allowed_values:
+          - "create-packet"
+          - "explain-packet"
+          - "review-packet"
+          - "revise-packet"
+          - "generate-packet-implementation-prompt"
+          - "run-packet-implementation"
+          - "generate-packet-verification-prompt"
+          - "generate-packet-correction-prompt"
+          - "run-packet-verification-and-correction-loop"
+          - "generate-packet-closeout-prompt"
+          - "closeout-packet"
+          - "create-program"
+          - "explain-program"
+          - "review-program"
+          - "revise-program"
+          - "generate-program-implementation-prompt"
+          - "generate-program-verification-prompt"
+          - "generate-program-correction-prompt"
+          - "run-program-verification-and-correction-loop"
+          - "generate-program-closeout-prompt"
+          - "closeout-program"
+      - input_name: "proposal_kind"
+        kind: "enum"
+        allowed_values:
+          - "architecture"
+          - "policy"
+          - "migration"
+          - "design"
+      - input_name: "execution_mode"
+        kind: "enum"
+        allowed_values:
+          - "sequential"
+          - "parallel-independent"
+          - "gated-parallel"
+          - "program-atomic"
+          - "approval-gated"
+    precedence:
+      - "missing-packet-path-for-explicit-explain-packet"
+      - "missing-packet-path-for-explicit-review-packet"
+      - "missing-packet-path-for-explicit-revise-packet"
+      - "missing-packet-path-for-explicit-generate-packet-implementation-prompt"
+      - "missing-packet-path-for-explicit-run-packet-implementation"
+      - "missing-packet-path-for-explicit-generate-packet-verification-prompt"
+      - "missing-packet-path-for-explicit-generate-packet-correction-prompt"
+      - "missing-finding-id-for-explicit-generate-packet-correction-prompt"
+      - "missing-packet-path-for-explicit-run-packet-verification-and-correction-loop"
+      - "missing-packet-path-for-explicit-generate-packet-closeout-prompt"
+      - "missing-packet-path-for-explicit-closeout-packet"
+      - "missing-program-path-for-explicit-explain-program"
+      - "missing-program-path-for-explicit-review-program"
+      - "missing-program-path-for-explicit-revise-program"
+      - "missing-program-path-for-explicit-generate-program-implementation-prompt"
+      - "missing-program-path-for-explicit-generate-program-verification-prompt"
+      - "missing-program-path-for-explicit-generate-program-correction-prompt"
+      - "missing-program-finding-id-for-explicit-generate-program-correction-prompt"
+      - "missing-program-path-for-explicit-run-program-verification-and-correction-loop"
+      - "missing-program-path-for-explicit-generate-program-closeout-prompt"
+      - "missing-program-path-for-explicit-closeout-program"
+      - "missing-packet-path-for-action-explain-packet"
+      - "missing-packet-path-for-action-review-packet"
+      - "missing-packet-path-for-action-revise-packet"
+      - "missing-packet-path-for-action-generate-packet-implementation-prompt"
+      - "missing-packet-path-for-action-run-packet-implementation"
+      - "missing-packet-path-for-action-generate-packet-verification-prompt"
+      - "missing-packet-path-for-action-generate-packet-correction-prompt"
+      - "missing-finding-id-for-action-generate-packet-correction-prompt"
+      - "missing-packet-path-for-action-run-packet-verification-and-correction-loop"
+      - "missing-packet-path-for-action-generate-packet-closeout-prompt"
+      - "missing-packet-path-for-action-closeout-packet"
+      - "missing-program-path-for-action-explain-program"
+      - "missing-program-path-for-action-review-program"
+      - "missing-program-path-for-action-revise-program"
+      - "missing-program-path-for-action-generate-program-implementation-prompt"
+      - "missing-program-path-for-action-generate-program-verification-prompt"
+      - "missing-program-path-for-action-generate-program-correction-prompt"
+      - "missing-program-finding-id-for-action-generate-program-correction-prompt"
+      - "missing-program-path-for-action-run-program-verification-and-correction-loop"
+      - "missing-program-path-for-action-generate-program-closeout-prompt"
+      - "missing-program-path-for-action-closeout-program"
+      - "explicit-bundle-create-packet"
+      - "explicit-bundle-explain-packet"
+      - "explicit-bundle-review-packet"
+      - "explicit-bundle-revise-packet"
+      - "explicit-bundle-generate-packet-implementation-prompt"
+      - "explicit-bundle-run-packet-implementation"
+      - "explicit-bundle-generate-packet-verification-prompt"
+      - "explicit-bundle-generate-packet-correction-prompt"
+      - "explicit-bundle-run-packet-verification-and-correction-loop"
+      - "explicit-bundle-generate-packet-closeout-prompt"
+      - "explicit-bundle-closeout-packet"
+      - "explicit-bundle-create-program"
+      - "explicit-bundle-explain-program"
+      - "explicit-bundle-review-program"
+      - "explicit-bundle-revise-program"
+      - "explicit-bundle-generate-program-implementation-prompt"
+      - "explicit-bundle-generate-program-verification-prompt"
+      - "explicit-bundle-generate-program-correction-prompt"
+      - "explicit-bundle-run-program-verification-and-correction-loop"
+      - "explicit-bundle-generate-program-closeout-prompt"
+      - "explicit-bundle-closeout-program"
+      - "explicit-unsupported-bundle"
+      - "action-create-packet"
+      - "action-explain-packet"
+      - "action-review-packet"
+      - "action-revise-packet"
+      - "action-generate-packet-implementation-prompt"
+      - "action-run-packet-implementation"
+      - "action-generate-packet-verification-prompt"
+      - "action-generate-packet-correction-prompt"
+      - "action-run-packet-verification-and-correction-loop"
+      - "action-generate-packet-closeout-prompt"
+      - "action-closeout-packet"
+      - "action-create-program"
+      - "action-explain-program"
+      - "action-review-program"
+      - "action-revise-program"
+      - "action-generate-program-implementation-prompt"
+      - "action-generate-program-verification-prompt"
+      - "action-generate-program-correction-prompt"
+      - "action-run-program-verification-and-correction-loop"
+      - "action-generate-program-closeout-prompt"
+      - "action-closeout-program"
+      - "packet-path-default-explain"
+      - "source-driven-packet-creation"
+      - "program-input-create"
+      - "program-packet-path-default-explain"
+      - "missing-routeable-inputs"
+    routes:
+      - route_id: "missing-required-inputs"
+        status: "escalate"
+        matchers:
+          - matcher_id: "missing-packet-path-for-explicit-explain-packet"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "explain-packet"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-review-packet"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "review-packet"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-revise-packet"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "revise-packet"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-generate-packet-implementation-prompt"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-implementation-prompt"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-run-packet-implementation"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "run-packet-implementation"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-generate-packet-verification-prompt"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-verification-prompt"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-generate-packet-correction-prompt"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-correction-prompt"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-finding-id-for-explicit-generate-packet-correction-prompt"
+            reason_codes: ["missing-finding-id"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-correction-prompt"
+              - input_name: "finding_id"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-run-packet-verification-and-correction-loop"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "run-packet-verification-and-correction-loop"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-generate-packet-closeout-prompt"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-closeout-prompt"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-explicit-closeout-packet"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "closeout-packet"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-explain-program"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "explain-program"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-review-program"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "review-program"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-revise-program"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "revise-program"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-generate-program-implementation-prompt"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-implementation-prompt"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-generate-program-verification-prompt"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-verification-prompt"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-generate-program-correction-prompt"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-correction-prompt"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-finding-id-for-explicit-generate-program-correction-prompt"
+            reason_codes: ["missing-finding-id"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-correction-prompt"
+              - input_name: "finding_id"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-run-program-verification-and-correction-loop"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "run-program-verification-and-correction-loop"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-generate-program-closeout-prompt"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-closeout-prompt"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-explicit-closeout-program"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "closeout-program"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-explain-packet"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "explain-packet"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-review-packet"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "review-packet"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-revise-packet"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "revise-packet"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-generate-packet-implementation-prompt"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-implementation-prompt"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-run-packet-implementation"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "run-packet-implementation"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-generate-packet-verification-prompt"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-verification-prompt"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-generate-packet-correction-prompt"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-correction-prompt"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-finding-id-for-action-generate-packet-correction-prompt"
+            reason_codes: ["missing-finding-id"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-correction-prompt"
+              - input_name: "finding_id"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-run-packet-verification-and-correction-loop"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "run-packet-verification-and-correction-loop"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-generate-packet-closeout-prompt"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-closeout-prompt"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-packet-path-for-action-closeout-packet"
+            reason_codes: ["missing-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "closeout-packet"
+              - input_name: "packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-explain-program"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "explain-program"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-review-program"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "review-program"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-revise-program"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "revise-program"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-generate-program-implementation-prompt"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-implementation-prompt"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-generate-program-verification-prompt"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-verification-prompt"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-generate-program-correction-prompt"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-correction-prompt"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-finding-id-for-action-generate-program-correction-prompt"
+            reason_codes: ["missing-finding-id"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-correction-prompt"
+              - input_name: "finding_id"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-run-program-verification-and-correction-loop"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "run-program-verification-and-correction-loop"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-generate-program-closeout-prompt"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-closeout-prompt"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+          - matcher_id: "missing-program-path-for-action-closeout-program"
+            reason_codes: ["missing-program-packet-path"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "closeout-program"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+      - route_id: "create-packet"
+        status: "resolved"
+        execution_binding_id: "create-packet"
+        matchers:
+          - matcher_id: "explicit-bundle-create-packet"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "create-packet"
+          - matcher_id: "action-create-packet"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "create-packet"
+          - matcher_id: "source-driven-packet-creation"
+            reason_codes: ["source-driven-default"]
+            all_of:
+              - input_name: "source_kind"
+                predicate: "present"
+      - route_id: "explain-packet"
+        status: "resolved"
+        execution_binding_id: "explain-packet"
+        matchers:
+          - matcher_id: "explicit-bundle-explain-packet"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "explain-packet"
+          - matcher_id: "action-explain-packet"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "explain-packet"
+          - matcher_id: "packet-path-default-explain"
+            reason_codes: ["packet-path-read-only-default"]
+            all_of:
+              - input_name: "packet_path"
+                predicate: "present"
+              - input_name: "bundle"
+                predicate: "absent"
+              - input_name: "lifecycle_action"
+                predicate: "absent"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+              - input_name: "source_kind"
+                predicate: "absent"
+              - input_name: "finding_id"
+                predicate: "absent"
+      - route_id: "review-packet"
+        status: "resolved"
+        execution_binding_id: "review-packet"
+        matchers:
+          - matcher_id: "explicit-bundle-review-packet"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "review-packet"
+          - matcher_id: "action-review-packet"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "review-packet"
+      - route_id: "revise-packet"
+        status: "resolved"
+        execution_binding_id: "revise-packet"
+        matchers:
+          - matcher_id: "explicit-bundle-revise-packet"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "revise-packet"
+          - matcher_id: "action-revise-packet"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "revise-packet"
+      - route_id: "generate-packet-implementation-prompt"
+        status: "resolved"
+        execution_binding_id: "generate-packet-implementation-prompt"
+        matchers:
+          - matcher_id: "explicit-bundle-generate-packet-implementation-prompt"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-implementation-prompt"
+          - matcher_id: "action-generate-packet-implementation-prompt"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-implementation-prompt"
+      - route_id: "run-packet-implementation"
+        status: "resolved"
+        execution_binding_id: "run-packet-implementation"
+        matchers:
+          - matcher_id: "explicit-bundle-run-packet-implementation"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "run-packet-implementation"
+          - matcher_id: "action-run-packet-implementation"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "run-packet-implementation"
+      - route_id: "generate-packet-verification-prompt"
+        status: "resolved"
+        execution_binding_id: "generate-packet-verification-prompt"
+        matchers:
+          - matcher_id: "explicit-bundle-generate-packet-verification-prompt"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-verification-prompt"
+          - matcher_id: "action-generate-packet-verification-prompt"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-verification-prompt"
+      - route_id: "generate-packet-correction-prompt"
+        status: "resolved"
+        execution_binding_id: "generate-packet-correction-prompt"
+        matchers:
+          - matcher_id: "explicit-bundle-generate-packet-correction-prompt"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-correction-prompt"
+          - matcher_id: "action-generate-packet-correction-prompt"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-correction-prompt"
+      - route_id: "run-packet-verification-and-correction-loop"
+        status: "resolved"
+        execution_binding_id: "run-packet-verification-and-correction-loop"
+        matchers:
+          - matcher_id: "explicit-bundle-run-packet-verification-and-correction-loop"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "run-packet-verification-and-correction-loop"
+          - matcher_id: "action-run-packet-verification-and-correction-loop"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "run-packet-verification-and-correction-loop"
+      - route_id: "generate-packet-closeout-prompt"
+        status: "resolved"
+        execution_binding_id: "generate-packet-closeout-prompt"
+        matchers:
+          - matcher_id: "explicit-bundle-generate-packet-closeout-prompt"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-packet-closeout-prompt"
+          - matcher_id: "action-generate-packet-closeout-prompt"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-packet-closeout-prompt"
+      - route_id: "closeout-packet"
+        status: "resolved"
+        execution_binding_id: "closeout-packet"
+        matchers:
+          - matcher_id: "explicit-bundle-closeout-packet"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "closeout-packet"
+          - matcher_id: "action-closeout-packet"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "closeout-packet"
+      - route_id: "create-program"
+        status: "resolved"
+        execution_binding_id: "create-program"
+        matchers:
+          - matcher_id: "explicit-bundle-create-program"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "create-program"
+          - matcher_id: "action-create-program"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "create-program"
+          - matcher_id: "program-input-create"
+            reason_codes: ["program-input"]
+            all_of:
+              - input_name: "child_packet_paths"
+                predicate: "present"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+      - route_id: "explain-program"
+        status: "resolved"
+        execution_binding_id: "explain-program"
+        matchers:
+          - matcher_id: "explicit-bundle-explain-program"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "explain-program"
+          - matcher_id: "action-explain-program"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "explain-program"
+          - matcher_id: "program-packet-path-default-explain"
+            reason_codes: ["program-packet-path-read-only-default"]
+            all_of:
+              - input_name: "program_packet_path"
+                predicate: "present"
+              - input_name: "bundle"
+                predicate: "absent"
+              - input_name: "lifecycle_action"
+                predicate: "absent"
+              - input_name: "packet_path"
+                predicate: "absent"
+              - input_name: "source_kind"
+                predicate: "absent"
+              - input_name: "child_packet_paths"
+                predicate: "absent"
+              - input_name: "finding_id"
+                predicate: "absent"
+      - route_id: "review-program"
+        status: "resolved"
+        execution_binding_id: "review-program"
+        matchers:
+          - matcher_id: "explicit-bundle-review-program"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "review-program"
+          - matcher_id: "action-review-program"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "review-program"
+      - route_id: "revise-program"
+        status: "resolved"
+        execution_binding_id: "revise-program"
+        matchers:
+          - matcher_id: "explicit-bundle-revise-program"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "revise-program"
+          - matcher_id: "action-revise-program"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "revise-program"
+      - route_id: "generate-program-implementation-prompt"
+        status: "resolved"
+        execution_binding_id: "generate-program-implementation-prompt"
+        matchers:
+          - matcher_id: "explicit-bundle-generate-program-implementation-prompt"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-implementation-prompt"
+          - matcher_id: "action-generate-program-implementation-prompt"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-implementation-prompt"
+      - route_id: "generate-program-verification-prompt"
+        status: "resolved"
+        execution_binding_id: "generate-program-verification-prompt"
+        matchers:
+          - matcher_id: "explicit-bundle-generate-program-verification-prompt"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-verification-prompt"
+          - matcher_id: "action-generate-program-verification-prompt"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-verification-prompt"
+      - route_id: "generate-program-correction-prompt"
+        status: "resolved"
+        execution_binding_id: "generate-program-correction-prompt"
+        matchers:
+          - matcher_id: "explicit-bundle-generate-program-correction-prompt"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-correction-prompt"
+          - matcher_id: "action-generate-program-correction-prompt"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-correction-prompt"
+      - route_id: "run-program-verification-and-correction-loop"
+        status: "resolved"
+        execution_binding_id: "run-program-verification-and-correction-loop"
+        matchers:
+          - matcher_id: "explicit-bundle-run-program-verification-and-correction-loop"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "run-program-verification-and-correction-loop"
+          - matcher_id: "action-run-program-verification-and-correction-loop"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "run-program-verification-and-correction-loop"
+      - route_id: "generate-program-closeout-prompt"
+        status: "resolved"
+        execution_binding_id: "generate-program-closeout-prompt"
+        matchers:
+          - matcher_id: "explicit-bundle-generate-program-closeout-prompt"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "generate-program-closeout-prompt"
+          - matcher_id: "action-generate-program-closeout-prompt"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "generate-program-closeout-prompt"
+      - route_id: "closeout-program"
+        status: "resolved"
+        execution_binding_id: "closeout-program"
+        matchers:
+          - matcher_id: "explicit-bundle-closeout-program"
+            reason_codes: ["explicit-bundle"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "equals"
+                value: "closeout-program"
+          - matcher_id: "action-closeout-program"
+            reason_codes: ["lifecycle-action"]
+            all_of:
+              - input_name: "lifecycle_action"
+                predicate: "equals"
+                value: "closeout-program"
+      - route_id: "unsupported-route-id"
+        status: "deny"
+        matchers:
+          - matcher_id: "explicit-unsupported-bundle"
+            reason_codes: ["unsupported-route-id"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "present"
+              - input_name: "bundle"
+                predicate: "not_one_of"
+                values:
+                  - "create-packet"
+                  - "explain-packet"
+                  - "review-packet"
+                  - "revise-packet"
+                  - "generate-packet-implementation-prompt"
+                  - "run-packet-implementation"
+                  - "generate-packet-verification-prompt"
+                  - "generate-packet-correction-prompt"
+                  - "run-packet-verification-and-correction-loop"
+                  - "generate-packet-closeout-prompt"
+                  - "closeout-packet"
+                  - "create-program"
+                  - "explain-program"
+                  - "review-program"
+                  - "revise-program"
+                  - "generate-program-implementation-prompt"
+                  - "generate-program-verification-prompt"
+                  - "generate-program-correction-prompt"
+                  - "run-program-verification-and-correction-loop"
+                  - "generate-program-closeout-prompt"
+                  - "closeout-program"
+      - route_id: "missing-routeable-inputs"
+        status: "escalate"
+        matchers:
+          - matcher_id: "missing-routeable-inputs"
+            reason_codes: ["missing-routeable-inputs"]
+            all_of:
+              - input_name: "bundle"
+                predicate: "absent"
+              - input_name: "lifecycle_action"
+                predicate: "absent"
+              - input_name: "source_kind"
+                predicate: "absent"
+              - input_name: "packet_path"
+                predicate: "absent"
+              - input_name: "program_packet_path"
+                predicate: "absent"
+              - input_name: "child_packet_paths"
+                predicate: "absent"
+    execution_bindings:
+      - binding_id: "create-packet"
+        route_id: "create-packet"
+        command_capability_id: "octon-proposal-create-packet"
+        skill_capability_id: "octon-proposal-lifecycle-create-packet"
+        prompt_set_id: "octon-proposal-lifecycle-create-packet"
+      - binding_id: "explain-packet"
+        route_id: "explain-packet"
+        command_capability_id: "octon-proposal-explain-packet"
+        skill_capability_id: "octon-proposal-lifecycle-explain-packet"
+        prompt_set_id: "octon-proposal-lifecycle-explain-packet"
+      - binding_id: "review-packet"
+        route_id: "review-packet"
+        command_capability_id: "octon-proposal-review-packet"
+        skill_capability_id: "octon-proposal-lifecycle-review-packet"
+        prompt_set_id: "octon-proposal-lifecycle-review-packet"
+      - binding_id: "revise-packet"
+        route_id: "revise-packet"
+        command_capability_id: "octon-proposal-revise-packet"
+        skill_capability_id: "octon-proposal-lifecycle-revise-packet"
+        prompt_set_id: "octon-proposal-lifecycle-revise-packet"
+      - binding_id: "generate-packet-implementation-prompt"
+        route_id: "generate-packet-implementation-prompt"
+        command_capability_id: "octon-proposal-generate-packet-implementation-prompt"
+        skill_capability_id: "octon-proposal-lifecycle-generate-packet-implementation-prompt"
+        prompt_set_id: "octon-proposal-lifecycle-generate-packet-implementation-prompt"
+      - binding_id: "run-packet-implementation"
+        route_id: "run-packet-implementation"
+        command_capability_id: "octon-proposal-run-packet-implementation"
+        skill_capability_id: "octon-proposal-lifecycle-run-packet-implementation"
+        prompt_set_id: "octon-proposal-lifecycle-run-packet-implementation"
+      - binding_id: "generate-packet-verification-prompt"
+        route_id: "generate-packet-verification-prompt"
+        command_capability_id: "octon-proposal-generate-packet-verification-prompt"
+        skill_capability_id: "octon-proposal-lifecycle-generate-packet-verification-prompt"
+        prompt_set_id: "octon-proposal-lifecycle-generate-packet-verification-prompt"
+      - binding_id: "generate-packet-correction-prompt"
+        route_id: "generate-packet-correction-prompt"
+        command_capability_id: "octon-proposal-generate-packet-correction-prompt"
+        skill_capability_id: "octon-proposal-lifecycle-generate-packet-correction-prompt"
+        prompt_set_id: "octon-proposal-lifecycle-generate-packet-correction-prompt"
+      - binding_id: "run-packet-verification-and-correction-loop"
+        route_id: "run-packet-verification-and-correction-loop"
+        command_capability_id: "octon-proposal-run-packet-verification-and-correction-loop"
+        skill_capability_id: "octon-proposal-lifecycle-run-packet-verification-and-correction-loop"
+        prompt_set_id: "octon-proposal-lifecycle-run-packet-verification-and-correction-loop"
+      - binding_id: "generate-packet-closeout-prompt"
+        route_id: "generate-packet-closeout-prompt"
+        command_capability_id: "octon-proposal-generate-packet-closeout-prompt"
+        skill_capability_id: "octon-proposal-lifecycle-generate-packet-closeout-prompt"
+        prompt_set_id: "octon-proposal-lifecycle-generate-packet-closeout-prompt"
+      - binding_id: "closeout-packet"
+        route_id: "closeout-packet"
+        command_capability_id: "octon-proposal-closeout-packet"
+        skill_capability_id: "octon-proposal-lifecycle-closeout-packet"
+        prompt_set_id: "octon-proposal-lifecycle-closeout-packet"
+      - binding_id: "create-program"
+        route_id: "create-program"
+        command_capability_id: "octon-proposal-create-program"
+        skill_capability_id: "octon-proposal-lifecycle-create-program"
+        prompt_set_id: "octon-proposal-lifecycle-create-program"
+      - binding_id: "explain-program"
+        route_id: "explain-program"
+        command_capability_id: "octon-proposal-explain-program"
+        skill_capability_id: "octon-proposal-lifecycle-explain-program"
+        prompt_set_id: "octon-proposal-lifecycle-explain-program"
+      - binding_id: "review-program"
+        route_id: "review-program"
+        command_capability_id: "octon-proposal-review-program"
+        skill_capability_id: "octon-proposal-lifecycle-review-program"
+        prompt_set_id: "octon-proposal-lifecycle-review-program"
+      - binding_id: "revise-program"
+        route_id: "revise-program"
+        command_capability_id: "octon-proposal-revise-program"
+        skill_capability_id: "octon-proposal-lifecycle-revise-program"
+        prompt_set_id: "octon-proposal-lifecycle-revise-program"
+      - binding_id: "generate-program-implementation-prompt"
+        route_id: "generate-program-implementation-prompt"
+        command_capability_id: "octon-proposal-generate-program-implementation-prompt"
+        skill_capability_id: "octon-proposal-lifecycle-generate-program-implementation-prompt"
+        prompt_set_id: "octon-proposal-lifecycle-generate-program-implementation-prompt"
+      - binding_id: "generate-program-verification-prompt"
+        route_id: "generate-program-verification-prompt"
+        command_capability_id: "octon-proposal-generate-program-verification-prompt"
+        skill_capability_id: "octon-proposal-lifecycle-generate-program-verification-prompt"
+        prompt_set_id: "octon-proposal-lifecycle-generate-program-verification-prompt"
+      - binding_id: "generate-program-correction-prompt"
+        route_id: "generate-program-correction-prompt"
+        command_capability_id: "octon-proposal-generate-program-correction-prompt"
+        skill_capability_id: "octon-proposal-lifecycle-generate-program-correction-prompt"
+        prompt_set_id: "octon-proposal-lifecycle-generate-program-correction-prompt"
+      - binding_id: "run-program-verification-and-correction-loop"
+        route_id: "run-program-verification-and-correction-loop"
+        command_capability_id: "octon-proposal-run-program-verification-and-correction-loop"
+        skill_capability_id: "octon-proposal-lifecycle-run-program-verification-and-correction-loop"
+        prompt_set_id: "octon-proposal-lifecycle-run-program-verification-and-correction-loop"
+      - binding_id: "generate-program-closeout-prompt"
+        route_id: "generate-program-closeout-prompt"
+        command_capability_id: "octon-proposal-generate-program-closeout-prompt"
+        skill_capability_id: "octon-proposal-lifecycle-generate-program-closeout-prompt"
+        prompt_set_id: "octon-proposal-lifecycle-generate-program-closeout-prompt"
+      - binding_id: "closeout-program"
+        route_id: "closeout-program"
+        command_capability_id: "octon-proposal-closeout-program"
+        skill_capability_id: "octon-proposal-lifecycle-closeout-program"
+        prompt_set_id: "octon-proposal-lifecycle-closeout-program"

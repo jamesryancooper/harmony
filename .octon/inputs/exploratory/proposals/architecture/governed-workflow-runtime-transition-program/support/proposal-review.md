@@ -1,11 +1,11 @@
 # Proposal Review Receipt
 
-review_id: governed-workflow-runtime-transition-program-review-2026-05-12
-reviewed_at: 2026-05-12T16:05:46Z
-reviewer: codex-proposal-packet-lifecycle-review
+review_id: governed-workflow-runtime-transition-program-review-2026-05-13-prompt-refresh
+reviewed_at: 2026-05-13T12:37:40Z
+reviewer: octon-proposal-lifecycle-review-program
 verdict: accepted
 implementation_prompt_authorized: yes
-reviewed_packet_digest: sha256:18764f3f598953b0c9f66deda04294d2915b54644c3c7e23e923f127b4622961
+reviewed_packet_digest: sha256:9e323e69fef7f3451f605227050c854496bdfcf6969b965df380957f8f7b4cfc
 open_blocking_findings_count: 0
 
 ## Approved Promotion Targets
@@ -42,6 +42,12 @@ None.
 
 ## Nonblocking Findings
 
+- Parent-local `support/program-creation.md` is now present with
+  `child_authority_preserved: yes`; it remains parent coordination evidence
+  only and does not satisfy child-owned lifecycle truth.
+- Parent-local `support/executable-program-implementation-prompt.md` is now
+  present as generated program implementation guidance; it authorizes no
+  implementation by itself and does not satisfy child-owned lifecycle truth.
 - Required child packets are now accepted and implementation-prompt authorized
   through their own review gates.
 - Program implementation must preserve the parent as a coordination surface and
@@ -50,8 +56,9 @@ None.
 
 ## Final Route Recommendation
 
-Generate `support/executable-program-implementation-prompt.md`, then route to
-proposal program implementation. The prompt must require child-owned durable
-implementation evidence, validator receipts, implementation-conformance reviews,
-post-implementation drift/churn reviews, promotion evidence, and a final program
-closeout gate before claiming canonical Governed Workflow Runtime support.
+Route to proposal program implementation using
+`support/executable-program-implementation-prompt.md`. The implementation route
+must require child-owned durable implementation evidence, validator receipts,
+implementation-conformance reviews, post-implementation drift/churn reviews,
+promotion evidence, and a final program closeout gate before claiming canonical
+Governed Workflow Runtime support.

@@ -1,7 +1,7 @@
 schema_version: octon-capability-routing-artifact-map-v3
 generator_version: capability-routing-publication-v3
-generation_id: capabilities-a705d1d1cbdc
-published_at: 2026-05-13T00:47:17Z
+generation_id: capabilities-cce2d7bc7205
+published_at: 2026-05-13T15:27:02Z
 artifacts:
   - artifact_map_id: extension-command-octon-concept-integration-octon-concept-integration
     effective_id: extension.command.octon-concept-integration.octon-concept-integration
@@ -11,9 +11,9 @@ artifacts:
     display_name: Octon Concept Integration
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -26,9 +26,9 @@ artifacts:
     display_name: Architecture Revision Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -41,9 +41,9 @@ artifacts:
     display_name: Constitutional Challenge Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -56,9 +56,9 @@ artifacts:
     display_name: Multi-Source Synthesis Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -71,9 +71,9 @@ artifacts:
     display_name: Packet Refresh And Supersession
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -86,9 +86,9 @@ artifacts:
     display_name: Packet To Implementation
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -101,9 +101,9 @@ artifacts:
     display_name: Repo Internal Concept Mining
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -116,9 +116,9 @@ artifacts:
     display_name: Source To Architecture Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -131,9 +131,9 @@ artifacts:
     display_name: Source To Migration Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -146,9 +146,9 @@ artifacts:
     display_name: Source To Policy Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -161,9 +161,9 @@ artifacts:
     display_name: Subsystem Targeted Integration
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -176,9 +176,9 @@ artifacts:
     display_name: Octon Decision Drafter
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -191,9 +191,9 @@ artifacts:
     display_name: ADR Update Draft
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -206,9 +206,9 @@ artifacts:
     display_name: Change Receipt Draft
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -221,9 +221,9 @@ artifacts:
     display_name: Migration Rationale Draft
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -236,9 +236,9 @@ artifacts:
     display_name: Rollback Notes Draft
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -251,9 +251,9 @@ artifacts:
     display_name: Octon Drift Triage
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-drift-triage
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -266,9 +266,9 @@ artifacts:
     display_name: Octon Impact Map And Validation Selector
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -281,9 +281,9 @@ artifacts:
     display_name: Mixed Input Impact Map
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -296,9 +296,9 @@ artifacts:
     display_name: Proposal Packet Impact Map
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -311,9 +311,9 @@ artifacts:
     display_name: Refactor Target Impact Map
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: command
@@ -326,373 +326,373 @@ artifacts:
     display_name: Touched Paths Impact Map
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: command
     extension_export_id: octon-impact-map-and-validation-selector-touched-paths
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet
-    display_name: Octon Proposal Packet
+    capability_id: octon-proposal
+    display_name: Octon Proposal Lifecycle
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-closeout
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-closeout
+    extension_export_id: octon-proposal
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-closeout-packet
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-closeout-packet
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-closeout
-    display_name: Proposal Packet Closeout
+    capability_id: octon-proposal-closeout-packet
+    display_name: 'Octon Proposal Lifecycle: Closeout Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-closeout
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-closeout-program
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-closeout-program
+    extension_export_id: octon-proposal-closeout-packet
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-closeout-program
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-closeout-program
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-closeout-program
-    display_name: Proposal Packet Closeout Program
+    capability_id: octon-proposal-closeout-program
+    display_name: 'Octon Proposal Lifecycle: Closeout Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-closeout-program
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-create
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-create
+    extension_export_id: octon-proposal-closeout-program
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-create-packet
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-create-packet
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-create
-    display_name: Proposal Packet Create
+    capability_id: octon-proposal-create-packet
+    display_name: 'Octon Proposal Lifecycle: Create Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-create
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-create-program
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-create-program
+    extension_export_id: octon-proposal-create-packet
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-create-program
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-create-program
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-create-program
-    display_name: Proposal Packet Create Program
+    capability_id: octon-proposal-create-program
+    display_name: 'Octon Proposal Lifecycle: Create Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-create-program
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-explain
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-explain
+    extension_export_id: octon-proposal-create-program
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-explain-packet
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-explain-packet
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-explain
-    display_name: Proposal Packet Explain
+    capability_id: octon-proposal-explain-packet
+    display_name: 'Octon Proposal Lifecycle: Explain Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-explain
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-explain-program
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-explain-program
+    extension_export_id: octon-proposal-explain-packet
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-explain-program
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-explain-program
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-explain-program
-    display_name: Proposal Packet Explain Program
+    capability_id: octon-proposal-explain-program
+    display_name: 'Octon Proposal Lifecycle: Explain Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-explain-program
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-generate-closeout-prompt
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-generate-closeout-prompt
+    extension_export_id: octon-proposal-explain-program
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-generate-packet-closeout-prompt
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-generate-packet-closeout-prompt
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-generate-closeout-prompt
-    display_name: Proposal Packet Generate Closeout Prompt
+    capability_id: octon-proposal-generate-packet-closeout-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Packet Closeout Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-generate-closeout-prompt
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-generate-correction-prompt
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-generate-correction-prompt
+    extension_export_id: octon-proposal-generate-packet-closeout-prompt
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-generate-packet-correction-prompt
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-generate-packet-correction-prompt
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-generate-correction-prompt
-    display_name: Proposal Packet Generate Correction Prompt
+    capability_id: octon-proposal-generate-packet-correction-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Packet Correction Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-generate-correction-prompt
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-generate-implementation-prompt
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-generate-implementation-prompt
+    extension_export_id: octon-proposal-generate-packet-correction-prompt
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-generate-packet-implementation-prompt
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-generate-packet-implementation-prompt
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-generate-implementation-prompt
-    display_name: Proposal Packet Generate Implementation Prompt
+    capability_id: octon-proposal-generate-packet-implementation-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Packet Implementation Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-generate-implementation-prompt
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-generate-program-closeout-prompt
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-generate-program-closeout-prompt
+    extension_export_id: octon-proposal-generate-packet-implementation-prompt
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-generate-packet-verification-prompt
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-generate-packet-verification-prompt
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-generate-program-closeout-prompt
-    display_name: Proposal Packet Generate Program Closeout Prompt
+    capability_id: octon-proposal-generate-packet-verification-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Packet Verification Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-generate-program-closeout-prompt
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-generate-program-correction-prompt
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-generate-program-correction-prompt
+    extension_export_id: octon-proposal-generate-packet-verification-prompt
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-generate-program-closeout-prompt
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-generate-program-closeout-prompt
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-generate-program-correction-prompt
-    display_name: Proposal Packet Generate Program Correction Prompt
+    capability_id: octon-proposal-generate-program-closeout-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Program Closeout Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-generate-program-correction-prompt
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-generate-program-implementation-prompt
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-generate-program-implementation-prompt
+    extension_export_id: octon-proposal-generate-program-closeout-prompt
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-generate-program-correction-prompt
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-generate-program-correction-prompt
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-generate-program-implementation-prompt
-    display_name: Proposal Packet Generate Program Implementation Prompt
+    capability_id: octon-proposal-generate-program-correction-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Program Correction Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-generate-program-implementation-prompt
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-generate-program-verification-prompt
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-generate-program-verification-prompt
+    extension_export_id: octon-proposal-generate-program-correction-prompt
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-generate-program-implementation-prompt
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-generate-program-implementation-prompt
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-generate-program-verification-prompt
-    display_name: Proposal Packet Generate Program Verification Prompt
+    capability_id: octon-proposal-generate-program-implementation-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Program Implementation Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-generate-program-verification-prompt
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-generate-verification-prompt
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-generate-verification-prompt
+    extension_export_id: octon-proposal-generate-program-implementation-prompt
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-generate-program-verification-prompt
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-generate-program-verification-prompt
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-generate-verification-prompt
-    display_name: Proposal Packet Generate Verification Prompt
+    capability_id: octon-proposal-generate-program-verification-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Program Verification Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-generate-verification-prompt
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-review
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-review
+    extension_export_id: octon-proposal-generate-program-verification-prompt
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-review-packet
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-review-packet
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-review
-    display_name: Proposal Packet Review
+    capability_id: octon-proposal-review-packet
+    display_name: 'Octon Proposal Lifecycle: Review Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-review
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-review-program
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-review-program
+    extension_export_id: octon-proposal-review-packet
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-review-program
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-review-program
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-review-program
-    display_name: Proposal Packet Review Program
+    capability_id: octon-proposal-review-program
+    display_name: 'Octon Proposal Lifecycle: Review Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-review-program
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-revise
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-revise
+    extension_export_id: octon-proposal-review-program
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-revise-packet
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-revise-packet
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-revise
-    display_name: Proposal Packet Revise
+    capability_id: octon-proposal-revise-packet
+    display_name: 'Octon Proposal Lifecycle: Revise Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-revise
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-revise-program
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-revise-program
+    extension_export_id: octon-proposal-revise-packet
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-revise-program
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-revise-program
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-revise-program
-    display_name: Proposal Packet Revise Program
+    capability_id: octon-proposal-revise-program
+    display_name: 'Octon Proposal Lifecycle: Revise Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-revise-program
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-run-implementation
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-run-implementation
+    extension_export_id: octon-proposal-revise-program
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-run-packet-implementation
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-run-packet-implementation
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-run-implementation
-    display_name: Proposal Packet Run Implementation
+    capability_id: octon-proposal-run-packet-implementation
+    display_name: 'Octon Proposal Lifecycle: Run Packet Implementation'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-run-implementation
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-run-lifecycle
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-run-lifecycle
+    extension_export_id: octon-proposal-run-packet-implementation
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-run-packet-lifecycle
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-run-packet-lifecycle
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-run-lifecycle
-    display_name: Proposal Packet Run Lifecycle
+    capability_id: octon-proposal-run-packet-lifecycle
+    display_name: 'Octon Proposal Lifecycle: Run Packet Lifecycle'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-run-lifecycle
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-run-program-lifecycle
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-run-program-lifecycle
+    extension_export_id: octon-proposal-run-packet-lifecycle
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-run-packet-verification-and-correction-loop
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-run-packet-verification-and-correction-loop
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-run-program-lifecycle
-    display_name: Proposal Packet Run Program Lifecycle
+    capability_id: octon-proposal-run-packet-verification-and-correction-loop
+    display_name: 'Octon Proposal Lifecycle: Run Packet Verification And Correction Loop'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-run-program-lifecycle
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-run-program-verification-and-correction-loop
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-run-program-verification-and-correction-loop
+    extension_export_id: octon-proposal-run-packet-verification-and-correction-loop
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-run-program-lifecycle
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-run-program-lifecycle
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-run-program-verification-and-correction-loop
-    display_name: Proposal Packet Run Program Verification And Correction Loop
+    capability_id: octon-proposal-run-program-lifecycle
+    display_name: 'Octon Proposal Lifecycle: Run Program Lifecycle'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-run-program-verification-and-correction-loop
-  - artifact_map_id: extension-command-octon-proposal-packet-lifecycle-octon-proposal-packet-run-verification-and-correction-loop
-    effective_id: extension.command.octon-proposal-packet-lifecycle.octon-proposal-packet-run-verification-and-correction-loop
+    extension_export_id: octon-proposal-run-program-lifecycle
+  - artifact_map_id: extension-command-octon-proposal-lifecycle-octon-proposal-run-program-verification-and-correction-loop
+    effective_id: extension.command.octon-proposal-lifecycle.octon-proposal-run-program-verification-and-correction-loop
     origin_class: extension
     capability_kind: command
-    capability_id: octon-proposal-packet-run-verification-and-correction-loop
-    display_name: Proposal Packet Run Verification And Correction Loop
+    capability_id: octon-proposal-run-program-verification-and-correction-loop
+    display_name: 'Octon Proposal Lifecycle: Run Program Verification And Correction Loop'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: command
-    extension_export_id: octon-proposal-packet-run-verification-and-correction-loop
+    extension_export_id: octon-proposal-run-program-verification-and-correction-loop
   - artifact_map_id: extension-skill-octon-concept-integration-octon-concept-integration
     effective_id: extension.skill.octon-concept-integration.octon-concept-integration
     origin_class: extension
@@ -701,9 +701,9 @@ artifacts:
     display_name: Octon Concept Integration
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -716,9 +716,9 @@ artifacts:
     display_name: Architecture Revision Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -731,9 +731,9 @@ artifacts:
     display_name: Constitutional Challenge Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -746,9 +746,9 @@ artifacts:
     display_name: Multi-Source Synthesis Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -761,9 +761,9 @@ artifacts:
     display_name: Packet Refresh And Supersession
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -776,9 +776,9 @@ artifacts:
     display_name: Packet To Implementation
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -791,9 +791,9 @@ artifacts:
     display_name: Repo Internal Concept Mining
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -806,9 +806,9 @@ artifacts:
     display_name: Source To Architecture Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -821,9 +821,9 @@ artifacts:
     display_name: Source To Migration Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -836,9 +836,9 @@ artifacts:
     display_name: Source To Policy Packet
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -851,9 +851,9 @@ artifacts:
     display_name: Subsystem Targeted Integration
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-concept-integration
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -866,9 +866,9 @@ artifacts:
     display_name: Octon Decision Drafter
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -881,9 +881,9 @@ artifacts:
     display_name: ADR Update Draft
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -896,9 +896,9 @@ artifacts:
     display_name: Change Receipt Draft
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -911,9 +911,9 @@ artifacts:
     display_name: Migration Rationale Draft
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -926,9 +926,9 @@ artifacts:
     display_name: Rollback Notes Draft
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-decision-drafter
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -941,9 +941,9 @@ artifacts:
     display_name: Octon Drift Triage
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-drift-triage
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -956,9 +956,9 @@ artifacts:
     display_name: Octon Impact Map And Validation Selector
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -971,9 +971,9 @@ artifacts:
     display_name: Mixed Input Impact Map
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -986,9 +986,9 @@ artifacts:
     display_name: Proposal Packet Impact Map
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -1001,9 +1001,9 @@ artifacts:
     display_name: Refactor Target Impact Map
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: skill
@@ -1016,373 +1016,373 @@ artifacts:
     display_name: Touched Paths Impact Map
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     extension_pack_id: octon-impact-map-and-validation-selector
     extension_source_id: bundled-first-party
     extension_export_kind: skill
     extension_export_id: octon-impact-map-and-validation-selector-touched-paths
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle
-    display_name: Octon Proposal Packet Lifecycle
+    capability_id: octon-proposal-lifecycle
+    display_name: Octon Proposal Lifecycle
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-closeout
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-closeout
+    extension_export_id: octon-proposal-lifecycle
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-closeout-packet
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-closeout-packet
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-closeout
-    display_name: Proposal Packet Lifecycle Closeout
+    capability_id: octon-proposal-lifecycle-closeout-packet
+    display_name: 'Octon Proposal Lifecycle: Closeout Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-closeout
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-closeout-program
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-closeout-program
+    extension_export_id: octon-proposal-lifecycle-closeout-packet
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-closeout-program
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-closeout-program
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-closeout-program
-    display_name: Proposal Packet Lifecycle Closeout Program
+    capability_id: octon-proposal-lifecycle-closeout-program
+    display_name: 'Octon Proposal Lifecycle: Closeout Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-closeout-program
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-create
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-create
+    extension_export_id: octon-proposal-lifecycle-closeout-program
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-create-packet
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-create-packet
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-create
-    display_name: Proposal Packet Lifecycle Create
+    capability_id: octon-proposal-lifecycle-create-packet
+    display_name: 'Octon Proposal Lifecycle: Create Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-create
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-create-program
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-create-program
+    extension_export_id: octon-proposal-lifecycle-create-packet
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-create-program
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-create-program
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-create-program
-    display_name: Proposal Packet Lifecycle Create Program
+    capability_id: octon-proposal-lifecycle-create-program
+    display_name: 'Octon Proposal Lifecycle: Create Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-create-program
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-explain
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-explain
+    extension_export_id: octon-proposal-lifecycle-create-program
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-explain-packet
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-explain-packet
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-explain
-    display_name: Proposal Packet Lifecycle Explain
+    capability_id: octon-proposal-lifecycle-explain-packet
+    display_name: 'Octon Proposal Lifecycle: Explain Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-explain
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-explain-program
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-explain-program
+    extension_export_id: octon-proposal-lifecycle-explain-packet
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-explain-program
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-explain-program
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-explain-program
-    display_name: Proposal Packet Lifecycle Explain Program
+    capability_id: octon-proposal-lifecycle-explain-program
+    display_name: 'Octon Proposal Lifecycle: Explain Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-explain-program
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-generate-closeout-prompt
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-generate-closeout-prompt
+    extension_export_id: octon-proposal-lifecycle-explain-program
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-generate-packet-closeout-prompt
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-generate-packet-closeout-prompt
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-generate-closeout-prompt
-    display_name: Proposal Packet Lifecycle Generate Closeout Prompt
+    capability_id: octon-proposal-lifecycle-generate-packet-closeout-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Packet Closeout Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-generate-closeout-prompt
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-generate-correction-prompt
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-generate-correction-prompt
+    extension_export_id: octon-proposal-lifecycle-generate-packet-closeout-prompt
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-generate-packet-correction-prompt
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-generate-packet-correction-prompt
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-generate-correction-prompt
-    display_name: Proposal Packet Lifecycle Generate Correction Prompt
+    capability_id: octon-proposal-lifecycle-generate-packet-correction-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Packet Correction Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-generate-correction-prompt
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-generate-implementation-prompt
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-generate-implementation-prompt
+    extension_export_id: octon-proposal-lifecycle-generate-packet-correction-prompt
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-generate-packet-implementation-prompt
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-generate-packet-implementation-prompt
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-generate-implementation-prompt
-    display_name: Proposal Packet Lifecycle Generate Implementation Prompt
+    capability_id: octon-proposal-lifecycle-generate-packet-implementation-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Packet Implementation Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-generate-implementation-prompt
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-generate-program-closeout-prompt
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-generate-program-closeout-prompt
+    extension_export_id: octon-proposal-lifecycle-generate-packet-implementation-prompt
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-generate-packet-verification-prompt
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-generate-packet-verification-prompt
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-generate-program-closeout-prompt
-    display_name: Proposal Packet Lifecycle Generate Program Closeout Prompt
+    capability_id: octon-proposal-lifecycle-generate-packet-verification-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Packet Verification Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-generate-program-closeout-prompt
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-generate-program-correction-prompt
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-generate-program-correction-prompt
+    extension_export_id: octon-proposal-lifecycle-generate-packet-verification-prompt
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-generate-program-closeout-prompt
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-generate-program-closeout-prompt
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-generate-program-correction-prompt
-    display_name: Proposal Packet Lifecycle Generate Program Correction Prompt
+    capability_id: octon-proposal-lifecycle-generate-program-closeout-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Program Closeout Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-generate-program-correction-prompt
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-generate-program-implementation-prompt
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-generate-program-implementation-prompt
+    extension_export_id: octon-proposal-lifecycle-generate-program-closeout-prompt
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-generate-program-correction-prompt
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-generate-program-correction-prompt
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-generate-program-implementation-prompt
-    display_name: Proposal Packet Lifecycle Generate Program Implementation Prompt
+    capability_id: octon-proposal-lifecycle-generate-program-correction-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Program Correction Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-generate-program-implementation-prompt
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-generate-program-verification-prompt
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-generate-program-verification-prompt
+    extension_export_id: octon-proposal-lifecycle-generate-program-correction-prompt
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-generate-program-implementation-prompt
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-generate-program-implementation-prompt
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-generate-program-verification-prompt
-    display_name: Proposal Packet Lifecycle Generate Program Verification Prompt
+    capability_id: octon-proposal-lifecycle-generate-program-implementation-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Program Implementation Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-generate-program-verification-prompt
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-generate-verification-prompt
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-generate-verification-prompt
+    extension_export_id: octon-proposal-lifecycle-generate-program-implementation-prompt
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-generate-program-verification-prompt
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-generate-program-verification-prompt
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-generate-verification-prompt
-    display_name: Proposal Packet Lifecycle Generate Verification Prompt
+    capability_id: octon-proposal-lifecycle-generate-program-verification-prompt
+    display_name: 'Octon Proposal Lifecycle: Generate Program Verification Prompt'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-generate-verification-prompt
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-review
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-review
+    extension_export_id: octon-proposal-lifecycle-generate-program-verification-prompt
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-review-packet
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-review-packet
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-review
-    display_name: Proposal Packet Lifecycle Review
+    capability_id: octon-proposal-lifecycle-review-packet
+    display_name: 'Octon Proposal Lifecycle: Review Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-review
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-review-program
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-review-program
+    extension_export_id: octon-proposal-lifecycle-review-packet
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-review-program
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-review-program
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-review-program
-    display_name: Proposal Packet Lifecycle Review Program
+    capability_id: octon-proposal-lifecycle-review-program
+    display_name: 'Octon Proposal Lifecycle: Review Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-review-program
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-revise
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-revise
+    extension_export_id: octon-proposal-lifecycle-review-program
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-revise-packet
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-revise-packet
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-revise
-    display_name: Proposal Packet Lifecycle Revise
+    capability_id: octon-proposal-lifecycle-revise-packet
+    display_name: 'Octon Proposal Lifecycle: Revise Packet'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-revise
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-revise-program
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-revise-program
+    extension_export_id: octon-proposal-lifecycle-revise-packet
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-revise-program
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-revise-program
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-revise-program
-    display_name: Proposal Packet Lifecycle Revise Program
+    capability_id: octon-proposal-lifecycle-revise-program
+    display_name: 'Octon Proposal Lifecycle: Revise Program'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-revise-program
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-run-implementation
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-run-implementation
+    extension_export_id: octon-proposal-lifecycle-revise-program
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-run-packet-implementation
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-run-packet-implementation
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-run-implementation
-    display_name: Proposal Packet Lifecycle Run Implementation
+    capability_id: octon-proposal-lifecycle-run-packet-implementation
+    display_name: 'Octon Proposal Lifecycle: Run Packet Implementation'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-run-implementation
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-run-lifecycle
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-run-lifecycle
+    extension_export_id: octon-proposal-lifecycle-run-packet-implementation
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-run-packet-lifecycle
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-run-packet-lifecycle
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-run-lifecycle
-    display_name: Proposal Packet Lifecycle Runner
+    capability_id: octon-proposal-lifecycle-run-packet-lifecycle
+    display_name: 'Octon Proposal Lifecycle: Run Packet Lifecycle'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-run-lifecycle
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-run-program-lifecycle
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-run-program-lifecycle
+    extension_export_id: octon-proposal-lifecycle-run-packet-lifecycle
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-run-packet-verification-and-correction-loop
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-run-packet-verification-and-correction-loop
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-run-program-lifecycle
-    display_name: Proposal Packet Lifecycle Program Runner
+    capability_id: octon-proposal-lifecycle-run-packet-verification-and-correction-loop
+    display_name: 'Octon Proposal Lifecycle: Run Packet Verification And Correction Loop'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-run-program-lifecycle
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-run-program-verification-and-correction-loop
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-run-program-verification-and-correction-loop
+    extension_export_id: octon-proposal-lifecycle-run-packet-verification-and-correction-loop
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-run-program-lifecycle
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-run-program-lifecycle
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-run-program-verification-and-correction-loop
-    display_name: Proposal Packet Lifecycle Run Program Verification And Correction Loop
+    capability_id: octon-proposal-lifecycle-run-program-lifecycle
+    display_name: 'Octon Proposal Lifecycle: Run Program Lifecycle'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-run-program-verification-and-correction-loop
-  - artifact_map_id: extension-skill-octon-proposal-packet-lifecycle-octon-proposal-packet-lifecycle-run-verification-and-correction-loop
-    effective_id: extension.skill.octon-proposal-packet-lifecycle.octon-proposal-packet-lifecycle-run-verification-and-correction-loop
+    extension_export_id: octon-proposal-lifecycle-run-program-lifecycle
+  - artifact_map_id: extension-skill-octon-proposal-lifecycle-octon-proposal-lifecycle-run-program-verification-and-correction-loop
+    effective_id: extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-run-program-verification-and-correction-loop
     origin_class: extension
     capability_kind: skill
-    capability_id: octon-proposal-packet-lifecycle-run-verification-and-correction-loop
-    display_name: Proposal Packet Lifecycle Run Verification And Correction Loop
+    capability_id: octon-proposal-lifecycle-run-program-verification-and-correction-loop
+    display_name: 'Octon Proposal Lifecycle: Run Program Verification And Correction Loop'
     source_kind: extension-export
     source_manifest_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_manifest_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
+    source_manifest_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
     source_path: .octon/generated/effective/extensions/catalog.effective.yml
-    source_sha256: dbe990d798e98d67ba5e4a1b9b6e9751f0e099df234e8c6c07da5e2ea9d76813
-    extension_pack_id: octon-proposal-packet-lifecycle
+    source_sha256: 3084fffcdfffff470a5d652ab9ffc357968d9522e9603a922737d6e71f18f81e
+    extension_pack_id: octon-proposal-lifecycle
     extension_source_id: bundled-first-party
     extension_export_kind: skill
-    extension_export_id: octon-proposal-packet-lifecycle-run-verification-and-correction-loop
+    extension_export_id: octon-proposal-lifecycle-run-program-verification-and-correction-loop
   - artifact_map_id: framework-command-alignment-check
     effective_id: framework.command.alignment-check
     origin_class: framework

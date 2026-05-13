@@ -1,0 +1,106 @@
+schema_version: "octon-validation-closeout-receipt-v1"
+receipt_id: "proposal-lifecycle-cleanup-2026-05-13T15-31-58Z"
+recorded_at: "2026-05-13T15:31:58Z"
+change_profile: "atomic"
+release_state: "pre-1.0"
+claim: >-
+  The proposal lifecycle cleanup follow-up tightened active naming guidance,
+  republished generated and host projections, retained pack-local validation
+  results, and left only unrelated global extension-local test failures outside
+  octon-proposal-lifecycle.
+evidence_class:
+  - "behavior proof"
+  - "generated-output freshness proof"
+  - "architecture or placement proof"
+scope:
+  pack_id: "octon-proposal-lifecycle"
+  source_extension_root: ".octon/inputs/additive/extensions/octon-proposal-lifecycle"
+  unified_boundary_preserved: true
+source_changes:
+  - path: ".octon/inputs/additive/extensions/octon-proposal-lifecycle/README.md"
+    change: >-
+      Naming scheme now states that route IDs carry the packet/program
+      qualifier and leaf command IDs are octon-proposal-<route-id>.
+  - path: ".octon/inputs/additive/extensions/octon-proposal-lifecycle/context/routing-guide.md"
+    change: >-
+      Routing guide naming scheme now mirrors the source README and avoids the
+      ambiguous <action>-packet shorthand for prompt-generator routes.
+publication:
+  extension_generation_id: "extensions-e539e7c8b239"
+  extension_publication_receipt: ".octon/state/evidence/validation/publication/extensions/2026-05-13T15-27-11Z-extensions-e539e7c8b239.yml"
+  extension_compatibility_receipt: ".octon/state/evidence/validation/compatibility/extensions/2026-05-13T15-27-11Z-extensions-e539e7c8b239.yml"
+  capability_generation_id: "capabilities-cce2d7bc7205"
+  capability_publication_receipt: ".octon/state/evidence/validation/publication/capabilities/2026-05-13T15-27-02Z-capabilities-cce2d7bc7205.yml"
+publication_commands:
+  - command: "bash .octon/framework/orchestration/runtime/_ops/scripts/publish-extension-state.sh"
+    result: "pass"
+    summary: "published extension state: extensions-e539e7c8b239"
+  - command: "bash .octon/framework/capabilities/_ops/scripts/publish-capability-routing.sh"
+    result: "pass"
+    summary: "published capability routing; final effective generation is capabilities-cce2d7bc7205"
+  - command: "bash .octon/framework/capabilities/_ops/scripts/publish-host-projections.sh"
+    result: "pass"
+    summary: "published host capability projections"
+pack_local_validation:
+  - command: "bash .octon/inputs/additive/extensions/octon-proposal-lifecycle/validation/tests/test-pack-shape.sh"
+    result: "pass"
+    summary: "Passed: 197; Failed: 0"
+  - command: "bash .octon/inputs/additive/extensions/octon-proposal-lifecycle/validation/tests/test-route-resolution.sh"
+    result: "pass"
+    summary: "Passed: 251; Failed: 0"
+  - command: "bash .octon/inputs/additive/extensions/octon-proposal-lifecycle/validation/tests/test-validate-proposal-program-structure.sh"
+    result: "pass"
+    summary: "Passed: 7; Failed: 0"
+publication_validation:
+  - command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh"
+    result: "pass"
+    summary: "Validation summary: errors=0"
+  - command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-capability-publication-state.sh"
+    result: "pass"
+    summary: >-
+      Initial parallel run observed stale upstream extension digests while the
+      extension validator was still running; after republishing capability
+      routing, the final run passed with errors=0.
+  - command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-host-projections.sh"
+    result: "pass"
+    summary: "Validation summary: errors=0"
+  - command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-lifecycle-contracts.sh"
+    result: "pass"
+    summary: "Validation summary: errors=0 warnings=0"
+global_extension_local_tests:
+  command: "bash .octon/framework/assurance/runtime/_ops/scripts/validate-extension-local-tests.sh"
+  result: "fail-unrelated"
+  summary: "Validation summary: errors=2"
+  proposal_lifecycle_results:
+    - ".octon/inputs/additive/extensions/octon-proposal-lifecycle/validation/tests/test-authority-boundaries.sh: pass"
+    - ".octon/inputs/additive/extensions/octon-proposal-lifecycle/validation/tests/test-pack-shape.sh: pass"
+    - ".octon/inputs/additive/extensions/octon-proposal-lifecycle/validation/tests/test-route-resolution.sh: pass"
+    - ".octon/inputs/additive/extensions/octon-proposal-lifecycle/validation/tests/test-routing-guide-docs.sh: pass"
+    - ".octon/inputs/additive/extensions/octon-proposal-lifecycle/validation/tests/test-validate-proposal-program-structure.sh: pass"
+  unrelated_failures:
+    - path: ".octon/inputs/additive/extensions/octon-concept-integration/validation/tests/test-scenario-behavior.sh"
+      classification: "unrelated"
+      reason: "fixture copy cannot find publication-wrapper-common.sh"
+    - path: ".octon/inputs/additive/extensions/octon-decision-drafter/validation/tests/test-routing-behavior.sh"
+      classification: "unrelated"
+      reason: "fixture copy cannot find publication-wrapper-common.sh"
+stale_name_sweeps:
+  active_surfaces:
+    command: >-
+      rg -n <retired packet-centric identifiers and retired correction-finding
+      alias> across source, instance selection, generated/effective
+      projections, and host projections
+    result: "pass"
+    summary: "No matches in active surfaces."
+  generic_trigger_placement:
+    result: "pass"
+    summary: >-
+      Generic trigger phrases remain on the composite dispatcher manifest;
+      packet leaf triggers are packet-qualified.
+  published_routing_guide:
+    command: >-
+      cmp -s source routing-guide.md generated/effective published
+      routing-guide.md
+    result: "pass"
+    summary: "Source routing guide matches the published extension projection."
+known_gaps: []
