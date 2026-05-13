@@ -158,6 +158,8 @@ input_bindings:
 
 states:
   - state_id: "create-program"
+  - state_id: "review-program"
+  - state_id: "revise-program"
   - state_id: "plan-children"
   - state_id: "coordinate-children"
   - state_id: "generate-program-implementation-prompt"
@@ -177,6 +179,11 @@ terminal_outcomes:
     when:
       all:
         - manifest_status: "rejected"
+        - receipt_verdict:
+            receipt_id: "proposal-review"
+            value: "rejected"
+        - receipt_fresh: "proposal-review"
+        - receipt_complete: "proposal-review"
 
 validators:
   - validator_id: "proposal-standard"
@@ -191,22 +198,132 @@ validators:
       - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-program-child-readiness.sh"
       - "--package"
       - "{{target}}"
+  - validator_id: "program-structure"
+    argv:
+      - "bash"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-program-structure.sh"
+      - "--package"
+      - "{{target}}"
+  - validator_id: "proposal-review-baseline"
+    argv:
+      - "bash"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-review-gate.sh"
+      - "--package"
+      - "{{target}}"
+  - validator_id: "proposal-review-strict"
+    argv:
+      - "bash"
+      - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-review-gate.sh"
+      - "--package"
+      - "{{target}}"
+      - "--require-implementation-authorization"
 
 gates:
+  - gate_id: "program-review-authorization"
+    validator_id: "proposal-review-strict"
+    required_before_routes:
+      - "generate-program-implementation-prompt"
+      - "promote-proposal"
+    on_fail_route_id: "review-proposal-program"
   - gate_id: "program-child-proposal-readiness"
     validator_id: "program-child-proposal-readiness"
     required_before_routes:
       - "generate-program-implementation-prompt"
+  - gate_id: "program-structure"
+    validator_id: "program-structure"
+    required_before_routes:
+      - "generate-program-implementation-prompt"
+      - "promote-proposal"
+      - "generate-program-verification-prompt"
+      - "generate-program-closeout-prompt"
+      - "closeout-proposal-program"
+      - "archive-proposal"
 
 receipts:
+  - receipt_id: "program-creation"
+    path: "support/program-creation.md"
+    required_fields:
+      - "creation_id"
+      - "created_at"
+      - "creator"
+      - "program_packet_path"
+      - "child_packet_count"
+      - "execution_mode"
+      - "child_registry_digest"
+      - "child_authority_preserved"
+      - "verdict"
+    verdict_field: "verdict"
+  - receipt_id: "proposal-review"
+    path: "support/proposal-review.md"
+    required_fields:
+      - "review_id"
+      - "reviewed_at"
+      - "reviewer"
+      - "verdict"
+      - "implementation_prompt_authorized"
+      - "reviewed_packet_digest"
+      - "open_blocking_findings_count"
+    verdict_field: "verdict"
+    freshness:
+      digest_command:
+        - "bash"
+        - ".octon/framework/assurance/runtime/_ops/scripts/validate-proposal-review-gate.sh"
+        - "--package"
+        - "{{target}}"
+        - "--print-digest"
+      digest_field: "reviewed_packet_digest"
   - receipt_id: "program-implementation-prompt"
     path: "support/executable-program-implementation-prompt.md"
+  - receipt_id: "implementation-run"
+    path: "support/implementation-run.md"
+    required_fields:
+      - "verdict"
+      - "implemented_at"
+      - "promotion_evidence_count"
+      - "child_authority_preserved"
+    verdict_field: "verdict"
   - receipt_id: "program-verification-prompt"
     path: "support/follow-up-program-verification-prompt.md"
   - receipt_id: "program-correction-prompt"
     path: "support/program-correction-prompts"
+  - receipt_id: "program-implementation-conformance"
+    path: "support/program-implementation-conformance-review.md"
+    required_fields:
+      - "verdict"
+      - "unresolved_items_count"
+      - "child_receipt_summary_count"
+      - "child_authority_preserved"
+    verdict_field: "verdict"
+  - receipt_id: "program-post-implementation-drift"
+    path: "support/program-post-implementation-drift-churn-review.md"
+    required_fields:
+      - "verdict"
+      - "unresolved_items_count"
+      - "child_receipt_summary_count"
+      - "child_authority_preserved"
+    verdict_field: "verdict"
   - receipt_id: "program-closeout-prompt"
     path: "support/custom-program-closeout-prompt.md"
+  - receipt_id: "proposal-closeout"
+    path: "support/proposal-closeout.md"
+    required_fields:
+      - "verdict"
+      - "closed_at"
+      - "archive_authorized"
+      - "child_authority_preserved"
+    verdict_field: "verdict"
+
+loops:
+  - loop_id: "program-review-revision"
+    receipt_id: "proposal-review"
+    verdict_field: "verdict"
+    repeat_values:
+      - "revision-required"
+    repeat_route_id: "revise-proposal-program"
+    terminal_values:
+      - "accepted"
+      - "rejected"
+    max_iterations: 5
 
 routes:
   - route_id: "create-proposal-program"
@@ -217,6 +334,8 @@ routes:
     required_inputs:
       - "child_packet_paths"
     completion:
+      expected_receipts:
+        - "program-creation"
       expected_paths:
         - "proposal.yml"
         - "README.md"
@@ -231,6 +350,44 @@ routes:
         - target_missing: true
         - file_absent: "proposal.yml"
         - file_absent: "resources/child-packet-index.yml"
+  - route_id: "review-proposal-program"
+    route_type: "extension"
+    command_id: "octon-proposal-packet-review-program"
+    skill_id: "octon-proposal-packet-lifecycle-review-program"
+    prompt_set_id: "octon-proposal-packet-lifecycle-review-proposal-program"
+    completion:
+      expected_receipts:
+        - "proposal-review"
+      replan_required: true
+    enter_when:
+      any:
+        - manifest_status: "draft"
+        - all:
+            - manifest_status: "in-review"
+            - receipt_absent: "proposal-review"
+        - all:
+            - any:
+                - manifest_status: "draft"
+                - manifest_status: "in-review"
+                - manifest_status: "accepted"
+                - manifest_status: "rejected"
+            - receipt_stale: "proposal-review"
+  - route_id: "revise-proposal-program"
+    route_type: "extension"
+    command_id: "octon-proposal-packet-revise-program"
+    skill_id: "octon-proposal-packet-lifecycle-revise-program"
+    prompt_set_id: "octon-proposal-packet-lifecycle-revise-proposal-program"
+    completion:
+      expected_paths:
+        - "support/revisions"
+      expected_target_change: true
+      replan_required: true
+    enter_when:
+      all:
+        - receipt_complete: "proposal-review"
+        - receipt_verdict:
+            receipt_id: "proposal-review"
+            value: "revision-required"
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
     command_id: "octon-proposal-packet-generate-program-implementation-prompt"
@@ -245,8 +402,40 @@ routes:
     enter_when:
       all:
         - manifest_status: "accepted"
+        - receipt_complete: "proposal-review"
+        - receipt_verdict:
+            receipt_id: "proposal-review"
+            value: "accepted"
+        - receipt_fresh: "proposal-review"
         - file_present: "resources/child-packet-index.yml"
         - receipt_absent: "program-implementation-prompt"
+  - route_id: "promote-proposal"
+    route_type: "workflow"
+    approval:
+      required_by_default: true
+      reason: "durable proposal program promotion requires explicit approval and child-authority preservation"
+    completion:
+      expected_manifest_status: "implemented"
+      replan_required: true
+    enter_when:
+      all:
+        - manifest_status: "accepted"
+        - receipt_complete: "proposal-review"
+        - receipt_verdict:
+            receipt_id: "proposal-review"
+            value: "accepted"
+        - receipt_fresh: "proposal-review"
+        - receipt_complete: "program-implementation-prompt"
+        - file_present: "support/executable-program-implementation-prompt.md"
+        - receipt_complete: "implementation-run"
+        - receipt_field_equals:
+            receipt_id: "implementation-run"
+            field: "verdict"
+            value: "pass"
+        - receipt_field_equals:
+            receipt_id: "implementation-run"
+            field: "child_authority_preserved"
+            value: "yes"
   - route_id: "generate-program-verification-prompt"
     route_type: "extension"
     command_id: "octon-proposal-packet-generate-program-verification-prompt"
@@ -269,13 +458,17 @@ routes:
     skill_id: "octon-proposal-packet-lifecycle-run-program-verification-and-correction-loop"
     prompt_set_id: "octon-proposal-packet-lifecycle-run-program-verification-and-correction-loop"
     completion:
-      expected_paths:
-        - "support/program-correction-prompts"
+      expected_receipts:
+        - "program-implementation-conformance"
+        - "program-post-implementation-drift"
       replan_required: true
     enter_when:
       all:
         - manifest_status: "implemented"
         - receipt_complete: "program-verification-prompt"
+        - any:
+            - receipt_absent: "program-implementation-conformance"
+            - receipt_absent: "program-post-implementation-drift"
   - route_id: "generate-program-correction-prompt"
     route_type: "extension"
     command_id: "octon-proposal-packet-generate-program-correction-prompt"
@@ -307,6 +500,24 @@ routes:
       all:
         - manifest_status: "implemented"
         - file_present: "resources/child-packet-index.yml"
+        - receipt_complete: "program-implementation-conformance"
+        - receipt_field_equals:
+            receipt_id: "program-implementation-conformance"
+            field: "verdict"
+            value: "pass"
+        - receipt_field_equals:
+            receipt_id: "program-implementation-conformance"
+            field: "child_authority_preserved"
+            value: "yes"
+        - receipt_complete: "program-post-implementation-drift"
+        - receipt_field_equals:
+            receipt_id: "program-post-implementation-drift"
+            field: "verdict"
+            value: "pass"
+        - receipt_field_equals:
+            receipt_id: "program-post-implementation-drift"
+            field: "child_authority_preserved"
+            value: "yes"
         - receipt_absent: "program-closeout-prompt"
   - route_id: "closeout-proposal-program"
     route_type: "extension"
@@ -317,9 +528,72 @@ routes:
       required_by_default: true
       reason: "program closeout coordinates durable child outcomes and archive posture"
     completion:
+      expected_receipts:
+        - "proposal-closeout"
       expected_manifest_status: "implemented"
       replan_required: true
     enter_when:
       all:
         - manifest_status: "implemented"
+        - receipt_complete: "program-implementation-conformance"
+        - receipt_field_equals:
+            receipt_id: "program-implementation-conformance"
+            field: "verdict"
+            value: "pass"
+        - receipt_field_equals:
+            receipt_id: "program-implementation-conformance"
+            field: "child_authority_preserved"
+            value: "yes"
+        - receipt_complete: "program-post-implementation-drift"
+        - receipt_field_equals:
+            receipt_id: "program-post-implementation-drift"
+            field: "verdict"
+            value: "pass"
+        - receipt_field_equals:
+            receipt_id: "program-post-implementation-drift"
+            field: "child_authority_preserved"
+            value: "yes"
         - receipt_complete: "program-closeout-prompt"
+        - receipt_absent: "proposal-closeout"
+  - route_id: "archive-proposal"
+    route_type: "workflow"
+    approval:
+      required_by_default: true
+      reason: "proposal program archival requires explicit approval and child-authority preservation"
+    completion:
+      expected_manifest_status: "archived"
+      replan_required: true
+    enter_when:
+      all:
+        - manifest_status: "implemented"
+        - receipt_complete: "program-implementation-conformance"
+        - receipt_field_equals:
+            receipt_id: "program-implementation-conformance"
+            field: "verdict"
+            value: "pass"
+        - receipt_field_equals:
+            receipt_id: "program-implementation-conformance"
+            field: "child_authority_preserved"
+            value: "yes"
+        - receipt_complete: "program-post-implementation-drift"
+        - receipt_field_equals:
+            receipt_id: "program-post-implementation-drift"
+            field: "verdict"
+            value: "pass"
+        - receipt_field_equals:
+            receipt_id: "program-post-implementation-drift"
+            field: "child_authority_preserved"
+            value: "yes"
+        - receipt_complete: "proposal-closeout"
+        - receipt_field_equals:
+            receipt_id: "proposal-closeout"
+            field: "verdict"
+            value: "pass"
+        - receipt_field_equals:
+            receipt_id: "proposal-closeout"
+            field: "archive_authorized"
+            value: "yes"
+        - receipt_field_equals:
+            receipt_id: "proposal-closeout"
+            field: "child_authority_preserved"
+            value: "yes"

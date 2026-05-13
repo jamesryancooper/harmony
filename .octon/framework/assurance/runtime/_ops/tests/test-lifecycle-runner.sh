@@ -693,6 +693,15 @@ YAML
     fail "lifecycle runner keeps direct Codex and Claude execution out of lifecycle.rs"
   fi
 
+  if ! rg -n 'program-creation|program-implementation-conformance|program-post-implementation-drift|program-structure' \
+    "$REPO_ROOT/.octon/framework/engine/runtime/crates/kernel/src/lifecycle.rs" \
+    "$REPO_ROOT/.octon/framework/engine/runtime/crates/kernel/src/lifecycle_driver.rs" \
+    "$REPO_ROOT/.octon/framework/engine/runtime/crates/lifecycle_executor/src" >/dev/null; then
+    pass "generic lifecycle runner and executor avoid proposal-program-specific receipt and gate ids"
+  else
+    fail "generic lifecycle runner and executor avoid proposal-program-specific receipt and gate ids"
+  fi
+
   printf '\nPassed: %s\nFailed: %s\n' "$pass_count" "$fail_count"
   [[ "$fail_count" -eq 0 ]]
 }

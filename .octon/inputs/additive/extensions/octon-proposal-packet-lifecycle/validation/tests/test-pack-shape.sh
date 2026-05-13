@@ -39,6 +39,9 @@ main() {
     generate-closeout-prompt
     closeout-proposal-packet
     create-proposal-program
+    explain-proposal-program
+    review-proposal-program
+    revise-proposal-program
     generate-program-implementation-prompt
     generate-program-verification-prompt
     generate-program-correction-prompt
@@ -59,6 +62,9 @@ main() {
   assert_file "skills/manifest.fragment.yml"
   assert_file "skills/registry.fragment.yml"
   assert_file "validation/compatibility.yml"
+  [[ -f "$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-program-structure.sh" ]] \
+    && pass "program structure validator exists" \
+    || fail "program structure validator is missing"
 
   for route in "${routes[@]}"; do
     assert_file "prompts/$route/manifest.yml"
@@ -72,7 +78,7 @@ main() {
   done
 
   manifest_count="$(find "$PACK_ROOT/prompts" -mindepth 2 -maxdepth 2 -name manifest.yml -type f | wc -l | tr -d ' ')"
-  [[ "$manifest_count" == "18" ]] && pass "18 prompt bundle manifests present" || fail "expected 18 prompt manifests, found $manifest_count"
+  [[ "$manifest_count" == "21" ]] && pass "21 prompt bundle manifests present" || fail "expected 21 prompt manifests, found $manifest_count"
 
   scenario_count="$(find "$PACK_ROOT/validation/scenarios" -name '*.md' -type f | wc -l | tr -d ' ')"
   [[ "$scenario_count" -ge 12 ]] && pass "manual and program scenario fixtures present" || fail "expected at least 12 scenarios, found $scenario_count"
@@ -136,6 +142,41 @@ main() {
     pass "blocked and deferred are not modeled as proposal statuses"
   else
     fail "blocked or deferred wording still reads as proposal status"
+  fi
+
+  if rg -n 'support/program-creation\.md' "$PACK_ROOT/prompts/create-proposal-program" >/dev/null \
+    && rg -n 'child_registry_digest' "$PACK_ROOT/prompts/create-proposal-program" >/dev/null \
+    && rg -n 'child_authority_preserved' "$PACK_ROOT/prompts/create-proposal-program" >/dev/null; then
+    pass "program creation prompt requires parent creation receipt"
+  else
+    fail "program creation prompt is missing parent creation receipt requirements"
+  fi
+
+  if rg -n 'support/program-implementation-conformance-review\.md' "$PACK_ROOT/prompts/generate-program-verification-prompt" "$PACK_ROOT/prompts/run-program-verification-and-correction-loop" "$PACK_ROOT/prompts/generate-program-correction-prompt" >/dev/null \
+    && rg -n 'support/program-post-implementation-drift-churn-review\.md' "$PACK_ROOT/prompts/generate-program-verification-prompt" "$PACK_ROOT/prompts/run-program-verification-and-correction-loop" "$PACK_ROOT/prompts/generate-program-correction-prompt" >/dev/null \
+    && rg -n 'child_receipt_summary_count' "$PACK_ROOT/prompts/generate-program-verification-prompt" "$PACK_ROOT/prompts/run-program-verification-and-correction-loop" >/dev/null \
+    && rg -n 'child_authority_preserved' "$PACK_ROOT/prompts/generate-program-verification-prompt" "$PACK_ROOT/prompts/run-program-verification-and-correction-loop" >/dev/null; then
+    pass "program verification prompts require aggregate receipts"
+  else
+    fail "program verification prompts are missing aggregate receipt requirements"
+  fi
+
+  if rg -n 'support/program-implementation-conformance-review\.md' "$PACK_ROOT/prompts/generate-program-closeout-prompt" "$PACK_ROOT/prompts/closeout-proposal-program" >/dev/null \
+    && rg -n 'support/program-post-implementation-drift-churn-review\.md' "$PACK_ROOT/prompts/generate-program-closeout-prompt" "$PACK_ROOT/prompts/closeout-proposal-program" >/dev/null \
+    && rg -n 'support/proposal-closeout\.md' "$PACK_ROOT/prompts/generate-program-closeout-prompt" "$PACK_ROOT/prompts/closeout-proposal-program" >/dev/null \
+    && rg -n 'archive_authorized' "$PACK_ROOT/prompts/generate-program-closeout-prompt" "$PACK_ROOT/prompts/closeout-proposal-program" >/dev/null \
+    && rg -n 'child_authority_preserved' "$PACK_ROOT/prompts/generate-program-closeout-prompt" "$PACK_ROOT/prompts/closeout-proposal-program" >/dev/null; then
+    pass "program closeout prompts require aggregate and closeout receipts"
+  else
+    fail "program closeout prompts are missing aggregate or closeout receipt requirements"
+  fi
+
+  assert_file "commands/octon-proposal-packet-run-program-lifecycle.md"
+  assert_file "skills/octon-proposal-packet-lifecycle-run-program-lifecycle/SKILL.md"
+  if ! rg -n 'run-program-implementation' "$PACK_ROOT/context/routing.contract.yml" "$PACK_ROOT/commands" "$PACK_ROOT/skills" "$PACK_ROOT/prompts" >/dev/null; then
+    pass "direct run-program-implementation surface is absent"
+  else
+    fail "direct run-program-implementation surface must not exist"
   fi
 
   printf '\nPassed: %s\nFailed: %s\n' "$pass_count" "$fail_count"

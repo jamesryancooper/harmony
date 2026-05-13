@@ -25,3 +25,10 @@ historical archive disposition.
 
 Run parent and child verification, targeted corrections, and re-verification
 until the program reaches a declared terminal state.
+
+On aggregate pass, write parent-local
+`support/program-implementation-conformance-review.md` and
+`support/program-post-implementation-drift-churn-review.md` with `verdict:
+pass` and `child_authority_preserved: yes` only when child manifests, receipts,
+promotion targets, validation verdicts, archive metadata, and terminal outcomes
+remain child-owned.

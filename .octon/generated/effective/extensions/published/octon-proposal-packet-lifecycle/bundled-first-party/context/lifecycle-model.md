@@ -87,6 +87,11 @@ routes do consume bounded loop attempts.
 ```text
 program-source-context
   -> program-created
+  -> program-review
+  -> program-revision-needed
+  -> program-revised
+  -> program-review
+  -> program-accepted
   -> child-packets-planned
   -> child-packets-created
   -> child-packets-validated
@@ -106,13 +111,32 @@ Program routes coordinate child packets. They do not own child lifecycle truth,
 child subtype manifest truth, child promotion targets, child validation
 verdicts, or child archive metadata.
 
-Program implementation prompt generation has its own child-readiness gate. For
-every required, non-deferred child, the gate requires required child metadata
-including `change_profile`, a passing implementation-grade completeness review,
-an accepted fresh proposal-review digest, declared packet-specific completeness
+Parent program review and revision are receipt-driven loops, not extra
+manifest statuses. `support/proposal-review.md` records `accepted`,
+`revision-required`, or `rejected`; `support/revisions/<revision-id>.md`
+records parent-local coordination revisions. The review may update only the
+parent manifest status to `accepted`, `rejected`, or `in-review`; revision may
+change only parent-local coordination files and must route back to
+`review-proposal-program`.
+
+Program implementation prompt generation requires a fresh accepted parent
+review receipt validated by `validate-proposal-review-gate.sh`. It also has a
+separate child-readiness gate. For every required, non-deferred child, the
+child-readiness gate requires required child metadata including
+`change_profile`, a passing implementation-grade completeness review, an
+accepted fresh proposal-review digest, declared packet-specific completeness
 coverage, coherent predecessor/successor constraints, and satisfied declared
-cutover constraints. The gate authorizes prompt generation only; it does not
-prove durable implementation has completed.
+cutover constraints. The child-readiness gate authorizes prompt generation
+only; it does not prove durable implementation has completed.
+
+Parent program promotion and archival use the existing `promote-proposal` and
+`archive-proposal` workflow ids. Promotion is allowed only after an accepted
+fresh parent review, generated program implementation prompt, and parent-local
+`support/implementation-run.md` with `verdict: pass` and
+`child_authority_preserved: yes`. Archival is allowed only after parent
+`implemented` status and parent-local `support/proposal-closeout.md` with
+`verdict: pass`, `archive_authorized: yes`, and
+`child_authority_preserved: yes`.
 
 Program controller runs also retain a parent-owned execution record: a
 hash-chained v2 event log, checkpoint, scheduler decision, recovery evidence,

@@ -3,8 +3,15 @@
 Use the composite route when the user provides a lifecycle action, packet path,
 source material, verification finding, or program packet. The dispatcher
 prefers explicit `bundle` values, then `lifecycle_action`, then falls back to
-read-only packet explanation for packet-path-only inputs and packet creation
-for source-driven inputs.
+read-only explanation or creation defaults for routeable composite inputs.
+
+Default resolution:
+
+- `packet_path` alone resolves to `explain-proposal-packet`.
+- `program_packet_path` alone resolves to `explain-proposal-program`.
+- `source_kind` defaults to `create-proposal-packet`.
+- `child_packet_paths` without `program_packet_path` defaults to
+  `create-proposal-program`.
 
 Use `octon lifecycle plan|run|resume` for the generic end-to-end lifecycle
 orchestration surface. The proposal pack exposes
@@ -39,9 +46,10 @@ execution.
 - Valid packet or program lifecycle actions with missing required packet,
   program, or finding inputs escalate instead of resolving.
 - Ambiguous lifecycle states escalate to packet revision or operator decision.
-- Packet-path-only composite input resolves only to read-only explanation.
-- Program-packet-only composite input escalates until the operator chooses a
-  program lifecycle action.
+- Packet-path-only composite input resolves only to read-only packet
+  explanation.
+- Program-packet-only composite input resolves only to read-only program
+  explanation.
 - Program routes reject nested child proposal package directories.
 - Closeout routes refuse failing checks, unresolved reviews, or missing archive
   and evidence posture.

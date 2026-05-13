@@ -22,12 +22,16 @@ Leaf commands:
 - `/octon-proposal-packet-closeout`
 - `/octon-proposal-packet-run-lifecycle`
 - `/octon-proposal-packet-create-program`
+- `/octon-proposal-packet-explain-program`
+- `/octon-proposal-packet-review-program`
+- `/octon-proposal-packet-revise-program`
 - `/octon-proposal-packet-generate-program-implementation-prompt`
 - `/octon-proposal-packet-generate-program-verification-prompt`
 - `/octon-proposal-packet-generate-program-correction-prompt`
 - `/octon-proposal-packet-run-program-verification-and-correction-loop`
 - `/octon-proposal-packet-generate-program-closeout-prompt`
 - `/octon-proposal-packet-closeout-program`
+- `/octon-proposal-packet-run-program-lifecycle`
 
 The dispatcher must preserve proposal authority boundaries and use generated
 effective extension/capability outputs after publication.

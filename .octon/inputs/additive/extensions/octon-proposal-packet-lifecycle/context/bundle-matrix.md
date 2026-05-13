@@ -14,6 +14,9 @@
 | `generate-closeout-prompt` | `octon-proposal-packet-lifecycle-generate-closeout-prompt` | `octon-proposal-packet-generate-closeout-prompt` | `octon-proposal-packet-lifecycle-generate-closeout-prompt` |
 | `closeout-proposal-packet` | `octon-proposal-packet-lifecycle-closeout-proposal-packet` | `octon-proposal-packet-closeout` | `octon-proposal-packet-lifecycle-closeout` |
 | `create-proposal-program` | `octon-proposal-packet-lifecycle-create-proposal-program` | `octon-proposal-packet-create-program` | `octon-proposal-packet-lifecycle-create-program` |
+| `explain-proposal-program` | `octon-proposal-packet-lifecycle-explain-proposal-program` | `octon-proposal-packet-explain-program` | `octon-proposal-packet-lifecycle-explain-program` |
+| `review-proposal-program` | `octon-proposal-packet-lifecycle-review-proposal-program` | `octon-proposal-packet-review-program` | `octon-proposal-packet-lifecycle-review-program` |
+| `revise-proposal-program` | `octon-proposal-packet-lifecycle-revise-proposal-program` | `octon-proposal-packet-revise-program` | `octon-proposal-packet-lifecycle-revise-program` |
 | `generate-program-implementation-prompt` | `octon-proposal-packet-lifecycle-generate-program-implementation-prompt` | `octon-proposal-packet-generate-program-implementation-prompt` | `octon-proposal-packet-lifecycle-generate-program-implementation-prompt` |
 | `generate-program-verification-prompt` | `octon-proposal-packet-lifecycle-generate-program-verification-prompt` | `octon-proposal-packet-generate-program-verification-prompt` | `octon-proposal-packet-lifecycle-generate-program-verification-prompt` |
 | `generate-program-correction-prompt` | `octon-proposal-packet-lifecycle-generate-program-correction-prompt` | `octon-proposal-packet-generate-program-correction-prompt` | `octon-proposal-packet-lifecycle-generate-program-correction-prompt` |
@@ -27,3 +30,9 @@
 `octon-proposal-packet-lifecycle-run-lifecycle` wrap the shared
 `octon lifecycle run --lifecycle proposal-packet --target <packet-path>` CLI.
 They are orchestration surfaces, not a prompt bundle route.
+
+`octon-proposal-packet-run-program-lifecycle` and
+`octon-proposal-packet-lifecycle-run-program-lifecycle` wrap
+`octon lifecycle run --lifecycle proposal-program --target
+<program-packet-path>`. They are orchestration surfaces, not dispatcher routes
+or prompt bundles.

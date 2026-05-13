@@ -27,6 +27,10 @@ records packet-local changes that address review findings. A
 `revision-required` review routes to revision, revision routes back to review,
 and implementation authorization requires a fresh accepted review receipt.
 
+Program review and revision follow the same receipt loop for parent
+coordination only. Parent program receipts may summarize child outcomes, but
+they never satisfy child receipts or child authority.
+
 ## Finding To Correction
 
 Verification findings must include stable ids, severity, affected paths,

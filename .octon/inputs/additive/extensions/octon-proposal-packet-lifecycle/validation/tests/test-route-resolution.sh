@@ -68,6 +68,9 @@ run-verification-and-correction-loop	octon-proposal-packet-run-verification-and-
 generate-closeout-prompt	octon-proposal-packet-generate-closeout-prompt	octon-proposal-packet-lifecycle-generate-closeout-prompt	octon-proposal-packet-lifecycle-generate-closeout-prompt	{"packet_path":".octon/inputs/exploratory/proposals/architecture/example"}
 closeout-proposal-packet	octon-proposal-packet-closeout	octon-proposal-packet-lifecycle-closeout	octon-proposal-packet-lifecycle-closeout-proposal-packet	{"packet_path":".octon/inputs/exploratory/proposals/architecture/example"}
 create-proposal-program	octon-proposal-packet-create-program	octon-proposal-packet-lifecycle-create-program	octon-proposal-packet-lifecycle-create-proposal-program	{"child_packet_paths":[".octon/inputs/exploratory/proposals/architecture/child-a"]}
+explain-proposal-program	octon-proposal-packet-explain-program	octon-proposal-packet-lifecycle-explain-program	octon-proposal-packet-lifecycle-explain-proposal-program	{"program_packet_path":".octon/inputs/exploratory/proposals/architecture/program"}
+review-proposal-program	octon-proposal-packet-review-program	octon-proposal-packet-lifecycle-review-program	octon-proposal-packet-lifecycle-review-proposal-program	{"program_packet_path":".octon/inputs/exploratory/proposals/architecture/program"}
+revise-proposal-program	octon-proposal-packet-revise-program	octon-proposal-packet-lifecycle-revise-program	octon-proposal-packet-lifecycle-revise-proposal-program	{"program_packet_path":".octon/inputs/exploratory/proposals/architecture/program"}
 generate-program-implementation-prompt	octon-proposal-packet-generate-program-implementation-prompt	octon-proposal-packet-lifecycle-generate-program-implementation-prompt	octon-proposal-packet-lifecycle-generate-program-implementation-prompt	{"program_packet_path":".octon/inputs/exploratory/proposals/architecture/program"}
 generate-program-verification-prompt	octon-proposal-packet-generate-program-verification-prompt	octon-proposal-packet-lifecycle-generate-program-verification-prompt	octon-proposal-packet-lifecycle-generate-program-verification-prompt	{"program_packet_path":".octon/inputs/exploratory/proposals/architecture/program"}
 generate-program-correction-prompt	octon-proposal-packet-generate-program-correction-prompt	octon-proposal-packet-lifecycle-generate-program-correction-prompt	octon-proposal-packet-lifecycle-generate-program-correction-prompt	{"program_packet_path":".octon/inputs/exploratory/proposals/architecture/program","finding_id":"FINDING-001"}
@@ -146,6 +149,9 @@ main() {
   json="$(resolve_route_success '{"child_packet_paths":[".octon/inputs/exploratory/proposals/architecture/child-a"]}')"
   assert_json "program input default creates program" "$json" '.status == "resolved" and .selected_route_id == "create-proposal-program"'
 
+  json="$(resolve_route_success '{"program_packet_path":".octon/inputs/exploratory/proposals/architecture/program"}')"
+  assert_json "program-path-only default explains program" "$json" '.status == "resolved" and .selected_route_id == "explain-proposal-program" and (.reason_codes | index("program-packet-path-read-only-default")) != null'
+
   json="$(resolve_route_success '{"lifecycle_action":"generate-correction-prompt","packet_path":".octon/inputs/exploratory/proposals/architecture/example","verification_finding_id":"FINDING-002"}')"
   assert_json "legacy verification_finding_id alias resolves correction" "$json" '.status == "resolved" and .selected_route_id == "generate-correction-prompt"'
 
@@ -154,9 +160,14 @@ main() {
   assert_route_failure "finding-only inputs escalate" '{"finding_id":"FINDING-001"}' "missing-routeable-inputs" "missing-routeable-inputs"
   assert_route_failure "missing packet path escalates" '{"lifecycle_action":"closeout-proposal-packet"}' "missing-required-inputs" "missing-packet-path"
   assert_route_failure "missing correction finding escalates" '{"lifecycle_action":"generate-correction-prompt","packet_path":".octon/inputs/exploratory/proposals/architecture/example"}' "missing-required-inputs" "missing-finding-id"
+  assert_route_failure "missing program path for explicit explain escalates" '{"bundle":"explain-proposal-program"}' "missing-required-inputs" "missing-program-packet-path"
+  assert_route_failure "missing program path for explicit review escalates" '{"bundle":"review-proposal-program"}' "missing-required-inputs" "missing-program-packet-path"
+  assert_route_failure "missing program path for explicit revise escalates" '{"bundle":"revise-proposal-program"}' "missing-required-inputs" "missing-program-packet-path"
+  assert_route_failure "missing program path for action explain escalates" '{"lifecycle_action":"explain-proposal-program"}' "missing-required-inputs" "missing-program-packet-path"
+  assert_route_failure "missing program path for action review escalates" '{"lifecycle_action":"review-proposal-program"}' "missing-required-inputs" "missing-program-packet-path"
+  assert_route_failure "missing program path for action revise escalates" '{"lifecycle_action":"revise-proposal-program"}' "missing-required-inputs" "missing-program-packet-path"
   assert_route_failure "missing program path escalates" '{"lifecycle_action":"closeout-proposal-program"}' "missing-required-inputs" "missing-program-packet-path"
   assert_route_failure "missing program correction finding escalates" '{"lifecycle_action":"generate-program-correction-prompt","program_packet_path":".octon/inputs/exploratory/proposals/architecture/program"}' "missing-required-inputs" "missing-finding-id"
-  assert_route_failure "program-packet-only route escalates" '{"program_packet_path":".octon/inputs/exploratory/proposals/architecture/program"}' "missing-required-inputs" "ambiguous-program-packet-route"
 
   json="$(
     bash "$REPO_ROOT/.octon/framework/orchestration/runtime/_ops/scripts/resolve-extension-prompt-bundle.sh" \

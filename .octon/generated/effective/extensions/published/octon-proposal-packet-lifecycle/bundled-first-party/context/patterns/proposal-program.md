@@ -36,12 +36,31 @@ Invalid placement:
 - `architecture/packet-sequence.md`
 - `architecture/child-packet-contract.md`
 - `architecture/program-closeout-plan.md`
+- `support/program-creation.md`
+- `support/program-implementation-conformance-review.md`
+- `support/program-post-implementation-drift-churn-review.md`
 - program-level risk, evidence, implementation, verification, correction, and
   closeout support prompts
 
 The parent may coordinate; it does not own child lifecycle truth, child subtype
 manifest truth, child promotion target truth, child acceptance criteria, child
 validation verdicts, or child archive metadata.
+
+## Parent Review And Revision
+
+Parent program review and revision are parent coordination only. Review covers
+the parent `proposal.yml`, child registry and index, sequence, child contract,
+validation plan, closeout plan, and parent support artifacts. It may write
+parent-local `support/proposal-review.md` with the existing review fields and
+may update only the parent manifest status to `accepted`, `rejected`, or
+`in-review`.
+
+Parent program revision may change only parent-local coordination files and
+write `support/revisions/<revision-id>.md`. It must not edit child manifests,
+child receipts, child promotion targets, child validation verdicts, child
+archive metadata, runtime truth, or generated effective authority. Parent
+review and revision receipts may summarize child outcomes but never satisfy
+child receipts.
 
 ## Required Relationship Consistency
 
@@ -50,6 +69,26 @@ Child ids in the parent `related_proposals`, `resources/child-packet-index.yml`,
 agree. The YAML child index is the structured runtime registry for Lifecycle
 Autopilot program orchestration; the Markdown index remains human-facing
 navigation. Every child validates as a normal manifest-governed proposal.
+
+Parent program structure is validated with:
+
+```sh
+bash .octon/framework/assurance/runtime/_ops/scripts/validate-proposal-program-structure.sh --package <program-packet-path>
+```
+
+This validator checks only parent-owned coordination structure and authority
+separation. It does not validate child implementation readiness and never
+satisfies child receipts, child promotion targets, child validation verdicts,
+or child archive metadata.
+
+## Creation Evidence
+
+Program creation writes parent-local `support/program-creation.md` with
+`creation_id`, `created_at`, `creator`, `program_packet_path`,
+`child_packet_count`, `execution_mode`, `child_registry_digest`,
+`child_authority_preserved`, and `verdict`. The receipt records that the parent
+registry and coordination artifacts were created without nesting or absorbing
+child authority. It is evidence only.
 
 ## Controller Invariants
 
@@ -63,9 +102,15 @@ aggregate closeout completeness, and honest support claims.
 
 ## Implementation Prompt Readiness
 
-Before `generate-program-implementation-prompt` may run, every required,
-non-deferred child packet must remain child-owned and pass the program
-child-readiness validator:
+Before `generate-program-implementation-prompt` may run, the parent program
+must have a fresh accepted parent review authorized with:
+
+```sh
+bash .octon/framework/assurance/runtime/_ops/scripts/validate-proposal-review-gate.sh --package <program-packet-path> --require-implementation-authorization
+```
+
+Every required, non-deferred child packet must also remain child-owned and pass
+the separate program child-readiness validator:
 
 ```sh
 bash .octon/framework/assurance/runtime/_ops/scripts/validate-proposal-program-child-readiness.sh --package <program-packet-path>
@@ -80,6 +125,25 @@ evidence may summarize these checks but never replaces child receipts.
 This gate is proposal-readiness only. It does not require implementation
 receipts or durable promoted artifacts to exist, and it must not be used as
 evidence that implementation has completed.
+
+## Promotion And Archive Workflows
+
+Parent program promotion uses the existing `promote-proposal` workflow id. It
+enters only after an accepted fresh parent review, a generated program
+implementation prompt, and parent-local `support/implementation-run.md` with
+`verdict: pass` and `child_authority_preserved: yes`. The parent program
+structure validator must also pass.
+
+Parent program archival uses the existing `archive-proposal` workflow id. It
+enters only after the parent manifest is `implemented`, parent-local aggregate
+verification receipts record `verdict: pass` and
+`child_authority_preserved: yes`, and parent-local
+`support/proposal-closeout.md` records `verdict: pass`, `archive_authorized:
+yes`, and `child_authority_preserved: yes`.
+
+These workflow routes change only parent program lifecycle status. They do not
+replace child manifests, child receipts, child promotion targets, child
+validation verdicts, or child archive metadata.
 
 ## Execution Modes
 
@@ -134,6 +198,14 @@ children:
 ```
 
 ## Closeout
+
+Program verification convergence writes parent-local
+`support/program-implementation-conformance-review.md` and
+`support/program-post-implementation-drift-churn-review.md`. These aggregate
+receipts summarize parent coordination, child receipt posture, and drift
+posture. They must include `child_authority_preserved: yes` before parent
+closeout or archival may proceed, and they never replace child receipts,
+promotion targets, validation verdicts, archive metadata, or terminal outcomes.
 
 Program closeout requires every required child to reach a terminal outcome
 allowed by the active lifecycle contract. The current proposal-program contract

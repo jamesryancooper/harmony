@@ -23,3 +23,7 @@ drift/churn gates before closeout or implemented archival.
 
 Create a parent proposal program packet that references canonical child
 packets. Reject nested child proposal package directories.
+
+Write parent-local `support/program-creation.md` with `child_authority_preserved:
+yes` only when the registry, human index, sequence, child contract, and closeout
+plan keep every child packet outside the parent package and child-owned.

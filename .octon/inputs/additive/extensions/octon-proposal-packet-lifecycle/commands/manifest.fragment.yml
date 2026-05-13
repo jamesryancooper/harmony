@@ -84,6 +84,24 @@ commands:
     summary: "Create a parent proposal program coordinating canonical child packets."
     access: agent
     argument_hint: "<source> [--child-packet-paths <paths>] [--execution-mode <mode>]"
+  - id: octon-proposal-packet-explain-program
+    display_name: Proposal Packet Explain Program
+    path: octon-proposal-packet-explain-program.md
+    summary: "Explain a parent proposal program without widening child authority."
+    access: agent
+    argument_hint: "<program-packet-path>"
+  - id: octon-proposal-packet-review-program
+    display_name: Proposal Packet Review Program
+    path: octon-proposal-packet-review-program.md
+    summary: "Review parent proposal program coordination without changing child authority."
+    access: agent
+    argument_hint: "<program-packet-path>"
+  - id: octon-proposal-packet-revise-program
+    display_name: Proposal Packet Revise Program
+    path: octon-proposal-packet-revise-program.md
+    summary: "Apply parent-local proposal program coordination revisions and record a revision receipt."
+    access: agent
+    argument_hint: "<program-packet-path> [--review-id <id>] [--finding-id <id>]"
   - id: octon-proposal-packet-generate-program-implementation-prompt
     display_name: Proposal Packet Generate Program Implementation Prompt
     path: octon-proposal-packet-generate-program-implementation-prompt.md
@@ -120,3 +138,9 @@ commands:
     summary: "Execute gated closeout for a proposal program."
     access: agent
     argument_hint: "<program-packet-path>"
+  - id: octon-proposal-packet-run-program-lifecycle
+    display_name: Proposal Packet Run Program Lifecycle
+    path: octon-proposal-packet-run-program-lifecycle.md
+    summary: "Run generic lifecycle orchestration for one proposal program and emit route handoff evidence."
+    access: agent
+    argument_hint: "<program-packet-path> [--run-id <id>] [--executor auto|codex|claude|mock] [--max-iterations <n>]"

@@ -128,6 +128,33 @@ skills:
     status: active
     tags: [octon, proposal, lifecycle, program]
     triggers: ["create proposal program"]
+  - id: octon-proposal-packet-lifecycle-explain-program
+    display_name: Proposal Packet Lifecycle Explain Program
+    group: extensions
+    path: octon-proposal-packet-lifecycle-explain-program/
+    skill_class: invocable
+    summary: "Run the explain-proposal-program bundle."
+    status: active
+    tags: [octon, proposal, lifecycle, program, explain]
+    triggers: ["explain proposal program"]
+  - id: octon-proposal-packet-lifecycle-review-program
+    display_name: Proposal Packet Lifecycle Review Program
+    group: extensions
+    path: octon-proposal-packet-lifecycle-review-program/
+    skill_class: invocable
+    summary: "Run the review-proposal-program bundle."
+    status: active
+    tags: [octon, proposal, lifecycle, program, review]
+    triggers: ["review proposal program"]
+  - id: octon-proposal-packet-lifecycle-revise-program
+    display_name: Proposal Packet Lifecycle Revise Program
+    group: extensions
+    path: octon-proposal-packet-lifecycle-revise-program/
+    skill_class: invocable
+    summary: "Run the revise-proposal-program bundle."
+    status: active
+    tags: [octon, proposal, lifecycle, program, revision]
+    triggers: ["revise proposal program"]
   - id: octon-proposal-packet-lifecycle-generate-program-implementation-prompt
     display_name: Proposal Packet Lifecycle Generate Program Implementation Prompt
     group: extensions
@@ -182,3 +209,12 @@ skills:
     status: active
     tags: [octon, proposal, lifecycle, program]
     triggers: ["closeout proposal program"]
+  - id: octon-proposal-packet-lifecycle-run-program-lifecycle
+    display_name: Proposal Packet Lifecycle Program Runner
+    group: extensions
+    path: octon-proposal-packet-lifecycle-run-program-lifecycle/
+    skill_class: invocable
+    summary: "Run the generic lifecycle runner against one proposal program target."
+    status: active
+    tags: [octon, proposal, lifecycle, program, runner, orchestration]
+    triggers: ["run proposal program lifecycle", "automate proposal program lifecycle"]

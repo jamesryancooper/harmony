@@ -9,6 +9,8 @@
 | `packet-explanation.md` | packet explanation |
 | `packet-review.md` | proposal review receipt and verdict routing |
 | `packet-revision.md` | packet-local revision receipt and review loop return |
+| `program-review.md` | parent-only proposal program review receipt and boundaries |
+| `program-revision.md` | parent-local proposal program revision receipt and boundaries |
 | `implementation-prompt-generation.md` | executable implementation prompt generation |
 | `verification-prompt-generation.md` | follow-up verification prompt generation |
 | `correction-prompt-generation.md` | targeted correction prompt generation |

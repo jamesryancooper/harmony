@@ -12,6 +12,8 @@ pass() { printf 'PASS: %s\n' "$1"; pass_count=$((pass_count + 1)); }
 fail() { printf 'FAIL: %s\n' "$1" >&2; fail_count=$((fail_count + 1)); }
 
 main() {
+  local status unexpected_statuses
+
   if rg -n 'do not become Octon authority|do not become authority|must not claim authority|never become Octon authority' "$PACK_ROOT" >/dev/null; then
     pass "non-authority boundary language is present"
   else
@@ -34,6 +36,57 @@ main() {
     pass "invalid nested child path is explicitly documented"
   else
     fail "invalid nested child path is not documented"
+  fi
+
+  if rg -n 'child manifests' "$PACK_ROOT/prompts/review-proposal-program" "$PACK_ROOT/prompts/revise-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'child receipts' "$PACK_ROOT/prompts/review-proposal-program" "$PACK_ROOT/prompts/revise-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'child promotion targets' "$PACK_ROOT/prompts/review-proposal-program" "$PACK_ROOT/prompts/revise-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'child validation verdicts' "$PACK_ROOT/prompts/review-proposal-program" "$PACK_ROOT/prompts/revise-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'child archive metadata' "$PACK_ROOT/prompts/review-proposal-program" "$PACK_ROOT/prompts/revise-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null; then
+    pass "program review and revision preserve child authority boundaries"
+  else
+    fail "program review and revision child authority boundaries are missing"
+  fi
+
+  if rg -n 'Parent (review|revision|program )?receipts? (may summarize child outcomes but )?never satisf(y|ies) child receipts|Parent `support/proposal-review.md` never satisfies child receipts|parent support receipts as child receipts' "$PACK_ROOT" >/dev/null; then
+    pass "parent receipts do not satisfy child receipts"
+  else
+    fail "parent receipt versus child receipt boundary is missing"
+  fi
+
+  if rg -n 'support/program-creation\.md' "$PACK_ROOT/prompts/create-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'never satisf(y|ies) child receipts|never satisfies child receipts' "$PACK_ROOT/prompts/create-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null; then
+    pass "program creation receipt is parent-local only"
+  else
+    fail "program creation receipt boundary is missing"
+  fi
+
+  if rg -n 'support/program-implementation-conformance-review\.md' "$PACK_ROOT/prompts" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'support/program-post-implementation-drift-churn-review\.md' "$PACK_ROOT/prompts" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'never (replace|satisf(y|ies)) child receipts|never satisfies child receipts' "$PACK_ROOT/prompts" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'child promotion targets' "$PACK_ROOT/prompts/run-program-verification-and-correction-loop" "$PACK_ROOT/prompts/closeout-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'child validation verdicts' "$PACK_ROOT/prompts/run-program-verification-and-correction-loop" "$PACK_ROOT/prompts/closeout-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null \
+    && rg -n 'child archive metadata' "$PACK_ROOT/prompts/run-program-verification-and-correction-loop" "$PACK_ROOT/prompts/closeout-proposal-program" "$PACK_ROOT/context/patterns/proposal-program.md" >/dev/null; then
+    pass "program aggregate receipts preserve child authority"
+  else
+    fail "program aggregate receipt authority boundary is missing"
+  fi
+
+  unexpected_statuses="$(
+    {
+      yq -r '.target.allowed_statuses[]?' "$PACK_ROOT/context/lifecycle.contract.yml"
+      yq -r '.target.allowed_statuses[]?' "$PACK_ROOT/context/lifecycles/proposal-program.contract.yml"
+    } | while IFS= read -r status; do
+      case "$status" in
+        draft|in-review|accepted|rejected|implemented|archived) ;;
+        *) printf '%s\n' "$status" ;;
+      esac
+    done | sort -u
+  )"
+  if [[ -z "$unexpected_statuses" ]]; then
+    pass "lifecycle contracts introduce no new manifest statuses"
+  else
+    fail "unexpected manifest statuses declared: $unexpected_statuses"
   fi
 
   printf '\nPassed: %s\nFailed: %s\n' "$pass_count" "$fail_count"

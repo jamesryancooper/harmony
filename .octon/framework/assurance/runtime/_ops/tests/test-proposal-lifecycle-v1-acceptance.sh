@@ -11,6 +11,8 @@ REPO_ROOT="$(cd "$OCTON_DIR/.." && pwd)"
 CARGO_MANIFEST="$REPO_ROOT/.octon/framework/engine/runtime/crates/Cargo.toml"
 REAL_CONTRACT="$REPO_ROOT/.octon/generated/effective/extensions/published/octon-proposal-packet-lifecycle/bundled-first-party/context/lifecycle.contract.yml"
 REAL_REVIEW_GATE="$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-review-gate.sh"
+REAL_STANDARD_GATE="$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh"
+REAL_READINESS_GATE="$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-implementation-readiness.sh"
 
 pass_count=0
 fail_count=0
@@ -35,6 +37,8 @@ new_fixture_repo() {
   mkdir -p "$root/.octon/framework/assurance/runtime/_ops/scripts"
   cp "$REAL_CONTRACT" "$root/.octon/generated/effective/extensions/published/octon-proposal-packet-lifecycle/bundled-first-party/context/lifecycle.contract.yml"
   cp "$REAL_REVIEW_GATE" "$root/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-review-gate.sh"
+  cp "$REAL_STANDARD_GATE" "$root/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-standard.sh"
+  cp "$REAL_READINESS_GATE" "$root/.octon/framework/assurance/runtime/_ops/scripts/validate-proposal-implementation-readiness.sh"
   cat >"$root/.octon/generated/effective/extensions/catalog.effective.yml" <<'YAML'
 schema_version: "octon-extension-effective-catalog-v7"
 packs:
@@ -79,7 +83,7 @@ write_packet() {
   local root="$1" name="$2" status="$3"
   local dir
   dir="$(packet_dir "$root" "$name")"
-  mkdir -p "$dir/support"
+  mkdir -p "$dir/support" "$dir/architecture"
   cat >"$dir/proposal.yml" <<EOF
 schema_version: "proposal-v1"
 proposal_id: "$name"
@@ -98,12 +102,60 @@ EOF
   cat >"$dir/README.md" <<EOF
 # Lifecycle V1 $name
 EOF
+  cat >"$dir/architecture/target-architecture.md" <<'EOF'
+# Target Architecture
+
+The packet updates the lifecycle acceptance fixture target under `.octon/framework/example.md`.
+EOF
+  cat >"$dir/architecture/implementation-plan.md" <<'EOF'
+# Implementation Plan
+
+Apply the fixture change, keep the retained evidence in support receipts, and validate the lifecycle route.
+EOF
+  cat >"$dir/architecture/acceptance-criteria.md" <<'EOF'
+# Acceptance Criteria
+
+- The lifecycle route selection remains deterministic.
+- The implementation, conformance, drift, and closeout receipts remain proposal-local lifecycle evidence.
+EOF
   cat >"$dir/support/implementation-grade-completeness-review.md" <<'EOF'
 # Implementation-Grade Completeness Review
 
 verdict: pass
 unresolved_questions_count: 0
 clarification_required: no
+
+## Blockers
+
+No blockers.
+
+## Assumptions
+
+The fixture target remains `.octon/framework/example.md`.
+
+## Promotion Target Coverage
+
+The review covers `.octon/framework/example.md`.
+
+## Affected Artifact Coverage
+
+The route fixture covers the packet manifest, support receipts, and architecture files.
+
+## Validator Coverage
+
+Run the proposal lifecycle validators and route-selection tests.
+
+## Implementation Prompt Readiness
+
+The packet is ready to generate or execute an implementation prompt.
+
+## Exclusions
+
+No exclusions.
+
+## Final Route Recommendation
+
+Proceed according to lifecycle route selection.
 EOF
 }
 
@@ -168,6 +220,25 @@ write_receipt() {
   shift 3
   mkdir -p "$(dirname "$(packet_dir "$root" "$name")/$rel")"
   printf '%s\n' "$@" >"$(packet_dir "$root" "$name")/$rel"
+}
+
+write_executable_prompt() {
+  local root="$1" name="$2"
+  local dir
+  dir="$(packet_dir "$root" "$name")"
+  cat >"$dir/support/executable-implementation-prompt.md" <<'EOF'
+# Executable Implementation Prompt
+
+Promotion target: `.octon/framework/example.md`.
+
+Run validation commands including `validate-proposal-implementation-conformance.sh` and the lifecycle route validators.
+
+Retain implementation evidence in `support/implementation-run.md`, `support/implementation-conformance-review.md`, and `support/post-implementation-drift-churn-review.md`.
+
+Rollback expectation: restore the fixture target and record rollback evidence if validation fails.
+
+Closeout and archive must be blocked until conformance and drift receipts pass and retained evidence is complete.
+EOF
 }
 
 assert_plan_route() {
@@ -300,12 +371,12 @@ main() {
 
   write_packet "$root" executable-packet accepted
   write_review "$root" executable-packet accepted yes 0
-  touch "$(packet_dir "$root" executable-packet)/support/executable-implementation-prompt.md"
+  write_executable_prompt "$root" executable-packet
   assert_plan_route_with_gate_pass "executable prompt routes to run implementation with strict gate" "$root" executable-packet run-implementation
 
   write_packet "$root" promote-packet accepted
   write_review "$root" promote-packet accepted yes 0
-  touch "$(packet_dir "$root" promote-packet)/support/executable-implementation-prompt.md"
+  write_executable_prompt "$root" promote-packet
   write_receipt "$root" promote-packet "support/implementation-run.md" \
     "verdict: pass" \
     "implemented_at: 2026-05-07T00:00:00Z" \
@@ -315,7 +386,7 @@ main() {
 
   write_packet "$root" empty-implementation-field-packet accepted
   write_review "$root" empty-implementation-field-packet accepted yes 0
-  touch "$(packet_dir "$root" empty-implementation-field-packet)/support/executable-implementation-prompt.md"
+  write_executable_prompt "$root" empty-implementation-field-packet
   write_receipt "$root" empty-implementation-field-packet "support/implementation-run.md" \
     "verdict: pass" \
     "implemented_at:" \
@@ -422,7 +493,7 @@ main() {
 
   write_packet "$root" promote-approval-packet accepted
   write_review "$root" promote-approval-packet accepted yes 0
-  touch "$(packet_dir "$root" promote-approval-packet)/support/executable-implementation-prompt.md"
+  write_executable_prompt "$root" promote-approval-packet
   write_receipt "$root" promote-approval-packet "support/implementation-run.md" \
     "verdict: pass" \
     "implemented_at: 2026-05-07T00:00:00Z" \

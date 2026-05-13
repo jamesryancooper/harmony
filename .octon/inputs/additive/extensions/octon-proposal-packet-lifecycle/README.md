@@ -17,7 +17,8 @@ The pack owns reusable routes for:
 - generating implementation, verification, correction, and closeout prompts,
 - running verification and correction convergence loops,
 - closing out individual proposal packets,
-- creating and operating proposal programs across canonical child packets.
+- creating, explaining, reviewing, revising, and operating proposal programs
+  across canonical child packets.
 
 ## Authority Boundary
 
@@ -60,6 +61,11 @@ before executing each approval-gated durable route under that policy.
 Packet-local receipts such as `support/implementation-run.md` and
 `support/proposal-closeout.md` advance later lifecycle handoffs without adding
 new `proposal.yml` statuses.
+
+`/octon-proposal-packet-run-program-lifecycle` wraps
+`octon lifecycle run --lifecycle proposal-program --target
+<program-packet-path>`. It is an orchestration wrapper only, not a dispatcher
+route or prompt bundle.
 
 ## Publication
 

@@ -24,6 +24,14 @@ implementation conformance and post-implementation drift/churn receipts. A
 program may aggregate child receipts, but it may not replace the packet-level
 post-implementation evidence.
 
+Program closeout also requires parent-local aggregate
+`support/program-implementation-conformance-review.md` and
+`support/program-post-implementation-drift-churn-review.md` receipts with
+`child_authority_preserved: yes`. It then writes only parent-local
+`support/proposal-closeout.md`; that receipt never satisfies child receipts,
+child promotion targets, child validation verdicts, child archive metadata, or
+child terminal outcomes.
+
 Execute gated program closeout after required child lifecycle states are
 implemented, archived, rejected, superseded, or covered by an explicitly
 deferred report outcome.

@@ -16,3 +16,9 @@ allowed-tools: Read Glob Grep Write(/.octon/inputs/exploratory/proposals/*)
 
 Generate aggregate verification across parent sequence, dependency, risk,
 evidence, and child packet acceptance criteria.
+
+Require the verification loop to produce parent-local
+`support/program-implementation-conformance-review.md` and
+`support/program-post-implementation-drift-churn-review.md` with aggregate
+verdicts and `child_authority_preserved`. These receipts may summarize child
+state but never satisfy child receipts or child validation verdicts.

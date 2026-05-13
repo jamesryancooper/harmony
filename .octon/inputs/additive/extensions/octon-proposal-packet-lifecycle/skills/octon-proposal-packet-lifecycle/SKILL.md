@@ -38,6 +38,12 @@ Resolve `bundle` or `lifecycle_action` through
   `accepted`, `revision-required`, or `rejected` review outcomes; do not add
   new proposal statuses. Use `support/revisions/<revision-id>.md` for
   packet-local revision passes and route back to review.
+- Program review and revision are parent coordination only. Parent review may
+  write parent-local `support/proposal-review.md` and update only the parent
+  manifest status to `accepted`, `rejected`, or `in-review`; parent revision
+  may write only parent-local coordination changes and
+  `support/revisions/<revision-id>.md`. Parent receipts never satisfy child
+  receipts.
 - Do not generate implementation prompts, run implementation, or promote a
   proposal unless `validate-proposal-review-gate.sh --package <proposal_path>
   --require-implementation-authorization` passes with a fresh accepted review
@@ -56,6 +62,10 @@ Resolve `bundle` or `lifecycle_action` through
   end-to-end lifecycle orchestration surface. The runner owns planning, gates,
   stale-receipt detection, loop limits, evidence, and resume; leaf proposal
   skills continue to own packet-specific semantics and edits.
+- Use `/octon-proposal-packet-run-program-lifecycle` for shared
+  `proposal-program` orchestration. It wraps `octon lifecycle run --lifecycle
+  proposal-program --target <program-packet-path>` and has no dispatcher route
+  or prompt bundle.
 - Ask clarifying questions only when the missing answer changes product
   semantics, promotion scope, irreversible churn, or authority ownership.
   Proceed with recorded assumptions when missing details are discoverable or

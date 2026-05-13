@@ -202,6 +202,44 @@ skills:
         description: "Canonical child proposal packet paths."
     requires:
       context: []
+  octon-proposal-packet-lifecycle-explain-program:
+    version: "1.0.0"
+    commands: ["/octon-proposal-packet-explain-program"]
+    parameters:
+      - name: program_packet_path
+        type: text
+        required: true
+        description: "Parent proposal program packet path."
+    requires:
+      context: []
+  octon-proposal-packet-lifecycle-review-program:
+    version: "1.0.0"
+    commands: ["/octon-proposal-packet-review-program"]
+    parameters:
+      - name: program_packet_path
+        type: text
+        required: true
+        description: "Parent proposal program packet path."
+    requires:
+      context: []
+  octon-proposal-packet-lifecycle-revise-program:
+    version: "1.0.0"
+    commands: ["/octon-proposal-packet-revise-program"]
+    parameters:
+      - name: program_packet_path
+        type: text
+        required: true
+        description: "Parent proposal program packet path."
+      - name: review_id
+        type: text
+        required: false
+        description: "Source parent review id to revise against."
+      - name: finding_id
+        type: text
+        required: false
+        description: "Specific parent review finding id to address."
+    requires:
+      context: []
   octon-proposal-packet-lifecycle-generate-program-implementation-prompt:
     version: "1.0.0"
     commands: ["/octon-proposal-packet-generate-program-implementation-prompt"]
@@ -264,5 +302,28 @@ skills:
         type: text
         required: true
         description: "Parent proposal program packet path."
+    requires:
+      context: []
+  octon-proposal-packet-lifecycle-run-program-lifecycle:
+    version: "1.0.0"
+    commands: ["/octon-proposal-packet-run-program-lifecycle"]
+    parameters:
+      - name: program_packet_path
+        type: text
+        required: true
+        description: "Parent proposal program packet path."
+      - name: run_id
+        type: text
+        required: false
+        description: "Optional lifecycle run id for deterministic resume."
+      - name: executor
+        type: text
+        required: false
+        default: "auto"
+        description: "Lifecycle route executor: auto, codex, claude, or mock."
+      - name: max_iterations
+        type: integer
+        required: false
+        description: "Optional bounded loop iteration override."
     requires:
       context: []

@@ -16,3 +16,8 @@ allowed-tools: Read Glob Grep Write(/.octon/inputs/exploratory/proposals/*)
 
 Generate targeted correction for a parent, child, child-group, or cross-packet
 finding without overriding child proposal authority.
+
+When correction changes aggregate verification posture, refresh only the
+parent-local aggregate conformance and drift receipts. Do not rewrite child
+receipts, child promotion targets, child validation verdicts, or child archive
+metadata from the parent program.
