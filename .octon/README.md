@@ -10,6 +10,18 @@ evidenced, reviewable boundaries. This super-root owns the authority, runtime,
 support, evidence, continuity, and generated read-model surfaces that keep that
 claim bounded.
 
+Octon's core runtime is best understood as a Governed Workflow Runtime:
+workflow state, run contracts, authorization, evidence, replay, rollback, and
+closeout own execution control. Agents participate only as bounded, evidenced
+activity nodes inside admitted execution harnesses.
+
+For admitted workflows, the execution harness is task-specific: it binds the
+current run contract, context, allowed capabilities, rollback posture, and
+evidence expectations for the work at hand. Workflow-statechart schemas,
+agent-node contracts, connector admission changes, MCP integration, Durable
+Object adapters, and external workflow-engine integration remain separately
+governed future work unless durable runtime contracts admit them.
+
 This README is the concise, registry-backed orientation surface. It summarizes
 the class-root model, the canonical registries, and the bootstrap entrypoints
 without restating the full path topology.

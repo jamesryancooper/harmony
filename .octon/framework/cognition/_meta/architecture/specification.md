@@ -20,6 +20,18 @@ This specification is the human-readable companion to that registry. It stays
 subordinate to the constitutional kernel and must not restate competing
 constitutional authority.
 
+## Canonical Runtime Framing
+
+Octon's core runtime is a Governed Workflow Runtime for consequential software
+work. It compiles or assembles the execution harness for each admitted workflow
+and allows agents to participate only as bounded, evidenced activity nodes.
+Workflow state owns control flow; agents do not.
+
+This framing does not create a rival control plane or imply live support for
+future workflow-statechart schemas, agent-node contracts, connector admission
+changes, MCP integration, Durable Object adapters, or external workflow-engine
+integration.
+
 ## Constitutional Authority
 
 Repo-local supreme control authority lives under

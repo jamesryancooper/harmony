@@ -6,6 +6,11 @@ super-rooted Octon harness.
 Enable reliable agent execution that is deterministic enough to trust,
 observable enough to debug, and flexible enough to evolve.
 
+Octon's runtime posture is workflow-first: workflow state, run contracts,
+authorization, evidence, rollback posture, and closeout own consequential
+control flow. Agents participate only as bounded, evidenced activity nodes
+inside admitted execution boundaries.
+
 The machine-readable ingress declaration lives at
 `/.octon/instance/ingress/manifest.yml`. Treat that manifest as the source of
 truth for mandatory reads, optional overlays, conditional overlays, adapter
@@ -34,6 +39,12 @@ restate the full topology registry.
   - `.octon/instance/charter/workspace.yml`
 - optional bootstrap orientation:
   - `.octon/instance/bootstrap/START.md`
+- agent boundary rule:
+  - agents may produce candidate artifacts, summaries, reviews,
+    classifications, patches, repair suggestions, or exception
+    recommendations
+  - agents may not authorize effects, own workflow state, schedule themselves
+    indefinitely, mutate control truth, admit connectors, or close work
 
 ## Read Order
 
@@ -84,6 +95,10 @@ or repo-consequential work, read:
 - generated outputs live under `generated/**` and remain derived-only
 - raw `inputs/**` never becomes a direct runtime or policy dependency
 - `inputs/exploratory/ideation/**` remains human-led
+- generated summaries, raw inputs, chat, model memory, host UI state, tool
+  availability, MCP server availability, Durable Object state, and external
+  workflow dashboards are not authority, permission, policy, retained
+  evidence, or closeout truth
 - overlay legality, publication metadata, and steady-state path families are
   registry-backed rather than hand-maintained here
 

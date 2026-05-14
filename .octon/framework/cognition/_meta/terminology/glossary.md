@@ -26,11 +26,50 @@ Use for Octon as a whole.
 
 ### Governed Agent Runtime
 
-Octon's execution core: the durable runtime that assembles context, mediates
-capability use, enforces policy, coordinates execution, records state, accepts
-intervention, supports rollback and recovery, and retains evidence.
+Compatibility language for Octon's runtime core during the transition to
+workflow-first framing. Read it as the **Governed Workflow Runtime** with
+bounded agent nodes, not as an agent-owned control plane.
 
-Use for the runtime core, not for the whole of Octon.
+Use only when compatibility with existing docs or retained references requires
+the phrase. Prefer **Governed Workflow Runtime** for new durable wording.
+
+### Governed Workflow Runtime
+
+Octon's execution core: the durable runtime that assembles context, mediates
+capability use, enforces policy, coordinates workflow state, records control
+and evidence, accepts intervention, supports replay, rollback, and recovery,
+and controls closeout.
+
+Use for the runtime core, not for the whole of Octon. Workflow state owns
+control flow. Agents do not.
+
+### Deterministic Governed Workflow
+
+A bounded execution path whose state transitions, authorization checks,
+context inputs, allowed effects, evidence requirements, rollback posture, and
+closeout gates are declared, inspectable, and reproducible enough to validate.
+
+### Task-Specific Execution Harness
+
+The execution envelope compiled or assembled for an admitted workflow or run.
+It binds the current objective, run contract, context pack, capability grants,
+authorized effect tokens, rollback posture, validation expectations, and
+retained evidence requirements.
+
+Do not use **harness** here as a synonym for a prompt, model, generic
+framework, or orchestrator.
+
+### Bounded Agent Node
+
+An agent participation point inside an admitted workflow. A bounded agent node
+may perform assigned activity within declared context, capability, evidence,
+and escalation limits, but it does not own workflow state or authorize effects.
+
+### Evidenced Activity Node
+
+A workflow activity whose inputs, outputs, decisions, tool calls, validations,
+and material effects are retained or traceable according to the run's evidence
+requirements.
 
 ### Harness
 
@@ -61,9 +100,10 @@ model routing, and success criteria.
 
 ### Agent
 
-The live operational composite produced when a model executes inside the
-Governed Agent Runtime under an Agent Definition, with active state, scoped
-capabilities, and a current objective.
+The live operational composite produced when a model executes as a bounded
+agent node inside the Governed Workflow Runtime under an Agent Definition, with
+active state, scoped capabilities, evidence obligations, and a current
+objective.
 
 ### Objective
 
@@ -86,6 +126,12 @@ run, mission, or execution route.
 
 A concrete callable operation or integration exposed through a capability
 pack. Tool availability does not bypass capability-pack governance.
+
+### Admitted Connector Operation
+
+A connector action that has passed the applicable support-target, capability,
+dossier, rollback, authorization, token, evidence, and disclosure requirements.
+Connector, tool, MCP, host, or external-system availability is not permission.
 
 ### Sandbox
 
@@ -192,11 +238,28 @@ describe Octon's governed execution substrate.
 
 ### Orchestrator
 
-Valid only for a coordination component or role. Banned as a whole-system
-name.
+Valid only for a coordination component or role. Banned as a whole-system name
+and discouraged as an agent-first system category, including "orchestrator of
+agents."
 
 ### Platform
 
 Avoid as a primary architecture classification. It may be used in product or
 deployment discussions only when the architecture classification has already
 been stated.
+
+### Autonomous Agent Worker
+
+Banned as a primary architecture term. It implies agent-owned control and
+ambient autonomy rather than bounded workflow participation.
+
+### Ambient Tool Access
+
+Banned as a permission model. Tools and connectors require declared capability,
+authorization, support, rollback, evidence, and disclosure posture.
+
+### Durable Object Authority
+
+Banned. Durable Objects, if introduced, may act only as governed coordination
+adapters and never as authority, permission, control truth, retained evidence,
+or closeout truth.

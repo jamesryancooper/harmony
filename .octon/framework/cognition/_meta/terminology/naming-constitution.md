@@ -31,6 +31,10 @@ The canonical classification for the whole system is:
 
 The canonical classification for Octon's execution core is:
 
+> **Governed Workflow Runtime**
+
+The controlled compatibility phrase for retained runtime-core references is:
+
 > **Governed Agent Runtime**
 
 The canonical classification for the live operating entity is:
@@ -43,19 +47,26 @@ The canonical classification for the cognition engine is:
 
 The canonical one-sentence form is:
 
-> **Octon is a Constitutional Engineering Harness whose execution core is a Governed Agent Runtime.**
+> **Octon is a Constitutional Engineering Harness whose execution core is a Governed Workflow Runtime.**
+
+Historical or retained compatibility text may still use **Governed Agent
+Runtime**, but that phrase must mean the Governed Workflow Runtime with bounded
+agent participation, not an agent-owned control plane.
 
 ## Core Principle
 
 An agent is not the model alone. An agent is the live composite produced when
-a model operates inside a governed runtime under an agent definition, with
-scoped capabilities, active state, and a current objective.
+a model operates as a bounded agent node inside the Governed Workflow Runtime
+under an agent definition, with scoped capabilities, active state, evidence
+obligations, and a current objective.
 
 Therefore:
 
 - **Model** is cognition.
 - **Agent Definition** is the static role and configuration contract.
-- **Governed Agent Runtime** is the governed execution machinery.
+- **Governed Workflow Runtime** is the governed execution machinery.
+- **Governed Agent Runtime** is compatibility language for retained references
+  until a later validated cutover retires or replaces the phrase.
 - **Constitutional Engineering Harness** is Octon's whole-system
   constitutional, governance, runtime, assurance, observability, evidence,
   and engineering substrate.
@@ -67,10 +78,12 @@ Use these terms as the canonical vocabulary in durable documentation, specs,
 schemas, comments, and operator-facing guidance:
 
 - **Constitutional Engineering Harness**
-- **Governed Agent Runtime**
+- **Governed Workflow Runtime**
 - **Model**
 - **Agent Definition**
 - **Agent**
+- **Bounded Agent Node**
+- **Task-Specific Execution Harness**
 - **Objective**
 - **Capability Surface**
 - **Capability Pack**
@@ -100,8 +113,9 @@ externally familiar labels:
 | **Harness** | Short form after **Constitutional Engineering Harness** has already been established. | Must not imply a prompt wrapper or runtime-only layer. |
 | **Octon Harness** | Legacy-friendly shorthand for the full system. | Prefer **Constitutional Engineering Harness** in new canonical text. |
 | **governed autonomous engineering harness** | Transitional legacy phrase found in historical wording. | Replace with **Constitutional Engineering Harness** in new canonical text. |
-| **Agent Harness** | External-facing comparison term for the execution core when needed. | Must not name the whole of Octon. Prefer **Governed Agent Runtime**. |
-| **Runtime** | Shorthand for **Governed Agent Runtime** once established. | Must not include constitution, lab, assurance, or proposal lifecycle unless explicitly expanded. |
+| **Governed Agent Runtime** | Compatibility phrase for retained runtime-core references while workflow-first terminology is adopted. | Must be read as **Governed Workflow Runtime** with bounded agent participation; must not imply agent-owned control flow. |
+| **Agent Harness** | External-facing comparison term for the execution core when needed. | Must not name the whole of Octon. Prefer **Governed Workflow Runtime**. |
+| **Runtime** | Shorthand for **Governed Workflow Runtime** once established. | Must not include constitution, lab, assurance, or proposal lifecycle unless explicitly expanded. |
 | **Orchestrator** | Specific coordination component or role. | Must not name the whole runtime or harness. |
 
 ## Banned Primary Terms
@@ -136,15 +150,24 @@ Incorrect:
 
 > Octon is a model harness.
 
-### Rule 2: Use **Governed Agent Runtime** for Octon's execution core
+### Rule 2: Use **Governed Workflow Runtime** for Octon's execution core
 
 Correct:
 
-> Octon's execution core is a Governed Agent Runtime.
+> Octon's execution core is a Governed Workflow Runtime.
+
+Compatibility:
+
+> Historical references to the Governed Agent Runtime describe the same
+> governed workflow runtime core with bounded agent participation.
 
 Incorrect:
 
-> The Governed Agent Runtime is all of Octon.
+> The Governed Workflow Runtime is all of Octon.
+
+Incorrect:
+
+> Agents own the runtime control flow.
 
 ### Rule 3: Never call the model the agent
 
@@ -263,6 +286,12 @@ capability surfaces, or broader autonomy modes. Support claims remain bounded
 by support-target declarations, governance exclusions, and evidence
 obligations.
 
+Workflow-first terminology must not imply live support for workflow-statechart
+schemas, agent-node contracts, task-specific execution harness schemas,
+connector admission changes, MCP integration, Durable Object adapters, or
+external workflow-engine integration until durable runtime contracts,
+validators, retained evidence, and cutover receipts prove those claims.
+
 ### Rule 15: Canonical terminology files must stand alone
 
 The naming constitution and glossary must remain self-contained durable
@@ -273,17 +302,20 @@ depend on proposal-local paths for their meaning.
 
 Use this note where a short migration explanation is needed:
 
-> Historical Octon text may use **Octon Harness**, **Harness**, or
-> **governed autonomous engineering harness**. New canonical text should
-> classify the whole system as a **Constitutional Engineering Harness** and
-> its execution core as a **Governed Agent Runtime**.
+> Historical Octon text may use **Octon Harness**, **Harness**,
+> **Governed Agent Runtime**, or **governed autonomous engineering harness**.
+> New canonical text should classify the whole system as a **Constitutional
+> Engineering Harness** and its execution core as a **Governed Workflow
+> Runtime**.
 
 ## Examples
 
 ### Correct
 
 - Octon is a Constitutional Engineering Harness.
-- Octon's execution core is a Governed Agent Runtime.
+- Octon's execution core is a Governed Workflow Runtime.
+- Governed Agent Runtime remains compatibility language for retained
+  references.
 - A model provides cognition inside an agent.
 - An Agent Definition supplies role, objectives, policies, and capability
   bindings.
@@ -295,6 +327,7 @@ Use this note where a short migration explanation is needed:
 ### Incorrect
 
 - Octon is a Model Harness.
+- Agents own workflow state.
 - The model is the agent.
 - Mission is the atomic execution unit.
 - The control plane performed the tool call.

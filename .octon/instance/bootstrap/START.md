@@ -7,6 +7,11 @@ description: Boot sequence and orientation for the root .octon Constitutional En
 
 Canonical goal: Enable reliable agent execution that is deterministic enough to trust, observable enough to debug, and flexible enough to evolve.
 
+Read that goal through Octon's workflow-first runtime posture. Workflow state,
+run contracts, execution authorization, evidence, rollback posture, and closeout
+own consequential control flow. Agents participate only as bounded, evidenced
+activity nodes inside admitted workflow and run boundaries.
+
 Use this document for the steady-state boot sequence. Canonical topology,
 authority families, publication metadata, and doc roles live in
 `/.octon/framework/cognition/_meta/architecture/contract-registry.yml`.
@@ -16,6 +21,11 @@ second authority plane. The constitutional kernel anchor remains
 `/.octon/framework/constitution/CHARTER.md`, authored lab assets remain under
 `/.octon/framework/lab/`, and retained lab evidence remains under
 `/.octon/state/evidence/lab/`.
+
+Generated summaries, raw inputs, chat, model memory, host UI state, tool
+availability, MCP server availability, Durable Object state, and external
+workflow dashboards are not authority, permission, policy, retained evidence,
+or closeout truth.
 
 Instance-native repo authority lives at:
 
@@ -73,6 +83,9 @@ Instance-native repo authority lives at:
 Consequential execution binds mission, run, control, and evidence surfaces
 without treating generated summaries or raw inputs as authority.
 Material execution remains bound to run contracts and execution authorization.
+Task-specific execution harnesses bind the current run contract, context,
+allowed capabilities, rollback posture, and evidence requirements for the work
+at hand; they do not make agents owners of workflow state.
 
 ## Live Operator Flow
 
