@@ -9,7 +9,7 @@ metadata:
   updated: "2026-04-30"
 skill_sets: [executor, specialist]
 capabilities: [self-validating]
-allowed-tools: Read Glob Grep Bash(git status) Bash(git diff) Bash(gh pr) Write(/.octon/inputs/exploratory/proposals/*) Write(/.octon/state/evidence/runs/skills/*)
+allowed-tools: Read Glob Grep Bash(git status) Bash(git diff) Bash(gh pr) Bash(.octon/framework/assurance/runtime/_ops/scripts/classify-proposal-worktree-hygiene.sh *) Write(/.octon/inputs/exploratory/proposals/*) Write(/.octon/state/evidence/runs/skills/*)
 ---
 
 # Octon Proposal Lifecycle: Closeout Packet
@@ -28,6 +28,24 @@ closeout or implemented archival, also refuse unless
 no unresolved items, or the packet records an explicit blocked/deferred report
 outcome or a rejected/superseded/historical archive disposition instead of a
 successful closeout.
+
+Before claiming archive readiness, run the read-only worktree hygiene
+classifier:
+
+```sh
+.octon/framework/assurance/runtime/_ops/scripts/classify-proposal-worktree-hygiene.sh --target <packet-path> --lifecycle proposal-packet --format yaml
+```
+
+Pass `--run-id <run-id>` when the lifecycle run id is available. If the
+classifier reports any `foreign-or-ambiguous` paths, write or refresh
+`support/proposal-closeout.md` with `verdict: blocked`,
+`archive_authorized: no`, `selected_git_route: stage-only-escalate`,
+`worktree_hygiene_verdict: blocked`,
+`worktree_hygiene_blocker_class: worktree-hygiene-blocked`, the three hygiene
+path counts, a `worktree_hygiene_evidence` reference to the classifier output,
+and `next_route_condition: closeout-change or operator scope resolution`. Do
+not stage, commit, push, delete, reset, archive, or otherwise clean worktree
+paths from this route.
 
 Successful closeout writes or refreshes `support/proposal-closeout.md` with at
 least `verdict`, `closed_at`, and `archive_authorized`. Use `verdict: pass` and

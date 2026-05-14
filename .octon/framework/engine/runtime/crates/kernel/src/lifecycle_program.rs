@@ -889,6 +889,15 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
                     terminal_outcome = plan.terminal_outcome.clone();
                     final_verdict = plan.final_verdict.clone();
                     receipt_digests = receipt_digest_map(&plan);
+                    let worktree_hygiene_blocked =
+                        lifecycle_plan_has_worktree_hygiene_blocker(&plan);
+                    if worktree_hygiene_blocked {
+                        blockers.push(ProgramBlocker {
+                            blocker_class: "worktree-hygiene-blocked".to_string(),
+                            message: "child closeout is blocked by foreign or ambiguous worktree hygiene; route through closeout-change or operator scope resolution".to_string(),
+                            recovery_route: None,
+                        });
+                    }
                     if plan
                         .receipt_states
                         .values()
@@ -924,7 +933,8 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
                                 .as_ref()
                                 .map(|route| route.route_id.clone()),
                         });
-                    } else if plan.final_verdict == "blocked-no-route" {
+                    } else if plan.final_verdict == "blocked-no-route" && !worktree_hygiene_blocked
+                    {
                         blockers.push(ProgramBlocker {
                             blocker_class: "missing-evidence".to_string(),
                             message: "child is not terminal and has no selectable route"
@@ -4129,8 +4139,13 @@ fn classify_program_blocker_class(blocker_class: &str) -> ProgramBlockerDisposit
         | "unsafe-resume"
         | "unsupported-mode"
         | "write-scope-conflict" => ProgramBlockerDisposition::Unsafe,
-        "dependency-blocked" | "executor-failed" | "missing-evidence" | "stale-receipt"
-        | "target-drift" | "validation-failed" => ProgramBlockerDisposition::Recoverable,
+        "dependency-blocked"
+        | "executor-failed"
+        | "missing-evidence"
+        | "stale-receipt"
+        | "target-drift"
+        | "validation-failed"
+        | "worktree-hygiene-blocked" => ProgramBlockerDisposition::Recoverable,
         _ => ProgramBlockerDisposition::Unsafe,
     }
 }
@@ -6965,8 +6980,9 @@ fn program_lifecycle_summary(
     plan: &ProgramLifecyclePlanResult,
     final_verdict: &str,
 ) -> String {
+    let blocker_summary = program_lifecycle_blocker_summary(plan);
     format!(
-        "# Program Lifecycle Run\n\nrun_id: {run_id}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nexecutor: {}\nexecution_mode: {}\nrunnable_children: {}\naggregate_state: {}\nfinal_verdict: {final_verdict}\n\nProgram evidence coordinates child lifecycle work only. Child packet manifests, receipts, promotion targets, validation verdicts, and archive metadata remain child-owned.\n",
+        "# Program Lifecycle Run\n\nrun_id: {run_id}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nexecutor: {}\nexecution_mode: {}\nrunnable_children: {}\naggregate_state: {}\nfinal_verdict: {final_verdict}\n{blocker_summary}\nProgram evidence coordinates child lifecycle work only. Child packet manifests, receipts, promotion targets, validation verdicts, and archive metadata remain child-owned.\n",
         now_rfc3339().unwrap_or_else(|_| "unknown".to_string()),
         plan.lifecycle_id,
         plan.execution_strategy,
@@ -6976,6 +6992,31 @@ fn program_lifecycle_summary(
         plan.runnable_batch.join(", "),
         plan.aggregate_state,
     )
+}
+
+fn program_lifecycle_blocker_summary(plan: &ProgramLifecyclePlanResult) -> String {
+    let mut lines = Vec::new();
+    for blocker in &plan.program_blockers {
+        lines.push(format!(
+            "- scope: program; blocker_class: {}; recovery_route: {}",
+            blocker.blocker_class,
+            blocker.recovery_route.as_deref().unwrap_or("none")
+        ));
+    }
+    for (child_id, state) in &plan.child_states {
+        for blocker in &state.blockers {
+            lines.push(format!(
+                "- scope: child; child_id: {child_id}; blocker_class: {}; recovery_route: {}",
+                blocker.blocker_class,
+                blocker.recovery_route.as_deref().unwrap_or("none")
+            ));
+        }
+    }
+    if lines.is_empty() {
+        String::new()
+    } else {
+        format!("\nBlockers:\n{}\n", lines.join("\n"))
+    }
 }
 
 fn program_cancelled_summary(
@@ -7005,6 +7046,14 @@ mod tests {
             message: format!("{class} blocker"),
             recovery_route: None,
         }
+    }
+
+    #[test]
+    fn worktree_hygiene_blocker_is_recoverable_without_lifecycle_route() {
+        assert_eq!(
+            classify_program_blocker_class("worktree-hygiene-blocked"),
+            ProgramBlockerDisposition::Recoverable
+        );
     }
 
     fn approval_blocker() -> ProgramApprovalBlocker {

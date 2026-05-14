@@ -195,6 +195,12 @@ pub(crate) struct LifecyclePlanResult {
     pub gate_results: Vec<GatePlanResult>,
     pub blocked_by_gate: Option<String>,
     pub checkpoint_drift: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blocker_class: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blocker_message: Option<String>,
     pub final_verdict: String,
 }
 
@@ -212,6 +218,8 @@ pub(crate) struct ReceiptPlanState {
     pub path: String,
     pub exists: bool,
     pub verdict: Option<String>,
+    #[serde(default)]
+    pub fields: BTreeMap<String, String>,
     pub missing_required_fields: Vec<String>,
     pub stale: Option<bool>,
     pub stored_digest: Option<String>,
@@ -1082,6 +1090,10 @@ pub(crate) fn plan_lifecycle_from_octon_dir(
         gate_results = results;
     }
 
+    let receipt_states = receipt_plan_states(&repo_root, &loaded.contract, &target_state);
+    let (blocker_class, blocker_message) =
+        lifecycle_plan_blocker_for_receipts(&final_verdict, &receipt_states);
+
     Ok(LifecyclePlanResult {
         schema_version: "octon-lifecycle-plan-v1".to_string(),
         lifecycle_id: loaded.contract.lifecycle_id.clone(),
@@ -1091,12 +1103,14 @@ pub(crate) fn plan_lifecycle_from_octon_dir(
         target: rel_display(&repo_root, &target_abs),
         target_exists: target_state.target_exists,
         manifest_status: target_state.manifest_status.clone(),
-        receipt_states: receipt_plan_states(&repo_root, &loaded.contract, &target_state),
+        receipt_states,
         terminal_outcome,
         next_route: selected_route.map(route_plan_state),
         gate_results,
         blocked_by_gate,
         checkpoint_drift: None,
+        blocker_class,
+        blocker_message,
         final_verdict,
     })
 }
@@ -1949,6 +1963,7 @@ fn receipt_plan_states(
                     path: rel_display(repo_root, &receipt.path_abs),
                     exists: receipt.exists,
                     verdict: receipt.fields.get(verdict_field).cloned(),
+                    fields: receipt.fields.clone(),
                     missing_required_fields: receipt.missing_required_fields.clone(),
                     stale: receipt.stale,
                     stored_digest: receipt.stored_digest.clone(),
@@ -1957,6 +1972,42 @@ fn receipt_plan_states(
             )
         })
         .collect()
+}
+
+pub(crate) fn lifecycle_plan_has_worktree_hygiene_blocker(plan: &LifecyclePlanResult) -> bool {
+    receipt_states_have_worktree_hygiene_blocker(&plan.receipt_states)
+}
+
+fn lifecycle_plan_blocker_for_receipts(
+    final_verdict: &str,
+    receipt_states: &BTreeMap<String, ReceiptPlanState>,
+) -> (Option<String>, Option<String>) {
+    if final_verdict == "blocked-no-route"
+        && receipt_states_have_worktree_hygiene_blocker(receipt_states)
+    {
+        return (
+            Some("worktree-hygiene-blocked".to_string()),
+            Some(
+                "proposal closeout is blocked by foreign or ambiguous worktree hygiene; route through closeout-change or operator scope resolution"
+                    .to_string(),
+            ),
+        );
+    }
+    (None, None)
+}
+
+fn receipt_states_have_worktree_hygiene_blocker(
+    receipt_states: &BTreeMap<String, ReceiptPlanState>,
+) -> bool {
+    let Some(closeout) = receipt_states.get("proposal-closeout") else {
+        return false;
+    };
+    closeout.verdict.as_deref() == Some("blocked")
+        && closeout
+            .fields
+            .get("worktree_hygiene_verdict")
+            .map(String::as_str)
+            == Some("blocked")
 }
 
 fn receipt_digest_map(plan: &LifecyclePlanResult) -> BTreeMap<String, String> {
@@ -2686,8 +2737,16 @@ fn lifecycle_summary(
         plan.terminal_outcome.is_some(),
     );
     let handoff_note = route_execution_note(execution_mode);
+    let blocker_note = plan
+        .blocker_class
+        .as_ref()
+        .map(|class| {
+            let message = plan.blocker_message.as_deref().unwrap_or("none");
+            format!("blocker_class: {class}\nblocker_message: {message}\n")
+        })
+        .unwrap_or_default();
     format!(
-        "# Lifecycle Run\n\nrun_id: {run_id}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nexecutor: {}\nroute_execution_mode: {execution_mode}\nselected_route: {route}\nterminal_outcome: {terminal}\nfinal_verdict: {final_verdict}\n\n{handoff_note}\n",
+        "# Lifecycle Run\n\nrun_id: {run_id}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nexecutor: {}\nroute_execution_mode: {execution_mode}\nselected_route: {route}\nterminal_outcome: {terminal}\nfinal_verdict: {final_verdict}\n{blocker_note}\n{handoff_note}\n",
         now_rfc3339().unwrap_or_else(|_| "unknown".to_string()),
         plan.lifecycle_id,
         plan.execution_strategy,
@@ -2847,6 +2906,39 @@ packs:
                 ),
             );
         }
+    }
+
+    #[test]
+    fn worktree_hygiene_closeout_receipt_sets_named_plan_blocker() {
+        let mut fields = BTreeMap::new();
+        fields.insert("verdict".to_string(), "blocked".to_string());
+        fields.insert(
+            "worktree_hygiene_verdict".to_string(),
+            "blocked".to_string(),
+        );
+        let mut receipt_states = BTreeMap::new();
+        receipt_states.insert(
+            "proposal-closeout".to_string(),
+            ReceiptPlanState {
+                path: "packet/support/proposal-closeout.md".to_string(),
+                exists: true,
+                verdict: Some("blocked".to_string()),
+                fields,
+                missing_required_fields: Vec::new(),
+                stale: None,
+                stored_digest: None,
+                current_digest: None,
+            },
+        );
+
+        let (blocker_class, blocker_message) =
+            lifecycle_plan_blocker_for_receipts("blocked-no-route", &receipt_states);
+
+        assert_eq!(blocker_class.as_deref(), Some("worktree-hygiene-blocked"));
+        assert!(blocker_message
+            .as_deref()
+            .unwrap_or_default()
+            .contains("closeout-change"));
     }
 
     #[test]
