@@ -28,7 +28,9 @@ stored in lifecycle checkpoints and evidence for safe retry.
 The runner resolves `proposal-packet` from the published effective extension
 catalog, reconstructs proposal state from `proposal.yml` and proposal-local
 support receipts, evaluates gates and stale-review checks, selects the next
-route, and writes run evidence plus a resumable checkpoint.
+route, and writes run evidence plus a resumable checkpoint. Its contract
+declares `execution_strategy: route-progression`, so packet lifecycle
+execution remains on the route-progression driver.
 
 Executor behavior:
 
@@ -41,6 +43,10 @@ Executor behavior:
   resumable approval by default. `--approval-policy unattended` is an explicit
   operator override; the adapter records approval override evidence before
   executing an approval-gated route under that policy.
+- Packet runs write hash-chained `lifecycle-events.ndjson` traces. `octon
+  lifecycle cancel --run-id <run> --reason <text>` durably cancels a retained
+  run; later resume or execute-routes operations must return `cancelled`
+  without adapter dispatch.
 - Non-execute handoffs do not consume bounded loop iterations because the
   selected route has not executed.
 

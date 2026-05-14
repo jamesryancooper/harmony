@@ -29,6 +29,18 @@ pub struct LifecycleRouteExecutionRequest {
     pub evidence_root: PathBuf,
     pub checkpoint_path: PathBuf,
     pub policy: LifecycleExecutionPolicy,
+    #[serde(default)]
+    pub approval_context: Option<LifecycleApprovalContext>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct LifecycleApprovalContext {
+    pub context_kind: String,
+    pub program_run_id: Option<String>,
+    pub child_id: Option<String>,
+    pub approval_instruction: Option<String>,
+    pub retry_instruction: Option<String>,
+    pub unattended_override_instruction: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

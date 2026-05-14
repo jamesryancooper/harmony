@@ -15,17 +15,40 @@ Default resolution:
 
 Use `octon lifecycle plan|run|resume` for the generic end-to-end lifecycle
 orchestration surface. The proposal pack exposes
-`/octon-proposal-run-packet-lifecycle` as a user-facing wrapper, while route
-dispatch remains responsible for the packet-specific leaf bundles. By default,
-`octon lifecycle run --executor auto|codex|claude` produces a gated
-`route-ready` handoff instead of invoking extension prompt bundles directly.
+`/octon-proposal-run-packet-lifecycle` and
+`/octon-proposal-run-program-lifecycle` as user-facing wrappers, while route
+dispatch remains responsible for packet- and program-specific leaf bundles. By
+default, `octon lifecycle run --executor auto|codex|claude` produces a gated
+handoff (`route-ready` for packets or `program-route-handoff` for programs)
+instead of invoking extension prompt bundles directly.
+Runtime dispatch follows the published contract `execution_strategy`:
+`route-progression` selects the packet lifecycle driver, while
+`orchestrated-replan-loop` selects the program lifecycle controller. Route
+contracts still define eligible work, and program scheduler fields still
+define child batching; neither is treated as the execution strategy.
 With `--execute-routes`, the runner delegates selected route execution to the
 shared lifecycle executor adapter; prompt-bundle and workflow execution remains
-outside the lifecycle runner itself.
+outside the lifecycle runner itself. For proposal programs, `--execute-routes`
+continues as a bounded plan-execute-replan loop until terminal completion,
+blocked state, approval pause, failure, timeout, cancellation, or max-step
+exhaustion.
 Because non-mock handoffs do not execute the selected route, they also do not
 consume bounded lifecycle loop iterations. Executed routes do consume bounded
 lifecycle loop attempts, including `auto`, `codex`, and `claude` adapter-backed
-execution.
+execution. For proposal programs, one step is one selected parent route
+dispatch or one runnable child batch dispatch; one child batch counts as one
+step regardless of `--max-child-concurrency`. Program route execution is
+additionally bounded by dependency gates, child receipts, write-scope checks,
+and approval gates.
+`octon lifecycle cancel --run-id <run> --reason <text>` is the shared durable
+stop control for packet and program runs. After cancellation, resume, retry, or
+execute-routes must report `cancelled` with `route_execution_mode: none` and no
+adapter dispatch. `octon lifecycle program cancel` remains accepted as a
+program-specific alias.
+Approval pauses remain adapter-enforced. Program child approval evidence should
+route operators through `octon lifecycle program approve`, then program retry
+or lifecycle resume, while still preserving explicit `unattended` and
+`program-approved` override evidence when an operator chooses those policies.
 
 ## Naming Scheme
 

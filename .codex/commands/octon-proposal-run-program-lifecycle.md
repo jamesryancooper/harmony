@@ -6,12 +6,52 @@ Run the generic lifecycle runner for one proposal program target:
 octon lifecycle run --lifecycle proposal-program --target <program-packet-path>
 ```
 
+If `octon` is not installed on PATH, or if the packaged binary does not expose
+`lifecycle`, use the repo-local development launcher:
+
+```sh
+.octon/framework/engine/runtime/run lifecycle run --lifecycle proposal-program --target <program-packet-path>
+```
+
 Use `--run-id`, `--executor`, `--max-iterations`, `--set key=value`, and
 `--set-file key=path` when deterministic resume, mock execution, bounded loop
 testing, or creation input binding is required. The runner plans from the
 published lifecycle contract, evaluates parent review, child-readiness, and
 parent receipt gates, records workflow evidence and checkpoints, and reports
-the next route.
+the next route. The proposal program contract declares
+`execution_strategy: orchestrated-replan-loop`, so runtime dispatch stays on
+the program lifecycle controller.
+
+Executor boundary:
+
+- Without `--execute-routes`, the runner stops at a planned
+  `program-route-handoff`; it does not invoke selected parent or child routes
+  and does not implement child packets.
+- With `--execute-routes`, the program runner performs a bounded
+  plan-execute-replan loop. Each iteration plans from live repository state,
+  dispatches either one selected parent route or one runnable child batch
+  through the shared lifecycle executor adapter, replans from child-owned
+  manifests and receipts, and continues until terminal completion, blocked
+  state, approval pause, failure, timeout, cancellation, or max-step
+  exhaustion.
+- Use `--max-steps` to bound adapter dispatch attempts. One step is one parent
+  route dispatch or one runnable child batch dispatch; pure planning and
+  non-execute handoffs do not consume steps. Use `--max-child-concurrency` to
+  bound concurrent child route executors inside one child batch.
+- Durable implementation, promotion, closeout, and archival routes pause for
+  explicit, resumable approval by default. `--approval-policy unattended` is an
+  explicit operator override; the adapter records approval override evidence
+  before executing an approval-gated route under that policy.
+- Program child approval pauses include structured operator guidance. Prefer
+  `octon lifecycle program approve --run-id <program-run> --child <child>
+  --route <route> --reason <reason>`, followed by `octon lifecycle program
+  retry --run-id <program-run> --child <child>` or lifecycle resume.
+- `octon lifecycle cancel --run-id <run> --reason <text>` durably cancels
+  packet or program runs. `octon lifecycle program cancel` remains an alias for
+  program runs. Cancelled runs return `final_verdict: cancelled` and
+  `route_execution_mode: none` without dispatching selected routes.
+- Non-execute route handoffs do not consume bounded loop iterations because no
+  selected route has executed.
 
 This wrapper is not a dispatcher route and has no prompt bundle. It must
 preserve child authority boundaries and must not treat parent support receipts

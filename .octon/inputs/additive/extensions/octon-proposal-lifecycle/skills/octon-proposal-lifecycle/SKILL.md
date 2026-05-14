@@ -60,12 +60,21 @@ Resolve `bundle` or `lifecycle_action` through
   policy, support, or closure authority.
 - Use the shared `octon lifecycle` runner when the operator asks for a single
   end-to-end lifecycle orchestration surface. The runner owns planning, gates,
-  stale-receipt detection, loop limits, evidence, and resume; leaf proposal
-  skills continue to own packet-specific semantics and edits.
+  stale-receipt detection, loop limits, evidence, and resume. Dispatch follows
+  the published `execution_strategy`: `route-progression` for packet routes and
+  `orchestrated-replan-loop` for program orchestration. Leaf proposal skills
+  continue to own packet-specific semantics and edits.
 - Use `/octon-proposal-run-program-lifecycle` for shared
   `proposal-program` orchestration. It wraps `octon lifecycle run --lifecycle
   proposal-program --target <program-packet-path>` and has no dispatcher route
-  or prompt bundle.
+  or prompt bundle. By default this is a planned `program-route-handoff`; add
+  `--execute-routes` with bounded execution options when the operator asks for
+  the plan-execute-replan loop rather than handoff evidence only. One program
+  step is one parent-route dispatch or one runnable child-batch dispatch.
+- Use `octon lifecycle cancel --run-id <run> --reason <text>` for durable
+  packet or program cancellation. Program child approval pauses should route
+  through `octon lifecycle program approve` before retry/resume unless the
+  operator explicitly chooses an unattended override.
 - Ask clarifying questions only when the missing answer changes product
   semantics, promotion scope, irreversible churn, or authority ownership.
   Proceed with recorded assumptions when missing details are discoverable or

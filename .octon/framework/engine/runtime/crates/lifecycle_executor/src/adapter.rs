@@ -49,6 +49,11 @@ impl LifecycleRouteExecutor for DefaultLifecycleRouteExecutor {
         .map_err(LifecycleExecutionError::from)?;
         let receipts = observer::observe_receipts(&request.target, &request.receipts)
             .map_err(LifecycleExecutionError::from)?;
+        if cancellation_token_active(&request) {
+            let result = cancellation_result(&request, before, receipts)?;
+            write_result(&request.evidence_root, &request.route.route_id, &result)?;
+            return Ok(result);
+        }
         if let Some(missing_inputs) = missing_required_inputs(&request) {
             let result = input_binding_blocked_result(&request, before, receipts, missing_inputs)?;
             write_result(&request.evidence_root, &request.route.route_id, &result)?;
@@ -81,6 +86,69 @@ impl LifecycleRouteExecutor for DefaultLifecycleRouteExecutor {
         write_result(&request.evidence_root, &request.route.route_id, &result)?;
         Ok(result)
     }
+}
+
+fn cancellation_token_active(request: &LifecycleRouteExecutionRequest) -> bool {
+    request
+        .policy
+        .cancellation_token
+        .as_ref()
+        .map(|token| token.exists())
+        .unwrap_or(false)
+}
+
+fn cancellation_result(
+    request: &LifecycleRouteExecutionRequest,
+    manifest_status_before: Option<String>,
+    receipts: Vec<crate::result::ReceiptObservation>,
+) -> Result<LifecycleRouteExecutionResult, LifecycleExecutionError> {
+    let now = approval::now_rfc3339();
+    let token = request
+        .policy
+        .cancellation_token
+        .as_ref()
+        .map(|path| path.display().to_string())
+        .unwrap_or_else(|| "none".to_string());
+    let cancelled_path = request
+        .evidence_root
+        .join(format!("{}-cancelled.yml", request.route.route_id));
+    fs::write(
+        &cancelled_path,
+        format!(
+            "schema_version: octon-lifecycle-route-cancelled-v1\nrun_id: {}\nroute_id: {}\ncancellation_token: {}\nrecorded_at: {}\n",
+            request.run_id,
+            request.route.route_id,
+            token,
+            now
+        ),
+    )?;
+    Ok(LifecycleRouteExecutionResult {
+        schema_version: "octon-lifecycle-route-execution-result-v1".to_string(),
+        run_id: request.run_id.clone(),
+        route_id: request.route.route_id.clone(),
+        executor_used: request.executor.clone(),
+        status: "cancelled".to_string(),
+        started_at: now.clone(),
+        ended_at: now,
+        manifest_status_before: manifest_status_before.clone(),
+        manifest_status_after: observer::manifest_status(
+            &request.target,
+            &request.manifest_path,
+            &request.status_field,
+        )
+        .map_err(LifecycleExecutionError::from)?,
+        receipts_observed: receipts,
+        evidence_paths: vec![cancelled_path],
+        stdout_path: None,
+        stderr_path: None,
+        prompt_packet_path: None,
+        retryable: false,
+        next_action: "cancelled".to_string(),
+        error_class: Some(LifecycleErrorClass::Cancelled),
+        error_message: Some(
+            "lifecycle cancellation token existed before route dispatch".to_string(),
+        ),
+    })
 }
 
 fn missing_required_inputs(request: &LifecycleRouteExecutionRequest) -> Option<Vec<String>> {

@@ -84,15 +84,41 @@ pub fn write_approval_pause(
         .approval_reason
         .as_deref()
         .unwrap_or("durable lifecycle route requires explicit approval");
+    let default_resume_instruction = format!(
+        "octon lifecycle run --lifecycle {} --target {} --run-id {} --execute-routes --approval-policy unattended",
+        request.lifecycle_id,
+        request.target.display(),
+        request.run_id
+    );
+    let approval_instruction = request
+        .approval_context
+        .as_ref()
+        .and_then(|context| context.approval_instruction.as_ref())
+        .cloned()
+        .unwrap_or_else(|| default_resume_instruction.clone());
+    let retry_instruction = request
+        .approval_context
+        .as_ref()
+        .and_then(|context| context.retry_instruction.as_ref())
+        .cloned();
+    let unattended_override_instruction = request
+        .approval_context
+        .as_ref()
+        .and_then(|context| context.unattended_override_instruction.as_ref())
+        .cloned()
+        .unwrap_or_else(|| default_resume_instruction.clone());
     let content = format!(
-        "schema_version: octon-lifecycle-approval-required-v1\nrun_id: {}\nlifecycle_id: {}\nroute_id: {}\nreason: {}\nresume_instruction: octon lifecycle run --lifecycle {} --target {} --run-id {} --execute-routes --approval-policy unattended\nunattended_policy_notice: unattended is an explicit operator override; resumed durable route execution records approval override evidence before mutation\n",
+        "schema_version: octon-lifecycle-approval-required-v1\nrun_id: {}\nlifecycle_id: {}\nroute_id: {}\nreason: {}\nresume_instruction: {}\nunattended_policy_notice: unattended is an explicit operator override; resumed durable route execution records approval override evidence before mutation\n{}",
         request.run_id,
         request.lifecycle_id,
         request.route.route_id,
         reason,
-        request.lifecycle_id,
-        request.target.display(),
-        request.run_id
+        approval_instruction,
+        approval_context_yaml(
+            request,
+            retry_instruction.as_deref(),
+            &unattended_override_instruction
+        )
     );
     fs::write(&path, content)?;
     Ok(LifecycleRouteExecutionResult {
@@ -120,6 +146,41 @@ pub fn write_approval_pause(
         error_class: Some(LifecycleErrorClass::ApprovalRequired),
         error_message: Some(reason.to_string()),
     })
+}
+
+fn approval_context_yaml(
+    request: &LifecycleRouteExecutionRequest,
+    retry_instruction: Option<&str>,
+    unattended_override_instruction: &str,
+) -> String {
+    let Some(context) = request.approval_context.as_ref() else {
+        return format!(
+            "approval_context:\n  context_kind: packet-route\n  unattended_override_instruction: {}\n",
+            unattended_override_instruction
+        );
+    };
+    let mut lines = vec![
+        "approval_context:".to_string(),
+        format!("  context_kind: {}", context.context_kind),
+        format!(
+            "  unattended_override_instruction: {}",
+            unattended_override_instruction
+        ),
+    ];
+    if let Some(program_run_id) = context.program_run_id.as_ref() {
+        lines.push(format!("  program_run_id: {program_run_id}"));
+    }
+    if let Some(child_id) = context.child_id.as_ref() {
+        lines.push(format!("  child_id: {child_id}"));
+    }
+    if let Some(approval_instruction) = context.approval_instruction.as_ref() {
+        lines.push(format!("  approval_instruction: {approval_instruction}"));
+    }
+    if let Some(retry_instruction) = retry_instruction {
+        lines.push(format!("  retry_instruction: {retry_instruction}"));
+    }
+    lines.push(String::new());
+    lines.join("\n")
 }
 
 pub fn now_rfc3339() -> String {

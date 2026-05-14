@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/schemas/lifecycle-approval-guidance.schema.json",
+  "title": "Octon Lifecycle Approval Guidance",
+  "description": "Structured approval guidance embedded in lifecycle approval-required evidence.",
+  "type": "object",
+  "required": [
+    "context_kind",
+    "unattended_override_instruction"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "context_kind": {
+      "type": "string",
+      "enum": [
+        "packet-route",
+        "program-parent-route",
+        "program-child-route"
+      ]
+    },
+    "program_run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "child_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "approval_instruction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "retry_instruction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "unattended_override_instruction": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

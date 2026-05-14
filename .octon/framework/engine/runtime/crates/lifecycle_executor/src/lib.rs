@@ -18,8 +18,8 @@ pub use errors::{LifecycleErrorClass, LifecycleExecutionError};
 pub use generated::{resolve_prompt_bundle, resolve_workflow_manifest};
 pub use input_binding::default_bound_inputs;
 pub use request::{
-    LifecycleExecutionPolicy, LifecycleReceiptSpec, LifecycleRouteExecutionRequest,
-    LifecycleRouteSpec,
+    LifecycleApprovalContext, LifecycleExecutionPolicy, LifecycleReceiptSpec,
+    LifecycleRouteExecutionRequest, LifecycleRouteSpec,
 };
 pub use result::{
     LifecycleRouteCompletionObservation, LifecycleRouteExecutionResult, ReceiptObservation,

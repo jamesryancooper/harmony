@@ -2,6 +2,7 @@ schema_version: "octon-extension-lifecycle-contract-v1"
 lifecycle_id: "proposal-packet"
 owner_extension: "octon-proposal-lifecycle"
 version: "1.0.0"
+execution_strategy: "route-progression"
 
 target:
   input: "packet_path"

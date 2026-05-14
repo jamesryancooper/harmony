@@ -13,7 +13,7 @@ fail() { printf 'FAIL: %s\n' "$1" >&2; fail_count=$((fail_count + 1)); }
 
 assert_contains() {
   local pattern="$1" label="$2"
-  if rg -n --fixed-strings "$pattern" "$GUIDE" >/dev/null; then
+  if rg -n --fixed-strings -- "$pattern" "$GUIDE" >/dev/null; then
     pass "$label"
   else
     fail "$label"
@@ -22,7 +22,7 @@ assert_contains() {
 
 assert_not_contains() {
   local pattern="$1" label="$2"
-  if rg -n -i --fixed-strings "$pattern" "$GUIDE" >/dev/null; then
+  if rg -n -i --fixed-strings -- "$pattern" "$GUIDE" >/dev/null; then
     fail "$label"
   else
     pass "$label"
@@ -44,6 +44,16 @@ main() {
     "child paths program creation default is documented"
   assert_contains '`create-program`.' \
     "program creation route id is documented"
+  assert_contains 'program-route-handoff' \
+    "program lifecycle handoff boundary is documented"
+  assert_contains '--execute-routes' \
+    "execute-routes boundary is documented"
+  assert_contains '--max-child-concurrency' \
+    "program child concurrency bound is documented"
+  assert_contains '`route-progression` selects the packet lifecycle driver' \
+    "route-progression execution strategy is documented"
+  assert_contains '`orchestrated-replan-loop` selects the program lifecycle controller' \
+    "orchestrated replan loop execution strategy is documented"
   assert_not_contains "$stale_program_escalation" \
     "stale program read-only default regression is absent"
 

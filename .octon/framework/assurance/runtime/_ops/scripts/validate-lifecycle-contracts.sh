@@ -227,6 +227,17 @@ valid_program_execution_mode() {
   esac
 }
 
+valid_lifecycle_execution_strategy() {
+  case "$1" in
+    route-progression|orchestrated-replan-loop)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 valid_program_blocker_class() {
   case "$1" in
     approval-required|stale-receipt|target-drift|validation-failed|dependency-blocked|missing-evidence|executor-failed|write-scope-conflict|unsafe-resume|unsupported-mode|authority-boundary-ambiguous)
@@ -534,6 +545,43 @@ validate_program_section() {
   done
 }
 
+validate_execution_strategy() {
+  local contract="$1" lifecycle_id="$2"
+  local declared has_program resolved
+
+  declared="$(yq -r '.execution_strategy // ""' "$contract" 2>/dev/null || true)"
+  has_program=0
+  yq -e '.program' "$contract" >/dev/null 2>&1 && has_program=1
+
+  if [[ -n "$declared" && "$declared" != "null" ]]; then
+    if valid_lifecycle_execution_strategy "$declared"; then
+      pass "lifecycle execution strategy valid: $lifecycle_id -> $declared"
+    else
+      fail "lifecycle execution strategy invalid: $lifecycle_id -> $declared"
+      return
+    fi
+    resolved="$declared"
+  elif [[ "$has_program" -eq 1 ]]; then
+    resolved="orchestrated-replan-loop"
+    pass "lifecycle execution strategy inferred: $lifecycle_id -> $resolved"
+  else
+    resolved="route-progression"
+    pass "lifecycle execution strategy inferred: $lifecycle_id -> $resolved"
+  fi
+
+  if [[ "$has_program" -eq 1 && "$resolved" != "orchestrated-replan-loop" ]]; then
+    fail "program lifecycle must use execution_strategy orchestrated-replan-loop: $lifecycle_id"
+  elif [[ "$has_program" -eq 1 ]]; then
+    pass "program lifecycle execution strategy compatible: $lifecycle_id"
+  fi
+
+  if [[ "$has_program" -eq 0 && "$resolved" == "orchestrated-replan-loop" ]]; then
+    fail "orchestrated-replan-loop requires a program section: $lifecycle_id"
+  elif [[ "$has_program" -eq 0 ]]; then
+    pass "packet lifecycle execution strategy compatible: $lifecycle_id"
+  fi
+}
+
 validate_program_route_references() {
   local contract="$1" lifecycle_id="$2" contract_route_ids="$3"
   local handler_key recovery_route_id
@@ -588,6 +636,7 @@ validate_contract() {
   [[ "$owner" == "$pack_id" ]] && pass "owner_extension matches pack id: $pack_id" || fail "owner_extension must match pack id: $pack_id"
   [[ "$lifecycle_id" =~ ^[a-z][a-z0-9-]*$ ]] && pass "lifecycle_id valid: $lifecycle_id" || fail "lifecycle_id invalid: $lifecycle_id"
   [[ "$(yq -r '.version // ""' "$contract")" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && pass "lifecycle version valid: $lifecycle_id" || fail "lifecycle version invalid: $lifecycle_id"
+  validate_execution_strategy "$contract" "$lifecycle_id"
   validate_program_section "$contract" "$lifecycle_id"
 
   target_manifest="$(yq -r '.target.manifest_path // ""' "$contract")"

@@ -38,6 +38,23 @@ gates. `blocked`,
 outcomes for a lifecycle gate or route decision; they are not additional
 proposal statuses.
 
+## Execution Strategies
+
+Lifecycle identity names the lifecycle contract, route contracts name the
+eligible route surfaces, and `execution_strategy` names the runner shape. The
+proposal packet lifecycle declares `route-progression`: one target plans the
+next selected route, optionally dispatches it through the lifecycle executor
+adapter, and replans from packet-owned manifests and receipts. The proposal
+program lifecycle declares `orchestrated-replan-loop`: one parent orchestration
+target repeatedly plans from live state, dispatches one selected parent route
+or runnable child batch, replans from child-owned manifests and receipts, and
+stops only at terminal, blocked, approval-paused, failure, cancellation, or
+max-step exhaustion states.
+
+`loops:` remains packet receipt-loop policy inside route progression.
+`program.supported_execution_modes` remains program scheduler policy for child
+batch selection. Neither field is interchangeable with `execution_strategy`.
+
 Proposal review and revision are receipt-driven loops, not extra manifest
 statuses. `support/proposal-review.md` records `accepted`,
 `revision-required`, or `rejected`; `support/revisions/<revision-id>.md`
@@ -63,6 +80,24 @@ unattended` is an explicit operator override for one-run automation; the adapter
 records approval override evidence before executing an approval-gated route
 under that policy. Non-execute handoffs do not consume loop iterations; executed
 routes do consume bounded loop attempts.
+
+Lifecycle stop evidence uses a shared vocabulary across packet and program
+runs: planned handoff, adapter-dispatched route or child batch, terminal
+completion, `blocked-human`, `blocked-recoverable`, `blocked-unsafe`,
+`blocked-max-steps`, `failed`, `timed-out`, and `cancelled`. Packet
+route-progression writes hash-chained `lifecycle-events.ndjson` traces;
+program orchestration keeps its hash-chained `program-events.ndjson` replay
+log. These traces improve observability but do not replace checkpoints,
+manifests, receipts, promotion evidence, or closeout evidence.
+
+Cancellation is a durable lifecycle stop condition. `octon lifecycle cancel
+--run-id <run> --reason <text>` writes a retained cancellation marker and
+updates the checkpoint to `final_verdict: cancelled`; `octon lifecycle program
+cancel` remains a compatibility alias. Resume, retry, and execute-routes
+checks must return `cancelled` with `route_execution_mode: none` once the
+marker exists. Program child approval pauses should route operators through
+program approval controls while preserving adapter-level approval enforcement
+and explicit override evidence.
 
 ## Completion Invariants
 
@@ -111,6 +146,19 @@ program-source-context
 Program routes coordinate child packets. They do not own child lifecycle truth,
 child subtype manifest truth, child promotion targets, child validation
 verdicts, or child archive metadata.
+
+The generic program lifecycle runner follows the same executor boundary as the
+packet runner. By default, `octon lifecycle run --lifecycle proposal-program`
+plans the next runnable parent or child route, writes evidence and a checkpoint,
+and stops at `program-route-handoff`. It does not execute child implementation.
+When invoked with `--execute-routes`, it runs a bounded plan-execute-replan
+loop: plan from live repository state, dispatch one selected parent route or
+one runnable child batch through the shared lifecycle executor adapter, replan
+from child-owned manifests and receipts, and continue until terminal
+completion, blocked state, approval pause, failure, timeout, cancellation, or
+max-step exhaustion. `--max-steps` counts adapter dispatch attempts, not pure
+planning; one child batch is one step regardless of
+`--max-child-concurrency`.
 
 Parent program review and revision are receipt-driven loops, not extra
 manifest statuses. `support/proposal-review.md` records `accepted`,

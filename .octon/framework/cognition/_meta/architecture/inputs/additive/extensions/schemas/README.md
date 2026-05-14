@@ -5,6 +5,9 @@
 | `extension-pack.schema.json` | `.octon/inputs/additive/extensions/<pack-id>/pack.yml` |
 | `extension-routing-contract.schema.json` | `.octon/inputs/additive/extensions/<pack-id>/context/routing.contract.yml` |
 | `extension-lifecycle-contract.schema.json` | `.octon/inputs/additive/extensions/<pack-id>/context/lifecycle.contract.yml` |
+| `lifecycle-approval-guidance.schema.json` | Structured `approval_context` embedded in lifecycle `approval-required.yml` evidence |
+| `lifecycle-cancellation.schema.json` | Durable packet/program lifecycle cancellation markers and evidence |
+| `lifecycle-run-event.schema.json` | Packet route-progression `lifecycle-events.ndjson` records under execution control and workflow evidence roots |
 | `program-lifecycle-event.schema.json` | Program lifecycle `program-events.ndjson` records under execution control and workflow evidence roots |
 | `proposal-program-child-registry.schema.json` | `.octon/inputs/additive/extensions/octon-proposal-lifecycle/context/patterns/proposal-program.md` and proposal-program `resources/child-packet-index.yml` files |
 | `proposal-program-mutation.schema.json` | `octon lifecycle program propose-mutation|apply-mutation --spec <path>` mutation specs |

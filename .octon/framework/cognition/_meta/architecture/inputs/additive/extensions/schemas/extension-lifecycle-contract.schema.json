@@ -31,6 +31,13 @@
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
     },
+    "execution_strategy": {
+      "type": "string",
+      "enum": [
+        "route-progression",
+        "orchestrated-replan-loop"
+      ]
+    },
     "target": {
       "type": "object",
       "additionalProperties": false,
@@ -671,5 +678,39 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "program",
+          "execution_strategy"
+        ]
+      },
+      "then": {
+        "properties": {
+          "execution_strategy": {
+            "const": "orchestrated-replan-loop"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution_strategy": {
+            "const": "orchestrated-replan-loop"
+          }
+        },
+        "required": [
+          "execution_strategy"
+        ]
+      },
+      "then": {
+        "required": [
+          "program"
+        ]
+      }
+    }
+  ]
 }

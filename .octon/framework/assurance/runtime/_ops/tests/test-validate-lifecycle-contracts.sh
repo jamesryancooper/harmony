@@ -310,15 +310,45 @@ main() {
   write_valid_contract "$root"
   assert_success "valid lifecycle contract passes" "$root"
 
+  root="$(new_fixture_repo valid-explicit-route-progression)"
+  write_fixture_support "$root"
+  write_valid_contract "$root"
+  yq -i '.execution_strategy = "route-progression"' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
+  assert_success "valid explicit route-progression lifecycle contract passes" "$root"
+
   root="$(new_fixture_repo valid-program-contract)"
   write_fixture_support "$root"
   write_valid_program_contract "$root"
   assert_success_contract "valid program lifecycle contract passes from lifecycles directory" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
+  root="$(new_fixture_repo valid-explicit-orchestrated-program-contract)"
+  write_fixture_support "$root"
+  write_valid_program_contract "$root"
+  yq -i '.execution_strategy = "orchestrated-replan-loop"' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+  assert_success_contract "valid explicit orchestrated program lifecycle contract passes" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+
   root="$(new_fixture_repo valid-program-atomic-contract)"
   write_fixture_support "$root"
   write_valid_atomic_program_contract "$root"
   assert_success_contract "valid program-atomic lifecycle contract passes with explicit atomic policy" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+
+  root="$(new_fixture_repo invalid-execution-strategy)"
+  write_fixture_support "$root"
+  write_valid_contract "$root"
+  yq -i '.execution_strategy = "linear"' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
+  assert_failure "invalid lifecycle execution strategy fails" "$root"
+
+  root="$(new_fixture_repo invalid-program-route-progression)"
+  write_fixture_support "$root"
+  write_valid_program_contract "$root"
+  yq -i '.execution_strategy = "route-progression"' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+  assert_failure_contract "program lifecycle with route-progression fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+
+  root="$(new_fixture_repo invalid-orchestrated-without-program)"
+  write_fixture_support "$root"
+  write_valid_contract "$root"
+  yq -i '.execution_strategy = "orchestrated-replan-loop"' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
+  assert_failure "orchestrated lifecycle without program section fails" "$root"
 
   root="$(new_fixture_repo invalid-program-atomic-supported)"
   write_fixture_support "$root"
@@ -558,6 +588,9 @@ main() {
     mutation_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/proposal-program-mutation.schema.json"
     scaffold_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/proposal-program-scaffold.schema.json"
     event_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/program-lifecycle-event.schema.json"
+    packet_event_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/lifecycle-run-event.schema.json"
+    cancellation_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/lifecycle-cancellation.schema.json"
+    approval_guidance_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/lifecycle-approval-guidance.schema.json"
     lifecycle_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/extension-lifecycle-contract.schema.json"
 
     assert_schema_query_equals "registry identifier definition matches runtime" "$registry_schema" '."$defs".identifier.pattern' '^[a-z][a-z0-9-]*$'
@@ -608,7 +641,16 @@ main() {
     assert_schema_query_equals "event identifier definition matches runtime" "$event_schema" '."$defs".identifier.pattern' '^[a-z][a-z0-9-]*$'
     assert_schema_query_equals "event child id uses canonical identifier" "$event_schema" '.properties.child_id."$ref"' '#/$defs/identifier'
     assert_schema_query_equals "event route id uses canonical identifier pattern" "$event_schema" '.properties.route_id.pattern' '^[a-z][a-z0-9-]*$'
+    assert_schema_query_equals "packet lifecycle event schema version declared" "$packet_event_schema" '.properties.schema_version.const' 'octon-lifecycle-run-event-v1'
+    assert_schema_query_equals "packet lifecycle event supports cancellation events" "$packet_event_schema" '.properties.final_verdict.enum[] | select(. == "cancelled")' 'cancelled'
+    assert_schema_query_equals "packet lifecycle event step kind includes route dispatch" "$packet_event_schema" '.properties.step_kind.enum[] | select(. == "route-dispatch")' 'route-dispatch'
+    assert_schema_query_equals "lifecycle cancellation schema accepts shared cancellation marker" "$cancellation_schema" '.properties.schema_version.enum[] | select(. == "octon-lifecycle-cancellation-v1")' 'octon-lifecycle-cancellation-v1'
+    assert_schema_query_equals "lifecycle cancellation schema accepts program cancellation evidence" "$cancellation_schema" '.properties.schema_version.enum[] | select(. == "octon-program-lifecycle-cancelled-v1")' 'octon-program-lifecycle-cancelled-v1'
+    assert_schema_query_equals "approval guidance schema routes program child approval" "$approval_guidance_schema" '.properties.context_kind.enum[] | select(. == "program-child-route")' 'program-child-route'
+    assert_schema_query_equals "approval guidance schema preserves packet route guidance" "$approval_guidance_schema" '.properties.context_kind.enum[] | select(. == "packet-route")' 'packet-route'
 
+    assert_schema_query_equals "lifecycle execution strategy accepts route-progression" "$lifecycle_schema" '.properties.execution_strategy.enum[] | select(. == "route-progression")' 'route-progression'
+    assert_schema_query_equals "lifecycle execution strategy accepts orchestrated-replan-loop" "$lifecycle_schema" '.properties.execution_strategy.enum[] | select(. == "orchestrated-replan-loop")' 'orchestrated-replan-loop'
     assert_schema_query_equals "lifecycle recovery idempotency accepts non-recoverable" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.idempotency_class.enum[] | select(. == "non-recoverable")' 'non-recoverable'
     assert_schema_query_equals "lifecycle recovery replan behavior supports after-attempt" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.replan_behavior.enum[] | select(. == "after-attempt")' 'after-attempt'
 

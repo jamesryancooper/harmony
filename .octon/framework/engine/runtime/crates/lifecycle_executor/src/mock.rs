@@ -100,7 +100,7 @@ fn execute_mock_proposal_route(request: &LifecycleRouteExecutionRequest) -> Resu
                 .join("support/executable-implementation-prompt.md"),
             "# Executable Implementation Prompt\n\nMock implementation prompt.\n",
         ),
-        "run-packet-implementation" => write_receipt(
+        "run-packet-implementation" | "run-implementation" => write_receipt(
             request.target.join("support/implementation-run.md"),
             &run_implementation_fields(),
         ),

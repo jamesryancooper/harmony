@@ -1257,6 +1257,15 @@ pub(crate) enum LifecycleCmd {
         #[arg(long = "run-id")]
         run_id: String,
     },
+    /// Cancel a retained packet or program lifecycle run.
+    Cancel {
+        /// Lifecycle run id.
+        #[arg(long = "run-id")]
+        run_id: String,
+        /// Cancellation reason recorded as evidence.
+        #[arg(long = "reason")]
+        reason: String,
+    },
     /// Inspect and control proposal-program lifecycle runs.
     Program {
         #[command(subcommand)]

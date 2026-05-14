@@ -1,7 +1,8 @@
 use octon_lifecycle_executor::{
     default_bound_inputs, resolve_prompt_bundle, resolve_workflow_manifest,
-    DefaultLifecycleRouteExecutor, LifecycleExecutionPolicy, LifecycleReceiptSpec,
-    LifecycleRouteExecutionRequest, LifecycleRouteExecutor, LifecycleRouteSpec,
+    DefaultLifecycleRouteExecutor, LifecycleApprovalContext, LifecycleExecutionPolicy,
+    LifecycleReceiptSpec, LifecycleRouteExecutionRequest, LifecycleRouteExecutor,
+    LifecycleRouteSpec,
 };
 use std::env;
 use std::fs;
@@ -207,7 +208,61 @@ fn request(
             retry_attempt: 0,
             approval_policy: policy.to_string(),
         },
+        approval_context: None,
     }
+}
+
+#[test]
+fn approval_pause_writes_program_child_guidance_when_present() {
+    let root = temp_root("program-child-approval-guidance");
+    let executor = DefaultLifecycleRouteExecutor::new(&root);
+    let mut request = request(&root, "review-proposal", "agent", "minimize");
+    request.route.approval_required_by_default = true;
+    request.approval_context = Some(LifecycleApprovalContext {
+        context_kind: "program-child-route".to_string(),
+        program_run_id: Some("program-run".to_string()),
+        child_id: Some("child-a".to_string()),
+        approval_instruction: Some(
+            "octon lifecycle program approve --run-id program-run --child child-a --route review-proposal --reason <reason>".to_string(),
+        ),
+        retry_instruction: Some(
+            "octon lifecycle program retry --run-id program-run --child child-a".to_string(),
+        ),
+        unattended_override_instruction: Some(
+            "octon lifecycle run --lifecycle proposal-packet --target packet --run-id child-run --execute-routes --approval-policy unattended".to_string(),
+        ),
+    });
+
+    let result = executor.execute_route(request.clone()).unwrap();
+
+    assert_eq!(result.status, "approval-required");
+    let approval = fs::read_to_string(request.evidence_root.join("approval-required.yml")).unwrap();
+    assert!(approval.contains("context_kind: program-child-route"));
+    assert!(approval.contains("program_run_id: program-run"));
+    assert!(approval.contains("child_id: child-a"));
+    assert!(approval.contains("octon lifecycle program approve --run-id program-run --child child-a --route review-proposal"));
+    assert!(approval.contains("octon lifecycle program retry --run-id program-run --child child-a"));
+}
+
+#[test]
+fn cancellation_token_returns_cancelled_before_executor_dispatch() {
+    let root = temp_root("cancellation-token");
+    let executor = DefaultLifecycleRouteExecutor::new(&root);
+    let mut request = request(&root, "review-proposal", "agent", "unattended");
+    let token = root.join(".octon/state/control/execution/runs/test-run/cancellation.yml");
+    write_file(&token, "schema_version: octon-lifecycle-cancellation-v1\n");
+    request.policy.cancellation_token = Some(token.clone());
+
+    let result = executor.execute_route(request.clone()).unwrap();
+
+    assert_eq!(result.status, "cancelled");
+    assert_eq!(
+        result.error_class,
+        Some(octon_lifecycle_executor::LifecycleErrorClass::Cancelled)
+    );
+    let cancelled =
+        fs::read_to_string(request.evidence_root.join("review-proposal-cancelled.yml")).unwrap();
+    assert!(cancelled.contains(&token.display().to_string()));
 }
 
 #[test]
@@ -439,12 +494,7 @@ fn mock_executor_writes_structured_result_and_receipt_observation() {
     let root = temp_root("mock");
     let executor = DefaultLifecycleRouteExecutor::new(&root);
     let result = executor
-        .execute_route(request(
-            &root,
-            "review-packet",
-            "extension",
-            "unattended",
-        ))
+        .execute_route(request(&root, "review-packet", "extension", "unattended"))
         .unwrap();
     assert_eq!(result.status, "completed");
     assert_eq!(result.executor_used, "mock");

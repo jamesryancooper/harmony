@@ -37,9 +37,18 @@
 `octon-proposal-lifecycle-run-packet-lifecycle` wrap the shared
 `octon lifecycle run --lifecycle proposal-packet --target <packet-path>` CLI.
 They are orchestration surfaces, not a prompt bundle route.
+The proposal packet lifecycle uses `execution_strategy: route-progression`;
+the proposal program lifecycle uses
+`execution_strategy: orchestrated-replan-loop`.
 
 `octon-proposal-run-program-lifecycle` and
 `octon-proposal-lifecycle-run-program-lifecycle` wrap
 `octon lifecycle run --lifecycle proposal-program --target
 <program-packet-path>`. They are orchestration surfaces, not dispatcher routes
-or prompt bundles.
+or prompt bundles. Without `--execute-routes`, they stop at a planned
+`program-route-handoff`; with `--execute-routes`, selected parent or child
+routes run through a bounded plan-execute-replan loop. One step is one parent
+route dispatch or one runnable child batch dispatch; one child batch remains
+one step regardless of `--max-child-concurrency`. Execution remains bounded by
+dependency gates, child receipts, write-scope checks, approval gates, and
+`--max-steps`.

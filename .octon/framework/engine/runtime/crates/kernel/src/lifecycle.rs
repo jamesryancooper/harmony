@@ -4,7 +4,7 @@ use anyhow::{bail, Context, Result};
 use octon_authority_engine::now_rfc3339;
 use octon_core::root::RootResolver;
 use octon_lifecycle_executor::{
-    default_bound_inputs, LifecycleExecutionPolicy, LifecycleReceiptSpec,
+    default_bound_inputs, LifecycleApprovalContext, LifecycleExecutionPolicy, LifecycleReceiptSpec,
     LifecycleRouteExecutionRequest, LifecycleRouteSpec,
 };
 use octon_runtime_resolver::{
@@ -14,7 +14,8 @@ use serde::{Deserialize, Serialize};
 use serde_yaml::Value;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
-use std::fs;
+use std::fs::{self, OpenOptions};
+use std::io::Write;
 use std::path::{Component, Path, PathBuf};
 use std::process::Command as ProcessCommand;
 
@@ -26,6 +27,141 @@ const GENERATED_EXTENSION_PUBLISHED_PREFIX: &str =
 const FRAMEWORK_ASSURANCE_SCRIPT_PREFIX: &str = ".octon/framework/assurance/runtime/_ops/scripts/";
 const WORKFLOW_EVIDENCE_ROOT_REL: &str = "state/evidence/runs/workflows";
 const RUN_CONTROL_ROOT_REL: &str = "state/control/execution/runs";
+const ROUTE_PROGRESSION_STRATEGY: &str = "route-progression";
+const ORCHESTRATED_REPLAN_LOOP_STRATEGY: &str = "orchestrated-replan-loop";
+const LIFECYCLE_EVENT_SCHEMA_VERSION: &str = "octon-lifecycle-run-event-v1";
+const LIFECYCLE_EVENT_FILE: &str = "lifecycle-events.ndjson";
+const LIFECYCLE_CANCELLATION_FILE: &str = "cancellation.yml";
+const LIFECYCLE_CANCELLED_EVIDENCE_FILE: &str = "lifecycle-cancelled.yml";
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) enum LifecycleExecutionStrategy {
+    RouteProgression,
+    OrchestratedReplanLoop,
+}
+
+impl LifecycleExecutionStrategy {
+    pub(crate) fn as_str(self) -> &'static str {
+        match self {
+            LifecycleExecutionStrategy::RouteProgression => ROUTE_PROGRESSION_STRATEGY,
+            LifecycleExecutionStrategy::OrchestratedReplanLoop => ORCHESTRATED_REPLAN_LOOP_STRATEGY,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum LifecycleStopClass {
+    Completed,
+    RouteReady,
+    Planned,
+    ApprovalRequired,
+    BlockedRecoverable,
+    BlockedHuman,
+    BlockedUnsafe,
+    BlockedMaxSteps,
+    Failed,
+    TimedOut,
+    Cancelled,
+}
+
+impl LifecycleStopClass {
+    pub(crate) fn is_terminal_or_blocked(self) -> bool {
+        !matches!(
+            self,
+            LifecycleStopClass::RouteReady | LifecycleStopClass::Planned
+        )
+    }
+}
+
+pub(crate) fn classify_lifecycle_status(status: &str) -> LifecycleStopClass {
+    match status {
+        "completed" | "terminal" | "no-op" | "skipped-idempotent" => LifecycleStopClass::Completed,
+        "route-ready"
+        | "gate-rerouted"
+        | "runnable"
+        | "mock-route-executed"
+        | "adapter-executed" => LifecycleStopClass::RouteReady,
+        "planned" | "partial" | "program-route-ready" => LifecycleStopClass::Planned,
+        "approval-required" => LifecycleStopClass::ApprovalRequired,
+        "blocked-human" => LifecycleStopClass::BlockedHuman,
+        "blocked-recoverable"
+        | "blocked"
+        | "blocked-no-route"
+        | "blocked-gate"
+        | "blocked-max-iterations" => LifecycleStopClass::BlockedRecoverable,
+        "blocked-unsafe" => LifecycleStopClass::BlockedUnsafe,
+        "blocked-max-steps" => LifecycleStopClass::BlockedMaxSteps,
+        "failed" => LifecycleStopClass::Failed,
+        "timed-out" => LifecycleStopClass::TimedOut,
+        "cancelled" => LifecycleStopClass::Cancelled,
+        _ => LifecycleStopClass::BlockedRecoverable,
+    }
+}
+
+pub(crate) struct LifecycleStepBudget {
+    max_steps: u32,
+    steps_used: u32,
+}
+
+impl LifecycleStepBudget {
+    pub(crate) fn new(max_steps: u32) -> Self {
+        Self {
+            max_steps,
+            steps_used: 0,
+        }
+    }
+
+    pub(crate) fn exhausted(&self) -> bool {
+        self.steps_used >= self.max_steps
+    }
+
+    pub(crate) fn step_index(&self) -> u32 {
+        self.steps_used
+    }
+
+    pub(crate) fn step_number(&self) -> u32 {
+        self.steps_used.saturating_add(1)
+    }
+
+    pub(crate) fn consume_dispatch(&mut self) {
+        self.steps_used = self.steps_used.saturating_add(1);
+    }
+
+    pub(crate) fn steps_used(&self) -> u32 {
+        self.steps_used
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+struct LifecycleRunEvent {
+    schema_version: String,
+    run_id: String,
+    lifecycle_id: String,
+    execution_strategy: String,
+    target: String,
+    event_index: u64,
+    previous_event_sha256: Option<String>,
+    event_sha256: Option<String>,
+    event_type: String,
+    event_category: String,
+    recorded_at: String,
+    actor: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    step_index: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    step_number: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    step_kind: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    route_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    child_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    final_verdict: Option<String>,
+    #[serde(default)]
+    data: BTreeMap<String, String>,
+}
 
 #[derive(Clone, Debug)]
 pub(crate) struct RunLifecycleOptions {
@@ -48,6 +184,7 @@ pub(crate) struct LifecyclePlanResult {
     pub schema_version: String,
     pub lifecycle_id: String,
     pub owner_extension: String,
+    pub execution_strategy: String,
     pub contract_path: String,
     pub target: String,
     pub target_exists: bool,
@@ -96,6 +233,7 @@ pub(crate) struct LifecycleRunResult {
     pub schema_version: String,
     pub run_id: String,
     pub lifecycle_id: String,
+    pub execution_strategy: String,
     pub target: String,
     pub executor: String,
     pub route_execution_mode: String,
@@ -110,6 +248,8 @@ pub(crate) struct LifecycleRunResult {
 struct LifecycleContract {
     lifecycle_id: String,
     owner_extension: String,
+    #[serde(default)]
+    execution_strategy: Option<LifecycleExecutionStrategy>,
     target: TargetSpec,
     #[serde(default)]
     terminal_outcomes: Vec<TerminalOutcomeSpec>,
@@ -155,6 +295,12 @@ struct ProgramAtomicPolicySpec {
 
 fn default_true() -> bool {
     true
+}
+
+fn default_route_progression_execution_strategy() -> String {
+    LifecycleExecutionStrategy::RouteProgression
+        .as_str()
+        .to_string()
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -360,6 +506,8 @@ struct LifecycleCheckpoint {
     schema_version: String,
     run_id: String,
     lifecycle_id: String,
+    #[serde(default = "default_route_progression_execution_strategy")]
+    execution_strategy: String,
     target: String,
     current_state: Option<String>,
     completed_states: Vec<String>,
@@ -372,6 +520,12 @@ struct LifecycleCheckpoint {
     last_validator_results: Vec<GatePlanResult>,
     #[serde(default)]
     run_inputs: BTreeMap<String, String>,
+    #[serde(default)]
+    cancelled_at: Option<String>,
+    #[serde(default)]
+    cancel_reason: Option<String>,
+    #[serde(default)]
+    cancellation_evidence_path: Option<String>,
     terminal_outcome: Option<String>,
     final_verdict: String,
     resume_instruction: String,
@@ -384,25 +538,179 @@ struct LifecycleRunInputsEvidence<'a> {
     inputs: &'a BTreeMap<String, String>,
 }
 
+#[derive(Serialize)]
+struct LifecycleControlResult {
+    schema_version: &'static str,
+    run_id: String,
+    control: String,
+    final_verdict: String,
+    checkpoint_path: String,
+    evidence_path: String,
+    recorded_at: String,
+    reason: String,
+}
+
+pub(crate) fn lifecycle_cancellation_token_path(control_root: &Path) -> PathBuf {
+    control_root.join(LIFECYCLE_CANCELLATION_FILE)
+}
+
+fn lifecycle_cancelled_evidence_path(evidence_root: &Path) -> PathBuf {
+    evidence_root.join(LIFECYCLE_CANCELLED_EVIDENCE_FILE)
+}
+
+fn lifecycle_event_log_path(root: &Path) -> PathBuf {
+    root.join(LIFECYCLE_EVENT_FILE)
+}
+
+fn lifecycle_checkpoint_cancelled(checkpoint: &LifecycleCheckpoint) -> bool {
+    checkpoint.final_verdict == "cancelled" || checkpoint.cancelled_at.is_some()
+}
+
+fn lifecycle_sha256_digest(bytes: &[u8]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(bytes);
+    format!("sha256:{:x}", hasher.finalize())
+}
+
+fn lifecycle_event_hash(event: &LifecycleRunEvent) -> Result<String> {
+    let mut event = event.clone();
+    event.event_sha256 = None;
+    Ok(lifecycle_sha256_digest(
+        serde_json::to_string(&event)?.as_bytes(),
+    ))
+}
+
+fn last_lifecycle_event_hash(log_path: &Path) -> Result<Option<String>> {
+    if !log_path.exists() {
+        return Ok(None);
+    }
+    let content = fs::read_to_string(log_path)?;
+    for line in content.lines().rev() {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let event: LifecycleRunEvent = serde_json::from_str(line)?;
+        return Ok(event.event_sha256);
+    }
+    Ok(None)
+}
+
+fn count_lifecycle_events(log_path: &Path) -> Result<u64> {
+    if !log_path.exists() {
+        return Ok(0);
+    }
+    Ok(fs::read_to_string(log_path)?
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .count() as u64)
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn append_lifecycle_event(
+    control_root: &Path,
+    evidence_root: &Path,
+    run_id: &str,
+    lifecycle_id: &str,
+    execution_strategy: &str,
+    target: &Path,
+    event_type: &str,
+    event_category: &str,
+    actor: &str,
+    step_index: Option<u32>,
+    step_number: Option<u32>,
+    step_kind: Option<&str>,
+    route_id: Option<&str>,
+    child_id: Option<&str>,
+    final_verdict: Option<&str>,
+    data: BTreeMap<String, String>,
+) -> Result<u64> {
+    fs::create_dir_all(control_root)?;
+    fs::create_dir_all(evidence_root)?;
+    let control_log = lifecycle_event_log_path(control_root);
+    let evidence_log = lifecycle_event_log_path(evidence_root);
+    let event_index = count_lifecycle_events(&control_log)?;
+    let previous_event_sha256 = last_lifecycle_event_hash(&control_log)?;
+    let mut event = LifecycleRunEvent {
+        schema_version: LIFECYCLE_EVENT_SCHEMA_VERSION.to_string(),
+        run_id: run_id.to_string(),
+        lifecycle_id: lifecycle_id.to_string(),
+        execution_strategy: execution_strategy.to_string(),
+        target: target.display().to_string(),
+        event_index,
+        previous_event_sha256,
+        event_sha256: None,
+        event_type: event_type.to_string(),
+        event_category: event_category.to_string(),
+        recorded_at: now_rfc3339()?,
+        actor: actor.to_string(),
+        step_index,
+        step_number,
+        step_kind: step_kind.map(str::to_string),
+        route_id: route_id.map(str::to_string),
+        child_id: child_id.map(str::to_string),
+        final_verdict: final_verdict.map(str::to_string),
+        data,
+    };
+    event.event_sha256 = Some(lifecycle_event_hash(&event)?);
+    let line = serde_json::to_string(&event)?;
+    for path in [&control_log, &evidence_log] {
+        let mut file = OpenOptions::new().create(true).append(true).open(path)?;
+        writeln!(file, "{line}")?;
+    }
+    Ok(event_index)
+}
+
+pub(crate) fn append_lifecycle_run_started_if_needed(
+    control_root: &Path,
+    evidence_root: &Path,
+    run_id: &str,
+    lifecycle_id: &str,
+    execution_strategy: &str,
+    target: &Path,
+) -> Result<()> {
+    if count_lifecycle_events(&lifecycle_event_log_path(control_root))? == 0 {
+        append_lifecycle_event(
+            control_root,
+            evidence_root,
+            run_id,
+            lifecycle_id,
+            execution_strategy,
+            target,
+            "run-started",
+            "lifecycle",
+            "runtime",
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            BTreeMap::new(),
+        )?;
+    }
+    Ok(())
+}
+
 pub(crate) fn cmd_lifecycle(cmd: LifecycleCmd) -> Result<()> {
     let octon_dir = RootResolver::resolve()?;
     match cmd {
         LifecycleCmd::Plan {
             lifecycle_id,
             target,
-        } => {
-            if is_program_lifecycle(&octon_dir, &lifecycle_id)? {
+        } => match lifecycle_execution_strategy_from_octon_dir(&octon_dir, &lifecycle_id)? {
+            LifecycleExecutionStrategy::RouteProgression => {
+                let plan = plan_lifecycle_from_octon_dir(&octon_dir, &lifecycle_id, &target)?;
+                println!("{}", serde_yaml::to_string(&plan)?);
+            }
+            LifecycleExecutionStrategy::OrchestratedReplanLoop => {
                 let plan = lifecycle_program::plan_program_lifecycle_from_octon_dir(
                     &octon_dir,
                     &lifecycle_id,
                     &target,
                 )?;
                 println!("{}", serde_yaml::to_string(&plan)?);
-            } else {
-                let plan = plan_lifecycle_from_octon_dir(&octon_dir, &lifecycle_id, &target)?;
-                println!("{}", serde_yaml::to_string(&plan)?);
             }
-        }
+        },
         LifecycleCmd::Run {
             lifecycle_id,
             target,
@@ -432,19 +740,23 @@ pub(crate) fn cmd_lifecycle(cmd: LifecycleCmd) -> Result<()> {
                 run_inputs,
                 program_child_filter: None,
             };
-            if is_program_lifecycle(&octon_dir, &options.lifecycle_id)? {
-                let result =
-                    lifecycle_program::run_program_lifecycle_from_octon_dir(&octon_dir, options)?;
-                println!("{}", serde_yaml::to_string(&result)?);
-            } else {
-                let result = if options.execute_routes {
-                    crate::lifecycle_driver::run_lifecycle_execute_from_octon_dir(
+            match lifecycle_execution_strategy_from_octon_dir(&octon_dir, &options.lifecycle_id)? {
+                LifecycleExecutionStrategy::RouteProgression => {
+                    let result = if options.execute_routes {
+                        crate::lifecycle_driver::run_lifecycle_execute_from_octon_dir(
+                            &octon_dir, options,
+                        )?
+                    } else {
+                        run_lifecycle_from_octon_dir(&octon_dir, options)?
+                    };
+                    println!("{}", serde_yaml::to_string(&result)?);
+                }
+                LifecycleExecutionStrategy::OrchestratedReplanLoop => {
+                    let result = lifecycle_program::run_program_lifecycle_from_octon_dir(
                         &octon_dir, options,
-                    )?
-                } else {
-                    run_lifecycle_from_octon_dir(&octon_dir, options)?
-                };
-                println!("{}", serde_yaml::to_string(&result)?);
+                    )?;
+                    println!("{}", serde_yaml::to_string(&result)?);
+                }
             }
         }
         LifecycleCmd::Resume { run_id } => {
@@ -457,6 +769,10 @@ pub(crate) fn cmd_lifecycle(cmd: LifecycleCmd) -> Result<()> {
                 let result = resume_lifecycle_from_octon_dir(&octon_dir, &run_id)?;
                 println!("{}", serde_yaml::to_string(&result)?);
             }
+        }
+        LifecycleCmd::Cancel { run_id, reason } => {
+            let result = cancel_lifecycle_run(&octon_dir, &run_id, &reason)?;
+            println!("{}", serde_yaml::to_string(&result)?);
         }
         LifecycleCmd::Program { cmd } => match cmd {
             LifecycleProgramCmd::Inspect { run_id } => {
@@ -500,8 +816,7 @@ pub(crate) fn cmd_lifecycle(cmd: LifecycleCmd) -> Result<()> {
                 println!("{}", serde_yaml::to_string(&result)?);
             }
             LifecycleProgramCmd::Cancel { run_id, reason } => {
-                let result =
-                    lifecycle_program::cancel_program_lifecycle_run(&octon_dir, &run_id, &reason)?;
+                let result = cancel_lifecycle_run(&octon_dir, &run_id, &reason)?;
                 println!("{}", serde_yaml::to_string(&result)?);
             }
             LifecycleProgramCmd::ProposeMutation { run_id, spec } => {
@@ -581,6 +896,144 @@ fn valid_run_input_key(key: &str) -> bool {
             .all(|ch| ch.is_ascii_alphanumeric() || ch == '_' || ch == '-')
 }
 
+fn cancel_lifecycle_run(octon_dir: &Path, run_id: &str, reason: &str) -> Result<Value> {
+    if lifecycle_program::program_checkpoint_exists(octon_dir, run_id)? {
+        return Ok(serde_yaml::to_value(
+            lifecycle_program::cancel_program_lifecycle_run(octon_dir, run_id, reason)?,
+        )?);
+    }
+    Ok(serde_yaml::to_value(cancel_packet_lifecycle_run(
+        octon_dir, run_id, reason,
+    )?)?)
+}
+
+fn cancel_packet_lifecycle_run(
+    octon_dir: &Path,
+    run_id: &str,
+    reason: &str,
+) -> Result<LifecycleControlResult> {
+    let sanitized_run_id = sanitize_run_id(run_id)?;
+    let control_root = octon_dir.join(RUN_CONTROL_ROOT_REL).join(&sanitized_run_id);
+    let evidence_root = octon_dir
+        .join(WORKFLOW_EVIDENCE_ROOT_REL)
+        .join(&sanitized_run_id);
+    let checkpoint_path = control_root.join("lifecycle-checkpoint.yml");
+    if !checkpoint_path.is_file() {
+        bail!("no retained lifecycle checkpoint found for run id {sanitized_run_id}");
+    }
+    fs::create_dir_all(&control_root)?;
+    fs::create_dir_all(&evidence_root)?;
+    let mut checkpoint: LifecycleCheckpoint = serde_yaml::from_slice(&fs::read(&checkpoint_path)?)?;
+    let cancelled_at = checkpoint.cancelled_at.clone().unwrap_or(now_rfc3339()?);
+    let cancellation_token = lifecycle_cancellation_token_path(&control_root);
+    let cancellation_evidence = lifecycle_cancelled_evidence_path(&evidence_root);
+    let repo_root = repo_root_for_octon(octon_dir)?;
+    let content = format!(
+        "schema_version: octon-lifecycle-cancellation-v1\nrun_id: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nreason: {}\ncancelled_at: {}\ncancellation_token: {}\ncheckpoint_path: {}\n",
+        sanitized_run_id,
+        checkpoint.lifecycle_id,
+        checkpoint.execution_strategy,
+        checkpoint.target,
+        reason,
+        cancelled_at,
+        rel_display(&repo_root, &cancellation_token),
+        rel_display(&repo_root, &checkpoint_path)
+    );
+    fs::write(&cancellation_token, &content)?;
+    fs::write(&cancellation_evidence, &content)?;
+    append_lifecycle_run_started_if_needed(
+        &control_root,
+        &evidence_root,
+        &sanitized_run_id,
+        &checkpoint.lifecycle_id,
+        &checkpoint.execution_strategy,
+        Path::new(&checkpoint.target),
+    )?;
+    let mut data = BTreeMap::new();
+    data.insert("reason".to_string(), reason.to_string());
+    data.insert(
+        "cancellation_token".to_string(),
+        rel_display(&repo_root, &cancellation_token),
+    );
+    data.insert(
+        "cancellation_evidence_path".to_string(),
+        rel_display(&repo_root, &cancellation_evidence),
+    );
+    append_lifecycle_event(
+        &control_root,
+        &evidence_root,
+        &sanitized_run_id,
+        &checkpoint.lifecycle_id,
+        &checkpoint.execution_strategy,
+        Path::new(&checkpoint.target),
+        "cancelled",
+        "control",
+        "operator",
+        None,
+        None,
+        None,
+        None,
+        None,
+        Some("cancelled"),
+        data,
+    )?;
+    checkpoint.cancelled_at = Some(cancelled_at.clone());
+    checkpoint.cancel_reason = Some(reason.to_string());
+    checkpoint.cancellation_evidence_path = Some(rel_display(&repo_root, &cancellation_evidence));
+    checkpoint.final_verdict = "cancelled".to_string();
+    checkpoint.terminal_outcome = Some("cancelled".to_string());
+    checkpoint.resume_instruction = "cancelled lifecycle runs cannot resume dispatch".to_string();
+    fs::write(&checkpoint_path, serde_yaml::to_string(&checkpoint)?)?;
+    fs::write(
+        evidence_root.join("summary.md"),
+        lifecycle_cancelled_summary(&checkpoint, &cancelled_at),
+    )?;
+    Ok(LifecycleControlResult {
+        schema_version: "octon-lifecycle-control-result-v1",
+        run_id: sanitized_run_id,
+        control: "cancel".to_string(),
+        final_verdict: "cancelled".to_string(),
+        checkpoint_path: rel_display(&repo_root, &checkpoint_path),
+        evidence_path: rel_display(&repo_root, &cancellation_evidence),
+        recorded_at: cancelled_at,
+        reason: reason.to_string(),
+    })
+}
+
+fn lifecycle_cancelled_summary(checkpoint: &LifecycleCheckpoint, cancelled_at: &str) -> String {
+    format!(
+        "# Lifecycle Run\n\nrun_id: {}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nroute_execution_mode: none\nselected_route: none\nterminal_outcome: cancelled\nfinal_verdict: cancelled\n\nNote: this lifecycle run was cancelled durably. Resume and execute-routes operations must not dispatch routes for this run.\n",
+        checkpoint.run_id,
+        cancelled_at,
+        checkpoint.lifecycle_id,
+        checkpoint.execution_strategy,
+        checkpoint.target,
+    )
+}
+
+fn lifecycle_cancelled_run_result(
+    repo_root: &Path,
+    evidence_root: &Path,
+    checkpoint_path: &Path,
+    checkpoint: &LifecycleCheckpoint,
+    executor: &str,
+) -> LifecycleRunResult {
+    LifecycleRunResult {
+        schema_version: "octon-lifecycle-run-result-v1".to_string(),
+        run_id: checkpoint.run_id.clone(),
+        lifecycle_id: checkpoint.lifecycle_id.clone(),
+        execution_strategy: checkpoint.execution_strategy.clone(),
+        target: checkpoint.target.clone(),
+        executor: executor.to_string(),
+        route_execution_mode: "none".to_string(),
+        bundle_root: rel_display(repo_root, evidence_root),
+        checkpoint_path: rel_display(repo_root, checkpoint_path),
+        selected_route: None,
+        terminal_outcome: Some("cancelled".to_string()),
+        final_verdict: "cancelled".to_string(),
+    }
+}
+
 pub(crate) fn plan_lifecycle_from_octon_dir(
     octon_dir: &Path,
     lifecycle_id: &str,
@@ -588,6 +1041,14 @@ pub(crate) fn plan_lifecycle_from_octon_dir(
 ) -> Result<LifecyclePlanResult> {
     let repo_root = repo_root_for_octon(octon_dir)?;
     let loaded = load_lifecycle_contract(octon_dir, lifecycle_id)?;
+    let execution_strategy = resolve_lifecycle_execution_strategy(&loaded.contract)?;
+    if execution_strategy != LifecycleExecutionStrategy::RouteProgression {
+        bail!(
+            "lifecycle {} uses execution_strategy {}; use the program lifecycle runner",
+            lifecycle_id,
+            execution_strategy.as_str()
+        );
+    }
     let target_abs = resolve_lifecycle_target_path(&repo_root, target)?;
     let target_state = build_target_state(&repo_root, &loaded.contract, &target_abs)?;
     let terminal_outcome = select_terminal_outcome(&loaded.contract, &target_state)?;
@@ -625,6 +1086,7 @@ pub(crate) fn plan_lifecycle_from_octon_dir(
         schema_version: "octon-lifecycle-plan-v1".to_string(),
         lifecycle_id: loaded.contract.lifecycle_id.clone(),
         owner_extension: loaded.contract.owner_extension.clone(),
+        execution_strategy: execution_strategy.as_str().to_string(),
         contract_path: rel_display(&repo_root, &loaded.path),
         target: rel_display(&repo_root, &target_abs),
         target_exists: target_state.target_exists,
@@ -653,8 +1115,17 @@ pub(crate) fn run_lifecycle_from_octon_dir(
         .join(WORKFLOW_EVIDENCE_ROOT_REL)
         .join(&sanitized_run_id);
     let control_root = octon_dir.join(RUN_CONTROL_ROOT_REL).join(&sanitized_run_id);
+    let checkpoint_path = control_root.join("lifecycle-checkpoint.yml");
 
     let loaded = load_lifecycle_contract(octon_dir, &options.lifecycle_id)?;
+    let execution_strategy = resolve_lifecycle_execution_strategy(&loaded.contract)?;
+    if execution_strategy != LifecycleExecutionStrategy::RouteProgression {
+        bail!(
+            "lifecycle {} uses execution_strategy {}; use the program lifecycle runner",
+            options.lifecycle_id,
+            execution_strategy.as_str()
+        );
+    }
     let target_abs = resolve_lifecycle_target_path(&repo_root, &options.target)?;
     let target_rel = rel_display(&repo_root, &target_abs);
     let mut plan =
@@ -665,6 +1136,7 @@ pub(crate) fn run_lifecycle_from_octon_dir(
             checkpoint,
             &sanitized_run_id,
             &options.lifecycle_id,
+            execution_strategy.as_str(),
             &target_rel,
         )?;
     }
@@ -691,6 +1163,27 @@ pub(crate) fn run_lifecycle_from_octon_dir(
 
     fs::create_dir_all(&evidence_root)?;
     fs::create_dir_all(&control_root)?;
+    append_lifecycle_run_started_if_needed(
+        &control_root,
+        &evidence_root,
+        &sanitized_run_id,
+        &options.lifecycle_id,
+        execution_strategy.as_str(),
+        &target_abs,
+    )?;
+    if let Some(checkpoint) = previous_checkpoint.as_ref() {
+        if lifecycle_checkpoint_cancelled(checkpoint)
+            || lifecycle_cancellation_token_path(&control_root).exists()
+        {
+            return Ok(lifecycle_cancelled_run_result(
+                &repo_root,
+                &evidence_root,
+                &checkpoint_path,
+                checkpoint,
+                options.executor.as_str(),
+            ));
+        }
+    }
 
     if let Some(route) = plan.next_route.as_ref() {
         if route_has_skip_when_target_exists(&loaded.contract, &route.route_id)
@@ -729,6 +1222,7 @@ pub(crate) fn run_lifecycle_from_octon_dir(
         schema_version: "octon-lifecycle-checkpoint-v1".to_string(),
         run_id: sanitized_run_id.clone(),
         lifecycle_id: options.lifecycle_id.clone(),
+        execution_strategy: execution_strategy.as_str().to_string(),
         target: target_rel.clone(),
         current_state: plan
             .next_route
@@ -753,11 +1247,19 @@ pub(crate) fn run_lifecycle_from_octon_dir(
         receipt_digests: receipt_digest_map(&plan),
         last_validator_results: plan.gate_results.clone(),
         run_inputs,
+        cancelled_at: previous_checkpoint
+            .as_ref()
+            .and_then(|checkpoint| checkpoint.cancelled_at.clone()),
+        cancel_reason: previous_checkpoint
+            .as_ref()
+            .and_then(|checkpoint| checkpoint.cancel_reason.clone()),
+        cancellation_evidence_path: previous_checkpoint
+            .as_ref()
+            .and_then(|checkpoint| checkpoint.cancellation_evidence_path.clone()),
         terminal_outcome: plan.terminal_outcome.clone(),
         final_verdict: final_verdict.clone(),
         resume_instruction: format!("octon lifecycle resume --run-id {}", sanitized_run_id),
     };
-    let checkpoint_path = control_root.join("lifecycle-checkpoint.yml");
     fs::write(&checkpoint_path, serde_yaml::to_string(&checkpoint)?)?;
     fs::write(
         evidence_root.join("plan.yml"),
@@ -772,11 +1274,84 @@ pub(crate) fn run_lifecycle_from_octon_dir(
         evidence_root.join("commands.md"),
         lifecycle_commands(&options.lifecycle_id, &target_abs, plan.next_route.as_ref()),
     )?;
+    let mut event_data = BTreeMap::new();
+    event_data.insert("final_verdict".to_string(), final_verdict.clone());
+    if let Some(route) = plan.next_route.as_ref() {
+        event_data.insert("selected_route".to_string(), route.route_id.clone());
+    }
+    append_lifecycle_event(
+        &control_root,
+        &evidence_root,
+        &sanitized_run_id,
+        &options.lifecycle_id,
+        execution_strategy.as_str(),
+        &target_abs,
+        "plan-created",
+        "planning",
+        "runtime",
+        None,
+        None,
+        None,
+        plan.next_route
+            .as_ref()
+            .map(|route| route.route_id.as_str()),
+        None,
+        Some(&final_verdict),
+        event_data,
+    )?;
+    if !options.execute_routes && plan.next_route.is_some() && final_verdict == "route-ready" {
+        append_lifecycle_event(
+            &control_root,
+            &evidence_root,
+            &sanitized_run_id,
+            &options.lifecycle_id,
+            execution_strategy.as_str(),
+            &target_abs,
+            "route-handoff",
+            "handoff",
+            "runtime",
+            None,
+            None,
+            None,
+            plan.next_route
+                .as_ref()
+                .map(|route| route.route_id.as_str()),
+            None,
+            Some(&final_verdict),
+            BTreeMap::new(),
+        )?;
+    } else if classify_lifecycle_status(&final_verdict).is_terminal_or_blocked() {
+        append_lifecycle_event(
+            &control_root,
+            &evidence_root,
+            &sanitized_run_id,
+            &options.lifecycle_id,
+            execution_strategy.as_str(),
+            &target_abs,
+            if final_verdict == "completed" {
+                "completed"
+            } else {
+                "blocked"
+            },
+            "status",
+            "runtime",
+            None,
+            None,
+            None,
+            plan.next_route
+                .as_ref()
+                .map(|route| route.route_id.as_str()),
+            None,
+            Some(&final_verdict),
+            BTreeMap::new(),
+        )?;
+    }
 
     Ok(LifecycleRunResult {
         schema_version: "octon-lifecycle-run-result-v1".to_string(),
         run_id: sanitized_run_id,
         lifecycle_id: options.lifecycle_id,
+        execution_strategy: execution_strategy.as_str().to_string(),
         target: target_rel,
         executor: options.executor.as_str().to_string(),
         route_execution_mode: route_execution_mode(
@@ -804,6 +1379,37 @@ pub(crate) fn resume_lifecycle_from_octon_dir(
     let repo_root = repo_root_for_octon(octon_dir)?;
     let target = PathBuf::from(&checkpoint.target);
     let loaded = load_lifecycle_contract(octon_dir, &checkpoint.lifecycle_id)?;
+    let execution_strategy = resolve_lifecycle_execution_strategy(&loaded.contract)?;
+    if execution_strategy != LifecycleExecutionStrategy::RouteProgression {
+        bail!(
+            "lifecycle {} uses execution_strategy {}; use the program lifecycle runner",
+            checkpoint.lifecycle_id,
+            execution_strategy.as_str()
+        );
+    }
+    if checkpoint.execution_strategy != execution_strategy.as_str() {
+        bail!(
+            "lifecycle run id {sanitized_run_id} checkpoint execution_strategy {} differs from loaded contract strategy {}",
+            checkpoint.execution_strategy,
+            execution_strategy.as_str()
+        );
+    }
+    let control_root = octon_dir.join(RUN_CONTROL_ROOT_REL).join(&sanitized_run_id);
+    let evidence_root = octon_dir
+        .join(WORKFLOW_EVIDENCE_ROOT_REL)
+        .join(&sanitized_run_id);
+    let checkpoint_path = control_root.join("lifecycle-checkpoint.yml");
+    if lifecycle_checkpoint_cancelled(&checkpoint)
+        || lifecycle_cancellation_token_path(&control_root).exists()
+    {
+        return Ok(lifecycle_cancelled_run_result(
+            &repo_root,
+            &evidence_root,
+            &checkpoint_path,
+            &checkpoint,
+            "resume",
+        ));
+    }
     let mut plan = plan_lifecycle_from_octon_dir(octon_dir, &checkpoint.lifecycle_id, &target)?;
     let reconstructed = plan
         .next_route
@@ -831,9 +1437,6 @@ pub(crate) fn resume_lifecycle_from_octon_dir(
         }
     }
 
-    let evidence_root = octon_dir
-        .join(WORKFLOW_EVIDENCE_ROOT_REL)
-        .join(&sanitized_run_id);
     fs::create_dir_all(&evidence_root)?;
     fs::write(
         evidence_root.join("resume-plan.yml"),
@@ -844,6 +1447,7 @@ pub(crate) fn resume_lifecycle_from_octon_dir(
         schema_version: "octon-lifecycle-run-result-v1".to_string(),
         run_id: sanitized_run_id.clone(),
         lifecycle_id: checkpoint.lifecycle_id,
+        execution_strategy: execution_strategy.as_str().to_string(),
         target: rel_display(
             &repo_root,
             &resolve_lifecycle_target_path(&repo_root, &target)?,
@@ -857,13 +1461,7 @@ pub(crate) fn resume_lifecycle_from_octon_dir(
         )
         .to_string(),
         bundle_root: rel_display(&repo_root, &evidence_root),
-        checkpoint_path: rel_display(
-            &repo_root,
-            &octon_dir
-                .join(RUN_CONTROL_ROOT_REL)
-                .join(&sanitized_run_id)
-                .join("lifecycle-checkpoint.yml"),
-        ),
+        checkpoint_path: rel_display(&repo_root, &checkpoint_path),
         selected_route: plan.next_route,
         terminal_outcome: plan.terminal_outcome,
         final_verdict: plan.final_verdict,
@@ -875,11 +1473,41 @@ fn load_lifecycle_contract(octon_dir: &Path, lifecycle_id: &str) -> Result<Loade
     read_lifecycle_contract(&path)
 }
 
-fn is_program_lifecycle(octon_dir: &Path, lifecycle_id: &str) -> Result<bool> {
-    Ok(load_lifecycle_contract(octon_dir, lifecycle_id)?
-        .contract
-        .program
-        .is_some())
+fn lifecycle_execution_strategy_from_octon_dir(
+    octon_dir: &Path,
+    lifecycle_id: &str,
+) -> Result<LifecycleExecutionStrategy> {
+    let loaded = load_lifecycle_contract(octon_dir, lifecycle_id)?;
+    resolve_lifecycle_execution_strategy(&loaded.contract)
+}
+
+fn resolve_lifecycle_execution_strategy(
+    contract: &LifecycleContract,
+) -> Result<LifecycleExecutionStrategy> {
+    let has_program = contract.program.is_some();
+    let strategy = contract.execution_strategy.unwrap_or(if has_program {
+        LifecycleExecutionStrategy::OrchestratedReplanLoop
+    } else {
+        LifecycleExecutionStrategy::RouteProgression
+    });
+    match (strategy, has_program) {
+        (LifecycleExecutionStrategy::RouteProgression, true) => {
+            bail!(
+                "lifecycle contract {} declares program orchestration but execution_strategy is {}; program lifecycles require {}",
+                contract.lifecycle_id,
+                strategy.as_str(),
+                LifecycleExecutionStrategy::OrchestratedReplanLoop.as_str()
+            )
+        }
+        (LifecycleExecutionStrategy::OrchestratedReplanLoop, false) => {
+            bail!(
+                "lifecycle contract {} declares execution_strategy {} without a program section; non-program orchestration is not supported",
+                contract.lifecycle_id,
+                strategy.as_str()
+            )
+        }
+        _ => Ok(strategy),
+    }
 }
 
 fn contract_path_from_effective_catalog(octon_dir: &Path, lifecycle_id: &str) -> Result<PathBuf> {
@@ -972,6 +1600,8 @@ fn read_lifecycle_contract(path: &Path) -> Result<LoadedContract> {
         &fs::read(path).with_context(|| format!("failed to read {}", path.display()))?,
     )
     .with_context(|| format!("failed to parse lifecycle contract {}", path.display()))?;
+    resolve_lifecycle_execution_strategy(&contract)
+        .with_context(|| format!("invalid lifecycle contract {}", path.display()))?;
     Ok(LoadedContract {
         path: path.to_path_buf(),
         contract,
@@ -1384,6 +2014,10 @@ pub(crate) fn lifecycle_execution_request_from_run(
         &run_inputs,
         evidence_root,
         checkpoint_path,
+        Some(lifecycle_cancellation_token_path(
+            &octon_dir.join(RUN_CONTROL_ROOT_REL).join(&run.run_id),
+        )),
+        None,
     )
 }
 
@@ -1400,6 +2034,8 @@ fn lifecycle_execution_request_for_route(
     run_inputs: &BTreeMap<String, String>,
     evidence_root: PathBuf,
     checkpoint_path: PathBuf,
+    cancellation_token: Option<PathBuf>,
+    approval_context: Option<LifecycleApprovalContext>,
 ) -> Result<Option<LifecycleRouteExecutionRequest>> {
     let repo_root = repo_root_for_octon(octon_dir)?;
     let loaded = load_lifecycle_contract(octon_dir, lifecycle_id)?;
@@ -1498,10 +2134,11 @@ fn lifecycle_execution_request_for_route(
         checkpoint_path,
         policy: LifecycleExecutionPolicy {
             timeout_seconds,
-            cancellation_token: None,
+            cancellation_token,
             retry_attempt,
             approval_policy: approval_policy.to_string(),
         },
+        approval_context,
     }))
 }
 
@@ -1911,6 +2548,12 @@ pub(crate) fn update_lifecycle_checkpoint_final_verdict(
         return Ok(());
     };
     checkpoint.final_verdict = final_verdict.to_string();
+    if final_verdict == "cancelled" && checkpoint.cancelled_at.is_none() {
+        checkpoint.cancelled_at = Some(now_rfc3339()?);
+        checkpoint.cancel_reason =
+            Some("cancellation token observed during route dispatch".to_string());
+        checkpoint.terminal_outcome = Some("cancelled".to_string());
+    }
     let path = checkpoint_path_for_run(octon_dir, run_id)?;
     fs::write(path, serde_yaml::to_string(&checkpoint)?)?;
     Ok(())
@@ -1971,6 +2614,7 @@ fn validate_checkpoint_binding(
     checkpoint: &LifecycleCheckpoint,
     sanitized_run_id: &str,
     lifecycle_id: &str,
+    execution_strategy: &str,
     target: &str,
 ) -> Result<()> {
     if checkpoint.run_id != sanitized_run_id {
@@ -1984,6 +2628,12 @@ fn validate_checkpoint_binding(
             "lifecycle run id {sanitized_run_id} is already bound to lifecycle {} target {}; requested lifecycle {lifecycle_id} target {target}",
             checkpoint.lifecycle_id,
             checkpoint.target
+        );
+    }
+    if checkpoint.execution_strategy != execution_strategy {
+        bail!(
+            "lifecycle run id {sanitized_run_id} checkpoint execution_strategy {} differs from loaded contract strategy {execution_strategy}",
+            checkpoint.execution_strategy
         );
     }
     Ok(())
@@ -2037,9 +2687,10 @@ fn lifecycle_summary(
     );
     let handoff_note = route_execution_note(execution_mode);
     format!(
-        "# Lifecycle Run\n\nrun_id: {run_id}\nrecorded_at: {}\nlifecycle_id: {}\ntarget: {}\nexecutor: {}\nroute_execution_mode: {execution_mode}\nselected_route: {route}\nterminal_outcome: {terminal}\nfinal_verdict: {final_verdict}\n\n{handoff_note}\n",
+        "# Lifecycle Run\n\nrun_id: {run_id}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nexecutor: {}\nroute_execution_mode: {execution_mode}\nselected_route: {route}\nterminal_outcome: {terminal}\nfinal_verdict: {final_verdict}\n\n{handoff_note}\n",
         now_rfc3339().unwrap_or_else(|_| "unknown".to_string()),
         plan.lifecycle_id,
+        plan.execution_strategy,
         plan.target,
         executor.as_str(),
     )
@@ -2058,10 +2709,11 @@ fn lifecycle_adapter_execution_summary(run: &LifecycleRunResult, adapter_status:
         .map(|route| format!("{}-route-execution.yml", route.route_id))
         .unwrap_or_else(|| "none".to_string());
     format!(
-        "# Lifecycle Run\n\nrun_id: {}\nrecorded_at: {}\nlifecycle_id: {}\ntarget: {}\nexecutor: {}\nroute_execution_mode: {}\nselected_route: {}\nterminal_outcome: {}\nfinal_verdict: {}\nadapter_route_status: {}\nroute_execution_result: {}\n\nNote: the lifecycle executor adapter executed the selected route. The runner will re-plan from target receipts and manifest state before selecting any further route.\n",
+        "# Lifecycle Run\n\nrun_id: {}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nexecutor: {}\nroute_execution_mode: {}\nselected_route: {}\nterminal_outcome: {}\nfinal_verdict: {}\nadapter_route_status: {}\nroute_execution_result: {}\n\nNote: the lifecycle executor adapter executed the selected route. The runner will re-plan from target receipts and manifest state before selecting any further route.\n",
         run.run_id,
         now_rfc3339().unwrap_or_else(|_| "unknown".to_string()),
         run.lifecycle_id,
+        run.execution_strategy,
         run.target,
         run.executor,
         run.route_execution_mode,
@@ -2178,6 +2830,173 @@ mod tests {
             fs::create_dir_all(path.parent().unwrap()).unwrap();
             fs::write(path, content).unwrap();
         }
+
+        fn write_catalog(&self, lifecycle_id: &str, projection_source_path: &str) {
+            self.write(
+                ".octon/generated/effective/extensions/catalog.effective.yml",
+                &format!(
+                    r#"
+schema_version: "test"
+packs:
+  - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
+    lifecycle_contracts:
+      - lifecycle_id: "{lifecycle_id}"
+        projection_source_path: "{projection_source_path}"
+"#
+                ),
+            );
+        }
+    }
+
+    #[test]
+    fn lifecycle_execution_strategy_defaults_packet_to_route_progression() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = FixtureRepo::new("strategy-default-packet");
+        fixture.write_catalog(
+            "proposal-packet",
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+        );
+        fixture.write(
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+            r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-packet"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: { input: "packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["draft"] }
+states: [{ state_id: "review" }]
+terminal_outcomes: []
+receipts: []
+routes:
+  - route_id: "review-proposal-packet"
+    route_type: "extension"
+    enter_when:
+      manifest_status: "draft"
+"#,
+        );
+        fixture.write("packet/proposal.yml", "status: draft\n");
+
+        let plan = plan_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-packet",
+            Path::new("packet"),
+        )
+        .unwrap();
+
+        assert_eq!(plan.execution_strategy, "route-progression");
+    }
+
+    #[test]
+    fn lifecycle_execution_strategy_defaults_program_to_orchestrated_replan_loop() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = FixtureRepo::new("strategy-default-program");
+        fixture.write_catalog(
+            "proposal-program",
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycles/proposal-program.contract.yml",
+        );
+        fixture.write(
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycles/proposal-program.contract.yml",
+            r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-program"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: { input: "program_packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["accepted"] }
+program:
+  child_registry_path: "resources/child-packet-index.yml"
+  child_lifecycle_id_default: "proposal-packet"
+  supported_execution_modes: ["parallel-independent"]
+states: [{ state_id: "coordinate" }]
+terminal_outcomes: []
+receipts:
+  - receipt_id: "program-summary"
+    path: "support/program-summary.md"
+routes:
+  - route_id: "review-program"
+    route_type: "extension"
+"#,
+        );
+
+        let strategy =
+            lifecycle_execution_strategy_from_octon_dir(&fixture.octon_dir, "proposal-program")
+                .unwrap();
+
+        assert_eq!(strategy, LifecycleExecutionStrategy::OrchestratedReplanLoop);
+    }
+
+    #[test]
+    fn lifecycle_execution_strategy_rejects_program_route_progression() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = FixtureRepo::new("strategy-invalid-program");
+        fixture.write_catalog(
+            "proposal-program",
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycles/proposal-program.contract.yml",
+        );
+        fixture.write(
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycles/proposal-program.contract.yml",
+            r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-program"
+owner_extension: "test-extension"
+version: "1.0.0"
+execution_strategy: "route-progression"
+target: { input: "program_packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["accepted"] }
+program:
+  child_registry_path: "resources/child-packet-index.yml"
+  child_lifecycle_id_default: "proposal-packet"
+  supported_execution_modes: ["parallel-independent"]
+states: [{ state_id: "coordinate" }]
+terminal_outcomes: []
+receipts:
+  - receipt_id: "program-summary"
+    path: "support/program-summary.md"
+routes:
+  - route_id: "review-program"
+    route_type: "extension"
+"#,
+        );
+
+        let error =
+            lifecycle_execution_strategy_from_octon_dir(&fixture.octon_dir, "proposal-program")
+                .unwrap_err();
+        let error = format!("{error:#}");
+
+        assert!(error.contains("program lifecycles require orchestrated-replan-loop"));
+    }
+
+    #[test]
+    fn lifecycle_execution_strategy_rejects_orchestrated_without_program() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = FixtureRepo::new("strategy-invalid-packet");
+        fixture.write_catalog(
+            "proposal-packet",
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+        );
+        fixture.write(
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+            r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-packet"
+owner_extension: "test-extension"
+version: "1.0.0"
+execution_strategy: "orchestrated-replan-loop"
+target: { input: "packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["draft"] }
+states: [{ state_id: "review" }]
+terminal_outcomes: []
+receipts: []
+routes:
+  - route_id: "review-proposal-packet"
+    route_type: "extension"
+"#,
+        );
+
+        let error =
+            lifecycle_execution_strategy_from_octon_dir(&fixture.octon_dir, "proposal-packet")
+                .unwrap_err();
+        let error = format!("{error:#}");
+
+        assert!(error.contains("without a program section"));
     }
 
     #[test]
@@ -2237,6 +3056,92 @@ routes:
             Some("revise-proposal-packet")
         );
         assert_eq!(plan.final_verdict, "route-ready");
+    }
+
+    #[test]
+    fn packet_lifecycle_cancellation_is_durable_across_resume() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = FixtureRepo::new("packet-cancel");
+        fixture.write(
+            ".octon/generated/effective/extensions/catalog.effective.yml",
+            r#"
+schema_version: "test"
+packs:
+  - pack_id: "test-extension"
+    capability_profiles: ["validation-surface", "lifecycle-contract"]
+    lifecycle_contracts:
+      - lifecycle_id: "proposal-packet"
+        projection_source_path: ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml"
+"#,
+        );
+        fixture.write(
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+            r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-packet"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: { input: "packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["draft"] }
+states: [{ state_id: "review" }]
+terminal_outcomes: []
+receipts: []
+routes:
+  - route_id: "review-proposal"
+    route_type: "agent"
+    enter_when: { manifest_status: "draft" }
+"#,
+        );
+        fixture.write("packet/proposal.yml", "status: draft\n");
+
+        let run = run_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-packet".to_string(),
+                target: PathBuf::from("packet"),
+                run_id: Some("packet-cancel".to_string()),
+                executor: ExecutorKind::Auto,
+                max_iterations: None,
+                execute_routes: false,
+                max_steps: None,
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "minimize".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+        assert_eq!(run.final_verdict, "route-ready");
+
+        let cancel =
+            cancel_packet_lifecycle_run(&fixture.octon_dir, "packet-cancel", "operator stop")
+                .unwrap();
+        assert_eq!(cancel.final_verdict, "cancelled");
+        assert!(fixture
+            .octon_dir
+            .join("state/control/execution/runs/packet-cancel/cancellation.yml")
+            .is_file());
+
+        let resumed = resume_lifecycle_from_octon_dir(&fixture.octon_dir, "packet-cancel").unwrap();
+        assert_eq!(resumed.final_verdict, "cancelled");
+        assert_eq!(resumed.route_execution_mode, "none");
+        let checkpoint: LifecycleCheckpoint = serde_yaml::from_slice(
+            &fs::read(
+                fixture
+                    .octon_dir
+                    .join("state/control/execution/runs/packet-cancel/lifecycle-checkpoint.yml"),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(checkpoint.cancel_reason.as_deref(), Some("operator stop"));
+        let event_log = fs::read_to_string(
+            fixture
+                .octon_dir
+                .join("state/control/execution/runs/packet-cancel/lifecycle-events.ndjson"),
+        )
+        .unwrap();
+        assert!(event_log.contains("\"event_type\":\"cancelled\""));
     }
 
     #[test]

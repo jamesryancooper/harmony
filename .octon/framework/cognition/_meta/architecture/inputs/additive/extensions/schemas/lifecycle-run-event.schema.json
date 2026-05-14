@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/schemas/lifecycle-run-event.schema.json",
+  "title": "Octon Lifecycle Run Event",
+  "description": "One hash-chained NDJSON record in a packet route-progression lifecycle event log.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "lifecycle_id",
+    "execution_strategy",
+    "target",
+    "event_index",
+    "event_sha256",
+    "event_type",
+    "event_category",
+    "recorded_at",
+    "actor",
+    "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "octon-lifecycle-run-event-v1"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "lifecycle_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "execution_strategy": {
+      "type": "string",
+      "enum": [
+        "route-progression",
+        "orchestrated-replan-loop"
+      ]
+    },
+    "target": {
+      "type": "string",
+      "minLength": 1
+    },
+    "event_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "previous_event_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "event_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "event_type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "event_category": {
+      "type": "string",
+      "enum": [
+        "lifecycle",
+        "planning",
+        "handoff",
+        "dispatch",
+        "status",
+        "budget",
+        "control"
+      ]
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "step_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "step_number": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "step_kind": {
+      "type": "string",
+      "enum": [
+        "route-dispatch",
+        "parent-route-dispatch",
+        "child-batch-dispatch",
+        "no-dispatch"
+      ]
+    },
+    "route_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "child_id": {
+      "$ref": "#/$defs/identifier"
+    },
+    "final_verdict": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "route-ready",
+        "gate-rerouted",
+        "planned",
+        "partial",
+        "mock-route-executed",
+        "skipped-idempotent",
+        "approval-required",
+        "blocked-human",
+        "blocked-recoverable",
+        "blocked-unsafe",
+        "blocked-max-steps",
+        "blocked-no-route",
+        "blocked-gate",
+        "blocked-max-iterations",
+        "failed",
+        "timed-out",
+        "cancelled"
+      ]
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    }
+  }
+}

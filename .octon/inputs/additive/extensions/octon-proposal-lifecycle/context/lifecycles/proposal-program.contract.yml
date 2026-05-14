@@ -2,6 +2,7 @@ schema_version: "octon-extension-lifecycle-contract-v1"
 lifecycle_id: "proposal-program"
 owner_extension: "octon-proposal-lifecycle"
 version: "1.0.0"
+execution_strategy: "orchestrated-replan-loop"
 
 target:
   input: "program_packet_path"

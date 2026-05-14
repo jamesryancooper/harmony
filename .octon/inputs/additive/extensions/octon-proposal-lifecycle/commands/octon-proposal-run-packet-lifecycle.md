@@ -12,7 +12,9 @@ testing, or creation input binding is required. For missing proposal targets,
 provide source context with `--set-file source=<path>` or `--set source=<text>`.
 The runner plans from the published lifecycle contract, evaluates
 receipt-driven gates, records workflow evidence and checkpoints, and reports
-the next route.
+the next route. The proposal packet contract declares
+`execution_strategy: route-progression`, so runtime dispatch stays on the
+packet lifecycle driver.
 
 Executor boundary:
 
@@ -25,6 +27,11 @@ Executor boundary:
   resumable approval by default. `--approval-policy unattended` is an explicit
   operator override; the adapter records approval override evidence before
   executing an approval-gated route under that policy.
+- Packet runs write hash-chained `lifecycle-events.ndjson` traces under the
+  run control root and workflow evidence root. `octon lifecycle cancel --run-id
+  <run> --reason <text>` durably cancels a retained run; resume or
+  execute-routes then returns `final_verdict: cancelled` with
+  `route_execution_mode: none`.
 - Non-execute route handoffs do not consume bounded loop iterations because
   the selected route has not executed.
 

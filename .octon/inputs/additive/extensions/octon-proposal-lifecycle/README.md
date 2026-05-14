@@ -69,7 +69,8 @@ Leaf routes are listed in `context/bundle-matrix.md` and governed by
 
 `/octon-proposal-run-packet-lifecycle` uses the shared lifecycle runner for
 orchestration, gate checks, stale-review detection, evidence, checkpoints, and
-resume. By default, non-mock executors stop at a gated `route-ready` handoff.
+resume. Its contract uses `execution_strategy: route-progression`. By default,
+non-mock executors stop at a gated `route-ready` handoff.
 With `--execute-routes`, selected routes run through the shared lifecycle
 executor adapter while prompt-bundle execution remains outside the lifecycle
 runner itself.
@@ -81,6 +82,11 @@ Durable implementation, promotion, and archival routes pause for explicit
 approval by default. `--approval-policy unattended` is an explicit operator
 override for one-run automation; the adapter records approval override evidence
 before executing each approval-gated durable route under that policy.
+Packet runs also write hash-chained `lifecycle-events.ndjson` traces under the
+run control root and workflow evidence root. `octon lifecycle cancel --run-id
+<run> --reason <text>` records durable cancellation evidence; resume and
+execute-routes operations return `cancelled` without adapter dispatch after
+that marker exists.
 Packet-local receipts such as `support/implementation-run.md` and
 `support/proposal-closeout.md` advance later lifecycle handoffs without adding
 new `proposal.yml` statuses.
@@ -88,7 +94,23 @@ new `proposal.yml` statuses.
 `/octon-proposal-run-program-lifecycle` wraps
 `octon lifecycle run --lifecycle proposal-program --target
 <program-packet-path>`. It is an orchestration wrapper only, not a dispatcher
-route or prompt bundle.
+route or prompt bundle. Its contract uses
+`execution_strategy: orchestrated-replan-loop`. By default it stops at a planned
+`program-route-handoff`; full selected-route automation requires
+`--execute-routes` plus bounded execution options such as `--max-steps` and
+`--max-child-concurrency`. With `--execute-routes`, the program runner loops
+through plan, one parent-route or child-batch dispatch, and live replan until
+completion, blocker, approval pause, failure, timeout, cancellation, or
+max-step exhaustion. One child batch is one step no matter how many child
+routes run inside that batch. When `octon` is not installed on PATH, use the
+repo-local development launcher `.octon/framework/engine/runtime/run lifecycle
+...`; the launcher routes `lifecycle` through the current source-backed kernel
+instead of a stale packaged binary.
+Program child approval pauses write structured guidance that routes operators
+through `octon lifecycle program approve --run-id <program-run> --child <child>
+--route <route> --reason <reason>` and then program retry/resume controls.
+The adapter still enforces approval and still records `unattended` or
+`program-approved` override evidence before mutation.
 
 ## Publication
 
