@@ -172,13 +172,58 @@ pub(crate) struct ProgramLifecyclePlanResult {
     #[serde(default)]
     pub program_blockers: Vec<ProgramBlocker>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub normalized_program_blockers: Vec<ProgramTaxonomyEvidence>,
+    #[serde(default)]
     pub child_states: BTreeMap<String, ProgramChildPlanState>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub normalized_child_blockers: BTreeMap<String, Vec<ProgramTaxonomyEvidence>>,
     #[serde(default)]
     pub runnable_batch: Vec<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scheduler_phase: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub skipped_blocked_children: Vec<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub required_child_completion: BTreeMap<String, ProgramRequiredChildCompletion>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub safe_repair_candidates: Vec<ProgramSafeRepairCandidate>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub program_recovery_recipe_validation_status: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub program_recovery_recipe_validation_failures: Vec<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub program_recovery_recipe_blocker_class: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub program_recovery_recipe_route_id: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub program_recovery_recipe_safe_unattended_basis: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub unsafe_results: Vec<ProgramUnsafeResultSummary>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unsafe_continuation_decision: Option<String>,
+    #[serde(default)]
     pub approval_blockers: Vec<ProgramApprovalBlocker>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub normalized_approval_blockers: Vec<ProgramTaxonomyEvidence>,
+    #[serde(default)]
     pub checkpoint_drift: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_reason: Option<String>,
     pub final_verdict: String,
 }
 
@@ -212,10 +257,71 @@ pub(crate) struct ProgramChildPlanState {
     #[serde(default)]
     pub receipt_digests: BTreeMap<String, String>,
     #[serde(default)]
+    pub gate_status: ProgramChildGateStatus,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub dependency_gate_status: BTreeMap<String, ProgramDependencyGateStatus>,
+    #[serde(default)]
     pub write_scopes: Vec<String>,
     #[serde(default)]
     pub blockers: Vec<ProgramBlocker>,
     pub final_verdict: String,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub(crate) struct ProgramChildGateStatus {
+    pub terminal: bool,
+    pub verification: bool,
+    pub closeout: bool,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub(crate) struct ProgramDependencyGateStatus {
+    pub dependency_id: String,
+    pub required_gate: String,
+    pub satisfied: bool,
+    pub observed_gate: String,
+    pub reason: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct ProgramRequiredChildCompletion {
+    pub required: bool,
+    pub deferred: bool,
+    pub terminal: bool,
+    #[serde(default)]
+    pub terminal_outcome: Option<String>,
+    pub final_verdict: String,
+    #[serde(default)]
+    pub selected_route: Option<String>,
+    #[serde(default)]
+    pub blockers: Vec<ProgramBlocker>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct ProgramSafeRepairCandidate {
+    pub scope: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub child_id: Option<String>,
+    pub blocker_class: String,
+    pub selected_repair_route: String,
+    pub safe_unattended_basis: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct ProgramUnsafeResultSummary {
+    pub scope: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub child_id: Option<String>,
+    pub route_id: String,
+    pub status: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blocker_class: Option<String>,
+    pub safe_continuation_available: bool,
+    pub continuation_reason: String,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -224,6 +330,182 @@ pub(crate) struct ProgramBlocker {
     pub message: String,
     #[serde(default)]
     pub recovery_route: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct ProgramTaxonomyEvidence {
+    pub raw_value: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub legacy_class: Option<String>,
+    pub normalized_category: String,
+    pub normalized_blocker_class: String,
+    pub disposition: String,
+    pub autonomy_basis: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub safe_unattended_basis: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+struct ProgramArtifactOperation {
+    operation_id: String,
+    child_id: String,
+    route_id: String,
+    operation: String,
+    destructive_operation: String,
+    artifact_paths: Vec<PathBuf>,
+    command_or_operation: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+struct ProgramArtifactCriticalityDecision {
+    schema_version: String,
+    program_run_id: String,
+    classification_policy_version: String,
+    operation_id: String,
+    child_id: String,
+    route_id: String,
+    operation: String,
+    destructive_operation: String,
+    artifact_paths: Vec<String>,
+    classification_inputs: Vec<String>,
+    artifact_owner: String,
+    authority_surface: String,
+    criticality: String,
+    ownership: String,
+    human_input_required: bool,
+    autonomous_allowed: bool,
+    rationale: String,
+    command_or_operation: String,
+    before_validation: String,
+    after_validation: String,
+    operation_supported: bool,
+    mutation_performed: bool,
+    mutation_status: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    blocked_reason: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+struct ProgramUnsafeRepairEvidence {
+    schema_version: String,
+    program_run_id: String,
+    #[serde(default)]
+    repair_scope: String,
+    #[serde(default)]
+    blocker_scope: String,
+    child_id: String,
+    unsafe_condition: String,
+    original_route_blocked_reason: String,
+    selected_repair_route: String,
+    agent_authority_basis: String,
+    files_artifacts_changed: Vec<String>,
+    before_validation: String,
+    after_validation: String,
+    #[serde(default)]
+    safe_continuation_available: bool,
+    #[serde(default)]
+    route_execution_status: String,
+    #[serde(default)]
+    recipe_validation_status: String,
+    #[serde(default)]
+    recipe_validation_failures: Vec<String>,
+    #[serde(default)]
+    post_attempt_validations_declared: Vec<String>,
+    #[serde(default)]
+    post_attempt_validation_results: Vec<String>,
+    #[serde(default)]
+    resume_decision_basis: String,
+    #[serde(default)]
+    post_attempt_validation_status: String,
+    #[serde(default)]
+    post_attempt_validation_failures: Vec<String>,
+    #[serde(default)]
+    final_blocker_class: Option<String>,
+    #[serde(default)]
+    final_execution_can_resume: bool,
+    execution_can_resume: bool,
+}
+
+#[derive(Clone, Debug, Default)]
+struct ProgramRecoveryRecipeValidationEvidence {
+    status: Option<String>,
+    failures: Vec<String>,
+    blocker_class: Option<String>,
+    route_id: Option<String>,
+    safe_unattended_basis: Option<String>,
+}
+
+#[derive(Clone, Debug)]
+struct ProgramRepairSelection<'a> {
+    blocker: &'a ProgramBlocker,
+    route: RoutePlanState,
+    safe_unattended_basis: String,
+    validation: ProgramRecoveryRecipeValidationEvidence,
+}
+
+#[derive(Clone, Debug, Default)]
+struct ProgramRepairSelectionResult<'a> {
+    selection: Option<ProgramRepairSelection<'a>>,
+    validation: Option<ProgramRecoveryRecipeValidationEvidence>,
+}
+
+impl ProgramRecoveryRecipeValidationEvidence {
+    fn passed(blocker_class: &str, route_id: &str, safe_unattended_basis: &str) -> Self {
+        Self {
+            status: Some("passed".to_string()),
+            failures: Vec::new(),
+            blocker_class: Some(blocker_class.to_string()),
+            route_id: Some(route_id.to_string()),
+            safe_unattended_basis: Some(safe_unattended_basis.to_string()),
+        }
+    }
+
+    fn failed(blocker_class: &str, route_id: Option<&str>, failures: Vec<String>) -> Self {
+        Self {
+            status: Some("failed".to_string()),
+            failures,
+            blocker_class: Some(blocker_class.to_string()),
+            route_id: route_id.map(str::to_string),
+            safe_unattended_basis: None,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+struct ProgramRecoveryPostAttemptValidationOutcome {
+    status: String,
+    failures: Vec<String>,
+    declared: Vec<String>,
+    results: Vec<String>,
+    execution_can_resume: bool,
+    resume_decision_basis: String,
+    final_blocker_class: Option<String>,
+}
+
+impl ProgramRecoveryPostAttemptValidationOutcome {
+    fn route_not_completed(
+        status: &str,
+        message: Option<&str>,
+        blocker_class: Option<String>,
+    ) -> Self {
+        let mut failures = vec![format!("repair route final status {status}")];
+        if let Some(message) = message {
+            failures.push(message.to_string());
+        }
+        Self {
+            status: "not-run-route-not-completed".to_string(),
+            failures,
+            declared: Vec::new(),
+            results: Vec::new(),
+            execution_can_resume: false,
+            resume_decision_basis:
+                "repair route did not complete; post-attempt validations were not run".to_string(),
+            final_blocker_class: blocker_class,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -300,6 +582,16 @@ struct ProgramLifecycleCheckpoint {
     #[serde(default)]
     approvals: Vec<ProgramApprovalGrant>,
     #[serde(default)]
+    program_recovery_recipe_validation_status: Option<String>,
+    #[serde(default)]
+    program_recovery_recipe_validation_failures: Vec<String>,
+    #[serde(default)]
+    program_recovery_recipe_blocker_class: Option<String>,
+    #[serde(default)]
+    program_recovery_recipe_route_id: Option<String>,
+    #[serde(default)]
+    program_recovery_recipe_safe_unattended_basis: Option<String>,
+    #[serde(default)]
     latest_event_offset: u64,
     #[serde(default)]
     latest_event_index: u64,
@@ -331,6 +623,10 @@ struct ProgramChildCheckpointState {
     #[serde(default)]
     receipt_digests: BTreeMap<String, String>,
     #[serde(default)]
+    gate_status: ProgramChildGateStatus,
+    #[serde(default)]
+    dependency_gate_status: BTreeMap<String, ProgramDependencyGateStatus>,
+    #[serde(default)]
     write_scopes: Vec<String>,
 }
 
@@ -361,6 +657,7 @@ struct ChildExecutionJob {
     lock_path: PathBuf,
     max_attempts: u32,
     blocker_class: Option<String>,
+    unsafe_repair: Option<ProgramUnsafeRepairEvidence>,
 }
 
 struct ChildExecutionOutcome {
@@ -540,6 +837,18 @@ pub(crate) struct ProgramLifecycleStatusReadModel {
     #[serde(default)]
     pub runnable_batch: Vec<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scheduler_phase: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub skipped_blocked_children: Vec<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "BTreeMap::is_empty")]
+    pub required_child_completion: BTreeMap<String, ProgramRequiredChildCompletion>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_reason: Option<String>,
+    #[serde(default)]
     pub program_route: Option<RoutePlanState>,
     #[serde(default)]
     pub program_gate_results: Vec<GatePlanResult>,
@@ -550,7 +859,13 @@ pub(crate) struct ProgramLifecycleStatusReadModel {
     #[serde(default)]
     pub program_blockers: Vec<ProgramBlocker>,
     #[serde(default)]
+    pub normalized_program_blockers: Vec<ProgramTaxonomyEvidence>,
+    #[serde(default)]
     pub child_blockers: BTreeMap<String, Vec<ProgramBlocker>>,
+    #[serde(default)]
+    pub normalized_child_blockers: BTreeMap<String, Vec<ProgramTaxonomyEvidence>>,
+    #[serde(default)]
+    pub normalized_approval_blockers: Vec<ProgramTaxonomyEvidence>,
     #[serde(default)]
     pub approvals: Vec<ProgramApprovalGrant>,
     #[serde(default)]
@@ -688,7 +1003,13 @@ pub(crate) fn plan_program_lifecycle_from_octon_dir(
     lifecycle_id: &str,
     target: &Path,
 ) -> Result<ProgramLifecyclePlanResult> {
-    plan_program_lifecycle_from_octon_dir_with_checkpoint(octon_dir, lifecycle_id, target, None)
+    plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
+        octon_dir,
+        lifecycle_id,
+        target,
+        None,
+        "minimize",
+    )
 }
 
 fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
@@ -696,6 +1017,22 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
     lifecycle_id: &str,
     target: &Path,
     checkpoint: Option<&ProgramLifecycleCheckpoint>,
+) -> Result<ProgramLifecyclePlanResult> {
+    plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
+        octon_dir,
+        lifecycle_id,
+        target,
+        checkpoint,
+        "minimize",
+    )
+}
+
+fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
+    octon_dir: &Path,
+    lifecycle_id: &str,
+    target: &Path,
+    checkpoint: Option<&ProgramLifecycleCheckpoint>,
+    approval_policy: &str,
 ) -> Result<ProgramLifecyclePlanResult> {
     let repo_root = repo_root_for_octon(octon_dir)?;
     let parent_context = load_program_parent_context(octon_dir, lifecycle_id, target)?;
@@ -713,7 +1050,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
     let parent_receipt_states = receipt_plan_states(&repo_root, &loaded.contract, &target_state);
     let terminal_outcome = select_terminal_outcome(&loaded.contract, &target_state)?;
     let mut program_blockers = Vec::new();
-    let (program_route, mut program_gate_results, blocked_by_program_gate) =
+    let (mut program_route, mut program_gate_results, blocked_by_program_gate) =
         if terminal_outcome.is_some() {
             (None, Vec::new(), None)
         } else {
@@ -738,6 +1075,8 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
         } else {
             "blocked-recoverable".to_string()
         };
+        let normalized_program_blockers =
+            normalized_program_blockers(Some(program), &program_blockers);
         return Ok(ProgramLifecyclePlanResult {
             schema_version: "octon-program-lifecycle-plan-v1".to_string(),
             lifecycle_id: loaded.contract.lifecycle_id,
@@ -757,10 +1096,25 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
             program_gate_results,
             blocked_by_program_gate,
             program_blockers,
+            normalized_program_blockers,
             child_states: BTreeMap::new(),
+            normalized_child_blockers: BTreeMap::new(),
             runnable_batch: Vec::new(),
+            scheduler_phase: None,
+            skipped_blocked_children: Vec::new(),
+            required_child_completion: BTreeMap::new(),
+            safe_repair_candidates: Vec::new(),
+            program_recovery_recipe_validation_status: None,
+            program_recovery_recipe_validation_failures: Vec::new(),
+            program_recovery_recipe_blocker_class: None,
+            program_recovery_recipe_route_id: None,
+            program_recovery_recipe_safe_unattended_basis: None,
+            unsafe_results: Vec::new(),
+            unsafe_continuation_decision: None,
             approval_blockers: Vec::new(),
+            normalized_approval_blockers: Vec::new(),
             checkpoint_drift: None,
+            stop_reason: Some("missing-child-registry".to_string()),
             final_verdict,
         });
     }
@@ -780,6 +1134,8 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
                 ),
                 recovery_route: Some("create-proposal-program".to_string()),
             });
+            let normalized_program_blockers =
+                normalized_program_blockers(Some(program), &program_blockers);
             return Ok(ProgramLifecyclePlanResult {
                 schema_version: "octon-program-lifecycle-plan-v1".to_string(),
                 lifecycle_id: loaded.contract.lifecycle_id,
@@ -799,10 +1155,25 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
                 program_gate_results,
                 blocked_by_program_gate,
                 program_blockers,
+                normalized_program_blockers,
                 child_states: BTreeMap::new(),
+                normalized_child_blockers: BTreeMap::new(),
                 runnable_batch: Vec::new(),
+                scheduler_phase: None,
+                skipped_blocked_children: Vec::new(),
+                required_child_completion: BTreeMap::new(),
+                safe_repair_candidates: Vec::new(),
+                program_recovery_recipe_validation_status: None,
+                program_recovery_recipe_validation_failures: Vec::new(),
+                program_recovery_recipe_blocker_class: None,
+                program_recovery_recipe_route_id: None,
+                program_recovery_recipe_safe_unattended_basis: None,
+                unsafe_results: Vec::new(),
+                unsafe_continuation_decision: None,
                 approval_blockers: Vec::new(),
+                normalized_approval_blockers: Vec::new(),
                 checkpoint_drift: None,
+                stop_reason: Some("invalid-child-registry".to_string()),
                 final_verdict: "blocked-unsafe".to_string(),
             });
         }
@@ -822,6 +1193,8 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
             message: error.to_string(),
             recovery_route: None,
         });
+        let normalized_program_blockers =
+            normalized_program_blockers(Some(program), &program_blockers);
         return Ok(ProgramLifecyclePlanResult {
             schema_version: "octon-program-lifecycle-plan-v1".to_string(),
             lifecycle_id: context.loaded.contract.lifecycle_id,
@@ -841,10 +1214,25 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
             program_gate_results,
             blocked_by_program_gate,
             program_blockers,
+            normalized_program_blockers,
             child_states: BTreeMap::new(),
+            normalized_child_blockers: BTreeMap::new(),
             runnable_batch: Vec::new(),
+            scheduler_phase: None,
+            skipped_blocked_children: Vec::new(),
+            required_child_completion: BTreeMap::new(),
+            safe_repair_candidates: Vec::new(),
+            program_recovery_recipe_validation_status: None,
+            program_recovery_recipe_validation_failures: Vec::new(),
+            program_recovery_recipe_blocker_class: None,
+            program_recovery_recipe_route_id: None,
+            program_recovery_recipe_safe_unattended_basis: None,
+            unsafe_results: Vec::new(),
+            unsafe_continuation_decision: None,
             approval_blockers: Vec::new(),
+            normalized_approval_blockers: Vec::new(),
             checkpoint_drift: None,
+            stop_reason: Some("invalid-child-registry".to_string()),
             final_verdict: "blocked-unsafe".to_string(),
         });
     }
@@ -872,11 +1260,12 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
         let mut terminal_outcome = None;
         let mut final_verdict = "deferred".to_string();
         let mut receipt_digests = BTreeMap::new();
+        let mut gate_status = ProgramChildGateStatus::default();
         let mut write_scopes = declared_or_default_write_scopes(child, &child_target_rel)?;
 
         if child.deferred {
             blockers.push(ProgramBlocker {
-                blocker_class: "dependency-blocked".to_string(),
+                blocker_class: "deferred".to_string(),
                 message: "child is explicitly deferred by the program registry".to_string(),
                 recovery_route: None,
             });
@@ -891,12 +1280,13 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
                     terminal_outcome = plan.terminal_outcome.clone();
                     final_verdict = plan.final_verdict.clone();
                     receipt_digests = receipt_digest_map(&plan);
+                    gate_status = child_gate_status_from_lifecycle_plan(&plan);
                     if plan.terminal_outcome.as_deref() != Some("archived") {
                         let worktree_hygiene_blocked =
                             lifecycle_plan_has_worktree_hygiene_blocker(&plan);
                         if worktree_hygiene_blocked {
                             blockers.push(ProgramBlocker {
-                                blocker_class: "worktree-hygiene-blocked".to_string(),
+                                blocker_class: "artifact-ownership-unclear".to_string(),
                                 message: "child closeout is blocked by foreign or ambiguous worktree hygiene; route through closeout-change or operator scope resolution".to_string(),
                                 recovery_route: None,
                             });
@@ -986,6 +1376,8 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
                 selected_route,
                 terminal_outcome,
                 receipt_digests,
+                gate_status,
+                dependency_gate_status: BTreeMap::new(),
                 write_scopes,
                 blockers,
                 final_verdict,
@@ -1001,7 +1393,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
         .any(|mode| mode == &context.registry.execution_mode)
     {
         program_blockers.push(ProgramBlocker {
-            blocker_class: "unsupported-mode".to_string(),
+            blocker_class: "unsupported-mode-config".to_string(),
             message: format!(
                 "program execution mode {} is not declared by the lifecycle contract",
                 context.registry.execution_mode
@@ -1025,6 +1417,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
         &context.registry_digest,
         &mut child_states,
         checkpoint.map(|checkpoint| &checkpoint.approvals),
+        approval_policy,
     );
     apply_recovery_dependent_handling(
         program,
@@ -1049,15 +1442,38 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
         }
         program_gate_results.extend(structure_results);
     }
+    let mut program_recovery_recipe_validation = ProgramRecoveryRecipeValidationEvidence::default();
+    if terminal_outcome.is_none() {
+        let repair_selection = selected_program_repair_blocker_with_validation(
+            &context.loaded.contract,
+            program,
+            &program_blockers,
+        );
+        if let Some(selection) = repair_selection.selection {
+            program_recovery_recipe_validation = selection.validation;
+            program_route = Some(selection.route);
+        } else if let Some(validation) = repair_selection.validation {
+            program_recovery_recipe_validation = validation;
+            program_route = None;
+        } else if program_blockers.iter().any(|blocker| {
+            classify_program_blocker_class(&blocker.blocker_class)
+                == ProgramBlockerDisposition::Unsafe
+        }) {
+            program_route = None;
+        }
+    }
 
     let mut runnable_batch = select_runnable_batch(program, &context.registry, &mut child_states);
     if program_route.is_some()
         || terminal_outcome.is_some()
         || program_blockers.iter().any(|blocker| {
             matches!(
-                blocker.blocker_class.as_str(),
-                "unsupported-mode" | "validation-failed" | "authority-boundary-ambiguous"
-            )
+                classify_program_blocker_class(&blocker.blocker_class),
+                ProgramBlockerDisposition::Human
+            ) || (blocker.blocker_class == "validation-failed"
+                && blocker
+                    .message
+                    .contains("program scheduling failed required gate"))
         })
     {
         runnable_batch.clear();
@@ -1069,8 +1485,11 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
         &context.registry_digest,
         &child_states,
         checkpoint.map(|c| &c.approvals),
+        approval_policy,
     )?;
     let (aggregate_state, final_verdict) = aggregate_program_state(
+        program,
+        Some(&context.loaded.contract),
         &child_states,
         &program_blockers,
         &approval_blockers,
@@ -1083,6 +1502,26 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
     } else {
         (aggregate_state, final_verdict)
     };
+    let scheduler_phase = scheduler_phase_for_batch(&context.registry, &runnable_batch);
+    let skipped_blocked_children = skipped_blocked_children(&child_states, &runnable_batch);
+    let required_child_completion = required_child_completion_matrix(&child_states);
+    let safe_repair_candidates = collect_safe_repair_candidates(
+        &context.loaded.contract,
+        program,
+        &program_blockers,
+        &child_states,
+    );
+    let stop_reason = program_stop_reason(
+        program,
+        Some(&context.loaded.contract),
+        &final_verdict,
+        terminal_outcome.as_deref(),
+        program_route.as_ref(),
+        &program_blockers,
+        &approval_blockers,
+        &child_states,
+        &runnable_batch,
+    );
     let checkpoint_drift = checkpoint.and_then(|checkpoint| {
         if checkpoint.child_registry_digest != context.registry_digest {
             Some(format!(
@@ -1093,6 +1532,9 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
             None
         }
     });
+    let normalized_program_blockers = normalized_program_blockers(Some(program), &program_blockers);
+    let normalized_child_blockers = normalized_child_blockers(Some(program), &child_states);
+    let normalized_approval_blockers = normalized_approval_blockers(&approval_blockers);
 
     Ok(ProgramLifecyclePlanResult {
         schema_version: "octon-program-lifecycle-plan-v1".to_string(),
@@ -1113,10 +1555,26 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
         program_gate_results,
         blocked_by_program_gate,
         program_blockers,
+        normalized_program_blockers,
         child_states,
+        normalized_child_blockers,
         runnable_batch,
+        scheduler_phase,
+        skipped_blocked_children,
+        required_child_completion,
+        safe_repair_candidates,
+        program_recovery_recipe_validation_status: program_recovery_recipe_validation.status,
+        program_recovery_recipe_validation_failures: program_recovery_recipe_validation.failures,
+        program_recovery_recipe_blocker_class: program_recovery_recipe_validation.blocker_class,
+        program_recovery_recipe_route_id: program_recovery_recipe_validation.route_id,
+        program_recovery_recipe_safe_unattended_basis: program_recovery_recipe_validation
+            .safe_unattended_basis,
+        unsafe_results: Vec::new(),
+        unsafe_continuation_decision: None,
         approval_blockers,
+        normalized_approval_blockers,
         checkpoint_drift,
+        stop_reason,
         final_verdict,
     })
 }
@@ -1223,7 +1681,7 @@ pub(crate) fn run_program_lifecycle_from_octon_dir(
             )),
         )?;
         step.result.route_execution_mode = "none".to_string();
-        if program_execute_loop_should_stop(&step.result)
+        if program_execute_loop_should_stop(&step.result, &options.approval_policy)
             || !program_result_has_pending_dispatch(&step.result)
         {
             return Ok(step.result);
@@ -1278,7 +1736,7 @@ pub(crate) fn run_program_lifecycle_from_octon_dir(
         all_child_results.extend(step.result.child_results.clone());
         step.result.child_results = all_child_results.clone();
         rewrite_program_recovery_log(&evidence_root, &all_child_results)?;
-        if program_execute_loop_should_stop(&step.result) {
+        if program_execute_loop_should_stop(&step.result, &options.approval_policy) {
             return Ok(step.result);
         }
         latest_step = Some(step);
@@ -1340,11 +1798,12 @@ fn run_program_lifecycle_single_step(
 ) -> Result<ProgramLifecycleStepOutcome> {
     let parent_context =
         load_program_parent_context(octon_dir, &options.lifecycle_id, &options.target)?;
-    let mut plan = plan_program_lifecycle_from_octon_dir_with_checkpoint(
+    let mut plan = plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
         octon_dir,
         &options.lifecycle_id,
         &options.target,
         previous_checkpoint,
+        &options.approval_policy,
     )?;
     if plan.program_route.is_none() {
         if let Some(child_id) = options.program_child_filter.as_ref() {
@@ -1417,6 +1876,10 @@ fn run_program_lifecycle_single_step(
     if !cancelled_before_dispatch && plan.program_route.is_some() {
         parent_route_handled = true;
         if options.execute_routes {
+            let before_parent_plan = plan.clone();
+            let parent_repair_blocker_class = before_parent_plan
+                .program_recovery_recipe_blocker_class
+                .clone();
             parent_route_result = execute_parent_program_route(
                 octon_dir,
                 sanitized_run_id,
@@ -1428,17 +1891,62 @@ fn run_program_lifecycle_single_step(
                 step_context,
             )?;
             if let Some(result) = parent_route_result.as_ref() {
+                let mut parent_repair_validation =
+                    ProgramRecoveryPostAttemptValidationOutcome::route_not_completed(
+                        &result.status,
+                        result.error_message.as_deref(),
+                        parent_repair_blocker_class.clone(),
+                    );
                 if matches!(result.status.as_str(), "completed" | "no-op") {
                     let replan_checkpoint =
                         checkpoint_for_post_execution_replan(previous_checkpoint);
-                    plan = plan_program_lifecycle_from_octon_dir_with_checkpoint(
+                    plan = plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
                         octon_dir,
                         &options.lifecycle_id,
                         &options.target,
                         replan_checkpoint.as_ref(),
+                        &options.approval_policy,
                     )?;
-                    final_verdict = plan.final_verdict.clone();
-                    terminal_outcome = plan.terminal_outcome.clone();
+                    if let (Some(program), Some(blocker_class)) = (
+                        parent_context.loaded.contract.program.as_ref(),
+                        parent_repair_blocker_class.as_deref(),
+                    ) {
+                        parent_repair_validation =
+                            enforce_program_recovery_post_attempt_validations(
+                                program,
+                                &before_parent_plan,
+                                &plan,
+                                control_root,
+                                blocker_class,
+                                result,
+                                true,
+                            );
+                    } else {
+                        parent_repair_validation =
+                            ProgramRecoveryPostAttemptValidationOutcome {
+                                status: "failed".to_string(),
+                                failures: vec![
+                                    "program repair route completed but blocker class or program contract was unavailable"
+                                        .to_string(),
+                                ],
+                                declared: Vec::new(),
+                                results: Vec::new(),
+                                execution_can_resume: false,
+                                resume_decision_basis:
+                                    "missing program repair validation context".to_string(),
+                                final_blocker_class: parent_repair_blocker_class.clone(),
+                            };
+                    }
+                    if parent_repair_validation.execution_can_resume {
+                        final_verdict = plan.final_verdict.clone();
+                        terminal_outcome = plan.terminal_outcome.clone();
+                    } else if plan_has_safe_continuation_after_unsafe(&plan) {
+                        final_verdict = "blocked-recoverable".to_string();
+                        terminal_outcome = None;
+                    } else {
+                        final_verdict = "blocked-unsafe".to_string();
+                        terminal_outcome = None;
+                    }
                 } else {
                     final_verdict = final_verdict_for_parent_route_status(&result.status);
                     terminal_outcome = if final_verdict == "cancelled" {
@@ -1447,6 +1955,11 @@ fn run_program_lifecycle_single_step(
                         None
                     };
                 }
+                finalize_parent_unsafe_repair_evidence(
+                    evidence_root,
+                    result,
+                    &parent_repair_validation,
+                )?;
             }
         } else {
             final_verdict = "route-ready".to_string();
@@ -1515,11 +2028,12 @@ fn run_program_lifecycle_single_step(
             )?
         };
         let replan_checkpoint = checkpoint_for_post_execution_replan(previous_checkpoint);
-        plan = plan_program_lifecycle_from_octon_dir_with_checkpoint(
+        plan = plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
             octon_dir,
             &options.lifecycle_id,
             &options.target,
             replan_checkpoint.as_ref(),
+            &options.approval_policy,
         )?;
         if plan.program_route.is_none() {
             if let Some(child_id) = options.program_child_filter.as_ref() {
@@ -1535,32 +2049,26 @@ fn run_program_lifecycle_single_step(
                 &mut child_results,
             )?;
         }
-        let execution_had_human_block = child_results
+        finalize_child_unsafe_repair_evidence(evidence_root, &child_results)?;
+        plan.unsafe_results = unsafe_result_summaries_for_children(&plan, &child_results);
+        plan.unsafe_continuation_decision = if plan.unsafe_results.is_empty() {
+            None
+        } else if plan
+            .unsafe_results
             .iter()
-            .any(|result| result.status == "approval-required");
-        let execution_had_cancellation = child_results
-            .iter()
-            .any(|result| result.status == "cancelled");
-        let execution_had_failure = child_results.iter().any(|result| {
-            matches!(
-                result.status.as_str(),
-                "failed" | "timed-out" | "blocked" | "blocked-unsafe"
-            )
-        });
-        final_verdict = if execution_had_cancellation {
-            "cancelled".to_string()
-        } else if child_results
-            .iter()
-            .any(|result| result.status == "blocked-unsafe")
+            .any(|result| result.safe_continuation_available)
         {
-            "blocked-unsafe".to_string()
-        } else if execution_had_human_block {
-            "blocked-human".to_string()
-        } else if execution_had_failure {
-            "blocked-recoverable".to_string()
+            Some("safe-continuation-available".to_string())
         } else {
-            plan.final_verdict.clone()
+            Some("no-safe-continuation".to_string())
         };
+        final_verdict = final_verdict_after_child_execution(&plan, &child_results);
+        if final_verdict == "blocked-unsafe"
+            && plan.unsafe_continuation_decision.as_deref() == Some("no-safe-continuation")
+        {
+            plan.runnable_batch.clear();
+            plan.program_route = None;
+        }
         terminal_outcome = plan.terminal_outcome.clone();
         if final_verdict == "cancelled" {
             terminal_outcome = Some("cancelled".to_string());
@@ -1690,26 +2198,128 @@ fn rewrite_program_recovery_log(
     Ok(())
 }
 
-fn program_execute_loop_should_stop(result: &ProgramLifecycleRunResult) -> bool {
-    result.terminal_outcome.is_some()
-        || matches!(
-            result.final_verdict.as_str(),
-            "completed"
-                | "blocked-human"
-                | "blocked-recoverable"
-                | "blocked-unsafe"
-                | "blocked-max-steps"
-                | "blocked-gate"
-                | "blocked-no-route"
-                | "failed"
-                | "timed-out"
-                | "cancelled"
-                | "blocked"
-        )
+fn program_execute_loop_should_stop(
+    result: &ProgramLifecycleRunResult,
+    approval_policy: &str,
+) -> bool {
+    if result.terminal_outcome.is_some() {
+        return true;
+    }
+    match normalize_program_state_value(&result.final_verdict) {
+        ProgramNormalizedCategory::Terminal
+        | ProgramNormalizedCategory::Cancellation
+        | ProgramNormalizedCategory::Budget => true,
+        ProgramNormalizedCategory::Unsafe => !program_result_has_pending_dispatch(result),
+        ProgramNormalizedCategory::Human => {
+            approval_policy != "unattended"
+                || !program_result_has_agent_continuable_dispatch(result)
+        }
+        ProgramNormalizedCategory::Recoverable | ProgramNormalizedCategory::Timeout => {
+            !program_result_has_pending_dispatch(result)
+        }
+    }
 }
 
 fn program_result_has_pending_dispatch(result: &ProgramLifecycleRunResult) -> bool {
     result.selected_parent_route.is_some() || !result.selected_children.is_empty()
+}
+
+fn program_result_has_agent_continuable_dispatch(result: &ProgramLifecycleRunResult) -> bool {
+    if !program_result_has_pending_dispatch(result) {
+        return false;
+    }
+    let parent_human_blocked = result
+        .parent_route_result
+        .as_ref()
+        .map(|result| result.status == "approval-required")
+        .unwrap_or(false);
+    let child_human_blocks = result
+        .child_results
+        .iter()
+        .filter(|summary| summary.status == "approval-required")
+        .count();
+    if parent_human_blocked
+        && result.child_results.is_empty()
+        && result.selected_children.is_empty()
+    {
+        return false;
+    }
+    result
+        .child_results
+        .iter()
+        .any(|summary| summary.status != "approval-required")
+        || child_human_blocks < result.selected_children.len()
+}
+
+fn plan_has_safe_continuation_after_unsafe(plan: &ProgramLifecyclePlanResult) -> bool {
+    plan.program_route.is_some()
+        || !plan.safe_repair_candidates.is_empty()
+        || (plan.execution_mode != "program-atomic" && !plan.runnable_batch.is_empty())
+}
+
+fn unsafe_result_summaries_for_children(
+    plan: &ProgramLifecyclePlanResult,
+    child_results: &[ProgramChildExecutionSummary],
+) -> Vec<ProgramUnsafeResultSummary> {
+    let safe_continuation = plan_has_safe_continuation_after_unsafe(plan);
+    let continuation_reason = if safe_continuation {
+        if plan.program_route.is_some() {
+            "program repair or parent route dispatch remains available"
+        } else if !plan.safe_repair_candidates.is_empty() {
+            "safe governed repair candidate remains available"
+        } else {
+            "independent runnable child work remains available"
+        }
+    } else {
+        "no safe governed repair route or independent runnable work remains"
+    };
+    child_results
+        .iter()
+        .filter(|result| result.status == "blocked-unsafe")
+        .map(|result| ProgramUnsafeResultSummary {
+            scope: "child".to_string(),
+            child_id: Some(result.child_id.clone()),
+            route_id: result.route_id.clone(),
+            status: result.status.clone(),
+            blocker_class: result.blocker_class.clone(),
+            safe_continuation_available: safe_continuation,
+            continuation_reason: continuation_reason.to_string(),
+        })
+        .collect()
+}
+
+fn final_verdict_after_child_execution(
+    plan: &ProgramLifecyclePlanResult,
+    child_results: &[ProgramChildExecutionSummary],
+) -> String {
+    let execution_had_human_block = child_results
+        .iter()
+        .any(|result| result.status == "approval-required");
+    let execution_had_cancellation = child_results
+        .iter()
+        .any(|result| result.status == "cancelled");
+    let execution_had_failure = child_results.iter().any(|result| {
+        matches!(
+            result.status.as_str(),
+            "failed" | "timed-out" | "blocked" | "blocked-unsafe"
+        )
+    });
+    let unsafe_results = child_results
+        .iter()
+        .any(|result| result.status == "blocked-unsafe");
+    if execution_had_cancellation {
+        "cancelled".to_string()
+    } else if unsafe_results && !plan_has_safe_continuation_after_unsafe(plan) {
+        "blocked-unsafe".to_string()
+    } else if unsafe_results {
+        "blocked-recoverable".to_string()
+    } else if execution_had_human_block {
+        "blocked-human".to_string()
+    } else if execution_had_failure {
+        "blocked-recoverable".to_string()
+    } else {
+        plan.final_verdict.clone()
+    }
 }
 
 fn mark_program_blocked_max_steps(
@@ -2282,12 +2892,19 @@ pub(crate) fn status_program_lifecycle_run(
         event_log_sha256: program_event_log_digest(&control_root)?,
         dag,
         runnable_batch: plan.runnable_batch,
+        scheduler_phase: plan.scheduler_phase,
+        skipped_blocked_children: plan.skipped_blocked_children,
+        required_child_completion: plan.required_child_completion,
+        stop_reason: plan.stop_reason,
         program_route: plan.program_route,
         program_gate_results: plan.program_gate_results,
         blocked_by_program_gate: plan.blocked_by_program_gate,
         parent_receipt_states: plan.parent_receipt_states,
         program_blockers: plan.program_blockers,
+        normalized_program_blockers: plan.normalized_program_blockers,
         child_blockers,
+        normalized_child_blockers: plan.normalized_child_blockers,
+        normalized_approval_blockers: plan.normalized_approval_blockers,
         approvals: checkpoint.approvals,
         recovery_attempts: checkpoint.recovery_attempts,
         atomic_barrier_state: reconstruct_atomic_barrier_state(&events)
@@ -3438,7 +4055,7 @@ fn apply_atomic_preflight_blockers(
 ) -> Result<()> {
     let Some(atomic_policy) = program.atomic_policy.as_ref() else {
         program_blockers.push(ProgramBlocker {
-            blocker_class: "unsupported-mode".to_string(),
+            blocker_class: "unsupported-mode-authority".to_string(),
             message: "program-atomic requires program.atomic_policy".to_string(),
             recovery_route: None,
         });
@@ -3446,7 +4063,7 @@ fn apply_atomic_preflight_blockers(
     };
     if atomic_policy.eligibility != "explicit-route-opt-in" {
         program_blockers.push(ProgramBlocker {
-            blocker_class: "unsupported-mode".to_string(),
+            blocker_class: "unsupported-mode-authority".to_string(),
             message: "program-atomic supports only explicit-route-opt-in atomic eligibility"
                 .to_string(),
             recovery_route: None,
@@ -3455,7 +4072,7 @@ fn apply_atomic_preflight_blockers(
     }
     if registry.schema_version != "octon-proposal-program-child-registry-v2" {
         program_blockers.push(ProgramBlocker {
-            blocker_class: "unsupported-mode".to_string(),
+            blocker_class: "unsupported-mode-authority".to_string(),
             message: "program-atomic requires octon-proposal-program-child-registry-v2".to_string(),
             recovery_route: None,
         });
@@ -3481,7 +4098,7 @@ fn apply_atomic_preflight_blockers(
             })
         }) {
             program_blockers.push(ProgramBlocker {
-                blocker_class: "write-scope-conflict".to_string(),
+                blocker_class: "atomic-write-scope-conflict".to_string(),
                 message: format!(
                     "program-atomic child {} write scope overlaps with child {other_child}",
                     state.child_id
@@ -3509,7 +4126,7 @@ fn apply_atomic_preflight_blockers(
         match atomic_spec_for_route(&loaded.contract, &route.route_id) {
             Ok(_) => {}
             Err(error) => state.blockers.push(ProgramBlocker {
-                blocker_class: "unsupported-mode".to_string(),
+                blocker_class: "unsupported-mode-authority".to_string(),
                 message: error.to_string(),
                 recovery_route: None,
             }),
@@ -3681,24 +4298,119 @@ fn rel_path_string(path: &Path) -> String {
     path.to_string_lossy().replace('\\', "/")
 }
 
+fn child_gate_status_from_lifecycle_plan(plan: &LifecyclePlanResult) -> ProgramChildGateStatus {
+    let terminal = plan.terminal_outcome.is_some();
+    let verification = terminal
+        || (receipt_passed(&plan.receipt_states, "implementation-run")
+            && receipt_passed(&plan.receipt_states, "implementation-conformance")
+            && receipt_passed(&plan.receipt_states, "post-implementation-drift"));
+    let closeout = terminal || closeout_receipt_authorizes_archive(&plan.receipt_states);
+    ProgramChildGateStatus {
+        terminal,
+        verification,
+        closeout,
+    }
+}
+
+fn receipt_passed(receipts: &BTreeMap<String, ReceiptPlanState>, receipt_id: &str) -> bool {
+    receipts
+        .get(receipt_id)
+        .map(|receipt| {
+            receipt.exists
+                && receipt.missing_required_fields.is_empty()
+                && receipt.verdict.as_deref() == Some("pass")
+        })
+        .unwrap_or(false)
+}
+
+fn closeout_receipt_authorizes_archive(receipts: &BTreeMap<String, ReceiptPlanState>) -> bool {
+    receipts
+        .get("proposal-closeout")
+        .map(|receipt| {
+            receipt.exists
+                && receipt.missing_required_fields.is_empty()
+                && receipt.verdict.as_deref() == Some("pass")
+                && receipt.fields.get("archive_authorized").map(String::as_str) == Some("yes")
+        })
+        .unwrap_or(false)
+}
+
 fn apply_dependency_blockers(child_states: &mut BTreeMap<String, ProgramChildPlanState>) {
-    let completed = child_states
+    let gate_statuses = child_states
         .iter()
-        .filter_map(|(id, state)| state.terminal_outcome.as_ref().map(|_| id.clone()))
-        .collect::<BTreeSet<_>>();
+        .map(|(id, state)| (id.clone(), state.gate_status.clone()))
+        .collect::<BTreeMap<_, _>>();
     for state in child_states.values_mut() {
         if state.deferred {
             continue;
         }
+        let required_gate = state
+            .dependency_gate
+            .as_deref()
+            .unwrap_or("terminal")
+            .to_string();
         for dependency in &state.dependencies {
-            if !completed.contains(dependency) {
+            let status = gate_statuses.get(dependency);
+            let (satisfied, observed_gate, reason) =
+                dependency_gate_satisfied(status, &required_gate);
+            state.dependency_gate_status.insert(
+                dependency.clone(),
+                ProgramDependencyGateStatus {
+                    dependency_id: dependency.clone(),
+                    required_gate: required_gate.clone(),
+                    satisfied,
+                    observed_gate,
+                    reason: reason.clone(),
+                },
+            );
+            if !satisfied {
                 state.blockers.push(ProgramBlocker {
-                    blocker_class: "dependency-blocked".to_string(),
-                    message: format!("dependency {dependency} is not terminal"),
+                    blocker_class: "dependency-gate-unsatisfied".to_string(),
+                    message: format!(
+                        "dependency {dependency} has not satisfied {required_gate} gate: {reason}"
+                    ),
                     recovery_route: None,
                 });
             }
         }
+    }
+}
+
+fn dependency_gate_satisfied(
+    status: Option<&ProgramChildGateStatus>,
+    required_gate: &str,
+) -> (bool, String, String) {
+    let Some(status) = status else {
+        return (
+            false,
+            "missing".to_string(),
+            "dependency is absent from child state map".to_string(),
+        );
+    };
+    let observed_gate = observed_gate(status);
+    let satisfied = match required_gate {
+        "verification" => status.verification || status.closeout || status.terminal,
+        "closeout" => status.closeout || status.terminal,
+        "terminal" => status.terminal,
+        _ => status.terminal,
+    };
+    let reason = if satisfied {
+        format!("observed {observed_gate}")
+    } else {
+        format!("observed {observed_gate}")
+    };
+    (satisfied, observed_gate, reason)
+}
+
+fn observed_gate(status: &ProgramChildGateStatus) -> String {
+    if status.terminal {
+        "terminal".to_string()
+    } else if status.closeout {
+        "closeout".to_string()
+    } else if status.verification {
+        "verification".to_string()
+    } else {
+        "none".to_string()
     }
 }
 
@@ -3723,7 +4435,7 @@ fn apply_checkpoint_child_drift(
         }
         if state.target != checkpoint_state.target {
             state.blockers.push(ProgramBlocker {
-                blocker_class: "target-drift".to_string(),
+                blocker_class: "target-drift-unclear".to_string(),
                 message: format!(
                     "child target changed from {} to {}",
                     checkpoint_state.target, state.target
@@ -3733,14 +4445,14 @@ fn apply_checkpoint_child_drift(
         }
         if state.receipt_digests != checkpoint_state.receipt_digests {
             state.blockers.push(ProgramBlocker {
-                blocker_class: "target-drift".to_string(),
+                blocker_class: "target-drift-explained".to_string(),
                 message: "child receipt digest set changed since checkpoint".to_string(),
                 recovery_route: None,
             });
         }
         if state.write_scopes != checkpoint_state.write_scopes {
             state.blockers.push(ProgramBlocker {
-                blocker_class: "target-drift".to_string(),
+                blocker_class: "target-drift-unclear".to_string(),
                 message: "child write scope set changed since checkpoint".to_string(),
                 recovery_route: None,
             });
@@ -3757,19 +4469,39 @@ fn apply_recovery_budget_blockers(
         return;
     };
     for state in child_states.values_mut() {
-        let exhausted = state.blockers.iter().find_map(|blocker| {
-            let budget = recovery_attempt_budget(program, &blocker.blocker_class)?;
-            let attempts =
-                recovery_attempt_count(checkpoint, &state.child_id, &blocker.blocker_class);
-            (attempts >= budget).then(|| (blocker.blocker_class.clone(), attempts, budget))
-        });
-        if let Some((blocker_class, attempts, budget)) = exhausted {
+        let exhausted = state
+            .blockers
+            .iter()
+            .enumerate()
+            .find_map(|(index, blocker)| {
+                let budget = recovery_attempt_budget(program, &blocker.blocker_class)?;
+                let attempts =
+                    recovery_attempt_count(checkpoint, &state.child_id, &blocker.blocker_class);
+                (attempts >= budget)
+                    .then(|| (index, blocker.blocker_class.clone(), attempts, budget))
+            });
+        if let Some((exhausted_index, blocker_class, attempts, budget)) = exhausted {
+            let alternate_safe_route = state.blockers.iter().find_map(|blocker| {
+                (blocker.blocker_class.as_str() != blocker_class.as_str()
+                    && recovery_route_for_blocker(program, blocker).is_some()
+                    && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class)
+                        .is_some())
+                .then(|| recovery_route_for_blocker(program, blocker))
+                .flatten()
+                .map(str::to_string)
+            });
+            let budget_blocker_class = if alternate_safe_route.is_some() {
+                "recovery-budget-exhausted-alternate-route"
+            } else {
+                "recovery-budget-override-required"
+            };
+            state.blockers.remove(exhausted_index);
             state.blockers.push(ProgramBlocker {
-                blocker_class: "executor-failed".to_string(),
+                blocker_class: budget_blocker_class.to_string(),
                 message: format!(
                     "recovery budget exhausted for {blocker_class}: attempts {attempts} budget {budget}"
                 ),
-                recovery_route: None,
+                recovery_route: alternate_safe_route,
             });
         }
     }
@@ -3780,13 +4512,21 @@ fn apply_recovery_approval_blockers(
     registry_digest: &str,
     child_states: &mut BTreeMap<String, ProgramChildPlanState>,
     approvals: Option<&Vec<ProgramApprovalGrant>>,
+    approval_policy: &str,
 ) {
     for state in child_states.values_mut() {
         let blockers = state.blockers.clone();
         for blocker in blockers {
-            if blocker.blocker_class == "approval-required"
-                || blocker_non_recoverable(&blocker.blocker_class)
+            if matches!(
+                blocker.blocker_class.as_str(),
+                "approval-required" | "operator-approval-required" | "governed-agent-approval"
+            ) || blocker_non_recoverable(&blocker.blocker_class)
                 || !recovery_requires_approval(program, &blocker.blocker_class)
+            {
+                continue;
+            }
+            if approval_policy == "unattended"
+                && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some()
             {
                 continue;
             }
@@ -3803,13 +4543,15 @@ fn apply_recovery_approval_blockers(
                 continue;
             }
             if state.blockers.iter().any(|existing| {
-                existing.blocker_class == "approval-required"
-                    && existing.recovery_route.as_deref() == Some(route_id)
+                matches!(
+                    existing.blocker_class.as_str(),
+                    "approval-required" | "operator-approval-required"
+                ) && existing.recovery_route.as_deref() == Some(route_id)
             }) {
                 continue;
             }
             state.blockers.push(ProgramBlocker {
-                blocker_class: "approval-required".to_string(),
+                blocker_class: "operator-approval-required".to_string(),
                 message: format!(
                     "recovery for {} requires program approval before route {} may execute",
                     blocker.blocker_class, route_id
@@ -3828,11 +4570,12 @@ fn apply_recovery_dependent_handling(
 ) {
     let mut additions: Vec<(String, ProgramBlocker)> = Vec::new();
     for state in child_states.values() {
-        for blocker in state
-            .blockers
-            .iter()
-            .filter(|blocker| blocker.blocker_class != "approval-required")
-        {
+        for blocker in state.blockers.iter().filter(|blocker| {
+            !matches!(
+                blocker.blocker_class.as_str(),
+                "approval-required" | "operator-approval-required" | "governed-agent-approval"
+            )
+        }) {
             let Some(handling) = recovery_dependent_handling(program, &blocker.blocker_class)
             else {
                 continue;
@@ -3848,10 +4591,17 @@ fn apply_recovery_dependent_handling(
                         if dependent.child_id == state.child_id {
                             continue;
                         }
+                        if dependent_dependency_gate_is_satisfied(
+                            child_states,
+                            &dependent.child_id,
+                            &state.child_id,
+                        ) {
+                            continue;
+                        }
                         additions.push((
                             dependent.child_id.clone(),
                             ProgramBlocker {
-                                blocker_class: "dependency-blocked".to_string(),
+                                blocker_class: "scheduler-paused".to_string(),
                                 message: format!(
                                     "dependent child paused while {} recovers from {}",
                                     state.child_id, blocker.blocker_class
@@ -3870,7 +4620,7 @@ fn apply_recovery_dependent_handling(
                         additions.push((
                             child.child_id.clone(),
                             ProgramBlocker {
-                                blocker_class: "dependency-blocked".to_string(),
+                                blocker_class: "scheduler-paused".to_string(),
                                 message: format!(
                                     "phase paused while {} recovers from {}",
                                     state.child_id, blocker.blocker_class
@@ -3882,7 +4632,7 @@ fn apply_recovery_dependent_handling(
                 }
                 "pause-barrier" => {
                     program_blockers.push(ProgramBlocker {
-                        blocker_class: "dependency-blocked".to_string(),
+                        blocker_class: "scheduler-paused".to_string(),
                         message: format!(
                             "program barrier paused while {} recovers from {}",
                             state.child_id, blocker.blocker_class
@@ -3918,6 +4668,18 @@ fn apply_recovery_dependent_handling(
             }
         }
     }
+}
+
+fn dependent_dependency_gate_is_satisfied(
+    child_states: &BTreeMap<String, ProgramChildPlanState>,
+    dependent_id: &str,
+    dependency_id: &str,
+) -> bool {
+    child_states
+        .get(dependent_id)
+        .and_then(|state| state.dependency_gate_status.get(dependency_id))
+        .map(|status| status.satisfied)
+        .unwrap_or(false)
 }
 
 fn select_runnable_batch(
@@ -3982,11 +4744,146 @@ fn runnable_child(
 }
 
 fn blocker_allows_child_route(program: &ProgramSpec, blocker: &ProgramBlocker) -> bool {
-    (blocker.recovery_route.is_some() || recovery_route_for_blocker(program, blocker).is_some())
-        && matches!(
-            blocker.blocker_class.as_str(),
-            "stale-receipt" | "validation-failed" | "missing-evidence"
-        )
+    let has_route =
+        blocker.recovery_route.is_some() || recovery_route_for_blocker(program, blocker).is_some();
+    has_route && blocker_is_agent_routable(program, blocker)
+}
+
+fn blocker_is_agent_routable(program: &ProgramSpec, blocker: &ProgramBlocker) -> bool {
+    classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Recoverable
+        || blocker_has_safe_agent_repair(program, blocker)
+}
+
+fn blocker_has_safe_agent_repair(program: &ProgramSpec, blocker: &ProgramBlocker) -> bool {
+    classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
+        && recovery_route_for_blocker(program, blocker).is_some()
+        && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some()
+}
+
+fn program_blocker_has_safe_agent_repair(
+    contract: &LifecycleContract,
+    program: &ProgramSpec,
+    blocker: &ProgramBlocker,
+) -> bool {
+    classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
+        && selected_program_repair_route(contract, program, blocker)
+            .and_then(|route| {
+                validate_program_recovery_recipe(contract, program, blocker, &route)
+                    .ok()
+                    .map(|validation| validation.safe_unattended_basis)
+            })
+            .flatten()
+            .is_some()
+}
+
+fn program_blocker_has_declared_safe_agent_repair(
+    program: &ProgramSpec,
+    blocker: &ProgramBlocker,
+) -> bool {
+    classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
+        && recovery_route_for_blocker(program, blocker).is_some()
+        && program_repair_safe_unattended_basis(program, &blocker.blocker_class).is_some()
+}
+
+fn selected_program_repair_route(
+    contract: &LifecycleContract,
+    program: &ProgramSpec,
+    blocker: &ProgramBlocker,
+) -> Option<RoutePlanState> {
+    let route_id = recovery_route_for_blocker(program, blocker)?;
+    route_by_id(contract, route_id)
+        .cloned()
+        .map(route_plan_state)
+}
+
+fn selected_program_repair_blocker<'a>(
+    contract: &LifecycleContract,
+    program: &ProgramSpec,
+    blockers: &'a [ProgramBlocker],
+) -> Option<(&'a ProgramBlocker, RoutePlanState, String)> {
+    selected_program_repair_blocker_with_validation(contract, program, blockers)
+        .selection
+        .map(|selection| {
+            (
+                selection.blocker,
+                selection.route,
+                selection.safe_unattended_basis,
+            )
+        })
+}
+
+fn selected_program_repair_blocker_with_validation<'a>(
+    contract: &LifecycleContract,
+    program: &ProgramSpec,
+    blockers: &'a [ProgramBlocker],
+) -> ProgramRepairSelectionResult<'a> {
+    let mut first_failure = None;
+    for blocker in blockers.iter().filter(|blocker| {
+        classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
+    }) {
+        let route_id = recovery_route_for_blocker(program, blocker);
+        let Some(route) = selected_program_repair_route(contract, program, blocker) else {
+            if route_id.is_some() {
+                first_failure.get_or_insert_with(|| {
+                    ProgramRecoveryRecipeValidationEvidence::failed(
+                        &blocker.blocker_class,
+                        route_id,
+                        vec![format!(
+                            "program recovery route {} is missing from program lifecycle contract",
+                            route_id.unwrap_or("unknown")
+                        )],
+                    )
+                });
+            }
+            continue;
+        };
+        match validate_program_recovery_recipe(contract, program, blocker, &route) {
+            Ok(validation) => {
+                let Some(basis) = validation.safe_unattended_basis.clone() else {
+                    first_failure.get_or_insert_with(|| {
+                        ProgramRecoveryRecipeValidationEvidence::failed(
+                            &blocker.blocker_class,
+                            Some(&route.route_id),
+                            vec![
+                                "program recovery validation passed without safe unattended basis"
+                                    .to_string(),
+                            ],
+                        )
+                    });
+                    continue;
+                };
+                return ProgramRepairSelectionResult {
+                    selection: Some(ProgramRepairSelection {
+                        blocker,
+                        route,
+                        safe_unattended_basis: basis,
+                        validation,
+                    }),
+                    validation: None,
+                };
+            }
+            Err(error) => {
+                first_failure.get_or_insert_with(|| {
+                    ProgramRecoveryRecipeValidationEvidence::failed(
+                        &blocker.blocker_class,
+                        Some(&route.route_id),
+                        vec![error.to_string()],
+                    )
+                });
+            }
+        }
+    }
+    ProgramRepairSelectionResult {
+        selection: None,
+        validation: first_failure,
+    }
+}
+
+fn program_repair_safe_unattended_basis(
+    program: &ProgramSpec,
+    blocker_class: &str,
+) -> Option<String> {
+    recovery_safe_unattended_basis(Some(program), blocker_class)
 }
 
 fn gated_parallel_candidates(
@@ -3994,33 +4891,36 @@ fn gated_parallel_candidates(
     registry: &ProgramChildRegistry,
     child_states: &BTreeMap<String, ProgramChildPlanState>,
 ) -> Vec<String> {
-    let next_phase = registry.children.iter().find_map(|child| {
-        let state = child_states.get(&child.child_id)?;
-        if state.terminal_outcome.is_none() && !state.deferred {
-            Some(
-                child
-                    .phase_id
-                    .clone()
-                    .or_else(|| child.group_id.clone())
-                    .unwrap_or_else(|| "default".to_string()),
-            )
-        } else {
-            None
+    let mut phases = Vec::new();
+    for child in &registry.children {
+        let phase = child_phase_key(child);
+        if !phases.iter().any(|existing| existing == &phase) {
+            phases.push(phase);
         }
-    });
-    registry
-        .children
-        .iter()
-        .filter(|child| {
-            next_phase.as_ref().map_or(false, |phase| {
-                child.phase_id.as_ref().or(child.group_id.as_ref()) == Some(phase)
-                    || (phase == "default" && child.phase_id.is_none() && child.group_id.is_none())
+    }
+    for phase in phases {
+        let candidates = registry
+            .children
+            .iter()
+            .filter(|child| child_phase_key(child) == phase)
+            .filter_map(|child| {
+                runnable_child(program, child_states, &child.child_id)
+                    .then(|| child.child_id.clone())
             })
-        })
-        .filter_map(|child| {
-            runnable_child(program, child_states, &child.child_id).then(|| child.child_id.clone())
-        })
-        .collect()
+            .collect::<Vec<_>>();
+        if !candidates.is_empty() {
+            return candidates;
+        }
+    }
+    Vec::new()
+}
+
+fn child_phase_key(child: &ProgramChildSpec) -> String {
+    child
+        .phase_id
+        .clone()
+        .or_else(|| child.group_id.clone())
+        .unwrap_or_else(|| "default".to_string())
 }
 
 fn enforce_write_scope_independence(
@@ -4042,11 +4942,20 @@ fn enforce_write_scope_independence(
         });
         if let Some((other_child, _)) = conflict {
             if serialize_conflicts {
+                if let Some(state) = child_states.get_mut(&child_id) {
+                    state.blockers.push(ProgramBlocker {
+                        blocker_class: "write-scope-serialization-required".to_string(),
+                        message: format!(
+                            "write scope overlaps with runnable child {other_child}; serialized by scheduler"
+                        ),
+                        recovery_route: None,
+                    });
+                }
                 continue;
             }
             if let Some(state) = child_states.get_mut(&child_id) {
                 state.blockers.push(ProgramBlocker {
-                    blocker_class: "write-scope-conflict".to_string(),
+                    blocker_class: "atomic-write-scope-conflict".to_string(),
                     message: format!("write scope overlaps with runnable child {other_child}"),
                     recovery_route: None,
                 });
@@ -4077,6 +4986,7 @@ fn collect_approval_blockers(
     registry_digest: &str,
     child_states: &BTreeMap<String, ProgramChildPlanState>,
     approvals: Option<&Vec<ProgramApprovalGrant>>,
+    approval_policy: &str,
 ) -> Result<Vec<ProgramApprovalBlocker>> {
     let mut blockers = Vec::new();
     for state in child_states.values() {
@@ -4097,10 +5007,15 @@ fn collect_approval_blockers(
                     None,
                 );
                 if required && !route_approval_granted {
+                    if approval_policy == "unattended"
+                        && route_spec_safe_unattended_basis(&route.route_id, route_spec).is_some()
+                    {
+                        continue;
+                    }
                     blockers.push(ProgramApprovalBlocker {
                         child_id: state.child_id.clone(),
                         route_id: route.route_id.clone(),
-                        blocker_class: None,
+                        blocker_class: Some("operator-approval-required".to_string()),
                         reason: route_spec
                             .approval
                             .as_ref()
@@ -4110,11 +5025,12 @@ fn collect_approval_blockers(
                 }
             }
         }
-        for blocker in state
-            .blockers
-            .iter()
-            .filter(|blocker| blocker.blocker_class != "approval-required")
-        {
+        for blocker in state.blockers.iter().filter(|blocker| {
+            !matches!(
+                blocker.blocker_class.as_str(),
+                "approval-required" | "operator-approval-required" | "governed-agent-approval"
+            )
+        }) {
             if !recovery_requires_approval(program, &blocker.blocker_class) {
                 continue;
             }
@@ -4128,6 +5044,11 @@ fn collect_approval_blockers(
                 Some(registry_digest),
                 Some(&blocker.blocker_class),
             ) {
+                continue;
+            }
+            if approval_policy == "unattended"
+                && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some()
+            {
                 continue;
             }
             blockers.push(ProgramApprovalBlocker {
@@ -4186,9 +5107,14 @@ fn approval_policy_for_child_route(
     route_id: &str,
     registry_digest: Option<&str>,
     blocker_class: Option<&str>,
+    safe_unattended: bool,
 ) -> String {
     if default_policy == "unattended" {
-        "unattended".to_string()
+        if safe_unattended {
+            "unattended".to_string()
+        } else {
+            "minimize".to_string()
+        }
     } else if approval_granted(
         approvals,
         child_id,
@@ -4262,32 +5188,350 @@ enum ProgramBlockerDisposition {
     Unsafe,
 }
 
-fn classify_program_blocker_class(blocker_class: &str) -> ProgramBlockerDisposition {
-    match blocker_class {
-        "approval-required" => ProgramBlockerDisposition::Human,
-        "authority-boundary-ambiguous"
-        | "unsafe-resume"
-        | "unsupported-mode"
-        | "write-scope-conflict" => ProgramBlockerDisposition::Unsafe,
-        "dependency-blocked"
-        | "executor-failed"
-        | "missing-evidence"
-        | "stale-receipt"
-        | "target-drift"
-        | "validation-failed"
-        | "worktree-hygiene-blocked" => ProgramBlockerDisposition::Recoverable,
-        _ => ProgramBlockerDisposition::Unsafe,
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum ProgramNormalizedCategory {
+    Recoverable,
+    Human,
+    Unsafe,
+    Budget,
+    Timeout,
+    Cancellation,
+    Terminal,
+}
+
+impl ProgramNormalizedCategory {
+    fn as_str(self) -> &'static str {
+        match self {
+            ProgramNormalizedCategory::Recoverable => "recoverable",
+            ProgramNormalizedCategory::Human => "human",
+            ProgramNormalizedCategory::Unsafe => "unsafe",
+            ProgramNormalizedCategory::Budget => "budget",
+            ProgramNormalizedCategory::Timeout => "timeout",
+            ProgramNormalizedCategory::Cancellation => "cancellation",
+            ProgramNormalizedCategory::Terminal => "terminal",
+        }
+    }
+
+    fn disposition(self) -> &'static str {
+        match self {
+            ProgramNormalizedCategory::Recoverable => "autonomous/recoverable",
+            ProgramNormalizedCategory::Human => "human-required",
+            ProgramNormalizedCategory::Unsafe => "unsafe-route/fail-closed",
+            ProgramNormalizedCategory::Budget => "budget",
+            ProgramNormalizedCategory::Timeout => "timeout",
+            ProgramNormalizedCategory::Cancellation => "cancellation",
+            ProgramNormalizedCategory::Terminal => "terminal",
+        }
     }
 }
 
+struct ProgramBlockerNormalization {
+    normalized_blocker_class: String,
+    normalized_category: ProgramNormalizedCategory,
+    legacy_class: Option<String>,
+    autonomy_basis: String,
+}
+
+fn classify_program_blocker_class(blocker_class: &str) -> ProgramBlockerDisposition {
+    match normalize_program_blocker_class(blocker_class).normalized_category {
+        ProgramNormalizedCategory::Recoverable
+        | ProgramNormalizedCategory::Budget
+        | ProgramNormalizedCategory::Timeout
+        | ProgramNormalizedCategory::Cancellation
+        | ProgramNormalizedCategory::Terminal => ProgramBlockerDisposition::Recoverable,
+        ProgramNormalizedCategory::Human => ProgramBlockerDisposition::Human,
+        ProgramNormalizedCategory::Unsafe => ProgramBlockerDisposition::Unsafe,
+    }
+}
+
+fn normalize_program_blocker_class(blocker_class: &str) -> ProgramBlockerNormalization {
+    let (normalized_blocker_class, normalized_category, autonomy_basis) = match blocker_class {
+        "governed-agent-approval" => (
+            "governed-agent-approval",
+            ProgramNormalizedCategory::Recoverable,
+            "route or recovery approval is safe for unattended execution by contract",
+        ),
+        "approval-required" | "operator-approval-required" => (
+            "operator-approval-required",
+            ProgramNormalizedCategory::Human,
+            "route or recovery approval is not safe-unattended by contract",
+        ),
+        "unsupported-mode-config" => (
+            "unsupported-mode-config",
+            ProgramNormalizedCategory::Recoverable,
+            "unsupported mode is a bounded local configuration or contract mismatch",
+        ),
+        "unsupported-mode" | "unsupported-mode-authority" => (
+            "unsupported-mode-authority",
+            ProgramNormalizedCategory::Unsafe,
+            "runtime cannot safely interpret authority, write scope, execution semantics, or rollback guarantees",
+        ),
+        "write-scope-serialization-required" => (
+            "write-scope-serialization-required",
+            ProgramNormalizedCategory::Recoverable,
+            "write-scope conflict can be handled by serializing safe child execution",
+        ),
+        "write-scope-conflict" | "atomic-write-scope-conflict" => (
+            "atomic-write-scope-conflict",
+            ProgramNormalizedCategory::Unsafe,
+            "conflicting atomic write scope has no safe serialization route",
+        ),
+        "dependency-blocked" | "dependency-gate-unsatisfied" => (
+            "dependency-gate-unsatisfied",
+            ProgramNormalizedCategory::Recoverable,
+            "dependency gate has not yet been satisfied and may advance through normal lifecycle routes",
+        ),
+        "scheduler-paused" => (
+            "scheduler-paused",
+            ProgramNormalizedCategory::Recoverable,
+            "scheduler intentionally paused dependent work while recovery proceeds",
+        ),
+        "deferred" => (
+            "deferred",
+            ProgramNormalizedCategory::Recoverable,
+            "child is explicitly deferred and is non-blocking for required-child completion",
+        ),
+        "target-drift-explained" => (
+            "target-drift-explained",
+            ProgramNormalizedCategory::Recoverable,
+            "local evidence explains target or receipt drift",
+        ),
+        "target-drift" | "target-drift-unclear" => (
+            "target-drift-unclear",
+            ProgramNormalizedCategory::Human,
+            "target drift cause, ownership, or authority is unclear",
+        ),
+        "noncritical-artifact-cleanup"
+        | "child-lock-stale"
+        | "generated-scratch-stale"
+        | "local-run-residue" => (
+            "noncritical-artifact-cleanup",
+            ProgramNormalizedCategory::Recoverable,
+            "artifact is generated, temporary, stale, reproducible, superseded, or current-run-owned",
+        ),
+        "artifact-cleanup-required" | "critical-artifact-cleanup-required" => (
+            "critical-artifact-cleanup-required",
+            ProgramNormalizedCategory::Human,
+            "cleanup touches critical or authority-sensitive artifacts",
+        ),
+        "worktree-hygiene-blocked" | "artifact-ownership-unclear" => (
+            "artifact-ownership-unclear",
+            ProgramNormalizedCategory::Human,
+            "artifact ownership or criticality is unclear and must not be guessed",
+        ),
+        "executor-timed-out" => (
+            "executor-timed-out",
+            ProgramNormalizedCategory::Recoverable,
+            "executor timeout may recover through a safe alternate route or retry budget",
+        ),
+        "executor-failed"
+        | "failed"
+        | "missing-evidence"
+        | "missing-required-evidence"
+        | "missing-route-evidence"
+        | "stale-receipt"
+        | "validation-failed" => (
+            blocker_class,
+            ProgramNormalizedCategory::Recoverable,
+            "routine validation, evidence, receipt, or execution failure is agent-diagnosable",
+        ),
+        "recovery-budget-exhausted-alternate-route" => (
+            "recovery-budget-exhausted-alternate-route",
+            ProgramNormalizedCategory::Recoverable,
+            "one recovery route exhausted but another safe route remains available",
+        ),
+        "recovery-budget-override-required" => (
+            "recovery-budget-override-required",
+            ProgramNormalizedCategory::Human,
+            "remaining recovery requires retry-budget override, judgment, scope expansion, or broader authority",
+        ),
+        "recovery-integrity-risk" => (
+            "recovery-integrity-risk",
+            ProgramNormalizedCategory::Unsafe,
+            "repeated recovery attempts indicate possible integrity risk",
+        ),
+        "authority-boundary-ambiguous" | "unsafe-resume" => (
+            blocker_class,
+            ProgramNormalizedCategory::Unsafe,
+            "authority, ownership, or resume safety is ambiguous",
+        ),
+        _ => (
+            blocker_class,
+            ProgramNormalizedCategory::Unsafe,
+            "unknown blocker class fails closed until taxonomy policy is explicit",
+        ),
+    };
+    let legacy_class =
+        (normalized_blocker_class != blocker_class).then(|| blocker_class.to_string());
+    ProgramBlockerNormalization {
+        normalized_blocker_class: normalized_blocker_class.to_string(),
+        normalized_category,
+        legacy_class,
+        autonomy_basis: autonomy_basis.to_string(),
+    }
+}
+
+fn normalize_program_state_value(value: &str) -> ProgramNormalizedCategory {
+    match value {
+        "completed" | "skipped-idempotent" | "no-op" => ProgramNormalizedCategory::Terminal,
+        "cancelled" => ProgramNormalizedCategory::Cancellation,
+        "blocked-max-steps" | "blocked-max-iterations" | "blocked-budget" => {
+            ProgramNormalizedCategory::Budget
+        }
+        "timed-out" => ProgramNormalizedCategory::Timeout,
+        "blocked-unsafe" => ProgramNormalizedCategory::Unsafe,
+        "blocked-human" => ProgramNormalizedCategory::Human,
+        "blocked-recoverable"
+        | "blocked-gate"
+        | "blocked-no-route"
+        | "failed"
+        | "blocked"
+        | "partial"
+        | "planned"
+        | "route-ready"
+        | "parent-route-ready" => ProgramNormalizedCategory::Recoverable,
+        _ => ProgramNormalizedCategory::Unsafe,
+    }
+}
+
+fn taxonomy_evidence_for_blocker(
+    program: Option<&ProgramSpec>,
+    blocker: &ProgramBlocker,
+) -> ProgramTaxonomyEvidence {
+    taxonomy_evidence_for_class(program, &blocker.blocker_class)
+}
+
+fn taxonomy_evidence_for_class(
+    program: Option<&ProgramSpec>,
+    blocker_class: &str,
+) -> ProgramTaxonomyEvidence {
+    let normalized = normalize_program_blocker_class(blocker_class);
+    let safe_unattended_basis = recovery_safe_unattended_basis(program, blocker_class);
+    ProgramTaxonomyEvidence {
+        raw_value: blocker_class.to_string(),
+        legacy_class: normalized.legacy_class,
+        normalized_category: normalized.normalized_category.as_str().to_string(),
+        normalized_blocker_class: normalized.normalized_blocker_class,
+        disposition: normalized.normalized_category.disposition().to_string(),
+        autonomy_basis: normalized.autonomy_basis,
+        safe_unattended_basis,
+    }
+}
+
+fn normalized_program_blockers(
+    program: Option<&ProgramSpec>,
+    blockers: &[ProgramBlocker],
+) -> Vec<ProgramTaxonomyEvidence> {
+    blockers
+        .iter()
+        .map(|blocker| taxonomy_evidence_for_blocker(program, blocker))
+        .collect()
+}
+
+fn normalized_child_blockers(
+    program: Option<&ProgramSpec>,
+    child_states: &BTreeMap<String, ProgramChildPlanState>,
+) -> BTreeMap<String, Vec<ProgramTaxonomyEvidence>> {
+    child_states
+        .iter()
+        .filter_map(|(child_id, state)| {
+            if state.blockers.is_empty() {
+                None
+            } else {
+                Some((
+                    child_id.clone(),
+                    normalized_program_blockers(program, &state.blockers),
+                ))
+            }
+        })
+        .collect()
+}
+
+fn normalized_approval_blockers(
+    approval_blockers: &[ProgramApprovalBlocker],
+) -> Vec<ProgramTaxonomyEvidence> {
+    approval_blockers
+        .iter()
+        .map(|blocker| {
+            let raw_value = blocker
+                .blocker_class
+                .as_deref()
+                .unwrap_or("route-approval")
+                .to_string();
+            let mut evidence = taxonomy_evidence_for_class(None, "operator-approval-required");
+            if raw_value != evidence.normalized_blocker_class {
+                evidence.legacy_class = Some(raw_value.clone());
+            }
+            evidence.raw_value = raw_value;
+            evidence
+        })
+        .collect()
+}
+
+fn collect_safe_repair_candidates(
+    contract: &LifecycleContract,
+    program: &ProgramSpec,
+    program_blockers: &[ProgramBlocker],
+    child_states: &BTreeMap<String, ProgramChildPlanState>,
+) -> Vec<ProgramSafeRepairCandidate> {
+    let mut candidates = Vec::new();
+    for blocker in program_blockers {
+        if let Some(route) = selected_program_repair_route(contract, program, blocker) {
+            if let Ok(validation) =
+                validate_program_recovery_recipe(contract, program, blocker, &route)
+            {
+                if let Some(basis) = validation.safe_unattended_basis {
+                    candidates.push(ProgramSafeRepairCandidate {
+                        scope: "program".to_string(),
+                        child_id: None,
+                        blocker_class: blocker.blocker_class.clone(),
+                        selected_repair_route: route.route_id,
+                        safe_unattended_basis: basis,
+                    });
+                }
+            }
+        }
+    }
+    for state in child_states.values() {
+        for blocker in &state.blockers {
+            if !blocker_has_safe_agent_repair(program, blocker) {
+                continue;
+            }
+            let Some(route_id) = recovery_route_for_blocker(program, blocker) else {
+                continue;
+            };
+            let Some(basis) = recovery_safe_unattended_basis(Some(program), &blocker.blocker_class)
+            else {
+                continue;
+            };
+            candidates.push(ProgramSafeRepairCandidate {
+                scope: "child".to_string(),
+                child_id: Some(state.child_id.clone()),
+                blocker_class: blocker.blocker_class.clone(),
+                selected_repair_route: route_id.to_string(),
+                safe_unattended_basis: basis,
+            });
+        }
+    }
+    candidates
+}
+
 fn aggregate_program_state(
+    program: &ProgramSpec,
+    contract: Option<&LifecycleContract>,
     child_states: &BTreeMap<String, ProgramChildPlanState>,
     program_blockers: &[ProgramBlocker],
     approval_blockers: &[ProgramApprovalBlocker],
     runnable_batch: &[String],
 ) -> (String, String) {
+    let program_safe_repair = |blocker: &ProgramBlocker| {
+        contract
+            .map(|contract| program_blocker_has_safe_agent_repair(contract, program, blocker))
+            .unwrap_or_else(|| program_blocker_has_declared_safe_agent_repair(program, blocker))
+    };
     if program_blockers.iter().any(|blocker| {
         classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
+            && !program_safe_repair(blocker)
     }) {
         return ("blocked-unsafe".to_string(), "blocked-unsafe".to_string());
     }
@@ -4302,6 +5546,7 @@ fn aggregate_program_state(
     if program_blockers.iter().any(|blocker| {
         classify_program_blocker_class(&blocker.blocker_class)
             == ProgramBlockerDisposition::Recoverable
+            || program_safe_repair(blocker)
     }) {
         return (
             "blocked-recoverable".to_string(),
@@ -4318,6 +5563,7 @@ fn aggregate_program_state(
         .collect::<Vec<_>>();
     if blockers.iter().any(|blocker| {
         classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
+            && !blocker_has_safe_agent_repair(program, blocker)
     }) {
         return ("blocked-unsafe".to_string(), "blocked-unsafe".to_string());
     }
@@ -4330,6 +5576,7 @@ fn aggregate_program_state(
         && blockers.iter().any(|blocker| {
             classify_program_blocker_class(&blocker.blocker_class)
                 == ProgramBlockerDisposition::Recoverable
+                || blocker_has_safe_agent_repair(program, blocker)
         })
     {
         return (
@@ -4352,6 +5599,137 @@ fn aggregate_program_state(
     } else {
         ("planned".to_string(), "planned".to_string())
     }
+}
+
+fn scheduler_phase_for_batch(
+    registry: &ProgramChildRegistry,
+    runnable_batch: &[String],
+) -> Option<String> {
+    let first = runnable_batch.first()?;
+    registry
+        .children
+        .iter()
+        .find(|child| &child.child_id == first)
+        .map(child_phase_key)
+}
+
+fn skipped_blocked_children(
+    child_states: &BTreeMap<String, ProgramChildPlanState>,
+    runnable_batch: &[String],
+) -> Vec<String> {
+    child_states
+        .iter()
+        .filter_map(|(child_id, state)| {
+            let skipped = state.required
+                && !state.deferred
+                && state.terminal_outcome.is_none()
+                && !state.blockers.is_empty()
+                && !runnable_batch.iter().any(|id| id == child_id);
+            skipped.then(|| child_id.clone())
+        })
+        .collect()
+}
+
+fn required_child_completion_matrix(
+    child_states: &BTreeMap<String, ProgramChildPlanState>,
+) -> BTreeMap<String, ProgramRequiredChildCompletion> {
+    child_states
+        .iter()
+        .filter(|(_, state)| state.required)
+        .map(|(child_id, state)| {
+            (
+                child_id.clone(),
+                ProgramRequiredChildCompletion {
+                    required: state.required,
+                    deferred: state.deferred,
+                    terminal: state.terminal_outcome.is_some(),
+                    terminal_outcome: state.terminal_outcome.clone(),
+                    final_verdict: state.final_verdict.clone(),
+                    selected_route: state
+                        .selected_route
+                        .as_ref()
+                        .map(|route| route.route_id.clone()),
+                    blockers: state.blockers.clone(),
+                },
+            )
+        })
+        .collect()
+}
+
+fn program_stop_reason(
+    program: &ProgramSpec,
+    contract: Option<&LifecycleContract>,
+    final_verdict: &str,
+    terminal_outcome: Option<&str>,
+    program_route: Option<&RoutePlanState>,
+    program_blockers: &[ProgramBlocker],
+    approval_blockers: &[ProgramApprovalBlocker],
+    child_states: &BTreeMap<String, ProgramChildPlanState>,
+    runnable_batch: &[String],
+) -> Option<String> {
+    if let Some(outcome) = terminal_outcome {
+        return Some(format!("terminal-outcome:{outcome}"));
+    }
+    if final_verdict == "completed" {
+        return Some("all-required-children-terminal".to_string());
+    }
+    if !runnable_batch.is_empty() {
+        return Some("dispatch-available".to_string());
+    }
+    let program_safe_repair = |blocker: &ProgramBlocker| {
+        contract
+            .map(|contract| program_blocker_has_safe_agent_repair(contract, program, blocker))
+            .unwrap_or_else(|| program_blocker_has_declared_safe_agent_repair(program, blocker))
+    };
+    if program_route.is_some()
+        && program_blockers.iter().any(|blocker| {
+            classify_program_blocker_class(&blocker.blocker_class)
+                == ProgramBlockerDisposition::Unsafe
+                && program_safe_repair(blocker)
+        })
+    {
+        return Some("program-unsafe-repair-dispatch-available".to_string());
+    }
+    if program_route.is_some() {
+        return Some("dispatch-available".to_string());
+    }
+    if program_blockers.iter().any(|blocker| {
+        classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
+            && !program_safe_repair(blocker)
+    }) {
+        return Some("program-unsafe-blocker-no-safe-repair".to_string());
+    }
+    if !approval_blockers.is_empty()
+        || program_blockers.iter().any(|blocker| {
+            classify_program_blocker_class(&blocker.blocker_class)
+                == ProgramBlockerDisposition::Human
+        })
+    {
+        return Some("approval-blocked-no-dispatch".to_string());
+    }
+    let required_nonterminal = child_states
+        .values()
+        .filter(|state| state.required && !state.deferred && state.terminal_outcome.is_none())
+        .collect::<Vec<_>>();
+    if required_nonterminal.iter().any(|state| {
+        state.blockers.iter().any(|blocker| {
+            classify_program_blocker_class(&blocker.blocker_class)
+                == ProgramBlockerDisposition::Unsafe
+                && !blocker_has_safe_agent_repair(program, blocker)
+        })
+    }) {
+        return Some("child-unsafe-blocker".to_string());
+    }
+    if required_nonterminal
+        .iter()
+        .any(|state| !state.blockers.is_empty())
+    {
+        return Some("required-child-blocked-no-dispatch".to_string());
+    }
+    if !required_nonterminal.is_empty() {
+        return Some("required-child-nonterminal-no-route".to_string());
+    }
+    None
 }
 
 fn filter_plan_to_child(plan: &mut ProgramLifecyclePlanResult, child_id: &str) -> Result<()> {
@@ -4397,6 +5775,45 @@ fn execute_parent_program_route(
     let parent_control_root = control_root.join("parent");
     fs::create_dir_all(&parent_evidence_root)?;
     fs::create_dir_all(&parent_control_root)?;
+    let loaded = load_lifecycle_contract(octon_dir, &plan.lifecycle_id)?;
+    let mut program_repair_basis = None;
+    if let Some(program) = loaded.contract.program.as_ref() {
+        for blocker in &plan.program_blockers {
+            if recovery_route_for_blocker(program, blocker) == Some(route.route_id.as_str())
+                && classify_program_blocker_class(&blocker.blocker_class)
+                    == ProgramBlockerDisposition::Unsafe
+            {
+                let validation =
+                    validate_program_recovery_recipe(&loaded.contract, program, blocker, route)
+                        .with_context(|| {
+                            format!(
+                        "program repair route {} failed recovery recipe validation before dispatch",
+                        route.route_id
+                    )
+                        })?;
+                program_repair_basis = validation.safe_unattended_basis;
+                break;
+            }
+        }
+    }
+    let unsafe_repair = loaded.contract.program.as_ref().and_then(|program| {
+        unsafe_repair_evidence_for_program_route(
+            program_run_id,
+            program,
+            plan,
+            &route.route_id,
+            &parent_evidence_root,
+        )
+    });
+    let parent_approval_policy = if options.approval_policy == "unattended"
+        && lifecycle_route_safe_unattended_basis(octon_dir, &plan.lifecycle_id, &route.route_id)?
+            .is_none()
+        && program_repair_basis.is_none()
+    {
+        "minimize".to_string()
+    } else {
+        options.approval_policy.clone()
+    };
     let request = lifecycle_execution_request_for_route(
         octon_dir,
         program_run_id,
@@ -4405,10 +5822,10 @@ fn execute_parent_program_route(
         route,
         options.executor,
         options.timeout_seconds.unwrap_or(1800),
-        &options.approval_policy,
+        &parent_approval_policy,
         0,
         run_inputs,
-        parent_evidence_root,
+        parent_evidence_root.clone(),
         parent_control_root.join("lifecycle-checkpoint.yml"),
         Some(lifecycle_cancellation_token_path(control_root)),
         Some(LifecycleApprovalContext {
@@ -4428,7 +5845,23 @@ fn execute_parent_program_route(
     .with_context(|| format!("missing selected parent route {}", route.route_id))?;
     let repo_root = repo_root_for_octon(octon_dir)?;
     let executor = DefaultLifecycleRouteExecutor::new(repo_root);
-    let result = executor.execute_route(request)?;
+    let result = match executor.execute_route(request) {
+        Ok(result) => result,
+        Err(error) => {
+            if let Some(evidence) = unsafe_repair {
+                write_unsafe_repair_evidence(
+                    &parent_evidence_root,
+                    evidence,
+                    None,
+                    Some(&error.to_string()),
+                )?;
+            }
+            return Err(error.into());
+        }
+    };
+    if let Some(evidence) = unsafe_repair {
+        write_unsafe_repair_evidence(&parent_evidence_root, evidence, Some(&result), None)?;
+    }
     append_program_event(
         control_root,
         evidence_root,
@@ -4492,6 +5925,19 @@ fn build_child_execution_jobs(
                 child_evidence_root.join("child-plan.yml"),
                 serde_yaml::to_string(state)?,
             )?;
+            let safe_unattended_basis = if let Some(class) = blocker_class.as_deref() {
+                load_lifecycle_contract(octon_dir, &plan.lifecycle_id)?
+                    .contract
+                    .program
+                    .as_ref()
+                    .and_then(|program| recovery_safe_unattended_basis(Some(program), class))
+            } else {
+                lifecycle_route_safe_unattended_basis(
+                    octon_dir,
+                    &state.child_lifecycle_id,
+                    &route.route_id,
+                )?
+            };
             let approval_policy = approval_policy_for_child_route(
                 &options.approval_policy,
                 approvals,
@@ -4499,7 +5945,18 @@ fn build_child_execution_jobs(
                 &route.route_id,
                 Some(&plan.child_registry_digest),
                 blocker_class.as_deref(),
+                safe_unattended_basis.is_some(),
             );
+            let unsafe_repair = blocker_class.as_deref().and_then(|class| {
+                unsafe_repair_evidence_for_job(
+                    program_run_id,
+                    state,
+                    class,
+                    &route.route_id,
+                    safe_unattended_basis.as_deref(),
+                    &child_evidence_root,
+                )
+            });
             if approval_policy == "program-approved" {
                 write_program_approval_execution_evidence(
                     repo_root,
@@ -4569,6 +6026,7 @@ fn build_child_execution_jobs(
                 lock_path,
                 max_attempts,
                 blocker_class,
+                unsafe_repair,
             });
         }
         Ok(())
@@ -4593,18 +6051,22 @@ fn selected_route_for_child_execution(
     approvals: Option<&Vec<ProgramApprovalGrant>>,
     registry_digest: &str,
 ) -> Result<(Option<RoutePlanState>, Option<String>)> {
-    let Some(blocker) = state.blockers.iter().find(|blocker| {
-        blocker.recovery_route.is_some()
-            && blocker.blocker_class != "approval-required"
-            && !blocker_non_recoverable(&blocker.blocker_class)
-    }) else {
-        return Ok((state.selected_route.clone(), None));
-    };
     let loaded = load_lifecycle_contract(octon_dir, &options.lifecycle_id)?;
     let Some(program) = loaded.contract.program.as_ref() else {
         return Ok((state.selected_route.clone(), None));
     };
-    if blocker_non_recoverable(&blocker.blocker_class) {
+    let Some(blocker) = state.blockers.iter().find(|blocker| {
+        recovery_route_for_blocker(program, blocker).is_some()
+            && !matches!(
+                blocker.blocker_class.as_str(),
+                "approval-required" | "operator-approval-required" | "governed-agent-approval"
+            )
+    }) else {
+        return Ok((state.selected_route.clone(), None));
+    };
+    if blocker_non_recoverable(&blocker.blocker_class)
+        && !blocker_has_safe_agent_repair(program, blocker)
+    {
         return Ok((None, Some(blocker.blocker_class.clone())));
     }
     validate_recovery_recipe(program, &blocker.blocker_class, state)?;
@@ -4613,15 +6075,18 @@ fn selected_route_for_child_execution(
     let Some(route_id) = route_id else {
         return Ok((state.selected_route.clone(), None));
     };
+    let approval_granted = approval_granted(
+        approvals,
+        &state.child_id,
+        route_id,
+        Some(registry_digest),
+        Some(&blocker.blocker_class),
+    );
+    let safe_unattended = options.approval_policy == "unattended"
+        && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some();
     if recovery_requires_approval(program, &blocker.blocker_class)
-        && options.approval_policy != "unattended"
-        && !approval_granted(
-            approvals,
-            &state.child_id,
-            route_id,
-            Some(registry_digest),
-            Some(&blocker.blocker_class),
-        )
+        && !approval_granted
+        && !safe_unattended
     {
         return Ok((None, Some(blocker.blocker_class.clone())));
     }
@@ -4645,6 +6110,104 @@ fn selected_route_for_child_execution(
             Some(blocker.blocker_class.clone()),
         ))
     }
+}
+
+fn unsafe_repair_evidence_for_job(
+    program_run_id: &str,
+    state: &ProgramChildPlanState,
+    blocker_class: &str,
+    route_id: &str,
+    safe_unattended_basis: Option<&str>,
+    child_evidence_root: &Path,
+) -> Option<ProgramUnsafeRepairEvidence> {
+    if classify_program_blocker_class(blocker_class) != ProgramBlockerDisposition::Unsafe {
+        return None;
+    }
+    let authority_basis = safe_unattended_basis?;
+    let unsafe_condition = state
+        .blockers
+        .iter()
+        .find(|blocker| blocker.blocker_class == blocker_class)
+        .map(|blocker| blocker.message.clone())
+        .unwrap_or_else(|| format!("unsafe blocker {blocker_class}"));
+    Some(ProgramUnsafeRepairEvidence {
+        schema_version: "octon-program-lifecycle-unsafe-repair-v2".to_string(),
+        program_run_id: program_run_id.to_string(),
+        repair_scope: "child".to_string(),
+        blocker_scope: "child".to_string(),
+        child_id: state.child_id.clone(),
+        unsafe_condition,
+        original_route_blocked_reason: format!(
+            "current route or action for {blocker_class} must not continue as-is"
+        ),
+        selected_repair_route: route_id.to_string(),
+        agent_authority_basis: authority_basis.to_string(),
+        files_artifacts_changed: vec![rel_path_string(child_evidence_root)],
+        before_validation:
+            "unsafe blocker selected for governed repair before child route dispatch".to_string(),
+        after_validation: "pending repair route execution".to_string(),
+        safe_continuation_available: true,
+        route_execution_status: "pending".to_string(),
+        recipe_validation_status: "passed".to_string(),
+        recipe_validation_failures: Vec::new(),
+        post_attempt_validations_declared: Vec::new(),
+        post_attempt_validation_results: Vec::new(),
+        resume_decision_basis: "pending post-attempt validation".to_string(),
+        post_attempt_validation_status: "pending".to_string(),
+        post_attempt_validation_failures: Vec::new(),
+        final_blocker_class: Some(blocker_class.to_string()),
+        final_execution_can_resume: false,
+        execution_can_resume: false,
+    })
+}
+
+fn unsafe_repair_evidence_for_program_route(
+    program_run_id: &str,
+    program: &ProgramSpec,
+    plan: &ProgramLifecyclePlanResult,
+    route_id: &str,
+    parent_evidence_root: &Path,
+) -> Option<ProgramUnsafeRepairEvidence> {
+    let blocker = plan.program_blockers.iter().find(|blocker| {
+        classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
+            && recovery_route_for_blocker(program, blocker) == Some(route_id)
+    })?;
+    let authority_basis = program_repair_safe_unattended_basis(program, &blocker.blocker_class)?;
+    let declared_validations = recovery_post_attempt_validations(program, &blocker.blocker_class);
+    Some(ProgramUnsafeRepairEvidence {
+        schema_version: "octon-program-lifecycle-unsafe-repair-v2".to_string(),
+        program_run_id: program_run_id.to_string(),
+        repair_scope: "program".to_string(),
+        blocker_scope: "program".to_string(),
+        child_id: "program".to_string(),
+        unsafe_condition: blocker.message.clone(),
+        original_route_blocked_reason: format!(
+            "program route or action for {} must not continue as-is",
+            blocker.blocker_class
+        ),
+        selected_repair_route: route_id.to_string(),
+        agent_authority_basis: authority_basis,
+        files_artifacts_changed: vec![rel_path_string(parent_evidence_root)],
+        before_validation:
+            "unsafe program blocker selected for governed repair before parent route dispatch"
+                .to_string(),
+        after_validation: "pending repair route execution".to_string(),
+        safe_continuation_available: true,
+        route_execution_status: "pending".to_string(),
+        recipe_validation_status: plan
+            .program_recovery_recipe_validation_status
+            .clone()
+            .unwrap_or_else(|| "passed".to_string()),
+        recipe_validation_failures: plan.program_recovery_recipe_validation_failures.clone(),
+        post_attempt_validations_declared: declared_validations,
+        post_attempt_validation_results: Vec::new(),
+        resume_decision_basis: "pending post-attempt validation".to_string(),
+        post_attempt_validation_status: "pending".to_string(),
+        post_attempt_validation_failures: Vec::new(),
+        final_blocker_class: Some(blocker.blocker_class.clone()),
+        final_execution_can_resume: false,
+        execution_can_resume: false,
+    })
 }
 
 fn program_child_approval_context(
@@ -4694,6 +6257,92 @@ fn recovery_route_for_blocker<'a>(
     recovery_route_id(program, &blocker.blocker_class)
         .map(String::as_str)
         .or(blocker.recovery_route.as_deref())
+}
+
+fn recovery_recipe_for_blocker<'a>(
+    program: &'a ProgramSpec,
+    blocker_class: &str,
+) -> Option<&'a ProgramRecoveryRecipeSpec> {
+    program
+        .recovery_policy
+        .recipes
+        .iter()
+        .find(|recipe| recovery_recipe_matches(recipe, blocker_class))
+}
+
+fn recovery_safe_unattended_basis(
+    program: Option<&ProgramSpec>,
+    blocker_class: &str,
+) -> Option<String> {
+    if blocker_class == "recovery-budget-exhausted-alternate-route" {
+        return Some(
+            "budget exhausted for one recovery route; selected alternate was preclassified safe"
+                .to_string(),
+        );
+    }
+    let program = program?;
+    let recipe = recovery_recipe_for_blocker(program, blocker_class)?;
+    let idempotency_class = recipe.idempotency_class.as_deref()?;
+    safe_unattended_idempotency_class(idempotency_class).then(|| {
+        format!(
+            "recovery recipe {} idempotency_class={idempotency_class}",
+            recipe.blocker_class
+        )
+    })
+}
+
+fn safe_unattended_idempotency_class(idempotency_class: &str) -> bool {
+    matches!(
+        idempotency_class,
+        "inspect-only" | "idempotent" | "idempotent-rerun" | "bounded-retry"
+    )
+}
+
+fn lifecycle_route_safe_unattended_basis(
+    octon_dir: &Path,
+    lifecycle_id: &str,
+    route_id: &str,
+) -> Result<Option<String>> {
+    let loaded = load_lifecycle_contract(octon_dir, lifecycle_id)?;
+    Ok(route_by_id(&loaded.contract, route_id)
+        .and_then(|route| route_spec_safe_unattended_basis(route_id, route)))
+}
+
+fn route_spec_safe_unattended_basis(route_id: &str, route: &RouteSpec) -> Option<String> {
+    let idempotency = route.idempotency.as_ref()?;
+    route_idempotency_safe_unattended_basis(idempotency)
+        .map(|basis| format!("route {route_id} {basis}"))
+}
+
+fn route_idempotency_safe_unattended_basis(value: &serde_yaml::Value) -> Option<String> {
+    match value {
+        serde_yaml::Value::String(class) => {
+            safe_unattended_idempotency_class(class).then(|| format!("idempotency={class}"))
+        }
+        serde_yaml::Value::Mapping(mapping) => {
+            for key in ["safe_unattended", "autonomous", "safe_for_unattended"] {
+                if mapping
+                    .get(&serde_yaml::Value::String(key.to_string()))
+                    .and_then(serde_yaml::Value::as_bool)
+                    .unwrap_or(false)
+                {
+                    return Some(format!("{key}=true"));
+                }
+            }
+            for key in ["idempotency_class", "class", "mode"] {
+                if let Some(class) = mapping
+                    .get(&serde_yaml::Value::String(key.to_string()))
+                    .and_then(serde_yaml::Value::as_str)
+                {
+                    if safe_unattended_idempotency_class(class) {
+                        return Some(format!("{key}={class}"));
+                    }
+                }
+            }
+            None
+        }
+        _ => None,
+    }
 }
 
 fn recovery_attempt_budget(program: &ProgramSpec, blocker_class: &str) -> Option<u32> {
@@ -4757,10 +6406,7 @@ fn recovery_replan_after_attempt(program: &ProgramSpec, blocker_class: &str) -> 
 }
 
 fn blocker_non_recoverable(blocker_class: &str) -> bool {
-    matches!(
-        blocker_class,
-        "unsafe-resume" | "authority-boundary-ambiguous"
-    )
+    classify_program_blocker_class(blocker_class) != ProgramBlockerDisposition::Recoverable
 }
 
 fn recovery_attempt_key(child_id: &str, blocker_class: &str) -> String {
@@ -4784,6 +6430,14 @@ fn validate_recovery_recipe(
     blocker_class: &str,
     state: &ProgramChildPlanState,
 ) -> Result<()> {
+    validate_child_recovery_recipe(program, blocker_class, state)
+}
+
+fn validate_child_recovery_recipe(
+    program: &ProgramSpec,
+    blocker_class: &str,
+    state: &ProgramChildPlanState,
+) -> Result<()> {
     let Some(recipe) = program
         .recovery_policy
         .recipes
@@ -4792,14 +6446,7 @@ fn validate_recovery_recipe(
     else {
         return Ok(());
     };
-    if recipe
-        .idempotency_class
-        .as_deref()
-        .map(|class| class == "non-idempotent" || class == "unsafe")
-        .unwrap_or(false)
-    {
-        bail!("recovery recipe for {blocker_class} is not executable because it is non-idempotent");
-    }
+    validate_recovery_recipe_metadata(recipe, blocker_class, false)?;
     for precondition in &recipe.preconditions {
         match precondition.as_str() {
             "live-state-readable" => {}
@@ -4824,17 +6471,90 @@ fn validate_recovery_recipe(
             other => bail!("unsupported recovery recipe precondition: {other}"),
         }
     }
+    Ok(())
+}
+
+fn validate_program_recovery_recipe(
+    contract: &LifecycleContract,
+    program: &ProgramSpec,
+    blocker: &ProgramBlocker,
+    selected_route: &RoutePlanState,
+) -> Result<ProgramRecoveryRecipeValidationEvidence> {
+    let blocker_class = blocker.blocker_class.as_str();
+    let route_id = recovery_route_for_blocker(program, blocker)
+        .with_context(|| format!("program recovery route missing for {blocker_class}"))?;
+    if route_id != selected_route.route_id {
+        bail!(
+            "selected program recovery route {} does not match declared route {route_id}",
+            selected_route.route_id
+        );
+    }
+    route_by_id(contract, route_id).with_context(|| {
+        format!("program recovery route {route_id} is missing from program lifecycle contract")
+    })?;
+    let recipe = recovery_recipe_for_blocker(program, blocker_class)
+        .with_context(|| format!("program recovery recipe missing for {blocker_class}"))?;
+    validate_recovery_recipe_metadata(recipe, blocker_class, true)?;
+    for precondition in &recipe.preconditions {
+        match precondition.as_str() {
+            "live-state-readable" => {}
+            "selected-route-present" => {}
+            "receipt-stale" => {
+                if blocker_class != "stale-receipt" {
+                    bail!("program recovery recipe precondition receipt-stale mismatched blocker class");
+                }
+            }
+            "missing-evidence" => {
+                if blocker_class != "missing-evidence" {
+                    bail!(
+                        "program recovery recipe precondition missing-evidence mismatched blocker class"
+                    );
+                }
+            }
+            "approval-grant-present" => {
+                bail!(
+                    "program recovery recipe precondition approval-grant-present is not automatically recoverable"
+                );
+            }
+            other => bail!("unsupported program recovery recipe precondition: {other}"),
+        }
+    }
+    let safe_unattended_basis = program_repair_safe_unattended_basis(program, blocker_class)
+        .with_context(|| {
+            format!("program recovery recipe for {blocker_class} has no safe unattended basis")
+        })?;
+    if classify_program_blocker_class(blocker_class) == ProgramBlockerDisposition::Unsafe
+        && !safe_unattended_idempotency_class(recipe.idempotency_class.as_deref().unwrap_or(""))
+    {
+        bail!("program unsafe repair for {blocker_class} is not safe for unattended execution");
+    }
+    Ok(ProgramRecoveryRecipeValidationEvidence::passed(
+        blocker_class,
+        route_id,
+        &safe_unattended_basis,
+    ))
+}
+
+fn validate_recovery_recipe_metadata(
+    recipe: &ProgramRecoveryRecipeSpec,
+    blocker_class: &str,
+    require_post_attempt_validation: bool,
+) -> Result<()> {
+    if recipe
+        .idempotency_class
+        .as_deref()
+        .map(|class| matches!(class, "non-idempotent" | "unsafe" | "non-recoverable"))
+        .unwrap_or(false)
+    {
+        bail!(
+            "recovery recipe for {blocker_class} is not executable because it is non-idempotent, unsafe, or non-recoverable"
+        );
+    }
+    if require_post_attempt_validation && recipe.post_attempt_validation.is_empty() {
+        bail!("program recovery recipe for {blocker_class} must declare post_attempt_validation");
+    }
     for validation in &recipe.post_attempt_validation {
-        if !matches!(
-            validation.as_str(),
-            "replan-live-state"
-                | "receipt-fresh"
-                | "receipt-freshness"
-                | "blocker-cleared"
-                | "replay-verify"
-                | "authority-boundary-check"
-                | "aggregate-closeout-check"
-        ) {
+        if !supported_recovery_post_attempt_validation(validation) {
             bail!("unsupported recovery recipe post-attempt validation: {validation}");
         }
     }
@@ -4857,6 +6577,19 @@ fn validate_recovery_recipe(
         }
     }
     Ok(())
+}
+
+fn supported_recovery_post_attempt_validation(validation: &str) -> bool {
+    matches!(
+        validation,
+        "replan-live-state"
+            | "receipt-fresh"
+            | "receipt-freshness"
+            | "blocker-cleared"
+            | "replay-verify"
+            | "authority-boundary-check"
+            | "aggregate-closeout-check"
+    )
 }
 
 fn enforce_recovery_post_attempt_validations(
@@ -4891,6 +6624,16 @@ fn enforce_recovery_post_attempt_validations(
             ));
             continue;
         };
+        if closeout_recovery_blocked_by_worktree(result, &blocker_class, state) {
+            result.status = "blocked".to_string();
+            result.retryable = false;
+            result.blocker_class = Some("artifact-ownership-unclear".to_string());
+            result.error_message = Some(
+                "closeout-packet wrote a blocked closeout receipt because worktree hygiene is blocked"
+                    .to_string(),
+            );
+            continue;
+        }
         let failed = validations.iter().find(|validation| {
             !recovery_post_attempt_validation_passed(
                 validation,
@@ -4909,6 +6652,21 @@ fn enforce_recovery_post_attempt_validations(
         }
     }
     Ok(())
+}
+
+fn closeout_recovery_blocked_by_worktree(
+    result: &ProgramChildExecutionSummary,
+    blocker_class: &str,
+    state: &ProgramChildPlanState,
+) -> bool {
+    result.route_id == "closeout-packet"
+        && blocker_class == "stale-receipt"
+        && state.blockers.iter().any(|blocker| {
+            matches!(
+                blocker.blocker_class.as_str(),
+                "worktree-hygiene-blocked" | "artifact-ownership-unclear"
+            )
+        })
 }
 
 fn recovery_post_attempt_validations(program: &ProgramSpec, blocker_class: &str) -> Vec<String> {
@@ -4954,6 +6712,136 @@ fn recovery_post_attempt_validation_passed(
         }
         "replay-verify" => verify_program_event_log_for_recovery(control_root).is_ok(),
         _ => false,
+    }
+}
+
+fn enforce_program_recovery_post_attempt_validations(
+    program: &ProgramSpec,
+    _before_plan: &ProgramLifecyclePlanResult,
+    after_plan: &ProgramLifecyclePlanResult,
+    control_root: &Path,
+    blocker_class: &str,
+    result: &LifecycleRouteExecutionResult,
+    live_replanned: bool,
+) -> ProgramRecoveryPostAttemptValidationOutcome {
+    if !matches!(result.status.as_str(), "completed" | "no-op") {
+        return ProgramRecoveryPostAttemptValidationOutcome::route_not_completed(
+            &result.status,
+            result.error_message.as_deref(),
+            Some(blocker_class.to_string()),
+        );
+    }
+    let declared = recovery_post_attempt_validations(program, blocker_class);
+    if declared.is_empty() {
+        return ProgramRecoveryPostAttemptValidationOutcome {
+            status: "failed".to_string(),
+            failures: vec![format!(
+                "program recovery recipe for {blocker_class} declared no post_attempt_validation"
+            )],
+            declared,
+            results: Vec::new(),
+            execution_can_resume: false,
+            resume_decision_basis:
+                "program repair cannot resume without declared post-attempt validation".to_string(),
+            final_blocker_class: Some(blocker_class.to_string()),
+        };
+    }
+
+    let mut failures = Vec::new();
+    let mut results = Vec::new();
+    for validation in &declared {
+        match program_recovery_post_attempt_validation_result(
+            validation,
+            after_plan,
+            control_root,
+            blocker_class,
+            live_replanned,
+        ) {
+            Ok(()) => results.push(format!("{validation}: pass")),
+            Err(error) => {
+                results.push(format!("{validation}: fail: {error}"));
+                failures.push(format!("{validation}: {error}"));
+            }
+        }
+    }
+    if failures.is_empty() {
+        ProgramRecoveryPostAttemptValidationOutcome {
+            status: "passed".to_string(),
+            failures,
+            declared,
+            results,
+            execution_can_resume: true,
+            resume_decision_basis:
+                "repair route completed and all declared program post-attempt validations passed"
+                    .to_string(),
+            final_blocker_class: None,
+        }
+    } else {
+        ProgramRecoveryPostAttemptValidationOutcome {
+            status: "failed".to_string(),
+            failures,
+            declared,
+            results,
+            execution_can_resume: false,
+            resume_decision_basis:
+                "program repair route completed but declared post-attempt validation failed"
+                    .to_string(),
+            final_blocker_class: Some(blocker_class.to_string()),
+        }
+    }
+}
+
+fn program_recovery_post_attempt_validation_result(
+    validation: &str,
+    after_plan: &ProgramLifecyclePlanResult,
+    control_root: &Path,
+    blocker_class: &str,
+    live_replanned: bool,
+) -> std::result::Result<(), String> {
+    match validation {
+        "replan-live-state" => live_replanned
+            .then_some(())
+            .ok_or_else(|| "live replan did not run after program repair".to_string()),
+        "blocker-cleared" => {
+            let remaining_same_blocker = after_plan
+                .program_blockers
+                .iter()
+                .any(|blocker| blocker.blocker_class == blocker_class);
+            (!remaining_same_blocker)
+                .then_some(())
+                .ok_or_else(|| format!("program blocker {blocker_class} remains after repair"))
+        }
+        "authority-boundary-check" => {
+            let remaining = after_plan.program_blockers.iter().find(|blocker| {
+                matches!(
+                    classify_program_blocker_class(&blocker.blocker_class),
+                    ProgramBlockerDisposition::Unsafe | ProgramBlockerDisposition::Human
+                )
+            });
+            remaining.is_none().then_some(()).ok_or_else(|| {
+                format!(
+                    "program authority or unsafe blocker remains after repair: {}",
+                    remaining
+                        .map(|blocker| blocker.blocker_class.as_str())
+                        .unwrap_or("unknown")
+                )
+            })
+        }
+        "aggregate-closeout-check" => (after_plan.aggregate_state != "completed"
+            || after_plan.final_verdict == "completed")
+            .then_some(())
+            .ok_or_else(|| {
+                "aggregate state is completed without completed final verdict".to_string()
+            }),
+        "replay-verify" => {
+            verify_program_event_log_for_recovery(control_root).map_err(|error| error.to_string())
+        }
+        "receipt-fresh" | "receipt-freshness" => {
+            Err("program-scope receipt freshness validation has no explicit source".to_string())
+        }
+        other => Err(format!(
+            "unsupported program post-attempt validation {other}"
+        )),
     }
 }
 
@@ -5010,7 +6898,7 @@ fn execute_atomic_program(
     if !plan.program_blockers.is_empty() {
         bail!("program-atomic preflight blocked by program blockers");
     }
-    if !plan.approval_blockers.is_empty() && options.approval_policy != "unattended" {
+    if !plan.approval_blockers.is_empty() {
         append_program_event(
             control_root,
             evidence_root,
@@ -5031,7 +6919,12 @@ fn execute_atomic_program(
                 status: "approval-required".to_string(),
                 attempts: 0,
                 retryable: false,
-                blocker_class: Some("approval-required".to_string()),
+                blocker_class: Some(
+                    blocker
+                        .blocker_class
+                        .clone()
+                        .unwrap_or_else(|| "operator-approval-required".to_string()),
+                ),
                 error_message: Some(blocker.reason.clone()),
             })
             .collect());
@@ -5362,6 +7255,7 @@ fn execute_atomic_route_phase(
         route_id,
         None,
         None,
+        route_spec_safe_unattended_basis(route_id, route).is_some(),
     );
     if approval_policy == "program-approved" {
         write_program_approval_execution_evidence(
@@ -5496,9 +7390,22 @@ fn release_atomic_locks(
     locks: Vec<(String, PathBuf)>,
 ) -> Result<()> {
     for (child_id, lock_path) in locks {
-        match fs::remove_file(&lock_path) {
-            Ok(()) => {}
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        let operation = ProgramArtifactOperation {
+            operation_id: format!("remove_atomic_child_lock-{child_id}-program-atomic"),
+            child_id: child_id.clone(),
+            route_id: "program-atomic".to_string(),
+            operation: "remove_atomic_child_lock".to_string(),
+            destructive_operation: "remove_file".to_string(),
+            artifact_paths: vec![lock_path.clone()],
+            command_or_operation: "fs::remove_file".to_string(),
+        };
+        let criticality_evidence = match perform_governed_artifact_cleanup(
+            control_root,
+            evidence_root,
+            program_run_id,
+            &operation,
+        ) {
+            Ok(path) => path,
             Err(error) => {
                 let error_message = error.to_string();
                 append_program_event(
@@ -5515,7 +7422,7 @@ fn release_atomic_locks(
                     "program-atomic could not release child lock for {child_id}: {error_message}"
                 );
             }
-        }
+        };
         append_program_event(
             control_root,
             evidence_root,
@@ -5524,7 +7431,7 @@ fn release_atomic_locks(
             Some(&child_id),
             None,
             "program-atomic released child lock",
-            BTreeMap::new(),
+            event_data([("criticality_evidence", criticality_evidence.as_str())]),
         )?;
     }
     Ok(())
@@ -5719,6 +7626,15 @@ fn execute_child_job(
         let result = match executor.execute_route(job.request.clone()) {
             Ok(result) => result,
             Err(error) => {
+                let error_message = error.to_string();
+                if let Some(evidence) = job.unsafe_repair.clone() {
+                    write_unsafe_repair_evidence(
+                        &job.request.evidence_root,
+                        evidence,
+                        None,
+                        Some(&error_message),
+                    )?;
+                }
                 return Ok(ChildExecutionOutcome {
                     summary: ProgramChildExecutionSummary {
                         child_id: job.child_id,
@@ -5728,7 +7644,7 @@ fn execute_child_job(
                         attempts,
                         retryable: false,
                         blocker_class: job.blocker_class,
-                        error_message: Some(error.to_string()),
+                        error_message: Some(error_message),
                     },
                     lock_path: job.lock_path,
                 });
@@ -5743,6 +7659,9 @@ fn execute_child_job(
         }
     }
     let result = last_result.context("child execution produced no result")?;
+    if let Some(evidence) = job.unsafe_repair.clone() {
+        write_unsafe_repair_evidence(&job.request.evidence_root, evidence, Some(&result), None)?;
+    }
     Ok(ChildExecutionOutcome {
         summary: ProgramChildExecutionSummary {
             child_id: job.child_id,
@@ -5756,6 +7675,197 @@ fn execute_child_job(
         },
         lock_path: job.lock_path,
     })
+}
+
+fn write_unsafe_repair_evidence(
+    child_evidence_root: &Path,
+    mut evidence: ProgramUnsafeRepairEvidence,
+    result: Option<&LifecycleRouteExecutionResult>,
+    error_message: Option<&str>,
+) -> Result<()> {
+    if let Some(result) = result {
+        let mut changed = result
+            .evidence_paths
+            .iter()
+            .map(|path| rel_path_string(path))
+            .collect::<Vec<_>>();
+        changed.extend(
+            result
+                .receipts_observed
+                .iter()
+                .map(|receipt| rel_path_string(&receipt.path)),
+        );
+        if let Some(path) = result.stdout_path.as_ref() {
+            changed.push(rel_path_string(path));
+        }
+        if let Some(path) = result.stderr_path.as_ref() {
+            changed.push(rel_path_string(path));
+        }
+        if let Some(path) = result.prompt_packet_path.as_ref() {
+            changed.push(rel_path_string(path));
+        }
+        if !changed.is_empty() {
+            changed.sort();
+            changed.dedup();
+            evidence.files_artifacts_changed = changed;
+        }
+        evidence.after_validation = format!(
+            "repair route status {}; retryable {}; receipts_observed {}",
+            result.status,
+            result.retryable,
+            result.receipts_observed.len()
+        );
+        evidence.route_execution_status = result.status.clone();
+        evidence.post_attempt_validation_status =
+            if matches!(result.status.as_str(), "completed" | "no-op") {
+                "pending".to_string()
+            } else {
+                "not-run-route-not-completed".to_string()
+            };
+        evidence.execution_can_resume = false;
+        evidence.final_execution_can_resume = false;
+    } else if let Some(error_message) = error_message {
+        evidence.after_validation =
+            format!("repair route failed before completion: {error_message}");
+        evidence.route_execution_status = "failed".to_string();
+        evidence.post_attempt_validation_status = "not-run-route-error".to_string();
+        evidence.post_attempt_validation_failures = vec![error_message.to_string()];
+        evidence.execution_can_resume = false;
+        evidence.final_execution_can_resume = false;
+    }
+    fs::create_dir_all(child_evidence_root)?;
+    fs::write(
+        child_evidence_root.join("unsafe-repair-decision.yml"),
+        serde_yaml::to_string(&evidence)?,
+    )?;
+    Ok(())
+}
+
+fn finalize_unsafe_repair_evidence(
+    evidence_root: &Path,
+    result: &ProgramChildExecutionSummary,
+) -> Result<()> {
+    finalize_unsafe_repair_evidence_with_outcome(evidence_root, result, None)
+}
+
+fn finalize_unsafe_repair_evidence_with_outcome(
+    evidence_root: &Path,
+    result: &ProgramChildExecutionSummary,
+    outcome: Option<&ProgramRecoveryPostAttemptValidationOutcome>,
+) -> Result<()> {
+    let evidence_path = evidence_root.join("unsafe-repair-decision.yml");
+    if !evidence_path.is_file() {
+        return Ok(());
+    }
+    let mut evidence: ProgramUnsafeRepairEvidence =
+        serde_yaml::from_slice(&fs::read(&evidence_path)?)?;
+    evidence.final_blocker_class = outcome
+        .and_then(|outcome| outcome.final_blocker_class.clone())
+        .or_else(|| result.blocker_class.clone());
+    evidence.post_attempt_validation_failures.clear();
+    if evidence.route_execution_status.is_empty() {
+        evidence.route_execution_status = if evidence.execution_can_resume {
+            "completed".to_string()
+        } else {
+            result.status.clone()
+        };
+    }
+    if let Some(outcome) = outcome {
+        evidence.post_attempt_validations_declared = outcome.declared.clone();
+        evidence.post_attempt_validation_results = outcome.results.clone();
+        evidence.post_attempt_validation_status = outcome.status.clone();
+        evidence.post_attempt_validation_failures = outcome.failures.clone();
+        evidence.resume_decision_basis = outcome.resume_decision_basis.clone();
+        evidence.final_execution_can_resume = outcome.execution_can_resume;
+        evidence.execution_can_resume = outcome.execution_can_resume;
+        fs::write(&evidence_path, serde_yaml::to_string(&evidence)?)?;
+        return Ok(());
+    }
+    let route_completed = matches!(
+        evidence.route_execution_status.as_str(),
+        "completed" | "no-op"
+    );
+    if matches!(result.status.as_str(), "completed" | "no-op") && route_completed {
+        evidence.post_attempt_validation_status = "passed".to_string();
+        evidence.post_attempt_validation_results = vec!["summary-status: pass".to_string()];
+        evidence.resume_decision_basis =
+            "repair route completed/no-op and post-attempt validations passed".to_string();
+        evidence.final_execution_can_resume = true;
+        evidence.execution_can_resume = true;
+    } else {
+        evidence.post_attempt_validation_status = if route_completed {
+            "failed".to_string()
+        } else {
+            "not-run-route-not-completed".to_string()
+        };
+        if let Some(message) = result.error_message.as_ref() {
+            evidence
+                .post_attempt_validation_failures
+                .push(message.clone());
+        } else {
+            evidence
+                .post_attempt_validation_failures
+                .push(format!("repair route final status {}", result.status));
+        }
+        evidence.post_attempt_validation_results =
+            vec![format!("summary-status: fail: {}", result.status)];
+        evidence.resume_decision_basis =
+            "repair route did not satisfy final post-attempt validation status".to_string();
+        evidence.final_execution_can_resume = false;
+        evidence.execution_can_resume = false;
+    }
+    fs::write(&evidence_path, serde_yaml::to_string(&evidence)?)?;
+    Ok(())
+}
+
+fn finalize_child_unsafe_repair_evidence(
+    evidence_root: &Path,
+    child_results: &[ProgramChildExecutionSummary],
+) -> Result<()> {
+    for result in child_results
+        .iter()
+        .filter(|result| result.blocker_class.is_some())
+    {
+        let child_evidence_root = evidence_root.join("children").join(&result.child_id);
+        finalize_unsafe_repair_evidence(&child_evidence_root, result)?;
+    }
+    Ok(())
+}
+
+fn finalize_parent_unsafe_repair_evidence(
+    evidence_root: &Path,
+    result: &LifecycleRouteExecutionResult,
+    outcome: &ProgramRecoveryPostAttemptValidationOutcome,
+) -> Result<()> {
+    let summary = ProgramChildExecutionSummary {
+        child_id: "program".to_string(),
+        child_run_id: "program".to_string(),
+        route_id: "program-parent-route".to_string(),
+        status: if matches!(result.status.as_str(), "completed" | "no-op")
+            && outcome.execution_can_resume
+        {
+            result.status.clone()
+        } else if matches!(result.status.as_str(), "completed" | "no-op") {
+            "failed".to_string()
+        } else {
+            result.status.clone()
+        },
+        attempts: 1,
+        retryable: result.retryable,
+        blocker_class: outcome.final_blocker_class.clone(),
+        error_message: if matches!(result.status.as_str(), "completed" | "no-op")
+            && !outcome.execution_can_resume
+        {
+            Some(outcome.failures.join("; "))
+        } else {
+            result.error_message.clone()
+        },
+    };
+    finalize_unsafe_repair_evidence_with_outcome(
+        &evidence_root.join("parent"),
+        &summary,
+        Some(outcome),
+    )
 }
 
 fn acquire_child_lock(control_root: &Path, child_id: &str) -> Result<PathBuf> {
@@ -5804,8 +7914,20 @@ fn release_child_lock(
     route_id: &str,
     lock_path: &Path,
 ) -> Result<()> {
-    match fs::remove_file(lock_path) {
-        Ok(()) => {
+    let operation = ProgramArtifactOperation {
+        operation_id: format!("remove_child_lock-{child_id}-{route_id}"),
+        child_id: child_id.to_string(),
+        route_id: route_id.to_string(),
+        operation: "remove_child_lock".to_string(),
+        destructive_operation: "remove_file".to_string(),
+        artifact_paths: vec![lock_path.to_path_buf()],
+        command_or_operation: "fs::remove_file".to_string(),
+    };
+    let criticality = assess_program_artifact_criticality(control_root, program_run_id, &operation);
+    match perform_governed_artifact_cleanup(control_root, evidence_root, program_run_id, &operation)
+    {
+        Ok(criticality_evidence) => {
+            let artifact_paths = criticality.artifact_paths.join(",");
             append_program_event(
                 control_root,
                 evidence_root,
@@ -5814,15 +7936,41 @@ fn release_child_lock(
                 Some(child_id),
                 Some(route_id),
                 "program child execution lock released",
-                BTreeMap::new(),
+                event_data([
+                    ("criticality", criticality.criticality.as_str()),
+                    ("artifact_path", artifact_paths.as_str()),
+                    ("criticality_evidence", criticality_evidence.as_str()),
+                ]),
             )?;
             Ok(())
+        }
+        Err(error) if !criticality.autonomous_allowed => {
+            let artifact_paths = criticality.artifact_paths.join(",");
+            append_program_event(
+                control_root,
+                evidence_root,
+                program_run_id,
+                "child-lock-cleanup-blocked",
+                Some(child_id),
+                Some(route_id),
+                "program child execution lock cleanup requires human input",
+                event_data([
+                    ("criticality", criticality.criticality.as_str()),
+                    ("artifact_path", artifact_paths.as_str()),
+                    ("criticality_evidence", "artifact-criticality"),
+                ]),
+            )?;
+            bail!(
+                "program child execution lock cleanup requires human input: {}",
+                criticality.rationale
+            );
         }
         Err(error) => {
             let message = format!(
                 "program child execution lock could not be released: {}",
                 error
             );
+            let artifact_paths = criticality.artifact_paths.join(",");
             append_program_event(
                 control_root,
                 evidence_root,
@@ -5831,9 +7979,301 @@ fn release_child_lock(
                 Some(child_id),
                 Some(route_id),
                 &message,
-                event_data([("status", "blocked-unsafe")]),
+                event_data([
+                    ("status", "blocked-unsafe"),
+                    ("criticality", criticality.criticality.as_str()),
+                    ("artifact_path", artifact_paths.as_str()),
+                ]),
             )?;
             bail!("{message}");
+        }
+    }
+}
+
+fn assess_program_artifact_criticality(
+    control_root: &Path,
+    program_run_id: &str,
+    operation: &ProgramArtifactOperation,
+) -> ProgramArtifactCriticalityDecision {
+    let lock_root = control_root.join("locks");
+    let tmp_root = control_root.join("tmp");
+    let scratch_root = control_root.join("scratch");
+    let primary_path = operation
+        .artifact_paths
+        .first()
+        .cloned()
+        .unwrap_or_else(PathBuf::new);
+    let expected_lock_path = lock_root.join(format!("{}.lock", operation.child_id));
+    let path_matches_expected = primary_path == expected_lock_path;
+    let under_lock_root = primary_path.starts_with(&lock_root);
+    let under_current_run_generated_root =
+        primary_path.starts_with(&tmp_root) || primary_path.starts_with(&scratch_root);
+    let exists = primary_path.exists();
+    let is_file = primary_path.is_file();
+    let is_dir = primary_path.is_dir();
+    let artifact_path = primary_path.to_string_lossy().to_string();
+    let retained_evidence = artifact_path.contains("/state/evidence/runs/workflows/");
+    let archive_metadata = artifact_path.contains("/.archive/");
+    let operation_supported = supported_destructive_operation(&operation.destructive_operation);
+    let authority_surface = if retained_evidence {
+        "retained-lifecycle-evidence"
+    } else if archive_metadata {
+        "archive-metadata"
+    } else if artifact_path.contains("/.octon/framework/")
+        || artifact_path.contains("/.octon/instance/")
+        || artifact_path.contains("/.octon/inputs/additive/extensions/")
+    {
+        "authored-contract-or-policy"
+    } else if under_lock_root {
+        "current-run-control-lock"
+    } else if under_current_run_generated_root {
+        "current-run-generated-artifact"
+    } else {
+        "unclear"
+    };
+    let before_validation = format!(
+        "exists={exists}; is_file={is_file}; is_dir={is_dir}; under_current_run_lock_root={under_lock_root}; under_current_run_generated_root={under_current_run_generated_root}; path_matches_child_lock={path_matches_expected}; authority_surface={authority_surface}; operation_supported={operation_supported}"
+    );
+    let generated_operation = matches!(
+        operation.operation.as_str(),
+        "generated_artifact_cleanup" | "remove_generated_artifact"
+    );
+    if operation_supported
+        && ((path_matches_expected && under_lock_root)
+            || (generated_operation && under_current_run_generated_root))
+    {
+        ProgramArtifactCriticalityDecision {
+            schema_version: "octon-program-artifact-criticality-decision-v1".to_string(),
+            program_run_id: program_run_id.to_string(),
+            classification_policy_version: "octon-program-artifact-criticality-policy-v2"
+                .to_string(),
+            operation_id: operation.operation_id.clone(),
+            child_id: operation.child_id.clone(),
+            route_id: operation.route_id.clone(),
+            operation: operation.operation.clone(),
+            destructive_operation: operation.destructive_operation.clone(),
+            artifact_paths: vec![artifact_path],
+            classification_inputs: vec![
+                format!("path_matches_child_lock={path_matches_expected}"),
+                format!("under_current_run_lock_root={under_lock_root}"),
+                format!("under_current_run_generated_root={under_current_run_generated_root}"),
+                format!("authority_surface={authority_surface}"),
+                format!("operation_supported={operation_supported}"),
+            ],
+            artifact_owner: "current-run".to_string(),
+            authority_surface: authority_surface.to_string(),
+            criticality: "non-critical".to_string(),
+            ownership: if under_lock_root {
+                "current-run-child-lock".to_string()
+            } else {
+                "current-run-generated-artifact".to_string()
+            },
+            human_input_required: false,
+            autonomous_allowed: true,
+            rationale: if under_lock_root {
+                "lock is a current-run coordination artifact, is named for the selected child, and is safe to remove after route completion or abandoned job construction".to_string()
+            } else {
+                "artifact is a current-run generated temporary or scratch artifact and is safe to remove after classification".to_string()
+            },
+            command_or_operation: operation.command_or_operation.clone(),
+            before_validation,
+            after_validation: "pending".to_string(),
+            operation_supported,
+            mutation_performed: false,
+            mutation_status: "pending".to_string(),
+            blocked_reason: None,
+        }
+    } else {
+        let (criticality, ownership, rationale, blocked_reason) = if !operation_supported {
+            (
+                "unclear",
+                "unclear",
+                "cleanup operation is unsupported and cannot be classified as safe",
+                "unsupported-destructive-operation",
+            )
+        } else if retained_evidence
+            || authority_surface == "authored-contract-or-policy"
+            || authority_surface == "archive-metadata"
+        {
+            (
+                    "critical",
+                    authority_surface,
+                    "artifact is retained lifecycle evidence or authored authority surface and must not be cleaned autonomously",
+                    "critical-artifact",
+                )
+        } else {
+            (
+                    "unclear",
+                    "unclear",
+                    "artifact path is not the expected current-run generated artifact path; ownership is unclear",
+                    "artifact-ownership-unclear",
+                )
+        };
+        ProgramArtifactCriticalityDecision {
+            schema_version: "octon-program-artifact-criticality-decision-v1".to_string(),
+            program_run_id: program_run_id.to_string(),
+            classification_policy_version: "octon-program-artifact-criticality-policy-v2"
+                .to_string(),
+            operation_id: operation.operation_id.clone(),
+            child_id: operation.child_id.clone(),
+            route_id: operation.route_id.clone(),
+            operation: operation.operation.clone(),
+            destructive_operation: operation.destructive_operation.clone(),
+            artifact_paths: vec![artifact_path],
+            classification_inputs: vec![
+                format!("path_matches_child_lock={path_matches_expected}"),
+                format!("under_current_run_lock_root={under_lock_root}"),
+                format!("under_current_run_generated_root={under_current_run_generated_root}"),
+                format!("authority_surface={authority_surface}"),
+                format!("operation_supported={operation_supported}"),
+            ],
+            artifact_owner: ownership.to_string(),
+            authority_surface: authority_surface.to_string(),
+            criticality: criticality.to_string(),
+            ownership: ownership.to_string(),
+            human_input_required: true,
+            autonomous_allowed: false,
+            rationale: rationale.to_string(),
+            command_or_operation: operation.command_or_operation.clone(),
+            before_validation,
+            after_validation: "not-run-human-input-required".to_string(),
+            operation_supported,
+            mutation_performed: false,
+            mutation_status: "blocked".to_string(),
+            blocked_reason: Some(blocked_reason.to_string()),
+        }
+    }
+}
+
+fn supported_destructive_operation(operation: &str) -> bool {
+    matches!(operation, "remove_file" | "remove_dir" | "remove_dir_all")
+}
+
+fn write_artifact_criticality_decision(
+    evidence_root: &Path,
+    decision: &ProgramArtifactCriticalityDecision,
+) -> Result<String> {
+    let root = evidence_root.join("artifact-criticality");
+    fs::create_dir_all(&root)?;
+    let file_stem = sanitize_run_id(&format!(
+        "{}-{}-{}",
+        decision.operation, decision.child_id, decision.route_id
+    ))?;
+    let path = root.join(format!("{file_stem}.yml"));
+    fs::write(&path, serde_yaml::to_string(decision)?)?;
+    Ok(rel_path_string(&path))
+}
+
+fn perform_governed_artifact_cleanup(
+    control_root: &Path,
+    evidence_root: &Path,
+    program_run_id: &str,
+    operation: &ProgramArtifactOperation,
+) -> Result<String> {
+    let mut decision = assess_program_artifact_criticality(control_root, program_run_id, operation);
+    write_artifact_criticality_decision(evidence_root, &decision)?;
+    if !decision.autonomous_allowed {
+        decision.after_validation = "not-run-human-input-required".to_string();
+        decision.mutation_performed = false;
+        decision.mutation_status = "blocked-human-input-required".to_string();
+        if decision.blocked_reason.is_none() {
+            decision.blocked_reason = Some("human-input-required".to_string());
+        }
+        let evidence_path = write_artifact_criticality_decision(evidence_root, &decision)?;
+        bail!(
+            "program artifact cleanup requires human input: {}; evidence: {}",
+            decision.rationale,
+            evidence_path
+        );
+    }
+    let Some(path) = operation.artifact_paths.first() else {
+        decision.after_validation = "cleanup failed: missing artifact path".to_string();
+        write_artifact_criticality_decision(evidence_root, &decision)?;
+        bail!("program artifact cleanup failed: missing artifact path");
+    };
+    match operation.destructive_operation.as_str() {
+        "remove_file" => match fs::remove_file(path) {
+            Ok(()) => {
+                decision.after_validation =
+                    "lock artifact absent after autonomous cleanup".to_string();
+                decision.mutation_performed = true;
+                decision.mutation_status = "completed".to_string();
+                let evidence_path = write_artifact_criticality_decision(evidence_root, &decision)?;
+                Ok(evidence_path)
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                decision.after_validation =
+                    "lock artifact already absent before autonomous cleanup".to_string();
+                decision.mutation_performed = false;
+                decision.mutation_status = "already-absent".to_string();
+                let evidence_path = write_artifact_criticality_decision(evidence_root, &decision)?;
+                Ok(evidence_path)
+            }
+            Err(error) => {
+                decision.after_validation = format!("cleanup failed: {error}");
+                decision.mutation_performed = false;
+                decision.mutation_status = "failed".to_string();
+                write_artifact_criticality_decision(evidence_root, &decision)?;
+                Err(error).with_context(|| "program artifact cleanup failed")
+            }
+        },
+        "remove_dir" => match fs::remove_dir(path) {
+            Ok(()) => {
+                decision.after_validation =
+                    "directory artifact absent after autonomous cleanup".to_string();
+                decision.mutation_performed = true;
+                decision.mutation_status = "completed".to_string();
+                let evidence_path = write_artifact_criticality_decision(evidence_root, &decision)?;
+                Ok(evidence_path)
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                decision.after_validation =
+                    "directory artifact already absent before autonomous cleanup".to_string();
+                decision.mutation_performed = false;
+                decision.mutation_status = "already-absent".to_string();
+                let evidence_path = write_artifact_criticality_decision(evidence_root, &decision)?;
+                Ok(evidence_path)
+            }
+            Err(error) => {
+                decision.after_validation = format!("cleanup failed: {error}");
+                decision.mutation_performed = false;
+                decision.mutation_status = "failed".to_string();
+                write_artifact_criticality_decision(evidence_root, &decision)?;
+                Err(error).with_context(|| "program artifact cleanup failed")
+            }
+        },
+        "remove_dir_all" => match fs::remove_dir_all(path) {
+            Ok(()) => {
+                decision.after_validation =
+                    "directory tree artifact absent after autonomous cleanup".to_string();
+                decision.mutation_performed = true;
+                decision.mutation_status = "completed".to_string();
+                let evidence_path = write_artifact_criticality_decision(evidence_root, &decision)?;
+                Ok(evidence_path)
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                decision.after_validation =
+                    "directory tree artifact already absent before autonomous cleanup".to_string();
+                decision.mutation_performed = false;
+                decision.mutation_status = "already-absent".to_string();
+                let evidence_path = write_artifact_criticality_decision(evidence_root, &decision)?;
+                Ok(evidence_path)
+            }
+            Err(error) => {
+                decision.after_validation = format!("cleanup failed: {error}");
+                decision.mutation_performed = false;
+                decision.mutation_status = "failed".to_string();
+                write_artifact_criticality_decision(evidence_root, &decision)?;
+                Err(error).with_context(|| "program artifact cleanup failed")
+            }
+        },
+        other => {
+            decision.after_validation = format!("cleanup failed: unsupported operation {other}");
+            decision.mutation_performed = false;
+            decision.mutation_status = "blocked-unsupported-operation".to_string();
+            decision.blocked_reason = Some("unsupported-destructive-operation".to_string());
+            write_artifact_criticality_decision(evidence_root, &decision)?;
+            bail!("program artifact cleanup failed: unsupported operation {other}");
         }
     }
 }
@@ -5868,6 +8308,8 @@ fn checkpoint_from_plan(
                         .or_else(|| state.terminal_outcome.clone()),
                     final_verdict: state.final_verdict.clone(),
                     receipt_digests: state.receipt_digests.clone(),
+                    gate_status: state.gate_status.clone(),
+                    dependency_gate_status: state.dependency_gate_status.clone(),
                     write_scopes: state.write_scopes.clone(),
                 },
             )
@@ -5898,6 +8340,17 @@ fn checkpoint_from_plan(
         child_states,
         recovery_attempts: previous_recovery_attempts,
         approvals,
+        program_recovery_recipe_validation_status: plan
+            .program_recovery_recipe_validation_status
+            .clone(),
+        program_recovery_recipe_validation_failures: plan
+            .program_recovery_recipe_validation_failures
+            .clone(),
+        program_recovery_recipe_blocker_class: plan.program_recovery_recipe_blocker_class.clone(),
+        program_recovery_recipe_route_id: plan.program_recovery_recipe_route_id.clone(),
+        program_recovery_recipe_safe_unattended_basis: plan
+            .program_recovery_recipe_safe_unattended_basis
+            .clone(),
         latest_event_offset,
         latest_event_index: latest_event_offset,
         latest_event_sha256: None,
@@ -7161,8 +9614,19 @@ fn program_lifecycle_summary(
     final_verdict: &str,
 ) -> String {
     let blocker_summary = program_lifecycle_blocker_summary(plan);
+    let scheduler_phase = plan.scheduler_phase.as_deref().unwrap_or("none");
+    let stop_reason = plan.stop_reason.as_deref().unwrap_or("none");
+    let skipped = if plan.skipped_blocked_children.is_empty() {
+        "none".to_string()
+    } else {
+        plan.skipped_blocked_children.join(", ")
+    };
+    let completion_summary = program_required_child_completion_summary(plan);
+    let taxonomy_summary = program_lifecycle_taxonomy_summary(plan);
+    let unsafe_summary = program_unsafe_continuation_summary(plan);
+    let recovery_validation_summary = program_recovery_recipe_validation_summary(plan);
     format!(
-        "# Program Lifecycle Run\n\nrun_id: {run_id}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nexecutor: {}\nexecution_mode: {}\nrunnable_children: {}\naggregate_state: {}\nfinal_verdict: {final_verdict}\n{blocker_summary}\nProgram evidence coordinates child lifecycle work only. Child packet manifests, receipts, promotion targets, validation verdicts, and archive metadata remain child-owned.\n",
+        "# Program Lifecycle Run\n\nrun_id: {run_id}\nrecorded_at: {}\nlifecycle_id: {}\nexecution_strategy: {}\ntarget: {}\nexecutor: {}\nexecution_mode: {}\nrunnable_children: {}\nscheduler_phase: {scheduler_phase}\nskipped_blocked_children: {skipped}\naggregate_state: {}\nfinal_verdict: {final_verdict}\nstop_reason: {stop_reason}\n{completion_summary}{blocker_summary}{taxonomy_summary}{recovery_validation_summary}{unsafe_summary}\nProgram evidence coordinates child lifecycle work only. Child packet manifests, receipts, promotion targets, validation verdicts, and archive metadata remain child-owned.\n",
         now_rfc3339().unwrap_or_else(|_| "unknown".to_string()),
         plan.lifecycle_id,
         plan.execution_strategy,
@@ -7172,6 +9636,99 @@ fn program_lifecycle_summary(
         plan.runnable_batch.join(", "),
         plan.aggregate_state,
     )
+}
+
+fn program_unsafe_continuation_summary(plan: &ProgramLifecyclePlanResult) -> String {
+    let mut lines = Vec::new();
+    if !plan.safe_repair_candidates.is_empty() {
+        lines.push("safe_repair_candidates:".to_string());
+        for candidate in &plan.safe_repair_candidates {
+            lines.push(format!(
+                "- scope: {}; child_id: {}; blocker_class: {}; route: {}; basis: {}",
+                candidate.scope,
+                candidate.child_id.as_deref().unwrap_or("none"),
+                candidate.blocker_class,
+                candidate.selected_repair_route,
+                candidate.safe_unattended_basis,
+            ));
+        }
+    }
+    if !plan.unsafe_results.is_empty() {
+        lines.push("unsafe_results:".to_string());
+        for result in &plan.unsafe_results {
+            lines.push(format!(
+                "- scope: {}; child_id: {}; route: {}; status: {}; blocker_class: {}; safe_continuation_available: {}; reason: {}",
+                result.scope,
+                result.child_id.as_deref().unwrap_or("none"),
+                result.route_id,
+                result.status,
+                result.blocker_class.as_deref().unwrap_or("none"),
+                result.safe_continuation_available,
+                result.continuation_reason,
+            ));
+        }
+    }
+    if let Some(decision) = plan.unsafe_continuation_decision.as_ref() {
+        lines.push(format!("unsafe_continuation_decision: {decision}"));
+    }
+    if lines.is_empty() {
+        String::new()
+    } else {
+        format!("\nUnsafe Continuation:\n{}\n", lines.join("\n"))
+    }
+}
+
+fn program_recovery_recipe_validation_summary(plan: &ProgramLifecyclePlanResult) -> String {
+    let Some(status) = plan.program_recovery_recipe_validation_status.as_ref() else {
+        return String::new();
+    };
+    let failures = if plan.program_recovery_recipe_validation_failures.is_empty() {
+        "none".to_string()
+    } else {
+        plan.program_recovery_recipe_validation_failures.join("; ")
+    };
+    format!(
+        "\nProgram Recovery Recipe Validation:\nstatus: {status}\nblocker_class: {}\nroute_id: {}\nsafe_unattended_basis: {}\nfailures: {failures}\n",
+        plan.program_recovery_recipe_blocker_class
+            .as_deref()
+            .unwrap_or("none"),
+        plan.program_recovery_recipe_route_id
+            .as_deref()
+            .unwrap_or("none"),
+        plan.program_recovery_recipe_safe_unattended_basis
+            .as_deref()
+            .unwrap_or("none"),
+    )
+}
+
+fn program_required_child_completion_summary(plan: &ProgramLifecyclePlanResult) -> String {
+    if plan.required_child_completion.is_empty() {
+        return String::new();
+    }
+    let lines = plan
+        .required_child_completion
+        .iter()
+        .map(|(child_id, completion)| {
+            let terminal = if completion.terminal { "yes" } else { "no" };
+            let outcome = completion.terminal_outcome.as_deref().unwrap_or("none");
+            let route = completion.selected_route.as_deref().unwrap_or("none");
+            let blockers = if completion.blockers.is_empty() {
+                "none".to_string()
+            } else {
+                completion
+                    .blockers
+                    .iter()
+                    .map(|blocker| blocker.blocker_class.as_str())
+                    .collect::<Vec<_>>()
+                    .join(",")
+            };
+            format!(
+                "- child_id: {child_id}; terminal: {terminal}; terminal_outcome: {outcome}; final_verdict: {}; selected_route: {route}; blockers: {blockers}",
+                completion.final_verdict
+            )
+        })
+        .collect::<Vec<_>>();
+    format!("\nRequired Child Completion:\n{}\n", lines.join("\n"))
 }
 
 fn program_lifecycle_blocker_summary(plan: &ProgramLifecyclePlanResult) -> String {
@@ -7196,6 +9753,44 @@ fn program_lifecycle_blocker_summary(plan: &ProgramLifecyclePlanResult) -> Strin
         String::new()
     } else {
         format!("\nBlockers:\n{}\n", lines.join("\n"))
+    }
+}
+
+fn program_lifecycle_taxonomy_summary(plan: &ProgramLifecyclePlanResult) -> String {
+    let mut lines = Vec::new();
+    for evidence in &plan.normalized_program_blockers {
+        lines.push(format!(
+            "- scope: program; raw_value: {}; normalized_blocker_class: {}; normalized_category: {}; disposition: {}",
+            evidence.raw_value,
+            evidence.normalized_blocker_class,
+            evidence.normalized_category,
+            evidence.disposition,
+        ));
+    }
+    for (child_id, evidences) in &plan.normalized_child_blockers {
+        for evidence in evidences {
+            lines.push(format!(
+                "- scope: child; child_id: {child_id}; raw_value: {}; normalized_blocker_class: {}; normalized_category: {}; disposition: {}",
+                evidence.raw_value,
+                evidence.normalized_blocker_class,
+                evidence.normalized_category,
+                evidence.disposition,
+            ));
+        }
+    }
+    for evidence in &plan.normalized_approval_blockers {
+        lines.push(format!(
+            "- scope: approval; raw_value: {}; normalized_blocker_class: {}; normalized_category: {}; disposition: {}",
+            evidence.raw_value,
+            evidence.normalized_blocker_class,
+            evidence.normalized_category,
+            evidence.disposition,
+        ));
+    }
+    if lines.is_empty() {
+        String::new()
+    } else {
+        format!("\nNormalized Taxonomy:\n{}\n", lines.join("\n"))
     }
 }
 
@@ -7233,15 +9828,27 @@ mod tests {
             child_id: "a".to_string(),
             route_id: "review-proposal".to_string(),
             reason: "approval required".to_string(),
-            blocker_class: Some("approval-required".to_string()),
+            blocker_class: Some("operator-approval-required".to_string()),
+        }
+    }
+
+    fn test_program_spec() -> ProgramSpec {
+        ProgramSpec {
+            child_registry_path: "resources/child-packet-index.yml".to_string(),
+            child_lifecycle_id_default: Some("proposal-packet".to_string()),
+            supported_execution_modes: Vec::new(),
+            atomic_policy: None,
+            recovery_policy: ProgramRecoveryPolicySpec::default(),
+            closeout_policy: None,
+            authority_boundaries: ProgramAuthorityBoundarySpec::default(),
         }
     }
 
     #[test]
-    fn worktree_hygiene_blocker_is_recoverable_without_lifecycle_route() {
+    fn worktree_hygiene_blocker_requires_human_without_criticality_evidence() {
         assert_eq!(
             classify_program_blocker_class("worktree-hygiene-blocked"),
-            ProgramBlockerDisposition::Recoverable
+            ProgramBlockerDisposition::Human
         );
     }
 
@@ -7269,6 +9876,8 @@ mod tests {
             }),
             terminal_outcome: None,
             receipt_digests: BTreeMap::new(),
+            gate_status: ProgramChildGateStatus::default(),
+            dependency_gate_status: BTreeMap::new(),
             write_scopes: vec![format!("children/{child_id}")],
             blockers,
             final_verdict: "route-ready".to_string(),
@@ -7277,28 +9886,45 @@ mod tests {
 
     #[test]
     fn aggregate_program_state_maps_program_blockers_to_final_verdicts() {
+        let program = test_program_spec();
         for class in ["validation-failed", "missing-evidence"] {
-            let (_state, verdict) =
-                aggregate_program_state(&BTreeMap::new(), &[blocker(class)], &[], &[]);
+            let (_state, verdict) = aggregate_program_state(
+                &program,
+                None,
+                &BTreeMap::new(),
+                &[blocker(class)],
+                &[],
+                &[],
+            );
             assert_eq!(verdict, "blocked-recoverable", "{class}");
         }
         let (_state, verdict) = aggregate_program_state(
+            &program,
+            None,
             &BTreeMap::new(),
             &[blocker("authority-boundary-ambiguous")],
             &[],
             &[],
         );
         assert_eq!(verdict, "blocked-unsafe");
-        let (_state, verdict) =
-            aggregate_program_state(&BTreeMap::new(), &[], &[approval_blocker()], &[]);
+        let (_state, verdict) = aggregate_program_state(
+            &program,
+            None,
+            &BTreeMap::new(),
+            &[],
+            &[approval_blocker()],
+            &[],
+        );
         assert_eq!(verdict, "blocked-human");
     }
 
     #[test]
     fn aggregate_program_state_preserves_runnable_children_when_unblocked() {
+        let program = test_program_spec();
         let mut children = BTreeMap::new();
         children.insert("a".to_string(), child_state("a", Vec::new()));
-        let (_state, verdict) = aggregate_program_state(&children, &[], &[], &["a".to_string()]);
+        let (_state, verdict) =
+            aggregate_program_state(&program, None, &children, &[], &[], &["a".to_string()]);
         assert_eq!(verdict, "planned");
 
         let mut blocked_children = BTreeMap::new();
@@ -7306,8 +9932,130 @@ mod tests {
             "a".to_string(),
             child_state("a", vec![blocker("missing-evidence")]),
         );
-        let (_state, verdict) = aggregate_program_state(&blocked_children, &[], &[], &[]);
+        let (_state, verdict) =
+            aggregate_program_state(&program, None, &blocked_children, &[], &[], &[]);
         assert_eq!(verdict, "blocked-recoverable");
+    }
+
+    #[test]
+    fn taxonomy_normalizes_legacy_states_and_blocker_classes() {
+        for (state, category) in [
+            ("blocked-max-steps", ProgramNormalizedCategory::Budget),
+            ("blocked-max-iterations", ProgramNormalizedCategory::Budget),
+            ("blocked-gate", ProgramNormalizedCategory::Recoverable),
+            ("blocked-no-route", ProgramNormalizedCategory::Recoverable),
+            ("failed", ProgramNormalizedCategory::Recoverable),
+            ("timed-out", ProgramNormalizedCategory::Timeout),
+            ("cancelled", ProgramNormalizedCategory::Cancellation),
+            ("completed", ProgramNormalizedCategory::Terminal),
+        ] {
+            assert_eq!(normalize_program_state_value(state), category, "{state}");
+        }
+
+        for (class, normalized_class, disposition) in [
+            (
+                "approval-required",
+                "operator-approval-required",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "unsupported-mode-config",
+                "unsupported-mode-config",
+                ProgramBlockerDisposition::Recoverable,
+            ),
+            (
+                "unsupported-mode",
+                "unsupported-mode-authority",
+                ProgramBlockerDisposition::Unsafe,
+            ),
+            (
+                "write-scope-conflict",
+                "atomic-write-scope-conflict",
+                ProgramBlockerDisposition::Unsafe,
+            ),
+            (
+                "dependency-blocked",
+                "dependency-gate-unsatisfied",
+                ProgramBlockerDisposition::Recoverable,
+            ),
+            (
+                "target-drift",
+                "target-drift-unclear",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "worktree-hygiene-blocked",
+                "artifact-ownership-unclear",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "child-lock-stale",
+                "noncritical-artifact-cleanup",
+                ProgramBlockerDisposition::Recoverable,
+            ),
+            (
+                "recovery-budget-override-required",
+                "recovery-budget-override-required",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "recovery-integrity-risk",
+                "recovery-integrity-risk",
+                ProgramBlockerDisposition::Unsafe,
+            ),
+        ] {
+            let evidence = taxonomy_evidence_for_class(None, class);
+            assert_eq!(
+                evidence.normalized_blocker_class, normalized_class,
+                "{class}"
+            );
+            assert_eq!(
+                classify_program_blocker_class(class),
+                disposition,
+                "{class}"
+            );
+        }
+    }
+
+    #[test]
+    fn recoverable_legacy_stop_states_continue_with_pending_dispatch() {
+        let mut result = ProgramLifecycleRunResult {
+            schema_version: "octon-program-lifecycle-run-result-v1".to_string(),
+            run_id: "legacy-stop-semantics".to_string(),
+            lifecycle_id: "proposal-program".to_string(),
+            execution_strategy: LifecycleExecutionStrategy::OrchestratedReplanLoop
+                .as_str()
+                .to_string(),
+            target: "parent".to_string(),
+            executor: "mock".to_string(),
+            route_execution_mode: "program-adapter-executed".to_string(),
+            bundle_root: "evidence".to_string(),
+            checkpoint_path: "checkpoint.yml".to_string(),
+            event_log_path: "events.ndjson".to_string(),
+            latest_event_offset: 1,
+            selected_parent_route: None,
+            parent_route_result: None,
+            selected_children: vec!["a".to_string()],
+            child_results: Vec::new(),
+            terminal_outcome: None,
+            final_verdict: "blocked-gate".to_string(),
+        };
+        for verdict in [
+            "blocked-gate",
+            "blocked-no-route",
+            "failed",
+            "timed-out",
+            "blocked",
+        ] {
+            result.final_verdict = verdict.to_string();
+            assert!(
+                !program_execute_loop_should_stop(&result, "unattended"),
+                "{verdict}"
+            );
+        }
+        result.selected_children.clear();
+        result.final_verdict = "blocked-gate".to_string();
+        assert!(program_execute_loop_should_stop(&result, "unattended"));
     }
 
     struct ProgramFixture {
@@ -7505,6 +10253,36 @@ routes:
     approval:
       required_by_default: true
       reason: "child route mutates a durable target"
+"#,
+            );
+        }
+
+        fn write_child_contract_with_safe_unattended_approval(&self) {
+            self.write(
+                ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+                r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-packet"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: { input: "packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["accepted", "implemented"] }
+states: [{ state_id: "implement" }]
+terminal_outcomes:
+  - outcome_id: "implemented"
+    when: { manifest_status: "implemented" }
+receipts:
+  - receipt_id: "implementation-run"
+    path: "support/implementation-run.md"
+routes:
+  - route_id: "run-implementation"
+    route_type: "extension"
+    enter_when: { manifest_status: "accepted" }
+    idempotency: "idempotent"
+    completion:
+      expected_receipts: ["implementation-run"]
+    approval:
+      required_by_default: true
+      reason: "child route is idempotent and safe for unattended execution"
 "#,
             );
         }
@@ -8043,6 +10821,105 @@ routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
 "#,
+            );
+        }
+
+        fn write_program_contract_with_safe_unsafe_repair(&self) {
+            self.write(
+                ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycles/proposal-program.contract.yml",
+                r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-program"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: { input: "program_packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["accepted", "implemented"] }
+program:
+  child_registry_path: "resources/child-packet-index.yml"
+  child_lifecycle_id_default: "proposal-packet"
+  supported_execution_modes: ["parallel-independent"]
+  recovery_policy:
+    max_recovery_attempts: 2
+    serialize_write_scope_conflicts: true
+    recipes:
+      - blocker_class: "unsupported-mode-authority"
+        recovery_route_id: "run-implementation"
+        idempotency_class: "idempotent"
+        approval_required: false
+        retry_budget: 1
+        dependent_handling: "continue-independent"
+        post_attempt_validation: ["replan-live-state"]
+        replan_behavior: "after-attempt"
+  authority_boundaries:
+    parent_coordinates_only: true
+    child_receipts_remain_child_owned: true
+    child_promotion_targets_remain_child_owned: true
+states: [{ state_id: "coordinate" }]
+routes:
+  - route_id: "generate-program-implementation-prompt"
+    route_type: "extension"
+"#,
+            );
+        }
+
+        fn write_program_contract_with_safe_program_unsafe_repair(&self, safe: bool) {
+            let idempotency_class = if safe { "idempotent" } else { "non-idempotent" };
+            self.write_program_contract_with_program_unsafe_repair_recipe(
+                idempotency_class,
+                "post_attempt_validation: [\"replan-live-state\"]",
+                "",
+                true,
+            );
+        }
+
+        fn write_program_contract_with_program_unsafe_repair_recipe(
+            &self,
+            idempotency_class: &str,
+            post_attempt_validation_line: &str,
+            preconditions_line: &str,
+            declare_route: bool,
+        ) {
+            let route = if declare_route {
+                r#"
+  - route_id: "generate-program-implementation-prompt"
+    route_type: "extension"
+"#
+            } else {
+                ""
+            };
+            self.write(
+                ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycles/proposal-program.contract.yml",
+                &format!(
+                    r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-program"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: {{ input: "program_packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["accepted", "implemented"] }}
+program:
+  child_registry_path: "resources/child-packet-index.yml"
+  child_lifecycle_id_default: "proposal-packet"
+  supported_execution_modes: ["parallel-independent"]
+  recovery_policy:
+    max_recovery_attempts: 2
+    serialize_write_scope_conflicts: true
+    recipes:
+      - blocker_class: "unsupported-mode-authority"
+        recovery_route_id: "generate-program-implementation-prompt"
+        {preconditions_line}
+        idempotency_class: "{idempotency_class}"
+        approval_required: true
+        retry_budget: 1
+        dependent_handling: "continue-independent"
+        {post_attempt_validation_line}
+        replan_behavior: "after-attempt"
+  authority_boundaries:
+    parent_coordinates_only: true
+    child_receipts_remain_child_owned: true
+    child_promotion_targets_remain_child_owned: true
+states: [{{ state_id: "coordinate" }}]
+routes:{route}
+"#
+                ),
             );
         }
 
@@ -8944,7 +11821,111 @@ routes:
         assert!(b
             .blockers
             .iter()
-            .any(|blocker| blocker.blocker_class == "dependency-blocked"));
+            .any(|blocker| blocker.blocker_class == "dependency-gate-unsatisfied"));
+    }
+
+    #[test]
+    fn verification_dependency_gate_allows_downstream_before_archive() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("dependency-verification-gate", true);
+        fixture.write_full_child_contract();
+        fixture.write_child("a", "framework/a.md", "implemented");
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write_child("b", "framework/b.md", "accepted");
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+  - child_id: "b"
+    path: "children/b"
+    dependencies: ["a"]
+    dependency_gate: "verification"
+"#,
+        );
+
+        let plan = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+
+        assert!(plan.runnable_batch.iter().any(|child| child == "b"));
+        let b = plan.child_states.get("b").unwrap();
+        assert!(b.dependency_gate_status.get("a").unwrap().satisfied);
+        assert!(!b
+            .blockers
+            .iter()
+            .any(|blocker| blocker.blocker_class == "dependency-gate-unsatisfied"));
+    }
+
+    #[test]
+    fn closeout_dependency_gate_requires_closeout_pass_or_terminal() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("dependency-closeout-gate", true);
+        fixture.write_full_child_contract();
+        fixture.write_child("a", "framework/a.md", "implemented");
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write_child("b", "framework/b.md", "accepted");
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+  - child_id: "b"
+    path: "children/b"
+    dependencies: ["a"]
+    dependency_gate: "closeout"
+"#,
+        );
+
+        let blocked = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+        let b = blocked.child_states.get("b").unwrap();
+        assert!(!b.dependency_gate_status.get("a").unwrap().satisfied);
+        assert!(b
+            .blockers
+            .iter()
+            .any(|blocker| blocker.message.contains("closeout gate")));
+
+        fixture.write(
+            "children/a/support/proposal-closeout.md",
+            "verdict: pass\narchive_authorized: yes\n",
+        );
+        let released = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+        let b = released.child_states.get("b").unwrap();
+        assert!(b.dependency_gate_status.get("a").unwrap().satisfied);
+        assert!(released.runnable_batch.iter().any(|child| child == "b"));
     }
 
     #[test]
@@ -9006,6 +11987,57 @@ routes:
     }
 
     #[test]
+    fn gated_parallel_skips_blocked_non_runnable_phase_when_dependency_gate_is_satisfied() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("gated-parallel-skip-blocked-phase", true);
+        fixture.write_full_child_contract();
+        fixture.write_child("a", "framework/a.md", "implemented");
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/proposal-closeout.md",
+            "verdict: blocked\narchive_authorized: no\nworktree_hygiene_verdict: blocked\n",
+        );
+        fixture.write_child("b", "framework/b.md", "accepted");
+        fixture.write_registry(
+            "gated-parallel",
+            r#"  - child_id: "a"
+    path: "children/a"
+    phase_id: "phase-1"
+  - child_id: "b"
+    path: "children/b"
+    dependencies: ["a"]
+    dependency_gate: "verification"
+    phase_id: "phase-2"
+"#,
+        );
+
+        let plan = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+
+        assert_eq!(plan.runnable_batch, vec!["b".to_string()]);
+        assert_eq!(plan.scheduler_phase.as_deref(), Some("phase-2"));
+        assert!(plan
+            .skipped_blocked_children
+            .iter()
+            .any(|child| child == "a"));
+    }
+
+    #[test]
     fn approval_gated_planning_reports_approval_blockers() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("approval-gated", true);
@@ -9029,6 +12061,85 @@ routes:
         assert_eq!(plan.approval_blockers.len(), 1);
         assert_eq!(plan.approval_blockers[0].child_id, "a");
         assert_eq!(plan.approval_blockers[0].route_id, "run-implementation");
+    }
+
+    #[test]
+    fn unattended_approval_auto_grants_only_safe_contract_routes() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let unsafe_fixture = ProgramFixture::new("approval-unattended-unsafe-route", true);
+        unsafe_fixture.write_child_contract_with_approval();
+        unsafe_fixture.write_child("a", "framework/a.md", "accepted");
+        unsafe_fixture.write_registry(
+            "approval-gated",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let unsafe_result = run_program_lifecycle_from_octon_dir(
+            &unsafe_fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("approval-unattended-unsafe-route".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(2),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+        assert_eq!(unsafe_result.final_verdict, "blocked-human");
+        assert!(unsafe_result
+            .child_results
+            .iter()
+            .any(|summary| summary.status == "approval-required"));
+        assert!(!unsafe_fixture
+            .root
+            .join("children/a/support/implementation-run.md")
+            .exists());
+
+        let safe_fixture = ProgramFixture::new("approval-unattended-safe-route", true);
+        safe_fixture.write_child_contract_with_safe_unattended_approval();
+        safe_fixture.write_child("a", "framework/a.md", "accepted");
+        safe_fixture.write_registry(
+            "approval-gated",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let safe_result = run_program_lifecycle_from_octon_dir(
+            &safe_fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("approval-unattended-safe-route".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+        assert!(safe_result
+            .child_results
+            .iter()
+            .any(|summary| summary.status == "completed"));
+        assert!(safe_fixture
+            .root
+            .join("children/a/support/implementation-run.md")
+            .is_file());
     }
 
     #[test]
@@ -9238,6 +12349,54 @@ routes:
     }
 
     #[test]
+    fn unattended_recovery_approval_runs_without_human_block() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("recovery-approval-unattended", true);
+        fixture.write_child_contract_with_fresh_receipt();
+        fixture.write_program_contract_with_recovery_approval();
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: pass\nreviewed_packet_digest: sha256:old\n",
+        );
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("recovery-approval-unattended".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert_ne!(result.final_verdict, "blocked-human");
+        assert!(!result
+            .child_results
+            .iter()
+            .any(|summary| summary.status == "approval-required"));
+        assert!(result.child_results.iter().any(|summary| {
+            summary.blocker_class.as_deref() == Some("stale-receipt")
+                && summary.route_id == "run-implementation"
+        }));
+    }
+
+    #[test]
     fn recovery_handler_only_semantics_are_enforced() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("recovery-handler-only-budget", true);
@@ -9371,6 +12530,575 @@ routes:
             .octon_dir
             .join("state/evidence/runs/workflows/recovery-handler-only-exec/children/a/run-implementation-program-approval-consumed.yml")
             .is_file());
+    }
+
+    #[test]
+    fn arbitrary_recoverable_blocker_with_route_is_runnable() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("recoverable-blocker-route", true);
+        fixture.write_program_contract_with_recovery_recipes();
+        let program = load_lifecycle_contract(&fixture.octon_dir, "proposal-program")
+            .unwrap()
+            .contract
+            .program
+            .unwrap();
+        let blocker = ProgramBlocker {
+            blocker_class: "executor-failed".to_string(),
+            message: "retryable executor failure".to_string(),
+            recovery_route: Some("run-implementation".to_string()),
+        };
+
+        assert!(blocker_allows_child_route(&program, &blocker));
+    }
+
+    #[test]
+    fn unsafe_blocker_without_safe_repair_is_not_runnable() {
+        let program = test_program_spec();
+        let blocker = ProgramBlocker {
+            blocker_class: "unsupported-mode-authority".to_string(),
+            message: "unsafe route cannot continue as-is".to_string(),
+            recovery_route: Some("run-implementation".to_string()),
+        };
+
+        assert!(!blocker_allows_child_route(&program, &blocker));
+        let mut children = BTreeMap::new();
+        children.insert("a".to_string(), child_state("a", vec![blocker]));
+        let (_state, verdict) = aggregate_program_state(&program, None, &children, &[], &[], &[]);
+        assert_eq!(verdict, "blocked-unsafe");
+    }
+
+    #[test]
+    fn safe_agent_repair_route_can_run_for_unsafe_blocker() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("unsafe-agent-repair", true);
+        fixture.write_child_contract();
+        fixture.write_program_contract_with_safe_unsafe_repair();
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+        let mut plan = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+        plan.child_states
+            .get_mut("a")
+            .unwrap()
+            .blockers
+            .push(ProgramBlocker {
+                blocker_class: "unsupported-mode-authority".to_string(),
+                message: "unsafe route cannot continue as-is; repair route is bounded".to_string(),
+                recovery_route: None,
+            });
+        let program = load_lifecycle_contract(&fixture.octon_dir, "proposal-program")
+            .unwrap()
+            .contract
+            .program
+            .unwrap();
+        assert!(blocker_has_safe_agent_repair(
+            &program,
+            plan.child_states.get("a").unwrap().blockers.last().unwrap()
+        ));
+        let (aggregate_state, verdict) = aggregate_program_state(
+            &program,
+            None,
+            &plan.child_states,
+            &[],
+            &[],
+            &["a".to_string()],
+        );
+        assert_eq!(aggregate_state, "planned");
+        assert_eq!(verdict, "planned");
+
+        let control_root = fixture
+            .octon_dir
+            .join("state/control/execution/runs/unsafe-agent-repair");
+        let evidence_root = fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/unsafe-agent-repair");
+        fs::create_dir_all(&control_root).unwrap();
+        fs::create_dir_all(&evidence_root).unwrap();
+        let jobs = build_child_execution_jobs(
+            &fixture.octon_dir,
+            &fixture.root,
+            "unsafe-agent-repair",
+            &BTreeMap::new(),
+            &RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("unsafe-agent-repair".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: None,
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+            &plan,
+            &evidence_root,
+            &control_root,
+            None,
+            None,
+        )
+        .unwrap();
+        assert_eq!(jobs.len(), 1);
+        assert!(jobs[0].unsafe_repair.is_some());
+        let summaries = execute_child_jobs(
+            &fixture.root,
+            "unsafe-agent-repair",
+            &control_root,
+            &evidence_root,
+            jobs,
+            1,
+            None,
+        )
+        .unwrap();
+        assert_eq!(summaries[0].status, "completed");
+        assert_eq!(
+            summaries[0].blocker_class.as_deref(),
+            Some("unsupported-mode-authority")
+        );
+        finalize_child_unsafe_repair_evidence(&evidence_root, &summaries).unwrap();
+        let evidence =
+            fs::read_to_string(evidence_root.join("children/a/unsafe-repair-decision.yml"))
+                .unwrap();
+        assert!(evidence.contains("unsafe_condition: unsafe route cannot continue as-is"));
+        assert!(evidence.contains("selected_repair_route: run-implementation"));
+        assert!(evidence.contains("agent_authority_basis: recovery recipe unsupported-mode-authority idempotency_class=idempotent"));
+        assert!(evidence.contains("post_attempt_validation_status: passed"));
+        assert!(evidence.contains("execution_can_resume: true"));
+    }
+
+    #[test]
+    fn program_unsafe_blocker_uses_safe_governed_program_repair_route() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("program-unsafe-repair", true);
+        fixture.write_program_contract_with_safe_program_unsafe_repair(true);
+        let loaded = load_lifecycle_contract(&fixture.octon_dir, "proposal-program").unwrap();
+        let program = loaded.contract.program.as_ref().unwrap();
+        let blocker = ProgramBlocker {
+            blocker_class: "unsupported-mode-authority".to_string(),
+            message: "program route cannot continue as-is".to_string(),
+            recovery_route: None,
+        };
+
+        let blockers = vec![blocker.clone()];
+        let (_blocker, route, basis) =
+            selected_program_repair_blocker(&loaded.contract, program, &blockers)
+                .expect("safe program repair route should be selected");
+
+        assert_eq!(route.route_id, "generate-program-implementation-prompt");
+        assert!(basis.contains("idempotency_class=idempotent"));
+        assert!(program_blocker_has_safe_agent_repair(
+            &loaded.contract,
+            program,
+            &blocker
+        ));
+        let (_state, verdict) = aggregate_program_state(
+            program,
+            Some(&loaded.contract),
+            &BTreeMap::new(),
+            &[blocker],
+            &[],
+            &[],
+        );
+        assert_eq!(verdict, "blocked-recoverable");
+    }
+
+    #[test]
+    fn program_unsafe_blocker_without_safe_basis_fails_closed() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("program-unsafe-no-safe-repair", true);
+        fixture.write_program_contract_with_safe_program_unsafe_repair(false);
+        let loaded = load_lifecycle_contract(&fixture.octon_dir, "proposal-program").unwrap();
+        let program = loaded.contract.program.as_ref().unwrap();
+        let blocker = ProgramBlocker {
+            blocker_class: "unsupported-mode-authority".to_string(),
+            message: "program route cannot continue as-is".to_string(),
+            recovery_route: None,
+        };
+
+        let blockers = vec![blocker.clone()];
+        assert!(selected_program_repair_blocker(&loaded.contract, program, &blockers).is_none());
+        let (_state, verdict) = aggregate_program_state(
+            program,
+            Some(&loaded.contract),
+            &BTreeMap::new(),
+            &[blocker],
+            &[],
+            &[],
+        );
+        assert_eq!(verdict, "blocked-unsafe");
+    }
+
+    #[test]
+    fn program_unsafe_repair_recipe_validation_rejects_invalid_metadata() {
+        let _guard = crate::acquire_kernel_test_lock();
+        for (name, idempotency, post_validation, preconditions, declare_route, expected) in [
+            (
+                "program-unsafe-bad-precondition",
+                "idempotent",
+                "post_attempt_validation: [\"replan-live-state\"]",
+                "preconditions: [\"unsupported-precondition\"]",
+                true,
+                "unsupported program recovery recipe precondition",
+            ),
+            (
+                "program-unsafe-empty-post-validation",
+                "idempotent",
+                "post_attempt_validation: []",
+                "",
+                true,
+                "must declare post_attempt_validation",
+            ),
+            (
+                "program-unsafe-non-idempotent",
+                "non-idempotent",
+                "post_attempt_validation: [\"replan-live-state\"]",
+                "",
+                true,
+                "not executable",
+            ),
+            (
+                "program-unsafe-unsafe-idempotency",
+                "unsafe",
+                "post_attempt_validation: [\"replan-live-state\"]",
+                "",
+                true,
+                "not executable",
+            ),
+            (
+                "program-unsafe-non-recoverable-idempotency",
+                "non-recoverable",
+                "post_attempt_validation: [\"replan-live-state\"]",
+                "",
+                true,
+                "not executable",
+            ),
+            (
+                "program-unsafe-missing-route",
+                "idempotent",
+                "post_attempt_validation: [\"replan-live-state\"]",
+                "",
+                false,
+                "missing from program lifecycle contract",
+            ),
+        ] {
+            let fixture = ProgramFixture::new(name, true);
+            fixture.write_program_contract_with_program_unsafe_repair_recipe(
+                idempotency,
+                post_validation,
+                preconditions,
+                declare_route,
+            );
+            let loaded = load_lifecycle_contract(&fixture.octon_dir, "proposal-program").unwrap();
+            let program = loaded.contract.program.as_ref().unwrap();
+            let blockers = vec![ProgramBlocker {
+                blocker_class: "unsupported-mode-authority".to_string(),
+                message: "program route cannot continue as-is".to_string(),
+                recovery_route: None,
+            }];
+
+            let selection = selected_program_repair_blocker_with_validation(
+                &loaded.contract,
+                program,
+                &blockers,
+            );
+
+            assert!(selection.selection.is_none(), "{name}");
+            let validation = selection.validation.expect("validation failure evidence");
+            assert_eq!(validation.status.as_deref(), Some("failed"), "{name}");
+            assert!(
+                validation
+                    .failures
+                    .iter()
+                    .any(|failure| failure.contains(expected)),
+                "{name}: {:?}",
+                validation.failures
+            );
+        }
+    }
+
+    #[test]
+    fn program_repair_post_attempt_validation_controls_parent_resume_evidence() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("program-parent-post-validation", true);
+        fixture.write_program_contract_with_program_unsafe_repair_recipe(
+            "idempotent",
+            "post_attempt_validation: [\"replan-live-state\", \"blocker-cleared\"]",
+            "",
+            true,
+        );
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+        let loaded = load_lifecycle_contract(&fixture.octon_dir, "proposal-program").unwrap();
+        let program = loaded.contract.program.as_ref().unwrap();
+        let mut before_plan = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+        before_plan.program_recovery_recipe_blocker_class =
+            Some("unsupported-mode-authority".to_string());
+        let mut blocked_after_plan = before_plan.clone();
+        blocked_after_plan.program_blockers.push(ProgramBlocker {
+            blocker_class: "unsupported-mode-authority".to_string(),
+            message: "unsafe blocker remains".to_string(),
+            recovery_route: None,
+        });
+        let route_result = LifecycleRouteExecutionResult {
+            schema_version: "octon-lifecycle-route-execution-result-v1".to_string(),
+            run_id: "program-parent-post-validation".to_string(),
+            route_id: "generate-program-implementation-prompt".to_string(),
+            executor_used: "mock".to_string(),
+            status: "completed".to_string(),
+            started_at: "now".to_string(),
+            ended_at: "now".to_string(),
+            manifest_status_before: None,
+            manifest_status_after: None,
+            receipts_observed: Vec::new(),
+            evidence_paths: Vec::new(),
+            stdout_path: None,
+            stderr_path: None,
+            prompt_packet_path: None,
+            retryable: false,
+            next_action: "replan".to_string(),
+            error_class: None,
+            error_message: None,
+        };
+        let control_root = fixture
+            .octon_dir
+            .join("state/control/execution/runs/program-parent-post-validation");
+        let evidence_root = fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/program-parent-post-validation");
+        fs::create_dir_all(evidence_root.join("parent")).unwrap();
+        let evidence = ProgramUnsafeRepairEvidence {
+            schema_version: "octon-program-lifecycle-unsafe-repair-v2".to_string(),
+            program_run_id: "program-parent-post-validation".to_string(),
+            repair_scope: "program".to_string(),
+            blocker_scope: "program".to_string(),
+            child_id: "program".to_string(),
+            unsafe_condition: "unsafe blocker remains".to_string(),
+            original_route_blocked_reason: "program route cannot continue as-is".to_string(),
+            selected_repair_route: "generate-program-implementation-prompt".to_string(),
+            agent_authority_basis:
+                "recovery recipe unsupported-mode-authority idempotency_class=idempotent"
+                    .to_string(),
+            files_artifacts_changed: Vec::new(),
+            before_validation: "planned".to_string(),
+            after_validation: "pending".to_string(),
+            safe_continuation_available: true,
+            route_execution_status: "pending".to_string(),
+            recipe_validation_status: "passed".to_string(),
+            recipe_validation_failures: Vec::new(),
+            post_attempt_validations_declared: vec![
+                "replan-live-state".to_string(),
+                "blocker-cleared".to_string(),
+            ],
+            post_attempt_validation_results: Vec::new(),
+            resume_decision_basis: "pending post-attempt validation".to_string(),
+            post_attempt_validation_status: "pending".to_string(),
+            post_attempt_validation_failures: Vec::new(),
+            final_blocker_class: Some("unsupported-mode-authority".to_string()),
+            final_execution_can_resume: false,
+            execution_can_resume: false,
+        };
+        write_unsafe_repair_evidence(
+            &evidence_root.join("parent"),
+            evidence,
+            Some(&route_result),
+            None,
+        )
+        .unwrap();
+
+        let failed = enforce_program_recovery_post_attempt_validations(
+            program,
+            &before_plan,
+            &blocked_after_plan,
+            &control_root,
+            "unsupported-mode-authority",
+            &route_result,
+            true,
+        );
+        assert!(!failed.execution_can_resume);
+        assert_eq!(failed.status, "failed");
+        finalize_parent_unsafe_repair_evidence(&evidence_root, &route_result, &failed).unwrap();
+        let failed_evidence =
+            fs::read_to_string(evidence_root.join("parent/unsafe-repair-decision.yml")).unwrap();
+        assert!(failed_evidence.contains("post_attempt_validation_status: failed"));
+        assert!(failed_evidence.contains("blocker-cleared: fail"));
+        assert!(failed_evidence.contains("execution_can_resume: false"));
+
+        let passed = enforce_program_recovery_post_attempt_validations(
+            program,
+            &before_plan,
+            &before_plan,
+            &control_root,
+            "unsupported-mode-authority",
+            &route_result,
+            true,
+        );
+        assert!(passed.execution_can_resume);
+        assert_eq!(passed.status, "passed");
+    }
+
+    #[test]
+    fn unsafe_child_result_continues_only_when_safe_work_remains() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("unsafe-child-continuation", true);
+        fixture.write_child_contract();
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+        let mut plan = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+        let unsafe_result = vec![ProgramChildExecutionSummary {
+            child_id: "a".to_string(),
+            child_run_id: "unsafe-child-continuation-a".to_string(),
+            route_id: "run-implementation".to_string(),
+            status: "blocked-unsafe".to_string(),
+            attempts: 1,
+            retryable: false,
+            blocker_class: Some("unsafe-resume".to_string()),
+            error_message: Some("unsafe route stopped".to_string()),
+        }];
+
+        plan.runnable_batch = vec!["b".to_string()];
+        assert_eq!(
+            final_verdict_after_child_execution(&plan, &unsafe_result),
+            "blocked-recoverable"
+        );
+        assert!(
+            unsafe_result_summaries_for_children(&plan, &unsafe_result)[0]
+                .safe_continuation_available
+        );
+
+        plan.runnable_batch.clear();
+        plan.safe_repair_candidates.clear();
+        plan.program_route = None;
+        assert_eq!(
+            final_verdict_after_child_execution(&plan, &unsafe_result),
+            "blocked-unsafe"
+        );
+        assert!(
+            !unsafe_result_summaries_for_children(&plan, &unsafe_result)[0]
+                .safe_continuation_available
+        );
+    }
+
+    #[test]
+    fn unsafe_repair_evidence_finalizes_after_validation_result() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("unsafe-repair-finalization", true);
+        let evidence_root = fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/unsafe-repair-finalization/children/a");
+        fs::create_dir_all(&evidence_root).unwrap();
+        let evidence = ProgramUnsafeRepairEvidence {
+            schema_version: "octon-program-lifecycle-unsafe-repair-v2".to_string(),
+            program_run_id: "unsafe-repair-finalization".to_string(),
+            repair_scope: "child".to_string(),
+            blocker_scope: "child".to_string(),
+            child_id: "a".to_string(),
+            unsafe_condition: "unsafe route stopped".to_string(),
+            original_route_blocked_reason: "current route cannot continue as-is".to_string(),
+            selected_repair_route: "run-implementation".to_string(),
+            agent_authority_basis: "recovery recipe idempotency_class=idempotent".to_string(),
+            files_artifacts_changed: Vec::new(),
+            before_validation: "planned".to_string(),
+            after_validation: "pending".to_string(),
+            safe_continuation_available: true,
+            route_execution_status: "pending".to_string(),
+            recipe_validation_status: "passed".to_string(),
+            recipe_validation_failures: Vec::new(),
+            post_attempt_validations_declared: vec!["replan-live-state".to_string()],
+            post_attempt_validation_results: Vec::new(),
+            resume_decision_basis: "pending post-attempt validation".to_string(),
+            post_attempt_validation_status: "pending".to_string(),
+            post_attempt_validation_failures: Vec::new(),
+            final_blocker_class: Some("unsafe-resume".to_string()),
+            final_execution_can_resume: false,
+            execution_can_resume: false,
+        };
+        let route_result = LifecycleRouteExecutionResult {
+            schema_version: "octon-lifecycle-route-execution-result-v1".to_string(),
+            run_id: "unsafe-repair-finalization-a".to_string(),
+            route_id: "run-implementation".to_string(),
+            executor_used: "mock".to_string(),
+            status: "completed".to_string(),
+            started_at: "now".to_string(),
+            ended_at: "now".to_string(),
+            manifest_status_before: None,
+            manifest_status_after: None,
+            receipts_observed: Vec::new(),
+            evidence_paths: Vec::new(),
+            stdout_path: None,
+            stderr_path: None,
+            prompt_packet_path: None,
+            retryable: false,
+            next_action: "replan".to_string(),
+            error_class: None,
+            error_message: None,
+        };
+        write_unsafe_repair_evidence(&evidence_root, evidence, Some(&route_result), None).unwrap();
+        let failed_summary = ProgramChildExecutionSummary {
+            child_id: "a".to_string(),
+            child_run_id: "unsafe-repair-finalization-a".to_string(),
+            route_id: "run-implementation".to_string(),
+            status: "failed".to_string(),
+            attempts: 1,
+            retryable: true,
+            blocker_class: Some("unsafe-resume".to_string()),
+            error_message: Some("post validation failed".to_string()),
+        };
+
+        finalize_unsafe_repair_evidence(&evidence_root, &failed_summary).unwrap();
+
+        let evidence_text =
+            fs::read_to_string(evidence_root.join("unsafe-repair-decision.yml")).unwrap();
+        assert!(evidence_text.contains("route_execution_status: completed"));
+        assert!(evidence_text.contains("post_attempt_validation_status: failed"));
+        assert!(evidence_text.contains("final_execution_can_resume: false"));
+        assert!(evidence_text.contains("execution_can_resume: false"));
+    }
+
+    #[test]
+    fn human_required_blocker_is_not_agent_repairable_without_local_evidence() {
+        let program = test_program_spec();
+        let blocker = ProgramBlocker {
+            blocker_class: "artifact-ownership-unclear".to_string(),
+            message: "ownership cannot be resolved from local evidence".to_string(),
+            recovery_route: Some("run-implementation".to_string()),
+        };
+
+        assert_eq!(
+            classify_program_blocker_class(&blocker.blocker_class),
+            ProgramBlockerDisposition::Human
+        );
+        assert!(!blocker_allows_child_route(&program, &blocker));
     }
 
     #[test]
@@ -11354,7 +15082,7 @@ rationale: "prove overwrite guard"
         assert!(b
             .blockers
             .iter()
-            .any(|blocker| blocker.blocker_class == "write-scope-conflict"));
+            .any(|blocker| blocker.blocker_class == "atomic-write-scope-conflict"));
     }
 
     #[test]
@@ -11384,7 +15112,7 @@ rationale: "prove overwrite guard"
         assert!(b
             .blockers
             .iter()
-            .all(|blocker| blocker.blocker_class != "write-scope-conflict"));
+            .any(|blocker| blocker.blocker_class == "write-scope-serialization-required"));
     }
 
     #[test]
@@ -11464,8 +15192,8 @@ rationale: "prove overwrite guard"
         assert!(a
             .blockers
             .iter()
-            .any(|blocker| blocker.blocker_class == "target-drift"));
-        assert_eq!(replanned.final_verdict, "blocked-recoverable");
+            .any(|blocker| blocker.blocker_class == "target-drift-unclear"));
+        assert_eq!(replanned.final_verdict, "blocked-human");
     }
 
     #[test]
@@ -11579,6 +15307,122 @@ rationale: "prove overwrite guard"
             "summary: {:?}",
             summary
         );
+    }
+
+    #[test]
+    fn closeout_blocked_receipt_maps_to_worktree_hygiene_blocker() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("closeout-blocked-classification", true);
+        fixture.write_program_contract_with_recovery_recipes();
+        fixture.write_child("a", "framework/a.md", "implemented");
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+        let mut plan = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+        plan.child_states
+            .get_mut("a")
+            .unwrap()
+            .blockers
+            .push(ProgramBlocker {
+                blocker_class: "artifact-ownership-unclear".to_string(),
+                message: "closeout blocked by worktree hygiene".to_string(),
+                recovery_route: None,
+            });
+        let program = load_lifecycle_contract(&fixture.octon_dir, "proposal-program")
+            .unwrap()
+            .contract
+            .program
+            .unwrap();
+        let control_root = fixture
+            .octon_dir
+            .join("state/control/execution/runs/closeout-blocked-classification");
+        let mut child_results = vec![ProgramChildExecutionSummary {
+            child_id: "a".to_string(),
+            child_run_id: "closeout-blocked-classification-a".to_string(),
+            route_id: "closeout-packet".to_string(),
+            status: "completed".to_string(),
+            attempts: 1,
+            retryable: false,
+            blocker_class: Some("stale-receipt".to_string()),
+            error_message: None,
+        }];
+
+        enforce_recovery_post_attempt_validations(
+            &program,
+            &plan,
+            &control_root,
+            true,
+            &mut child_results,
+        )
+        .unwrap();
+
+        assert_eq!(child_results[0].status, "blocked");
+        assert_eq!(
+            child_results[0].blocker_class.as_deref(),
+            Some("artifact-ownership-unclear")
+        );
+        assert!(!child_results[0].retryable);
+    }
+
+    #[test]
+    fn program_execute_loop_continues_recoverable_or_unattended_pending_dispatch() {
+        let result = ProgramLifecycleRunResult {
+            schema_version: "octon-program-lifecycle-run-result-v1".to_string(),
+            run_id: "stop-semantics".to_string(),
+            lifecycle_id: "proposal-program".to_string(),
+            execution_strategy: LifecycleExecutionStrategy::OrchestratedReplanLoop
+                .as_str()
+                .to_string(),
+            target: "parent".to_string(),
+            executor: "mock".to_string(),
+            route_execution_mode: "program-adapter-executed".to_string(),
+            bundle_root: "evidence".to_string(),
+            checkpoint_path: "checkpoint.yml".to_string(),
+            event_log_path: "events.ndjson".to_string(),
+            latest_event_offset: 1,
+            selected_parent_route: None,
+            parent_route_result: None,
+            selected_children: vec!["a".to_string()],
+            child_results: Vec::new(),
+            terminal_outcome: None,
+            final_verdict: "blocked-recoverable".to_string(),
+        };
+        assert!(!program_execute_loop_should_stop(&result, "minimize"));
+
+        let mut blocked_human = result.clone();
+        blocked_human.final_verdict = "blocked-human".to_string();
+        assert!(program_execute_loop_should_stop(&blocked_human, "minimize"));
+        assert!(!program_execute_loop_should_stop(
+            &blocked_human,
+            "unattended"
+        ));
+        let mut approval_blocked = blocked_human.clone();
+        approval_blocked.child_results = vec![ProgramChildExecutionSummary {
+            child_id: "a".to_string(),
+            child_run_id: "stop-semantics-a".to_string(),
+            route_id: "run-implementation".to_string(),
+            status: "approval-required".to_string(),
+            attempts: 0,
+            retryable: false,
+            blocker_class: Some("operator-approval-required".to_string()),
+            error_message: None,
+        }];
+        assert!(program_execute_loop_should_stop(
+            &approval_blocked,
+            "unattended"
+        ));
+
+        let mut no_dispatch = result;
+        no_dispatch.selected_children.clear();
+        assert!(program_execute_loop_should_stop(&no_dispatch, "unattended"));
     }
 
     #[test]
@@ -11847,6 +15691,8 @@ routes:
                     }),
                     terminal_outcome: None,
                     receipt_digests: BTreeMap::new(),
+                    gate_status: ProgramChildGateStatus::default(),
+                    dependency_gate_status: BTreeMap::new(),
                     write_scopes: vec![target.to_string(), scope.to_string()],
                     blockers: Vec::new(),
                     final_verdict: "route-ready".to_string(),
@@ -11874,10 +15720,25 @@ routes:
             program_gate_results: Vec::new(),
             blocked_by_program_gate: None,
             program_blockers: Vec::new(),
+            normalized_program_blockers: Vec::new(),
             child_states,
+            normalized_child_blockers: BTreeMap::new(),
             runnable_batch: vec!["a".to_string(), "b".to_string()],
+            scheduler_phase: Some("default".to_string()),
+            skipped_blocked_children: Vec::new(),
+            required_child_completion: BTreeMap::new(),
+            safe_repair_candidates: Vec::new(),
+            program_recovery_recipe_validation_status: None,
+            program_recovery_recipe_validation_failures: Vec::new(),
+            program_recovery_recipe_blocker_class: None,
+            program_recovery_recipe_route_id: None,
+            program_recovery_recipe_safe_unattended_basis: None,
+            unsafe_results: Vec::new(),
+            unsafe_continuation_decision: None,
             approval_blockers: Vec::new(),
+            normalized_approval_blockers: Vec::new(),
             checkpoint_drift: None,
+            stop_reason: Some("dispatch-available".to_string()),
             final_verdict: "planned".to_string(),
         };
         let evidence_root = fixture
@@ -11929,6 +15790,204 @@ routes:
         )
         .unwrap();
         assert!(events.contains("child-lock-released"));
+        let criticality = fs::read_to_string(
+            fixture.octon_dir.join(
+                "state/evidence/runs/workflows/lock-build-failure/artifact-criticality/remove_child_lock-a-run-implementation.yml",
+            ),
+        )
+        .unwrap();
+        assert!(criticality.contains("criticality: non-critical"));
+        assert!(criticality.contains("human_input_required: false"));
+        assert!(criticality.contains("after_validation: lock artifact absent"));
+    }
+
+    #[test]
+    fn child_lock_cleanup_blocks_when_ownership_is_unclear() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("lock-criticality-unclear", true);
+        let control_root = fixture
+            .octon_dir
+            .join("state/control/execution/runs/lock-criticality-unclear");
+        let evidence_root = fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/lock-criticality-unclear");
+        fs::create_dir_all(&control_root).unwrap();
+        fs::create_dir_all(&evidence_root).unwrap();
+        let unclear_lock_path = control_root.join("unexpected.lock");
+        fs::write(&unclear_lock_path, "child_id: a\n").unwrap();
+
+        let error = release_child_lock(
+            &control_root,
+            &evidence_root,
+            "lock-criticality-unclear",
+            "a",
+            "run-implementation",
+            &unclear_lock_path,
+        )
+        .unwrap_err();
+
+        assert!(error.to_string().contains("requires human input"));
+        assert!(
+            unclear_lock_path.exists(),
+            "unclear ownership must not be cleaned autonomously"
+        );
+        let criticality = fs::read_to_string(
+            evidence_root.join("artifact-criticality/remove_child_lock-a-run-implementation.yml"),
+        )
+        .unwrap();
+        assert!(criticality.contains("criticality: unclear"));
+        assert!(criticality.contains("human_input_required: true"));
+        assert!(criticality.contains("after_validation: not-run-human-input-required"));
+    }
+
+    #[test]
+    fn atomic_lock_cleanup_records_generalized_criticality_evidence() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("atomic-lock-criticality", true);
+        let control_root = fixture
+            .octon_dir
+            .join("state/control/execution/runs/atomic-lock-criticality");
+        let evidence_root = fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/atomic-lock-criticality");
+        fs::create_dir_all(control_root.join("locks")).unwrap();
+        fs::create_dir_all(&evidence_root).unwrap();
+        let lock_path = control_root.join("locks/a.lock");
+        fs::write(&lock_path, "child_id: a\n").unwrap();
+
+        release_atomic_locks(
+            &control_root,
+            &evidence_root,
+            "atomic-lock-criticality",
+            vec![("a".to_string(), lock_path.clone())],
+        )
+        .unwrap();
+
+        assert!(!lock_path.exists());
+        let criticality = fs::read_to_string(
+            evidence_root
+                .join("artifact-criticality/remove_atomic_child_lock-a-program-atomic.yml"),
+        )
+        .unwrap();
+        assert!(criticality.contains("operation_id: remove_atomic_child_lock-a-program-atomic"));
+        assert!(criticality.contains("destructive_operation: remove_file"));
+        assert!(criticality.contains("artifact_owner: current-run"));
+        assert!(criticality.contains("human_input_required: false"));
+    }
+
+    #[test]
+    fn generalized_cleanup_blocks_retained_evidence_artifacts() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("critical-artifact-cleanup", true);
+        let control_root = fixture
+            .octon_dir
+            .join("state/control/execution/runs/critical-artifact-cleanup");
+        let evidence_root = fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/critical-artifact-cleanup");
+        fs::create_dir_all(&control_root).unwrap();
+        fs::create_dir_all(&evidence_root).unwrap();
+        let retained_evidence = evidence_root.join("program-plan.yml");
+        fs::write(&retained_evidence, "final_verdict: planned\n").unwrap();
+        let operation = ProgramArtifactOperation {
+            operation_id: "remove-retained-evidence".to_string(),
+            child_id: "a".to_string(),
+            route_id: "run-implementation".to_string(),
+            operation: "remove_retained_evidence".to_string(),
+            destructive_operation: "remove_file".to_string(),
+            artifact_paths: vec![retained_evidence.clone()],
+            command_or_operation: "fs::remove_file".to_string(),
+        };
+
+        let error = perform_governed_artifact_cleanup(
+            &control_root,
+            &evidence_root,
+            "critical-artifact-cleanup",
+            &operation,
+        )
+        .unwrap_err();
+
+        assert!(error.to_string().contains("requires human input"));
+        assert!(retained_evidence.exists());
+        let criticality = fs::read_to_string(
+            evidence_root
+                .join("artifact-criticality/remove_retained_evidence-a-run-implementation.yml"),
+        )
+        .unwrap();
+        assert!(criticality.contains("criticality: critical"));
+        assert!(criticality.contains("authority_surface: retained-lifecycle-evidence"));
+        assert!(criticality.contains("human_input_required: true"));
+        assert!(criticality.contains(
+            "classification_policy_version: octon-program-artifact-criticality-policy-v2"
+        ));
+        assert!(criticality.contains("mutation_status: blocked"));
+    }
+
+    #[test]
+    fn governed_cleanup_blocks_unsupported_destructive_operations_with_evidence() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("unsupported-cleanup-operation", true);
+        let control_root = fixture
+            .octon_dir
+            .join("state/control/execution/runs/unsupported-cleanup-operation");
+        let evidence_root = fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/unsupported-cleanup-operation");
+        fs::create_dir_all(control_root.join("locks")).unwrap();
+        fs::create_dir_all(&evidence_root).unwrap();
+        let lock_path = control_root.join("locks/a.lock");
+        fs::write(&lock_path, "child_id: a\n").unwrap();
+        let operation = ProgramArtifactOperation {
+            operation_id: "unsupported-cleanup".to_string(),
+            child_id: "a".to_string(),
+            route_id: "run-implementation".to_string(),
+            operation: "remove_child_lock".to_string(),
+            destructive_operation: "archive_mutation".to_string(),
+            artifact_paths: vec![lock_path.clone()],
+            command_or_operation: "archive_mutation".to_string(),
+        };
+
+        let error = perform_governed_artifact_cleanup(
+            &control_root,
+            &evidence_root,
+            "unsupported-cleanup-operation",
+            &operation,
+        )
+        .unwrap_err();
+
+        assert!(error.to_string().contains("requires human input"));
+        assert!(lock_path.exists());
+        let criticality = fs::read_to_string(
+            evidence_root.join("artifact-criticality/remove_child_lock-a-run-implementation.yml"),
+        )
+        .unwrap();
+        assert!(criticality.contains("operation_supported: false"));
+        assert!(criticality.contains("blocked_reason: unsupported-destructive-operation"));
+        assert!(criticality.contains("mutation_performed: false"));
+    }
+
+    #[test]
+    fn lifecycle_program_destructive_cleanup_uses_governed_helper() {
+        let source = include_str!("lifecycle_program.rs");
+        let offenders = source
+            .lines()
+            .enumerate()
+            .filter(|(_, line)| {
+                (line.contains("fs::remove_file(")
+                    || line.contains("fs::remove_dir(")
+                    || line.contains("fs::remove_dir_all("))
+                    && !line.contains("match fs::remove_file(path)")
+                    && !line.contains("match fs::remove_dir(path)")
+                    && !line.contains("match fs::remove_dir_all(path)")
+                    && !line.contains("fs::remove_dir_all(&self.root)")
+                    && !line.contains("line.contains(")
+            })
+            .map(|(line, text)| format!("{}: {}", line + 1, text.trim()))
+            .collect::<Vec<_>>();
+        assert!(
+            offenders.is_empty(),
+            "destructive cleanup must use perform_governed_artifact_cleanup: {offenders:?}"
+        );
     }
 
     #[test]

@@ -240,7 +240,15 @@ valid_lifecycle_execution_strategy() {
 
 valid_program_blocker_class() {
   case "$1" in
-    approval-required|stale-receipt|target-drift|validation-failed|dependency-blocked|missing-evidence|executor-failed|write-scope-conflict|unsafe-resume|unsupported-mode|authority-boundary-ambiguous)
+    governed-agent-approval|operator-approval-required|approval-required|\
+stale-receipt|validation-failed|missing-evidence|executor-failed|executor-timed-out|\
+unsupported-mode|unsupported-mode-config|unsupported-mode-authority|\
+write-scope-conflict|write-scope-serialization-required|atomic-write-scope-conflict|\
+dependency-blocked|dependency-gate-unsatisfied|scheduler-paused|deferred|\
+target-drift|target-drift-explained|target-drift-unclear|\
+noncritical-artifact-cleanup|critical-artifact-cleanup-required|artifact-cleanup-required|worktree-hygiene-blocked|artifact-ownership-unclear|\
+recovery-budget-exhausted-alternate-route|recovery-budget-override-required|recovery-integrity-risk|\
+unsafe-resume|authority-boundary-ambiguous)
       return 0
       ;;
     *)
@@ -260,6 +268,17 @@ program_blocker_non_recoverable() {
   esac
 }
 
+program_blocker_unsafe() {
+  case "$1" in
+    unsupported-mode|unsupported-mode-authority|atomic-write-scope-conflict|recovery-integrity-risk|unsafe-resume|authority-boundary-ambiguous)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 valid_program_id() {
   [[ "$1" =~ ^[a-z][a-z0-9-]*$ ]]
 }
@@ -267,6 +286,28 @@ valid_program_id() {
 valid_program_recovery_idempotency_class() {
   case "$1" in
     inspect-only|idempotent|idempotent-rerun|bounded-retry|approval-gated-mutation|non-idempotent|unsafe|non-recoverable)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_program_recovery_safe_idempotency_class() {
+  case "$1" in
+    inspect-only|idempotent|idempotent-rerun|bounded-retry)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_program_recovery_precondition() {
+  case "$1" in
+    live-state-readable|selected-route-present|receipt-stale|missing-evidence)
       return 0
       ;;
     *)
@@ -405,9 +446,13 @@ validate_program_recovery_recipe() {
       && pass "program recovery recipe preconditions unique: $label" \
       || fail "program recovery recipe preconditions duplicate: $label"
     while IFS= read -r validation; do
-      [[ -n "$validation" ]] \
-        && pass "program recovery recipe precondition declared: $label -> $validation" \
-        || fail "program recovery recipe precondition empty: $label"
+      if [[ -z "$validation" ]]; then
+        fail "program recovery recipe precondition empty: $label"
+      elif valid_program_recovery_precondition "$validation"; then
+        pass "program recovery recipe precondition valid: $label -> $validation"
+      else
+        fail "program recovery recipe precondition invalid: $label -> $validation"
+      fi
     done < <(yq -r ".program.recovery_policy.recipes[$recipe_index].preconditions[]? // \"\"" "$contract" 2>/dev/null || true)
   fi
 
@@ -464,6 +509,13 @@ validate_program_recovery_recipe() {
     [[ -z "$recovery_route_id" || "$recovery_route_id" == "null" ]] \
       && pass "non-recoverable recipe has no recovery route: $label" \
       || fail "non-recoverable recipe must not declare recovery_route_id: $label"
+  elif program_blocker_unsafe "$blocker"; then
+    valid_program_recovery_safe_idempotency_class "$idempotency" \
+      && pass "unsafe repair recipe idempotency is safe-unattended: $label -> $idempotency" \
+      || fail "unsafe repair recipe must declare safe-unattended idempotency: $label"
+    [[ "$validation_count" =~ ^[0-9]+$ && "$validation_count" -gt 0 ]] \
+      && pass "unsafe repair recipe declares post-attempt validation: $label" \
+      || fail "unsafe repair recipe must declare post-attempt validation: $label"
   fi
 }
 
@@ -651,7 +703,9 @@ validate_contract() {
   yq -e '.receipts | tag == "!!seq" and length > 0' "$contract" >/dev/null 2>&1 && pass "receipts declared: $lifecycle_id" || fail "receipts missing: $lifecycle_id"
   while IFS= read -r binding_source; do
     [[ -n "$binding_source" ]] || continue
-    if [[ "$binding_source" == "lifecycle.target" || "$binding_source" =~ ^run\.input\.[A-Za-z0-9_-]+$ ]]; then
+    if [[ "$binding_source" == "lifecycle.target" \
+      || "$binding_source" =~ ^run\.input\.[A-Za-z0-9_-]+$ \
+      || "$binding_source" =~ ^receipt\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$ ]]; then
       pass "input binding source valid: $binding_source"
     else
       fail "input binding source invalid: $binding_source"

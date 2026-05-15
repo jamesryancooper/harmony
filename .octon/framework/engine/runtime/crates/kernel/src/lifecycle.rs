@@ -95,7 +95,7 @@ pub(crate) fn classify_lifecycle_status(status: &str) -> LifecycleStopClass {
         "failed" => LifecycleStopClass::Failed,
         "timed-out" => LifecycleStopClass::TimedOut,
         "cancelled" => LifecycleStopClass::Cancelled,
-        _ => LifecycleStopClass::BlockedRecoverable,
+        _ => LifecycleStopClass::BlockedUnsafe,
     }
 }
 
@@ -2112,6 +2112,12 @@ fn lifecycle_execution_request_for_route(
             if let Some(value) = run_inputs.get(input_name) {
                 bound_inputs.insert(name.clone(), value.clone());
             }
+        } else if let Some((receipt_id, field)) = receipt_field_binding(&binding.source)? {
+            if let Some(value) =
+                lifecycle_receipt_field_value(&target, &loaded.contract, receipt_id, field)?
+            {
+                bound_inputs.insert(name.clone(), value);
+            }
         } else {
             bail!(
                 "unsupported lifecycle input binding source for {}: {}",
@@ -2191,6 +2197,43 @@ fn lifecycle_execution_request_for_route(
         },
         approval_context,
     }))
+}
+
+fn receipt_field_binding(source: &str) -> Result<Option<(&str, &str)>> {
+    let Some(rest) = source.strip_prefix("receipt.") else {
+        return Ok(None);
+    };
+    let Some((receipt_id, field)) = rest.split_once('.') else {
+        bail!("receipt input binding source must be receipt.<receipt_id>.<field>: {source}");
+    };
+    if receipt_id.is_empty() || field.is_empty() {
+        bail!("receipt input binding source must be receipt.<receipt_id>.<field>: {source}");
+    }
+    Ok(Some((receipt_id, field)))
+}
+
+fn lifecycle_receipt_field_value(
+    target: &Path,
+    contract: &LifecycleContract,
+    receipt_id: &str,
+    field: &str,
+) -> Result<Option<String>> {
+    let Some(receipt) = contract
+        .receipts
+        .iter()
+        .find(|receipt| receipt.receipt_id == receipt_id)
+    else {
+        bail!("receipt input binding references unknown receipt: {receipt_id}");
+    };
+    let path = resolve_target_local_path(
+        target,
+        &receipt.path,
+        &format!("receipt input binding {}", receipt.receipt_id),
+    )?;
+    if !path.is_file() {
+        return Ok(None);
+    }
+    Ok(parse_receipt_fields(&path)?.get(field).cloned())
 }
 
 fn parse_receipt_fields(path: &Path) -> Result<BTreeMap<String, String>> {
@@ -2909,6 +2952,26 @@ packs:
     }
 
     #[test]
+    fn lifecycle_unknown_status_fails_closed() {
+        assert_eq!(
+            classify_lifecycle_status("unrecognized-control-plane-status"),
+            LifecycleStopClass::BlockedUnsafe
+        );
+        for status in [
+            "blocked",
+            "blocked-gate",
+            "blocked-no-route",
+            "blocked-max-iterations",
+        ] {
+            assert_eq!(
+                classify_lifecycle_status(status),
+                LifecycleStopClass::BlockedRecoverable,
+                "{status}"
+            );
+        }
+    }
+
+    #[test]
     fn worktree_hygiene_closeout_receipt_sets_named_plan_blocker() {
         let mut fields = BTreeMap::new();
         fields.insert("verdict".to_string(), "blocked".to_string());
@@ -3089,6 +3152,90 @@ routes:
         let error = format!("{error:#}");
 
         assert!(error.contains("without a program section"));
+    }
+
+    #[test]
+    fn lifecycle_execution_request_binds_inputs_from_receipt_fields() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = FixtureRepo::new("receipt-input-binding");
+        fixture.write_catalog(
+            "proposal-packet",
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+        );
+        fixture.write(
+            ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+            r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-packet"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: { input: "packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["implemented"] }
+input_bindings:
+  target:
+    source: "lifecycle.target"
+  disposition:
+    source: "receipt.proposal-closeout.archive_disposition"
+  promotion_evidence:
+    source: "receipt.proposal-closeout.promotion_evidence"
+states: [{ state_id: "archive" }]
+terminal_outcomes: []
+receipts:
+  - receipt_id: "proposal-closeout"
+    path: "support/proposal-closeout.md"
+    required_fields: ["verdict", "closed_at", "archive_authorized"]
+    verdict_field: "verdict"
+routes:
+  - route_id: "archive-proposal"
+    route_type: "workflow"
+"#,
+        );
+        fixture.write("packet/proposal.yml", "status: implemented\n");
+        fixture.write(
+            "packet/support/proposal-closeout.md",
+            "verdict: pass\nclosed_at: 2026-05-14T00:00:00Z\narchive_authorized: yes\narchive_disposition: implemented\npromotion_evidence: .octon/state/evidence/example.md\n",
+        );
+        let route = RoutePlanState {
+            route_id: "archive-proposal".to_string(),
+            route_type: "workflow".to_string(),
+            command_id: None,
+            skill_id: None,
+            prompt_set_id: None,
+        };
+
+        let request = lifecycle_execution_request_for_route(
+            &fixture.octon_dir,
+            "run-1",
+            "proposal-packet",
+            "packet",
+            &route,
+            ExecutorKind::Codex,
+            60,
+            "unattended",
+            0,
+            &BTreeMap::new(),
+            fixture
+                .root
+                .join(".octon/state/evidence/runs/workflows/run-1"),
+            fixture
+                .root
+                .join(".octon/state/control/execution/runs/run-1/lifecycle-checkpoint.yml"),
+            None,
+            None,
+        )
+        .unwrap()
+        .unwrap();
+
+        assert_eq!(
+            request.bound_inputs.get("disposition").map(String::as_str),
+            Some("implemented")
+        );
+        assert_eq!(
+            request
+                .bound_inputs
+                .get("promotion_evidence")
+                .map(String::as_str),
+            Some(".octon/state/evidence/example.md")
+        );
     }
 
     #[test]
