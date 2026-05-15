@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/engine/runtime/spec/workflow-statechart-v1.schema.json",
+  "title": "Octon Workflow Statechart v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "statechart_id",
+    "canonical_lifecycle_ref",
+    "control_root",
+    "retained_evidence_root",
+    "generated_projection_root",
+    "states",
+    "allowed_transitions",
+    "invalid_transition_policy",
+    "run_lifecycle_mapping",
+    "authority_boundary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "workflow-statechart-v1"
+    },
+    "statechart_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "canonical_lifecycle_ref": {
+      "const": ".octon/framework/engine/runtime/spec/run-lifecycle-v1.md"
+    },
+    "control_root": {
+      "const": ".octon/state/control/execution/runs"
+    },
+    "retained_evidence_root": {
+      "const": ".octon/state/evidence/runs"
+    },
+    "generated_projection_root": {
+      "const": ".octon/generated/cognition/projections/materialized"
+    },
+    "states": {
+      "type": "array",
+      "minItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/lifecycleState"
+      }
+    },
+    "allowed_transitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draft",
+        "bound",
+        "authorized",
+        "running",
+        "paused",
+        "staged",
+        "revoked",
+        "failed",
+        "rolled_back",
+        "succeeded",
+        "denied",
+        "closed"
+      ],
+      "properties": {
+        "draft": { "$ref": "#/$defs/lifecycleStateArray" },
+        "bound": { "$ref": "#/$defs/lifecycleStateArray" },
+        "authorized": { "$ref": "#/$defs/lifecycleStateArray" },
+        "running": { "$ref": "#/$defs/lifecycleStateArray" },
+        "paused": { "$ref": "#/$defs/lifecycleStateArray" },
+        "staged": { "$ref": "#/$defs/lifecycleStateArray" },
+        "revoked": { "$ref": "#/$defs/lifecycleStateArray" },
+        "failed": { "$ref": "#/$defs/lifecycleStateArray" },
+        "rolled_back": { "$ref": "#/$defs/lifecycleStateArray" },
+        "succeeded": { "$ref": "#/$defs/lifecycleStateArray" },
+        "denied": { "$ref": "#/$defs/lifecycleStateArray" },
+        "closed": { "$ref": "#/$defs/lifecycleStateArray" }
+      }
+    },
+    "invalid_transition_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "reason_code_pattern",
+        "may_advance_lifecycle_state"
+      ],
+      "properties": {
+        "decision": {
+          "const": "failed-closed"
+        },
+        "reason_code_pattern": {
+          "const": "^FCR-[0-9]{3}$"
+        },
+        "may_advance_lifecycle_state": {
+          "const": false
+        }
+      }
+    },
+    "run_lifecycle_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draft",
+        "bound",
+        "authorized",
+        "running",
+        "paused",
+        "staged",
+        "revoked",
+        "failed",
+        "rolled_back",
+        "succeeded",
+        "denied",
+        "closed"
+      ],
+      "properties": {
+        "draft": { "const": "draft" },
+        "bound": { "const": "bound" },
+        "authorized": { "const": "authorized" },
+        "running": { "const": "running" },
+        "paused": { "const": "paused" },
+        "staged": { "const": "staged" },
+        "revoked": { "const": "revoked" },
+        "failed": { "const": "failed" },
+        "rolled_back": { "const": "rolled_back" },
+        "succeeded": { "const": "succeeded" },
+        "denied": { "const": "denied" },
+        "closed": { "const": "closed" }
+      }
+    },
+    "authority_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "creates_second_control_root",
+        "authorizes_execution",
+        "replaces_run_lifecycle",
+        "generated_projection_is_authority",
+        "proposal_lineage_is_authority"
+      ],
+      "properties": {
+        "creates_second_control_root": { "const": false },
+        "authorizes_execution": { "const": false },
+        "replaces_run_lifecycle": { "const": false },
+        "generated_projection_is_authority": { "const": false },
+        "proposal_lineage_is_authority": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "lifecycleState": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "bound",
+        "authorized",
+        "running",
+        "paused",
+        "staged",
+        "revoked",
+        "failed",
+        "rolled_back",
+        "succeeded",
+        "denied",
+        "closed"
+      ]
+    },
+    "lifecycleStateArray": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/lifecycleState"
+      }
+    }
+  }
+}

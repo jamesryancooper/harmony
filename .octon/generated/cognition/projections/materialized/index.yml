@@ -12,6 +12,9 @@ files:
   - id: compatibility-retirement-map
     path: compatibility-retirement-map.md
     summary: Transitional compatibility retirement summary.
+  - id: workflow-statechart-harness
+    path: workflow-statechart-harness.yml
+    summary: Derived non-authoritative workflow statechart and task-specific harness navigation model.
   - id: support-card-repo-shell-observe-read
     path: support-cards/repo-shell-observe-read-en.yml
     summary: Derived support proof card for repo-shell observe-and-read support.

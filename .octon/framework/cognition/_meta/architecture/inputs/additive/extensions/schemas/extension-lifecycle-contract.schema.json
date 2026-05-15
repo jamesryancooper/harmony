@@ -148,7 +148,7 @@
       "properties": {
         "source": {
           "type": "string",
-          "pattern": "^(lifecycle\\.target|run\\.input\\.[A-Za-z0-9_-]+)$"
+          "pattern": "^(lifecycle\\.target|run\\.input\\.[A-Za-z0-9_-]+|receipt\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+)$"
         }
       }
     },

@@ -21,11 +21,10 @@ python3 - "$ROOT_DIR" "$DEFAULT_FIXTURES_ROOT" "$DEFAULT_EVIDENCE_ROOT" "$VALIDA
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-
-import yaml
 
 ROOT_DIR = Path(sys.argv[1])
 DEFAULT_FIXTURES_ROOT = Path(sys.argv[2])
@@ -161,8 +160,7 @@ def parse_args():
 
 
 def load_yaml(path):
-    with Path(path).open("r", encoding="utf-8") as handle:
-        return yaml.safe_load(handle)
+    return json.loads(subprocess.check_output(["yq", "-o=json", ".", str(path)], text=True))
 
 
 def normalize_state(state):
@@ -474,7 +472,11 @@ def write_reports(evidence_root, report):
         if report_semantics(existing) == report_semantics(report):
             report["generated_at"] = existing.get("generated_at", report["generated_at"])
 
-    yml_content = yaml.safe_dump(report, sort_keys=False, width=120)
+    yml_content = subprocess.check_output(
+        ["yq", "-P", "-o=yaml", "."],
+        input=json.dumps(report, separators=(",", ":")),
+        text=True,
+    )
     md_content = render_report_markdown(report)
     write_if_changed(yml_path, yml_content)
     write_if_changed(md_path, md_content)

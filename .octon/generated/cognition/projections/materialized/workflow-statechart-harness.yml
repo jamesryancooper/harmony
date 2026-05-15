@@ -1,0 +1,63 @@
+schema_version: "workflow-statechart-harness-projection-v1"
+projection_id: "workflow-statechart-harness"
+generated_at: "2026-05-15T00:49:28Z"
+authority_status: "derived-only"
+non_authority_notice: >-
+  This generated projection is a navigation read model only. Runtime authority,
+  policy authority, control truth, support claims, and closeout evidence remain
+  in the cited framework, state/control, and state/evidence sources.
+source_refs:
+  - ".octon/framework/engine/runtime/spec/workflow-statechart-v1.md"
+  - ".octon/framework/engine/runtime/spec/workflow-statechart-v1.schema.json"
+  - ".octon/framework/engine/runtime/spec/task-specific-execution-harness-v1.md"
+  - ".octon/framework/engine/runtime/spec/task-specific-execution-harness-v1.schema.json"
+  - ".octon/framework/engine/runtime/spec/task-specific-execution-harness-compile-receipt-v1.schema.json"
+  - ".octon/framework/constitution/contracts/runtime/workflow-statechart-v1.schema.json"
+  - ".octon/framework/constitution/contracts/runtime/task-specific-execution-harness-v1.schema.json"
+  - ".octon/framework/constitution/contracts/runtime/task-specific-execution-harness-compile-receipt-v1.schema.json"
+canonical_runtime_refs:
+  - ".octon/framework/engine/runtime/spec/run-lifecycle-v1.md"
+  - ".octon/framework/engine/runtime/spec/run-journal-v1.md"
+  - ".octon/framework/engine/runtime/spec/execution-authorization-v1.md"
+  - ".octon/framework/engine/runtime/spec/context-pack-builder-v1.md"
+  - ".octon/framework/engine/runtime/spec/authorized-effect-token-v1.md"
+  - ".octon/framework/engine/runtime/spec/evidence-store-v1.md"
+forbidden_consumers:
+  - "runtime_authority"
+  - "policy_authority"
+  - "control_truth"
+  - "support_claim_authority"
+  - "closeout_evidence"
+statechart_summary:
+  states:
+    - "draft"
+    - "bound"
+    - "authorized"
+    - "running"
+    - "paused"
+    - "staged"
+    - "revoked"
+    - "failed"
+    - "rolled_back"
+    - "succeeded"
+    - "denied"
+    - "closed"
+  canonical_lifecycle_ref: ".octon/framework/engine/runtime/spec/run-lifecycle-v1.md"
+harness_required_bindings:
+  - "objective_binding"
+  - "run_contract_binding"
+  - "support_target_binding"
+  - "capability_envelope_binding"
+  - "context_pack_binding"
+  - "authorization_route_binding"
+  - "effect_token_class_binding"
+  - "evidence_obligation_binding"
+  - "rollback_or_compensation_binding"
+  - "human_intervention_binding"
+  - "model_cost_policy_binding"
+  - "closeout_criteria_binding"
+boundary_summary:
+  creates_second_control_root: false
+  harness_authorizes_execution: false
+  generated_projection_is_authority: false
+  execution_authorization_required: true

@@ -38,7 +38,11 @@ gates remain unfinished unless the verdict is explicitly reported as a blocked
 or deferred outcome.
 
 When closeout succeeds, write or refresh `support/proposal-closeout.md` with at
-least `verdict`, `closed_at`, and `archive_authorized`. Use `verdict: pass` and
+least `verdict`, `closed_at`, and `archive_authorized`. When
+`archive_authorized: yes`, also record explicit workflow inputs
+`archive_disposition` and `promotion_evidence`; for implemented packets,
+`archive_disposition` must be `implemented` and `promotion_evidence` must name
+durable evidence outside the proposal packet. Use `verdict: pass` and
 `archive_authorized: yes` only when the packet is ready for the separate
 `archive-proposal` lifecycle route. Do not archive the packet directly from
 this route.

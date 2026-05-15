@@ -29,6 +29,10 @@ input_bindings:
     source: "run.input.proposal_kind"
   proposal_id:
     source: "run.input.proposal_id"
+  disposition:
+    source: "receipt.proposal-closeout.archive_disposition"
+  promotion_evidence:
+    source: "receipt.proposal-closeout.promotion_evidence"
 
 states:
   - state_id: "create"

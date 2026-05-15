@@ -27,6 +27,9 @@ temp/
 .octon/generated/cognition/graph/**
 .octon/generated/cognition/projections/materialized/
 .octon/generated/cognition/projections/materialized/**
+!.octon/generated/cognition/projections/materialized/
+!.octon/generated/cognition/projections/materialized/index.yml
+!.octon/generated/cognition/projections/materialized/workflow-statechart-harness.yml
 
 # Logs directory
 logs/
@@ -160,3 +163,5 @@ Icon?
 !.octon/inputs/exploratory/proposals/.archive/architecture/lifecycle-autopilot-effective-catalog-portability-correction/**
 !.octon/inputs/exploratory/proposals/.archive/architecture/foundational-entry-artifact-canonical-framing-update/
 !.octon/inputs/exploratory/proposals/.archive/architecture/foundational-entry-artifact-canonical-framing-update/**
+!.octon/inputs/exploratory/proposals/.archive/architecture/framing-boundary-and-terminology-guardrails/
+!.octon/inputs/exploratory/proposals/.archive/architecture/framing-boundary-and-terminology-guardrails/**

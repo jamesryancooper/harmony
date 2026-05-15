@@ -225,6 +225,32 @@ bridges:
     summary_root: ".octon/generated/cognition/summaries/missions"
     projection_root: ".octon/generated/cognition/projections/materialized/missions"
     rule: "Generated mission summaries and mission views must reference per-run evidence when runs are bound."
+workflow_statechart_task_harness:
+  workflow_statechart:
+    schema_ref: ".octon/framework/constitution/contracts/runtime/workflow-statechart-v1.schema.json"
+    runtime_spec_ref: ".octon/framework/engine/runtime/spec/workflow-statechart-v1.md"
+    runtime_schema_ref: ".octon/framework/engine/runtime/spec/workflow-statechart-v1.schema.json"
+    canonical_lifecycle_ref: ".octon/framework/engine/runtime/spec/run-lifecycle-v1.md"
+    control_root: ".octon/state/control/execution/runs"
+    retained_evidence_root: ".octon/state/evidence/runs"
+    rule: "Workflow Statechart v1 is a validation overlay over Run Lifecycle v1 and does not create a second control root."
+  task_specific_execution_harness:
+    schema_ref: ".octon/framework/constitution/contracts/runtime/task-specific-execution-harness-v1.schema.json"
+    runtime_spec_ref: ".octon/framework/engine/runtime/spec/task-specific-execution-harness-v1.md"
+    runtime_schema_ref: ".octon/framework/engine/runtime/spec/task-specific-execution-harness-v1.schema.json"
+    compile_receipt_schema_ref: ".octon/framework/constitution/contracts/runtime/task-specific-execution-harness-compile-receipt-v1.schema.json"
+    compile_receipt_runtime_schema_ref: ".octon/framework/engine/runtime/spec/task-specific-execution-harness-compile-receipt-v1.schema.json"
+    rule: "Task-specific harness records bind the required objective, run-contract, support, capability, context, authorization, effect-token, evidence, rollback, human-intervention, model/cost, and closeout envelope before authorization is requested."
+  generated_projection:
+    projection_ref: ".octon/generated/cognition/projections/materialized/workflow-statechart-harness.yml"
+    authority_status: "derived-only"
+    forbidden_consumers:
+      - "runtime_authority"
+      - "policy_authority"
+      - "control_truth"
+      - "support_claim_authority"
+      - "closeout_evidence"
+    rule: "Generated statechart and harness projections are navigation-only and cannot satisfy runtime, policy, support, control, or closeout authority."
 migration:
   event_family_canonicalization:
     source_contract_ref: ".octon/framework/engine/runtime/spec/runtime-event-v1.schema.json"

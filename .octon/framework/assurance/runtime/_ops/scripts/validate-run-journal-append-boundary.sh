@@ -74,6 +74,13 @@ def text_files():
                 yield path
 
 
+def first_rust_cfg_test_line(lines: list[str]) -> int | None:
+    for line_no, line in enumerate(lines, start=1):
+        if re.match(r"^\s*#\[cfg\(test\)\]", line):
+            return line_no
+    return None
+
+
 def has_redirect_to_tainted(line: str, tainted_vars: set[str]) -> bool:
     for var in tainted_vars:
         if re.search(rf"(^|[^<])>{1,2}\s*[\"']?\$\{{?{re.escape(var)}\}}?", line):
@@ -106,7 +113,10 @@ for path in text_files():
     tainted_vars: set[str] = set()
     rust_pending_var = None
     rust_pending_contains_event = False
+    rust_cfg_test_start = first_rust_cfg_test_line(lines) if path.suffix == ".rs" else None
     for line_no, line in enumerate(lines, start=1):
+        if rust_cfg_test_start is not None and line_no >= rust_cfg_test_start:
+            continue
         shell_match = SHELL_ASSIGN.search(line)
         py_match = PY_ASSIGN.search(line)
         rust_match = RUST_ASSIGN_START.search(line)

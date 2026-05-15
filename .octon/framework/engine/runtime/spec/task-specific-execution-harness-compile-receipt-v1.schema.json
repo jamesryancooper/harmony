@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/engine/runtime/spec/task-specific-execution-harness-compile-receipt-v1.schema.json",
+  "title": "Octon Task-Specific Execution Harness Compile Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "harness_ref",
+    "statechart_ref",
+    "compiled_at",
+    "compiler_ref",
+    "validated_binding_fields",
+    "validation_result",
+    "authorization_boundary",
+    "evidence_refs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "task-specific-execution-harness-compile-receipt-v1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "harness_ref": {
+      "type": "string",
+      "minLength": 1,
+      "not": {
+        "pattern": "(^|/)\\.octon/(generated|inputs)/"
+      }
+    },
+    "statechart_ref": {
+      "const": ".octon/framework/engine/runtime/spec/workflow-statechart-v1.schema.json"
+    },
+    "compiled_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "compiler_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "validated_binding_fields": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 12,
+      "items": {
+        "type": "string",
+        "enum": [
+          "objective_binding",
+          "run_contract_binding",
+          "support_target_binding",
+          "capability_envelope_binding",
+          "context_pack_binding",
+          "authorization_route_binding",
+          "effect_token_class_binding",
+          "evidence_obligation_binding",
+          "rollback_or_compensation_binding",
+          "human_intervention_binding",
+          "model_cost_policy_binding",
+          "closeout_criteria_binding"
+        ]
+      }
+    },
+    "validation_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "missing_required_bindings",
+        "generated_projection_authority_violations",
+        "proposal_authority_violations"
+      ],
+      "properties": {
+        "verdict": {
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "missing_required_bindings": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "generated_projection_authority_violations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "proposal_authority_violations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "authorization_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compile_receipt_authorizes_execution",
+        "execution_authorization_required",
+        "effect_token_verification_required"
+      ],
+      "properties": {
+        "compile_receipt_authorizes_execution": { "const": false },
+        "execution_authorization_required": { "const": true },
+        "effect_token_verification_required": { "const": true }
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^\\.octon/state/evidence/"
+      }
+    }
+  }
+}

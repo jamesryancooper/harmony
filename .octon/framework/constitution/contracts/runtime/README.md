@@ -42,6 +42,16 @@ Run roots are the primary execution-time unit of truth.
   side effects occur.
 - Mission continuity, summaries, and mission views may consume run evidence,
   but they may not replace the run root as the execution-time source of truth.
+- Workflow Statechart v1 is a validation overlay over Run Lifecycle v1. It
+  does not create a second control root or authorize execution by itself.
+- Task-specific execution harness records must bind objective, run contract,
+  support target, capability envelope, context pack, authorization route,
+  effect-token classes, evidence obligations, rollback or compensation posture,
+  human-intervention posture, model/cost policy, and closeout criteria before
+  authorization is requested.
+- Generated statechart or harness projections are derived-only navigation
+  surfaces and cannot satisfy runtime authority, policy authority, support
+  claims, control truth, or closeout evidence.
 
 ## Canonical Files
 
@@ -59,6 +69,9 @@ Run roots are the primary execution-time unit of truth.
 - `checkpoint-v2.schema.json`
 - `state-reconstruction-v1.md`
 - `replay-pointers-v1.schema.json`
+- `workflow-statechart-v1.schema.json`
+- `task-specific-execution-harness-v1.schema.json`
+- `task-specific-execution-harness-compile-receipt-v1.schema.json`
 
 ## Canonical Roots
 
