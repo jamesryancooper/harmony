@@ -305,6 +305,7 @@
             "validation-failed",
             "dependency-blocked",
             "missing-evidence",
+            "publication-drift",
             "executor-failed",
             "write-scope-conflict",
             "unsafe-resume",
@@ -315,6 +316,12 @@
         "recovery_route_id": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "recovery_action_id": {
+          "type": "string",
+          "enum": [
+            "refresh-publication-projections"
+          ]
         },
         "preconditions": {
           "type": "array",
@@ -367,7 +374,8 @@
               "receipt-freshness",
               "blocker-cleared",
               "authority-boundary-check",
-              "aggregate-closeout-check"
+              "aggregate-closeout-check",
+              "publication-freshness-cleared"
             ]
           },
           "uniqueItems": true

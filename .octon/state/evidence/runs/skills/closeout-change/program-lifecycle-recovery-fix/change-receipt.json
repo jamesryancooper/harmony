@@ -1,0 +1,77 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "program-lifecycle-recovery-fix-2026-05-16",
+  "selected_route": "branch-no-pr",
+  "operator_requested_route": "branch-no-pr",
+  "target_lifecycle_outcome": "cleaned",
+  "lifecycle_outcome": "published-branch",
+  "outcome_intent": "attempt-cleaned-closeout",
+  "intent": "Fix the proposal program lifecycle loop so repeated child-route no-progress and publication projection drift trigger bounded parent-level recovery instead of burning step budget on child retries.",
+  "scope": {
+    "summary": "Adds child-route progress fingerprints, publication-drift parent recovery, projection refresh validation, closeout hygiene preflight, recovery contract fields, schema validation, and deterministic read-model refresh outputs.",
+    "touched_paths": [
+      ".octon/framework/engine/runtime/crates/kernel/src/lifecycle_program.rs",
+      ".octon/framework/engine/runtime/crates/kernel/src/lifecycle.rs",
+      ".octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/extension-lifecycle-contract.schema.json",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-lifecycle-contracts.sh",
+      ".octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycles/proposal-program.contract.yml",
+      ".octon/generated/effective/extensions/published/octon-proposal-lifecycle/bundled-first-party/context/lifecycles/proposal-program.contract.yml",
+      ".octon/generated/effective/governance/support-envelope-reconciliation.yml",
+      ".octon/generated/cognition/projections/materialized/runs/",
+      ".octon/state/evidence/validation/runtime/governed-runtime-materialization-v1/run-health/generation.yml"
+    ],
+    "leftover_evidence_artifacts": {
+      "disposition": "retained_unstaged_foreign_or_ambiguous",
+      "reason": "Unrelated lifecycle, publish, proposal, and validation evidence artifacts already existed in the dirty worktree or were produced by adjacent runs. They are operational evidence with unclear ownership, so they were left unstaged and not deleted."
+    }
+  },
+  "source_branch_ref": "chore/program-lifecycle-recovery-fix",
+  "remote_branch_ref": "origin/chore/program-lifecycle-recovery-fix",
+  "landing_evaluation": {
+    "status": "blocked",
+    "source_ref": "chore/program-lifecycle-recovery-fix",
+    "target_ref": "origin/main",
+    "blocker_reason": "Hosted no-PR landing and cleaned closeout require a clean landing worktree, exact source SHA validation, origin/main equality after landing, branch cleanup evidence, and local main sync. The current worktree contains foreign or ambiguous dirty evidence artifacts that must not be deleted, staged, or claimed by this change."
+  },
+  "not_landed_reason": "Target outcome was cleaned, but landing evidence cannot be honestly claimed from the current dirty worktree with foreign or ambiguous artifacts present.",
+  "not_cleaned_reason": "Branch cleanup and post-cleanup local main sync require successful landing evidence first; leftover evidence artifacts were retained unstaged because ownership is unclear.",
+  "integration_status": "not_landed",
+  "publication_status": "pushed-branch",
+  "cleanup_status": "deferred",
+  "cleanup_evidence_refs": [
+    "Leftover evidence disposition recorded in scope.leftover_evidence_artifacts; no foreign evidence paths were staged or deleted."
+  ],
+  "source_branch_cleanup": {
+    "status": "deferred",
+    "local_branch": "chore/program-lifecycle-recovery-fix",
+    "remote_branch": "origin/chore/program-lifecycle-recovery-fix",
+    "blocker_reason": "Cleanup is deferred until the branch is landed or explicitly discarded."
+  },
+  "validation_evidence_refs": [
+    "cargo test --manifest-path .octon/framework/engine/runtime/crates/Cargo.toml -p octon_kernel lifecycle_program -- --nocapture: passed, 119 tests",
+    "bash .octon/framework/assurance/runtime/_ops/scripts/validate-lifecycle-contracts.sh: passed, errors=0 warnings=0",
+    "bash .octon/framework/assurance/runtime/_ops/scripts/validate-support-envelope-reconciliation.sh: passed, errors=0",
+    "bash .octon/framework/assurance/runtime/_ops/scripts/validate-run-health-read-model.sh: passed, errors=0",
+    "bash .octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh: passed, errors=0",
+    "bash .octon/framework/assurance/runtime/_ops/scripts/validate-no-raw-generated-effective-runtime-reads.sh: passed, errors=0"
+  ],
+  "review_waiver_refs": [
+    "Solo branch-no-pr route requested by operator; no PR metadata is attached to this receipt."
+  ],
+  "durable_history": {
+    "kind": "branch",
+    "ref": "chore/program-lifecycle-recovery-fix",
+    "branch": "chore/program-lifecycle-recovery-fix"
+  },
+  "rollback_handle": {
+    "kind": "discard-branch",
+    "ref": "chore/program-lifecycle-recovery-fix",
+    "instructions": "If the branch is not landed, delete local and remote branch refs. If later landed, revert the landed commit range from origin/main."
+  },
+  "closeout_outcome": "continued",
+  "remaining_blockers": [
+    "Hosted no-PR landing was not attempted because current worktree evidence ownership is ambiguous and cleanup cannot be safely proven.",
+    "Cleaned closeout requires landing evidence, safe branch cleanup or explicit deferred cleanup after landing, and local main alignment."
+  ],
+  "created_at": "2026-05-16T15:02:54Z"
+}

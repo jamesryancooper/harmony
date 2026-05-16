@@ -10,6 +10,7 @@ use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Component, Path, PathBuf};
+use std::process::Command;
 use std::thread;
 
 const PROGRAM_CHECKPOINT_FILE: &str = "program-lifecycle-checkpoint.yml";
@@ -18,6 +19,7 @@ const DEFAULT_PROGRAM_MAX_STEPS: u32 = 20;
 const DEFAULT_MAX_CHILD_CONCURRENCY: usize = 2;
 const MISSING_CHILD_REGISTRY_DIGEST: &str = "missing-child-registry";
 const INVALID_CHILD_REGISTRY_DIGEST: &str = "invalid-child-registry";
+const REFRESH_PUBLICATION_PROJECTIONS_ACTION: &str = "refresh-publication-projections";
 
 fn default_orchestrated_replan_loop_execution_strategy() -> String {
     LifecycleExecutionStrategy::OrchestratedReplanLoop
@@ -268,7 +270,7 @@ pub(crate) struct ProgramChildPlanState {
     pub final_verdict: String,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 pub(crate) struct ProgramChildGateStatus {
     pub terminal: bool,
     pub verification: bool,
@@ -559,6 +561,22 @@ pub(crate) struct ProgramChildExecutionSummary {
     pub error_message: Option<String>,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+struct ProgramRecoveryProgressFingerprint {
+    child_id: String,
+    route_id: String,
+    blocker_class: String,
+    final_verdict: String,
+    #[serde(default)]
+    terminal_outcome: Option<String>,
+    #[serde(default)]
+    gate_status: ProgramChildGateStatus,
+    #[serde(default)]
+    receipt_digests: BTreeMap<String, String>,
+    #[serde(default)]
+    selected_route_id: Option<String>,
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 struct ProgramLifecycleCheckpoint {
     schema_version: String,
@@ -585,6 +603,10 @@ struct ProgramLifecycleCheckpoint {
     child_states: BTreeMap<String, ProgramChildCheckpointState>,
     #[serde(default)]
     recovery_attempts: BTreeMap<String, u32>,
+    #[serde(default)]
+    program_recovery_action_attempts: BTreeMap<String, u32>,
+    #[serde(default)]
+    recovery_progress_fingerprints: BTreeMap<String, ProgramRecoveryProgressFingerprint>,
     #[serde(default)]
     approvals: Vec<ProgramApprovalGrant>,
     #[serde(default)]
@@ -673,6 +695,16 @@ struct ChildExecutionJob {
 struct ChildExecutionOutcome {
     summary: ProgramChildExecutionSummary,
     lock_path: PathBuf,
+}
+
+#[derive(Clone, Debug)]
+struct ProgramRecoveryActionOutcome {
+    action_id: String,
+    blocker_class: String,
+    status: String,
+    evidence_path: String,
+    failed_command: Option<String>,
+    error_message: Option<String>,
 }
 
 struct ProgramLifecycleStepOutcome {
@@ -1430,6 +1462,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
         )?;
     }
     apply_closeout_policy_blockers(program, &child_states, &mut program_blockers);
+    apply_recovery_progress_blockers(program, &mut child_states, checkpoint);
     apply_recovery_budget_blockers(program, &mut child_states, checkpoint);
     apply_recovery_approval_blockers(
         program,
@@ -1829,6 +1862,10 @@ fn run_program_lifecycle_single_step(
         previous_checkpoint,
         &options.approval_policy,
     )?;
+    let mut program_recovery_action_attempts = previous_checkpoint
+        .map(|checkpoint| checkpoint.program_recovery_action_attempts.clone())
+        .unwrap_or_default();
+    let mut program_recovery_action_attempted = false;
     if plan.program_route.is_none() {
         if let Some(child_id) = options.program_child_filter.as_ref() {
             filter_plan_to_child(&mut plan, child_id)?;
@@ -1999,10 +2036,78 @@ fn run_program_lifecycle_single_step(
         && !parent_route_handled
         && !plan.runnable_batch.is_empty()
     {
+        if let Some(program) = parent_context.loaded.contract.program.as_ref() {
+            if let Some(outcome) = execute_selected_program_recovery_action(
+                program,
+                &plan,
+                previous_checkpoint,
+                &mut program_recovery_action_attempts,
+                repo_root,
+                control_root,
+                evidence_root,
+                sanitized_run_id,
+                step_context,
+            )? {
+                program_recovery_action_attempted = true;
+                if outcome.status == "completed" {
+                    let replan_checkpoint =
+                        checkpoint_for_post_execution_replan(previous_checkpoint);
+                    plan = plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
+                        octon_dir,
+                        &options.lifecycle_id,
+                        &options.target,
+                        replan_checkpoint.as_ref(),
+                        &options.approval_policy,
+                    )?;
+                    if plan.program_route.is_none() {
+                        if let Some(child_id) = options.program_child_filter.as_ref() {
+                            filter_plan_to_child(&mut plan, child_id)?;
+                        }
+                    }
+                    if let Some(failed_outcome) = enforce_program_recovery_action_post_validations(
+                        repo_root,
+                        program,
+                        &plan,
+                        control_root,
+                        evidence_root,
+                        sanitized_run_id,
+                        &outcome,
+                        step_context,
+                    )? {
+                        record_program_recovery_action_failure(
+                            &mut plan,
+                            &mut final_verdict,
+                            &mut terminal_outcome,
+                            &failed_outcome,
+                        );
+                        plan.runnable_batch.clear();
+                    } else {
+                        final_verdict = plan.final_verdict.clone();
+                        terminal_outcome = plan.terminal_outcome.clone();
+                    }
+                } else {
+                    record_program_recovery_action_failure(
+                        &mut plan,
+                        &mut final_verdict,
+                        &mut terminal_outcome,
+                        &outcome,
+                    );
+                    plan.runnable_batch.clear();
+                }
+            }
+        }
+    }
+
+    if !cancelled_before_dispatch
+        && options.execute_routes
+        && !parent_route_handled
+        && !plan.runnable_batch.is_empty()
+    {
         let max_concurrency = options
             .max_child_concurrency
             .unwrap_or(DEFAULT_MAX_CHILD_CONCURRENCY)
             .max(1);
+        let before_child_dispatch_plan = plan.clone();
         let scheduled_children = plan.runnable_batch.join(",");
         append_program_event(
             control_root,
@@ -2031,7 +2136,7 @@ fn run_program_lifecycle_single_step(
                 previous_checkpoint.map(|checkpoint| &checkpoint.approvals),
             )?
         } else {
-            let jobs = build_child_execution_jobs(
+            let (jobs, mut preflight_results) = build_child_execution_jobs(
                 octon_dir,
                 repo_root,
                 sanitized_run_id,
@@ -2043,7 +2148,7 @@ fn run_program_lifecycle_single_step(
                 previous_checkpoint.map(|checkpoint| &checkpoint.approvals),
                 previous_checkpoint,
             )?;
-            execute_child_jobs(
+            let mut executed_results = execute_child_jobs(
                 repo_root,
                 sanitized_run_id,
                 control_root,
@@ -2051,7 +2156,9 @@ fn run_program_lifecycle_single_step(
                 jobs,
                 max_concurrency,
                 step_context,
-            )?
+            )?;
+            preflight_results.append(&mut executed_results);
+            preflight_results
         };
         let replan_checkpoint = checkpoint_for_post_execution_replan(previous_checkpoint);
         plan = plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
@@ -2074,6 +2181,82 @@ fn run_program_lifecycle_single_step(
                 true,
                 &mut child_results,
             )?;
+            let no_progress_blockers = mark_no_progress_child_results(
+                &before_child_dispatch_plan,
+                &plan,
+                &mut child_results,
+                control_root,
+                evidence_root,
+                sanitized_run_id,
+                step_context,
+            )?;
+            if no_progress_blockers
+                .iter()
+                .any(|blocker| blocker == "publication-drift")
+                && !program_recovery_action_attempted
+            {
+                if let Some(outcome) = execute_selected_program_recovery_action(
+                    program,
+                    &plan,
+                    previous_checkpoint,
+                    &mut program_recovery_action_attempts,
+                    repo_root,
+                    control_root,
+                    evidence_root,
+                    sanitized_run_id,
+                    step_context,
+                )? {
+                    program_recovery_action_attempted = true;
+                    if outcome.status == "completed" {
+                        let replan_checkpoint =
+                            checkpoint_for_post_execution_replan(previous_checkpoint);
+                        plan = plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
+                            octon_dir,
+                            &options.lifecycle_id,
+                            &options.target,
+                            replan_checkpoint.as_ref(),
+                            &options.approval_policy,
+                        )?;
+                        if plan.program_route.is_none() {
+                            if let Some(child_id) = options.program_child_filter.as_ref() {
+                                filter_plan_to_child(&mut plan, child_id)?;
+                            }
+                        }
+                        if let Some(failed_outcome) =
+                            enforce_program_recovery_action_post_validations(
+                                repo_root,
+                                program,
+                                &plan,
+                                control_root,
+                                evidence_root,
+                                sanitized_run_id,
+                                &outcome,
+                                step_context,
+                            )?
+                        {
+                            record_program_recovery_action_failure(
+                                &mut plan,
+                                &mut final_verdict,
+                                &mut terminal_outcome,
+                                &failed_outcome,
+                            );
+                            plan.runnable_batch.clear();
+                        }
+                    } else {
+                        record_program_recovery_action_failure(
+                            &mut plan,
+                            &mut final_verdict,
+                            &mut terminal_outcome,
+                            &outcome,
+                        );
+                        plan.runnable_batch.clear();
+                    }
+                } else {
+                    plan.runnable_batch.clear();
+                }
+            } else if !no_progress_blockers.is_empty() {
+                plan.runnable_batch.clear();
+            }
         }
         finalize_child_unsafe_repair_evidence(evidence_root, &child_results)?;
         plan.unsafe_results = unsafe_result_summaries_for_children(&plan, &child_results);
@@ -2151,7 +2334,13 @@ fn run_program_lifecycle_single_step(
         fs::write(&checkpoint_path, serde_yaml::to_string(&checkpoint)?)?;
     }
     let latest_event_offset = count_program_events(control_root)?;
-    let dispatch_attempted = parent_route_result.is_some() || !child_results.is_empty();
+    checkpoint.program_recovery_action_attempts = program_recovery_action_attempts;
+    enrich_checkpoint_event_metadata(&mut checkpoint, control_root)?;
+    fs::write(&checkpoint_path, serde_yaml::to_string(&checkpoint)?)?;
+
+    let dispatch_attempted = parent_route_result.is_some()
+        || !child_results.is_empty()
+        || program_recovery_action_attempted;
     let route_execution_mode = if dispatch_attempted {
         "program-adapter-executed"
     } else if options.execute_routes {
@@ -4633,6 +4822,47 @@ fn apply_recovery_budget_blockers(
     }
 }
 
+fn apply_recovery_progress_blockers(
+    program: &ProgramSpec,
+    child_states: &mut BTreeMap<String, ProgramChildPlanState>,
+    checkpoint: Option<&ProgramLifecycleCheckpoint>,
+) {
+    let Some(checkpoint) = checkpoint else {
+        return;
+    };
+    for state in child_states.values_mut() {
+        let no_progress = state
+            .blockers
+            .iter()
+            .enumerate()
+            .find_map(|(index, blocker)| {
+                let route_id = recovery_route_for_blocker(program, blocker)
+                    .or(blocker.recovery_route.as_deref())
+                    .or_else(|| {
+                        state
+                            .selected_route
+                            .as_ref()
+                            .map(|route| route.route_id.as_str())
+                    })?;
+                let key = recovery_progress_key(&state.child_id, route_id, &blocker.blocker_class);
+                let previous = checkpoint.recovery_progress_fingerprints.get(&key)?;
+                let current = child_progress_fingerprint(state, route_id, &blocker.blocker_class);
+                (previous == &current)
+                    .then(|| (index, blocker.blocker_class.clone(), route_id.to_string()))
+            });
+        if let Some((index, blocker_class, route_id)) = no_progress {
+            state.blockers.remove(index);
+            state.blockers.push(ProgramBlocker {
+                blocker_class: "recovery-integrity-risk".to_string(),
+                message: format!(
+                    "child route {route_id} already completed without changing progress for blocker {blocker_class}; same child/route/blocker will not be retried automatically"
+                ),
+                recovery_route: None,
+            });
+        }
+    }
+}
+
 fn apply_recovery_approval_blockers(
     program: &ProgramSpec,
     registry_digest: &str,
@@ -6069,8 +6299,9 @@ fn build_child_execution_jobs(
     control_root: &Path,
     approvals: Option<&Vec<ProgramApprovalGrant>>,
     checkpoint: Option<&ProgramLifecycleCheckpoint>,
-) -> Result<Vec<ChildExecutionJob>> {
+) -> Result<(Vec<ChildExecutionJob>, Vec<ProgramChildExecutionSummary>)> {
     let mut jobs = Vec::new();
+    let mut preflight_summaries = Vec::new();
     let result = (|| -> Result<()> {
         for child_id in &plan.runnable_batch {
             let Some(state) = plan.child_states.get(child_id) else {
@@ -6095,6 +6326,18 @@ fn build_child_execution_jobs(
                 child_evidence_root.join("child-plan.yml"),
                 serde_yaml::to_string(state)?,
             )?;
+            if let Some(summary) = closeout_worktree_hygiene_preflight(
+                repo_root,
+                control_root,
+                evidence_root,
+                &child_evidence_root,
+                program_run_id,
+                state,
+                &route.route_id,
+            )? {
+                preflight_summaries.push(summary);
+                continue;
+            }
             let program_contract = load_lifecycle_contract(octon_dir, &options.lifecycle_id)?;
             let program = program_contract.contract.program.as_ref();
             let route_safe_unattended_basis = match program {
@@ -6220,7 +6463,81 @@ fn build_child_execution_jobs(
         return Err(error);
     }
     let _ = repo_root;
-    Ok(jobs)
+    Ok((jobs, preflight_summaries))
+}
+
+fn closeout_worktree_hygiene_preflight(
+    repo_root: &Path,
+    control_root: &Path,
+    evidence_root: &Path,
+    child_evidence_root: &Path,
+    program_run_id: &str,
+    state: &ProgramChildPlanState,
+    route_id: &str,
+) -> Result<Option<ProgramChildExecutionSummary>> {
+    if !matches!(route_id, "closeout-packet" | "archive-proposal") {
+        return Ok(None);
+    }
+    let stdout_path = child_evidence_root.join("worktree-hygiene-preflight.stdout.yml");
+    let stderr_path = child_evidence_root.join("worktree-hygiene-preflight.stderr.log");
+    let script =
+        ".octon/framework/assurance/runtime/_ops/scripts/classify-proposal-worktree-hygiene.sh";
+    if !repo_root.join(script).is_file() {
+        return Ok(None);
+    }
+    let output = Command::new("bash")
+        .arg(script)
+        .arg("--target")
+        .arg(&state.target)
+        .arg("--lifecycle")
+        .arg("proposal-packet")
+        .arg("--run-id")
+        .arg(program_run_id)
+        .arg("--format")
+        .arg("yaml")
+        .current_dir(repo_root)
+        .env("OCTON_ROOT_DIR", repo_root)
+        .output()?;
+    fs::write(&stdout_path, &output.stdout)?;
+    fs::write(&stderr_path, &output.stderr)?;
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let status = if output.status.success() && stdout.contains("worktree_hygiene_verdict: \"pass\"")
+    {
+        "pass"
+    } else {
+        "blocked"
+    };
+    let stdout_rel = rel_display(repo_root, &stdout_path);
+    let stderr_rel = rel_display(repo_root, &stderr_path);
+    append_program_event(
+        control_root,
+        evidence_root,
+        program_run_id,
+        "worktree-hygiene-preflight",
+        Some(&state.child_id),
+        Some(route_id),
+        "child closeout worktree hygiene preflight completed",
+        program_event_data([
+            ("status", status),
+            ("stdout_path", stdout_rel.as_str()),
+            ("stderr_path", stderr_rel.as_str()),
+        ]),
+    )?;
+    if status == "pass" {
+        return Ok(None);
+    }
+    Ok(Some(ProgramChildExecutionSummary {
+        child_id: state.child_id.clone(),
+        child_run_id: format!("{program_run_id}-{}-worktree-hygiene", state.child_id),
+        route_id: route_id.to_string(),
+        status: "blocked".to_string(),
+        attempts: 0,
+        retryable: false,
+        blocker_class: Some("artifact-ownership-unclear".to_string()),
+        error_message: Some(
+            "closeout/archive blocked by foreign or ambiguous worktree hygiene".to_string(),
+        ),
+    }))
 }
 
 fn selected_route_for_child_execution(
@@ -6453,6 +6770,15 @@ fn recovery_route_id<'a>(program: &'a ProgramSpec, blocker_class: &str) -> Optio
         })
 }
 
+fn recovery_action_id<'a>(program: &'a ProgramSpec, blocker_class: &str) -> Option<&'a String> {
+    program
+        .recovery_policy
+        .recipes
+        .iter()
+        .find(|recipe| recovery_recipe_matches(recipe, blocker_class))
+        .and_then(|recipe| recipe.recovery_action_id.as_ref())
+}
+
 fn recovery_route_for_blocker<'a>(
     program: &'a ProgramSpec,
     blocker: &'a ProgramBlocker,
@@ -6616,6 +6942,30 @@ fn recovery_attempt_key(child_id: &str, blocker_class: &str) -> String {
     format!("{child_id}:{blocker_class}")
 }
 
+fn recovery_progress_key(child_id: &str, route_id: &str, blocker_class: &str) -> String {
+    format!("{child_id}:{route_id}:{blocker_class}")
+}
+
+fn child_progress_fingerprint(
+    state: &ProgramChildPlanState,
+    route_id: &str,
+    blocker_class: &str,
+) -> ProgramRecoveryProgressFingerprint {
+    ProgramRecoveryProgressFingerprint {
+        child_id: state.child_id.clone(),
+        route_id: route_id.to_string(),
+        blocker_class: blocker_class.to_string(),
+        final_verdict: state.final_verdict.clone(),
+        terminal_outcome: state.terminal_outcome.clone(),
+        gate_status: state.gate_status.clone(),
+        receipt_digests: state.receipt_digests.clone(),
+        selected_route_id: state
+            .selected_route
+            .as_ref()
+            .map(|route| route.route_id.clone()),
+    }
+}
+
 fn recovery_attempt_count(
     checkpoint: &ProgramLifecycleCheckpoint,
     child_id: &str,
@@ -6625,6 +6975,28 @@ fn recovery_attempt_count(
         .recovery_attempts
         .get(&recovery_attempt_key(child_id, blocker_class))
         .copied()
+        .unwrap_or(0)
+}
+
+fn program_recovery_action_attempt_key(blocker_class: &str, action_id: &str) -> String {
+    format!("{blocker_class}:{action_id}")
+}
+
+fn program_recovery_action_attempt_count(
+    checkpoint: Option<&ProgramLifecycleCheckpoint>,
+    blocker_class: &str,
+    action_id: &str,
+) -> u32 {
+    checkpoint
+        .and_then(|checkpoint| {
+            checkpoint
+                .program_recovery_action_attempts
+                .get(&program_recovery_action_attempt_key(
+                    blocker_class,
+                    action_id,
+                ))
+                .copied()
+        })
         .unwrap_or(0)
 }
 
@@ -6779,6 +7151,11 @@ fn validate_recovery_recipe_metadata(
             bail!("unsupported recovery replan_behavior: {replan_behavior}");
         }
     }
+    if let Some(action_id) = recipe.recovery_action_id.as_deref() {
+        if action_id != REFRESH_PUBLICATION_PROJECTIONS_ACTION {
+            bail!("unsupported recovery_action_id: {action_id}");
+        }
+    }
     Ok(())
 }
 
@@ -6792,6 +7169,7 @@ fn supported_recovery_post_attempt_validation(validation: &str) -> bool {
             | "replay-verify"
             | "authority-boundary-check"
             | "aggregate-closeout-check"
+            | "publication-freshness-cleared"
     )
 }
 
@@ -6913,6 +7291,10 @@ fn recovery_post_attempt_validation_passed(
         "aggregate-closeout-check" => {
             plan.aggregate_state != "completed" || plan.final_verdict == "completed"
         }
+        "publication-freshness-cleared" => !state
+            .blockers
+            .iter()
+            .any(|blocker| blocker.blocker_class == "publication-drift"),
         "replay-verify" => verify_program_event_log_for_recovery(control_root).is_ok(),
         _ => false,
     }
@@ -7036,6 +7418,21 @@ fn program_recovery_post_attempt_validation_result(
             .ok_or_else(|| {
                 "aggregate state is completed without completed final verdict".to_string()
             }),
+        "publication-freshness-cleared" => {
+            let remaining_child = after_plan.child_states.values().any(|state| {
+                state
+                    .blockers
+                    .iter()
+                    .any(|blocker| blocker.blocker_class == "publication-drift")
+            });
+            let remaining_program = after_plan
+                .program_blockers
+                .iter()
+                .any(|blocker| blocker.blocker_class == "publication-drift");
+            (!remaining_child && !remaining_program)
+                .then_some(())
+                .ok_or_else(|| "publication-drift blocker remains after repair".to_string())
+        }
         "replay-verify" => {
             verify_program_event_log_for_recovery(control_root).map_err(|error| error.to_string())
         }
@@ -7071,6 +7468,511 @@ fn verify_program_event_log_for_recovery(control_root: &Path) -> Result<()> {
             errors.join("; ")
         );
     }
+}
+
+fn select_program_recovery_action<'a>(
+    program: &'a ProgramSpec,
+    plan: &'a ProgramLifecyclePlanResult,
+    checkpoint: Option<&ProgramLifecycleCheckpoint>,
+) -> Option<(&'a str, &'a str)> {
+    for state in plan.child_states.values() {
+        for blocker in &state.blockers {
+            let action_id = recovery_action_id(program, &blocker.blocker_class)?;
+            let budget = recovery_attempt_budget(program, &blocker.blocker_class)
+                .or(program.recovery_policy.max_recovery_attempts)
+                .unwrap_or(1);
+            let used = program_recovery_action_attempt_count(
+                checkpoint,
+                &blocker.blocker_class,
+                action_id,
+            );
+            if used < budget {
+                return Some((blocker.blocker_class.as_str(), action_id.as_str()));
+            }
+        }
+    }
+    None
+}
+
+fn execute_selected_program_recovery_action(
+    program: &ProgramSpec,
+    plan: &ProgramLifecyclePlanResult,
+    previous_checkpoint: Option<&ProgramLifecycleCheckpoint>,
+    program_recovery_action_attempts: &mut BTreeMap<String, u32>,
+    repo_root: &Path,
+    control_root: &Path,
+    evidence_root: &Path,
+    program_run_id: &str,
+    step_context: Option<ProgramExecutionStepContext>,
+) -> Result<Option<ProgramRecoveryActionOutcome>> {
+    let Some((blocker_class, action_id)) =
+        select_program_recovery_action(program, plan, previous_checkpoint)
+    else {
+        return Ok(None);
+    };
+    let key = program_recovery_action_attempt_key(blocker_class, action_id);
+    let attempt_number = program_recovery_action_attempts
+        .get(&key)
+        .copied()
+        .unwrap_or(0)
+        + 1;
+    let outcome = execute_program_recovery_action(
+        repo_root,
+        control_root,
+        evidence_root,
+        program_run_id,
+        blocker_class,
+        action_id,
+        attempt_number,
+        step_context,
+    )?;
+    *program_recovery_action_attempts.entry(key).or_default() += 1;
+    Ok(Some(outcome))
+}
+
+fn mark_no_progress_child_results(
+    before_plan: &ProgramLifecyclePlanResult,
+    after_plan: &ProgramLifecyclePlanResult,
+    child_results: &mut [ProgramChildExecutionSummary],
+    control_root: &Path,
+    evidence_root: &Path,
+    program_run_id: &str,
+    step_context: Option<ProgramExecutionStepContext>,
+) -> Result<Vec<String>> {
+    let mut no_progress_blockers = Vec::new();
+    for result in child_results.iter_mut() {
+        if !matches!(result.status.as_str(), "completed" | "no-op") {
+            continue;
+        }
+        let Some(blocker_class) = result.blocker_class.as_deref() else {
+            continue;
+        };
+        let Some(before_state) = before_plan.child_states.get(&result.child_id) else {
+            continue;
+        };
+        let Some(after_state) = after_plan.child_states.get(&result.child_id) else {
+            continue;
+        };
+        let before = child_progress_fingerprint(before_state, &result.route_id, blocker_class);
+        let after = child_progress_fingerprint(after_state, &result.route_id, blocker_class);
+        if before != after {
+            continue;
+        }
+        append_program_event(
+            control_root,
+            evidence_root,
+            program_run_id,
+            "child-route-no-progress",
+            Some(&result.child_id),
+            Some(&result.route_id),
+            "child route completed without advancing child lifecycle progress",
+            program_step_event_data(
+                step_context.as_ref(),
+                "child-batch-dispatch",
+                [
+                    ("blocker_class", blocker_class),
+                    ("route_id", result.route_id.as_str()),
+                ],
+            ),
+        )?;
+        no_progress_blockers.push(blocker_class.to_string());
+        result.status = "blocked".to_string();
+        result.retryable = false;
+        result.error_message = Some(format!(
+            "route completed but child lifecycle progress did not change for blocker {blocker_class}"
+        ));
+    }
+    no_progress_blockers.sort();
+    no_progress_blockers.dedup();
+    Ok(no_progress_blockers)
+}
+
+fn record_program_recovery_action_failure(
+    plan: &mut ProgramLifecyclePlanResult,
+    final_verdict: &mut String,
+    terminal_outcome: &mut Option<String>,
+    outcome: &ProgramRecoveryActionOutcome,
+) {
+    *final_verdict = "blocked-recoverable".to_string();
+    *terminal_outcome = None;
+    plan.final_verdict = final_verdict.clone();
+    plan.terminal_outcome = None;
+    plan.stop_reason = Some(format!(
+        "program recovery action {} for {} failed at command {} (evidence: {}): {}",
+        outcome.action_id,
+        outcome.blocker_class,
+        outcome.failed_command.as_deref().unwrap_or("unknown"),
+        outcome.evidence_path,
+        outcome
+            .error_message
+            .as_deref()
+            .unwrap_or("no error message")
+    ));
+}
+
+fn enforce_program_recovery_action_post_validations(
+    repo_root: &Path,
+    program: &ProgramSpec,
+    after_plan: &ProgramLifecyclePlanResult,
+    control_root: &Path,
+    evidence_root: &Path,
+    program_run_id: &str,
+    outcome: &ProgramRecoveryActionOutcome,
+    step_context: Option<ProgramExecutionStepContext>,
+) -> Result<Option<ProgramRecoveryActionOutcome>> {
+    let declared = recovery_post_attempt_validations(program, &outcome.blocker_class);
+    let mut failures = Vec::new();
+    if declared.is_empty() {
+        failures.push(format!(
+            "program recovery recipe for {} declared no post_attempt_validation",
+            outcome.blocker_class
+        ));
+    }
+    for validation in &declared {
+        if let Err(error) = program_recovery_post_attempt_validation_result(
+            validation,
+            after_plan,
+            control_root,
+            &outcome.blocker_class,
+            true,
+        ) {
+            failures.push(format!("{validation}: {error}"));
+        }
+    }
+    if failures.is_empty() {
+        return Ok(None);
+    }
+    let message = failures.join("; ");
+    let failed_command = "post-validation";
+    append_program_event(
+        control_root,
+        evidence_root,
+        program_run_id,
+        "program-recovery-action-validation-failed",
+        None,
+        Some(&outcome.action_id),
+        "program recovery action post-validation failed",
+        program_step_event_data(
+            step_context.as_ref(),
+            "program-recovery-action",
+            [
+                ("blocker_class", outcome.blocker_class.as_str()),
+                ("action_id", outcome.action_id.as_str()),
+                ("failed_command", failed_command),
+                ("evidence_path", outcome.evidence_path.as_str()),
+            ],
+        ),
+    )?;
+    let action_root = if Path::new(&outcome.evidence_path).is_absolute() {
+        PathBuf::from(&outcome.evidence_path)
+    } else {
+        repo_root.join(&outcome.evidence_path)
+    };
+    write_program_recovery_action_summary(
+        repo_root,
+        &action_root,
+        &outcome.action_id,
+        &outcome.blocker_class,
+        "failed",
+        Some(failed_command),
+        Some(&message),
+    )?;
+    Ok(Some(ProgramRecoveryActionOutcome {
+        action_id: outcome.action_id.clone(),
+        blocker_class: outcome.blocker_class.clone(),
+        status: "failed".to_string(),
+        evidence_path: outcome.evidence_path.clone(),
+        failed_command: Some(failed_command.to_string()),
+        error_message: Some(message),
+    }))
+}
+
+fn execute_program_recovery_action(
+    repo_root: &Path,
+    control_root: &Path,
+    evidence_root: &Path,
+    program_run_id: &str,
+    blocker_class: &str,
+    action_id: &str,
+    attempt_number: u32,
+    step_context: Option<ProgramExecutionStepContext>,
+) -> Result<ProgramRecoveryActionOutcome> {
+    if action_id != REFRESH_PUBLICATION_PROJECTIONS_ACTION {
+        bail!("unsupported program recovery action: {action_id}");
+    }
+    let octon_dir = repo_root.join(".octon");
+    let action_root = evidence_root
+        .join("program-recovery-actions")
+        .join(action_id)
+        .join(format!("attempt-{attempt_number}"));
+    fs::create_dir_all(&action_root)?;
+    append_program_event(
+        control_root,
+        evidence_root,
+        program_run_id,
+        "program-recovery-action-started",
+        None,
+        Some(action_id),
+        "program recovery action started",
+        program_step_event_data(
+            step_context.as_ref(),
+            "program-recovery-action",
+            [("blocker_class", blocker_class), ("action_id", action_id)],
+        ),
+    )?;
+
+    let commands: Vec<(&str, Vec<String>, Vec<(&str, String)>)> = vec![
+        (
+            "generate-support-envelope-reconciliation",
+            vec![
+                ".octon/framework/assurance/runtime/_ops/scripts/generate-support-envelope-reconciliation.sh".to_string(),
+            ],
+            Vec::new(),
+        ),
+        (
+            "generate-run-health-read-model",
+            vec![
+                ".octon/framework/assurance/runtime/_ops/scripts/generate-run-health-read-model.sh".to_string(),
+                "--all-runs".to_string(),
+                "--evidence-root".to_string(),
+                action_root.join("run-health").to_string_lossy().to_string(),
+            ],
+            Vec::new(),
+        ),
+        (
+            "validate-support-envelope-reconciliation",
+            vec![
+                ".octon/framework/assurance/runtime/_ops/scripts/validate-support-envelope-reconciliation.sh".to_string(),
+            ],
+            vec![(
+                "OCTON_SUPPORT_ENVELOPE_EVIDENCE_DIR",
+                action_root
+                    .join("support-envelope-validation")
+                    .to_string_lossy()
+                    .to_string(),
+            )],
+        ),
+        (
+            "validate-run-health-read-model",
+            vec![
+                ".octon/framework/assurance/runtime/_ops/scripts/validate-run-health-read-model.sh".to_string(),
+            ],
+            Vec::new(),
+        ),
+        (
+            "validate-architecture-conformance",
+            vec![
+                ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh".to_string(),
+            ],
+            Vec::new(),
+        ),
+    ];
+
+    for (index, (command_id, argv, extra_env)) in commands.iter().enumerate() {
+        let command_index = index + 1;
+        let stdout_path = action_root.join(format!("{command_index:02}-{command_id}.stdout.log"));
+        let stderr_path = action_root.join(format!("{command_index:02}-{command_id}.stderr.log"));
+        let result_path = action_root.join(format!("{command_index:02}-{command_id}.result.yml"));
+        let output = run_program_recovery_command(
+            repo_root,
+            &octon_dir,
+            argv,
+            extra_env,
+            &stdout_path,
+            &stderr_path,
+        )?;
+        let exit_code = output.status.code().unwrap_or(-1).to_string();
+        let status = if output.status.success() {
+            "completed"
+        } else {
+            "failed"
+        };
+        fs::write(
+            &result_path,
+            format!(
+                "schema_version: \"octon-program-recovery-action-command-v1\"\naction_id: \"{action_id}\"\nblocker_class: \"{blocker_class}\"\ncommand_id: \"{command_id}\"\nstatus: \"{status}\"\nexit_code: {exit_code}\nstdout_path: \"{}\"\nstderr_path: \"{}\"\n",
+                rel_display(repo_root, &stdout_path),
+                rel_display(repo_root, &stderr_path)
+            ),
+        )?;
+        if !output.status.success() {
+            let message =
+                format!("program recovery action {action_id} failed at command {command_id}");
+            let evidence_path = rel_display(repo_root, &action_root);
+            append_program_event(
+                control_root,
+                evidence_root,
+                program_run_id,
+                "program-recovery-action-validation-failed",
+                None,
+                Some(action_id),
+                "program recovery action validation failed",
+                program_step_event_data(
+                    step_context.as_ref(),
+                    "program-recovery-action",
+                    [
+                        ("blocker_class", blocker_class),
+                        ("action_id", action_id),
+                        ("failed_command", command_id),
+                        ("evidence_path", evidence_path.as_str()),
+                    ],
+                ),
+            )?;
+            append_program_event(
+                control_root,
+                evidence_root,
+                program_run_id,
+                "program-recovery-action-finished",
+                None,
+                Some(action_id),
+                "program recovery action finished with failure",
+                program_step_event_data(
+                    step_context.as_ref(),
+                    "program-recovery-action",
+                    [
+                        ("blocker_class", blocker_class),
+                        ("action_id", action_id),
+                        ("status", "failed"),
+                        ("failed_command", command_id),
+                        ("evidence_path", evidence_path.as_str()),
+                    ],
+                ),
+            )?;
+            write_program_recovery_action_summary(
+                repo_root,
+                &action_root,
+                action_id,
+                blocker_class,
+                "failed",
+                Some(command_id),
+                Some(&message),
+            )?;
+            return Ok(ProgramRecoveryActionOutcome {
+                action_id: action_id.to_string(),
+                blocker_class: blocker_class.to_string(),
+                status: "failed".to_string(),
+                evidence_path,
+                failed_command: Some(command_id.to_string()),
+                error_message: Some(message),
+            });
+        }
+    }
+
+    write_program_recovery_changed_paths(repo_root, &action_root)?;
+    append_program_event(
+        control_root,
+        evidence_root,
+        program_run_id,
+        "program-recovery-action-finished",
+        None,
+        Some(action_id),
+        "program recovery action finished",
+        program_step_event_data(
+            step_context.as_ref(),
+            "program-recovery-action",
+            [
+                ("blocker_class", blocker_class),
+                ("action_id", action_id),
+                ("status", "completed"),
+            ],
+        ),
+    )?;
+    write_program_recovery_action_summary(
+        repo_root,
+        &action_root,
+        action_id,
+        blocker_class,
+        "completed",
+        None,
+        None,
+    )?;
+    Ok(ProgramRecoveryActionOutcome {
+        action_id: action_id.to_string(),
+        blocker_class: blocker_class.to_string(),
+        status: "completed".to_string(),
+        evidence_path: rel_display(repo_root, &action_root),
+        failed_command: None,
+        error_message: None,
+    })
+}
+
+fn run_program_recovery_command(
+    repo_root: &Path,
+    octon_dir: &Path,
+    argv: &[String],
+    extra_env: &Vec<(&str, String)>,
+    stdout_path: &Path,
+    stderr_path: &Path,
+) -> Result<std::process::Output> {
+    let (script, args) = argv
+        .split_first()
+        .context("program recovery command missing script")?;
+    let mut command = Command::new("bash");
+    command
+        .arg(script)
+        .args(args)
+        .current_dir(repo_root)
+        .env("OCTON_DIR_OVERRIDE", octon_dir)
+        .env("OCTON_ROOT_DIR", repo_root);
+    for (key, value) in extra_env {
+        command.env(key, value);
+    }
+    let output = command.output()?;
+    fs::write(stdout_path, &output.stdout)?;
+    fs::write(stderr_path, &output.stderr)?;
+    Ok(output)
+}
+
+fn write_program_recovery_changed_paths(repo_root: &Path, action_root: &Path) -> Result<()> {
+    let output = Command::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("status")
+        .arg("--short")
+        .arg("--")
+        .arg(".octon/generated")
+        .arg(".octon/state/evidence/validation/runtime/governed-runtime-materialization-v1/run-health")
+        .output()?;
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let changed_paths = stdout
+        .lines()
+        .filter(|line| {
+            line.contains("support-envelope-reconciliation.yml")
+                || line.contains(".octon/generated/cognition/projections/materialized/runs")
+                || line.contains(
+                    ".octon/state/evidence/validation/runtime/governed-runtime-materialization-v1/run-health",
+                )
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    let changed_paths = if changed_paths.is_empty() {
+        changed_paths
+    } else {
+        format!("{changed_paths}\n")
+    };
+    fs::write(action_root.join("changed-paths.txt"), changed_paths)?;
+    Ok(())
+}
+
+fn write_program_recovery_action_summary(
+    repo_root: &Path,
+    action_root: &Path,
+    action_id: &str,
+    blocker_class: &str,
+    status: &str,
+    failed_command: Option<&str>,
+    error_message: Option<&str>,
+) -> Result<()> {
+    let failed_command = failed_command.unwrap_or("");
+    let error_message = error_message.unwrap_or("");
+    fs::write(
+        action_root.join("summary.yml"),
+        format!(
+            "schema_version: \"octon-program-recovery-action-v1\"\naction_id: \"{action_id}\"\nblocker_class: \"{blocker_class}\"\nstatus: \"{status}\"\nfailed_command: \"{failed_command}\"\nerror_message: \"{error_message}\"\nevidence_path: \"{}\"\n",
+            rel_display(repo_root, action_root)
+        ),
+    )?;
+    Ok(())
 }
 
 fn recovery_recipe_matches(recipe: &ProgramRecoveryRecipeSpec, blocker_class: &str) -> bool {
@@ -8494,6 +9396,8 @@ fn checkpoint_from_plan(
     terminal_outcome: Option<String>,
     latest_event_offset: u64,
     mut previous_recovery_attempts: BTreeMap<String, u32>,
+    previous_program_recovery_action_attempts: BTreeMap<String, u32>,
+    mut previous_progress_fingerprints: BTreeMap<String, ProgramRecoveryProgressFingerprint>,
     approvals: Vec<ProgramApprovalGrant>,
 ) -> ProgramLifecycleCheckpoint {
     let child_states = plan
@@ -8528,6 +9432,13 @@ fn checkpoint_from_plan(
         *previous_recovery_attempts
             .entry(result.child_id.clone())
             .or_default() += result.attempts;
+        if let Some(state) = plan.child_states.get(&result.child_id) {
+            let blocker_class = result.blocker_class.as_deref().unwrap_or("route");
+            previous_progress_fingerprints.insert(
+                recovery_progress_key(&result.child_id, &result.route_id, blocker_class),
+                child_progress_fingerprint(state, &result.route_id, blocker_class),
+            );
+        }
     }
 
     ProgramLifecycleCheckpoint {
@@ -8546,6 +9457,8 @@ fn checkpoint_from_plan(
         scheduler_decision: plan.runnable_batch.clone(),
         child_states,
         recovery_attempts: previous_recovery_attempts,
+        program_recovery_action_attempts: previous_program_recovery_action_attempts,
+        recovery_progress_fingerprints: previous_progress_fingerprints,
         approvals,
         program_recovery_recipe_validation_status: plan
             .program_recovery_recipe_validation_status
@@ -8611,6 +9524,12 @@ fn write_program_checkpoint_snapshot(
         count_program_events(control_root)?,
         previous_checkpoint
             .map(|checkpoint| checkpoint.recovery_attempts.clone())
+            .unwrap_or_default(),
+        previous_checkpoint
+            .map(|checkpoint| checkpoint.program_recovery_action_attempts.clone())
+            .unwrap_or_default(),
+        previous_checkpoint
+            .map(|checkpoint| checkpoint.recovery_progress_fingerprints.clone())
             .unwrap_or_default(),
         previous_checkpoint
             .map(|checkpoint| checkpoint.approvals.clone())
@@ -11100,6 +12019,102 @@ routes:
             );
         }
 
+        fn write_program_contract_with_publication_recovery_action(&self) {
+            self.write(
+                ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycles/proposal-program.contract.yml",
+                r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-program"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: { input: "program_packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["accepted", "implemented"] }
+program:
+  child_registry_path: "resources/child-packet-index.yml"
+  child_lifecycle_id_default: "proposal-packet"
+  supported_execution_modes: ["parallel-independent"]
+  recovery_policy:
+    max_recovery_attempts: 2
+    serialize_write_scope_conflicts: true
+    handlers:
+      publication-drift:
+        max_attempts: 1
+        replan_after_attempt: true
+    recipes:
+      - blocker_class: "publication-drift"
+        recovery_action_id: "refresh-publication-projections"
+        idempotency_class: "idempotent-rerun"
+        approval_required: false
+        retry_budget: 1
+        dependent_handling: "pause-dependent"
+        post_attempt_validation: ["replan-live-state", "publication-freshness-cleared", "replay-verify"]
+        replan_behavior: "after-attempt"
+  authority_boundaries:
+    parent_coordinates_only: true
+    child_receipts_remain_child_owned: true
+    child_promotion_targets_remain_child_owned: true
+states: [{ state_id: "coordinate" }]
+routes:
+  - route_id: "generate-program-implementation-prompt"
+    route_type: "extension"
+"#,
+            );
+        }
+
+        fn write_publication_recovery_scripts(&self, pass: bool, clear_child_blocker: bool) {
+            let generate_support = if pass {
+                if clear_child_blocker {
+                    r#"#!/usr/bin/env bash
+set -euo pipefail
+mkdir -p children/a/support
+cat > children/a/support/implementation-run.md <<'EOF'
+verdict: pass
+EOF
+cat > children/a/support/implementation-conformance-review.md <<'EOF'
+verdict: pass
+EOF
+cat > children/a/support/post-implementation-drift-churn-review.md <<'EOF'
+verdict: pass
+EOF
+printf 'support envelope refreshed\n'
+"#
+                } else {
+                    "#!/usr/bin/env bash\nprintf 'support envelope refreshed\\n'\n"
+                }
+            } else {
+                "#!/usr/bin/env bash\nprintf 'support envelope failed\\n' >&2\nexit 3\n"
+            };
+            self.write(
+                ".octon/framework/assurance/runtime/_ops/scripts/generate-support-envelope-reconciliation.sh",
+                generate_support,
+            );
+            self.write(
+                ".octon/framework/assurance/runtime/_ops/scripts/generate-run-health-read-model.sh",
+                "#!/usr/bin/env bash\nprintf 'run health refreshed\\n'\n",
+            );
+            self.write(
+                ".octon/framework/assurance/runtime/_ops/scripts/validate-support-envelope-reconciliation.sh",
+                "#!/usr/bin/env bash\nprintf 'support envelope valid\\n'\n",
+            );
+            self.write(
+                ".octon/framework/assurance/runtime/_ops/scripts/validate-run-health-read-model.sh",
+                "#!/usr/bin/env bash\nprintf 'run health valid\\n'\n",
+            );
+            self.write(
+                ".octon/framework/assurance/runtime/_ops/scripts/validate-architecture-conformance.sh",
+                "#!/usr/bin/env bash\nprintf 'architecture valid\\n'\n",
+            );
+        }
+
+        fn write_worktree_hygiene_classifier(&self, pass: bool) {
+            let verdict = if pass { "pass" } else { "blocked" };
+            self.write(
+                ".octon/framework/assurance/runtime/_ops/scripts/classify-proposal-worktree-hygiene.sh",
+                &format!(
+                    "#!/usr/bin/env bash\nprintf 'worktree_hygiene_verdict: \"{verdict}\"\\n'\n"
+                ),
+            );
+        }
+
         fn write_program_contract_with_safe_unsafe_repair(&self) {
             self.write(
                 ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycles/proposal-program.contract.yml",
@@ -12846,6 +13861,8 @@ routes:
             None,
             0,
             BTreeMap::new(),
+            BTreeMap::new(),
+            BTreeMap::new(),
             Vec::new(),
         );
         checkpoint
@@ -12919,12 +13936,26 @@ routes:
         assert!(retry.child_results.iter().any(|summary| {
             summary.blocker_class.as_deref() == Some("stale-receipt")
                 && summary.route_id == "run-implementation"
-                && summary.status == "completed"
+                && summary.status == "blocked"
+                && summary
+                    .error_message
+                    .as_deref()
+                    .unwrap_or_default()
+                    .contains("did not change")
         }));
         assert!(fixture
             .octon_dir
             .join("state/evidence/runs/workflows/recovery-handler-only-exec/children/a/run-implementation-program-approval-consumed.yml")
             .is_file());
+        let events = read_program_events(
+            &fixture
+                .octon_dir
+                .join("state/control/execution/runs/recovery-handler-only-exec"),
+        )
+        .unwrap();
+        assert!(events
+            .iter()
+            .any(|event| event.event_type == "child-route-no-progress"));
     }
 
     #[test]
@@ -13018,7 +14049,7 @@ routes:
             .join("state/evidence/runs/workflows/unsafe-agent-repair");
         fs::create_dir_all(&control_root).unwrap();
         fs::create_dir_all(&evidence_root).unwrap();
-        let jobs = build_child_execution_jobs(
+        let (jobs, preflight_summaries) = build_child_execution_jobs(
             &fixture.octon_dir,
             &fixture.root,
             "unsafe-agent-repair",
@@ -13044,6 +14075,7 @@ routes:
             None,
         )
         .unwrap();
+        assert!(preflight_summaries.is_empty());
         assert_eq!(jobs.len(), 1);
         assert!(jobs[0].unsafe_repair.is_some());
         let summaries = execute_child_jobs(
@@ -15572,6 +16604,8 @@ rationale: "prove overwrite guard"
             None,
             0,
             BTreeMap::new(),
+            BTreeMap::new(),
+            BTreeMap::new(),
             Vec::new(),
         );
 
@@ -15629,6 +16663,8 @@ rationale: "prove overwrite guard"
             &plan.final_verdict,
             None,
             0,
+            BTreeMap::new(),
+            BTreeMap::new(),
             BTreeMap::new(),
             Vec::new(),
         );
@@ -15700,6 +16736,8 @@ rationale: "prove overwrite guard"
             &plan.final_verdict,
             None,
             0,
+            BTreeMap::new(),
+            BTreeMap::new(),
             BTreeMap::new(),
             Vec::new(),
         );
@@ -15773,6 +16811,288 @@ rationale: "prove overwrite guard"
             .blockers
             .iter()
             .any(|blocker| blocker.blocker_class == "missing-evidence"));
+    }
+
+    #[test]
+    fn no_progress_fingerprint_blocks_same_child_route_retry() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("no-progress-fingerprint", true);
+        fixture.write_full_child_contract();
+        fixture.write_program_contract_with_publication_recovery_action();
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write(
+            "children/a/support/executable-implementation-prompt.md",
+            "# Executable Implementation Prompt\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: blocked\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: fail\nGenerated/effective projection drift remains.\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: fail\nRead-model digest drift remains.\n",
+        );
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+        let plan = plan_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+        )
+        .unwrap();
+        assert_eq!(plan.runnable_batch, vec!["a".to_string()]);
+        let child_results = vec![ProgramChildExecutionSummary {
+            child_id: "a".to_string(),
+            child_run_id: "no-progress-fingerprint-a".to_string(),
+            route_id: "run-packet-implementation".to_string(),
+            status: "blocked".to_string(),
+            attempts: 1,
+            retryable: false,
+            blocker_class: Some("publication-drift".to_string()),
+            error_message: Some(
+                "route completed but child lifecycle progress did not change".to_string(),
+            ),
+        }];
+        let checkpoint = checkpoint_from_plan(
+            "no-progress-fingerprint",
+            "proposal-program",
+            "parent",
+            ExecutorKind::Mock,
+            "minimize",
+            &BTreeMap::new(),
+            &plan,
+            &child_results,
+            "blocked-recoverable",
+            None,
+            0,
+            BTreeMap::new(),
+            BTreeMap::new(),
+            BTreeMap::new(),
+            Vec::new(),
+        );
+
+        let replanned = plan_program_lifecycle_from_octon_dir_with_checkpoint(
+            &fixture.octon_dir,
+            "proposal-program",
+            Path::new("parent"),
+            Some(&checkpoint),
+        )
+        .unwrap();
+        let child = replanned.child_states.get("a").unwrap();
+        assert!(replanned.runnable_batch.is_empty());
+        assert!(child.blockers.iter().any(|blocker| {
+            blocker.blocker_class == "recovery-integrity-risk"
+                && blocker.message.contains("same child/route/blocker")
+        }));
+    }
+
+    #[test]
+    fn publication_drift_runs_parent_refresh_then_resumes_child_execution() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("publication-recovery-resume", true);
+        fixture.write_full_child_contract();
+        fixture.write_program_contract_with_publication_recovery_action();
+        fixture.write_publication_recovery_scripts(true, true);
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write(
+            "children/a/support/executable-implementation-prompt.md",
+            "# Executable Implementation Prompt\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: blocked\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: fail\nGenerated/effective projection drift remains.\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: fail\nRead-model digest drift remains.\n",
+        );
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("publication-recovery-resume".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert!(result
+            .child_results
+            .iter()
+            .any(|summary| summary.route_id == "promote-proposal"));
+        assert!(fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/publication-recovery-resume/program-recovery-actions/refresh-publication-projections/attempt-1/summary.yml")
+            .is_file());
+        let events = read_program_events(
+            &fixture
+                .octon_dir
+                .join("state/control/execution/runs/publication-recovery-resume"),
+        )
+        .unwrap();
+        assert!(events
+            .iter()
+            .any(|event| event.event_type == "program-recovery-action-started"));
+        assert!(events
+            .iter()
+            .any(|event| event.event_type == "program-recovery-action-finished"));
+    }
+
+    #[test]
+    fn failed_publication_refresh_stops_blocked_recoverable_without_child_retry() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("publication-recovery-failed", true);
+        fixture.write_full_child_contract();
+        fixture.write_program_contract_with_publication_recovery_action();
+        fixture.write_publication_recovery_scripts(false, false);
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write(
+            "children/a/support/executable-implementation-prompt.md",
+            "# Executable Implementation Prompt\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: blocked\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: fail\nGenerated/effective projection drift remains.\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: fail\nRead-model digest drift remains.\n",
+        );
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("publication-recovery-failed".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert_eq!(result.final_verdict, "blocked-recoverable");
+        assert!(result.child_results.is_empty());
+        let summary_path = fixture.octon_dir.join(
+            "state/evidence/runs/workflows/publication-recovery-failed/program-recovery-actions/refresh-publication-projections/attempt-1/summary.yml",
+        );
+        let summary = fs::read_to_string(summary_path).unwrap();
+        assert!(summary.contains("status: \"failed\""));
+        assert!(summary.contains("failed_command: \"generate-support-envelope-reconciliation\""));
+        let events = read_program_events(
+            &fixture
+                .octon_dir
+                .join("state/control/execution/runs/publication-recovery-failed"),
+        )
+        .unwrap();
+        assert!(events
+            .iter()
+            .any(|event| event.event_type == "program-recovery-action-validation-failed"));
+    }
+
+    #[test]
+    fn publication_refresh_requires_freshness_clear_before_child_retry() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("publication-recovery-still-stale", true);
+        fixture.write_full_child_contract();
+        fixture.write_program_contract_with_publication_recovery_action();
+        fixture.write_publication_recovery_scripts(true, false);
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write(
+            "children/a/support/executable-implementation-prompt.md",
+            "# Executable Implementation Prompt\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: blocked\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: fail\nGenerated/effective projection drift remains.\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: fail\nRead-model digest drift remains.\n",
+        );
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("publication-recovery-still-stale".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert_eq!(result.final_verdict, "blocked-recoverable");
+        assert!(result.child_results.is_empty());
+        let summary_path = fixture.octon_dir.join(
+            "state/evidence/runs/workflows/publication-recovery-still-stale/program-recovery-actions/refresh-publication-projections/attempt-1/summary.yml",
+        );
+        let summary = fs::read_to_string(summary_path).unwrap();
+        assert!(summary.contains("failed_command: \"post-validation\""));
+        assert!(summary.contains("publication-freshness-cleared"));
     }
 
     #[test]
@@ -15890,6 +17210,67 @@ rationale: "prove overwrite guard"
             Some("artifact-ownership-unclear")
         );
         assert!(!child_results[0].retryable);
+    }
+
+    #[test]
+    fn closeout_hygiene_preflight_blocks_foreign_paths_before_dispatch() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("closeout-hygiene-preflight", true);
+        fixture.write_full_child_contract();
+        fixture.write_worktree_hygiene_classifier(false);
+        fixture.write_child("a", "framework/a.md", "implemented");
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write_registry(
+            "parallel-independent",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("closeout-hygiene-preflight".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                approval_policy: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert_eq!(result.child_results.len(), 1);
+        let summary = &result.child_results[0];
+        assert_eq!(summary.route_id, "closeout-packet");
+        assert_eq!(summary.status, "blocked");
+        assert_eq!(summary.attempts, 0);
+        assert_eq!(
+            summary.blocker_class.as_deref(),
+            Some("artifact-ownership-unclear")
+        );
+        let events = read_program_events(
+            &fixture
+                .octon_dir
+                .join("state/control/execution/runs/closeout-hygiene-preflight"),
+        )
+        .unwrap();
+        assert!(events
+            .iter()
+            .any(|event| event.event_type == "worktree-hygiene-preflight"));
     }
 
     #[test]

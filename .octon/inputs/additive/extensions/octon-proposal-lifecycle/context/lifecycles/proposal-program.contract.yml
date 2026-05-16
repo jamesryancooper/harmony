@@ -43,6 +43,9 @@ program:
         max_attempts: 1
         replan_after_attempt: true
         approval_required: false
+      publication-drift:
+        max_attempts: 1
+        replan_after_attempt: true
       missing-evidence:
         max_attempts: 2
         replan_after_attempt: true
@@ -82,6 +85,17 @@ program:
         dependent_handling: "continue-independent"
         post_attempt_validation:
           - "replan-live-state"
+        replan_behavior: "after-attempt"
+      - blocker_class: "publication-drift"
+        recovery_action_id: "refresh-publication-projections"
+        idempotency_class: "idempotent-rerun"
+        approval_required: false
+        retry_budget: 1
+        dependent_handling: "pause-dependent"
+        post_attempt_validation:
+          - "replan-live-state"
+          - "publication-freshness-cleared"
+          - "replay-verify"
         replan_behavior: "after-attempt"
       - blocker_class: "missing-evidence"
         idempotency_class: "idempotent-rerun"

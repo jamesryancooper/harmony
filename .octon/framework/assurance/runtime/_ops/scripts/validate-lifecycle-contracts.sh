@@ -242,6 +242,7 @@ valid_program_blocker_class() {
   case "$1" in
     governed-agent-approval|operator-approval-required|approval-required|\
 stale-receipt|validation-failed|missing-evidence|executor-failed|executor-timed-out|\
+publication-drift|\
 unsupported-mode|unsupported-mode-config|unsupported-mode-authority|\
 write-scope-conflict|write-scope-serialization-required|atomic-write-scope-conflict|\
 dependency-blocked|dependency-gate-unsatisfied|scheduler-paused|deferred|\
@@ -329,7 +330,7 @@ valid_program_recovery_dependent_handling() {
 
 valid_program_recovery_post_attempt_validation() {
   case "$1" in
-    replay-verify|replan-live-state|receipt-fresh|receipt-freshness|blocker-cleared|authority-boundary-check|aggregate-closeout-check)
+    replay-verify|replan-live-state|receipt-fresh|receipt-freshness|blocker-cleared|authority-boundary-check|aggregate-closeout-check|publication-freshness-cleared)
       return 0
       ;;
     *)
@@ -349,13 +350,24 @@ valid_program_recovery_replan_behavior() {
   esac
 }
 
+valid_program_recovery_action_id() {
+  case "$1" in
+    refresh-publication-projections)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 validate_recovery_object_keys() {
   local contract="$1" expr="$2" label="$3"
   local key
   while IFS= read -r key; do
     [[ -n "$key" ]] || continue
     case "$key" in
-      blocker_class|recovery_route_id|preconditions|idempotency_class|approval_required|retry_budget|dependent_handling|post_attempt_validation|replan_behavior|max_attempts|replan_after_attempt)
+      blocker_class|recovery_route_id|recovery_action_id|preconditions|idempotency_class|approval_required|retry_budget|dependent_handling|post_attempt_validation|replan_behavior|max_attempts|replan_after_attempt)
         pass "program recovery field allowed: $label -> $key"
         ;;
       *)
@@ -409,7 +421,7 @@ validate_program_recovery_handler() {
 
 validate_program_recovery_recipe() {
   local contract="$1" lifecycle_id="$2" recipe_index="$3"
-  local label blocker idempotency approval retry_budget dependent_handling replan_behavior recovery_route_id
+  local label blocker idempotency approval retry_budget dependent_handling replan_behavior recovery_route_id recovery_action_id
   local validation validation_count validation_index precondition_count unique_precondition_count unique_validation_count
 
   label="$lifecycle_id recipe[$recipe_index]"
@@ -434,6 +446,17 @@ validate_program_recovery_recipe() {
     valid_program_id "$recovery_route_id" \
       && pass "program recovery recipe route id valid: $label -> $recovery_route_id" \
       || fail "program recovery recipe route id invalid: $label -> $recovery_route_id"
+  fi
+  recovery_action_id="$(yq -r ".program.recovery_policy.recipes[$recipe_index].recovery_action_id // \"\"" "$contract" 2>/dev/null || true)"
+  if [[ -n "$recovery_action_id" && "$recovery_action_id" != "null" ]]; then
+    valid_program_recovery_action_id "$recovery_action_id" \
+      && pass "program recovery recipe action id valid: $label -> $recovery_action_id" \
+      || fail "program recovery recipe action id invalid: $label -> $recovery_action_id"
+  fi
+  if [[ -n "$recovery_route_id" && "$recovery_route_id" != "null" && -n "$recovery_action_id" && "$recovery_action_id" != "null" ]]; then
+    fail "program recovery recipe must not declare both route and action: $label"
+  else
+    pass "program recovery recipe route/action exclusivity valid: $label"
   fi
 
   if yq -e ".program.recovery_policy.recipes[$recipe_index].preconditions" "$contract" >/dev/null 2>&1; then
@@ -509,6 +532,9 @@ validate_program_recovery_recipe() {
     [[ -z "$recovery_route_id" || "$recovery_route_id" == "null" ]] \
       && pass "non-recoverable recipe has no recovery route: $label" \
       || fail "non-recoverable recipe must not declare recovery_route_id: $label"
+    [[ -z "$recovery_action_id" || "$recovery_action_id" == "null" ]] \
+      && pass "non-recoverable recipe has no recovery action: $label" \
+      || fail "non-recoverable recipe must not declare recovery_action_id: $label"
   elif program_blocker_unsafe "$blocker"; then
     valid_program_recovery_safe_idempotency_class "$idempotency" \
       && pass "unsafe repair recipe idempotency is safe-unattended: $label -> $idempotency" \

@@ -340,6 +340,8 @@ struct ProgramRecoveryRecipeSpec {
     #[serde(default)]
     recovery_route_id: Option<String>,
     #[serde(default)]
+    recovery_action_id: Option<String>,
+    #[serde(default)]
     preconditions: Vec<String>,
     #[serde(default)]
     idempotency_class: Option<String>,
