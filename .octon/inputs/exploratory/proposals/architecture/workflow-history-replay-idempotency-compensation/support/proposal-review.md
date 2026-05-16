@@ -1,11 +1,11 @@
 # Proposal Review Receipt
 
-review_id: workflow-history-replay-idempotency-compensation-review-2026-05-12
-reviewed_at: 2026-05-12T17:35:00Z
+review_id: workflow-history-replay-idempotency-compensation-review-2026-05-16-promotion-target-narrowing
+reviewed_at: 2026-05-16T04:38:20Z
 reviewer: codex-proposal-packet-lifecycle-review
 verdict: accepted
 implementation_prompt_authorized: yes
-reviewed_packet_digest: sha256:dfbdc52e26f67a559d6c7f9e06edd4d19e0a9c99caad8c28ddb08ecf81573340
+reviewed_packet_digest: sha256:96d73537cf531e0a68ad85f0f6ee983b9532acd9da800e4d17ed40c0429fb104
 open_blocking_findings_count: 0
 
 ## Approved Promotion Targets
@@ -13,7 +13,7 @@ open_blocking_findings_count: 0
 - `.octon/framework/engine/runtime/spec/`
 - `.octon/framework/constitution/contracts/runtime/`
 - `.octon/framework/assurance/runtime/_ops/scripts/`
-- `.octon/state/evidence/`
+- `.octon/state/evidence/validation/proposals/workflow-history-replay-idempotency-compensation/20260515T213817Z/`
 
 ## Exclusions
 
@@ -29,6 +29,7 @@ None.
 ## Nonblocking Findings
 
 - Final semantic revision added the required child manifest `change_profile: atomic`.
+- Promotion target narrowing binds retained evidence to the child-specific validation evidence root instead of the broad `.octon/state/evidence/` tree.
 - Durable implementation, validation, conformance, drift/churn, and promotion evidence remain required before this packet can be closed as implemented.
 - Unsupported rollback and incomplete replay cases must remain disclosed by implementation evidence.
 

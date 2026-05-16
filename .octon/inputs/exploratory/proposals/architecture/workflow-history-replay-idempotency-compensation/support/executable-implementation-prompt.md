@@ -113,7 +113,7 @@ Durable edits may touch only these promotion target families:
 - `.octon/framework/engine/runtime/spec/`
 - `.octon/framework/constitution/contracts/runtime/`
 - `.octon/framework/assurance/runtime/_ops/scripts/`
-- `.octon/state/evidence/`
+- `.octon/state/evidence/validation/proposals/workflow-history-replay-idempotency-compensation/20260515T213817Z/`
 
 Expected durable outputs may include the smallest coherent set of files in
 those families, such as:
