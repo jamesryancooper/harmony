@@ -1,7 +1,7 @@
 schema_version: "octon-extension-artifact-map-v5"
 generator_version: "extension-publication-v6"
 generation_id: "extensions-e539e7c8b239"
-published_at: "2026-05-16T16:26:07Z"
+published_at: "2026-05-17T21:31:24Z"
 capability_profiles:
   - pack_id: "octon-concept-integration"
     source_id: "bundled-first-party"
@@ -2167,7 +2167,7 @@ artifacts:
     bucket: "context"
     relative_path: "context/lifecycles/proposal-program.contract.yml"
     source_path: ".octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycles/proposal-program.contract.yml"
-    sha256: "4acfdd149330d2ecc524863d2b6a8ebeb3152d375fbf6f13ec6a1b53e9db46f2"
+    sha256: "7e715cb6e11a1432a2d13d95e39dcb5bc9dd0f2000ab51cc3f92037d5a3bd184"
   - pack_id: "octon-proposal-lifecycle"
     source_id: "bundled-first-party"
     bucket: "context"

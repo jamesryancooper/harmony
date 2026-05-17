@@ -1,0 +1,120 @@
+schema_version: "octon-authority-zone-policy-v1"
+policy_id: "default-authority-zones"
+zones:
+  - zone_id: "octon-run-bound"
+    path_matchers:
+      - ".octon/state/control/execution/runs/<run-id>/**"
+      - ".octon/state/evidence/runs/<run-id>/**"
+      - ".octon/state/continuity/runs/<run-id>/**"
+    artifact_classes:
+      - "run-control"
+      - "run-evidence"
+    allowed_operation_classes:
+      - "inspect"
+      - "append-run-evidence"
+      - "update-run-control"
+      - "retry-child-route"
+      - "program-recovery-action"
+      - "closeout-readiness"
+    approval_posture: "pre-granted"
+    evidence_requirement: "authority-zone-decision"
+    fail_closed_blocker: "authority-zone-denied"
+    requires_current_run_binding: true
+    generated_non_authority: false
+  - zone_id: "octon-generated-derived"
+    path_matchers:
+      - ".octon/generated/**"
+      - ".claude/**"
+      - ".cursor/**"
+      - ".codex/commands/**"
+      - ".codex/skills/**"
+    artifact_classes:
+      - "generated-derived"
+    allowed_operation_classes:
+      - "inspect"
+      - "refresh-generated-projection"
+      - "program-recovery-action"
+    approval_posture: "pre-granted"
+    evidence_requirement: "publication-receipt"
+    fail_closed_blocker: "authority-zone-denied"
+    requires_current_run_binding: false
+    generated_non_authority: true
+    forbidden_authority_consumers:
+      - "approval"
+      - "child-receipt"
+      - "child-validation"
+      - "child-promotion"
+      - "child-archive"
+      - "terminal-truth"
+      - "closeout-truth"
+  - zone_id: "octon-authored-governance"
+    path_matchers:
+      - ".octon/framework/**"
+      - ".octon/inputs/additive/**"
+      - ".octon/instance/governance/**"
+      - ".octon/state/control/extensions/**"
+      - ".octon/state/control/capabilities/**"
+    artifact_classes:
+      - "authored-governance"
+    allowed_operation_classes:
+      - "inspect"
+    approval_posture: "approval-required"
+    evidence_requirement: "approval-grant"
+    fail_closed_blocker: "durable-authority-approval-required"
+    requires_current_run_binding: false
+    generated_non_authority: false
+  - zone_id: "workspace-declared"
+    path_matchers:
+      - "**"
+    artifact_classes:
+      - "workspace-source"
+    allowed_operation_classes:
+      - "inspect"
+      - "execute-child-route"
+      - "retry-child-route"
+    approval_posture: "approval-required"
+    evidence_requirement: "authority-zone-decision"
+    fail_closed_blocker: "protected-artifact-approval-required"
+    requires_current_run_binding: false
+    requires_declared_write_scope: true
+    generated_non_authority: false
+  - zone_id: "current-run-agent-artifact"
+    path_matchers:
+      - ".octon/state/control/execution/runs/<run-id>/locks/**"
+      - ".octon/state/control/execution/runs/<run-id>/tmp/**"
+      - ".octon/state/control/execution/runs/<run-id>/scratch/**"
+    artifact_classes:
+      - "current-run-generated"
+    allowed_operation_classes:
+      - "inspect"
+      - "cleanup-current-run-artifact"
+    approval_posture: "pre-granted"
+    evidence_requirement: "authority-zone-decision"
+    fail_closed_blocker: "artifact-ownership-unclear"
+    requires_current_run_binding: true
+    requires_declared_write_scope: true
+    generated_non_authority: true
+  - zone_id: "protected-or-external"
+    path_matchers:
+      - "**"
+    artifact_classes:
+      - "protected-human-or-external"
+      - "unknown"
+    allowed_operation_classes:
+      - "inspect"
+    approval_posture: "deny"
+    evidence_requirement: "approval-grant"
+    fail_closed_blocker: "authority-zone-ambiguous"
+    requires_current_run_binding: false
+    generated_non_authority: false
+self_authorization_policy:
+  fail_closed_blocker: "self-authorization-attempt"
+  same_segment_authority_widening_denied: true
+  mutable_authority_surfaces:
+    - ".octon/framework/constitution/**"
+    - ".octon/framework/constitution/contracts/authority/**"
+    - ".octon/inputs/additive/**/context/lifecycles/**"
+    - ".octon/state/control/execution/approvals/**"
+    - ".octon/state/control/execution/exceptions/**"
+    - ".octon/state/control/execution/revocations/**"
+    - ".octon/instance/governance/**"

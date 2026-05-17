@@ -307,9 +307,30 @@
             "missing-evidence",
             "publication-drift",
             "executor-failed",
+            "executor-timed-out",
+            "executor-preflight-blocked",
+            "step-budget-exhausted-continuable",
             "write-scope-conflict",
+            "atomic-write-scope-conflict",
+            "noncritical-artifact-cleanup",
+            "critical-artifact-cleanup-required",
+            "artifact-cleanup-required",
+            "artifact-ownership-unclear",
+            "recovery-route-unavailable",
+            "receipt-recovery-unavailable",
+            "finding-binding-unavailable",
+            "deferred-evidence-missing",
+            "aggregate-closeout-readiness-missing",
+            "recovery-budget-override-required",
+            "recovery-integrity-risk",
+            "authority-zone-denied",
+            "authority-zone-ambiguous",
+            "self-authorization-attempt",
+            "durable-authority-approval-required",
+            "protected-artifact-approval-required",
             "unsafe-resume",
             "unsupported-mode",
+            "unsupported-mode-config",
             "authority-boundary-ambiguous"
           ]
         },
@@ -320,14 +341,30 @@
         "recovery_action_id": {
           "type": "string",
           "enum": [
-            "refresh-publication-projections"
+            "refresh-publication-projections",
+            "rebaseline-checkpoint",
+            "cleanup-current-run-artifacts"
           ]
         },
         "preconditions": {
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "enum": [
+              "live-state-readable",
+              "selected-route-present",
+              "receipt-stale",
+              "missing-evidence",
+              "target-path-unchanged",
+              "write-scope-unchanged",
+              "current-run-child-owned-drift-evidence",
+              "authority-zone-allowed",
+              "artifact-ownership-known",
+              "declared-write-scope-contained",
+              "run-bound-current",
+              "source-authority-digest-unchanged",
+              "generated-non-authority"
+            ]
           },
           "uniqueItems": true
         },
@@ -387,8 +424,81 @@
             "after-attempt",
             "always"
           ]
+        },
+        "allowed_authority_zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authorityZone"
+          },
+          "uniqueItems": true
+        },
+        "allowed_artifact_classes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authorityArtifactClass"
+          },
+          "uniqueItems": true
+        },
+        "operation_class": {
+          "$ref": "#/$defs/authorityOperationClass"
+        },
+        "requires_run_binding": {
+          "type": "boolean"
+        },
+        "requires_declared_write_scope": {
+          "type": "boolean"
+        },
+        "requires_zone_evidence": {
+          "type": "boolean"
+        },
+        "approval_required_for_zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authorityZone"
+          },
+          "uniqueItems": true
         }
       }
+    },
+    "authorityZone": {
+      "type": "string",
+      "enum": [
+        "octon-run-bound",
+        "octon-generated-derived",
+        "octon-authored-governance",
+        "workspace-declared",
+        "current-run-agent-artifact",
+        "protected-or-external"
+      ]
+    },
+    "authorityArtifactClass": {
+      "type": "string",
+      "enum": [
+        "run-control",
+        "run-evidence",
+        "generated-derived",
+        "authored-governance",
+        "workspace-source",
+        "current-run-generated",
+        "protected-human-or-external",
+        "unknown"
+      ]
+    },
+    "authorityOperationClass": {
+      "type": "string",
+      "enum": [
+        "inspect",
+        "append-run-evidence",
+        "update-run-control",
+        "refresh-generated-projection",
+        "cleanup-current-run-artifact",
+        "retry-child-route",
+        "execute-child-route",
+        "program-recovery-action",
+        "closeout-readiness",
+        "durable-authority-mutation",
+        "protected-artifact-mutation"
+      ]
     },
     "programCloseoutPolicy": {
       "type": "object",

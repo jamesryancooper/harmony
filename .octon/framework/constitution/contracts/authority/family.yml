@@ -17,6 +17,11 @@ authority_routing:
   grant:
     schema_ref: ".octon/framework/constitution/contracts/authority/approval-grant-v1.schema.json"
     control_root: ".octon/state/control/execution/approvals/grants"
+  authority_zone:
+    decision_schema_ref: ".octon/framework/constitution/contracts/authority/authority-zone-v1.schema.json"
+    policy_ref: ".octon/framework/constitution/contracts/authority/authority-zone-policy.yml"
+    evidence_root: ".octon/state/evidence/control/execution"
+    rule: "Authority Zone decisions classify operation, path, artifact ownership, run binding, write scope, evidence, and approval posture before dispatch; path prefix alone never authorizes mutation."
   exception_lease:
     schema_ref: ".octon/framework/constitution/contracts/authority/exception-lease-v1.schema.json"
     control_root: ".octon/state/control/execution/exceptions/leases"

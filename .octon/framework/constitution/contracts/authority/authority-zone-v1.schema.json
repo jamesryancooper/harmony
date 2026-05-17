@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/framework/constitution/contracts/authority/authority-zone-v1.schema.json",
+  "title": "Octon Authority Zone Decision v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision_id",
+    "run_id",
+    "operation_class",
+    "authority_zone",
+    "artifact_class",
+    "approval_posture",
+    "autonomous_allowed",
+    "fail_closed_blocker",
+    "path_refs",
+    "declared_write_scopes",
+    "evidence_requirement",
+    "basis",
+    "decided_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "octon-authority-zone-decision-v1"
+    },
+    "decision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "child_id": {
+      "type": ["string", "null"]
+    },
+    "route_id": {
+      "type": ["string", "null"]
+    },
+    "blocker_class": {
+      "type": ["string", "null"]
+    },
+    "operation_class": {
+      "$ref": "#/$defs/operation_class"
+    },
+    "authority_zone": {
+      "$ref": "#/$defs/authority_zone"
+    },
+    "artifact_class": {
+      "$ref": "#/$defs/artifact_class"
+    },
+    "approval_posture": {
+      "type": "string",
+      "enum": [
+        "pre-granted",
+        "approval-required",
+        "deny"
+      ]
+    },
+    "autonomous_allowed": {
+      "type": "boolean"
+    },
+    "fail_closed_blocker": {
+      "type": "string",
+      "minLength": 1
+    },
+    "path_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "declared_write_scopes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "workspace_contained": {
+      "type": "boolean"
+    },
+    "declared_scope_contained": {
+      "type": "boolean"
+    },
+    "run_bound_current": {
+      "type": "boolean"
+    },
+    "generated_non_authority": {
+      "type": "boolean"
+    },
+    "source_authority_digest": {
+      "type": ["string", "null"]
+    },
+    "write_scope_digest": {
+      "type": ["string", "null"]
+    },
+    "evidence_requirement": {
+      "type": "string",
+      "enum": [
+        "authority-zone-decision",
+        "publication-receipt",
+        "approval-grant",
+        "promotion-receipt",
+        "retained-run-evidence"
+      ]
+    },
+    "basis": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "forbidden_authority_consumers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "decided_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "authority_zone": {
+      "type": "string",
+      "enum": [
+        "octon-run-bound",
+        "octon-generated-derived",
+        "octon-authored-governance",
+        "workspace-declared",
+        "current-run-agent-artifact",
+        "protected-or-external"
+      ]
+    },
+    "artifact_class": {
+      "type": "string",
+      "enum": [
+        "run-control",
+        "run-evidence",
+        "generated-derived",
+        "authored-governance",
+        "workspace-source",
+        "current-run-generated",
+        "protected-human-or-external",
+        "unknown"
+      ]
+    },
+    "operation_class": {
+      "type": "string",
+      "enum": [
+        "inspect",
+        "append-run-evidence",
+        "update-run-control",
+        "refresh-generated-projection",
+        "cleanup-current-run-artifact",
+        "retry-child-route",
+        "execute-child-route",
+        "program-recovery-action",
+        "closeout-readiness",
+        "durable-authority-mutation",
+        "protected-artifact-mutation"
+      ]
+    }
+  }
+}

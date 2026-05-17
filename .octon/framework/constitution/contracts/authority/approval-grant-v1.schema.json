@@ -65,9 +65,76 @@
         "type": "string",
         "minLength": 1
       }
+    },
+    "authority_zone": {
+      "$ref": "#/$defs/authority_zone"
+    },
+    "operation_class": {
+      "$ref": "#/$defs/operation_class"
+    },
+    "artifact_class": {
+      "$ref": "#/$defs/artifact_class"
+    },
+    "write_scope_digest": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_authority_digest": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "grant_scope_digest": {
+      "type": [
+        "string",
+        "null"
+      ]
     }
   },
   "$defs": {
+    "authority_zone": {
+      "type": "string",
+      "enum": [
+        "octon-run-bound",
+        "octon-generated-derived",
+        "octon-authored-governance",
+        "workspace-declared",
+        "current-run-agent-artifact",
+        "protected-or-external"
+      ]
+    },
+    "artifact_class": {
+      "type": "string",
+      "enum": [
+        "run-control",
+        "run-evidence",
+        "generated-derived",
+        "authored-governance",
+        "workspace-source",
+        "current-run-generated",
+        "protected-human-or-external",
+        "unknown"
+      ]
+    },
+    "operation_class": {
+      "type": "string",
+      "enum": [
+        "inspect",
+        "append-run-evidence",
+        "update-run-control",
+        "refresh-generated-projection",
+        "cleanup-current-run-artifact",
+        "retry-child-route",
+        "execute-child-route",
+        "program-recovery-action",
+        "closeout-readiness",
+        "durable-authority-mutation",
+        "protected-artifact-mutation"
+      ]
+    },
     "projection_source": {
       "type": "object",
       "additionalProperties": false,

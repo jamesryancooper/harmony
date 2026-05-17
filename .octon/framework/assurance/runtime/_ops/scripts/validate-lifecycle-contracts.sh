@@ -241,14 +241,16 @@ valid_lifecycle_execution_strategy() {
 valid_program_blocker_class() {
   case "$1" in
     governed-agent-approval|operator-approval-required|approval-required|\
-stale-receipt|validation-failed|missing-evidence|executor-failed|executor-timed-out|\
+stale-receipt|validation-failed|missing-evidence|executor-failed|executor-timed-out|executor-preflight-blocked|\
 publication-drift|\
 unsupported-mode|unsupported-mode-config|unsupported-mode-authority|\
 write-scope-conflict|write-scope-serialization-required|atomic-write-scope-conflict|\
-dependency-blocked|dependency-gate-unsatisfied|scheduler-paused|deferred|\
+dependency-blocked|dependency-gate-unsatisfied|scheduler-paused|deferred|step-budget-exhausted-continuable|\
 target-drift|target-drift-explained|target-drift-unclear|\
 noncritical-artifact-cleanup|critical-artifact-cleanup-required|artifact-cleanup-required|worktree-hygiene-blocked|artifact-ownership-unclear|\
 recovery-budget-exhausted-alternate-route|recovery-budget-override-required|recovery-integrity-risk|\
+recovery-route-unavailable|receipt-recovery-unavailable|finding-binding-unavailable|deferred-evidence-missing|aggregate-closeout-readiness-missing|\
+authority-zone-denied|authority-zone-ambiguous|self-authorization-attempt|durable-authority-approval-required|protected-artifact-approval-required|\
 unsafe-resume|authority-boundary-ambiguous)
       return 0
       ;;
@@ -271,7 +273,43 @@ program_blocker_non_recoverable() {
 
 program_blocker_unsafe() {
   case "$1" in
-    unsupported-mode|unsupported-mode-authority|atomic-write-scope-conflict|recovery-integrity-risk|unsafe-resume|authority-boundary-ambiguous)
+    unsupported-mode|unsupported-mode-authority|atomic-write-scope-conflict|recovery-integrity-risk|authority-zone-ambiguous|self-authorization-attempt|unsafe-resume|authority-boundary-ambiguous)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+program_blocker_human_required() {
+  case "$1" in
+    operator-approval-required|approval-required|executor-preflight-blocked|unsupported-mode-config|target-drift|target-drift-unclear|\
+critical-artifact-cleanup-required|artifact-cleanup-required|worktree-hygiene-blocked|artifact-ownership-unclear|\
+recovery-budget-override-required|recovery-route-unavailable|receipt-recovery-unavailable|finding-binding-unavailable|\
+deferred-evidence-missing|aggregate-closeout-readiness-missing|authority-zone-denied|durable-authority-approval-required|protected-artifact-approval-required)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+program_blocker_dependency_wait() {
+  case "$1" in
+    dependency-blocked|dependency-gate-unsatisfied|scheduler-paused|deferred|write-scope-serialization-required)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+program_blocker_runtime_child_route() {
+  case "$1" in
+    stale-receipt|missing-evidence|executor-failed|executor-timed-out)
       return 0
       ;;
     *)
@@ -308,7 +346,8 @@ valid_program_recovery_safe_idempotency_class() {
 
 valid_program_recovery_precondition() {
   case "$1" in
-    live-state-readable|selected-route-present|receipt-stale|missing-evidence)
+    live-state-readable|selected-route-present|receipt-stale|missing-evidence|target-path-unchanged|write-scope-unchanged|current-run-child-owned-drift-evidence|\
+authority-zone-allowed|artifact-ownership-known|declared-write-scope-contained|run-bound-current|source-authority-digest-unchanged|generated-non-authority)
       return 0
       ;;
     *)
@@ -352,7 +391,40 @@ valid_program_recovery_replan_behavior() {
 
 valid_program_recovery_action_id() {
   case "$1" in
-    refresh-publication-projections)
+    refresh-publication-projections|rebaseline-checkpoint|cleanup-current-run-artifacts)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_authority_zone() {
+  case "$1" in
+    octon-run-bound|octon-generated-derived|octon-authored-governance|workspace-declared|current-run-agent-artifact|protected-or-external)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_authority_artifact_class() {
+  case "$1" in
+    run-control|run-evidence|generated-derived|authored-governance|workspace-source|current-run-generated|protected-human-or-external|unknown)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_authority_operation_class() {
+  case "$1" in
+    inspect|append-run-evidence|update-run-control|refresh-generated-projection|cleanup-current-run-artifact|retry-child-route|execute-child-route|program-recovery-action|closeout-readiness|durable-authority-mutation|protected-artifact-mutation)
       return 0
       ;;
     *)
@@ -367,7 +439,8 @@ validate_recovery_object_keys() {
   while IFS= read -r key; do
     [[ -n "$key" ]] || continue
     case "$key" in
-      blocker_class|recovery_route_id|recovery_action_id|preconditions|idempotency_class|approval_required|retry_budget|dependent_handling|post_attempt_validation|replan_behavior|max_attempts|replan_after_attempt)
+      blocker_class|recovery_route_id|recovery_action_id|preconditions|idempotency_class|approval_required|retry_budget|dependent_handling|post_attempt_validation|replan_behavior|max_attempts|replan_after_attempt|\
+allowed_authority_zones|allowed_artifact_classes|operation_class|requires_run_binding|requires_declared_write_scope|requires_zone_evidence|approval_required_for_zones)
         pass "program recovery field allowed: $label -> $key"
         ;;
       *)
@@ -379,7 +452,7 @@ validate_recovery_object_keys() {
 
 validate_program_recovery_handler() {
   local contract="$1" lifecycle_id="$2" handler_key="$3"
-  local handler_attempts handler_replan handler_approval recovery_route_id
+  local handler_attempts handler_replan handler_approval recovery_route_id recipe_dispatch_count
 
   valid_program_blocker_class "$handler_key" \
     && pass "program recovery handler blocker valid: $lifecycle_id -> $handler_key" \
@@ -417,12 +490,26 @@ validate_program_recovery_handler() {
       && pass "program recovery handler approval flag valid: $lifecycle_id -> $handler_key" \
       || fail "program recovery handler approval flag invalid: $lifecycle_id -> $handler_key"
   fi
+
+  recipe_dispatch_count="$(yq -r "[.program.recovery_policy.recipes[]? | select(.blocker_class == \"$handler_key\") | select(((.recovery_route_id // \"\") != \"\") or ((.recovery_action_id // \"\") != \"\"))] | length" "$contract" 2>/dev/null || echo 0)"
+  if program_blocker_non_recoverable "$handler_key" \
+    || program_blocker_unsafe "$handler_key" \
+    || program_blocker_human_required "$handler_key" \
+    || program_blocker_dependency_wait "$handler_key" \
+    || program_blocker_runtime_child_route "$handler_key" \
+    || [[ -n "$recovery_route_id" && "$recovery_route_id" != "null" ]] \
+    || [[ "$recipe_dispatch_count" =~ ^[0-9]+$ && "$recipe_dispatch_count" -gt 0 ]]; then
+    pass "program recovery handler dispatchability modeled: $lifecycle_id -> $handler_key"
+  else
+    fail "program recovery handler lacks route/action/wait/runtime dispatch: $lifecycle_id -> $handler_key"
+  fi
 }
 
 validate_program_recovery_recipe() {
   local contract="$1" lifecycle_id="$2" recipe_index="$3"
   local label blocker idempotency approval retry_budget dependent_handling replan_behavior recovery_route_id recovery_action_id
   local validation validation_count validation_index precondition_count unique_precondition_count unique_validation_count
+  local zone_count zone_index zone artifact_count artifact_index artifact operation_class required_flag approval_zone_count approval_zone_index approval_zone
 
   label="$lifecycle_id recipe[$recipe_index]"
   yq -e ".program.recovery_policy.recipes[$recipe_index] | tag == \"!!map\"" "$contract" >/dev/null 2>&1 \
@@ -489,6 +576,83 @@ validate_program_recovery_recipe() {
     && pass "program recovery recipe approval flag valid: $label" \
     || fail "program recovery recipe approval flag invalid: $label"
 
+  if yq -e ".program.recovery_policy.recipes[$recipe_index].allowed_authority_zones" "$contract" >/dev/null 2>&1; then
+    yq -e ".program.recovery_policy.recipes[$recipe_index].allowed_authority_zones | tag == \"!!seq\"" "$contract" >/dev/null 2>&1 \
+      && pass "program recovery recipe authority zones sequence valid: $label" \
+      || fail "program recovery recipe authority zones must be a sequence: $label"
+  fi
+  zone_count="$(yq -r "(.program.recovery_policy.recipes[$recipe_index].allowed_authority_zones // []) | length" "$contract" 2>/dev/null || echo 0)"
+  for ((zone_index=0; zone_index<zone_count; zone_index++)); do
+    zone="$(yq -r ".program.recovery_policy.recipes[$recipe_index].allowed_authority_zones[$zone_index] // \"\"" "$contract" 2>/dev/null || true)"
+    valid_authority_zone "$zone" \
+      && pass "program recovery recipe authority zone valid: $label -> $zone" \
+      || fail "program recovery recipe authority zone invalid: $label -> $zone"
+    if [[ "$approval" == "false" && ( "$zone" == "octon-authored-governance" || "$zone" == "protected-or-external" ) ]]; then
+      fail "approval-free recovery recipe must not allow durable/protected authority zone: $label -> $zone"
+    fi
+  done
+
+  if yq -e ".program.recovery_policy.recipes[$recipe_index].allowed_artifact_classes" "$contract" >/dev/null 2>&1; then
+    yq -e ".program.recovery_policy.recipes[$recipe_index].allowed_artifact_classes | tag == \"!!seq\"" "$contract" >/dev/null 2>&1 \
+      && pass "program recovery recipe artifact classes sequence valid: $label" \
+      || fail "program recovery recipe artifact classes must be a sequence: $label"
+  fi
+  artifact_count="$(yq -r "(.program.recovery_policy.recipes[$recipe_index].allowed_artifact_classes // []) | length" "$contract" 2>/dev/null || echo 0)"
+  for ((artifact_index=0; artifact_index<artifact_count; artifact_index++)); do
+    artifact="$(yq -r ".program.recovery_policy.recipes[$recipe_index].allowed_artifact_classes[$artifact_index] // \"\"" "$contract" 2>/dev/null || true)"
+    valid_authority_artifact_class "$artifact" \
+      && pass "program recovery recipe artifact class valid: $label -> $artifact" \
+      || fail "program recovery recipe artifact class invalid: $label -> $artifact"
+    if [[ "$approval" == "false" && ( "$artifact" == "authored-governance" || "$artifact" == "protected-human-or-external" || "$artifact" == "unknown" ) ]]; then
+      fail "approval-free recovery recipe must not allow durable/protected artifact class: $label -> $artifact"
+    fi
+  done
+
+  operation_class="$(yq -r ".program.recovery_policy.recipes[$recipe_index].operation_class // \"\"" "$contract" 2>/dev/null || true)"
+  if [[ -n "$operation_class" && "$operation_class" != "null" ]]; then
+    valid_authority_operation_class "$operation_class" \
+      && pass "program recovery recipe operation class valid: $label -> $operation_class" \
+      || fail "program recovery recipe operation class invalid: $label -> $operation_class"
+    if [[ "$approval" == "false" && ( "$operation_class" == "durable-authority-mutation" || "$operation_class" == "protected-artifact-mutation" ) ]]; then
+      fail "approval-free recovery recipe must not allow durable/protected operation class: $label -> $operation_class"
+    fi
+  fi
+
+  for required_flag in requires_run_binding requires_declared_write_scope requires_zone_evidence; do
+    if yq -e ".program.recovery_policy.recipes[$recipe_index] | has(\"$required_flag\")" "$contract" >/dev/null 2>&1; then
+      local flag_value
+      flag_value="$(yq -r ".program.recovery_policy.recipes[$recipe_index].$required_flag | tostring" "$contract" 2>/dev/null || true)"
+      [[ "$flag_value" == "true" || "$flag_value" == "false" ]] \
+        && pass "program recovery recipe authority flag valid: $label -> $required_flag" \
+        || fail "program recovery recipe authority flag invalid: $label -> $required_flag"
+    fi
+  done
+
+  if yq -e ".program.recovery_policy.recipes[$recipe_index].approval_required_for_zones" "$contract" >/dev/null 2>&1; then
+    yq -e ".program.recovery_policy.recipes[$recipe_index].approval_required_for_zones | tag == \"!!seq\"" "$contract" >/dev/null 2>&1 \
+      && pass "program recovery recipe approval-required zones sequence valid: $label" \
+      || fail "program recovery recipe approval-required zones must be a sequence: $label"
+  fi
+  approval_zone_count="$(yq -r "(.program.recovery_policy.recipes[$recipe_index].approval_required_for_zones // []) | length" "$contract" 2>/dev/null || echo 0)"
+  for ((approval_zone_index=0; approval_zone_index<approval_zone_count; approval_zone_index++)); do
+    approval_zone="$(yq -r ".program.recovery_policy.recipes[$recipe_index].approval_required_for_zones[$approval_zone_index] // \"\"" "$contract" 2>/dev/null || true)"
+    valid_authority_zone "$approval_zone" \
+      && pass "program recovery recipe approval-required zone valid: $label -> $approval_zone" \
+      || fail "program recovery recipe approval-required zone invalid: $label -> $approval_zone"
+  done
+
+  if [[ "$approval" == "false" ]]; then
+    [[ "$zone_count" =~ ^[0-9]+$ && "$zone_count" -gt 0 ]] \
+      && pass "approval-free recovery recipe declares authority zones: $label" \
+      || fail "approval-free recovery recipe must declare allowed_authority_zones: $label"
+    [[ "$artifact_count" =~ ^[0-9]+$ && "$artifact_count" -gt 0 ]] \
+      && pass "approval-free recovery recipe declares artifact classes: $label" \
+      || fail "approval-free recovery recipe must declare allowed_artifact_classes: $label"
+    [[ -n "$operation_class" && "$operation_class" != "null" ]] \
+      && pass "approval-free recovery recipe declares operation class: $label" \
+      || fail "approval-free recovery recipe must declare operation_class: $label"
+  fi
+
   retry_budget="$(yq -r ".program.recovery_policy.recipes[$recipe_index].retry_budget // \"\"" "$contract" 2>/dev/null || true)"
   [[ "$retry_budget" =~ ^[0-9]+$ && "$retry_budget" -le 10 ]] \
     && pass "program recovery recipe retry budget valid: $label -> $retry_budget" \
@@ -542,6 +706,29 @@ validate_program_recovery_recipe() {
     [[ "$validation_count" =~ ^[0-9]+$ && "$validation_count" -gt 0 ]] \
       && pass "unsafe repair recipe declares post-attempt validation: $label" \
       || fail "unsafe repair recipe must declare post-attempt validation: $label"
+  elif program_blocker_human_required "$blocker"; then
+    [[ "$retry_budget" == "0" ]] \
+      && pass "human-required recovery recipe retry budget is zero: $label" \
+      || fail "human-required recovery recipe retry budget must be zero: $label"
+    [[ -z "$recovery_route_id" || "$recovery_route_id" == "null" ]] \
+      && pass "human-required recovery recipe has no recovery route: $label" \
+      || fail "human-required recovery recipe must not declare recovery_route_id: $label"
+    [[ -z "$recovery_action_id" || "$recovery_action_id" == "null" ]] \
+      && pass "human-required recovery recipe has no recovery action: $label" \
+      || fail "human-required recovery recipe must not declare recovery_action_id: $label"
+    pass "human-required recovery recipe dispatchability is fail-closed: $label"
+  elif program_blocker_dependency_wait "$blocker"; then
+    pass "dependency-wait recovery recipe dispatchability modeled: $label"
+  elif program_blocker_runtime_child_route "$blocker"; then
+    yq -e ".program.recovery_policy.recipes[$recipe_index].preconditions[]? | select(. == \"selected-route-present\")" "$contract" >/dev/null 2>&1 \
+      && pass "runtime child route recovery recipe requires selected route: $label" \
+      || fail "runtime child route recovery recipe must require selected-route-present: $label"
+  else
+    if [[ -n "$recovery_route_id" && "$recovery_route_id" != "null" ]] || [[ -n "$recovery_action_id" && "$recovery_action_id" != "null" ]]; then
+      pass "recoverable recovery recipe dispatchability modeled: $label"
+    else
+      fail "recoverable recovery recipe lacks route/action/wait/runtime dispatch: $label"
+    fi
   fi
 }
 
@@ -562,6 +749,57 @@ validate_program_recovery_policy() {
   fi
   for ((recipe_index=0; recipe_index<recipe_count; recipe_index++)); do
     validate_program_recovery_recipe "$contract" "$lifecycle_id" "$recipe_index"
+  done
+}
+
+validate_program_closeout_policy() {
+  local contract="$1" lifecycle_id="$2"
+  local req_count req_index outcome receipt_count receipt_index receipt_id field_count field_index field_name field_value
+
+  if ! yq -e '.program.closeout_policy' "$contract" >/dev/null 2>&1; then
+    return 0
+  fi
+  if yq -e '.program.closeout_policy.terminal_child_receipt_requirements' "$contract" >/dev/null 2>&1; then
+    yq -e '.program.closeout_policy.terminal_child_receipt_requirements | tag == "!!seq"' "$contract" >/dev/null 2>&1 \
+      && pass "program closeout terminal child receipt requirements sequence valid: $lifecycle_id" \
+      || fail "program closeout terminal child receipt requirements must be a sequence: $lifecycle_id"
+  fi
+  req_count="$(yq -r '(.program.closeout_policy.terminal_child_receipt_requirements // []) | length' "$contract" 2>/dev/null || echo 0)"
+  for ((req_index=0; req_index<req_count; req_index++)); do
+    outcome="$(yq -r ".program.closeout_policy.terminal_child_receipt_requirements[$req_index].outcome_id // \"\"" "$contract" 2>/dev/null || true)"
+    valid_program_id "$outcome" \
+      && pass "program closeout terminal outcome requirement id valid: $lifecycle_id -> $outcome" \
+      || fail "program closeout terminal outcome requirement id invalid: $lifecycle_id -> $outcome"
+    yq -e ".program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipts | tag == \"!!seq\" and length > 0" "$contract" >/dev/null 2>&1 \
+      && pass "program closeout required child receipts declared: $lifecycle_id -> $outcome" \
+      || fail "program closeout required child receipts missing: $lifecycle_id -> $outcome"
+    receipt_count="$(yq -r "(.program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipts // []) | length" "$contract" 2>/dev/null || echo 0)"
+    for ((receipt_index=0; receipt_index<receipt_count; receipt_index++)); do
+      receipt_id="$(yq -r ".program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipts[$receipt_index] // \"\"" "$contract" 2>/dev/null || true)"
+      valid_program_id "$receipt_id" \
+        && pass "program closeout child receipt id valid: $lifecycle_id $outcome -> $receipt_id" \
+        || fail "program closeout child receipt id invalid: $lifecycle_id $outcome -> $receipt_id"
+    done
+    if yq -e ".program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipt_field_equals" "$contract" >/dev/null 2>&1; then
+      yq -e ".program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipt_field_equals | tag == \"!!seq\"" "$contract" >/dev/null 2>&1 \
+        && pass "program closeout child receipt field checks sequence valid: $lifecycle_id -> $outcome" \
+        || fail "program closeout child receipt field checks must be a sequence: $lifecycle_id -> $outcome"
+    fi
+    field_count="$(yq -r "(.program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipt_field_equals // []) | length" "$contract" 2>/dev/null || echo 0)"
+    for ((field_index=0; field_index<field_count; field_index++)); do
+      receipt_id="$(yq -r ".program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipt_field_equals[$field_index].receipt_id // \"\"" "$contract" 2>/dev/null || true)"
+      field_name="$(yq -r ".program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipt_field_equals[$field_index].field // \"\"" "$contract" 2>/dev/null || true)"
+      field_value="$(yq -r ".program.closeout_policy.terminal_child_receipt_requirements[$req_index].required_receipt_field_equals[$field_index].value // \"\"" "$contract" 2>/dev/null || true)"
+      valid_program_id "$receipt_id" \
+        && pass "program closeout child receipt field check receipt valid: $lifecycle_id $outcome -> $receipt_id" \
+        || fail "program closeout child receipt field check receipt invalid: $lifecycle_id $outcome -> $receipt_id"
+      [[ "$field_name" =~ ^[A-Za-z_][A-Za-z0-9_-]*$ ]] \
+        && pass "program closeout child receipt field check field valid: $lifecycle_id $outcome -> $field_name" \
+        || fail "program closeout child receipt field check field invalid: $lifecycle_id $outcome -> $field_name"
+      [[ -n "$field_value" && "$field_value" != "null" ]] \
+        && pass "program closeout child receipt field check value declared: $lifecycle_id $outcome -> $receipt_id.$field_name" \
+        || fail "program closeout child receipt field check value missing: $lifecycle_id $outcome -> $receipt_id.$field_name"
+    done
   done
 }
 
@@ -614,6 +852,7 @@ validate_program_section() {
     && pass "program write-scope conflict policy valid: $lifecycle_id" \
     || fail "program write-scope conflict policy invalid: $lifecycle_id"
   validate_program_recovery_policy "$contract" "$lifecycle_id"
+  validate_program_closeout_policy "$contract" "$lifecycle_id"
 
   for key in parent_coordinates_only child_receipts_remain_child_owned child_promotion_targets_remain_child_owned; do
     boundary_value="$(yq -r ".program.authority_boundaries.${key} // \"\"" "$contract" 2>/dev/null || true)"

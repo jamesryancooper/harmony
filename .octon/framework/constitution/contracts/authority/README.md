@@ -11,6 +11,8 @@ The authority family is fully active.
   `/.octon/state/control/execution/approvals/requests/**`
 - normalized approval grants live under:
   `/.octon/state/control/execution/approvals/grants/**`
+- authority zone decisions are retained under the current run or control
+  evidence roots before governed dispatch
 - normalized exception leases live under:
   `/.octon/state/control/execution/exceptions/**`
 - normalized revocations live under:
@@ -29,12 +31,18 @@ The authority family is fully active.
 - Runtime resolves approval only from canonical `ApprovalRequest`,
   `ApprovalGrant`, revocation, exception, decision, and grant-bundle
   artifacts.
+- Runtime resolves autonomous execution only after an Authority Zone decision
+  proves the operation, path, artifact ownership, write scope, run binding,
+  idempotency posture, and evidence requirement are allowed. A `.octon/` path
+  prefix is not an authority grant by itself.
 
 ## Canonical Files
 
 - `family.yml`
 - `approval-request-v1.schema.json`
 - `approval-grant-v1.schema.json`
+- `authority-zone-v1.schema.json`
+- `authority-zone-policy.yml`
 - `exception-lease-v1.schema.json`
 - `revocation-v1.schema.json`
 - `quorum-policy-v1.schema.json`

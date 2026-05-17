@@ -355,6 +355,20 @@ struct ProgramRecoveryRecipeSpec {
     post_attempt_validation: Vec<String>,
     #[serde(default)]
     replan_behavior: Option<String>,
+    #[serde(default)]
+    allowed_authority_zones: Vec<String>,
+    #[serde(default)]
+    allowed_artifact_classes: Vec<String>,
+    #[serde(default)]
+    operation_class: Option<String>,
+    #[serde(default)]
+    requires_run_binding: bool,
+    #[serde(default)]
+    requires_declared_write_scope: bool,
+    #[serde(default)]
+    requires_zone_evidence: bool,
+    #[serde(default)]
+    approval_required_for_zones: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -362,11 +376,29 @@ struct ProgramCloseoutPolicySpec {
     #[serde(default)]
     required_child_terminal_outcomes: Vec<String>,
     #[serde(default)]
+    terminal_child_receipt_requirements: Vec<ProgramTerminalChildReceiptRequirementSpec>,
+    #[serde(default)]
     require_child_receipts_fresh: bool,
     #[serde(default)]
     require_aggregate_evidence: bool,
     #[serde(default)]
     enforce_authority_boundaries: bool,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+struct ProgramTerminalChildReceiptRequirementSpec {
+    outcome_id: String,
+    #[serde(default)]
+    required_receipts: Vec<String>,
+    #[serde(default)]
+    required_receipt_field_equals: Vec<ProgramReceiptFieldRequirementSpec>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize)]
+struct ProgramReceiptFieldRequirementSpec {
+    receipt_id: String,
+    field: String,
+    value: String,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]

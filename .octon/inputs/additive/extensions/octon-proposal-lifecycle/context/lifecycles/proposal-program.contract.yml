@@ -35,7 +35,7 @@ program:
       stale-receipt:
         max_attempts: 2
         replan_after_attempt: true
-      target-drift:
+      target-drift-explained:
         max_attempts: 1
         replan_after_attempt: true
       validation-failed:
@@ -52,14 +52,27 @@ program:
       executor-failed:
         max_attempts: 2
         replan_after_attempt: true
-      write-scope-conflict:
+      executor-timed-out:
+        max_attempts: 2
+        replan_after_attempt: true
+      executor-preflight-blocked:
         max_attempts: 0
+        approval_required: true
+      unsupported-mode-config:
+        max_attempts: 0
+        approval_required: true
+      noncritical-artifact-cleanup:
+        max_attempts: 1
         replan_after_attempt: true
       approval-required:
         max_attempts: 0
         approval_required: true
     recipes:
       - blocker_class: "stale-receipt"
+        preconditions:
+          - "live-state-readable"
+          - "selected-route-present"
+          - "receipt-stale"
         idempotency_class: "idempotent-rerun"
         approval_required: false
         retry_budget: 2
@@ -68,7 +81,22 @@ program:
           - "replan-live-state"
           - "receipt-freshness"
         replan_behavior: "after-attempt"
-      - blocker_class: "target-drift"
+        allowed_authority_zones:
+          - "workspace-declared"
+        allowed_artifact_classes:
+          - "workspace-source"
+        operation_class: "retry-child-route"
+        requires_declared_write_scope: true
+        requires_zone_evidence: true
+      - blocker_class: "target-drift-explained"
+        recovery_action_id: "rebaseline-checkpoint"
+        preconditions:
+          - "live-state-readable"
+          - "target-path-unchanged"
+          - "write-scope-unchanged"
+          - "current-run-child-owned-drift-evidence"
+          - "authority-zone-allowed"
+          - "run-bound-current"
         idempotency_class: "inspect-only"
         approval_required: false
         retry_budget: 1
@@ -76,9 +104,21 @@ program:
         post_attempt_validation:
           - "replan-live-state"
           - "authority-boundary-check"
-        replan_behavior: "always"
+          - "replay-verify"
+        replan_behavior: "after-attempt"
+        allowed_authority_zones:
+          - "octon-run-bound"
+        allowed_artifact_classes:
+          - "run-control"
+          - "run-evidence"
+        operation_class: "program-recovery-action"
+        requires_run_binding: true
+        requires_zone_evidence: true
       - blocker_class: "validation-failed"
         recovery_route_id: "generate-program-correction-prompt"
+        preconditions:
+          - "authority-zone-allowed"
+          - "declared-write-scope-contained"
         idempotency_class: "approval-gated-mutation"
         approval_required: false
         retry_budget: 1
@@ -86,8 +126,18 @@ program:
         post_attempt_validation:
           - "replan-live-state"
         replan_behavior: "after-attempt"
+        allowed_authority_zones:
+          - "workspace-declared"
+        allowed_artifact_classes:
+          - "workspace-source"
+        operation_class: "program-recovery-action"
+        requires_declared_write_scope: true
+        requires_zone_evidence: true
       - blocker_class: "publication-drift"
         recovery_action_id: "refresh-publication-projections"
+        preconditions:
+          - "authority-zone-allowed"
+          - "generated-non-authority"
         idempotency_class: "idempotent-rerun"
         approval_required: false
         retry_budget: 1
@@ -97,7 +147,19 @@ program:
           - "publication-freshness-cleared"
           - "replay-verify"
         replan_behavior: "after-attempt"
+        allowed_authority_zones:
+          - "octon-generated-derived"
+        allowed_artifact_classes:
+          - "generated-derived"
+        operation_class: "refresh-generated-projection"
+        requires_zone_evidence: true
       - blocker_class: "missing-evidence"
+        preconditions:
+          - "live-state-readable"
+          - "selected-route-present"
+          - "missing-evidence"
+          - "authority-zone-allowed"
+          - "declared-write-scope-contained"
         idempotency_class: "idempotent-rerun"
         approval_required: false
         retry_budget: 2
@@ -105,7 +167,19 @@ program:
         post_attempt_validation:
           - "replan-live-state"
         replan_behavior: "after-attempt"
+        allowed_authority_zones:
+          - "workspace-declared"
+        allowed_artifact_classes:
+          - "workspace-source"
+        operation_class: "retry-child-route"
+        requires_declared_write_scope: true
+        requires_zone_evidence: true
       - blocker_class: "executor-failed"
+        preconditions:
+          - "live-state-readable"
+          - "selected-route-present"
+          - "authority-zone-allowed"
+          - "declared-write-scope-contained"
         idempotency_class: "bounded-retry"
         approval_required: false
         retry_budget: 2
@@ -113,14 +187,57 @@ program:
         post_attempt_validation:
           - "replan-live-state"
         replan_behavior: "after-attempt"
-      - blocker_class: "write-scope-conflict"
-        idempotency_class: "inspect-only"
+        allowed_authority_zones:
+          - "workspace-declared"
+        allowed_artifact_classes:
+          - "workspace-source"
+        operation_class: "retry-child-route"
+        requires_declared_write_scope: true
+        requires_zone_evidence: true
+      - blocker_class: "executor-timed-out"
+        preconditions:
+          - "live-state-readable"
+          - "selected-route-present"
+          - "authority-zone-allowed"
+          - "declared-write-scope-contained"
+        idempotency_class: "bounded-retry"
         approval_required: false
-        retry_budget: 0
-        dependent_handling: "pause-phase"
+        retry_budget: 2
+        dependent_handling: "continue-independent"
         post_attempt_validation:
+          - "replan-live-state"
+        replan_behavior: "after-attempt"
+        allowed_authority_zones:
+          - "workspace-declared"
+        allowed_artifact_classes:
+          - "workspace-source"
+        operation_class: "retry-child-route"
+        requires_declared_write_scope: true
+        requires_zone_evidence: true
+      - blocker_class: "noncritical-artifact-cleanup"
+        recovery_action_id: "cleanup-current-run-artifacts"
+        preconditions:
+          - "live-state-readable"
+          - "current-run-child-owned-drift-evidence"
+          - "authority-zone-allowed"
+          - "artifact-ownership-known"
+          - "run-bound-current"
+        idempotency_class: "idempotent"
+        approval_required: false
+        retry_budget: 1
+        dependent_handling: "continue-independent"
+        post_attempt_validation:
+          - "replan-live-state"
           - "authority-boundary-check"
-        replan_behavior: "always"
+        replan_behavior: "after-attempt"
+        allowed_authority_zones:
+          - "current-run-agent-artifact"
+        allowed_artifact_classes:
+          - "current-run-generated"
+        operation_class: "cleanup-current-run-artifact"
+        requires_run_binding: true
+        requires_declared_write_scope: true
+        requires_zone_evidence: true
       - blocker_class: "approval-required"
         idempotency_class: "approval-gated-mutation"
         approval_required: true
@@ -149,6 +266,36 @@ program:
     required_child_terminal_outcomes:
       - "archived"
       - "rejected"
+    terminal_child_receipt_requirements:
+      - outcome_id: "archived"
+        required_receipts:
+          - "implementation-run"
+          - "implementation-conformance"
+          - "post-implementation-drift"
+          - "proposal-closeout"
+        required_receipt_field_equals:
+          - receipt_id: "implementation-run"
+            field: "verdict"
+            value: "pass"
+          - receipt_id: "implementation-conformance"
+            field: "verdict"
+            value: "pass"
+          - receipt_id: "post-implementation-drift"
+            field: "verdict"
+            value: "pass"
+          - receipt_id: "proposal-closeout"
+            field: "verdict"
+            value: "pass"
+          - receipt_id: "proposal-closeout"
+            field: "archive_authorized"
+            value: "yes"
+      - outcome_id: "rejected"
+        required_receipts:
+          - "proposal-review"
+        required_receipt_field_equals:
+          - receipt_id: "proposal-review"
+            field: "verdict"
+            value: "rejected"
     require_child_receipts_fresh: true
     require_aggregate_evidence: true
     enforce_authority_boundaries: true

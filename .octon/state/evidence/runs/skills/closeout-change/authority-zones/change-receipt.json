@@ -1,0 +1,89 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "authority-zones-governed-automation",
+  "selected_route": "branch-no-pr",
+  "operator_requested_route": "branch-no-pr",
+  "target_lifecycle_outcome": "cleaned",
+  "lifecycle_outcome": "branch-local-complete",
+  "outcome_intent": "attempt-cleaned-closeout",
+  "intent": "Introduce authority zones for governed Octon automation so bounded internal repair can proceed only when zone, ownership, write scope, run binding, idempotency, approval, and evidence allow it.",
+  "scope": {
+    "summary": "Authority-zone contract, lifecycle recovery metadata, runtime dispatch enforcement, validators, generated projections, and validation receipts.",
+    "touched_paths": [
+      ".octon/framework/constitution/contracts/authority/",
+      ".octon/framework/engine/runtime/crates/kernel/src/lifecycle.rs",
+      ".octon/framework/engine/runtime/crates/kernel/src/lifecycle_program.rs",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-authority-zone-policy.sh",
+      ".octon/framework/assurance/runtime/_ops/scripts/validate-lifecycle-contracts.sh",
+      ".octon/framework/assurance/runtime/_ops/tests/test-validate-lifecycle-contracts.sh",
+      ".octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/extension-lifecycle-contract.schema.json",
+      ".octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycles/proposal-program.contract.yml",
+      ".octon/generated/effective/",
+      ".octon/generated/cognition/projections/materialized/runs/",
+      ".claude/skills/octon-proposal-lifecycle-*/SKILL.md",
+      ".cursor/skills/octon-proposal-lifecycle-*/SKILL.md"
+    ],
+    "diff_refs": [
+      "branch: chore/authority-zones-closeout"
+    ]
+  },
+  "source_branch_ref": "chore/authority-zones-closeout",
+  "landing_evaluation": {
+    "status": "not_attempted",
+    "blocker_reason": "Hosted branch-no-pr landing and source-branch cleanup were not attempted because the worktree contains out-of-scope blocked proposal receipts and retained runtime evidence that must not be deleted or folded into this completed authority-zone change set.",
+    "evidence_refs": [
+      ".octon/state/evidence/runs/skills/closeout-change/authority-zones/worktree-classification.md"
+    ]
+  },
+  "not_landed_reason": "branch-local closeout only; no PR opened and no hosted main mutation attempted",
+  "not_cleaned_reason": "source branch is intentionally retained as the branch-no-pr durable history while unrelated retained evidence and blocked proposal receipts remain unstaged",
+  "integration_method": "not-applicable",
+  "integration_status": "not_landed",
+  "publication_status": "none",
+  "cleanup_status": "completed",
+  "cleanup_evidence_refs": [
+    ".octon/state/evidence/runs/skills/closeout-change/authority-zones/worktree-classification.md"
+  ],
+  "source_branch_cleanup": {
+    "status": "deferred",
+    "local_branch": "chore/authority-zones-closeout",
+    "worktree": "authority-zone change set staged and committed; unrelated retained evidence and blocked proposal receipts preserved",
+    "blocker_reason": "cleaning the source branch would require landing or discarding retained evidence outside the completed authority-zone change set",
+    "evidence_refs": [
+      ".octon/state/evidence/runs/skills/closeout-change/authority-zones/worktree-classification.md"
+    ]
+  },
+  "validation_evidence_refs": [
+    "cargo test -p octon_kernel",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-authority-zone-policy.sh",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-lifecycle-contracts.sh --contract .octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycles/proposal-program.contract.yml",
+    ".octon/framework/assurance/runtime/_ops/tests/test-validate-lifecycle-contracts.sh",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-extension-publication-state.sh",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-route-bundle.sh",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-host-projections.sh",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-publication-freshness-gates.sh",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-support-envelope-reconciliation.sh",
+    ".octon/framework/assurance/runtime/_ops/scripts/validate-run-health-read-model.sh",
+    "git diff --check"
+  ],
+  "review_waiver_refs": [
+    "solo local branch-no-pr closeout requested; no PR opened"
+  ],
+  "durable_history": {
+    "kind": "branch",
+    "ref": "chore/authority-zones-closeout",
+    "branch": "chore/authority-zones-closeout"
+  },
+  "rollback_handle": {
+    "kind": "discard-branch",
+    "ref": "chore/authority-zones-closeout",
+    "instructions": "Before landing, discard by switching away from chore/authority-zones-closeout and deleting the branch. After landing, revert the resulting commit."
+  },
+  "closeout_outcome": "continued",
+  "remaining_blockers": [
+    "Full cleaned/landed closeout requires hosted no-PR landing and branch cleanup, which were not attempted because unrelated retained evidence and blocked proposal receipts remain outside this completed change set."
+  ],
+  "created_at": "2026-05-17T21:55:45Z",
+  "updated_at": "2026-05-17T21:55:45Z"
+}

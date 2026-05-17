@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/../../../../../.." && pwd)"
 VALIDATOR="$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-lifecycle-contracts.sh"
+AUTHORITY_ZONE_VALIDATOR="$REPO_ROOT/.octon/framework/assurance/runtime/_ops/scripts/validate-authority-zone-policy.sh"
 
 pass_count=0
 fail_count=0
@@ -282,6 +283,26 @@ assert_success() {
 assert_failure() {
   local label="$1" root="$2"
   assert_failure_contract "$label" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
+}
+
+assert_authority_zone_policy_success() {
+  local label="$1" root="$2" policy_path="$3"
+  if OCTON_ROOT_DIR="$root" bash "$AUTHORITY_ZONE_VALIDATOR" "$policy_path" >/tmp/octon-authority-zone-policy.out 2>&1; then
+    pass "$label"
+  else
+    cat /tmp/octon-authority-zone-policy.out >&2
+    fail "$label"
+  fi
+}
+
+assert_authority_zone_policy_failure() {
+  local label="$1" root="$2" policy_path="$3"
+  if OCTON_ROOT_DIR="$root" bash "$AUTHORITY_ZONE_VALIDATOR" "$policy_path" >/tmp/octon-authority-zone-policy.out 2>&1; then
+    cat /tmp/octon-authority-zone-policy.out >&2
+    fail "$label"
+  else
+    pass "$label"
+  fi
 }
 
 assert_schema_contains() {
@@ -578,11 +599,43 @@ main() {
     yq -i '.program.recovery_policy.recipes = [{"blocker_class": "validation-failed", "recovery_route_id": "missing-route", "idempotency_class": "approval-gated-mutation", "approval_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "missing recovery recipe route fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
+    root="$(new_fixture_repo invalid-recovery-recipe-no-dispatch)"
+    write_fixture_support "$root"
+    write_valid_atomic_program_contract "$root"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "validation-failed", "idempotency_class": "approval-gated-mutation", "approval_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    assert_failure_contract "recoverable recovery recipe without route action or wait fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+
+    root="$(new_fixture_repo invalid-recovery-recipe-action)"
+    write_fixture_support "$root"
+    write_valid_atomic_program_contract "$root"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "magic-action", "idempotency_class": "idempotent-rerun", "approval_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    assert_failure_contract "unsupported recovery recipe action fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+
     root="$(new_fixture_repo invalid-non-recoverable-recipe-route)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
     yq -i '.program.recovery_policy.recipes = [{"blocker_class": "unsafe-resume", "recovery_route_id": "test-route", "idempotency_class": "non-recoverable", "approval_required": true, "retry_budget": 0, "dependent_handling": "fail-closed", "post_attempt_validation": ["replay-verify"], "replan_behavior": "none"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "non-recoverable recovery route fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+
+    root="$(new_fixture_repo invalid-recovery-recipe-zone)"
+    write_fixture_support "$root"
+    write_valid_atomic_program_contract "$root"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "refresh-publication-projections", "idempotency_class": "idempotent-rerun", "approval_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt", "allowed_authority_zones": ["octon-authored-governance"], "allowed_artifact_classes": ["authored-governance"], "operation_class": "refresh-generated-projection"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    assert_failure_contract "approval-free durable authority zone recovery fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+
+    root="$(new_fixture_repo invalid-recovery-recipe-operation)"
+    write_fixture_support "$root"
+    write_valid_atomic_program_contract "$root"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "refresh-publication-projections", "idempotency_class": "idempotent-rerun", "approval_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt", "allowed_authority_zones": ["octon-generated-derived"], "allowed_artifact_classes": ["generated-derived"], "operation_class": "magic-operation"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    assert_failure_contract "unsupported authority operation recovery fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+
+    assert_authority_zone_policy_success "source authority-zone policy passes" "$REPO_ROOT" ".octon/framework/constitution/contracts/authority/authority-zone-policy.yml"
+
+    root="$(new_fixture_repo invalid-authority-zone-policy)"
+    mkdir -p "$root/.octon/framework/constitution/contracts/authority"
+    cp "$REPO_ROOT/.octon/framework/constitution/contracts/authority/authority-zone-policy.yml" "$root/.octon/framework/constitution/contracts/authority/authority-zone-policy.yml"
+    yq -i '(.zones[] | select(.zone_id == "octon-authored-governance").approval_posture) = "pre-granted"' "$root/.octon/framework/constitution/contracts/authority/authority-zone-policy.yml"
+    assert_authority_zone_policy_failure "authored governance pregrant policy fails" "$root" ".octon/framework/constitution/contracts/authority/authority-zone-policy.yml"
 
     registry_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/proposal-program-child-registry.schema.json"
     mutation_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/proposal-program-mutation.schema.json"
@@ -653,6 +706,11 @@ main() {
     assert_schema_query_equals "lifecycle execution strategy accepts orchestrated-replan-loop" "$lifecycle_schema" '.properties.execution_strategy.enum[] | select(. == "orchestrated-replan-loop")' 'orchestrated-replan-loop'
     assert_schema_query_equals "lifecycle recovery idempotency accepts non-recoverable" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.idempotency_class.enum[] | select(. == "non-recoverable")' 'non-recoverable'
     assert_schema_query_equals "lifecycle recovery replan behavior supports after-attempt" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.replan_behavior.enum[] | select(. == "after-attempt")' 'after-attempt'
+    assert_schema_query_equals "lifecycle recovery supports authority zone metadata" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.allowed_authority_zones.items."$ref"' '#/$defs/authorityZone'
+    assert_schema_query_equals "lifecycle recovery supports authority operation metadata" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.operation_class."$ref"' '#/$defs/authorityOperationClass'
+    assert_schema_query_equals "lifecycle recovery preconditions support authority-zone-allowed" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.preconditions.items.enum[] | select(. == "authority-zone-allowed")' 'authority-zone-allowed'
+    assert_schema_query_equals "lifecycle recovery actions support cleanup-current-run-artifacts" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.recovery_action_id.enum[] | select(. == "cleanup-current-run-artifacts")' 'cleanup-current-run-artifacts'
+    assert_schema_query_equals "lifecycle recovery blockers support authority-zone-denied" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.blocker_class.enum[] | select(. == "authority-zone-denied")' 'authority-zone-denied'
 
     program_contract="$REPO_ROOT/.octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycles/proposal-program.contract.yml"
     assert_success_contract "source proposal-program lifecycle contract passes" "$REPO_ROOT" ".octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycles/proposal-program.contract.yml"

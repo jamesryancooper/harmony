@@ -1,7 +1,7 @@
 use super::*;
 use octon_lifecycle_executor::{
-    DefaultLifecycleRouteExecutor, LifecycleRouteExecutionRequest, LifecycleRouteExecutionResult,
-    LifecycleRouteExecutor,
+    DefaultLifecycleRouteExecutor, LifecycleErrorClass, LifecycleExecutionError,
+    LifecycleRouteExecutionRequest, LifecycleRouteExecutionResult, LifecycleRouteExecutor,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -20,6 +20,35 @@ const DEFAULT_MAX_CHILD_CONCURRENCY: usize = 2;
 const MISSING_CHILD_REGISTRY_DIGEST: &str = "missing-child-registry";
 const INVALID_CHILD_REGISTRY_DIGEST: &str = "invalid-child-registry";
 const REFRESH_PUBLICATION_PROJECTIONS_ACTION: &str = "refresh-publication-projections";
+const REBASELINE_CHECKPOINT_ACTION: &str = "rebaseline-checkpoint";
+const CLEANUP_CURRENT_RUN_ARTIFACTS_ACTION: &str = "cleanup-current-run-artifacts";
+const AUTHORITY_ZONE_RUN_BOUND: &str = "octon-run-bound";
+const AUTHORITY_ZONE_GENERATED_DERIVED: &str = "octon-generated-derived";
+const AUTHORITY_ZONE_AUTHORED_GOVERNANCE: &str = "octon-authored-governance";
+const AUTHORITY_ZONE_WORKSPACE_DECLARED: &str = "workspace-declared";
+const AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT: &str = "current-run-agent-artifact";
+const AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL: &str = "protected-or-external";
+const ARTIFACT_CLASS_RUN_CONTROL: &str = "run-control";
+const ARTIFACT_CLASS_RUN_EVIDENCE: &str = "run-evidence";
+const ARTIFACT_CLASS_GENERATED_DERIVED: &str = "generated-derived";
+const ARTIFACT_CLASS_AUTHORED_GOVERNANCE: &str = "authored-governance";
+const ARTIFACT_CLASS_WORKSPACE_SOURCE: &str = "workspace-source";
+const ARTIFACT_CLASS_CURRENT_RUN_GENERATED: &str = "current-run-generated";
+const ARTIFACT_CLASS_PROTECTED_OR_EXTERNAL: &str = "protected-human-or-external";
+const ARTIFACT_CLASS_UNKNOWN: &str = "unknown";
+const OPERATION_CLASS_REFRESH_GENERATED_PROJECTION: &str = "refresh-generated-projection";
+const OPERATION_CLASS_CLEANUP_CURRENT_RUN_ARTIFACT: &str = "cleanup-current-run-artifact";
+const OPERATION_CLASS_RETRY_CHILD_ROUTE: &str = "retry-child-route";
+const OPERATION_CLASS_EXECUTE_CHILD_ROUTE: &str = "execute-child-route";
+const OPERATION_CLASS_PROGRAM_RECOVERY_ACTION: &str = "program-recovery-action";
+const OPERATION_CLASS_CLOSEOUT_READINESS: &str = "closeout-readiness";
+const APPROVAL_POSTURE_PRE_GRANTED: &str = "pre-granted";
+const APPROVAL_POSTURE_APPROVAL_REQUIRED: &str = "approval-required";
+const APPROVAL_POSTURE_DENY: &str = "deny";
+const BLOCKER_AUTHORITY_ZONE_DENIED: &str = "authority-zone-denied";
+const BLOCKER_AUTHORITY_ZONE_AMBIGUOUS: &str = "authority-zone-ambiguous";
+const BLOCKER_DURABLE_AUTHORITY_APPROVAL_REQUIRED: &str = "durable-authority-approval-required";
+const BLOCKER_PROTECTED_ARTIFACT_APPROVAL_REQUIRED: &str = "protected-artifact-approval-required";
 
 fn default_orchestrated_replan_loop_execution_strategy() -> String {
     LifecycleExecutionStrategy::OrchestratedReplanLoop
@@ -374,8 +403,15 @@ struct ProgramArtifactCriticalityDecision {
     classification_inputs: Vec<String>,
     artifact_owner: String,
     authority_surface: String,
+    authority_zone: String,
+    artifact_class: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    authority_zone_decision: Option<String>,
     criticality: String,
     ownership: String,
+    workspace_contained: bool,
+    declared_scope_contained: bool,
     human_input_required: bool,
     autonomous_allowed: bool,
     rationale: String,
@@ -388,6 +424,61 @@ struct ProgramArtifactCriticalityDecision {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     blocked_reason: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+struct AuthorityZoneDecision {
+    schema_version: String,
+    decision_id: String,
+    run_id: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    child_id: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    route_id: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    blocker_class: Option<String>,
+    operation_class: String,
+    authority_zone: String,
+    artifact_class: String,
+    approval_posture: String,
+    autonomous_allowed: bool,
+    fail_closed_blocker: String,
+    path_refs: Vec<String>,
+    declared_write_scopes: Vec<String>,
+    #[serde(default)]
+    workspace_contained: bool,
+    #[serde(default)]
+    declared_scope_contained: bool,
+    #[serde(default)]
+    run_bound_current: bool,
+    #[serde(default)]
+    generated_non_authority: bool,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    source_authority_digest: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    write_scope_digest: Option<String>,
+    evidence_requirement: String,
+    basis: Vec<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    forbidden_authority_consumers: Vec<String>,
+    decided_at: String,
+}
+
+#[derive(Clone, Debug)]
+struct AuthorityPathClassification {
+    zone: String,
+    artifact_class: String,
+    basis: String,
+    workspace_contained: bool,
+    declared_scope_contained: bool,
+    run_bound_current: bool,
+    generated_non_authority: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -441,16 +532,14 @@ struct ProgramRecoveryRecipeValidationEvidence {
 }
 
 #[derive(Clone, Debug)]
-struct ProgramRepairSelection<'a> {
-    blocker: &'a ProgramBlocker,
+struct ProgramRepairSelection {
     route: RoutePlanState,
-    safe_unattended_basis: String,
     validation: ProgramRecoveryRecipeValidationEvidence,
 }
 
 #[derive(Clone, Debug, Default)]
-struct ProgramRepairSelectionResult<'a> {
-    selection: Option<ProgramRepairSelection<'a>>,
+struct ProgramRepairSelectionResult {
+    selection: Option<ProgramRepairSelection>,
     validation: Option<ProgramRecoveryRecipeValidationEvidence>,
 }
 
@@ -559,6 +648,12 @@ pub(crate) struct ProgramChildExecutionSummary {
     pub blocker_class: Option<String>,
     #[serde(default)]
     pub error_message: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error_class: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub evidence_paths: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
@@ -738,6 +833,24 @@ pub(crate) struct ProgramApprovalGrant {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     registry_digest: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    authority_zone: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    operation_class: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    artifact_class: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    write_scope_digest: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    source_authority_digest: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    grant_scope_digest: Option<String>,
     reason: String,
     recorded_at: String,
     evidence_path: String,
@@ -1107,7 +1220,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
                     "program child registry missing: {}",
                     parent_context.registry_rel
                 ),
-                recovery_route: Some("create-proposal-program".to_string()),
+                recovery_route: Some("create-program".to_string()),
             });
         }
         let final_verdict = if terminal_outcome.is_some() {
@@ -1174,7 +1287,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
                     "failed to parse child registry {}: {error}",
                     parent_context.registry_rel
                 ),
-                recovery_route: Some("create-proposal-program".to_string()),
+                recovery_route: Some("create-program".to_string()),
             });
             let normalized_program_blockers =
                 normalized_program_blockers(Some(program), &program_blockers);
@@ -1436,7 +1549,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
         );
     }
 
-    apply_checkpoint_child_drift(&mut child_states, checkpoint);
+    apply_checkpoint_child_drift(&repo_root, &mut child_states, checkpoint);
     apply_dependency_blockers(&mut child_states);
     if !program
         .supported_execution_modes
@@ -1461,7 +1574,23 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
             &mut program_blockers,
         )?;
     }
-    apply_closeout_policy_blockers(program, &child_states, &mut program_blockers);
+    apply_closeout_policy_blockers(
+        octon_dir,
+        &repo_root,
+        program,
+        &context.registry,
+        &context.target_rel,
+        &child_states,
+        &mut program_blockers,
+    )?;
+    apply_child_receipt_recovery_routes(octon_dir, &repo_root, program, &mut child_states)?;
+    apply_executor_result_retry_blockers(&mut child_states, checkpoint);
+    apply_program_recovery_action_budget_blockers(
+        program,
+        &mut child_states,
+        &mut program_blockers,
+        checkpoint,
+    );
     apply_recovery_progress_blockers(program, &mut child_states, checkpoint);
     apply_recovery_budget_blockers(program, &mut child_states, checkpoint);
     apply_recovery_approval_blockers(
@@ -1477,6 +1606,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
         &mut child_states,
         &mut program_blockers,
     );
+    apply_recoverable_dispatchability_blockers(program, &mut child_states, &mut program_blockers);
 
     if program_route.is_none() && terminal_outcome.is_none() {
         let structure_results = run_program_gate_by_id(
@@ -1512,6 +1642,12 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
                 == ProgramBlockerDisposition::Unsafe
         }) {
             program_route = None;
+        } else if program_route.is_none() {
+            program_route = selected_program_recoverable_route(
+                &context.loaded.contract,
+                program,
+                &program_blockers,
+            );
         }
     }
 
@@ -1547,7 +1683,13 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
         &approval_blockers,
         &runnable_batch,
     );
-    let (aggregate_state, final_verdict) = if terminal_outcome.is_some() {
+    let terminal_outcome =
+        if terminal_outcome.as_deref() == Some("archived") && final_verdict != "completed" {
+            None
+        } else {
+            terminal_outcome
+        };
+    let (aggregate_state, final_verdict) = if terminal_outcome.as_deref() == Some("rejected") {
         ("completed".to_string(), "completed".to_string())
     } else if program_route.is_some() {
         ("parent-route-ready".to_string(), "route-ready".to_string())
@@ -2181,6 +2323,8 @@ fn run_program_lifecycle_single_step(
                 true,
                 &mut child_results,
             )?;
+            let publication_post_validation_failed =
+                child_results_have_publication_post_validation_failure(&child_results);
             let no_progress_blockers = mark_no_progress_child_results(
                 &before_child_dispatch_plan,
                 &plan,
@@ -2190,9 +2334,10 @@ fn run_program_lifecycle_single_step(
                 sanitized_run_id,
                 step_context,
             )?;
-            if no_progress_blockers
-                .iter()
-                .any(|blocker| blocker == "publication-drift")
+            if (publication_post_validation_failed
+                || no_progress_blockers
+                    .iter()
+                    .any(|blocker| blocker == "publication-drift"))
                 && !program_recovery_action_attempted
             {
                 if let Some(outcome) = execute_selected_program_recovery_action(
@@ -2457,7 +2602,7 @@ fn program_result_has_agent_continuable_dispatch(result: &ProgramLifecycleRunRes
         .filter(|summary| {
             matches!(
                 summary.status.as_str(),
-                "approval-required" | "executor-preflight-blocked"
+                "approval-required" | "executor-preflight-blocked" | "blocked-human"
             )
         })
         .count();
@@ -2470,7 +2615,7 @@ fn program_result_has_agent_continuable_dispatch(result: &ProgramLifecycleRunRes
     result.child_results.iter().any(|summary| {
         !matches!(
             summary.status.as_str(),
-            "approval-required" | "executor-preflight-blocked"
+            "approval-required" | "executor-preflight-blocked" | "blocked-human"
         )
     }) || child_non_continuable_blocks < result.selected_children.len()
 }
@@ -2519,7 +2664,7 @@ fn final_verdict_after_child_execution(
     let execution_had_human_block = child_results.iter().any(|result| {
         matches!(
             result.status.as_str(),
-            "approval-required" | "executor-preflight-blocked"
+            "approval-required" | "executor-preflight-blocked" | "blocked-human"
         )
     });
     let execution_had_cancellation = child_results
@@ -2561,6 +2706,12 @@ fn mark_program_blocked_max_steps(
 ) -> Result<ProgramLifecycleRunResult> {
     let max_steps_value = max_steps.to_string();
     let steps_used_value = steps_used.to_string();
+    let verdict =
+        if options.max_steps.is_some() && program_result_has_pending_dispatch(&step.result) {
+            "step-budget-exhausted-continuable"
+        } else {
+            "blocked-max-steps"
+        };
     append_program_event(
         control_root,
         evidence_root,
@@ -2572,21 +2723,22 @@ fn mark_program_blocked_max_steps(
         program_event_data([
             ("max_steps", max_steps_value.as_str()),
             ("steps_used", steps_used_value.as_str()),
+            ("final_verdict", verdict),
         ]),
     )?;
 
     let checkpoint_path = program_checkpoint_path_for_run(octon_dir, run_id)?;
     let mut checkpoint = read_program_checkpoint_for_run(octon_dir, run_id)?
         .with_context(|| format!("missing program lifecycle checkpoint for run {run_id}"))?;
-    checkpoint.final_verdict = "blocked-max-steps".to_string();
+    checkpoint.final_verdict = verdict.to_string();
     checkpoint.terminal_outcome = None;
     enrich_checkpoint_event_metadata(&mut checkpoint, control_root)?;
     fs::write(&checkpoint_path, serde_yaml::to_string(&checkpoint)?)?;
     fs::write(
         evidence_root.join("summary.md"),
-        program_lifecycle_summary(run_id, &options.executor, &step.plan, "blocked-max-steps"),
+        program_lifecycle_summary(run_id, &options.executor, &step.plan, verdict),
     )?;
-    step.result.final_verdict = "blocked-max-steps".to_string();
+    step.result.final_verdict = verdict.to_string();
     step.result.terminal_outcome = None;
     step.result.latest_event_offset = count_program_events(control_root)?;
     Ok(step.result)
@@ -2728,15 +2880,58 @@ pub(crate) fn approve_program_lifecycle_child_route(
     fs::create_dir_all(&control_root)?;
     let evidence_path = approval_root.join(format!("{child_id}-{route_id}-approval.yml"));
     let recorded_at = now_rfc3339()?;
+    let authority_decision = plan.child_states.get(child_id).map(|state| {
+        let approval_operation_class =
+            if approval_blocker
+                .blocker_class
+                .as_deref()
+                .is_some_and(|class| {
+                    !matches!(class, "operator-approval-required" | "approval-required")
+                })
+            {
+                OPERATION_CLASS_RETRY_CHILD_ROUTE
+            } else {
+                OPERATION_CLASS_EXECUTE_CHILD_ROUTE
+            };
+        child_route_authority_decision(
+            &repo_root,
+            &sanitized_run_id,
+            state,
+            route_id,
+            approval_operation_class,
+        )
+    });
+    let authority_decision_path = if let Some(decision) = authority_decision.as_ref() {
+        Some(write_authority_zone_decision(&evidence_root, decision)?)
+    } else {
+        None
+    };
     fs::write(
         &evidence_path,
         format!(
-            "schema_version: octon-program-lifecycle-approval-v1\nrun_id: {sanitized_run_id}\nchild_id: {child_id}\nroute_id: {route_id}\nblocker_class: {}\nregistry_digest: {}\nreason: {reason}\nrecorded_at: {recorded_at}\nresume_instruction: octon lifecycle resume --run-id {sanitized_run_id}\nretry_instruction: octon lifecycle program retry --run-id {sanitized_run_id} --child {child_id}\n",
+            "schema_version: octon-program-lifecycle-approval-v1\nrun_id: {sanitized_run_id}\nchild_id: {child_id}\nroute_id: {route_id}\nblocker_class: {}\nregistry_digest: {}\nauthority_zone: {}\noperation_class: {}\nartifact_class: {}\nwrite_scope_digest: {}\nauthority_zone_decision: {}\nreason: {reason}\nrecorded_at: {recorded_at}\nresume_instruction: octon lifecycle resume --run-id {sanitized_run_id}\nretry_instruction: octon lifecycle program retry --run-id {sanitized_run_id} --child {child_id}\n",
             approval_blocker
                 .blocker_class
                 .as_deref()
                 .unwrap_or("route-approval"),
-            plan.child_registry_digest
+            plan.child_registry_digest,
+            authority_decision
+                .as_ref()
+                .map(|decision| decision.authority_zone.as_str())
+                .unwrap_or("unknown"),
+            authority_decision
+                .as_ref()
+                .map(|decision| decision.operation_class.as_str())
+                .unwrap_or("unknown"),
+            authority_decision
+                .as_ref()
+                .map(|decision| decision.artifact_class.as_str())
+                .unwrap_or("unknown"),
+            authority_decision
+                .as_ref()
+                .and_then(|decision| decision.write_scope_digest.as_deref())
+                .unwrap_or(""),
+            authority_decision_path.as_deref().unwrap_or("")
         ),
     )?;
     let grant = ProgramApprovalGrant {
@@ -2744,6 +2939,22 @@ pub(crate) fn approve_program_lifecycle_child_route(
         route_id: route_id.to_string(),
         blocker_class: approval_blocker.blocker_class.clone(),
         registry_digest: Some(plan.child_registry_digest.clone()),
+        authority_zone: authority_decision
+            .as_ref()
+            .map(|decision| decision.authority_zone.clone()),
+        operation_class: authority_decision
+            .as_ref()
+            .map(|decision| decision.operation_class.clone()),
+        artifact_class: authority_decision
+            .as_ref()
+            .map(|decision| decision.artifact_class.clone()),
+        write_scope_digest: authority_decision
+            .as_ref()
+            .and_then(|decision| decision.write_scope_digest.clone()),
+        source_authority_digest: authority_decision
+            .as_ref()
+            .and_then(|decision| decision.source_authority_digest.clone()),
+        grant_scope_digest: Some(plan.child_registry_digest.clone()),
         reason: reason.to_string(),
         recorded_at,
         evidence_path: rel_display(&repo_root, &evidence_path),
@@ -4370,12 +4581,16 @@ fn apply_atomic_preflight_blockers(
 }
 
 fn apply_closeout_policy_blockers(
+    octon_dir: &Path,
+    repo_root: &Path,
     program: &ProgramSpec,
+    registry: &ProgramChildRegistry,
+    parent_target_rel: &str,
     child_states: &BTreeMap<String, ProgramChildPlanState>,
     program_blockers: &mut Vec<ProgramBlocker>,
-) {
+) -> Result<()> {
     let Some(policy) = program.closeout_policy.as_ref() else {
-        return;
+        return Ok(());
     };
     if policy.enforce_authority_boundaries
         && (!program.authority_boundaries.parent_coordinates_only
@@ -4390,6 +4605,18 @@ fn apply_closeout_policy_blockers(
             blocker_class: "authority-boundary-ambiguous".to_string(),
             message: "program closeout policy requires strict parent/child authority boundaries"
                 .to_string(),
+            recovery_route: None,
+        });
+    }
+    if let Some(message) = policy
+        .enforce_authority_boundaries
+        .then(|| parent_child_owned_surface_blocker_message(repo_root, parent_target_rel))
+        .transpose()?
+        .flatten()
+    {
+        program_blockers.push(ProgramBlocker {
+            blocker_class: "authority-boundary-ambiguous".to_string(),
+            message,
             recovery_route: None,
         });
     }
@@ -4417,8 +4644,233 @@ fn apply_closeout_policy_blockers(
             }
         }
     }
-    let _ = policy.require_child_receipts_fresh;
+    let required = child_states
+        .values()
+        .filter(|state| state.required && !state.deferred)
+        .collect::<Vec<_>>();
+    let required_children_terminal = !required.is_empty()
+        && required
+            .iter()
+            .all(|state| state.terminal_outcome.is_some());
+    if required_children_terminal && policy.require_child_receipts_fresh {
+        for state in required {
+            if let Err(error) = child_closeout_receipts_ready(octon_dir, repo_root, policy, state) {
+                program_blockers.push(ProgramBlocker {
+                    blocker_class: "receipt-recovery-unavailable".to_string(),
+                    message: format!(
+                        "required child {} is not closeout-ready: {error}",
+                        state.child_id
+                    ),
+                    recovery_route: None,
+                });
+            }
+        }
+    }
+    if required_children_terminal {
+        for state in child_states.values().filter(|state| state.deferred) {
+            if let Some(child) = registry
+                .children
+                .iter()
+                .find(|child| child.child_id == state.child_id)
+            {
+                if let Err(error) = deferred_child_evidence_ready(repo_root, state, child) {
+                    program_blockers.push(ProgramBlocker {
+                        blocker_class: "deferred-evidence-missing".to_string(),
+                        message: format!(
+                            "deferred child {} lacks closeout evidence: {error}",
+                            state.child_id
+                        ),
+                        recovery_route: None,
+                    });
+                }
+            }
+        }
+    }
     let _ = policy.require_aggregate_evidence;
+    Ok(())
+}
+
+fn parent_child_owned_surface_blocker_message(
+    repo_root: &Path,
+    parent_target_rel: &str,
+) -> Result<Option<String>> {
+    let parent_root = resolve_lifecycle_target_path(repo_root, Path::new(parent_target_rel))?;
+    let parent_manifest = parent_root.join("proposal.yml");
+    if parent_manifest.is_file() {
+        let manifest: serde_yaml::Value = serde_yaml::from_slice(&fs::read(parent_manifest)?)?;
+        for forbidden in [
+            "child_receipts",
+            "child_validation_verdict",
+            "child_validation_verdicts",
+            "child_validation_results",
+            "child_promotion_targets",
+            "child_archive_metadata",
+        ] {
+            if manifest.get(forbidden).is_some() {
+                return Ok(Some(format!(
+                    "parent manifest contains child-owned surface {forbidden}"
+                )));
+            }
+        }
+    }
+    for forbidden_path in [
+        "support/child-validation-verdicts.yml",
+        "support/child-validation-verdicts.yaml",
+        "support/child-validation-verdicts.md",
+        "resources/child-validation-verdicts.yml",
+        "resources/child-validation-verdicts.yaml",
+        "resources/child-validation-verdicts.md",
+    ] {
+        if parent_root.join(forbidden_path).exists() {
+            return Ok(Some(format!(
+                "parent evidence contains child-owned validation verdict surface {forbidden_path}"
+            )));
+        }
+    }
+    Ok(None)
+}
+
+fn child_closeout_receipts_ready(
+    octon_dir: &Path,
+    repo_root: &Path,
+    policy: &ProgramCloseoutPolicySpec,
+    state: &ProgramChildPlanState,
+) -> Result<()> {
+    let child_contract = load_lifecycle_contract(octon_dir, &state.child_lifecycle_id)?;
+    if child_contract.contract.receipts.is_empty() {
+        return Ok(());
+    }
+    let outcome = state
+        .terminal_outcome
+        .as_deref()
+        .context("child closeout readiness requires terminal outcome")?;
+    let required_receipts =
+        child_closeout_required_receipt_ids(policy, &child_contract.contract, outcome);
+    let live_plan = plan_lifecycle_from_octon_dir(
+        octon_dir,
+        &state.child_lifecycle_id,
+        Path::new(&state.target),
+    )?;
+    for receipt in child_contract
+        .contract
+        .receipts
+        .iter()
+        .filter(|receipt| required_receipts.contains(&receipt.receipt_id))
+    {
+        let Some(live_receipt) = live_plan.receipt_states.get(&receipt.receipt_id) else {
+            bail!("missing live receipt state {}", receipt.receipt_id);
+        };
+        if !live_receipt.exists {
+            bail!("missing child-owned receipt {}", receipt.receipt_id);
+        }
+        if !live_receipt.missing_required_fields.is_empty() {
+            bail!(
+                "receipt {} missing required fields: {}",
+                receipt.receipt_id,
+                live_receipt.missing_required_fields.join(",")
+            );
+        }
+        if live_receipt.stale == Some(true) {
+            bail!("receipt {} is stale", receipt.receipt_id);
+        }
+        let child_target_abs = resolve_lifecycle_target_path(repo_root, Path::new(&state.target))?;
+        let receipt_path = resolve_target_local_path(
+            &child_target_abs,
+            &receipt.path,
+            "program closeout child receipt",
+        )?;
+        if !receipt_path.starts_with(&child_target_abs) {
+            bail!("receipt {} is not child-owned", receipt.receipt_id);
+        }
+    }
+    validate_child_closeout_receipt_fields(policy, outcome, &live_plan.receipt_states)?;
+    Ok(())
+}
+
+fn child_closeout_required_receipt_ids(
+    policy: &ProgramCloseoutPolicySpec,
+    child_contract: &LifecycleContract,
+    outcome: &str,
+) -> BTreeSet<String> {
+    policy
+        .terminal_child_receipt_requirements
+        .iter()
+        .find(|requirement| requirement.outcome_id == outcome)
+        .map(|requirement| {
+            requirement
+                .required_receipts
+                .iter()
+                .cloned()
+                .collect::<BTreeSet<_>>()
+        })
+        .filter(|ids| !ids.is_empty())
+        .unwrap_or_else(|| {
+            child_contract
+                .receipts
+                .iter()
+                .map(|receipt| receipt.receipt_id.clone())
+                .collect()
+        })
+}
+
+fn validate_child_closeout_receipt_fields(
+    policy: &ProgramCloseoutPolicySpec,
+    outcome: &str,
+    receipt_states: &BTreeMap<String, ReceiptPlanState>,
+) -> Result<()> {
+    let Some(requirement) = policy
+        .terminal_child_receipt_requirements
+        .iter()
+        .find(|requirement| requirement.outcome_id == outcome)
+    else {
+        return Ok(());
+    };
+    for expected in &requirement.required_receipt_field_equals {
+        let receipt = receipt_states
+            .get(&expected.receipt_id)
+            .with_context(|| format!("missing live receipt state {}", expected.receipt_id))?;
+        let actual = receipt.fields.get(&expected.field).map(String::as_str);
+        if actual != Some(expected.value.as_str()) {
+            bail!(
+                "receipt {} field {} must be {} for terminal outcome {}",
+                expected.receipt_id,
+                expected.field,
+                expected.value,
+                outcome
+            );
+        }
+    }
+    Ok(())
+}
+
+fn deferred_child_evidence_ready(
+    repo_root: &Path,
+    state: &ProgramChildPlanState,
+    child: &ProgramChildSpec,
+) -> Result<()> {
+    if state.seed_role.is_none()
+        && state.rollback_posture.is_none()
+        && child.supersession_evidence.is_none()
+    {
+        bail!("missing seed_role, rollback_posture, or supersession_evidence");
+    }
+    if matches!(
+        state.rollback_posture.as_deref(),
+        Some("superseded" | "replaced" | "rejected")
+    ) && child.supersession_evidence.is_none()
+    {
+        bail!("rollback_posture requires supersession_evidence");
+    }
+    if let Some(evidence_ref) = child.supersession_evidence.as_deref() {
+        if !is_safe_repo_relative(evidence_ref) {
+            bail!("supersession evidence reference is unsafe: {evidence_ref}");
+        }
+        let evidence_abs = resolve_lifecycle_target_path(repo_root, Path::new(evidence_ref))?;
+        if !evidence_abs.is_file() {
+            bail!("supersession evidence reference is dangling: {evidence_ref}");
+        }
+    }
+    Ok(())
 }
 
 fn run_program_gate_by_id(
@@ -4530,6 +4982,486 @@ fn archived_target_for_active_target(active_target: &Path) -> Option<PathBuf> {
 
 fn rel_path_string(path: &Path) -> String {
     path.to_string_lossy().replace('\\', "/")
+}
+
+fn authority_write_scope_digest(scopes: &[String]) -> Option<String> {
+    if scopes.is_empty() {
+        return None;
+    }
+    let mut normalized = scopes.to_vec();
+    normalized.sort();
+    Some(format!(
+        "sha256:{}",
+        hex::encode(Sha256::digest(normalized.join("\n").as_bytes()))
+    ))
+}
+
+fn authority_path_ref(repo_root: &Path, path: &Path) -> String {
+    let abs = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        repo_root.join(path)
+    };
+    abs.strip_prefix(repo_root)
+        .map(rel_path_string)
+        .unwrap_or_else(|_| rel_path_string(path))
+}
+
+fn rel_path_under(rel: &str, prefix: &str) -> bool {
+    let prefix = prefix.trim_end_matches('/');
+    rel == prefix
+        || rel
+            .strip_prefix(prefix)
+            .is_some_and(|tail| tail.starts_with('/'))
+}
+
+fn scope_contains_rel_path(scope: &str, rel: &str) -> bool {
+    let scope = scope
+        .trim()
+        .trim_start_matches("./")
+        .trim_end_matches("/**")
+        .trim_end_matches('/');
+    scope.is_empty() || scope == "." || scope == "*" || scope == "**" || rel_path_under(rel, scope)
+}
+
+fn declared_scopes_contain_path(scopes: &[String], rel: &str) -> bool {
+    scopes
+        .iter()
+        .any(|scope| scope_contains_rel_path(scope, rel))
+}
+
+fn classify_authority_path(
+    repo_root: &Path,
+    run_id: &str,
+    operation_class: &str,
+    path: &Path,
+    declared_write_scopes: &[String],
+) -> AuthorityPathClassification {
+    let rel = authority_path_ref(repo_root, path);
+    let abs = if path.is_absolute() {
+        path.to_path_buf()
+    } else {
+        repo_root.join(path)
+    };
+    let workspace_contained = abs.starts_with(repo_root);
+    let declared_scope_contained = declared_scopes_contain_path(declared_write_scopes, &rel);
+    let run_control_prefix = format!(".octon/state/control/execution/runs/{run_id}");
+    let run_evidence_prefix = format!(".octon/state/evidence/runs/{run_id}");
+    let run_continuity_prefix = format!(".octon/state/continuity/runs/{run_id}");
+    let current_run_lock_prefix = format!("{run_control_prefix}/locks");
+    let current_run_tmp_prefix = format!("{run_control_prefix}/tmp");
+    let current_run_scratch_prefix = format!("{run_control_prefix}/scratch");
+    let under_current_run_generated = rel_path_under(&rel, &current_run_lock_prefix)
+        || rel_path_under(&rel, &current_run_tmp_prefix)
+        || rel_path_under(&rel, &current_run_scratch_prefix);
+    if operation_class == OPERATION_CLASS_CLEANUP_CURRENT_RUN_ARTIFACT
+        && under_current_run_generated
+    {
+        return AuthorityPathClassification {
+            zone: AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT.to_string(),
+            artifact_class: ARTIFACT_CLASS_CURRENT_RUN_GENERATED.to_string(),
+            basis: "path is current-run lock/tmp/scratch artifact".to_string(),
+            workspace_contained,
+            declared_scope_contained,
+            run_bound_current: true,
+            generated_non_authority: true,
+        };
+    }
+    if rel_path_under(&rel, &run_control_prefix) {
+        return AuthorityPathClassification {
+            zone: AUTHORITY_ZONE_RUN_BOUND.to_string(),
+            artifact_class: ARTIFACT_CLASS_RUN_CONTROL.to_string(),
+            basis: "path is under current run control root".to_string(),
+            workspace_contained,
+            declared_scope_contained: true,
+            run_bound_current: true,
+            generated_non_authority: false,
+        };
+    }
+    if rel_path_under(&rel, &run_evidence_prefix) || rel_path_under(&rel, &run_continuity_prefix) {
+        return AuthorityPathClassification {
+            zone: AUTHORITY_ZONE_RUN_BOUND.to_string(),
+            artifact_class: ARTIFACT_CLASS_RUN_EVIDENCE.to_string(),
+            basis: "path is under current run evidence or continuity root".to_string(),
+            workspace_contained,
+            declared_scope_contained: true,
+            run_bound_current: true,
+            generated_non_authority: false,
+        };
+    }
+    if rel_path_under(&rel, ".octon/generated")
+        || rel_path_under(&rel, ".claude")
+        || rel_path_under(&rel, ".cursor")
+        || rel_path_under(&rel, ".codex/commands")
+        || rel_path_under(&rel, ".codex/skills")
+    {
+        return AuthorityPathClassification {
+            zone: AUTHORITY_ZONE_GENERATED_DERIVED.to_string(),
+            artifact_class: ARTIFACT_CLASS_GENERATED_DERIVED.to_string(),
+            basis: "path is generated derived projection surface".to_string(),
+            workspace_contained,
+            declared_scope_contained: true,
+            run_bound_current: false,
+            generated_non_authority: true,
+        };
+    }
+    if rel_path_under(&rel, ".octon/framework")
+        || rel_path_under(&rel, ".octon/inputs/additive")
+        || rel_path_under(&rel, ".octon/instance/governance")
+        || rel_path_under(&rel, ".octon/state/control/extensions")
+        || rel_path_under(&rel, ".octon/state/control/capabilities")
+    {
+        return AuthorityPathClassification {
+            zone: AUTHORITY_ZONE_AUTHORED_GOVERNANCE.to_string(),
+            artifact_class: ARTIFACT_CLASS_AUTHORED_GOVERNANCE.to_string(),
+            basis: "path is authored governance or durable control surface".to_string(),
+            workspace_contained,
+            declared_scope_contained,
+            run_bound_current: false,
+            generated_non_authority: false,
+        };
+    }
+    if workspace_contained && !rel_path_under(&rel, ".octon") && declared_scope_contained {
+        return AuthorityPathClassification {
+            zone: AUTHORITY_ZONE_WORKSPACE_DECLARED.to_string(),
+            artifact_class: ARTIFACT_CLASS_WORKSPACE_SOURCE.to_string(),
+            basis: "path is workspace-local and contained in declared write scope".to_string(),
+            workspace_contained,
+            declared_scope_contained,
+            run_bound_current: false,
+            generated_non_authority: false,
+        };
+    }
+    AuthorityPathClassification {
+        zone: AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL.to_string(),
+        artifact_class: if workspace_contained {
+            ARTIFACT_CLASS_UNKNOWN.to_string()
+        } else {
+            ARTIFACT_CLASS_PROTECTED_OR_EXTERNAL.to_string()
+        },
+        basis: "path ownership, scope containment, or authority boundary is not autonomously safe"
+            .to_string(),
+        workspace_contained,
+        declared_scope_contained,
+        run_bound_current: false,
+        generated_non_authority: false,
+    }
+}
+
+fn authority_zone_rank(zone: &str) -> u8 {
+    match zone {
+        AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL => 6,
+        AUTHORITY_ZONE_AUTHORED_GOVERNANCE => 5,
+        AUTHORITY_ZONE_WORKSPACE_DECLARED => 4,
+        AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT => 3,
+        AUTHORITY_ZONE_RUN_BOUND => 2,
+        AUTHORITY_ZONE_GENERATED_DERIVED => 1,
+        _ => 7,
+    }
+}
+
+fn authority_zone_posture(zone: &str) -> (&'static str, &'static str, &'static str) {
+    match zone {
+        AUTHORITY_ZONE_RUN_BOUND => (
+            APPROVAL_POSTURE_PRE_GRANTED,
+            BLOCKER_AUTHORITY_ZONE_DENIED,
+            "authority-zone-decision",
+        ),
+        AUTHORITY_ZONE_GENERATED_DERIVED => (
+            APPROVAL_POSTURE_PRE_GRANTED,
+            BLOCKER_AUTHORITY_ZONE_DENIED,
+            "publication-receipt",
+        ),
+        AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT => (
+            APPROVAL_POSTURE_PRE_GRANTED,
+            "artifact-ownership-unclear",
+            "authority-zone-decision",
+        ),
+        AUTHORITY_ZONE_AUTHORED_GOVERNANCE => (
+            APPROVAL_POSTURE_APPROVAL_REQUIRED,
+            BLOCKER_DURABLE_AUTHORITY_APPROVAL_REQUIRED,
+            "approval-grant",
+        ),
+        AUTHORITY_ZONE_WORKSPACE_DECLARED => (
+            APPROVAL_POSTURE_APPROVAL_REQUIRED,
+            BLOCKER_PROTECTED_ARTIFACT_APPROVAL_REQUIRED,
+            "authority-zone-decision",
+        ),
+        AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL => (
+            APPROVAL_POSTURE_DENY,
+            BLOCKER_AUTHORITY_ZONE_AMBIGUOUS,
+            "approval-grant",
+        ),
+        _ => (
+            APPROVAL_POSTURE_DENY,
+            BLOCKER_AUTHORITY_ZONE_AMBIGUOUS,
+            "approval-grant",
+        ),
+    }
+}
+
+fn operation_allowed_in_zone(zone: &str, operation_class: &str) -> bool {
+    match zone {
+        AUTHORITY_ZONE_RUN_BOUND => matches!(
+            operation_class,
+            "inspect"
+                | "append-run-evidence"
+                | "update-run-control"
+                | OPERATION_CLASS_RETRY_CHILD_ROUTE
+                | OPERATION_CLASS_PROGRAM_RECOVERY_ACTION
+                | OPERATION_CLASS_CLOSEOUT_READINESS
+        ),
+        AUTHORITY_ZONE_GENERATED_DERIVED => matches!(
+            operation_class,
+            "inspect"
+                | OPERATION_CLASS_REFRESH_GENERATED_PROJECTION
+                | OPERATION_CLASS_PROGRAM_RECOVERY_ACTION
+        ),
+        AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT => matches!(
+            operation_class,
+            "inspect" | OPERATION_CLASS_CLEANUP_CURRENT_RUN_ARTIFACT
+        ),
+        AUTHORITY_ZONE_AUTHORED_GOVERNANCE | AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL => {
+            operation_class == "inspect"
+        }
+        AUTHORITY_ZONE_WORKSPACE_DECLARED => matches!(
+            operation_class,
+            "inspect" | OPERATION_CLASS_EXECUTE_CHILD_ROUTE | OPERATION_CLASS_RETRY_CHILD_ROUTE
+        ),
+        _ => false,
+    }
+}
+
+fn classify_authority_zone(
+    repo_root: &Path,
+    run_id: &str,
+    child_id: Option<&str>,
+    route_id: Option<&str>,
+    blocker_class: Option<&str>,
+    operation_class: &str,
+    paths: &[PathBuf],
+    declared_write_scopes: &[String],
+    source_authority_digest: Option<&str>,
+) -> AuthorityZoneDecision {
+    let path_refs = paths
+        .iter()
+        .map(|path| authority_path_ref(repo_root, path))
+        .collect::<Vec<_>>();
+    let mut classifications = paths
+        .iter()
+        .map(|path| {
+            classify_authority_path(
+                repo_root,
+                run_id,
+                operation_class,
+                path,
+                declared_write_scopes,
+            )
+        })
+        .collect::<Vec<_>>();
+    if classifications.is_empty() {
+        classifications.push(AuthorityPathClassification {
+            zone: AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL.to_string(),
+            artifact_class: ARTIFACT_CLASS_UNKNOWN.to_string(),
+            basis: "no path evidence was supplied for authority-zone classification".to_string(),
+            workspace_contained: false,
+            declared_scope_contained: false,
+            run_bound_current: false,
+            generated_non_authority: false,
+        });
+    }
+    classifications.sort_by_key(|classification| authority_zone_rank(&classification.zone));
+    let selected = classifications
+        .last()
+        .cloned()
+        .expect("authority classifications are non-empty");
+    let mixed_zones = classifications
+        .iter()
+        .any(|classification| classification.zone != selected.zone);
+    let zone = if mixed_zones {
+        AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL.to_string()
+    } else {
+        selected.zone.clone()
+    };
+    let artifact_class = if mixed_zones {
+        ARTIFACT_CLASS_UNKNOWN.to_string()
+    } else {
+        selected.artifact_class.clone()
+    };
+    let (approval_posture, fail_closed_blocker, evidence_requirement) =
+        authority_zone_posture(&zone);
+    let workspace_contained = classifications
+        .iter()
+        .all(|classification| classification.workspace_contained);
+    let declared_scope_contained = classifications
+        .iter()
+        .all(|classification| classification.declared_scope_contained);
+    let run_bound_current = classifications
+        .iter()
+        .any(|classification| classification.run_bound_current);
+    let generated_non_authority = classifications
+        .iter()
+        .any(|classification| classification.generated_non_authority);
+    let operation_allowed = operation_allowed_in_zone(&zone, operation_class);
+    let autonomous_allowed = approval_posture == APPROVAL_POSTURE_PRE_GRANTED
+        && operation_allowed
+        && workspace_contained
+        && !mixed_zones
+        && match zone.as_str() {
+            AUTHORITY_ZONE_RUN_BOUND => run_bound_current,
+            AUTHORITY_ZONE_GENERATED_DERIVED => generated_non_authority,
+            AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT => {
+                run_bound_current && declared_scope_contained && generated_non_authority
+            }
+            _ => false,
+        };
+    let mut basis = classifications
+        .iter()
+        .map(|classification| classification.basis.clone())
+        .collect::<Vec<_>>();
+    basis.push(format!("operation_class={operation_class}"));
+    basis.push(format!("operation_allowed={operation_allowed}"));
+    if mixed_zones {
+        basis.push("mixed authority zones require fail-closed classification".to_string());
+    }
+    let digest_input = format!(
+        "{run_id}:{operation_class}:{}:{}",
+        path_refs.join("|"),
+        declared_write_scopes.join("|")
+    );
+    let digest = hex::encode(Sha256::digest(digest_input.as_bytes()));
+    let decision_id = format!(
+        "authority-zone-{}-{}",
+        sanitize_run_id(operation_class).unwrap_or_else(|_| "operation".to_string()),
+        &digest[..12]
+    );
+    AuthorityZoneDecision {
+        schema_version: "octon-authority-zone-decision-v1".to_string(),
+        decision_id,
+        run_id: run_id.to_string(),
+        child_id: child_id.map(str::to_string),
+        route_id: route_id.map(str::to_string),
+        blocker_class: blocker_class.map(str::to_string),
+        operation_class: operation_class.to_string(),
+        authority_zone: zone,
+        artifact_class,
+        approval_posture: approval_posture.to_string(),
+        autonomous_allowed,
+        fail_closed_blocker: fail_closed_blocker.to_string(),
+        path_refs,
+        declared_write_scopes: declared_write_scopes.to_vec(),
+        workspace_contained,
+        declared_scope_contained,
+        run_bound_current,
+        generated_non_authority,
+        source_authority_digest: source_authority_digest.map(str::to_string),
+        write_scope_digest: authority_write_scope_digest(declared_write_scopes),
+        evidence_requirement: evidence_requirement.to_string(),
+        basis,
+        forbidden_authority_consumers: if generated_non_authority {
+            vec![
+                "approval".to_string(),
+                "child-receipt".to_string(),
+                "child-validation".to_string(),
+                "child-promotion".to_string(),
+                "child-archive".to_string(),
+                "terminal-truth".to_string(),
+                "closeout-truth".to_string(),
+            ]
+        } else {
+            Vec::new()
+        },
+        decided_at: now_rfc3339().unwrap_or_else(|_| "unknown".to_string()),
+    }
+}
+
+fn write_authority_zone_decision(
+    evidence_root: &Path,
+    decision: &AuthorityZoneDecision,
+) -> Result<String> {
+    let root = evidence_root.join("authority-zone-decisions");
+    fs::create_dir_all(&root)?;
+    let file_stem = sanitize_run_id(&decision.decision_id)?;
+    let path = root.join(format!("{file_stem}.yml"));
+    fs::write(&path, serde_yaml::to_string(decision)?)?;
+    Ok(rel_path_string(&path))
+}
+
+fn recovery_recipe_allows_authority_decision(
+    recipe: Option<&ProgramRecoveryRecipeSpec>,
+    decision: &AuthorityZoneDecision,
+) -> bool {
+    let Some(recipe) = recipe else {
+        return false;
+    };
+    if !recipe.allowed_authority_zones.is_empty()
+        && !recipe
+            .allowed_authority_zones
+            .iter()
+            .any(|zone| zone == &decision.authority_zone)
+    {
+        return false;
+    }
+    if !recipe.allowed_artifact_classes.is_empty()
+        && !recipe
+            .allowed_artifact_classes
+            .iter()
+            .any(|artifact| artifact == &decision.artifact_class)
+    {
+        return false;
+    }
+    if recipe
+        .operation_class
+        .as_deref()
+        .is_some_and(|operation| operation != decision.operation_class)
+    {
+        return false;
+    }
+    if recipe.requires_run_binding && !decision.run_bound_current {
+        return false;
+    }
+    if recipe.requires_declared_write_scope && !decision.declared_scope_contained {
+        return false;
+    }
+    if recipe
+        .approval_required_for_zones
+        .iter()
+        .any(|zone| zone == &decision.authority_zone)
+        && !recipe.approval_required
+    {
+        return false;
+    }
+    true
+}
+
+fn authority_decision_allows_route_unattended(decision: &AuthorityZoneDecision) -> bool {
+    if decision.autonomous_allowed {
+        return true;
+    }
+    decision.authority_zone == AUTHORITY_ZONE_WORKSPACE_DECLARED
+        && decision.operation_class == OPERATION_CLASS_EXECUTE_CHILD_ROUTE
+        && decision.workspace_contained
+        && decision.declared_scope_contained
+}
+
+fn child_route_authority_decision(
+    repo_root: &Path,
+    run_id: &str,
+    state: &ProgramChildPlanState,
+    route_id: &str,
+    operation_class: &str,
+) -> AuthorityZoneDecision {
+    classify_authority_zone(
+        repo_root,
+        run_id,
+        Some(&state.child_id),
+        Some(route_id),
+        None,
+        operation_class,
+        &[PathBuf::from(&state.target)],
+        &state.write_scopes,
+        None,
+    )
 }
 
 fn child_gate_status_from_lifecycle_plan(plan: &LifecyclePlanResult) -> ProgramChildGateStatus {
@@ -4730,6 +5662,7 @@ fn observed_gate(status: &ProgramChildGateStatus) -> String {
 }
 
 fn apply_checkpoint_child_drift(
+    repo_root: &Path,
     child_states: &mut BTreeMap<String, ProgramChildPlanState>,
     checkpoint: Option<&ProgramLifecycleCheckpoint>,
 ) {
@@ -4759,9 +5692,22 @@ fn apply_checkpoint_child_drift(
             });
         }
         if state.receipt_digests != checkpoint_state.receipt_digests {
+            let stable_authority_shape = state.target == checkpoint_state.target
+                && state.write_scopes == checkpoint_state.write_scopes;
+            let blocker_class = if stable_authority_shape
+                && child_drift_has_current_run_route_evidence(repo_root, checkpoint, child_id)
+            {
+                "target-drift-explained"
+            } else {
+                "target-drift-unclear"
+            };
             state.blockers.push(ProgramBlocker {
-                blocker_class: "target-drift-explained".to_string(),
-                message: "child receipt digest set changed since checkpoint".to_string(),
+                blocker_class: blocker_class.to_string(),
+                message: if blocker_class == "target-drift-explained" {
+                    "child receipt digest set changed since checkpoint with current-run child route evidence".to_string()
+                } else {
+                    "child receipt digest set changed since checkpoint without current-run child-owned route evidence".to_string()
+                },
                 recovery_route: None,
             });
         }
@@ -4773,6 +5719,318 @@ fn apply_checkpoint_child_drift(
             });
         }
     }
+}
+
+fn child_drift_has_current_run_route_evidence(
+    repo_root: &Path,
+    checkpoint: &ProgramLifecycleCheckpoint,
+    child_id: &str,
+) -> bool {
+    checkpoint
+        .recovery_attempts
+        .get(child_id)
+        .copied()
+        .unwrap_or(0)
+        > 0
+        && repo_root
+            .join(".octon")
+            .join(WORKFLOW_EVIDENCE_ROOT_REL)
+            .join(&checkpoint.run_id)
+            .join("children")
+            .join(child_id)
+            .is_dir()
+}
+
+fn apply_child_receipt_recovery_routes(
+    octon_dir: &Path,
+    repo_root: &Path,
+    program: &ProgramSpec,
+    child_states: &mut BTreeMap<String, ProgramChildPlanState>,
+) -> Result<()> {
+    for state in child_states.values_mut() {
+        let child_has_unresolved_authority = state.blockers.iter().any(|blocker| {
+            matches!(
+                classify_program_blocker_class(&blocker.blocker_class),
+                ProgramBlockerDisposition::Human | ProgramBlockerDisposition::Unsafe
+            )
+        });
+        if child_has_unresolved_authority {
+            continue;
+        }
+        let needs_receipt_recovery = state.blockers.iter().any(|blocker| {
+            matches!(
+                blocker.blocker_class.as_str(),
+                "stale-receipt" | "missing-evidence"
+            ) && recovery_route_for_blocker(program, blocker).is_none()
+                && recovery_action_id(program, &blocker.blocker_class).is_none()
+        });
+        if !needs_receipt_recovery {
+            continue;
+        }
+        let receipt_ids = recoverable_child_receipt_ids(octon_dir, state)?;
+        let recovery_route = if receipt_ids.is_empty() {
+            None
+        } else {
+            enterable_child_receipt_recovery_route(octon_dir, repo_root, state, &receipt_ids)?
+        };
+        let route_candidates = if receipt_ids.is_empty() {
+            Vec::new()
+        } else {
+            child_receipt_recovery_route_candidates(octon_dir, state, &receipt_ids)?
+        };
+        for blocker in state.blockers.iter_mut().filter(|blocker| {
+            matches!(
+                blocker.blocker_class.as_str(),
+                "stale-receipt" | "missing-evidence"
+            ) && blocker.recovery_route.is_none()
+                && recovery_route_id(program, &blocker.blocker_class).is_none()
+                && recovery_action_id(program, &blocker.blocker_class).is_none()
+        }) {
+            if let Some(route_id) = recovery_route.as_ref() {
+                blocker.recovery_route = Some(route_id.clone());
+                blocker.message = format!(
+                    "{}; selected child-owned receipt recovery route {}",
+                    blocker.message, route_id
+                );
+            } else {
+                blocker.blocker_class = "receipt-recovery-unavailable".to_string();
+                blocker.message = if receipt_ids.is_empty() {
+                    "child-owned receipt recovery required but no absent, stale, or incomplete child receipt id was discoverable from live child contract state".to_string()
+                } else {
+                    format!(
+                        "child-owned receipts require recovery but no enterable owning route exists: {}; candidate owning routes: {}",
+                        receipt_ids.join(","),
+                        if route_candidates.is_empty() {
+                            "none".to_string()
+                        } else {
+                            route_candidates.join(",")
+                        }
+                    )
+                };
+                blocker.recovery_route = None;
+            }
+        }
+    }
+    Ok(())
+}
+
+fn recoverable_child_receipt_ids(
+    octon_dir: &Path,
+    state: &ProgramChildPlanState,
+) -> Result<Vec<String>> {
+    let plan = plan_lifecycle_from_octon_dir(
+        octon_dir,
+        &state.child_lifecycle_id,
+        Path::new(&state.target),
+    )?;
+    let mut receipt_ids = plan
+        .receipt_states
+        .iter()
+        .filter(|(_, receipt)| {
+            !receipt.exists
+                || receipt.stale == Some(true)
+                || (receipt.exists && !receipt.missing_required_fields.is_empty())
+        })
+        .map(|(id, _)| id.clone())
+        .collect::<Vec<_>>();
+    receipt_ids.sort();
+    receipt_ids.dedup();
+    Ok(receipt_ids)
+}
+
+fn child_receipt_recovery_route_candidates(
+    octon_dir: &Path,
+    state: &ProgramChildPlanState,
+    receipt_ids: &[String],
+) -> Result<Vec<String>> {
+    let loaded = load_lifecycle_contract(octon_dir, &state.child_lifecycle_id)?;
+    let mut route_ids = loaded
+        .contract
+        .routes
+        .iter()
+        .filter(|route| {
+            route
+                .completion
+                .as_ref()
+                .map(|completion| {
+                    completion
+                        .expected_receipts
+                        .iter()
+                        .any(|receipt_id| receipt_ids.iter().any(|needed| needed == receipt_id))
+                })
+                .unwrap_or(false)
+        })
+        .map(|route| route.route_id.clone())
+        .collect::<Vec<_>>();
+    route_ids.sort();
+    route_ids.dedup();
+    Ok(route_ids)
+}
+
+fn enterable_child_receipt_recovery_route(
+    octon_dir: &Path,
+    repo_root: &Path,
+    state: &ProgramChildPlanState,
+    receipt_ids: &[String],
+) -> Result<Option<String>> {
+    let loaded = load_lifecycle_contract(octon_dir, &state.child_lifecycle_id)?;
+    let target_abs = resolve_lifecycle_target_path(repo_root, Path::new(&state.target))?;
+    let target_state = build_target_state(repo_root, &loaded.contract, &target_abs)?;
+    for route in &loaded.contract.routes {
+        let produces_needed_receipt = route
+            .completion
+            .as_ref()
+            .map(|completion| {
+                completion
+                    .expected_receipts
+                    .iter()
+                    .any(|receipt_id| receipt_ids.iter().any(|needed| needed == receipt_id))
+            })
+            .unwrap_or(false);
+        if !produces_needed_receipt {
+            continue;
+        }
+        let enterable = route
+            .enter_when
+            .as_ref()
+            .map(|condition| eval_condition(condition, &loaded.contract, &target_state))
+            .transpose()?
+            .unwrap_or(false);
+        if enterable {
+            return Ok(Some(route.route_id.clone()));
+        }
+    }
+    Ok(None)
+}
+
+fn apply_recoverable_dispatchability_blockers(
+    program: &ProgramSpec,
+    child_states: &mut BTreeMap<String, ProgramChildPlanState>,
+    program_blockers: &mut Vec<ProgramBlocker>,
+) {
+    for blocker in program_blockers.iter_mut() {
+        if recoverable_blocker_lacks_dispatch(program, blocker) {
+            let original_class = blocker.blocker_class.clone();
+            blocker.blocker_class = "recovery-route-unavailable".to_string();
+            blocker.message = format!(
+                "program blocker {original_class} has no executable recovery route, action, or wait rule: {}",
+                blocker.message
+            );
+            blocker.recovery_route = None;
+        }
+    }
+    for state in child_states.values_mut() {
+        for blocker in &mut state.blockers {
+            if recoverable_blocker_lacks_dispatch(program, blocker) {
+                let original_class = blocker.blocker_class.clone();
+                blocker.blocker_class = "recovery-route-unavailable".to_string();
+                blocker.message = format!(
+                    "child blocker {original_class} has no executable recovery route, action, or wait rule: {}",
+                    blocker.message
+                );
+                blocker.recovery_route = None;
+            }
+        }
+    }
+}
+
+fn recoverable_blocker_lacks_dispatch(program: &ProgramSpec, blocker: &ProgramBlocker) -> bool {
+    if classify_program_blocker_class(&blocker.blocker_class)
+        != ProgramBlockerDisposition::Recoverable
+    {
+        return false;
+    }
+    if declared_wait_blocker(&blocker.blocker_class) {
+        return false;
+    }
+    recovery_route_for_blocker(program, blocker).is_none()
+        && recovery_action_id(program, &blocker.blocker_class).is_none()
+}
+
+fn declared_wait_blocker(blocker_class: &str) -> bool {
+    matches!(
+        blocker_class,
+        "dependency-gate-unsatisfied"
+            | "dependency-blocked"
+            | "scheduler-paused"
+            | "deferred"
+            | "write-scope-serialization-required"
+    )
+}
+
+fn apply_executor_result_retry_blockers(
+    child_states: &mut BTreeMap<String, ProgramChildPlanState>,
+    checkpoint: Option<&ProgramLifecycleCheckpoint>,
+) {
+    let Some(checkpoint) = checkpoint else {
+        return;
+    };
+    for state in child_states.values_mut() {
+        if state.terminal_outcome.is_some() {
+            continue;
+        }
+        for blocker_class in ["executor-failed", "executor-timed-out"] {
+            let attempts = recovery_attempt_count(checkpoint, &state.child_id, blocker_class);
+            if attempts == 0
+                || state
+                    .blockers
+                    .iter()
+                    .any(|blocker| blocker.blocker_class == blocker_class)
+            {
+                continue;
+            }
+            state.blockers.push(ProgramBlocker {
+                blocker_class: blocker_class.to_string(),
+                message: format!(
+                    "previous child route execution ended with {blocker_class}; attempts recorded: {attempts}"
+                ),
+                recovery_route: state.selected_route.as_ref().map(|route| route.route_id.clone()),
+            });
+        }
+    }
+}
+
+fn apply_program_recovery_action_budget_blockers(
+    program: &ProgramSpec,
+    child_states: &mut BTreeMap<String, ProgramChildPlanState>,
+    program_blockers: &mut Vec<ProgramBlocker>,
+    checkpoint: Option<&ProgramLifecycleCheckpoint>,
+) {
+    let Some(checkpoint) = checkpoint else {
+        return;
+    };
+    for blocker in program_blockers.iter_mut() {
+        apply_program_recovery_action_budget_to_blocker(program, blocker, checkpoint);
+    }
+    for state in child_states.values_mut() {
+        for blocker in &mut state.blockers {
+            apply_program_recovery_action_budget_to_blocker(program, blocker, checkpoint);
+        }
+    }
+}
+
+fn apply_program_recovery_action_budget_to_blocker(
+    program: &ProgramSpec,
+    blocker: &mut ProgramBlocker,
+    checkpoint: &ProgramLifecycleCheckpoint,
+) {
+    let Some(action_id) = recovery_action_id(program, &blocker.blocker_class) else {
+        return;
+    };
+    let budget = recovery_attempt_budget(program, &blocker.blocker_class)
+        .or(program.recovery_policy.max_recovery_attempts)
+        .unwrap_or(1);
+    let used =
+        program_recovery_action_attempt_count(Some(checkpoint), &blocker.blocker_class, action_id);
+    if used < budget {
+        return;
+    }
+    let original = blocker.blocker_class.clone();
+    blocker.blocker_class = "recovery-budget-override-required".to_string();
+    blocker.message = format!(
+        "program recovery action {action_id} for {original} exhausted retry budget: attempts {used} budget {budget}"
+    );
+    blocker.recovery_route = None;
 }
 
 fn apply_recovery_budget_blockers(
@@ -5152,27 +6410,11 @@ fn selected_program_repair_route(
         .map(route_plan_state)
 }
 
-fn selected_program_repair_blocker<'a>(
+fn selected_program_repair_blocker_with_validation(
     contract: &LifecycleContract,
     program: &ProgramSpec,
-    blockers: &'a [ProgramBlocker],
-) -> Option<(&'a ProgramBlocker, RoutePlanState, String)> {
-    selected_program_repair_blocker_with_validation(contract, program, blockers)
-        .selection
-        .map(|selection| {
-            (
-                selection.blocker,
-                selection.route,
-                selection.safe_unattended_basis,
-            )
-        })
-}
-
-fn selected_program_repair_blocker_with_validation<'a>(
-    contract: &LifecycleContract,
-    program: &ProgramSpec,
-    blockers: &'a [ProgramBlocker],
-) -> ProgramRepairSelectionResult<'a> {
+    blockers: &[ProgramBlocker],
+) -> ProgramRepairSelectionResult {
     let mut first_failure = None;
     for blocker in blockers.iter().filter(|blocker| {
         classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
@@ -5195,7 +6437,7 @@ fn selected_program_repair_blocker_with_validation<'a>(
         };
         match validate_program_recovery_recipe(contract, program, blocker, &route) {
             Ok(validation) => {
-                let Some(basis) = validation.safe_unattended_basis.clone() else {
+                if validation.safe_unattended_basis.is_none() {
                     first_failure.get_or_insert_with(|| {
                         ProgramRecoveryRecipeValidationEvidence::failed(
                             &blocker.blocker_class,
@@ -5207,14 +6449,9 @@ fn selected_program_repair_blocker_with_validation<'a>(
                         )
                     });
                     continue;
-                };
+                }
                 return ProgramRepairSelectionResult {
-                    selection: Some(ProgramRepairSelection {
-                        blocker,
-                        route,
-                        safe_unattended_basis: basis,
-                        validation,
-                    }),
+                    selection: Some(ProgramRepairSelection { route, validation }),
                     validation: None,
                 };
             }
@@ -5233,6 +6470,35 @@ fn selected_program_repair_blocker_with_validation<'a>(
         selection: None,
         validation: first_failure,
     }
+}
+
+fn selected_program_recoverable_route(
+    contract: &LifecycleContract,
+    program: &ProgramSpec,
+    blockers: &[ProgramBlocker],
+) -> Option<RoutePlanState> {
+    for blocker in blockers.iter().filter(|blocker| {
+        classify_program_blocker_class(&blocker.blocker_class)
+            == ProgramBlockerDisposition::Recoverable
+            && !declared_wait_blocker(&blocker.blocker_class)
+    }) {
+        let Some(route_id) = recovery_route_for_blocker(program, blocker) else {
+            continue;
+        };
+        let Some(recipe) = recovery_recipe_for_blocker(program, &blocker.blocker_class) else {
+            continue;
+        };
+        if validate_recovery_recipe_metadata(recipe, &blocker.blocker_class, false).is_err() {
+            continue;
+        }
+        if recovery_requires_approval(program, &blocker.blocker_class) {
+            continue;
+        }
+        if let Some(route) = route_by_id(contract, route_id) {
+            return Some(route_plan_state(route.clone()));
+        }
+    }
+    None
 }
 
 fn program_repair_safe_unattended_basis(
@@ -5345,26 +6611,40 @@ fn collect_approval_blockers(
     approval_policy: &str,
 ) -> Result<Vec<ProgramApprovalBlocker>> {
     let mut blockers = Vec::new();
+    let repo_root = repo_root_for_octon(octon_dir)?;
     for state in child_states.values() {
         if let Some(route) = state.selected_route.as_ref() {
             let loaded = load_lifecycle_contract(octon_dir, &state.child_lifecycle_id)?;
             if let Some(route_spec) = route_by_id(&loaded.contract, &route.route_id) {
+                let authority_decision = child_route_authority_decision(
+                    &repo_root,
+                    "planning",
+                    state,
+                    &route.route_id,
+                    OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
+                );
                 let required = route_spec
                     .approval
                     .as_ref()
                     .map(|approval| approval.required_by_default)
                     .unwrap_or(false)
-                    || route_spec.route_type == "workflow";
-                let route_approval_granted = approval_granted(
+                    || route_spec.route_type == "workflow"
+                    || matches!(
+                        authority_decision.authority_zone.as_str(),
+                        AUTHORITY_ZONE_AUTHORED_GOVERNANCE | AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
+                    );
+                let route_approval_granted = approval_granted_for_authority_decision(
                     approvals,
                     &state.child_id,
                     &route.route_id,
                     Some(registry_digest),
                     None,
+                    &authority_decision,
                 );
                 if required && !route_approval_granted {
                     if approval_policy == "unattended"
                         && child_route_safe_unattended_basis(
+                            &repo_root,
                             program,
                             state,
                             &route.route_id,
@@ -5399,17 +6679,26 @@ fn collect_approval_blockers(
             let Some(recovery_route) = recovery_route_for_blocker(program, blocker) else {
                 continue;
             };
-            if approval_granted(
+            let authority_decision = child_route_authority_decision(
+                &repo_root,
+                "planning",
+                state,
+                recovery_route,
+                OPERATION_CLASS_RETRY_CHILD_ROUTE,
+            );
+            if approval_granted_for_authority_decision(
                 approvals,
                 &state.child_id,
                 recovery_route,
                 Some(registry_digest),
                 Some(&blocker.blocker_class),
+                &authority_decision,
             ) {
                 continue;
             }
             if approval_policy == "unattended"
                 && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some()
+                && authority_decision_allows_route_unattended(&authority_decision)
             {
                 continue;
             }
@@ -5428,26 +6717,24 @@ fn collect_approval_blockers(
 }
 
 fn child_route_safe_unattended_basis(
-    program: &ProgramSpec,
+    repo_root: &Path,
+    _program: &ProgramSpec,
     state: &ProgramChildPlanState,
     route_id: &str,
     route: &RouteSpec,
 ) -> Option<String> {
-    if let Some(basis) = route_spec_safe_unattended_basis(route_id, route) {
-        return Some(basis);
-    }
-    if route.route_type != "workflow" {
-        return None;
-    }
-    let has_human_or_unsafe_blocker = state.blockers.iter().any(|blocker| {
-        matches!(
-            classify_program_blocker_class(&blocker.blocker_class),
-            ProgramBlockerDisposition::Human | ProgramBlockerDisposition::Unsafe
-        ) && !blocker_has_safe_agent_repair(program, blocker)
-    });
-    (!has_human_or_unsafe_blocker).then(|| {
+    let basis = route_spec_safe_unattended_basis(route_id, route)?;
+    let authority_decision = child_route_authority_decision(
+        repo_root,
+        "planning",
+        state,
+        route_id,
+        OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
+    );
+    authority_decision_allows_route_unattended(&authority_decision).then(|| {
         format!(
-            "route {route_id} operator-unattended workflow override with no human-only or unsafe child blocker"
+            "{basis}; authority_zone={}; artifact_class={}",
+            authority_decision.authority_zone, authority_decision.artifact_class
         )
     })
 }
@@ -5459,8 +6746,10 @@ fn lifecycle_route_safe_unattended_basis_for_child(
     route_id: &str,
 ) -> Result<Option<String>> {
     let loaded = load_lifecycle_contract(octon_dir, &state.child_lifecycle_id)?;
-    Ok(route_by_id(&loaded.contract, route_id)
-        .and_then(|route| child_route_safe_unattended_basis(program, state, route_id, route)))
+    let repo_root = repo_root_for_octon(octon_dir)?;
+    Ok(route_by_id(&loaded.contract, route_id).and_then(|route| {
+        child_route_safe_unattended_basis(&repo_root, program, state, route_id, route)
+    }))
 }
 
 fn approval_granted(
@@ -5498,6 +6787,77 @@ fn approval_granted(
         .unwrap_or(false)
 }
 
+fn authority_grant_requires_zone_binding(decision: &AuthorityZoneDecision) -> bool {
+    matches!(
+        decision.authority_zone.as_str(),
+        AUTHORITY_ZONE_AUTHORED_GOVERNANCE
+            | AUTHORITY_ZONE_WORKSPACE_DECLARED
+            | AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
+    ) || matches!(
+        decision.artifact_class.as_str(),
+        ARTIFACT_CLASS_AUTHORED_GOVERNANCE
+            | ARTIFACT_CLASS_WORKSPACE_SOURCE
+            | ARTIFACT_CLASS_PROTECTED_OR_EXTERNAL
+            | ARTIFACT_CLASS_UNKNOWN
+    )
+}
+
+fn approval_granted_for_authority_decision(
+    approvals: Option<&Vec<ProgramApprovalGrant>>,
+    child_id: &str,
+    route_id: &str,
+    registry_digest: Option<&str>,
+    blocker_class: Option<&str>,
+    decision: &AuthorityZoneDecision,
+) -> bool {
+    approvals
+        .map(|approvals| {
+            approvals.iter().any(|grant| {
+                if grant.child_id != child_id || grant.route_id != route_id {
+                    return false;
+                }
+                if registry_digest
+                    .map(|digest| {
+                        grant
+                            .registry_digest
+                            .as_deref()
+                            .map(|grant_digest| grant_digest == digest)
+                            .unwrap_or(true)
+                    })
+                    .unwrap_or(true)
+                    == false
+                {
+                    return false;
+                }
+                if blocker_class
+                    .map(|class| {
+                        grant
+                            .blocker_class
+                            .as_deref()
+                            .map(|grant_class| grant_class == class)
+                            .unwrap_or(true)
+                    })
+                    .unwrap_or(true)
+                    == false
+                {
+                    return false;
+                }
+                if authority_grant_requires_zone_binding(decision) {
+                    return grant.authority_zone.as_deref()
+                        == Some(decision.authority_zone.as_str())
+                        && grant.operation_class.as_deref()
+                            == Some(decision.operation_class.as_str())
+                        && grant.artifact_class.as_deref()
+                            == Some(decision.artifact_class.as_str())
+                        && grant.write_scope_digest.as_deref()
+                            == decision.write_scope_digest.as_deref();
+                }
+                true
+            })
+        })
+        .unwrap_or(false)
+}
+
 fn approval_policy_for_child_route(
     default_policy: &str,
     approvals: Option<&Vec<ProgramApprovalGrant>>,
@@ -5506,6 +6866,7 @@ fn approval_policy_for_child_route(
     registry_digest: Option<&str>,
     blocker_class: Option<&str>,
     safe_unattended: bool,
+    authority_decision: Option<&AuthorityZoneDecision>,
 ) -> String {
     if default_policy == "unattended" {
         if safe_unattended {
@@ -5513,13 +6874,27 @@ fn approval_policy_for_child_route(
         } else {
             "minimize".to_string()
         }
-    } else if approval_granted(
-        approvals,
-        child_id,
-        route_id,
-        registry_digest,
-        blocker_class,
-    ) {
+    } else if authority_decision
+        .map(|decision| {
+            approval_granted_for_authority_decision(
+                approvals,
+                child_id,
+                route_id,
+                registry_digest,
+                blocker_class,
+                decision,
+            )
+        })
+        .unwrap_or_else(|| {
+            approval_granted(
+                approvals,
+                child_id,
+                route_id,
+                registry_digest,
+                blocker_class,
+            )
+        })
+    {
         "program-approved".to_string()
     } else {
         default_policy.to_string()
@@ -5656,8 +7031,8 @@ fn normalize_program_blocker_class(blocker_class: &str) -> ProgramBlockerNormali
         ),
         "unsupported-mode-config" => (
             "unsupported-mode-config",
-            ProgramNormalizedCategory::Recoverable,
-            "unsupported mode is a bounded local configuration or contract mismatch",
+            ProgramNormalizedCategory::Human,
+            "unsupported mode configuration lacks an authorized normalization route",
         ),
         "unsupported-mode" | "unsupported-mode-authority" => (
             "unsupported-mode-authority",
@@ -5722,6 +7097,16 @@ fn normalize_program_blocker_class(blocker_class: &str) -> ProgramBlockerNormali
             ProgramNormalizedCategory::Recoverable,
             "executor timeout may recover through a safe alternate route or retry budget",
         ),
+        "executor-preflight-blocked" => (
+            "executor-preflight-blocked",
+            ProgramNormalizedCategory::Human,
+            "executor preflight requires access, credentials, or execution authority not already granted",
+        ),
+        "step-budget-exhausted-continuable" => (
+            "step-budget-exhausted-continuable",
+            ProgramNormalizedCategory::Budget,
+            "caller-provided step budget was exhausted while safe continuation evidence remains",
+        ),
         "executor-failed"
         | "failed"
         | "implementation-blocked"
@@ -5745,10 +7130,55 @@ fn normalize_program_blocker_class(blocker_class: &str) -> ProgramBlockerNormali
             ProgramNormalizedCategory::Human,
             "remaining recovery requires retry-budget override, judgment, scope expansion, or broader authority",
         ),
+        "recovery-route-unavailable" => (
+            "recovery-route-unavailable",
+            ProgramNormalizedCategory::Human,
+            "recoverable blocker has no executable route, action, or declared wait condition",
+        ),
+        "receipt-recovery-unavailable" => (
+            "receipt-recovery-unavailable",
+            ProgramNormalizedCategory::Human,
+            "child-owned receipt repair has no enterable child-owned route",
+        ),
+        "finding-binding-unavailable" => (
+            "finding-binding-unavailable",
+            ProgramNormalizedCategory::Human,
+            "correction route requires a finding_id that cannot be derived from runtime evidence",
+        ),
+        "deferred-evidence-missing" => (
+            "deferred-evidence-missing",
+            ProgramNormalizedCategory::Human,
+            "deferred, superseded, replaced, or rejected child lacks explicit registry evidence",
+        ),
+        "aggregate-closeout-readiness-missing" => (
+            "aggregate-closeout-readiness-missing",
+            ProgramNormalizedCategory::Human,
+            "aggregate clean finish lacks required child-owned receipts, authority evidence, or aggregate evidence",
+        ),
+        "authority-zone-denied" => (
+            "authority-zone-denied",
+            ProgramNormalizedCategory::Human,
+            "selected route or action is outside the authority zones allowed by contract",
+        ),
+        "durable-authority-approval-required" => (
+            "durable-authority-approval-required",
+            ProgramNormalizedCategory::Human,
+            "authored governance or durable authority mutation requires an existing zone-bound approval",
+        ),
+        "protected-artifact-approval-required" => (
+            "protected-artifact-approval-required",
+            ProgramNormalizedCategory::Human,
+            "protected or workspace-source artifact mutation requires explicit zone-bound approval",
+        ),
         "recovery-integrity-risk" => (
             "recovery-integrity-risk",
             ProgramNormalizedCategory::Unsafe,
             "repeated recovery attempts indicate possible integrity risk",
+        ),
+        "authority-zone-ambiguous" | "self-authorization-attempt" => (
+            blocker_class,
+            ProgramNormalizedCategory::Unsafe,
+            "authority zone, ownership, or authorization basis is ambiguous or self-produced",
         ),
         "authority-boundary-ambiguous" | "unsafe-resume" => (
             blocker_class,
@@ -5775,9 +7205,10 @@ fn normalize_program_state_value(value: &str) -> ProgramNormalizedCategory {
     match value {
         "completed" | "skipped-idempotent" | "no-op" => ProgramNormalizedCategory::Terminal,
         "cancelled" => ProgramNormalizedCategory::Cancellation,
-        "blocked-max-steps" | "blocked-max-iterations" | "blocked-budget" => {
-            ProgramNormalizedCategory::Budget
-        }
+        "blocked-max-steps"
+        | "blocked-max-iterations"
+        | "blocked-budget"
+        | "step-budget-exhausted-continuable" => ProgramNormalizedCategory::Budget,
         "timed-out" => ProgramNormalizedCategory::Timeout,
         "blocked-unsafe" => ProgramNormalizedCategory::Unsafe,
         "blocked-human" => ProgramNormalizedCategory::Human,
@@ -6214,6 +7645,45 @@ fn execute_parent_program_route(
     } else {
         options.approval_policy.clone()
     };
+    let parent_run_inputs = if route.route_id == "generate-program-correction-prompt"
+        && run_inputs
+            .get("finding_id")
+            .map(|value| value.trim().is_empty())
+            .unwrap_or(true)
+    {
+        match derive_and_write_finding_binding(plan, &parent_evidence_root)? {
+            Some(finding_id) => {
+                let mut inputs = run_inputs.clone();
+                inputs.insert("finding_id".to_string(), finding_id);
+                inputs
+            }
+            None => {
+                let result = finding_binding_unavailable_result(
+                    program_run_id,
+                    route,
+                    &plan.target,
+                    &parent_evidence_root,
+                )?;
+                append_program_event(
+                    control_root,
+                    evidence_root,
+                    program_run_id,
+                    "parent-route-finished",
+                    None,
+                    Some(&route.route_id),
+                    "program parent route execution finished",
+                    program_step_event_data(
+                        step_context.as_ref(),
+                        "parent-route-dispatch",
+                        [("status", result.status.as_str())],
+                    ),
+                )?;
+                return Ok(Some(result));
+            }
+        }
+    } else {
+        run_inputs.clone()
+    };
     let request = lifecycle_execution_request_for_route(
         octon_dir,
         program_run_id,
@@ -6224,7 +7694,7 @@ fn execute_parent_program_route(
         options.timeout_seconds.unwrap_or(1800),
         &parent_approval_policy,
         0,
-        run_inputs,
+        &parent_run_inputs,
         parent_evidence_root.clone(),
         parent_control_root.join("lifecycle-checkpoint.yml"),
         Some(lifecycle_cancellation_token_path(control_root)),
@@ -6279,6 +7749,174 @@ fn execute_parent_program_route(
     Ok(Some(result))
 }
 
+#[derive(Serialize)]
+struct ProgramFindingBindingEvidence {
+    schema_version: &'static str,
+    status: String,
+    finding_id: Option<String>,
+    source_kind: String,
+    source_ref: String,
+    source_digest: String,
+}
+
+fn derive_and_write_finding_binding(
+    plan: &ProgramLifecyclePlanResult,
+    parent_evidence_root: &Path,
+) -> Result<Option<String>> {
+    let derived = derive_finding_id(plan);
+    let evidence = match derived {
+        Some((finding_id, source_kind, source_ref, source_digest)) => {
+            ProgramFindingBindingEvidence {
+                schema_version: "octon-program-finding-binding-v1",
+                status: "derived".to_string(),
+                finding_id: Some(finding_id.clone()),
+                source_kind,
+                source_ref,
+                source_digest,
+            }
+        }
+        None => ProgramFindingBindingEvidence {
+            schema_version: "octon-program-finding-binding-v1",
+            status: "unavailable".to_string(),
+            finding_id: None,
+            source_kind: "none".to_string(),
+            source_ref: "no runtime validation evidence carried a finding id or diagnostic source"
+                .to_string(),
+            source_digest: "none".to_string(),
+        },
+    };
+    fs::write(
+        parent_evidence_root.join("finding-binding.yml"),
+        serde_yaml::to_string(&evidence)?,
+    )?;
+    Ok(evidence.finding_id)
+}
+
+fn derive_finding_id(
+    plan: &ProgramLifecyclePlanResult,
+) -> Option<(String, String, String, String)> {
+    for (receipt_id, receipt) in &plan.parent_receipt_states {
+        if !receipt.exists
+            || !receipt.missing_required_fields.is_empty()
+            || receipt.stale == Some(true)
+        {
+            continue;
+        }
+        for field in ["finding_id", "finding"] {
+            if let Some(value) = receipt
+                .fields
+                .get(field)
+                .filter(|value| !value.trim().is_empty())
+            {
+                let digest = sha256_hex(value.as_bytes());
+                return Some((
+                    value.clone(),
+                    "parent-receipt-field".to_string(),
+                    format!("{receipt_id}.{field}"),
+                    format!("sha256:{digest}"),
+                ));
+            }
+        }
+    }
+    if let Some(gate) = plan.program_gate_results.iter().find(|gate| !gate.passed) {
+        let diagnostic = format!(
+            "{}\n{}\n{}",
+            gate.gate_id,
+            gate.stdout.trim(),
+            gate.stderr.trim()
+        );
+        let digest = sha256_hex(diagnostic.as_bytes());
+        return Some((
+            format!("finding-{}", &digest[..16]),
+            "failed-gate".to_string(),
+            format!("{}:{}", gate.gate_id, gate.validator_id),
+            format!("sha256:{digest}"),
+        ));
+    }
+    if let Some(blocker) = plan
+        .program_blockers
+        .iter()
+        .find(|blocker| blocker.blocker_class == "validation-failed")
+    {
+        let digest = sha256_hex(blocker.message.as_bytes());
+        return Some((
+            format!("finding-{}", &digest[..16]),
+            "program-blocker".to_string(),
+            blocker.blocker_class.clone(),
+            format!("sha256:{digest}"),
+        ));
+    }
+    for (child_id, state) in &plan.child_states {
+        if let Some(blocker) = state.blockers.iter().find(|blocker| {
+            matches!(
+                blocker.blocker_class.as_str(),
+                "validation-failed" | "missing-evidence" | "stale-receipt"
+            )
+        }) {
+            let diagnostic = format!(
+                "{}\n{}\n{}\n{}",
+                child_id,
+                blocker.blocker_class,
+                blocker.recovery_route.as_deref().unwrap_or("no-route"),
+                blocker.message
+            );
+            let digest = sha256_hex(diagnostic.as_bytes());
+            return Some((
+                format!("finding-{}", &digest[..16]),
+                "child-diagnostic".to_string(),
+                format!("child:{child_id}:{}", blocker.blocker_class),
+                format!("sha256:{digest}"),
+            ));
+        }
+    }
+    None
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(bytes);
+    format!("{:x}", hasher.finalize())
+}
+
+fn finding_binding_unavailable_result(
+    program_run_id: &str,
+    route: &RoutePlanState,
+    _target: &str,
+    parent_evidence_root: &Path,
+) -> Result<LifecycleRouteExecutionResult> {
+    let now = now_rfc3339()?;
+    let evidence_path = parent_evidence_root.join("finding-binding.yml");
+    if !evidence_path.is_file() {
+        fs::write(
+            &evidence_path,
+            "schema_version: octon-program-finding-binding-v1\nstatus: unavailable\nsource_kind: none\nsource_ref: no runtime validation evidence carried a finding id or diagnostic source\nsource_digest: none\n",
+        )?;
+    }
+    Ok(LifecycleRouteExecutionResult {
+        schema_version: "octon-lifecycle-route-execution-result-v1".to_string(),
+        run_id: program_run_id.to_string(),
+        route_id: route.route_id.clone(),
+        executor_used: "program-controller".to_string(),
+        status: "blocked-human".to_string(),
+        started_at: now.clone(),
+        ended_at: now,
+        manifest_status_before: None,
+        manifest_status_after: None,
+        receipts_observed: Vec::new(),
+        evidence_paths: vec![evidence_path],
+        stdout_path: None,
+        stderr_path: None,
+        prompt_packet_path: None,
+        retryable: false,
+        next_action: "manual-intervention".to_string(),
+        error_class: Some(LifecycleErrorClass::InputBinding),
+        error_message: Some(
+            "finding-binding-unavailable: generate-program-correction-prompt requires finding_id"
+                .to_string(),
+        ),
+    })
+}
+
 fn final_verdict_for_parent_route_status(status: &str) -> String {
     match status {
         "approval-required" => "blocked-human".to_string(),
@@ -6315,6 +7953,22 @@ fn build_child_execution_jobs(
                 &plan.child_registry_digest,
             )?;
             let Some(route) = route.as_ref() else {
+                preflight_summaries.push(ProgramChildExecutionSummary {
+                    child_id: child_id.clone(),
+                    child_run_id: format!("{program_run_id}-{child_id}-recovery-route"),
+                    route_id: "none".to_string(),
+                    status: "blocked-human".to_string(),
+                    attempts: 0,
+                    retryable: false,
+                    blocker_class: Some(
+                        blocker_class.unwrap_or_else(|| "recovery-route-unavailable".to_string()),
+                    ),
+                    error_message: Some(
+                        "child blocker has no executable selected route".to_string(),
+                    ),
+                    error_class: None,
+                    evidence_paths: Vec::new(),
+                });
                 continue;
             };
             let child_run_id = sanitize_run_id(&format!("{program_run_id}-{child_id}"))?;
@@ -6360,6 +8014,17 @@ fn build_child_execution_jobs(
             } else {
                 route_safe_unattended_basis
             };
+            let authority_decision = child_route_authority_decision(
+                repo_root,
+                program_run_id,
+                state,
+                &route.route_id,
+                if blocker_class.is_some() {
+                    OPERATION_CLASS_RETRY_CHILD_ROUTE
+                } else {
+                    OPERATION_CLASS_EXECUTE_CHILD_ROUTE
+                },
+            );
             let approval_policy = approval_policy_for_child_route(
                 &options.approval_policy,
                 approvals,
@@ -6368,7 +8033,74 @@ fn build_child_execution_jobs(
                 Some(&plan.child_registry_digest),
                 blocker_class.as_deref(),
                 safe_unattended_basis.is_some(),
+                Some(&authority_decision),
             );
+            let authority_decision_path =
+                write_authority_zone_decision(evidence_root, &authority_decision)?;
+            let route_contract_allows_unapproved_workspace =
+                route.route_type != "workflow" && blocker_class.is_none();
+            let authority_dispatch_allowed = approval_policy == "program-approved"
+                || authority_decision.autonomous_allowed
+                || (authority_decision.authority_zone == AUTHORITY_ZONE_WORKSPACE_DECLARED
+                    && authority_decision.workspace_contained
+                    && authority_decision.declared_scope_contained
+                    && route_contract_allows_unapproved_workspace)
+                || (authority_decision.authority_zone == AUTHORITY_ZONE_WORKSPACE_DECLARED
+                    && authority_decision.workspace_contained
+                    && authority_decision.declared_scope_contained
+                    && blocker_class.is_some()
+                    && safe_unattended_basis.is_some())
+                || (approval_policy == "unattended"
+                    && safe_unattended_basis.is_some()
+                    && authority_decision_allows_route_unattended(&authority_decision));
+            if !authority_dispatch_allowed {
+                let dispatch_blocker_class = if authority_decision.authority_zone
+                    == AUTHORITY_ZONE_WORKSPACE_DECLARED
+                    && route.route_type == "workflow"
+                {
+                    "operator-approval-required".to_string()
+                } else {
+                    authority_decision.fail_closed_blocker.clone()
+                };
+                append_program_event(
+                    control_root,
+                    evidence_root,
+                    program_run_id,
+                    "child-route-authority-blocked",
+                    Some(child_id),
+                    Some(&route.route_id),
+                    "program child route blocked by authority-zone decision",
+                    event_data([
+                        ("authority_zone", authority_decision.authority_zone.as_str()),
+                        ("artifact_class", authority_decision.artifact_class.as_str()),
+                        ("authority_decision", authority_decision_path.as_str()),
+                    ]),
+                )?;
+                preflight_summaries.push(ProgramChildExecutionSummary {
+                    child_id: child_id.clone(),
+                    child_run_id: child_run_id.clone(),
+                    route_id: route.route_id.clone(),
+                    status: if dispatch_blocker_class == "operator-approval-required" {
+                        "approval-required".to_string()
+                    } else if classify_program_blocker_class(&dispatch_blocker_class)
+                        == ProgramBlockerDisposition::Unsafe
+                    {
+                        "blocked-unsafe".to_string()
+                    } else {
+                        "blocked-human".to_string()
+                    },
+                    attempts: 0,
+                    retryable: false,
+                    blocker_class: Some(dispatch_blocker_class),
+                    error_message: Some(format!(
+                        "authority zone {} does not permit unattended dispatch for artifact class {}",
+                        authority_decision.authority_zone, authority_decision.artifact_class
+                    )),
+                    error_class: Some("authority-zone".to_string()),
+                    evidence_paths: vec![authority_decision_path],
+                });
+                continue;
+            }
             let unsafe_repair = blocker_class.as_deref().and_then(|class| {
                 unsafe_repair_evidence_for_job(
                     program_run_id,
@@ -6501,12 +8233,8 @@ fn closeout_worktree_hygiene_preflight(
     fs::write(&stdout_path, &output.stdout)?;
     fs::write(&stderr_path, &output.stderr)?;
     let stdout = String::from_utf8_lossy(&output.stdout);
-    let status = if output.status.success() && stdout.contains("worktree_hygiene_verdict: \"pass\"")
-    {
-        "pass"
-    } else {
-        "blocked"
-    };
+    let decision = classify_worktree_hygiene_preflight(output.status.success(), &stdout);
+    let status = decision.status;
     let stdout_rel = rel_display(repo_root, &stdout_path);
     let stderr_rel = rel_display(repo_root, &stderr_path);
     append_program_event(
@@ -6533,11 +8261,67 @@ fn closeout_worktree_hygiene_preflight(
         status: "blocked".to_string(),
         attempts: 0,
         retryable: false,
-        blocker_class: Some("artifact-ownership-unclear".to_string()),
-        error_message: Some(
-            "closeout/archive blocked by foreign or ambiguous worktree hygiene".to_string(),
-        ),
+        blocker_class: Some(decision.blocker_class),
+        error_message: Some(decision.message),
+        error_class: None,
+        evidence_paths: vec![stdout_rel, stderr_rel],
     }))
+}
+
+struct WorktreeHygienePreflightDecision {
+    status: &'static str,
+    blocker_class: String,
+    message: String,
+}
+
+#[derive(Default, Deserialize)]
+struct WorktreeHygieneClassifierOutput {
+    #[serde(default)]
+    worktree_hygiene_verdict: Option<String>,
+    #[serde(default)]
+    worktree_hygiene_blocker_class: Option<String>,
+    #[serde(default)]
+    worktree_hygiene_foreign_path_count: Option<u64>,
+}
+
+fn classify_worktree_hygiene_preflight(
+    classifier_succeeded: bool,
+    stdout: &str,
+) -> WorktreeHygienePreflightDecision {
+    let parsed = serde_yaml::from_str::<WorktreeHygieneClassifierOutput>(stdout).ok();
+    let verdict = parsed
+        .as_ref()
+        .and_then(|value| value.worktree_hygiene_verdict.as_deref())
+        .unwrap_or_default();
+    let blocker_class = parsed
+        .as_ref()
+        .and_then(|value| value.worktree_hygiene_blocker_class.as_deref())
+        .unwrap_or_default();
+    let foreign_count = parsed
+        .as_ref()
+        .and_then(|value| value.worktree_hygiene_foreign_path_count);
+
+    let noncritical_current_run_residue = matches!(
+        blocker_class,
+        "noncritical-artifact-cleanup"
+            | "local-run-residue"
+            | "child-lock-stale"
+            | "generated-scratch-stale"
+    ) && foreign_count == Some(0);
+
+    if classifier_succeeded && (verdict == "pass" || noncritical_current_run_residue) {
+        return WorktreeHygienePreflightDecision {
+            status: "pass",
+            blocker_class: String::new(),
+            message: "closeout/archive worktree hygiene is passable".to_string(),
+        };
+    }
+
+    WorktreeHygienePreflightDecision {
+        status: "blocked",
+        blocker_class: "artifact-ownership-unclear".to_string(),
+        message: "closeout/archive blocked by foreign or ambiguous worktree hygiene".to_string(),
+    }
 }
 
 fn selected_route_for_child_execution(
@@ -6777,6 +8561,24 @@ fn recovery_action_id<'a>(program: &'a ProgramSpec, blocker_class: &str) -> Opti
         .iter()
         .find(|recipe| recovery_recipe_matches(recipe, blocker_class))
         .and_then(|recipe| recipe.recovery_action_id.as_ref())
+}
+
+fn child_results_have_publication_post_validation_failure(
+    child_results: &[ProgramChildExecutionSummary],
+) -> bool {
+    child_results.iter().any(|result| {
+        result.blocker_class.as_deref() == Some("publication-drift")
+            && result.status == "failed"
+            && result
+                .error_message
+                .as_deref()
+                .map(|message| {
+                    message
+                        .contains("recovery post-attempt validation failed for publication-drift")
+                        && message.contains("publication-freshness-cleared")
+                })
+                .unwrap_or(false)
+    })
 }
 
 fn recovery_route_for_blocker<'a>(
@@ -7040,6 +8842,15 @@ fn validate_child_recovery_recipe(
                     bail!("recovery recipe precondition missing-evidence mismatched blocker class");
                 }
             }
+            "target-path-unchanged"
+            | "write-scope-unchanged"
+            | "current-run-child-owned-drift-evidence"
+            | "authority-zone-allowed"
+            | "artifact-ownership-known"
+            | "declared-write-scope-contained"
+            | "run-bound-current"
+            | "source-authority-digest-unchanged"
+            | "generated-non-authority" => {}
             "approval-grant-present" => {
                 bail!("recovery recipe precondition approval-grant-present is not automatically recoverable");
             }
@@ -7086,6 +8897,15 @@ fn validate_program_recovery_recipe(
                     );
                 }
             }
+            "target-path-unchanged"
+            | "write-scope-unchanged"
+            | "current-run-child-owned-drift-evidence"
+            | "authority-zone-allowed"
+            | "artifact-ownership-known"
+            | "declared-write-scope-contained"
+            | "run-bound-current"
+            | "source-authority-digest-unchanged"
+            | "generated-non-authority" => {}
             "approval-grant-present" => {
                 bail!(
                     "program recovery recipe precondition approval-grant-present is not automatically recoverable"
@@ -7128,6 +8948,11 @@ fn validate_recovery_recipe_metadata(
     if require_post_attempt_validation && recipe.post_attempt_validation.is_empty() {
         bail!("program recovery recipe for {blocker_class} must declare post_attempt_validation");
     }
+    if recipe.requires_zone_evidence
+        && (recipe.allowed_authority_zones.is_empty() || recipe.operation_class.is_none())
+    {
+        bail!("recovery recipe for {blocker_class} requires zone evidence but does not declare authority-zone dispatch metadata");
+    }
     for validation in &recipe.post_attempt_validation {
         if !supported_recovery_post_attempt_validation(validation) {
             bail!("unsupported recovery recipe post-attempt validation: {validation}");
@@ -7152,11 +8977,109 @@ fn validate_recovery_recipe_metadata(
         }
     }
     if let Some(action_id) = recipe.recovery_action_id.as_deref() {
-        if action_id != REFRESH_PUBLICATION_PROJECTIONS_ACTION {
+        if !supported_program_recovery_action(action_id) {
             bail!("unsupported recovery_action_id: {action_id}");
         }
     }
+    for zone in &recipe.allowed_authority_zones {
+        if !supported_authority_zone(zone) {
+            bail!("unsupported recovery authority zone: {zone}");
+        }
+        if !recipe.approval_required
+            && matches!(
+                zone.as_str(),
+                AUTHORITY_ZONE_AUTHORED_GOVERNANCE | AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
+            )
+        {
+            bail!("approval-free recovery recipe for {blocker_class} allows protected authority zone {zone}");
+        }
+    }
+    for artifact_class in &recipe.allowed_artifact_classes {
+        if !supported_authority_artifact_class(artifact_class) {
+            bail!("unsupported recovery authority artifact class: {artifact_class}");
+        }
+        if !recipe.approval_required
+            && matches!(
+                artifact_class.as_str(),
+                ARTIFACT_CLASS_AUTHORED_GOVERNANCE
+                    | ARTIFACT_CLASS_PROTECTED_OR_EXTERNAL
+                    | ARTIFACT_CLASS_UNKNOWN
+            )
+        {
+            bail!("approval-free recovery recipe for {blocker_class} allows protected artifact class {artifact_class}");
+        }
+    }
+    if let Some(operation_class) = recipe.operation_class.as_deref() {
+        if !supported_authority_operation_class(operation_class) {
+            bail!("unsupported recovery authority operation class: {operation_class}");
+        }
+        if !recipe.approval_required
+            && matches!(
+                operation_class,
+                "durable-authority-mutation" | "protected-artifact-mutation"
+            )
+        {
+            bail!("approval-free recovery recipe for {blocker_class} allows protected operation class {operation_class}");
+        }
+    }
+    for zone in &recipe.approval_required_for_zones {
+        if !supported_authority_zone(zone) {
+            bail!("unsupported approval-required authority zone: {zone}");
+        }
+    }
     Ok(())
+}
+
+fn supported_program_recovery_action(action_id: &str) -> bool {
+    matches!(
+        action_id,
+        REFRESH_PUBLICATION_PROJECTIONS_ACTION
+            | REBASELINE_CHECKPOINT_ACTION
+            | CLEANUP_CURRENT_RUN_ARTIFACTS_ACTION
+    )
+}
+
+fn supported_authority_zone(zone: &str) -> bool {
+    matches!(
+        zone,
+        AUTHORITY_ZONE_RUN_BOUND
+            | AUTHORITY_ZONE_GENERATED_DERIVED
+            | AUTHORITY_ZONE_AUTHORED_GOVERNANCE
+            | AUTHORITY_ZONE_WORKSPACE_DECLARED
+            | AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT
+            | AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
+    )
+}
+
+fn supported_authority_artifact_class(artifact_class: &str) -> bool {
+    matches!(
+        artifact_class,
+        ARTIFACT_CLASS_RUN_CONTROL
+            | ARTIFACT_CLASS_RUN_EVIDENCE
+            | ARTIFACT_CLASS_GENERATED_DERIVED
+            | ARTIFACT_CLASS_AUTHORED_GOVERNANCE
+            | ARTIFACT_CLASS_WORKSPACE_SOURCE
+            | ARTIFACT_CLASS_CURRENT_RUN_GENERATED
+            | ARTIFACT_CLASS_PROTECTED_OR_EXTERNAL
+            | ARTIFACT_CLASS_UNKNOWN
+    )
+}
+
+fn supported_authority_operation_class(operation_class: &str) -> bool {
+    matches!(
+        operation_class,
+        "inspect"
+            | "append-run-evidence"
+            | "update-run-control"
+            | OPERATION_CLASS_REFRESH_GENERATED_PROJECTION
+            | OPERATION_CLASS_CLEANUP_CURRENT_RUN_ARTIFACT
+            | OPERATION_CLASS_RETRY_CHILD_ROUTE
+            | OPERATION_CLASS_EXECUTE_CHILD_ROUTE
+            | OPERATION_CLASS_PROGRAM_RECOVERY_ACTION
+            | OPERATION_CLASS_CLOSEOUT_READINESS
+            | "durable-authority-mutation"
+            | "protected-artifact-mutation"
+    )
 }
 
 fn supported_recovery_post_attempt_validation(validation: &str) -> bool {
@@ -7419,19 +9342,28 @@ fn program_recovery_post_attempt_validation_result(
                 "aggregate state is completed without completed final verdict".to_string()
             }),
         "publication-freshness-cleared" => {
-            let remaining_child = after_plan.child_states.values().any(|state| {
-                state
-                    .blockers
-                    .iter()
-                    .any(|blocker| blocker.blocker_class == "publication-drift")
-            });
             let remaining_program = after_plan
                 .program_blockers
                 .iter()
                 .any(|blocker| blocker.blocker_class == "publication-drift");
-            (!remaining_child && !remaining_program)
-                .then_some(())
-                .ok_or_else(|| "publication-drift blocker remains after repair".to_string())
+            if remaining_program {
+                return Err("program publication-drift blocker remains after repair".to_string());
+            }
+            if !after_plan.child_states.values().any(|state| {
+                state
+                    .blockers
+                    .iter()
+                    .any(|blocker| blocker.blocker_class == "publication-drift")
+            }) {
+                return Ok(());
+            }
+            (blocker_class == "publication-drift"
+                && remaining_publication_drift_is_limited_to_rerunnable_children(after_plan))
+            .then_some(())
+            .ok_or_else(|| {
+                "publication-drift blocker remains after repair without a selected child recovery route"
+                    .to_string()
+            })
         }
         "replay-verify" => {
             verify_program_event_log_for_recovery(control_root).map_err(|error| error.to_string())
@@ -7443,6 +9375,35 @@ fn program_recovery_post_attempt_validation_result(
             "unsupported program post-attempt validation {other}"
         )),
     }
+}
+
+fn remaining_publication_drift_is_limited_to_rerunnable_children(
+    after_plan: &ProgramLifecyclePlanResult,
+) -> bool {
+    let mut saw_publication_drift = false;
+    for state in after_plan.child_states.values() {
+        for blocker in state
+            .blockers
+            .iter()
+            .filter(|blocker| blocker.blocker_class == "publication-drift")
+        {
+            saw_publication_drift = true;
+            let selected_route = state
+                .selected_route
+                .as_ref()
+                .map(|route| route.route_id.as_str());
+            if selected_route.is_none()
+                || blocker.recovery_route.as_deref() != selected_route
+                || !after_plan
+                    .runnable_batch
+                    .iter()
+                    .any(|id| id == &state.child_id)
+            {
+                return false;
+            }
+        }
+    }
+    saw_publication_drift
 }
 
 fn verify_program_event_log_for_recovery(control_root: &Path) -> Result<()> {
@@ -7475,9 +9436,24 @@ fn select_program_recovery_action<'a>(
     plan: &'a ProgramLifecyclePlanResult,
     checkpoint: Option<&ProgramLifecycleCheckpoint>,
 ) -> Option<(&'a str, &'a str)> {
+    for blocker in &plan.program_blockers {
+        let Some(action_id) = recovery_action_id(program, &blocker.blocker_class) else {
+            continue;
+        };
+        let budget = recovery_attempt_budget(program, &blocker.blocker_class)
+            .or(program.recovery_policy.max_recovery_attempts)
+            .unwrap_or(1);
+        let used =
+            program_recovery_action_attempt_count(checkpoint, &blocker.blocker_class, action_id);
+        if used < budget {
+            return Some((blocker.blocker_class.as_str(), action_id.as_str()));
+        }
+    }
     for state in plan.child_states.values() {
         for blocker in &state.blockers {
-            let action_id = recovery_action_id(program, &blocker.blocker_class)?;
+            let Some(action_id) = recovery_action_id(program, &blocker.blocker_class) else {
+                continue;
+            };
             let budget = recovery_attempt_budget(program, &blocker.blocker_class)
                 .or(program.recovery_policy.max_recovery_attempts)
                 .unwrap_or(1);
@@ -7517,6 +9493,7 @@ fn execute_selected_program_recovery_action(
         .unwrap_or(0)
         + 1;
     let outcome = execute_program_recovery_action(
+        program,
         repo_root,
         control_root,
         evidence_root,
@@ -7528,6 +9505,51 @@ fn execute_selected_program_recovery_action(
     )?;
     *program_recovery_action_attempts.entry(key).or_default() += 1;
     Ok(Some(outcome))
+}
+
+fn authority_paths_for_program_recovery_action(
+    repo_root: &Path,
+    evidence_root: &Path,
+    program_run_id: &str,
+    action_id: &str,
+) -> (Vec<PathBuf>, Vec<String>, &'static str) {
+    match action_id {
+        REFRESH_PUBLICATION_PROJECTIONS_ACTION => (
+            vec![
+                repo_root.join(".octon/generated"),
+                repo_root.join(".claude"),
+                repo_root.join(".cursor"),
+                repo_root.join(".codex/commands"),
+                repo_root.join(".codex/skills"),
+            ],
+            Vec::new(),
+            OPERATION_CLASS_REFRESH_GENERATED_PROJECTION,
+        ),
+        REBASELINE_CHECKPOINT_ACTION => (
+            vec![evidence_root.to_path_buf()],
+            Vec::new(),
+            OPERATION_CLASS_PROGRAM_RECOVERY_ACTION,
+        ),
+        CLEANUP_CURRENT_RUN_ARTIFACTS_ACTION => {
+            let run_control = repo_root
+                .join(".octon/state/control/execution/runs")
+                .join(program_run_id);
+            (
+                vec![
+                    run_control.join("locks"),
+                    run_control.join("tmp"),
+                    run_control.join("scratch"),
+                ],
+                vec![authority_path_ref(repo_root, &run_control)],
+                OPERATION_CLASS_CLEANUP_CURRENT_RUN_ARTIFACT,
+            )
+        }
+        _ => (
+            vec![evidence_root.to_path_buf()],
+            Vec::new(),
+            OPERATION_CLASS_PROGRAM_RECOVERY_ACTION,
+        ),
+    }
 }
 
 fn mark_no_progress_child_results(
@@ -7688,6 +9710,7 @@ fn enforce_program_recovery_action_post_validations(
 }
 
 fn execute_program_recovery_action(
+    program: &ProgramSpec,
     repo_root: &Path,
     control_root: &Path,
     evidence_root: &Path,
@@ -7697,7 +9720,7 @@ fn execute_program_recovery_action(
     attempt_number: u32,
     step_context: Option<ProgramExecutionStepContext>,
 ) -> Result<ProgramRecoveryActionOutcome> {
-    if action_id != REFRESH_PUBLICATION_PROJECTIONS_ACTION {
+    if !supported_program_recovery_action(action_id) {
         bail!("unsupported program recovery action: {action_id}");
     }
     let octon_dir = repo_root.join(".octon");
@@ -7706,6 +9729,73 @@ fn execute_program_recovery_action(
         .join(action_id)
         .join(format!("attempt-{attempt_number}"));
     fs::create_dir_all(&action_root)?;
+    let (authority_paths, declared_write_scopes, operation_class) =
+        authority_paths_for_program_recovery_action(
+            repo_root,
+            evidence_root,
+            program_run_id,
+            action_id,
+        );
+    let authority_decision = classify_authority_zone(
+        repo_root,
+        program_run_id,
+        None,
+        Some(action_id),
+        Some(blocker_class),
+        operation_class,
+        &authority_paths,
+        &declared_write_scopes,
+        None,
+    );
+    let authority_decision_path =
+        write_authority_zone_decision(evidence_root, &authority_decision)?;
+    let recipe = recovery_recipe_for_blocker(program, blocker_class);
+    if !authority_decision.autonomous_allowed
+        || !recovery_recipe_allows_authority_decision(recipe, &authority_decision)
+    {
+        let evidence_path = rel_display(repo_root, &action_root);
+        let message = format!(
+            "program recovery action {action_id} denied by authority zone {} for artifact class {}; decision evidence: {authority_decision_path}",
+            authority_decision.authority_zone, authority_decision.artifact_class
+        );
+        append_program_event(
+            control_root,
+            evidence_root,
+            program_run_id,
+            "program-recovery-action-authority-blocked",
+            None,
+            Some(action_id),
+            "program recovery action blocked by authority-zone decision",
+            program_step_event_data(
+                step_context.as_ref(),
+                "program-recovery-action",
+                [
+                    ("blocker_class", blocker_class),
+                    ("action_id", action_id),
+                    ("authority_zone", authority_decision.authority_zone.as_str()),
+                    ("artifact_class", authority_decision.artifact_class.as_str()),
+                    ("authority_decision", authority_decision_path.as_str()),
+                ],
+            ),
+        )?;
+        write_program_recovery_action_summary(
+            repo_root,
+            &action_root,
+            action_id,
+            blocker_class,
+            "failed",
+            Some(authority_decision.fail_closed_blocker.as_str()),
+            Some(&message),
+        )?;
+        return Ok(ProgramRecoveryActionOutcome {
+            action_id: action_id.to_string(),
+            blocker_class: authority_decision.fail_closed_blocker,
+            status: "failed".to_string(),
+            evidence_path,
+            failed_command: Some("authority-zone-decision".to_string()),
+            error_message: Some(message),
+        });
+    }
     append_program_event(
         control_root,
         evidence_root,
@@ -7720,6 +9810,98 @@ fn execute_program_recovery_action(
             [("blocker_class", blocker_class), ("action_id", action_id)],
         ),
     )?;
+
+    if action_id == REBASELINE_CHECKPOINT_ACTION {
+        let evidence_path = rel_display(repo_root, &action_root);
+        fs::write(
+            action_root.join("rebaseline-summary.yml"),
+            format!(
+                "schema_version: \"octon-program-rebaseline-checkpoint-v1\"\naction_id: \"{action_id}\"\nblocker_class: \"{blocker_class}\"\nstatus: \"completed\"\nreplan_required: true\n"
+            ),
+        )?;
+        append_program_event(
+            control_root,
+            evidence_root,
+            program_run_id,
+            "program-recovery-action-finished",
+            None,
+            Some(action_id),
+            "program recovery action finished",
+            program_step_event_data(
+                step_context.as_ref(),
+                "program-recovery-action",
+                [
+                    ("blocker_class", blocker_class),
+                    ("action_id", action_id),
+                    ("status", "completed"),
+                    ("evidence_path", evidence_path.as_str()),
+                ],
+            ),
+        )?;
+        write_program_recovery_action_summary(
+            repo_root,
+            &action_root,
+            action_id,
+            blocker_class,
+            "completed",
+            None,
+            None,
+        )?;
+        return Ok(ProgramRecoveryActionOutcome {
+            action_id: action_id.to_string(),
+            blocker_class: blocker_class.to_string(),
+            status: "completed".to_string(),
+            evidence_path,
+            failed_command: None,
+            error_message: None,
+        });
+    }
+
+    if action_id == CLEANUP_CURRENT_RUN_ARTIFACTS_ACTION {
+        let evidence_path = rel_display(repo_root, &action_root);
+        fs::write(
+            action_root.join("cleanup-current-run-artifacts.yml"),
+            format!(
+                "schema_version: \"octon-program-current-run-cleanup-v1\"\naction_id: \"{action_id}\"\nblocker_class: \"{blocker_class}\"\nstatus: \"completed\"\nmutation_performed: false\nrationale: \"current-run artifact cleanup is executed through governed artifact cleanup operations; no standalone cleanup operation was selected by the blocker\"\nreplan_required: true\n"
+            ),
+        )?;
+        append_program_event(
+            control_root,
+            evidence_root,
+            program_run_id,
+            "program-recovery-action-finished",
+            None,
+            Some(action_id),
+            "program recovery action finished",
+            program_step_event_data(
+                step_context.as_ref(),
+                "program-recovery-action",
+                [
+                    ("blocker_class", blocker_class),
+                    ("action_id", action_id),
+                    ("status", "completed"),
+                    ("evidence_path", evidence_path.as_str()),
+                ],
+            ),
+        )?;
+        write_program_recovery_action_summary(
+            repo_root,
+            &action_root,
+            action_id,
+            blocker_class,
+            "completed",
+            None,
+            None,
+        )?;
+        return Ok(ProgramRecoveryActionOutcome {
+            action_id: action_id.to_string(),
+            blocker_class: blocker_class.to_string(),
+            status: "completed".to_string(),
+            evidence_path,
+            failed_command: None,
+            error_message: None,
+        });
+    }
 
     let commands: Vec<(&str, Vec<String>, Vec<(&str, String)>)> = vec![
         (
@@ -8031,6 +10213,8 @@ fn execute_atomic_program(
                         .unwrap_or_else(|| "operator-approval-required".to_string()),
                 ),
                 error_message: Some(blocker.reason.clone()),
+                error_class: None,
+                evidence_paths: Vec::new(),
             })
             .collect());
     }
@@ -8053,18 +10237,20 @@ fn execute_atomic_program(
             .into_iter()
             .map(|child_id| {
                 ProgramChildExecutionSummary {
-                child_id: child_id.clone(),
-                child_run_id: format!("{program_run_id}-{child_id}-atomic-preflight"),
-                route_id: "program-atomic".to_string(),
-                status: "blocked-unsafe".to_string(),
-                attempts: 0,
-                retryable: false,
-                blocker_class: Some("unsafe-resume".to_string()),
-                error_message: Some(
-                    "program-atomic requires every required non-deferred participant to be runnable"
-                        .to_string(),
-                ),
-            }
+                    child_id: child_id.clone(),
+                    child_run_id: format!("{program_run_id}-{child_id}-atomic-preflight"),
+                    route_id: "program-atomic".to_string(),
+                    status: "blocked-unsafe".to_string(),
+                    attempts: 0,
+                    retryable: false,
+                    blocker_class: Some("unsafe-resume".to_string()),
+                    error_message: Some(
+                        "program-atomic requires every required non-deferred participant to be runnable"
+                            .to_string(),
+                    ),
+                    error_class: None,
+                    evidence_paths: Vec::new(),
+                }
             })
             .collect());
     }
@@ -8097,6 +10283,8 @@ fn execute_atomic_program(
                     retryable: false,
                     blocker_class: Some("unsafe-resume".to_string()),
                     error_message: Some(error_message),
+                    error_class: None,
+                    evidence_paths: Vec::new(),
                 }]);
             }
         };
@@ -8176,6 +10364,8 @@ fn execute_atomic_program(
                     retryable: false,
                     blocker_class: Some("unsafe-resume".to_string()),
                     error_message: Some(error_message),
+                    error_class: None,
+                    evidence_paths: Vec::new(),
                 });
                 return Ok(summaries);
             }
@@ -8272,6 +10462,8 @@ fn execute_atomic_program(
                     retryable: false,
                     blocker_class: Some("unsafe-resume".to_string()),
                     error_message: Some(error_message),
+                    error_class: None,
+                    evidence_paths: Vec::new(),
                 });
                 return Ok(summaries);
             }
@@ -8312,6 +10504,8 @@ fn execute_atomic_program(
                         "program-atomic commit failed and compensation did not complete"
                             .to_string(),
                     ),
+                    error_class: None,
+                    evidence_paths: Vec::new(),
                 });
             } else {
                 summaries.extend(compensation);
@@ -8353,6 +10547,14 @@ fn execute_atomic_route_phase(
         .join(phase);
     fs::create_dir_all(&child_evidence_root)?;
     fs::create_dir_all(&child_control_root)?;
+    let repo_root = repo_root_for_octon(octon_dir)?;
+    let authority_decision = child_route_authority_decision(
+        &repo_root,
+        program_run_id,
+        state,
+        route_id,
+        OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
+    );
     let approval_policy = approval_policy_for_child_route(
         &options.approval_policy,
         approvals,
@@ -8361,10 +10563,69 @@ fn execute_atomic_route_phase(
         None,
         None,
         route_spec_safe_unattended_basis(route_id, route).is_some(),
+        Some(&authority_decision),
     );
+    let authority_decision_path =
+        write_authority_zone_decision(evidence_root, &authority_decision)?;
+    let atomic_authority_allowed = approval_policy == "program-approved"
+        || authority_decision.autonomous_allowed
+        || (authority_decision.authority_zone == AUTHORITY_ZONE_WORKSPACE_DECLARED
+            && authority_decision.workspace_contained
+            && authority_decision.declared_scope_contained
+            && route.route_type != "workflow")
+        || (approval_policy == "unattended"
+            && route_spec_safe_unattended_basis(route_id, route).is_some()
+            && authority_decision_allows_route_unattended(&authority_decision));
+    if !atomic_authority_allowed {
+        let dispatch_blocker_class = if authority_decision.authority_zone
+            == AUTHORITY_ZONE_WORKSPACE_DECLARED
+            && route.route_type == "workflow"
+        {
+            "operator-approval-required".to_string()
+        } else {
+            authority_decision.fail_closed_blocker.clone()
+        };
+        append_program_event(
+            control_root,
+            evidence_root,
+            program_run_id,
+            "atomic-child-route-authority-blocked",
+            Some(&state.child_id),
+            Some(route_id),
+            "program atomic child route blocked by authority-zone decision",
+            event_data([
+                ("authority_zone", authority_decision.authority_zone.as_str()),
+                ("artifact_class", authority_decision.artifact_class.as_str()),
+                ("authority_decision", authority_decision_path.as_str()),
+            ]),
+        )?;
+        return Ok(ProgramChildExecutionSummary {
+            child_id: state.child_id.clone(),
+            child_run_id,
+            route_id: route_id.to_string(),
+            status: if dispatch_blocker_class == "operator-approval-required" {
+                "approval-required".to_string()
+            } else if classify_program_blocker_class(&dispatch_blocker_class)
+                == ProgramBlockerDisposition::Unsafe
+            {
+                "blocked-unsafe".to_string()
+            } else {
+                "blocked-human".to_string()
+            },
+            attempts: 0,
+            retryable: false,
+            blocker_class: Some(dispatch_blocker_class),
+            error_message: Some(format!(
+                "authority zone {} does not permit atomic route dispatch for artifact class {}",
+                authority_decision.authority_zone, authority_decision.artifact_class
+            )),
+            error_class: Some("authority-zone".to_string()),
+            evidence_paths: vec![authority_decision_path],
+        });
+    }
     if approval_policy == "program-approved" {
         write_program_approval_execution_evidence(
-            &repo_root_for_octon(octon_dir)?,
+            &repo_root,
             &child_evidence_root,
             program_run_id,
             &state.child_id,
@@ -8427,7 +10688,16 @@ fn execute_atomic_route_phase(
         attempts: 1,
         retryable: result.retryable,
         blocker_class: None,
-        error_message: result.error_message,
+        error_message: result.error_message.clone(),
+        error_class: result
+            .error_class
+            .as_ref()
+            .map(|class| class.as_str().to_string()),
+        evidence_paths: result
+            .evidence_paths
+            .iter()
+            .map(|path| rel_path_string(path))
+            .collect(),
     })
 }
 
@@ -8468,6 +10738,8 @@ fn rollback_atomic_children(
                 retryable: false,
                 blocker_class: Some("authority-boundary-ambiguous".to_string()),
                 error_message: Some("missing rollback or compensation route".to_string()),
+                error_class: None,
+                evidence_paths: Vec::new(),
             });
             continue;
         };
@@ -8732,6 +11004,8 @@ fn execute_child_job(
             Ok(result) => result,
             Err(error) => {
                 let error_message = error.to_string();
+                let (blocker_class, retryable) = adapter_error_blocker_class(&error);
+                let evidence_paths = write_child_adapter_error_evidence(&job, &error)?;
                 if let Some(evidence) = job.unsafe_repair.clone() {
                     write_unsafe_repair_evidence(
                         &job.request.evidence_root,
@@ -8747,9 +11021,11 @@ fn execute_child_job(
                         route_id: job.route_id,
                         status: "failed".to_string(),
                         attempts,
-                        retryable: false,
-                        blocker_class: job.blocker_class,
+                        retryable,
+                        blocker_class: job.blocker_class.or_else(|| Some(blocker_class)),
                         error_message: Some(error_message),
+                        error_class: Some(error.class.as_str().to_string()),
+                        evidence_paths,
                     },
                     lock_path: job.lock_path,
                 });
@@ -8772,14 +11048,86 @@ fn execute_child_job(
             child_id: job.child_id,
             child_run_id: job.child_run_id,
             route_id: job.route_id,
-            status: result.status,
+            status: result.status.clone(),
             attempts,
             retryable: result.retryable,
-            blocker_class: job.blocker_class,
-            error_message: result.error_message,
+            blocker_class: job
+                .blocker_class
+                .or_else(|| execution_result_blocker_class(&result)),
+            error_message: result.error_message.clone(),
+            error_class: result
+                .error_class
+                .as_ref()
+                .map(|class| class.as_str().to_string()),
+            evidence_paths: result
+                .evidence_paths
+                .iter()
+                .map(|path| rel_path_string(path))
+                .collect(),
         },
         lock_path: job.lock_path,
     })
+}
+
+fn adapter_error_blocker_class(error: &LifecycleExecutionError) -> (String, bool) {
+    match &error.class {
+        LifecycleErrorClass::Timeout => ("executor-timed-out".to_string(), true),
+        LifecycleErrorClass::ExecutorFailed | LifecycleErrorClass::ExecutorUnavailable => {
+            ("executor-failed".to_string(), true)
+        }
+        LifecycleErrorClass::ApprovalRequired | LifecycleErrorClass::InputBinding => {
+            ("executor-preflight-blocked".to_string(), false)
+        }
+        _ => ("executor-failed".to_string(), false),
+    }
+}
+
+fn write_child_adapter_error_evidence(
+    job: &ChildExecutionJob,
+    error: &LifecycleExecutionError,
+) -> Result<Vec<String>> {
+    fs::create_dir_all(&job.request.evidence_root)?;
+    let evidence_path = job
+        .request
+        .evidence_root
+        .join(format!("{}-adapter-error.yml", job.route_id));
+    fs::write(
+        &evidence_path,
+        format!(
+            "schema_version: octon-program-child-adapter-error-v1\nchild_id: {}\nchild_run_id: {}\nroute_id: {}\nstatus: failed\nerror_class: {}\nretryable: {}\nmessage: {}\nrecorded_at: {}\n",
+            job.child_id,
+            job.child_run_id,
+            job.route_id,
+            error.class.as_str(),
+            matches!(
+                &error.class,
+                LifecycleErrorClass::Timeout
+                    | LifecycleErrorClass::ExecutorFailed
+                    | LifecycleErrorClass::ExecutorUnavailable
+            ),
+            yaml_scalar(&error.message),
+            now_rfc3339()?
+        ),
+    )?;
+    Ok(vec![rel_path_string(&evidence_path)])
+}
+
+fn execution_result_blocker_class(result: &LifecycleRouteExecutionResult) -> Option<String> {
+    if result.status == "executor-preflight-blocked" {
+        return Some("executor-preflight-blocked".to_string());
+    }
+    if !result.retryable {
+        return None;
+    }
+    match result.error_class.as_ref().map(|class| class.as_str()) {
+        Some("timeout") => Some("executor-timed-out".to_string()),
+        Some("executor-failed") | Some("executor-unavailable") => {
+            Some("executor-failed".to_string())
+        }
+        _ if result.status == "timed-out" => Some("executor-timed-out".to_string()),
+        _ if result.status == "failed" => Some("executor-failed".to_string()),
+        _ => None,
+    }
 }
 
 fn write_unsafe_repair_evidence(
@@ -8965,6 +11313,15 @@ fn finalize_parent_unsafe_repair_evidence(
         } else {
             result.error_message.clone()
         },
+        error_class: result
+            .error_class
+            .as_ref()
+            .map(|class| class.as_str().to_string()),
+        evidence_paths: result
+            .evidence_paths
+            .iter()
+            .map(|path| rel_path_string(path))
+            .collect(),
     };
     finalize_unsafe_repair_evidence_with_outcome(
         &evidence_root.join("parent"),
@@ -9113,6 +11470,30 @@ fn assess_program_artifact_criticality(
     let under_lock_root = primary_path.starts_with(&lock_root);
     let under_current_run_generated_root =
         primary_path.starts_with(&tmp_root) || primary_path.starts_with(&scratch_root);
+    let workspace_root = control_root
+        .ancestors()
+        .find(|path| {
+            path.file_name()
+                .map(|name| name == ".octon")
+                .unwrap_or(false)
+        })
+        .and_then(Path::parent)
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| control_root.to_path_buf());
+    let workspace_contained = primary_path.starts_with(&workspace_root);
+    let declared_cleanup_scopes = vec![authority_path_ref(&workspace_root, control_root)];
+    let authority_decision = classify_authority_zone(
+        &workspace_root,
+        program_run_id,
+        Some(&operation.child_id),
+        Some(&operation.route_id),
+        None,
+        OPERATION_CLASS_CLEANUP_CURRENT_RUN_ARTIFACT,
+        &operation.artifact_paths,
+        &declared_cleanup_scopes,
+        None,
+    );
+    let declared_scope_contained = under_lock_root || under_current_run_generated_root;
     let exists = primary_path.exists();
     let is_file = primary_path.is_file();
     let is_dir = primary_path.is_dir();
@@ -9124,6 +11505,16 @@ fn assess_program_artifact_criticality(
         "retained-lifecycle-evidence"
     } else if archive_metadata {
         "archive-metadata"
+    } else if authority_decision.authority_zone == AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT {
+        if under_lock_root {
+            "current-run-control-lock"
+        } else {
+            "current-run-generated-artifact"
+        }
+    } else if authority_decision.authority_zone == AUTHORITY_ZONE_AUTHORED_GOVERNANCE {
+        "authored-contract-or-policy"
+    } else if authority_decision.authority_zone == AUTHORITY_ZONE_RUN_BOUND {
+        "current-run-control-or-evidence"
     } else if artifact_path.contains("/.octon/framework/")
         || artifact_path.contains("/.octon/instance/")
         || artifact_path.contains("/.octon/inputs/additive/extensions/")
@@ -9144,6 +11535,9 @@ fn assess_program_artifact_criticality(
         "generated_artifact_cleanup" | "remove_generated_artifact"
     );
     if operation_supported
+        && workspace_contained
+        && declared_scope_contained
+        && authority_decision.autonomous_allowed
         && ((path_matches_expected && under_lock_root)
             || (generated_operation && under_current_run_generated_root))
     {
@@ -9162,17 +11556,24 @@ fn assess_program_artifact_criticality(
                 format!("path_matches_child_lock={path_matches_expected}"),
                 format!("under_current_run_lock_root={under_lock_root}"),
                 format!("under_current_run_generated_root={under_current_run_generated_root}"),
+                format!("workspace_contained={workspace_contained}"),
+                format!("declared_scope_contained={declared_scope_contained}"),
                 format!("authority_surface={authority_surface}"),
                 format!("operation_supported={operation_supported}"),
             ],
             artifact_owner: "current-run".to_string(),
             authority_surface: authority_surface.to_string(),
+            authority_zone: authority_decision.authority_zone,
+            artifact_class: authority_decision.artifact_class,
+            authority_zone_decision: None,
             criticality: "non-critical".to_string(),
             ownership: if under_lock_root {
                 "current-run-child-lock".to_string()
             } else {
                 "current-run-generated-artifact".to_string()
             },
+            workspace_contained,
+            declared_scope_contained,
             human_input_required: false,
             autonomous_allowed: true,
             rationale: if under_lock_root {
@@ -9197,8 +11598,10 @@ fn assess_program_artifact_criticality(
                 "unsupported-destructive-operation",
             )
         } else if retained_evidence
+            || artifact_path.contains("/.octon/state/evidence/")
             || authority_surface == "authored-contract-or-policy"
             || authority_surface == "archive-metadata"
+            || authority_decision.authority_zone == AUTHORITY_ZONE_AUTHORED_GOVERNANCE
         {
             (
                     "critical",
@@ -9229,13 +11632,20 @@ fn assess_program_artifact_criticality(
                 format!("path_matches_child_lock={path_matches_expected}"),
                 format!("under_current_run_lock_root={under_lock_root}"),
                 format!("under_current_run_generated_root={under_current_run_generated_root}"),
+                format!("workspace_contained={workspace_contained}"),
+                format!("declared_scope_contained={declared_scope_contained}"),
                 format!("authority_surface={authority_surface}"),
                 format!("operation_supported={operation_supported}"),
             ],
             artifact_owner: ownership.to_string(),
             authority_surface: authority_surface.to_string(),
+            authority_zone: authority_decision.authority_zone,
+            artifact_class: authority_decision.artifact_class,
+            authority_zone_decision: None,
             criticality: criticality.to_string(),
             ownership: ownership.to_string(),
+            workspace_contained,
+            declared_scope_contained,
             human_input_required: true,
             autonomous_allowed: false,
             rationale: rationale.to_string(),
@@ -9276,6 +11686,32 @@ fn perform_governed_artifact_cleanup(
     operation: &ProgramArtifactOperation,
 ) -> Result<String> {
     let mut decision = assess_program_artifact_criticality(control_root, program_run_id, operation);
+    let workspace_root = control_root
+        .ancestors()
+        .find(|path| {
+            path.file_name()
+                .map(|name| name == ".octon")
+                .unwrap_or(false)
+        })
+        .and_then(Path::parent)
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| control_root.to_path_buf());
+    let declared_cleanup_scopes = vec![authority_path_ref(&workspace_root, control_root)];
+    let authority_decision = classify_authority_zone(
+        &workspace_root,
+        program_run_id,
+        Some(&operation.child_id),
+        Some(&operation.route_id),
+        None,
+        OPERATION_CLASS_CLEANUP_CURRENT_RUN_ARTIFACT,
+        &operation.artifact_paths,
+        &declared_cleanup_scopes,
+        None,
+    );
+    decision.authority_zone_decision = Some(write_authority_zone_decision(
+        evidence_root,
+        &authority_decision,
+    )?);
     write_artifact_criticality_decision(evidence_root, &decision)?;
     if !decision.autonomous_allowed {
         decision.after_validation = "not-run-human-input-required".to_string();
@@ -10218,12 +12654,12 @@ fn verify_program_closeout(
         .map(|policy| policy.required_child_terminal_outcomes.as_slice())
         .unwrap_or(&[]);
     let mut checks = BTreeMap::new();
-    if plan
+    if let Some(blocker) = plan
         .program_blockers
         .iter()
-        .any(|blocker| blocker.blocker_class == "authority-boundary-ambiguous")
+        .find(|blocker| blocker.blocker_class == "authority-boundary-ambiguous")
     {
-        bail!("program closeout blocked: unresolved program authority ambiguity");
+        bail!("program closeout blocked: {}", blocker.message);
     }
     verify_parent_program_closeout_receipts(&repo_root, plan)?;
     verify_parent_does_not_own_child_surfaces(&repo_root, checkpoint)?;
@@ -10304,7 +12740,7 @@ fn verify_program_closeout(
             format!("child:{}:terminal-outcome", state.child_id),
             outcome.to_string(),
         );
-        verify_child_receipts_for_closeout(octon_dir, &repo_root, state)?;
+        verify_child_receipts_for_closeout(octon_dir, &repo_root, policy, state)?;
         verify_child_authority_surfaces_for_closeout(&repo_root, checkpoint, state)?;
         checks.insert(
             format!("child:{}:receipts", state.child_id),
@@ -10440,6 +12876,7 @@ fn verify_parent_receipt_field(
 fn verify_child_receipts_for_closeout(
     octon_dir: &Path,
     repo_root: &Path,
+    policy: Option<&ProgramCloseoutPolicySpec>,
     state: &ProgramChildPlanState,
 ) -> Result<()> {
     let child_contract = load_lifecycle_contract(octon_dir, &state.child_lifecycle_id)?;
@@ -10447,12 +12884,35 @@ fn verify_child_receipts_for_closeout(
     if child_contract.contract.receipts.is_empty() {
         return Ok(());
     }
+    let outcome = state.terminal_outcome.as_deref().with_context(|| {
+        format!(
+            "program closeout blocked: child {} has no terminal outcome",
+            state.child_id
+        )
+    })?;
+    let required_receipts = policy
+        .map(|policy| {
+            child_closeout_required_receipt_ids(policy, &child_contract.contract, outcome)
+        })
+        .unwrap_or_else(|| {
+            child_contract
+                .contract
+                .receipts
+                .iter()
+                .map(|receipt| receipt.receipt_id.clone())
+                .collect()
+        });
     let live_plan = plan_lifecycle_from_octon_dir(
         octon_dir,
         &state.child_lifecycle_id,
         Path::new(&state.target),
     )?;
-    for receipt in &child_contract.contract.receipts {
+    for receipt in child_contract
+        .contract
+        .receipts
+        .iter()
+        .filter(|receipt| required_receipts.contains(&receipt.receipt_id))
+    {
         let receipt_path = resolve_target_local_path(
             &child_target_abs,
             &receipt.path,
@@ -10520,6 +12980,15 @@ fn verify_child_receipts_for_closeout(
                 receipt.receipt_id
             );
         }
+    }
+    if let Some(policy) = policy {
+        validate_child_closeout_receipt_fields(policy, outcome, &live_plan.receipt_states)
+            .with_context(|| {
+                format!(
+                    "program closeout blocked: child {} terminal outcome {} receipt fields invalid",
+                    state.child_id, outcome
+                )
+            })?;
     }
     Ok(())
 }
@@ -10975,6 +13444,222 @@ mod tests {
         }
     }
 
+    fn test_recovery_recipe(blocker_class: &str) -> ProgramRecoveryRecipeSpec {
+        ProgramRecoveryRecipeSpec {
+            blocker_class: blocker_class.to_string(),
+            recovery_route_id: None,
+            recovery_action_id: None,
+            preconditions: Vec::new(),
+            idempotency_class: Some("idempotent-rerun".to_string()),
+            approval_required: false,
+            retry_budget: Some(1),
+            dependent_handling: Some("continue-independent".to_string()),
+            post_attempt_validation: vec!["replan-live-state".to_string()],
+            replan_behavior: Some("after-attempt".to_string()),
+            allowed_authority_zones: vec![AUTHORITY_ZONE_WORKSPACE_DECLARED.to_string()],
+            allowed_artifact_classes: vec![ARTIFACT_CLASS_WORKSPACE_SOURCE.to_string()],
+            operation_class: Some(OPERATION_CLASS_RETRY_CHILD_ROUTE.to_string()),
+            requires_run_binding: false,
+            requires_declared_write_scope: true,
+            requires_zone_evidence: true,
+            approval_required_for_zones: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn authority_zone_classifies_representative_paths() {
+        let repo = Path::new("/workspace/octon");
+        let run_id = "run-1";
+
+        let run_evidence = classify_authority_zone(
+            repo,
+            run_id,
+            None,
+            None,
+            None,
+            "append-run-evidence",
+            &[repo.join(".octon/state/evidence/runs/run-1/events.yml")],
+            &[],
+            None,
+        );
+        assert_eq!(run_evidence.authority_zone, AUTHORITY_ZONE_RUN_BOUND);
+        assert_eq!(run_evidence.artifact_class, ARTIFACT_CLASS_RUN_EVIDENCE);
+        assert!(run_evidence.autonomous_allowed);
+
+        let previous_run_evidence = classify_authority_zone(
+            repo,
+            run_id,
+            None,
+            None,
+            None,
+            "append-run-evidence",
+            &[repo.join(".octon/state/evidence/runs/previous-run/events.yml")],
+            &[],
+            None,
+        );
+        assert_eq!(
+            previous_run_evidence.authority_zone,
+            AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
+        );
+        assert!(!previous_run_evidence.autonomous_allowed);
+
+        let generated = classify_authority_zone(
+            repo,
+            run_id,
+            None,
+            None,
+            None,
+            OPERATION_CLASS_REFRESH_GENERATED_PROJECTION,
+            &[repo.join(".octon/generated/effective/extensions/catalog.effective.yml")],
+            &[],
+            None,
+        );
+        assert_eq!(generated.authority_zone, AUTHORITY_ZONE_GENERATED_DERIVED);
+        assert_eq!(generated.artifact_class, ARTIFACT_CLASS_GENERATED_DERIVED);
+        assert!(generated.autonomous_allowed);
+        assert!(generated.generated_non_authority);
+        assert!(generated
+            .forbidden_authority_consumers
+            .iter()
+            .any(|consumer| consumer == "child-receipt"));
+
+        let authored = classify_authority_zone(
+            repo,
+            run_id,
+            None,
+            None,
+            None,
+            "durable-authority-mutation",
+            &[repo.join(".octon/framework/constitution/contracts/authority/family.yml")],
+            &[],
+            None,
+        );
+        assert_eq!(authored.authority_zone, AUTHORITY_ZONE_AUTHORED_GOVERNANCE);
+        assert_eq!(
+            authored.fail_closed_blocker,
+            BLOCKER_DURABLE_AUTHORITY_APPROVAL_REQUIRED
+        );
+        assert!(!authored.autonomous_allowed);
+
+        let workspace = classify_authority_zone(
+            repo,
+            run_id,
+            Some("child-a"),
+            Some("implement"),
+            None,
+            OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
+            &[repo.join("src/lib.rs")],
+            &["src".to_string()],
+            None,
+        );
+        assert_eq!(workspace.authority_zone, AUTHORITY_ZONE_WORKSPACE_DECLARED);
+        assert!(authority_decision_allows_route_unattended(&workspace));
+
+        let outside_declared_scope = classify_authority_zone(
+            repo,
+            run_id,
+            Some("child-a"),
+            Some("implement"),
+            None,
+            OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
+            &[repo.join("src/lib.rs")],
+            &["docs".to_string()],
+            None,
+        );
+        assert_eq!(
+            outside_declared_scope.authority_zone,
+            AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
+        );
+        assert_eq!(
+            outside_declared_scope.fail_closed_blocker,
+            BLOCKER_AUTHORITY_ZONE_AMBIGUOUS
+        );
+
+        let current_run_artifact = classify_authority_zone(
+            repo,
+            run_id,
+            Some("child-a"),
+            Some("implement"),
+            None,
+            OPERATION_CLASS_CLEANUP_CURRENT_RUN_ARTIFACT,
+            &[repo.join(".octon/state/control/execution/runs/run-1/tmp/lock.tmp")],
+            &[".octon/state/control/execution/runs/run-1".to_string()],
+            None,
+        );
+        assert_eq!(
+            current_run_artifact.authority_zone,
+            AUTHORITY_ZONE_CURRENT_RUN_AGENT_ARTIFACT
+        );
+        assert!(current_run_artifact.autonomous_allowed);
+    }
+
+    #[test]
+    fn authority_zone_recipe_metadata_blocks_approval_free_protected_mutation() {
+        let mut recipe = test_recovery_recipe("publication-drift");
+        recipe.allowed_authority_zones = vec![AUTHORITY_ZONE_AUTHORED_GOVERNANCE.to_string()];
+        recipe.allowed_artifact_classes = vec![ARTIFACT_CLASS_AUTHORED_GOVERNANCE.to_string()];
+        recipe.operation_class = Some("durable-authority-mutation".to_string());
+
+        let error = validate_recovery_recipe_metadata(&recipe, "publication-drift", true)
+            .expect_err("approval-free durable authority recipe should fail");
+        assert!(error
+            .to_string()
+            .contains("allows protected authority zone"));
+    }
+
+    #[test]
+    fn authority_zone_grants_require_zone_binding_for_workspace_source() {
+        let repo = Path::new("/workspace/octon");
+        let decision = classify_authority_zone(
+            repo,
+            "run-1",
+            Some("child-a"),
+            Some("implement"),
+            None,
+            OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
+            &[repo.join("src/lib.rs")],
+            &["src".to_string()],
+            None,
+        );
+        let legacy_grant = ProgramApprovalGrant {
+            child_id: "child-a".to_string(),
+            route_id: "implement".to_string(),
+            blocker_class: None,
+            registry_digest: Some("sha256:registry".to_string()),
+            authority_zone: None,
+            operation_class: None,
+            artifact_class: None,
+            write_scope_digest: None,
+            source_authority_digest: None,
+            grant_scope_digest: None,
+            reason: "legacy grant".to_string(),
+            recorded_at: "2026-05-17T00:00:00Z".to_string(),
+            evidence_path: "approval.yml".to_string(),
+        };
+        assert!(!approval_granted_for_authority_decision(
+            Some(&vec![legacy_grant.clone()]),
+            "child-a",
+            "implement",
+            Some("sha256:registry"),
+            None,
+            &decision
+        ));
+
+        let mut zone_bound_grant = legacy_grant;
+        zone_bound_grant.authority_zone = Some(decision.authority_zone.clone());
+        zone_bound_grant.operation_class = Some(decision.operation_class.clone());
+        zone_bound_grant.artifact_class = Some(decision.artifact_class.clone());
+        zone_bound_grant.write_scope_digest = decision.write_scope_digest.clone();
+        assert!(approval_granted_for_authority_decision(
+            Some(&vec![zone_bound_grant]),
+            "child-a",
+            "implement",
+            Some("sha256:registry"),
+            None,
+            &decision
+        ));
+    }
+
     #[test]
     fn worktree_hygiene_blocker_requires_human_without_criticality_evidence() {
         assert_eq!(
@@ -11013,6 +13698,287 @@ mod tests {
             blockers,
             final_verdict: "route-ready".to_string(),
         }
+    }
+
+    fn program_plan_with_children(
+        child_states: BTreeMap<String, ProgramChildPlanState>,
+        runnable_batch: Vec<&str>,
+    ) -> ProgramLifecyclePlanResult {
+        ProgramLifecyclePlanResult {
+            schema_version: "octon-program-lifecycle-plan-v1".to_string(),
+            lifecycle_id: "proposal-program".to_string(),
+            owner_extension: "test-extension".to_string(),
+            execution_strategy: LifecycleExecutionStrategy::OrchestratedReplanLoop
+                .as_str()
+                .to_string(),
+            contract_path: "test".to_string(),
+            target: "parent".to_string(),
+            parent_manifest_status: Some("accepted".to_string()),
+            child_registry_path: "parent/resources/child-packet-index.yml".to_string(),
+            child_registry_schema_version: "octon-proposal-program-child-registry-v2".to_string(),
+            child_registry_digest: "sha256:test".to_string(),
+            execution_mode: "parallel-independent".to_string(),
+            aggregate_state: "planned".to_string(),
+            terminal_outcome: None,
+            parent_receipt_states: BTreeMap::new(),
+            program_route: None,
+            program_gate_results: Vec::new(),
+            blocked_by_program_gate: None,
+            program_blockers: Vec::new(),
+            normalized_program_blockers: Vec::new(),
+            child_states,
+            normalized_child_blockers: BTreeMap::new(),
+            runnable_batch: runnable_batch
+                .into_iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
+            scheduler_phase: Some("default".to_string()),
+            skipped_blocked_children: Vec::new(),
+            required_child_completion: BTreeMap::new(),
+            safe_repair_candidates: Vec::new(),
+            program_recovery_recipe_validation_status: None,
+            program_recovery_recipe_validation_failures: Vec::new(),
+            program_recovery_recipe_blocker_class: None,
+            program_recovery_recipe_route_id: None,
+            program_recovery_recipe_safe_unattended_basis: None,
+            unsafe_results: Vec::new(),
+            unsafe_continuation_decision: None,
+            approval_blockers: Vec::new(),
+            normalized_approval_blockers: Vec::new(),
+            checkpoint_drift: None,
+            stop_reason: Some("dispatch-available".to_string()),
+            final_verdict: "planned".to_string(),
+        }
+    }
+
+    fn program_with_publication_recovery_action() -> ProgramSpec {
+        let mut program = test_program_spec();
+        program.recovery_policy.max_recovery_attempts = Some(2);
+        program
+            .recovery_policy
+            .recipes
+            .push(ProgramRecoveryRecipeSpec {
+                blocker_class: "publication-drift".to_string(),
+                recovery_action_id: Some(REFRESH_PUBLICATION_PROJECTIONS_ACTION.to_string()),
+                idempotency_class: Some("idempotent-rerun".to_string()),
+                approval_required: false,
+                retry_budget: Some(1),
+                dependent_handling: Some("pause-dependent".to_string()),
+                post_attempt_validation: vec![
+                    "replan-live-state".to_string(),
+                    "publication-freshness-cleared".to_string(),
+                    "replay-verify".to_string(),
+                ],
+                replan_behavior: Some("after-attempt".to_string()),
+                ..Default::default()
+            });
+        program
+    }
+
+    fn program_with_rebaseline_checkpoint_action() -> ProgramSpec {
+        let mut program = test_program_spec();
+        program.recovery_policy.max_recovery_attempts = Some(2);
+        program
+            .recovery_policy
+            .recipes
+            .push(ProgramRecoveryRecipeSpec {
+                blocker_class: "target-drift-explained".to_string(),
+                recovery_action_id: Some(REBASELINE_CHECKPOINT_ACTION.to_string()),
+                idempotency_class: Some("inspect-only".to_string()),
+                approval_required: false,
+                retry_budget: Some(1),
+                dependent_handling: Some("pause-dependent".to_string()),
+                post_attempt_validation: vec![
+                    "replan-live-state".to_string(),
+                    "authority-boundary-check".to_string(),
+                    "replay-verify".to_string(),
+                ],
+                replan_behavior: Some("after-attempt".to_string()),
+                ..Default::default()
+            });
+        program
+    }
+
+    #[test]
+    fn recoverable_no_dispatch_blocker_becomes_recovery_route_unavailable() {
+        let program = test_program_spec();
+        let mut program_blockers = vec![blocker("implementation-blocked")];
+        let mut child_states = BTreeMap::new();
+
+        apply_recoverable_dispatchability_blockers(
+            &program,
+            &mut child_states,
+            &mut program_blockers,
+        );
+
+        assert_eq!(
+            program_blockers[0].blocker_class,
+            "recovery-route-unavailable"
+        );
+        assert!(program_blockers[0]
+            .message
+            .contains("implementation-blocked"));
+        assert!(program_blockers[0].recovery_route.is_none());
+    }
+
+    #[test]
+    fn target_drift_explained_selects_rebaseline_once_then_exhausts_budget() {
+        let program = program_with_rebaseline_checkpoint_action();
+        let mut child_states = BTreeMap::new();
+        child_states.insert(
+            "a".to_string(),
+            child_state("a", vec![blocker("target-drift-explained")]),
+        );
+        let plan = program_plan_with_children(child_states.clone(), vec![]);
+
+        assert_eq!(
+            select_program_recovery_action(&program, &plan, None),
+            Some(("target-drift-explained", REBASELINE_CHECKPOINT_ACTION))
+        );
+
+        let mut used_actions = BTreeMap::new();
+        used_actions.insert(
+            program_recovery_action_attempt_key(
+                "target-drift-explained",
+                REBASELINE_CHECKPOINT_ACTION,
+            ),
+            1,
+        );
+        let checkpoint = checkpoint_from_plan(
+            "target-drift-explained-budget",
+            "proposal-program",
+            "parent",
+            ExecutorKind::Mock,
+            "unattended",
+            &BTreeMap::new(),
+            &plan,
+            &[],
+            "blocked-recoverable",
+            None,
+            0,
+            BTreeMap::new(),
+            used_actions,
+            BTreeMap::new(),
+            Vec::new(),
+        );
+
+        assert!(select_program_recovery_action(&program, &plan, Some(&checkpoint)).is_none());
+
+        let mut exhausted_children = child_states;
+        let mut exhausted_program_blockers = Vec::new();
+        apply_program_recovery_action_budget_blockers(
+            &program,
+            &mut exhausted_children,
+            &mut exhausted_program_blockers,
+            Some(&checkpoint),
+        );
+        let exhausted = exhausted_children
+            .get("a")
+            .unwrap()
+            .blockers
+            .first()
+            .unwrap();
+        assert_eq!(exhausted.blocker_class, "recovery-budget-override-required");
+        assert!(exhausted.message.contains(REBASELINE_CHECKPOINT_ACTION));
+    }
+
+    #[test]
+    fn finding_binding_derives_deterministic_id_from_failed_gate() {
+        let mut plan = program_plan_with_children(BTreeMap::new(), vec![]);
+        plan.program_gate_results.push(GatePlanResult {
+            gate_id: "program-child-proposal-readiness".to_string(),
+            validator_id: "proposal-validator".to_string(),
+            passed: false,
+            exit_code: Some(1),
+            stdout: "missing child evidence".to_string(),
+            stderr: "validator diagnostic".to_string(),
+        });
+        let evidence_root = std::env::temp_dir().join(format!(
+            "octon-finding-binding-{}",
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&evidence_root).unwrap();
+
+        let finding_id = derive_and_write_finding_binding(&plan, &evidence_root)
+            .unwrap()
+            .unwrap();
+        let repeated = derive_and_write_finding_binding(&plan, &evidence_root)
+            .unwrap()
+            .unwrap();
+        let evidence = fs::read_to_string(evidence_root.join("finding-binding.yml")).unwrap();
+
+        assert_eq!(finding_id, repeated);
+        assert!(finding_id.starts_with("finding-"));
+        assert!(evidence.contains("status: derived"));
+        assert!(evidence.contains("source_kind: failed-gate"));
+        assert!(evidence.contains("program-child-proposal-readiness:proposal-validator"));
+    }
+
+    #[test]
+    fn finding_binding_unavailable_emits_input_binding_stop() {
+        let evidence_root = std::env::temp_dir().join(format!(
+            "octon-finding-binding-unavailable-{}",
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&evidence_root).unwrap();
+        let route = RoutePlanState {
+            route_id: "generate-program-correction-prompt".to_string(),
+            route_type: "extension".to_string(),
+            command_id: None,
+            skill_id: None,
+            prompt_set_id: None,
+        };
+
+        let result =
+            finding_binding_unavailable_result("missing-finding", &route, "parent", &evidence_root)
+                .unwrap();
+
+        assert_eq!(result.status, "blocked-human");
+        assert_eq!(result.error_class, Some(LifecycleErrorClass::InputBinding));
+        assert!(result
+            .error_message
+            .as_deref()
+            .unwrap_or_default()
+            .contains("finding-binding-unavailable"));
+        assert!(result
+            .evidence_paths
+            .iter()
+            .any(|path| path.ends_with("finding-binding.yml")));
+    }
+
+    #[test]
+    fn retryable_executor_timeout_maps_to_durable_blocker_class() {
+        let result = LifecycleRouteExecutionResult {
+            schema_version: "octon-lifecycle-route-execution-result-v1".to_string(),
+            run_id: "executor-timeout".to_string(),
+            route_id: "run-implementation".to_string(),
+            executor_used: "mock".to_string(),
+            status: "timed-out".to_string(),
+            started_at: "now".to_string(),
+            ended_at: "now".to_string(),
+            manifest_status_before: None,
+            manifest_status_after: None,
+            receipts_observed: Vec::new(),
+            evidence_paths: vec![PathBuf::from("evidence/executor-timeout.yml")],
+            stdout_path: None,
+            stderr_path: None,
+            prompt_packet_path: None,
+            retryable: true,
+            next_action: "retry".to_string(),
+            error_class: Some(LifecycleErrorClass::Timeout),
+            error_message: Some("executor timed out".to_string()),
+        };
+
+        assert_eq!(
+            execution_result_blocker_class(&result).as_deref(),
+            Some("executor-timed-out")
+        );
     }
 
     #[test]
@@ -11082,6 +14048,10 @@ mod tests {
         ] {
             assert_eq!(normalize_program_state_value(state), category, "{state}");
         }
+        assert_eq!(
+            normalize_program_state_value("step-budget-exhausted-continuable"),
+            ProgramNormalizedCategory::Budget
+        );
 
         for (class, normalized_class, disposition) in [
             (
@@ -11092,6 +14062,16 @@ mod tests {
             (
                 "unsupported-mode-config",
                 "unsupported-mode-config",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "executor-preflight-blocked",
+                "executor-preflight-blocked",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "step-budget-exhausted-continuable",
+                "step-budget-exhausted-continuable",
                 ProgramBlockerDisposition::Recoverable,
             ),
             (
@@ -11140,6 +14120,31 @@ mod tests {
                 ProgramBlockerDisposition::Human,
             ),
             (
+                "authority-zone-denied",
+                "authority-zone-denied",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "durable-authority-approval-required",
+                "durable-authority-approval-required",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "protected-artifact-approval-required",
+                "protected-artifact-approval-required",
+                ProgramBlockerDisposition::Human,
+            ),
+            (
+                "authority-zone-ambiguous",
+                "authority-zone-ambiguous",
+                ProgramBlockerDisposition::Unsafe,
+            ),
+            (
+                "self-authorization-attempt",
+                "self-authorization-attempt",
+                ProgramBlockerDisposition::Unsafe,
+            ),
+            (
                 "recovery-integrity-risk",
                 "recovery-integrity-risk",
                 ProgramBlockerDisposition::Unsafe,
@@ -11156,6 +14161,147 @@ mod tests {
                 "{class}"
             );
         }
+    }
+
+    #[test]
+    fn program_recovery_action_selection_skips_non_action_child_blockers() {
+        let program = program_with_publication_recovery_action();
+        let mut child_states = BTreeMap::new();
+        child_states.insert(
+            "a".to_string(),
+            child_state("a", vec![blocker("artifact-ownership-unclear")]),
+        );
+        child_states.insert(
+            "b".to_string(),
+            child_state("b", vec![blocker("publication-drift")]),
+        );
+        let plan = program_plan_with_children(child_states, vec!["a", "b"]);
+
+        let selected = select_program_recovery_action(&program, &plan, None);
+
+        assert_eq!(
+            selected,
+            Some(("publication-drift", REFRESH_PUBLICATION_PROJECTIONS_ACTION))
+        );
+    }
+
+    #[test]
+    fn publication_post_validation_failure_selects_publication_recovery_action() {
+        let program = program_with_publication_recovery_action();
+        let mut child_states = BTreeMap::new();
+        child_states.insert(
+            "a".to_string(),
+            child_state(
+                "a",
+                vec![
+                    blocker("artifact-ownership-unclear"),
+                    blocker("publication-drift"),
+                ],
+            ),
+        );
+        let plan = program_plan_with_children(child_states, vec!["a"]);
+        let child_results = vec![ProgramChildExecutionSummary {
+            child_id: "a".to_string(),
+            child_run_id: "publication-post-validation-a".to_string(),
+            route_id: "run-packet-implementation".to_string(),
+            status: "failed".to_string(),
+            attempts: 1,
+            retryable: true,
+            blocker_class: Some("publication-drift".to_string()),
+            error_message: Some(
+                "recovery post-attempt validation failed for publication-drift: publication-freshness-cleared"
+                    .to_string(),
+            ),
+            error_class: None,
+            evidence_paths: Vec::new(),
+        }];
+
+        assert!(child_results_have_publication_post_validation_failure(
+            &child_results
+        ));
+        assert_eq!(
+            select_program_recovery_action(&program, &plan, None),
+            Some(("publication-drift", REFRESH_PUBLICATION_PROJECTIONS_ACTION))
+        );
+    }
+
+    #[test]
+    fn publication_action_post_validation_allows_selected_child_recovery_route() {
+        let mut publication_blocker = blocker("publication-drift");
+        publication_blocker.recovery_route = Some("run-packet-implementation".to_string());
+        let mut child = child_state("a", vec![publication_blocker]);
+        child.selected_route = Some(RoutePlanState {
+            route_id: "run-packet-implementation".to_string(),
+            route_type: "agent".to_string(),
+            command_id: None,
+            skill_id: None,
+            prompt_set_id: None,
+        });
+        let mut child_states = BTreeMap::new();
+        child_states.insert("a".to_string(), child);
+        let plan = program_plan_with_children(child_states, vec!["a"]);
+
+        assert!(program_recovery_post_attempt_validation_result(
+            "publication-freshness-cleared",
+            &plan,
+            Path::new("."),
+            "publication-drift",
+            true,
+        )
+        .is_ok());
+
+        let ambiguous_plan = program_plan_with_children(
+            BTreeMap::from([(
+                "a".to_string(),
+                child_state("a", vec![blocker("publication-drift")]),
+            )]),
+            vec!["a"],
+        );
+        assert!(program_recovery_post_attempt_validation_result(
+            "publication-freshness-cleared",
+            &ambiguous_plan,
+            Path::new("."),
+            "publication-drift",
+            true,
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn worktree_hygiene_preflight_allows_current_run_noncritical_residue_only() {
+        let pass_decision = classify_worktree_hygiene_preflight(
+            true,
+            r#"
+worktree_hygiene_verdict: "blocked"
+worktree_hygiene_blocker_class: "local-run-residue"
+worktree_hygiene_foreign_path_count: 0
+"#,
+        );
+        assert_eq!(pass_decision.status, "pass");
+
+        let foreign_decision = classify_worktree_hygiene_preflight(
+            true,
+            r#"
+worktree_hygiene_verdict: "blocked"
+worktree_hygiene_blocker_class: "local-run-residue"
+worktree_hygiene_foreign_path_count: 1
+"#,
+        );
+        assert_eq!(foreign_decision.status, "blocked");
+        assert_eq!(foreign_decision.blocker_class, "artifact-ownership-unclear");
+
+        let ambiguous_decision = classify_worktree_hygiene_preflight(
+            true,
+            r#"
+worktree_hygiene_verdict: "blocked"
+worktree_hygiene_blocker_class: "worktree-hygiene-blocked"
+"#,
+        );
+        assert_eq!(ambiguous_decision.status, "blocked");
+        assert_eq!(
+            ambiguous_decision.blocker_class,
+            "artifact-ownership-unclear"
+        );
     }
 
     #[test]
@@ -12550,10 +15696,11 @@ routes:
             result.gate_id == "program-child-proposal-readiness" && !result.passed
         }));
         assert!(plan.program_blockers.iter().any(|blocker| {
-            blocker.blocker_class == "validation-failed"
+            blocker.blocker_class == "recovery-route-unavailable"
                 && blocker
                     .message
                     .contains("generate-program-implementation-prompt")
+                && blocker.message.contains("validation-failed")
         }));
     }
 
@@ -12794,7 +15941,7 @@ routes:
             receipt.receipt_id == "proposal-review" && receipt.exists && receipt.complete
         }));
         assert!(result.selected_children.is_empty());
-        assert_eq!(result.final_verdict, "blocked-max-steps");
+        assert_eq!(result.final_verdict, "step-budget-exhausted-continuable");
         let events = read_program_events(
             &fixture
                 .octon_dir
@@ -13434,7 +16581,7 @@ routes:
     }
 
     #[test]
-    fn unattended_policy_dispatches_governed_workflow_promotion() {
+    fn unattended_policy_blocks_workflow_promotion_without_safe_basis() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("approval-unattended-workflow-promote", true);
         fixture.write_child_contract_with_workflow_promotion_approval();
@@ -13469,19 +16616,20 @@ routes:
         )
         .unwrap();
 
+        assert_eq!(result.final_verdict, "blocked-human");
         assert!(result.child_results.iter().any(|summary| {
-            summary.route_id == "promote-proposal" && summary.status == "completed"
+            summary.route_id == "promote-proposal" && summary.status == "approval-required"
         }));
         assert_eq!(
             proposal_status_at_target(&fixture.root.join("children/a"))
                 .unwrap()
                 .as_deref(),
-            Some("implemented")
+            Some("accepted")
         );
-        assert!(fixture
+        assert!(!fixture
             .octon_dir
             .join("state/evidence/runs/workflows/approval-unattended-workflow-promote/children/a/promote-proposal-approval-override.yml")
-            .is_file());
+            .exists());
     }
 
     #[test]
@@ -13533,14 +16681,15 @@ routes:
         )
         .unwrap();
 
+        assert_eq!(resumed.final_verdict, "blocked-human");
         assert!(resumed.child_results.iter().any(|summary| {
-            summary.route_id == "promote-proposal" && summary.status == "completed"
+            summary.route_id == "promote-proposal" && summary.status == "approval-required"
         }));
         assert_eq!(
             proposal_status_at_target(&fixture.root.join("children/a"))
                 .unwrap()
                 .as_deref(),
-            Some("implemented")
+            Some("accepted")
         );
         let resumed_checkpoint =
             read_program_checkpoint_for_run(&fixture.octon_dir, "resume-preserves-unattended")
@@ -14118,11 +17267,19 @@ routes:
         };
 
         let blockers = vec![blocker.clone()];
-        let (_blocker, route, basis) =
-            selected_program_repair_blocker(&loaded.contract, program, &blockers)
+        let selection =
+            selected_program_repair_blocker_with_validation(&loaded.contract, program, &blockers)
+                .selection
                 .expect("safe program repair route should be selected");
 
-        assert_eq!(route.route_id, "generate-program-implementation-prompt");
+        assert_eq!(
+            selection.route.route_id,
+            "generate-program-implementation-prompt"
+        );
+        let basis = selection
+            .validation
+            .safe_unattended_basis
+            .expect("safe program repair basis should be retained");
         assert!(basis.contains("idempotency_class=idempotent"));
         assert!(program_blocker_has_safe_agent_repair(
             &loaded.contract,
@@ -14154,7 +17311,13 @@ routes:
         };
 
         let blockers = vec![blocker.clone()];
-        assert!(selected_program_repair_blocker(&loaded.contract, program, &blockers).is_none());
+        assert!(selected_program_repair_blocker_with_validation(
+            &loaded.contract,
+            program,
+            &blockers
+        )
+        .selection
+        .is_none());
         let (_state, verdict) = aggregate_program_state(
             program,
             Some(&loaded.contract),
@@ -14411,6 +17574,8 @@ routes:
             retryable: false,
             blocker_class: Some("unsafe-resume".to_string()),
             error_message: Some("unsafe route stopped".to_string()),
+            error_class: None,
+            evidence_paths: Vec::new(),
         }];
 
         plan.runnable_batch = vec!["b".to_string()];
@@ -14500,6 +17665,8 @@ routes:
             retryable: true,
             blocker_class: Some("unsafe-resume".to_string()),
             error_message: Some("post validation failed".to_string()),
+            error_class: None,
+            evidence_paths: Vec::new(),
         };
 
         finalize_unsafe_repair_evidence(&evidence_root, &failed_summary).unwrap();
@@ -14807,7 +17974,7 @@ routes:
         )
         .unwrap();
 
-        assert_eq!(result.final_verdict, "blocked-max-steps");
+        assert_eq!(result.final_verdict, "step-budget-exhausted-continuable");
         assert_eq!(
             result
                 .child_results
@@ -14851,7 +18018,10 @@ routes:
             .unwrap(),
         )
         .unwrap();
-        assert_eq!(checkpoint.final_verdict, "blocked-max-steps");
+        assert_eq!(
+            checkpoint.final_verdict,
+            "step-budget-exhausted-continuable"
+        );
         assert_eq!(checkpoint.execution_strategy, "orchestrated-replan-loop");
 
         let resumed =
@@ -14912,7 +18082,7 @@ routes:
         )
         .unwrap();
 
-        assert_eq!(result.final_verdict, "blocked-max-steps");
+        assert_eq!(result.final_verdict, "step-budget-exhausted-continuable");
         assert_eq!(result.child_results.len(), 2);
         assert!(result.child_results.iter().all(|summary| {
             summary.route_id == "generate-packet-implementation-prompt"
@@ -15000,7 +18170,7 @@ routes:
         )
         .unwrap();
 
-        assert_eq!(result.final_verdict, "blocked-max-steps");
+        assert_eq!(result.final_verdict, "step-budget-exhausted-continuable");
         assert!(result.child_results.is_empty());
         assert!(!fixture
             .root
@@ -16098,14 +19268,13 @@ rationale: "prove overwrite guard"
         )
         .unwrap();
 
-        assert_eq!(plan.final_verdict, "blocked-recoverable");
-        assert!(plan
-            .child_states
-            .get("a")
-            .unwrap()
-            .blockers
-            .iter()
-            .any(|blocker| blocker.blocker_class == "stale-receipt"));
+        assert_eq!(plan.final_verdict, "blocked-human");
+        assert!(plan.program_blockers.iter().any(|blocker| {
+            blocker.blocker_class == "receipt-recovery-unavailable"
+                && blocker
+                    .message
+                    .contains("required child a is not closeout-ready")
+        }));
     }
 
     #[test]
@@ -16860,6 +20029,8 @@ rationale: "prove overwrite guard"
             error_message: Some(
                 "route completed but child lifecycle progress did not change".to_string(),
             ),
+            error_class: None,
+            evidence_paths: Vec::new(),
         }];
         let checkpoint = checkpoint_from_plan(
             "no-progress-fingerprint",
@@ -17036,7 +20207,7 @@ rationale: "prove overwrite guard"
     }
 
     #[test]
-    fn publication_refresh_requires_freshness_clear_before_child_retry() {
+    fn publication_refresh_allows_child_retry_for_stale_child_receipt() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("publication-recovery-still-stale", true);
         fixture.write_full_child_contract();
@@ -17085,14 +20256,16 @@ rationale: "prove overwrite guard"
         )
         .unwrap();
 
-        assert_eq!(result.final_verdict, "blocked-recoverable");
-        assert!(result.child_results.is_empty());
+        assert_eq!(result.final_verdict, "step-budget-exhausted-continuable");
+        assert!(result
+            .child_results
+            .iter()
+            .any(|summary| summary.route_id == "run-packet-implementation"));
         let summary_path = fixture.octon_dir.join(
             "state/evidence/runs/workflows/publication-recovery-still-stale/program-recovery-actions/refresh-publication-projections/attempt-1/summary.yml",
         );
         let summary = fs::read_to_string(summary_path).unwrap();
-        assert!(summary.contains("failed_command: \"post-validation\""));
-        assert!(summary.contains("publication-freshness-cleared"));
+        assert!(summary.contains("status: \"completed\""));
     }
 
     #[test]
@@ -17193,6 +20366,8 @@ rationale: "prove overwrite guard"
             retryable: false,
             blocker_class: Some("stale-receipt".to_string()),
             error_message: None,
+            error_class: None,
+            evidence_paths: Vec::new(),
         }];
 
         enforce_recovery_post_attempt_validations(
@@ -17381,6 +20556,8 @@ rationale: "prove overwrite guard"
             retryable: false,
             blocker_class: Some("operator-approval-required".to_string()),
             error_message: None,
+            error_class: None,
+            evidence_paths: Vec::new(),
         }];
         assert!(program_execute_loop_should_stop(
             &approval_blocked,
@@ -17396,6 +20573,8 @@ rationale: "prove overwrite guard"
             retryable: false,
             blocker_class: Some("executor-unavailable".to_string()),
             error_message: Some("nested Codex runtime preflight failed".to_string()),
+            error_class: None,
+            evidence_paths: Vec::new(),
         }];
         assert!(program_execute_loop_should_stop(
             &executor_preflight_blocked,
@@ -17471,6 +20650,8 @@ rationale: "prove overwrite guard"
                 retryable: false,
                 blocker_class: Some("stale-receipt".to_string()),
                 error_message: None,
+                error_class: None,
+                evidence_paths: Vec::new(),
             }];
 
             enforce_recovery_post_attempt_validations(
@@ -17542,6 +20723,8 @@ rationale: "prove overwrite guard"
             retryable: false,
             blocker_class: Some("stale-receipt".to_string()),
             error_message: None,
+            error_class: None,
+            evidence_paths: Vec::new(),
         }];
 
         enforce_recovery_post_attempt_validations(
@@ -17996,6 +21179,8 @@ routes:
                 retryable: false,
                 blocker_class: None,
                 error_message: None,
+                error_class: None,
+                evidence_paths: Vec::new(),
             },
             lock_path: lock_path.clone(),
         };
@@ -18041,6 +21226,8 @@ routes:
                 retryable: false,
                 blocker_class: None,
                 error_message: None,
+                error_class: None,
+                evidence_paths: Vec::new(),
             },
             lock_path: lock_path.clone(),
         };
