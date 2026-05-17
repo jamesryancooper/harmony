@@ -4,7 +4,7 @@
   "selected_route": "branch-no-pr",
   "operator_requested_route": "branch-no-pr",
   "target_lifecycle_outcome": "cleaned",
-  "lifecycle_outcome": "branch-local-complete",
+  "lifecycle_outcome": "cleaned",
   "outcome_intent": "attempt-cleaned-closeout",
   "intent": "Introduce authority zones for governed Octon automation so bounded internal repair can proceed only when zone, ownership, write scope, run binding, idempotency, approval, and evidence allow it.",
   "scope": {
@@ -28,28 +28,64 @@
     ]
   },
   "source_branch_ref": "chore/authority-zones-closeout",
+  "target_branch_ref": "origin/main@2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+  "remote_branch_ref": "origin/chore/authority-zones-closeout@2aea56270d2e76e8dda836cfad0157fbb783d9e3",
   "landing_evaluation": {
-    "status": "not_attempted",
-    "blocker_reason": "Hosted branch-no-pr landing and source-branch cleanup were not attempted because the worktree contains out-of-scope blocked proposal receipts and retained runtime evidence that must not be deleted or folded into this completed authority-zone change set.",
+    "status": "succeeded",
+    "provider_ruleset_ref": "live:gh api repos/jamesryancooper/octon/rules/branches/main",
+    "source_ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "target_ref": "origin/main@2aea56270d2e76e8dda836cfad0157fbb783d9e3",
     "evidence_refs": [
-      ".octon/state/evidence/runs/skills/closeout-change/authority-zones/worktree-classification.md"
+      "git-branch-hosted-preflight.sh --receipt .octon/state/evidence/runs/skills/closeout-change/authority-zones/change-receipt.json --require-check route_neutral_closeout_validation --require-check branch_naming_validation --require-check route_aware_autonomy_validation --require-check exact_source_sha_validation",
+      "git-required-checks-at-ref.sh --ref HEAD --require-check route_neutral_closeout_validation --require-check branch_naming_validation --require-check route_aware_autonomy_validation --require-check exact_source_sha_validation"
     ]
   },
-  "not_landed_reason": "branch-local closeout only; no PR opened and no hosted main mutation attempted",
-  "not_cleaned_reason": "source branch is intentionally retained as the branch-no-pr durable history while unrelated retained evidence and blocked proposal receipts remain unstaged",
-  "integration_method": "not-applicable",
-  "integration_status": "not_landed",
-  "publication_status": "none",
+  "hosted_landing": {
+    "remote": "origin",
+    "target_branch": "main",
+    "source_branch": "chore/authority-zones-closeout",
+    "source_ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "target_pre_ref": "2e37a6baa223ee5e80aac29cf8476ad90abeff12",
+    "target_post_ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "validated_ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "required_check_refs": [
+      "route_neutral_closeout_validation@2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+      "branch_naming_validation@2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+      "route_aware_autonomy_validation@2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+      "exact_source_sha_validation@2aea56270d2e76e8dda836cfad0157fbb783d9e3"
+    ],
+    "provider_ruleset_ref": "live:gh api repos/jamesryancooper/octon/rules/branches/main",
+    "push_refspec": "2aea56270d2e76e8dda836cfad0157fbb783d9e3:refs/heads/main",
+    "fast_forward_only": true
+  },
+  "landed_ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+  "main_alignment": {
+    "local_main_ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "origin_main_ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "landed_ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "aligned": true,
+    "verification_ref": "git rev-parse main origin/main HEAD"
+  },
+  "integration_method": "fast-forward",
+  "integration_status": "landed",
+  "publication_status": "hosted-main-updated",
   "cleanup_status": "completed",
   "cleanup_evidence_refs": [
+    "git-branch-cleanup.sh --branch chore/authority-zones-closeout --landed-ref 2aea56270d2e76e8dda836cfad0157fbb783d9e3 --retained-rollback-ref origin/main-before-landing:2e37a6baa223ee5e80aac29cf8476ad90abeff12 --delete-remote --confirm",
+    "local source branch deleted",
+    "remote source branch deleted",
+    "local main synced to origin/main",
+    "preserved out-of-scope retained evidence and blocked proposal artifacts restored after cleanup",
     ".octon/state/evidence/runs/skills/closeout-change/authority-zones/worktree-classification.md"
   ],
   "source_branch_cleanup": {
-    "status": "deferred",
+    "status": "completed",
     "local_branch": "chore/authority-zones-closeout",
-    "worktree": "authority-zone change set staged and committed; unrelated retained evidence and blocked proposal receipts preserved",
-    "blocker_reason": "cleaning the source branch would require landing or discarding retained evidence outside the completed authority-zone change set",
+    "remote_branch": "origin/chore/authority-zones-closeout",
+    "worktree": "/Users/jamesryancooper/Projects/octon switched to main and synced to origin/main",
     "evidence_refs": [
+      "git branch --list chore/authority-zones-closeout returned empty after cleanup",
+      "git ls-remote --heads origin chore/authority-zones-closeout returned empty after cleanup",
       ".octon/state/evidence/runs/skills/closeout-change/authority-zones/worktree-classification.md"
     ]
   },
@@ -68,22 +104,19 @@
     "git diff --check"
   ],
   "review_waiver_refs": [
-    "solo local branch-no-pr closeout requested; no PR opened"
+    "operator explicitly requested full branch-no-pr cleaned closeout without PR"
   ],
   "durable_history": {
-    "kind": "branch",
-    "ref": "chore/authority-zones-closeout",
-    "branch": "chore/authority-zones-closeout"
+    "kind": "commit",
+    "ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "branch": "main"
   },
   "rollback_handle": {
-    "kind": "discard-branch",
-    "ref": "chore/authority-zones-closeout",
-    "instructions": "Before landing, discard by switching away from chore/authority-zones-closeout and deleting the branch. After landing, revert the resulting commit."
+    "kind": "revert-commit",
+    "ref": "2aea56270d2e76e8dda836cfad0157fbb783d9e3",
+    "instructions": "Revert 2aea56270d2e76e8dda836cfad0157fbb783d9e3 from main if rollback is required. The pre-landing origin/main ref was 2e37a6baa223ee5e80aac29cf8476ad90abeff12."
   },
-  "closeout_outcome": "continued",
-  "remaining_blockers": [
-    "Full cleaned/landed closeout requires hosted no-PR landing and branch cleanup, which were not attempted because unrelated retained evidence and blocked proposal receipts remain outside this completed change set."
-  ],
+  "closeout_outcome": "completed",
   "created_at": "2026-05-17T21:55:45Z",
-  "updated_at": "2026-05-17T21:55:45Z"
+  "updated_at": "2026-05-17T22:35:19Z"
 }
