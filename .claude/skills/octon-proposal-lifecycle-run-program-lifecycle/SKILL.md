@@ -50,10 +50,9 @@ Executor behavior:
   route dispatch or one runnable child batch dispatch; pure planning and
   non-execute handoffs do not consume steps. Use `--max-child-concurrency` to
   bound concurrent child route executors inside one child batch.
-- Durable implementation, promotion, closeout, and archival routes pause for
-  explicit, resumable approval by default. `--approval-policy unattended` is an
-  explicit operator override; the adapter records approval override evidence
-  before executing an approval-gated route under that policy.
+- Durable implementation, promotion, closeout, and archival routes execute only after
+  proof-gated delegation succeeds. `--invocation-authority unattended` authorizes
+  delegated execution, but missing or invalid proof fails closed.
 - Before a long unattended run with the `codex` executor, preflight nested
   executor runtime access. If the sandbox cannot write the Codex runtime state
   database, app-server socket, or required local executor state, rerun through

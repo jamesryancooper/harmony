@@ -1,4 +1,4 @@
-use crate::approval;
+use crate::authorization;
 use crate::auto;
 use crate::claude;
 use crate::codex;
@@ -59,22 +59,24 @@ impl LifecycleRouteExecutor for DefaultLifecycleRouteExecutor {
             write_result(&request.evidence_root, &request.route.route_id, &result)?;
             return Ok(result);
         }
-        if approval::approval_required(&request) {
-            let result = approval::write_approval_pause(&request, before, receipts)?;
-            write_result(&request.evidence_root, &request.route.route_id, &result)?;
-            return Ok(result);
-        }
+        let authorization_proof = match authorization::authorize_before_dispatch(
+            &self.repo_root,
+            &request,
+            before.clone(),
+            receipts.clone(),
+        ) {
+            Ok(path) => path,
+            Err(result) => {
+                write_result(&request.evidence_root, &request.route.route_id, &result)?;
+                return Ok(result);
+            }
+        };
         if let Some(result) =
             executor_preflight_blocked(&self.repo_root, &request, before.clone(), receipts.clone())?
         {
             write_result(&request.evidence_root, &request.route.route_id, &result)?;
             return Ok(result);
         }
-        let approval_override = if approval::unattended_override_active(&request) {
-            Some(approval::write_unattended_override(&request)?)
-        } else {
-            None
-        };
         let mut result = match match request.executor.as_str() {
             "mock" => mock::execute_mock(&request),
             "codex" | "claude" | "auto" => execute_real(&self.repo_root, &request),
@@ -86,9 +88,7 @@ impl LifecycleRouteExecutor for DefaultLifecycleRouteExecutor {
             Ok(result) => result,
             Err(error) => failure_result(&request, before, receipts, error)?,
         };
-        if let Some(path) = approval_override {
-            result.evidence_paths.insert(0, path);
-        }
+        result.evidence_paths.insert(0, authorization_proof);
         write_result(&request.evidence_root, &request.route.route_id, &result)?;
         Ok(result)
     }
@@ -119,7 +119,7 @@ fn executor_preflight_blocked(
     let Some(reason) = codex::runtime_preflight_failure() else {
         return Ok(None);
     };
-    let now = approval::now_rfc3339();
+    let now = authorization::now_rfc3339();
     let evidence_path = request.evidence_root.join(format!(
         "{}-executor-preflight-blocked.yml",
         request.route.route_id
@@ -176,7 +176,7 @@ fn cancellation_result(
     manifest_status_before: Option<String>,
     receipts: Vec<crate::result::ReceiptObservation>,
 ) -> Result<LifecycleRouteExecutionResult, LifecycleExecutionError> {
-    let now = approval::now_rfc3339();
+    let now = authorization::now_rfc3339();
     let token = request
         .policy
         .cancellation_token
@@ -252,7 +252,7 @@ fn input_binding_blocked_result(
     receipts: Vec<crate::result::ReceiptObservation>,
     missing_inputs: Vec<String>,
 ) -> Result<LifecycleRouteExecutionResult, LifecycleExecutionError> {
-    let now = approval::now_rfc3339();
+    let now = authorization::now_rfc3339();
     let blocked_path = request.evidence_root.join(format!(
         "{}-input-binding-blocked.yml",
         request.route.route_id
@@ -345,7 +345,7 @@ fn failure_result(
     receipts: Vec<crate::result::ReceiptObservation>,
     error: LifecycleExecutionError,
 ) -> Result<LifecycleRouteExecutionResult, LifecycleExecutionError> {
-    let now = approval::now_rfc3339();
+    let now = authorization::now_rfc3339();
     let error_path = request
         .evidence_root
         .join(format!("{}-error.yml", request.route.route_id));
@@ -395,7 +395,7 @@ fn failure_result_without_observation(
     request: &LifecycleRouteExecutionRequest,
     error: LifecycleExecutionError,
 ) -> Result<LifecycleRouteExecutionResult, LifecycleExecutionError> {
-    let now = approval::now_rfc3339();
+    let now = authorization::now_rfc3339();
     let error_path = request
         .evidence_root
         .join(format!("{}-error.yml", request.route.route_id));

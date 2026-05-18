@@ -324,7 +324,7 @@ main() {
   write_packet "$root" draft-packet draft
   assert_plan_route "draft routes to proposal review" "$root" draft-packet review-packet
 
-  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target missing-source-packet --run-id missing-source --executor mock --execute-routes --approval-policy unattended --max-steps 2)"
+  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target missing-source-packet --run-id missing-source --executor mock --execute-routes --invocation-authority unattended --max-steps 2)"
   if yq -e '.final_verdict == "blocked" and .selected_route.route_id == "create-packet"' >/dev/null <<<"$output" \
     && [[ -f "$root/.octon/state/evidence/runs/workflows/missing-source/create-packet-input-binding-blocked.yml" ]] \
     && [[ ! -f "$(packet_dir "$root" missing-source-packet)/proposal.yml" ]]; then
@@ -335,7 +335,7 @@ main() {
   fi
 
   printf 'source from set-file\n' >"$root/source-context.txt"
-  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target set-file-packet --run-id set-file-create --executor mock --execute-routes --approval-policy unattended --max-steps 1 --set-file source=source-context.txt)"
+  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target set-file-packet --run-id set-file-create --executor mock --execute-routes --invocation-authority unattended --max-steps 1 --set-file source=source-context.txt)"
   if yq -e '.final_verdict == "blocked-max-steps"' >/dev/null <<<"$output" \
     && yq -e '.run_inputs.source == "source from set-file\n"' "$root/.octon/state/control/execution/runs/set-file-create/lifecycle-checkpoint.yml" >/dev/null \
     && grep -q 'source from set-file' "$(packet_dir "$root" set-file-packet)/resources/source-context.md"; then
@@ -344,7 +344,7 @@ main() {
     printf '%s\n' "$output" >&2
     fail "set-file source input is bound, persisted, and used for creation"
   fi
-  if octon_cli "$root" lifecycle run --lifecycle proposal-packet --target set-file-packet --run-id set-file-create --executor mock --execute-routes --approval-policy unattended --max-steps 1 --set source=different >/tmp/octon-v1-run-input-drift.out 2>&1; then
+  if octon_cli "$root" lifecycle run --lifecycle proposal-packet --target set-file-packet --run-id set-file-create --executor mock --execute-routes --invocation-authority unattended --max-steps 1 --set source=different >/tmp/octon-v1-run-input-drift.out 2>&1; then
     cat /tmp/octon-v1-run-input-drift.out >&2
     fail "run id cannot change persisted creation inputs"
   else
@@ -451,15 +451,15 @@ main() {
   fi
 
   write_packet "$root" execute-packet draft
-  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target execute-packet --run-id v2-execute --executor mock --execute-routes --approval-policy unattended --max-steps 12)"
+  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target execute-packet --run-id v2-execute --executor mock --execute-routes --invocation-authority unattended --max-steps 12)"
 	  if yq -e '.terminal_outcome == "archived" and .final_verdict == "completed"' >/dev/null <<<"$output" \
 	    && grep -q '^status: archived$' "$(packet_dir "$root" execute-packet)/proposal.yml" \
 	    && [[ -f "$(packet_dir "$root" execute-packet)/support/proposal-review.md" ]] \
 	    && [[ -f "$(packet_dir "$root" execute-packet)/support/implementation-run.md" ]] \
 	    && [[ -f "$(packet_dir "$root" execute-packet)/support/proposal-closeout.md" ]] \
-	    && [[ -f "$root/.octon/state/evidence/runs/workflows/v2-execute/run-packet-implementation-approval-override.yml" ]] \
-	    && [[ -f "$root/.octon/state/evidence/runs/workflows/v2-execute/promote-proposal-approval-override.yml" ]] \
-	    && [[ -f "$root/.octon/state/evidence/runs/workflows/v2-execute/archive-proposal-approval-override.yml" ]]; then
+	    && [[ -f "$root/.octon/state/evidence/runs/v2-execute/authorization/run-packet-implementation-delegation-proof.yml" ]] \
+	    && [[ -f "$root/.octon/state/evidence/runs/v2-execute/authorization/promote-proposal-delegation-proof.yml" ]] \
+	    && [[ -f "$root/.octon/state/evidence/runs/v2-execute/authorization/archive-proposal-delegation-proof.yml" ]]; then
 	    pass "execute-routes mock completes proposal lifecycle end to end"
   else
     printf '%s\n' "$output" >&2
@@ -467,7 +467,7 @@ main() {
   fi
 
   printf 'missing target end-to-end source\n' >"$root/missing-e2e-source.txt"
-  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target created-e2e-packet --run-id v2-create-e2e --executor mock --execute-routes --approval-policy unattended --max-steps 12 --set-file source=missing-e2e-source.txt)"
+  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target created-e2e-packet --run-id v2-create-e2e --executor mock --execute-routes --invocation-authority unattended --max-steps 12 --set-file source=missing-e2e-source.txt)"
   if yq -e '.terminal_outcome == "archived" and .final_verdict == "completed"' >/dev/null <<<"$output" \
     && grep -q '^status: archived$' "$(packet_dir "$root" created-e2e-packet)/proposal.yml" \
     && [[ -f "$(packet_dir "$root" created-e2e-packet)/support/proposal-creation.md" ]] \
@@ -479,16 +479,18 @@ main() {
     fail "execute-routes mock completes lifecycle from missing target creation"
   fi
 
-  write_packet "$root" approval-packet draft
-  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target approval-packet --run-id v2-approval --executor mock --execute-routes --approval-policy minimize --max-steps 12)"
-  if yq -e '.final_verdict == "approval-required" and .selected_route.route_id == "run-packet-implementation"' >/dev/null <<<"$output" \
-    && [[ -f "$root/.octon/state/evidence/runs/workflows/v2-approval/approval-required.yml" ]] \
+  write_packet "$root" approval-packet accepted
+  write_review "$root" approval-packet accepted yes 0
+  write_executable_prompt "$root" approval-packet
+  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target approval-packet --run-id v2-approval --executor mock --execute-routes --invocation-authority minimize --max-steps 12)"
+  if yq -e '.final_verdict == "authorization-proof-failed" and .selected_route.route_id == "run-packet-implementation"' >/dev/null <<<"$output" \
+    && [[ -f "$root/.octon/state/evidence/runs/v2-approval/authorization/run-packet-implementation-delegation-proof-failed.yml" ]] \
     && grep -q '^route_execution_mode: adapter-executed$' "$root/.octon/state/evidence/runs/workflows/v2-approval/summary.md" \
-    && grep -q '^adapter_route_status: approval-required$' "$root/.octon/state/evidence/runs/workflows/v2-approval/summary.md"; then
-    pass "execute-routes pauses before durable implementation by default"
+    && grep -q '^adapter_route_status: authorization-proof-failed$' "$root/.octon/state/evidence/runs/workflows/v2-approval/summary.md"; then
+    pass "execute-routes fails closed before unsupported implementation authority"
   else
     printf '%s\n' "$output" >&2
-    fail "execute-routes pauses before durable implementation by default"
+    fail "execute-routes fails closed before unsupported implementation authority"
   fi
 
   write_packet "$root" promote-approval-packet accepted
@@ -498,13 +500,13 @@ main() {
     "verdict: pass" \
     "implemented_at: 2026-05-07T00:00:00Z" \
     "promotion_evidence_count: 1"
-  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target promote-approval-packet --run-id v2-promote-approval --executor mock --execute-routes --approval-policy minimize --max-steps 3)"
-  if yq -e '.final_verdict == "approval-required" and .selected_route.route_id == "promote-proposal"' >/dev/null <<<"$output" \
-    && [[ -f "$root/.octon/state/evidence/runs/workflows/v2-promote-approval/approval-required.yml" ]]; then
-    pass "execute-routes pauses before durable promote by default"
+  output="$(octon_cli "$root" lifecycle run --lifecycle proposal-packet --target promote-approval-packet --run-id v2-promote-approval --executor mock --execute-routes --invocation-authority minimize --max-steps 3)"
+  if yq -e '.final_verdict == "authorization-proof-failed" and .selected_route.route_id == "promote-proposal"' >/dev/null <<<"$output" \
+    && [[ -f "$root/.octon/state/evidence/runs/v2-promote-approval/authorization/promote-proposal-delegation-proof-failed.yml" ]]; then
+    pass "execute-routes fails closed before unsupported promote authority"
   else
     printf '%s\n' "$output" >&2
-    fail "execute-routes pauses before durable promote by default"
+    fail "execute-routes fails closed before unsupported promote authority"
   fi
 
   printf '\nPassed: %s\nFailed: %s\n' "$pass_count" "$fail_count"

@@ -38,11 +38,10 @@ Executor boundary:
   route dispatch or one runnable child batch dispatch; pure planning and
   non-execute handoffs do not consume steps. Use `--max-child-concurrency` to
   bound concurrent child route executors inside one child batch.
-- Durable implementation, promotion, closeout, and archival routes pause for
-  explicit, resumable approval by default. `--approval-policy unattended` is an
-  explicit operator override; the adapter records approval override evidence
-  before executing an approval-gated route under that policy.
-- Program child approval pauses include structured operator guidance. Prefer
+- Durable implementation, promotion, closeout, and archival routes execute only after
+  proof-gated delegation succeeds. `--invocation-authority unattended` authorizes
+  delegated execution, but missing or invalid proof fails closed.
+- Program child human-boundary blocks include structured typed-exception guidance. Use
   `octon lifecycle program approve --run-id <program-run> --child <child>
   --route <route> --reason <reason>`, followed by `octon lifecycle program
   retry --run-id <program-run> --child <child>` or lifecycle resume.

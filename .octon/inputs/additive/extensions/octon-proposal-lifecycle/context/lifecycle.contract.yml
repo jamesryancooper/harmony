@@ -183,6 +183,23 @@ loops:
 routes:
   - route_id: "create-packet"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion:
+        - "proposal-creation"
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "governance-mutation"
+        - "external-irreversible-effect"
     command_id: "octon-proposal-create-packet"
     skill_id: "octon-proposal-lifecycle-create-packet"
     prompt_set_id: "octon-proposal-lifecycle-create-packet"
@@ -209,6 +226,24 @@ routes:
             - file_absent: "proposal.yml"
   - route_id: "review-packet"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion:
+        - "proposal-review"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "contradictory-evidence-resolution"
+        - "stale-evidence-acceptance"
     command_id: "octon-proposal-review-packet"
     skill_id: "octon-proposal-lifecycle-review-packet"
     prompt_set_id: "octon-proposal-lifecycle-review-packet"
@@ -231,6 +266,22 @@ routes:
             - receipt_stale: "proposal-review"
   - route_id: "revise-packet"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch:
+        - "proposal-review"
+      required_receipts_before_completion: []
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "bounded-retry"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
     command_id: "octon-proposal-revise-packet"
     skill_id: "octon-proposal-lifecycle-revise-packet"
     prompt_set_id: "octon-proposal-lifecycle-revise-packet"
@@ -247,6 +298,24 @@ routes:
             value: "revision-required"
   - route_id: "generate-packet-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates:
+        - "implementation-grade-readiness"
+        - "implementation-authorization"
+      required_receipts_before_dispatch:
+        - "proposal-review"
+      required_receipts_before_completion: []
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "stale-evidence-acceptance"
     command_id: "octon-proposal-generate-packet-implementation-prompt"
     skill_id: "octon-proposal-lifecycle-generate-packet-implementation-prompt"
     prompt_set_id: "octon-proposal-lifecycle-generate-packet-implementation-prompt"
@@ -264,15 +333,31 @@ routes:
         - file_absent: "support/executable-implementation-prompt.md"
   - route_id: "run-packet-implementation"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-run-bound"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates:
+        - "implementation-grade-readiness"
+        - "implementation-authorization"
+      required_receipts_before_dispatch:
+        - "proposal-review"
+      required_receipts_before_completion:
+        - "implementation-run"
+      replay_class: "bounded-retry"
+      automated_recovery_policy: "bounded-retry"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "governance-mutation"
+        - "external-irreversible-effect"
     command_id: "octon-proposal-run-packet-implementation"
     skill_id: "octon-proposal-lifecycle-run-packet-implementation"
     prompt_set_id: "octon-proposal-lifecycle-run-packet-implementation"
-    idempotency:
-      idempotency_class: "bounded-retry"
-      safe_unattended: true
-    approval:
-      required_by_default: true
-      reason: "durable repository implementation requires explicit approval"
     completion:
       expected_receipts:
         - "implementation-run"
@@ -322,9 +407,31 @@ routes:
                 value: "fail"
   - route_id: "promote-proposal"
     route_type: "workflow"
-    approval:
-      required_by_default: true
-      reason: "durable proposal promotion requires explicit approval"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-generated-derived"
+        - "octon-run-bound"
+      declared_write_scope_source: "workflow-scope"
+      required_evidence_gates:
+        - "implementation-grade-readiness"
+        - "implementation-authorization"
+      required_receipts_before_dispatch:
+        - "proposal-review"
+        - "implementation-run"
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "governance-mutation"
+        - "contradictory-evidence-resolution"
+        - "stale-evidence-acceptance"
+        - "external-irreversible-effect"
     completion:
       expected_manifest_status: "implemented"
       replan_required: true
@@ -343,6 +450,26 @@ routes:
             value: "pass"
   - route_id: "run-packet-verification-and-correction-loop"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-run-bound"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch:
+        - "implementation-run"
+      required_receipts_before_completion:
+        - "implementation-conformance"
+        - "post-implementation-drift"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "bounded-retry"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "stale-evidence-acceptance"
     command_id: "octon-proposal-run-packet-verification-and-correction-loop"
     skill_id: "octon-proposal-lifecycle-run-packet-verification-and-correction-loop"
     prompt_set_id: "octon-proposal-lifecycle-run-packet-verification-and-correction-loop"
@@ -361,6 +488,26 @@ routes:
             - receipt_absent: "post-implementation-drift"
   - route_id: "closeout-packet"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-run-bound"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch:
+        - "implementation-conformance"
+        - "post-implementation-drift"
+      required_receipts_before_completion:
+        - "proposal-closeout"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "stale-evidence-acceptance"
     command_id: "octon-proposal-closeout-packet"
     skill_id: "octon-proposal-lifecycle-closeout-packet"
     prompt_set_id: "octon-proposal-lifecycle-closeout-packet"
@@ -384,9 +531,28 @@ routes:
         - receipt_absent: "proposal-closeout"
   - route_id: "archive-proposal"
     route_type: "workflow"
-    approval:
-      required_by_default: true
-      reason: "proposal archival requires explicit approval"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-generated-derived"
+        - "octon-run-bound"
+      declared_write_scope_source: "workflow-scope"
+      required_evidence_gates: []
+      required_receipts_before_dispatch:
+        - "implementation-conformance"
+        - "post-implementation-drift"
+        - "proposal-closeout"
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "contradictory-evidence-resolution"
+        - "stale-evidence-acceptance"
     completion:
       expected_manifest_status: "archived"
       replan_required: true

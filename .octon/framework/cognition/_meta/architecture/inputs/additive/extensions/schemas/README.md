@@ -5,7 +5,7 @@
 | `extension-pack.schema.json` | `.octon/inputs/additive/extensions/<pack-id>/pack.yml` |
 | `extension-routing-contract.schema.json` | `.octon/inputs/additive/extensions/<pack-id>/context/routing.contract.yml` |
 | `extension-lifecycle-contract.schema.json` | `.octon/inputs/additive/extensions/<pack-id>/context/lifecycle.contract.yml` |
-| `lifecycle-approval-guidance.schema.json` | Structured `approval_context` embedded in lifecycle `approval-required.yml` evidence |
+| `lifecycle-human-exception-grant.schema.json` | Typed lifecycle human exception grant context for non-machine-provable boundaries |
 | `lifecycle-cancellation.schema.json` | Durable packet/program lifecycle cancellation markers and evidence |
 | `lifecycle-run-event.schema.json` | Packet route-progression `lifecycle-events.ndjson` records under execution control and workflow evidence roots |
 | `program-lifecycle-event.schema.json` | Program lifecycle `program-events.ndjson` records under execution control and workflow evidence roots |

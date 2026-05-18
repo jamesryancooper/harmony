@@ -74,12 +74,12 @@ detection, loop bounds, evidence, checkpoints, and resume. By default, it stops
 at a gated `route-ready` handoff. When invoked with `--execute-routes`, it
 delegates selected routes to the shared lifecycle executor adapter, which owns
 `mock`, `auto`, `codex`, and `claude` route execution outside the lifecycle
-runner. Durable routes declare approval metadata in the lifecycle contract and
-pause for explicit, resumable approval by default. `--approval-policy
-unattended` is an explicit operator override for one-run automation; the adapter
-records approval override evidence before executing an approval-gated route
-under that policy. Non-execute handoffs do not consume loop iterations; executed
-routes do consume bounded loop attempts.
+runner. Routes declare a required `delegation_contract`; durable routes execute
+unattended only after invocation authority, evidence gates, scope checks,
+authority-zone checks, replay class, and required before-dispatch receipts
+produce a retained delegation proof. `--invocation-authority unattended` authorizes only proof-gated delegated execution.
+Non-execute handoffs do not consume loop iterations; executed routes do consume
+bounded loop attempts.
 
 Lifecycle stop evidence uses a shared vocabulary across packet and program
 runs: planned handoff, adapter-dispatched route or child batch, terminal
@@ -95,9 +95,9 @@ Cancellation is a durable lifecycle stop condition. `octon lifecycle cancel
 updates the checkpoint to `final_verdict: cancelled`; `octon lifecycle program
 cancel` remains a compatibility alias. Resume, retry, and execute-routes
 checks must return `cancelled` with `route_execution_mode: none` once the
-marker exists. Program child approval pauses should route operators through
-program approval controls while preserving adapter-level approval enforcement
-and explicit override evidence.
+marker exists. Program child human-boundary blocks should route operators
+through typed human exception grant controls while preserving adapter-level
+delegation proof enforcement.
 
 ## Completion Invariants
 
@@ -105,9 +105,10 @@ and explicit override evidence.
   completeness, expected path existence, expected manifest status, target
   digest change, terminal outcome, or an explicit idempotent no-op.
 - Existing unrelated receipts never satisfy route completion.
-- Durable repository mutation must be approval-gated by default or explicitly
-  authorized by a tested lifecycle contract exception. Unattended execution is
-  recorded as an operator override, not as implicit durable authority.
+- Durable repository mutation must be proof-gated by `delegation_contract`,
+  invocation authority, evidence, scope, authority-zone, replay, and receipt
+  checks. Generated outputs and proposal-local receipts can satisfy evidence
+  gates but never grant authority.
 - Stale or incomplete receipts must not unlock implementation, promotion,
   closeout, archive, or terminal success.
 - Landing blockers are confined to concrete failures that can cause unsafe
@@ -193,9 +194,10 @@ optional mutation evidence, optional scaffold evidence, and aggregate closeout
 receipt. These surfaces coordinate and explain the parent program only. They do
 not satisfy child receipts or rewrite child lifecycle authority.
 
-Program approval grants are parent-run control evidence. A grant only unblocks
-the named child route in that program run; route execution records
-`program-approved` approval evidence before proceeding, and child receipts
+Program human exception grants are parent-run control evidence for typed
+non-machine-provable boundaries. A grant only unblocks the named child route in
+that program run; route execution records grant-consumption evidence before
+dispatch, then writes and re-reads the delegation proof, and child receipts
 remain child-owned. Recovery recipes are bounded by blocker class, retry budget,
 preconditions, post-attempt validation, and live replanning. `unsafe-resume` and
 `authority-boundary-ambiguous` remain fail-closed.

@@ -1,4 +1,4 @@
-use crate::approval::now_rfc3339;
+use crate::authorization::now_rfc3339;
 use crate::errors::{LifecycleErrorClass, LifecycleExecutionError};
 use crate::observer;
 use crate::request::LifecycleRouteExecutionRequest;
@@ -30,6 +30,8 @@ pub fn execute_mock(
         .join(format!("{}-mock.log", request.route.route_id));
     let mutation = if request.lifecycle_id == "proposal-packet" {
         execute_mock_proposal_route(request)
+    } else if request.lifecycle_id == "proposal-program" {
+        execute_mock_program_route(request)
     } else {
         Ok(())
     };
@@ -124,6 +126,13 @@ fn execute_mock_proposal_route(request: &LifecycleRouteExecutionRequest) -> Resu
             &closeout_fields(),
         ),
         "archive-proposal" => set_manifest_status(request, "archived"),
+        _ => Ok(()),
+    }
+}
+
+fn execute_mock_program_route(request: &LifecycleRouteExecutionRequest) -> Result<()> {
+    match request.route.route_id.as_str() {
+        "promote-proposal" => set_manifest_status(request, "implemented"),
         _ => Ok(()),
     }
 }

@@ -2704,10 +2704,25 @@ pub fn run_promote_proposal_from_octon_dir(
         "proposal must be promoted from the active path: {}",
         proposal_rel
     );
+    let promotion_mode = match manifest.status.as_str() {
+        "accepted" => "mutating-transition",
+        "implemented" => "idempotent-no-op",
+        other => bail!(
+            "promote-proposal requires status=accepted, or status=implemented with matching registry for replay; found {}",
+            other
+        ),
+    };
     ensure!(
-        manifest.status == "accepted",
-        "promote-proposal requires status=accepted, found {}",
-        manifest.status
+        promotion_mode != "idempotent-no-op"
+            || proposal_registry_active_status_matches(
+                &repo_root,
+                &proposal_rel,
+                &manifest.proposal_kind,
+                &manifest.proposal_id,
+                "implemented",
+            )?,
+        "promote-proposal replay requires registry status=implemented for {}",
+        proposal_rel
     );
 
     let stage_validate = authorize_workflow_stage(
@@ -2745,11 +2760,7 @@ pub fn run_promote_proposal_from_octon_dir(
         &proposal_root,
         &bundle_root,
         &manifest.proposal_kind,
-    )
-    .and_then(|path| {
-        run_proposal_review_gate_validator(&repo_root, &proposal_root, &bundle_root, true)?;
-        Ok(path)
-    }) {
+    ) {
         Ok(path) => path,
         Err(error) => {
             let _ = finalize_workflow_stage(
@@ -2775,6 +2786,33 @@ pub fn run_promote_proposal_from_octon_dir(
             return Err(error);
         }
     };
+    if promotion_mode == "mutating-transition" {
+        if let Err(error) =
+            run_proposal_review_gate_validator(&repo_root, &proposal_root, &bundle_root, true)
+        {
+            let _ = finalize_workflow_stage(
+                &stage_validate,
+                "failed",
+                Some(error.to_string()),
+                vec![bundle_root
+                    .join("standard-validator.log")
+                    .display()
+                    .to_string()],
+            );
+            let _ = finalize_workflow_failure(
+                &workflow_artifacts,
+                &workflow_request,
+                &workflow_grant,
+                &started_at,
+                error.to_string(),
+                vec![
+                    bundle_root.display().to_string(),
+                    proposal_root.display().to_string(),
+                ],
+            );
+            return Err(error);
+        }
+    }
     finalize_workflow_stage(
         &stage_validate,
         "succeeded",
@@ -2810,46 +2848,58 @@ pub fn run_promote_proposal_from_octon_dir(
         None,
         None,
     )?;
-    let promote_result: Result<()> = (|| {
-        let original_manifest = manifest.clone();
+    let promote_result: Result<Vec<String>> = (|| {
         ensure_promotion_targets_ready(&repo_root, &manifest, &proposal_root)?;
+        if promotion_mode == "idempotent-no-op" {
+            return Ok(vec![".octon/generated/proposals/registry.yml".to_string()]);
+        }
+        let original_manifest = manifest.clone();
         manifest.status = "implemented".to_string();
         write_proposal_manifest(&proposal_root, &manifest)?;
         if let Err(error) = regenerate_proposal_registry(&repo_root, true) {
             write_proposal_manifest(&proposal_root, &original_manifest)?;
             return Err(error);
         }
-        Ok(())
-    })();
-    if let Err(error) = promote_result {
-        let _ = finalize_workflow_stage(
-            &stage_promote,
-            "failed",
-            Some(error.to_string()),
-            vec![proposal_root.display().to_string()],
+        ensure!(
+            proposal_registry_active_status_matches(
+                &repo_root,
+                &proposal_rel,
+                &manifest.proposal_kind,
+                &manifest.proposal_id,
+                "implemented",
+            )?,
+            "promote-proposal registry regeneration did not publish implemented status for {}",
+            proposal_rel
         );
-        let _ = finalize_workflow_failure(
-            &workflow_artifacts,
-            &workflow_request,
-            &workflow_grant,
-            &started_at,
-            error.to_string(),
-            vec![
-                bundle_root.display().to_string(),
-                proposal_root.display().to_string(),
-            ],
-        );
-        return Err(error);
-    }
-    finalize_workflow_stage(
-        &stage_promote,
-        "succeeded",
-        None,
-        vec![
+        Ok(vec![
             rel_path(&repo_root, &proposal_root.join("proposal.yml")),
             ".octon/generated/proposals/registry.yml".to_string(),
-        ],
-    )?;
+        ])
+    })();
+    let promoted_paths = match promote_result {
+        Ok(paths) => paths,
+        Err(error) => {
+            let _ = finalize_workflow_stage(
+                &stage_promote,
+                "failed",
+                Some(error.to_string()),
+                vec![proposal_root.display().to_string()],
+            );
+            let _ = finalize_workflow_failure(
+                &workflow_artifacts,
+                &workflow_request,
+                &workflow_grant,
+                &started_at,
+                error.to_string(),
+                vec![
+                    bundle_root.display().to_string(),
+                    proposal_root.display().to_string(),
+                ],
+            );
+            return Err(error);
+        }
+    };
+    finalize_workflow_stage(&stage_promote, "succeeded", None, promoted_paths)?;
 
     write_create_inventory(&bundle_root, &proposal_root)?;
     write_create_commands_log(
@@ -2861,16 +2911,18 @@ pub fn run_promote_proposal_from_octon_dir(
                 rel_path(&repo_root, &validator_log)
             ),
             format!(
-                "- promote proposal | proposal_path={} | promotion_evidence={}",
+                "- promote proposal | proposal_path={} | promotion_mode={} | promotion_evidence={}",
                 proposal_rel,
+                promotion_mode,
                 options.promotion_evidence.join(", ")
             ),
         ],
     )?;
     let summary = format!(
-        "# Promote Proposal Summary\n\n- workflow_id: `promote-proposal`\n- proposal_path: `{}`\n- proposal_kind: `{}`\n- final_verdict: `implemented`\n- bundle_root: `{}`\n- summary_report: `{}`\n- validator_log: `{}`\n- promotion_evidence: `{}`\n",
+        "# Promote Proposal Summary\n\n- workflow_id: `promote-proposal`\n- proposal_path: `{}`\n- proposal_kind: `{}`\n- final_verdict: `implemented`\n- promotion_mode: `{}`\n- bundle_root: `{}`\n- summary_report: `{}`\n- validator_log: `{}`\n- promotion_evidence: `{}`\n",
         proposal_rel,
         manifest.proposal_kind,
+        promotion_mode,
         rel_path(&repo_root, &bundle_root),
         rel_path(&repo_root, &summary_report),
         rel_path(&repo_root, &validator_log),
@@ -2881,9 +2933,10 @@ pub fn run_promote_proposal_from_octon_dir(
     fs::write(
         bundle_root.join("validation.md"),
         format!(
-            "# Validation\n\n- final_verdict: `implemented`\n- proposal_kind: `{}`\n- validator_log: `{}`\n- status_after_promotion: `implemented`\n- registry_sync: `passed`\n",
+            "# Validation\n\n- final_verdict: `implemented`\n- proposal_kind: `{}`\n- validator_log: `{}`\n- status_after_promotion: `implemented`\n- promotion_mode: `{}`\n- registry_sync: `passed`\n",
             manifest.proposal_kind,
-            rel_path(&repo_root, &validator_log)
+            rel_path(&repo_root, &validator_log),
+            promotion_mode
         ),
     )?;
     fs::write(
@@ -5507,6 +5560,32 @@ fn regenerate_proposal_registry(repo_root: &Path, write: bool) -> Result<()> {
         );
     }
     Ok(())
+}
+
+fn proposal_registry_active_status_matches(
+    repo_root: &Path,
+    proposal_rel: &str,
+    proposal_kind: &str,
+    proposal_id: &str,
+    expected_status: &str,
+) -> Result<bool> {
+    let registry_path = repo_root.join(".octon/generated/proposals/registry.yml");
+    ensure!(
+        registry_path.is_file(),
+        "proposal registry missing: {}",
+        registry_path.display()
+    );
+    let registry: ProposalRegistry = serde_yaml::from_str(
+        &fs::read_to_string(&registry_path)
+            .with_context(|| format!("read {}", registry_path.display()))?,
+    )
+    .with_context(|| format!("parse {}", registry_path.display()))?;
+    Ok(registry.active.iter().any(|entry| {
+        entry.path == proposal_rel
+            && entry.kind == proposal_kind
+            && entry.id == proposal_id
+            && entry.status == expected_status
+    }))
 }
 
 fn write_create_stage_input(

@@ -335,8 +335,8 @@ fn ensure_existing_components_stay_in_target(
 mod tests {
     use super::*;
     use crate::request::{
-        LifecycleExecutionPolicy, LifecycleReceiptSpec, LifecycleRouteExecutionRequest,
-        LifecycleRouteSpec,
+        LifecycleDelegationContract, LifecycleExecutionPolicy, LifecycleInvocationAuthority,
+        LifecycleReceiptSpec, LifecycleRouteExecutionRequest, LifecycleRouteSpec,
     };
     use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -371,8 +371,18 @@ mod tests {
                 prompt_set_id: None,
                 required_inputs: Vec::new(),
                 completion_replan_required: true,
-                approval_required_by_default: false,
-                approval_reason: None,
+                delegation_contract: Some(LifecycleDelegationContract {
+                    decision_class: "delegated-execution".to_string(),
+                    safe_delegation: true,
+                    authority_zones_allowed: vec!["workspace-declared".to_string()],
+                    declared_write_scope_source: "route-completion-and-target".to_string(),
+                    required_evidence_gates: Vec::new(),
+                    required_receipts_before_dispatch: vec!["proposal-closeout".to_string()],
+                    required_receipts_before_completion: vec!["proposal-closeout".to_string()],
+                    replay_class: "no-op-safe".to_string(),
+                    automated_recovery_policy: "fail-closed".to_string(),
+                    human_only_boundaries: vec!["scope-expansion".to_string()],
+                }),
             },
             effective_extension_catalog: root
                 .join(".octon/generated/effective/extensions/catalog.effective.yml"),
@@ -399,9 +409,14 @@ mod tests {
                 timeout_seconds: 30,
                 cancellation_token: None,
                 retry_attempt: 0,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: LifecycleInvocationAuthority {
+                    mode: "unattended".to_string(),
+                    provenance: "test".to_string(),
+                    authority_ref: None,
+                },
             },
-            approval_context: None,
+            human_boundary_context: None,
+            evidence_gate_results: BTreeMap::new(),
         }
     }
 

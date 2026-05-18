@@ -1,5 +1,5 @@
 mod adapter;
-mod approval;
+mod authorization;
 mod auto;
 mod claude;
 mod codex;
@@ -18,8 +18,9 @@ pub use errors::{LifecycleErrorClass, LifecycleExecutionError};
 pub use generated::{resolve_prompt_bundle, resolve_workflow_manifest};
 pub use input_binding::default_bound_inputs;
 pub use request::{
-    LifecycleApprovalContext, LifecycleExecutionPolicy, LifecycleReceiptSpec,
-    LifecycleRouteExecutionRequest, LifecycleRouteSpec,
+    LifecycleDelegationContract, LifecycleExecutionPolicy, LifecycleHumanBoundaryContext,
+    LifecycleInvocationAuthority, LifecycleReceiptSpec, LifecycleRouteExecutionRequest,
+    LifecycleRouteSpec,
 };
 pub use result::{
     LifecycleRouteCompletionObservation, LifecycleRouteExecutionResult, ReceiptObservation,

@@ -1241,9 +1241,9 @@ pub(crate) enum LifecycleCmd {
         /// Maximum concurrent child route executors for program lifecycles.
         #[arg(long = "max-child-concurrency")]
         max_child_concurrency: Option<usize>,
-        /// Approval policy for execute-routes mode: minimize or unattended operator override.
-        #[arg(long = "approval-policy", default_value = "minimize")]
-        approval_policy: String,
+        /// Invocation authority for execute-routes mode. Unattended dispatch is proof-gated.
+        #[arg(long = "invocation-authority", default_value = "unattended")]
+        invocation_authority: String,
         /// Generic lifecycle run input as key=value. May be repeated.
         #[arg(long = "set", value_name = "KEY=VALUE")]
         set: Vec<String>,

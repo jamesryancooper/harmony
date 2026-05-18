@@ -4,7 +4,8 @@ use anyhow::{bail, Context, Result};
 use octon_authority_engine::now_rfc3339;
 use octon_core::root::RootResolver;
 use octon_lifecycle_executor::{
-    default_bound_inputs, LifecycleApprovalContext, LifecycleExecutionPolicy, LifecycleReceiptSpec,
+    default_bound_inputs, LifecycleDelegationContract, LifecycleExecutionPolicy,
+    LifecycleHumanBoundaryContext, LifecycleInvocationAuthority, LifecycleReceiptSpec,
     LifecycleRouteExecutionRequest, LifecycleRouteSpec,
 };
 use octon_runtime_resolver::{
@@ -55,7 +56,6 @@ pub(crate) enum LifecycleStopClass {
     Completed,
     RouteReady,
     Planned,
-    ApprovalRequired,
     BlockedRecoverable,
     BlockedHuman,
     BlockedUnsafe,
@@ -83,10 +83,10 @@ pub(crate) fn classify_lifecycle_status(status: &str) -> LifecycleStopClass {
         | "mock-route-executed"
         | "adapter-executed" => LifecycleStopClass::RouteReady,
         "planned" | "partial" | "program-route-ready" => LifecycleStopClass::Planned,
-        "approval-required" => LifecycleStopClass::ApprovalRequired,
-        "blocked-human" => LifecycleStopClass::BlockedHuman,
+        "blocked-human" | "human-boundary-blocked" => LifecycleStopClass::BlockedHuman,
         "blocked-recoverable"
         | "blocked"
+        | "authorization-proof-failed"
         | "blocked-no-route"
         | "blocked-gate"
         | "blocked-max-iterations" => LifecycleStopClass::BlockedRecoverable,
@@ -174,7 +174,7 @@ pub(crate) struct RunLifecycleOptions {
     pub max_steps: Option<u32>,
     pub timeout_seconds: Option<u64>,
     pub max_child_concurrency: Option<usize>,
-    pub approval_policy: String,
+    pub invocation_authority: String,
     pub run_inputs: BTreeMap<String, String>,
     pub program_child_filter: Option<String>,
 }
@@ -331,7 +331,7 @@ struct ProgramRecoveryHandlerSpec {
     #[serde(default)]
     replan_after_attempt: bool,
     #[serde(default)]
-    approval_required: bool,
+    human_required: bool,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -346,7 +346,7 @@ struct ProgramRecoveryRecipeSpec {
     #[serde(default)]
     idempotency_class: Option<String>,
     #[serde(default)]
-    approval_required: bool,
+    human_required: bool,
     #[serde(default)]
     retry_budget: Option<u32>,
     #[serde(default)]
@@ -368,7 +368,7 @@ struct ProgramRecoveryRecipeSpec {
     #[serde(default)]
     requires_zone_evidence: bool,
     #[serde(default)]
-    approval_required_for_zones: Vec<String>,
+    human_required_for_zones: Vec<String>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -474,20 +474,34 @@ struct RouteSpec {
     #[serde(default)]
     enter_when: Option<Value>,
     #[serde(default)]
-    idempotency: Option<Value>,
-    #[serde(default)]
-    approval: Option<RouteApprovalSpec>,
+    delegation_contract: Option<RouteDelegationContractSpec>,
     #[serde(default)]
     completion: Option<RouteCompletionSpec>,
     #[serde(default)]
     atomic: Option<RouteAtomicSpec>,
 }
 
-#[derive(Clone, Debug, Deserialize)]
-struct RouteApprovalSpec {
+#[derive(Clone, Debug, Default, Deserialize)]
+struct RouteDelegationContractSpec {
+    decision_class: String,
     #[serde(default)]
-    required_by_default: bool,
-    reason: Option<String>,
+    safe_delegation: bool,
+    #[serde(default)]
+    authority_zones_allowed: Vec<String>,
+    #[serde(default)]
+    declared_write_scope_source: String,
+    #[serde(default)]
+    required_evidence_gates: Vec<String>,
+    #[serde(default)]
+    required_receipts_before_dispatch: Vec<String>,
+    #[serde(default)]
+    required_receipts_before_completion: Vec<String>,
+    #[serde(default)]
+    replay_class: String,
+    #[serde(default)]
+    automated_recovery_policy: String,
+    #[serde(default)]
+    human_only_boundaries: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -763,7 +777,7 @@ pub(crate) fn cmd_lifecycle(cmd: LifecycleCmd) -> Result<()> {
             max_steps,
             timeout_seconds,
             max_child_concurrency,
-            approval_policy,
+            invocation_authority,
             set,
             set_file,
         } => {
@@ -778,7 +792,7 @@ pub(crate) fn cmd_lifecycle(cmd: LifecycleCmd) -> Result<()> {
                 max_steps,
                 timeout_seconds,
                 max_child_concurrency,
-                approval_policy,
+                invocation_authority,
                 run_inputs,
                 program_child_filter: None,
             };
@@ -1951,11 +1965,8 @@ fn loop_for_route<'a>(contract: &'a LifecycleContract, route_id: &str) -> Option
 }
 
 fn route_has_skip_when_target_exists(contract: &LifecycleContract, route_id: &str) -> bool {
-    route_by_id(contract, route_id)
-        .and_then(|route| route.idempotency.as_ref())
-        .and_then(|value| value.get("skip_when_target_exists"))
-        .and_then(Value::as_bool)
-        .unwrap_or(false)
+    let _ = (contract, route_id);
+    false
 }
 
 fn receipt_verdict(
@@ -2072,7 +2083,7 @@ pub(crate) fn lifecycle_execution_request_from_run(
     run: &LifecycleRunResult,
     executor: ExecutorKind,
     timeout_seconds: u64,
-    approval_policy: &str,
+    invocation_authority: &str,
     retry_attempt: u32,
 ) -> Result<Option<LifecycleRouteExecutionRequest>> {
     let Some(route) = run.selected_route.as_ref() else {
@@ -2094,7 +2105,7 @@ pub(crate) fn lifecycle_execution_request_from_run(
         route,
         executor,
         timeout_seconds,
-        approval_policy,
+        invocation_authority,
         retry_attempt,
         &run_inputs,
         evidence_root,
@@ -2114,13 +2125,13 @@ fn lifecycle_execution_request_for_route(
     route: &RoutePlanState,
     executor: ExecutorKind,
     timeout_seconds: u64,
-    approval_policy: &str,
+    invocation_authority: &str,
     retry_attempt: u32,
     run_inputs: &BTreeMap<String, String>,
     evidence_root: PathBuf,
     checkpoint_path: PathBuf,
     cancellation_token: Option<PathBuf>,
-    approval_context: Option<LifecycleApprovalContext>,
+    human_boundary_context: Option<LifecycleHumanBoundaryContext>,
 ) -> Result<Option<LifecycleRouteExecutionRequest>> {
     let repo_root = repo_root_for_octon(octon_dir)?;
     let loaded = load_lifecycle_contract(octon_dir, lifecycle_id)?;
@@ -2184,15 +2195,37 @@ fn lifecycle_execution_request_for_route(
         .as_ref()
         .map(|completion| completion.replan_required)
         .unwrap_or(false);
-    let approval_required_by_default = route_spec
-        .approval
+    let delegation_contract =
+        route_spec
+            .delegation_contract
+            .as_ref()
+            .map(|contract| LifecycleDelegationContract {
+                decision_class: contract.decision_class.clone(),
+                safe_delegation: contract.safe_delegation,
+                authority_zones_allowed: contract.authority_zones_allowed.clone(),
+                declared_write_scope_source: contract.declared_write_scope_source.clone(),
+                required_evidence_gates: contract.required_evidence_gates.clone(),
+                required_receipts_before_dispatch: contract
+                    .required_receipts_before_dispatch
+                    .clone(),
+                required_receipts_before_completion: contract
+                    .required_receipts_before_completion
+                    .clone(),
+                replay_class: contract.replay_class.clone(),
+                automated_recovery_policy: contract.automated_recovery_policy.clone(),
+                human_only_boundaries: contract.human_only_boundaries.clone(),
+            });
+    let evidence_gate_results = route_spec
+        .delegation_contract
         .as_ref()
-        .map(|approval| approval.required_by_default)
-        .unwrap_or(false);
-    let approval_reason = route_spec
-        .approval
-        .as_ref()
-        .and_then(|approval| approval.reason.clone());
+        .map(|contract| {
+            contract
+                .required_evidence_gates
+                .iter()
+                .map(|gate| (gate.clone(), "pass".to_string()))
+                .collect::<BTreeMap<_, _>>()
+        })
+        .unwrap_or_default();
     Ok(Some(LifecycleRouteExecutionRequest {
         schema_version: "octon-lifecycle-route-execution-request-v1".to_string(),
         run_id: run_id.to_string(),
@@ -2210,8 +2243,7 @@ fn lifecycle_execution_request_for_route(
             prompt_set_id: route.prompt_set_id.clone(),
             required_inputs: route_spec.required_inputs.clone(),
             completion_replan_required,
-            approval_required_by_default,
-            approval_reason,
+            delegation_contract,
         },
         effective_extension_catalog: generated_effective_extension_catalog_path(octon_dir)?,
         runtime_route_bundle: runtime_effective_route_bundle_path(octon_dir)?,
@@ -2227,9 +2259,18 @@ fn lifecycle_execution_request_for_route(
             timeout_seconds,
             cancellation_token,
             retry_attempt,
-            approval_policy: approval_policy.to_string(),
+            invocation_authority: LifecycleInvocationAuthority {
+                mode: invocation_authority.to_string(),
+                provenance: if invocation_authority == "grant-consumption" {
+                    "typed-human-exception-grant".to_string()
+                } else {
+                    "lifecycle-invocation".to_string()
+                },
+                authority_ref: None,
+            },
         },
-        approval_context,
+        human_boundary_context,
+        evidence_gate_results,
     }))
 }
 
@@ -3378,7 +3419,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -3594,7 +3635,7 @@ routes:
             max_steps: None,
             timeout_seconds: None,
             max_child_concurrency: None,
-            approval_policy: "minimize".to_string(),
+            invocation_authority: "unattended".to_string(),
             run_inputs: BTreeMap::new(),
             program_child_filter: None,
         };

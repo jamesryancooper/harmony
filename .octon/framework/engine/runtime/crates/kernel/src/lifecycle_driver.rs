@@ -41,7 +41,7 @@ pub(crate) fn run_lifecycle_execute_from_octon_dir(
                 max_steps: options.max_steps,
                 timeout_seconds: options.timeout_seconds,
                 max_child_concurrency: options.max_child_concurrency,
-                approval_policy: options.approval_policy.clone(),
+                invocation_authority: options.invocation_authority.clone(),
                 run_inputs: options.run_inputs.clone(),
                 program_child_filter: options.program_child_filter.clone(),
             },
@@ -82,7 +82,7 @@ pub(crate) fn run_lifecycle_execute_from_octon_dir(
             &run,
             options.executor,
             timeout_seconds,
-            &options.approval_policy,
+            &options.invocation_authority,
             step_budget.step_index(),
         )?
         else {
@@ -111,8 +111,10 @@ pub(crate) fn run_lifecycle_execute_from_octon_dir(
         append_packet_event_for_run(
             &repo_root,
             &run,
-            if execution.status == "approval-required" {
-                "approval-pause"
+            if execution.status == "human-boundary-blocked" {
+                "human-boundary-blocked"
+            } else if execution.status == "authorization-proof-failed" {
+                "authorization-proof-failed"
             } else if execution.status == "cancelled" {
                 "cancelled"
             } else {
@@ -131,7 +133,13 @@ pub(crate) fn run_lifecycle_execute_from_octon_dir(
             "completed" | "no-op" => {
                 continue;
             }
-            "approval-required" | "failed" | "timed-out" | "cancelled" | "blocked" => {
+            "authorization-proof-failed"
+            | "human-boundary-blocked"
+            | "failed"
+            | "timed-out"
+            | "cancelled"
+            | "blocked"
+            | "executor-preflight-blocked" => {
                 return Ok(run);
             }
             other => bail!("unsupported lifecycle execution status: {other}"),

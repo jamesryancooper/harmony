@@ -64,7 +64,7 @@ Run health statuses are:
 - `stale`
 - `unsupported`
 - `revoked`
-- `approval-required`
+- `authority-ambiguity`
 - `review-required`
 - `evidence-incomplete`
 - `rollback-required`

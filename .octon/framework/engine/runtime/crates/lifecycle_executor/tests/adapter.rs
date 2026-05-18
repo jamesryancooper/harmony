@@ -1,9 +1,10 @@
 use octon_lifecycle_executor::{
     default_bound_inputs, resolve_prompt_bundle, resolve_workflow_manifest,
-    DefaultLifecycleRouteExecutor, LifecycleApprovalContext, LifecycleExecutionPolicy,
-    LifecycleReceiptSpec, LifecycleRouteExecutionRequest, LifecycleRouteExecutor,
-    LifecycleRouteSpec,
+    DefaultLifecycleRouteExecutor, LifecycleDelegationContract, LifecycleExecutionPolicy,
+    LifecycleHumanBoundaryContext, LifecycleInvocationAuthority, LifecycleReceiptSpec,
+    LifecycleRouteExecutionRequest, LifecycleRouteExecutor, LifecycleRouteSpec,
 };
+use std::collections::BTreeMap;
 use std::env;
 use std::fs;
 #[cfg(unix)]
@@ -203,7 +204,7 @@ fn request(
     root: &Path,
     route_id: &str,
     route_type: &str,
-    policy: &str,
+    invocation_authority: &str,
 ) -> LifecycleRouteExecutionRequest {
     let target = root.join("packet");
     write_file(&target.join("proposal.yml"), "status: draft\n");
@@ -225,8 +226,7 @@ fn request(
             prompt_set_id: None,
             required_inputs: Vec::new(),
             completion_replan_required: true,
-            approval_required_by_default: false,
-            approval_reason: None,
+            delegation_contract: Some(default_delegation_contract()),
         },
         effective_extension_catalog: root
             .join(".octon/generated/effective/extensions/catalog.effective.yml"),
@@ -257,42 +257,82 @@ fn request(
             timeout_seconds: 30,
             cancellation_token: None,
             retry_attempt: 0,
-            approval_policy: policy.to_string(),
+            invocation_authority: LifecycleInvocationAuthority {
+                mode: invocation_authority.to_string(),
+                provenance: "test-invocation".to_string(),
+                authority_ref: None,
+            },
         },
-        approval_context: None,
+        human_boundary_context: None,
+        evidence_gate_results: BTreeMap::new(),
+    }
+}
+
+fn default_delegation_contract() -> LifecycleDelegationContract {
+    LifecycleDelegationContract {
+        decision_class: "delegated-execution".to_string(),
+        safe_delegation: true,
+        authority_zones_allowed: vec!["workspace-declared".to_string()],
+        declared_write_scope_source: "route-completion-and-target".to_string(),
+        required_evidence_gates: Vec::new(),
+        required_receipts_before_dispatch: Vec::new(),
+        required_receipts_before_completion: Vec::new(),
+        replay_class: "bounded-retry".to_string(),
+        automated_recovery_policy: "fail-closed".to_string(),
+        human_only_boundaries: vec![
+            "scope-expansion".to_string(),
+            "policy-override".to_string(),
+            "governance-mutation".to_string(),
+            "external-irreversible-effect".to_string(),
+        ],
     }
 }
 
 #[test]
-fn approval_pause_writes_program_child_guidance_when_present() {
-    let root = temp_root("program-child-approval-guidance");
+fn human_boundary_block_writes_typed_exception_failure_when_contract_is_not_delegable() {
+    let root = temp_root("program-child-human-boundary");
     let executor = DefaultLifecycleRouteExecutor::new(&root);
-    let mut request = request(&root, "review-proposal", "agent", "minimize");
-    request.route.approval_required_by_default = true;
-    request.approval_context = Some(LifecycleApprovalContext {
+    let mut request = request(&root, "review-proposal", "agent", "unattended");
+    request.route.delegation_contract = Some(LifecycleDelegationContract {
+        decision_class: "new-governance-decision".to_string(),
+        safe_delegation: false,
+        authority_zones_allowed: vec!["workspace-declared".to_string()],
+        declared_write_scope_source: "route-completion-and-target".to_string(),
+        required_evidence_gates: Vec::new(),
+        required_receipts_before_dispatch: Vec::new(),
+        required_receipts_before_completion: Vec::new(),
+        replay_class: "non-replay-safe".to_string(),
+        automated_recovery_policy: "fail-closed".to_string(),
+        human_only_boundaries: vec!["policy-override".to_string()],
+    });
+    request.human_boundary_context = Some(LifecycleHumanBoundaryContext {
         context_kind: "program-child-route".to_string(),
         program_run_id: Some("program-run".to_string()),
         child_id: Some("child-a".to_string()),
-        approval_instruction: Some(
-            "octon lifecycle program approve --run-id program-run --child child-a --route review-proposal --reason <reason>".to_string(),
+        human_exception_instruction: Some(
+            "record typed human exception grant for policy-override".to_string(),
         ),
         retry_instruction: Some(
             "octon lifecycle program retry --run-id program-run --child child-a".to_string(),
-        ),
-        unattended_override_instruction: Some(
-            "octon lifecycle run --lifecycle proposal-packet --target packet --run-id child-run --execute-routes --approval-policy unattended".to_string(),
         ),
     });
 
     let result = executor.execute_route(request.clone()).unwrap();
 
-    assert_eq!(result.status, "approval-required");
-    let approval = fs::read_to_string(request.evidence_root.join("approval-required.yml")).unwrap();
-    assert!(approval.contains("context_kind: program-child-route"));
-    assert!(approval.contains("program_run_id: program-run"));
-    assert!(approval.contains("child_id: child-a"));
-    assert!(approval.contains("octon lifecycle program approve --run-id program-run --child child-a --route review-proposal"));
-    assert!(approval.contains("octon lifecycle program retry --run-id program-run --child child-a"));
+    assert_eq!(result.status, "human-boundary-blocked");
+    assert_eq!(
+        result.error_class,
+        Some(octon_lifecycle_executor::LifecycleErrorClass::HumanBoundaryRequired)
+    );
+    let failure = fs::read_to_string(
+        root.join(".octon/state/evidence/runs/test-run/authorization/review-proposal-delegation-proof-failed.yml"),
+    )
+    .unwrap();
+    assert!(failure.contains("status: human-boundary-blocked"));
+    assert!(!request
+        .evidence_root
+        .join("review-proposal-mock.log")
+        .exists());
 }
 
 #[test]
@@ -756,41 +796,41 @@ fn mock_executor_creates_draft_proposal_packet_from_bound_source() {
 }
 
 #[test]
-fn workflow_routes_pause_for_approval_by_default() {
-    let root = temp_root("approval");
-    let executor = DefaultLifecycleRouteExecutor::new(&root);
-    let result = executor
-        .execute_route(request(&root, "promote-proposal", "workflow", "minimize"))
-        .unwrap();
-    assert_eq!(result.status, "approval-required");
-    assert_eq!(result.next_action, "resume-after-approval");
-    assert!(root
-        .join(".octon/state/evidence/runs/workflows/test-run/approval-required.yml")
-        .is_file());
-}
-
-#[test]
-fn unattended_approval_override_writes_explicit_evidence() {
-    let root = temp_root("approval-override");
+fn workflow_routes_dispatch_by_delegation_contract_not_route_type() {
+    let root = temp_root("workflow-delegation");
     let executor = DefaultLifecycleRouteExecutor::new(&root);
     let mut request = request(&root, "promote-proposal", "workflow", "unattended");
     request.expected_receipts = Vec::new();
     request.expected_manifest_status = Some("implemented".to_string());
-
-    let result = executor.execute_route(request).unwrap();
-
+    let result = executor.execute_route(request.clone()).unwrap();
     assert_eq!(result.status, "completed");
-    let override_path = root.join(
-        ".octon/state/evidence/runs/workflows/test-run/promote-proposal-approval-override.yml",
+    assert!(root
+        .join(".octon/state/evidence/runs/test-run/authorization/promote-proposal-delegation-proof.yml")
+        .is_file());
+    assert!(!root
+        .join(".octon/state/evidence/runs/workflows/test-run/human-boundary-blocked.yml")
+        .exists());
+}
+
+#[test]
+fn unsupported_invocation_authority_fails_closed_without_dispatch() {
+    let root = temp_root("authorization-proof-failed");
+    let executor = DefaultLifecycleRouteExecutor::new(&root);
+    let mut request = request(&root, "promote-proposal", "workflow", "unsupported-mode");
+    request.expected_receipts = Vec::new();
+    request.expected_manifest_status = Some("implemented".to_string());
+
+    let result = executor.execute_route(request.clone()).unwrap();
+
+    assert_eq!(result.status, "authorization-proof-failed");
+    assert_eq!(
+        result.error_class,
+        Some(octon_lifecycle_executor::LifecycleErrorClass::AuthorizationProofFailed)
     );
-    assert!(override_path.is_file());
-    let content = fs::read_to_string(&override_path).unwrap();
-    assert!(content.contains("override_class: operator-unattended-durable-route"));
-    assert!(content.contains("authorization_source: cli-operator-override"));
-    assert!(result
-        .evidence_paths
-        .iter()
-        .any(|path| path.ends_with("promote-proposal-approval-override.yml")));
+    assert!(!root.join("packet/support").exists());
+    assert!(root
+        .join(".octon/state/evidence/runs/test-run/authorization/promote-proposal-delegation-proof-failed.yml")
+        .is_file());
 }
 
 #[test]
@@ -824,25 +864,34 @@ fn missing_required_input_blocks_before_executor_dispatch() {
 }
 
 #[test]
-fn approval_metadata_pauses_extension_routes_by_default() {
-    let root = temp_root("extension-approval");
+fn missing_delegation_contract_fails_closed_before_extension_dispatch() {
+    let root = temp_root("extension-missing-delegation");
     let executor = DefaultLifecycleRouteExecutor::new(&root);
-    let mut request = request(&root, "run-packet-implementation", "extension", "minimize");
-    request.route.approval_required_by_default = true;
-    request.route.approval_reason = Some("durable implementation".to_string());
+    let mut request = request(
+        &root,
+        "run-packet-implementation",
+        "extension",
+        "unattended",
+    );
+    request.route.delegation_contract = None;
     let result = executor.execute_route(request).unwrap();
-    assert_eq!(result.status, "approval-required");
+    assert_eq!(result.status, "authorization-proof-failed");
     assert_eq!(
-        result.error_message.as_deref(),
-        Some("durable implementation")
+        result.error_class,
+        Some(octon_lifecycle_executor::LifecycleErrorClass::AuthorizationProofFailed)
     );
 }
 
 #[test]
-fn extension_route_ids_do_not_force_approval_without_metadata() {
-    let root = temp_root("extension-no-hardcoded-approval");
+fn extension_route_ids_dispatch_when_delegation_contract_passes() {
+    let root = temp_root("extension-delegation-contract");
     let executor = DefaultLifecycleRouteExecutor::new(&root);
-    let mut request = request(&root, "run-packet-implementation", "extension", "minimize");
+    let mut request = request(
+        &root,
+        "run-packet-implementation",
+        "extension",
+        "unattended",
+    );
     request.receipts = vec![LifecycleReceiptSpec {
         receipt_id: "implementation-run".to_string(),
         path: "support/implementation-run.md".to_string(),
@@ -857,7 +906,7 @@ fn extension_route_ids_do_not_force_approval_without_metadata() {
 
     let result = executor.execute_route(request).unwrap();
     assert_eq!(result.status, "completed");
-    assert_ne!(result.status, "approval-required");
+    assert_ne!(result.status, "human-boundary-blocked");
 }
 
 #[test]

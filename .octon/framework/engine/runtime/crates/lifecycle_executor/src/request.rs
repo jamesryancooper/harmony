@@ -30,17 +30,18 @@ pub struct LifecycleRouteExecutionRequest {
     pub checkpoint_path: PathBuf,
     pub policy: LifecycleExecutionPolicy,
     #[serde(default)]
-    pub approval_context: Option<LifecycleApprovalContext>,
+    pub human_boundary_context: Option<LifecycleHumanBoundaryContext>,
+    #[serde(default)]
+    pub evidence_gate_results: BTreeMap<String, String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct LifecycleApprovalContext {
+pub struct LifecycleHumanBoundaryContext {
     pub context_kind: String,
     pub program_run_id: Option<String>,
     pub child_id: Option<String>,
-    pub approval_instruction: Option<String>,
+    pub human_exception_instruction: Option<String>,
     pub retry_instruction: Option<String>,
-    pub unattended_override_instruction: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -54,9 +55,27 @@ pub struct LifecycleRouteSpec {
     pub required_inputs: Vec<String>,
     #[serde(default)]
     pub completion_replan_required: bool,
+    pub delegation_contract: Option<LifecycleDelegationContract>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct LifecycleDelegationContract {
+    pub decision_class: String,
     #[serde(default)]
-    pub approval_required_by_default: bool,
-    pub approval_reason: Option<String>,
+    pub safe_delegation: bool,
+    #[serde(default)]
+    pub authority_zones_allowed: Vec<String>,
+    pub declared_write_scope_source: String,
+    #[serde(default)]
+    pub required_evidence_gates: Vec<String>,
+    #[serde(default)]
+    pub required_receipts_before_dispatch: Vec<String>,
+    #[serde(default)]
+    pub required_receipts_before_completion: Vec<String>,
+    pub replay_class: String,
+    pub automated_recovery_policy: String,
+    #[serde(default)]
+    pub human_only_boundaries: Vec<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -73,5 +92,13 @@ pub struct LifecycleExecutionPolicy {
     pub timeout_seconds: u64,
     pub cancellation_token: Option<PathBuf>,
     pub retry_attempt: u32,
-    pub approval_policy: String,
+    pub invocation_authority: LifecycleInvocationAuthority,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct LifecycleInvocationAuthority {
+    pub mode: String,
+    pub provenance: String,
+    #[serde(default)]
+    pub authority_ref: Option<String>,
 }

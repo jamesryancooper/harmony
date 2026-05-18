@@ -39,16 +39,17 @@ execution. For proposal programs, one step is one selected parent route
 dispatch or one runnable child batch dispatch; one child batch counts as one
 step regardless of `--max-child-concurrency`. Program route execution is
 additionally bounded by dependency gates, child receipts, write-scope checks,
-and approval gates.
+authority-zone checks, replay checks, receipt checks, and delegation proof
+retention.
 `octon lifecycle cancel --run-id <run> --reason <text>` is the shared durable
 stop control for packet and program runs. After cancellation, resume, retry, or
 execute-routes must report `cancelled` with `route_execution_mode: none` and no
 adapter dispatch. `octon lifecycle program cancel` remains accepted as a
 program-specific alias.
-Approval pauses remain adapter-enforced. Program child approval evidence should
-route operators through `octon lifecycle program approve`, then program retry
-or lifecycle resume, while still preserving explicit `unattended` and
-`program-approved` override evidence when an operator chooses those policies.
+Human-boundary blocks remain fail-closed. Program child human exception grant
+evidence should route operators through `octon lifecycle program approve`, then
+program retry or lifecycle resume. Grant consumption records typed
+grant-consumption evidence and never substitutes for the route delegation proof.
 
 ## Naming Scheme
 

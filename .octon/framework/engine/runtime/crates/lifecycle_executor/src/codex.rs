@@ -1,4 +1,4 @@
-use crate::approval::now_rfc3339;
+use crate::authorization::now_rfc3339;
 use crate::errors::{LifecycleErrorClass, LifecycleExecutionError};
 use crate::request::LifecycleRouteExecutionRequest;
 use crate::result::LifecycleRouteExecutionResult;
@@ -522,7 +522,7 @@ fn write_executor_start_evidence(
     fs::write(
         path,
         format!(
-            "schema_version: octon-lifecycle-executor-start-v1\nrun_id: {}\nroute_id: {}\nexecutor_name: {}\nexecutor_bin: {}\ncommand_line: {}\ntimeout_seconds: {}\nretry_attempt: {}\napproval_policy: {}\ncancellation_token: {}\nstarted_at: {}\n",
+            "schema_version: octon-lifecycle-executor-start-v1\nrun_id: {}\nroute_id: {}\nexecutor_name: {}\nexecutor_bin: {}\ncommand_line: {}\ntimeout_seconds: {}\nretry_attempt: {}\ninvocation_authority: {}\ncancellation_token: {}\nstarted_at: {}\n",
             yaml_scalar(&request.run_id),
             yaml_scalar(&request.route.route_id),
             yaml_scalar(executor_name),
@@ -530,7 +530,7 @@ fn write_executor_start_evidence(
             yaml_scalar(command_line),
             request.policy.timeout_seconds,
             request.policy.retry_attempt,
-            yaml_scalar(&request.policy.approval_policy),
+            yaml_scalar(&request.policy.invocation_authority.mode),
             yaml_scalar(&cancellation_token),
             yaml_scalar(&now_rfc3339()),
         ),

@@ -302,6 +302,21 @@ case_promote_passes() {
   grep -Fq 'status: "implemented"' "$registry" || return 1
 }
 
+case_promote_replay_passes_when_registry_matches() {
+  local fixture_root output bundle_root manifest
+  fixture_root="$(new_fixture_repo)"
+  write_active_architecture_proposal "$fixture_root" "accepted"
+  write_registry_for_active_status "$fixture_root" "accepted"
+  write_accepted_proposal_review "$fixture_root"
+  run_workflow "$fixture_root" promote-proposal --set "proposal_path=.octon/inputs/exploratory/proposals/architecture/fixture-proposal" --set "promotion_evidence=.octon/README.md" >/dev/null
+  output="$(run_workflow "$fixture_root" promote-proposal --set "proposal_path=.octon/inputs/exploratory/proposals/architecture/fixture-proposal" --set "promotion_evidence=.octon/README.md")"
+  bundle_root="$(printf '%s\n' "$output" | sed -n 's/^bundle_root: //p' | tail -n 1)"
+  manifest="$fixture_root/.octon/inputs/exploratory/proposals/architecture/fixture-proposal/proposal.yml"
+  assert_file_exists "$bundle_root/summary.md" || return 1
+  [[ "$(yq -r '.status' "$manifest")" == "implemented" ]] || return 1
+  grep -Fq 'promotion_mode: `idempotent-no-op`' "$bundle_root/summary.md" || return 1
+}
+
 case_promote_rejects_accepted_without_review() {
   local fixture_root
   fixture_root="$(new_fixture_repo)"
@@ -356,6 +371,7 @@ case_archive_rejects_non_implemented_disposition() {
 main() {
   case_validate_passes && pass "validate-proposal workflow validates a proposal and writes bundle receipts" || fail "validate-proposal workflow validates a proposal and writes bundle receipts"
   case_promote_passes && pass "promote-proposal workflow marks an accepted proposal implemented and regenerates registry" || fail "promote-proposal workflow marks an accepted proposal implemented and regenerates registry"
+  case_promote_replay_passes_when_registry_matches && pass "promote-proposal workflow replays as a no-op when registry already matches" || fail "promote-proposal workflow replays as a no-op when registry already matches"
   if ! case_promote_rejects_non_accepted_status >/dev/null 2>&1; then
     pass "promote-proposal rejects proposals that are not accepted"
   else

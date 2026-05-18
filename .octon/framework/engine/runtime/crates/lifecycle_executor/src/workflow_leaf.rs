@@ -26,14 +26,14 @@ pub fn render_workflow_leaf_prompt(
         )
     })?;
     let mut rendered = format!(
-        "# Lifecycle Workflow Leaf Execution\n\nRun workflow `{}` for lifecycle `{}`.\n\n- run_id: `{}`\n- approval_policy: `{}`\n\nWorkflow contract: `{}`\n\nInputs:\n",
+        "# Lifecycle Workflow Leaf Execution\n\nRun workflow `{}` for lifecycle `{}`.\n\n- run_id: `{}`\n- invocation_authority: `{}`\n\nWorkflow contract: `{}`\n\nInputs:\n",
         request.route.route_id,
         request.lifecycle_id,
         request.run_id,
-        request.policy.approval_policy,
+        request.policy.invocation_authority.mode,
         manifest_path.display()
     );
-    if let Some(context) = request.approval_context.as_ref() {
+    if let Some(context) = request.human_boundary_context.as_ref() {
         rendered.push_str("- context_kind: `");
         rendered.push_str(&context.context_kind);
         rendered.push_str("`\n");

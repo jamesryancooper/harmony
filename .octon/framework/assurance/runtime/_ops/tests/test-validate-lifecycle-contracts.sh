@@ -127,6 +127,17 @@ loops:
 routes:
   - route_id: "test-route"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: ["test-gate"]
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["test-review"]
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override"]
     command_id: "test-command"
     skill_id: "test-extension-skill"
     prompt_set_id: "test-extension-test-route"
@@ -135,9 +146,6 @@ routes:
       expected_receipts: ["test-review"]
       expected_paths: ["support/proposal-review.md"]
       replan_required: true
-    approval:
-      required_by_default: true
-      reason: "test route mutates durable fixtures"
     enter_when:
       manifest_status: "draft"
 YAML
@@ -182,6 +190,17 @@ receipts:
 routes:
   - route_id: "test-route"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-summary"]
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override"]
     completion:
       expected_receipts: ["program-summary"]
 YAML
@@ -237,6 +256,17 @@ receipts:
 routes:
   - route_id: "test-route"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-summary"]
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override"]
     atomic:
       stage_route_id: "atomic-stage"
       commit_route_id: "atomic-commit"
@@ -246,12 +276,56 @@ routes:
       expected_receipts: ["program-summary"]
   - route_id: "atomic-stage"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "program-mutation-envelope"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override"]
   - route_id: "atomic-commit"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "program-mutation-envelope"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override"]
   - route_id: "atomic-rollback"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "program-mutation-envelope"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override"]
   - route_id: "atomic-compensate"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "program-mutation-envelope"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override"]
 YAML
 }
 
@@ -527,11 +601,17 @@ main() {
   yq -i '.receipts[0].freshness = {"digest_command": ["bash", "/tmp/not-allowed.sh"], "digest_field": "reviewed_packet_digest"}' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
   assert_failure "invalid freshness digest command path fails" "$root"
 
-  root="$(new_fixture_repo missing-approval-reason)"
+  root="$(new_fixture_repo missing-delegation-contract)"
   write_fixture_support "$root"
   write_valid_contract "$root"
-  yq -i 'del(.routes[0].approval.reason)' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
-  assert_failure "approval-required route without reason fails" "$root"
+  yq -i 'del(.routes[0].delegation_contract)' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
+  assert_failure "route without delegation contract fails" "$root"
+
+  root="$(new_fixture_repo legacy-route-approval)"
+  write_fixture_support "$root"
+  write_valid_contract "$root"
+  yq -i '.routes[0].approval.required_by_default = true' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycle.contract.yml"
+  assert_failure "legacy route approval primitive fails" "$root"
 
   root="$(new_fixture_repo invalid-input-binding-source)"
   write_fixture_support "$root"
@@ -566,67 +646,67 @@ main() {
     root="$(new_fixture_repo invalid-recovery-handler-approval)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.handlers."executor-failed".approval_required = "yes"' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.handlers."executor-failed".human_required = "yes"' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "invalid recovery handler approval flag fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-missing-field)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "stale-receipt", "approval_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "stale-receipt", "human_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "recovery recipe missing required field fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-idempotency)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "stale-receipt", "idempotency_class": "magic", "approval_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "stale-receipt", "idempotency_class": "magic", "human_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "invalid recovery recipe idempotency fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-post-validation)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "stale-receipt", "idempotency_class": "idempotent-rerun", "approval_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["trust-me"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "stale-receipt", "idempotency_class": "idempotent-rerun", "human_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["trust-me"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "invalid recovery recipe post-attempt validation fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-replan)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "stale-receipt", "idempotency_class": "idempotent-rerun", "approval_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "eventually"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "stale-receipt", "idempotency_class": "idempotent-rerun", "human_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "eventually"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "invalid recovery recipe replan behavior fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-route)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "validation-failed", "recovery_route_id": "missing-route", "idempotency_class": "approval-gated-mutation", "approval_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "validation-failed", "recovery_route_id": "missing-route", "idempotency_class": "approval-gated-mutation", "human_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "missing recovery recipe route fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-no-dispatch)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "validation-failed", "idempotency_class": "approval-gated-mutation", "approval_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "validation-failed", "idempotency_class": "approval-gated-mutation", "human_required": false, "retry_budget": 1, "dependent_handling": "continue-independent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "recoverable recovery recipe without route action or wait fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-action)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "magic-action", "idempotency_class": "idempotent-rerun", "approval_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "magic-action", "idempotency_class": "idempotent-rerun", "human_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "unsupported recovery recipe action fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-non-recoverable-recipe-route)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "unsafe-resume", "recovery_route_id": "test-route", "idempotency_class": "non-recoverable", "approval_required": true, "retry_budget": 0, "dependent_handling": "fail-closed", "post_attempt_validation": ["replay-verify"], "replan_behavior": "none"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "unsafe-resume", "recovery_route_id": "test-route", "idempotency_class": "non-recoverable", "human_required": true, "retry_budget": 0, "dependent_handling": "fail-closed", "post_attempt_validation": ["replay-verify"], "replan_behavior": "none"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "non-recoverable recovery route fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-zone)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "refresh-publication-projections", "idempotency_class": "idempotent-rerun", "approval_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt", "allowed_authority_zones": ["octon-authored-governance"], "allowed_artifact_classes": ["authored-governance"], "operation_class": "refresh-generated-projection"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "refresh-publication-projections", "idempotency_class": "idempotent-rerun", "human_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt", "allowed_authority_zones": ["octon-authored-governance"], "allowed_artifact_classes": ["authored-governance"], "operation_class": "refresh-generated-projection"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "approval-free durable authority zone recovery fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     root="$(new_fixture_repo invalid-recovery-recipe-operation)"
     write_fixture_support "$root"
     write_valid_atomic_program_contract "$root"
-    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "refresh-publication-projections", "idempotency_class": "idempotent-rerun", "approval_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt", "allowed_authority_zones": ["octon-generated-derived"], "allowed_artifact_classes": ["generated-derived"], "operation_class": "magic-operation"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
+    yq -i '.program.recovery_policy.recipes = [{"blocker_class": "publication-drift", "recovery_action_id": "refresh-publication-projections", "idempotency_class": "idempotent-rerun", "human_required": false, "retry_budget": 1, "dependent_handling": "pause-dependent", "post_attempt_validation": ["replan-live-state"], "replan_behavior": "after-attempt", "allowed_authority_zones": ["octon-generated-derived"], "allowed_artifact_classes": ["generated-derived"], "operation_class": "magic-operation"}]' "$root/.octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
     assert_failure_contract "unsupported authority operation recovery fails" "$root" ".octon/inputs/additive/extensions/test-extension/context/lifecycles/proposal-program.contract.yml"
 
     assert_authority_zone_policy_success "source authority-zone policy passes" "$REPO_ROOT" ".octon/framework/constitution/contracts/authority/authority-zone-policy.yml"
@@ -643,7 +723,7 @@ main() {
     event_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/program-lifecycle-event.schema.json"
     packet_event_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/lifecycle-run-event.schema.json"
     cancellation_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/lifecycle-cancellation.schema.json"
-    approval_guidance_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/lifecycle-approval-guidance.schema.json"
+    approval_guidance_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/lifecycle-human-exception-grant.schema.json"
     lifecycle_schema="$REPO_ROOT/.octon/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/extension-lifecycle-contract.schema.json"
 
     assert_schema_query_equals "registry identifier definition matches runtime" "$registry_schema" '."$defs".identifier.pattern' '^[a-z][a-z0-9-]*$'
@@ -699,8 +779,8 @@ main() {
     assert_schema_query_equals "packet lifecycle event step kind includes route dispatch" "$packet_event_schema" '.properties.step_kind.enum[] | select(. == "route-dispatch")' 'route-dispatch'
     assert_schema_query_equals "lifecycle cancellation schema accepts shared cancellation marker" "$cancellation_schema" '.properties.schema_version.enum[] | select(. == "octon-lifecycle-cancellation-v1")' 'octon-lifecycle-cancellation-v1'
     assert_schema_query_equals "lifecycle cancellation schema accepts program cancellation evidence" "$cancellation_schema" '.properties.schema_version.enum[] | select(. == "octon-program-lifecycle-cancelled-v1")' 'octon-program-lifecycle-cancelled-v1'
-    assert_schema_query_equals "approval guidance schema routes program child approval" "$approval_guidance_schema" '.properties.context_kind.enum[] | select(. == "program-child-route")' 'program-child-route'
-    assert_schema_query_equals "approval guidance schema preserves packet route guidance" "$approval_guidance_schema" '.properties.context_kind.enum[] | select(. == "packet-route")' 'packet-route'
+    assert_schema_query_equals "human exception schema routes program child grants" "$approval_guidance_schema" '.properties.context_kind.enum[] | select(. == "program-child-route")' 'program-child-route'
+    assert_schema_query_equals "human exception schema requires typed boundary" "$approval_guidance_schema" '.properties.human_only_boundary.enum[] | select(. == "scope-expansion")' 'scope-expansion'
 
     assert_schema_query_equals "lifecycle execution strategy accepts route-progression" "$lifecycle_schema" '.properties.execution_strategy.enum[] | select(. == "route-progression")' 'route-progression'
     assert_schema_query_equals "lifecycle execution strategy accepts orchestrated-replan-loop" "$lifecycle_schema" '.properties.execution_strategy.enum[] | select(. == "orchestrated-replan-loop")' 'orchestrated-replan-loop'
@@ -712,7 +792,10 @@ main() {
     assert_schema_query_equals "lifecycle recovery actions support cleanup-current-run-artifacts" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.recovery_action_id.enum[] | select(. == "cleanup-current-run-artifacts")' 'cleanup-current-run-artifacts'
     assert_schema_query_equals "lifecycle recovery blockers support authority-zone-denied" "$lifecycle_schema" '."$defs".programRecoveryRecipe.properties.blocker_class.enum[] | select(. == "authority-zone-denied")' 'authority-zone-denied'
 
+    packet_contract="$REPO_ROOT/.octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycle.contract.yml"
     program_contract="$REPO_ROOT/.octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycles/proposal-program.contract.yml"
+    assert_success_contract "source proposal-packet lifecycle contract passes" "$REPO_ROOT" ".octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycle.contract.yml"
+    assert_schema_query_equals "packet promote declares safe delegation contract" "$packet_contract" '.routes[]? | select(.route_id == "promote-proposal").delegation_contract.safe_delegation' 'true'
     assert_success_contract "source proposal-program lifecycle contract passes" "$REPO_ROOT" ".octon/inputs/additive/extensions/octon-proposal-lifecycle/context/lifecycles/proposal-program.contract.yml"
     assert_schema_query_equals "program review route declared" "$program_contract" '.routes[]?.route_id | select(. == "review-program")' 'review-program'
     assert_schema_query_equals "program revise route declared" "$program_contract" '.routes[]?.route_id | select(. == "revise-program")' 'revise-program'
@@ -732,6 +815,7 @@ main() {
     assert_schema_query_equals "program closeout prompt requires aggregate conformance pass" "$program_contract" '.routes[]? | select(.route_id == "generate-program-closeout-prompt").enter_when.all[] | select(has("receipt_field_equals") and .receipt_field_equals.receipt_id == "program-implementation-conformance" and .receipt_field_equals.field == "verdict").receipt_field_equals.value' 'pass'
     assert_schema_query_equals "program closeout prompt requires aggregate drift pass" "$program_contract" '.routes[]? | select(.route_id == "generate-program-closeout-prompt").enter_when.all[] | select(has("receipt_field_equals") and .receipt_field_equals.receipt_id == "program-post-implementation-drift" and .receipt_field_equals.field == "verdict").receipt_field_equals.value' 'pass'
     assert_schema_query_equals "program promote uses existing workflow route" "$program_contract" '.routes[]? | select(.route_id == "promote-proposal").route_type' 'workflow'
+    assert_schema_query_equals "program promote declares safe delegation contract" "$program_contract" '.routes[]? | select(.route_id == "promote-proposal").delegation_contract.safe_delegation' 'true'
     assert_schema_query_equals "program promote has no command binding" "$program_contract" '.routes[]? | select(.route_id == "promote-proposal" and has("command_id")).route_id' ''
     assert_schema_query_equals "program promote has no skill binding" "$program_contract" '.routes[]? | select(.route_id == "promote-proposal" and has("skill_id")).route_id' ''
     assert_schema_query_equals "program promote has no prompt binding" "$program_contract" '.routes[]? | select(.route_id == "promote-proposal" and has("prompt_set_id")).route_id' ''

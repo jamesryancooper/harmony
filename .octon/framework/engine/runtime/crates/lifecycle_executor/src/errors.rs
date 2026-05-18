@@ -5,7 +5,8 @@ use thiserror::Error;
 pub enum LifecycleErrorClass {
     Discovery,
     InputBinding,
-    ApprovalRequired,
+    AuthorizationProofFailed,
+    HumanBoundaryRequired,
     ExecutorUnavailable,
     ExecutorFailed,
     Timeout,
@@ -21,7 +22,8 @@ impl LifecycleErrorClass {
         match self {
             Self::Discovery => "discovery",
             Self::InputBinding => "input-binding",
-            Self::ApprovalRequired => "approval-required",
+            Self::AuthorizationProofFailed => "authorization-proof-failed",
+            Self::HumanBoundaryRequired => "human-boundary-required",
             Self::ExecutorUnavailable => "executor-unavailable",
             Self::ExecutorFailed => "executor-failed",
             Self::Timeout => "timeout",

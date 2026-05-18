@@ -42,7 +42,7 @@ program:
         recovery_route_id: "generate-program-correction-prompt"
         max_attempts: 1
         replan_after_attempt: true
-        approval_required: false
+        human_required: false
       publication-drift:
         max_attempts: 1
         replan_after_attempt: true
@@ -57,16 +57,16 @@ program:
         replan_after_attempt: true
       executor-preflight-blocked:
         max_attempts: 0
-        approval_required: true
+        human_required: true
       unsupported-mode-config:
         max_attempts: 0
-        approval_required: true
+        human_required: true
       noncritical-artifact-cleanup:
         max_attempts: 1
         replan_after_attempt: true
-      approval-required:
+      authority-ambiguity:
         max_attempts: 0
-        approval_required: true
+        human_required: true
     recipes:
       - blocker_class: "stale-receipt"
         preconditions:
@@ -74,7 +74,7 @@ program:
           - "selected-route-present"
           - "receipt-stale"
         idempotency_class: "idempotent-rerun"
-        approval_required: false
+        human_required: false
         retry_budget: 2
         dependent_handling: "pause-dependent"
         post_attempt_validation:
@@ -98,7 +98,7 @@ program:
           - "authority-zone-allowed"
           - "run-bound-current"
         idempotency_class: "inspect-only"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "pause-dependent"
         post_attempt_validation:
@@ -120,7 +120,7 @@ program:
           - "authority-zone-allowed"
           - "declared-write-scope-contained"
         idempotency_class: "approval-gated-mutation"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "continue-independent"
         post_attempt_validation:
@@ -139,7 +139,7 @@ program:
           - "authority-zone-allowed"
           - "generated-non-authority"
         idempotency_class: "idempotent-rerun"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "pause-dependent"
         post_attempt_validation:
@@ -161,7 +161,7 @@ program:
           - "authority-zone-allowed"
           - "declared-write-scope-contained"
         idempotency_class: "idempotent-rerun"
-        approval_required: false
+        human_required: false
         retry_budget: 2
         dependent_handling: "pause-dependent"
         post_attempt_validation:
@@ -181,7 +181,7 @@ program:
           - "authority-zone-allowed"
           - "declared-write-scope-contained"
         idempotency_class: "bounded-retry"
-        approval_required: false
+        human_required: false
         retry_budget: 2
         dependent_handling: "continue-independent"
         post_attempt_validation:
@@ -201,7 +201,7 @@ program:
           - "authority-zone-allowed"
           - "declared-write-scope-contained"
         idempotency_class: "bounded-retry"
-        approval_required: false
+        human_required: false
         retry_budget: 2
         dependent_handling: "continue-independent"
         post_attempt_validation:
@@ -223,7 +223,7 @@ program:
           - "artifact-ownership-known"
           - "run-bound-current"
         idempotency_class: "idempotent"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "continue-independent"
         post_attempt_validation:
@@ -238,9 +238,9 @@ program:
         requires_run_binding: true
         requires_declared_write_scope: true
         requires_zone_evidence: true
-      - blocker_class: "approval-required"
+      - blocker_class: "authority-ambiguity"
         idempotency_class: "approval-gated-mutation"
-        approval_required: true
+        human_required: true
         retry_budget: 0
         dependent_handling: "pause-phase"
         post_attempt_validation:
@@ -248,7 +248,7 @@ program:
         replan_behavior: "none"
       - blocker_class: "unsafe-resume"
         idempotency_class: "non-recoverable"
-        approval_required: true
+        human_required: true
         retry_budget: 0
         dependent_handling: "fail-closed"
         post_attempt_validation:
@@ -256,7 +256,7 @@ program:
         replan_behavior: "none"
       - blocker_class: "authority-boundary-ambiguous"
         idempotency_class: "non-recoverable"
-        approval_required: true
+        human_required: true
         retry_budget: 0
         dependent_handling: "fail-closed"
         post_attempt_validation:
@@ -490,6 +490,23 @@ loops:
 routes:
   - route_id: "create-program"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion:
+        - "program-creation"
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "governance-mutation"
+        - "external-irreversible-effect"
     command_id: "octon-proposal-create-program"
     skill_id: "octon-proposal-lifecycle-create-program"
     prompt_set_id: "octon-proposal-lifecycle-create-program"
@@ -514,6 +531,24 @@ routes:
         - file_absent: "resources/child-packet-index.yml"
   - route_id: "review-program"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion:
+        - "proposal-review"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "contradictory-evidence-resolution"
+        - "stale-evidence-acceptance"
     command_id: "octon-proposal-review-program"
     skill_id: "octon-proposal-lifecycle-review-program"
     prompt_set_id: "octon-proposal-lifecycle-review-program"
@@ -536,6 +571,22 @@ routes:
             - receipt_stale: "proposal-review"
   - route_id: "revise-program"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch:
+        - "proposal-review"
+      required_receipts_before_completion: []
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "bounded-retry"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
     command_id: "octon-proposal-revise-program"
     skill_id: "octon-proposal-lifecycle-revise-program"
     prompt_set_id: "octon-proposal-lifecycle-revise-program"
@@ -552,6 +603,26 @@ routes:
             value: "revision-required"
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates:
+        - "program-review-authorization"
+        - "program-child-proposal-readiness"
+        - "program-structure"
+      required_receipts_before_dispatch:
+        - "proposal-review"
+      required_receipts_before_completion:
+        - "program-implementation-prompt"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "stale-evidence-acceptance"
     command_id: "octon-proposal-generate-program-implementation-prompt"
     skill_id: "octon-proposal-lifecycle-generate-program-implementation-prompt"
     prompt_set_id: "octon-proposal-lifecycle-generate-program-implementation-prompt"
@@ -573,9 +644,33 @@ routes:
         - receipt_absent: "program-implementation-prompt"
   - route_id: "promote-proposal"
     route_type: "workflow"
-    approval:
-      required_by_default: true
-      reason: "durable proposal program promotion requires explicit approval and child-authority preservation"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-generated-derived"
+        - "octon-run-bound"
+      declared_write_scope_source: "workflow-scope"
+      required_evidence_gates:
+        - "program-review-authorization"
+        - "program-structure"
+      required_receipts_before_dispatch:
+        - "proposal-review"
+        - "program-implementation-prompt"
+        - "implementation-run"
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "governance-mutation"
+        - "contradictory-evidence-resolution"
+        - "stale-evidence-acceptance"
+        - "authority-ambiguity"
+        - "external-irreversible-effect"
     completion:
       expected_manifest_status: "implemented"
       replan_required: true
@@ -600,6 +695,23 @@ routes:
             value: "yes"
   - route_id: "generate-program-verification-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates:
+        - "program-structure"
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion:
+        - "program-verification-prompt"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "authority-ambiguity"
     command_id: "octon-proposal-generate-program-verification-prompt"
     skill_id: "octon-proposal-lifecycle-generate-program-verification-prompt"
     prompt_set_id: "octon-proposal-lifecycle-generate-program-verification-prompt"
@@ -616,6 +728,26 @@ routes:
         - receipt_absent: "program-verification-prompt"
   - route_id: "run-program-verification-and-correction-loop"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-run-bound"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch:
+        - "program-verification-prompt"
+      required_receipts_before_completion:
+        - "program-implementation-conformance"
+        - "program-post-implementation-drift"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "bounded-retry"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "stale-evidence-acceptance"
     command_id: "octon-proposal-run-program-verification-and-correction-loop"
     skill_id: "octon-proposal-lifecycle-run-program-verification-and-correction-loop"
     prompt_set_id: "octon-proposal-lifecycle-run-program-verification-and-correction-loop"
@@ -633,6 +765,22 @@ routes:
             - receipt_absent: "program-post-implementation-drift"
   - route_id: "generate-program-correction-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch:
+        - "program-verification-prompt"
+      required_receipts_before_completion: []
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "bounded-retry"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
     command_id: "octon-proposal-generate-program-correction-prompt"
     skill_id: "octon-proposal-lifecycle-generate-program-correction-prompt"
     prompt_set_id: "octon-proposal-lifecycle-generate-program-correction-prompt"
@@ -649,6 +797,26 @@ routes:
         - receipt_complete: "program-verification-prompt"
   - route_id: "generate-program-closeout-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates:
+        - "program-structure"
+      required_receipts_before_dispatch:
+        - "program-implementation-conformance"
+        - "program-post-implementation-drift"
+      required_receipts_before_completion:
+        - "program-closeout-prompt"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "stale-evidence-acceptance"
     command_id: "octon-proposal-generate-program-closeout-prompt"
     skill_id: "octon-proposal-lifecycle-generate-program-closeout-prompt"
     prompt_set_id: "octon-proposal-lifecycle-generate-program-closeout-prompt"
@@ -683,12 +851,32 @@ routes:
         - receipt_absent: "program-closeout-prompt"
   - route_id: "closeout-program"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-run-bound"
+      declared_write_scope_source: "route-completion-and-target"
+      required_evidence_gates:
+        - "program-structure"
+      required_receipts_before_dispatch:
+        - "program-implementation-conformance"
+        - "program-post-implementation-drift"
+        - "program-closeout-prompt"
+      required_receipts_before_completion:
+        - "proposal-closeout"
+      replay_class: "idempotent-rerun"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "stale-evidence-acceptance"
+        - "authority-ambiguity"
     command_id: "octon-proposal-closeout-program"
     skill_id: "octon-proposal-lifecycle-closeout-program"
     prompt_set_id: "octon-proposal-lifecycle-closeout-program"
-    approval:
-      required_by_default: true
-      reason: "program closeout coordinates durable child outcomes and archive posture"
     completion:
       expected_receipts:
         - "proposal-closeout"
@@ -719,9 +907,30 @@ routes:
         - receipt_absent: "proposal-closeout"
   - route_id: "archive-proposal"
     route_type: "workflow"
-    approval:
-      required_by_default: true
-      reason: "proposal program archival requires explicit approval and child-authority preservation"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed:
+        - "workspace-declared"
+        - "octon-generated-derived"
+        - "octon-run-bound"
+      declared_write_scope_source: "workflow-scope"
+      required_evidence_gates:
+        - "program-structure"
+      required_receipts_before_dispatch:
+        - "program-implementation-conformance"
+        - "program-post-implementation-drift"
+        - "proposal-closeout"
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries:
+        - "scope-expansion"
+        - "policy-override"
+        - "unresolved-risk-acceptance"
+        - "contradictory-evidence-resolution"
+        - "stale-evidence-acceptance"
+        - "authority-ambiguity"
     completion:
       expected_manifest_status: "archived"
       replan_required: true

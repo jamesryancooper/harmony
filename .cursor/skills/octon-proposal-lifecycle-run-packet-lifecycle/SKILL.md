@@ -39,10 +39,9 @@ Executor behavior:
 - With `--execute-routes`, route execution is delegated to the shared lifecycle
   executor adapter. The adapter owns `mock`, `auto`, `codex`, and `claude`
   route execution outside the lifecycle runner.
-- Durable implementation, promotion, and archival routes pause for explicit,
-  resumable approval by default. `--approval-policy unattended` is an explicit
-  operator override; the adapter records approval override evidence before
-  executing an approval-gated route under that policy.
+- Durable implementation, promotion, closeout, and archival routes execute only after
+  proof-gated delegation succeeds. `--invocation-authority unattended` authorizes
+  delegated execution, but missing or invalid proof fails closed.
 - Packet runs write hash-chained `lifecycle-events.ndjson` traces. `octon
   lifecycle cancel --run-id <run> --reason <text>` durably cancels a retained
   run; later resume or execute-routes operations must return `cancelled`

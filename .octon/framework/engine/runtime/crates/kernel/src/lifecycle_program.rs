@@ -42,13 +42,20 @@ const OPERATION_CLASS_RETRY_CHILD_ROUTE: &str = "retry-child-route";
 const OPERATION_CLASS_EXECUTE_CHILD_ROUTE: &str = "execute-child-route";
 const OPERATION_CLASS_PROGRAM_RECOVERY_ACTION: &str = "program-recovery-action";
 const OPERATION_CLASS_CLOSEOUT_READINESS: &str = "closeout-readiness";
+const ROUTE_ID_PROMOTE_PROPOSAL: &str = "promote-proposal";
+const RECEIPT_ID_PROPOSAL_REVIEW: &str = "proposal-review";
+const RECEIPT_ID_PROGRAM_IMPLEMENTATION_PROMPT: &str = "program-implementation-prompt";
+const RECEIPT_ID_IMPLEMENTATION_RUN: &str = "implementation-run";
+const RECEIPT_ID_IMPLEMENTATION_CONFORMANCE: &str = "implementation-conformance";
+const RECEIPT_ID_POST_IMPLEMENTATION_DRIFT: &str = "post-implementation-drift";
+const FIELD_CHILD_AUTHORITY_PRESERVED: &str = "child_authority_preserved";
 const APPROVAL_POSTURE_PRE_GRANTED: &str = "pre-granted";
-const APPROVAL_POSTURE_APPROVAL_REQUIRED: &str = "approval-required";
+const APPROVAL_POSTURE_APPROVAL_REQUIRED: &str = "authority-ambiguity";
 const APPROVAL_POSTURE_DENY: &str = "deny";
 const BLOCKER_AUTHORITY_ZONE_DENIED: &str = "authority-zone-denied";
 const BLOCKER_AUTHORITY_ZONE_AMBIGUOUS: &str = "authority-zone-ambiguous";
-const BLOCKER_DURABLE_AUTHORITY_APPROVAL_REQUIRED: &str = "durable-authority-approval-required";
-const BLOCKER_PROTECTED_ARTIFACT_APPROVAL_REQUIRED: &str = "protected-artifact-approval-required";
+const BLOCKER_DURABLE_AUTHORITY_APPROVAL_REQUIRED: &str = "scope-expansion";
+const BLOCKER_PROTECTED_ARTIFACT_APPROVAL_REQUIRED: &str = "scope-expansion";
 
 fn default_orchestrated_replan_loop_execution_strategy() -> String {
     LifecycleExecutionStrategy::OrchestratedReplanLoop
@@ -238,7 +245,7 @@ pub(crate) struct ProgramLifecyclePlanResult {
     pub program_recovery_recipe_route_id: Option<String>,
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub program_recovery_recipe_safe_unattended_basis: Option<String>,
+    pub program_recovery_recipe_delegation_contract_basis: Option<String>,
     #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub unsafe_results: Vec<ProgramUnsafeResultSummary>,
@@ -337,7 +344,7 @@ pub(crate) struct ProgramSafeRepairCandidate {
     pub child_id: Option<String>,
     pub blocker_class: String,
     pub selected_repair_route: String,
-    pub safe_unattended_basis: String,
+    pub delegation_contract_basis: String,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -375,7 +382,7 @@ pub(crate) struct ProgramTaxonomyEvidence {
     pub autonomy_basis: String,
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub safe_unattended_basis: Option<String>,
+    pub delegation_contract_basis: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -522,13 +529,45 @@ struct ProgramUnsafeRepairEvidence {
     execution_can_resume: bool,
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct ProgramDelegatedPromotionReceipt {
+    schema_version: String,
+    delegation_kind: String,
+    program_run_id: String,
+    lifecycle_id: String,
+    route_id: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    child_id: Option<String>,
+    registry_digest: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    write_scope_digest: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    authority_zone_decision_ref: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    authority_zone: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    artifact_class: Option<String>,
+    required_receipt_verdicts: BTreeMap<String, String>,
+    required_receipt_digests: BTreeMap<String, String>,
+    route_delegation_contract_basis: String,
+    invocation_authority: String,
+    human_exception_grant: bool,
+    authority_provenance: Vec<String>,
+    recorded_at: String,
+}
+
 #[derive(Clone, Debug, Default)]
 struct ProgramRecoveryRecipeValidationEvidence {
     status: Option<String>,
     failures: Vec<String>,
     blocker_class: Option<String>,
     route_id: Option<String>,
-    safe_unattended_basis: Option<String>,
+    delegation_contract_basis: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -544,13 +583,13 @@ struct ProgramRepairSelectionResult {
 }
 
 impl ProgramRecoveryRecipeValidationEvidence {
-    fn passed(blocker_class: &str, route_id: &str, safe_unattended_basis: &str) -> Self {
+    fn passed(blocker_class: &str, route_id: &str, delegation_contract_basis: &str) -> Self {
         Self {
             status: Some("passed".to_string()),
             failures: Vec::new(),
             blocker_class: Some(blocker_class.to_string()),
             route_id: Some(route_id.to_string()),
-            safe_unattended_basis: Some(safe_unattended_basis.to_string()),
+            delegation_contract_basis: Some(delegation_contract_basis.to_string()),
         }
     }
 
@@ -560,7 +599,7 @@ impl ProgramRecoveryRecipeValidationEvidence {
             failures,
             blocker_class: Some(blocker_class.to_string()),
             route_id: route_id.map(str::to_string),
-            safe_unattended_basis: None,
+            delegation_contract_basis: None,
         }
     }
 }
@@ -682,8 +721,8 @@ struct ProgramLifecycleCheckpoint {
     target: String,
     #[serde(default)]
     executor: Option<String>,
-    #[serde(default = "default_approval_policy_minimize")]
-    approval_policy: String,
+    #[serde(default = "default_invocation_authority_unattended")]
+    invocation_authority: String,
     #[serde(default)]
     timeout_seconds: Option<u64>,
     #[serde(default)]
@@ -713,7 +752,7 @@ struct ProgramLifecycleCheckpoint {
     #[serde(default)]
     program_recovery_recipe_route_id: Option<String>,
     #[serde(default)]
-    program_recovery_recipe_safe_unattended_basis: Option<String>,
+    program_recovery_recipe_delegation_contract_basis: Option<String>,
     #[serde(default)]
     latest_event_offset: u64,
     #[serde(default)]
@@ -737,8 +776,8 @@ struct ProgramLifecycleCheckpoint {
     resume_instruction: String,
 }
 
-fn default_approval_policy_minimize() -> String {
-    "minimize".to_string()
+fn default_invocation_authority_unattended() -> String {
+    "unattended".to_string()
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -828,6 +867,8 @@ pub(crate) struct ProgramApprovalGrant {
     child_id: String,
     route_id: String,
     #[serde(default)]
+    human_only_boundary: String,
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     blocker_class: Option<String>,
     #[serde(default)]
@@ -854,6 +895,24 @@ pub(crate) struct ProgramApprovalGrant {
     reason: String,
     recorded_at: String,
     evidence_path: String,
+}
+
+fn human_only_boundary_for_blocker_class(blocker_class: Option<&str>) -> &'static str {
+    match blocker_class {
+        Some("policy-override") => "policy-override",
+        Some("governance-mutation") => "governance-mutation",
+        Some("unsafe-resume") => "unsafe-resume",
+        Some("external-irreversible-effect") => "external-irreversible-effect",
+        Some("stale-receipt") | Some("publication-drift") => "stale-evidence-acceptance",
+        Some("authority-zone-ambiguous")
+        | Some("authority-boundary-ambiguous")
+        | Some("authority-ambiguity")
+        | None => "authority-ambiguity",
+        Some("scope-expansion")
+        | Some("write-scope-conflict")
+        | Some("atomic-write-scope-conflict") => "scope-expansion",
+        _ => "unresolved-risk-acceptance",
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -1163,7 +1222,7 @@ pub(crate) fn plan_program_lifecycle_from_octon_dir(
         lifecycle_id,
         target,
         None,
-        "minimize",
+        "unattended",
     )
 }
 
@@ -1178,7 +1237,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint(
         lifecycle_id,
         target,
         checkpoint,
-        "minimize",
+        "unattended",
     )
 }
 
@@ -1187,7 +1246,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
     lifecycle_id: &str,
     target: &Path,
     checkpoint: Option<&ProgramLifecycleCheckpoint>,
-    approval_policy: &str,
+    invocation_authority: &str,
 ) -> Result<ProgramLifecyclePlanResult> {
     let repo_root = repo_root_for_octon(octon_dir)?;
     let parent_context = load_program_parent_context(octon_dir, lifecycle_id, target)?;
@@ -1263,7 +1322,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
             program_recovery_recipe_validation_failures: Vec::new(),
             program_recovery_recipe_blocker_class: None,
             program_recovery_recipe_route_id: None,
-            program_recovery_recipe_safe_unattended_basis: None,
+            program_recovery_recipe_delegation_contract_basis: None,
             unsafe_results: Vec::new(),
             unsafe_continuation_decision: None,
             approval_blockers: Vec::new(),
@@ -1322,7 +1381,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
                 program_recovery_recipe_validation_failures: Vec::new(),
                 program_recovery_recipe_blocker_class: None,
                 program_recovery_recipe_route_id: None,
-                program_recovery_recipe_safe_unattended_basis: None,
+                program_recovery_recipe_delegation_contract_basis: None,
                 unsafe_results: Vec::new(),
                 unsafe_continuation_decision: None,
                 approval_blockers: Vec::new(),
@@ -1381,7 +1440,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
             program_recovery_recipe_validation_failures: Vec::new(),
             program_recovery_recipe_blocker_class: None,
             program_recovery_recipe_route_id: None,
-            program_recovery_recipe_safe_unattended_basis: None,
+            program_recovery_recipe_delegation_contract_basis: None,
             unsafe_results: Vec::new(),
             unsafe_continuation_decision: None,
             approval_blockers: Vec::new(),
@@ -1598,7 +1657,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
         &context.registry_digest,
         &mut child_states,
         checkpoint.map(|checkpoint| &checkpoint.approvals),
-        approval_policy,
+        invocation_authority,
     );
     apply_recovery_dependent_handling(
         program,
@@ -1673,7 +1732,7 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
         &context.registry_digest,
         &child_states,
         checkpoint.map(|c| &c.approvals),
-        approval_policy,
+        invocation_authority,
     )?;
     let (aggregate_state, final_verdict) = aggregate_program_state(
         program,
@@ -1761,8 +1820,8 @@ fn plan_program_lifecycle_from_octon_dir_with_checkpoint_and_policy(
         program_recovery_recipe_validation_failures: program_recovery_recipe_validation.failures,
         program_recovery_recipe_blocker_class: program_recovery_recipe_validation.blocker_class,
         program_recovery_recipe_route_id: program_recovery_recipe_validation.route_id,
-        program_recovery_recipe_safe_unattended_basis: program_recovery_recipe_validation
-            .safe_unattended_basis,
+        program_recovery_recipe_delegation_contract_basis: program_recovery_recipe_validation
+            .delegation_contract_basis,
         unsafe_results: Vec::new(),
         unsafe_continuation_decision: None,
         approval_blockers,
@@ -1825,7 +1884,7 @@ pub(crate) fn run_program_lifecycle_from_octon_dir(
         &control_root,
         &evidence_root,
         &sanitized_run_id,
-        &options.approval_policy,
+        &options.invocation_authority,
     )?;
     if let Some(checkpoint) = previous_checkpoint.as_ref() {
         if program_checkpoint_cancelled(checkpoint)
@@ -1880,7 +1939,7 @@ pub(crate) fn run_program_lifecycle_from_octon_dir(
             )),
         )?;
         step.result.route_execution_mode = "none".to_string();
-        if program_execute_loop_should_stop(&step.result, &options.approval_policy)
+        if program_execute_loop_should_stop(&step.result, &options.invocation_authority)
             || !program_result_has_pending_dispatch(&step.result)
         {
             return Ok(step.result);
@@ -1935,7 +1994,7 @@ pub(crate) fn run_program_lifecycle_from_octon_dir(
         all_child_results.extend(step.result.child_results.clone());
         step.result.child_results = all_child_results.clone();
         rewrite_program_recovery_log(&evidence_root, &all_child_results)?;
-        if program_execute_loop_should_stop(&step.result, &options.approval_policy) {
+        if program_execute_loop_should_stop(&step.result, &options.invocation_authority) {
             return Ok(step.result);
         }
         latest_step = Some(step);
@@ -2002,7 +2061,7 @@ fn run_program_lifecycle_single_step(
         &options.lifecycle_id,
         &options.target,
         previous_checkpoint,
-        &options.approval_policy,
+        &options.invocation_authority,
     )?;
     let mut program_recovery_action_attempts = previous_checkpoint
         .map(|checkpoint| checkpoint.program_recovery_action_attempts.clone())
@@ -2038,7 +2097,7 @@ fn run_program_lifecycle_single_step(
         &options.lifecycle_id,
         target_rel,
         options.executor,
-        &options.approval_policy,
+        &options.invocation_authority,
         run_inputs,
         &plan,
         &child_results,
@@ -2110,7 +2169,7 @@ fn run_program_lifecycle_single_step(
                         &options.lifecycle_id,
                         &options.target,
                         replan_checkpoint.as_ref(),
-                        &options.approval_policy,
+                        &options.invocation_authority,
                     )?;
                     if let (Some(program), Some(blocker_class)) = (
                         parent_context.loaded.contract.program.as_ref(),
@@ -2199,7 +2258,7 @@ fn run_program_lifecycle_single_step(
                         &options.lifecycle_id,
                         &options.target,
                         replan_checkpoint.as_ref(),
-                        &options.approval_policy,
+                        &options.invocation_authority,
                     )?;
                     if plan.program_route.is_none() {
                         if let Some(child_id) = options.program_child_filter.as_ref() {
@@ -2308,7 +2367,7 @@ fn run_program_lifecycle_single_step(
             &options.lifecycle_id,
             &options.target,
             replan_checkpoint.as_ref(),
-            &options.approval_policy,
+            &options.invocation_authority,
         )?;
         if plan.program_route.is_none() {
             if let Some(child_id) = options.program_child_filter.as_ref() {
@@ -2360,7 +2419,7 @@ fn run_program_lifecycle_single_step(
                             &options.lifecycle_id,
                             &options.target,
                             replan_checkpoint.as_ref(),
-                            &options.approval_policy,
+                            &options.invocation_authority,
                         )?;
                         if plan.program_route.is_none() {
                             if let Some(child_id) = options.program_child_filter.as_ref() {
@@ -2436,7 +2495,7 @@ fn run_program_lifecycle_single_step(
         &options.lifecycle_id,
         target_rel,
         options.executor,
-        &options.approval_policy,
+        &options.invocation_authority,
         run_inputs,
         &plan,
         &child_results,
@@ -2523,7 +2582,7 @@ fn append_program_run_started_if_needed(
     control_root: &Path,
     evidence_root: &Path,
     run_id: &str,
-    approval_policy: &str,
+    invocation_authority: &str,
 ) -> Result<()> {
     if count_program_events(control_root)? > 0 {
         return Ok(());
@@ -2536,7 +2595,7 @@ fn append_program_run_started_if_needed(
         None,
         None,
         "program lifecycle run started",
-        program_event_data([("approval_policy", approval_policy)]),
+        program_event_data([("invocation_authority", invocation_authority)]),
     )?;
     Ok(())
 }
@@ -2563,7 +2622,7 @@ fn rewrite_program_recovery_log(
 
 fn program_execute_loop_should_stop(
     result: &ProgramLifecycleRunResult,
-    approval_policy: &str,
+    invocation_authority: &str,
 ) -> bool {
     if result.terminal_outcome.is_some() {
         return true;
@@ -2574,7 +2633,7 @@ fn program_execute_loop_should_stop(
         | ProgramNormalizedCategory::Budget => true,
         ProgramNormalizedCategory::Unsafe => !program_result_has_pending_dispatch(result),
         ProgramNormalizedCategory::Human => {
-            approval_policy != "unattended"
+            invocation_authority != "unattended"
                 || !program_result_has_agent_continuable_dispatch(result)
         }
         ProgramNormalizedCategory::Recoverable | ProgramNormalizedCategory::Timeout => {
@@ -2594,7 +2653,7 @@ fn program_result_has_agent_continuable_dispatch(result: &ProgramLifecycleRunRes
     let parent_human_blocked = result
         .parent_route_result
         .as_ref()
-        .map(|result| result.status == "approval-required")
+        .map(|result| result.status == "human-boundary-blocked")
         .unwrap_or(false);
     let child_non_continuable_blocks = result
         .child_results
@@ -2602,7 +2661,7 @@ fn program_result_has_agent_continuable_dispatch(result: &ProgramLifecycleRunRes
         .filter(|summary| {
             matches!(
                 summary.status.as_str(),
-                "approval-required" | "executor-preflight-blocked" | "blocked-human"
+                "human-boundary-blocked" | "executor-preflight-blocked" | "blocked-human"
             )
         })
         .count();
@@ -2615,7 +2674,7 @@ fn program_result_has_agent_continuable_dispatch(result: &ProgramLifecycleRunRes
     result.child_results.iter().any(|summary| {
         !matches!(
             summary.status.as_str(),
-            "approval-required" | "executor-preflight-blocked" | "blocked-human"
+            "human-boundary-blocked" | "executor-preflight-blocked" | "blocked-human"
         )
     }) || child_non_continuable_blocks < result.selected_children.len()
 }
@@ -2664,7 +2723,7 @@ fn final_verdict_after_child_execution(
     let execution_had_human_block = child_results.iter().any(|result| {
         matches!(
             result.status.as_str(),
-            "approval-required" | "executor-preflight-blocked" | "blocked-human"
+            "authority-ambiguity" | "executor-preflight-blocked" | "blocked-human"
         )
     });
     let execution_had_cancellation = child_results
@@ -2771,7 +2830,7 @@ pub(crate) fn resume_program_lifecycle_from_octon_dir(
             max_child_concurrency: checkpoint
                 .max_child_concurrency
                 .or(Some(DEFAULT_MAX_CHILD_CONCURRENCY)),
-            approval_policy: checkpoint.approval_policy,
+            invocation_authority: checkpoint.invocation_authority,
             run_inputs: checkpoint.run_inputs,
             program_child_filter: None,
         },
@@ -2875,24 +2934,24 @@ pub(crate) fn approve_program_lifecycle_child_route(
     let evidence_root = octon_dir
         .join(WORKFLOW_EVIDENCE_ROOT_REL)
         .join(&sanitized_run_id);
-    let approval_root = evidence_root.join("approvals");
-    fs::create_dir_all(&approval_root)?;
+    let human_exception_root = evidence_root.join("human-exception-grants");
+    fs::create_dir_all(&human_exception_root)?;
     fs::create_dir_all(&control_root)?;
-    let evidence_path = approval_root.join(format!("{child_id}-{route_id}-approval.yml"));
+    let evidence_path =
+        human_exception_root.join(format!("{child_id}-{route_id}-human-exception-grant.yml"));
     let recorded_at = now_rfc3339()?;
+    let human_only_boundary =
+        human_only_boundary_for_blocker_class(approval_blocker.blocker_class.as_deref());
     let authority_decision = plan.child_states.get(child_id).map(|state| {
-        let approval_operation_class =
-            if approval_blocker
-                .blocker_class
-                .as_deref()
-                .is_some_and(|class| {
-                    !matches!(class, "operator-approval-required" | "approval-required")
-                })
-            {
-                OPERATION_CLASS_RETRY_CHILD_ROUTE
-            } else {
-                OPERATION_CLASS_EXECUTE_CHILD_ROUTE
-            };
+        let approval_operation_class = if approval_blocker
+            .blocker_class
+            .as_deref()
+            .is_some_and(|class| !matches!(class, "authority-ambiguity"))
+        {
+            OPERATION_CLASS_RETRY_CHILD_ROUTE
+        } else {
+            OPERATION_CLASS_EXECUTE_CHILD_ROUTE
+        };
         child_route_authority_decision(
             &repo_root,
             &sanitized_run_id,
@@ -2909,7 +2968,7 @@ pub(crate) fn approve_program_lifecycle_child_route(
     fs::write(
         &evidence_path,
         format!(
-            "schema_version: octon-program-lifecycle-approval-v1\nrun_id: {sanitized_run_id}\nchild_id: {child_id}\nroute_id: {route_id}\nblocker_class: {}\nregistry_digest: {}\nauthority_zone: {}\noperation_class: {}\nartifact_class: {}\nwrite_scope_digest: {}\nauthority_zone_decision: {}\nreason: {reason}\nrecorded_at: {recorded_at}\nresume_instruction: octon lifecycle resume --run-id {sanitized_run_id}\nretry_instruction: octon lifecycle program retry --run-id {sanitized_run_id} --child {child_id}\n",
+            "schema_version: octon-program-lifecycle-human-exception-grant-v1\nrun_id: {sanitized_run_id}\nchild_id: {child_id}\nroute_id: {route_id}\nhuman_only_boundary: {human_only_boundary}\nblocker_class: {}\nregistry_digest: {}\nauthority_zone: {}\noperation_class: {}\nartifact_class: {}\nwrite_scope_digest: {}\nauthority_zone_decision: {}\nreason: {reason}\nrecorded_at: {recorded_at}\nresume_instruction: octon lifecycle resume --run-id {sanitized_run_id}\nretry_instruction: octon lifecycle program retry --run-id {sanitized_run_id} --child {child_id}\n",
             approval_blocker
                 .blocker_class
                 .as_deref()
@@ -2937,6 +2996,7 @@ pub(crate) fn approve_program_lifecycle_child_route(
     let grant = ProgramApprovalGrant {
         child_id: child_id.to_string(),
         route_id: route_id.to_string(),
+        human_only_boundary: human_only_boundary.to_string(),
         blocker_class: approval_blocker.blocker_class.clone(),
         registry_digest: Some(plan.child_registry_digest.clone()),
         authority_zone: authority_decision
@@ -2964,12 +3024,13 @@ pub(crate) fn approve_program_lifecycle_child_route(
         &control_root,
         &evidence_root,
         &sanitized_run_id,
-        "approval-granted",
+        "human-exception-granted",
         Some(child_id),
         Some(route_id),
-        "operator approval evidence recorded",
+        "typed human exception grant recorded",
         event_data([
             ("reason", reason),
+            ("human_only_boundary", human_only_boundary),
             ("registry_digest", plan.child_registry_digest.as_str()),
         ]),
     )?;
@@ -3006,7 +3067,7 @@ pub(crate) fn retry_program_lifecycle_run(
             max_steps: None,
             timeout_seconds: None,
             max_child_concurrency: Some(DEFAULT_MAX_CHILD_CONCURRENCY),
-            approval_policy: "minimize".to_string(),
+            invocation_authority: "unattended".to_string(),
             run_inputs: checkpoint.run_inputs,
             program_child_filter: child,
         },
@@ -3041,7 +3102,7 @@ pub(crate) fn cancel_program_lifecycle_run(
         &control_root,
         &evidence_root,
         &sanitized_run_id,
-        &checkpoint.approval_policy,
+        &checkpoint.invocation_authority,
     )?;
     let evidence_path = evidence_root.join("program-cancelled.yml");
     let cancellation_token = lifecycle_cancellation_token_path(&control_root);
@@ -5030,6 +5091,18 @@ fn declared_scopes_contain_path(scopes: &[String], rel: &str) -> bool {
         .any(|scope| scope_contains_rel_path(scope, rel))
 }
 
+fn rel_is_manifest_governed_proposal_packet(rel: &str) -> bool {
+    rel_path_under(rel, ".octon/inputs/exploratory/proposals")
+        && !rel_path_under(rel, ".octon/inputs/exploratory/ideation")
+}
+
+fn operation_targets_proposal_lifecycle_packet(operation_class: &str) -> bool {
+    matches!(
+        operation_class,
+        OPERATION_CLASS_EXECUTE_CHILD_ROUTE | OPERATION_CLASS_RETRY_CHILD_ROUTE
+    )
+}
+
 fn classify_authority_path(
     repo_root: &Path,
     run_id: &str,
@@ -5115,6 +5188,22 @@ fn classify_authority_path(
             zone: AUTHORITY_ZONE_AUTHORED_GOVERNANCE.to_string(),
             artifact_class: ARTIFACT_CLASS_AUTHORED_GOVERNANCE.to_string(),
             basis: "path is authored governance or durable control surface".to_string(),
+            workspace_contained,
+            declared_scope_contained,
+            run_bound_current: false,
+            generated_non_authority: false,
+        };
+    }
+    if workspace_contained
+        && declared_scope_contained
+        && operation_targets_proposal_lifecycle_packet(operation_class)
+        && rel_is_manifest_governed_proposal_packet(&rel)
+    {
+        return AuthorityPathClassification {
+            zone: AUTHORITY_ZONE_WORKSPACE_DECLARED.to_string(),
+            artifact_class: ARTIFACT_CLASS_WORKSPACE_SOURCE.to_string(),
+            basis: "path is a declared manifest-governed proposal packet lifecycle target"
+                .to_string(),
             workspace_contained,
             declared_scope_contained,
             run_bound_current: false,
@@ -5424,10 +5513,10 @@ fn recovery_recipe_allows_authority_decision(
         return false;
     }
     if recipe
-        .approval_required_for_zones
+        .human_required_for_zones
         .iter()
         .any(|zone| zone == &decision.authority_zone)
-        && !recipe.approval_required
+        && !recipe.human_required
     {
         return false;
     }
@@ -6057,7 +6146,7 @@ fn apply_recovery_budget_blockers(
             let alternate_safe_route = state.blockers.iter().find_map(|blocker| {
                 (blocker.blocker_class.as_str() != blocker_class.as_str()
                     && recovery_route_for_blocker(program, blocker).is_some()
-                    && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class)
+                    && recovery_delegation_contract_basis(Some(program), &blocker.blocker_class)
                         .is_some())
                 .then(|| recovery_route_for_blocker(program, blocker))
                 .flatten()
@@ -6126,21 +6215,22 @@ fn apply_recovery_approval_blockers(
     registry_digest: &str,
     child_states: &mut BTreeMap<String, ProgramChildPlanState>,
     approvals: Option<&Vec<ProgramApprovalGrant>>,
-    approval_policy: &str,
+    invocation_authority: &str,
 ) {
     for state in child_states.values_mut() {
         let blockers = state.blockers.clone();
         for blocker in blockers {
             if matches!(
                 blocker.blocker_class.as_str(),
-                "approval-required" | "operator-approval-required" | "governed-agent-approval"
+                "authority-ambiguity" | "policy-override"
             ) || blocker_non_recoverable(&blocker.blocker_class)
                 || !recovery_requires_approval(program, &blocker.blocker_class)
             {
                 continue;
             }
-            if approval_policy == "unattended"
-                && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some()
+            if invocation_authority == "unattended"
+                && recovery_delegation_contract_basis(Some(program), &blocker.blocker_class)
+                    .is_some()
             {
                 continue;
             }
@@ -6157,15 +6247,13 @@ fn apply_recovery_approval_blockers(
                 continue;
             }
             if state.blockers.iter().any(|existing| {
-                matches!(
-                    existing.blocker_class.as_str(),
-                    "approval-required" | "operator-approval-required"
-                ) && existing.recovery_route.as_deref() == Some(route_id)
+                matches!(existing.blocker_class.as_str(), "authority-ambiguity")
+                    && existing.recovery_route.as_deref() == Some(route_id)
             }) {
                 continue;
             }
             state.blockers.push(ProgramBlocker {
-                blocker_class: "operator-approval-required".to_string(),
+                blocker_class: "authority-ambiguity".to_string(),
                 message: format!(
                     "recovery for {} requires program approval before route {} may execute",
                     blocker.blocker_class, route_id
@@ -6187,7 +6275,7 @@ fn apply_recovery_dependent_handling(
         for blocker in state.blockers.iter().filter(|blocker| {
             !matches!(
                 blocker.blocker_class.as_str(),
-                "approval-required" | "operator-approval-required" | "governed-agent-approval"
+                "authority-ambiguity" | "policy-override"
             )
         }) {
             let Some(handling) = recovery_dependent_handling(program, &blocker.blocker_class)
@@ -6371,7 +6459,7 @@ fn blocker_is_agent_routable(program: &ProgramSpec, blocker: &ProgramBlocker) ->
 fn blocker_has_safe_agent_repair(program: &ProgramSpec, blocker: &ProgramBlocker) -> bool {
     classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
         && recovery_route_for_blocker(program, blocker).is_some()
-        && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some()
+        && recovery_delegation_contract_basis(Some(program), &blocker.blocker_class).is_some()
 }
 
 fn program_blocker_has_safe_agent_repair(
@@ -6384,7 +6472,7 @@ fn program_blocker_has_safe_agent_repair(
             .and_then(|route| {
                 validate_program_recovery_recipe(contract, program, blocker, &route)
                     .ok()
-                    .map(|validation| validation.safe_unattended_basis)
+                    .map(|validation| validation.delegation_contract_basis)
             })
             .flatten()
             .is_some()
@@ -6396,7 +6484,7 @@ fn program_blocker_has_declared_safe_agent_repair(
 ) -> bool {
     classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
         && recovery_route_for_blocker(program, blocker).is_some()
-        && program_repair_safe_unattended_basis(program, &blocker.blocker_class).is_some()
+        && program_repair_delegation_contract_basis(program, &blocker.blocker_class).is_some()
 }
 
 fn selected_program_repair_route(
@@ -6437,7 +6525,7 @@ fn selected_program_repair_blocker_with_validation(
         };
         match validate_program_recovery_recipe(contract, program, blocker, &route) {
             Ok(validation) => {
-                if validation.safe_unattended_basis.is_none() {
+                if validation.delegation_contract_basis.is_none() {
                     first_failure.get_or_insert_with(|| {
                         ProgramRecoveryRecipeValidationEvidence::failed(
                             &blocker.blocker_class,
@@ -6501,11 +6589,11 @@ fn selected_program_recoverable_route(
     None
 }
 
-fn program_repair_safe_unattended_basis(
+fn program_repair_delegation_contract_basis(
     program: &ProgramSpec,
     blocker_class: &str,
 ) -> Option<String> {
-    recovery_safe_unattended_basis(Some(program), blocker_class)
+    recovery_delegation_contract_basis(Some(program), blocker_class)
 }
 
 fn gated_parallel_candidates(
@@ -6608,7 +6696,7 @@ fn collect_approval_blockers(
     registry_digest: &str,
     child_states: &BTreeMap<String, ProgramChildPlanState>,
     approvals: Option<&Vec<ProgramApprovalGrant>>,
-    approval_policy: &str,
+    invocation_authority: &str,
 ) -> Result<Vec<ProgramApprovalBlocker>> {
     let mut blockers = Vec::new();
     let repo_root = repo_root_for_octon(octon_dir)?;
@@ -6623,12 +6711,8 @@ fn collect_approval_blockers(
                     &route.route_id,
                     OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
                 );
-                let required = route_spec
-                    .approval
-                    .as_ref()
-                    .map(|approval| approval.required_by_default)
-                    .unwrap_or(false)
-                    || route_spec.route_type == "workflow"
+                let required = route_spec_delegation_contract_basis(&route.route_id, route_spec)
+                    .is_none()
                     || matches!(
                         authority_decision.authority_zone.as_str(),
                         AUTHORITY_ZONE_AUTHORED_GOVERNANCE | AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
@@ -6642,8 +6726,8 @@ fn collect_approval_blockers(
                     &authority_decision,
                 );
                 if required && !route_approval_granted {
-                    if approval_policy == "unattended"
-                        && child_route_safe_unattended_basis(
+                    if invocation_authority == "unattended"
+                        && child_route_delegation_contract_basis(
                             &repo_root,
                             program,
                             state,
@@ -6657,12 +6741,8 @@ fn collect_approval_blockers(
                     blockers.push(ProgramApprovalBlocker {
                         child_id: state.child_id.clone(),
                         route_id: route.route_id.clone(),
-                        blocker_class: Some("operator-approval-required".to_string()),
-                        reason: route_spec
-                            .approval
-                            .as_ref()
-                            .and_then(|approval| approval.reason.clone())
-                            .unwrap_or_else(|| "durable child route requires approval".to_string()),
+                        blocker_class: Some("authority-ambiguity".to_string()),
+                        reason: "child route lacks a machine-provable delegation contract or targets a protected authority zone".to_string(),
                     });
                 }
             }
@@ -6670,7 +6750,7 @@ fn collect_approval_blockers(
         for blocker in state.blockers.iter().filter(|blocker| {
             !matches!(
                 blocker.blocker_class.as_str(),
-                "approval-required" | "operator-approval-required" | "governed-agent-approval"
+                "authority-ambiguity" | "policy-override"
             )
         }) {
             if !recovery_requires_approval(program, &blocker.blocker_class) {
@@ -6696,8 +6776,9 @@ fn collect_approval_blockers(
             ) {
                 continue;
             }
-            if approval_policy == "unattended"
-                && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some()
+            if invocation_authority == "unattended"
+                && recovery_delegation_contract_basis(Some(program), &blocker.blocker_class)
+                    .is_some()
                 && authority_decision_allows_route_unattended(&authority_decision)
             {
                 continue;
@@ -6716,14 +6797,105 @@ fn collect_approval_blockers(
     Ok(blockers)
 }
 
-fn child_route_safe_unattended_basis(
+fn receipt_complete_and_not_stale(receipt: Option<&ReceiptPlanState>) -> bool {
+    receipt
+        .map(|receipt| {
+            receipt.exists
+                && receipt.missing_required_fields.is_empty()
+                && receipt.stale != Some(true)
+        })
+        .unwrap_or(false)
+}
+
+fn receipt_verdict_eq(
+    receipts: &BTreeMap<String, ReceiptPlanState>,
+    receipt_id: &str,
+    expected: &str,
+) -> bool {
+    receipts
+        .get(receipt_id)
+        .map(|receipt| {
+            receipt_complete_and_not_stale(Some(receipt))
+                && receipt.verdict.as_deref() == Some(expected)
+        })
+        .unwrap_or(false)
+}
+
+fn receipt_field_eq(
+    receipts: &BTreeMap<String, ReceiptPlanState>,
+    receipt_id: &str,
+    field: &str,
+    expected: &str,
+) -> bool {
+    receipts
+        .get(receipt_id)
+        .map(|receipt| {
+            receipt_complete_and_not_stale(Some(receipt))
+                && receipt.fields.get(field).map(String::as_str) == Some(expected)
+        })
+        .unwrap_or(false)
+}
+
+fn child_promotion_evidence_ready(state: &ProgramChildPlanState) -> bool {
+    state.gate_status.verification && state.blockers.is_empty()
+}
+
+fn parent_promotion_evidence_ready(plan: &ProgramLifecyclePlanResult) -> bool {
+    plan.parent_manifest_status.as_deref() == Some("accepted")
+        && plan.blocked_by_program_gate.is_none()
+        && !plan.program_gate_results.is_empty()
+        && plan.program_gate_results.iter().all(|gate| gate.passed)
+        && receipt_verdict_eq(
+            &plan.parent_receipt_states,
+            RECEIPT_ID_PROPOSAL_REVIEW,
+            "accepted",
+        )
+        && receipt_complete_and_not_stale(
+            plan.parent_receipt_states
+                .get(RECEIPT_ID_PROGRAM_IMPLEMENTATION_PROMPT),
+        )
+        && receipt_verdict_eq(
+            &plan.parent_receipt_states,
+            RECEIPT_ID_IMPLEMENTATION_RUN,
+            "pass",
+        )
+        && receipt_field_eq(
+            &plan.parent_receipt_states,
+            RECEIPT_ID_IMPLEMENTATION_RUN,
+            FIELD_CHILD_AUTHORITY_PRESERVED,
+            "yes",
+        )
+}
+
+fn parent_route_delegation_contract_basis(
+    octon_dir: &Path,
+    plan: &ProgramLifecyclePlanResult,
+    route: &RoutePlanState,
+) -> Result<Option<String>> {
+    let Some(basis) =
+        lifecycle_route_delegation_contract_basis(octon_dir, &plan.lifecycle_id, &route.route_id)?
+    else {
+        return Ok(None);
+    };
+    if route.route_id != ROUTE_ID_PROMOTE_PROPOSAL {
+        return Ok(Some(basis));
+    }
+    if !parent_promotion_evidence_ready(plan) {
+        return Ok(None);
+    }
+    Ok(Some(format!(
+        "{basis}; parent promotion evidence=accepted-review+passing-gates+implementation-run-pass+child_authority_preserved"
+    )))
+}
+
+fn child_route_delegation_contract_basis(
     repo_root: &Path,
     _program: &ProgramSpec,
     state: &ProgramChildPlanState,
     route_id: &str,
     route: &RouteSpec,
 ) -> Option<String> {
-    let basis = route_spec_safe_unattended_basis(route_id, route)?;
+    let basis = route_spec_delegation_contract_basis(route_id, route)?;
     let authority_decision = child_route_authority_decision(
         repo_root,
         "planning",
@@ -6731,6 +6903,18 @@ fn child_route_safe_unattended_basis(
         route_id,
         OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
     );
+    if route_id == ROUTE_ID_PROMOTE_PROPOSAL {
+        return (child_promotion_evidence_ready(state)
+            && authority_decision.authority_zone == AUTHORITY_ZONE_WORKSPACE_DECLARED
+            && authority_decision.workspace_contained
+            && authority_decision.declared_scope_contained)
+            .then(|| {
+                format!(
+                    "{basis}; child promotion evidence=implementation-run-pass+implementation-conformance-pass+post-implementation-drift-pass; authority_zone={}; artifact_class={}",
+                    authority_decision.authority_zone, authority_decision.artifact_class
+                )
+            });
+    }
     authority_decision_allows_route_unattended(&authority_decision).then(|| {
         format!(
             "{basis}; authority_zone={}; artifact_class={}",
@@ -6739,7 +6923,7 @@ fn child_route_safe_unattended_basis(
     })
 }
 
-fn lifecycle_route_safe_unattended_basis_for_child(
+fn lifecycle_route_delegation_contract_basis_for_child(
     octon_dir: &Path,
     program: &ProgramSpec,
     state: &ProgramChildPlanState,
@@ -6748,7 +6932,7 @@ fn lifecycle_route_safe_unattended_basis_for_child(
     let loaded = load_lifecycle_contract(octon_dir, &state.child_lifecycle_id)?;
     let repo_root = repo_root_for_octon(octon_dir)?;
     Ok(route_by_id(&loaded.contract, route_id).and_then(|route| {
-        child_route_safe_unattended_basis(&repo_root, program, state, route_id, route)
+        child_route_delegation_contract_basis(&repo_root, program, state, route_id, route)
     }))
 }
 
@@ -6858,23 +7042,17 @@ fn approval_granted_for_authority_decision(
         .unwrap_or(false)
 }
 
-fn approval_policy_for_child_route(
+fn invocation_authority_for_child_route(
     default_policy: &str,
     approvals: Option<&Vec<ProgramApprovalGrant>>,
     child_id: &str,
     route_id: &str,
     registry_digest: Option<&str>,
     blocker_class: Option<&str>,
-    safe_unattended: bool,
+    delegation_safe: bool,
     authority_decision: Option<&AuthorityZoneDecision>,
 ) -> String {
-    if default_policy == "unattended" {
-        if safe_unattended {
-            "unattended".to_string()
-        } else {
-            "minimize".to_string()
-        }
-    } else if authority_decision
+    let grant_bound = authority_decision
         .map(|decision| {
             approval_granted_for_authority_decision(
                 approvals,
@@ -6893,9 +7071,17 @@ fn approval_policy_for_child_route(
                 registry_digest,
                 blocker_class,
             )
-        })
-    {
-        "program-approved".to_string()
+        });
+    if default_policy == "unattended" {
+        if delegation_safe {
+            "unattended".to_string()
+        } else if grant_bound {
+            "grant-consumption".to_string()
+        } else {
+            "unattended".to_string()
+        }
+    } else if grant_bound {
+        "grant-consumption".to_string()
     } else {
         default_policy.to_string()
     }
@@ -6936,15 +7122,17 @@ fn write_program_approval_execution_evidence(
                         .unwrap_or(true)
             })
         })
-        .with_context(|| format!("missing approval grant for child route {child_id}:{route_id}"))?;
+        .with_context(|| {
+            format!("missing typed human exception grant for child route {child_id}:{route_id}")
+        })?;
     fs::create_dir_all(child_evidence_root)?;
-    let path = child_evidence_root.join(format!("{route_id}-program-approval-consumed.yml"));
+    let path = child_evidence_root.join(format!("{route_id}-grant-consumption.yml"));
     fs::write(
         path,
         format!(
-            "schema_version: octon-program-lifecycle-approval-consumed-v1\nprogram_run_id: {program_run_id}\nchild_id: {child_id}\nroute_id: {route_id}\nblocker_class: {}\nregistry_digest: {}\napproval_grant_ref: {}\napproval_reason: {}\nrecorded_at: {}\nauthorization_source: program-operator-approval-grant\n",
+            "schema_version: octon-program-lifecycle-grant-consumption-v1\nprogram_run_id: {program_run_id}\nchild_id: {child_id}\nroute_id: {route_id}\nblocker_class: {}\nregistry_digest: {}\nhuman_exception_grant_ref: {}\nhuman_exception_reason: {}\nrecorded_at: {}\nauthorization_source: typed-human-exception-grant\n",
             grant.blocker_class.as_deref().unwrap_or("route-approval"),
-            grant.registry_digest.as_deref().unwrap_or("legacy-approval"),
+            grant.registry_digest.as_deref().unwrap_or("legacy-grant"),
             grant.evidence_path,
             grant.reason,
             now_rfc3339()?
@@ -7019,15 +7207,15 @@ fn classify_program_blocker_class(blocker_class: &str) -> ProgramBlockerDisposit
 
 fn normalize_program_blocker_class(blocker_class: &str) -> ProgramBlockerNormalization {
     let (normalized_blocker_class, normalized_category, autonomy_basis) = match blocker_class {
-        "governed-agent-approval" => (
-            "governed-agent-approval",
+        "policy-override" => (
+            "policy-override",
             ProgramNormalizedCategory::Recoverable,
-            "route or recovery approval is safe for unattended execution by contract",
+            "route or recovery is machine-delegable by contract",
         ),
-        "approval-required" | "operator-approval-required" => (
-            "operator-approval-required",
+        "authority-ambiguity" => (
+            "authority-ambiguity",
             ProgramNormalizedCategory::Human,
-            "route or recovery approval is not safe-unattended by contract",
+            "route or recovery is blocked at a human-only boundary",
         ),
         "unsupported-mode-config" => (
             "unsupported-mode-config",
@@ -7160,15 +7348,10 @@ fn normalize_program_blocker_class(blocker_class: &str) -> ProgramBlockerNormali
             ProgramNormalizedCategory::Human,
             "selected route or action is outside the authority zones allowed by contract",
         ),
-        "durable-authority-approval-required" => (
-            "durable-authority-approval-required",
+        "scope-expansion" => (
+            "scope-expansion",
             ProgramNormalizedCategory::Human,
-            "authored governance or durable authority mutation requires an existing zone-bound approval",
-        ),
-        "protected-artifact-approval-required" => (
-            "protected-artifact-approval-required",
-            ProgramNormalizedCategory::Human,
-            "protected or workspace-source artifact mutation requires explicit zone-bound approval",
+            "mutation would expand the declared scope or authority zone without a typed human exception grant",
         ),
         "recovery-integrity-risk" => (
             "recovery-integrity-risk",
@@ -7237,7 +7420,7 @@ fn taxonomy_evidence_for_class(
     blocker_class: &str,
 ) -> ProgramTaxonomyEvidence {
     let normalized = normalize_program_blocker_class(blocker_class);
-    let safe_unattended_basis = recovery_safe_unattended_basis(program, blocker_class);
+    let delegation_contract_basis = recovery_delegation_contract_basis(program, blocker_class);
     ProgramTaxonomyEvidence {
         raw_value: blocker_class.to_string(),
         legacy_class: normalized.legacy_class,
@@ -7245,7 +7428,7 @@ fn taxonomy_evidence_for_class(
         normalized_blocker_class: normalized.normalized_blocker_class,
         disposition: normalized.normalized_category.disposition().to_string(),
         autonomy_basis: normalized.autonomy_basis,
-        safe_unattended_basis,
+        delegation_contract_basis,
     }
 }
 
@@ -7289,7 +7472,7 @@ fn normalized_approval_blockers(
                 .as_deref()
                 .unwrap_or("route-approval")
                 .to_string();
-            let mut evidence = taxonomy_evidence_for_class(None, "operator-approval-required");
+            let mut evidence = taxonomy_evidence_for_class(None, "authority-ambiguity");
             if raw_value != evidence.normalized_blocker_class {
                 evidence.legacy_class = Some(raw_value.clone());
             }
@@ -7311,13 +7494,13 @@ fn collect_safe_repair_candidates(
             if let Ok(validation) =
                 validate_program_recovery_recipe(contract, program, blocker, &route)
             {
-                if let Some(basis) = validation.safe_unattended_basis {
+                if let Some(basis) = validation.delegation_contract_basis {
                     candidates.push(ProgramSafeRepairCandidate {
                         scope: "program".to_string(),
                         child_id: None,
                         blocker_class: blocker.blocker_class.clone(),
                         selected_repair_route: route.route_id,
-                        safe_unattended_basis: basis,
+                        delegation_contract_basis: basis,
                     });
                 }
             }
@@ -7331,7 +7514,8 @@ fn collect_safe_repair_candidates(
             let Some(route_id) = recovery_route_for_blocker(program, blocker) else {
                 continue;
             };
-            let Some(basis) = recovery_safe_unattended_basis(Some(program), &blocker.blocker_class)
+            let Some(basis) =
+                recovery_delegation_contract_basis(Some(program), &blocker.blocker_class)
             else {
                 continue;
             };
@@ -7340,7 +7524,7 @@ fn collect_safe_repair_candidates(
                 child_id: Some(state.child_id.clone()),
                 blocker_class: blocker.blocker_class.clone(),
                 selected_repair_route: route_id.to_string(),
-                safe_unattended_basis: basis,
+                delegation_contract_basis: basis,
             });
         }
     }
@@ -7622,7 +7806,7 @@ fn execute_parent_program_route(
                         route.route_id
                     )
                         })?;
-                program_repair_basis = validation.safe_unattended_basis;
+                program_repair_basis = validation.delegation_contract_basis;
                 break;
             }
         }
@@ -7636,14 +7820,16 @@ fn execute_parent_program_route(
             &parent_evidence_root,
         )
     });
-    let parent_approval_policy = if options.approval_policy == "unattended"
-        && lifecycle_route_safe_unattended_basis(octon_dir, &plan.lifecycle_id, &route.route_id)?
-            .is_none()
+    let repo_root = repo_root_for_octon(octon_dir)?;
+    let parent_delegation_contract_basis =
+        parent_route_delegation_contract_basis(octon_dir, plan, route)?;
+    let parent_invocation_authority = if options.invocation_authority == "unattended"
+        && parent_delegation_contract_basis.is_none()
         && program_repair_basis.is_none()
     {
-        "minimize".to_string()
+        "unattended".to_string()
     } else {
-        options.approval_policy.clone()
+        options.invocation_authority.clone()
     };
     let parent_run_inputs = if route.route_id == "generate-program-correction-prompt"
         && run_inputs
@@ -7692,28 +7878,71 @@ fn execute_parent_program_route(
         route,
         options.executor,
         options.timeout_seconds.unwrap_or(1800),
-        &parent_approval_policy,
+        &parent_invocation_authority,
         0,
         &parent_run_inputs,
         parent_evidence_root.clone(),
         parent_control_root.join("lifecycle-checkpoint.yml"),
         Some(lifecycle_cancellation_token_path(control_root)),
-        Some(LifecycleApprovalContext {
+        Some(LifecycleHumanBoundaryContext {
             context_kind: "program-parent-route".to_string(),
             program_run_id: Some(program_run_id.to_string()),
             child_id: None,
-            approval_instruction: None,
+            human_exception_instruction: None,
             retry_instruction: Some(format!(
                 "octon lifecycle program retry --run-id {program_run_id}"
-            )),
-            unattended_override_instruction: Some(format!(
-                "octon lifecycle run --lifecycle {} --target {} --run-id {} --execute-routes --approval-policy unattended",
-                plan.lifecycle_id, plan.target, program_run_id
             )),
         }),
     )?
     .with_context(|| format!("missing selected parent route {}", route.route_id))?;
-    let repo_root = repo_root_for_octon(octon_dir)?;
+    if parent_invocation_authority == "unattended" && route.route_id == ROUTE_ID_PROMOTE_PROPOSAL {
+        if let Some(basis) = parent_delegation_contract_basis.as_deref() {
+            let delegation_receipt = write_delegated_promotion_receipt(
+                &parent_evidence_root,
+                program_run_id,
+                &plan.lifecycle_id,
+                &route.route_id,
+                None,
+                &plan.child_registry_digest,
+                None,
+                Some("parent-route-contract:child-authority-preserved"),
+                Some("program-parent"),
+                Some(ARTIFACT_CLASS_WORKSPACE_SOURCE),
+                parent_promotion_required_receipt_verdicts(plan),
+                parent_promotion_required_receipt_digests(&repo_root, plan)?,
+                basis,
+                vec![
+                    "route-contract:delegation_contract.safe_delegation=true".to_string(),
+                    "lifecycle-invocation:invocation_authority=unattended".to_string(),
+                    "parent-gates:passing".to_string(),
+                    "implementation-run:child_authority_preserved=yes".to_string(),
+                ],
+            )?;
+            let mut data = program_step_event_data(
+                step_context.as_ref(),
+                "parent-route-dispatch",
+                [
+                    ("delegation_receipt", delegation_receipt.as_str()),
+                    ("invocation_authority", parent_invocation_authority.as_str()),
+                    ("delegation_kind", "machine-enforced-delegated-execution"),
+                ],
+            );
+            data.insert(
+                "registry_digest".to_string(),
+                plan.child_registry_digest.clone(),
+            );
+            append_program_event(
+                control_root,
+                evidence_root,
+                program_run_id,
+                "delegated-promotion-authorized",
+                None,
+                Some(&route.route_id),
+                "parent promotion delegated by route contract, unattended policy, and retained evidence gates",
+                data,
+            )?;
+        }
+    }
     let executor = DefaultLifecycleRouteExecutor::new(repo_root);
     let result = match executor.execute_route(request) {
         Ok(result) => result,
@@ -7919,11 +8148,152 @@ fn finding_binding_unavailable_result(
 
 fn final_verdict_for_parent_route_status(status: &str) -> String {
     match status {
-        "approval-required" => "blocked-human".to_string(),
+        "human-boundary-blocked" => "blocked-human".to_string(),
+        "authorization-proof-failed" => "blocked-recoverable".to_string(),
         "cancelled" => "cancelled".to_string(),
         "failed" | "timed-out" | "blocked" => "blocked-recoverable".to_string(),
         other => other.to_string(),
     }
+}
+
+fn child_promotion_required_receipt_verdicts() -> BTreeMap<String, String> {
+    BTreeMap::from([
+        (
+            RECEIPT_ID_IMPLEMENTATION_RUN.to_string(),
+            "pass".to_string(),
+        ),
+        (
+            RECEIPT_ID_IMPLEMENTATION_CONFORMANCE.to_string(),
+            "pass".to_string(),
+        ),
+        (
+            RECEIPT_ID_POST_IMPLEMENTATION_DRIFT.to_string(),
+            "pass".to_string(),
+        ),
+    ])
+}
+
+fn child_promotion_required_receipt_digests(
+    state: &ProgramChildPlanState,
+) -> BTreeMap<String, String> {
+    [
+        RECEIPT_ID_IMPLEMENTATION_RUN,
+        RECEIPT_ID_IMPLEMENTATION_CONFORMANCE,
+        RECEIPT_ID_POST_IMPLEMENTATION_DRIFT,
+    ]
+    .into_iter()
+    .filter_map(|receipt_id| {
+        state
+            .receipt_digests
+            .get(receipt_id)
+            .map(|digest| (receipt_id.to_string(), digest.clone()))
+    })
+    .collect()
+}
+
+fn parent_promotion_required_receipt_verdicts(
+    plan: &ProgramLifecyclePlanResult,
+) -> BTreeMap<String, String> {
+    let mut verdicts = BTreeMap::new();
+    for receipt_id in [RECEIPT_ID_PROPOSAL_REVIEW, RECEIPT_ID_IMPLEMENTATION_RUN] {
+        if let Some(verdict) = plan
+            .parent_receipt_states
+            .get(receipt_id)
+            .and_then(|receipt| receipt.verdict.as_ref())
+        {
+            verdicts.insert(receipt_id.to_string(), verdict.clone());
+        }
+    }
+    if let Some(value) = plan
+        .parent_receipt_states
+        .get(RECEIPT_ID_IMPLEMENTATION_RUN)
+        .and_then(|receipt| receipt.fields.get(FIELD_CHILD_AUTHORITY_PRESERVED))
+    {
+        verdicts.insert(
+            format!("{RECEIPT_ID_IMPLEMENTATION_RUN}.{FIELD_CHILD_AUTHORITY_PRESERVED}"),
+            value.clone(),
+        );
+    }
+    verdicts.insert("program-gates".to_string(), "pass".to_string());
+    verdicts
+}
+
+fn parent_promotion_required_receipt_digests(
+    repo_root: &Path,
+    plan: &ProgramLifecyclePlanResult,
+) -> Result<BTreeMap<String, String>> {
+    let mut digests = BTreeMap::new();
+    for receipt_id in [
+        RECEIPT_ID_PROPOSAL_REVIEW,
+        RECEIPT_ID_PROGRAM_IMPLEMENTATION_PROMPT,
+        RECEIPT_ID_IMPLEMENTATION_RUN,
+    ] {
+        let Some(receipt) = plan.parent_receipt_states.get(receipt_id) else {
+            continue;
+        };
+        if let Some(digest) = receipt
+            .current_digest
+            .as_ref()
+            .or(receipt.stored_digest.as_ref())
+        {
+            digests.insert(receipt_id.to_string(), digest.clone());
+            continue;
+        }
+        if receipt.exists {
+            digests.insert(
+                receipt_id.to_string(),
+                file_digest(&repo_root.join(&receipt.path))?,
+            );
+        }
+    }
+    Ok(digests)
+}
+
+fn write_delegated_promotion_receipt(
+    evidence_root: &Path,
+    program_run_id: &str,
+    lifecycle_id: &str,
+    route_id: &str,
+    child_id: Option<&str>,
+    registry_digest: &str,
+    write_scope_digest: Option<&str>,
+    authority_zone_decision_ref: Option<&str>,
+    authority_zone: Option<&str>,
+    artifact_class: Option<&str>,
+    required_receipt_verdicts: BTreeMap<String, String>,
+    required_receipt_digests: BTreeMap<String, String>,
+    route_delegation_contract_basis: &str,
+    authority_provenance: Vec<String>,
+) -> Result<String> {
+    fs::create_dir_all(evidence_root)?;
+    let subject = child_id.unwrap_or("parent");
+    let path = evidence_root.join(format!(
+        "delegated-promotion-{}-{}.yml",
+        sanitize_run_id(subject)?,
+        sanitize_run_id(route_id)?
+    ));
+    let receipt = ProgramDelegatedPromotionReceipt {
+        schema_version: "octon-program-delegated-promotion-v1".to_string(),
+        delegation_kind: "machine-enforced-delegated-execution".to_string(),
+        program_run_id: program_run_id.to_string(),
+        lifecycle_id: lifecycle_id.to_string(),
+        route_id: route_id.to_string(),
+        child_id: child_id.map(str::to_string),
+        registry_digest: registry_digest.to_string(),
+        write_scope_digest: write_scope_digest.map(str::to_string),
+        authority_zone_decision_ref: authority_zone_decision_ref.map(str::to_string),
+        authority_zone: authority_zone.map(str::to_string),
+        artifact_class: artifact_class.map(str::to_string),
+        required_receipt_verdicts,
+        required_receipt_digests,
+        route_delegation_contract_basis: route_delegation_contract_basis.to_string(),
+        invocation_authority: "unattended".to_string(),
+        human_exception_grant: false,
+        authority_provenance,
+        recorded_at: now_rfc3339()?,
+    };
+    fs::write(&path, serde_yaml::to_string(&receipt)?)?;
+    Ok(rel_path_string(&path))
 }
 
 fn build_child_execution_jobs(
@@ -7994,25 +8364,25 @@ fn build_child_execution_jobs(
             }
             let program_contract = load_lifecycle_contract(octon_dir, &options.lifecycle_id)?;
             let program = program_contract.contract.program.as_ref();
-            let route_safe_unattended_basis = match program {
-                Some(program) => lifecycle_route_safe_unattended_basis_for_child(
+            let route_delegation_contract_basis = match program {
+                Some(program) => lifecycle_route_delegation_contract_basis_for_child(
                     octon_dir,
                     program,
                     state,
                     &route.route_id,
                 )?,
-                None => lifecycle_route_safe_unattended_basis(
+                None => lifecycle_route_delegation_contract_basis(
                     octon_dir,
                     &state.child_lifecycle_id,
                     &route.route_id,
                 )?,
             };
-            let safe_unattended_basis = if let Some(class) = blocker_class.as_deref() {
+            let delegation_contract_basis = if let Some(class) = blocker_class.as_deref() {
                 program
-                    .and_then(|program| recovery_safe_unattended_basis(Some(program), class))
-                    .or(route_safe_unattended_basis)
+                    .and_then(|program| recovery_delegation_contract_basis(Some(program), class))
+                    .or(route_delegation_contract_basis)
             } else {
-                route_safe_unattended_basis
+                route_delegation_contract_basis
             };
             let authority_decision = child_route_authority_decision(
                 repo_root,
@@ -8025,21 +8395,21 @@ fn build_child_execution_jobs(
                     OPERATION_CLASS_EXECUTE_CHILD_ROUTE
                 },
             );
-            let approval_policy = approval_policy_for_child_route(
-                &options.approval_policy,
+            let invocation_authority = invocation_authority_for_child_route(
+                &options.invocation_authority,
                 approvals,
                 child_id,
                 &route.route_id,
                 Some(&plan.child_registry_digest),
                 blocker_class.as_deref(),
-                safe_unattended_basis.is_some(),
+                delegation_contract_basis.is_some(),
                 Some(&authority_decision),
             );
             let authority_decision_path =
                 write_authority_zone_decision(evidence_root, &authority_decision)?;
             let route_contract_allows_unapproved_workspace =
                 route.route_type != "workflow" && blocker_class.is_none();
-            let authority_dispatch_allowed = approval_policy == "program-approved"
+            let authority_dispatch_allowed = invocation_authority == "grant-consumption"
                 || authority_decision.autonomous_allowed
                 || (authority_decision.authority_zone == AUTHORITY_ZONE_WORKSPACE_DECLARED
                     && authority_decision.workspace_contained
@@ -8049,16 +8419,16 @@ fn build_child_execution_jobs(
                     && authority_decision.workspace_contained
                     && authority_decision.declared_scope_contained
                     && blocker_class.is_some()
-                    && safe_unattended_basis.is_some())
-                || (approval_policy == "unattended"
-                    && safe_unattended_basis.is_some()
+                    && delegation_contract_basis.is_some())
+                || (invocation_authority == "unattended"
+                    && delegation_contract_basis.is_some()
                     && authority_decision_allows_route_unattended(&authority_decision));
             if !authority_dispatch_allowed {
                 let dispatch_blocker_class = if authority_decision.authority_zone
                     == AUTHORITY_ZONE_WORKSPACE_DECLARED
                     && route.route_type == "workflow"
                 {
-                    "operator-approval-required".to_string()
+                    "authority-ambiguity".to_string()
                 } else {
                     authority_decision.fail_closed_blocker.clone()
                 };
@@ -8080,8 +8450,8 @@ fn build_child_execution_jobs(
                     child_id: child_id.clone(),
                     child_run_id: child_run_id.clone(),
                     route_id: route.route_id.clone(),
-                    status: if dispatch_blocker_class == "operator-approval-required" {
-                        "approval-required".to_string()
+                    status: if dispatch_blocker_class == "authority-ambiguity" {
+                        "human-boundary-blocked".to_string()
                     } else if classify_program_blocker_class(&dispatch_blocker_class)
                         == ProgramBlockerDisposition::Unsafe
                     {
@@ -8107,11 +8477,11 @@ fn build_child_execution_jobs(
                     state,
                     class,
                     &route.route_id,
-                    safe_unattended_basis.as_deref(),
+                    delegation_contract_basis.as_deref(),
                     &child_evidence_root,
                 )
             });
-            if approval_policy == "program-approved" {
+            if invocation_authority == "grant-consumption" {
                 write_program_approval_execution_evidence(
                     repo_root,
                     &child_evidence_root,
@@ -8123,6 +8493,63 @@ fn build_child_execution_jobs(
                     approvals,
                 )?;
             }
+            if invocation_authority == "unattended"
+                && blocker_class.is_none()
+                && route.route_id == ROUTE_ID_PROMOTE_PROPOSAL
+            {
+                if let Some(basis) = delegation_contract_basis.as_deref() {
+                    let delegation_receipt = write_delegated_promotion_receipt(
+                        &child_evidence_root,
+                        program_run_id,
+                        &state.child_lifecycle_id,
+                        &route.route_id,
+                        Some(child_id),
+                        &plan.child_registry_digest,
+                        authority_decision.write_scope_digest.as_deref(),
+                        Some(&authority_decision_path),
+                        Some(&authority_decision.authority_zone),
+                        Some(&authority_decision.artifact_class),
+                        child_promotion_required_receipt_verdicts(),
+                        child_promotion_required_receipt_digests(state),
+                        basis,
+                        vec![
+                            "route-contract:delegation_contract.safe_delegation=true".to_string(),
+                            "lifecycle-invocation:invocation_authority=unattended".to_string(),
+                            "authority-zone:workspace-declared".to_string(),
+                            "child-verification:implementation-run+conformance+drift=pass"
+                                .to_string(),
+                        ],
+                    )?;
+                    let mut data = program_step_event_data(
+                        None,
+                        "child-route-dispatch",
+                        [
+                            ("delegation_receipt", delegation_receipt.as_str()),
+                            ("invocation_authority", invocation_authority.as_str()),
+                            ("authority_decision", authority_decision_path.as_str()),
+                            ("delegation_kind", "machine-enforced-delegated-execution"),
+                        ],
+                    );
+                    data.insert(
+                        "registry_digest".to_string(),
+                        plan.child_registry_digest.clone(),
+                    );
+                    if let Some(write_scope_digest) = authority_decision.write_scope_digest.as_ref()
+                    {
+                        data.insert("write_scope_digest".to_string(), write_scope_digest.clone());
+                    }
+                    append_program_event(
+                        control_root,
+                        evidence_root,
+                        program_run_id,
+                        "delegated-promotion-authorized",
+                        Some(child_id),
+                        Some(&route.route_id),
+                        "child promotion delegated by route contract, unattended policy, authority-zone decision, and retained evidence gates",
+                        data,
+                    )?;
+                }
+            }
             let request = lifecycle_execution_request_for_route(
                 octon_dir,
                 &child_run_id,
@@ -8131,7 +8558,7 @@ fn build_child_execution_jobs(
                 route,
                 options.executor,
                 options.timeout_seconds.unwrap_or(1800),
-                &approval_policy,
+                &invocation_authority,
                 0,
                 run_inputs,
                 child_evidence_root,
@@ -8340,7 +8767,7 @@ fn selected_route_for_child_execution(
         recovery_route_for_blocker(program, blocker).is_some()
             && !matches!(
                 blocker.blocker_class.as_str(),
-                "approval-required" | "operator-approval-required" | "governed-agent-approval"
+                "authority-ambiguity" | "policy-override"
             )
             && (unresolved_authority_blocker.is_none()
                 || matches!(
@@ -8371,11 +8798,11 @@ fn selected_route_for_child_execution(
         Some(registry_digest),
         Some(&blocker.blocker_class),
     );
-    let safe_unattended = options.approval_policy == "unattended"
-        && recovery_safe_unattended_basis(Some(program), &blocker.blocker_class).is_some();
+    let delegation_safe = options.invocation_authority == "unattended"
+        && recovery_delegation_contract_basis(Some(program), &blocker.blocker_class).is_some();
     if recovery_requires_approval(program, &blocker.blocker_class)
         && !approval_granted
-        && !safe_unattended
+        && !delegation_safe
     {
         return Ok((None, Some(blocker.blocker_class.clone())));
     }
@@ -8408,7 +8835,7 @@ fn unresolved_child_authority_blocker<'a>(
     state.blockers.iter().find(|blocker| {
         !matches!(
             blocker.blocker_class.as_str(),
-            "approval-required" | "operator-approval-required" | "governed-agent-approval"
+            "authority-ambiguity" | "policy-override"
         ) && matches!(
             classify_program_blocker_class(&blocker.blocker_class),
             ProgramBlockerDisposition::Human | ProgramBlockerDisposition::Unsafe
@@ -8421,13 +8848,13 @@ fn unsafe_repair_evidence_for_job(
     state: &ProgramChildPlanState,
     blocker_class: &str,
     route_id: &str,
-    safe_unattended_basis: Option<&str>,
+    delegation_contract_basis: Option<&str>,
     child_evidence_root: &Path,
 ) -> Option<ProgramUnsafeRepairEvidence> {
     if classify_program_blocker_class(blocker_class) != ProgramBlockerDisposition::Unsafe {
         return None;
     }
-    let authority_basis = safe_unattended_basis?;
+    let authority_basis = delegation_contract_basis?;
     let unsafe_condition = state
         .blockers
         .iter()
@@ -8476,7 +8903,8 @@ fn unsafe_repair_evidence_for_program_route(
         classify_program_blocker_class(&blocker.blocker_class) == ProgramBlockerDisposition::Unsafe
             && recovery_route_for_blocker(program, blocker) == Some(route_id)
     })?;
-    let authority_basis = program_repair_safe_unattended_basis(program, &blocker.blocker_class)?;
+    let authority_basis =
+        program_repair_delegation_contract_basis(program, &blocker.blocker_class)?;
     let declared_validations = recovery_post_attempt_validations(program, &blocker.blocker_class);
     Some(ProgramUnsafeRepairEvidence {
         schema_version: "octon-program-lifecycle-unsafe-repair-v2".to_string(),
@@ -8517,23 +8945,20 @@ fn unsafe_repair_evidence_for_program_route(
 fn program_child_approval_context(
     program_run_id: &str,
     child_id: &str,
-    child_run_id: &str,
-    child_lifecycle_id: &str,
-    child_target: &str,
+    _child_run_id: &str,
+    _child_lifecycle_id: &str,
+    _child_target: &str,
     route_id: &str,
-) -> LifecycleApprovalContext {
-    LifecycleApprovalContext {
+) -> LifecycleHumanBoundaryContext {
+    LifecycleHumanBoundaryContext {
         context_kind: "program-child-route".to_string(),
         program_run_id: Some(program_run_id.to_string()),
         child_id: Some(child_id.to_string()),
-        approval_instruction: Some(format!(
-            "octon lifecycle program approve --run-id {program_run_id} --child {child_id} --route {route_id} --reason <reason>"
+        human_exception_instruction: Some(format!(
+            "record typed human exception grant for program child route {child_id}:{route_id}"
         )),
         retry_instruction: Some(format!(
             "octon lifecycle program retry --run-id {program_run_id} --child {child_id}"
-        )),
-        unattended_override_instruction: Some(format!(
-            "octon lifecycle run --lifecycle {child_lifecycle_id} --target {child_target} --run-id {child_run_id} --execute-routes --approval-policy unattended"
         )),
     }
 }
@@ -8601,7 +9026,7 @@ fn recovery_recipe_for_blocker<'a>(
         .find(|recipe| recovery_recipe_matches(recipe, blocker_class))
 }
 
-fn recovery_safe_unattended_basis(
+fn recovery_delegation_contract_basis(
     program: Option<&ProgramSpec>,
     blocker_class: &str,
 ) -> Option<String> {
@@ -8614,7 +9039,7 @@ fn recovery_safe_unattended_basis(
     let program = program?;
     let recipe = recovery_recipe_for_blocker(program, blocker_class)?;
     let idempotency_class = recipe.idempotency_class.as_deref()?;
-    safe_unattended_idempotency_class(idempotency_class).then(|| {
+    delegated_replay_class(idempotency_class).then(|| {
         format!(
             "recovery recipe {} idempotency_class={idempotency_class}",
             recipe.blocker_class
@@ -8622,57 +9047,35 @@ fn recovery_safe_unattended_basis(
     })
 }
 
-fn safe_unattended_idempotency_class(idempotency_class: &str) -> bool {
+fn delegated_replay_class(idempotency_class: &str) -> bool {
     matches!(
         idempotency_class,
-        "inspect-only" | "idempotent" | "idempotent-rerun" | "bounded-retry"
+        "inspect-only" | "idempotent" | "idempotent-rerun" | "bounded-retry" | "no-op-safe"
     )
 }
 
-fn lifecycle_route_safe_unattended_basis(
+fn lifecycle_route_delegation_contract_basis(
     octon_dir: &Path,
     lifecycle_id: &str,
     route_id: &str,
 ) -> Result<Option<String>> {
     let loaded = load_lifecycle_contract(octon_dir, lifecycle_id)?;
     Ok(route_by_id(&loaded.contract, route_id)
-        .and_then(|route| route_spec_safe_unattended_basis(route_id, route)))
+        .and_then(|route| route_spec_delegation_contract_basis(route_id, route)))
 }
 
-fn route_spec_safe_unattended_basis(route_id: &str, route: &RouteSpec) -> Option<String> {
-    let idempotency = route.idempotency.as_ref()?;
-    route_idempotency_safe_unattended_basis(idempotency)
-        .map(|basis| format!("route {route_id} {basis}"))
-}
-
-fn route_idempotency_safe_unattended_basis(value: &serde_yaml::Value) -> Option<String> {
-    match value {
-        serde_yaml::Value::String(class) => {
-            safe_unattended_idempotency_class(class).then(|| format!("idempotency={class}"))
-        }
-        serde_yaml::Value::Mapping(mapping) => {
-            for key in ["safe_unattended", "autonomous", "safe_for_unattended"] {
-                if mapping
-                    .get(&serde_yaml::Value::String(key.to_string()))
-                    .and_then(serde_yaml::Value::as_bool)
-                    .unwrap_or(false)
-                {
-                    return Some(format!("{key}=true"));
-                }
-            }
-            for key in ["idempotency_class", "class", "mode"] {
-                if let Some(class) = mapping
-                    .get(&serde_yaml::Value::String(key.to_string()))
-                    .and_then(serde_yaml::Value::as_str)
-                {
-                    if safe_unattended_idempotency_class(class) {
-                        return Some(format!("{key}={class}"));
-                    }
-                }
-            }
-            None
-        }
-        _ => None,
+fn route_spec_delegation_contract_basis(route_id: &str, route: &RouteSpec) -> Option<String> {
+    let contract = route.delegation_contract.as_ref()?;
+    if contract.decision_class == "delegated-execution"
+        && contract.safe_delegation
+        && delegated_replay_class(&contract.replay_class)
+    {
+        Some(format!(
+            "route {route_id} delegation_contract.safe_delegation=true replay_class={}",
+            contract.replay_class
+        ))
+    } else {
+        None
     }
 }
 
@@ -8698,13 +9101,13 @@ fn recovery_requires_approval(program: &ProgramSpec, blocker_class: &str) -> boo
         .recipes
         .iter()
         .find(|recipe| recovery_recipe_matches(recipe, blocker_class))
-        .map(|recipe| recipe.approval_required)
+        .map(|recipe| recipe.human_required)
         .or_else(|| {
             program
                 .recovery_policy
                 .handlers
                 .get(blocker_class)
-                .map(|handler| handler.approval_required)
+                .map(|handler| handler.human_required)
         })
         .unwrap_or(false)
 }
@@ -8914,19 +9317,19 @@ fn validate_program_recovery_recipe(
             other => bail!("unsupported program recovery recipe precondition: {other}"),
         }
     }
-    let safe_unattended_basis = program_repair_safe_unattended_basis(program, blocker_class)
-        .with_context(|| {
+    let delegation_contract_basis =
+        program_repair_delegation_contract_basis(program, blocker_class).with_context(|| {
             format!("program recovery recipe for {blocker_class} has no safe unattended basis")
         })?;
     if classify_program_blocker_class(blocker_class) == ProgramBlockerDisposition::Unsafe
-        && !safe_unattended_idempotency_class(recipe.idempotency_class.as_deref().unwrap_or(""))
+        && !delegated_replay_class(recipe.idempotency_class.as_deref().unwrap_or(""))
     {
         bail!("program unsafe repair for {blocker_class} is not safe for unattended execution");
     }
     Ok(ProgramRecoveryRecipeValidationEvidence::passed(
         blocker_class,
         route_id,
-        &safe_unattended_basis,
+        &delegation_contract_basis,
     ))
 }
 
@@ -8985,7 +9388,7 @@ fn validate_recovery_recipe_metadata(
         if !supported_authority_zone(zone) {
             bail!("unsupported recovery authority zone: {zone}");
         }
-        if !recipe.approval_required
+        if !recipe.human_required
             && matches!(
                 zone.as_str(),
                 AUTHORITY_ZONE_AUTHORED_GOVERNANCE | AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
@@ -8998,7 +9401,7 @@ fn validate_recovery_recipe_metadata(
         if !supported_authority_artifact_class(artifact_class) {
             bail!("unsupported recovery authority artifact class: {artifact_class}");
         }
-        if !recipe.approval_required
+        if !recipe.human_required
             && matches!(
                 artifact_class.as_str(),
                 ARTIFACT_CLASS_AUTHORED_GOVERNANCE
@@ -9013,7 +9416,7 @@ fn validate_recovery_recipe_metadata(
         if !supported_authority_operation_class(operation_class) {
             bail!("unsupported recovery authority operation class: {operation_class}");
         }
-        if !recipe.approval_required
+        if !recipe.human_required
             && matches!(
                 operation_class,
                 "durable-authority-mutation" | "protected-artifact-mutation"
@@ -9022,9 +9425,9 @@ fn validate_recovery_recipe_metadata(
             bail!("approval-free recovery recipe for {blocker_class} allows protected operation class {operation_class}");
         }
     }
-    for zone in &recipe.approval_required_for_zones {
+    for zone in &recipe.human_required_for_zones {
         if !supported_authority_zone(zone) {
-            bail!("unsupported approval-required authority zone: {zone}");
+            bail!("unsupported authority-ambiguity authority zone: {zone}");
         }
     }
     Ok(())
@@ -10203,14 +10606,14 @@ fn execute_atomic_program(
                 child_id: blocker.child_id.clone(),
                 child_run_id: format!("{program_run_id}-{}", blocker.child_id),
                 route_id: blocker.route_id.clone(),
-                status: "approval-required".to_string(),
+                status: "human-boundary-blocked".to_string(),
                 attempts: 0,
                 retryable: false,
                 blocker_class: Some(
                     blocker
                         .blocker_class
                         .clone()
-                        .unwrap_or_else(|| "operator-approval-required".to_string()),
+                        .unwrap_or_else(|| "authority-ambiguity".to_string()),
                 ),
                 error_message: Some(blocker.reason.clone()),
                 error_class: None,
@@ -10555,33 +10958,33 @@ fn execute_atomic_route_phase(
         route_id,
         OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
     );
-    let approval_policy = approval_policy_for_child_route(
-        &options.approval_policy,
+    let invocation_authority = invocation_authority_for_child_route(
+        &options.invocation_authority,
         approvals,
         &state.child_id,
         route_id,
         None,
         None,
-        route_spec_safe_unattended_basis(route_id, route).is_some(),
+        route_spec_delegation_contract_basis(route_id, route).is_some(),
         Some(&authority_decision),
     );
     let authority_decision_path =
         write_authority_zone_decision(evidence_root, &authority_decision)?;
-    let atomic_authority_allowed = approval_policy == "program-approved"
+    let atomic_authority_allowed = invocation_authority == "grant-consumption"
         || authority_decision.autonomous_allowed
         || (authority_decision.authority_zone == AUTHORITY_ZONE_WORKSPACE_DECLARED
             && authority_decision.workspace_contained
             && authority_decision.declared_scope_contained
             && route.route_type != "workflow")
-        || (approval_policy == "unattended"
-            && route_spec_safe_unattended_basis(route_id, route).is_some()
+        || (invocation_authority == "unattended"
+            && route_spec_delegation_contract_basis(route_id, route).is_some()
             && authority_decision_allows_route_unattended(&authority_decision));
     if !atomic_authority_allowed {
         let dispatch_blocker_class = if authority_decision.authority_zone
             == AUTHORITY_ZONE_WORKSPACE_DECLARED
             && route.route_type == "workflow"
         {
-            "operator-approval-required".to_string()
+            "authority-ambiguity".to_string()
         } else {
             authority_decision.fail_closed_blocker.clone()
         };
@@ -10603,8 +11006,8 @@ fn execute_atomic_route_phase(
             child_id: state.child_id.clone(),
             child_run_id,
             route_id: route_id.to_string(),
-            status: if dispatch_blocker_class == "operator-approval-required" {
-                "approval-required".to_string()
+            status: if dispatch_blocker_class == "authority-ambiguity" {
+                "human-boundary-blocked".to_string()
             } else if classify_program_blocker_class(&dispatch_blocker_class)
                 == ProgramBlockerDisposition::Unsafe
             {
@@ -10623,7 +11026,7 @@ fn execute_atomic_route_phase(
             evidence_paths: vec![authority_decision_path],
         });
     }
-    if approval_policy == "program-approved" {
+    if invocation_authority == "grant-consumption" {
         write_program_approval_execution_evidence(
             &repo_root,
             &child_evidence_root,
@@ -10653,7 +11056,7 @@ fn execute_atomic_route_phase(
         &route_plan,
         options.executor,
         options.timeout_seconds.unwrap_or(1800),
-        &approval_policy,
+        &invocation_authority,
         0,
         run_inputs,
         child_evidence_root,
@@ -11075,9 +11478,9 @@ fn adapter_error_blocker_class(error: &LifecycleExecutionError) -> (String, bool
         LifecycleErrorClass::ExecutorFailed | LifecycleErrorClass::ExecutorUnavailable => {
             ("executor-failed".to_string(), true)
         }
-        LifecycleErrorClass::ApprovalRequired | LifecycleErrorClass::InputBinding => {
-            ("executor-preflight-blocked".to_string(), false)
-        }
+        LifecycleErrorClass::AuthorizationProofFailed
+        | LifecycleErrorClass::HumanBoundaryRequired
+        | LifecycleErrorClass::InputBinding => ("executor-preflight-blocked".to_string(), false),
         _ => ("executor-failed".to_string(), false),
     }
 }
@@ -11824,7 +12227,7 @@ fn checkpoint_from_plan(
     lifecycle_id: &str,
     target: &str,
     executor: ExecutorKind,
-    approval_policy: &str,
+    invocation_authority: &str,
     run_inputs: &BTreeMap<String, String>,
     plan: &ProgramLifecyclePlanResult,
     child_results: &[ProgramChildExecutionSummary],
@@ -11884,7 +12287,7 @@ fn checkpoint_from_plan(
         execution_strategy: plan.execution_strategy.clone(),
         target: target.to_string(),
         executor: Some(executor.as_str().to_string()),
-        approval_policy: approval_policy.to_string(),
+        invocation_authority: invocation_authority.to_string(),
         timeout_seconds: None,
         max_child_concurrency: None,
         child_registry_digest: plan.child_registry_digest.clone(),
@@ -11904,8 +12307,8 @@ fn checkpoint_from_plan(
             .clone(),
         program_recovery_recipe_blocker_class: plan.program_recovery_recipe_blocker_class.clone(),
         program_recovery_recipe_route_id: plan.program_recovery_recipe_route_id.clone(),
-        program_recovery_recipe_safe_unattended_basis: plan
-            .program_recovery_recipe_safe_unattended_basis
+        program_recovery_recipe_delegation_contract_basis: plan
+            .program_recovery_recipe_delegation_contract_basis
             .clone(),
         latest_event_offset,
         latest_event_index: latest_event_offset,
@@ -11937,7 +12340,7 @@ fn write_program_checkpoint_snapshot(
     lifecycle_id: &str,
     target: &str,
     executor: ExecutorKind,
-    approval_policy: &str,
+    invocation_authority: &str,
     run_inputs: &BTreeMap<String, String>,
     plan: &ProgramLifecyclePlanResult,
     child_results: &[ProgramChildExecutionSummary],
@@ -11951,7 +12354,7 @@ fn write_program_checkpoint_snapshot(
         lifecycle_id,
         target,
         executor,
-        approval_policy,
+        invocation_authority,
         run_inputs,
         plan,
         child_results,
@@ -13249,7 +13652,7 @@ fn program_unsafe_continuation_summary(plan: &ProgramLifecyclePlanResult) -> Str
                 candidate.child_id.as_deref().unwrap_or("none"),
                 candidate.blocker_class,
                 candidate.selected_repair_route,
-                candidate.safe_unattended_basis,
+                candidate.delegation_contract_basis,
             ));
         }
     }
@@ -13288,14 +13691,14 @@ fn program_recovery_recipe_validation_summary(plan: &ProgramLifecyclePlanResult)
         plan.program_recovery_recipe_validation_failures.join("; ")
     };
     format!(
-        "\nProgram Recovery Recipe Validation:\nstatus: {status}\nblocker_class: {}\nroute_id: {}\nsafe_unattended_basis: {}\nfailures: {failures}\n",
+        "\nProgram Recovery Recipe Validation:\nstatus: {status}\nblocker_class: {}\nroute_id: {}\ndelegation_contract_basis: {}\nfailures: {failures}\n",
         plan.program_recovery_recipe_blocker_class
             .as_deref()
             .unwrap_or("none"),
         plan.program_recovery_recipe_route_id
             .as_deref()
             .unwrap_or("none"),
-        plan.program_recovery_recipe_safe_unattended_basis
+        plan.program_recovery_recipe_delegation_contract_basis
             .as_deref()
             .unwrap_or("none"),
     )
@@ -13428,7 +13831,7 @@ mod tests {
             child_id: "a".to_string(),
             route_id: "review-proposal".to_string(),
             reason: "approval required".to_string(),
-            blocker_class: Some("operator-approval-required".to_string()),
+            blocker_class: Some("authority-ambiguity".to_string()),
         }
     }
 
@@ -13451,7 +13854,7 @@ mod tests {
             recovery_action_id: None,
             preconditions: Vec::new(),
             idempotency_class: Some("idempotent-rerun".to_string()),
-            approval_required: false,
+            human_required: false,
             retry_budget: Some(1),
             dependent_handling: Some("continue-independent".to_string()),
             post_attempt_validation: vec!["replan-live-state".to_string()],
@@ -13462,7 +13865,7 @@ mod tests {
             requires_run_binding: false,
             requires_declared_write_scope: true,
             requires_zone_evidence: true,
-            approval_required_for_zones: Vec::new(),
+            human_required_for_zones: Vec::new(),
         }
     }
 
@@ -13555,6 +13958,47 @@ mod tests {
         assert_eq!(workspace.authority_zone, AUTHORITY_ZONE_WORKSPACE_DECLARED);
         assert!(authority_decision_allows_route_unattended(&workspace));
 
+        let proposal_packet = classify_authority_zone(
+            repo,
+            run_id,
+            Some("child-a"),
+            Some("run-packet-implementation"),
+            None,
+            OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
+            &[repo.join(".octon/inputs/exploratory/proposals/architecture/example-child")],
+            &[".octon/inputs/exploratory/proposals/architecture/example-child".to_string()],
+            None,
+        );
+        assert_eq!(
+            proposal_packet.authority_zone,
+            AUTHORITY_ZONE_WORKSPACE_DECLARED
+        );
+        assert_eq!(
+            proposal_packet.artifact_class,
+            ARTIFACT_CLASS_WORKSPACE_SOURCE
+        );
+        assert!(authority_decision_allows_route_unattended(&proposal_packet));
+        assert!(proposal_packet
+            .basis
+            .iter()
+            .any(|basis| basis.contains("manifest-governed proposal packet")));
+
+        let undeclared_proposal_packet = classify_authority_zone(
+            repo,
+            run_id,
+            Some("child-a"),
+            Some("run-packet-implementation"),
+            None,
+            OPERATION_CLASS_EXECUTE_CHILD_ROUTE,
+            &[repo.join(".octon/inputs/exploratory/proposals/architecture/example-child")],
+            &[".octon/framework/engine/runtime/spec".to_string()],
+            None,
+        );
+        assert_eq!(
+            undeclared_proposal_packet.authority_zone,
+            AUTHORITY_ZONE_PROTECTED_OR_EXTERNAL
+        );
+
         let outside_declared_scope = classify_authority_zone(
             repo,
             run_id,
@@ -13624,6 +14068,7 @@ mod tests {
         let legacy_grant = ProgramApprovalGrant {
             child_id: "child-a".to_string(),
             route_id: "implement".to_string(),
+            human_only_boundary: "authority-ambiguity".to_string(),
             blocker_class: None,
             registry_digest: Some("sha256:registry".to_string()),
             authority_zone: None,
@@ -13632,9 +14077,9 @@ mod tests {
             write_scope_digest: None,
             source_authority_digest: None,
             grant_scope_digest: None,
-            reason: "legacy grant".to_string(),
+            reason: "unbound grant".to_string(),
             recorded_at: "2026-05-17T00:00:00Z".to_string(),
-            evidence_path: "approval.yml".to_string(),
+            evidence_path: "human-exception-grant.yml".to_string(),
         };
         assert!(!approval_granted_for_authority_decision(
             Some(&vec![legacy_grant.clone()]),
@@ -13740,7 +14185,7 @@ mod tests {
             program_recovery_recipe_validation_failures: Vec::new(),
             program_recovery_recipe_blocker_class: None,
             program_recovery_recipe_route_id: None,
-            program_recovery_recipe_safe_unattended_basis: None,
+            program_recovery_recipe_delegation_contract_basis: None,
             unsafe_results: Vec::new(),
             unsafe_continuation_decision: None,
             approval_blockers: Vec::new(),
@@ -13761,7 +14206,7 @@ mod tests {
                 blocker_class: "publication-drift".to_string(),
                 recovery_action_id: Some(REFRESH_PUBLICATION_PROJECTIONS_ACTION.to_string()),
                 idempotency_class: Some("idempotent-rerun".to_string()),
-                approval_required: false,
+                human_required: false,
                 retry_budget: Some(1),
                 dependent_handling: Some("pause-dependent".to_string()),
                 post_attempt_validation: vec![
@@ -13785,7 +14230,7 @@ mod tests {
                 blocker_class: "target-drift-explained".to_string(),
                 recovery_action_id: Some(REBASELINE_CHECKPOINT_ACTION.to_string()),
                 idempotency_class: Some("inspect-only".to_string()),
-                approval_required: false,
+                human_required: false,
                 retry_budget: Some(1),
                 dependent_handling: Some("pause-dependent".to_string()),
                 post_attempt_validation: vec![
@@ -14055,8 +14500,8 @@ mod tests {
 
         for (class, normalized_class, disposition) in [
             (
-                "approval-required",
-                "operator-approval-required",
+                "authority-ambiguity",
+                "authority-ambiguity",
                 ProgramBlockerDisposition::Human,
             ),
             (
@@ -14125,13 +14570,13 @@ mod tests {
                 ProgramBlockerDisposition::Human,
             ),
             (
-                "durable-authority-approval-required",
-                "durable-authority-approval-required",
+                "scope-expansion",
+                "scope-expansion",
                 ProgramBlockerDisposition::Human,
             ),
             (
-                "protected-artifact-approval-required",
-                "protected-artifact-approval-required",
+                "scope-expansion",
+                "scope-expansion",
                 ProgramBlockerDisposition::Human,
             ),
             (
@@ -14413,6 +14858,17 @@ receipts:
 routes:
   - route_id: "run-implementation"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["implementation-run"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when: { manifest_status: "accepted" }
     completion:
       expected_receipts: ["implementation-run"]
@@ -14455,6 +14911,17 @@ receipts:
 routes:
   - route_id: "generate-packet-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - manifest_status: "accepted"
@@ -14463,9 +14930,17 @@ routes:
       expected_receipts: ["implementation-prompt"]
   - route_id: "run-packet-implementation"
     route_type: "extension"
-    idempotency:
-      idempotency_class: "bounded-retry"
-      safe_unattended: true
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["implementation-prompt"]
+      required_receipts_before_completion: ["implementation-run"]
+      replay_class: "bounded-retry"
+      automated_recovery_policy: "bounded-automated-retry"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       any:
         - all:
@@ -14491,6 +14966,17 @@ routes:
       expected_receipts: ["implementation-run"]
   - route_id: "promote-proposal"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["implementation-run"]
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - manifest_status: "accepted"
@@ -14500,6 +14986,17 @@ routes:
       expected_manifest_status: "implemented"
   - route_id: "run-packet-verification-and-correction-loop"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["implementation-run"]
+      required_receipts_before_completion: ["implementation-conformance", "post-implementation-drift"]
+      replay_class: "bounded-retry"
+      automated_recovery_policy: "bounded-automated-retry"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - manifest_status: "implemented"
@@ -14510,6 +15007,17 @@ routes:
       expected_receipts: ["implementation-conformance", "post-implementation-drift"]
   - route_id: "closeout-packet"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["implementation-conformance", "post-implementation-drift"]
+      required_receipts_before_completion: ["proposal-closeout"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation", "unresolved-risk-acceptance"]
     enter_when:
       all:
         - manifest_status: "implemented"
@@ -14522,6 +15030,17 @@ routes:
       expected_receipts: ["proposal-closeout"]
   - route_id: "archive-proposal"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["proposal-closeout"]
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation", "unresolved-risk-acceptance", "stale-evidence-acceptance"]
     enter_when:
       all:
         - manifest_status: "implemented"
@@ -14534,7 +15053,7 @@ routes:
             );
         }
 
-        fn write_child_contract_with_approval(&self) {
+        fn write_child_contract_with_human_boundary(&self) {
             self.write(
                 ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
                 r#"
@@ -14554,16 +15073,24 @@ routes:
   - route_id: "run-implementation"
     route_type: "extension"
     enter_when: { manifest_status: "accepted" }
+    delegation_contract:
+      decision_class: "new-governance-decision"
+      safe_delegation: false
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["implementation-run"]
+      replay_class: "non-replay-safe"
+      automated_recovery_policy: "fail-closed-human-boundary"
+      human_only_boundaries: ["scope-expansion"]
     completion:
       expected_receipts: ["implementation-run"]
-    approval:
-      required_by_default: true
-      reason: "child route mutates a durable target"
 "#,
             );
         }
 
-        fn write_child_contract_with_workflow_promotion_approval(&self) {
+        fn write_child_contract_with_workflow_promotion_human_boundary(&self) {
             self.write(
                 ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
                 r#"
@@ -14584,6 +15111,17 @@ receipts:
 routes:
   - route_id: "promote-proposal"
     route_type: "workflow"
+    delegation_contract:
+      decision_class: "new-governance-decision"
+      safe_delegation: false
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "workflow-scope"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["implementation-run"]
+      required_receipts_before_completion: []
+      replay_class: "non-replay-safe"
+      automated_recovery_policy: "fail-closed-human-boundary"
+      human_only_boundaries: ["scope-expansion"]
     enter_when:
       all:
         - manifest_status: "accepted"
@@ -14591,14 +15129,62 @@ routes:
         - receipt_verdict: { receipt_id: "implementation-run", value: "pass" }
     completion:
       expected_manifest_status: "implemented"
-    approval:
-      required_by_default: true
-      reason: "durable proposal promotion requires explicit approval"
 "#,
             );
         }
 
-        fn write_child_contract_with_safe_unattended_approval(&self) {
+        fn write_child_contract_with_safe_workflow_promotion(&self) {
+            self.write(
+                ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
+                r#"
+schema_version: "octon-extension-lifecycle-contract-v1"
+lifecycle_id: "proposal-packet"
+owner_extension: "test-extension"
+version: "1.0.0"
+target: { input: "packet_path", manifest_path: "proposal.yml", status_field: "status", allowed_statuses: ["accepted", "implemented"] }
+states: [{ state_id: "promote" }]
+terminal_outcomes:
+  - outcome_id: "implemented"
+    when: { manifest_status: "implemented" }
+receipts:
+  - receipt_id: "implementation-run"
+    path: "support/implementation-run.md"
+    required_fields: ["verdict"]
+    verdict_field: "verdict"
+  - receipt_id: "implementation-conformance"
+    path: "support/implementation-conformance-review.md"
+    required_fields: ["verdict"]
+    verdict_field: "verdict"
+  - receipt_id: "post-implementation-drift"
+    path: "support/post-implementation-drift-churn-review.md"
+    required_fields: ["verdict"]
+    verdict_field: "verdict"
+routes:
+  - route_id: "promote-proposal"
+    route_type: "workflow"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "workflow-scope"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["implementation-run"]
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
+    enter_when:
+      all:
+        - manifest_status: "accepted"
+        - receipt_complete: "implementation-run"
+        - receipt_verdict: { receipt_id: "implementation-run", value: "pass" }
+    completion:
+      expected_manifest_status: "implemented"
+"#,
+            );
+        }
+
+        fn write_child_contract_with_delegation_contract(&self) {
             self.write(
                 ".octon/generated/effective/extensions/published/test-extension/bundled/context/lifecycle.contract.yml",
                 r#"
@@ -14618,12 +15204,19 @@ routes:
   - route_id: "run-implementation"
     route_type: "extension"
     enter_when: { manifest_status: "accepted" }
-    idempotency: "idempotent"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["implementation-run"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     completion:
       expected_receipts: ["implementation-run"]
-    approval:
-      required_by_default: true
-      reason: "child route is idempotent and safe for unattended execution"
 "#,
             );
         }
@@ -14656,6 +15249,17 @@ receipts:
 routes:
   - route_id: "run-implementation"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["implementation-run"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation", "stale-evidence-acceptance"]
     enter_when: { manifest_status: "accepted" }
     completion:
       expected_receipts: ["implementation-run"]
@@ -14728,6 +15332,17 @@ receipts:
 routes:
   - route_id: "run-implementation"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["implementation-run"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when: {{ manifest_status: "accepted" }}
     atomic:
       stage_route_id: "atomic-stage"
@@ -14735,18 +15350,62 @@ routes:
       rollback_route_id: "atomic-rollback"
 {compensation_field}  - route_id: "atomic-stage"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     completion:
       {stage_completion}
   - route_id: "atomic-commit"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     completion:
       {commit_completion}
   - route_id: "atomic-rollback"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     completion:
       expected_manifest_status: "accepted"
   - route_id: "atomic-compensate"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     completion:
       expected_manifest_status: "accepted"
 "#
@@ -14785,6 +15444,17 @@ receipts:
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#
                 ),
             );
@@ -14832,6 +15502,17 @@ receipts:
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
             );
         }
@@ -14877,6 +15558,17 @@ receipts:
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - manifest_status: "accepted"
@@ -14974,6 +15666,17 @@ receipts:
 routes:
   - route_id: "create-proposal-program"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-creation"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     completion:
       expected_receipts: ["program-creation"]
     enter_when:
@@ -14983,6 +15686,17 @@ routes:
         - file_absent: "resources/child-packet-index.yml"
   - route_id: "review-proposal-program"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["proposal-review"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     completion:
       expected_receipts: ["proposal-review"]
     enter_when:
@@ -15000,12 +15714,34 @@ routes:
             - receipt_stale: "proposal-review"
   - route_id: "revise-proposal-program"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["proposal-review"]
+      required_receipts_before_completion: []
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - receipt_complete: "proposal-review"
         - receipt_verdict: { receipt_id: "proposal-review", value: "revision-required" }
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - manifest_status: "accepted"
@@ -15016,6 +15752,17 @@ routes:
         - receipt_absent: "program-implementation-prompt"
   - route_id: "promote-proposal"
     route_type: "workflow"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared", "program-child-registry"]
+      declared_write_scope_source: "program-child-registry"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["proposal-review", "implementation-run"]
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - manifest_status: "accepted"
@@ -15029,6 +15776,17 @@ routes:
         - receipt_field_equals: { receipt_id: "implementation-run", field: "child_authority_preserved", value: "yes" }
   - route_id: "generate-program-verification-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-verification-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - manifest_status: "implemented"
@@ -15036,6 +15794,17 @@ routes:
         - receipt_absent: "program-verification-prompt"
   - route_id: "run-program-verification-and-correction-loop"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["program-verification-prompt"]
+      required_receipts_before_completion: ["program-implementation-conformance", "program-post-implementation-drift"]
+      replay_class: "bounded-retry"
+      automated_recovery_policy: "bounded-automated-retry"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     completion:
       expected_receipts: ["program-implementation-conformance", "program-post-implementation-drift"]
     enter_when:
@@ -15047,6 +15816,17 @@ routes:
             - receipt_absent: "program-post-implementation-drift"
   - route_id: "generate-program-closeout-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["program-implementation-conformance", "program-post-implementation-drift"]
+      required_receipts_before_completion: ["program-closeout-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
     enter_when:
       all:
         - manifest_status: "implemented"
@@ -15059,6 +15839,17 @@ routes:
         - receipt_absent: "program-closeout-prompt"
   - route_id: "closeout-proposal-program"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["program-implementation-conformance", "program-post-implementation-drift", "program-closeout-prompt"]
+      required_receipts_before_completion: ["proposal-closeout"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation", "unresolved-risk-acceptance"]
     enter_when:
       all:
         - manifest_status: "implemented"
@@ -15072,6 +15863,17 @@ routes:
         - receipt_absent: "proposal-closeout"
   - route_id: "archive-proposal"
     route_type: "workflow"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "workflow-scope"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: ["proposal-closeout"]
+      required_receipts_before_completion: []
+      replay_class: "no-op-safe"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation", "unresolved-risk-acceptance", "stale-evidence-acceptance"]
     enter_when:
       all:
         - manifest_status: "implemented"
@@ -15123,6 +15925,17 @@ terminal_outcomes:
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
             );
         }
@@ -15148,7 +15961,7 @@ program:
         recovery_route_id: "run-implementation"
         preconditions: ["receipt-stale", "selected-route-present"]
         idempotency_class: "idempotent"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "block-dependents"
         post_attempt_validation: ["replan-live-state", "receipt-fresh"]
@@ -15161,6 +15974,17 @@ states: [{ state_id: "coordinate" }]
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
             );
         }
@@ -15189,7 +16013,7 @@ program:
       - blocker_class: "publication-drift"
         recovery_action_id: "refresh-publication-projections"
         idempotency_class: "idempotent-rerun"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "pause-dependent"
         post_attempt_validation: ["replan-live-state", "publication-freshness-cleared", "replay-verify"]
@@ -15202,6 +16026,17 @@ states: [{ state_id: "coordinate" }]
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
             );
         }
@@ -15281,7 +16116,7 @@ program:
       - blocker_class: "unsupported-mode-authority"
         recovery_route_id: "run-implementation"
         idempotency_class: "idempotent"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "continue-independent"
         post_attempt_validation: ["replan-live-state"]
@@ -15294,6 +16129,17 @@ states: [{ state_id: "coordinate" }]
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
             );
         }
@@ -15319,6 +16165,17 @@ routes:
                 r#"
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#
             } else {
                 ""
@@ -15344,7 +16201,7 @@ program:
         recovery_route_id: "generate-program-implementation-prompt"
         {preconditions_line}
         idempotency_class: "{idempotency_class}"
-        approval_required: true
+        human_required: false
         retry_budget: 1
         dependent_handling: "continue-independent"
         {post_attempt_validation_line}
@@ -15381,7 +16238,7 @@ program:
         recovery_route_id: "run-implementation"
         preconditions: ["receipt-stale", "selected-route-present"]
         idempotency_class: "idempotent"
-        approval_required: true
+        human_required: false
         retry_budget: 1
         dependent_handling: "pause-dependent"
         post_attempt_validation: ["replan-live-state"]
@@ -15394,6 +16251,17 @@ states: [{ state_id: "coordinate" }]
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
             );
         }
@@ -15418,7 +16286,7 @@ program:
       stale-receipt:
         recovery_route_id: "run-implementation"
         max_attempts: 1
-        approval_required: true
+        human_required: false
         replan_after_attempt: true
   authority_boundaries:
     parent_coordinates_only: true
@@ -15428,6 +16296,17 @@ states: [{ state_id: "coordinate" }]
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
             );
         }
@@ -15452,7 +16331,7 @@ program:
       - blocker_class: "stale-receipt"
         recovery_route_id: "run-implementation"
         idempotency_class: "idempotent"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "continue-independent"
         post_attempt_validation: ["replay-verify"]
@@ -15465,6 +16344,17 @@ states: [{ state_id: "coordinate" }]
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
             );
         }
@@ -15781,6 +16671,49 @@ routes:
     }
 
     #[test]
+    fn unattended_parent_promotion_dispatches_with_child_authority_preserved() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = program_review_fixture("program-promote-unattended-safe", "accepted");
+        fixture.write_parent_review_receipt("accepted", "sha256:live");
+        fixture.write_program_implementation_prompt_receipt();
+        fixture.write_parent_implementation_run_receipt("yes");
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("program-promote-unattended-safe".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                invocation_authority: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert_eq!(
+            result
+                .parent_route_result
+                .as_ref()
+                .map(|route| route.status.as_str()),
+            Some("completed")
+        );
+        let receipt_path = fixture.octon_dir.join(
+            "state/evidence/runs/workflows/program-promote-unattended-safe/parent/delegated-promotion-parent-promote-proposal.yml",
+        );
+        let receipt = fs::read_to_string(&receipt_path).unwrap();
+        assert!(receipt.contains("delegation_kind: machine-enforced-delegated-execution"));
+        assert!(receipt.contains("human_exception_grant: false"));
+        assert!(receipt.contains("implementation-run.child_authority_preserved"));
+    }
+
+    #[test]
     fn program_review_workflow_routes_closeout_receipt_to_archive() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = program_review_fixture("program-review-archive", "implemented");
@@ -15890,7 +16823,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -15927,7 +16860,7 @@ routes:
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -16479,7 +17412,7 @@ routes:
     fn approval_gated_planning_reports_approval_blockers() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("approval-gated", true);
-        fixture.write_child_contract_with_approval();
+        fixture.write_child_contract_with_human_boundary();
         fixture.write_child("a", "framework/a.md", "accepted");
         fixture.write_registry(
             "approval-gated",
@@ -16505,7 +17438,7 @@ routes:
     fn unattended_approval_auto_grants_only_safe_contract_routes() {
         let _guard = crate::acquire_kernel_test_lock();
         let unsafe_fixture = ProgramFixture::new("approval-unattended-unsafe-route", true);
-        unsafe_fixture.write_child_contract_with_approval();
+        unsafe_fixture.write_child_contract_with_human_boundary();
         unsafe_fixture.write_child("a", "framework/a.md", "accepted");
         unsafe_fixture.write_registry(
             "approval-gated",
@@ -16526,7 +17459,7 @@ routes:
                 max_steps: Some(2),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -16536,14 +17469,14 @@ routes:
         assert!(unsafe_result
             .child_results
             .iter()
-            .any(|summary| summary.status == "approval-required"));
+            .any(|summary| summary.status == "human-boundary-blocked"));
         assert!(!unsafe_fixture
             .root
             .join("children/a/support/implementation-run.md")
             .exists());
 
         let safe_fixture = ProgramFixture::new("approval-unattended-safe-route", true);
-        safe_fixture.write_child_contract_with_safe_unattended_approval();
+        safe_fixture.write_child_contract_with_delegation_contract();
         safe_fixture.write_child("a", "framework/a.md", "accepted");
         safe_fixture.write_registry(
             "approval-gated",
@@ -16564,7 +17497,7 @@ routes:
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -16584,7 +17517,7 @@ routes:
     fn unattended_policy_blocks_workflow_promotion_without_safe_basis() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("approval-unattended-workflow-promote", true);
-        fixture.write_child_contract_with_workflow_promotion_approval();
+        fixture.write_child_contract_with_workflow_promotion_human_boundary();
         fixture.write_child("a", "framework/a.md", "accepted");
         fixture.write(
             "children/a/support/implementation-run.md",
@@ -16609,7 +17542,7 @@ routes:
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -16618,7 +17551,7 @@ routes:
 
         assert_eq!(result.final_verdict, "blocked-human");
         assert!(result.child_results.iter().any(|summary| {
-            summary.route_id == "promote-proposal" && summary.status == "approval-required"
+            summary.route_id == "promote-proposal" && summary.status == "human-boundary-blocked"
         }));
         assert_eq!(
             proposal_status_at_target(&fixture.root.join("children/a"))
@@ -16628,15 +17561,222 @@ routes:
         );
         assert!(!fixture
             .octon_dir
-            .join("state/evidence/runs/workflows/approval-unattended-workflow-promote/children/a/promote-proposal-approval-override.yml")
+            .join("state/evidence/runs/workflows/approval-unattended-workflow-promote/children/a/authorization/promote-proposal-delegation-proof.yml")
             .exists());
     }
 
     #[test]
-    fn program_resume_preserves_checkpointed_unattended_approval_policy() {
+    fn unattended_policy_dispatches_workflow_promotion_with_safe_evidence() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("approval-unattended-workflow-promote-safe", true);
+        fixture.write_child_contract_with_safe_workflow_promotion();
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write_registry(
+            "approval-gated",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("approval-unattended-workflow-promote-safe".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                invocation_authority: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert!(result.child_results.iter().any(|summary| {
+            summary.route_id == "promote-proposal" && summary.status == "completed"
+        }));
+        assert_eq!(
+            proposal_status_at_target(&fixture.root.join("children/a"))
+                .unwrap()
+                .as_deref(),
+            Some("implemented")
+        );
+        let receipt_path = fixture.octon_dir.join(
+            "state/evidence/runs/workflows/approval-unattended-workflow-promote-safe/children/a/delegated-promotion-a-promote-proposal.yml",
+        );
+        let receipt = fs::read_to_string(&receipt_path).unwrap();
+        assert!(receipt.contains("delegation_kind: machine-enforced-delegated-execution"));
+        assert!(receipt.contains("human_exception_grant: false"));
+        assert!(receipt.contains("implementation-conformance"));
+        assert!(receipt.contains("post-implementation-drift"));
+    }
+
+    #[test]
+    fn unattended_child_promotion_requires_conformance_and_drift_receipts() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("approval-unattended-workflow-promote-missing", true);
+        fixture.write_child_contract_with_safe_workflow_promotion();
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: pass\n",
+        );
+        fixture.write_registry(
+            "approval-gated",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("approval-unattended-workflow-promote-missing".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                invocation_authority: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert!(result.child_results.iter().any(|summary| {
+            summary.route_id == "promote-proposal" && summary.status == "human-boundary-blocked"
+        }));
+        assert!(!fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/approval-unattended-workflow-promote-missing/children/a/delegated-promotion-a-promote-proposal.yml")
+            .exists());
+    }
+
+    #[test]
+    fn unattended_child_promotion_blocks_failed_drift_receipt() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("approval-unattended-workflow-promote-drift", true);
+        fixture.write_child_contract_with_safe_workflow_promotion();
+        fixture.write_child("a", "framework/a.md", "accepted");
+        fixture.write(
+            "children/a/support/implementation-run.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/implementation-conformance-review.md",
+            "verdict: pass\n",
+        );
+        fixture.write(
+            "children/a/support/post-implementation-drift-churn-review.md",
+            "verdict: fail\n",
+        );
+        fixture.write_registry(
+            "approval-gated",
+            r#"  - child_id: "a"
+    path: "children/a"
+"#,
+        );
+
+        let result = run_program_lifecycle_from_octon_dir(
+            &fixture.octon_dir,
+            RunLifecycleOptions {
+                lifecycle_id: "proposal-program".to_string(),
+                target: PathBuf::from("parent"),
+                run_id: Some("approval-unattended-workflow-promote-drift".to_string()),
+                executor: ExecutorKind::Mock,
+                max_iterations: None,
+                execute_routes: true,
+                max_steps: Some(1),
+                timeout_seconds: None,
+                max_child_concurrency: None,
+                invocation_authority: "unattended".to_string(),
+                run_inputs: BTreeMap::new(),
+                program_child_filter: None,
+            },
+        )
+        .unwrap();
+
+        assert!(!result.child_results.iter().any(|summary| {
+            summary.route_id == "promote-proposal" && summary.status == "completed"
+        }));
+        assert_eq!(
+            proposal_status_at_target(&fixture.root.join("children/a"))
+                .unwrap()
+                .as_deref(),
+            Some("accepted")
+        );
+        assert!(!fixture
+            .octon_dir
+            .join("state/evidence/runs/workflows/approval-unattended-workflow-promote-drift/children/a/delegated-promotion-a-promote-proposal.yml")
+            .exists());
+    }
+
+    #[test]
+    fn workflow_promotion_safe_basis_rejects_undeclared_scope_and_protected_zone() {
+        let _guard = crate::acquire_kernel_test_lock();
+        let fixture = ProgramFixture::new("approval-unattended-workflow-promote-zone", true);
+        fixture.write_child_contract_with_safe_workflow_promotion();
+        let child_contract =
+            load_lifecycle_contract(&fixture.octon_dir, "proposal-packet").unwrap();
+        let route = route_by_id(&child_contract.contract, ROUTE_ID_PROMOTE_PROPOSAL).unwrap();
+        let program_contract =
+            load_lifecycle_contract(&fixture.octon_dir, "proposal-program").unwrap();
+        let program = program_contract.contract.program.as_ref().unwrap();
+
+        let mut undeclared = child_state("a", Vec::new());
+        undeclared.selected_route = Some(route_plan_state(route.clone()));
+        undeclared.gate_status.verification = true;
+        undeclared.write_scopes = vec!["children/other".to_string()];
+        assert!(child_route_delegation_contract_basis(
+            &fixture.root,
+            program,
+            &undeclared,
+            ROUTE_ID_PROMOTE_PROPOSAL,
+            route,
+        )
+        .is_none());
+
+        let mut protected = child_state("b", Vec::new());
+        protected.target = ".octon/framework/protected-child".to_string();
+        protected.write_scopes = vec![".octon/framework/protected-child".to_string()];
+        protected.selected_route = Some(route_plan_state(route.clone()));
+        protected.gate_status.verification = true;
+        assert!(child_route_delegation_contract_basis(
+            &fixture.root,
+            program,
+            &protected,
+            ROUTE_ID_PROMOTE_PROPOSAL,
+            route,
+        )
+        .is_none());
+    }
+
+    #[test]
+    fn program_resume_preserves_checkpointed_unattended_invocation_authority() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("resume-preserves-unattended", true);
-        fixture.write_child_contract_with_workflow_promotion_approval();
+        fixture.write_child_contract_with_workflow_promotion_human_boundary();
         fixture.write_child("a", "framework/a.md", "accepted");
         fixture.write(
             "children/a/support/implementation-run.md",
@@ -16661,7 +17801,7 @@ routes:
                 max_steps: Some(7),
                 timeout_seconds: Some(42),
                 max_child_concurrency: Some(2),
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -16671,7 +17811,7 @@ routes:
             read_program_checkpoint_for_run(&fixture.octon_dir, "resume-preserves-unattended")
                 .unwrap()
                 .unwrap();
-        assert_eq!(checkpoint.approval_policy, "unattended");
+        assert_eq!(checkpoint.invocation_authority, "unattended");
         assert_eq!(checkpoint.timeout_seconds, Some(42));
         assert_eq!(checkpoint.max_child_concurrency, Some(2));
 
@@ -16683,7 +17823,7 @@ routes:
 
         assert_eq!(resumed.final_verdict, "blocked-human");
         assert!(resumed.child_results.iter().any(|summary| {
-            summary.route_id == "promote-proposal" && summary.status == "approval-required"
+            summary.route_id == "promote-proposal" && summary.status == "human-boundary-blocked"
         }));
         assert_eq!(
             proposal_status_at_target(&fixture.root.join("children/a"))
@@ -16695,7 +17835,7 @@ routes:
             read_program_checkpoint_for_run(&fixture.octon_dir, "resume-preserves-unattended")
                 .unwrap()
                 .unwrap();
-        assert_eq!(resumed_checkpoint.approval_policy, "unattended");
+        assert_eq!(resumed_checkpoint.invocation_authority, "unattended");
         assert_eq!(resumed_checkpoint.timeout_seconds, Some(42));
         assert_eq!(resumed_checkpoint.max_child_concurrency, Some(2));
     }
@@ -16704,7 +17844,7 @@ routes:
     fn approval_grant_is_consumed_by_retry_without_unattended_cli_policy() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("approval-consumed", true);
-        fixture.write_child_contract_with_approval();
+        fixture.write_child_contract_with_human_boundary();
         fixture.write_child("a", "framework/a.md", "accepted");
         fixture.write_registry(
             "approval-gated",
@@ -16725,7 +17865,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -16734,7 +17874,7 @@ routes:
         assert!(first
             .child_results
             .iter()
-            .any(|summary| summary.status == "approval-required"));
+            .any(|summary| summary.status == "human-boundary-blocked"));
         assert!(!fixture
             .root
             .join("children/a/support/implementation-run.md")
@@ -16766,11 +17906,11 @@ routes:
             .is_file());
         assert!(fixture
             .octon_dir
-            .join("state/evidence/runs/workflows/approval-consumed/children/a/run-implementation-program-approval-consumed.yml")
+            .join("state/evidence/runs/workflows/approval-consumed/children/a/run-implementation-grant-consumption.yml")
             .is_file());
         assert!(fixture
             .octon_dir
-            .join("state/evidence/runs/workflows/approval-consumed/children/a/run-implementation-approval-override.yml")
+            .join("state/evidence/runs/workflows/approval-consumed/children/a/run-implementation-grant-consumption.yml")
             .is_file());
     }
 
@@ -16778,7 +17918,7 @@ routes:
     fn approval_grant_is_consumed_by_resume_without_unattended_cli_policy() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("approval-resume", true);
-        fixture.write_child_contract_with_approval();
+        fixture.write_child_contract_with_human_boundary();
         fixture.write_child("a", "framework/a.md", "accepted");
         fixture.write_registry(
             "approval-gated",
@@ -16799,7 +17939,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -16808,7 +17948,7 @@ routes:
         assert!(first
             .child_results
             .iter()
-            .any(|summary| summary.status == "approval-required"));
+            .any(|summary| summary.status == "human-boundary-blocked"));
 
         approve_program_lifecycle_child_route(
             &fixture.octon_dir,
@@ -16854,13 +17994,9 @@ routes:
             Path::new("parent"),
         )
         .unwrap();
-        assert!(plan.runnable_batch.is_empty());
-        assert_eq!(plan.final_verdict, "blocked-human");
-        assert_eq!(plan.approval_blockers.len(), 1);
-        assert_eq!(
-            plan.approval_blockers[0].blocker_class.as_deref(),
-            Some("stale-receipt")
-        );
+        assert_eq!(plan.runnable_batch, vec!["a".to_string()]);
+        assert_ne!(plan.final_verdict, "blocked-human");
+        assert!(plan.approval_blockers.is_empty());
 
         let first = run_program_lifecycle_from_octon_dir(
             &fixture.octon_dir,
@@ -16874,36 +18010,23 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
         )
         .unwrap();
-        assert!(first.child_results.is_empty());
-
-        approve_program_lifecycle_child_route(
-            &fixture.octon_dir,
-            "recovery-approval",
-            "a",
-            "run-implementation",
-            "operator approved recovery route",
-        )
-        .unwrap();
-        let retry =
-            retry_program_lifecycle_run(&fixture.octon_dir, "recovery-approval", Some("a".into()))
-                .unwrap();
-        assert!(retry
+        assert!(first
             .child_results
             .iter()
             .any(
                 |summary| summary.blocker_class.as_deref() == Some("stale-receipt")
                     && summary.route_id == "run-implementation"
             ));
-        assert!(fixture
+        assert!(!fixture
             .octon_dir
-            .join("state/evidence/runs/workflows/recovery-approval/children/a/run-implementation-program-approval-consumed.yml")
-            .is_file());
+            .join("state/evidence/runs/workflows/recovery-approval/children/a/run-implementation-grant-consumption.yml")
+            .exists());
     }
 
     #[test]
@@ -16936,7 +18059,7 @@ routes:
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -16947,7 +18070,7 @@ routes:
         assert!(!result
             .child_results
             .iter()
-            .any(|summary| summary.status == "approval-required"));
+            .any(|summary| summary.status == "human-boundary-blocked"));
         assert!(result.child_results.iter().any(|summary| {
             summary.blocker_class.as_deref() == Some("stale-receipt")
                 && summary.route_id == "run-implementation"
@@ -16988,21 +18111,18 @@ routes:
             Some("run-implementation")
         );
         assert_eq!(recovery_attempt_budget(&program, "stale-receipt"), Some(1));
-        assert!(recovery_requires_approval(&program, "stale-receipt"));
+        assert!(!recovery_requires_approval(&program, "stale-receipt"));
         assert!(recovery_replan_after_attempt(&program, "stale-receipt"));
-        assert!(plan.runnable_batch.is_empty());
-        assert_eq!(plan.final_verdict, "blocked-human");
-        assert_eq!(
-            plan.approval_blockers[0].blocker_class.as_deref(),
-            Some("stale-receipt")
-        );
+        assert_eq!(plan.runnable_batch, vec!["a".to_string()]);
+        assert_ne!(plan.final_verdict, "blocked-human");
+        assert!(plan.approval_blockers.is_empty());
 
         let mut checkpoint = checkpoint_from_plan(
             "recovery-handler-only-budget",
             "proposal-program",
             "parent",
             ExecutorKind::Mock,
-            "minimize",
+            "unattended",
             &BTreeMap::new(),
             &plan,
             &[],
@@ -17059,30 +18179,13 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
         )
         .unwrap();
-        assert!(first.child_results.is_empty());
-
-        approve_program_lifecycle_child_route(
-            &fixture.octon_dir,
-            "recovery-handler-only-exec",
-            "a",
-            "run-implementation",
-            "operator approved handler recovery route",
-        )
-        .unwrap();
-        let retry = retry_program_lifecycle_run(
-            &fixture.octon_dir,
-            "recovery-handler-only-exec",
-            Some("a".into()),
-        )
-        .unwrap();
-
-        assert!(retry.child_results.iter().any(|summary| {
+        assert!(first.child_results.iter().any(|summary| {
             summary.blocker_class.as_deref() == Some("stale-receipt")
                 && summary.route_id == "run-implementation"
                 && summary.status == "blocked"
@@ -17092,10 +18195,10 @@ routes:
                     .unwrap_or_default()
                     .contains("did not change")
         }));
-        assert!(fixture
+        assert!(!fixture
             .octon_dir
-            .join("state/evidence/runs/workflows/recovery-handler-only-exec/children/a/run-implementation-program-approval-consumed.yml")
-            .is_file());
+            .join("state/evidence/runs/workflows/recovery-handler-only-exec/children/a/run-implementation-grant-consumption.yml")
+            .exists());
         let events = read_program_events(
             &fixture
                 .octon_dir
@@ -17213,7 +18316,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -17278,7 +18381,7 @@ routes:
         );
         let basis = selection
             .validation
-            .safe_unattended_basis
+            .delegation_contract_basis
             .expect("safe program repair basis should be retained");
         assert!(basis.contains("idempotency_class=idempotent"));
         assert!(program_blocker_has_safe_agent_repair(
@@ -17767,7 +18870,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -17817,7 +18920,7 @@ routes:
                 max_steps: Some(20),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -17967,7 +19070,7 @@ routes:
                 max_steps: Some(2),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18075,7 +19178,7 @@ routes:
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: Some(1),
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18163,7 +19266,7 @@ routes:
                 max_steps: Some(0),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18212,7 +19315,7 @@ routes:
                 max_steps: Some(20),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18289,7 +19392,7 @@ routes:
                 max_steps: Some(20),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18334,7 +19437,7 @@ routes:
                 max_steps: Some(20),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18402,7 +19505,7 @@ routes:
                 max_steps: Some(20),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18431,7 +19534,7 @@ routes:
     fn program_operator_controls_use_checkpointed_event_log() {
         let _guard = crate::acquire_kernel_test_lock();
         let fixture = ProgramFixture::new("operator-control", true);
-        fixture.write_child_contract_with_approval();
+        fixture.write_child_contract_with_human_boundary();
         fixture.write_child("a", "framework/a.md", "accepted");
         fixture.write_registry(
             "parallel-independent",
@@ -18451,7 +19554,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18537,7 +19640,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18582,7 +19685,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18639,7 +19742,7 @@ routes:
                     max_steps: None,
                     timeout_seconds: None,
                     max_child_concurrency: None,
-                    approval_policy: "minimize".to_string(),
+                    invocation_authority: "unattended".to_string(),
                     run_inputs: BTreeMap::new(),
                     program_child_filter: None,
                 },
@@ -18735,7 +19838,7 @@ children:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18784,7 +19887,7 @@ children:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -18866,7 +19969,7 @@ rationale: "add follow-on packet candidate"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19056,7 +20159,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19080,7 +20183,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19125,7 +20228,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19181,7 +20284,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19233,7 +20336,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19307,7 +20410,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19366,7 +20469,7 @@ rationale: "prove overwrite guard"
                     max_steps: None,
                     timeout_seconds: None,
                     max_child_concurrency: None,
-                    approval_policy: "minimize".to_string(),
+                    invocation_authority: "unattended".to_string(),
                     run_inputs: BTreeMap::new(),
                     program_child_filter: None,
                 },
@@ -19418,7 +20521,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19477,7 +20580,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19532,7 +20635,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19587,7 +20690,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19637,7 +20740,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -19765,7 +20868,7 @@ rationale: "prove overwrite guard"
             "proposal-program",
             "parent",
             ExecutorKind::Mock,
-            "minimize",
+            "unattended",
             &BTreeMap::new(),
             &plan,
             &[],
@@ -19825,7 +20928,7 @@ rationale: "prove overwrite guard"
             "proposal-program",
             "parent",
             ExecutorKind::Mock,
-            "minimize",
+            "unattended",
             &BTreeMap::new(),
             &plan,
             &[],
@@ -19898,7 +21001,7 @@ rationale: "prove overwrite guard"
             "proposal-program",
             "parent",
             ExecutorKind::Mock,
-            "minimize",
+            "unattended",
             &BTreeMap::new(),
             &plan,
             &[],
@@ -20037,7 +21140,7 @@ rationale: "prove overwrite guard"
             "proposal-program",
             "parent",
             ExecutorKind::Mock,
-            "minimize",
+            "unattended",
             &BTreeMap::new(),
             &plan,
             &child_results,
@@ -20108,7 +21211,7 @@ rationale: "prove overwrite guard"
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -20180,7 +21283,7 @@ rationale: "prove overwrite guard"
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -20249,7 +21352,7 @@ rationale: "prove overwrite guard"
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -20298,7 +21401,7 @@ rationale: "prove overwrite guard"
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -20421,7 +21524,7 @@ rationale: "prove overwrite guard"
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -20500,7 +21603,7 @@ rationale: "prove overwrite guard"
                 max_steps: Some(1),
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "unattended".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -20537,11 +21640,10 @@ rationale: "prove overwrite guard"
             terminal_outcome: None,
             final_verdict: "blocked-recoverable".to_string(),
         };
-        assert!(!program_execute_loop_should_stop(&result, "minimize"));
+        assert!(!program_execute_loop_should_stop(&result, "unattended"));
 
         let mut blocked_human = result.clone();
         blocked_human.final_verdict = "blocked-human".to_string();
-        assert!(program_execute_loop_should_stop(&blocked_human, "minimize"));
         assert!(!program_execute_loop_should_stop(
             &blocked_human,
             "unattended"
@@ -20551,10 +21653,10 @@ rationale: "prove overwrite guard"
             child_id: "a".to_string(),
             child_run_id: "stop-semantics-a".to_string(),
             route_id: "run-implementation".to_string(),
-            status: "approval-required".to_string(),
+            status: "human-boundary-blocked".to_string(),
             attempts: 0,
             retryable: false,
-            blocker_class: Some("operator-approval-required".to_string()),
+            blocker_class: Some("authority-ambiguity".to_string()),
             error_message: None,
             error_class: None,
             evidence_paths: Vec::new(),
@@ -20614,7 +21716,7 @@ rationale: "prove overwrite guard"
                     max_steps: None,
                     timeout_seconds: None,
                     max_child_concurrency: None,
-                    approval_policy: "minimize".to_string(),
+                    invocation_authority: "unattended".to_string(),
                     run_inputs: BTreeMap::new(),
                     program_child_filter: None,
                 },
@@ -20768,7 +21870,7 @@ program:
       - blocker_class: "stale-receipt"
         recovery_route_id: "run-implementation"
         idempotency_class: "idempotent"
-        approval_required: false
+        human_required: false
         retry_budget: 1
         dependent_handling: "continue-independent"
         post_attempt_validation: ["replan-live-state"]
@@ -20781,6 +21883,17 @@ states: [{ state_id: "coordinate" }]
 routes:
   - route_id: "generate-program-implementation-prompt"
     route_type: "extension"
+    delegation_contract:
+      decision_class: "delegated-execution"
+      safe_delegation: true
+      authority_zones_allowed: ["workspace-declared"]
+      declared_write_scope_source: "target"
+      required_evidence_gates: []
+      required_receipts_before_dispatch: []
+      required_receipts_before_completion: ["program-implementation-prompt"]
+      replay_class: "idempotent"
+      automated_recovery_policy: "fail-closed"
+      human_only_boundaries: ["scope-expansion", "policy-override", "governance-mutation"]
 "#,
         );
         fixture.write_child("a", "framework/a.md", "accepted");
@@ -20807,7 +21920,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -20897,7 +22010,7 @@ routes:
             program_recovery_recipe_validation_failures: Vec::new(),
             program_recovery_recipe_blocker_class: None,
             program_recovery_recipe_route_id: None,
-            program_recovery_recipe_safe_unattended_basis: None,
+            program_recovery_recipe_delegation_contract_basis: None,
             unsafe_results: Vec::new(),
             unsafe_continuation_decision: None,
             approval_blockers: Vec::new(),
@@ -20929,7 +22042,7 @@ routes:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },
@@ -21420,7 +22533,7 @@ children:
                     max_steps: None,
                     timeout_seconds: None,
                     max_child_concurrency: None,
-                    approval_policy: "minimize".to_string(),
+                    invocation_authority: "unattended".to_string(),
                     run_inputs: BTreeMap::new(),
                     program_child_filter: None,
                 },
@@ -21468,7 +22581,7 @@ children:
                 max_steps: None,
                 timeout_seconds: None,
                 max_child_concurrency: None,
-                approval_policy: "minimize".to_string(),
+                invocation_authority: "unattended".to_string(),
                 run_inputs: BTreeMap::new(),
                 program_child_filter: None,
             },

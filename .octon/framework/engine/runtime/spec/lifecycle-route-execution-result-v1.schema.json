@@ -21,19 +21,20 @@
     "route_id": { "type": "string", "minLength": 1 },
     "executor_used": { "type": "string", "minLength": 1 },
     "status": {
-      "enum": ["completed", "no-op", "failed", "timed-out", "cancelled", "approval-required", "blocked"]
+      "enum": ["completed", "no-op", "failed", "timed-out", "cancelled", "blocked", "authorization-proof-failed", "human-boundary-blocked", "executor-preflight-blocked"]
     },
     "receipts_observed": { "type": "array" },
     "evidence_paths": { "type": "array" },
     "retryable": { "type": "boolean" },
-    "next_action": { "enum": ["replan", "resume-after-approval", "manual-intervention"] },
+    "next_action": { "enum": ["replan", "manual-intervention", "cancelled", "rerun-with-approved-executor-access"] },
     "error_class": {
       "type": ["string", "null"],
       "enum": [
         null,
         "discovery",
         "input-binding",
-        "approval-required",
+        "authorization-proof-failed",
+        "human-boundary-required",
         "executor-unavailable",
         "executor-failed",
         "timeout",

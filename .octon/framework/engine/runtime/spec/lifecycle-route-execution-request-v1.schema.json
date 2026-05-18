@@ -27,7 +27,7 @@
     "executor": { "enum": ["auto", "codex", "claude", "mock"] },
     "route": {
       "type": "object",
-      "required": ["route_id", "route_type"],
+      "required": ["route_id", "route_type", "delegation_contract"],
       "properties": {
         "route_id": { "type": "string", "minLength": 1 },
         "route_type": { "enum": ["extension", "workflow"] },
@@ -36,8 +36,54 @@
         "prompt_set_id": { "type": ["string", "null"] },
         "required_inputs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
         "completion_replan_required": { "type": "boolean" },
-        "approval_required_by_default": { "type": "boolean" },
-        "approval_reason": { "type": ["string", "null"] }
+        "delegation_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "decision_class",
+            "safe_delegation",
+            "authority_zones_allowed",
+            "declared_write_scope_source",
+            "required_evidence_gates",
+            "required_receipts_before_dispatch",
+            "required_receipts_before_completion",
+            "replay_class",
+            "automated_recovery_policy",
+            "human_only_boundaries"
+          ],
+          "properties": {
+            "decision_class": { "enum": ["delegated-execution", "new-governance-decision"] },
+            "safe_delegation": { "type": "boolean" },
+            "authority_zones_allowed": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "declared_write_scope_source": { "type": "string", "minLength": 1 },
+            "required_evidence_gates": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "required_receipts_before_dispatch": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "required_receipts_before_completion": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "replay_class": { "enum": ["inspect-only", "idempotent", "idempotent-rerun", "bounded-retry", "no-op-safe", "non-replay-safe"] },
+            "automated_recovery_policy": { "type": "string", "minLength": 1 },
+            "human_only_boundaries": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": [
+                  "scope-expansion",
+                  "policy-override",
+                  "unresolved-risk-acceptance",
+                  "governance-mutation",
+                  "contradictory-evidence-resolution",
+                  "stale-evidence-acceptance",
+                  "authority-ambiguity",
+                  "unsafe-resume",
+                  "external-irreversible-effect"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "bound_inputs": { "type": "object", "additionalProperties": { "type": "string" } },
@@ -48,13 +94,24 @@
     "expected_target_change": { "type": "boolean" },
     "policy": {
       "type": "object",
-      "required": ["timeout_seconds", "retry_attempt", "approval_policy"],
+      "required": ["timeout_seconds", "retry_attempt", "invocation_authority"],
       "properties": {
         "timeout_seconds": { "type": "integer", "minimum": 1 },
         "cancellation_token": { "type": ["string", "null"] },
         "retry_attempt": { "type": "integer", "minimum": 0 },
-        "approval_policy": { "type": "string", "minLength": 1 }
+        "invocation_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "provenance"],
+          "properties": {
+            "mode": { "enum": ["unattended", "grant-consumption"] },
+            "provenance": { "type": "string", "minLength": 1 },
+            "authority_ref": { "type": ["string", "null"] }
+          }
+        }
       }
-    }
+    },
+    "human_boundary_context": { "type": ["object", "null"] },
+    "evidence_gate_results": { "type": "object", "additionalProperties": { "type": "string" } }
   }
 }

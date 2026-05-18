@@ -78,10 +78,12 @@ For a missing proposal target, bind creation source context with
 `--set-file source=<path>` or `--set source=<text>`; normalized inputs are
 retained in the lifecycle checkpoint and evidence so creation can be retried
 without losing context.
-Durable implementation, promotion, and archival routes pause for explicit
-approval by default. `--approval-policy unattended` is an explicit operator
-override for one-run automation; the adapter records approval override evidence
-before executing each approval-gated durable route under that policy.
+Durable implementation, promotion, closeout, and archival routes are
+machine-delegated when their `delegation_contract`, invocation authority,
+evidence gates, scope checks, authority-zone checks, replay class, and
+before-dispatch receipts produce a retained delegation proof. `--invocation-authority
+unattended` authorizes only proof-gated delegated execution; missing,
+ambiguous, stale, unsupported, or out-of-scope proof fails closed.
 Packet runs also write hash-chained `lifecycle-events.ndjson` traces under the
 run control root and workflow evidence root. `octon lifecycle cancel --run-id
 <run> --reason <text>` records durable cancellation evidence; resume and
@@ -106,11 +108,12 @@ routes run inside that batch. When `octon` is not installed on PATH, use the
 repo-local development launcher `.octon/framework/engine/runtime/run lifecycle
 ...`; the launcher routes `lifecycle` through the current source-backed kernel
 instead of a stale packaged binary.
-Program child approval pauses write structured guidance that routes operators
-through `octon lifecycle program approve --run-id <program-run> --child <child>
---route <route> --reason <reason>` and then program retry/resume controls.
-The adapter still enforces approval and still records `unattended` or
-`program-approved` override evidence before mutation.
+Program child human-boundary blocks write structured guidance that routes
+operators through `octon lifecycle program approve --run-id <program-run>
+--child <child> --route <route> --reason <reason>` only for typed
+non-machine-provable boundaries. Consuming an already-bound grant records
+grant-consumption evidence and still requires a retained delegation proof
+before route dispatch.
 
 ## Publication
 

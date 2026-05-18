@@ -328,7 +328,7 @@
         "status": {
           "enum": [
             "authorized",
-            "approval-required",
+            "authority-ambiguity",
             "revoked",
             "denied",
             "review-required",
@@ -485,7 +485,7 @@
         "stale",
         "unsupported",
         "revoked",
-        "approval-required",
+        "authority-ambiguity",
         "review-required",
         "evidence-incomplete",
         "rollback-required",

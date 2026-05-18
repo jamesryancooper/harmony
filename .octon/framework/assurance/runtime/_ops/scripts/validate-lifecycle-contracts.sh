@@ -240,7 +240,7 @@ valid_lifecycle_execution_strategy() {
 
 valid_program_blocker_class() {
   case "$1" in
-    governed-agent-approval|operator-approval-required|approval-required|\
+    policy-override|authority-ambiguity|authority-ambiguity|\
 stale-receipt|validation-failed|missing-evidence|executor-failed|executor-timed-out|executor-preflight-blocked|\
 publication-drift|\
 unsupported-mode|unsupported-mode-config|unsupported-mode-authority|\
@@ -250,7 +250,7 @@ target-drift|target-drift-explained|target-drift-unclear|\
 noncritical-artifact-cleanup|critical-artifact-cleanup-required|artifact-cleanup-required|worktree-hygiene-blocked|artifact-ownership-unclear|\
 recovery-budget-exhausted-alternate-route|recovery-budget-override-required|recovery-integrity-risk|\
 recovery-route-unavailable|receipt-recovery-unavailable|finding-binding-unavailable|deferred-evidence-missing|aggregate-closeout-readiness-missing|\
-authority-zone-denied|authority-zone-ambiguous|self-authorization-attempt|durable-authority-approval-required|protected-artifact-approval-required|\
+authority-zone-denied|authority-zone-ambiguous|self-authorization-attempt|scope-expansion|protected-artifact-authority-ambiguity|\
 unsafe-resume|authority-boundary-ambiguous)
       return 0
       ;;
@@ -284,10 +284,10 @@ program_blocker_unsafe() {
 
 program_blocker_human_required() {
   case "$1" in
-    operator-approval-required|approval-required|executor-preflight-blocked|unsupported-mode-config|target-drift|target-drift-unclear|\
+    authority-ambiguity|authority-ambiguity|executor-preflight-blocked|unsupported-mode-config|target-drift|target-drift-unclear|\
 critical-artifact-cleanup-required|artifact-cleanup-required|worktree-hygiene-blocked|artifact-ownership-unclear|\
 recovery-budget-override-required|recovery-route-unavailable|receipt-recovery-unavailable|finding-binding-unavailable|\
-deferred-evidence-missing|aggregate-closeout-readiness-missing|authority-zone-denied|durable-authority-approval-required|protected-artifact-approval-required)
+deferred-evidence-missing|aggregate-closeout-readiness-missing|authority-zone-denied|scope-expansion|protected-artifact-authority-ambiguity)
       return 0
       ;;
     *)
@@ -335,7 +335,51 @@ valid_program_recovery_idempotency_class() {
 
 valid_program_recovery_safe_idempotency_class() {
   case "$1" in
-    inspect-only|idempotent|idempotent-rerun|bounded-retry)
+    inspect-only|idempotent|idempotent-rerun|bounded-retry|no-op-safe)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_route_delegation_decision_class() {
+  case "$1" in
+    delegated-execution|new-governance-decision)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_route_replay_class() {
+  case "$1" in
+    inspect-only|idempotent|idempotent-rerun|bounded-retry|no-op-safe|non-replay-safe)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_route_write_scope_source() {
+  case "$1" in
+    target|route-completion-and-target|workflow-scope|program-child-registry|program-mutation-envelope|run-bound-artifacts)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+valid_human_only_boundary() {
+  case "$1" in
+    scope-expansion|policy-override|unresolved-risk-acceptance|governance-mutation|contradictory-evidence-resolution|stale-evidence-acceptance|authority-ambiguity|unsafe-resume|external-irreversible-effect)
       return 0
       ;;
     *)
@@ -439,8 +483,8 @@ validate_recovery_object_keys() {
   while IFS= read -r key; do
     [[ -n "$key" ]] || continue
     case "$key" in
-      blocker_class|recovery_route_id|recovery_action_id|preconditions|idempotency_class|approval_required|retry_budget|dependent_handling|post_attempt_validation|replan_behavior|max_attempts|replan_after_attempt|\
-allowed_authority_zones|allowed_artifact_classes|operation_class|requires_run_binding|requires_declared_write_scope|requires_zone_evidence|approval_required_for_zones)
+      blocker_class|recovery_route_id|recovery_action_id|preconditions|idempotency_class|human_required|retry_budget|dependent_handling|post_attempt_validation|replan_behavior|max_attempts|replan_after_attempt|\
+allowed_authority_zones|allowed_artifact_classes|operation_class|requires_run_binding|requires_declared_write_scope|requires_zone_evidence|human_required_for_zones)
         pass "program recovery field allowed: $label -> $key"
         ;;
       *)
@@ -484,8 +528,8 @@ validate_program_recovery_handler() {
       || fail "program recovery handler replan flag invalid: $lifecycle_id -> $handler_key"
   fi
 
-  if yq -e ".program.recovery_policy.handlers.\"$handler_key\" | has(\"approval_required\")" "$contract" >/dev/null 2>&1; then
-    handler_approval="$(yq -r ".program.recovery_policy.handlers.\"$handler_key\".approval_required | tostring" "$contract" 2>/dev/null || true)"
+  if yq -e ".program.recovery_policy.handlers.\"$handler_key\" | has(\"human_required\")" "$contract" >/dev/null 2>&1; then
+    handler_approval="$(yq -r ".program.recovery_policy.handlers.\"$handler_key\".human_required | tostring" "$contract" 2>/dev/null || true)"
     [[ "$handler_approval" == "true" || "$handler_approval" == "false" ]] \
       && pass "program recovery handler approval flag valid: $lifecycle_id -> $handler_key" \
       || fail "program recovery handler approval flag invalid: $lifecycle_id -> $handler_key"
@@ -517,7 +561,7 @@ validate_program_recovery_recipe() {
     || fail "program recovery recipe must be a map: $label"
   validate_recovery_object_keys "$contract" ".program.recovery_policy.recipes[$recipe_index]" "$label"
 
-  for field in blocker_class idempotency_class approval_required retry_budget dependent_handling post_attempt_validation replan_behavior; do
+  for field in blocker_class idempotency_class human_required retry_budget dependent_handling post_attempt_validation replan_behavior; do
     yq -e ".program.recovery_policy.recipes[$recipe_index] | has(\"$field\")" "$contract" >/dev/null 2>&1 \
       && pass "program recovery recipe field declared: $label -> $field" \
       || fail "program recovery recipe field missing: $label -> $field"
@@ -571,7 +615,7 @@ validate_program_recovery_recipe() {
     && pass "program recovery recipe idempotency valid: $label -> $idempotency" \
     || fail "program recovery recipe idempotency invalid: $label -> $idempotency"
 
-  approval="$(yq -r ".program.recovery_policy.recipes[$recipe_index].approval_required | tostring" "$contract" 2>/dev/null || true)"
+  approval="$(yq -r ".program.recovery_policy.recipes[$recipe_index].human_required | tostring" "$contract" 2>/dev/null || true)"
   [[ "$approval" == "true" || "$approval" == "false" ]] \
     && pass "program recovery recipe approval flag valid: $label" \
     || fail "program recovery recipe approval flag invalid: $label"
@@ -628,17 +672,17 @@ validate_program_recovery_recipe() {
     fi
   done
 
-  if yq -e ".program.recovery_policy.recipes[$recipe_index].approval_required_for_zones" "$contract" >/dev/null 2>&1; then
-    yq -e ".program.recovery_policy.recipes[$recipe_index].approval_required_for_zones | tag == \"!!seq\"" "$contract" >/dev/null 2>&1 \
-      && pass "program recovery recipe approval-required zones sequence valid: $label" \
-      || fail "program recovery recipe approval-required zones must be a sequence: $label"
+  if yq -e ".program.recovery_policy.recipes[$recipe_index].human_required_for_zones" "$contract" >/dev/null 2>&1; then
+    yq -e ".program.recovery_policy.recipes[$recipe_index].human_required_for_zones | tag == \"!!seq\"" "$contract" >/dev/null 2>&1 \
+      && pass "program recovery recipe authority-ambiguity zones sequence valid: $label" \
+      || fail "program recovery recipe authority-ambiguity zones must be a sequence: $label"
   fi
-  approval_zone_count="$(yq -r "(.program.recovery_policy.recipes[$recipe_index].approval_required_for_zones // []) | length" "$contract" 2>/dev/null || echo 0)"
+  approval_zone_count="$(yq -r "(.program.recovery_policy.recipes[$recipe_index].human_required_for_zones // []) | length" "$contract" 2>/dev/null || echo 0)"
   for ((approval_zone_index=0; approval_zone_index<approval_zone_count; approval_zone_index++)); do
-    approval_zone="$(yq -r ".program.recovery_policy.recipes[$recipe_index].approval_required_for_zones[$approval_zone_index] // \"\"" "$contract" 2>/dev/null || true)"
+    approval_zone="$(yq -r ".program.recovery_policy.recipes[$recipe_index].human_required_for_zones[$approval_zone_index] // \"\"" "$contract" 2>/dev/null || true)"
     valid_authority_zone "$approval_zone" \
-      && pass "program recovery recipe approval-required zone valid: $label -> $approval_zone" \
-      || fail "program recovery recipe approval-required zone invalid: $label -> $approval_zone"
+      && pass "program recovery recipe authority-ambiguity zone valid: $label -> $approval_zone" \
+      || fail "program recovery recipe authority-ambiguity zone invalid: $label -> $approval_zone"
   done
 
   if [[ "$approval" == "false" ]]; then
@@ -926,7 +970,7 @@ validate_program_route_references() {
 
 validate_contract() {
   local contract="$1" rel pack_id owner lifecycle_id routing_contract command_manifest skill_manifest skill_registry workflows_manifest
-  local route_ids contract_route_ids command_ids skill_ids prompt_set_ids workflow_ids validator_ids receipt_ids input_binding_ids
+  local route_ids contract_route_ids command_ids skill_ids prompt_set_ids workflow_ids validator_ids gate_ids receipt_ids input_binding_ids
   local route_count index route_id route_type command_id skill_id prompt_set_id validator_id receipt_id loop_id max_iterations target_manifest allowed_statuses
 
   rel="$(rel_from_root "$contract")"
@@ -994,6 +1038,7 @@ validate_contract() {
   prompt_set_ids="$(find "$OCTON_DIR/inputs/additive/extensions/$pack_id/prompts" -name manifest.yml -type f -print 2>/dev/null | while IFS= read -r prompt_manifest; do yq -r '.prompt_set_id // ""' "$prompt_manifest"; done | awk 'NF' | LC_ALL=C sort -u)"
   workflow_ids="$(load_ids "$workflows_manifest" '.workflows[]?.id')"
   validator_ids="$(load_ids "$contract" '.validators[]?.validator_id')"
+  gate_ids="$(load_ids "$contract" '.gates[]?.gate_id')"
   receipt_ids="$(load_ids "$contract" '.receipts[]?.receipt_id')"
   contract_route_ids="$(load_ids "$contract" '.routes[]?.route_id')"
   input_binding_ids="$(load_ids "$contract" '.input_bindings // {} | keys[]?')"
@@ -1052,7 +1097,7 @@ validate_contract() {
         && pass "route completion expected receipt exists: $route_id -> $receipt_id" \
         || fail "route completion expected receipt missing: $route_id -> $receipt_id"
     done < <(yq -r ".routes[$index].completion.expected_receipts[]? // \"\"" "$contract" 2>/dev/null || true)
-    local expected_path expected_status approval_required approval_reason
+    local expected_path expected_status decision_class safe_delegation replay_class scope_source recovery_policy
     while IFS= read -r expected_path; do
       [[ -n "$expected_path" ]] || continue
       valid_rel_path "$expected_path" \
@@ -1065,13 +1110,86 @@ validate_contract() {
         && pass "route completion expected manifest status allowed: $route_id -> $expected_status" \
         || fail "route completion expected manifest status invalid: $route_id -> $expected_status"
     fi
-    approval_required="$(yq -r ".routes[$index].approval.required_by_default // \"\"" "$contract" 2>/dev/null || true)"
-    approval_reason="$(yq -r ".routes[$index].approval.reason // \"\"" "$contract" 2>/dev/null || true)"
-    if [[ "$approval_required" == "true" ]]; then
-      [[ -n "$approval_reason" && "$approval_reason" != "null" ]] \
-        && pass "route approval reason declared: $route_id" \
-        || fail "route approval reason missing: $route_id"
+    if yq -e ".routes[$index] | has(\"approval\")" "$contract" >/dev/null 2>&1; then
+      fail "route legacy approval primitive forbidden: $route_id"
+    else
+      pass "route legacy approval primitive absent: $route_id"
     fi
+    if yq -e ".routes[$index] | has(\"idempotency\")" "$contract" >/dev/null 2>&1; then
+      fail "route legacy idempotency primitive forbidden: $route_id"
+    else
+      pass "route legacy idempotency primitive absent: $route_id"
+    fi
+    if yq -e ".routes[$index].delegation_contract | tag == \"!!map\"" "$contract" >/dev/null 2>&1; then
+      pass "route delegation contract declared: $route_id"
+    else
+      fail "route delegation contract missing: $route_id"
+    fi
+    for field in decision_class safe_delegation authority_zones_allowed declared_write_scope_source required_evidence_gates required_receipts_before_dispatch required_receipts_before_completion replay_class automated_recovery_policy human_only_boundaries; do
+      yq -e ".routes[$index].delegation_contract | has(\"$field\")" "$contract" >/dev/null 2>&1 \
+        && pass "route delegation contract field declared: $route_id -> $field" \
+        || fail "route delegation contract field missing: $route_id -> $field"
+    done
+    decision_class="$(yq -r ".routes[$index].delegation_contract.decision_class // \"\"" "$contract" 2>/dev/null || true)"
+    valid_route_delegation_decision_class "$decision_class" \
+      && pass "route delegation decision class valid: $route_id -> $decision_class" \
+      || fail "route delegation decision class invalid: $route_id -> $decision_class"
+    safe_delegation="$(yq -r ".routes[$index].delegation_contract.safe_delegation | tostring" "$contract" 2>/dev/null || true)"
+    [[ "$safe_delegation" == "true" || "$safe_delegation" == "false" ]] \
+      && pass "route delegation safe flag valid: $route_id" \
+      || fail "route delegation safe flag invalid: $route_id"
+    scope_source="$(yq -r ".routes[$index].delegation_contract.declared_write_scope_source // \"\"" "$contract" 2>/dev/null || true)"
+    valid_route_write_scope_source "$scope_source" \
+      && pass "route delegation write scope source valid: $route_id -> $scope_source" \
+      || fail "route delegation write scope source invalid: $route_id -> $scope_source"
+    replay_class="$(yq -r ".routes[$index].delegation_contract.replay_class // \"\"" "$contract" 2>/dev/null || true)"
+    valid_route_replay_class "$replay_class" \
+      && pass "route delegation replay class valid: $route_id -> $replay_class" \
+      || fail "route delegation replay class invalid: $route_id -> $replay_class"
+    recovery_policy="$(yq -r ".routes[$index].delegation_contract.automated_recovery_policy // \"\"" "$contract" 2>/dev/null || true)"
+    [[ -n "$recovery_policy" && "$recovery_policy" != "null" ]] \
+      && pass "route delegation automated recovery policy declared: $route_id" \
+      || fail "route delegation automated recovery policy missing: $route_id"
+    local delegation_zone_count delegation_zone_index delegation_zone
+    delegation_zone_count="$(yq -r "(.routes[$index].delegation_contract.authority_zones_allowed // []) | length" "$contract" 2>/dev/null || echo 0)"
+    [[ "$delegation_zone_count" =~ ^[0-9]+$ && "$delegation_zone_count" -gt 0 ]] \
+      && pass "route delegation authority zones declared: $route_id" \
+      || fail "route delegation authority zones missing: $route_id"
+    for ((delegation_zone_index=0; delegation_zone_index<delegation_zone_count; delegation_zone_index++)); do
+      delegation_zone="$(yq -r ".routes[$index].delegation_contract.authority_zones_allowed[$delegation_zone_index] // \"\"" "$contract" 2>/dev/null || true)"
+      valid_authority_zone "$delegation_zone" \
+        && pass "route delegation authority zone valid: $route_id -> $delegation_zone" \
+        || fail "route delegation authority zone invalid: $route_id -> $delegation_zone"
+    done
+    while IFS= read -r gate_id; do
+      [[ -n "$gate_id" ]] || continue
+      id_list_contains "$gate_id" "$gate_ids" \
+        && pass "route delegation evidence gate exists: $route_id -> $gate_id" \
+        || fail "route delegation evidence gate missing: $route_id -> $gate_id"
+    done < <(yq -r ".routes[$index].delegation_contract.required_evidence_gates[]? // \"\"" "$contract" 2>/dev/null || true)
+    while IFS= read -r receipt_id; do
+      [[ -n "$receipt_id" ]] || continue
+      id_list_contains "$receipt_id" "$receipt_ids" \
+        && pass "route delegation dispatch receipt exists: $route_id -> $receipt_id" \
+        || fail "route delegation dispatch receipt missing: $route_id -> $receipt_id"
+    done < <(yq -r ".routes[$index].delegation_contract.required_receipts_before_dispatch[]? // \"\"" "$contract" 2>/dev/null || true)
+    while IFS= read -r receipt_id; do
+      [[ -n "$receipt_id" ]] || continue
+      id_list_contains "$receipt_id" "$receipt_ids" \
+        && pass "route delegation completion receipt exists: $route_id -> $receipt_id" \
+        || fail "route delegation completion receipt missing: $route_id -> $receipt_id"
+    done < <(yq -r ".routes[$index].delegation_contract.required_receipts_before_completion[]? // \"\"" "$contract" 2>/dev/null || true)
+    local human_boundary_count human_boundary_index human_boundary
+    human_boundary_count="$(yq -r "(.routes[$index].delegation_contract.human_only_boundaries // []) | length" "$contract" 2>/dev/null || echo 0)"
+    [[ "$human_boundary_count" =~ ^[0-9]+$ && "$human_boundary_count" -gt 0 ]] \
+      && pass "route delegation human-only boundaries declared: $route_id" \
+      || fail "route delegation human-only boundaries missing: $route_id"
+    for ((human_boundary_index=0; human_boundary_index<human_boundary_count; human_boundary_index++)); do
+      human_boundary="$(yq -r ".routes[$index].delegation_contract.human_only_boundaries[$human_boundary_index] // \"\"" "$contract" 2>/dev/null || true)"
+      valid_human_only_boundary "$human_boundary" \
+        && pass "route delegation human-only boundary valid: $route_id -> $human_boundary" \
+        || fail "route delegation human-only boundary invalid: $route_id -> $human_boundary"
+    done
     if yq -e ".routes[$index].atomic" "$contract" >/dev/null 2>&1; then
       local atomic_ref atomic_label rollback_ref compensation_ref
       for atomic_label in stage_route_id commit_route_id; do

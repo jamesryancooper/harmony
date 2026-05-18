@@ -278,7 +278,7 @@
         "replan_after_attempt": {
           "type": "boolean"
         },
-        "approval_required": {
+        "human_required": {
           "type": "boolean"
         }
       }
@@ -289,7 +289,7 @@
       "required": [
         "blocker_class",
         "idempotency_class",
-        "approval_required",
+        "human_required",
         "retry_budget",
         "dependent_handling",
         "post_attempt_validation",
@@ -299,7 +299,7 @@
         "blocker_class": {
           "type": "string",
           "enum": [
-            "approval-required",
+            "authority-ambiguity",
             "stale-receipt",
             "target-drift",
             "validation-failed",
@@ -326,8 +326,8 @@
             "authority-zone-denied",
             "authority-zone-ambiguous",
             "self-authorization-attempt",
-            "durable-authority-approval-required",
-            "protected-artifact-approval-required",
+            "scope-expansion",
+            "protected-artifact-authority-ambiguity",
             "unsafe-resume",
             "unsupported-mode",
             "unsupported-mode-config",
@@ -381,7 +381,7 @@
             "non-recoverable"
           ]
         },
-        "approval_required": {
+        "human_required": {
           "type": "boolean"
         },
         "retry_budget": {
@@ -451,7 +451,7 @@
         "requires_zone_evidence": {
           "type": "boolean"
         },
-        "approval_required_for_zones": {
+        "human_required_for_zones": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/authorityZone"
@@ -679,7 +679,7 @@
     "route": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["route_id", "route_type"],
+      "required": ["route_id", "route_type", "delegation_contract"],
       "properties": {
         "route_id": {
           "type": "string",
@@ -711,12 +711,8 @@
         "enter_when": {
           "$ref": "#/$defs/conditionSet"
         },
-        "idempotency": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "approval": {
-          "$ref": "#/$defs/routeApproval"
+        "delegation_contract": {
+          "$ref": "#/$defs/routeDelegationContract"
         },
         "completion": {
           "$ref": "#/$defs/routeCompletion"
@@ -753,16 +749,105 @@
         { "required": ["compensation_route_id"] }
       ]
     },
-    "routeApproval": {
+    "routeDelegationContract": {
       "type": "object",
       "additionalProperties": false,
+      "required": [
+        "decision_class",
+        "safe_delegation",
+        "authority_zones_allowed",
+        "declared_write_scope_source",
+        "required_evidence_gates",
+        "required_receipts_before_dispatch",
+        "required_receipts_before_completion",
+        "replay_class",
+        "automated_recovery_policy",
+        "human_only_boundaries"
+      ],
       "properties": {
-        "required_by_default": {
+        "decision_class": {
+          "type": "string",
+          "enum": ["delegated-execution", "new-governance-decision"]
+        },
+        "safe_delegation": {
           "type": "boolean"
         },
-        "reason": {
+        "authority_zones_allowed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authorityZone"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "declared_write_scope_source": {
+          "type": "string",
+          "enum": [
+            "target",
+            "route-completion-and-target",
+            "workflow-scope",
+            "program-child-registry",
+            "program-mutation-envelope",
+            "run-bound-artifacts"
+          ]
+        },
+        "required_evidence_gates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        },
+        "required_receipts_before_dispatch": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        },
+        "required_receipts_before_completion": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        },
+        "replay_class": {
+          "type": "string",
+          "enum": [
+            "inspect-only",
+            "idempotent",
+            "idempotent-rerun",
+            "bounded-retry",
+            "no-op-safe",
+            "non-replay-safe"
+          ]
+        },
+        "automated_recovery_policy": {
           "type": "string",
           "minLength": 1
+        },
+        "human_only_boundaries": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "scope-expansion",
+              "policy-override",
+              "unresolved-risk-acceptance",
+              "governance-mutation",
+              "contradictory-evidence-resolution",
+              "stale-evidence-acceptance",
+              "authority-ambiguity",
+              "unsafe-resume",
+              "external-irreversible-effect"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
         }
       }
     },

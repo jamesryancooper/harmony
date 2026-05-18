@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://octon.local/schemas/lifecycle-human-exception-grant.schema.json",
+  "title": "Octon Lifecycle Human Exception Grant",
+  "description": "Typed human exception boundary for lifecycle execution that cannot be machine-proven.",
+  "type": "object",
+  "required": [
+    "context_kind",
+    "human_only_boundary",
+    "human_exception_instruction"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "context_kind": {
+      "type": "string",
+      "enum": [
+        "packet-route",
+        "program-parent-route",
+        "program-child-route"
+      ]
+    },
+    "program_run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "child_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "human_only_boundary": {
+      "type": "string",
+      "enum": [
+        "scope-expansion",
+        "policy-override",
+        "unresolved-risk-acceptance",
+        "governance-mutation",
+        "contradictory-evidence-resolution",
+        "stale-evidence-acceptance",
+        "authority-ambiguity",
+        "unsafe-resume",
+        "external-irreversible-effect"
+      ]
+    },
+    "human_exception_instruction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "retry_instruction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_provenance": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    }
+  }
+}

@@ -19,15 +19,15 @@ pub fn render_extension_prompt(
         prompt_set_id,
     )?;
     let mut rendered = format!(
-        "# Lifecycle Route Execution\n\n- run_id: `{}`\n- lifecycle_id: `{}`\n- route_id: `{}`\n- target: `{}`\n- prompt_set_id: `{}`\n- approval_policy: `{}`\n\n",
+        "# Lifecycle Route Execution\n\n- run_id: `{}`\n- lifecycle_id: `{}`\n- route_id: `{}`\n- target: `{}`\n- prompt_set_id: `{}`\n- invocation_authority: `{}`\n\n",
         request.run_id,
         request.lifecycle_id,
         request.route.route_id,
         request.target.display(),
         bundle.prompt_set_id,
-        request.policy.approval_policy
+        request.policy.invocation_authority.mode
     );
-    if let Some(context) = request.approval_context.as_ref() {
+    if let Some(context) = request.human_boundary_context.as_ref() {
         rendered.push_str("## Program Context\n\n");
         rendered.push_str(&format!("- context_kind: `{}`\n", context.context_kind));
         if let Some(program_run_id) = context.program_run_id.as_ref() {
@@ -39,9 +39,9 @@ pub fn render_extension_prompt(
         if let Some(retry_instruction) = context.retry_instruction.as_ref() {
             rendered.push_str(&format!("- retry_instruction: `{retry_instruction}`\n"));
         }
-        if let Some(unattended_instruction) = context.unattended_override_instruction.as_ref() {
+        if let Some(human_exception_instruction) = context.human_exception_instruction.as_ref() {
             rendered.push_str(&format!(
-                "- unattended_override_instruction: `{unattended_instruction}`\n"
+                "- human_exception_instruction: `{human_exception_instruction}`\n"
             ));
         }
         rendered.push('\n');
