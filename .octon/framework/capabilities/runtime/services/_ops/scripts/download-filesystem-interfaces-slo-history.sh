@@ -32,14 +32,15 @@ gh_with_retries() {
 
   local attempt output status
   for ((attempt = 1; attempt <= attempts; attempt += 1)); do
-    if output="$("$@" 2>&1)"; then
+    output="$("$@" 2>&1)"
+    status="$?"
+    if [[ "$status" -eq 0 ]]; then
       if [[ -n "$output" ]]; then
         printf "%s\n" "$output"
       fi
       return 0
     fi
 
-    status="$?"
     if [[ "$attempt" -lt "$attempts" ]]; then
       echo "WARN: $label failed on attempt $attempt/$attempts; retrying in ${delay}s" >&2
       if [[ -n "$output" ]]; then
@@ -55,6 +56,68 @@ gh_with_retries() {
       echo "$output" >&2
     fi
     return "$status"
+  done
+}
+
+jq_escape() {
+  local value="$1"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  printf "%s" "$value"
+}
+
+list_successful_runs_for_workflow() {
+  gh_with_retries "list successful runs for workflow '$workflow'" \
+    gh run list \
+      --repo "$repo" \
+      --workflow "$workflow" \
+      --limit "$limit" \
+      --json databaseId,conclusion \
+      --jq '.[] | select(.conclusion=="success") | .databaseId'
+}
+
+list_successful_runs_from_repository() {
+  local workflow_path="$workflow"
+  if [[ "$workflow_path" != .github/workflows/* ]]; then
+    workflow_path=".github/workflows/$workflow_path"
+  fi
+
+  local workflow_jq workflow_path_jq
+  workflow_jq="$(jq_escape "$workflow")"
+  workflow_path_jq="$(jq_escape "$workflow_path")"
+
+  local max_pages="${GITHUB_ACTIONS_RUN_LIST_FALLBACK_PAGES:-10}"
+  if ! [[ "$max_pages" =~ ^[0-9]+$ ]] || [[ "$max_pages" -lt 1 ]]; then
+    max_pages="10"
+  fi
+
+  local page page_output run_id collected
+  collected=0
+  for ((page = 1; page <= max_pages && collected < limit; page += 1)); do
+    page_output="$(
+      gh_with_retries "list successful repository workflow runs page $page" \
+        gh api --method GET "repos/$repo/actions/runs" \
+          -F per_page=100 \
+          -F page="$page" \
+          -f status=success \
+          -F exclude_pull_requests=true \
+          --jq ".workflow_runs[] | select(.path == \"$workflow_path_jq\" or .path == \"$workflow_jq\" or .name == \"$workflow_jq\") | .id"
+    )" || return "$?"
+
+    if [[ -z "$page_output" ]]; then
+      continue
+    fi
+
+    while IFS= read -r run_id; do
+      if [[ -z "$run_id" ]]; then
+        continue
+      fi
+      printf "%s\n" "$run_id"
+      collected=$((collected + 1))
+      if [[ "$collected" -ge "$limit" ]]; then
+        break
+      fi
+    done <<< "$page_output"
   done
 }
 
@@ -122,15 +185,14 @@ fi
 
 mkdir -p "$out_dir"
 
-run_list_output="$(
-  gh_with_retries "list successful runs for workflow '$workflow'" \
-    gh run list \
-      --repo "$repo" \
-      --workflow "$workflow" \
-      --limit "$limit" \
-      --json databaseId,conclusion \
-      --jq '.[] | select(.conclusion=="success") | .databaseId'
-)" || exit "$?"
+if [[ "${GITHUB_ACTIONS_FORCE_RUN_LIST_FALLBACK:-0}" == "1" ]]; then
+  run_list_output="$(list_successful_runs_from_repository)" || exit "$?"
+else
+  if ! run_list_output="$(list_successful_runs_for_workflow)"; then
+    echo "WARN: workflow-specific run listing failed; falling back to repository workflow run listing" >&2
+    run_list_output="$(list_successful_runs_from_repository)" || exit "$?"
+  fi
+fi
 
 run_ids=()
 if [[ -n "$run_list_output" ]]; then
