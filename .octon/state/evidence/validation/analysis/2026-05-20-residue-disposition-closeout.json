@@ -1,0 +1,167 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "residue-disposition-closeout-2026-05-20",
+  "selected_route": "branch-no-pr",
+  "operator_requested_route": "branch-no-pr",
+  "target_lifecycle_outcome": "cleaned",
+  "lifecycle_outcome": "preserved",
+  "outcome_intent": "attempt-cleaned-closeout",
+  "intent": "Close out the remaining local residue after the input-model clean-break migration by removing only helper-classified safe residue, preserving unrelated or ambiguous work, and recording an auditable disposition without opening a PR.",
+  "scope": {
+    "summary": "Residue disposition receipt for the dirty original worktree and a clean receipt-only branch-no-pr closeout branch.",
+    "profile_selection_receipt": {
+      "change_profile": "atomic",
+      "release_state": "pre-1.0",
+      "route": "branch-no-pr",
+      "selection_rationale": "The operator explicitly required branch-no-pr and prohibited PR creation. The cleanup is a bounded atomic closeout/disposition pass; no hard gate requires transitional coexistence."
+    },
+    "starting_inventory": {
+      "branch": "chore/inputs-clean-break",
+      "head": "4117efa3bd92feb6104f17ece0499c80a816e627",
+      "main": "1cb8618943350ed735f3a87d312141f7e5e3334d",
+      "origin_main": "1cb8618943350ed735f3a87d312141f7e5e3334d",
+      "ahead_behind_origin_main": "1 ahead, 5 behind",
+      "status_counts_before_cleanup": {
+        "total": 646,
+        "staged": 37,
+        "unstaged": 165,
+        "untracked": 447,
+        "ignored": 3683
+      },
+      "local_branches": [
+        "chore/inputs-clean-break@4117efa3",
+        "chore/orchestrated-replan-postmortem-prompt@e834e785",
+        "chore/referenced-lifecycle-evidence@4269fc737",
+        "main@1cb861894"
+      ],
+      "remote_branches": [
+        "origin/main@1cb861894"
+      ]
+    },
+    "dispositions": [
+      {
+        "group": "already-landed input closeout duplicates",
+        "disposition": "remove as safe residue",
+        "evidence": "git diff --name-status origin/main -- $(git diff --name-only origin/main...HEAD) returned no differences; the remaining local branch commit is patch-equivalent to landed origin/main history."
+      },
+      {
+        "group": "stale input-model residue",
+        "disposition": "remove as safe residue",
+        "evidence": ".octon/inputs/exploratory/runtime-adapters-experimental-external.yml is absent from the working tree and absent from origin/main; git add -u staged the local deletion relative to the obsolete branch index."
+      },
+      {
+        "group": "local run, publication, prompt-alignment, generated scratch, control, continuity, and evidence residue",
+        "disposition": "remove as safe residue",
+        "evidence": "cleanup-local-run-artifacts.sh dry-run classified 814 untracked files as cleanup candidates, 47 protected referenced files, and 83 manual-review files; confirm mode removed only the 814 cleanup candidates; follow-up dry-run reported zero cleanup candidates."
+      },
+      {
+        "group": "exploratory plan/report/package moves",
+        "disposition": "leave untouched with note",
+        "evidence": "Broad staged and unstaged exploratory moves remain logically separate from the input clean-break closeout and require their own validation if pursued."
+      },
+      {
+        "group": "synthesize-research skill changes",
+        "disposition": "leave untouched with note",
+        "evidence": "Skill and host projection changes are unrelated to the residue cleanup and remain preserved."
+      },
+      {
+        "group": "Rust, audit, plan, and process-incoming-intake skill assets",
+        "disposition": "leave untouched with note",
+        "evidence": "Untracked skill assets are coherent but unrelated; no safe deletion or landing authority was proven."
+      },
+      {
+        "group": "release and version files",
+        "disposition": "leave untouched with note",
+        "evidence": "Release/version changes are separate release hygiene work and were not mixed into this cleanup."
+      },
+      {
+        "group": "generated/effective outputs and state/control/evidence files not classified as cleanup candidates",
+        "disposition": "leave untouched with note",
+        "evidence": "The cleanup helper protected referenced files and left manual-review artifacts for explicit future classification."
+      }
+    ],
+    "post_cleanup_inventory": {
+      "status_counts": {
+        "total": 313,
+        "staged": 38,
+        "unstaged": 164,
+        "untracked": 114,
+        "ignored": 3683
+      },
+      "cleanup_helper_summary": {
+        "cleanup_candidates": 0,
+        "protected_referenced": 47,
+        "manual_review": 83
+      }
+    },
+    "touched_paths": [
+      ".octon/state/evidence/validation/analysis/2026-05-20-residue-disposition-closeout.json"
+    ],
+    "diff_refs": [
+      "origin/main@1cb8618943350ed735f3a87d312141f7e5e3334d",
+      "source branch chore/residue-disposition-closeout"
+    ]
+  },
+  "source_branch_ref": "chore/residue-disposition-closeout",
+  "target_branch_ref": "origin/main@1cb8618943350ed735f3a87d312141f7e5e3334d",
+  "landing_evaluation": {
+    "status": "not_attempted",
+    "provider_ruleset_ref": ".octon/framework/execution-roles/practices/standards/git-worktree-autonomy-contract.yml",
+    "source_ref": "chore/residue-disposition-closeout",
+    "target_ref": "origin/main@1cb8618943350ed735f3a87d312141f7e5e3334d",
+    "blocker_reason": "Hosted landing evidence is produced after this receipt commit exists; final response records the resulting landing, sync, and cleanup evidence.",
+    "evidence_refs": [
+      "branch-no-pr route selected before mutation",
+      "receipt branch based on origin/main@1cb8618943350ed735f3a87d312141f7e5e3334d"
+    ]
+  },
+  "not_landed_reason": "This receipt is recorded before hosted no-PR landing preflight and landing are run.",
+  "not_cleaned_reason": "The original dirty branch retains ambiguous user-owned work and cannot be deleted; cleanup can only claim removal of helper-classified safe residue plus preservation of unrelated groups.",
+  "integration_method": "not-applicable",
+  "integration_status": "not_landed",
+  "publication_status": "none",
+  "cleanup_status": "deferred",
+  "cleanup_evidence_refs": [
+    "git add -u .octon/inputs/exploratory/runtime-adapters-experimental-external.yml aligned the obsolete branch index with origin/main for the retired file",
+    "cleanup-local-run-artifacts.sh --summary-only: cleanup_candidates=814, protected_referenced=47, manual_review=83",
+    "cleanup-local-run-artifacts.sh --confirm --summary-only: removed 814 cleanup candidate files",
+    "cleanup-local-run-artifacts.sh --summary-only after cleanup: cleanup_candidates=0, protected_referenced=47, manual_review=83"
+  ],
+  "source_branch_cleanup": {
+    "status": "deferred",
+    "local_branch": "chore/residue-disposition-closeout",
+    "remote_branch": "origin/chore/residue-disposition-closeout",
+    "worktree": "/private/tmp/octon-residue-disposition-closeout",
+    "blocker_reason": "Source branch cleanup must wait until hosted landing and origin/main containment are proven.",
+    "evidence_refs": [
+      "git-worktree-autonomy-contract requires containment before branch cleanup"
+    ]
+  },
+  "validation_evidence_refs": [
+    "cleanup-local-run-artifacts.sh --summary-only before cleanup: PASS",
+    "cleanup-local-run-artifacts.sh --confirm --summary-only: PASS",
+    "cleanup-local-run-artifacts.sh --summary-only after cleanup: PASS",
+    "git diff --check: planned",
+    "validate-change-closeout-lifecycle-alignment.sh --receipt .octon/state/evidence/validation/analysis/2026-05-20-residue-disposition-closeout.json: planned"
+  ],
+  "review_waiver_refs": [
+    "operator explicitly requested branch-no-pr and prohibited PR creation"
+  ],
+  "durable_history": {
+    "kind": "branch",
+    "ref": "chore/residue-disposition-closeout",
+    "branch": "chore/residue-disposition-closeout"
+  },
+  "rollback_handle": {
+    "kind": "discard-branch",
+    "ref": "chore/residue-disposition-closeout",
+    "instructions": "Before hosted landing, delete the local and remote source branch. After hosted landing, revert the landed receipt commit if the audit record itself must be removed; the local cleanup removed only untracked helper-classified cleanup candidates."
+  },
+  "closeout_outcome": "continued",
+  "remaining_blockers": [
+    "Original branch chore/inputs-clean-break is active and dirty; do not delete it while ambiguous user-owned work remains.",
+    "Exploratory moves, synthesize-research changes, Rust/intake skill assets, release/version files, generated/effective outputs, and manual-review evidence require separate classification before mutation.",
+    "This receipt cannot self-reference a post-commit hosted landed SHA; final closeout response records hosted landing evidence separately if landing succeeds."
+  ],
+  "created_at": "2026-05-20T18:42:26Z"
+}
