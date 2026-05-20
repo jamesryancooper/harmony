@@ -1,0 +1,129 @@
+{
+  "schema": "octon-change-closeout-receipt-v1",
+  "receipt_id": "2026-05-20-residue-branch-no-pr-closeout-follow-up",
+  "created_at": "2026-05-20T19:45:00Z",
+  "change_profile": "atomic",
+  "release_state": "pre-1.0",
+  "profile_selection_receipt": {
+    "selected_change_profile": "atomic",
+    "selected_release_state": "pre-1.0",
+    "basis": "Residual work was split into isolated, coherent branch-no-pr change sets and landed only after validation and hosted no-PR preflight."
+  },
+  "intent": "Close out the remaining residue review recommendations through isolated branch-no-pr landings while preserving unrelated or ambiguous user-owned work.",
+  "route": "branch-no-pr",
+  "target_outcome": "cleaned",
+  "actual_lifecycle_outcome": "landed-and-synced-pending-local-branch-cleanup",
+  "scope": {
+    "included_change_sets": [
+      {
+        "branch": "chore/input-surface-harness-contracts",
+        "commit": "884d234dabc862a1e4926ba6b87ea37e94fe0b73",
+        "summary": "Harden input surface contracts and validators."
+      },
+      {
+        "branch": "chore/proposal-packet-terminology",
+        "commit": "642b4af66da81d9c708ae08f16b241ab7e6e07c7",
+        "summary": "Align proposal packet terminology and scaffold validation."
+      },
+      {
+        "branch": "chore/synthesize-research-syntheses-output",
+        "commit": "154664ef08f4b20f01cb03d1e9d2c4712e3853fb",
+        "summary": "Align synthesize-research skill outputs with syntheses."
+      },
+      {
+        "branch": "chore/packet8-input-scaffold-test",
+        "commit": "084e6ced11f11a26001e3291588ac81b044275c1",
+        "summary": "Align packet8 scaffold path tests."
+      },
+      {
+        "branch": "chore/rust-tooling-skill-assets",
+        "commit": "a3f5f81da6eadaff1b7f5ca3b134916e7d5c77b5",
+        "summary": "Add Rust tooling skill assets and required host projections."
+      },
+      {
+        "branch": "chore/process-incoming-intake-workflow",
+        "commit": "c48bd2e30cbde9813d8687ee72dddf08e6e7b5e7",
+        "summary": "Add the process-incoming-intake workflow, command, projections, and validation coverage."
+      }
+    ],
+    "excluded": [
+      "The original dirty chore/inputs-clean-break worktree is preserved as user-owned or ambiguous residue.",
+      "Unrelated generated/effective outputs, exploratory report/package moves, release/version files, and state/control residue were not mixed into unrelated commits.",
+      "Raw .octon/inputs/** material was not treated as runtime, policy, generated, state/control, publication, retained evidence, or host-projection authority."
+    ]
+  },
+  "validation_evidence": {
+    "input_surface_harness_contracts": [
+      "git diff --check",
+      "validate-harness-structure.sh",
+      "validate-input-non-authority.sh",
+      "validate-input-archive-retention.sh",
+      "test-validate-raw-input-dependency-ban.sh"
+    ],
+    "proposal_packet_terminology": [
+      "git diff --check",
+      "bash -n validator checks",
+      "framework terminology sweeps",
+      "validate-workflows.sh"
+    ],
+    "synthesize_research_syntheses_output": [
+      "git diff --check",
+      "projection/source diff checks",
+      "drafts absence sweep",
+      "validate-host-projections.sh"
+    ],
+    "packet8_input_scaffold_test": [
+      "git diff --check",
+      "bash -n test-packet8-template-scaffold.sh",
+      "test-packet8-template-scaffold.sh"
+    ],
+    "rust_tooling_skill_assets": [
+      "git diff --check",
+      "validate-capability-publication-state.sh",
+      "validate-host-projections.sh",
+      "validate-harness-structure.sh",
+      "test-validate-host-projections.sh",
+      "validate-skills.sh"
+    ],
+    "process_incoming_intake_workflow": [
+      "git diff --check",
+      "validate-capability-publication-state.sh",
+      "validate-workflows.sh",
+      "validate-host-projections.sh",
+      "bash -n validate-workflows.sh",
+      "test-validate-host-projections.sh",
+      "validate-harness-structure.sh"
+    ],
+    "known_limitations": [
+      "validate-skills.sh completed with exit 0 and two warnings unrelated to the Rust tooling skill assets change set.",
+      "No publishers, projection generators, migrations, or alignment profiles were run except capability routing and host projection publishers required by skill/command publication change sets."
+    ]
+  },
+  "durable_history": {
+    "origin_main_after_process_workflow": "c48bd2e30cbde9813d8687ee72dddf08e6e7b5e7",
+    "integration_method": "hosted no-PR fast-forward/update",
+    "provider_preflight": "Live provider rules allowed route-neutral hosted no-PR landing; empty check set was explicitly allowed; exact-SHA required checks passed for each hosted landing."
+  },
+  "rollback_discard_plan": {
+    "rollback_handles": [
+      "Use git revert on origin/main for any landed commit that must be backed out.",
+      "Use the retained source branch refs until branch cleanup completes.",
+      "Use local worktrees under /private/tmp/octon-* as discardable isolated implementation workspaces until cleanup completes."
+    ],
+    "force_push": false
+  },
+  "integration_status": "All included change-set commits were landed on origin/main before this receipt was created.",
+  "publication_status": "Capability routing and host projections were intentionally regenerated only for the Rust tooling skill assets and process-incoming-intake command/workflow change sets.",
+  "cleanup_status": {
+    "completed_before_receipt": [
+      "Accepted change sets were split into isolated branches and landed on origin/main."
+    ],
+    "pending_after_receipt_landing": [
+      "Fetch origin, sync local main to origin/main, verify commit containment, and remove only obsolete contained source branches/worktrees."
+    ],
+    "retained": [
+      "Original dirty chore/inputs-clean-break worktree and branch remain untouched until explicitly resolved."
+    ]
+  },
+  "blockers": []
+}
