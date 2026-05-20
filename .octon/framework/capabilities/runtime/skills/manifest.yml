@@ -890,6 +890,74 @@ skills:
       - specialist
     capabilities: []
 
+  - id: rust
+    display_name: Rust
+    group: foundations
+    path: foundations/rust/
+    skill_class: context
+    summary: "Foundation skill set for Rust CLI tools, repo-local automation, and growing Rust scripts."
+    status: active
+    tags:
+      - foundation
+      - rust
+      - cargo
+      - cli
+      - automation
+    triggers:
+      - "rust foundation parent skill"
+      - "rust cli tool architecture guidance"
+    skill_sets:
+      - specialist
+    capabilities: []
+
+  - id: audit-rust-tool-architecture
+    display_name: Audit Rust Tool Architecture
+    group: foundations
+    path: foundations/rust/audit-tool-architecture/
+    skill_class: invocable
+    summary: "Bounded evidence-backed architecture audit for Rust scripts, crates, CLI utilities, automation tools, and repo-local Rust scopes."
+    status: active
+    tags:
+      - rust
+      - cargo
+      - audit
+      - cli
+      - architecture
+    triggers:
+      - "audit rust tool architecture"
+      - "review rust cli tool structure"
+      - "rust script architecture audit"
+      - "run audit-rust-tool-architecture"
+    skill_sets:
+      - executor
+      - guardian
+    capabilities:
+      - domain-specialized
+
+  - id: plan-rust-tool-migration
+    display_name: Plan Rust Tool Migration
+    group: foundations
+    path: foundations/rust/plan-tool-migration/
+    skill_class: invocable
+    summary: "Staged Rust tool migration planning for Rust scripts, crates, CLI utilities, automation tools, and repo-local Rust scopes."
+    status: active
+    tags:
+      - rust
+      - cargo
+      - planning
+      - migration
+      - architecture
+    triggers:
+      - "plan rust tool migration"
+      - "rust cli migration plan"
+      - "plan rust script architecture migration"
+      - "run plan-rust-tool-migration"
+    skill_sets:
+      - executor
+      - guardian
+    capabilities:
+      - domain-specialized
+
   - id: react-composition-patterns
     display_name: React Composition Patterns
     group: foundations

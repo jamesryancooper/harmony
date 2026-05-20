@@ -1,9 +1,9 @@
 schema_version: octon-capability-routing-effective-v3
 generator_version: capability-routing-publication-v3
-generation_id: capabilities-839864a1e985
-published_at: 2026-05-20T17:24:16Z
+generation_id: capabilities-59cb89ce72cb
+published_at: 2026-05-20T19:25:14Z
 publication_status: published
-publication_receipt_path: .octon/state/evidence/validation/publication/capabilities/2026-05-20T17-24-16Z-capabilities-839864a1e985.yml
+publication_receipt_path: .octon/state/evidence/validation/publication/capabilities/2026-05-20T19-25-14Z-capabilities-59cb89ce72cb.yml
 invalidation_conditions:
   - root-manifest-sha-changed
   - native-capability-manifest-changed
@@ -17,7 +17,7 @@ source:
   framework_commands_manifest_path: .octon/framework/capabilities/runtime/commands/manifest.yml
   framework_commands_manifest_sha256: 13e67cbfac06e5ac7e930a0f92c82ae76886213651c446bc78203603c5ddfdb0
   framework_skills_manifest_path: .octon/framework/capabilities/runtime/skills/manifest.yml
-  framework_skills_manifest_sha256: e866c2d05140f6c5adc70e0fd1faad3f90c1a67cce8065ed09f62e4ec641eecc
+  framework_skills_manifest_sha256: 6a0f07f65f226986d8d195bc276f2c67f21bf03d03a65d6d5f6bded47eb7459a
   framework_skills_registry_path: .octon/framework/capabilities/runtime/skills/registry.yml
   framework_skills_registry_sha256: 488eb85c27a71fbe101b4e0faf8ba500de544172bcd311a1117d004f4233af4e
   framework_services_manifest_path: .octon/framework/capabilities/runtime/services/manifest.yml
@@ -47,6 +47,170 @@ routing_context:
   extension_publication_status: published
   scope_resolution_mode: single-active-scope
 routing_candidates:
+  - effective_id: framework.skill.plan-rust-tool-migration
+    artifact_map_id: framework-skill-plan-rust-tool-migration
+    origin_class: framework
+    capability_kind: skill
+    capability_id: plan-rust-tool-migration
+    display_name: Plan Rust Tool Migration
+    summary: Staged Rust tool migration planning for Rust scripts, crates, CLI utilities, automation tools, and repo-local Rust scopes.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**/Cargo.toml'
+        - '**/Cargo.lock'
+        - '**/*.rs'
+        - '**/src/main.rs'
+        - '**/src/lib.rs'
+        - '**/src/bin/**'
+        - '**/crates/**'
+        - '**/tests/**'
+        - '**/xtask/**'
+      exclude:
+        - '**/target/**'
+        - '**/.git/**'
+        - '**/node_modules/**'
+    fingerprints:
+      tech_tags:
+        - rust
+        - cargo
+        - cli
+        - automation
+        - repo-tooling
+        - migration
+      language_tags:
+        - rust
+    scope_relevance:
+      matching_scope_ids:
+        - octon-harness
+      tech_tag_matches:
+        - rust
+        - cargo
+        - cli
+        - automation
+        - repo-tooling
+        - migration
+      language_tag_matches:
+        - rust
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 7
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9992-1-skill-framework.skill.plan-rust-tool-migration
+    projection_name: plan-rust-tool-migration
+  - effective_id: framework.skill.audit-rust-tool-architecture
+    artifact_map_id: framework-skill-audit-rust-tool-architecture
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-rust-tool-architecture
+    display_name: Audit Rust Tool Architecture
+    summary: Bounded evidence-backed architecture audit for Rust scripts, crates, CLI utilities, automation tools, and repo-local Rust scopes.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters:
+      - claude
+      - cursor
+      - codex
+    selectors:
+      include:
+        - '**/Cargo.toml'
+        - '**/Cargo.lock'
+        - '**/*.rs'
+        - '**/src/main.rs'
+        - '**/src/lib.rs'
+        - '**/src/bin/**'
+        - '**/crates/**'
+        - '**/tests/**'
+        - '**/xtask/**'
+      exclude:
+        - '**/target/**'
+        - '**/.git/**'
+        - '**/node_modules/**'
+    fingerprints:
+      tech_tags:
+        - rust
+        - cargo
+        - cli
+        - automation
+        - repo-tooling
+      language_tags:
+        - rust
+    scope_relevance:
+      matching_scope_ids:
+        - octon-harness
+      tech_tag_matches:
+        - rust
+        - cargo
+        - cli
+        - automation
+        - repo-tooling
+      language_tag_matches:
+        - rust
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 6
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9993-1-skill-framework.skill.audit-rust-tool-architecture
+    projection_name: audit-rust-tool-architecture
+  - effective_id: framework.skill.rust
+    artifact_map_id: framework-skill-rust
+    origin_class: framework
+    capability_kind: skill
+    capability_id: rust
+    display_name: Rust
+    summary: Foundation skill set for Rust CLI tools, repo-local automation, and growing Rust scripts.
+    status: active
+    source_manifest: .octon/framework/capabilities/runtime/skills/manifest.yml
+    capability_domain: foundations
+    host_adapters: []
+    selectors:
+      include:
+        - '**/Cargo.toml'
+        - '**/Cargo.lock'
+        - '**/*.rs'
+        - '**/src/main.rs'
+        - '**/src/lib.rs'
+        - '**/src/bin/**'
+        - '**/crates/**'
+        - '**/tests/**'
+        - '**/xtask/**'
+      exclude:
+        - '**/target/**'
+        - '**/.git/**'
+        - '**/node_modules/**'
+    fingerprints:
+      tech_tags:
+        - rust
+        - cargo
+        - cli
+        - automation
+        - repo-tooling
+      language_tags:
+        - rust
+    scope_relevance:
+      matching_scope_ids:
+        - octon-harness
+      tech_tag_matches:
+        - rust
+        - cargo
+        - cli
+        - automation
+        - repo-tooling
+      language_tag_matches:
+        - rust
+      preferred_domain_match_scope_ids: []
+      preferred_kind_match_scope_ids: []
+      score: 6
+    precedence_tier: native-authority
+    stable_sort_key: 9999-9993-1-skill-framework.skill.rust
+    projection_name: rust
   - effective_id: framework.skill.closeout-change
     artifact_map_id: framework-skill-closeout-change
     origin_class: framework
@@ -6187,6 +6351,9 @@ routing_candidates:
     stable_sort_key: 9999-9999-2-skill-extension.skill.octon-proposal-lifecycle.octon-proposal-lifecycle-run-program-verification-and-correction-loop
     projection_name: octon-proposal-lifecycle-run-program-verification-and-correction-loop
 resolution_order:
+  - framework.skill.plan-rust-tool-migration
+  - framework.skill.audit-rust-tool-architecture
+  - framework.skill.rust
   - framework.skill.closeout-change
   - instance.command.repo-hygiene
   - framework.command.alignment-check

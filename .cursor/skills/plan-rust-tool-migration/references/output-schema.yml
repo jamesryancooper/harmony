@@ -1,0 +1,59 @@
+schema_version: "1.0"
+kind: rust_tool_migration_plan_summary
+required_fields:
+  - run_id
+  - date
+  - target_path
+  - desired_target
+  - recommended_target
+  - stages
+  - validation_commands
+  - non_authority_notice
+
+fields:
+  run_id:
+    type: string
+  date:
+    type: string
+    format: YYYY-MM-DD
+  target_path:
+    type: string
+  desired_target:
+    type: string
+  recommended_target:
+    type: string
+  stages:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - name
+        - objective
+        - changes
+        - acceptance_criteria
+      fields:
+        id: string
+        name: string
+        objective: string
+        changes: array
+        risks: array
+        acceptance_criteria: array
+        validation: array
+  file_moves:
+    type: array
+    items:
+      type: object
+      fields:
+        from: string
+        to: string
+        rationale: string
+  validation_commands:
+    type: array
+    items: string
+  rollback_notes:
+    type: array
+    items: string
+  non_authority_notice:
+    type: string
+    required_value: "This migration plan is advisory and does not authorize source mutation by itself."

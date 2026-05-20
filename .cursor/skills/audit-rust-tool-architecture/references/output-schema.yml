@@ -1,0 +1,97 @@
+schema_version: "1.0"
+kind: rust_tool_architecture_audit_summary
+required_fields:
+  - run_id
+  - date
+  - target_path
+  - current_classification
+  - recommended_target
+  - verdict
+  - findings
+  - migration_stages
+  - validation_commands
+
+fields:
+  run_id:
+    type: string
+  date:
+    type: string
+    format: YYYY-MM-DD
+  target_path:
+    type: string
+  inspected_paths:
+    type: array
+    items: string
+  current_classification:
+    type: string
+    allowed:
+      - healthy-small-script
+      - growing-script-needs-modules
+      - tool-needs-bin-lib-split
+      - tool-needs-multiple-binaries
+      - workspace-candidate
+      - overengineered-for-current-needs
+      - unsafe-effect-boundaries
+      - insufficient-tests-for-consequence
+  recommended_target:
+    type: string
+    allowed:
+      - single-main-rs
+      - main-rs-plus-modules
+      - bin-lib-split
+      - multiple-binaries
+      - workspace
+      - reusable-internal-crates
+  verdict:
+    type: string
+  scorecard:
+    type: object
+    keys:
+      project_structure: integer
+      cli_boundary: integer
+      orchestration_domain_boundary: integer
+      error_handling: integer
+      config_inputs: integer
+      diagnostics: integer
+      testing: integer
+      async_concurrency: integer
+      filesystem_process_safety: integer
+      performance_memory: integer
+  findings:
+    type: array
+    items:
+      type: object
+      required:
+        - id
+        - severity
+        - title
+        - evidence
+        - recommendation
+        - validation
+      fields:
+        id: string
+        severity:
+          type: string
+          allowed: [critical, high, medium, low, info]
+        title: string
+        evidence: array
+        why_it_matters: string
+        recommendation: string
+        minimum_sufficient_fix: string
+        overengineering_boundary: string
+        validation: string
+  migration_stages:
+    type: array
+    items:
+      type: object
+      fields:
+        stage: string
+        objective: string
+        files_to_change: array
+        acceptance_criteria: array
+  validation_commands:
+    type: array
+    items: string
+  non_authority_notice:
+    type: string
+    required_value: "This audit is advisory evidence and does not authorize source mutation by itself."

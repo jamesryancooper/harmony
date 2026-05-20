@@ -1,7 +1,7 @@
 schema_version: octon-capability-routing-artifact-map-v3
 generator_version: capability-routing-publication-v3
-generation_id: capabilities-839864a1e985
-published_at: 2026-05-20T17:24:16Z
+generation_id: capabilities-59cb89ce72cb
+published_at: 2026-05-20T19:25:14Z
 artifacts:
   - artifact_map_id: extension-command-octon-concept-integration-octon-concept-integration
     effective_id: extension.command.octon-concept-integration.octon-concept-integration
@@ -2029,6 +2029,17 @@ artifacts:
     source_manifest_sha256: 488eb85c27a71fbe101b4e0faf8ba500de544172bcd311a1117d004f4233af4e
     source_path: .octon/framework/capabilities/runtime/skills/audit/audit-release-readiness/SKILL.md
     source_sha256: b85b5bf0eb4daccfc71397211a2687c4acd3047d1c1d05e721980ab24b769b74
+  - artifact_map_id: framework-skill-audit-rust-tool-architecture
+    effective_id: framework.skill.audit-rust-tool-architecture
+    origin_class: framework
+    capability_kind: skill
+    capability_id: audit-rust-tool-architecture
+    display_name: Audit Rust Tool Architecture
+    source_kind: framework-native
+    source_manifest_path: .octon/framework/capabilities/runtime/skills/registry.yml
+    source_manifest_sha256: 488eb85c27a71fbe101b4e0faf8ba500de544172bcd311a1117d004f4233af4e
+    source_path: .octon/framework/capabilities/runtime/skills/foundations/rust/audit-tool-architecture/SKILL.md
+    source_sha256: d732fb5befeaba52f39f255277a40ac84e2045685aeffdf872180ee9130a48a8
   - artifact_map_id: framework-skill-audit-security-compliance
     effective_id: framework.skill.audit-security-compliance
     origin_class: framework
@@ -2172,6 +2183,17 @@ artifacts:
     source_manifest_sha256: 488eb85c27a71fbe101b4e0faf8ba500de544172bcd311a1117d004f4233af4e
     source_path: .octon/framework/capabilities/runtime/skills/synthesis/plan-charter-alignment/SKILL.md
     source_sha256: fe7c946bbd5e5d2e348492769cf29f49ae90fd55ef0e70b2c01badf923621d12
+  - artifact_map_id: framework-skill-plan-rust-tool-migration
+    effective_id: framework.skill.plan-rust-tool-migration
+    origin_class: framework
+    capability_kind: skill
+    capability_id: plan-rust-tool-migration
+    display_name: Plan Rust Tool Migration
+    source_kind: framework-native
+    source_manifest_path: .octon/framework/capabilities/runtime/skills/registry.yml
+    source_manifest_sha256: 488eb85c27a71fbe101b4e0faf8ba500de544172bcd311a1117d004f4233af4e
+    source_path: .octon/framework/capabilities/runtime/skills/foundations/rust/plan-tool-migration/SKILL.md
+    source_sha256: 92547c88a9f2e9503bde4d2ec767e195fb633906c43ab9aa74ade574dff1dec3
   - artifact_map_id: framework-skill-postgres
     effective_id: framework.skill.postgres
     origin_class: framework
@@ -2403,6 +2425,17 @@ artifacts:
     source_manifest_sha256: 488eb85c27a71fbe101b4e0faf8ba500de544172bcd311a1117d004f4233af4e
     source_path: .octon/framework/capabilities/runtime/skills/remediation/resolve-pr-comments/SKILL.md
     source_sha256: cc2b44c6cf800d4a933478564014e9438086cf0574b48b468b6416d20c3d1281
+  - artifact_map_id: framework-skill-rust
+    effective_id: framework.skill.rust
+    origin_class: framework
+    capability_kind: skill
+    capability_id: rust
+    display_name: Rust
+    source_kind: framework-native
+    source_manifest_path: .octon/framework/capabilities/runtime/skills/registry.yml
+    source_manifest_sha256: 488eb85c27a71fbe101b4e0faf8ba500de544172bcd311a1117d004f4233af4e
+    source_path: .octon/framework/capabilities/runtime/skills/foundations/rust/SKILL.md
+    source_sha256: 1ba1a861425cf89a803f2c9e621053254afc69fa4429fe55fe0c3bb44e41f092
   - artifact_map_id: framework-skill-spec-to-implementation
     effective_id: framework.skill.spec-to-implementation
     origin_class: framework
@@ -2501,7 +2534,7 @@ artifacts:
     source_manifest_path: .octon/framework/capabilities/runtime/skills/registry.yml
     source_manifest_sha256: 488eb85c27a71fbe101b4e0faf8ba500de544172bcd311a1117d004f4233af4e
     source_path: .octon/framework/capabilities/runtime/skills/synthesis/synthesize-research/SKILL.md
-    source_sha256: 6198de9d302e919d14591c39eada54baa04d80863bd2d2daaf9731f86a607de0
+    source_sha256: 24fe7863ccc87e989383555af0339f67a94d4429009371ba334f25a1ba479f6e
   - artifact_map_id: framework-skill-triage-ci-failure
     effective_id: framework.skill.triage-ci-failure
     origin_class: framework
