@@ -1,0 +1,153 @@
+{
+  "schema": "octon-change-closeout-receipt-v1",
+  "receipt_id": "2026-05-20-input-residue-cleanup-branch-no-pr",
+  "created_at": "2026-05-20T21:21:11Z",
+  "change_profile": "atomic",
+  "release_state": "pre-1.0",
+  "profile_selection_receipt": {
+    "selected_change_profile": "atomic",
+    "selected_release_state": "pre-1.0",
+    "basis": "The cleanup was bounded to isolated branch-no-pr landings and evidence-backed residue disposal while preserving ambiguous or user-owned work."
+  },
+  "intent": "Implement the residue cleanup action plan for the remaining inputs-clean-break worktree state without opening a PR, force-pushing, or discarding ambiguous/user-owned work.",
+  "selected_route": "branch-no-pr",
+  "target_outcome": "cleaned",
+  "actual_lifecycle_outcome": "accepted-change-sets-landed-with-ambiguous-residue-retained",
+  "route_constraints": [
+    "No PR was opened.",
+    "No force push was used.",
+    "Only branch-no-pr hosted fast-forward landings were used for accepted change sets.",
+    "Publishers, projection generators, migrations, and alignment profiles were not run.",
+    ".octon/inputs/** was not treated as runtime, policy, generated, state/control, publication, retained evidence, or host-projection authority."
+  ],
+  "starting_inventory_summary": {
+    "starting_branch": "chore/inputs-clean-break",
+    "starting_head": "2cbd05b5cdb02becd59df3a2b8f8a76ce5ec4d08",
+    "starting_main": "2cbd05b5cdb02becd59df3a2b8f8a76ce5ec4d08",
+    "starting_origin_main": "2cbd05b5cdb02becd59df3a2b8f8a76ce5ec4d08",
+    "starting_dirty_summary": "59 modified tracked files, 132 untracked files, no staged files, and large ignored local/build residue."
+  },
+  "pre_cleanup_snapshots": [
+    "/private/tmp/octon-inputs-clean-break-pre-cleanup.diff",
+    "/private/tmp/octon-inputs-clean-break-pre-cleanup-untracked.txt",
+    "/private/tmp/octon-inputs-clean-break-pre-cleanup-status.txt"
+  ],
+  "safe_residue_removed": [
+    ".octon/inputs/additive/.archive/.gitkeep",
+    ".octon/state/evidence/validation/compatibility/extensions/2026-05-20T15-45-42Z-extensions-e539e7c8b239.yml",
+    ".octon/state/evidence/validation/publication/extensions/2026-05-20T15-45-42Z-extensions-e539e7c8b239.yml",
+    ".octon/state/evidence/validation/publication/capabilities/2026-05-20T15-50-51Z-capabilities-6678c82743dc.yml",
+    ".octon/state/evidence/validation/extensions/prompt-alignment/2026-05-20T15-45-42Z-*"
+  ],
+  "safe_tracked_residue_restored_to_origin_main": [
+    ".octon/framework/manifest.yml",
+    ".octon/octon.yml",
+    ".release-please-manifest.json",
+    "CHANGELOG.md",
+    "version.txt",
+    ".octon/generated/cognition/projections/materialized/missions/mission-autonomy-live-validation/mission-view.yml",
+    ".octon/generated/cognition/summaries/missions/mission-autonomy-live-validation/{next.md,now.md,recent.md,recover.md}",
+    ".octon/generated/cognition/summaries/operators/octon-maintainers/mission-autonomy-live-validation.md",
+    ".octon/generated/effective/orchestration/missions/mission-autonomy-live-validation/scenario-resolution.yml",
+    ".octon/state/control/execution/missions/mission-autonomy-live-validation/mode-state.yml",
+    ".octon/generated/effective/capabilities/{artifact-map.yml,generation.lock.yml,routing.effective.yml}",
+    ".octon/generated/effective/extensions/{artifact-map.yml,catalog.effective.yml,generation.lock.yml}",
+    ".octon/state/control/extensions/{active.yml,quarantine.yml}",
+    ".octon/state/evidence/decisions/repo/capabilities/acp-decisions.jsonl",
+    ".octon/state/evidence/validation/assurance/effective/{active-weight-context.lock.yml,effective-weights.lock.yml}"
+  ],
+  "accepted_change_sets": [
+    {
+      "branch": "chore/input-taxonomy-validator-followup",
+      "landed_commit": "34b2540893bbbc116a4527cc9aac08358766f3f3",
+      "commit_subject": "chore(inputs): harden input taxonomy validators",
+      "source_paths": [
+        ".octon/framework/assurance/runtime/_ops/scripts/validate-bootstrap-authority-surfaces.sh",
+        ".octon/framework/assurance/runtime/_ops/scripts/validate-framework-core-boundary.sh",
+        ".octon/framework/assurance/runtime/_ops/scripts/validate-raw-input-dependency-ban.sh",
+        ".octon/framework/assurance/runtime/_ops/scripts/validate-runtime-effective-state.sh",
+        ".octon/framework/assurance/runtime/_ops/tests/test-packet8-template-scaffold.sh",
+        ".octon/framework/assurance/scripts/validate-authority-classification.sh",
+        ".octon/framework/capabilities/_meta/architecture/discovery.md",
+        ".octon/framework/capabilities/_meta/architecture/execution.md",
+        ".octon/framework/capabilities/practices/design-conventions.md",
+        ".octon/framework/capabilities/runtime/skills/_scaffold/template/SKILL.md",
+        ".octon/framework/orchestration/runtime/workflows/meta/migrate-harness/stages/02-structure-migration.md",
+        ".octon/framework/scaffolding/practices/prompts/audit-self-containment.md"
+      ],
+      "landing_branch_used": "chore/input-taxonomy-validator-followup"
+    },
+    {
+      "branch": "chore/preserve-input-migration-evidence",
+      "landing_branch_used": "chore/preserve-input-migration-evidence-closeout",
+      "landed_commit": "2a350a3e7622dd1be3d964a45515721061be15fb",
+      "commit_subject": "chore(evidence): preserve input migration receipts",
+      "source_paths": [
+        ".octon/state/evidence/migration/2026-05-19-incoming-intake-units-clean-break.md",
+        ".octon/state/evidence/migration/2026-05-20-incoming-intake-architecture-refinement.md",
+        ".octon/state/evidence/migration/2026-05-20-incoming-intake-hardening-follow-up.md",
+        ".octon/state/evidence/migration/2026-05-20-intake-taxonomy-hardening/**"
+      ]
+    },
+    {
+      "branch": "chore/preserve-rust-intake-prompt-evidence",
+      "landing_branch_used": "chore/preserve-rust-intake-prompt-evidence-closeout",
+      "landed_commit": "0429c925bdefef25f7f8359f2cb031a76613ae83",
+      "commit_subject": "chore(evidence): preserve rust intake prompt evidence",
+      "source_paths": [
+        ".octon/framework/scaffolding/practices/prompts/2026-05-19-rust-source-authority-intake-processing.prompt.md",
+        ".octon/state/evidence/runs/skills/refine-prompt/2026-05-19-downloaded-skill-pack-installation-workflow.md",
+        ".octon/state/evidence/runs/skills/refine-prompt/2026-05-19-rust-source-authority-install-review-update.md"
+      ]
+    }
+  ],
+  "validation_evidence": {
+    "input_taxonomy_validator_followup": [
+      "git diff --check HEAD^ HEAD",
+      "validate-bootstrap-authority-surfaces.sh: errors=0",
+      "validate-input-non-authority.sh: errors=0",
+      "validate-raw-input-dependency-ban.sh: errors=0",
+      "validate-harness-structure.sh: errors=0 warnings=0",
+      "test-packet8-template-scaffold.sh: pass",
+      "validate-runtime-effective-state.sh: errors=0",
+      "hosted exact-SHA checks passed: route_neutral_closeout_validation, route_aware_autonomy_validation, exact_source_sha_validation, branch_naming_validation",
+      "hosted no-PR landing fast-forwarded origin/main from 2cbd05b5cdb02becd59df3a2b8f8a76ce5ec4d08 to 34b2540893bbbc116a4527cc9aac08358766f3f3"
+    ],
+    "preserve_input_migration_evidence": [
+      "git diff --check HEAD^ HEAD",
+      "validate-input-non-authority.sh: errors=0",
+      "validate-input-archive-retention.sh: errors=0",
+      "validate-harness-structure.sh: errors=0 warnings=0",
+      "validate-non-authority-register.sh: errors=0",
+      "hosted exact-SHA checks passed: route_neutral_closeout_validation, route_aware_autonomy_validation, exact_source_sha_validation, branch_naming_validation",
+      "hosted no-PR landing fast-forwarded origin/main from 34b2540893bbbc116a4527cc9aac08358766f3f3 to 2a350a3e7622dd1be3d964a45515721061be15fb"
+    ],
+    "preserve_rust_intake_prompt_evidence": [
+      "git diff --check HEAD^ HEAD",
+      "validate-input-non-authority.sh: errors=0",
+      "validate-raw-input-dependency-ban.sh: errors=0",
+      "validate-harness-structure.sh: errors=0 warnings=0",
+      "hosted exact-SHA checks passed: route_neutral_closeout_validation, route_aware_autonomy_validation, exact_source_sha_validation, branch_naming_validation",
+      "hosted no-PR landing fast-forwarded origin/main from 2a350a3e7622dd1be3d964a45515721061be15fb to 0429c925bdefef25f7f8359f2cb031a76613ae83"
+    ]
+  },
+  "intentionally_retained_residue": [
+    "Tracked proposal packet/package terminology edits across alignment-check.sh, shared-foundation.md, audit workflow stages, proposal creation workflow stages, and proposal source-of-truth-map templates; ownership and lifecycle remain ambiguous.",
+    "Untracked state/control lifecycle-proposal-program run directories under .octon/state/control/execution/runs/**; retention status remains ambiguous.",
+    "Untracked analysis and effect-token validation evidence under .octon/state/evidence/validation/**; unrelated to the input cleanup and not proven disposable.",
+    "Ignored local/build residue; not part of the evidence-backed safe cleanup set."
+  ],
+  "integration_status": "Accepted change sets were landed on origin/main by hosted no-PR fast-forward/update before this receipt was created.",
+  "publication_status": "No extension publication, host projection regeneration, alignment profile, publisher, or migration script was run for this cleanup.",
+  "cleanup_status": "Safe stale generated/release/control residue was restored or removed only when backed by origin/main containment, superseding receipt evidence, or redundant tracked replacement. Ambiguous/user-owned residue was left untouched.",
+  "blockers": [
+    "A fully clean worktree is not evidence-backed because tracked proposal terminology edits, untracked lifecycle run-control records, and unrelated validation evidence remain ambiguous or user-owned."
+  ],
+  "rollback_or_discard_plan": [
+    "Revert 34b2540893bbbc116a4527cc9aac08358766f3f3 from main to roll back the input taxonomy validator follow-up.",
+    "Revert 2a350a3e7622dd1be3d964a45515721061be15fb from main to roll back the migration evidence preservation commit.",
+    "Revert 0429c925bdefef25f7f8359f2cb031a76613ae83 from main to roll back the rust intake prompt evidence preservation commit.",
+    "Use /private/tmp/octon-inputs-clean-break-pre-cleanup.diff and related snapshots to inspect pre-cleanup local residue if a discarded local item must be reviewed.",
+    "Do not reset, delete, or overwrite remaining ambiguous residue without a separate ownership and lifecycle decision."
+  ]
+}
