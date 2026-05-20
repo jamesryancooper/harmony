@@ -175,9 +175,26 @@ Exploratory proposal packets may inform review or promotion work, but they
 remain non-authoritative lineage until their content is promoted outside
 `inputs/**`.
 
+## Exploratory Inputs
+
+- human-led ideation: `inputs/exploratory/ideation/**`
+- manifest-governed proposal packets: `inputs/exploratory/proposals/**`
+- advisory planning artifacts: `inputs/exploratory/plans/*.md`
+- research synthesis outputs: `inputs/exploratory/syntheses/*.md`
+- non-authoritative multi-file reports: `inputs/exploratory/reports/<report-id>/**`
+
+Retired exploratory staging nouns have no compatibility aliases and are
+rejected by harness validators.
+
+Exploratory inputs may inform work, but they are not runtime, policy,
+generated, state/control, publication, retained evidence, or host-projection
+authority.
+
 ## Additive Inputs
 
-- raw pack input: `inputs/additive/extensions/<pack-id>/**`
+- incoming additive intake: `inputs/additive/.incoming/<intake-id>/**`
+- retained additive intake archive: `inputs/additive/.archive/<intake-id>/**`
+- normalized extension pack source: `inputs/additive/extensions/<pack-id>/**`
 - desired trust activation: `instance/extensions.yml`
 - actual active state: `state/control/extensions/active.yml`
 - quarantine state: `state/control/extensions/quarantine.yml`

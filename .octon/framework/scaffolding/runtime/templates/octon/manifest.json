@@ -33,8 +33,16 @@
         "instance/cognition/context/scopes",
         "instance/capabilities/runtime/commands",
         "instance/orchestration/missions",
+        "inputs/additive",
+        "inputs/additive/.incoming",
+        "inputs/additive/.archive",
         "inputs/additive/extensions",
-        "inputs/additive/extensions/.archive",
+        "inputs/exploratory",
+        "inputs/exploratory/proposals",
+        "inputs/exploratory/ideation",
+        "inputs/exploratory/plans",
+        "inputs/exploratory/syntheses",
+        "inputs/exploratory/reports",
         "instance/governance/policies",
         "instance/governance/contracts",
         "instance/execution-roles/runtime",
@@ -109,6 +117,10 @@
     "state/continuity/repo/entities.json": "Entity state tracking",
     "state/continuity/repo/next.md": "Immediate actionable steps",
     "state/continuity/scopes/README.md": "Scope continuity root; declared scopes get continuity scaffolds during locality publication",
-    "generated/proposals/registry.yml": "Generated proposal registry"
+    "generated/proposals/registry.yml": "Generated proposal registry",
+    "inputs/exploratory/README.md": "Exploratory raw-input taxonomy",
+    "inputs/exploratory/plans/README.md": "Advisory planning input contract",
+    "inputs/exploratory/syntheses/README.md": "Research synthesis input contract",
+    "inputs/exploratory/reports/README.md": "Multi-file report input contract"
   }
 }

@@ -50,9 +50,28 @@ Compiled locality publication and control surfaces live under:
 - `generated/effective/locality/artifact-map.yml`
 - `generated/effective/locality/generation.lock.yml`
 
-Raw additive extension inputs live only under:
+Incoming additive intake units live only under:
+
+- `inputs/additive/.incoming/<intake-id>/`
+
+Post-decision retained additive intake units live only under:
+
+- `inputs/additive/.archive/<intake-id>/`
+
+Normalized additive extension packs live only under:
 
 - `inputs/additive/extensions/<pack-id>/`
+
+Exploratory raw inputs are non-authoritative and use these surfaces:
+
+- `inputs/exploratory/ideation/**`
+- `inputs/exploratory/proposals/**`
+- `inputs/exploratory/plans/*.md`
+- `inputs/exploratory/syntheses/*.md`
+- `inputs/exploratory/reports/<report-id>/**`
+
+Retired exploratory staging nouns must remain absent and have no compatibility
+aliases.
 
 Overlay-capable repo authority is limited to declared enabled overlay points:
 

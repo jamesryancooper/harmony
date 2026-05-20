@@ -36,6 +36,15 @@ require_dir() {
   fi
 }
 
+forbid_path() {
+  local path="$1"
+  if [[ -e "$path" ]]; then
+    fail "obsolete path exists: ${path#$ROOT_DIR/}"
+  else
+    pass "obsolete path absent: ${path#$ROOT_DIR/}"
+  fi
+}
+
 echo "== Harness Structure Validation =="
 
 require_file "$OCTON_DIR/README.md"
@@ -46,6 +55,8 @@ require_dir "$OCTON_DIR/framework"
 require_dir "$OCTON_DIR/instance"
 require_dir "$OCTON_DIR/inputs"
 require_dir "$OCTON_DIR/inputs/additive"
+require_dir "$OCTON_DIR/inputs/additive/.incoming"
+require_dir "$OCTON_DIR/inputs/additive/.archive"
 require_dir "$OCTON_DIR/inputs/additive/extensions"
 require_dir "$OCTON_DIR/state"
 require_dir "$OCTON_DIR/generated"
@@ -164,6 +175,7 @@ require_file "$OCTON_DIR/framework/capabilities/packs/telemetry/manifest.yml"
 require_dir "$OCTON_DIR/framework/cognition"
 require_dir "$OCTON_DIR/framework/cognition/_meta/architecture/inputs/additive/extensions"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/inputs/additive/extensions/README.md"
+require_file "$OCTON_DIR/framework/cognition/_meta/architecture/inputs/additive/README.md"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/README.md"
 require_file "$OCTON_DIR/framework/cognition/_meta/architecture/inputs/additive/extensions/schemas/extension-pack.schema.json"
 require_dir "$OCTON_DIR/framework/cognition/_meta/architecture/instance/extensions"
@@ -215,6 +227,11 @@ require_dir "$OCTON_DIR/framework/engine/governance/extensions"
 require_file "$OCTON_DIR/framework/engine/governance/extensions/README.md"
 require_file "$OCTON_DIR/framework/engine/governance/extensions/boundary-contract.md"
 require_file "$OCTON_DIR/framework/engine/governance/extensions/trust-and-compatibility.md"
+require_dir "$OCTON_DIR/framework/engine/governance/inputs"
+require_dir "$OCTON_DIR/framework/engine/governance/inputs/additive"
+require_file "$OCTON_DIR/framework/engine/governance/inputs/additive/README.md"
+require_file "$OCTON_DIR/framework/engine/governance/inputs/additive/incoming-intake-processing.md"
+forbid_path "$OCTON_DIR/framework/engine/governance/extensions/incoming-intake-processing.md"
 require_dir "$OCTON_DIR/framework/engine/runtime/adapters"
 require_file "$OCTON_DIR/framework/engine/runtime/adapters/README.md"
 require_dir "$OCTON_DIR/framework/engine/runtime/adapters/host"
@@ -332,11 +349,17 @@ require_dir "$OCTON_DIR/instance/assurance/runtime"
 require_file "$OCTON_DIR/instance/assurance/runtime/README.md"
 
 require_dir "$OCTON_DIR/inputs/exploratory"
+require_file "$OCTON_DIR/inputs/exploratory/README.md"
 require_dir "$OCTON_DIR/inputs/exploratory/proposals"
 require_dir "$OCTON_DIR/inputs/exploratory/ideation"
 require_dir "$OCTON_DIR/inputs/exploratory/plans"
+require_file "$OCTON_DIR/inputs/exploratory/plans/README.md"
 require_dir "$OCTON_DIR/inputs/exploratory/syntheses"
+require_file "$OCTON_DIR/inputs/exploratory/syntheses/README.md"
 require_dir "$OCTON_DIR/inputs/exploratory/reports"
+require_file "$OCTON_DIR/inputs/exploratory/reports/README.md"
+forbid_path "$OCTON_DIR/inputs/exploratory/drafts"
+forbid_path "$OCTON_DIR/inputs/exploratory/packages"
 
 require_dir "$OCTON_DIR/state/continuity/repo"
 require_file "$OCTON_DIR/state/continuity/README.md"

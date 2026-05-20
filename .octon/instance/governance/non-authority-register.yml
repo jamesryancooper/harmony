@@ -119,7 +119,7 @@ entries:
     paths:
       - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/blocker-register.yml
       - .octon/state/evidence/disclosure/releases/2026-04-11-uec-bounded-recertified-complete/closure/traceability-matrix.yml
-    canonical_source_ref: .octon/inputs/exploratory/proposals/architecture/octon_bounded_uec_packet/traceability/01-master-closure-blocker-register.md
+    canonical_source_ref: .octon/inputs/exploratory/proposals/.archive/architecture/octon-bounded-uec-packet/traceability/01-master-closure-blocker-register.md
     authority_mode: derived-non-authority
     generation_or_projection_mechanism: retained release evidence derived from exploratory packet findings
     claim_adjacent: true
