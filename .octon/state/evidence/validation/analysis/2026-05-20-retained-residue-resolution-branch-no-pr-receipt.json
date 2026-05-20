@@ -1,0 +1,116 @@
+{
+  "schema_version": "change-receipt-v1",
+  "change_id": "retained-residue-resolution-2026-05-20",
+  "selected_route": "branch-no-pr",
+  "operator_requested_route": "branch-no-pr",
+  "target_lifecycle_outcome": "cleaned",
+  "lifecycle_outcome": "cleaned",
+  "outcome_intent": "attempt-cleaned-closeout",
+  "intent": "resolve retained local residue by preserving governed evidence and control records, removing safe ignored residue, and cleaning obsolete branches without opening a PR",
+  "scope": {
+    "summary": "Restored invalid local terminology residue, retained proposal closeout analysis evidence, retained effect-token validation evidence, retained lifecycle-program run-control records, removed safe ignored OS/build residue, synced local main, and cleaned contained source branches.",
+    "touched_paths": [
+      ".octon/state/evidence/validation/analysis/2026-05-18-lifecycle-residue-cleanup-route-change-receipt.json",
+      ".octon/state/evidence/validation/analysis/2026-05-18-promote-proposal.md",
+      ".octon/state/evidence/validation/proposals/effect-token-enforcement-coverage/**",
+      ".octon/state/control/execution/runs/lifecycle-proposal-program-1779030299251-bf643b7a/**",
+      ".octon/state/control/execution/runs/lifecycle-proposal-program-1779033717217-11c873b0/**",
+      ".octon/state/control/execution/runs/lifecycle-proposal-program-1779034770570-736311ce/**",
+      ".octon/state/control/execution/runs/lifecycle-proposal-program-1779065869245-b6edc43e/**",
+      ".octon/state/control/execution/runs/lifecycle-proposal-program-1779066111333-35e4c5f8/**",
+      ".octon/state/control/execution/runs/lifecycle-proposal-program-1779067158410-d1f799dc/**",
+      ".octon/state/control/execution/runs/lifecycle-proposal-program-1779132128064-c7c44009/**"
+    ],
+    "diff_refs": [
+      "c9ca15e3d0311563ffd87fd92d8e111f1ceb3801",
+      "58cfaf85e12a27645da0bc980d069d1c7155864f",
+      "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3"
+    ]
+  },
+  "source_branch_ref": "chore/retain-lifecycle-program-runs",
+  "target_branch_ref": "origin/main@3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+  "remote_branch_ref": "origin/chore/retain-lifecycle-program-runs@3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+  "hosted_landing": {
+    "remote": "origin",
+    "target_branch": "main",
+    "source_branch": "chore/retain-lifecycle-program-runs",
+    "source_ref": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "target_pre_ref": "58cfaf85e12a27645da0bc980d069d1c7155864f",
+    "target_post_ref": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "validated_ref": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "required_check_refs": [
+      "route_neutral_closeout_validation@3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+      "branch_naming_validation@3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+      "route_aware_autonomy_validation@3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+      "exact_source_sha_validation@3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3"
+    ],
+    "provider_ruleset_ref": "github-ruleset:target-route-neutral-main@live",
+    "push_refspec": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3:refs/heads/main",
+    "fast_forward_only": true
+  },
+  "landing_evaluation": {
+    "status": "succeeded",
+    "provider_ruleset_ref": "live gh api repos/jamesryancooper/octon/rules/branches/main",
+    "source_ref": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "target_ref": "origin/main@3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "evidence_refs": [
+      "hosted no-PR helper reported provider ruleset allows route-neutral updates for each landed source branch",
+      "hosted no-PR helper reported origin/main equals each landed ref after push"
+    ]
+  },
+  "landed_ref": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+  "main_alignment": {
+    "local_main_ref": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "origin_main_ref": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "landed_ref": "3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "aligned": true,
+    "verification_ref": "git rev-parse HEAD && git rev-parse main && git rev-parse origin/main"
+  },
+  "integration_method": "fast-forward",
+  "integration_status": "landed",
+  "publication_status": "hosted-main-updated",
+  "cleanup_status": "completed",
+  "cleanup_evidence_refs": [
+    "restored 23 invalid tracked terminology/validator-path edits to origin/main state",
+    "removed ignored .DS_Store OS metadata files",
+    "removed ignored .octon/generated/.tmp and .octon/framework/engine/runtime/crates/target build residue",
+    "cleaned local and remote branches chore/retain-analysis-evidence, chore/retain-effect-token-evidence, and chore/retain-lifecycle-program-runs after origin/main containment",
+    "cleaned local branches chore/inputs-clean-break and chore/record-input-residue-cleanup-receipt after origin/main containment"
+  ],
+  "source_branch_cleanup": {
+    "status": "completed",
+    "local_branch": "chore/retain-analysis-evidence; chore/retain-effect-token-evidence; chore/retain-lifecycle-program-runs; chore/inputs-clean-break; chore/record-input-residue-cleanup-receipt",
+    "remote_branch": "origin/chore/retain-analysis-evidence; origin/chore/retain-effect-token-evidence; origin/chore/retain-lifecycle-program-runs",
+    "evidence_refs": [
+      "git-branch-cleanup.sh output: origin/main containment verified for each branch",
+      "git-branch-cleanup.sh output: no open PR exists for each cleanup branch",
+      "git ls-remote --heads origin returned only refs/heads/main for checked branch names"
+    ]
+  },
+  "validation_evidence_refs": [
+    "jq empty .octon/state/evidence/validation/analysis/2026-05-18-lifecycle-residue-cleanup-route-change-receipt.json",
+    "git diff --cached --check for analysis evidence",
+    "git diff --cached --check for effect-token validation evidence after whitespace normalization",
+    "ruby YAML/NDJSON parse check for lifecycle-program run-control records",
+    "git diff --check after each preservation commit",
+    "GitHub exact-source-SHA checks passed for c9ca15e3d0311563ffd87fd92d8e111f1ceb3801",
+    "GitHub exact-source-SHA checks passed for 58cfaf85e12a27645da0bc980d069d1c7155864f",
+    "GitHub exact-source-SHA checks passed for 3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3"
+  ],
+  "review_waiver_refs": [
+    "operator requested branch-no-pr and explicitly prohibited PR creation"
+  ],
+  "durable_history": {
+    "kind": "commit",
+    "ref": "c9ca15e3d0311563ffd87fd92d8e111f1ceb3801;58cfaf85e12a27645da0bc980d069d1c7155864f;3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3",
+    "branch": "main"
+  },
+  "rollback_handle": {
+    "kind": "manual-instructions",
+    "ref": "revert 3771c89712d19f428d1fd2d15b0ac9cfd47c6ba3, then 58cfaf85e12a27645da0bc980d069d1c7155864f, then c9ca15e3d0311563ffd87fd92d8e111f1ceb3801 if rollback is required",
+    "instructions": "Rollback the retained residue preservation by reverting the three landed commits in reverse order. Removed ignored build residue is rebuildable; removed .DS_Store files are disposable OS metadata."
+  },
+  "closeout_outcome": "completed",
+  "remaining_blockers": [],
+  "created_at": "2026-05-20T00:00:00Z"
+}
